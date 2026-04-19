@@ -1,25 +1,14 @@
 <!DOCTYPE html>
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║  S&C PROGRAM PLATFORM — Dynamic Template (V5 Home)                          ║
+║  S&C PROGRAM PLATFORM — Dynamic Template                                    ║
 ║  Loads athlete data from JSON via URL parameter: ?client=athlete_id         ║
 ║                                                                              ║
 ║  DEPLOYMENT: GitHub Pages                                                    ║
 ║  USAGE:      amirardekani.com/program.html?client=john_doe                  ║
 ║  DATA:       /data/john_doe.json                                            ║
+║  SCHEMA:     see SCHEMA.md for the full JSON shape                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-OPTIONAL JSON FIELDS FOR ENHANCED HOME SCREEN:
-  currentProgram.cycleNumber, cycleName, cycleTagline, cycleWeeks
-  currentProgram.primaryFocus, secondaryFocus
-  currentProgram.whyThisMatters (array of paragraphs)
-  currentProgram.mentalCue (string)
-  currentProgram.whyThisMattersPart2 (array of paragraphs)
-  currentProgram.outcomes (array of strings)
-  currentProgram.nextCycleTeaser {cycleNumber, name, weeks, subtitle, paragraphs}
-  journey.cycles[] {num, name, tagline, weeks, status, primary, secondary}
-
-All are optional. Missing sections simply don't render.
 -->
 <html lang="en">
 <head>
@@ -170,10 +159,17 @@ All are optional. Missing sections simply don't render.
   }
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
+  /* 6-month goal / purpose — shown above the athlete name */
   .home-eyebrow {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-    color: #555; margin-bottom: 12px;
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--yellow);
+    background: var(--yellow-dim);
+    border: 1px solid var(--yellow-mid);
+    padding: 7px 14px; border-radius: 6px;
+    margin-bottom: 18px;
   }
 
   .home-name {
@@ -256,10 +252,17 @@ All are optional. Missing sections simply don't render.
     pointer-events: none;
   }
 
+  /* "CURRENT CYCLE · NOW" — highlighted pill */
   .cm-eyebrow {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--ice); margin-bottom: 10px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ice);
+    background: var(--ice-dim);
+    border: 1px solid var(--ice-mid);
+    padding: 5px 12px; border-radius: 6px;
+    margin-bottom: 14px;
   }
 
   .cm-header {
@@ -290,38 +293,27 @@ All are optional. Missing sections simply don't render.
     text-transform: uppercase;
   }
 
-  .focus-tracks {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  /* Flexible focus list — unlimited focuses, stacked vertically */
+  .focus-list {
+    display: flex; flex-direction: column; gap: 8px;
     margin-bottom: 20px;
   }
-  @media (max-width: 540px) { .focus-tracks { grid-template-columns: 1fr; } }
-
-  .focus-track {
+  .focus-list-item {
     background: var(--ice-dim);
-    border: 1px solid rgba(184,224,246,0.08);
-    border-radius: 10px; padding: 13px 15px;
-  }
-  .focus-track.secondary {
-    background: var(--purple-dim);
-    border-color: rgba(183,148,246,0.1);
-  }
-
-  .track-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-    margin-bottom: 5px; color: var(--ice);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .focus-track.secondary .track-label { color: var(--purple); }
-  .track-label::before {
-    content: ''; width: 4px; height: 4px;
-    border-radius: 50%; background: currentColor;
-  }
-
-  .track-text {
+    border: 1px solid rgba(184,224,246,0.12);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex; align-items: flex-start; gap: 10px;
     font-family: 'Barlow', sans-serif;
     font-size: 13.5px; color: #e8e8e8;
     line-height: 1.5; font-weight: 400;
+  }
+  .focus-list-item::before {
+    content: '';
+    width: 6px; height: 6px; margin-top: 7px;
+    border-radius: 50%;
+    background: var(--ice);
+    flex-shrink: 0;
   }
 
   .cm-body-label {
@@ -337,26 +329,6 @@ All are optional. Missing sections simply don't render.
     line-height: 1.75; font-weight: 300;
   }
   .cm-body p + p { margin-top: 12px; }
-
-  .mental-cue {
-    margin: 18px 0;
-    padding: 18px 22px;
-    background: var(--yellow-dim);
-    border-left: 3px solid var(--yellow);
-    border-radius: 4px;
-  }
-  .mental-cue-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--yellow); margin-bottom: 6px;
-  }
-  .mental-cue-text {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px; font-weight: 700;
-    color: #fff;
-    font-style: italic; letter-spacing: -0.3px;
-    line-height: 1.3;
-  }
 
   .outcomes-block {
     margin-top: 20px;
@@ -414,10 +386,17 @@ All are optional. Missing sections simply don't render.
     background: radial-gradient(circle, var(--purple-glow), transparent 70%);
     pointer-events: none;
   }
+  /* "COMING NEXT" — highlighted pill (purple to contrast with current) */
   .next-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--purple); margin-bottom: 6px; opacity: 0.85;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--purple);
+    background: var(--purple-dim);
+    border: 1px solid var(--purple-mid);
+    padding: 5px 12px; border-radius: 6px;
+    margin-bottom: 12px;
   }
   .next-title {
     font-family: 'Barlow Condensed', sans-serif;
@@ -619,10 +598,10 @@ All are optional. Missing sections simply don't render.
     border-radius: 8px;
   }
 
-  /* Bottom CTA row (replaces old buttons) */
+  /* Bottom CTA row — fixed so "Open Current Program" is always visible */
   .home-bottom-cta {
-    position: sticky;
-    bottom: 0;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
     background: rgba(10,10,10,0.95);
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid #222;
@@ -630,6 +609,9 @@ All are optional. Missing sections simply don't render.
     display: flex; gap: 10px;
     z-index: 40;
   }
+  /* Reserve space so content isn't hidden behind the fixed bar */
+  #screen-home { padding-bottom: 90px; }
+
   .home-cta {
     flex: 1; padding: 14px 20px; border-radius: 10px;
     font-family: 'Barlow Condensed', sans-serif;
@@ -640,11 +622,13 @@ All are optional. Missing sections simply don't render.
   }
   .cta-main { background: var(--yellow); color: #0A0A0A; }
   .cta-main:active { transform: scale(0.98); }
-  .cta-ghost {
-    background: none; color: #999;
-    border: 1px solid #222;
+  /* Notes button — highlighted in the design system's blue (ice) */
+  .cta-notes {
+    background: var(--ice-dim);
+    color: var(--ice);
+    border: 1px solid var(--ice-mid);
   }
-  .cta-ghost:active { border-color: var(--yellow); color: var(--yellow); }
+  .cta-notes:active { background: var(--ice-mid); transform: scale(0.98); }
 
   .home-history-list {
     padding: 0 24px 24px;
@@ -1128,7 +1112,7 @@ All are optional. Missing sections simply don't render.
   <!-- Bottom CTA -->
   <div class="home-bottom-cta">
     <button class="home-cta cta-main" onclick="goTo('program')">Open Current Program</button>
-    <button class="home-cta cta-ghost" onclick="goTo('notes')">Notes</button>
+    <button class="home-cta cta-notes" onclick="goTo('notes')">Notes</button>
   </div>
 
 </div>
@@ -1233,7 +1217,8 @@ let isLoading = true;
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
 
-  document.title = `${DATA.athlete.firstName} ${DATA.athlete.lastName} — Program ${DATA.currentProgram.number}`;
+  const _currentCycle = (DATA.cycles || [])[DATA.currentCycleIndex || 0];
+  document.title = `${DATA.athlete.firstName} ${DATA.athlete.lastName}${_currentCycle ? ' — ' + _currentCycle.name : ''}`;
 
   renderHome();
   renderProgram();
@@ -1260,126 +1245,104 @@ function showError(msg) {
 // ═══════════════════════════════════════════════════════════════════════
 function renderHome() {
   const a = DATA.athlete;
-  const p = DATA.currentProgram;
-  const hasCycleData = !!p.cycleName;
-  const hasJourney = !!(DATA.journey && DATA.journey.cycles && DATA.journey.cycles.length);
 
-  // ── Eyebrow & name
+  // ── New schema: cycles[] + currentCycleIndex (single source of truth)
+  const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
+  const idx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const current = cycles[idx];
+  const next = cycles[idx + 1];
+  const hasCycles = cycles.length > 0;
+
+  // Helper: derive a status label from the cycle's position relative to currentCycleIndex
+  const statusOf = i => {
+    if (i < idx) return 'completed';
+    if (i === idx) return 'active';
+    if (i === idx + 1) return 'next';
+    return 'locked';
+  };
+
+  // ── Eyebrow (the 6-month goal/purpose pill above the name)
   document.getElementById('home-eyebrow').textContent =
-    (DATA.sport.badge || 'Program') + (p.month ? ' · ' + p.month : '');
+    (DATA.sport && DATA.sport.badge) ? DATA.sport.badge : 'Program';
 
+  // ── Athlete name
   document.getElementById('home-name').innerHTML =
     `${esc(a.firstName)}<span>${esc(a.lastName)}</span>`;
 
-  // ── Meta (coach, focus, etc.)
-  let metaHtml = '';
-  if (DATA.coach?.name) metaHtml += `<strong>Coach</strong> ${esc(DATA.coach.name)}`;
-  if (p.focus) metaHtml += (metaHtml ? ' · ' : '') + `<strong>Focus</strong> ${esc(p.focus)}`;
-  document.getElementById('home-meta').innerHTML = metaHtml;
+  // ── Meta — coach line is built-in for all clients (no longer pulled from JSON)
+  document.getElementById('home-meta').innerHTML = `<strong>Coach:</strong> Amir Ardekani`;
 
-  // ── Cycle pill (only if cycle data exists)
-  if (hasCycleData) {
+  // ── Current cycle pill (only if there is a current cycle)
+  if (current) {
     document.getElementById('home-cycle-pill-wrap').innerHTML = `
       <span class="home-phase-chip">
         <span class="live-dot"></span>
-        ${p.cycleNumber ? 'Cycle ' + p.cycleNumber + ' — ' : ''}${esc(p.cycleName)}
+        ${current.num != null ? 'Cycle ' + current.num + ' — ' : ''}${esc(current.name)}
       </span>`;
   }
 
-  // ── Progress bar (only if journey exists)
-  if (hasJourney) {
-    const cycles = DATA.journey.cycles;
-    const completedCount = cycles.filter(c => c.status === 'completed').length;
-    const total = DATA.journey.totalCycles || cycles.length;
-    const activeIdx = cycles.findIndex(c => c.status === 'active');
-    const progressPct = activeIdx >= 0 ? ((activeIdx + 0.5) / total) * 100 : (completedCount / total) * 100;
+  // ── Progress bar + top nav pills (only if there are cycles)
+  if (hasCycles) {
+    const total = cycles.length;
+    const progressPct = ((idx + 0.5) / total) * 100;
     document.getElementById('home-progress-wrap').innerHTML = `
       <div class="home-progress">
         <div class="home-progress-bar">
           <div class="home-progress-fill" style="width: ${progressPct}%"></div>
         </div>
-        <div class="home-progress-label">${activeIdx >= 0 ? activeIdx + 1 : completedCount} of ${total} cycles</div>
+        <div class="home-progress-label">${idx + 1} of ${total} cycles</div>
       </div>`;
 
-    // Top pills
-    const pills = cycles.map(c => {
-      let cls = 'locked';
-      if (c.status === 'completed') cls = 'completed';
-      else if (c.status === 'active') cls = 'active';
-      else if (c.status === 'next') cls = 'next';
+    const pills = cycles.map((c, i) => {
+      const cls = statusOf(i);
       return `<div class="home-pill ${cls}" data-label="${esc(c.name)}" data-num="${c.num}"></div>`;
     }).join('');
     document.getElementById('homePills').innerHTML = pills;
   } else {
-    // Simple fallback meta rows if no journey
-    let simple = '<div class="home-simple-meta">';
-    if (p.month) simple += `<div class="home-simple-meta-row"><strong>Program</strong><span>${esc(p.month)}</span></div>`;
-    if (p.number) simple += `<div class="home-simple-meta-row"><strong>Number</strong><span>#${esc(p.number)}</span></div>`;
-    simple += '</div>';
-    document.getElementById('home-simple-meta-wrap').innerHTML = simple;
+    // Simple fallback for athletes without any cycles defined
+    const label = DATA.workouts && DATA.workouts.label;
+    if (label) {
+      document.getElementById('home-simple-meta-wrap').innerHTML = `
+        <div class="home-simple-meta">
+          <div class="home-simple-meta-row"><strong>Program</strong><span>${esc(label)}</span></div>
+        </div>`;
+    }
   }
 
-  // ── Current cycle message card (only if whyThisMatters exists)
-  if (hasCycleData && (p.whyThisMatters || p.primaryFocus || p.outcomes)) {
+  // ── Current cycle message card (renders if the current cycle has any rich content)
+  if (current && (current.message || (current.focuses && current.focuses.length))) {
     let html = `<div class="current-message">`;
     html += `<div class="cm-eyebrow">● CURRENT CYCLE · NOW</div>`;
     html += `<div class="cm-header">`;
-    html += `<div class="cm-title">${esc(p.cycleName)}</div>`;
-    if (p.cycleWeeks) html += `<div class="cm-weeks">${esc(p.cycleWeeks)}</div>`;
+    html += `<div class="cm-title">${esc(current.name)}</div>`;
+    if (current.weeks) html += `<div class="cm-weeks">${esc(current.weeks)}</div>`;
     html += `</div>`;
-    if (p.cycleTagline) html += `<div class="cm-subtitle">${esc(p.cycleTagline)}</div>`;
+    if (current.tagline) html += `<div class="cm-subtitle">${esc(current.tagline)}</div>`;
 
-    // Primary / Secondary focus
-    if (p.primaryFocus || p.secondaryFocus) {
-      html += `<div class="focus-tracks">`;
-      if (p.primaryFocus) html += `
-        <div class="focus-track primary">
-          <div class="track-label">Primary Focus</div>
-          <div class="track-text">${esc(p.primaryFocus)}</div>
-        </div>`;
-      if (p.secondaryFocus) html += `
-        <div class="focus-track secondary">
-          <div class="track-label">Secondary Focus</div>
-          <div class="track-text">${esc(p.secondaryFocus)}</div>
-        </div>`;
+    // Flexible focus list (unlimited)
+    if (Array.isArray(current.focuses) && current.focuses.length) {
+      html += `<div class="focus-list">`;
+      current.focuses.forEach(f => {
+        html += `<div class="focus-list-item">${esc(f)}</div>`;
+      });
       html += `</div>`;
     }
 
-    // Why this matters
-    if (p.whyThisMatters && p.whyThisMatters.length) {
+    const msg = current.message || {};
+
+    // Why this cycle matters — paragraphs
+    if (Array.isArray(msg.paragraphs) && msg.paragraphs.length) {
       html += `<div class="cm-body-label">Why This Cycle Matters</div>`;
       html += `<div class="cm-body">`;
-      p.whyThisMatters.forEach(para => { html += `<p>${esc(para)}</p>`; });
-      html += `</div>`;
-    }
-
-    // Mental cue
-    if (p.mentalCue) {
-      html += `
-        <div class="mental-cue">
-          <div class="mental-cue-label">Mental Cue — This Block</div>
-          <div class="mental-cue-text">"${esc(p.mentalCue)}"</div>
-        </div>`;
-    }
-
-    // Why this matters part 2
-    if (p.whyThisMattersPart2 && p.whyThisMattersPart2.length) {
-      html += `<div class="cm-body">`;
-      p.whyThisMattersPart2.forEach(para => { html += `<p>${esc(para)}</p>`; });
+      msg.paragraphs.forEach(para => { html += `<p>${esc(para)}</p>`; });
       html += `</div>`;
     }
 
     // Outcomes
-    if (p.outcomes && p.outcomes.length) {
+    if (Array.isArray(msg.outcomes) && msg.outcomes.length) {
       html += `<div class="outcomes-block">`;
-      let endLabel = 'Expected Outcomes';
-      if (p.cycleWeeks) {
-        const endWeekMatch = p.cycleWeeks.match(/(\d+)\s*$/);
-        if (endWeekMatch) endLabel += ' · By End of Week ' + endWeekMatch[1];
-      }
-      html += `<div class="outcomes-label">${esc(endLabel)}</div>`;
-      html += `<div class="outcomes-heading">You'll feel:</div>`;
-      p.outcomes.forEach(o => {
+      html += `<div class="outcomes-label">Expected outcomes after this cycle:</div>`;
+      msg.outcomes.forEach(o => {
         html += `<div class="outcome-item"><div class="outcome-check">✓</div><div class="outcome-text">${esc(o)}</div></div>`;
       });
       html += `</div>`;
@@ -1389,18 +1352,21 @@ function renderHome() {
     document.getElementById('current-message-wrap').innerHTML = html;
   }
 
-  // ── Next cycle teaser
-  if (p.nextCycleTeaser) {
-    const n = p.nextCycleTeaser;
+  // ── Next cycle teaser (uses the cycle right after the current one)
+  if (next) {
+    const teaser = next.teaser || {};
     let html = `<div class="next-card-wrap"><div class="next-card">`;
-    html += `<div class="next-label">COMING NEXT${n.cycleNumber ? ' · CYCLE ' + String(n.cycleNumber).padStart(2,'0') : ''}${n.weeks ? ' · ' + esc(n.weeks).toUpperCase() : ''}</div>`;
-    if (n.name) html += `<div class="next-title">${esc(n.name)}</div>`;
-    if (n.subtitle) html += `<div class="next-subtitle">${esc(n.subtitle)}</div>`;
-    if (n.paragraphs && n.paragraphs.length) {
+    const labelBits = ['COMING NEXT'];
+    if (next.num != null) labelBits.push('CYCLE ' + String(next.num).padStart(2, '0'));
+    if (next.weeks) labelBits.push(esc(next.weeks).toUpperCase());
+    html += `<div class="next-label">${labelBits.join(' · ')}</div>`;
+    if (next.name) html += `<div class="next-title">${esc(next.name)}</div>`;
+    if (teaser.subtitle) html += `<div class="next-subtitle">${esc(teaser.subtitle)}</div>`;
+    if (Array.isArray(teaser.paragraphs) && teaser.paragraphs.length) {
       html += `<div class="next-teaser">`;
-      n.paragraphs.forEach((para, i) => {
-        // Last paragraph wraps in em
-        if (i === n.paragraphs.length - 1 && n.paragraphs.length > 1) {
+      teaser.paragraphs.forEach((para, i) => {
+        // Last paragraph wraps in em (kept for visual consistency)
+        if (i === teaser.paragraphs.length - 1 && teaser.paragraphs.length > 1) {
           html += `<p><em>${esc(para)}</em></p>`;
         } else {
           html += `<p>${esc(para)}</p>`;
@@ -1412,25 +1378,31 @@ function renderHome() {
     document.getElementById('next-card-wrap').innerHTML = html;
   }
 
-  // ── Journey spine
-  if (hasJourney) {
-    let html = `<div class="section-header">All ${DATA.journey.cycles.length} Cycles — Tap to Explore</div>`;
+  // ── Remaining phases — everything after the next cycle
+  const remaining = cycles.slice(idx + 2);
+  if (remaining.length) {
+    let html = `<div class="section-header">Remaining Phases</div>`;
     html += `<div class="journey">`;
-    DATA.journey.cycles.forEach(c => {
-      const statusClass = `is-${c.status || 'locked'}`;
+    remaining.forEach((c, ri) => {
+      const realIndex = idx + 2 + ri;       // position in original cycles[]
+      const status = statusOf(realIndex);   // 'locked' or 'completed'
+      const statusClass = `is-${status}`;
 
       let badge = '';
-      if (c.status === 'active') badge = '<span class="phase-badge badge-active">NOW</span>';
-      else if (c.status === 'completed') badge = '<span class="phase-badge badge-completed">✓ DONE</span>';
-      else if (c.status === 'next') badge = '<span class="phase-badge badge-next">NEXT</span>';
+      if (status === 'completed') badge = '<span class="phase-badge badge-completed">✓ DONE</span>';
 
       let extra = '';
-      if (c.status === 'locked') extra = `<div class="locked-hint">🔒 This cycle unlocks when you arrive</div>`;
-      else if (c.status === 'next') extra = `<div class="locked-hint" style="border-color: var(--purple-mid); color: var(--purple);">◌ Preview — what you're building toward</div>`;
+      if (status === 'locked') extra = `<div class="locked-hint">🔒 This cycle unlocks when you arrive</div>`;
+
+      const focuses = Array.isArray(c.focuses) ? c.focuses : [];
+      const focusBlock = focuses.map(f => `
+        <div class="detail-focus">
+          <div class="detail-focus-text">${esc(f)}</div>
+        </div>`).join('');
 
       html += `
         <div class="phase-row ${statusClass}" data-phase="${c.num}">
-          <div class="phase-dot-wrap"><div class="phase-dot ${c.status || 'locked'}"></div></div>
+          <div class="phase-dot-wrap"><div class="phase-dot ${status}"></div></div>
           <div class="phase-content">
             <div class="phase-header">
               <div class="phase-big-num">${c.num}</div>
@@ -1443,18 +1415,9 @@ function renderHome() {
                 ${c.weeks ? `<div class="phase-weeks">${esc(c.weeks)}</div>` : ''}
               </div>
             </div>
-            ${(c.primary || c.secondary) ? `<div class="expand-hint"><span class="arrow">→</span> Tap to explore focus</div>` : ''}
+            ${focuses.length ? `<div class="expand-hint"><span class="arrow">→</span> Tap to explore focus</div>` : ''}
             <div class="phase-detail">
-              ${c.primary ? `
-                <div class="detail-focus primary">
-                  <div class="detail-focus-label">Primary Focus</div>
-                  <div class="detail-focus-text">${esc(c.primary)}</div>
-                </div>` : ''}
-              ${c.secondary ? `
-                <div class="detail-focus secondary">
-                  <div class="detail-focus-label">Secondary Focus</div>
-                  <div class="detail-focus-text">${esc(c.secondary)}</div>
-                </div>` : ''}
+              ${focusBlock}
               ${extra}
             </div>
           </div>
@@ -1471,13 +1434,9 @@ function renderHome() {
         if (!was) row.classList.add('expanded');
       });
     });
-
-    // Auto-expand the active cycle
-    const activeRow = document.querySelector('.phase-row.is-active');
-    if (activeRow) activeRow.classList.add('expanded');
   }
 
-  // ── History list (archives)
+  // ── Past programs (archives)
   if (DATA.programHistory && DATA.programHistory.length) {
     let html = `<div class="section-header" style="padding-left: 0;">Past Programs</div>`;
     DATA.programHistory.forEach(h => {
@@ -1496,14 +1455,14 @@ function renderHome() {
 //  3. RENDER: CURRENT PROGRAM (unchanged)
 // ═══════════════════════════════════════════════════════════════════════
 function renderProgram() {
-  const p = DATA.currentProgram;
+  const w = DATA.workouts || { days: [] };
   const a = DATA.athlete;
 
-  document.getElementById('prog-eyebrow').textContent = p.eyebrow || '';
+  document.getElementById('prog-eyebrow').textContent = w.label || '';
   document.getElementById('prog-subtitle').textContent =
-    `Designed for ${a.firstName} ${a.lastName} by ${DATA.coach.name}`;
+    `Designed for ${a.firstName} ${a.lastName} by Amir Ardekani`;
 
-  const days = p.days;
+  const days = w.days || [];
   dayTotals = {};
 
   const tabsHtml = days.map((day, i) => {
@@ -1694,7 +1653,7 @@ function goTo(screen, historyId) {
 }
 
 function switchDay(n) {
-  const dayIds = DATA.currentProgram.days.map(d => d.id);
+  const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => d.id);
   document.querySelectorAll('.day-tab').forEach((t, i) =>
     t.classList.toggle('active', dayIds[i] === n));
   document.querySelectorAll('.day-content').forEach((d, i) =>
@@ -1748,7 +1707,7 @@ function confirmSession(day) {
 function markSuggestedDay() {
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('suggested'));
   const tabs = document.querySelectorAll('.day-tab');
-  const dayIds = DATA.currentProgram.days.map(d => String(d.id));
+  const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
   for (let i = 0; i < dayIds.length; i++) {
     if (!localStorage.getItem(ATHLETE_ID + '_completed_d' + dayIds[i])) {
       tabs[i]?.classList.add('suggested');
