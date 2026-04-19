@@ -641,34 +641,6 @@
   /* When all 3 buttons are visible, tighten padding so labels fit on small screens */
   .home-bottom-cta.has-three .home-cta { padding: 14px 8px; font-size: 13px; letter-spacing: 0.5px; }
 
-  .home-history-list {
-    padding: 0 24px 24px;
-  }
-  .home-history-item {
-    display: flex; align-items: center; gap: 12px;
-    background: #141414;
-    border: 1px solid #222;
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .home-history-item:hover { border-color: var(--yellow-mid); }
-  .home-history-icon {
-    color: var(--yellow); opacity: 0.5;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-  }
-  .home-history-label {
-    flex: 1;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-size: 14px;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: #ccc;
-  }
-  .home-history-arrow { color: #666; }
-
   /* Fallback simple intro for JSONs with no cycle data */
   .home-simple-meta {
     display: flex; flex-direction: column; gap: 6px;
@@ -1117,9 +1089,6 @@
   <!-- Journey spine (optional) -->
   <div id="journey-wrap"></div>
 
-  <!-- History list (fallback) -->
-  <div id="home-history" class="home-history-list"></div>
-
   <!-- Bottom CTA — the "Past Programs" button is only shown when the athlete has programHistory -->
   <div class="home-bottom-cta" id="home-bottom-cta">
     <button class="home-cta cta-main" onclick="goTo('program')">Current Program</button>
@@ -1449,20 +1418,8 @@ function renderHome() {
     });
   }
 
-  // ── Past programs (archives)
+  // ── Past programs (archives) — reveal the "Past Programs" button in the bottom CTA bar
   if (DATA.programHistory && DATA.programHistory.length) {
-    let html = `<div class="section-header" style="padding-left: 0;">Past Programs</div>`;
-    DATA.programHistory.forEach(h => {
-      html += `
-        <div class="home-history-item" onclick="goTo('archive','${esc(h.id)}')">
-          <span class="home-history-icon">◰</span>
-          <span class="home-history-label">${esc(h.label)}</span>
-          <span class="home-history-arrow">→</span>
-        </div>`;
-    });
-    document.getElementById('home-history').innerHTML = html;
-
-    // Reveal the "Past Programs" button in the bottom CTA bar + compact the 3-button layout
     const pastBtn = document.getElementById('cta-past-programs');
     if (pastBtn) pastBtn.style.display = '';
     document.getElementById('home-bottom-cta').classList.add('has-three');
