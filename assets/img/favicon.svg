@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AA monogram">
+  <rect width="64" height="64" rx="12" fill="#0A0A0A"/>
+  <path d="M2 2 L12 2 L12 6 L6 6 L6 12 L2 12 Z" fill="#D4FF00" opacity="0.9"/>
+  <text x="32" y="44" text-anchor="middle"
+        font-family="'Barlow Condensed','Impact','Arial Black',sans-serif"
+        font-weight="900" font-size="34" fill="#D4FF00" letter-spacing="-3">AA</text>
+</svg>

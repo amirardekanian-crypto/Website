@@ -1,0 +1,250 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   BASE — resets, typography, containers, utility classes.
+   Depends on tokens.css.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+a  { color: inherit; text-decoration: none; }
+img, svg, video { display: block; max-width: 100%; }
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+button { background: none; border: none; cursor: pointer; }
+
+ul, ol { list-style: none; }
+
+/* ── Film-grain overlay (opt-in on <body class="grain">) ── */
+body.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* ═══ Container ═══ */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+/* ═══ Typography ═══ */
+.h-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+.h-display em { font-style: normal; color: var(--accent); }
+
+.h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(46px, 8vw, 86px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.h1 em { font-style: normal; color: var(--accent); }
+
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.h2 em { font-style: normal; color: var(--accent); }
+
+.h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lead {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.body-sm {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.eyebrow::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: currentColor;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.section-label::before {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: currentColor;
+}
+
+/* ═══ Section rhythm ═══ */
+section { padding: 100px 0; position: relative; }
+@media (max-width: 768px) {
+  section { padding: 72px 0; }
+  :root { --container-pad: 22px; }
+}
+
+/* ═══ Buttons ═══ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 32px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--dur-fast), box-shadow var(--dur), background var(--dur), color var(--dur);
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.btn-primary:hover { box-shadow: var(--shadow-glow); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 16px 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+}
+.btn-ghost:hover { color: var(--accent); transform: none; }
+
+.btn .arrow-r { transition: transform var(--dur); }
+.btn:hover .arrow-r { transform: translateX(3px); }
+
+/* ═══ Reveal on scroll ═══ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+.reveal-d4 { transition-delay: 0.32s; }
+.reveal-d5 { transition-delay: 0.40s; }
+.reveal-d6 { transition-delay: 0.48s; }
+
+/* ═══ Focus ═══ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ═══ Screen reader only ═══ */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ═══ Skip-to-content ═══ */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 12px;
+  z-index: var(--z-modal);
+  transition: top var(--dur);
+}
+.skip-link:focus { top: 8px; }

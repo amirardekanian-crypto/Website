@@ -1,0 +1,802 @@
+{
+  "athlete": {
+    "id": "pooya_pasandideh",
+    "firstName": "Pooya",
+    "lastName": "Pasandideh"
+  },
+  "coach": {
+    "name": "Amir"
+  },
+  "sport": {
+    "badge": "🏋️ General Fitness — Body Recomposition"
+  },
+  "currentProgram": {
+    "number": 1,
+    "eyebrow": "CYCLE 1 · FOUNDATION FORGE",
+    "month": "Weeks 1–5",
+    "focus": "Hypertrophy-driven body recomposition with progressive core development and shoulder-safe programming",
+    "cycleNumber": 1,
+    "cycleName": "FOUNDATION FORGE",
+    "cycleTagline": "BUILD THE ENGINE",
+    "cycleWeeks": "Weeks 1–5",
+    "primaryFocus": "Develop baseline strength across all major compound lifts while progressively loading the core with intention and control.",
+    "secondaryFocus": "Ingrain high-quality movement patterns, lock in consistent training habits, and initiate a sustainable caloric deficit without sacrificing performance.",
+    "whyThisMatters": [
+      "This cycle sets the ceiling for everything that follows. The strength, stability, and habits you build here determine how much volume, density, and intensity your body can tolerate later.",
+      "Your joints, connective tissue, and nervous system are adapting to structured compound loading while your core is learning to handle real demands — not cosmetic work, but load-bearing function."
+    ],
+    
+    "mentalCue": "Own every rep. Earn the right to progress.",
+
+    "whyThisMattersPart2": [
+      "This is not the phase to chase visible abs or burn yourself into the ground. Strength comes first. Movement quality comes first.",
+      "Controlled eccentrics, honest RPEs, and zero junk volume are non-negotiable. The discipline you show here compounds later."
+    ],
+
+    "outcomes": [
+      "Noticeable strength increases in squat, hinge, press, and row patterns",
+      "Improved trunk stability and confidence under load",
+      "Established training consistency and momentum across four sessions per week",
+      "Clear progress in foundational lifts despite operating in a caloric deficit"
+    ],
+
+    "nextCycleTeaser": {
+      "cycleNumber": 2,
+      "name": "VOLUME ENGINE",
+      "weeks": "Weeks 6–10",
+      "subtitle": "The foundation stays. The workload explodes.",
+      "paragraphs": [
+        "Cycle 2 transforms your strength base into visible muscle through higher training density and significantly increased hypertrophy volume.",
+        "Rest periods shorten, weekly sets per muscle climb, and sessions demand sustained output rather than isolated effort.",
+        "Core training evolves from simple loading into weighted and hanging variations, while structured conditioning blocks accelerate fat loss without eroding muscle.",
+        "Complete this cycle as written and progress your loads. What follows rewards those who built properly — and finished everything."
+      ]
+    },
+
+
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Upper Body — Strength Emphasis",
+        "completionTitle": "Upper Body Locked In",
+        "completionMessage": "Strength foundations set. Every press balanced by a pull, every rep owned with tempo. This is where the engine gets built.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Band Pull-Apart",
+                "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc",
+                "chips": [
+                  { "label": "2 Sets", "style": "dark" },
+                  { "label": "15 Reps", "style": "dark" },
+                  { "label": "Tempo 2-1-1-0", "style": "dark" },
+                  { "label": "RPE 5", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Hands finish wide, thumbs pointing behind you", "Feel the squeeze between the shoulder blades"],
+                  "bad": ["Shrugging the traps up toward the ears"]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Dead Hang",
+                "videoUrl": "https://www.youtube.com/watch?v=0Bx_Ap7-EwU",
+                "chips": [
+                  { "label": "2 Sets", "style": "dark" },
+                  { "label": "20s Hold", "style": "dark" },
+                  { "label": "RPE 4", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Shoulders drop away from the ears, body hangs long", "Feel the lats stretch and the spine decompress"],
+                  "bad": ["Bending the elbows or swinging"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary Strength",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Bench Press",
+                "videoUrl": "https://www.youtube.com/watch?v=CjHIKDQ4RQo",
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6-8 Reps" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Bar path finishes directly over the shoulder joint", "Feel the chest stretch at the bottom, drive through the palms"],
+                  "bad": ["Flaring the elbows beyond 45 degrees from the torso"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": "https://www.youtube.com/watch?v=0-DXJiceG-0",
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Elbows drive past the ribcage, dumbbells finish beside the hip", "Feel the mid-back muscles contract hard at the top"],
+                  "bad": ["Jerking the weight up with momentum or shrugging"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Incline Dumbbell Press",
+                "videoUrl": "https://www.youtube.com/watch?v=jMQA3XtJSgo",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Dumbbells travel in a slight arc, finishing over the upper chest", "Feel the stretch across the upper pec at the bottom of each rep"],
+                  "bad": ["Setting the incline too steep — this shifts load onto the anterior deltoid"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": "https://www.youtube.com/watch?v=0Po47vvj9g4",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Hands finish beside the ears, rope splits wide", "Feel the rear delts and external rotators contract"],
+                  "bad": ["Pulling with the biceps or leaning backward excessively"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Rollout",
+                "videoUrl": "https://www.youtube.com/watch?v=6pTAoXD2X6c",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 3-0-2-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Bar rolls out until arms are extended, body stays in one rigid line", "Feel the deep abdominals brace against the stretch"],
+                  "bad": ["Letting the lower back sag or arch at full extension"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Band Pallof Press",
+                "videoUrl": "https://www.youtube.com/watch?v=HXrLaqNIkTs",
+                "hasRest": true,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "Tempo 2-2-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Arms extend straight out, hips and shoulders stay square", "Feel the obliques resist the cable's pull"],
+                  "bad": ["Rotating the torso toward the cable stack"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Lower Body — Strength Emphasis",
+        "completionTitle": "Lower Body Conquered",
+        "completionMessage": "Heavy legs done. The squats and hinges you just ground through are the biggest metabolic drivers in this programme. That is where the fat loss lives.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Banded Glute Bridge",
+                "videoUrl": "https://www.youtube.com/watch?v=GaxOodE1Irk",
+                "chips": [
+                  { "label": "2 Sets", "style": "dark" },
+                  { "label": "15 Reps", "style": "dark" },
+                  { "label": "Tempo 2-2-1-0", "style": "dark" },
+                  { "label": "RPE 5", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Hips rise until the body forms a straight line from knees to shoulders", "Feel the glutes squeeze hard at the top, not the lower back"],
+                  "bad": ["Hyperextending the lumbar spine at lockout"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary Strength",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Back Squat",
+                "videoUrl": "https://www.youtube.com/watch?v=rrJIyZGlK8c",
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6-8 Reps" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Hips and knees break together, chest stays tall, depth reaches parallel or below", "Feel the quads load on the way down and the glutes drive at the bottom"],
+                  "bad": ["Knees caving inward on the ascent"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Barbell Romanian Deadlift",
+                "videoUrl": "https://www.youtube.com/watch?v=bT5OOBgY4bc",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Bar stays in contact with the legs, hips push straight back", "Feel a deep stretch through the hamstrings at the bottom"],
+                  "bad": ["Rounding the upper back or bending the knees excessively"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": "https://www.youtube.com/watch?v=p5dCqF7wWUw",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Feet shoulder-width apart on the platform, knees track over toes", "Feel the quads working through the full range"],
+                  "bad": ["Letting the lower back lift off the pad at the bottom"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Lying Leg Curl",
+                "videoUrl": "https://www.youtube.com/watch?v=SbSNUXPRkc8",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Hips stay pressed into the pad, heels pull toward the glutes", "Feel the hamstrings contract from the knee up toward the hip"],
+                  "bad": ["Lifting the hips off the pad to cheat the weight up"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core + Finisher",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Hanging Knee Raise",
+                "videoUrl": "https://www.youtube.com/watch?v=ACnl_apRkqU",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Knees rise above hip height, body stays still from the shoulders up", "Feel the lower abdominals curl the pelvis upward"],
+                  "bad": ["Swinging or using momentum to lift the knees"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Kettlebell Swing",
+                "videoUrl": "https://www.youtube.com/watch?v=1FjAoO5McVI",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Explosive" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Bell reaches chest height, arms are relaxed, hips snap forward", "Feel the glutes and hamstrings drive the bell — not the arms"],
+                  "bad": ["Squatting the swing or pulling with the shoulders"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Upper Body — Hypertrophy Emphasis",
+        "completionTitle": "Volume Delivered",
+        "completionMessage": "High-rep upper body work done. The muscle has to grow before it can be revealed. Every set today pushed you closer to both.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Band External Rotation",
+                "videoUrl": "https://www.youtube.com/shorts/FeCio_IImxc",
+                "chips": [
+                  { "label": "2 Sets", "style": "dark" },
+                  { "label": "12 Each Arm", "style": "dark" },
+                  { "label": "Tempo 2-1-2-0", "style": "dark" },
+                  { "label": "RPE 5", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Forearm rotates outward while the elbow stays pinned to the ribs", "Feel the deep rotator cuff muscles behind the shoulder working"],
+                  "bad": ["Letting the elbow drift away from the body"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Assisted Pull-Up",
+                "videoUrl": "https://www.youtube.com/watch?v=BOqrRMjxkj8",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Chin clears the bar, chest lifts toward it", "Feel the lats pull the elbows down and back"],
+                  "bad": ["Kipping or using excessive body swing"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Dumbbell Overhead Press",
+                "videoUrl": "https://www.youtube.com/watch?v=TsduLWuhlFM",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Dumbbells press up in a slight arc, finishing over the shoulders", "Feel the deltoids contract from the shoulder cap outward"],
+                  "bad": ["Arching the lower back excessively to compensate for heavy weight"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Chest Fly (Low-to-High)",
+                "videoUrl": "https://www.youtube.com/watch?v=8bAUxZlIR38",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Hands meet at chest height with a slight bend in the elbows throughout", "Feel the pec fibres shorten as the arms come together"],
+                  "bad": ["Bending the elbows more as the weight gets heavy"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Arm Cable Row",
+                "videoUrl": "https://www.youtube.com/watch?v=_HuCbiiHGk0",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Each Arm" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbow drives straight back, torso stays square to the machine", "Feel the lat and mid-back on the working side do the pulling"],
+                  "bad": ["Rotating the torso to create momentum"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Lateral Raise",
+                "videoUrl": "https://www.youtube.com/watch?v=8aUc9snLOxU",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Arms rise to shoulder height, slight forward lean of the torso", "Feel the middle deltoid lift the weight, not the traps"],
+                  "bad": ["Shrugging the shoulders or swinging the dumbbells"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Arms",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Hammer Curl",
+                "videoUrl": "https://www.youtube.com/watch?v=RIEMoYL_h1Y",
+                "hasRest": true,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Palms face each other throughout, elbows stay fixed at the sides", "Feel the brachioradialis and outer bicep contract"],
+                  "bad": ["Swinging the body or moving the elbows forward"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Tricep Pushdown",
+                "videoUrl": "https://www.youtube.com/watch?v=LXkCrxn3caQ",
+                "hasRest": true,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Rope splits at the bottom, arms fully extend", "Feel the triceps lock out the elbow completely"],
+                  "bad": ["Leaning over the cable or flaring the elbows out"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Bench Crunch",
+                "videoUrl": "https://www.youtube.com/watch?v=RVrBJAPo868",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Elbows drive toward the knees, the spine rounds deliberately", "Feel the rectus abdominis shorten from the ribcage down"],
+                  "bad": ["Pulling with the arms or sitting back onto the heels"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Lower Body — Hypertrophy + Metabolic",
+        "completionTitle": "Full Week Complete",
+        "completionMessage": "Four sessions down. Lower body built, energy torched, core hammered. You earned your rest days — recover hard and come back stronger.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bodyweight Reverse Lunge",
+                "videoUrl": "https://www.youtube.com/watch?v=xrPteyQLGAo",
+                "chips": [
+                  { "label": "2 Sets", "style": "dark" },
+                  { "label": "8 Each Leg", "style": "dark" },
+                  { "label": "Tempo 2-0-1-0", "style": "dark" },
+                  { "label": "RPE 4", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Back knee lowers toward the floor, front shin stays vertical", "Feel the front-leg glute and quad load each rep"],
+                  "bad": ["Letting the torso collapse forward"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Conventional Deadlift",
+                "videoUrl": "https://www.youtube.com/watch?v=1QIvuYWqo6w",
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6-8 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Bar stays tight to the body, hips and shoulders rise at the same rate", "Feel the whole posterior chain — glutes, hamstrings, back — work as one unit"],
+                  "bad": ["Letting the hips shoot up faster than the chest off the floor"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Split Squat",
+                "videoUrl": "https://www.youtube.com/watch?v=Wcmg-3iHwjQ",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Each Leg" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Front knee tracks over the toe, rear foot rests lightly on the bench", "Feel the front-leg quad and glute do all the work"],
+                  "bad": ["Pushing off the back foot or leaning excessively forward"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": "https://www.youtube.com/watch?v=4ZDm5EbiFI8",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Shin pad reaches full knee extension at the top", "Feel the quad — especially just above the kneecap — contract hard"],
+                  "bad": ["Using momentum to swing the weight up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Machine Calf Raise",
+                "videoUrl": "https://www.youtube.com/watch?v=g_E7_q1z2bo",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Heels drop below the platform, then rise as high as possible", "Feel the calf muscles shorten fully at the top"],
+                  "bad": ["Bouncing at the bottom without pausing"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Hanging Leg Raise",
+                "videoUrl": "https://www.youtube.com/watch?v=Yrtvs-nEnk0",
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 8" },
+                  { "label": "Priority", "style": "yellow" }
+                ],
+                "cues": {
+                  "good": ["Legs rise to at least parallel, body stays still above the waist", "Feel the lower abs curl the pelvis upward under control"],
+                  "bad": ["Swinging or using hip flexor momentum to get the legs up"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Metabolic Finisher",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Slam & Carry Circuit",
+                "videoUrl": "https://www.youtube.com/watch?v=8OtwXwrJizk",
+                "rounds": "×4 Rounds",
+                "items": [
+                  {
+                    "name": "Medicine Ball Slam",
+                    "detail": "10 Reps · Explosive · RPE 9",
+                    "cues": {
+                      "good": ["Ball reaches full overhead, then slams into the floor with maximum force", "Feel the core contract violently as the ball accelerates down"],
+                      "bad": ["Bending only at the waist — use the whole body, hips included"]
+                    }
+                  },
+                  {
+                    "name": "Dumbbell Farmer's Walk",
+                    "detail": "30m · Controlled · RPE 8 · 30s Rest",
+                    "cues": {
+                      "good": ["Tall posture, shoulders packed down, no leaning to either side", "Feel the grip, core, and upper back working to stabilise the load"],
+                      "bad": ["Letting the shoulders round forward or the head drop"]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+"__JOURNEY_FIELD": "OPTIONAL — omit entire 'journey' object to hide the cycles spine timeline on home",
+"journey": {
+  "totalCycles": 5,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "FOUNDATION FORGE",
+      "tagline": "Build the Engine",
+      "weeks": "Weeks 1–5",
+      "status": "active",
+      "primary": "Build baseline strength in compound lifts and establish progressive core overload.",
+      "secondary": "Ingrain movement quality, lock in consistent training habits, and initiate a sustainable caloric deficit."
+    },
+    {
+      "num": 2,
+      "name": "VOLUME ENGINE",
+      "tagline": "Force the Adaptation",
+      "weeks": "Weeks 6–10",
+      "status": "next",
+      "primary": "Increase hypertrophy volume per muscle group through higher training density and shorter rest periods.",
+      "secondary": "Advance core loading to weighted and hanging variations while introducing structured conditioning blocks."
+    },
+    {
+      "num": 3,
+      "name": "METABOLIC OVERRIDE",
+      "tagline": "Burn Without Breakdown",
+      "weeks": "Weeks 11–16",
+      "status": "locked",
+      "primary": "Maximise energy expenditure through high-density supersets and circuit-based resistance training while preserving muscle.",
+      "secondary": "Peak direct abdominal volume and introduce advanced anti-extension and trunk control progressions."
+    },
+    {
+      "num": 4,
+      "name": "STRENGTH RECLAIM",
+      "tagline": "Hold the Line",
+      "weeks": "Weeks 17–21",
+      "status": "locked",
+      "primary": "Restore and surpass early-cycle strength levels with reduced volume and higher intensity to protect lean mass.",
+      "secondary": "Reduce conditioning volume and refine muscular detail through isolation and contraction-focused work."
+    },
+    {
+      "num": 5,
+      "name": "THE REVEAL",
+      "tagline": "Maintain What You Earned",
+      "weeks": "Weeks 22–26",
+      "status": "locked",
+      "primary": "Maintain peak strength while reducing fatigue and bringing body composition to target condition.",
+      "secondary": "Transition to maintenance intake and stress-test the physique, habits, and systems that sustain long-term results."
+    }
+  ]
+ },
+
+  "programHistory": [],
+  "notes": {
+    "greeting": "For You, Pooya",
+    "cards": [
+      {
+        "icon": "🦷",
+        "title": "Your Job Is Working Against You — Manage It",
+        "body": "Dentistry locks you into sustained forward-head, rounded-shoulder posture for hours each day. This programme deliberately counters that with dead hangs, face pulls, band pull-aparts, and external rotations — but those only work if you treat them with the same intention as your main lifts. On clinic days, try to reset your posture every 60 minutes: stand, retract your shoulder blades, and take five deep breaths with your arms at your sides."
+      },
+      {
+        "icon": "🍗",
+        "title": "Protein Is the Non-Negotiable — Hit 160g Minimum",
+        "body": "At 86 kg with a recomposition goal, you need at least 1.8–2.0 g/kg of protein daily — that is 155–170 g as a floor. This is the single dietary variable that most directly determines whether you lose fat while keeping muscle. Spread intake across four meals. If your current diet is not structured around protein targets, start by tracking protein alone for two weeks before worrying about total calories."
+      },
+      {
+        "icon": "😴",
+        "title": "Protect Your 7–8 Hours",
+        "body": "Your sleep quality score of 7 and 7–8 hours duration are solid — do not let this slip as training intensity increases. Growth hormone release and muscle protein synthesis peak during deep sleep. If your stress pushes sleep below 7 hours consistently, reduce session RPE by one point that week rather than grinding through fatigue. Underrecovered training is worse than slightly easier training."
+      },
+      {
+        "icon": "🎯",
+        "title": "RPE Honesty Makes or Breaks This Block",
+        "body": "An RPE 8 means two reps left in the tank, genuinely. If you are reaching failure on sets prescribed at RPE 7–8, the load is too heavy and you are accumulating fatigue that will compromise the next session. Start conservative in Week 1. The tempo prescriptions in this block — 3-second eccentrics on most compounds — will make moderate loads feel significantly harder than you expect."
+      },
+      {
+        "icon": "🧱",
+        "title": "Core Training Is Programmed — Do Not Add More",
+        "body": "This block includes four dedicated core segments per week across anti-extension, anti-rotation, loaded flexion, and hanging work. That is a high dose. Do not add extra ab work on rest days or at the end of sessions — more volume does not accelerate ab visibility, and excessive core fatigue will compromise your squat and deadlift bracing. The abs will grow from this stimulus. The fat covering them will reduce from the deficit."
+      },
+      {
+        "icon": "📓",
+        "title": "Log Every Session — You Will Need the Data",
+        "body": "Starting in Cycle 2, your loads and rep targets will be prescribed relative to what you achieved in this block. If you do not log your working weights and actual reps completed, you will be guessing. Use any app or a notebook, but record at minimum: exercise, weight, reps per set, and how the RPE actually felt. This log becomes the blueprint for every cycle that follows."
+      },
+      {
+        "icon": "⚖️",
+        "title": "Weekly Weigh-In Protocol",
+        "body": "Weigh yourself every morning after waking and using the bathroom, then average the seven readings at the end of each week. You are looking for the weekly average to trend downward by 0.3–0.5 kg per week over this block. If it drops faster, you are likely in too steep a deficit. If it does not move at all over three consecutive weeks, reduce daily intake by 200 kcal."
+      }
+    ]
+  }
+}

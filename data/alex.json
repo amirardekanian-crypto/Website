@@ -1,0 +1,192 @@
+{
+  "_comment": "=============================================================",
+  "_comment_2": "SAMPLE ATHLETE JSON with all OPTIONAL cycle/journey fields.",
+  "_comment_3": "Any field marked 'OPTIONAL' can be omitted — the home page",
+  "_comment_4": "will gracefully hide that section if the field is missing.",
+  "_comment_5": "=============================================================",
+
+  "athlete": {
+    "id": "alex_fernandez",
+    "firstName": "Alex",
+    "lastName": "Fernandez"
+  },
+
+  "coach": {
+    "name": "Amirhossein Ardekani"
+  },
+
+  "sport": {
+    "badge": "Hybrid · Half Marathon"
+  },
+
+  "currentProgram": {
+    "number": "01",
+    "month": "Jan — Feb 2026",
+    "focus": "Foundation & Movement Quality",
+    "eyebrow": "CYCLE 1 · FOUNDATION FORGE",
+
+    "__OPTIONAL_CYCLE_FIELDS": "Everything below is optional. Omit any field to hide its section on home screen.",
+    "cycleNumber": 1,
+    "cycleName": "FOUNDATION FORGE",
+    "cycleTagline": "BUILD THE PLATFORM",
+    "cycleWeeks": "Weeks 1–5",
+    "primaryFocus": "Build foundational movement quality and neuromuscular efficiency across all major patterns.",
+    "secondaryFocus": "Establish aerobic base and running consistency toward half marathon preparation.",
+
+    "whyThisMatters": [
+      "This is where everything starts — and it matters more than any other phase. Foundation Forge isn't about pushing limits. It's about building the platform every future result will stand on.",
+      "Your nervous system is learning to recruit muscle efficiently for the first time under structured load. Your joints, tendons, and connective tissue are adapting to patterns they haven't been asked to perform before. Your aerobic engine is being tuned to carry you further than your current 1–2 days of cardio ever could."
+    ],
+
+    "mentalCue": "Precision over intensity.",
+
+    "whyThisMattersPart2": [
+      "The temptation will be to go heavier, faster, or harder than prescribed. Resist it. The tempo, the RPE caps, the movement cues — these are the programme."
+    ],
+
+    "outcomes": [
+      "Notably stronger in your squat and hinge patterns",
+      "More stable through your core during running",
+      "Ready to run continuously for 30+ minutes without stopping"
+    ],
+
+    "nextCycleTeaser": {
+      "cycleNumber": 2,
+      "name": "STRENGTH ENGINE",
+      "weeks": "Weeks 6–10",
+      "subtitle": "You've built the foundation. Now we load it.",
+      "paragraphs": [
+        "Cycle 2 is where the body starts to genuinely change — where the patterns you've drilled become vehicles for real strength, and where your running stops feeling like cardio and starts feeling like training.",
+        "The work gets heavier, the runs get structured, and the gap between who you are now and who you're capable of being starts to close fast.",
+        "Earn it in these five weeks. It's waiting."
+      ]
+    },
+
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "LOWER BODY · STRENGTH",
+        "completionTitle": "Day 1 Complete",
+        "completionMessage": "Strong work. Rest up and see you for Day 2.",
+        "blocks": [
+          {
+            "title": "Warm-up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "name": "Dynamic Hip Opener",
+                "chips": [{"label": "3 × 30s"}],
+                "hasRest": false
+              }
+            ]
+          },
+          {
+            "title": "Main Lifts",
+            "icon": "💪",
+            "exercises": [
+              {
+                "name": "Back Squat",
+                "chips": [
+                  {"label": "4 × 6", "style": "yellow"},
+                  {"label": "Tempo 3-1-1"}
+                ],
+                "hasRest": true,
+                "videoUrl": "https://youtube.com/...",
+                "cues": {
+                  "good": ["Chest up through the descent", "Knees tracking over toes"],
+                  "bad": ["Don't let the knees cave in", "Avoid excessive forward lean"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  "__JOURNEY_FIELD": "OPTIONAL — omit entire 'journey' object to hide the cycles spine timeline on home",
+  "journey": {
+    "totalCycles": 5,
+    "cycles": [
+      {
+        "num": 1,
+        "name": "FOUNDATION FORGE",
+        "tagline": "Build the Platform",
+        "weeks": "Weeks 1–5",
+        "status": "active",
+        "primary": "Build foundational movement quality and neuromuscular efficiency across all major patterns.",
+        "secondary": "Establish aerobic base and running consistency toward half marathon preparation."
+      },
+      {
+        "num": 2,
+        "name": "STRENGTH ENGINE",
+        "tagline": "Load the Foundation",
+        "weeks": "Weeks 6–10",
+        "status": "next",
+        "primary": "Increase relative strength through progressive overload on compound movements.",
+        "secondary": "Extend run duration and introduce structured tempo running intervals."
+      },
+      {
+        "num": 3,
+        "name": "METABOLIC SHIFT",
+        "tagline": "Reshape the System",
+        "weeks": "Weeks 11–15",
+        "status": "locked",
+        "primary": "Drive body recomposition through higher training density and elevated metabolic demand.",
+        "secondary": "Develop single-leg and running-specific strength for race durability."
+      },
+      {
+        "num": 4,
+        "name": "RACE READY",
+        "tagline": "Peak & Deliver",
+        "weeks": "Weeks 16–20",
+        "status": "locked",
+        "primary": "Peak running volume and muscular endurance for half marathon completion.",
+        "secondary": "Maintain lean muscle and reduce session fatigue through smart load management."
+      },
+      {
+        "num": 5,
+        "name": "CONSOLIDATE & ELEVATE",
+        "tagline": "Integrate for Life",
+        "weeks": "Weeks 21–24",
+        "status": "locked",
+        "primary": "Integrate all physical qualities into a sustainable, high-performance lifestyle structure.",
+        "secondary": "Post-race recovery, reflection, and transition into long-term athletic identity."
+      }
+    ]
+  },
+
+  "programHistory": [
+    {
+      "id": "prep_block",
+      "label": "Prep Block",
+      "subtitle": "Pre-Program Assessment Phase",
+      "days": [
+        {
+          "label": "Day 1",
+          "focus": "Movement Screen",
+          "exercises": [
+            {"name": "Overhead Squat Assessment", "detail": "3 reps"},
+            {"name": "Single-Leg Balance", "detail": "30s/side"}
+          ]
+        }
+      ]
+    }
+  ],
+
+  "notes": {
+    "greeting": "HEY ALEX — WELCOME",
+    "cards": [
+      {
+        "icon": "📖",
+        "title": "How to Use This Program",
+        "body": "Check off each exercise as you complete it. Log weights and RPE. The timer is for rest periods between sets."
+      },
+      {
+        "icon": "⚠️",
+        "title": "Important Guidelines",
+        "body": "If something doesn't feel right, message me. Don't push through sharp pain."
+      }
+    ]
+  }
+}

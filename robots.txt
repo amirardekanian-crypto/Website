@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /program.html
+Disallow: /data/
+
+Sitemap: https://www.amirardekani.com/sitemap.xml
