@@ -4,56 +4,87 @@
     "firstName": "Pooya",
     "lastName": "Pasandideh"
   },
-  "coach": {
-    "name": "Amir"
-  },
   "sport": {
     "badge": "🏋️ General Fitness — Body Recomposition"
   },
-  "currentProgram": {
-    "number": 1,
-    "eyebrow": "CYCLE 1 · FOUNDATION FORGE",
-    "month": "Weeks 1–5",
-    "focus": "Hypertrophy-driven body recomposition with progressive core development and shoulder-safe programming",
-    "cycleNumber": 1,
-    "cycleName": "FOUNDATION FORGE",
-    "cycleTagline": "BUILD THE ENGINE",
-    "cycleWeeks": "Weeks 1–5",
-    "primaryFocus": "Develop baseline strength across all major compound lifts while progressively loading the core with intention and control.",
-    "secondaryFocus": "Ingrain high-quality movement patterns, lock in consistent training habits, and initiate a sustainable caloric deficit without sacrificing performance.",
-    "whyThisMatters": [
-      "This cycle sets the ceiling for everything that follows. The strength, stability, and habits you build here determine how much volume, density, and intensity your body can tolerate later.",
-      "Your joints, connective tissue, and nervous system are adapting to structured compound loading while your core is learning to handle real demands — not cosmetic work, but load-bearing function."
-    ],
-    
-    "mentalCue": "Own every rep. Earn the right to progress.",
-
-    "whyThisMattersPart2": [
-      "This is not the phase to chase visible abs or burn yourself into the ground. Strength comes first. Movement quality comes first.",
-      "Controlled eccentrics, honest RPEs, and zero junk volume are non-negotiable. The discipline you show here compounds later."
-    ],
-
-    "outcomes": [
-      "Noticeable strength increases in squat, hinge, press, and row patterns",
-      "Improved trunk stability and confidence under load",
-      "Established training consistency and momentum across four sessions per week",
-      "Clear progress in foundational lifts despite operating in a caloric deficit"
-    ],
-
-    "nextCycleTeaser": {
-      "cycleNumber": 2,
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "FOUNDATION FORGE",
+      "tagline": "Build the Engine",
+      "weeks": "Weeks 1–5",
+      "focuses": [
+        "Build baseline strength in compound lifts and establish progressive core overload.",
+        "Ingrain movement quality, lock in consistent training habits, and initiate a sustainable caloric deficit."
+      ],
+      "message": {
+        "paragraphs": [
+          "This cycle sets the ceiling for everything that follows. The strength, stability, and habits you build here determine how much volume, density, and intensity your body can tolerate later.",
+          "Your joints, connective tissue, and nervous system are adapting to structured compound loading while your core is learning to handle real demands — not cosmetic work, but load-bearing function.",
+          "This is not the phase to chase visible abs or burn yourself into the ground. Strength comes first. Movement quality comes first.",
+          "Controlled eccentrics, honest RPEs, and zero junk volume are non-negotiable. The discipline you show here compounds later."
+        ],
+        "outcomes": [
+          "Noticeable strength increases in squat, hinge, press, and row patterns",
+          "Improved trunk stability and confidence under load",
+          "Established training consistency and momentum across four sessions per week",
+          "Clear progress in foundational lifts despite operating in a caloric deficit"
+        ]
+      }
+    },
+    {
+      "num": 2,
       "name": "VOLUME ENGINE",
+      "tagline": "Force the Adaptation",
       "weeks": "Weeks 6–10",
-      "subtitle": "The foundation stays. The workload explodes.",
-      "paragraphs": [
-        "Cycle 2 transforms your strength base into visible muscle through higher training density and significantly increased hypertrophy volume.",
-        "Rest periods shorten, weekly sets per muscle climb, and sessions demand sustained output rather than isolated effort.",
-        "Core training evolves from simple loading into weighted and hanging variations, while structured conditioning blocks accelerate fat loss without eroding muscle.",
-        "Complete this cycle as written and progress your loads. What follows rewards those who built properly — and finished everything."
+      "focuses": [
+        "Increase hypertrophy volume per muscle group through higher training density and shorter rest periods.",
+        "Advance core loading to weighted and hanging variations while introducing structured conditioning blocks."
+      ],
+      "teaser": {
+        "subtitle": "The foundation stays. The workload explodes.",
+        "paragraphs": [
+          "Cycle 2 transforms your strength base into visible muscle through higher training density and significantly increased hypertrophy volume.",
+          "Rest periods shorten, weekly sets per muscle climb, and sessions demand sustained output rather than isolated effort.",
+          "Core training evolves from simple loading into weighted and hanging variations, while structured conditioning blocks accelerate fat loss without eroding muscle.",
+          "Complete this cycle as written and progress your loads. What follows rewards those who built properly — and finished everything."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "METABOLIC OVERRIDE",
+      "tagline": "Burn Without Breakdown",
+      "weeks": "Weeks 11–16",
+      "focuses": [
+        "Maximise energy expenditure through high-density supersets and circuit-based resistance training while preserving muscle.",
+        "Peak direct abdominal volume and introduce advanced anti-extension and trunk control progressions."
       ]
     },
-
-
+    {
+      "num": 4,
+      "name": "STRENGTH RECLAIM",
+      "tagline": "Hold the Line",
+      "weeks": "Weeks 17–21",
+      "focuses": [
+        "Restore and surpass early-cycle strength levels with reduced volume and higher intensity to protect lean mass.",
+        "Reduce conditioning volume and refine muscular detail through isolation and contraction-focused work."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "THE REVEAL",
+      "tagline": "Maintain What You Earned",
+      "weeks": "Weeks 22–26",
+      "focuses": [
+        "Maintain peak strength while reducing fatigue and bringing body composition to target condition.",
+        "Transition to maintenance intake and stress-test the physique, habits, and systems that sustain long-term results."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "CYCLE 1 · FOUNDATION FORGE",
     "days": [
       {
         "id": 1,
@@ -70,14 +101,31 @@
                 "name": "Band Pull-Apart",
                 "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc",
                 "chips": [
-                  { "label": "2 Sets", "style": "dark" },
-                  { "label": "15 Reps", "style": "dark" },
-                  { "label": "Tempo 2-1-1-0", "style": "dark" },
-                  { "label": "RPE 5", "style": "dark" }
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "15 Reps",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 5",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hands finish wide, thumbs pointing behind you", "Feel the squeeze between the shoulder blades"],
-                  "bad": ["Shrugging the traps up toward the ears"]
+                  "good": [
+                    "Hands finish wide, thumbs pointing behind you",
+                    "Feel the squeeze between the shoulder blades"
+                  ],
+                  "bad": [
+                    "Shrugging the traps up toward the ears"
+                  ]
                 }
               },
               {
@@ -85,13 +133,27 @@
                 "name": "Dead Hang",
                 "videoUrl": "https://www.youtube.com/watch?v=0Bx_Ap7-EwU",
                 "chips": [
-                  { "label": "2 Sets", "style": "dark" },
-                  { "label": "20s Hold", "style": "dark" },
-                  { "label": "RPE 4", "style": "dark" }
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "20s Hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 4",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Shoulders drop away from the ears, body hangs long", "Feel the lats stretch and the spine decompress"],
-                  "bad": ["Bending the elbows or swinging"]
+                  "good": [
+                    "Shoulders drop away from the ears, body hangs long",
+                    "Feel the lats stretch and the spine decompress"
+                  ],
+                  "bad": [
+                    "Bending the elbows or swinging"
+                  ]
                 }
               }
             ]
@@ -106,15 +168,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=CjHIKDQ4RQo",
                 "hasRest": true,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6-8 Reps" },
-                  { "label": "Tempo 3-1-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6-8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Bar path finishes directly over the shoulder joint", "Feel the chest stretch at the bottom, drive through the palms"],
-                  "bad": ["Flaring the elbows beyond 45 degrees from the torso"]
+                  "good": [
+                    "Bar path finishes directly over the shoulder joint",
+                    "Feel the chest stretch at the bottom, drive through the palms"
+                  ],
+                  "bad": [
+                    "Flaring the elbows beyond 45 degrees from the torso"
+                  ]
                 }
               },
               {
@@ -123,15 +202,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=0-DXJiceG-0",
                 "hasRest": true,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×8-10 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8-10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Elbows drive past the ribcage, dumbbells finish beside the hip", "Feel the mid-back muscles contract hard at the top"],
-                  "bad": ["Jerking the weight up with momentum or shrugging"]
+                  "good": [
+                    "Elbows drive past the ribcage, dumbbells finish beside the hip",
+                    "Feel the mid-back muscles contract hard at the top"
+                  ],
+                  "bad": [
+                    "Jerking the weight up with momentum or shrugging"
+                  ]
                 }
               }
             ]
@@ -146,14 +242,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=jMQA3XtJSgo",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Dumbbells travel in a slight arc, finishing over the upper chest", "Feel the stretch across the upper pec at the bottom of each rep"],
-                  "bad": ["Setting the incline too steep — this shifts load onto the anterior deltoid"]
+                  "good": [
+                    "Dumbbells travel in a slight arc, finishing over the upper chest",
+                    "Feel the stretch across the upper pec at the bottom of each rep"
+                  ],
+                  "bad": [
+                    "Setting the incline too steep — this shifts load onto the anterior deltoid"
+                  ]
                 }
               },
               {
@@ -162,14 +272,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=0Po47vvj9g4",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hands finish beside the ears, rope splits wide", "Feel the rear delts and external rotators contract"],
-                  "bad": ["Pulling with the biceps or leaning backward excessively"]
+                  "good": [
+                    "Hands finish beside the ears, rope splits wide",
+                    "Feel the rear delts and external rotators contract"
+                  ],
+                  "bad": [
+                    "Pulling with the biceps or leaning backward excessively"
+                  ]
                 }
               }
             ]
@@ -184,15 +308,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=6pTAoXD2X6c",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8-10 Reps" },
-                  { "label": "Tempo 3-0-2-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8-10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Bar rolls out until arms are extended, body stays in one rigid line", "Feel the deep abdominals brace against the stretch"],
-                  "bad": ["Letting the lower back sag or arch at full extension"]
+                  "good": [
+                    "Bar rolls out until arms are extended, body stays in one rigid line",
+                    "Feel the deep abdominals brace against the stretch"
+                  ],
+                  "bad": [
+                    "Letting the lower back sag or arch at full extension"
+                  ]
                 }
               },
               {
@@ -201,14 +342,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=HXrLaqNIkTs",
                 "hasRest": true,
                 "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×10 Each Side" },
-                  { "label": "Tempo 2-2-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-2-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Arms extend straight out, hips and shoulders stay square", "Feel the obliques resist the cable's pull"],
-                  "bad": ["Rotating the torso toward the cable stack"]
+                  "good": [
+                    "Arms extend straight out, hips and shoulders stay square",
+                    "Feel the obliques resist the cable's pull"
+                  ],
+                  "bad": [
+                    "Rotating the torso toward the cable stack"
+                  ]
                 }
               }
             ]
@@ -230,14 +385,31 @@
                 "name": "Banded Glute Bridge",
                 "videoUrl": "https://www.youtube.com/watch?v=GaxOodE1Irk",
                 "chips": [
-                  { "label": "2 Sets", "style": "dark" },
-                  { "label": "15 Reps", "style": "dark" },
-                  { "label": "Tempo 2-2-1-0", "style": "dark" },
-                  { "label": "RPE 5", "style": "dark" }
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "15 Reps",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "Tempo 2-2-1-0",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 5",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hips rise until the body forms a straight line from knees to shoulders", "Feel the glutes squeeze hard at the top, not the lower back"],
-                  "bad": ["Hyperextending the lumbar spine at lockout"]
+                  "good": [
+                    "Hips rise until the body forms a straight line from knees to shoulders",
+                    "Feel the glutes squeeze hard at the top, not the lower back"
+                  ],
+                  "bad": [
+                    "Hyperextending the lumbar spine at lockout"
+                  ]
                 }
               }
             ]
@@ -252,15 +424,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=rrJIyZGlK8c",
                 "hasRest": true,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6-8 Reps" },
-                  { "label": "Tempo 3-1-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6-8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hips and knees break together, chest stays tall, depth reaches parallel or below", "Feel the quads load on the way down and the glutes drive at the bottom"],
-                  "bad": ["Knees caving inward on the ascent"]
+                  "good": [
+                    "Hips and knees break together, chest stays tall, depth reaches parallel or below",
+                    "Feel the quads load on the way down and the glutes drive at the bottom"
+                  ],
+                  "bad": [
+                    "Knees caving inward on the ascent"
+                  ]
                 }
               },
               {
@@ -269,15 +458,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=bT5OOBgY4bc",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8-10 Reps" },
-                  { "label": "Tempo 3-1-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8-10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Bar stays in contact with the legs, hips push straight back", "Feel a deep stretch through the hamstrings at the bottom"],
-                  "bad": ["Rounding the upper back or bending the knees excessively"]
+                  "good": [
+                    "Bar stays in contact with the legs, hips push straight back",
+                    "Feel a deep stretch through the hamstrings at the bottom"
+                  ],
+                  "bad": [
+                    "Rounding the upper back or bending the knees excessively"
+                  ]
                 }
               }
             ]
@@ -292,14 +498,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=p5dCqF7wWUw",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 8" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
                 ],
                 "cues": {
-                  "good": ["Feet shoulder-width apart on the platform, knees track over toes", "Feel the quads working through the full range"],
-                  "bad": ["Letting the lower back lift off the pad at the bottom"]
+                  "good": [
+                    "Feet shoulder-width apart on the platform, knees track over toes",
+                    "Feel the quads working through the full range"
+                  ],
+                  "bad": [
+                    "Letting the lower back lift off the pad at the bottom"
+                  ]
                 }
               },
               {
@@ -308,14 +528,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=SbSNUXPRkc8",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hips stay pressed into the pad, heels pull toward the glutes", "Feel the hamstrings contract from the knee up toward the hip"],
-                  "bad": ["Lifting the hips off the pad to cheat the weight up"]
+                  "good": [
+                    "Hips stay pressed into the pad, heels pull toward the glutes",
+                    "Feel the hamstrings contract from the knee up toward the hip"
+                  ],
+                  "bad": [
+                    "Lifting the hips off the pad to cheat the weight up"
+                  ]
                 }
               }
             ]
@@ -330,14 +564,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=ACnl_apRkqU",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Knees rise above hip height, body stays still from the shoulders up", "Feel the lower abdominals curl the pelvis upward"],
-                  "bad": ["Swinging or using momentum to lift the knees"]
+                  "good": [
+                    "Knees rise above hip height, body stays still from the shoulders up",
+                    "Feel the lower abdominals curl the pelvis upward"
+                  ],
+                  "bad": [
+                    "Swinging or using momentum to lift the knees"
+                  ]
                 }
               },
               {
@@ -346,14 +594,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=1FjAoO5McVI",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Explosive" },
-                  { "label": "RPE 8" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Explosive"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
                 ],
                 "cues": {
-                  "good": ["Bell reaches chest height, arms are relaxed, hips snap forward", "Feel the glutes and hamstrings drive the bell — not the arms"],
-                  "bad": ["Squatting the swing or pulling with the shoulders"]
+                  "good": [
+                    "Bell reaches chest height, arms are relaxed, hips snap forward",
+                    "Feel the glutes and hamstrings drive the bell — not the arms"
+                  ],
+                  "bad": [
+                    "Squatting the swing or pulling with the shoulders"
+                  ]
                 }
               }
             ]
@@ -375,14 +637,31 @@
                 "name": "Band External Rotation",
                 "videoUrl": "https://www.youtube.com/shorts/FeCio_IImxc",
                 "chips": [
-                  { "label": "2 Sets", "style": "dark" },
-                  { "label": "12 Each Arm", "style": "dark" },
-                  { "label": "Tempo 2-1-2-0", "style": "dark" },
-                  { "label": "RPE 5", "style": "dark" }
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "12 Each Arm",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 5",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Forearm rotates outward while the elbow stays pinned to the ribs", "Feel the deep rotator cuff muscles behind the shoulder working"],
-                  "bad": ["Letting the elbow drift away from the body"]
+                  "good": [
+                    "Forearm rotates outward while the elbow stays pinned to the ribs",
+                    "Feel the deep rotator cuff muscles behind the shoulder working"
+                  ],
+                  "bad": [
+                    "Letting the elbow drift away from the body"
+                  ]
                 }
               }
             ]
@@ -397,15 +676,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=BOqrRMjxkj8",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8-10 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8-10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Chin clears the bar, chest lifts toward it", "Feel the lats pull the elbows down and back"],
-                  "bad": ["Kipping or using excessive body swing"]
+                  "good": [
+                    "Chin clears the bar, chest lifts toward it",
+                    "Feel the lats pull the elbows down and back"
+                  ],
+                  "bad": [
+                    "Kipping or using excessive body swing"
+                  ]
                 }
               },
               {
@@ -414,14 +710,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=TsduLWuhlFM",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Dumbbells press up in a slight arc, finishing over the shoulders", "Feel the deltoids contract from the shoulder cap outward"],
-                  "bad": ["Arching the lower back excessively to compensate for heavy weight"]
+                  "good": [
+                    "Dumbbells press up in a slight arc, finishing over the shoulders",
+                    "Feel the deltoids contract from the shoulder cap outward"
+                  ],
+                  "bad": [
+                    "Arching the lower back excessively to compensate for heavy weight"
+                  ]
                 }
               }
             ]
@@ -436,14 +746,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=8bAUxZlIR38",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hands meet at chest height with a slight bend in the elbows throughout", "Feel the pec fibres shorten as the arms come together"],
-                  "bad": ["Bending the elbows more as the weight gets heavy"]
+                  "good": [
+                    "Hands meet at chest height with a slight bend in the elbows throughout",
+                    "Feel the pec fibres shorten as the arms come together"
+                  ],
+                  "bad": [
+                    "Bending the elbows more as the weight gets heavy"
+                  ]
                 }
               },
               {
@@ -452,14 +776,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=_HuCbiiHGk0",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Each Arm" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Each Arm"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Elbow drives straight back, torso stays square to the machine", "Feel the lat and mid-back on the working side do the pulling"],
-                  "bad": ["Rotating the torso to create momentum"]
+                  "good": [
+                    "Elbow drives straight back, torso stays square to the machine",
+                    "Feel the lat and mid-back on the working side do the pulling"
+                  ],
+                  "bad": [
+                    "Rotating the torso to create momentum"
+                  ]
                 }
               },
               {
@@ -468,14 +806,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=8aUc9snLOxU",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-0-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Arms rise to shoulder height, slight forward lean of the torso", "Feel the middle deltoid lift the weight, not the traps"],
-                  "bad": ["Shrugging the shoulders or swinging the dumbbells"]
+                  "good": [
+                    "Arms rise to shoulder height, slight forward lean of the torso",
+                    "Feel the middle deltoid lift the weight, not the traps"
+                  ],
+                  "bad": [
+                    "Shrugging the shoulders or swinging the dumbbells"
+                  ]
                 }
               }
             ]
@@ -490,14 +842,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=RIEMoYL_h1Y",
                 "hasRest": true,
                 "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-0-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Palms face each other throughout, elbows stay fixed at the sides", "Feel the brachioradialis and outer bicep contract"],
-                  "bad": ["Swinging the body or moving the elbows forward"]
+                  "good": [
+                    "Palms face each other throughout, elbows stay fixed at the sides",
+                    "Feel the brachioradialis and outer bicep contract"
+                  ],
+                  "bad": [
+                    "Swinging the body or moving the elbows forward"
+                  ]
                 }
               },
               {
@@ -506,14 +872,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=LXkCrxn3caQ",
                 "hasRest": true,
                 "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Rope splits at the bottom, arms fully extend", "Feel the triceps lock out the elbow completely"],
-                  "bad": ["Leaning over the cable or flaring the elbows out"]
+                  "good": [
+                    "Rope splits at the bottom, arms fully extend",
+                    "Feel the triceps lock out the elbow completely"
+                  ],
+                  "bad": [
+                    "Leaning over the cable or flaring the elbows out"
+                  ]
                 }
               }
             ]
@@ -528,15 +908,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=RVrBJAPo868",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Elbows drive toward the knees, the spine rounds deliberately", "Feel the rectus abdominis shorten from the ribcage down"],
-                  "bad": ["Pulling with the arms or sitting back onto the heels"]
+                  "good": [
+                    "Elbows drive toward the knees, the spine rounds deliberately",
+                    "Feel the rectus abdominis shorten from the ribcage down"
+                  ],
+                  "bad": [
+                    "Pulling with the arms or sitting back onto the heels"
+                  ]
                 }
               }
             ]
@@ -558,14 +955,31 @@
                 "name": "Bodyweight Reverse Lunge",
                 "videoUrl": "https://www.youtube.com/watch?v=xrPteyQLGAo",
                 "chips": [
-                  { "label": "2 Sets", "style": "dark" },
-                  { "label": "8 Each Leg", "style": "dark" },
-                  { "label": "Tempo 2-0-1-0", "style": "dark" },
-                  { "label": "RPE 4", "style": "dark" }
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "8 Each Leg",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 4",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Back knee lowers toward the floor, front shin stays vertical", "Feel the front-leg glute and quad load each rep"],
-                  "bad": ["Letting the torso collapse forward"]
+                  "good": [
+                    "Back knee lowers toward the floor, front shin stays vertical",
+                    "Feel the front-leg glute and quad load each rep"
+                  ],
+                  "bad": [
+                    "Letting the torso collapse forward"
+                  ]
                 }
               }
             ]
@@ -580,15 +994,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=1QIvuYWqo6w",
                 "hasRest": true,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6-8 Reps" },
-                  { "label": "Tempo 2-1-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6-8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Bar stays tight to the body, hips and shoulders rise at the same rate", "Feel the whole posterior chain — glutes, hamstrings, back — work as one unit"],
-                  "bad": ["Letting the hips shoot up faster than the chest off the floor"]
+                  "good": [
+                    "Bar stays tight to the body, hips and shoulders rise at the same rate",
+                    "Feel the whole posterior chain — glutes, hamstrings, back — work as one unit"
+                  ],
+                  "bad": [
+                    "Letting the hips shoot up faster than the chest off the floor"
+                  ]
                 }
               },
               {
@@ -597,15 +1028,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=Wcmg-3iHwjQ",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Each Leg" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Each Leg"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Front knee tracks over the toe, rear foot rests lightly on the bench", "Feel the front-leg quad and glute do all the work"],
-                  "bad": ["Pushing off the back foot or leaning excessively forward"]
+                  "good": [
+                    "Front knee tracks over the toe, rear foot rests lightly on the bench",
+                    "Feel the front-leg quad and glute do all the work"
+                  ],
+                  "bad": [
+                    "Pushing off the back foot or leaning excessively forward"
+                  ]
                 }
               }
             ]
@@ -620,14 +1068,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=4ZDm5EbiFI8",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Shin pad reaches full knee extension at the top", "Feel the quad — especially just above the kneecap — contract hard"],
-                  "bad": ["Using momentum to swing the weight up"]
+                  "good": [
+                    "Shin pad reaches full knee extension at the top",
+                    "Feel the quad — especially just above the kneecap — contract hard"
+                  ],
+                  "bad": [
+                    "Using momentum to swing the weight up"
+                  ]
                 }
               },
               {
@@ -636,14 +1098,28 @@
                 "videoUrl": "https://www.youtube.com/watch?v=g_E7_q1z2bo",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-2-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-2-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Heels drop below the platform, then rise as high as possible", "Feel the calf muscles shorten fully at the top"],
-                  "bad": ["Bouncing at the bottom without pausing"]
+                  "good": [
+                    "Heels drop below the platform, then rise as high as possible",
+                    "Feel the calf muscles shorten fully at the top"
+                  ],
+                  "bad": [
+                    "Bouncing at the bottom without pausing"
+                  ]
                 }
               }
             ]
@@ -658,15 +1134,32 @@
                 "videoUrl": "https://www.youtube.com/watch?v=Yrtvs-nEnk0",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Priority", "style": "yellow" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10-12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
-                  "good": ["Legs rise to at least parallel, body stays still above the waist", "Feel the lower abs curl the pelvis upward under control"],
-                  "bad": ["Swinging or using hip flexor momentum to get the legs up"]
+                  "good": [
+                    "Legs rise to at least parallel, body stays still above the waist",
+                    "Feel the lower abs curl the pelvis upward under control"
+                  ],
+                  "bad": [
+                    "Swinging or using hip flexor momentum to get the legs up"
+                  ]
                 }
               }
             ]
@@ -685,16 +1178,26 @@
                     "name": "Medicine Ball Slam",
                     "detail": "10 Reps · Explosive · RPE 9",
                     "cues": {
-                      "good": ["Ball reaches full overhead, then slams into the floor with maximum force", "Feel the core contract violently as the ball accelerates down"],
-                      "bad": ["Bending only at the waist — use the whole body, hips included"]
+                      "good": [
+                        "Ball reaches full overhead, then slams into the floor with maximum force",
+                        "Feel the core contract violently as the ball accelerates down"
+                      ],
+                      "bad": [
+                        "Bending only at the waist — use the whole body, hips included"
+                      ]
                     }
                   },
                   {
                     "name": "Dumbbell Farmer's Walk",
                     "detail": "30m · Controlled · RPE 8 · 30s Rest",
                     "cues": {
-                      "good": ["Tall posture, shoulders packed down, no leaning to either side", "Feel the grip, core, and upper back working to stabilise the load"],
-                      "bad": ["Letting the shoulders round forward or the head drop"]
+                      "good": [
+                        "Tall posture, shoulders packed down, no leaning to either side",
+                        "Feel the grip, core, and upper back working to stabilise the load"
+                      ],
+                      "bad": [
+                        "Letting the shoulders round forward or the head drop"
+                      ]
                     }
                   }
                 ]
@@ -705,59 +1208,6 @@
       }
     ]
   },
-
-"__JOURNEY_FIELD": "OPTIONAL — omit entire 'journey' object to hide the cycles spine timeline on home",
-"journey": {
-  "totalCycles": 5,
-  "cycles": [
-    {
-      "num": 1,
-      "name": "FOUNDATION FORGE",
-      "tagline": "Build the Engine",
-      "weeks": "Weeks 1–5",
-      "status": "active",
-      "primary": "Build baseline strength in compound lifts and establish progressive core overload.",
-      "secondary": "Ingrain movement quality, lock in consistent training habits, and initiate a sustainable caloric deficit."
-    },
-    {
-      "num": 2,
-      "name": "VOLUME ENGINE",
-      "tagline": "Force the Adaptation",
-      "weeks": "Weeks 6–10",
-      "status": "next",
-      "primary": "Increase hypertrophy volume per muscle group through higher training density and shorter rest periods.",
-      "secondary": "Advance core loading to weighted and hanging variations while introducing structured conditioning blocks."
-    },
-    {
-      "num": 3,
-      "name": "METABOLIC OVERRIDE",
-      "tagline": "Burn Without Breakdown",
-      "weeks": "Weeks 11–16",
-      "status": "locked",
-      "primary": "Maximise energy expenditure through high-density supersets and circuit-based resistance training while preserving muscle.",
-      "secondary": "Peak direct abdominal volume and introduce advanced anti-extension and trunk control progressions."
-    },
-    {
-      "num": 4,
-      "name": "STRENGTH RECLAIM",
-      "tagline": "Hold the Line",
-      "weeks": "Weeks 17–21",
-      "status": "locked",
-      "primary": "Restore and surpass early-cycle strength levels with reduced volume and higher intensity to protect lean mass.",
-      "secondary": "Reduce conditioning volume and refine muscular detail through isolation and contraction-focused work."
-    },
-    {
-      "num": 5,
-      "name": "THE REVEAL",
-      "tagline": "Maintain What You Earned",
-      "weeks": "Weeks 22–26",
-      "status": "locked",
-      "primary": "Maintain peak strength while reducing fatigue and bringing body composition to target condition.",
-      "secondary": "Transition to maintenance intake and stress-test the physique, habits, and systems that sustain long-term results."
-    }
-  ]
- },
-
   "programHistory": [],
   "notes": {
     "greeting": "For You, Pooya",

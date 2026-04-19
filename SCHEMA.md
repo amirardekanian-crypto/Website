@@ -1,5 +1,157 @@
 # S&C Program Platform — JSON Schema Guide
 
+## AI Generation Guide (for producing a new client JSON)
+
+**Role:** You are generating a client JSON file for a fitness coaching web app.
+**Output:** A single valid JSON file matching the template below. No comments, no prose, no trailing commas — just strict JSON.
+
+### Hard Rules (do not break)
+
+- Required keys: `athlete.id`, `athlete.firstName`, `athlete.lastName`, `currentCycleIndex`, `cycles`, `workouts`, `workouts.days`.
+- `athlete.id` must be lowercase `firstname_lastname` (appears in the URL and localStorage).
+- `currentCycleIndex` is 0-based. `0` means the athlete is on the first cycle in `cycles`.
+- Every `days[]` entry must have a **unique numeric** `id` (1, 2, 3…).
+- Every day must contain at least one `block`; every block must contain at least one `exercise`.
+- `type` on every exercise must be exactly one of: `"simple"`, `"standard"`, `"circuit"`.
+- Chip `style`, if used, must be exactly `"yellow"` or `"dark"` (or omitted).
+- Only exercises with `"hasRest": true` show the rest timer, weight log, and RPE selector — use this on loaded / strength work.
+- A `"circuit"` exercise must include `rounds` (string) and `items[]` (array).
+- Output strict, valid JSON. No comments. No trailing commas.
+
+### Template to fill
+
+Replace each placeholder value. Keep an optional section only if it applies; otherwise remove that section entirely.
+
+```json
+{
+  "athlete": {
+    "id": "firstname_lastname",
+    "firstName": "First",
+    "lastName": "Last"
+  },
+  "sport": {
+    "badge": "🏋️ Goal or purpose pill"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Cycle Name",
+      "tagline": "Short italic line (optional)",
+      "weeks": "Weeks 1–5",
+      "focuses": [
+        "Focus statement one.",
+        "Focus statement two."
+      ],
+      "message": {
+        "paragraphs": [
+          "Paragraph explaining why this cycle matters.",
+          "Another paragraph."
+        ],
+        "outcomes": [
+          "Expected outcome one",
+          "Expected outcome two"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Next Cycle Name",
+      "weeks": "Weeks 6–10",
+      "focuses": [
+        "Focus statement for the next cycle."
+      ],
+      "teaser": {
+        "subtitle": "One-line hook",
+        "paragraphs": [
+          "Paragraph teasing the next cycle.",
+          "Final paragraph (auto-italicised when there is more than one)."
+        ]
+      }
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Month One",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Lower Body",
+        "completionTitle": "Great Work",
+        "completionMessage": "Day complete — recover well.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "chips": [{ "label": "5 minutes", "style": "dark" }]
+              },
+              {
+                "type": "circuit",
+                "name": "Dynamic Mobility",
+                "rounds": "×3 Rounds",
+                "items": [
+                  {
+                    "name": "90/90 Hip Rotations",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Keep hips grounded"],
+                      "bad": ["Don't arch the back"]
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "standard",
+                "name": "Back Squat",
+                "videoUrl": "https://www.youtube.com/watch?v=example",
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" },
+                  { "label": "Tempo 3-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the floor away"],
+                  "bad": ["Don't let the knees cave in"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, First",
+    "cards": [
+      {
+        "icon": "⏱",
+        "title": "Understanding Tempo",
+        "body": "The numbers next to an exercise (e.g. 3-1-1) describe tempo in seconds: eccentric — pause — concentric."
+      }
+    ]
+  }
+}
+```
+
+### Placeholder guidance
+
+- `athlete.id` → lowercase, underscore-separated (e.g. `john_doe`).
+- `sport.badge` → short line shown above the name, e.g. `"🎾 Tennis Performance"`. Omit the whole `sport` object if not relevant.
+- `focuses[]` → one-line training focus statements. Any number allowed.
+- `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
+- `message.outcomes[]` → 3–6 concrete, measurable expected outcomes.
+- `teaser` → hype section for the NEXT cycle only. Omit the whole `teaser` object if there is no next cycle planned.
+- `chips[]` → metadata pills (sets, reps, tempo, RPE). `style: "yellow"` for the primary set count, `"dark"` for duration / equipment, no style = default grey.
+- `videoUrl` → full YouTube / Vimeo URL. Omit the field entirely if no video exists.
+- `notes` → optional. Remove the whole object if there are no coaching notes to add.
+
+---
+
 ## Architecture Overview
 
 ```
@@ -17,21 +169,41 @@ The template reads the `client` parameter, fetches `data/john_doe.json`, and ren
 
 ---
 
-## JSON Structure
+## High-Level Shape
 
 ```
 {
-  athlete        → identity
-  coach          → your details
-  sport          → badge displayed on home screen
-  currentProgram → the active training block
+  athlete             → identity
+  sport               → goal/purpose pill above the name
+  currentCycleIndex   → which cycle the athlete is on right now (0-based)
+  cycles[]            → all training cycles (any number)
+    └─ message{}        only meaningful on the current cycle
+    └─ teaser{}         only meaningful on the next cycle
+  workouts            → the actual training days for the current cycle
     └─ days[]
-        └─ blocks[]        ← FLEXIBLE: any order, any type
-            └─ exercises[]  ← simple | circuit | standard
-  programHistory → archived completed programs
-  notes          → expandable coaching notes
+        └─ blocks[]     FLEXIBLE: any order, any type
+            └─ exercises[]  simple | circuit | standard
+  programHistory[]    → archived completed programs (optional)
+  notes               → expandable coaching notes (optional)
 }
 ```
+
+The current cycle, next cycle, and remaining phases are all **derived from `currentCycleIndex`** — there is no need to manually mark "active" / "next" / "locked" anywhere.
+
+---
+
+## How `currentCycleIndex` Drives the Home Screen
+
+`currentCycleIndex` is a 0-based pointer into `cycles[]`.
+
+| Position | What the home screen shows |
+|---|---|
+| `i < currentCycleIndex` | A completed phase in the bottom "Remaining Phases" list (with ✓ DONE badge) |
+| `i === currentCycleIndex` | The big blue "CURRENT CYCLE · NOW" card |
+| `i === currentCycleIndex + 1` | The purple "COMING NEXT" teaser card |
+| `i > currentCycleIndex + 1` | A locked phase in the bottom "Remaining Phases" list |
+
+To advance the athlete to the next cycle, just **bump `currentCycleIndex` by 1**. Nothing else needs to change.
 
 ---
 
@@ -39,43 +211,112 @@ The template reads the `client` parameter, fetches `data/john_doe.json`, and ren
 
 ### Top Level
 
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `athlete.id` | string | ✅ | Unique ID, used for localStorage. Format: `firstname_lastname` |
+| `athlete.firstName` | string | ✅ | First name (white in hero) |
+| `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
+| `sport.badge` | string | optional | Goal/purpose pill above name, e.g. `"🏋️ Tennis Performance"` |
+| `currentCycleIndex` | number | ✅ | 0-based index into `cycles[]` |
+| `cycles` | array | ✅ | All training cycles (can be 1, 5, 12 — any number) |
+| `workouts` | object | ✅ | The training days for the current cycle |
+| `programHistory` | array | optional | Archived past programs |
+| `notes` | object | optional | Coaching notes (Notes tab) |
+
+> **Note:** The coach line on the home screen ("Coach: Amir Ardekani") is hardcoded in `program.html` — it is no longer in JSON.
+
+---
+
+### `cycles[n]`
+
+Each cycle describes one training phase.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `num` | number | ✅ | Cycle number (shown as the big faded number on the phase row) |
+| `name` | string | ✅ | Phase name, e.g. `"Foundation Forge"` |
+| `tagline` | string | optional | Short italic line under the name |
+| `weeks` | string | optional | e.g. `"Weeks 1–5"` |
+| `focuses` | string[] | optional | Unlimited list of focus statements |
+| `message` | object | optional | Only used when this is the current cycle (see below) |
+| `teaser` | object | optional | Only used when this is the next cycle (see below) |
+
+#### `message` (only rendered on the current cycle)
+
 | Field | Type | Description |
 |-------|------|-------------|
-| `athlete.id` | string | Unique ID, used for localStorage keys. Format: `firstname_lastname` |
-| `athlete.firstName` | string | First name (displayed large on hero) |
-| `athlete.lastName` | string | Last name (displayed in accent colour) |
-| `coach.name` | string | Coach full name |
-| `sport.badge` | string | Badge text on home screen, e.g. `"🏋️ Tennis Performance"` |
+| `paragraphs` | string[] | Body text under "Why This Cycle Matters" |
+| `outcomes` | string[] | Checklist under "Expected outcomes after this cycle:" |
 
-### `currentProgram`
+#### `teaser` (only rendered on the next cycle)
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `number` | number | Program number (e.g. 2) |
-| `eyebrow` | string | Small text above title, e.g. `"Program 02 · Month Two"` |
-| `month` | string | Displayed in hero meta, e.g. `"Month 2"` |
-| `focus` | string | Training focus, e.g. `"Strength / Power / Speed"` |
-| `days` | array | Training days — can be any count (2, 3, 4, 5, 6...) |
+| `subtitle` | string | One-line hook |
+| `paragraphs` | string[] | Body text. The last paragraph is auto-italicised when there is more than one. |
 
-### `days[n]`
+#### Example cycle
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | number | Day number (1, 2, 3...) — used for tab labels |
-| `focusTag` | string | Yellow badge at top of day, e.g. `"Squat & Glute Activation"` |
-| `completionTitle` | string | Shown when day is finished |
-| `completionMessage` | string | Motivational message on completion |
-| `blocks` | array | **FLEXIBLE** list of training sections — any order |
+```json
+{
+  "num": 1,
+  "name": "Foundation Forge",
+  "tagline": "Build the Platform",
+  "weeks": "Weeks 1–5",
+  "focuses": [
+    "Build foundational movement quality across all major patterns.",
+    "Establish aerobic base and running consistency."
+  ],
+  "message": {
+    "paragraphs": [
+      "This is where everything starts.",
+      "Your nervous system is learning to recruit muscle efficiently."
+    ],
+    "outcomes": [
+      "Noticeably improved strength in squat and hinge",
+      "Ability to run 30+ minutes without stopping"
+    ]
+  },
+  "teaser": {
+    "subtitle": "You've built the foundation. Now we load it.",
+    "paragraphs": [
+      "Cycle 2 is where the body begins to genuinely change.",
+      "Earn it in these five weeks."
+    ]
+  }
+}
+```
+
+---
+
+### `workouts`
+
+The actual training content for the current cycle.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `label` | string | optional | Header text on the program screen, e.g. `"Program 01 · Month One"` |
+| `days` | array | ✅ | Training days (any count: 2, 3, 4, 5, 6...) |
+
+### `workouts.days[n]`
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | number | ✅ | Day number (1, 2, 3...) — used for tab labels |
+| `focusTag` | string | optional | Yellow badge at top of day |
+| `completionTitle` | string | optional | Heading shown when day is finished |
+| `completionMessage` | string | optional | Body text on completion |
+| `blocks` | array | ✅ | List of training sections — any order, any count |
 
 ### `blocks[n]` — Training Section
 
-Each block is a section header + exercises. Blocks can appear in any order, and a day can have any number of blocks.
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | string | ✅ | Section label, e.g. `"Warm-Up"`, `"Plyometrics"` |
+| `icon` | string | optional | Emoji icon |
+| `exercises` | array | ✅ | Exercises within this block |
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string | Section label, e.g. `"Warm-Up"`, `"Plyometrics"`, `"Conditioning"` |
-| `icon` | string | Emoji icon for the section |
-| `exercises` | array | Exercises within this block |
+---
 
 ### Exercise Types
 
@@ -86,7 +327,7 @@ Best for: warm-ups, cool-downs, single-item entries.
 {
   "type": "simple",
   "name": "Bike",
-  "videoUrl": "https://www.youtube.com/watch?v=example",  // optional
+  "videoUrl": "https://www.youtube.com/watch?v=example",
   "chips": [{ "label": "5 minutes", "style": "dark" }],
   "cues": {
     "good": ["Steady pace"],
@@ -96,13 +337,13 @@ Best for: warm-ups, cool-downs, single-item entries.
 ```
 
 #### `type: "circuit"` — Multiple sub-exercises as one checklist item
-Best for: mobility circuits, activation circuits, warm-up complexes.
+Best for: mobility circuits, activation circuits.
 
 ```json
 {
   "type": "circuit",
   "name": "Dynamic Mobility",
-  "videoUrl": "https://www.youtube.com/watch?v=example",  // optional
+  "videoUrl": "https://www.youtube.com/watch?v=example",
   "rounds": "×3 Rounds",
   "items": [
     {
@@ -115,13 +356,13 @@ Best for: mobility circuits, activation circuits, warm-up complexes.
 ```
 
 #### `type: "standard"` — Full exercise with rest timer, weight log, RPE
-Best for: all loaded exercises (strength, plyos, power, accessories).
+Best for: all loaded exercises (strength, plyos, accessories).
 
 ```json
 {
   "type": "standard",
   "name": "Back Squat",
-  "videoUrl": "https://www.youtube.com/watch?v=example",  // optional
+  "videoUrl": "https://www.youtube.com/watch?v=example",
   "hasRest": true,
   "chips": [
     { "label": "4 Sets", "style": "yellow" },
@@ -138,29 +379,7 @@ Best for: all loaded exercises (strength, plyos, power, accessories).
 
 ### `videoUrl` — Optional Exercise Video
 
-Any exercise (of any type) can include an optional `videoUrl` field containing a YouTube URL. When present, a play button renders next to the exercise name. When omitted, nothing appears.
-
-```json
-{
-  "type": "standard",
-  "name": "Back Squat",
-  "videoUrl": "https://www.youtube.com/watch?v=example",
-  "hasRest": true,
-  "chips": [...]
-}
-```
-
-Works the same way on all three exercise types:
-
-```json
-{ "type": "simple",   "name": "Bike",             "videoUrl": "https://www.youtube.com/watch?v=example", ... }
-{ "type": "circuit",  "name": "Dynamic Mobility",  "videoUrl": "https://www.youtube.com/watch?v=example", ... }
-{ "type": "standard", "name": "Back Squat",         "videoUrl": "https://www.youtube.com/watch?v=example", ... }
-```
-
-If `videoUrl` is absent or `null`, no button is rendered.
-
----
+Any exercise (any type) can include a `videoUrl`. When present, a play button appears next to the name. When omitted, no button renders.
 
 ### Chip Styles
 
@@ -227,20 +446,40 @@ Archives are read-only summaries. Add a new object for each completed program bl
 
 ---
 
-## Workflow: Adding a New Athlete
+## Common Workflows
+
+### Adding a New Athlete
 
 1. Copy any existing JSON file (e.g. `john_doe.json`)
 2. Rename to `new_athlete.json`
-3. Update all fields
+3. Update `athlete`, `sport`, `cycles`, and `workouts`
 4. Send the athlete: `yoursite.github.io/program.html?client=new_athlete`
 
 No HTML editing required.
 
-## Workflow: New Program Month
+### Advancing to the Next Cycle
 
-1. Move current program data into `programHistory` (simplified format)
-2. Update `currentProgram` with new days/blocks/exercises
-3. Increment `number`, update `eyebrow`, `month`, `focus`
+1. **Move the previous `workouts` content into `programHistory`** (in the simplified `{label, focus, exercises[{name, detail}]}` shape).
+2. **Replace `workouts.days`** with the new cycle's training days.
+3. **Increment `currentCycleIndex` by 1.**
+4. (Optional) Update `workouts.label`.
+
+The home screen automatically re-derives current / next / completed / locked.
+
+### Adding More Focuses to a Cycle
+
+`focuses` is an array — add as many as you want:
+
+```json
+"focuses": [
+  "Build foundational movement quality.",
+  "Establish aerobic base.",
+  "Improve sleep and recovery quality.",
+  "Reinforce nutrition habits."
+]
+```
+
+---
 
 ## Flexible Day Structure Examples
 
@@ -272,3 +511,24 @@ No HTML editing required.
 ```
 
 The system adapts to your programming — not the other way around.
+
+---
+
+## Migration Notes (from the old schema)
+
+The old `currentProgram` + `journey` structure has been replaced. The migration is automatic if you used the migration script; otherwise, the mapping is:
+
+| Old field | New location |
+|---|---|
+| `coach.name` | Removed — coach is hardcoded in HTML |
+| `currentProgram.cycleNumber` / `cycleName` / `cycleTagline` / `cycleWeeks` | `cycles[currentCycleIndex].num` / `name` / `tagline` / `weeks` |
+| `currentProgram.primaryFocus` + `secondaryFocus` | `cycles[currentCycleIndex].focuses[]` |
+| `currentProgram.whyThisMatters` + `whyThisMattersPart2` | `cycles[currentCycleIndex].message.paragraphs[]` |
+| `currentProgram.outcomes` | `cycles[currentCycleIndex].message.outcomes[]` |
+| `currentProgram.mentalCue` | Removed (no longer rendered) |
+| `currentProgram.month` / `focus` | Removed (no longer rendered) |
+| `currentProgram.nextCycleTeaser` | `cycles[currentCycleIndex + 1].teaser` |
+| `currentProgram.eyebrow` | `workouts.label` |
+| `currentProgram.days` | `workouts.days` |
+| `journey.cycles[]` | `cycles[]` (statuses are now derived from `currentCycleIndex`) |
+| `journey.totalCycles` | Removed (use `cycles.length`) |
