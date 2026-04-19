@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  S&C PROGRAM PLATFORM — Dynamic Template (V5 Home)                          ║
+║  Loads athlete data from JSON via URL parameter: ?client=athlete_id         ║
+║                                                                              ║
+║  DEPLOYMENT: GitHub Pages                                                    ║
+║  USAGE:      amirardekani.com/program.html?client=john_doe                  ║
+║  DATA:       /data/john_doe.json                                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+OPTIONAL JSON FIELDS FOR ENHANCED HOME SCREEN:
+  currentProgram.cycleNumber, cycleName, cycleTagline, cycleWeeks
+  currentProgram.primaryFocus, secondaryFocus
+  currentProgram.whyThisMatters (array of paragraphs)
+  currentProgram.mentalCue (string)
+  currentProgram.whyThisMattersPart2 (array of paragraphs)
+  currentProgram.outcomes (array of strings)
+  currentProgram.nextCycleTeaser {cycleNumber, name, weeks, subtitle, paragraphs}
+  journey.cycles[] {num, name, tagline, weeks, status, primary, secondary}
+
+All are optional. Missing sections simply don't render.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S&C Program</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
+<style>
+  :root {
+    --yellow: #D4FF00;
+    --yellow-dim: rgba(212,255,0,0.08);
+    --yellow-mid: rgba(212,255,0,0.22);
+    --yellow-glow: rgba(212,255,0,0.2);
+
+    --ice: #B8E0F6;
+    --ice-dim: rgba(184,224,246,0.08);
+    --ice-mid: rgba(184,224,246,0.22);
+    --ice-glow: rgba(184,224,246,0.2);
+
+    --purple: #B794F6;
+    --purple-dim: rgba(183,148,246,0.08);
+    --purple-mid: rgba(183,148,246,0.22);
+    --purple-glow: rgba(183,148,246,0.2);
+
+    --grey-bg: #F0F0F0;
+    --grey-mid: #D8D8D8;
+    --grey-dark: #2A2A2A;
+    --grey-card: #E8E8E8;
+    --grey-text: #555;
+    --white: #FAFAFA;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--grey-bg);
+    color: var(--grey-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Loading State ── */
+  .loading-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #0A0A0A;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  .loading-screen.hidden { opacity: 0; pointer-events: none; }
+  .loading-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid #222; border-top-color: var(--yellow);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  .loading-text {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: #555; margin-top: 20px;
+  }
+  .error-screen {
+    position: fixed; inset: 0; z-index: 9998;
+    background: #0A0A0A;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px;
+  }
+  .error-screen.visible { display: flex; }
+  .error-icon { font-size: 48px; margin-bottom: 16px; }
+  .error-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 28px; color: var(--yellow); text-transform: uppercase;
+    margin-bottom: 8px; text-align: center;
+  }
+  .error-msg { font-size: 14px; color: #777; text-align: center; line-height: 1.6; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Screens ── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     HOME SCREEN — NEW V5 DESIGN
+     ═══════════════════════════════════════════════════════════════════════ */
+  #screen-home {
+    background: #0A0A0A;
+    color: #f0f0f0;
+    font-family: 'Barlow Condensed', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Sticky nav */
+  .home-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid #222;
+    padding: 14px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .home-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    color: #999; text-decoration: none;
+    transition: color 0.2s;
+  }
+  .home-brand strong { color: var(--yellow); }
+  .home-brand:hover, .home-brand:hover strong { color: #ffffff; }
+
+  .home-pills { display: flex; gap: 4px; }
+  .home-pill {
+    width: 28px; height: 6px; border-radius: 3px;
+    background: #222; cursor: pointer;
+    transition: all 0.3s ease; position: relative;
+  }
+  .home-pill.completed { background: var(--yellow); opacity: 0.45; }
+  .home-pill.active { background: var(--ice); box-shadow: 0 0 8px var(--ice-glow); }
+  .home-pill.next { background: var(--purple); opacity: 0.4; }
+  .home-pill.locked { background: #222; }
+  .home-pill:hover::after {
+    content: attr(data-label);
+    position: absolute; bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 1px;
+    color: #fff; white-space: nowrap;
+    background: #141414;
+    padding: 3px 8px; border-radius: 4px;
+    border: 1px solid #222;
+  }
+
+  /* Intro */
+  .home-intro {
+    padding: 48px 24px 36px;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeInUp 0.6s ease 0.1s forwards;
+  }
+  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+  .home-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: #555; margin-bottom: 12px;
+  }
+
+  .home-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(42px, 12vw, 64px);
+    font-weight: 900; letter-spacing: -2px;
+    line-height: 0.95; margin-bottom: 10px;
+    color: #fff; text-transform: uppercase;
+  }
+  .home-name span { color: var(--yellow); display: block; }
+
+  .home-meta {
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px; font-weight: 300; letter-spacing: 0.3px;
+    color: #999; margin-bottom: 20px; line-height: 1.6;
+  }
+  .home-meta strong { color: #ccc; font-weight: 500; }
+
+  .home-phase-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ice-dim);
+    border: 1px solid var(--ice-mid);
+    color: var(--ice);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    padding: 4px 12px; border-radius: 6px;
+    font-size: 14px; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ice);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .home-progress { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+  .home-progress-bar {
+    flex: 1; max-width: 220px; height: 3px;
+    background: #222; border-radius: 2px; overflow: hidden;
+  }
+  .home-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--yellow), var(--ice));
+    border-radius: 2px;
+  }
+  .home-progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: #666; letter-spacing: 1px;
+  }
+
+  /* Current cycle message card */
+  .current-message {
+    margin: 0 24px 20px;
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 16px;
+    padding: 28px 26px 24px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 0.2s forwards;
+  }
+
+  .current-message::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ice), transparent);
+  }
+  .current-message::after {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, var(--ice-glow), transparent 70%);
+    pointer-events: none;
+  }
+
+  .cm-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ice); margin-bottom: 10px;
+  }
+
+  .cm-header {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 4px; flex-wrap: wrap;
+  }
+
+  .cm-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(24px, 7vw, 34px);
+    font-weight: 900; letter-spacing: -1px;
+    line-height: 1; color: #fff;
+    text-transform: uppercase;
+  }
+
+  .cm-weeks {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: #555;
+    letter-spacing: 1.5px;
+  }
+
+  .cm-subtitle {
+    font-size: 13px; color: var(--purple);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    opacity: 0.85;
+    text-transform: uppercase;
+  }
+
+  .focus-tracks {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 540px) { .focus-tracks { grid-template-columns: 1fr; } }
+
+  .focus-track {
+    background: var(--ice-dim);
+    border: 1px solid rgba(184,224,246,0.08);
+    border-radius: 10px; padding: 13px 15px;
+  }
+  .focus-track.secondary {
+    background: var(--purple-dim);
+    border-color: rgba(183,148,246,0.1);
+  }
+
+  .track-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 5px; color: var(--ice);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .focus-track.secondary .track-label { color: var(--purple); }
+  .track-label::before {
+    content: ''; width: 4px; height: 4px;
+    border-radius: 50%; background: currentColor;
+  }
+
+  .track-text {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13.5px; color: #e8e8e8;
+    line-height: 1.5; font-weight: 400;
+  }
+
+  .cm-body-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: #555; margin-bottom: 10px;
+    padding-top: 16px; border-top: 1px solid #222;
+  }
+
+  .cm-body {
+    font-family: 'Barlow', sans-serif;
+    font-size: 14.5px; color: #aaa;
+    line-height: 1.75; font-weight: 300;
+  }
+  .cm-body p + p { margin-top: 12px; }
+
+  .mental-cue {
+    margin: 18px 0;
+    padding: 18px 22px;
+    background: var(--yellow-dim);
+    border-left: 3px solid var(--yellow);
+    border-radius: 4px;
+  }
+  .mental-cue-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--yellow); margin-bottom: 6px;
+  }
+  .mental-cue-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: #fff;
+    font-style: italic; letter-spacing: -0.3px;
+    line-height: 1.3;
+  }
+
+  .outcomes-block {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #222;
+  }
+  .outcomes-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: #555; margin-bottom: 10px;
+  }
+  .outcomes-heading {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: #fff; margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .outcome-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 7px 0;
+  }
+  .outcome-check {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--yellow-mid);
+    background: var(--yellow-dim);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--yellow);
+    margin-top: 2px; font-weight: 700;
+  }
+  .outcome-text {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13.5px; color: #e8e8e8;
+    line-height: 1.5;
+  }
+
+  /* Next cycle card */
+  .next-card-wrap {
+    padding: 0 24px 20px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 0.3s forwards;
+  }
+  .next-card {
+    background: linear-gradient(135deg, var(--purple-dim) 0%, #141414 60%);
+    border: 1px solid var(--purple-mid);
+    border-radius: 16px;
+    padding: 24px 26px;
+    position: relative;
+    overflow: hidden;
+  }
+  .next-card::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, var(--purple-glow), transparent 70%);
+    pointer-events: none;
+  }
+  .next-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--purple); margin-bottom: 6px; opacity: 0.85;
+  }
+  .next-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(22px, 6vw, 28px);
+    font-weight: 900; margin-bottom: 4px;
+    letter-spacing: -0.5px; line-height: 1.1;
+    color: #fff; text-transform: uppercase;
+  }
+  .next-subtitle {
+    font-size: 13px; color: var(--purple);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px; margin-bottom: 14px;
+    opacity: 0.75;
+  }
+  .next-teaser {
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px; color: #aaa;
+    line-height: 1.7;
+  }
+  .next-teaser p + p { margin-top: 10px; }
+  .next-teaser em {
+    color: #fff; font-style: italic;
+    font-weight: 500;
+  }
+
+  /* Journey / All cycles spine */
+  .section-header {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase; color: #555;
+    margin: 0 0 20px; padding: 0 24px 0 96px;
+  }
+  @media (max-width: 600px) {
+    .section-header { padding-left: 72px; }
+  }
+
+  .journey {
+    position: relative;
+    padding: 0 24px 20px;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 0.4s forwards;
+  }
+  .journey::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 52px;
+    width: 2px; height: 100%;
+    background: linear-gradient(
+      to bottom,
+      var(--yellow) 0%, var(--yellow) 10%,
+      var(--ice) 10%, var(--ice) 30%,
+      var(--purple) 30%, var(--purple) 50%,
+      #222 50%, #222 100%
+    );
+    opacity: 0.5;
+  }
+  @media (max-width: 600px) { .journey::before { left: 28px; } }
+
+  .phase-row {
+    display: flex; gap: 24px;
+    padding: 24px 0;
+    position: relative;
+    cursor: pointer;
+    align-items: flex-start;
+  }
+  .phase-row + .phase-row { border-top: 1px solid rgba(255,255,255,0.03); }
+
+  .phase-dot-wrap {
+    flex-shrink: 0; width: 56px;
+    display: flex; justify-content: center;
+    position: relative; z-index: 2;
+    padding-top: 6px;
+  }
+  @media (max-width: 600px) { .phase-dot-wrap { width: 32px; } }
+
+  .phase-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+  .phase-dot.completed { background: var(--yellow); border: 2px solid var(--yellow); }
+  .phase-dot.active {
+    background: #0A0A0A;
+    border: 3px solid var(--ice);
+    box-shadow: 0 0 12px var(--ice-glow);
+    animation: dotPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 12px var(--ice-glow); }
+    50% { box-shadow: 0 0 22px rgba(184,224,246,0.35); }
+  }
+  .phase-dot.next { background: none; border: 2px dashed var(--purple-mid); }
+  .phase-dot.locked { background: none; border: 2px solid #222; opacity: 0.5; }
+
+  .phase-content { flex: 1; max-width: 620px; }
+
+  .phase-header {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 4px; flex-wrap: wrap;
+  }
+  .phase-big-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 56px; font-weight: 900;
+    line-height: 1; color: #222;
+    letter-spacing: -3px;
+    transition: color 0.4s ease;
+    user-select: none;
+  }
+  @media (max-width: 600px) { .phase-big-num { font-size: 44px; } }
+
+  .phase-row.is-completed .phase-big-num { color: rgba(212,255,0,0.12); }
+  .phase-row.is-active .phase-big-num { color: rgba(184,224,246,0.18); }
+  .phase-row.is-next .phase-big-num { color: rgba(183,148,246,0.15); }
+  .phase-row.is-locked .phase-big-num { opacity: 0.4; }
+
+  .phase-title-group { flex: 1; min-width: 0; }
+  .phase-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .phase-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 24px; font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #f0f0f0;
+    text-transform: uppercase;
+  }
+  .phase-row.is-locked .phase-name { opacity: 0.4; }
+
+  .phase-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .badge-active { background: var(--ice); color: #050508; font-weight: 700; }
+  .badge-completed { background: var(--yellow-dim); color: var(--yellow); }
+  .badge-next { background: var(--purple-dim); color: var(--purple); }
+
+  .phase-tagline {
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px; color: #666;
+    font-weight: 400; font-style: italic;
+    margin-top: 2px;
+  }
+  .phase-weeks {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: #555;
+    letter-spacing: 1px; margin-top: 4px;
+  }
+
+  .expand-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: #555;
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-top: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .expand-hint .arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+  }
+  .phase-row.expanded .expand-hint .arrow { transform: rotate(90deg); }
+
+  .phase-detail {
+    overflow: hidden; max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.4s ease, margin 0.4s ease;
+    margin-top: 0;
+  }
+  .phase-row.expanded .phase-detail {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 14px;
+  }
+
+  .detail-focus + .detail-focus { margin-top: 10px; }
+  .detail-focus-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 3px; color: var(--ice);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .detail-focus.secondary .detail-focus-label { color: var(--purple); }
+  .detail-focus-label::before {
+    content: ''; width: 4px; height: 4px;
+    border-radius: 50%; background: currentColor;
+  }
+  .detail-focus-text {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13.5px; color: #e8e8e8;
+    line-height: 1.55;
+  }
+
+  .locked-hint {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px; color: #555;
+    font-style: italic;
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 12px;
+    padding: 9px 13px;
+    border: 1px dashed #222;
+    border-radius: 8px;
+  }
+
+  /* Bottom CTA row (replaces old buttons) */
+  .home-bottom-cta {
+    position: sticky;
+    bottom: 0;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #222;
+    padding: 14px 24px;
+    display: flex; gap: 10px;
+    z-index: 40;
+  }
+  .home-cta {
+    flex: 1; padding: 14px 20px; border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s ease;
+    text-align: center; border: none;
+  }
+  .cta-main { background: var(--yellow); color: #0A0A0A; }
+  .cta-main:active { transform: scale(0.98); }
+  .cta-ghost {
+    background: none; color: #999;
+    border: 1px solid #222;
+  }
+  .cta-ghost:active { border-color: var(--yellow); color: var(--yellow); }
+
+  .home-history-list {
+    padding: 0 24px 24px;
+  }
+  .home-history-item {
+    display: flex; align-items: center; gap: 12px;
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .home-history-item:hover { border-color: var(--yellow-mid); }
+  .home-history-icon {
+    color: var(--yellow); opacity: 0.5;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+  }
+  .home-history-label {
+    flex: 1;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 14px;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: #ccc;
+  }
+  .home-history-arrow { color: #666; }
+
+  /* Fallback simple intro for JSONs with no cycle data */
+  .home-simple-meta {
+    display: flex; flex-direction: column; gap: 6px;
+    margin: 20px 0 0;
+  }
+  .home-simple-meta-row {
+    display: flex; gap: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase; letter-spacing: 1px;
+    font-size: 12px;
+  }
+  .home-simple-meta-row strong { color: #999; min-width: 80px; }
+  .home-simple-meta-row span { color: #fff; font-weight: 600; }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     REMAINING SCREENS — UNCHANGED LAYOUT, UPDATED COLORS ONLY
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* ── Archive ── */
+  #screen-archive { background: var(--grey-bg); }
+  .archive-banner { background: var(--grey-dark); padding: 48px 24px 32px; position: relative; overflow: hidden; }
+  .archive-banner::after {
+    content: attr(data-watermark); position: absolute; bottom: -10px; right: -8px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 64px;
+    color: rgba(255,255,255,0.04); letter-spacing: -2px; pointer-events: none;
+  }
+  .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--purple); margin-bottom: 8px; }
+  .archive-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; color: #555; text-transform: uppercase; line-height: 1; }
+  .archive-title span { color: #888; }
+  .archive-scroll { padding: 20px 20px 100px; }
+  .archive-day-block { background: var(--white); border-radius: 8px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--grey-mid); opacity: 0.75; }
+  .archive-day-title { background: #3a3a3a; padding: 14px 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: #999; display: flex; align-items: center; gap: 10px; }
+  .archive-day-title span { font-size: 10px; font-weight: 400; color: #555; letter-spacing: 2px; }
+  .archive-exercise-list { padding: 14px 18px; }
+  .archive-ex { padding: 8px 0; border-bottom: 1px solid var(--grey-card); display: flex; justify-content: space-between; align-items: center; }
+  .archive-ex:last-child { border-bottom: none; }
+  .archive-ex-name { font-size: 14px; font-weight: 500; color: #555; }
+  .archive-ex-detail { font-size: 12px; color: #aaa; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
+
+  /* ── Current Program Header ── */
+  #screen-program { background: var(--grey-bg); }
+  .prog-header { background: var(--grey-dark); padding: 48px 24px 0; position: relative; overflow: hidden; }
+  .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
+  .prog-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 6px; }
+  .prog-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: var(--white); text-transform: uppercase; line-height: 1; margin-bottom: 4px; }
+  .prog-subtitle { font-size: 12px; color: #777; font-weight: 300; margin-bottom: 24px; }
+
+  .day-tabs { display: flex; border-top: 1px solid #3a3a3a; }
+  .day-tab { flex: 1; padding: 14px 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #666; background: transparent; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: color 0.2s, border-color 0.2s; position: relative; }
+  .day-tab.active { color: var(--ice); border-bottom-color: var(--ice); }
+
+  .tab-progress-pill { display: inline-block; background: #3a3a3a; color: #888; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 5px; border-radius: 10px; margin-left: 4px; vertical-align: middle; transition: background 0.3s, color 0.3s; }
+  .day-tab.active .tab-progress-pill { background: var(--ice-dim); color: var(--ice); }
+  .tab-progress-pill.complete { background: var(--yellow) !important; color: var(--grey-dark) !important; }
+
+  .day-content { display: none; padding: 20px 32px 120px 20px; }
+  .day-content.active { display: block; animation: fadeUp 0.3s ease both; }
+
+  /* ── Vertical Progress Bar ── */
+  .v-progress {
+    position: fixed; right: 0; top: 120px; bottom: 70px;
+    width: 12px; background: #3a3a3a;
+    border-radius: 6px 0 0 6px; z-index: 200; overflow: hidden;
+    display: none;
+  }
+  .v-progress.active { display: block; }
+  .v-progress-fill {
+    position: absolute; top: 0; left: 0; right: 0;
+    background: var(--yellow); border-radius: 6px 0 0 6px;
+    height: 0%; transition: height 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ── Suggested Day Dot ── */
+  .day-tab.suggested::after {
+    content: ''; display: inline-block;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--ice); margin-left: 5px;
+    vertical-align: middle; animation: fadeIn 0.4s ease both;
+  }
+
+  /* ── Session Confirm ── */
+  .session-confirm {
+    display: none; background: #1e1e1e; border-radius: 8px;
+    padding: 16px 20px; margin-top: 16px; border: 1px solid #444;
+    flex-direction: row; align-items: center; justify-content: space-between;
+  }
+  .session-confirm.visible { display: flex; animation: fadeUp 0.3s ease both; }
+  .confirm-text {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: #888;
+  }
+  .confirm-btn {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+    background: var(--yellow); color: var(--grey-dark);
+    border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; white-space: nowrap;
+  }
+
+  /* ── Timer Exercise Name ── */
+  .timer-exercise-name {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--yellow); margin-bottom: 4px; text-align: center;
+  }
+
+  /* ── Section Headers ── */
+  .section-header-prog { display: flex; align-items: center; gap: 10px; margin: 24px 0 10px; }
+  .section-icon { display: none; }
+  .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); flex: 1; }
+  .section-header-prog::after { content: ''; flex: 1; height: 1px; background: var(--grey-mid); }
+
+  /* ── Checklist Items ── */
+  .checklist-item { background: var(--white); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--grey-mid); overflow: hidden; transition: border-color 0.25s, opacity 0.25s; cursor: pointer; user-select: none; }
+  .checklist-item.checked { border-color: var(--yellow); opacity: 0.65; }
+  .checklist-item.checked .item-name { text-decoration: line-through; color: #aaa; }
+  .checklist-item.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
+  .checklist-item.checked .check-box::after { opacity: 1; transform: scale(1); }
+
+  .item-main { display: flex; align-items: center; padding: 14px 16px; gap: 14px; }
+  .check-box { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--grey-mid); background: transparent; flex-shrink: 0; position: relative; transition: background 0.2s, border-color 0.2s; }
+  .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--grey-dark); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .item-body { flex: 1; min-width: 0; }
+  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.1; color: var(--grey-dark); transition: color 0.2s; }
+  .play-btn {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: transparent;
+    border: 1px solid var(--grey-mid);
+    border-radius: 4px;
+    padding: 5px 9px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--grey-text);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: border-color 0.15s, color 0.15s;
+    line-height: 1;
+  }
+  .play-btn:hover { border-color: var(--grey-dark); color: var(--grey-dark); }
+  body[data-dark] .play-btn { border-color: #444; color: #666; }
+  body[data-dark] .play-btn:hover { border-color: #888; color: #aaa; }
+  .item-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .chip { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--grey-card); color: var(--grey-dark); letter-spacing: 0.3px; }
+  .chip.yellow { background: var(--yellow); color: var(--grey-dark); }
+  .chip.dark   { background: #3a3a3a; color: #aaa; }
+
+  .item-rest { border-top: 1px solid var(--grey-card); padding: 0; flex-direction: column; align-items: stretch; gap: 0; }
+  .rest-row { display: flex; align-items: center; justify-content: flex-end; padding: 10px 16px; }
+  .rest-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--grey-dark); color: var(--yellow); border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+
+  /* ── Coaching Cues ── */
+  details.cues { border-top: 1px solid var(--grey-card); }
+  details.cues summary { padding: 9px 16px; font-size: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #999; cursor: pointer; list-style: none; user-select: none; }
+  details.cues summary::-webkit-details-marker { display: none; }
+  details.cues summary::before { content: '▶  Coaching Cues'; }
+  details[open].cues summary::before { content: '▼  Coaching Cues'; }
+  details.cues .cue-body { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+  details.cues .cue { font-size: 12px; line-height: 1.4; padding: 7px 10px; border-radius: 5px; }
+  details.cues .cue.good { background: #f0ffe0; color: #3a6b00; }
+  details.cues .cue.bad  { background: #fff0f0; color: #8b0000; }
+  details.cues .cue.good::before { content: '✅  '; }
+  details.cues .cue.bad::before  { content: '❌  '; }
+  .item-rest details.cues, .item-rest details.cues * { pointer-events: auto; }
+
+  /* ── Round Groups ── */
+  .round-list { margin-top: 10px; display: flex; flex-direction: column; gap: 0; }
+  .round-row { display: flex; flex-direction: column; border-bottom: 1px solid var(--grey-card); }
+  .round-row:last-child { border-bottom: none; }
+  .round-row-main { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+  .round-name { font-size: 13px; color: var(--grey-text); flex: 1; }
+  .round-detail { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; color: #aaa; margin-right: 8px; }
+  .round-group.checked .round-row { opacity: 0.5; }
+  details.round-cue { }
+  details.round-cue summary { font-size: 9px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; cursor: pointer; list-style: none; padding: 0 0 5px 0; user-select: none; }
+  details.round-cue summary::-webkit-details-marker { display: none; }
+  details.round-cue summary::before { content: '▶  Cues'; }
+  details[open].round-cue summary::before { content: '▼  Cues'; }
+  details.round-cue .round-cue-body { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 8px; }
+  details.round-cue .cue { font-size: 11px; line-height: 1.4; padding: 5px 8px; border-radius: 4px; }
+  details.round-cue .cue.good { background: #f0ffe0; color: #3a6b00; }
+  details.round-cue .cue.bad  { background: #fff0f0; color: #8b0000; }
+  details.round-cue .cue.good::before { content: '✅  '; }
+  details.round-cue .cue.bad::before  { content: '❌  '; }
+
+  /* ── Session Complete ── */
+  .session-complete { display: none; background: var(--grey-dark); border-radius: 12px; padding: 32px 24px; text-align: center; margin-top: 20px; border: 1px solid #3a3a3a; }
+  .session-complete.visible { display: block; animation: fadeUp 0.4s ease both; }
+  .complete-emoji { font-size: 48px; margin-bottom: 12px; }
+  .complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 36px; color: var(--yellow); text-transform: uppercase; line-height: 1; margin-bottom: 6px; }
+  .complete-sub { font-size: 13px; color: #666; font-weight: 300; margin-bottom: 20px; }
+  .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: #666; border: 1px solid #444; padding: 12px 24px; border-radius: 4px; cursor: pointer; }
+
+  /* ── Back Bar ── */
+  .back-bar { background: var(--grey-dark); padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .back-arrow { color: var(--yellow); font-size: 20px; line-height: 1; }
+  .back-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #888; }
+
+  /* ── Notes ── */
+  #screen-notes { background: var(--grey-bg); }
+  .notes-header { background: var(--grey-dark); padding: 48px 24px 32px; position: relative; }
+  .notes-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--purple); }
+  .notes-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: var(--white); text-transform: uppercase; line-height: 1; }
+  .notes-subtitle { font-size: 12px; color: #666; margin-top: 6px; font-weight: 300; }
+  .note-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
+  .note-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .note-icon { width: 32px; height: 32px; background: var(--purple); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .note-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; }
+  .note-chevron { font-size: 12px; color: var(--grey-text); transition: transform 0.2s; }
+  .note-card.open .note-chevron { transform: rotate(180deg); }
+  .note-body { display: none; padding: 14px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
+  .note-card.open .note-body { display: block; }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--grey-dark); display: flex; border-top: 1px solid #333; z-index: 50; }
+  .nav-item { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; border: none; background: transparent; }
+  .nav-icon { font-size: 18px; }
+  .nav-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #555; transition: color 0.2s; }
+  .nav-item.active .nav-label { color: var(--yellow); }
+
+  /* ── Timer ── */
+  .timer-overlay { position: fixed; inset: 0; background: rgba(20,20,20,0.96); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+  .timer-overlay.visible { display: flex; }
+  .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 16px; }
+  .timer-ring { width: 220px; height: 220px; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
+  .timer-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .timer-ring circle { fill: none; stroke-width: 4; }
+  .ring-bg { stroke: #333; }
+  .ring-progress { stroke: var(--yellow); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .timer-inner { position: relative; text-align: center; }
+  .timer-display { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 96px; color: var(--white); line-height: 1; letter-spacing: -2px; }
+  .timer-display.warning { color: var(--yellow); }
+  .timer-presets { display: flex; gap: 10px; margin-top: 32px; }
+  .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid #444; background: transparent; color: #aaa; cursor: pointer; }
+  .preset-btn.selected { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
+  .timer-controls { display: flex; gap: 12px; margin-top: 20px; }
+  .timer-ctrl-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 28px; border-radius: 4px; border: none; cursor: pointer; }
+  .btn-start { background: var(--yellow); color: #2A2A2A; }
+  .btn-close { background: #333; color: #aaa; }
+  .btn-reset { background: #222; color: #777; border: 1px solid #444; }
+
+  .day-focus-tag { display: inline-block; background: var(--yellow); color: var(--grey-dark); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; margin-bottom: 16px; }
+
+  /* ── Weight Log ── */
+  .weight-log { border-top: 1px solid var(--grey-card); padding: 9px 16px; display: flex; align-items: center; gap: 10px; }
+  .weight-log label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #aaa; white-space: nowrap; flex-shrink: 0; }
+  .weight-input { flex: 1; background: var(--grey-card); border: 1px solid transparent; border-radius: 4px; padding: 6px 10px; font-size: 13px; font-family: 'Barlow', sans-serif; color: var(--grey-dark); outline: none; transition: border-color 0.2s; }
+  .weight-input:focus { border-color: var(--yellow); }
+  .weight-input::placeholder { color: #bbb; }
+  .checklist-item.checked .weight-log { opacity: 0.4; }
+
+  /* ── RPE Selector ── */
+  .rpe-row { display: none; border-top: 1px solid var(--grey-card); padding: 9px 16px; align-items: center; gap: 6px; }
+  .rpe-row.visible { display: flex; animation: fadeUp 0.2s ease both; }
+  .rpe-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #aaa; margin-right: 2px; flex-shrink: 0; }
+  .rpe-btn { width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--grey-text); transition: background 0.15s, border-color 0.15s; flex-shrink: 0; }
+  .rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--grey-dark); }
+
+  /* ── Dark Toggle ── */
+  .dark-toggle { background: transparent; border: 1px solid #444; border-radius: 4px; padding: 5px 9px; cursor: pointer; font-size: 14px; margin-left: auto; line-height: 1; }
+
+  /* ── Dark Mode ── */
+  body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #888; --white: #202020; }
+  body[data-dark] .checklist-item { border-color: #333; }
+  body[data-dark] .item-name { color: #ddd; }
+  body[data-dark] .section-title { color: #666; }
+  body[data-dark] .section-header-prog::after { background: #333; }
+  body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
+  body[data-dark] .weight-input::placeholder { color: #555; }
+  body[data-dark] .rpe-btn { border-color: #444; color: #666; }
+  body[data-dark] .chip { background: #2a2a2a; color: #aaa; }
+  body[data-dark] .day-focus-tag { opacity: 0.9; }
+  body[data-dark] .round-row { border-color: #333; color: #777; }
+  body[data-dark] details.cues .cue.good { background: #1a2a0a; color: #7ab040; }
+  body[data-dark] details.cues .cue.bad  { background: #2a0a0a; color: #c06060; }
+  body[data-dark] .note-body { color: #aaa; }
+  body[data-dark] .note-card { border-color: #333; background: #202020; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes expandW  { from { width: 0; opacity: 0; } to { width: 40px; opacity: 1; } }
+
+  /* ═══ Video modal (shared.js injects this element) ═══ */
+  .video-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.92);
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: fadeIn 0.25s ease;
+  }
+  .video-modal.is-open { display: flex; }
+  .video-modal-inner {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  }
+  .video-modal-frame, .video-modal-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .video-modal-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .video-modal-close:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
+  }
+
+  /* ═══ A2HS install toast ═══ */
+  .a2hs-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%) translateY(120%);
+    z-index: 2000;
+    max-width: 380px;
+    width: calc(100% - 40px);
+    background: #1A1A1A;
+    color: #E8E8E8;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+    font-family: 'Barlow', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .a2hs-toast.is-visible { transform: translateX(-50%) translateY(0); }
+  .a2hs-toast-icon {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    border-radius: 3px;
+    background: var(--yellow);
+    color: #0A0A0A;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-family: 'Barlow Condensed', system-ui, sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .a2hs-toast-body { flex: 1; }
+  .a2hs-toast-body strong {
+    display: block;
+    font-family: 'Barlow Condensed', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .a2hs-toast button {
+    padding: 8px 12px;
+    border-radius: 3px;
+    border: none;
+    background: #0A0A0A;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .a2hs-toast button.primary {
+    background: var(--yellow);
+    color: #0A0A0A;
+  }
+  .a2hs-toast-actions { display: flex; gap: 6px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══ LOADING ═══ -->
+<div class="loading-screen" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading Program</div>
+</div>
+
+<div class="error-screen" id="error-screen">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title">Program Not Found</div>
+  <div class="error-msg" id="error-msg">Could not load athlete data. Check the URL parameter.</div>
+</div>
+
+<!-- ═══ HOME (NEW V5 DESIGN) ═══ -->
+<div id="screen-home" class="screen">
+
+  <!-- Sticky nav -->
+  <div class="home-nav">
+    <a href="https://www.amirardekani.com" target="_blank" rel="noopener" class="home-brand">
+      <strong>AmirArdekani</strong>.com
+    </a>
+    <div class="home-pills" id="homePills"></div>
+  </div>
+
+  <!-- Intro -->
+  <div class="home-intro">
+    <div class="home-eyebrow" id="home-eyebrow"></div>
+    <div class="home-name" id="home-name"></div>
+    <div class="home-meta" id="home-meta"></div>
+    <div id="home-cycle-pill-wrap"></div>
+    <div id="home-progress-wrap"></div>
+    <div id="home-simple-meta-wrap"></div>
+  </div>
+
+  <!-- Current cycle message (optional) -->
+  <div id="current-message-wrap"></div>
+
+  <!-- Next cycle (optional) -->
+  <div id="next-card-wrap"></div>
+
+  <!-- Journey spine (optional) -->
+  <div id="journey-wrap"></div>
+
+  <!-- History list (fallback) -->
+  <div id="home-history" class="home-history-list"></div>
+
+  <!-- Bottom CTA -->
+  <div class="home-bottom-cta">
+    <button class="home-cta cta-main" onclick="goTo('program')">Open Current Program</button>
+    <button class="home-cta cta-ghost" onclick="goTo('notes')">Notes</button>
+  </div>
+
+</div>
+
+<!-- ═══ ARCHIVE ═══ -->
+<div id="screen-archive" class="screen">
+  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span></div>
+  <div class="archive-banner" id="archive-banner" data-watermark="">
+    <div class="archive-label">Completed</div>
+    <div class="archive-title" id="archive-title"></div>
+  </div>
+  <div class="archive-scroll" id="archive-scroll"></div>
+</div>
+
+<!-- ═══ CURRENT PROGRAM ═══ -->
+<div id="screen-program" class="screen">
+  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span><button class="dark-toggle" onclick="toggleDark(event)">🌙</button></div>
+  <div class="prog-header">
+    <div class="prog-eyebrow" id="prog-eyebrow"></div>
+    <div class="prog-title">Training</div>
+    <div class="prog-subtitle" id="prog-subtitle"></div>
+    <div class="day-tabs" id="day-tabs"></div>
+  </div>
+  <div id="day-panels"></div>
+  <div class="v-progress" id="v-progress"><div class="v-progress-fill" id="v-fill"></div></div>
+  <div class="bottom-nav" id="nav-program">
+    <button class="nav-item active" onclick="goTo('program')"><span class="nav-icon">💪</span><span class="nav-label">Program</span></button>
+    <button class="nav-item" onclick="goTo('notes')"><span class="nav-icon">📋</span><span class="nav-label">Notes</span></button>
+  </div>
+</div>
+
+<!-- ═══ NOTES ═══ -->
+<div id="screen-notes" class="screen">
+  <div class="notes-header">
+    <div class="prog-eyebrow" id="notes-greeting"></div>
+    <div class="notes-title">Notes &amp;<br>Details</div>
+    <div class="notes-subtitle">Read these before your first session</div>
+  </div>
+  <div id="notes-container" style="padding: 20px 0 100px;"></div>
+  <div class="bottom-nav" id="nav-notes">
+    <button class="nav-item" onclick="goTo('program')"><span class="nav-icon">💪</span><span class="nav-label">Program</span></button>
+    <button class="nav-item active" onclick="goTo('notes')"><span class="nav-icon">📋</span><span class="nav-label">Notes</span></button>
+  </div>
+</div>
+
+<!-- ═══ TIMER ═══ -->
+<div class="timer-overlay" id="timerOverlay">
+  <div class="timer-exercise-name" id="timer-exercise-name"></div>
+  <div class="timer-label">Rest Timer</div>
+  <div class="timer-ring">
+    <svg viewBox="0 0 220 220">
+      <circle class="ring-bg" cx="110" cy="110" r="100"/>
+      <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="100" stroke-dasharray="628" stroke-dashoffset="0"/>
+    </svg>
+    <div class="timer-inner"><div class="timer-display" id="timerDisplay">60</div></div>
+  </div>
+  <div class="timer-presets">
+    <button class="preset-btn" onclick="setPreset(30,event)">30s</button>
+    <button class="preset-btn selected" onclick="setPreset(60,event)">60s</button>
+    <button class="preset-btn" onclick="setPreset(90,event)">90s</button>
+    <button class="preset-btn" onclick="setPreset(120,event)">2m</button>
+  </div>
+  <div class="timer-controls">
+    <button class="timer-ctrl-btn btn-start" id="startStopBtn" onclick="toggleTimer()">Start</button>
+    <button class="timer-ctrl-btn btn-reset" onclick="resetTimer()">Reset</button>
+    <button class="timer-ctrl-btn btn-close" onclick="closeTimer()">Close</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  DYNAMIC S&C PROGRAM ENGINE
+// ═══════════════════════════════════════════════════════════════════════
+
+let DATA = null;
+let ATHLETE_ID = '';
+let STORAGE_KEY = '';
+let dayTotals = {};
+let isLoading = true;
+
+// ── 1. BOOT ──
+(async function boot() {
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get('client');
+
+  if (!clientId) {
+    showError('No client specified. Use: program.html?client=athlete_id');
+    return;
+  }
+
+  try {
+    const res = await fetch(`data/${clientId}.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    DATA = await res.json();
+  } catch (e) {
+    showError(`Could not load data for "${clientId}".\n\nMake sure data/${clientId}.json exists.`);
+    return;
+  }
+
+  ATHLETE_ID = DATA.athlete.id;
+  STORAGE_KEY = ATHLETE_ID + '_prog_state';
+
+  if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
+
+  document.title = `${DATA.athlete.firstName} ${DATA.athlete.lastName} — Program ${DATA.currentProgram.number}`;
+
+  renderHome();
+  renderProgram();
+  renderNotes();
+
+  restoreState();
+  isLoading = false;
+  markSuggestedDay();
+
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('screen-home').classList.add('active');
+  }, 300);
+})();
+
+function showError(msg) {
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('error-msg').textContent = msg;
+  document.getElementById('error-screen').classList.add('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  2. RENDER: HOME (V5 DESIGN, GRACEFUL FALLBACK)
+// ═══════════════════════════════════════════════════════════════════════
+function renderHome() {
+  const a = DATA.athlete;
+  const p = DATA.currentProgram;
+  const hasCycleData = !!p.cycleName;
+  const hasJourney = !!(DATA.journey && DATA.journey.cycles && DATA.journey.cycles.length);
+
+  // ── Eyebrow & name
+  document.getElementById('home-eyebrow').textContent =
+    (DATA.sport.badge || 'Program') + (p.month ? ' · ' + p.month : '');
+
+  document.getElementById('home-name').innerHTML =
+    `${esc(a.firstName)}<span>${esc(a.lastName)}</span>`;
+
+  // ── Meta (coach, focus, etc.)
+  let metaHtml = '';
+  if (DATA.coach?.name) metaHtml += `<strong>Coach</strong> ${esc(DATA.coach.name)}`;
+  if (p.focus) metaHtml += (metaHtml ? ' · ' : '') + `<strong>Focus</strong> ${esc(p.focus)}`;
+  document.getElementById('home-meta').innerHTML = metaHtml;
+
+  // ── Cycle pill (only if cycle data exists)
+  if (hasCycleData) {
+    document.getElementById('home-cycle-pill-wrap').innerHTML = `
+      <span class="home-phase-chip">
+        <span class="live-dot"></span>
+        ${p.cycleNumber ? 'Cycle ' + p.cycleNumber + ' — ' : ''}${esc(p.cycleName)}
+      </span>`;
+  }
+
+  // ── Progress bar (only if journey exists)
+  if (hasJourney) {
+    const cycles = DATA.journey.cycles;
+    const completedCount = cycles.filter(c => c.status === 'completed').length;
+    const total = DATA.journey.totalCycles || cycles.length;
+    const activeIdx = cycles.findIndex(c => c.status === 'active');
+    const progressPct = activeIdx >= 0 ? ((activeIdx + 0.5) / total) * 100 : (completedCount / total) * 100;
+    document.getElementById('home-progress-wrap').innerHTML = `
+      <div class="home-progress">
+        <div class="home-progress-bar">
+          <div class="home-progress-fill" style="width: ${progressPct}%"></div>
+        </div>
+        <div class="home-progress-label">${activeIdx >= 0 ? activeIdx + 1 : completedCount} of ${total} cycles</div>
+      </div>`;
+
+    // Top pills
+    const pills = cycles.map(c => {
+      let cls = 'locked';
+      if (c.status === 'completed') cls = 'completed';
+      else if (c.status === 'active') cls = 'active';
+      else if (c.status === 'next') cls = 'next';
+      return `<div class="home-pill ${cls}" data-label="${esc(c.name)}" data-num="${c.num}"></div>`;
+    }).join('');
+    document.getElementById('homePills').innerHTML = pills;
+  } else {
+    // Simple fallback meta rows if no journey
+    let simple = '<div class="home-simple-meta">';
+    if (p.month) simple += `<div class="home-simple-meta-row"><strong>Program</strong><span>${esc(p.month)}</span></div>`;
+    if (p.number) simple += `<div class="home-simple-meta-row"><strong>Number</strong><span>#${esc(p.number)}</span></div>`;
+    simple += '</div>';
+    document.getElementById('home-simple-meta-wrap').innerHTML = simple;
+  }
+
+  // ── Current cycle message card (only if whyThisMatters exists)
+  if (hasCycleData && (p.whyThisMatters || p.primaryFocus || p.outcomes)) {
+    let html = `<div class="current-message">`;
+    html += `<div class="cm-eyebrow">● CURRENT CYCLE · NOW</div>`;
+    html += `<div class="cm-header">`;
+    html += `<div class="cm-title">${esc(p.cycleName)}</div>`;
+    if (p.cycleWeeks) html += `<div class="cm-weeks">${esc(p.cycleWeeks)}</div>`;
+    html += `</div>`;
+    if (p.cycleTagline) html += `<div class="cm-subtitle">${esc(p.cycleTagline)}</div>`;
+
+    // Primary / Secondary focus
+    if (p.primaryFocus || p.secondaryFocus) {
+      html += `<div class="focus-tracks">`;
+      if (p.primaryFocus) html += `
+        <div class="focus-track primary">
+          <div class="track-label">Primary Focus</div>
+          <div class="track-text">${esc(p.primaryFocus)}</div>
+        </div>`;
+      if (p.secondaryFocus) html += `
+        <div class="focus-track secondary">
+          <div class="track-label">Secondary Focus</div>
+          <div class="track-text">${esc(p.secondaryFocus)}</div>
+        </div>`;
+      html += `</div>`;
+    }
+
+    // Why this matters
+    if (p.whyThisMatters && p.whyThisMatters.length) {
+      html += `<div class="cm-body-label">Why This Cycle Matters</div>`;
+      html += `<div class="cm-body">`;
+      p.whyThisMatters.forEach(para => { html += `<p>${esc(para)}</p>`; });
+      html += `</div>`;
+    }
+
+    // Mental cue
+    if (p.mentalCue) {
+      html += `
+        <div class="mental-cue">
+          <div class="mental-cue-label">Mental Cue — This Block</div>
+          <div class="mental-cue-text">"${esc(p.mentalCue)}"</div>
+        </div>`;
+    }
+
+    // Why this matters part 2
+    if (p.whyThisMattersPart2 && p.whyThisMattersPart2.length) {
+      html += `<div class="cm-body">`;
+      p.whyThisMattersPart2.forEach(para => { html += `<p>${esc(para)}</p>`; });
+      html += `</div>`;
+    }
+
+    // Outcomes
+    if (p.outcomes && p.outcomes.length) {
+      html += `<div class="outcomes-block">`;
+      let endLabel = 'Expected Outcomes';
+      if (p.cycleWeeks) {
+        const endWeekMatch = p.cycleWeeks.match(/(\d+)\s*$/);
+        if (endWeekMatch) endLabel += ' · By End of Week ' + endWeekMatch[1];
+      }
+      html += `<div class="outcomes-label">${esc(endLabel)}</div>`;
+      html += `<div class="outcomes-heading">You'll feel:</div>`;
+      p.outcomes.forEach(o => {
+        html += `<div class="outcome-item"><div class="outcome-check">✓</div><div class="outcome-text">${esc(o)}</div></div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+    document.getElementById('current-message-wrap').innerHTML = html;
+  }
+
+  // ── Next cycle teaser
+  if (p.nextCycleTeaser) {
+    const n = p.nextCycleTeaser;
+    let html = `<div class="next-card-wrap"><div class="next-card">`;
+    html += `<div class="next-label">COMING NEXT${n.cycleNumber ? ' · CYCLE ' + String(n.cycleNumber).padStart(2,'0') : ''}${n.weeks ? ' · ' + esc(n.weeks).toUpperCase() : ''}</div>`;
+    if (n.name) html += `<div class="next-title">${esc(n.name)}</div>`;
+    if (n.subtitle) html += `<div class="next-subtitle">${esc(n.subtitle)}</div>`;
+    if (n.paragraphs && n.paragraphs.length) {
+      html += `<div class="next-teaser">`;
+      n.paragraphs.forEach((para, i) => {
+        // Last paragraph wraps in em
+        if (i === n.paragraphs.length - 1 && n.paragraphs.length > 1) {
+          html += `<p><em>${esc(para)}</em></p>`;
+        } else {
+          html += `<p>${esc(para)}</p>`;
+        }
+      });
+      html += `</div>`;
+    }
+    html += `</div></div>`;
+    document.getElementById('next-card-wrap').innerHTML = html;
+  }
+
+  // ── Journey spine
+  if (hasJourney) {
+    let html = `<div class="section-header">All ${DATA.journey.cycles.length} Cycles — Tap to Explore</div>`;
+    html += `<div class="journey">`;
+    DATA.journey.cycles.forEach(c => {
+      const statusClass = `is-${c.status || 'locked'}`;
+
+      let badge = '';
+      if (c.status === 'active') badge = '<span class="phase-badge badge-active">NOW</span>';
+      else if (c.status === 'completed') badge = '<span class="phase-badge badge-completed">✓ DONE</span>';
+      else if (c.status === 'next') badge = '<span class="phase-badge badge-next">NEXT</span>';
+
+      let extra = '';
+      if (c.status === 'locked') extra = `<div class="locked-hint">🔒 This cycle unlocks when you arrive</div>`;
+      else if (c.status === 'next') extra = `<div class="locked-hint" style="border-color: var(--purple-mid); color: var(--purple);">◌ Preview — what you're building toward</div>`;
+
+      html += `
+        <div class="phase-row ${statusClass}" data-phase="${c.num}">
+          <div class="phase-dot-wrap"><div class="phase-dot ${c.status || 'locked'}"></div></div>
+          <div class="phase-content">
+            <div class="phase-header">
+              <div class="phase-big-num">${c.num}</div>
+              <div class="phase-title-group">
+                <div class="phase-name-row">
+                  <div class="phase-name">${esc(c.name)}</div>
+                  ${badge}
+                </div>
+                ${c.tagline ? `<div class="phase-tagline">${esc(c.tagline)}</div>` : ''}
+                ${c.weeks ? `<div class="phase-weeks">${esc(c.weeks)}</div>` : ''}
+              </div>
+            </div>
+            ${(c.primary || c.secondary) ? `<div class="expand-hint"><span class="arrow">→</span> Tap to explore focus</div>` : ''}
+            <div class="phase-detail">
+              ${c.primary ? `
+                <div class="detail-focus primary">
+                  <div class="detail-focus-label">Primary Focus</div>
+                  <div class="detail-focus-text">${esc(c.primary)}</div>
+                </div>` : ''}
+              ${c.secondary ? `
+                <div class="detail-focus secondary">
+                  <div class="detail-focus-label">Secondary Focus</div>
+                  <div class="detail-focus-text">${esc(c.secondary)}</div>
+                </div>` : ''}
+              ${extra}
+            </div>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+    document.getElementById('journey-wrap').innerHTML = html;
+
+    // Attach expand handlers
+    document.querySelectorAll('.phase-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const was = row.classList.contains('expanded');
+        document.querySelectorAll('.phase-row.expanded').forEach(r => r.classList.remove('expanded'));
+        if (!was) row.classList.add('expanded');
+      });
+    });
+
+    // Auto-expand the active cycle
+    const activeRow = document.querySelector('.phase-row.is-active');
+    if (activeRow) activeRow.classList.add('expanded');
+  }
+
+  // ── History list (archives)
+  if (DATA.programHistory && DATA.programHistory.length) {
+    let html = `<div class="section-header" style="padding-left: 0;">Past Programs</div>`;
+    DATA.programHistory.forEach(h => {
+      html += `
+        <div class="home-history-item" onclick="goTo('archive','${esc(h.id)}')">
+          <span class="home-history-icon">◰</span>
+          <span class="home-history-label">${esc(h.label)}</span>
+          <span class="home-history-arrow">→</span>
+        </div>`;
+    });
+    document.getElementById('home-history').innerHTML = html;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  3. RENDER: CURRENT PROGRAM (unchanged)
+// ═══════════════════════════════════════════════════════════════════════
+function renderProgram() {
+  const p = DATA.currentProgram;
+  const a = DATA.athlete;
+
+  document.getElementById('prog-eyebrow').textContent = p.eyebrow || '';
+  document.getElementById('prog-subtitle').textContent =
+    `Designed for ${a.firstName} ${a.lastName} by ${DATA.coach.name}`;
+
+  const days = p.days;
+  dayTotals = {};
+
+  const tabsHtml = days.map((day, i) => {
+    const total = countExercises(day);
+    dayTotals[String(day.id)] = total;
+    return `<button class="day-tab${i === 0 ? ' active' : ''}"
+      onclick="switchDay(${day.id})">Day ${day.id}
+      <span class="tab-progress-pill" id="pill-${day.id}">0/${total}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('day-tabs').innerHTML = tabsHtml;
+
+  const panelsHtml = days.map((day, i) => {
+    let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
+    html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
+
+    day.blocks.forEach(block => {
+      html += `<div class="section-header-prog"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
+      block.exercises.forEach(ex => {
+        html += renderExercise(ex, day.id);
+      });
+    });
+
+    html += `<div class="session-confirm" id="confirm-${day.id}">
+      <span class="confirm-text">All done with Day ${day.id}?</span>
+      <button class="confirm-btn" onclick="confirmSession('${day.id}')">Finish Session ✓</button>
+    </div>`;
+    html += `<div class="session-complete" id="complete-${day.id}">
+      <div class="complete-emoji">🏆</div>
+      <div class="complete-title">${esc(day.completionTitle)}</div>
+      <div class="complete-sub">${esc(day.completionMessage)}</div>
+      <button class="reset-session-btn" onclick="resetDay('${day.id}')">Reset Session</button>
+    </div>`;
+    html += `</div>`;
+    return html;
+  }).join('');
+
+  document.getElementById('day-panels').innerHTML = panelsHtml;
+}
+
+function countExercises(day) {
+  let count = 0;
+  day.blocks.forEach(b => { count += b.exercises.length; });
+  return count;
+}
+
+function renderExercise(ex, dayId) {
+  if (ex.type === 'circuit') return renderCircuit(ex, dayId);
+
+  const chipsHtml = (ex.chips || []).map(c =>
+    `<span class="chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`
+  ).join('');
+
+  const cuesHtml = renderCues(ex.cues);
+  const hasRest = ex.hasRest;
+  const playBtn = ex.videoUrl
+    ? `<button class="play-btn" onclick="handlePlayVideo('${ex.videoUrl}');event.stopPropagation();">▶</button>`
+    : '';
+
+  let restBlock = '';
+  if (cuesHtml || hasRest) {
+    restBlock = `<div class="item-rest">${cuesHtml}`;
+    if (hasRest) restBlock += `<div class="rest-row"><button class="rest-btn" onclick="openTimer(event)">Rest ⏱</button></div>`;
+    restBlock += `</div>`;
+  }
+
+  return `<div class="checklist-item" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
+    <div class="item-main"><div class="check-box"></div>
+      <div class="item-body">
+        <div class="item-name">${esc(ex.name)}</div>
+        ${chipsHtml ? `<div class="item-chips">${chipsHtml}</div>` : ''}
+      </div>
+      ${playBtn}
+    </div>
+    ${restBlock}
+  </div>`;
+}
+
+function renderCircuit(ex, dayId) {
+  const roundsHtml = (ex.items || []).map(item => {
+    const itemCues = renderRoundCues(item.cues);
+    return `<div class="round-row">
+      <div class="round-row-main"><span class="round-name">${esc(item.name)}</span><span class="round-detail">${esc(item.detail)}</span></div>
+      ${itemCues}
+    </div>`;
+  }).join('');
+
+  const playBtn = ex.videoUrl
+    ? `<button class="play-btn" onclick="handlePlayVideo('${ex.videoUrl}');event.stopPropagation();">▶</button>`
+    : '';
+
+  return `<div class="checklist-item round-group" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
+    <div class="item-main"><div class="check-box"></div>
+      <div class="item-body">
+        <div class="item-name">${esc(ex.name)}</div>
+        <div class="item-chips"><span class="chip yellow">${esc(ex.rounds)}</span></div>
+        <div class="round-list">${roundsHtml}</div>
+      </div>
+      ${playBtn}
+    </div>
+  </div>`;
+}
+
+function handlePlayVideo(url) {
+  if (!url) return;
+  if (window.VideoModal && typeof window.VideoModal.open === 'function') {
+    window.VideoModal.open(url);
+    return;
+  }
+  window.open(url, '_blank');
+}
+
+function renderCues(cues) {
+  if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
+  let body = '';
+  (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
+  (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
+  return `<details class="cues"><summary></summary><div class="cue-body">${body}</div></details>`;
+}
+
+function renderRoundCues(cues) {
+  if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
+  let body = '';
+  (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
+  (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
+  return `<details class="round-cue"><summary></summary><div class="round-cue-body">${body}</div></details>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  4. RENDER: ARCHIVE (unchanged)
+// ═══════════════════════════════════════════════════════════════════════
+function renderArchive(programId) {
+  const program = (DATA.programHistory || []).find(p => p.id === programId);
+  if (!program) return;
+
+  document.getElementById('archive-banner').setAttribute('data-watermark', program.label.toUpperCase());
+  document.getElementById('archive-title').innerHTML =
+    `${esc(program.label)}<br><span>${esc(program.subtitle)}</span>`;
+
+  document.getElementById('archive-scroll').innerHTML = program.days.map(day => `
+    <div class="archive-day-block">
+      <div class="archive-day-title">${esc(day.label)} <span>· ${esc(day.focus)}</span></div>
+      <div class="archive-exercise-list">
+        ${day.exercises.map(ex =>
+          `<div class="archive-ex"><span class="archive-ex-name">${esc(ex.name)}</span><span class="archive-ex-detail">${esc(ex.detail)}</span></div>`
+        ).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  5. RENDER: NOTES (unchanged)
+// ═══════════════════════════════════════════════════════════════════════
+function renderNotes() {
+  const notes = DATA.notes;
+  if (!notes) return;
+
+  document.getElementById('notes-greeting').textContent = notes.greeting;
+
+  document.getElementById('notes-container').innerHTML = (notes.cards || []).map(card => `
+    <div class="note-card" onclick="toggleNote(this)">
+      <div class="note-card-header">
+        <div class="note-icon">${card.icon}</div>
+        <div class="note-card-title">${esc(card.title)}</div>
+        <span class="note-chevron">▼</span>
+      </div>
+      <div class="note-body">${esc(card.body)}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  6. INTERACTIVITY
+// ═══════════════════════════════════════════════════════════════════════
+
+function goTo(screen, historyId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const id = screen === 'archive' ? 'screen-archive' : 'screen-' + screen;
+  document.getElementById(id).classList.add('active');
+  document.getElementById('v-progress').classList.toggle('active', screen === 'program');
+  if (screen === 'archive' && historyId) renderArchive(historyId);
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (screen === 'program') {
+    document.querySelectorAll('#nav-program .nav-item:first-child, #nav-notes .nav-item:first-child').forEach(n => n.classList.add('active'));
+  } else if (screen === 'notes') {
+    document.querySelectorAll('#nav-program .nav-item:last-child, #nav-notes .nav-item:last-child').forEach(n => n.classList.add('active'));
+  }
+  window.scrollTo(0, 0);
+}
+
+function switchDay(n) {
+  const dayIds = DATA.currentProgram.days.map(d => d.id);
+  document.querySelectorAll('.day-tab').forEach((t, i) =>
+    t.classList.toggle('active', dayIds[i] === n));
+  document.querySelectorAll('.day-content').forEach((d, i) =>
+    d.classList.toggle('active', dayIds[i] === n));
+  updateProgress(String(n));
+  window.scrollTo(0, 0);
+}
+
+function toggleCheck(item, day) {
+  if (event && event.target.closest('details, .weight-log, .rpe-row, .play-btn')) return;
+  item.classList.toggle('checked');
+  const rpeRow = item.querySelector('.rpe-row');
+  if (rpeRow) rpeRow.classList.toggle('visible', item.classList.contains('checked'));
+  saveState();
+  updateProgress(day);
+}
+
+function updateProgress(day) {
+  const total = dayTotals[day];
+  if (!total) return;
+  const items = document.querySelectorAll(`[data-day="${day}"]`);
+  const done  = Array.from(items).filter(i => i.classList.contains('checked')).length;
+
+  const pill = document.getElementById('pill-' + day);
+  if (pill) {
+    pill.textContent = done + '/' + total;
+    pill.classList.toggle('complete', done === total);
+  }
+
+  document.getElementById('v-fill').style.height = (done / total * 100) + '%';
+
+  const confirmEl  = document.getElementById('confirm-'  + day);
+  const completeEl = document.getElementById('complete-' + day);
+  if (done === total && !completeEl.classList.contains('visible') && !isLoading) {
+    confirmEl.classList.add('visible');
+  } else if (done < total) {
+    confirmEl.classList.remove('visible');
+    completeEl.classList.remove('visible');
+  }
+}
+
+function confirmSession(day) {
+  document.getElementById('confirm-' + day).classList.remove('visible');
+  const completeEl = document.getElementById('complete-' + day);
+  completeEl.classList.add('visible');
+  completeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  localStorage.setItem(ATHLETE_ID + '_completed_d' + day, new Date().toDateString());
+  markSuggestedDay();
+}
+
+function markSuggestedDay() {
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('suggested'));
+  const tabs = document.querySelectorAll('.day-tab');
+  const dayIds = DATA.currentProgram.days.map(d => String(d.id));
+  for (let i = 0; i < dayIds.length; i++) {
+    if (!localStorage.getItem(ATHLETE_ID + '_completed_d' + dayIds[i])) {
+      tabs[i]?.classList.add('suggested');
+      break;
+    }
+  }
+}
+
+function resetDay(day) {
+  document.querySelectorAll(`[data-day="${day}"]`).forEach(i => i.classList.remove('checked'));
+  document.querySelectorAll(`[data-day="${day}"] .rpe-row`).forEach(r => r.classList.remove('visible'));
+  document.getElementById('confirm-'  + day).classList.remove('visible');
+  document.getElementById('complete-' + day).classList.remove('visible');
+  localStorage.removeItem(ATHLETE_ID + '_completed_d' + day);
+  saveState();
+  updateProgress(day);
+  markSuggestedDay();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleNote(card) { card.classList.toggle('open'); }
+
+function saveState() {
+  const state = {};
+  Object.keys(dayTotals).forEach(day => {
+    state[day] = Array.from(document.querySelectorAll(`[data-day="${day}"]`))
+      .map(i => i.classList.contains('checked'));
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+
+function restoreState() {
+  const state = loadState();
+  Object.keys(dayTotals).forEach(day => {
+    const items = Array.from(document.querySelectorAll(`[data-day="${day}"]`));
+    (state[day] || []).forEach((checked, idx) => {
+      if (checked && items[idx]) {
+        items[idx].classList.add('checked');
+        const rpeRow = items[idx].querySelector('.rpe-row');
+        if (rpeRow) rpeRow.classList.add('visible');
+      }
+    });
+    if (localStorage.getItem(ATHLETE_ID + '_completed_d' + day)) {
+      const el = document.getElementById('complete-' + day);
+      if (el) el.classList.add('visible');
+    }
+    updateProgress(day);
+  });
+
+  initWeightLogs();
+  initRPE();
+}
+
+function initWeightLogs() {
+  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
+    if (!card.querySelector('.rest-btn')) return;
+    const name  = card.querySelector('.item-name').textContent.trim();
+    const wKey  = ATHLETE_ID + '_wlog_' + name.replace(/\s+/g, '_');
+    const saved = localStorage.getItem(wKey) || '';
+    const div   = document.createElement('div');
+    div.className = 'weight-log';
+    div.innerHTML = `<label>Weight</label><input class="weight-input" type="text" placeholder="e.g. 60 kg × 6" value="${esc(saved)}">`;
+    div.querySelector('input').addEventListener('input', e => localStorage.setItem(wKey, e.target.value));
+    div.addEventListener('click', e => e.stopPropagation());
+    card.appendChild(div);
+  });
+}
+
+function initRPE() {
+  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
+    if (!card.querySelector('.rest-btn')) return;
+    const name   = card.querySelector('.item-name').textContent.trim();
+    const rpeKey = ATHLETE_ID + '_rpe_' + name.replace(/\s+/g, '_');
+    const saved  = localStorage.getItem(rpeKey);
+    const div    = document.createElement('div');
+    div.className = 'rpe-row';
+    div.innerHTML = '<span class="rpe-label">RPE</span>' +
+      [6,7,8,9,10].map(n =>
+        `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
+      ).join('');
+    card.appendChild(div);
+  });
+}
+
+function selectRPE(btn, key, e) {
+  e.stopPropagation();
+  btn.closest('.rpe-row').querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  localStorage.setItem(key, btn.textContent.trim());
+}
+
+function toggleDark(e) {
+  e.stopPropagation();
+  const on = document.body.hasAttribute('data-dark');
+  on ? document.body.removeAttribute('data-dark') : document.body.setAttribute('data-dark', '');
+  localStorage.setItem('dark_mode', on ? '' : '1');
+}
+
+// ── Timer ──
+let timerDuration = 60, timerRemaining = 60, timerInterval = null, timerRunning = false;
+const circumference = 2 * Math.PI * 100;
+
+function openTimer(e) {
+  if (e) e.stopPropagation();
+  const card = e ? e.target.closest('.checklist-item') : null;
+  const name = card ? card.querySelector('.item-name').textContent.trim() : '';
+  document.getElementById('timer-exercise-name').textContent = name;
+  document.getElementById('timerOverlay').classList.add('visible');
+  resetTimer();
+}
+
+function closeTimer() { document.getElementById('timerOverlay').classList.remove('visible'); pauseTimer(); }
+
+function setPreset(secs, e) {
+  if (e) e.stopPropagation();
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+  if (e) e.target.classList.add('selected');
+  timerDuration = secs; timerRemaining = secs;
+  pauseTimer(); updateTimerDisplay(); updateRing(1);
+}
+
+function toggleTimer() { timerRunning ? pauseTimer() : startTimer(); }
+
+function startTimer() {
+  if (timerRemaining <= 0) timerRemaining = timerDuration;
+  timerRunning = true;
+  document.getElementById('startStopBtn').textContent = 'Pause';
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    updateTimerDisplay();
+    updateRing(timerRemaining / timerDuration);
+    if (timerRemaining <= 0) {
+      pauseTimer();
+      document.getElementById('timerDisplay').textContent = 'GO!';
+      document.getElementById('timerDisplay').classList.add('warning');
+      setTimeout(() => { document.getElementById('timerDisplay').classList.remove('warning'); closeTimer(); }, 1200);
+    }
+  }, 1000);
+}
+
+function pauseTimer() { timerRunning = false; clearInterval(timerInterval); document.getElementById('startStopBtn').textContent = 'Start'; }
+
+function resetTimer() {
+  pauseTimer(); timerRemaining = timerDuration;
+  updateTimerDisplay(); updateRing(1);
+  document.getElementById('timerDisplay').classList.remove('warning');
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (timerRemaining > 60) {
+    const m = Math.floor(timerRemaining / 60), s = timerRemaining % 60;
+    el.textContent = m + ':' + String(s).padStart(2, '0');
+  } else { el.textContent = timerRemaining; }
+  el.classList.toggle('warning', timerRemaining <= 5);
+}
+
+function updateRing(fraction) {
+  document.getElementById('ringProgress').style.strokeDashoffset = circumference * (1 - fraction);
+}
+
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+</script>
+
+<!-- Shared helpers: VideoModal + A2HS prompt -->
+<script defer src="/assets/js/shared.js"></script>
+<script>
+  // Offer Add-to-Home-Screen a few seconds after first paint.
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
+    }, 2500);
+  });
+</script>
+
+</body>
+</html>
