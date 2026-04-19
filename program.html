@@ -630,6 +630,17 @@
   }
   .cta-notes:active { background: var(--ice-mid); transform: scale(0.98); }
 
+  /* Past Programs button — purple to distinguish from Current + Notes */
+  .cta-history {
+    background: var(--purple-dim);
+    color: var(--purple);
+    border: 1px solid var(--purple-mid);
+  }
+  .cta-history:active { background: var(--purple-mid); transform: scale(0.98); }
+
+  /* When all 3 buttons are visible, tighten padding so labels fit on small screens */
+  .home-bottom-cta.has-three .home-cta { padding: 14px 8px; font-size: 13px; letter-spacing: 0.5px; }
+
   .home-history-list {
     padding: 0 24px 24px;
   }
@@ -1109,10 +1120,11 @@
   <!-- History list (fallback) -->
   <div id="home-history" class="home-history-list"></div>
 
-  <!-- Bottom CTA -->
-  <div class="home-bottom-cta">
-    <button class="home-cta cta-main" onclick="goTo('program')">Open Current Program</button>
+  <!-- Bottom CTA — the "Past Programs" button is only shown when the athlete has programHistory -->
+  <div class="home-bottom-cta" id="home-bottom-cta">
+    <button class="home-cta cta-main" onclick="goTo('program')">Current Program</button>
     <button class="home-cta cta-notes" onclick="goTo('notes')">Notes</button>
+    <button class="home-cta cta-history" id="cta-past-programs" onclick="openFirstArchive()" style="display:none">Past Programs</button>
   </div>
 
 </div>
@@ -1146,6 +1158,7 @@
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
+  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span></div>
   <div class="notes-header">
     <div class="prog-eyebrow" id="notes-greeting"></div>
     <div class="notes-title">Notes &amp;<br>Details</div>
@@ -1448,6 +1461,18 @@ function renderHome() {
         </div>`;
     });
     document.getElementById('home-history').innerHTML = html;
+
+    // Reveal the "Past Programs" button in the bottom CTA bar + compact the 3-button layout
+    const pastBtn = document.getElementById('cta-past-programs');
+    if (pastBtn) pastBtn.style.display = '';
+    document.getElementById('home-bottom-cta').classList.add('has-three');
+  }
+}
+
+// Opens the most recent archived program (first entry of programHistory)
+function openFirstArchive() {
+  if (DATA.programHistory && DATA.programHistory.length) {
+    goTo('archive', DATA.programHistory[0].id);
   }
 }
 
