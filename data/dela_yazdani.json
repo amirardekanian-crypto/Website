@@ -4,17 +4,85 @@
     "firstName": "Dela",
     "lastName": "Yazdani"
   },
-  "coach": {
-    "name": "Amirhossein"
-  },
   "sport": {
     "badge": "🏋️ Fitness & Body Recomposition"
   },
-  "currentProgram": {
-    "number": 1,
-    "eyebrow": "Program 01 · Foundation Forge",
-    "month": "Cycle 1 · Weeks 1–4",
-    "focus": "Movement Foundation & Body Recomposition",
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "tagline": "Build the Platform",
+      "weeks": "Weeks 1–4",
+      "focuses": [
+        "Build fundamental movement patterns and establish the training habit.",
+        "Prime the nervous system and begin shifting body composition from baseline."
+      ],
+      "message": {
+        "paragraphs": [
+          "This phase is not the most exciting one. It is the most important one. Everything that happens in Cycles 2 through 5 — every strength gain, every body composition shift, every visible change — is built on what you do right now.",
+          "Foundation Forge exists to teach your body how to move correctly under load, to build the connective tissue and motor patterns that allow you to train hard later without breaking down. You are not just exercising. You are programming your nervous system.",
+          "Your job this cycle is simple: show up, move well, and do not rush. The weights will feel light. That is correct."
+        ],
+        "outcomes": [
+          "Noticeably improved energy across training days",
+          "Movement patterns feel more controlled and deliberate",
+          "Sleep quality begins to shift as the body adapts to regular training",
+          "Body awareness and proprioception improve — you will feel muscles working that you couldn't before",
+          "Priority lifts tracked and baseline loads established for Cycle 2"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Structural Build",
+      "tagline": "Load the Foundation",
+      "weeks": "Weeks 5–10",
+      "focuses": [
+        "Develop progressive strength across all major movement patterns.",
+        "Increase mechanical tension to drive visible muscle development."
+      ],
+      "teaser": {
+        "subtitle": "The loading begins in earnest.",
+        "paragraphs": [
+          "The movement foundation you are building right now becomes the platform for real progressive overload — structured week-by-week weight increases that directly reshape muscle tissue. You will discover what you are genuinely capable of lifting, and it will be more than you expect.",
+          "Finish this cycle clean and you will have earned it."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Metabolic Shift",
+      "tagline": "Ignite the Engine",
+      "weeks": "Weeks 11–16",
+      "focuses": [
+        "Layer metabolic demand onto the strength base to accelerate fat loss.",
+        "Improve work capacity and cardiovascular resilience."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Recomposition Peak",
+      "tagline": "Build What's Visible",
+      "weeks": "Weeks 17–22",
+      "focuses": [
+        "Maximise hypertrophy through increased volume and intensity.",
+        "Sharpen body composition and develop visible muscle definition."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Shape & Sustain",
+      "tagline": "Own It Long-Term",
+      "weeks": "Weeks 23–28",
+      "focuses": [
+        "Peak the physique and consolidate all strength gains.",
+        "Build the lifestyle infrastructure to sustain results independently."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Foundation Forge",
     "days": [
       {
         "id": 1,
@@ -29,7 +97,6 @@
               {
                 "type": "simple",
                 "name": "Bike or Treadmill",
-                "videoUrl": null,
                 "chips": [
                   { "label": "5 minutes", "style": "dark" },
                   { "label": "Low Intensity", "style": "dark" }
@@ -53,7 +120,6 @@
               {
                 "type": "circuit",
                 "name": "Movement Prep",
-                "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "items": [
                   {
@@ -100,7 +166,6 @@
               {
                 "type": "standard",
                 "name": "Box Step-Up",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Movement Prep", "style": "yellow" },
@@ -118,7 +183,6 @@
               {
                 "type": "standard",
                 "name": "Lateral Step-Touch",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "2 Sets" },
@@ -141,7 +205,6 @@
               {
                 "type": "standard",
                 "name": "Goblet Squat",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Priority", "style": "yellow" },
@@ -161,7 +224,6 @@
               {
                 "type": "standard",
                 "name": "Romanian Deadlift (DB)",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -180,7 +242,6 @@
               {
                 "type": "standard",
                 "name": "Leg Press",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -199,7 +260,6 @@
               {
                 "type": "standard",
                 "name": "Seated Leg Curl",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -232,7 +292,6 @@
               {
                 "type": "simple",
                 "name": "Rowing Machine or Arm Swings + March",
-                "videoUrl": null,
                 "chips": [
                   { "label": "5 minutes", "style": "dark" },
                   { "label": "Easy Pace", "style": "dark" }
@@ -254,7 +313,6 @@
               {
                 "type": "circuit",
                 "name": "Shoulder & Upper Back Prep",
-                "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "items": [
                   {
@@ -312,7 +370,6 @@
               {
                 "type": "standard",
                 "name": "Seated Machine Chest Press",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Start Here", "style": "yellow" },
@@ -332,7 +389,6 @@
               {
                 "type": "standard",
                 "name": "Lat Pulldown (Cable)",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -351,7 +407,6 @@
               {
                 "type": "standard",
                 "name": "DB Overhead Press",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -370,7 +425,6 @@
               {
                 "type": "standard",
                 "name": "Seated Cable Row",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -389,7 +443,6 @@
               {
                 "type": "standard",
                 "name": "DB Lateral Raise",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -408,7 +461,6 @@
               {
                 "type": "standard",
                 "name": "Cable Tricep Pushdown",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -427,7 +479,6 @@
               {
                 "type": "standard",
                 "name": "DB Bicep Curl",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -460,7 +511,6 @@
               {
                 "type": "simple",
                 "name": "Walk or March in Place",
-                "videoUrl": null,
                 "chips": [
                   { "label": "5 minutes", "style": "dark" }
                 ],
@@ -481,7 +531,6 @@
               {
                 "type": "circuit",
                 "name": "Core & Hip Activation",
-                "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "items": [
                   {
@@ -528,7 +577,6 @@
               {
                 "type": "standard",
                 "name": "Box Step-Up with Knee Drive",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Movement Prep", "style": "yellow" },
@@ -546,7 +594,6 @@
               {
                 "type": "standard",
                 "name": "Lateral Shuffle (controlled)",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "2 Sets" },
@@ -569,7 +616,6 @@
               {
                 "type": "standard",
                 "name": "DB Sumo Deadlift",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Priority", "style": "yellow" },
@@ -589,7 +635,6 @@
               {
                 "type": "standard",
                 "name": "DB Reverse Lunge",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -608,7 +653,6 @@
               {
                 "type": "standard",
                 "name": "Seated Cable Row",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -627,7 +671,6 @@
               {
                 "type": "standard",
                 "name": "DB Arnold Press",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -660,7 +703,6 @@
               {
                 "type": "simple",
                 "name": "Stationary Bike",
-                "videoUrl": null,
                 "chips": [
                   { "label": "5 minutes", "style": "dark" },
                   { "label": "Easy Pace", "style": "dark" }
@@ -682,7 +724,6 @@
               {
                 "type": "circuit",
                 "name": "Glute Activation",
-                "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "items": [
                   {
@@ -729,7 +770,6 @@
               {
                 "type": "standard",
                 "name": "Squat-to-Stand",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Movement Prep", "style": "yellow" },
@@ -747,7 +787,6 @@
               {
                 "type": "standard",
                 "name": "Forward Skip",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "2 Sets" },
@@ -770,7 +809,6 @@
               {
                 "type": "standard",
                 "name": "Hip Thrust",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "Priority 🔥", "style": "yellow" },
@@ -790,7 +828,6 @@
               {
                 "type": "standard",
                 "name": "Cable Glute Kickback",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -809,7 +846,6 @@
               {
                 "type": "standard",
                 "name": "DB Sumo Squat",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
@@ -828,7 +864,6 @@
               {
                 "type": "standard",
                 "name": "Lying Leg Curl",
-                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   { "label": "3 Sets" },
