@@ -166,8 +166,16 @@
 }
 .footer-link:hover { color: var(--accent); }
 
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.footer-contact .footer-link { font-size: 12px; }
+
 @media (max-width: 600px) {
   .footer-inner { flex-direction: column; text-align: center; gap: 16px; }
+  .footer-contact { align-items: center; }
 }
 
 /* ═══ Chips ═══ */
