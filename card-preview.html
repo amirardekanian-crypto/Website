@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise Card — Design Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #D4FF00;
+    --ice: #B8E0F6;
+    --purple: #B794F6;
+    --grey-bg: #F0F0F0;
+    --grey-mid: #D8D8D8;
+    --grey-dark: #2A2A2A;
+    --grey-card: #E8E8E8;
+    --grey-text: #555;
+    --white: #FAFAFA;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--grey-bg);
+    color: var(--grey-dark);
+    min-height: 100vh;
+    padding: 30px 16px 60px;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; }
+
+  .page-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--grey-text);
+    margin-bottom: 30px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 720px) {
+    .columns { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+
+  .col-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 10px;
+  }
+  .col-label.proposed { color: var(--grey-dark); }
+  .col-label.proposed::after {
+    content: ' · NEW';
+    background: var(--yellow);
+    color: var(--grey-dark);
+    padding: 2px 6px;
+    margin-left: 6px;
+    border-radius: 3px;
+    font-size: 10px;
+  }
+
+  /* ═══ CURRENT DESIGN ═══ */
+  .current .checklist-item {
+    background: var(--white);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--grey-mid);
+    overflow: hidden;
+    transition: border-color 0.25s, opacity 0.25s;
+    cursor: pointer;
+    user-select: none;
+  }
+  .current .item-main { display: flex; align-items: center; padding: 14px 16px; gap: 14px; }
+  .current .check-box {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid var(--grey-mid);
+    background: transparent; flex-shrink: 0;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .current .check-box::after {
+    content: '✓'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--grey-dark);
+    opacity: 0; transform: scale(0.5);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .current .item-body { flex: 1; min-width: 0; }
+  .current .item-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 18px; line-height: 1.1;
+    color: var(--grey-dark);
+  }
+  .current .item-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .current .chip {
+    font-size: 11px; font-weight: 500;
+    padding: 2px 8px; border-radius: 20px;
+    background: var(--grey-card); color: var(--grey-dark);
+    letter-spacing: 0.3px;
+  }
+  .current .chip.yellow { background: var(--yellow); color: var(--grey-dark); }
+  .current .play-btn {
+    display: flex; align-items: center; gap: 3px;
+    background: transparent;
+    border: 1px solid var(--grey-mid);
+    border-radius: 4px;
+    padding: 5px 9px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 12px;
+    color: var(--grey-text);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .current .item-rest {
+    border-top: 1px solid var(--grey-card);
+    display: flex; justify-content: flex-end;
+    padding: 10px 16px;
+  }
+  .current .rest-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: var(--grey-dark); color: var(--yellow);
+    border: none; padding: 7px 12px; border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Current Coaching Cues */
+  .current details.cues { border-top: 1px solid var(--grey-card); }
+  .current details.cues summary {
+    padding: 9px 16px;
+    font-size: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #999;
+    cursor: pointer; list-style: none; user-select: none;
+  }
+  .current details.cues summary::-webkit-details-marker { display: none; }
+  .current details.cues summary::before { content: '▶  Coaching Cues'; }
+  .current details[open].cues summary::before { content: '▼  Coaching Cues'; }
+  .current details.cues .cue-body {
+    padding: 8px 16px 12px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .current details.cues .cue {
+    font-size: 12px; line-height: 1.4;
+    padding: 7px 10px; border-radius: 5px;
+  }
+  .current details.cues .cue.good { background: #f0ffe0; color: #3a6b00; }
+  .current details.cues .cue.bad  { background: #fff0f0; color: #8b0000; }
+  .current details.cues .cue.good::before { content: '✅  '; }
+  .current details.cues .cue.bad::before  { content: '❌  '; }
+
+  /* ═══ PROPOSED DESIGN ═══ */
+  .proposed .card {
+    position: relative;
+    background: var(--white);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: transform 0.12s ease, box-shadow 0.2s, background 0.3s;
+    cursor: pointer;
+    user-select: none;
+  }
+  /* Left-edge accent stripe — color matches block type, same palette as the home page */
+  .proposed .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--grey-mid);
+    transition: opacity 0.25s;
+  }
+  .proposed .card.warmup::before   { background: var(--ice); }
+  .proposed .card.strength::before { background: var(--yellow); }
+  .proposed .card.power::before    { background: var(--purple); }
+  .proposed .card.checked::before  { opacity: 0.45; }
+  .proposed .card:active {
+    transform: scale(0.99);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .proposed .card.checked {
+    background: rgba(212,255,0,0.06);
+    border-color: rgba(212,255,0,0.35);
+  }
+  .proposed .card.checked .item-name {
+    text-decoration: line-through;
+    color: #888;
+  }
+  .proposed .card.checked .check-box {
+    background: var(--yellow);
+    border-color: var(--yellow);
+  }
+  .proposed .card.checked .check-box::after {
+    opacity: 1; transform: scale(1);
+  }
+
+  .proposed .item-main {
+    display: flex; align-items: center;
+    padding: 16px 18px; gap: 16px;
+  }
+  .proposed .check-box {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid var(--grey-mid);
+    background: transparent; flex-shrink: 0;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .proposed .check-box::after {
+    content: '✓'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--grey-dark);
+    opacity: 0; transform: scale(0.5);
+    transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .proposed .item-body { flex: 1; min-width: 0; }
+  .proposed .item-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 21px; line-height: 1.1;
+    letter-spacing: 0.3px;
+    color: var(--grey-dark);
+    transition: color 0.2s;
+  }
+  .proposed .item-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 8px;
+  }
+  .proposed .chip {
+    font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+    background: var(--grey-card); color: var(--grey-dark);
+    letter-spacing: 0.3px;
+  }
+  .proposed .chip.stat {
+    /* numeric chips use monospace so data reads cleanly */
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 3px 9px;
+    background: #1a1a1a;
+    color: var(--yellow);
+    letter-spacing: 0;
+  }
+
+  /* Filled-yellow play button */
+  .proposed .play-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--yellow);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    transition: transform 0.15s;
+  }
+  .proposed .play-btn:hover { transform: scale(1.05); }
+  .proposed .play-btn svg {
+    width: 14px; height: 14px;
+    fill: var(--grey-dark);
+    margin-left: 2px;
+  }
+
+  .proposed .item-rest {
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex; justify-content: flex-end;
+    padding: 10px 16px;
+  }
+  .proposed .rest-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: var(--grey-dark); color: var(--yellow);
+    border: none; padding: 8px 14px; border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* Proposed Coaching Cues */
+  .proposed details.cues { border-top: 1px solid rgba(0,0,0,0.05); }
+  .proposed details.cues summary {
+    padding: 12px 18px;
+    font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--grey-text);
+    cursor: pointer; list-style: none; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.15s;
+  }
+  .proposed details.cues summary:hover { color: var(--grey-dark); }
+  .proposed details.cues summary::-webkit-details-marker { display: none; }
+  .proposed details.cues .chev {
+    width: 10px; height: 10px;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+  .proposed details[open].cues .chev { transform: rotate(90deg); }
+  .proposed details.cues .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
+  .proposed details.cues .cue-body {
+    padding: 4px 18px 14px;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .proposed details.cues .cue {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px; line-height: 1.45;
+    padding: 9px 12px 9px 14px;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+    background: rgba(0,0,0,0.025);
+    display: flex; align-items: flex-start; gap: 9px;
+  }
+  .proposed details.cues .cue::before {
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    width: 16px; height: 16px; border-radius: 50%;
+    font-size: 10px; font-weight: 700;
+    margin-top: 1px;
+  }
+  .proposed details.cues .cue.good {
+    border-left-color: #6DBE45;
+    background: rgba(109,190,69,0.08);
+    color: #2a4d0f;
+  }
+  .proposed details.cues .cue.good::before {
+    content: '✓';
+    background: #6DBE45;
+    color: white;
+  }
+  .proposed details.cues .cue.bad {
+    border-left-color: #E74C3C;
+    background: rgba(231,76,60,0.07);
+    color: #6b1a10;
+  }
+  .proposed details.cues .cue.bad::before {
+    content: '✕';
+    background: #E74C3C;
+    color: white;
+  }
+
+  .notes {
+    margin-top: 32px;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--grey-text);
+  }
+  .notes strong { color: var(--grey-dark); }
+  .notes-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 10px; color: var(--grey-dark);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-title">Exercise Card Preview</div>
+    <div class="page-sub">Tap the cards to see the checked state. Resize the window to see mobile layout.</div>
+
+    <div class="columns">
+      <!-- ═══ CURRENT ═══ -->
+      <div class="current">
+        <div class="col-label">Current</div>
+
+        <div class="checklist-item">
+          <div class="item-main">
+            <div class="check-box"></div>
+            <div class="item-body">
+              <div class="item-name">Bike — Easy Spin</div>
+              <div class="item-chips">
+                <span class="chip">WARM-UP</span>
+                <span class="chip">5 min</span>
+              </div>
+            </div>
+            <button class="play-btn">▶</button>
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="item-main">
+            <div class="check-box"></div>
+            <div class="item-body">
+              <div class="item-name">Barbell Back Squat</div>
+              <div class="item-chips">
+                <span class="chip yellow">STRENGTH</span>
+                <span class="chip">3×8</span>
+                <span class="chip">@ 70%</span>
+              </div>
+            </div>
+            <button class="play-btn">▶</button>
+          </div>
+          <details class="cues" open>
+            <summary></summary>
+            <div class="cue-body">
+              <span class="cue good">Chest tall, brace your core before descent</span>
+              <span class="cue good">Drive knees out in line with your toes</span>
+              <span class="cue bad">Don't let your heels lift off the floor</span>
+            </div>
+          </details>
+          <div class="item-rest">
+            <button class="rest-btn">Rest ⏱</button>
+          </div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="item-main">
+            <div class="check-box"></div>
+            <div class="item-body">
+              <div class="item-name">Box Jump</div>
+              <div class="item-chips">
+                <span class="chip">PLYOMETRICS</span>
+                <span class="chip">4×3</span>
+              </div>
+            </div>
+            <button class="play-btn">▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PROPOSED ═══ -->
+      <div class="proposed">
+        <div class="col-label proposed">Proposed</div>
+
+        <div class="card warmup" onclick="this.classList.toggle('checked')">
+          <div class="item-main">
+            <div class="check-box"></div>
+            <div class="item-body">
+              <div class="item-name">Bike — Easy Spin</div>
+              <div class="item-chips">
+                <span class="chip">WARM-UP</span>
+                <span class="chip stat">5 min</span>
+              </div>
+            </div>
+            <button class="play-btn" onclick="event.stopPropagation()" aria-label="Play video">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card strength" onclick="this.classList.toggle('checked')">
+          <div class="item-main">
+            <div class="check-box"></div>
+            <div class="item-body">
+              <div class="item-name">Barbell Back Squat</div>
+              <div class="item-chips">
+                <span class="chip">STRENGTH</span>
+                <span class="chip stat">3×8</span>
+                <span class="chip stat">@ 70%</span>
+              </div>
+            </div>
+            <button class="play-btn" onclick="event.stopPropagation()" aria-label="Play video">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+          <details class="cues" open onclick="event.stopPropagation()">
+            <summary>
+              <svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>
+              Coaching Cues
+            </summary>
+            <div class="cue-body">
+              <span class="cue good">Chest tall, brace your core before descent</span>
+              <span class="cue good">Drive knees out in line with your toes</span>
+              <span class="cue bad">Don't let your heels lift off the floor</span>
+            </div>
+          </details>
+          <div class="item-rest">
+            <button class="rest-btn" onclick="event.stopPropagation()">Rest ⏱</button>
+          </div>
+        </div>
+
+        <div class="card power" onclick="this.classList.toggle('checked')">
+          <div class="item-main">
+            <div class="check-box"></div>
+            <div class="item-body">
+              <div class="item-name">Box Jump</div>
+              <div class="item-chips">
+                <span class="chip">PLYOMETRICS</span>
+                <span class="chip stat">4×3</span>
+              </div>
+            </div>
+            <button class="play-btn" onclick="event.stopPropagation()" aria-label="Play video">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="notes-title">What changed · Card</div>
+      <strong>1.</strong> Softer shadow + 14px radius → premium lift without extra clutter.<br>
+      <strong>2.</strong> Larger exercise name (21px) with slight letter-spacing → name dominates the card.<br>
+      <strong>3.</strong> Numeric chips (sets×reps, load) use Space Mono on a dark background → reads as data, not a label.<br>
+      <strong>4.</strong> Filled yellow play button (36px circle) → clear, tappable, on-brand.<br>
+      <strong>5.</strong> Tap the card: subtle press animation + warm yellow-tinted "checked" state instead of just dimming.<br>
+      <strong>6.</strong> More breathing room in padding (16px vs 14px) and chip spacing.
+    </div>
+
+    <div class="notes">
+      <div class="notes-title">What changed · Left-edge Stripe</div>
+      <strong>1.</strong> Each card now has a 3px vertical bar on the left, color-coded by block type.<br>
+      <strong>2.</strong> Colors come straight from your home page palette — <span style="display:inline-block;width:10px;height:10px;background:#B8E0F6;border-radius:2px;vertical-align:middle"></span> ice for warm-up/mobility, <span style="display:inline-block;width:10px;height:10px;background:#D4FF00;border-radius:2px;vertical-align:middle"></span> yellow for strength, <span style="display:inline-block;width:10px;height:10px;background:#B794F6;border-radius:2px;vertical-align:middle"></span> purple for power/plyo.<br>
+      <strong>3.</strong> Lets you scan a long workout day and instantly see the structure (warm-up → strength → power) without reading.<br>
+      <strong>4.</strong> Stripe dims when the exercise is checked, so it never fights with the rest of the card.
+    </div>
+
+    <div class="notes">
+      <div class="notes-title">What changed · Coaching Cues</div>
+      <strong>1.</strong> Cleaner summary row: 11px (vs 10px), smooth rotating chevron SVG instead of ▶/▼ text, hover state for feedback.<br>
+      <strong>2.</strong> Body text bumped to 13px Barlow (vs 12px) — easier to read during a workout.<br>
+      <strong>3.</strong> Each cue has a 3px colored left bar + tiny circular ✓/✕ badge instead of emoji — looks intentional, not casual.<br>
+      <strong>4.</strong> Softer green/red tints (brand-adjacent) and deeper text color → premium rather than alert-banner.<br>
+      <strong>5.</strong> More padding and 7px gaps between cues → breathes better and is kinder on the eye mid-set.
+    </div>
+  </div>
+</body>
+</html>

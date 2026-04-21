@@ -20,7 +20,41 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
+<!-- iPhone home-screen icon label (iOS ignores <title> if this is set) -->
+<meta name="apple-mobile-web-app-title" content="S&C Program">
+<!-- Dynamic manifest: saves the CURRENT client's URL when "Add to Home Screen"
+     is used, and shows "S&C Program" as the app name. Replaces /manifest.json
+     on this page only; other pages still use the static one. -->
+<script>
+  (function () {
+    var client = new URLSearchParams(window.location.search).get('client');
+    var startUrl = client
+      ? 'program.html?client=' + encodeURIComponent(client)
+      : 'program.html';
+    var manifest = {
+      name: "S&C Program",
+      short_name: "S&C Program",
+      description: "Bespoke tennis strength & conditioning program.",
+      start_url: startUrl,
+      scope: "/",
+      display: "standalone",
+      orientation: "portrait",
+      background_color: "#0A0A0A",
+      theme_color: "#0A0A0A",
+      lang: "en-GB",
+      categories: ["fitness", "health", "sports"],
+      icons: [
+        { src: "/assets/img/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+        { src: "/assets/img/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      ]
+    };
+    var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    var link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  })();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <style>
@@ -439,19 +473,15 @@
     opacity: 0;
     animation: fadeInUp 0.6s ease 0.4s forwards;
   }
+  /* Connecting line between cycle dots — kept neutral on purpose so it never
+     misaligns when the cycle list changes. The dots themselves carry the color
+     story (yellow = done, ice = active, purple = next, grey = locked). */
   .journey::before {
     content: '';
     position: absolute;
     top: 0; left: 52px;
     width: 2px; height: 100%;
-    background: linear-gradient(
-      to bottom,
-      var(--yellow) 0%, var(--yellow) 10%,
-      var(--ice) 10%, var(--ice) 30%,
-      var(--purple) 30%, var(--purple) 50%,
-      #222 50%, #222 100%
-    );
-    opacity: 0.5;
+    background: rgba(255,255,255,0.06);
   }
   @media (max-width: 600px) { .journey::before { left: 28px; } }
 
@@ -695,6 +725,12 @@
   .tab-progress-pill { display: inline-block; background: #3a3a3a; color: #888; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 5px; border-radius: 10px; margin-left: 4px; vertical-align: middle; transition: background 0.3s, color 0.3s; }
   .day-tab.active .tab-progress-pill { background: var(--ice-dim); color: var(--ice); }
   .tab-progress-pill.complete { background: var(--yellow) !important; color: var(--grey-dark) !important; }
+  /* Brief pop animation whenever the count changes (triggered from updateProgress) */
+  .tab-progress-pill.pulse { animation: pillPulse 0.32s ease; }
+  @keyframes pillPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
+  }
 
   .day-content { display: none; padding: 20px 32px 120px 20px; }
   .day-content.active { display: block; animation: fadeUp 0.3s ease both; }
@@ -720,6 +756,7 @@
     background: var(--ice); margin-left: 5px;
     vertical-align: middle; animation: fadeIn 0.4s ease both;
   }
+
 
   /* ── Session Confirm ── */
   .session-confirm {
@@ -753,41 +790,89 @@
   .section-header-prog::after { content: ''; flex: 1; height: 1px; background: var(--grey-mid); }
 
   /* ── Checklist Items ── */
-  .checklist-item { background: var(--white); border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--grey-mid); overflow: hidden; transition: border-color 0.25s, opacity 0.25s; cursor: pointer; user-select: none; }
-  .checklist-item.checked { border-color: var(--yellow); opacity: 0.65; }
-  .checklist-item.checked .item-name { text-decoration: line-through; color: #aaa; }
+  /* ── Exercise card (refreshed: softer shadow, larger radius, premium feel) ── */
+  .checklist-item {
+    position: relative;
+    background: var(--white);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: transform 0.12s ease, box-shadow 0.2s, background 0.3s, border-color 0.25s;
+    cursor: pointer;
+    user-select: none;
+  }
+  /* Press feedback — small scale on tap for tactile feel */
+  .checklist-item:active { transform: scale(0.99); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  /* Checked state — soft yellow tint instead of just dimming */
+  .checklist-item.checked {
+    background: rgba(212,255,0,0.06);
+    border-color: rgba(212,255,0,0.35);
+  }
+  .checklist-item.checked .item-name { text-decoration: line-through; color: #888; }
   .checklist-item.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
   .checklist-item.checked .check-box::after { opacity: 1; transform: scale(1); }
 
-  .item-main { display: flex; align-items: center; padding: 14px 16px; gap: 14px; }
+  /* Left-edge accent stripe — color matches block type, same palette as the home page */
+  .checklist-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: opacity 0.25s, background 0.25s;
+  }
+  .checklist-item.block-warmup::before   { background: var(--ice); }
+  .checklist-item.block-strength::before { background: var(--yellow); }
+  .checklist-item.block-power::before    { background: var(--purple); }
+  .checklist-item.checked::before        { opacity: 0.45; }
+
+  .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 16px; }
   .check-box { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--grey-mid); background: transparent; flex-shrink: 0; position: relative; transition: background 0.2s, border-color 0.2s; }
   .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--grey-dark); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   .item-body { flex: 1; min-width: 0; }
-  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.1; color: var(--grey-dark); transition: color 0.2s; }
-  .play-btn {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    background: transparent;
-    border: 1px solid var(--grey-mid);
-    border-radius: 4px;
-    padding: 5px 9px;
+  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.1; letter-spacing: 0.3px; color: var(--grey-dark); transition: color 0.2s; }
+
+  /* Exercise number (1, 2, 3 within a block) — sits to the LEFT of the name,
+     big and bold so clients can see position at a glance. */
+  .ex-num {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    color: var(--grey-text);
-    cursor: pointer;
-    white-space: nowrap;
+    font-weight: 900;
+    font-size: 26px;
+    color: #bbb;
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 18px;
+    text-align: center;
+    letter-spacing: -0.5px;
+    transition: color 0.2s;
+  }
+  .checklist-item.checked .ex-num { color: #d8d8d8; }
+  body[data-dark] .ex-num { color: #555; }
+  body[data-dark] .checklist-item.checked .ex-num { color: #3a3a3a; }
+
+  /* Filled-yellow play button — clear, tappable, on-brand */
+  .play-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--yellow);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     margin-left: auto;
-    transition: border-color 0.15s, color 0.15s;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    transition: transform 0.15s, box-shadow 0.2s;
+    color: var(--grey-dark);
+    font-size: 14px;
     line-height: 1;
+    padding-left: 2px; /* visual centering for the ▶ glyph */
   }
-  .play-btn:hover { border-color: var(--grey-dark); color: var(--grey-dark); }
-  body[data-dark] .play-btn { border-color: #444; color: #666; }
-  body[data-dark] .play-btn:hover { border-color: #888; color: #aaa; }
-  .item-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-  .chip { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--grey-card); color: var(--grey-dark); letter-spacing: 0.3px; }
+  .play-btn:hover { transform: scale(1.05); }
+  body[data-dark] .play-btn { background: var(--yellow); color: var(--grey-dark); }
+  .item-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--grey-card); color: var(--grey-dark); letter-spacing: 0.3px; }
   .chip.yellow { background: var(--yellow); color: var(--grey-dark); }
   .chip.dark   { background: #3a3a3a; color: #aaa; }
 
@@ -795,44 +880,258 @@
   .rest-row { display: flex; align-items: center; justify-content: flex-end; padding: 10px 16px; }
   .rest-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--grey-dark); color: var(--yellow); border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
-  /* ── Coaching Cues ── */
-  details.cues { border-top: 1px solid var(--grey-card); }
-  details.cues summary { padding: 9px 16px; font-size: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #999; cursor: pointer; list-style: none; user-select: none; }
+  /* ── Coaching Cues (refreshed: rotating chevron + soft pill cues with circular badges) ── */
+  details.cues { border-top: 1px solid rgba(0,0,0,0.05); }
+  details.cues summary {
+    padding: 12px 18px;
+    font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--grey-text);
+    cursor: pointer; list-style: none; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.15s;
+  }
+  /* Desktop-only hover (prevents "sticky hover" on phones after a tap) */
+  @media (hover: hover) {
+    details.cues summary:hover { color: var(--grey-dark); background: rgba(0,0,0,0.025); }
+  }
+  /* Touch + click feedback — brief flash while the finger is pressing */
+  details.cues summary:active { background: rgba(0,0,0,0.05); }
   details.cues summary::-webkit-details-marker { display: none; }
-  details.cues summary::before { content: '▶  Coaching Cues'; }
-  details[open].cues summary::before { content: '▼  Coaching Cues'; }
-  details.cues .cue-body { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 6px; }
-  details.cues .cue { font-size: 12px; line-height: 1.4; padding: 7px 10px; border-radius: 5px; }
-  details.cues .cue.good { background: #f0ffe0; color: #3a6b00; }
-  details.cues .cue.bad  { background: #fff0f0; color: #8b0000; }
-  details.cues .cue.good::before { content: '✅  '; }
-  details.cues .cue.bad::before  { content: '❌  '; }
+  details.cues .chev {
+    width: 10px; height: 10px;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+  details[open].cues .chev { transform: rotate(90deg); }
+  details.cues .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
+  details.cues .cue-body { padding: 4px 18px 14px; display: flex; flex-direction: column; gap: 7px; }
+  details.cues .cue {
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px; line-height: 1.45;
+    padding: 9px 12px 9px 14px;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+    background: rgba(0,0,0,0.025);
+    display: flex; align-items: flex-start; gap: 9px;
+  }
+  details.cues .cue::before {
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    width: 16px; height: 16px; border-radius: 50%;
+    font-size: 10px; font-weight: 700;
+    margin-top: 1px;
+  }
+  details.cues .cue.good {
+    border-left-color: #6DBE45;
+    background: rgba(109,190,69,0.08);
+    color: #2a4d0f;
+  }
+  details.cues .cue.good::before { content: '✓'; background: #6DBE45; color: white; }
+  details.cues .cue.bad {
+    border-left-color: #E74C3C;
+    background: rgba(231,76,60,0.07);
+    color: #6b1a10;
+  }
+  details.cues .cue.bad::before { content: '✕'; background: #E74C3C; color: white; }
   .item-rest details.cues, .item-rest details.cues * { pointer-events: auto; }
 
   /* ── Round Groups ── */
   .round-list { margin-top: 10px; display: flex; flex-direction: column; gap: 0; }
   .round-row { display: flex; flex-direction: column; border-bottom: 1px solid var(--grey-card); }
   .round-row:last-child { border-bottom: none; }
-  .round-row-main { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
-  .round-name { font-size: 13px; color: var(--grey-text); flex: 1; }
+  /* Main row (letter · name · detail) — this is the "tap to complete" area, kept compact. */
+  .round-row-main { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; gap: 10px; }
+  .round-letter {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #bbb;
+    width: 14px; flex-shrink: 0;
+    text-align: center;
+  }
+  .round-name { font-size: 15px; color: var(--grey-text); flex: 1; }
   .round-detail { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; color: #aaa; margin-right: 8px; }
   .round-group.checked .round-row { opacity: 0.5; }
-  details.round-cue { }
-  details.round-cue summary { font-size: 9px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; cursor: pointer; list-style: none; padding: 0 0 5px 0; user-select: none; }
+  /* Round cues (inside a circuit) — same chevron + pill design as main cues,
+     just slightly more compact for the tighter layout. Larger tap area so it
+     doesn't accidentally trigger the parent "complete circuit" click. */
+  details.round-cue { margin-top: 2px; }
+  /* Cues toggle — large generous tap area so it's almost impossible to miss
+     and so it dominates the row's vertical space (vs. the small "complete" row). */
+  details.round-cue summary {
+    padding: 16px 6px;            /* tall tap target — ~44px high */
+    margin: 0 -4px;               /* extends slightly beyond the row to widen the hit zone */
+    font-size: 11px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--grey-text);
+    cursor: pointer; list-style: none; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+  }
+  /* Desktop-only hover (prevents "sticky hover" on phones after a tap) */
+  @media (hover: hover) {
+    details.round-cue summary:hover { color: var(--grey-dark); background: rgba(0,0,0,0.025); }
+  }
+  /* Touch + click feedback — brief flash while the finger is pressing */
+  details.round-cue summary:active { background: rgba(0,0,0,0.05); }
   details.round-cue summary::-webkit-details-marker { display: none; }
-  details.round-cue summary::before { content: '▶  Cues'; }
-  details[open].round-cue summary::before { content: '▼  Cues'; }
-  details.round-cue .round-cue-body { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 8px; }
-  details.round-cue .cue { font-size: 11px; line-height: 1.4; padding: 5px 8px; border-radius: 4px; }
-  details.round-cue .cue.good { background: #f0ffe0; color: #3a6b00; }
-  details.round-cue .cue.bad  { background: #fff0f0; color: #8b0000; }
-  details.round-cue .cue.good::before { content: '✅  '; }
-  details.round-cue .cue.bad::before  { content: '❌  '; }
+  details.round-cue .chev {
+    width: 9px; height: 9px;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+  details[open].round-cue .chev { transform: rotate(90deg); }
+  details.round-cue .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
+  details.round-cue .round-cue-body { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 10px; }
+  details.round-cue .cue {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px; line-height: 1.45;
+    padding: 7px 10px 7px 12px;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+    background: rgba(0,0,0,0.025);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  details.round-cue .cue::before {
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    width: 14px; height: 14px; border-radius: 50%;
+    font-size: 9px; font-weight: 700;
+    margin-top: 1px;
+  }
+  details.round-cue .cue.good {
+    border-left-color: #6DBE45;
+    background: rgba(109,190,69,0.08);
+    color: #2a4d0f;
+  }
+  details.round-cue .cue.good::before { content: '✓'; background: #6DBE45; color: white; }
+  details.round-cue .cue.bad {
+    border-left-color: #E74C3C;
+    background: rgba(231,76,60,0.07);
+    color: #6b1a10;
+  }
+  details.round-cue .cue.bad::before { content: '✕'; background: #E74C3C; color: white; }
 
   /* ── Session Complete ── */
-  .session-complete { display: none; background: var(--grey-dark); border-radius: 12px; padding: 32px 24px; text-align: center; margin-top: 20px; border: 1px solid #3a3a3a; }
+  .session-complete { display: none; background: var(--grey-dark); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid #3a3a3a; }
   .session-complete.visible { display: block; animation: fadeUp 0.4s ease both; }
-  .complete-emoji { font-size: 48px; margin-bottom: 12px; }
+  /* Refined completion medallion — circular yellow ring with a check, scales in with a glow */
+  .complete-emoji {
+    width: 64px; height: 64px;
+    margin: 0 auto 18px;
+    border: 2px solid var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--yellow);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px; font-weight: 900;
+    line-height: 1;
+    animation: completePop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s both;
+    box-shadow: 0 0 36px rgba(212,255,0,0.22);
+  }
+  @keyframes completePop {
+    0%   { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── Session RPE inside the completion card ── */
+  .complete-rpe { margin: 20px auto 6px; max-width: 380px; }
+  .complete-rpe-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .complete-rpe-hint { font-family: 'Barlow', sans-serif; font-size: 11px; color: #666; margin-bottom: 12px; }
+  .complete-rpe-buttons { display: flex; gap: 5px; }
+  .complete-rpe-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: transparent;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 14px;
+    color: #aaa;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+  }
+  @media (hover: hover) {
+    .complete-rpe-btn:hover { border-color: #888; color: #fff; }
+  }
+  .complete-rpe-btn:active { transform: scale(0.92); }
+  .complete-rpe-btn.selected {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--grey-dark);
+  }
+
+  /* ── Notes for Coach (inside the completion card, under the RPE row) ── */
+  .complete-note { margin: 18px auto 0; max-width: 380px; text-align: left; }
+  .complete-note-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .complete-note-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px; line-height: 1.5;
+    color: #e8e8e8;
+    background: #141414;
+    border: 1px solid #333;
+    border-radius: 8px;
+    outline: none;
+    resize: vertical;
+    display: block; box-sizing: border-box;
+    transition: border-color 0.15s;
+  }
+  .complete-note-input::placeholder { color: #666; }
+  .complete-note-input:focus { border-color: #555; }
+
+  /* ── Completion actions (Send + Reset + status) ── */
+  .complete-actions {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-top: 22px; align-items: center;
+  }
+  .send-session-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--yellow);
+    color: var(--grey-dark);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 260px;
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+  }
+  .send-session-btn:active { transform: scale(0.97); }
+  .send-session-btn:disabled {
+    background: #444;
+    color: #777;
+    cursor: not-allowed;
+  }
+  .send-session-status {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    color: #888;
+    min-height: 16px;
+    text-align: center;
+  }
+  .send-session-status.success { color: var(--yellow); }
+  .send-session-status.error   { color: #E74C3C; }
   .complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 36px; color: var(--yellow); text-transform: uppercase; line-height: 1; margin-bottom: 6px; }
   .complete-sub { font-size: 13px; color: #666; font-weight: 300; margin-bottom: 20px; }
   .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: #666; border: 1px solid #444; padding: 12px 24px; border-radius: 4px; cursor: pointer; }
@@ -888,6 +1187,55 @@
   .day-focus-tag { display: inline-block; background: var(--yellow); color: var(--grey-dark); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; margin-bottom: 16px; }
 
   /* ── Weight Log ── */
+  /* ── Personal note per exercise (saves to localStorage per athlete + exercise) ── */
+  .note-row { border-top: 1px solid var(--grey-card); }
+  .note-row summary {
+    padding: 10px 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #aaa;
+    cursor: pointer; list-style: none; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .note-row summary::-webkit-details-marker { display: none; }
+  .note-row summary .chev { width: 9px; height: 9px; transition: transform 0.25s ease; flex-shrink: 0; }
+  .note-row[open] summary .chev { transform: rotate(90deg); }
+  .note-row summary .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
+  .note-row summary .note-preview {
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px; font-weight: 400;
+    text-transform: none; letter-spacing: 0;
+    color: var(--grey-text);
+    margin-left: auto;
+    max-width: 55%;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  @media (hover: hover) {
+    .note-row summary:hover { color: var(--grey-dark); background: rgba(0,0,0,0.025); }
+  }
+  .note-row summary:active { background: rgba(0,0,0,0.05); }
+  .note-row textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 10px 16px 12px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px; line-height: 1.5;
+    color: var(--grey-dark);
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--grey-card);
+    outline: none;
+    resize: vertical;
+    display: block;
+    box-sizing: border-box;
+  }
+  body[data-dark] .note-row textarea { color: #ddd; }
+  body[data-dark] .note-row { border-color: #333; }
+  body[data-dark] .note-row textarea { border-top-color: #333; }
+  .checklist-item.checked .note-row { opacity: 0.4; }
+
   .weight-log { border-top: 1px solid var(--grey-card); padding: 9px 16px; display: flex; align-items: center; gap: 10px; }
   .weight-log label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #aaa; white-space: nowrap; flex-shrink: 0; }
   .weight-input { flex: 1; background: var(--grey-card); border: 1px solid transparent; border-radius: 4px; padding: 6px 10px; font-size: 13px; font-family: 'Barlow', sans-serif; color: var(--grey-dark); outline: none; transition: border-color 0.2s; }
@@ -958,16 +1306,19 @@
     height: 100%;
     border: 0;
   }
+  /* Close button — sits INSIDE the video frame at top-right so it's always
+     visible (was previously placed above with overflow:hidden clipping it). */
   .video-modal-close {
     position: absolute;
-    top: -44px;
-    right: 0;
-    width: 36px;
-    height: 36px;
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
+    background: rgba(0,0,0,0.55);
     color: #fff;
     border: 1px solid rgba(255,255,255,0.25);
     border-radius: 50%;
@@ -975,10 +1326,13 @@
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
   }
-  .video-modal-close:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.5);
+  @media (hover: hover) {
+    .video-modal-close:hover {
+      background: rgba(0,0,0,0.78);
+      border-color: rgba(255,255,255,0.55);
+    }
   }
+  .video-modal-close:active { background: rgba(0,0,0,0.85); }
 
   /* ═══ A2HS install toast ═══ */
   .a2hs-toast {
@@ -1201,6 +1555,11 @@ let isLoading = true;
 
   const _currentCycle = (DATA.cycles || [])[DATA.currentCycleIndex || 0];
   document.title = `${DATA.athlete.firstName} ${DATA.athlete.lastName}${_currentCycle ? ' — ' + _currentCycle.name : ''}`;
+
+  // Clear per-session data (checks, per-exercise RPE, day note, session RPE) for any day
+  // that was completed on a previous date. Weight inputs and per-exercise notes are PRESERVED
+  // because they're useful starting points (weights) or personal context (movement notes).
+  autoResetStaleDays();
 
   renderHome();
   renderProgram();
@@ -1461,22 +1820,47 @@ function renderProgram() {
     let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
 
-    day.blocks.forEach(block => {
+    // Continuous numbering across the whole day (1 → total exercises)
+    let exerciseNum = 1;
+    day.blocks.forEach((block, bIdx) => {
+      const blockClass = blockCategory(block.title, bIdx);
       html += `<div class="section-header-prog"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
       block.exercises.forEach(ex => {
-        html += renderExercise(ex, day.id);
+        html += renderExercise(ex, day.id, exerciseNum++, blockClass);
       });
     });
+
+    // RPE + coach note both live INSIDE the completion card (revealed after Finish)
+    const noteKey   = ATHLETE_ID + '_daynote_' + day.id;
+    const sRpeKey   = ATHLETE_ID + '_srpe_'    + day.id;
+    const savedNote = localStorage.getItem(noteKey) || '';
 
     html += `<div class="session-confirm" id="confirm-${day.id}">
       <span class="confirm-text">All done with Day ${day.id}?</span>
       <button class="confirm-btn" onclick="confirmSession('${day.id}')">Finish Session ✓</button>
     </div>`;
     html += `<div class="session-complete" id="complete-${day.id}">
-      <div class="complete-emoji">🏆</div>
+      <div class="complete-emoji">✓</div>
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
-      <button class="reset-session-btn" onclick="resetDay('${day.id}')">Reset Session</button>
+      <div class="complete-rpe">
+        <div class="complete-rpe-label">How hard was this session?</div>
+        <div class="complete-rpe-hint">1 = very easy · 10 = maximum effort</div>
+        <div class="complete-rpe-buttons" data-key="${sRpeKey}">
+          ${[1,2,3,4,5,6,7,8,9,10].map(n =>
+            `<button type="button" class="complete-rpe-btn" data-rpe="${n}">${n}</button>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="complete-note">
+        <div class="complete-note-label">Notes for Coach (optional)</div>
+        <textarea class="complete-note-input" data-key="${noteKey}" placeholder="Pain, swap requests, how you felt today…">${esc(savedNote)}</textarea>
+      </div>
+      <div class="complete-actions">
+        <button class="send-session-btn" onclick="sendSession('${day.id}')">Send Session Info to Coach</button>
+        <button class="reset-session-btn" onclick="resetDay('${day.id}')">Reset Session</button>
+        <div class="send-session-status" id="send-status-${day.id}"></div>
+      </div>
     </div>`;
     html += `</div>`;
     return html;
@@ -1491,12 +1875,29 @@ function countExercises(day) {
   return count;
 }
 
-function renderExercise(ex, dayId) {
-  if (ex.type === 'circuit') return renderCircuit(ex, dayId);
+// Map a block.title (e.g. "Strength", "Warm-Up", "Plyometrics") to a stripe color class.
+// If the title doesn't match any known keyword, fall back to cycling through the three
+// colors by block index so ANY new block type still gets a stripe and the design stays
+// consistent. blockIndex is the 0-based position of the block within its day.
+function blockCategory(title, blockIndex) {
+  const t = (title || '').toLowerCase();
+  if (t.includes('warm') || t.includes('mobility') || t.includes('activation') || t.includes('cool')) return 'block-warmup';
+  if (t.includes('plyo') || t.includes('power') || t.includes('jump') || t.includes('med ball') || t.includes('rotational') || t.includes('explosive')) return 'block-power';
+  if (t.includes('strength')) return 'block-strength';
+  // Fallback for unknown / future block types — cycles ice → yellow → purple → ice …
+  const fallback = ['block-warmup', 'block-strength', 'block-power'];
+  return fallback[(blockIndex || 0) % fallback.length];
+}
 
-  const chipsHtml = (ex.chips || []).map(c =>
-    `<span class="chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`
-  ).join('');
+// Build a chip from { label, style } — original behavior, no auto-styling
+function chipHtml(c) {
+  return `<span class="chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`;
+}
+
+function renderExercise(ex, dayId, num, blockClass) {
+  if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass);
+
+  const chipsHtml = (ex.chips || []).map(chipHtml).join('');
 
   const cuesHtml = renderCues(ex.cues);
   const hasRest = ex.hasRest;
@@ -1511,8 +1912,12 @@ function renderExercise(ex, dayId) {
     restBlock += `</div>`;
   }
 
-  return `<div class="checklist-item" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
-    <div class="item-main"><div class="check-box"></div>
+  const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
+
+  return `<div class="checklist-item ${blockClass}" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
+    <div class="item-main">
+      <div class="check-box"></div>
+      ${numBadge}
       <div class="item-body">
         <div class="item-name">${esc(ex.name)}</div>
         ${chipsHtml ? `<div class="item-chips">${chipsHtml}</div>` : ''}
@@ -1523,11 +1928,18 @@ function renderExercise(ex, dayId) {
   </div>`;
 }
 
-function renderCircuit(ex, dayId) {
-  const roundsHtml = (ex.items || []).map(item => {
+function renderCircuit(ex, dayId, num, blockClass) {
+  // The circuit itself takes ONE number from the day's running counter.
+  // Each item inside is labelled A, B, C…
+  const roundsHtml = (ex.items || []).map((item, i) => {
+    const letter = String.fromCharCode(65 + i); // 65 = 'A'
     const itemCues = renderRoundCues(item.cues);
     return `<div class="round-row">
-      <div class="round-row-main"><span class="round-name">${esc(item.name)}</span><span class="round-detail">${esc(item.detail)}</span></div>
+      <div class="round-row-main">
+        <span class="round-letter">${letter}</span>
+        <span class="round-name">${esc(item.name)}</span>
+        <span class="round-detail">${esc(item.detail)}</span>
+      </div>
       ${itemCues}
     </div>`;
   }).join('');
@@ -1536,11 +1948,16 @@ function renderCircuit(ex, dayId) {
     ? `<button class="play-btn" onclick="handlePlayVideo('${ex.videoUrl}');event.stopPropagation();">▶</button>`
     : '';
 
-  return `<div class="checklist-item round-group" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
-    <div class="item-main"><div class="check-box"></div>
+  const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
+  const roundsChip = `<span class="chip yellow">${esc(ex.rounds)}</span>`;
+
+  return `<div class="checklist-item round-group ${blockClass}" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
+    <div class="item-main">
+      <div class="check-box"></div>
+      ${numBadge}
       <div class="item-body">
         <div class="item-name">${esc(ex.name)}</div>
-        <div class="item-chips"><span class="chip yellow">${esc(ex.rounds)}</span></div>
+        <div class="item-chips">${roundsChip}</div>
         <div class="round-list">${roundsHtml}</div>
       </div>
       ${playBtn}
@@ -1562,7 +1979,9 @@ function renderCues(cues) {
   let body = '';
   (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
   (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
-  return `<details class="cues"><summary></summary><div class="cue-body">${body}</div></details>`;
+  // Summary now includes a rotating chevron + label (replaces the old ▶/▼ pseudo-element text)
+  const summary = `<summary><svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>Coaching Cues</summary>`;
+  return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
 }
 
 function renderRoundCues(cues) {
@@ -1570,7 +1989,8 @@ function renderRoundCues(cues) {
   let body = '';
   (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
   (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
-  return `<details class="round-cue"><summary></summary><div class="round-cue-body">${body}</div></details>`;
+  const summary = `<summary><svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>Cues</summary>`;
+  return `<details class="round-cue">${summary}<div class="round-cue-body">${body}</div></details>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1647,6 +2067,8 @@ function switchDay(n) {
 function toggleCheck(item, day) {
   if (event && event.target.closest('details, .weight-log, .rpe-row, .play-btn')) return;
   item.classList.toggle('checked');
+  // Haptic feedback on phones (ignored by desktop). 15ms = short, premium tap.
+  if (navigator.vibrate) navigator.vibrate(15);
   const rpeRow = item.querySelector('.rpe-row');
   if (rpeRow) rpeRow.classList.toggle('visible', item.classList.contains('checked'));
   saveState();
@@ -1663,6 +2085,13 @@ function updateProgress(day) {
   if (pill) {
     pill.textContent = done + '/' + total;
     pill.classList.toggle('complete', done === total);
+    // Brief pulse animation — only on user actions, not during initial restore
+    if (!isLoading) {
+      pill.classList.remove('pulse');
+      // force reflow so the same animation can replay if the user taps quickly
+      void pill.offsetWidth;
+      pill.classList.add('pulse');
+    }
   }
 
   document.getElementById('v-fill').style.height = (done / total * 100) + '%';
@@ -1679,9 +2108,10 @@ function updateProgress(day) {
 
 function confirmSession(day) {
   document.getElementById('confirm-' + day).classList.remove('visible');
+  // Reveal the completion card (now contains the RPE prompt + coach note + Send button).
   const completeEl = document.getElementById('complete-' + day);
   completeEl.classList.add('visible');
-  completeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   localStorage.setItem(ATHLETE_ID + '_completed_d' + day, new Date().toDateString());
   markSuggestedDay();
 }
@@ -1711,6 +2141,46 @@ function resetDay(day) {
 }
 
 function toggleNote(card) { card.classList.toggle('open'); }
+
+// Wipes per-session data for any day completed on a previous calendar date.
+// Preserves: weight log inputs, per-exercise notes (personal context).
+// Clears: exercise checks, per-exercise RPE, day note, session RPE, sent timestamp.
+function autoResetStaleDays() {
+  if (!DATA || !DATA.workouts) return;
+  const today = new Date().toDateString();
+  const days  = DATA.workouts.days || [];
+
+  // Pull the global checks state once so we can prune stale days from it
+  let checkState = {};
+  try { checkState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) {}
+  let checkStateChanged = false;
+
+  days.forEach(day => {
+    const completedKey = ATHLETE_ID + '_completed_d' + day.id;
+    const completedOn  = localStorage.getItem(completedKey);
+    if (completedOn && completedOn !== today) {
+      // Per-day per-session data
+      localStorage.removeItem(completedKey);
+      localStorage.removeItem(ATHLETE_ID + '_daynote_' + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_srpe_'    + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
+      // Per-exercise RPE for this day's exercises (weights + notes are kept on purpose)
+      (day.blocks || []).forEach(block => {
+        (block.exercises || []).forEach(ex => {
+          const k = ex.name.replace(/\s+/g, '_');
+          localStorage.removeItem(ATHLETE_ID + '_rpe_' + k);
+        });
+      });
+      // Drop this day's check state from the global state object
+      if (String(day.id) in checkState) {
+        delete checkState[String(day.id)];
+        checkStateChanged = true;
+      }
+    }
+  });
+
+  if (checkStateChanged) localStorage.setItem(STORAGE_KEY, JSON.stringify(checkState));
+}
 
 function saveState() {
   const state = {};
@@ -1746,6 +2216,153 @@ function restoreState() {
 
   initWeightLogs();
   initRPE();
+  initNotes();
+  initDayWrapup();
+}
+
+// Wire up the day-level comment box + the session-RPE buttons that now live
+// inside the completion card. Tap a number to select; tap the same number again
+// to deselect (so clients can correct a mistap). All values auto-save.
+function initDayWrapup() {
+  document.querySelectorAll('.complete-note-input').forEach(ta => {
+    const key = ta.dataset.key;
+    ta.addEventListener('input', e => localStorage.setItem(key, e.target.value));
+    ta.addEventListener('click', e => e.stopPropagation());
+  });
+  document.querySelectorAll('.complete-rpe-buttons').forEach(group => {
+    const key = group.dataset.key;
+    const saved = localStorage.getItem(key);
+    group.querySelectorAll('.complete-rpe-btn').forEach(btn => {
+      if (saved === btn.dataset.rpe) btn.classList.add('selected');
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const wasSelected = btn.classList.contains('selected');
+        group.querySelectorAll('.complete-rpe-btn').forEach(b => b.classList.remove('selected'));
+        if (!wasSelected) {
+          btn.classList.add('selected');
+          localStorage.setItem(key, btn.dataset.rpe);
+          if (navigator.vibrate) navigator.vibrate(10);
+        } else {
+          localStorage.removeItem(key);
+        }
+      });
+    });
+  });
+
+  // If the client already sent today (then reloaded the page), restore the
+  // "Last sent: HH:MM" status and rename the Send button to "Update info to Coach".
+  document.querySelectorAll('.send-session-status').forEach(statusEl => {
+    const day = statusEl.id.replace('send-status-', '');
+    const sentISO = localStorage.getItem(ATHLETE_ID + '_sent_d' + day);
+    if (!sentISO) return;
+    const sentAt = new Date(sentISO);
+    if (sentAt.toDateString() !== new Date().toDateString()) return; // stale → skip
+    statusEl.className = 'send-session-status success';
+    statusEl.textContent = '✓ Last sent: ' + formatSentTime(sentAt);
+    const btn = document.querySelector('#complete-' + day + ' .send-session-btn');
+    if (btn) btn.textContent = 'Update info to Coach';
+  });
+}
+
+// Bundles all data for a given day and submits it to Web3Forms (same service
+// as form.html). Builds a clean, readable summary the coach gets via email.
+async function sendSession(day) {
+  const completeEl = document.getElementById('complete-' + day);
+  const btn        = completeEl.querySelector('.send-session-btn');
+  const status     = document.getElementById('send-status-' + day);
+
+  // Require RPE before sending — that's the whole point of the rating.
+  const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
+  if (!sRpe) {
+    status.className = 'send-session-status error';
+    status.textContent = 'Please rate the session difficulty first (1–10).';
+    return;
+  }
+
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'Sending…';
+  status.className = 'send-session-status';
+  status.textContent = '';
+
+  try {
+    const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day)) || {};
+    const dayNote = localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '';
+
+    // Build a human-readable summary for the coach
+    let summary = `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}\n`;
+    summary += `Session RPE: ${sRpe}/10\n`;
+    if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
+    summary += `\nExercise log:\n`;
+
+    const collectFor = name => {
+      const k = name.replace(/\s+/g, '_');
+      const w = localStorage.getItem(ATHLETE_ID + '_wlog_' + k) || '';
+      const r = localStorage.getItem(ATHLETE_ID + '_rpe_'  + k) || '';
+      const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
+      return { w, r, n };
+    };
+
+    (dayData.blocks || []).forEach(block => {
+      summary += `\n[${block.title}]\n`;
+      (block.exercises || []).forEach(ex => {
+        const { w, r, n } = collectFor(ex.name);
+        const bits = [];
+        if (w) bits.push('Weight: ' + w);
+        if (r) bits.push('RPE: ' + r);
+        if (n) bits.push('Note: ' + n);
+        summary += `• ${ex.name}` + (bits.length ? '  —  ' + bits.join(' · ') : '') + '\n';
+        // Circuit items
+        (ex.items || []).forEach(item => {
+          summary += `   · ${item.name}${item.detail ? ' (' + item.detail + ')' : ''}\n`;
+        });
+      });
+    });
+
+    // POST to Web3Forms — same access key used by form.html
+    const fd = new FormData();
+    fd.append('access_key', 'efc57e0c-997d-4d71-b07a-71c8268ec668');
+    fd.append('from_name', `${DATA.athlete.firstName} ${DATA.athlete.lastName} — Session Report`);
+    fd.append('subject', `Session Report · ${DATA.athlete.firstName} ${DATA.athlete.lastName} · Day ${day}`);
+    fd.append('Athlete', `${DATA.athlete.firstName} ${DATA.athlete.lastName}`);
+    fd.append('Day', `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}`);
+    fd.append('Session RPE', sRpe + '/10');
+    fd.append('Notes from athlete', dayNote || '(none)');
+    fd.append('Full summary', summary);
+
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: fd
+    });
+
+    if (!res.ok) throw new Error('Submit failed');
+
+    const sentAt = new Date();
+    localStorage.setItem(ATHLETE_ID + '_sent_d' + day, sentAt.toISOString());
+
+    status.className = 'send-session-status success';
+    status.textContent = '✓ Sent — your coach will see it shortly.';
+    btn.textContent = 'Sent ✓';
+    if (window.plausible) window.plausible('Session Sent');
+
+    // Re-enable after 3s so the client can edit (add a weight, change RPE, tweak the note)
+    // and resend as many times as needed. Each tap sends a fresh email.
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Update info to Coach';
+      status.textContent = '✓ Last sent: ' + formatSentTime(sentAt);
+    }, 3000);
+  } catch (err) {
+    status.className = 'send-session-status error';
+    status.textContent = 'Something went wrong. Please try again.';
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
+// Tiny helper: HH:MM in the user's locale (e.g. "2:14 PM")
+function formatSentTime(date) {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function initWeightLogs() {
@@ -1760,6 +2377,35 @@ function initWeightLogs() {
     div.querySelector('input').addEventListener('input', e => localStorage.setItem(wKey, e.target.value));
     div.addEventListener('click', e => e.stopPropagation());
     card.appendChild(div);
+  });
+}
+
+// Personal note per exercise — saved to localStorage per athlete + exercise.
+// Only added to "main" exercises (those with a rest button), same scope as weight-log.
+function initNotes() {
+  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
+    if (!card.querySelector('.rest-btn')) return;
+    const name  = card.querySelector('.item-name').textContent.trim();
+    const key   = ATHLETE_ID + '_note_' + name.replace(/\s+/g, '_');
+    const saved = localStorage.getItem(key) || '';
+    const det = document.createElement('details');
+    det.className = 'note-row';
+    det.innerHTML =
+      `<summary>
+         <svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>
+         Note
+         <span class="note-preview">${esc(saved)}</span>
+       </summary>
+       <textarea placeholder="Add a personal note… (auto-saves)">${esc(saved)}</textarea>`;
+    const ta = det.querySelector('textarea');
+    const preview = det.querySelector('.note-preview');
+    ta.addEventListener('input', e => {
+      localStorage.setItem(key, e.target.value);
+      preview.textContent = e.target.value;
+    });
+    // Keep clicks inside the note from bubbling up to the card's check-toggle
+    det.addEventListener('click', e => e.stopPropagation());
+    card.appendChild(det);
   });
 }
 
