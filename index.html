@@ -73,7 +73,7 @@
       "serviceType": "Tennis Strength & Conditioning",
       "provider": { "@id": "https://www.amirardekani.com/#person" },
       "areaServed": "Worldwide",
-      "description": "6-month individualised online strength & conditioning coaching for competitive tennis players. Evidence-based periodised programming with ongoing check-ins and programme adjustment.",
+      "description": "Online tennis and padel strength & conditioning coaching. Three programmes available: Foundation (3 months), Performance (6 months), and Elite (6 months). Evidence-based, individualised programming with ongoing check-ins and programme adjustment.",
       "audience": {
         "@type": "Audience",
         "audienceType": "Competitive tennis players"
@@ -418,6 +418,155 @@
   }
   .cta-section .section-label { justify-content: center; }
 
+  /* ── PRICING ── */
+  .pricing-section { padding: 120px 0; }
+  .pricing-includes { margin-bottom: 32px; text-align: center; }
+  .pricing-includes p {
+    font-size: 14px; font-weight: 300; color: var(--text-secondary);
+    line-height: 1.7; margin: 0;
+  }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-bottom: 56px;
+  }
+  .pricing-card { display: flex; flex-direction: column; position: relative; }
+  .pricing-card--featured {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 60px rgba(212,255,0,0.08);
+  }
+  .pricing-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #0a0a0a;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 3px;
+    white-space: nowrap;
+  }
+  .pricing-price {
+    font-family: var(--font-display); font-weight: 900;
+    font-size: 48px; color: var(--text-primary); line-height: 1; margin-bottom: 4px;
+  }
+  .pricing-term {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 24px;
+  }
+  .pricing-features {
+    list-style: none; padding: 0; margin: 0 0 32px;
+    display: flex; flex-direction: column; gap: 10px;
+    flex-grow: 1;
+  }
+  .pricing-features li {
+    font-size: 14px; font-weight: 300; color: var(--text-secondary);
+    line-height: 1.5; padding-left: 18px; position: relative;
+  }
+  .pricing-features li::before {
+    content: '+'; position: absolute; left: 0; top: 0;
+    color: var(--accent); font-weight: 700;
+  }
+  .pricing-feature--accent { color: var(--accent) !important; font-weight: 500 !important; }
+  .pricing-star { color: var(--accent); margin-right: 4px; }
+  .pricing-included {
+    display: inline-block; margin-left: 6px;
+    background: var(--accent-dim); color: var(--accent);
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; padding: 2px 8px; border-radius: 3px;
+    border: 1px solid rgba(212,255,0,0.15);
+  }
+  .pricing-card .btn { align-self: stretch; text-align: center; justify-content: center; }
+  .pricing-promise { margin-top: 24px; }
+  .pricing-promise-inner { max-width: 720px; margin: 0 auto; text-align: center; }
+
+  /* ── FAQ ── */
+  .faq-section { padding: 120px 0; }
+  .faq-list {
+    max-width: 800px; margin: 56px auto 0;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .faq-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--dur);
+  }
+  .faq-item:hover { border-color: var(--border-light); }
+  .faq-item[open] { border-color: var(--accent); }
+  .faq-item summary {
+    list-style: none; cursor: pointer;
+    padding: 20px 24px;
+    font-family: var(--font-display);
+    font-weight: 700; font-size: 16px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-primary);
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+'; color: var(--accent);
+    font-size: 24px; font-weight: 300; line-height: 1;
+    transition: transform var(--dur);
+  }
+  .faq-item[open] summary::after { content: '−'; }
+  .faq-item p {
+    padding: 0 24px 20px;
+    font-size: 14px; font-weight: 300; color: var(--text-secondary);
+    line-height: 1.7; margin: 0;
+  }
+
+  /* ── CONTACT ── */
+  .contact-section { padding: 120px 0; }
+  .contact-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; max-width: 900px; margin: 56px auto 0;
+  }
+  .contact-card {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 40px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: border-color var(--dur), transform var(--dur), background var(--dur);
+  }
+  .contact-card:hover {
+    border-color: var(--accent);
+    background: var(--bg-raised);
+    transform: translateY(-2px);
+  }
+  .contact-icon {
+    font-size: 28px; margin-bottom: 16px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--accent-dim);
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(212,255,0,0.15);
+  }
+  .contact-label {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .contact-value {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 16px; color: var(--text-primary);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── STICKY MOBILE CTA ── */
+  .mobile-sticky-cta { display: none; }
+  @media (max-width: 768px) {
+    .mobile-sticky-cta {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 100;
+      background: var(--accent); color: #0a0a0a;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+      text-decoration: none; padding: 16px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px rgba(212,255,0,0.2);
+    }
+    /* stop the sticky button covering the footer */
+    body { padding-bottom: 84px; }
+  }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     .cred-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
@@ -425,7 +574,7 @@
     .for-grid, .cred-deep-grid { grid-template-columns: 1fr; }
     .for-grid { gap: 32px; }
     .cred-deep-grid { gap: 20px; }
-    .method-grid, .demo-layout, .commit-layout { grid-template-columns: 1fr; }
+    .method-grid, .demo-layout, .commit-layout, .pricing-grid, .contact-grid { grid-template-columns: 1fr; }
     .demo-layout { gap: 40px; }
     .commit-layout { gap: 32px; }
     .phone-mockup { order: -1; }
@@ -458,9 +607,9 @@
   <div class="container hero-content">
     <span class="eyebrow reveal">Tennis Strength &amp; Conditioning</span>
     <h1 id="hero-title" class="h1 hero-h1 reveal reveal-d1">Move Better.<br>Hit Harder.<br><em>Last Longer.</em></h1>
-    <p class="lead hero-sub reveal reveal-d2">A 6-month online strength &amp; conditioning coaching programme for competitive tennis players. Evidence-based, individualised training that transfers directly to court — improving your movement, your stroke quality, and your resilience where it counts.</p>
+    <p class="lead hero-sub reveal reveal-d2">The S&amp;C programme used by 500+ competitive tennis and padel players. Improving movement, stroke quality, and resilience — in one season.</p>
     <div class="hero-actions reveal reveal-d3">
-      <a href="/form.html" class="btn btn-primary">Apply for the 6-Month Programme <span class="arrow-r" aria-hidden="true">→</span></a>
+      <a href="/form.html" class="btn btn-primary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
       <a href="#method" class="btn-ghost">See How It Works ↓</a>
     </div>
   </div>
@@ -494,13 +643,13 @@
 <section aria-labelledby="for-title">
   <div class="container">
     <div class="section-label reveal">Fit Check</div>
-    <h2 id="for-title" class="section-heading reveal reveal-d1">Built for<br><em>Competitive Tennis Players</em></h2>
-    <p class="lead section-desc reveal reveal-d2">Not a generic fitness plan repackaged for racket sports. This is strength &amp; conditioning coaching designed from the ground up for the movement demands of tennis — the accelerations, the decelerations, the repeated sprints, the rotational force production.</p>
+    <h2 id="for-title" class="section-heading reveal reveal-d1">Built for<br><em>Competitive Tennis &amp; Padel Players</em></h2>
+    <p class="lead section-desc reveal reveal-d2">Not a generic fitness plan repackaged for racket sports. This is strength &amp; conditioning coaching designed from the ground up for the movement demands of tennis and padel — the accelerations, the decelerations, the repeated sprints, the rotational force production.</p>
 
     <div class="for-grid">
       <div class="reveal reveal-d3">
         <div class="for-col-title yes">✓ Built for you if</div>
-        <div class="for-item"><span class="for-icon check">+</span>You're a competitive tennis player — club, county, national, or international level</div>
+        <div class="for-item"><span class="for-icon check">+</span>You're a competitive tennis or padel player — club, county, national, or international level</div>
         <div class="for-item"><span class="for-icon check">+</span>You train or compete multiple times per week and need S&amp;C that integrates with your on-court schedule</div>
         <div class="for-item"><span class="for-icon check">+</span>You want to see direct transfer from the gym to the court — in your movement, your shots, and your durability</div>
         <div class="for-item"><span class="for-icon check">+</span>You understand that physical performance is a competitive advantage and you're ready to commit to a 6-month process</div>
@@ -510,7 +659,7 @@
         <div class="for-col-title no">✗ Not the right fit if</div>
         <div class="for-item"><span class="for-icon cross">–</span>You're looking for generic workout templates or a fitness app</div>
         <div class="for-item"><span class="for-icon cross">–</span>You want to train based on how you feel each day without structure</div>
-        <div class="for-item"><span class="for-icon cross">–</span>You're not currently playing or competing in tennis</div>
+        <div class="for-item"><span class="for-icon cross">–</span>You're not currently playing or competing in tennis or padel</div>
         <div class="for-item"><span class="for-icon cross">–</span>You want a coach who will just tell you what you want to hear</div>
         <div class="for-item"><span class="for-icon cross">–</span>You're not prepared to follow a plan with consistency over 6 months</div>
       </div>
@@ -518,57 +667,77 @@
   </div>
 </section>
 
-<!-- ═══ 6-MONTH COMMITMENT ═══ -->
-<section class="commit-section" id="commitment" aria-labelledby="commit-title">
+<!-- ═══ PRICING ═══ -->
+<section class="pricing-section" id="pricing" aria-labelledby="pricing-title">
   <div class="container">
-    <div class="section-label reveal">The Commitment</div>
-    <h2 id="commit-title" class="section-heading reveal reveal-d1">Not a Programme.<br><em>A Coaching Partnership.</em></h2>
-    <p class="lead section-desc reveal reveal-d2">This isn't a PDF you download and figure out alone. It's a 6-month working relationship where your tennis strength &amp; conditioning is built, monitored, and adjusted around you and your competitive season.</p>
+    <div class="section-label reveal">Programmes</div>
+    <h2 id="pricing-title" class="section-heading reveal reveal-d1">Choose Your<br><em>Programme</em></h2>
 
-    <div class="commit-layout">
-      <div class="card reveal reveal-d3">
-        <div class="card-eyebrow">What's Included</div>
-        <div class="card-title">6-Month Online<br>Tennis S&amp;C Programme</div>
-        <div class="body-sm commit-card-body">Fully individualised training designed around your competitive calendar, your body, and your goals. Not a template. Not a one-off plan. Ongoing coaching that adapts as you do.</div>
-        <div class="commit-features">
-          <div class="commit-feature">
-            <div class="commit-feature-icon" aria-hidden="true">📋</div>
-            <div class="commit-feature-text"><strong>4 check-ins per month</strong> — ongoing review, adjustment, and progression throughout the programme</div>
-          </div>
-          <div class="commit-feature">
-            <div class="commit-feature-icon" aria-hidden="true">🔄</div>
-            <div class="commit-feature-text"><strong>Programme adjusted continuously</strong> — responds to your data, your season, and how your body adapts over time</div>
-          </div>
-          <div class="commit-feature">
-            <div class="commit-feature-icon" aria-hidden="true">💬</div>
-            <div class="commit-feature-text"><strong>Direct coach communication</strong> — questions answered, form reviewed, concerns addressed between check-ins</div>
-          </div>
-          <div class="commit-feature">
-            <div class="commit-feature-icon" aria-hidden="true">📱</div>
-            <div class="commit-feature-text"><strong>Interactive training system</strong> — your programme delivered through a custom platform with session tracking built in</div>
-          </div>
-          <div class="commit-feature">
-            <div class="commit-feature-icon" aria-hidden="true">📊</div>
-            <div class="commit-feature-text"><strong>Periodised structure</strong> — training phases that build on each other and peak when your competition calendar demands it</div>
-          </div>
-        </div>
-      </div>
+    <!-- Every programme includes strip -->
+    <div class="card pricing-includes reveal reveal-d2">
+      <div class="card-eyebrow">Every programme includes</div>
+      <p>Personalised training dashboard &amp; app · intake call (up to 30 min) · fully personalised programme based on your goals &amp; assessment · 6–7 monthly performance notes · WhatsApp &amp; email support · 15% loyalty renewal discount.</p>
+    </div>
 
-      <div class="commit-right reveal reveal-d4">
-        <div class="commit-stat-card">
-          <div class="commit-stat-num">6</div>
-          <div class="commit-stat-label"><strong>Months Minimum</strong>Meaningful physical adaptation takes time. Six months gives us the runway to build real, lasting change in how you move and perform on court.</div>
-        </div>
-        <div class="commit-stat-card">
-          <div class="commit-stat-num">4×</div>
-          <div class="commit-stat-label"><strong>Monthly Check-Ins</strong>Every week I review your progress, assess your load, and adjust your programme. It's a living system — not a static document.</div>
-        </div>
-        <div class="commit-stat-card">
-          <div class="commit-stat-num">1:1</div>
-          <div class="commit-stat-label"><strong>Fully Individual</strong>No group templates. No cookie-cutter plans. Your programme is designed for your body, your sport, and your competition schedule.</div>
+    <!-- Tier cards -->
+    <div class="pricing-grid">
+
+      <!-- Foundation -->
+      <article class="card pricing-card reveal reveal-d2">
+        <div class="card-eyebrow">Foundation</div>
+        <div class="pricing-price">£149</div>
+        <div class="pricing-term">3-month programme</div>
+        <ul class="pricing-features">
+          <li>1 monthly check-in</li>
+          <li>WhatsApp &amp; email support</li>
+        </ul>
+        <a href="#apply" class="btn btn-secondary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+      </article>
+
+      <!-- Performance (highlighted) -->
+      <article class="card pricing-card pricing-card--featured reveal reveal-d3">
+        <div class="pricing-badge">Most popular</div>
+        <div class="card-eyebrow">Performance</div>
+        <div class="pricing-price">£349</div>
+        <div class="pricing-term">6-month programme</div>
+        <ul class="pricing-features">
+          <li>4 weekly check-ins per month</li>
+          <li>Programme updated monthly</li>
+          <li>Monthly progress report</li>
+          <li class="pricing-feature--accent">Training &amp; competition warm-up programmes</li>
+        </ul>
+        <a href="#apply" class="btn btn-primary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+      </article>
+
+      <!-- Elite -->
+      <article class="card pricing-card reveal reveal-d4">
+        <div class="card-eyebrow">Elite</div>
+        <div class="pricing-price">£599</div>
+        <div class="pricing-term">6-month programme</div>
+        <ul class="pricing-features">
+          <li>Periodised plan aligned to your tournament schedule</li>
+          <li>Weekly 1:1 video call with your coach</li>
+          <li>Programme updated monthly</li>
+          <li>Priority WhatsApp &amp; email support</li>
+          <li class="pricing-feature--accent">Training &amp; competition warm-up programmes</li>
+          <li>End-of-block performance report</li>
+          <li><span class="pricing-star" aria-hidden="true">★</span> 2× video technique reviews per month <span class="pricing-included">included</span></li>
+        </ul>
+        <a href="#apply" class="btn btn-secondary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+      </article>
+
+    </div>
+
+    <!-- 60-day performance promise -->
+    <div class="results-strip pricing-promise reveal reveal-d4">
+      <div class="container">
+        <div class="results-context pricing-promise-inner">
+          <div class="results-context-heading">The 60-day performance promise</div>
+          <div class="results-context-body">Follow the programme. If you don't feel measurably stronger, more resilient, and more powerful on court within 60 days — I'll personally review and rebuild your plan at no charge.</div>
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
@@ -769,6 +938,69 @@
   </div>
 </section>
 
+<!-- ═══ FAQ ═══ -->
+<section class="faq-section" id="faq" aria-labelledby="faq-title">
+  <div class="container">
+    <div class="section-label reveal">Common Questions</div>
+    <h2 id="faq-title" class="section-heading reveal reveal-d1">Before You <em>Apply</em></h2>
+    <p class="lead section-desc reveal reveal-d2">The questions athletes ask me most — before we ever speak.</p>
+
+    <div class="faq-list">
+      <details class="faq-item reveal reveal-d2">
+        <summary>Do I need access to a gym?</summary>
+        <p>Ideally yes, but a home-gym setup works too. During your intake call we map out exactly what equipment you have or can get, and I build the programme around that. You don't need a fully-kitted commercial gym to get real, measurable results.</p>
+      </details>
+      <details class="faq-item reveal reveal-d2">
+        <summary>I travel for tournaments — how does that work?</summary>
+        <p>Travel is built into the plan from day one. Your programme includes travel-friendly sessions that can be done with minimal equipment, plus competition-week tapering so you arrive at tournaments feeling sharp — not smashed from a heavy lifting session two days earlier.</p>
+      </details>
+      <details class="faq-item reveal reveal-d3">
+        <summary>Can I combine this with my existing tennis or padel coach's programming?</summary>
+        <p>Yes — and I strongly encourage it. Strength &amp; conditioning is the layer underneath your on-court work, not a replacement for it. I'll happily coordinate load with your tennis coach if useful, so your gym and court sessions work together instead of fighting each other.</p>
+      </details>
+      <details class="faq-item reveal reveal-d3">
+        <summary>What if I get injured mid-programme?</summary>
+        <p>We adapt. I've worked through hundreds of in-season niggles and injuries with athletes. Your programme gets adjusted immediately — often maintaining or even building strength in areas that aren't affected, so you come back fitter than you left.</p>
+      </details>
+      <details class="faq-item reveal reveal-d4">
+        <summary>How much time per week does the programme take?</summary>
+        <p>Typically 2–4 sessions per week, 45–60 minutes each. The exact volume is calibrated to your on-court hours, your season phase, and how your body is responding — not a rigid template. Most athletes find it slots neatly around their existing training.</p>
+      </details>
+      <details class="faq-item reveal reveal-d4">
+        <summary>How is this different from a generic workout app?</summary>
+        <p>An app gives you a workout. I give you a coach. Your programme is designed for your body and your competitive calendar, reviewed and adjusted by me every month, and delivered through an interactive platform where your data feeds directly into the next block of training. There's a human being on the other end of it — that's the whole point.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section class="contact-section" id="contact" aria-labelledby="contact-title">
+  <div class="container">
+    <div class="section-label reveal">Get in Touch</div>
+    <h2 id="contact-title" class="section-heading reveal reveal-d1">Reach Out <em>Directly</em></h2>
+    <p class="lead section-desc reveal reveal-d2">Have a question before applying? Send me a message — I usually reply within 24 hours.</p>
+
+    <div class="contact-grid">
+      <a href="https://wa.me/447435363461" target="_blank" rel="noopener" class="contact-card reveal reveal-d2">
+        <div class="contact-icon" aria-hidden="true">💬</div>
+        <div class="contact-label">WhatsApp</div>
+        <div class="contact-value">+44 7435 363461</div>
+      </a>
+      <a href="https://instagram.com/amirardekanian" target="_blank" rel="noopener" class="contact-card reveal reveal-d3">
+        <div class="contact-icon" aria-hidden="true">📷</div>
+        <div class="contact-label">Instagram</div>
+        <div class="contact-value">@amirardekanian</div>
+      </a>
+      <a href="https://www.linkedin.com/in/amirardekanian/" target="_blank" rel="noopener" class="contact-card reveal reveal-d4">
+        <div class="contact-icon" aria-hidden="true">💼</div>
+        <div class="contact-label">LinkedIn</div>
+        <div class="contact-value">Amirhossein Ardekanian</div>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ FINAL CTA ═══ -->
 <section class="cta-section" id="apply" aria-labelledby="cta-title">
   <div class="cta-glow" aria-hidden="true"></div>
@@ -776,7 +1008,7 @@
     <div class="section-label reveal">Limited Availability</div>
     <h2 id="cta-title" class="cta-heading reveal reveal-d1">Ready to Train<br><em>With Intent?</em></h2>
     <p class="cta-sub reveal reveal-d2">I work with a small number of athletes at a time to ensure quality. Fill out the application and I'll be in touch within 48 hours to discuss whether we're a good fit for the 6-month programme.</p>
-    <a href="/form.html" class="btn btn-primary reveal reveal-d3">Apply for the 6-Month Programme <span class="arrow-r" aria-hidden="true">→</span></a>
+    <a href="/form.html" class="btn btn-primary reveal reveal-d3">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
     <div class="cta-note reveal reveal-d4">Application takes 2 minutes · No commitment until we speak</div>
   </div>
 </section>
@@ -785,6 +1017,11 @@
 
 <!-- ═══ FOOTER (injected by shared.js) ═══ -->
 <footer id="site-footer" class="site-footer" role="contentinfo"></footer>
+
+<!-- Sticky mobile Apply button (visible on screens ≤ 768px) -->
+<a href="/form.html" class="mobile-sticky-cta" aria-label="Apply for the programme">
+  Apply Now <span class="arrow-r" aria-hidden="true">→</span>
+</a>
 
 <script defer src="/assets/js/shared.js"></script>
 </body>
