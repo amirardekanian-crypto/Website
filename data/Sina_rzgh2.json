@@ -1,0 +1,690 @@
+{
+  "athlete": {
+    "id": "sina_razeghi",
+    "firstName": "Sina",
+    "lastName": "Razeghi"
+  },
+  "sport": {
+    "badge": "🎾 Tennis / Padel Performance"
+  },
+  "currentCycleIndex": 1,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "tagline": "Build the Platform",
+      "weeks": "Weeks 1–4",
+      "focuses": [
+        "Build baseline movement quality across squat, split squat, and hinge patterns.",
+        "Begin shoulder stabilisation work and establish core anti-rotation capacity."
+      ]
+    },
+    {
+      "num": 2,
+      "name": "Structural Strength",
+      "tagline": "Load the Foundation",
+      "weeks": "Weeks 5–8",
+      "focuses": [
+        "Tempo-based strength in squat and RDL with shoulder-friendly pressing.",
+        "Deepen shoulder rehab integration and introduce rotational power for padel transfer."
+      ],
+      "message": {
+        "paragraphs": [
+          "Cycle 1 built the platform. This cycle is where we start loading it. You'll see the same patterns as last month — squat, hinge, press, pull — but now under controlled tempo with real intent.",
+          "Mentally, focus on owning the eccentric on every rep and keeping shoulder rehab as important as the strength work, not second to it. Earn the tempo. The weight will follow."
+        ],
+        "outcomes": [
+          "Noticeably stronger Back Squat and Barbell RDL under tempo",
+          "Shoulder handles pressing without irritation or pinching",
+          "First exposure to real rotational power through med ball work",
+          "Cleaner landing mechanics on single-leg plyometrics",
+          "Improved anti-rotation core control under load"
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Rotational Engine",
+      "weeks": "Weeks 9–13",
+      "focuses": [
+        "Convert strength into padel-specific rotational power through progressive med ball and cable work.",
+        "Sharpen reactive landing mechanics and lateral court movement."
+      ],
+      "teaser": {
+        "subtitle": "You've pressed, pulled, and squatted under control. Now we turn strength into speed.",
+        "paragraphs": [
+          "Cycle 3 is where the med ball stops being a warm-up and becomes the point of the session.",
+          "The court will feel different after this cycle — your shots will have a weight behind them you haven't felt before.",
+          "Earn it in these four weeks."
+        ]
+      }
+    },
+    {
+      "num": 4,
+      "name": "Durability Build",
+      "weeks": "Weeks 14–18",
+      "focuses": [
+        "Bulletproof the shoulder and knees through eccentric overload and tendon-focused loading.",
+        "Integrate sport-load management — training that coexists with harder padel weeks."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Integrated Athlete",
+      "weeks": "Weeks 19–23",
+      "focuses": [
+        "Fuse strength, power, and conditioning into one robust athletic profile.",
+        "Establish an autoregulated maintenance rhythm for long-term use."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 02 · Month Two",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Squat & Glute Activation",
+        "completionTitle": "Great Work, Sina",
+        "completionMessage": "Day 1 complete — recover well and hydrate.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 minutes", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Steady pace — raise the heart rate gradually"],
+                  "bad": ["Don't sprint — this is preparation, not training"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Dynamic Mobility",
+                "videoUrl": null,
+                "rounds": "×3 Rounds",
+                "items": [
+                  {
+                    "name": "90/90 Hip Rotations",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Keep both hips grounded"],
+                      "bad": ["Don't arch the lower back to rotate further"]
+                    }
+                  },
+                  {
+                    "name": "Goblet Squat — 3-sec eccentric",
+                    "detail": "×6",
+                    "cues": {
+                      "good": ["Chest tall, slow controlled descent"],
+                      "bad": ["Don't let the heels lift off the floor"]
+                    }
+                  },
+                  {
+                    "name": "Ankle Dorsiflexion Rocks",
+                    "detail": "×8 each side",
+                    "cues": {
+                      "good": ["Drive the knee forward over the toes"],
+                      "bad": ["Don't let the heel come off the ground"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Plyometrics",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Broad Jump",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×5 Reps" }
+                ],
+                "cues": {
+                  "good": ["Soft knees on landing, neutral spine", "Reset fully between reps"],
+                  "bad": ["Don't let knees cave inward on landing", "Don't rush the next rep without resetting"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Bound → Stick",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×5/side" }
+                ],
+                "cues": {
+                  "good": ["Hold landing for 2 seconds", "Control before you repeat"],
+                  "bad": ["Don't wobble out of the stick position", "Don't collapse the landing knee inward"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🏋️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Back Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" },
+                  { "label": "Tempo 3-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["3 sec down, 1 sec pause, 1 sec up", "Push the floor away on the way up"],
+                  "bad": ["Don't rush the descent", "Don't let knees cave in at the bottom"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Leg Hip Lift",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10+10" },
+                  { "label": "Tempo 2-1-2" }
+                ],
+                "cues": {
+                  "good": ["Drive through the heel", "Squeeze glute at the top for a full second"],
+                  "bad": ["Don't push off the toes", "Don't arch the lower back to get higher"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Step-Down",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×6+6" }
+                ],
+                "cues": {
+                  "good": ["Slow and controlled descent", "Watch the standing knee in the mirror"],
+                  "bad": ["Don't let the standing knee cave inward", "Don't drop quickly — control the eccentric"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Pallof Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12/side" }
+                ],
+                "cues": {
+                  "good": ["Dynamic press — extend fully and return", "Resist rotation throughout the entire set"],
+                  "bad": ["Don't let the cable pull you into rotation", "Don't hold your breath — breathe through each press"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Shoulder Rehab & Upper Body",
+        "completionTitle": "Great Work, Sina",
+        "completionMessage": "Day 2 complete — protect your shoulder, sleep well.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Arm Bike / Ski Erg / Cross Trainer",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 minutes", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Moderate pace to warm the shoulder joint"],
+                  "bad": ["Don't push pace if the shoulder feels tight — stay easy"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Shoulder Activation",
+                "videoUrl": null,
+                "rounds": "×3 Rounds",
+                "items": [
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Lead with the shoulder blades, not the hands"],
+                      "bad": ["Don't shrug the traps toward the ears"]
+                    }
+                  },
+                  {
+                    "name": "Wall Slide",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Keep hands and elbows in contact with the wall"],
+                      "bad": ["Don't let the lower back arch off the wall"]
+                    }
+                  },
+                  {
+                    "name": "Band ER at Side",
+                    "detail": "×12/side",
+                    "cues": {
+                      "good": ["Elbow pinned to the ribs throughout"],
+                      "bad": ["Don't let the elbow drift away from the body"]
+                    }
+                  },
+                  {
+                    "name": "Side-Lying ER",
+                    "detail": "×10/side",
+                    "cues": {
+                      "good": ["Slow and deliberate — this should never cause pain"],
+                      "bad": ["Don't use a weight that makes you cheat with the trunk"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🏋️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "Priority", "style": "yellow" },
+                  { "label": "3 Sets" },
+                  { "label": "×15" },
+                  { "label": "Tempo 2-0-2" }
+                ],
+                "cues": {
+                  "good": ["First exercise — prime the cuff before pressing", "Light load, full range, lead with the elbows"],
+                  "bad": ["Don't go heavy — this is a quality movement", "Don't let the elbows drop below shoulder height"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm DB Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10+10" },
+                  { "label": "Tempo 2-1-2" },
+                  { "label": "RPE 6–7" }
+                ],
+                "cues": {
+                  "good": ["Ribs stacked over hips — tall posture", "Control the lockout, don't snap it"],
+                  "bad": ["Don't flare the ribs forward to press heavier", "Stop the set if you feel a front-shoulder pinch"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "3-Point Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10+10" },
+                  { "label": "Tempo 3-1-1" }
+                ],
+                "cues": {
+                  "good": ["1-second hold at the top of each rep", "Squeeze the scapula inward at the peak"],
+                  "bad": ["Don't rotate the trunk to lift heavier", "Don't let the shoulder round forward on the descent"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Incline DB Chest Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10" },
+                  { "label": "Tempo 3-1-1" },
+                  { "label": "RPE 6–7" }
+                ],
+                "cues": {
+                  "good": ["Scapulae retracted into the bench throughout", "Stop immediately if a pinch shows up at the front of the shoulder"],
+                  "bad": ["Don't flare the elbows to 90° — tuck them ~45°", "Don't chase load this cycle — the shoulder comes first"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lat Pull-Down",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10" },
+                  { "label": "Tempo 3-1-1" }
+                ],
+                "cues": {
+                  "good": ["Lead with the elbows driving down", "Slight chest lift as the bar approaches"],
+                  "bad": ["Don't use the trunk to swing the weight down", "Don't let the bar yank you on the way up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Incline Y-T Raise",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 each shape" }
+                ],
+                "cues": {
+                  "good": ["Very light or bodyweight — quality over load", "Thumbs up on the Y, pinkies up on the T"],
+                  "bad": ["Don't shrug the traps to lift higher", "Don't rush the reps — slow and deliberate"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×20m/side" }
+                ],
+                "cues": {
+                  "good": ["One arm only — resist the lean", "Tall posture and even steps throughout"],
+                  "bad": ["Don't let the loaded side pull you sideways", "Don't hold your breath — breathe normally while walking"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Hinge & Rotational Power",
+        "completionTitle": "Great Work, Sina",
+        "completionMessage": "Day 3 complete — the rotational work pays off on court.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 minutes", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Steady pace — raise heart rate gradually"],
+                  "bad": ["Don't sprint — this is preparation, not training"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Activation",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "items": [
+                  {
+                    "name": "Walking Lunges",
+                    "detail": "×6+6",
+                    "cues": {
+                      "good": ["Step long, drop the back knee softly"],
+                      "bad": ["Don't let the front knee drive past the toes aggressively"]
+                    }
+                  },
+                  {
+                    "name": "Airplane Hold",
+                    "detail": "×4+4 — 3-sec hold",
+                    "cues": {
+                      "good": ["Keep hips level — drive the back leg up, not out"],
+                      "bad": ["Don't let the standing-side hip drop"]
+                    }
+                  },
+                  {
+                    "name": "Deadbug",
+                    "detail": "×6+6",
+                    "cues": {
+                      "good": ["Press the lower back into the floor throughout"],
+                      "bad": ["Don't let the ribs flare as the leg extends"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Plyometrics",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Low Box Rebound Jump",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" }
+                ],
+                "cues": {
+                  "good": ["Minimal ground contact — think fast feet", "Stiff ankles on landing"],
+                  "bad": ["Don't sink into a deep squat on landing", "Don't chase jump height — chase contact speed"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Leg Lateral Hop → Stick",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×5+5" }
+                ],
+                "cues": {
+                  "good": ["2-second landing hold", "Control the single-leg position before repeating"],
+                  "bad": ["Don't let the landing knee collapse inward", "Don't rush the next rep — nail the stick first"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Med Ball — Rotational Power",
+            "icon": "💥",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Rotational Wall Slam",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "Max Intent", "style": "yellow" },
+                  { "label": "3 Sets" },
+                  { "label": "×6/side" },
+                  { "label": "2–3 kg", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Hips lead, trunk follows, arm releases last", "Same sequence as your padel groundstrokes"],
+                  "bad": ["Don't go heavier — speed of rotation is the point", "Don't throw arm-only — the power comes from the hips"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🏋️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell RDL",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push hips back — don't just bend forward", "Bar stays close to the legs throughout"],
+                  "bad": ["Don't round the lower back at the bottom", "Don't squat the movement — this is a hinge"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Leg RDL (DB)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×6+6" }
+                ],
+                "cues": {
+                  "good": ["Hips level — don't open to the side", "Slight bend in the standing knee"],
+                  "bad": ["Don't chase load — quality over weight", "Don't rotate the torso as you hinge"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Chop",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12+12" }
+                ],
+                "cues": {
+                  "good": ["Controlled tempo both directions", "Trunk rotates — hips stay square"],
+                  "bad": ["Don't pull with the arms — drive through the trunk", "Don't let the hips rotate with the torso"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Plank Shoulder Tap",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10+10" }
+                ],
+                "cues": {
+                  "good": ["Hips stay still — resist the rotation", "Slow and deliberate taps"],
+                  "bad": ["Don't let the hips shift side to side", "Don't rush — speed defeats the purpose"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "programHistory": [
+    {
+      "id": "prog1",
+      "label": "Program 1",
+      "subtitle": "Month One",
+      "days": [
+        {
+          "label": "Day 1",
+          "focus": "Lower Body Power",
+          "exercises": [
+            { "name": "Back Squat", "detail": "3×10" },
+            { "name": "Split Squat", "detail": "3×8+8" },
+            { "name": "Lateral Step-Down", "detail": "3×5+5" },
+            { "name": "Pallof Press Hold", "detail": "3×20–30s" },
+            { "name": "Pogo Jumps", "detail": "3×20" },
+            { "name": "Lateral Line Hops", "detail": "3×15/side" }
+          ]
+        },
+        {
+          "label": "Day 2",
+          "focus": "Upper / Shoulder",
+          "exercises": [
+            { "name": "Half-Kneeling Shoulder Press", "detail": "3×10+10" },
+            { "name": "3-Point Row", "detail": "3×8+8" },
+            { "name": "Barbell Chest Press", "detail": "3×10" },
+            { "name": "Lat Pull-Down", "detail": "3×8" },
+            { "name": "Cable External Rotation", "detail": "3×12+12" },
+            { "name": "Inclined Y Raise", "detail": "3×10" },
+            { "name": "Farmers Carry", "detail": "3×30–40s" }
+          ]
+        },
+        {
+          "label": "Day 3",
+          "focus": "Lower / Core",
+          "exercises": [
+            { "name": "Goblet Squat", "detail": "4×8" },
+            { "name": "Single-Leg RDL", "detail": "3×8+8" },
+            { "name": "Cable Chop", "detail": "3×10+10" },
+            { "name": "Plank Leg Lifts", "detail": "3×24" },
+            { "name": "Low Box Rebound Jump", "detail": "3×8" },
+            { "name": "Single-Leg Pogos", "detail": "3×12/side" }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": {
+    "greeting": "For You, Sina",
+    "cards": [
+      {
+        "icon": "🦾",
+        "title": "Your Shoulder Rule This Cycle",
+        "body": "Your shoulder is mostly pain-free now — we're loading it carefully but honestly. Posterior soreness after pressing is expected and productive. A sharp or pinching sensation at the front of the shoulder during Incline DB Press or Half-Kneeling DB Press is not. If you feel it, stop the set, drop the weight one notch, and flag it. The Side-Lying ER, Band ER, and Face Pull are doing the quiet heavy lifting here — treat them with the same focus as the squat."
+      },
+      {
+        "icon": "⏱",
+        "title": "Why Tempo Matters More Than Weight Right Now",
+        "body": "You're still under a year into consistent lifting, so your tendons and joints are catching up to what your muscles can produce. The 3-1-1 tempos on Back Squat, RDL, and 3-Point Row aren't there to make sessions harder — they're there to build the connective tissue resilience that protects your shoulder and knees long-term. Slow the eccentric down like you mean it. If you can't hold the tempo, the weight is too heavy."
+      },
+      {
+        "icon": "🎾",
+        "title": "The Med Ball Is the New Piece",
+        "body": "Last cycle had no rotational power work — this one does. The Rotational Wall Slams on Day 3 are a direct transfer to your padel groundstrokes. Stay at 2–3 kg: the stimulus is speed of rotation, not load. Hips lead, trunk follows, arm releases last — exactly like a clean forehand. Do not go heavier until the pattern feels automatic. Heavier ball means slower rotation and worse transfer."
+      },
+      {
+        "icon": "🎯",
+        "title": "Day 2 Order Matters",
+        "body": "Cable Face Pull is marked Priority and placed first for a reason: it primes the cuff before any pressing load goes through the shoulder. Don't skip it or rush it to get to the 'real' exercises — on Day 2, the rehab and activation block is the real exercise. The pressing is only safe because the prep was honest."
+      },
+      {
+        "icon": "🎾",
+        "title": "Padel on Off Days",
+        "body": "Keep padel moderate in weeks 1–3 — technical play, not maximum-effort matches. The rotational med ball work on Day 3 is already giving your shoulder and trunk a sport-specific stimulus, and stacking hard padel on top will slow the shoulder adaptation, not speed it up. Week 4 is a deload in the gym, so that's your window to push on court if you feel good."
+      },
+      {
+        "icon": "😴",
+        "title": "Recovery Is Where You Adapt",
+        "body": "You'll feel this cycle in new places — posterior shoulder, adductors, hamstrings from the tempo RDL. Sleep is non-negotiable: 7–9 hours, and protect the night before Day 2 especially. Tendon adaptation and rotator cuff remodelling both happen in deep sleep. Under-sleep this cycle and the shoulder progress stalls first."
+      },
+      {
+        "icon": "📉",
+        "title": "Week 4 Is a Deload — Not a Missed Week",
+        "body": "In week 4, volume drops by about 40%, plyos come out, and loads stay moderate. Same exercises, fewer sets. This is not you 'losing progress' — it's when your body consolidates everything you built in weeks 1–3. As a beginner you'll be tempted to skip it or push through. Don't. The deload is what makes Cycle 3 possible."
+      },
+      {
+        "icon": "🧭",
+        "title": "Track Two Things Every Session",
+        "body": "Log the weight and RPE (1–10) for Back Squat, Barbell RDL, and whichever press you ran that day. That's it — don't overcomplicate it. This gives us clean signal for progressing loads into Cycle 3 and flags early if the shoulder is starting to creep in RPE (a sign of fatigue or irritation before pain shows up)."
+      }
+    ]
+  }
+}
