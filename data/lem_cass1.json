@@ -1,0 +1,727 @@
+{
+  "athlete": {
+    "id": "lem_cass1",
+    "firstName": "Lemuel",
+    "lastName": "Cassidy"
+  },
+  "sport": {
+    "badge": "🎾 Tennis Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Rebuild & Reset",
+      "tagline": "Re-load What You've Lost",
+      "weeks": "Weeks 1–5",
+      "focuses": [
+        "Progressively re-load the injured right lat and rotator cuff while correcting left-right asymmetry.",
+        "Establish baseline hypertrophy and movement quality across all major patterns."
+      ],
+      "message": {
+        "paragraphs": [
+          "This cycle is about rebuilding the shoulder you need for the next decade of tennis — not the next tournament. Every rotator cuff set, every left-side lead, every controlled tempo rep is laying tissue down where you've been losing it.",
+          "Mentally: your job here is patience and precision, not intensity. By the end of week 5, serving should feel smoother and more stable, the left side should be catching up to the right, and you'll hold quality deeper into practice sessions. You're not chasing numbers this cycle — you're earning the right to chase them in the next one."
+        ],
+        "outcomes": [
+          "Pain-free serving at moderate intensity",
+          "Visible reduction in left-right strength asymmetry",
+          "2–3kg of added lean mass",
+          "Improved shoulder girdle stability under load",
+          "Sustained quality across longer practice sessions"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Symmetry Engine",
+      "weeks": "Weeks 6–10",
+      "focuses": [
+        "Drive unilateral hypertrophy to close the strength and size gap between sides.",
+        "Reintroduce graded overhead loading as shoulder tolerance returns."
+      ],
+      "teaser": {
+        "subtitle": "You've rebuilt the foundation. Now we close the gap.",
+        "paragraphs": [
+          "Cycle 2 is where the rebuild turns into something you can actually feel on the court. The left side stops being a weak link. The shoulder stops being a liability. Overhead work comes back — carefully, on your terms.",
+          "This is the cycle where your body starts to move like a semi-pro's body should. Earn it here first."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Armour Build",
+      "weeks": "Weeks 11–15",
+      "focuses": [
+        "Accumulate maximum lean mass through intensified hypertrophy across the whole body.",
+        "Build shoulder girdle durability with loaded carries, heavy rows, and controlled overhead work."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Power Translation",
+      "weeks": "Weeks 16–20",
+      "focuses": [
+        "Convert new muscle into tennis-specific rotational power and serve-chain speed.",
+        "Maintain strength while introducing medicine ball, plyometric, and landmine rotational work."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Match Engine",
+      "weeks": "Weeks 21–25",
+      "focuses": [
+        "Build repeat-effort capacity so performance quality holds through long matches and tournament weeks.",
+        "Preserve the strength and mass gained while tapering into competition-ready form."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Rebuild & Reset",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Lower Body Strength",
+        "completionTitle": "Strong Work, Lem",
+        "completionMessage": "Lower body done — recover well and fuel up.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Breathing stays nasal and controlled the whole time", "Legs should feel warm and primed, not fatigued"],
+                  "bad": ["Spiking the effort — this is a ramp, not a workout"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "World's Greatest Stretch",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×5/side" },
+                  { "label": "Controlled" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Back knee brushes the floor at the bottom", "Stretch through the front hip flexor and back quad"],
+                  "bad": ["Rushing through reps without hitting end range"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Glute Bridge with 3s Hold",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10" },
+                  { "label": "Tempo 2-3-1-0" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Hips fully extended, ribs tucked down", "Squeeze glutes hard at the top — no low back work"],
+                  "bad": ["Over-arching the lower back to fake height"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Main Strength",
+            "icon": "🏋️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Goblet Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Chest stays vertical, elbows tucked in at hip crease", "Feel tension through the whole quad as you stand"],
+                  "bad": ["Letting the heels lift or knees cave inward"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Romanian Deadlift",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×10" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bar path stays close to the legs — shins, knees, thighs", "Feel a deep stretch through the hamstrings before pulling"],
+                  "bad": ["Rounding the upper back when loading the right side"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Rear Foot Elevated Split Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/leg" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Front shin vertical, back knee kisses the floor", "Front-leg glute drives you up, not back-leg push"],
+                  "bad": ["Lead with the left leg — match reps on the right, never exceed the weaker side"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessories + Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Seated Leg Curl",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Curl the pad through a full range, controlled back", "Pure hamstring tension — feel it bunch behind the knee"],
+                  "bad": ["Using momentum to throw the pad down"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Pallof Press",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 1-2-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Arms stay locked, no torso rotation toward the cable", "Obliques brace hard — resist the pull"],
+                  "bad": ["Shrugging the shoulders as you press"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Upper Push + Shoulder Health",
+        "completionTitle": "Shoulder Work Banked",
+        "completionMessage": "Cuff and press done — that's durability in the bank.",
+        "blocks": [
+          {
+            "title": "Rotator Cuff Activation",
+            "icon": "🩺",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Band Pull-Apart",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×15" },
+                  { "label": "Tempo 2-1-2-0" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Arms sweep outward like opening curtains, chest proud", "Squeeze between the shoulder blades, no neck tension"],
+                  "bad": ["Shrugging up — keep shoulders packed down"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Side-Lying External Rotation",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12/side" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Elbow pinned to the ribs, rotate from the shoulder only", "Deep burn in the back of the shoulder — that's the cuff"],
+                  "bad": ["Letting the elbow drift away from the body"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Serratus Wall Slide",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Forearms stay pressed into the wall the whole range", "Feel the shoulder blades wrap around the ribcage at the top"],
+                  "bad": ["Shrugging or losing wall contact"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Press",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Landmine Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8/arm" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Ribs stay down, press up and slightly across the body", "Triceps and front delt working together, no pinching at the top"],
+                  "bad": ["Lead with the left arm — match reps right, never push through right-side pain"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Flat Dumbbell Bench Press (Neutral Grip)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×10" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbows tracked at roughly 45° to the ribs, not flared wide", "Chest does the work, shoulders stay set back and down"],
+                  "bad": ["Letting the right shoulder roll forward at lockout"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessories",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Single-Arm Dumbbell Push Press (Iso-Hold Bottom)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/arm" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Hold the bottom position before every press — no bounce", "Feel the whole shoulder stack stabilise before moving"],
+                  "bad": ["Locking out hard overhead — keep the top gentle"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Triceps Pushdown",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Elbows glued to the ribs, wrists stay neutral", "Triceps do all the work — no shoulder involvement"],
+                  "bad": ["Leaning forward to push more weight"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 3-0-3-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Lower back stays flat on the floor the entire set", "Deep core brace — ribs and hips locked together"],
+                  "bad": ["Letting the back arch when the leg extends"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Lower Hypertrophy (Unilateral)",
+        "completionTitle": "Left Side Earning It",
+        "completionMessage": "Every left-led rep is closing the gap. Refuel and rest.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rower",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Arms stay relaxed — legs do 70% of the drive", "Body feels warm and loose, not winded"],
+                  "bad": ["Hard pulls with the right arm — keep it passive"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "90/90 Hip Rotations",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Controlled" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Both knees move together like windshield wipers", "Open feeling through the inside and outside of the hip"],
+                  "bad": ["Hitching the hips off the floor to get more range"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Banded Lateral Walk",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10/direction" },
+                  { "label": "Tempo 1-0-1-0" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Stay in a low athletic stance the whole time", "Side glutes burning before you start the main work"],
+                  "bad": ["Feet clicking together — keep constant band tension"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Unilateral Strength",
+            "icon": "🦵",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Front Foot Elevated Split Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×10/leg" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Torso vertical, drop straight down, no forward lean", "Quad and glute of the front leg working as one"],
+                  "bad": ["Lead with the left — never exceed what the left leg can match"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Leg Dumbbell Hip Thrust",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/leg" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Hips lock out level — no dipping to one side", "Working glute fires before the hamstring does"],
+                  "bad": ["Arching the lower back to finish the lockout"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Hypertrophy + Endurance",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Walking Lunge",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12/leg" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Long stride, knee tracks over the middle of the foot", "Continuous leg burn — this is endurance, not a max lift"],
+                  "bad": ["Short, mincing steps that turn it into a calf-pump drill"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Calf Raise",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×15" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Rise to the highest point your big toe can push", "Deep stretch at the bottom, full squeeze at the top"],
+                  "bad": ["Bouncing through reps without pausing"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "30s/side", "style": "dark" },
+                  { "label": "Hold" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Body in a straight line — hips don't sag or pike up", "Deep oblique brace, especially on the left side"],
+                  "bad": ["Resting weight through the shoulder — drive it down"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Upper Pull + Rehab / Symmetry",
+        "completionTitle": "Lat Re-Loaded",
+        "completionMessage": "Controlled pulling done. That tissue is rebuilding.",
+        "blocks": [
+          {
+            "title": "Rotator Cuff + Scapular Prep",
+            "icon": "🩺",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Prone Y-Raise",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Thumbs point up, arms form a Y, chest off the bench", "Low between the shoulder blades should burn"],
+                  "bad": ["Shrugging up toward the ears"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable External Rotation at 90° Abduction",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12/side" },
+                  { "label": "Tempo 3-1-2-0" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Upper arm parallel to the floor, rotate the forearm up", "Back-of-shoulder working — controlled, no snapping"],
+                  "bad": ["Pushing through pain on the right — back off if it pinches"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Banded Scapular Pull-Down",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Arms stay straight, shoulder blades slide down the back", "The depression — not the pull — is doing the work"],
+                  "bad": ["Bending the elbows and turning it into a pulldown"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Pull",
+            "icon": "🪢",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×10" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Row to the lower ribs, elbows stay tucked near the body", "Mid-back squeeze — both sides should fire evenly"],
+                  "bad": ["Letting the right side dominate — pause if it does"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Arm Dumbbell Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12/arm" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbow drives back, not up — think pocket, not armpit", "Full-range stretch at the bottom, hard contraction at the top"],
+                  "bad": ["Lead with the left — weight is set by the left, not the right"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Lat Re-Load (Sub-Maximal)",
+            "icon": "🧘",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Straight-Arm Pulldown (Eccentric-Biased)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×12" },
+                  { "label": "Tempo 4-1-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Arms straight, pull from the armpits down to the hips", "Controlled lat engagement — never near failure on right"],
+                  "bad": ["Going heavy — this is tissue re-loading, not a pump set"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Farmer's Carry",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "30m", "style": "dark" },
+                  { "label": "Walk" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Shoulders packed down, chest tall, steady pace", "Grip, traps, and core working together as one unit"],
+                  "bad": ["Hunching forward or letting the right shoulder droop"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Hold",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "30s/side", "style": "dark" },
+                  { "label": "Hold" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Arms locked out, body square to the cable", "Deep anti-rotation brace — glutes and obliques firing"],
+                  "bad": ["Letting the hips rotate toward the cable"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Lemuel",
+    "cards": [
+      {
+        "icon": "🩺",
+        "title": "Clear the Lat Before You Load It",
+        "body": "Your upper right lat is still symptomatic — Cycle 1 is structured around re-loading that tissue progressively, not avoiding it. If any pulling movement produces sharp or stabbing pain (not just fatigue or a mild stretch), stop that set and drop the load 30–40% on the next one. Before running this programme, get one more opinion from a sports physio who works with throwing or racket athletes — the first physio not helping doesn't mean physio is wrong for you, it means the match wasn't right."
+      },
+      {
+        "icon": "⬅️",
+        "title": "Lead With the Left, Always",
+        "body": "Every unilateral exercise in this programme — split squats, single-leg hip thrusts, single-arm presses, single-arm rows — starts with your LEFT (non-dominant) side. Whatever reps you hit on the left at the prescribed RPE becomes the ceiling for the right. Do not go heavier or do more reps on the right just because it feels easier. Closing the asymmetry gap is the goal, and you only close it by matching down, not pushing up."
+      },
+      {
+        "icon": "⏱",
+        "title": "Understanding Tempo",
+        "body": "The four numbers next to each exercise (e.g. 3-1-1-0) describe tempo in seconds: eccentric (lowering) — pause at the bottom — concentric (lifting) — rest at the top. A 3-1-1-0 back squat means 3 seconds down, 1 second pause at the bottom, 1 second up, no rest at the top. Controlling tempo is how you build real tissue capacity — rushing reps to hit the numbers defeats the whole purpose of the session."
+      },
+      {
+        "icon": "🎾",
+        "title": "Schedule This Around Tennis",
+        "body": "With 5–6 tennis days, the gym work has to fit around the court, not compete with it. Ideal layout: Lower Body days (1 and 3) sit 48 hours before your hardest tennis sessions, and Upper Body days (2 and 4) ideally fall on lighter court days or match-prep days since there's no overhead loading. If you have a tournament week, keep Day 2 (rotator cuff prep) and drop volume on the other three — the cuff work is non-negotiable, the heavy lifting can wait."
+      },
+      {
+        "icon": "🍽️",
+        "title": "64kg Is Your Ceiling on Performance",
+        "body": "At semi-pro level and your height, 64kg is leaving durability on the table — more tissue means better shoulder stability, less late-match drop-off, and a buffer against the next injury. Aim to add 2–3kg of lean mass across this cycle. Practically: a palm of protein at every meal (four times a day), carbs around training and tennis sessions, and don't train fasted. If your weight isn't ticking up by week 3, you're under-eating — no amount of hypertrophy programming fixes an empty plate."
+      },
+      {
+        "icon": "🛌",
+        "title": "Your Sleep Is Your Edge",
+        "body": "You're sleeping 7–8 hours at a quality of 8/10 — that is genuinely elite recovery data for a 22-year-old training and competing at this volume, and it's why this programme can ask as much of you as it does. Protect it. On tournament weeks, prioritise sleep over every other recovery tool. If stress ticks up past 7/10, pull one set off each main lift before you cut sleep — your nervous system cannot rebuild a torn lat on five hours."
+      }
+    ]
+  }
+}
