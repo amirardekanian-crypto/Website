@@ -1,0 +1,630 @@
+{
+  "athlete": {
+    "id": "mhd_bhbd1",
+    "firstName": "Mahdi",
+    "lastName": "Behboodi"
+  },
+  "sport": {
+    "badge": "🎾 Padel Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "tagline": "Build the Platform",
+      "weeks": "Weeks 1–5",
+      "focuses": [
+        "Build movement quality in free-weight patterns and introduce rotational power on a clean slate.",
+        "Establish posterior chain resilience and shoulder durability under daily padel load."
+      ],
+      "message": {
+        "paragraphs": [
+          "This cycle is the platform everything else gets built on. You already have the sport hours — what you don't yet have is the free-weight base and the rotational engine that separates good padel players from elite ones.",
+          "For the next five weeks, focus on owning every rep — tempo is the coach here, not the load. By the end of Cycle 1 you should feel noticeably more stable in your split stance, snappier out of low balls, and more durable through a full day of court work. Trust the tempo. The weight comes later."
+        ],
+        "outcomes": [
+          "Cleaner free-weight patterns on trap bar and split squat",
+          "Noticeably stronger eccentric control in Nordics and lateral decel",
+          "Higher rotational power output on med-ball throws",
+          "Reduced shoulder fatigue through daily padel sessions",
+          "Copenhagen plank held cleanly for 30 seconds per side",
+          "A durable foundation ready for heavy strength loading in Cycle 2"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Strength Engine",
+      "weeks": "Weeks 6–10",
+      "focuses": [
+        "Intensify compound strength (trap bar, split squat, bench) into the 3–5 rep range with heavier loading.",
+        "Deepen unilateral capacity and close any left/right asymmetries exposed in Cycle 1."
+      ],
+      "teaser": {
+        "subtitle": "The platform starts producing real output.",
+        "paragraphs": [
+          "Cycle 2 is where the reps drop, the loads climb, and everything you rehearsed in Cycle 1 gets tested under pressure. This is the phase that builds the strength your opponents will feel on the court.",
+          "Earn it in these first five weeks — everything that follows depends on the base you lay here."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Power Conversion",
+      "weeks": "Weeks 11–15",
+      "focuses": [
+        "Convert raw strength into on-court power through contrast training and advanced plyometrics.",
+        "Peak rotational velocity and reactive ability for in-season padel demands."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Court Carryover",
+      "weeks": "Weeks 16–20",
+      "focuses": [
+        "Maintain strength and power on minimal volume while sport demand rises.",
+        "Sharpen deceleration, multi-directional speed, and recovery between high-intensity bouts."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Foundation Forge",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Lower Body Power",
+        "completionTitle": "Strong Work",
+        "completionMessage": "Lower body done — hydrate, refuel, and sleep well tonight.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 minutes", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Steady hum — conversational pace to the end"],
+                  "bad": ["Don't sprint the last minute — this is a primer"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "World's Greatest Stretch",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×5/side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Back knee hovers, top arm stacks overhead"],
+                  "bad": ["Don't let the back foot collapse inward"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Band Walk",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Knees track over toes, feet parallel"],
+                  "bad": ["Don't bob up and down — hips stay level"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Pogo Jump",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×15" },
+                  { "label": "Tempo X-0-X-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Stiff ankles, quiet landings, short ground contact"],
+                  "bad": ["Don't bend deep at the knees — this is ankle, not squat"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Power & Strength",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Trap Bar Deadlift",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×5 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bar travels straight — chest and hips rise together"],
+                  "bad": ["Don't let hips shoot up before the chest"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Rear-Foot Elevated Split Squat (DB)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Front shin vertical, slight forward torso lean"],
+                  "bad": ["Don't push off the back foot — front leg does the work"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Nordic Hamstring Curl (Eccentric)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×5 Reps" },
+                  { "label": "Tempo 5-0-X-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Rigid line from knee to shoulder — no hip hinge"],
+                  "bad": ["Don't drop fast — fight every inch of the descent"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Athletic Finisher",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lateral Bound & Stick",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×4/side" },
+                  { "label": "Tempo X-3-X-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Land in athletic stance and hold 3 seconds — no wobble"],
+                  "bad": ["Don't bounce straight back — the stick is the drill"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Copenhagen Plank",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "20 sec/side", "style": "dark" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Body in a straight line, top leg supported on the bench"],
+                  "bad": ["Don't let the hips sag — squeeze the glutes"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Upper Body Strength",
+        "completionTitle": "Locked In",
+        "completionMessage": "Upper body done — your shoulders will thank you for the cuff work.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rower",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "3 minutes", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Legs → hips → arms, in that order every stroke"],
+                  "bad": ["Don't pull with the arms first — legs do 60%"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Dynamic Shoulder Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "items": [
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Squeeze shoulder blades together at end range"],
+                      "bad": ["Don't shrug up toward the ears"]
+                    }
+                  },
+                  {
+                    "name": "Wall Slide",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Keep ribs down and arms flush to the wall"],
+                      "bad": ["Don't let the lower back arch off the wall"]
+                    }
+                  },
+                  {
+                    "name": "Scap Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Small range — let the shoulder blades do the moving"],
+                      "bad": ["Don't bend the elbows — arms stay locked"]
+                    }
+                  }
+                ],
+                "cues": {
+                  "good": ["Slow and deliberate — mid-back and scap muscles switching on"],
+                  "bad": ["Don't rush — this is the insurance policy for everything that follows"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength Pair",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "DB Bench Press (Neutral Grip)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Dumbbells arc to meet above the lower chest"],
+                  "bad": ["Don't flare elbows to 90° — keep them around 45°"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported DB Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbows finish high and behind — squeeze blades together"],
+                  "bad": ["Don't shrug up as you pull — shoulders stay locked down"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Unilateral Push & Pull",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm Landmine Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×6/side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Down knee, hand, ribs, and hip stack in a vertical line"],
+                  "bad": ["Don't let the torso rotate open — brace the obliques"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm Cable Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Hips stay square to the cable — no trunk rotation"],
+                  "bad": ["Don't twist through the row to steal more range"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Rotator Cuff & Scap Circuit",
+            "icon": "🛡️",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Rotator Cuff Resilience Circuit",
+                "videoUrl": null,
+                "rounds": "×3 Rounds",
+                "items": [
+                  {
+                    "name": "Cable External Rotation",
+                    "detail": "×12/side",
+                    "cues": {
+                      "good": ["Elbow pinned tight to the ribs throughout"],
+                      "bad": ["Don't let the shoulder drift forward"]
+                    }
+                  },
+                  {
+                    "name": "Face Pull",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Pull to the forehead, thumbs rotating back"],
+                      "bad": ["Don't pull to the chest — that's too low"]
+                    }
+                  },
+                  {
+                    "name": "Prone Y-Raise",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Thumbs up, raise in a Y shape"],
+                      "bad": ["Don't shrug up toward the ears"]
+                    }
+                  }
+                ],
+                "cues": {
+                  "good": ["Slow and deliberate — small muscles doing the work"],
+                  "bad": ["Don't go heavy — form breaks before the cuff gets stimulus"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Rotational Power",
+        "completionTitle": "Power Unleashed",
+        "completionMessage": "Rotational day done — you've just trained what wins points on the court.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Jump Rope",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "3 minutes", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Stay on the balls of the feet — quiet, rhythmic bounces"],
+                  "bad": ["Don't kick the heels back — stay tall and springy"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Dynamic Mobility Flow",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "items": [
+                  {
+                    "name": "Open/Close the Gate",
+                    "detail": "×5/side",
+                    "cues": {
+                      "good": ["Big, deliberate hip circles — full range"],
+                      "bad": ["Don't rush — own every degree of motion"]
+                    }
+                  },
+                  {
+                    "name": "Thoracic Windmill",
+                    "detail": "×8/side",
+                    "cues": {
+                      "good": ["Top hand reaches to the sky — follow it with the eyes"],
+                      "bad": ["Don't let the bottom knee lift off the floor"]
+                    }
+                  },
+                  {
+                    "name": "Inchworm",
+                    "detail": "×6",
+                    "cues": {
+                      "good": ["Walk hands out to plank, then step feet in"],
+                      "bad": ["Don't let the hips sag at the plank position"]
+                    }
+                  }
+                ],
+                "cues": {
+                  "good": ["Hips and mid-back opening up one segment at a time"],
+                  "bad": ["Don't force range — breathe into positions instead of bouncing"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Rotational Power",
+            "icon": "🌀",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Medicine Ball Rotational Throw (Wall)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×4/side" },
+                  { "label": "Tempo X-0-X-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Back hip opens first, then trunk, then arms — like your padel swing"],
+                  "bad": ["Don't throw with the arms — if the trailing heel doesn't lift, it doesn't count"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Box Jump",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets" },
+                  { "label": "×3 Reps" },
+                  { "label": "Tempo X-0-X-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Land soft in the same athletic stance you jumped from"],
+                  "bad": ["Don't pick a box that's too tall — that measures hip flexion, not power"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength & Core",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Goblet Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbows track inside the knees at the bottom, chest tall"],
+                  "bad": ["Don't let the heels rise — that's an ankle mobility signal"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Tall-Kneeling Cable Pallof Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press out, hold 2 seconds, no sideways drift"],
+                  "bad": ["Don't arch the lower back — ribs stack over hips"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Finisher",
+            "icon": "🏁",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Heavy Farmer's Carry",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "30 m", "style": "dark" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Tall posture, shoulders packed down, eyes forward"],
+                  "bad": ["Don't let the shoulders round forward — own the posture or lower the load"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Kettlebell Swing (Russian)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo X-0-X-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bell floats to chest height — hips drive, not arms"],
+                  "bad": ["Don't squat the swing — this is a hinge, not a front raise"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Mahdi",
+    "cards": [
+      {
+        "icon": "🎾",
+        "title": "Gym Sits Under Padel, Not Over It",
+        "body": "You're training padel daily — the gym is a supplement, not the main event. Always book gym sessions so the highest-intensity lifts (trap bar, med-ball throws, box jumps) sit at least 4–6 hours away from your hardest court session, or the morning after an easier on-court day. If a match or tough practice surprised you the day before, drop RPE by one point across the board. You won't lose adaptation — you'll protect it."
+      },
+      {
+        "icon": "⏱",
+        "title": "Tempo Is the Coach This Cycle",
+        "body": "The numbers next to each exercise (e.g. 3-1-1-0) are eccentric – pause – concentric – reset, in seconds. Coming from a machine-dominant background, your free-weight patterns will only clean up if you respect the tempo. A 5-second Nordic descent at RPE 8 builds more eccentric strength than a 2-second descent at RPE 9 — and it carries over directly to deceleration on court. Don't let the ego shorten the down phase."
+      },
+      {
+        "icon": "🌀",
+        "title": "The Med-Ball Throw Is Your Most Important Lift",
+        "body": "The rotational throw on Day 3 has the highest direct carryover to your padel swing of any exercise in this program. Treat every rep like a first-serve — full intent, full hip, full follow-through. If the trailing heel doesn't pop up off the floor, you threw with your arm and the rep doesn't count. Four quality reps per side beats eight sloppy ones every time."
+      },
+      {
+        "icon": "🛡️",
+        "title": "Protect the Shoulder — It's Already Working Daily",
+        "body": "Padel gives your shoulder plenty of overhead volume already, which is why Cycle 1 has zero barbell overhead pressing. The landmine press and the cuff circuit on Day 2 aren't filler — they're what keeps you playing pain-free through Cycles 2 and 3. Don't skip them, don't rush them, and don't load them heavy. Slow reps, small muscles, big payoff."
+      },
+      {
+        "icon": "🦵",
+        "title": "The Copenhagen Plank Is Non-Negotiable",
+        "body": "Padel is a lateral-dominant sport, and adductor strains are one of the most common shutdowns in racket athletes. The Copenhagen on Day 1 is the single best insurance policy available. Start on the knee version if the full version is too hard — just earn the time under tension. By Week 5 aim to hold 30 seconds per side cleanly."
+      },
+      {
+        "icon": "😴",
+        "title": "Your Sleep Is a Weapon — Keep It That Way",
+        "body": "Sleep at 8/10 and 7–8 hours is exactly what a daily-training pro needs — that's not background info, that's why you can recover from this load at all. Stress at 5/10 is manageable but not ideal around heavy Nordic, box jump, or top-set trap bar days. On high-stress days, keep the warm-up in and drop the finisher — the top-end work is what drives adaptation in this cycle."
+      }
+    ]
+  }
+}
