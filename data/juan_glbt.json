@@ -1,0 +1,704 @@
+{
+  "athlete": {
+    "id": "juan_glbt",
+    "firstName": "Juan",
+    "lastName": "Galbete"
+  },
+  "sport": {
+    "badge": "🎾 Padel Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "tagline": "Build the Platform",
+      "weeks": "Weeks 1–5",
+      "focuses": [
+        "Build baseline strength and tendon capacity in the adductors, elbow, and foot while respecting current symptoms.",
+        "Establish movement quality across squat, hinge, press, and pull patterns with a 3-day gym habit."
+      ],
+      "message": {
+        "paragraphs": [
+          "Juan, this cycle is the foundation every later cycle is built on. You've been playing padel at high volume without the gym capacity to match it — that's exactly why your adductors, elbow, and foot are talking to you.",
+          "For the next five weeks, your job is simple: own every rep at the prescribed tempo. The slow eccentrics are not cosmetic — they are the medicine your tendons need.",
+          "Build the platform now and everything after gets better."
+        ],
+        "outcomes": [
+          "Adductor, elbow, and foot soreness noticeably settled by week 3",
+          "Measurable strength increase in goblet squat and Romanian deadlift",
+          "Copenhagen plank held 20 seconds clean on both sides",
+          "Fresher legs deep into the third game of a padel set",
+          "3 gym sessions per week built into a consistent habit"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Resilience Engine",
+      "weeks": "Weeks 6–10",
+      "focuses": [
+        "Progress strength loads and introduce early reactive work once tendons have settled under slow-tempo loading.",
+        "Expand unilateral capacity and rotational control to match padel's asymmetric demands."
+      ],
+      "teaser": {
+        "subtitle": "The body stops tolerating load and starts demanding it.",
+        "paragraphs": [
+          "Resilience Engine is where the tendons you rebuilt in Cycle 1 will be asked to do more — faster, heavier, and under sharper demands.",
+          "The court will feel different first: later into the third set, the explosive step still has bite.",
+          "Earn this cycle by finishing Foundation Forge clean — the reward is a body that no longer breaks down where it used to."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Power Platform",
+      "weeks": "Weeks 11–15",
+      "focuses": [
+        "Develop rate of force development through loaded jumps, medicine ball work, and heavier hip-hinge power.",
+        "Build the strength ceiling (RPE 8) that higher power outputs will eventually rest on."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Court Transfer",
+      "weeks": "Weeks 16–20",
+      "focuses": [
+        "Translate gym strength and power into padel-specific multidirectional speed, deceleration, and rotational acceleration.",
+        "Sharpen single-leg reactive strength for split-step, lateral lunge, and push-off mechanics."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Competition Edge",
+      "weeks": "Weeks 21–25",
+      "focuses": [
+        "Peak athletic output with minimum effective dose — maintain strength, sharpen speed, optimise recovery between matches.",
+        "Auto-regulated loading so gym work supports tournament weekends rather than competing with them."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Month One",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Lower Body + Adductor Resilience",
+        "completionTitle": "Foundation Laid",
+        "completionMessage": "Day 1 done — walk it out, hydrate, and let the adductors soak up the work.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Breathing stays nasal and controlled."],
+                  "bad": ["Treating this like a conditioning piece — it's a primer, not a session."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "90/90 Hip Switches",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 3" }
+                ],
+                "cues": {
+                  "good": ["Both knees touch the floor on every rep.", "Hip capsule opening, no pinching at the front."],
+                  "bad": ["Bouncing knees down using momentum instead of actively rotating the hips."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cossack Squat (Bodyweight)",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×6/side" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Heel of the working leg stays flat, other leg straight with toes up.", "Long controlled stretch through the inside of the trailing thigh."],
+                  "bad": ["Dropping into the bottom without control — load the adductor eccentrically."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🏋️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Goblet Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bell stays close to the sternum, elbows tracking inside the knees.", "Even pressure through both feet, quads and glutes sharing the load."],
+                  "bad": ["Knees collapsing inward at the bottom — the #1 fault under load."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Romanian Deadlift",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Dumbbells travel straight down the thigh, shins vertical.", "Deep hamstring stretch just above the knee, then drive the floor away."],
+                  "bad": ["Rounding the lower back at the bottom by reaching beyond your range."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Unilateral + Adductor",
+            "icon": "🦵",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Rear-Foot Elevated Split Squat",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Front shin vertical at the bottom, torso upright.", "Front glute and quad sharing the work evenly."],
+                  "bad": ["Pushing off the back foot — it is a balance point, not a driver."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Copenhagen Plank (Short Lever)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "15–20 sec/side", "style": "dark" },
+                  { "label": "Isometric" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Hips stacked, body in a straight line from head to foot.", "Deep inside-thigh engagement, no pain or pinch."],
+                  "bad": ["Letting hips sag — progress time only when form stays clean."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Foot & Hip Prehab",
+            "icon": "🩹",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Single-Leg Calf Raise (Bent Knee, Soleus)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12/side" },
+                  { "label": "Tempo 3-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Knee bent ~25°, heel drives straight up to full height.", "Slow burn in the lower calf / Achilles, not the upper gastroc."],
+                  "bad": ["Bouncing out of the bottom — eccentric and pause are the medicine."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Banded Side-Lying Hip Abduction",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×15/side" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Top leg lifts in line with the torso, toe pointed slightly down.", "Upper-outer glute lit up, no effort in the low back."],
+                  "bad": ["Rolling the hips backward to cheat the range."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 2-2-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Ribs down, shoulders square, no rotation toward the anchor.", "Deep obliques bracing hard to resist the pull."],
+                  "bad": ["Pressing with the arms instead of anti-rotating with the trunk."]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Upper Body + Elbow Tendon Rehab",
+        "completionTitle": "Elbow Earned It",
+        "completionMessage": "Nice work — the tendons just got a proper dose. Ice if needed, move on.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Row Ergometer",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Smooth catch-drive-finish, 20–24 strokes/min.", "Upper back and lats waking up, breath easy."],
+                  "bad": ["Pulling hard with the arms — legs and hips lead every stroke."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Band Pull-Apart",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Arms stay at chest height, band finishes at the collarbones.", "Rear delts and mid-traps pinching together."],
+                  "bad": ["Shrugging the traps up — keep shoulders packed down."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Wall Slide (Banded)",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Wrists stay on the wall the whole time.", "Low traps engaging as the arms slide up."],
+                  "bad": ["Arching the low back off the wall to fake the range."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Push",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Bench Press (Neutral Grip)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbows at ~45° to the ribs, dumbbells stack over shoulders at top.", "Even chest contraction, no pinching at the elbow."],
+                  "bad": ["Flaring the elbows wide — it hammers the elbow tendons."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm DB Overhead Press",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Ribs stay stacked over pelvis, no side-bend.", "Glute of the down-knee firing to keep the pelvis level."],
+                  "bad": ["Leaning away from the working arm to press heavier weight."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Pull",
+            "icon": "🪢",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Elbows drive back past the ribs, chest stays pinned to the pad.", "Mid-back squeezing, minimal forearm/grip strain."],
+                  "bad": ["Turning it into a biceps curl by bending the elbows early."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Neutral-Grip Lat Pulldown",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-1-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bar pulls to upper chest, elbows drive down and in.", "Lats initiating the pull, forearms relatively relaxed."],
+                  "bad": ["Over-gripping — use a loose hook grip to spare the elbow."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elbow Tendon Rehab",
+            "icon": "🩹",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Eccentric Wrist Extension (Single Arm)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12/side" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Forearm fully supported on the bench, slow lower only.", "Controlled pull on the outside of the forearm — mild discomfort OK, sharp pain is not."],
+                  "bad": ["Rushing the lowering phase — the 3-second eccentric is the whole point."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cross-Body Hammer Curl",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Dumbbell travels across the body toward the opposite shoulder.", "Brachioradialis and forearm loading evenly, no elbow pinch."],
+                  "bad": ["Swinging the weight — slow tempo protects the tendon."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Low back stays pinned to the floor the entire time.", "Deep abs engaged, breathing controlled throughout."],
+                  "bad": ["Letting the back arch when the leg extends — shorten range instead."]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Athletic Power + Rotational Core",
+        "completionTitle": "Power Banked",
+        "completionMessage": "Solid finish to the week — breathe down, sleep well, padel loves you tomorrow.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Dynamic Flow (A-Skip, Lateral Shuffle, Carioca)",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "2 Rounds", "style": "dark" },
+                  { "label": "30 sec each", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Light on the feet, smooth side-to-side transitions.", "Hips and ankles mobile, heart rate lifted, no foot pain."],
+                  "bad": ["Going too intense — this preps the nervous system, not fatigues it."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Bodyweight Squat to Stand",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Full hip depth, chest tall, arms overhead at the top.", "Hips, knees, ankles all opening through full range."],
+                  "bad": ["Rushing — own every rep slowly."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Band External Rotation",
+                "videoUrl": null,
+                "hasRest": false,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 3" }
+                ],
+                "cues": {
+                  "good": ["Elbow pinned to the side, forearm rotates outward.", "Deep rear shoulder activating, no effort in the traps."],
+                  "bad": ["Letting the elbow drift away from the ribcage."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Power / Athletic",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Kettlebell Swing (Two-Hand)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "5 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 1-0-X-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bell floats to chest height driven purely by hip snap.", "Explosive glute contraction, arms are just ropes."],
+                  "bad": ["Squatting the swing — it's a hinge, not a front raise."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Rotational Chop (High-to-Low)",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Rotation comes from the hips and trunk, arms stay long.", "Obliques driving, adductors quiet — no groin strain."],
+                  "bad": ["Yanking with the arms — if the low back rounds, you've gone too heavy."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Full-Body Strength",
+            "icon": "🏋️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Kettlebell Sumo Deadlift",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Knees track over mid-foot, chest stays lifted through the lockout.", "Inner thigh and glute sharing the load evenly."],
+                  "bad": ["Letting the knees cave inward — preserves the adductors."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm Cable Row",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Shoulder slides down and back, elbow finishes behind the ribs.", "Lat and mid-back working, no sway in the torso."],
+                  "bad": ["Rotating the trunk with the pull — the anti-rotation is the point."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Carries + Anti-Rotation",
+            "icon": "🎒",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "3 Sets" },
+                  { "label": "30 m/side", "style": "dark" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Shoulders level, steps even, no limp or lean.", "Opposite-side obliques bracing hard the whole walk."],
+                  "bad": ["Letting the loaded shoulder drop — pick lighter if form breaks."]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Side Plank with Top-Leg Lift",
+                "videoUrl": null,
+                "hasRest": true,
+                "chips": [
+                  { "label": "2 Sets" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Straight line from head to foot, top leg rises to hip height.", "Obliques and outer glute working together."],
+                  "bad": ["Hips sagging toward the floor between reps."]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Cool-Down",
+            "icon": "🌬️",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Box Breathing (4-4-4-4)",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "3 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Slow, quiet, audible only to you.", "Shoulders drop, heart rate settles, parasympathetic shift."],
+                  "bad": ["Skipping it — this is how you buy back recovery for padel tomorrow."]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Juan",
+    "cards": [
+      {
+        "icon": "🎾",
+        "title": "Gym-Day Timing Around Padel",
+        "body": "You play 5–6 days of padel and only have 3 gym slots, so placement matters as much as the sessions themselves. Put Day 1 (Lower Body) at least 24 hours away from a hard padel match — the rear-foot split squat and Copenhagen plank will leave the legs heavy the next day. Day 2 (Upper Body + Elbow) is your most padel-friendly session — you can train it the morning before a match if needed. Day 3 (Athletic Power) goes best on a lighter padel day since the swings and chops share a nervous-system bill with the court."
+      },
+      {
+        "icon": "⏱",
+        "title": "Why the Tempo Is Non-Negotiable",
+        "body": "Tempo numbers like 3-0-1-0 are not suggestions — they are the actual mechanism fixing your elbow and foot. Heavy slow resistance (the 3-second lowering) is the most evidence-backed protocol for tendinopathy recovery. The single-leg calf raise and eccentric wrist extension specifically need the slow lower to do their job. If you rush the tempo to chase heavier weight, you get neither the strength adaptation nor the tendon healing. Slower reps, lighter weight — this is the cycle for it."
+      },
+      {
+        "icon": "🦵",
+        "title": "About the Adductor Work",
+        "body": "The Copenhagen plank is the single most important exercise in this block for you. Padel is 80% lateral lunging and the groin soreness you're feeling is a direct signal that the adductors are being asked to do work they have no strength reserve for. Start at the short-lever version (knee on the bench, not the foot) and stay there until you can hold 20 seconds clean both sides. Do not progress the lever length just because the time feels easy — depth of capacity matters more than rank."
+      },
+      {
+        "icon": "💪",
+        "title": "Managing the Padel Elbow",
+        "body": "Your elbow is tendon overload, not structural damage, which means the worst thing you can do is rest it completely — tendons lose capacity without load. The eccentric wrist extension and cross-body hammer curl are both designed to load the flexor and extensor origins in a range that promotes healing. Some mild discomfort (2–3/10) during the slow lower is acceptable and even productive; sharp pain (5+/10) is a signal to drop the weight, not push through. On padel days, consider a light grip-friendly warm-up (band wrist curls × 15 each way) before you play."
+      },
+      {
+        "icon": "🦶",
+        "title": "The Foot Tendon and Your Calf Work",
+        "body": "Your lower right foot tendon soreness (likely plantar fascia or peroneal origin) responds almost identically to the elbow — load it, don't avoid it. The bent-knee single-leg calf raise is the key exercise: it biases the soleus, which is the primary tissue most lateral-sport foot injuries stem from. Work through the full range even if there's mild discomfort in the lower heel area, but stop short of the point where the foot feels sharply aggravated. Progress by adding reps or adding a light DB in the opposite hand before you add pace."
+      },
+      {
+        "icon": "🛌",
+        "title": "Your Recovery Is a Weapon — Use It",
+        "body": "You sleep 7–8 hours at a self-reported 9/10 quality, which is better than 90% of athletes your age and is probably the single biggest reason you can handle 5–6 padel days without being wrecked. Protect this fiercely during Cycle 1 — the slow-tempo work taxes the nervous system more than it looks on paper. If padel volume spikes one week (tournament, extra matches), drop your gym session RPE by one point rather than skipping — maintaining the habit beats any individual workout."
+      },
+      {
+        "icon": "🔥",
+        "title": "Stress at 6/10 — What It Means Here",
+        "body": "A stress score of 6/10 sits in the range where recovery is still intact but trending, and it matters most at the edges of your gym sessions. Use the 3-minute box breathing cool-down at the end of Day 3 seriously — it's not filler. If you notice your RPE 7 sets feel more like RPE 8–9 for a few sessions in a row, that's stress cashing in on recovery: back off 10% in load before you back off volume, and get to bed 30 minutes earlier for three nights rather than skipping training."
+      }
+    ]
+  }
+}
