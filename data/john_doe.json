@@ -105,7 +105,10 @@
                 "type": "simple",
                 "name": "Bike",
                 "chips": [
-                  { "label": "5 minutes", "style": "dark" }
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -179,8 +182,12 @@
                 "type": "standard",
                 "name": "Broad Jump",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×5 Reps" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×5 Reps"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -197,8 +204,12 @@
                 "type": "standard",
                 "name": "Lateral Bound → Stick",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×5/side" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×5/side"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -222,10 +233,19 @@
                 "name": "Back Squat",
                 "videoUrl": "https://www.youtube.com/watch?v=ultWZbUMPL8",
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6 Reps" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -242,9 +262,15 @@
                 "type": "standard",
                 "name": "Single-Leg Hip Lift",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10+10" },
-                  { "label": "Tempo 2-1-2" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10+10"
+                  },
+                  {
+                    "label": "Tempo 2-1-2"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -261,8 +287,12 @@
                 "type": "standard",
                 "name": "Lateral Step-Down",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×6+6" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×6+6"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -279,8 +309,12 @@
                 "type": "standard",
                 "name": "Pallof Press",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×12/side" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×12/side"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -311,7 +345,10 @@
                 "type": "simple",
                 "name": "Arm Bike / Ski Erg / Cross Trainer",
                 "chips": [
-                  { "label": "5 minutes", "style": "dark" }
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -344,7 +381,8 @@
                       "bad": [
                         "Don't shrug the shoulders up"
                       ]
-                    }
+                    },
+                    "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
                   },
                   {
                     "name": "Wall Slide",
@@ -397,10 +435,19 @@
                 "type": "standard",
                 "name": "Cable Face Pull",
                 "chips": [
-                  { "label": "Priority", "style": "yellow" },
-                  { "label": "3 Sets" },
-                  { "label": "×15" },
-                  { "label": "Tempo 2-0-2" }
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×15"
+                  },
+                  {
+                    "label": "Tempo 2-0-2"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -411,16 +458,25 @@
                   "bad": [
                     "Don't use momentum — this is a control exercise"
                   ]
-                }
+                },
+                "videoUrl": "https://www.youtube.com/watch?v=0Po47vvj9g4"
               },
               {
                 "type": "standard",
                 "name": "Half-Kneeling Single-Arm DB Press",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10+10" },
-                  { "label": "Tempo 2-1-2" },
-                  { "label": "RPE 6–7" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10+10"
+                  },
+                  {
+                    "label": "Tempo 2-1-2"
+                  },
+                  {
+                    "label": "RPE 6–7"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -437,9 +493,15 @@
                 "type": "standard",
                 "name": "3-Point Row",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10+10" },
-                  { "label": "Tempo 3-1-1" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10+10"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -454,12 +516,20 @@
               },
               {
                 "type": "standard",
-                "name": "Incline DB Chest Press",
+                "name": "Incline Dumbbell Press",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 6–7" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  },
+                  {
+                    "label": "RPE 6–7"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -470,15 +540,22 @@
                   "bad": [
                     "Don't flare elbows past 45 degrees"
                   ]
-                }
+                },
+                "videoUrl": "https://www.youtube.com/watch?v=jMQA3XtJSgo"
               },
               {
                 "type": "standard",
                 "name": "Lat Pull-Down",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10" },
-                  { "label": "Tempo 3-1-1" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -495,8 +572,12 @@
                 "type": "standard",
                 "name": "Incline Y-T Raise",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10 each shape" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10 each shape"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -513,8 +594,12 @@
                 "type": "standard",
                 "name": "Suitcase Carry",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×20m/side" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×20m/side"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -545,7 +630,10 @@
                 "type": "simple",
                 "name": "Bike",
                 "chips": [
-                  { "label": "5 minutes", "style": "dark" }
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -594,7 +682,7 @@
                     }
                   },
                   {
-                    "name": "Deadbug",
+                    "name": "Dead Bug",
                     "detail": "×6+6",
                     "cues": {
                       "good": [
@@ -604,7 +692,8 @@
                       "bad": [
                         "Don't let the lower back arch off the floor"
                       ]
-                    }
+                    },
+                    "videoUrl": "https://www.youtube.com/watch?v=-VykQ1HD0Vw"
                   }
                 ]
               }
@@ -618,8 +707,12 @@
                 "type": "standard",
                 "name": "Low Box Rebound Jump",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×6 Reps" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×6 Reps"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -636,8 +729,12 @@
                 "type": "standard",
                 "name": "Single-Leg Lateral Hop → Stick",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×5+5" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×5+5"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -660,10 +757,19 @@
                 "type": "standard",
                 "name": "Rotational Wall Slam",
                 "chips": [
-                  { "label": "Max Intent", "style": "yellow" },
-                  { "label": "3 Sets" },
-                  { "label": "×6/side" },
-                  { "label": "2–3 kg" }
+                  {
+                    "label": "Max Intent",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×6/side"
+                  },
+                  {
+                    "label": "2–3 kg"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -684,12 +790,21 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell RDL",
+                "name": "Barbell Romanian Deadlift",
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×8 Reps" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -700,14 +815,19 @@
                   "bad": [
                     "Don't round the lower back — if you feel it rounding, stop the set"
                   ]
-                }
+                },
+                "videoUrl": "https://www.youtube.com/watch?v=bT5OOBgY4bc"
               },
               {
                 "type": "standard",
                 "name": "Single-Leg RDL (DB)",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×6+6" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×6+6"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -724,8 +844,12 @@
                 "type": "standard",
                 "name": "Cable Chop",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×12+12" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×12+12"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -742,8 +866,12 @@
                 "type": "standard",
                 "name": "Plank Shoulder Tap",
                 "chips": [
-                  { "label": "3 Sets" },
-                  { "label": "×10+10" }
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10+10"
+                  }
                 ],
                 "hasRest": true,
                 "cues": {
@@ -772,37 +900,94 @@
           "label": "Day 1",
           "focus": "Lower Body Power",
           "exercises": [
-            { "name": "Back Squat", "detail": "3×10" },
-            { "name": "Split Squat", "detail": "3×8+8" },
-            { "name": "Lateral Step-Down", "detail": "3×5+5" },
-            { "name": "Pallof Press Hold", "detail": "3×20–30s" },
-            { "name": "Pogo Jumps", "detail": "3×20" },
-            { "name": "Lateral Line Hops", "detail": "3×15/side" }
+            {
+              "name": "Back Squat",
+              "detail": "3×10"
+            },
+            {
+              "name": "Split Squat",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Lateral Step-Down",
+              "detail": "3×5+5"
+            },
+            {
+              "name": "Pallof Press Hold",
+              "detail": "3×20–30s"
+            },
+            {
+              "name": "Pogo Jumps",
+              "detail": "3×20"
+            },
+            {
+              "name": "Lateral Line Hops",
+              "detail": "3×15/side"
+            }
           ]
         },
         {
           "label": "Day 2",
           "focus": "Upper / Shoulder",
           "exercises": [
-            { "name": "Half-Kneeling Shoulder Press", "detail": "3×10+10" },
-            { "name": "3-Point Row", "detail": "3×8+8" },
-            { "name": "Barbell Chest Press", "detail": "3×10" },
-            { "name": "Lat Pull-Down", "detail": "3×8" },
-            { "name": "Cable External Rotation", "detail": "3×12+12" },
-            { "name": "Inclined Y Raise", "detail": "3×10" },
-            { "name": "Farmers Carry", "detail": "3×30–40s" }
+            {
+              "name": "Half-Kneeling Shoulder Press",
+              "detail": "3×10+10"
+            },
+            {
+              "name": "3-Point Row",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Barbell Chest Press",
+              "detail": "3×10"
+            },
+            {
+              "name": "Lat Pull-Down",
+              "detail": "3×8"
+            },
+            {
+              "name": "Cable External Rotation",
+              "detail": "3×12+12"
+            },
+            {
+              "name": "Inclined Y Raise",
+              "detail": "3×10"
+            },
+            {
+              "name": "Farmers Carry",
+              "detail": "3×30–40s"
+            }
           ]
         },
         {
           "label": "Day 3",
           "focus": "Lower / Core",
           "exercises": [
-            { "name": "Goblet Squat", "detail": "4×8" },
-            { "name": "Single-Leg RDL", "detail": "3×8+8" },
-            { "name": "Cable Chop", "detail": "3×10+10" },
-            { "name": "Plank Leg Lifts", "detail": "3×24" },
-            { "name": "Low Box Rebound Jump", "detail": "3×8" },
-            { "name": "Single-Leg Pogos", "detail": "3×12/side" }
+            {
+              "name": "Goblet Squat",
+              "detail": "4×8"
+            },
+            {
+              "name": "Single-Leg RDL",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Cable Chop",
+              "detail": "3×10+10"
+            },
+            {
+              "name": "Plank Leg Lifts",
+              "detail": "3×24"
+            },
+            {
+              "name": "Low Box Rebound Jump",
+              "detail": "3×8"
+            },
+            {
+              "name": "Single-Leg Pogos",
+              "detail": "3×12/side"
+            }
           ]
         }
       ]

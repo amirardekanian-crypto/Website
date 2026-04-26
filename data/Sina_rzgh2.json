@@ -96,11 +96,18 @@
                 "name": "Bike",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 minutes", "style": "dark" }
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Steady pace — raise the heart rate gradually"],
-                  "bad": ["Don't sprint — this is preparation, not training"]
+                  "good": [
+                    "Steady pace — raise the heart rate gradually"
+                  ],
+                  "bad": [
+                    "Don't sprint — this is preparation, not training"
+                  ]
                 }
               },
               {
@@ -113,24 +120,36 @@
                     "name": "90/90 Hip Rotations",
                     "detail": "×12",
                     "cues": {
-                      "good": ["Keep both hips grounded"],
-                      "bad": ["Don't arch the lower back to rotate further"]
+                      "good": [
+                        "Keep both hips grounded"
+                      ],
+                      "bad": [
+                        "Don't arch the lower back to rotate further"
+                      ]
                     }
                   },
                   {
                     "name": "Goblet Squat — 3-sec eccentric",
                     "detail": "×6",
                     "cues": {
-                      "good": ["Chest tall, slow controlled descent"],
-                      "bad": ["Don't let the heels lift off the floor"]
+                      "good": [
+                        "Chest tall, slow controlled descent"
+                      ],
+                      "bad": [
+                        "Don't let the heels lift off the floor"
+                      ]
                     }
                   },
                   {
                     "name": "Ankle Dorsiflexion Rocks",
                     "detail": "×8 each side",
                     "cues": {
-                      "good": ["Drive the knee forward over the toes"],
-                      "bad": ["Don't let the heel come off the ground"]
+                      "good": [
+                        "Drive the knee forward over the toes"
+                      ],
+                      "bad": [
+                        "Don't let the heel come off the ground"
+                      ]
                     }
                   }
                 ]
@@ -147,12 +166,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×5 Reps" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5 Reps"
+                  }
                 ],
                 "cues": {
-                  "good": ["Soft knees on landing, neutral spine", "Reset fully between reps"],
-                  "bad": ["Don't let knees cave inward on landing", "Don't rush the next rep without resetting"]
+                  "good": [
+                    "Soft knees on landing, neutral spine",
+                    "Reset fully between reps"
+                  ],
+                  "bad": [
+                    "Don't let knees cave inward on landing",
+                    "Don't rush the next rep without resetting"
+                  ]
                 }
               },
               {
@@ -161,12 +191,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×5/side" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5/side"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hold landing for 2 seconds", "Control before you repeat"],
-                  "bad": ["Don't wobble out of the stick position", "Don't collapse the landing knee inward"]
+                  "good": [
+                    "Hold landing for 2 seconds",
+                    "Control before you repeat"
+                  ],
+                  "bad": [
+                    "Don't wobble out of the stick position",
+                    "Don't collapse the landing knee inward"
+                  ]
                 }
               }
             ]
@@ -177,18 +218,33 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Back Squat",
-                "videoUrl": null,
+                "name": "Barbell Back Squat",
+                "videoUrl": "https://www.youtube.com/watch?v=rrJIyZGlK8c",
                 "hasRest": true,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6 Reps" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["3 sec down, 1 sec pause, 1 sec up", "Push the floor away on the way up"],
-                  "bad": ["Don't rush the descent", "Don't let knees cave in at the bottom"]
+                  "good": [
+                    "3 sec down, 1 sec pause, 1 sec up",
+                    "Push the floor away on the way up"
+                  ],
+                  "bad": [
+                    "Don't rush the descent",
+                    "Don't let knees cave in at the bottom"
+                  ]
                 }
               },
               {
@@ -197,13 +253,26 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10+10" },
-                  { "label": "Tempo 2-1-2" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10"
+                  },
+                  {
+                    "label": "Tempo 2-1-2"
+                  }
                 ],
                 "cues": {
-                  "good": ["Drive through the heel", "Squeeze glute at the top for a full second"],
-                  "bad": ["Don't push off the toes", "Don't arch the lower back to get higher"]
+                  "good": [
+                    "Drive through the heel",
+                    "Squeeze glute at the top for a full second"
+                  ],
+                  "bad": [
+                    "Don't push off the toes",
+                    "Don't arch the lower back to get higher"
+                  ]
                 }
               },
               {
@@ -212,12 +281,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×6+6" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6+6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Slow and controlled descent", "Watch the standing knee in the mirror"],
-                  "bad": ["Don't let the standing knee cave inward", "Don't drop quickly — control the eccentric"]
+                  "good": [
+                    "Slow and controlled descent",
+                    "Watch the standing knee in the mirror"
+                  ],
+                  "bad": [
+                    "Don't let the standing knee cave inward",
+                    "Don't drop quickly — control the eccentric"
+                  ]
                 }
               },
               {
@@ -226,12 +306,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12/side" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12/side"
+                  }
                 ],
                 "cues": {
-                  "good": ["Dynamic press — extend fully and return", "Resist rotation throughout the entire set"],
-                  "bad": ["Don't let the cable pull you into rotation", "Don't hold your breath — breathe through each press"]
+                  "good": [
+                    "Dynamic press — extend fully and return",
+                    "Resist rotation throughout the entire set"
+                  ],
+                  "bad": [
+                    "Don't let the cable pull you into rotation",
+                    "Don't hold your breath — breathe through each press"
+                  ]
                 }
               }
             ]
@@ -253,11 +344,18 @@
                 "name": "Arm Bike / Ski Erg / Cross Trainer",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 minutes", "style": "dark" }
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Moderate pace to warm the shoulder joint"],
-                  "bad": ["Don't push pace if the shoulder feels tight — stay easy"]
+                  "good": [
+                    "Moderate pace to warm the shoulder joint"
+                  ],
+                  "bad": [
+                    "Don't push pace if the shoulder feels tight — stay easy"
+                  ]
                 }
               },
               {
@@ -270,32 +368,49 @@
                     "name": "Band Pull-Apart",
                     "detail": "×15",
                     "cues": {
-                      "good": ["Lead with the shoulder blades, not the hands"],
-                      "bad": ["Don't shrug the traps toward the ears"]
-                    }
+                      "good": [
+                        "Lead with the shoulder blades, not the hands"
+                      ],
+                      "bad": [
+                        "Don't shrug the traps toward the ears"
+                      ]
+                    },
+                    "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
                   },
                   {
                     "name": "Wall Slide",
                     "detail": "×10",
                     "cues": {
-                      "good": ["Keep hands and elbows in contact with the wall"],
-                      "bad": ["Don't let the lower back arch off the wall"]
+                      "good": [
+                        "Keep hands and elbows in contact with the wall"
+                      ],
+                      "bad": [
+                        "Don't let the lower back arch off the wall"
+                      ]
                     }
                   },
                   {
                     "name": "Band ER at Side",
                     "detail": "×12/side",
                     "cues": {
-                      "good": ["Elbow pinned to the ribs throughout"],
-                      "bad": ["Don't let the elbow drift away from the body"]
+                      "good": [
+                        "Elbow pinned to the ribs throughout"
+                      ],
+                      "bad": [
+                        "Don't let the elbow drift away from the body"
+                      ]
                     }
                   },
                   {
                     "name": "Side-Lying ER",
                     "detail": "×10/side",
                     "cues": {
-                      "good": ["Slow and deliberate — this should never cause pain"],
-                      "bad": ["Don't use a weight that makes you cheat with the trunk"]
+                      "good": [
+                        "Slow and deliberate — this should never cause pain"
+                      ],
+                      "bad": [
+                        "Don't use a weight that makes you cheat with the trunk"
+                      ]
                     }
                   }
                 ]
@@ -309,17 +424,32 @@
               {
                 "type": "standard",
                 "name": "Cable Face Pull",
-                "videoUrl": null,
+                "videoUrl": "https://www.youtube.com/watch?v=0Po47vvj9g4",
                 "hasRest": true,
                 "chips": [
-                  { "label": "Priority", "style": "yellow" },
-                  { "label": "3 Sets" },
-                  { "label": "×15" },
-                  { "label": "Tempo 2-0-2" }
+                  {
+                    "label": "Priority",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×15"
+                  },
+                  {
+                    "label": "Tempo 2-0-2"
+                  }
                 ],
                 "cues": {
-                  "good": ["First exercise — prime the cuff before pressing", "Light load, full range, lead with the elbows"],
-                  "bad": ["Don't go heavy — this is a quality movement", "Don't let the elbows drop below shoulder height"]
+                  "good": [
+                    "First exercise — prime the cuff before pressing",
+                    "Light load, full range, lead with the elbows"
+                  ],
+                  "bad": [
+                    "Don't go heavy — this is a quality movement",
+                    "Don't let the elbows drop below shoulder height"
+                  ]
                 }
               },
               {
@@ -328,14 +458,29 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10+10" },
-                  { "label": "Tempo 2-1-2" },
-                  { "label": "RPE 6–7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10"
+                  },
+                  {
+                    "label": "Tempo 2-1-2"
+                  },
+                  {
+                    "label": "RPE 6–7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Ribs stacked over hips — tall posture", "Control the lockout, don't snap it"],
-                  "bad": ["Don't flare the ribs forward to press heavier", "Stop the set if you feel a front-shoulder pinch"]
+                  "good": [
+                    "Ribs stacked over hips — tall posture",
+                    "Control the lockout, don't snap it"
+                  ],
+                  "bad": [
+                    "Don't flare the ribs forward to press heavier",
+                    "Stop the set if you feel a front-shoulder pinch"
+                  ]
                 }
               },
               {
@@ -344,29 +489,57 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10+10" },
-                  { "label": "Tempo 3-1-1" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  }
                 ],
                 "cues": {
-                  "good": ["1-second hold at the top of each rep", "Squeeze the scapula inward at the peak"],
-                  "bad": ["Don't rotate the trunk to lift heavier", "Don't let the shoulder round forward on the descent"]
+                  "good": [
+                    "1-second hold at the top of each rep",
+                    "Squeeze the scapula inward at the peak"
+                  ],
+                  "bad": [
+                    "Don't rotate the trunk to lift heavier",
+                    "Don't let the shoulder round forward on the descent"
+                  ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Incline DB Chest Press",
-                "videoUrl": null,
+                "name": "Incline Dumbbell Press",
+                "videoUrl": "https://www.youtube.com/watch?v=jMQA3XtJSgo",
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 6–7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  },
+                  {
+                    "label": "RPE 6–7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Scapulae retracted into the bench throughout", "Stop immediately if a pinch shows up at the front of the shoulder"],
-                  "bad": ["Don't flare the elbows to 90° — tuck them ~45°", "Don't chase load this cycle — the shoulder comes first"]
+                  "good": [
+                    "Scapulae retracted into the bench throughout",
+                    "Stop immediately if a pinch shows up at the front of the shoulder"
+                  ],
+                  "bad": [
+                    "Don't flare the elbows to 90° — tuck them ~45°",
+                    "Don't chase load this cycle — the shoulder comes first"
+                  ]
                 }
               },
               {
@@ -375,13 +548,26 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10" },
-                  { "label": "Tempo 3-1-1" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  }
                 ],
                 "cues": {
-                  "good": ["Lead with the elbows driving down", "Slight chest lift as the bar approaches"],
-                  "bad": ["Don't use the trunk to swing the weight down", "Don't let the bar yank you on the way up"]
+                  "good": [
+                    "Lead with the elbows driving down",
+                    "Slight chest lift as the bar approaches"
+                  ],
+                  "bad": [
+                    "Don't use the trunk to swing the weight down",
+                    "Don't let the bar yank you on the way up"
+                  ]
                 }
               },
               {
@@ -390,12 +576,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 each shape" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 each shape"
+                  }
                 ],
                 "cues": {
-                  "good": ["Very light or bodyweight — quality over load", "Thumbs up on the Y, pinkies up on the T"],
-                  "bad": ["Don't shrug the traps to lift higher", "Don't rush the reps — slow and deliberate"]
+                  "good": [
+                    "Very light or bodyweight — quality over load",
+                    "Thumbs up on the Y, pinkies up on the T"
+                  ],
+                  "bad": [
+                    "Don't shrug the traps to lift higher",
+                    "Don't rush the reps — slow and deliberate"
+                  ]
                 }
               },
               {
@@ -404,12 +601,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×20m/side" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×20m/side"
+                  }
                 ],
                 "cues": {
-                  "good": ["One arm only — resist the lean", "Tall posture and even steps throughout"],
-                  "bad": ["Don't let the loaded side pull you sideways", "Don't hold your breath — breathe normally while walking"]
+                  "good": [
+                    "One arm only — resist the lean",
+                    "Tall posture and even steps throughout"
+                  ],
+                  "bad": [
+                    "Don't let the loaded side pull you sideways",
+                    "Don't hold your breath — breathe normally while walking"
+                  ]
                 }
               }
             ]
@@ -431,11 +639,18 @@
                 "name": "Bike",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 minutes", "style": "dark" }
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Steady pace — raise heart rate gradually"],
-                  "bad": ["Don't sprint — this is preparation, not training"]
+                  "good": [
+                    "Steady pace — raise heart rate gradually"
+                  ],
+                  "bad": [
+                    "Don't sprint — this is preparation, not training"
+                  ]
                 }
               },
               {
@@ -448,25 +663,38 @@
                     "name": "Walking Lunges",
                     "detail": "×6+6",
                     "cues": {
-                      "good": ["Step long, drop the back knee softly"],
-                      "bad": ["Don't let the front knee drive past the toes aggressively"]
+                      "good": [
+                        "Step long, drop the back knee softly"
+                      ],
+                      "bad": [
+                        "Don't let the front knee drive past the toes aggressively"
+                      ]
                     }
                   },
                   {
                     "name": "Airplane Hold",
                     "detail": "×4+4 — 3-sec hold",
                     "cues": {
-                      "good": ["Keep hips level — drive the back leg up, not out"],
-                      "bad": ["Don't let the standing-side hip drop"]
+                      "good": [
+                        "Keep hips level — drive the back leg up, not out"
+                      ],
+                      "bad": [
+                        "Don't let the standing-side hip drop"
+                      ]
                     }
                   },
                   {
-                    "name": "Deadbug",
+                    "name": "Dead Bug",
                     "detail": "×6+6",
                     "cues": {
-                      "good": ["Press the lower back into the floor throughout"],
-                      "bad": ["Don't let the ribs flare as the leg extends"]
-                    }
+                      "good": [
+                        "Press the lower back into the floor throughout"
+                      ],
+                      "bad": [
+                        "Don't let the ribs flare as the leg extends"
+                      ]
+                    },
+                    "videoUrl": "https://www.youtube.com/watch?v=-VykQ1HD0Vw"
                   }
                 ]
               }
@@ -482,12 +710,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×6 Reps" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6 Reps"
+                  }
                 ],
                 "cues": {
-                  "good": ["Minimal ground contact — think fast feet", "Stiff ankles on landing"],
-                  "bad": ["Don't sink into a deep squat on landing", "Don't chase jump height — chase contact speed"]
+                  "good": [
+                    "Minimal ground contact — think fast feet",
+                    "Stiff ankles on landing"
+                  ],
+                  "bad": [
+                    "Don't sink into a deep squat on landing",
+                    "Don't chase jump height — chase contact speed"
+                  ]
                 }
               },
               {
@@ -496,12 +735,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×5+5" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5+5"
+                  }
                 ],
                 "cues": {
-                  "good": ["2-second landing hold", "Control the single-leg position before repeating"],
-                  "bad": ["Don't let the landing knee collapse inward", "Don't rush the next rep — nail the stick first"]
+                  "good": [
+                    "2-second landing hold",
+                    "Control the single-leg position before repeating"
+                  ],
+                  "bad": [
+                    "Don't let the landing knee collapse inward",
+                    "Don't rush the next rep — nail the stick first"
+                  ]
                 }
               }
             ]
@@ -516,14 +766,30 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "Max Intent", "style": "yellow" },
-                  { "label": "3 Sets" },
-                  { "label": "×6/side" },
-                  { "label": "2–3 kg", "style": "dark" }
+                  {
+                    "label": "Max Intent",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×6/side"
+                  },
+                  {
+                    "label": "2–3 kg",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hips lead, trunk follows, arm releases last", "Same sequence as your padel groundstrokes"],
-                  "bad": ["Don't go heavier — speed of rotation is the point", "Don't throw arm-only — the power comes from the hips"]
+                  "good": [
+                    "Hips lead, trunk follows, arm releases last",
+                    "Same sequence as your padel groundstrokes"
+                  ],
+                  "bad": [
+                    "Don't go heavier — speed of rotation is the point",
+                    "Don't throw arm-only — the power comes from the hips"
+                  ]
                 }
               }
             ]
@@ -534,18 +800,33 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell RDL",
-                "videoUrl": null,
+                "name": "Barbell Romanian Deadlift",
+                "videoUrl": "https://www.youtube.com/watch?v=bT5OOBgY4bc",
                 "hasRest": true,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×8 Reps" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Push hips back — don't just bend forward", "Bar stays close to the legs throughout"],
-                  "bad": ["Don't round the lower back at the bottom", "Don't squat the movement — this is a hinge"]
+                  "good": [
+                    "Push hips back — don't just bend forward",
+                    "Bar stays close to the legs throughout"
+                  ],
+                  "bad": [
+                    "Don't round the lower back at the bottom",
+                    "Don't squat the movement — this is a hinge"
+                  ]
                 }
               },
               {
@@ -554,12 +835,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×6+6" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6+6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hips level — don't open to the side", "Slight bend in the standing knee"],
-                  "bad": ["Don't chase load — quality over weight", "Don't rotate the torso as you hinge"]
+                  "good": [
+                    "Hips level — don't open to the side",
+                    "Slight bend in the standing knee"
+                  ],
+                  "bad": [
+                    "Don't chase load — quality over weight",
+                    "Don't rotate the torso as you hinge"
+                  ]
                 }
               },
               {
@@ -568,12 +860,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12+12" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12+12"
+                  }
                 ],
                 "cues": {
-                  "good": ["Controlled tempo both directions", "Trunk rotates — hips stay square"],
-                  "bad": ["Don't pull with the arms — drive through the trunk", "Don't let the hips rotate with the torso"]
+                  "good": [
+                    "Controlled tempo both directions",
+                    "Trunk rotates — hips stay square"
+                  ],
+                  "bad": [
+                    "Don't pull with the arms — drive through the trunk",
+                    "Don't let the hips rotate with the torso"
+                  ]
                 }
               },
               {
@@ -582,12 +885,23 @@
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10+10" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10"
+                  }
                 ],
                 "cues": {
-                  "good": ["Hips stay still — resist the rotation", "Slow and deliberate taps"],
-                  "bad": ["Don't let the hips shift side to side", "Don't rush — speed defeats the purpose"]
+                  "good": [
+                    "Hips stay still — resist the rotation",
+                    "Slow and deliberate taps"
+                  ],
+                  "bad": [
+                    "Don't let the hips shift side to side",
+                    "Don't rush — speed defeats the purpose"
+                  ]
                 }
               }
             ]
@@ -606,37 +920,94 @@
           "label": "Day 1",
           "focus": "Lower Body Power",
           "exercises": [
-            { "name": "Back Squat", "detail": "3×10" },
-            { "name": "Split Squat", "detail": "3×8+8" },
-            { "name": "Lateral Step-Down", "detail": "3×5+5" },
-            { "name": "Pallof Press Hold", "detail": "3×20–30s" },
-            { "name": "Pogo Jumps", "detail": "3×20" },
-            { "name": "Lateral Line Hops", "detail": "3×15/side" }
+            {
+              "name": "Back Squat",
+              "detail": "3×10"
+            },
+            {
+              "name": "Split Squat",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Lateral Step-Down",
+              "detail": "3×5+5"
+            },
+            {
+              "name": "Pallof Press Hold",
+              "detail": "3×20–30s"
+            },
+            {
+              "name": "Pogo Jumps",
+              "detail": "3×20"
+            },
+            {
+              "name": "Lateral Line Hops",
+              "detail": "3×15/side"
+            }
           ]
         },
         {
           "label": "Day 2",
           "focus": "Upper / Shoulder",
           "exercises": [
-            { "name": "Half-Kneeling Shoulder Press", "detail": "3×10+10" },
-            { "name": "3-Point Row", "detail": "3×8+8" },
-            { "name": "Barbell Chest Press", "detail": "3×10" },
-            { "name": "Lat Pull-Down", "detail": "3×8" },
-            { "name": "Cable External Rotation", "detail": "3×12+12" },
-            { "name": "Inclined Y Raise", "detail": "3×10" },
-            { "name": "Farmers Carry", "detail": "3×30–40s" }
+            {
+              "name": "Half-Kneeling Shoulder Press",
+              "detail": "3×10+10"
+            },
+            {
+              "name": "3-Point Row",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Barbell Chest Press",
+              "detail": "3×10"
+            },
+            {
+              "name": "Lat Pull-Down",
+              "detail": "3×8"
+            },
+            {
+              "name": "Cable External Rotation",
+              "detail": "3×12+12"
+            },
+            {
+              "name": "Inclined Y Raise",
+              "detail": "3×10"
+            },
+            {
+              "name": "Farmers Carry",
+              "detail": "3×30–40s"
+            }
           ]
         },
         {
           "label": "Day 3",
           "focus": "Lower / Core",
           "exercises": [
-            { "name": "Goblet Squat", "detail": "4×8" },
-            { "name": "Single-Leg RDL", "detail": "3×8+8" },
-            { "name": "Cable Chop", "detail": "3×10+10" },
-            { "name": "Plank Leg Lifts", "detail": "3×24" },
-            { "name": "Low Box Rebound Jump", "detail": "3×8" },
-            { "name": "Single-Leg Pogos", "detail": "3×12/side" }
+            {
+              "name": "Goblet Squat",
+              "detail": "4×8"
+            },
+            {
+              "name": "Single-Leg RDL",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Cable Chop",
+              "detail": "3×10+10"
+            },
+            {
+              "name": "Plank Leg Lifts",
+              "detail": "3×24"
+            },
+            {
+              "name": "Low Box Rebound Jump",
+              "detail": "3×8"
+            },
+            {
+              "name": "Single-Leg Pogos",
+              "detail": "3×12/side"
+            }
           ]
         }
       ]

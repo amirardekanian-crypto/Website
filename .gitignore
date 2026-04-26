@@ -1,1 +1,11 @@
-data/
+# Secrets — NEVER push
+.notion_token
+
+# Patcher intermediate output and audit files — produced locally, not part of the site
+data/jsons_patched/
+data/Jsons_original/
+data/patch_report.txt
+data/unresolved_movements.txt
+data/patch_jsons_1.py.txt
+
+# Athlete JSONs in data/ ARE pushed (the website fetches them at runtime).
