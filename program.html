@@ -671,13 +671,13 @@
   /* When all 3 buttons are visible, tighten padding so labels fit on small screens */
   .home-bottom-cta.has-three .home-cta { padding: 14px 8px; font-size: 13px; letter-spacing: 0.5px; }
 
-  /* App Guide button — neutral white/grey style to stay distinct from yellow/ice/purple */
+  /* App Guide button — white background with purple lettering */
   .cta-guide {
-    background: rgba(255,255,255,0.06);
-    color: #f0f0f0;
-    border: 1px solid #333;
+    background: #fff;
+    color: var(--purple);
+    border: 1px solid var(--purple);
   }
-  .cta-guide:active { background: rgba(255,255,255,0.12); transform: scale(0.98); }
+  .cta-guide:active { background: #f0f0f0; transform: scale(0.98); }
 
   /* When 4 buttons are visible (App Guide + Past Programs), wrap to 2 rows */
   .home-bottom-cta.has-four { flex-wrap: wrap; }
