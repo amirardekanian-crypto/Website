@@ -671,6 +671,69 @@
   /* When all 3 buttons are visible, tighten padding so labels fit on small screens */
   .home-bottom-cta.has-three .home-cta { padding: 14px 8px; font-size: 13px; letter-spacing: 0.5px; }
 
+  /* App Guide button — neutral white/grey style to stay distinct from yellow/ice/purple */
+  .cta-guide {
+    background: rgba(255,255,255,0.06);
+    color: #f0f0f0;
+    border: 1px solid #333;
+  }
+  .cta-guide:active { background: rgba(255,255,255,0.12); transform: scale(0.98); }
+
+  /* When 4 buttons are visible (App Guide + Past Programs), wrap to 2 rows */
+  .home-bottom-cta.has-four { flex-wrap: wrap; }
+  .home-bottom-cta.has-four .cta-main { flex: 1 1 100%; }
+  .home-bottom-cta.has-four .home-cta:not(.cta-main) {
+    flex: 1 1 0; padding: 12px 6px; font-size: 12px; letter-spacing: 0.5px;
+  }
+
+  /* ── App Guide screen ── shares cards with Notes for a familiar look */
+  #screen-guide { background: var(--grey-bg); }
+  .guide-header { background: var(--grey-dark); padding: 48px 24px 32px; position: relative; }
+  .guide-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
+  .guide-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 8px; }
+  .guide-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: var(--white); text-transform: uppercase; line-height: 1; }
+  .guide-subtitle { font-size: 12px; color: #888; margin-top: 6px; font-weight: 300; }
+  .guide-container { padding: 20px 0 100px; }
+  /* Reuse .note-card styles — but always-open (no chevron, no toggle) */
+  .guide-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
+  .guide-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; }
+  .guide-icon { width: 32px; height: 32px; background: var(--yellow); color: #0A0A0A; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .guide-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; text-transform: uppercase; letter-spacing: 0.5px; }
+  .guide-body { padding: 4px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; }
+  .guide-body p { margin: 0 0 10px; }
+  .guide-body p:last-child { margin-bottom: 0; }
+  .guide-body strong { color: #0A0A0A; font-weight: 700; }
+  .guide-body ul { margin: 4px 0 0; padding-left: 18px; }
+  .guide-body li { margin: 4px 0; }
+  /* "Important" callout for the Send Data to Coach card */
+  .guide-card.important { border: 1px solid var(--yellow); box-shadow: 0 0 0 3px var(--yellow-dim); }
+  .guide-card.important .guide-icon { background: var(--yellow); }
+  .guide-important-tag {
+    display: inline-block; margin-left: 8px; padding: 2px 8px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    background: var(--yellow); color: #0A0A0A; border-radius: 3px;
+  }
+  /* WhatsApp CTA at bottom of the guide */
+  .guide-whatsapp {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin: 24px 20px 0; padding: 16px 20px;
+    background: #25D366; color: #fff;
+    border-radius: 10px; text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 16px; letter-spacing: 1px; text-transform: uppercase;
+    transition: transform 0.15s;
+  }
+  .guide-whatsapp:active { transform: scale(0.98); }
+  .guide-whatsapp-num { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 400; opacity: 0.9; }
+
+  /* Dark-mode variants — match the .note-card pattern already in use */
+  body[data-dark] #screen-guide { background: #0a0a0a; }
+  body[data-dark] .guide-card { background: #202020; border-color: #333; }
+  body[data-dark] .guide-card-title { color: #f0f0f0; }
+  body[data-dark] .guide-body { color: #aaa; }
+  body[data-dark] .guide-body strong { color: #fff; }
+
   /* Fallback simple intro for JSONs with no cycle data */
   .home-simple-meta {
     display: flex; flex-direction: column; gap: 6px;
@@ -784,10 +847,21 @@
   }
 
   /* ── Section Headers ── */
-  .section-header-prog { display: flex; align-items: center; gap: 10px; margin: 24px 0 10px; }
+  .section-header-prog { display: flex; align-items: center; gap: 14px; margin: 38px 0 14px; }
   .section-icon { display: none; }
-  .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); flex: 1; }
-  .section-header-prog::after { content: ''; flex: 1; height: 1px; background: var(--grey-mid); }
+  /* Bigger, bolder title — coloured per block (warm-up = ice, strength = yellow, power = purple) */
+  .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; line-height: 1; transition: color 0.2s; }
+  /* Thicker trailing line — colour matches the block accent for a strong section break */
+  .section-header-prog::after { content: ''; flex: 1; height: 3px; border-radius: 2px; background: var(--grey-mid); transition: background 0.2s; }
+
+  /* Per-block section colours — full neon, matching the rest of the design system.
+     Title and line use the same bright variant for a strong, on-brand section break. */
+  .section-header-prog.block-warmup   .section-title { color: var(--ice); }
+  .section-header-prog.block-warmup::after           { background: var(--ice); }
+  .section-header-prog.block-strength .section-title { color: var(--yellow); }
+  .section-header-prog.block-strength::after         { background: var(--yellow); }
+  .section-header-prog.block-power    .section-title { color: var(--purple); }
+  .section-header-prog.block-power::after            { background: var(--purple); }
 
   /* ── Checklist Items ── */
   /* ── Exercise card (refreshed: softer shadow, larger radius, premium feel) ── */
@@ -805,14 +879,35 @@
   }
   /* Press feedback — small scale on tap for tactile feel */
   .checklist-item:active { transform: scale(0.99); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-  /* Checked state — soft yellow tint instead of just dimming */
-  .checklist-item.checked {
-    background: rgba(212,255,0,0.06);
-    border-color: rgba(212,255,0,0.35);
-  }
+  /* Checked state — base styling. The actual tint colour is overridden below
+     per block type (warm-up = ice, strength = yellow, power = purple) so the
+     "done" colour matches the section colour the client already sees. */
   .checklist-item.checked .item-name { text-decoration: line-through; color: #888; }
-  .checklist-item.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
   .checklist-item.checked .check-box::after { opacity: 1; transform: scale(1); }
+
+  /* Per-block "done" tints — match the left-edge accent stripe colour */
+  .checklist-item.block-warmup.checked {
+    background: rgba(184,224,246,0.12);
+    border-color: rgba(184,224,246,0.40);
+  }
+  .checklist-item.block-warmup.checked .check-box { background: var(--ice); border-color: var(--ice); }
+
+  .checklist-item.block-strength.checked {
+    background: rgba(212,255,0,0.08);
+    border-color: rgba(212,255,0,0.40);
+  }
+  .checklist-item.block-strength.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
+
+  .checklist-item.block-power.checked {
+    background: rgba(183,148,246,0.12);
+    border-color: rgba(183,148,246,0.40);
+  }
+  .checklist-item.block-power.checked .check-box { background: var(--purple); border-color: var(--purple); }
+
+  /* Dark-mode variants — slightly brighter tints so the colour reads on a black bg */
+  body[data-dark] .checklist-item.block-warmup.checked   { background: rgba(184,224,246,0.10); border-color: rgba(184,224,246,0.30); }
+  body[data-dark] .checklist-item.block-strength.checked { background: rgba(212,255,0,0.07);   border-color: rgba(212,255,0,0.30); }
+  body[data-dark] .checklist-item.block-power.checked    { background: rgba(183,148,246,0.10); border-color: rgba(183,148,246,0.30); }
 
   /* Left-edge accent stripe — color matches block type, same palette as the home page */
   .checklist-item::before {
@@ -828,29 +923,46 @@
   .checklist-item.block-power::before    { background: var(--purple); }
   .checklist-item.checked::before        { opacity: 0.45; }
 
-  .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 16px; }
-  .check-box { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--grey-mid); background: transparent; flex-shrink: 0; position: relative; transition: background 0.2s, border-color 0.2s; }
-  .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--grey-dark); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 14px; }
+  /* Bigger check circle — feels more tappable and gives a clearer "done" feedback */
+  .check-box { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--grey-mid); background: transparent; flex-shrink: 0; position: relative; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+  .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--grey-dark); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   .item-body { flex: 1; min-width: 0; }
+  /* Number + name now share one line so the number reads as part of the title */
+  .item-name-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.1; letter-spacing: 0.3px; color: var(--grey-dark); transition: color 0.2s; }
 
-  /* Exercise number (1, 2, 3 within a block) — sits to the LEFT of the name,
-     big and bold so clients can see position at a glance. */
+  /* Exercise number (1, 2, 3 within a block) — paired in-line with the name,
+     bigger and bolder so it reads as "1. Glute Bridge Hold" at a glance. */
   .ex-num {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
-    font-size: 26px;
-    color: #bbb;
+    font-size: 36px;
+    color: #999;
     line-height: 1;
     flex-shrink: 0;
-    min-width: 18px;
-    text-align: center;
-    letter-spacing: -0.5px;
-    transition: color 0.2s;
+    letter-spacing: -1px;
+    transition: color 0.2s, font-size 0.2s;
   }
-  .checklist-item.checked .ex-num { color: #d8d8d8; }
-  body[data-dark] .ex-num { color: #555; }
-  body[data-dark] .checklist-item.checked .ex-num { color: #3a3a3a; }
+  .checklist-item.checked .ex-num { color: #c5c5c5; }
+  body[data-dark] .ex-num { color: #666; }
+  body[data-dark] .checklist-item.checked .ex-num { color: #444; }
+
+  /* Collapsed state — appears AFTER the client checks the box and logs RPE.
+     Collapses the card to a thin one-liner so the workout list shrinks as
+     they progress. Tapping the collapsed row re-opens it (without unchecking). */
+  .checklist-item.collapsed .item-main { padding: 10px 16px; gap: 12px; }
+  .checklist-item.collapsed .item-chips,
+  .checklist-item.collapsed .item-rest,
+  .checklist-item.collapsed .weight-log,
+  .checklist-item.collapsed .rpe-row,
+  .checklist-item.collapsed .note-row,
+  .checklist-item.collapsed .round-list,
+  .checklist-item.collapsed .item-actions { display: none !important; }
+  .checklist-item.collapsed .item-name { font-size: 16px; font-weight: 600; }
+  .checklist-item.collapsed .ex-num { font-size: 22px; }
+  .checklist-item.collapsed .check-box { width: 28px; height: 28px; }
+  .checklist-item.collapsed .check-box::after { font-size: 14px; }
 
   /* Filled-yellow play button — clear, tappable, on-brand */
   .play-btn {
@@ -871,6 +983,10 @@
   }
   .play-btn:hover { transform: scale(1.05); }
   body[data-dark] .play-btn { background: var(--yellow); color: var(--grey-dark); }
+
+  /* Wrapper so the play button stays right-aligned in the action area */
+  .item-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
+  .item-actions .play-btn { margin-left: 0; }
   .item-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--grey-card); color: var(--grey-dark); letter-spacing: 0.3px; }
   .chip.yellow { background: var(--yellow); color: var(--grey-dark); }
@@ -881,61 +997,58 @@
   .rest-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--grey-dark); color: var(--yellow); border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
   /* ── Coaching Cues (refreshed: rotating chevron + soft pill cues with circular badges) ── */
+  /* Compact "Coaching Cues" toggle — sits at the bottom of the card (in the
+     rest area), small and quiet so it doesn't take much space when closed.
+     When opened, the cues themselves are just colored text (no background fills). */
   details.cues { border-top: 1px solid rgba(0,0,0,0.05); }
   details.cues summary {
-    padding: 12px 18px;
-    font-size: 11px;
+    padding: 7px 18px;
+    font-size: 10px;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700; letter-spacing: 1.5px;
     text-transform: uppercase; color: var(--grey-text);
     cursor: pointer; list-style: none; user-select: none;
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 6px;
     transition: color 0.15s;
   }
-  /* Desktop-only hover (prevents "sticky hover" on phones after a tap) */
   @media (hover: hover) {
-    details.cues summary:hover { color: var(--grey-dark); background: rgba(0,0,0,0.025); }
+    details.cues summary:hover { color: var(--grey-dark); }
   }
-  /* Touch + click feedback — brief flash while the finger is pressing */
-  details.cues summary:active { background: rgba(0,0,0,0.05); }
   details.cues summary::-webkit-details-marker { display: none; }
   details.cues .chev {
-    width: 10px; height: 10px;
+    width: 8px; height: 8px;
     transition: transform 0.25s ease;
     flex-shrink: 0;
   }
   details[open].cues .chev { transform: rotate(90deg); }
   details.cues .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
-  details.cues .cue-body { padding: 4px 18px 14px; display: flex; flex-direction: column; gap: 7px; }
-  details.cues .cue {
+  details.cues .cue-body { padding: 2px 18px 10px; display: flex; flex-direction: column; gap: 5px; }
+
+  /* Cue lines — plain colored text, no backgrounds (per design preference). */
+  .cue {
     font-family: 'Barlow', sans-serif;
     font-size: 13px; line-height: 1.45;
-    padding: 9px 12px 9px 14px;
-    border-radius: 6px;
-    border-left: 3px solid transparent;
-    background: rgba(0,0,0,0.025);
-    display: flex; align-items: flex-start; gap: 9px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    display: flex; align-items: flex-start; gap: 6px;
   }
-  details.cues .cue::before {
-    display: flex; align-items: center; justify-content: center;
+  .cue::before {
+    display: inline-block;
     flex-shrink: 0;
-    width: 16px; height: 16px; border-radius: 50%;
-    font-size: 10px; font-weight: 700;
-    margin-top: 1px;
+    width: auto; height: auto; border-radius: 0;
+    background: transparent !important;
+    font-size: 13px; font-weight: 900;
+    margin-top: 0;
+    line-height: 1.45;
   }
-  details.cues .cue.good {
-    border-left-color: #6DBE45;
-    background: rgba(109,190,69,0.08);
-    color: #2a4d0f;
-  }
-  details.cues .cue.good::before { content: '✓'; background: #6DBE45; color: white; }
-  details.cues .cue.bad {
-    border-left-color: #E74C3C;
-    background: rgba(231,76,60,0.07);
-    color: #6b1a10;
-  }
-  details.cues .cue.bad::before { content: '✕'; background: #E74C3C; color: white; }
-  .item-rest details.cues, .item-rest details.cues * { pointer-events: auto; }
+  .cue.good { color: #2f7a17; }
+  .cue.good::before { content: '✓'; color: #6DBE45; }
+  .cue.bad { color: #a32014; }
+  .cue.bad::before { content: '✕'; color: #E74C3C; }
+  body[data-dark] details.cues { border-top-color: rgba(255,255,255,0.08); }
+  body[data-dark] .cue.good { color: #9bd06f; }
+  body[data-dark] .cue.bad  { color: #e58579; }
 
   /* ── Round Groups ── */
   .round-list { margin-top: 10px; display: flex; flex-direction: column; gap: 0; }
@@ -954,67 +1067,8 @@
   .round-name { font-size: 15px; color: var(--grey-text); flex: 1; }
   .round-detail { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; color: #aaa; margin-right: 8px; }
   .round-group.checked .round-row { opacity: 0.5; }
-  /* Round cues (inside a circuit) — same chevron + pill design as main cues,
-     just slightly more compact for the tighter layout. Larger tap area so it
-     doesn't accidentally trigger the parent "complete circuit" click. */
-  details.round-cue { margin-top: 2px; }
-  /* Cues toggle — large generous tap area so it's almost impossible to miss
-     and so it dominates the row's vertical space (vs. the small "complete" row). */
-  details.round-cue summary {
-    padding: 16px 6px;            /* tall tap target — ~44px high */
-    margin: 0 -4px;               /* extends slightly beyond the row to widen the hit zone */
-    font-size: 11px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--grey-text);
-    cursor: pointer; list-style: none; user-select: none;
-    display: flex; align-items: center; gap: 8px;
-    border-radius: 6px;
-    transition: color 0.15s, background 0.15s;
-  }
-  /* Desktop-only hover (prevents "sticky hover" on phones after a tap) */
-  @media (hover: hover) {
-    details.round-cue summary:hover { color: var(--grey-dark); background: rgba(0,0,0,0.025); }
-  }
-  /* Touch + click feedback — brief flash while the finger is pressing */
-  details.round-cue summary:active { background: rgba(0,0,0,0.05); }
-  details.round-cue summary::-webkit-details-marker { display: none; }
-  details.round-cue .chev {
-    width: 9px; height: 9px;
-    transition: transform 0.25s ease;
-    flex-shrink: 0;
-  }
-  details[open].round-cue .chev { transform: rotate(90deg); }
-  details.round-cue .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
-  details.round-cue .round-cue-body { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 10px; }
-  details.round-cue .cue {
-    font-family: 'Barlow', sans-serif;
-    font-size: 12px; line-height: 1.45;
-    padding: 7px 10px 7px 12px;
-    border-radius: 6px;
-    border-left: 3px solid transparent;
-    background: rgba(0,0,0,0.025);
-    display: flex; align-items: flex-start; gap: 8px;
-  }
-  details.round-cue .cue::before {
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    width: 14px; height: 14px; border-radius: 50%;
-    font-size: 9px; font-weight: 700;
-    margin-top: 1px;
-  }
-  details.round-cue .cue.good {
-    border-left-color: #6DBE45;
-    background: rgba(109,190,69,0.08);
-    color: #2a4d0f;
-  }
-  details.round-cue .cue.good::before { content: '✓'; background: #6DBE45; color: white; }
-  details.round-cue .cue.bad {
-    border-left-color: #E74C3C;
-    background: rgba(231,76,60,0.07);
-    color: #6b1a10;
-  }
-  details.round-cue .cue.bad::before { content: '✕'; background: #E74C3C; color: white; }
+  /* Round cues (inside a circuit) reuse the same details.cues styling as the
+     main exercise cues — single source of truth so they look identical. */
 
   /* ── Session Complete ── */
   .session-complete { display: none; background: var(--grey-dark); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid #3a3a3a; }
@@ -1444,9 +1498,10 @@
   <div id="journey-wrap"></div>
 
   <!-- Bottom CTA — the "Past Programs" button is only shown when the athlete has programHistory -->
-  <div class="home-bottom-cta" id="home-bottom-cta">
+  <div class="home-bottom-cta has-three" id="home-bottom-cta">
     <button class="home-cta cta-main" onclick="goTo('program')">Current Program</button>
     <button class="home-cta cta-notes" onclick="goTo('notes')">Notes</button>
+    <button class="home-cta cta-guide" onclick="goTo('guide')">App Guide</button>
     <button class="home-cta cta-history" id="cta-past-programs" onclick="openFirstArchive()" style="display:none">Past Programs</button>
   </div>
 
@@ -1494,6 +1549,116 @@
   </div>
 </div>
 
+<!-- ═══ APP GUIDE ═══ static how-to-use page, same for every client -->
+<div id="screen-guide" class="screen">
+  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span></div>
+  <div class="guide-header">
+    <div class="guide-eyebrow">For everyone</div>
+    <div class="guide-title">App<br>Guide</div>
+    <div class="guide-subtitle">How to use this app — read once, refer back anytime</div>
+  </div>
+  <div class="guide-container">
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">🧭</div>
+        <div class="guide-card-title">Getting around</div>
+      </div>
+      <div class="guide-body">
+        <p>Open the app from your home screen. The homepage shows your current cycle and progress.</p>
+        <p>Tap <strong>Current Program</strong> to start training, or <strong>Notes</strong> to read the personal notes I write you each cycle. Inside Current Program, the tabs at the top (D1, D2, D3…) switch between training days.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">💪</div>
+        <div class="guide-card-title">RPE &amp; Tempo</div>
+      </div>
+      <div class="guide-body">
+        <p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p>
+        <p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">✏️</div>
+        <div class="guide-card-title">Logging your sets</div>
+      </div>
+      <div class="guide-body">
+        <p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p>
+        <p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>
+      </div>
+    </div>
+
+    <div class="guide-card important">
+      <div class="guide-card-header">
+        <div class="guide-icon">✅</div>
+        <div class="guide-card-title">Finish Workout → Send Data to Coach<span class="guide-important-tag">Important</span></div>
+      </div>
+      <div class="guide-body">
+        <p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p>
+        <p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">📅</div>
+        <div class="guide-card-title">What to report &amp; how often</div>
+      </div>
+      <div class="guide-body">
+        <p><strong>Every session</strong> → use the Send Data to Coach button (above).</p>
+        <p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p>
+        <p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">📲</div>
+        <div class="guide-card-title">Install the app on your home screen</div>
+      </div>
+      <div class="guide-body">
+        <p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p>
+        <p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p>
+        <p>Once installed it opens like a normal app — full-screen, no browser bar.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">🛠️</div>
+        <div class="guide-card-title">Built-in tools</div>
+      </div>
+      <div class="guide-body">
+        <ul>
+          <li><strong>Rest timer</strong> — tap the timer icon on an exercise to start a countdown between sets.</li>
+          <li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li>
+          <li><strong>Dark mode</strong> — tap the 🌙 button on the program screen for low-light gym sessions.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-header">
+        <div class="guide-icon">💬</div>
+        <div class="guide-card-title">Questions or problems</div>
+      </div>
+      <div class="guide-body">
+        <p>Message me on WhatsApp anytime — form check videos, equipment swaps ("my gym doesn't have this machine, what should I do instead?"), or anything you're unsure about. Don't sit on something for days; quick check-ins beat long waits.</p>
+      </div>
+    </div>
+
+    <a class="guide-whatsapp" href="https://wa.me/447435363461" target="_blank" rel="noopener">
+      <span>Message me on WhatsApp</span>
+      <span class="guide-whatsapp-num">+44 7435 363461</span>
+    </a>
+
+  </div>
+</div>
+
 <!-- ═══ TIMER ═══ -->
 <div class="timer-overlay" id="timerOverlay">
   <div class="timer-exercise-name" id="timer-exercise-name"></div>
@@ -1503,13 +1668,7 @@
       <circle class="ring-bg" cx="110" cy="110" r="100"/>
       <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="100" stroke-dasharray="628" stroke-dashoffset="0"/>
     </svg>
-    <div class="timer-inner"><div class="timer-display" id="timerDisplay">60</div></div>
-  </div>
-  <div class="timer-presets">
-    <button class="preset-btn" onclick="setPreset(30,event)">30s</button>
-    <button class="preset-btn selected" onclick="setPreset(60,event)">60s</button>
-    <button class="preset-btn" onclick="setPreset(90,event)">90s</button>
-    <button class="preset-btn" onclick="setPreset(120,event)">2m</button>
+    <div class="timer-inner"><div class="timer-display" id="timerDisplay">2:00</div></div>
   </div>
   <div class="timer-controls">
     <button class="timer-ctrl-btn btn-start" id="startStopBtn" onclick="toggleTimer()">Start</button>
@@ -1795,10 +1954,14 @@ function renderHome() {
   }
 
   // ── Past programs (archives) — reveal the "Past Programs" button in the bottom CTA bar
+  // The bar now has 3 fixed buttons (Current / Notes / App Guide) so showing Past Programs
+  // makes 4 total — switch to the 2-row 'has-four' layout in that case.
   if (DATA.programHistory && DATA.programHistory.length) {
     const pastBtn = document.getElementById('cta-past-programs');
     if (pastBtn) pastBtn.style.display = '';
-    document.getElementById('home-bottom-cta').classList.add('has-three');
+    const cta = document.getElementById('home-bottom-cta');
+    cta.classList.remove('has-three');
+    cta.classList.add('has-four');
   }
 }
 
@@ -1841,7 +2004,7 @@ function renderProgram() {
     let exerciseNum = 1;
     day.blocks.forEach((block, bIdx) => {
       const blockClass = blockCategory(block.title, bIdx);
-      html += `<div class="section-header-prog"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
+      html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
       block.exercises.forEach(ex => {
         html += renderExercise(ex, day.id, exerciseNum++, blockClass);
       });
@@ -1917,16 +2080,23 @@ function renderExercise(ex, dayId, num, blockClass) {
   const chipsHtml = (ex.chips || []).map(chipHtml).join('');
 
   const cuesHtml = renderCues(ex.cues);
-  const hasRest = ex.hasRest;
+  // Every "standard" exercise gets a rest timer (and the weight log, RPE, note are
+  // attached later by initWeightLogs/initRPE/initNotes via .rest-btn presence).
+  // "simple" exercises (warm-ups, cool-downs) never get rest. The legacy `hasRest`
+  // field is no longer needed — type alone decides.
+  const isStandard = ex.type === 'standard';
+  const restSec = (typeof ex.restSec === 'number' && ex.restSec > 0) ? ex.restSec : 120;
   const _vid = getVideoUrl(ex);
   const playBtn = _vid
     ? `<button class="play-btn" onclick="handlePlayVideo('${_vid}');event.stopPropagation();">▶</button>`
     : '';
+  const actions = playBtn ? `<div class="item-actions">${playBtn}</div>` : '';
 
+  // Bottom area: cues toggle (if any) + rest button (for standard). Same place as before.
   let restBlock = '';
-  if (cuesHtml || hasRest) {
+  if (cuesHtml || isStandard) {
     restBlock = `<div class="item-rest">${cuesHtml}`;
-    if (hasRest) restBlock += `<div class="rest-row"><button class="rest-btn" onclick="openTimer(event)">Rest ⏱</button></div>`;
+    if (isStandard) restBlock += `<div class="rest-row"><button class="rest-btn" data-rest="${restSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(restSec)}</button></div>`;
     restBlock += `</div>`;
   }
 
@@ -1935,12 +2105,11 @@ function renderExercise(ex, dayId, num, blockClass) {
   return `<div class="checklist-item ${blockClass}" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
     <div class="item-main">
       <div class="check-box"></div>
-      ${numBadge}
       <div class="item-body">
-        <div class="item-name">${esc(ex.name)}</div>
+        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
         ${chipsHtml ? `<div class="item-chips">${chipsHtml}</div>` : ''}
       </div>
-      ${playBtn}
+      ${actions}
     </div>
     ${restBlock}
   </div>`;
@@ -1966,23 +2135,41 @@ function renderCircuit(ex, dayId, num, blockClass) {
   const playBtn = _vid
     ? `<button class="play-btn" onclick="handlePlayVideo('${_vid}');event.stopPropagation();">▶</button>`
     : '';
+  const actions = playBtn ? `<div class="item-actions">${playBtn}</div>` : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
   const roundsChip = `<span class="chip yellow">${esc(ex.rounds)}</span>`;
 
+  // Every circuit always rests AFTER all sub-exercises are finished.
+  // restSec from JSON wins; otherwise default to 60s for circuits (vs 120s for
+  // standard exercises) since circuits are usually conditioning/mobility.
+  const circuitRestSec = (typeof ex.restSec === 'number' && ex.restSec > 0) ? ex.restSec : 60;
+  const circuitRestBlock =
+    `<div class="item-rest"><div class="rest-row"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div></div>`;
+
   return `<div class="checklist-item round-group ${blockClass}" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
     <div class="item-main">
       <div class="check-box"></div>
-      ${numBadge}
       <div class="item-body">
-        <div class="item-name">${esc(ex.name)}</div>
+        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
         <div class="item-chips">${roundsChip}</div>
         <div class="round-list">${roundsHtml}</div>
       </div>
-      ${playBtn}
+      ${actions}
     </div>
+    ${circuitRestBlock}
   </div>`;
 }
+
+// Tiny helper: turns 90 -> "90s", 120 -> "2m", 150 -> "2:30"
+function formatRestLabel(secs) {
+  if (!secs || secs <= 0) return '';
+  if (secs < 60) return secs + 's';
+  if (secs % 60 === 0) return (secs / 60) + 'm';
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
 
 function handlePlayVideo(url) {
   if (!url) return;
@@ -1993,23 +2180,26 @@ function handlePlayVideo(url) {
   window.open(url, '_blank');
 }
 
+// Builds the cues toggle that sits at the bottom of the card (in the rest area).
+// Compact summary "Coaching Cues" + chevron; expands to colored-text cues.
 function renderCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
   let body = '';
   (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
   (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
-  // Summary now includes a rotating chevron + label (replaces the old ▶/▼ pseudo-element text)
   const summary = `<summary><svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>Coaching Cues</summary>`;
   return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
 }
 
+// Round cues use the same details.cues styling as the main exercise cues so
+// every "Cues" toggle in the app looks and behaves identically.
 function renderRoundCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
   let body = '';
   (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
   (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
   const summary = `<summary><svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>Cues</summary>`;
-  return `<details class="round-cue">${summary}<div class="round-cue-body">${body}</div></details>`;
+  return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -2084,12 +2274,31 @@ function switchDay(n) {
 }
 
 function toggleCheck(item, day) {
-  if (event && event.target.closest('details, .weight-log, .rpe-row, .play-btn')) return;
+  if (event && event.target.closest('details, .weight-log, .rpe-row, .play-btn, .rest-btn')) return;
+
+  // If the card is currently collapsed, a tap should expand it (NOT uncheck).
+  // The user can then change their RPE / weight / note, and uncheck via the box.
+  if (item.classList.contains('collapsed')) {
+    item.classList.remove('collapsed');
+    return;
+  }
+
   item.classList.toggle('checked');
   // Haptic feedback on phones (ignored by desktop). 15ms = short, premium tap.
   if (navigator.vibrate) navigator.vibrate(15);
   const rpeRow = item.querySelector('.rpe-row');
   if (rpeRow) rpeRow.classList.toggle('visible', item.classList.contains('checked'));
+
+  // For items WITHOUT an RPE row (simple warm-ups), there's nothing left to log,
+  // so collapse immediately on check. Items with RPE collapse later — see selectRPE.
+  if (item.classList.contains('checked') && !rpeRow) {
+    item.classList.add('collapsed');
+  }
+  // If we just unchecked, make sure we're not also collapsed
+  if (!item.classList.contains('checked')) {
+    item.classList.remove('collapsed');
+  }
+
   saveState();
   updateProgress(day);
 }
@@ -2148,7 +2357,7 @@ function markSuggestedDay() {
 }
 
 function resetDay(day) {
-  document.querySelectorAll(`[data-day="${day}"]`).forEach(i => i.classList.remove('checked'));
+  document.querySelectorAll(`[data-day="${day}"]`).forEach(i => { i.classList.remove('checked'); i.classList.remove('collapsed'); });
   document.querySelectorAll(`[data-day="${day}"] .rpe-row`).forEach(r => r.classList.remove('visible'));
   document.getElementById('confirm-'  + day).classList.remove('visible');
   document.getElementById('complete-' + day).classList.remove('visible');
@@ -2237,6 +2446,17 @@ function restoreState() {
   initRPE();
   initNotes();
   initDayWrapup();
+
+  // After RPE buttons are wired up, collapse any card that's checked AND has a
+  // saved RPE (or is a simple-type item with no RPE picker). Mirrors the live
+  // behavior so the page picks up where they left off.
+  document.querySelectorAll('#screen-program .checklist-item.checked').forEach(card => {
+    const rpeRow = card.querySelector('.rpe-row');
+    const hasSelectedRPE = rpeRow && rpeRow.querySelector('.rpe-btn.selected');
+    if (!rpeRow || hasSelectedRPE) {
+      card.classList.add('collapsed');
+    }
+  });
 }
 
 // Wire up the day-level comment box + the session-RPE buttons that now live
@@ -2387,6 +2607,10 @@ function formatSentTime(date) {
 function initWeightLogs() {
   document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
     if (!card.querySelector('.rest-btn')) return;
+    // Skip circuits — they have multiple sub-exercises so a single "Weight" field
+    // doesn't fit. Clients log weights for each sub-exercise inside the free-form
+    // Note row instead (e.g. "KB 16, slam 6, box 50").
+    if (card.classList.contains('round-group')) return;
     const name  = card.querySelector('.item-name').textContent.trim();
     const wKey  = ATHLETE_ID + '_wlog_' + name.replace(/\s+/g, '_');
     const saved = localStorage.getItem(wKey) || '';
@@ -2449,6 +2673,13 @@ function selectRPE(btn, key, e) {
   btn.closest('.rpe-row').querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   localStorage.setItem(key, btn.textContent.trim());
+
+  // Collapse the card now — the client has logged everything we need.
+  // They can re-expand by tapping the row to change anything.
+  const card = btn.closest('.checklist-item');
+  if (card && card.classList.contains('checked')) {
+    card.classList.add('collapsed');
+  }
 }
 
 function toggleDark(e) {
@@ -2459,27 +2690,30 @@ function toggleDark(e) {
 }
 
 // ── Timer ──
-let timerDuration = 60, timerRemaining = 60, timerInterval = null, timerRunning = false;
+// Rest duration comes from the clicked exercise's `data-rest` attribute (set from
+// the JSON's `restSec` field), or falls back to 120s if not provided.
+let timerDuration = 120, timerRemaining = 120, timerInterval = null, timerRunning = false;
 const circumference = 2 * Math.PI * 100;
 
 function openTimer(e) {
   if (e) e.stopPropagation();
+  const btn  = e ? e.target.closest('.rest-btn') : null;
   const card = e ? e.target.closest('.checklist-item') : null;
   const name = card ? card.querySelector('.item-name').textContent.trim() : '';
+
+  // Read rest duration from the button's data-rest, default to 120s
+  const parsed = btn ? parseInt(btn.getAttribute('data-rest'), 10) : NaN;
+  const secs = (Number.isFinite(parsed) && parsed > 0) ? parsed : 120;
+  timerDuration = secs;
+  timerRemaining = secs;
+
   document.getElementById('timer-exercise-name').textContent = name;
   document.getElementById('timerOverlay').classList.add('visible');
+  // resetTimer() refreshes display + ring using the new timerDuration
   resetTimer();
 }
 
 function closeTimer() { document.getElementById('timerOverlay').classList.remove('visible'); pauseTimer(); }
-
-function setPreset(secs, e) {
-  if (e) e.stopPropagation();
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
-  if (e) e.target.classList.add('selected');
-  timerDuration = secs; timerRemaining = secs;
-  pauseTimer(); updateTimerDisplay(); updateRing(1);
-}
 
 function toggleTimer() { timerRunning ? pauseTimer() : startTimer(); }
 

@@ -14,8 +14,13 @@
 - Every day must contain at least one `block`; every block must contain at least one `exercise`.
 - `type` on every exercise must be exactly one of: `"simple"`, `"standard"`, `"circuit"`.
 - Chip `style`, if used, must be exactly `"yellow"` or `"dark"` (or omitted).
-- Only exercises with `"hasRest": true` show the rest timer, weight log, and RPE selector — use this on loaded / strength work.
+- The `type` field decides what tools an exercise gets — no separate flags needed:
+  - `"simple"` → just the row. No rest, no weight, no RPE, no note.
+  - `"standard"` → always has rest timer + weight log + RPE selector + personal note.
+  - `"circuit"` → always has rest timer at the end + one overall RPE + personal note. (No weight input — weights are written into the note, e.g. "KB 16, slam 6, box 50".)
+- `"restSec"` (number, seconds) controls the rest timer duration. Defaults if omitted: **120s for `standard`**, **60s for `circuit`**. Override per exercise as needed.
 - A `"circuit"` exercise must include `rounds` (string) and `items[]` (array).
+- The legacy `"hasRest"` field is no longer used and can be removed. Old files that still contain it will keep working — the field is simply ignored.
 - Output strict, valid JSON. No comments. No trailing commas.
 
 ### Template to fill
@@ -92,6 +97,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
                 "type": "circuit",
                 "name": "Dynamic Mobility",
                 "rounds": "×3 Rounds",
+                "restSec": 60,
                 "items": [
                   {
                     "name": "90/90 Hip Rotations",
@@ -107,7 +113,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
                 "type": "standard",
                 "name": "Back Squat",
                 "videoUrl": "https://www.youtube.com/watch?v=example",
-                "hasRest": true,
+                "restSec": 180,
                 "chips": [
                   { "label": "4 Sets", "style": "yellow" },
                   { "label": "×6 Reps" },
@@ -320,8 +326,8 @@ The actual training content for the current cycle.
 
 ### Exercise Types
 
-#### `type: "simple"` — No rest timer, no weight log
-Best for: warm-ups, cool-downs, single-item entries.
+#### `type: "simple"` — Plain row, no extras
+Best for: warm-ups, cool-downs, single-item entries that don't need rest, weight, RPE, or notes.
 
 ```json
 {
@@ -337,33 +343,39 @@ Best for: warm-ups, cool-downs, single-item entries.
 ```
 
 #### `type: "circuit"` — Multiple sub-exercises as one checklist item
-Best for: mobility circuits, activation circuits.
+Best for: mobility circuits, activation circuits, conditioning circuits, combination drills.
 
 ```json
 {
   "type": "circuit",
-  "name": "Dynamic Mobility",
+  "name": "Conditioning Circuit",
   "videoUrl": "https://www.youtube.com/watch?v=example",
   "rounds": "×3 Rounds",
+  "restSec": 90,
   "items": [
     {
-      "name": "90/90 Hip Rotations",
-      "detail": "×12",
+      "name": "Kettlebell Swing",
+      "detail": "×12 · RPE 7",
       "cues": { "good": ["..."], "bad": ["..."] }
     }
   ]
 }
 ```
 
-#### `type: "standard"` — Full exercise with rest timer, weight log, RPE
-Best for: all loaded exercises (strength, plyos, accessories).
+Every circuit gets, automatically:
+- A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — default **60s**, override with `restSec`).
+- An **RPE** selector for the whole circuit.
+- A free-form **Note** row where the client can log weights, equipment, and how it felt (e.g. *"KB 16, slam 6, box 50, third round felt heavy"*).
+
+#### `type: "standard"` — Loaded exercise with rest, weight, RPE
+Best for: all loaded exercises (strength, plyos, accessories) — and any single-exercise row that should be logged.
 
 ```json
 {
   "type": "standard",
   "name": "Back Squat",
   "videoUrl": "https://www.youtube.com/watch?v=example",
-  "hasRest": true,
+  "restSec": 180,
   "chips": [
     { "label": "4 Sets", "style": "yellow" },
     { "label": "×6 Reps" },
@@ -376,6 +388,8 @@ Best for: all loaded exercises (strength, plyos, accessories).
   }
 }
 ```
+
+Every `standard` exercise gets, automatically: rest timer + weight log + RPE selector + personal note. `restSec` defaults to **120s** if omitted. Common values: `60`, `90`, `120` (= 2 min), `180` (= 3 min), `240` (= 4 min).
 
 ### `videoUrl` — Optional Exercise Video
 
