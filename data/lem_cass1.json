@@ -140,7 +140,7 @@
               },
               {
                 "type": "standard",
-                "name": "Glute Bridge with 3s Hold",
+                "name": "Glute Bridge",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
@@ -270,7 +270,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Seated Leg Curl",
+                "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -435,7 +435,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Landmine Press",
+                "name": "Half-Kneeling Single-Arm Landmine Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -465,7 +465,7 @@
               },
               {
                 "type": "standard",
-                "name": "Flat Dumbbell Bench Press (Neutral Grip)",
+                "name": "Dumbbell Bench Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -501,7 +501,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Single-Arm Dumbbell Push Press (Iso-Hold Bottom)",
+                "name": "Single-Arm Dumbbell Push Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
