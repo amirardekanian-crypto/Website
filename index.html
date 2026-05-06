@@ -589,6 +589,189 @@
     .phone-mockup { width: 240px; }
     .phone-screen { height: 440px; }
   }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     ATHLETE TESTIMONIALS
+     Horizontal-scrolling carousel. Animation activates automatically once
+     3+ cards are present. Hover pauses the scroll. Hover/focus zooms photo.
+     ═══════════════════════════════════════════════════════════════════════ */
+  .testimonials-section {
+    padding: 100px 0 90px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-raised);
+    overflow: hidden;
+  }
+  /* Rail wraps the viewport + the two nav buttons */
+  .testimonials-rail {
+    position: relative;
+    margin-top: 56px;
+  }
+  .testimonials-viewport {
+    position: relative;
+    padding: 12px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE / Edge */
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+            mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+  }
+  .testimonials-viewport::-webkit-scrollbar { display: none; }   /* Chrome / Safari */
+  .testimonials-track {
+    display: flex; gap: 28px;
+    width: max-content;
+    padding: 0 28px;
+  }
+
+  /* Nav buttons (left / right) */
+  .testimonials-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(20, 20, 20, 0.85);
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    z-index: 5;
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 700; line-height: 1;
+    transition: background var(--dur), color var(--dur), border-color var(--dur);
+  }
+  .testimonials-nav:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+  }
+  .testimonials-nav:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .testimonials-prev { left: 12px; }
+  .testimonials-next { right: 12px; }
+
+  /* Card layout: large portrait photo on the left, content panel on the right */
+  .testimonial-card {
+    background: var(--bg-card);
+    width: 720px; height: 720px;
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative; overflow: hidden;
+    border-top: 2px solid var(--accent);
+    border-radius: var(--radius-md);
+  }
+  .testimonial-photo {
+    position: relative; overflow: hidden;
+    background: #2a2a2a;
+  }
+  .testimonial-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center 15%;
+    display: block;
+    transition: transform 0.6s var(--ease);
+  }
+  .testimonial-card:hover .testimonial-photo img,
+  .testimonial-card:focus-within .testimonial-photo img {
+    transform: scale(1.06);
+  }
+  .testimonial-photo::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to right, transparent 70%, var(--bg-card) 100%);
+    pointer-events: none;
+  }
+
+  .testimonial-content {
+    padding: 40px 36px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .testimonial-content::before {
+    content: '\201C';
+    font-family: var(--font-display);
+    font-weight: 900; font-size: 180px;
+    color: var(--accent); opacity: 0.06;
+    position: absolute; top: -28px; right: 18px;
+    line-height: 1; pointer-events: none;
+  }
+
+  .testimonial-achievements {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 24px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .testimonial-achievement {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; font-weight: 300;
+    color: var(--text-primary); line-height: 1.5;
+  }
+  .testimonial-achievement-icon {
+    color: var(--accent); font-size: 10px;
+    margin-top: 4px; flex-shrink: 0;
+  }
+
+  .testimonial-quote {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-secondary); font-style: italic;
+    font-weight: 300; margin: 0 0 22px;
+  }
+  .testimonial-quote strong {
+    color: var(--accent); font-style: normal; font-weight: 500;
+  }
+
+  .testimonial-duration {
+    font-family: var(--font-mono);
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); opacity: 0.7;
+    margin-bottom: 24px;
+  }
+
+  .testimonial-byline {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .testimonial-name {
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+    line-height: 1; margin-bottom: 4px;
+  }
+  .testimonial-role {
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Testimonials — responsive (mobile stacks photo above content) */
+  @media (max-width: 768px) {
+    .testimonials-section { padding: 80px 0 60px; }
+    .testimonial-card {
+      width: 88vw;
+      max-width: 420px;
+      height: auto;
+      grid-template-columns: 1fr;
+      grid-template-rows: 340px auto;
+    }
+    .testimonial-photo::after {
+      background: linear-gradient(to bottom, transparent 60%, var(--bg-card) 100%);
+    }
+    .testimonial-content { padding: 28px 24px; }
+    .testimonial-name { font-size: 20px; }
+    .testimonials-nav { width: 40px; height: 40px; font-size: 20px; }
+    .testimonials-prev { left: 8px; }
+    .testimonials-next { right: 8px; }
+  }
 </style>
 </head>
 <body>
@@ -664,6 +847,162 @@
         <div class="for-item"><span class="for-icon cross">–</span>You're not prepared to follow a plan with consistency over 6 months</div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ═══ ATHLETE TESTIMONIALS ═══ -->
+<section class="testimonials-section" id="testimonials" aria-labelledby="testimonials-title">
+  <div class="container">
+    <div class="section-label reveal">Athlete Voices</div>
+    <h2 id="testimonials-title" class="section-heading reveal reveal-d1">Trusted by<br><em>Elite Athletes</em></h2>
+    <p class="lead section-desc reveal reveal-d2">Real feedback from competitive players who trained with the system.</p>
+  </div>
+
+  <div class="testimonials-rail reveal reveal-d2">
+    <button type="button" class="testimonials-nav testimonials-prev" aria-label="Previous testimonial">‹</button>
+    <div class="testimonials-viewport">
+    <div class="testimonials-track">
+
+      <!-- ──────────── Mehraneh ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/mehraneh.jpg" alt="Mehraneh Zohourian in action on a clay court">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Multiple ATF Championship titles</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Full Iran U18 National Team representative</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Called up to Senior National Team at age 15</span></div>
+          </div>
+          <p class="testimonial-quote">"I worked with Amirhossein for four years, aiming to compete at ITF level and reach the senior national team. My biggest challenge had been finding a coach who could integrate high-level tennis training with structured strength and conditioning — and understand the psychological demands of elite competition. This approach kept me <strong>largely injury-free, with consistent body composition and full physical readiness throughout the season.</strong> Just as importantly, the environment was effective without being mentally draining; even on hard days I stayed consistent, with no unnecessary pressure. I'd strongly recommend it to anyone who wants serious performance with a <strong>sustainable, well-balanced training approach.</strong>"</p>
+          <div class="testimonial-duration">4 years together</div>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Mehraneh Zohourian</div>
+            <div class="testimonial-role">Professional Tennis Player</div>
+          </div>
+        </div>
+      </article>
+      <!-- ──────────── Mahdi Behboodi ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/mahdi.jpg" alt="Mahdi Behboodi">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Current FIP World Ranking #728</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Professional Padel Coach</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>15+ years competitive tennis experience</span></div>
+          </div>
+          <p class="testimonial-quote">"I worked with Amirhossein for around two years to improve my physical preparation for competitive play. My main challenge was building muscle mass, as I have a naturally lean build. Following the program, I saw <strong>significant gains in both training performance and match play, with clear progression throughout.</strong> The sessions were highly specific to my sport — far more structured and targeted than my previous training. I'd strongly recommend him, especially to racket sport athletes — <strong>his playing experience adds a valuable dimension to his coaching.</strong>"</p>
+          <div class="testimonial-duration">2 years together</div>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Mahdi Behboodi</div>
+            <div class="testimonial-role">Professional Padel Player &amp; Coach</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ──────────── Sarina Akhavan ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/sarina.jpg" alt="Sarina Akhavan">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Multiple Junior Tennis Champion</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Senior National Team Player</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>ITF Tour Competitor</span></div>
+          </div>
+          <p class="testimonial-quote">"My objective was a more specialised, tennis-specific approach to strength and conditioning. The challenge was finding a coach with both a deep understanding of physical training and real insight into the demands of tennis. It quickly became clear I was working with someone who <strong>understands anatomy and performance, and has a deep understanding of tennis itself</strong> — that combination had a significant impact on my development. His own playing experience allowed for a higher level of trust, knowing he could accurately analyse my game and identify areas for improvement. I'd strongly recommend this to tennis athletes serious about <strong>structured, long-term development.</strong>"</p>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Sarina Akhavan</div>
+            <div class="testimonial-role">Professional Tennis Player</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ──────────── Hamed Navakhti ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/hamed.jpg" alt="Hamed Navakhti">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Multiple Junior National Champion</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Double National Champion</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Professional Hitting Partner</span></div>
+          </div>
+          <p class="testimonial-quote">"Although my time working with Amir was short — more in a colleague setting — my goal was to improve my on-court performance. I was already aware of his expertise and wanted a more focused approach to my development, which he consistently provided. The improvements were significant and <strong>immediately noticeable</strong> — the progress was so clear that I personally reached out to share the results. The most valuable lesson I gained: performance improvements don't require excessive physical strain in every session, but a structured, intelligent approach. Whenever I'm asked about high-quality coaching, I confidently recommend him — particularly for his <strong>care in managing load and minimising injury risk.</strong>"</p>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Hamed Navakhti</div>
+            <div class="testimonial-role">Professional Tennis Player &amp; Coach</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ──────────── Mehdi Rahmani ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/mehdi-rahmani.jpg" alt="Mehdi Rahmani">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>ITF Professional Player</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Tennis Coach</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Padel Coach</span></div>
+          </div>
+          <p class="testimonial-quote">"I worked with Amirhossein for around two years, aiming to improve my tennis-specific physical performance. I saw significant improvements in footwork, speed, and endurance — <strong>my movement on court became a major strength.</strong> I felt quick, reactive, and capable of covering every ball even under high pressure. The results fully matched my objectives. Another key factor was his presence and support during competitions — he consistently understood the physical demands of match play and <strong>provided exactly what I needed to perform at my best.</strong> I'd strongly recommend him to any athlete looking to develop high-level tennis fitness."</p>
+          <div class="testimonial-duration">2 years together</div>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Mehdi Rahmani</div>
+            <div class="testimonial-role">ITF Professional Player &amp; Coach</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ──────────── Helen Taheri ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/helen.jpg" alt="Helen Taheri">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Multiple U10 National Champion</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Multiple U12 National Champion</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Competing professionally in Denmark</span></div>
+          </div>
+          <p class="testimonial-quote">"I worked with Amirhossein for over two years as my tennis fitness coach. My biggest challenge had been maintaining consistency and physical strength throughout matches. Through our work, I developed significantly in <strong>strength, speed, and on-court confidence</strong> — I was able to perform more consistently and feel more prepared during competition. I'd strongly recommend him to any tennis player serious about <strong>improving their physical performance and competing at a higher level.</strong>"</p>
+          <div class="testimonial-duration">2+ years together</div>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Helen Taheri</div>
+            <div class="testimonial-role">Competitive Junior Tennis Player</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ──────────── Dr. Shahin Nazarpour ──────────── -->
+      <article class="testimonial-card">
+        <div class="testimonial-photo">
+          <img src="/assets/img/athletes/shahin.jpg" alt="Dr. Shahin Nazarpour">
+        </div>
+        <div class="testimonial-content">
+          <div class="testimonial-achievements">
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Practising Neurosurgeon</span></div>
+            <div class="testimonial-achievement"><span class="testimonial-achievement-icon">▲</span><span>Active Tennis Player</span></div>
+          </div>
+          <p class="testimonial-quote">"I worked with Amirhossein to improve my body composition and overall physical condition. One of the biggest challenges is simply getting started — but once you commit, consistency follows. Throughout the process, I experienced clear improvements in <strong>respiratory capacity, overall health, and mental well-being.</strong> The training environment was professional and comfortable — effective progress without unnecessary pressure, while still leaving room to push intensity. What stood out most was the level of trust: I had full confidence in his knowledge and approach. <strong>He is one of the few coaches I would genuinely rely on.</strong> I'd strongly recommend him to anyone looking to train seriously."</p>
+          <div class="testimonial-byline">
+            <div class="testimonial-name">Dr. Shahin Nazarpour</div>
+            <div class="testimonial-role">Neurosurgeon &amp; Tennis Player</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ──── Add new athlete cards below this line ──── -->
+
+    </div>
+    </div>
+    <button type="button" class="testimonials-nav testimonials-next" aria-label="Next testimonial">›</button>
   </div>
 </section>
 
@@ -1022,6 +1361,84 @@
 <a href="/form.html" class="mobile-sticky-cta" aria-label="Apply for the programme">
   Apply Now <span class="arrow-r" aria-hidden="true">→</span>
 </a>
+
+<!-- ═══ Testimonials carousel: auto-scroll + manual prev/next ═══ -->
+<script>
+(function () {
+  const viewport = document.querySelector('.testimonials-viewport');
+  const track    = document.querySelector('.testimonials-track');
+  const prevBtn  = document.querySelector('.testimonials-prev');
+  const nextBtn  = document.querySelector('.testimonials-next');
+  if (!viewport || !track) return;
+
+  const SPEED = 30;          // pixels per second of auto-scroll
+  const PAUSE_AFTER_CLICK = 4500;
+
+  let isPaused   = false;
+  let isReturning = false;
+  let lastTime   = 0;
+
+  function maxScroll() {
+    return viewport.scrollWidth - viewport.clientWidth;
+  }
+  function getCardWidth() {
+    const card = track.querySelector('.testimonial-card');
+    if (!card) return 748;
+    const styles = window.getComputedStyle(track);
+    const gap = parseFloat(styles.gap || styles.columnGap || '28');
+    return card.offsetWidth + gap;
+  }
+  function pauseAfterClick() {
+    isPaused = true;
+    clearTimeout(viewport._resumeTimer);
+    viewport._resumeTimer = setTimeout(() => { isPaused = false; }, PAUSE_AFTER_CLICK);
+  }
+
+  // Auto-scroll loop (runs continuously, gated by isPaused)
+  function tick(now) {
+    if (lastTime === 0) lastTime = now;
+    const delta = now - lastTime;
+    lastTime = now;
+
+    if (!isPaused && !isReturning) {
+      const ms = maxScroll();
+      const next = viewport.scrollLeft + (SPEED * delta / 1000);
+      if (ms > 0 && next >= ms) {
+        // reached the end — smooth scroll back to start
+        isReturning = true;
+        viewport.scrollTo({ left: 0, behavior: 'smooth' });
+        setTimeout(() => { isReturning = false; }, 900);
+      } else {
+        viewport.scrollLeft = next;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // Pause on hover / focus / touch
+  viewport.addEventListener('mouseenter', () => { isPaused = true; });
+  viewport.addEventListener('mouseleave', () => { isPaused = false; });
+  viewport.addEventListener('touchstart', () => { isPaused = true; }, { passive: true });
+  viewport.addEventListener('touchend',   () => { pauseAfterClick(); });
+
+  // Manual nav
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      pauseAfterClick();
+      const target = viewport.scrollLeft + getCardWidth();
+      viewport.scrollTo({ left: target > maxScroll() - 10 ? 0 : target, behavior: 'smooth' });
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      pauseAfterClick();
+      const target = viewport.scrollLeft - getCardWidth();
+      viewport.scrollTo({ left: target < 0 ? maxScroll() : target, behavior: 'smooth' });
+    });
+  }
+})();
+</script>
 
 <script defer src="/assets/js/shared.js"></script>
 </body>
