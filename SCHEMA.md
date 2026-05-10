@@ -32,7 +32,8 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
   "athlete": {
     "id": "firstname_lastname",
     "firstName": "First",
-    "lastName": "Last"
+    "lastName": "Last",
+    "avatar": "https://example.com/photo.jpg"
   },
   "sport": {
     "badge": "🏋️ Goal or purpose pill"
@@ -44,6 +45,8 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
       "name": "Cycle Name",
       "tagline": "Short italic line (optional)",
       "weeks": "Weeks 1–5",
+      "startDate": "2024-04-28",
+      "endDate": "2024-06-01",
       "focuses": [
         "Focus statement one.",
         "Focus statement two."
@@ -63,6 +66,8 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
       "num": 2,
       "name": "Next Cycle Name",
       "weeks": "Weeks 6–10",
+      "startDate": "2024-06-02",
+      "endDate": "2024-07-06",
       "focuses": [
         "Focus statement for the next cycle."
       ],
@@ -222,14 +227,15 @@ To advance the athlete to the next cycle, just **bump `currentCycleIndex` by 1**
 | `athlete.id` | string | ✅ | Unique ID, used for localStorage. Format: `firstname_lastname` |
 | `athlete.firstName` | string | ✅ | First name (white in hero) |
 | `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
-| `sport.badge` | string | optional | Goal/purpose pill above name, e.g. `"🏋️ Tennis Performance"` |
+| `athlete.avatar` | string | optional | URL or path to athlete's photo. Falls back to initials when missing. |
+| `sport.badge` | string | optional | Goal/purpose text under the name on the athlete card, e.g. `"🏋️ Tennis Performance"` |
 | `currentCycleIndex` | number | ✅ | 0-based index into `cycles[]` |
 | `cycles` | array | ✅ | All training cycles (can be 1, 5, 12 — any number) |
 | `workouts` | object | ✅ | The training days for the current cycle |
 | `programHistory` | array | optional | Archived past programs |
 | `notes` | object | optional | Coaching notes (Notes tab) |
 
-> **Note:** The coach line on the home screen ("Coach: Amir Ardekani") is hardcoded in `program.html` — it is no longer in JSON.
+> **Note:** The coach line was removed from the home screen — Amir is always the coach.
 
 ---
 
@@ -243,6 +249,8 @@ Each cycle describes one training phase.
 | `name` | string | ✅ | Phase name, e.g. `"Foundation Forge"` |
 | `tagline` | string | optional | Short italic line under the name |
 | `weeks` | string | optional | e.g. `"Weeks 1–5"` |
+| `startDate` | string | optional | Cycle start date, ISO format `"YYYY-MM-DD"`. Shown on the athlete card for the current cycle. |
+| `endDate` | string | optional | Cycle end date, ISO format `"YYYY-MM-DD"`. Drives the subscription banner (appears when ≤14 days remain). |
 | `focuses` | string[] | optional | Unlimited list of focus statements |
 | `message` | object | optional | Only used when this is the current cycle (see below) |
 | `teaser` | object | optional | Only used when this is the next cycle (see below) |
