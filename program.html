@@ -901,8 +901,10 @@
     display: none; background: #1e1e1e; border-radius: 8px;
     padding: 16px 20px; margin-top: 16px; border: 1px solid #444;
     flex-direction: row; align-items: center; justify-content: space-between;
+    gap: 14px;
   }
   .session-confirm.visible { display: flex; animation: fadeUp 0.3s ease both; }
+  .confirm-body { flex: 1; min-width: 0; }
   .confirm-text {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: #888;
@@ -912,6 +914,49 @@
     font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
     background: var(--yellow); color: var(--grey-dark);
     border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  /* Partial state — softer amber accent so it reads as "heads up" not "go". */
+  .session-confirm.partial {
+    flex-direction: column; align-items: stretch;
+    border-color: rgba(255,180,80,0.45);
+    background: linear-gradient(180deg, rgba(255,180,80,0.06), #1e1e1e);
+  }
+  .session-confirm.partial .confirm-text { color: #ffb450; }
+  .session-confirm.partial .confirm-btn {
+    background: transparent; color: #ffb450;
+    border: 1px solid rgba(255,180,80,0.55);
+  }
+  .session-confirm.partial .confirm-btn.arming {
+    background: #ffb450; color: #1a1a1a; border-color: #ffb450;
+    animation: armPulse 1s ease infinite;
+  }
+  .confirm-missing { display: none; margin-top: 10px; }
+  .session-confirm.partial .confirm-missing { display: block; }
+  .confirm-missing-label {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #888; margin-bottom: 6px;
+  }
+  .confirm-missing ul {
+    list-style: none; margin: 0; padding: 0;
+    font-size: 13px; color: #ccc;
+  }
+  .confirm-missing li {
+    padding: 5px 0; border-top: 1px solid #2c2c2c;
+    display: flex; justify-content: space-between; gap: 12px; align-items: center;
+  }
+  .confirm-missing li:first-child { border-top: none; }
+  .confirm-missing-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .confirm-missing-tag {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: #ffb450; white-space: nowrap;
+  }
+  @keyframes armPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,180,80,0.55); }
+    50%      { box-shadow: 0 0 0 8px rgba(255,180,80,0); }
   }
 
   /* ── Timer Exercise Name ── */
@@ -2209,6 +2254,10 @@ function getVideoUrl(ex) {
   restoreState();
   isLoading = false;
   markSuggestedDay();
+  // restoreState() ran updateProgress() while isLoading was still true, which
+  // suppresses the Finish Session card. Re-run it now so users who closed the
+  // page after checking the last set still see the prompt when they return.
+  Object.keys(dayTotals).forEach(d => updateProgress(d));
 
   setTimeout(() => {
     document.getElementById('loading').classList.add('hidden');
@@ -2517,7 +2566,10 @@ function renderProgram() {
     const savedNote = localStorage.getItem(noteKey) || '';
 
     html += `<div class="session-confirm" id="confirm-${day.id}">
-      <span class="confirm-text">All done with Day ${day.id}?</span>
+      <div class="confirm-body">
+        <span class="confirm-text">All done with Day ${day.id}?</span>
+        <div class="confirm-missing"></div>
+      </div>
       <button class="confirm-btn" onclick="confirmSession('${day.id}')">Finish Session ✓</button>
     </div>`;
     html += `<div class="session-complete" id="complete-${day.id}">
@@ -3084,26 +3136,96 @@ function switchDay(n) {
   window.scrollTo(0, 0);
 }
 
-// Set-aware progress: standard exercises contribute one unit per done set,
-// circuits + simple count as 1 if .checked. So 2/4 sets done in Back Squat
-// adds 2 units to the day's done count — partial completion shows on the bar.
-function updateProgress(day) {
-  const total = dayTotals[day];
-  if (!total) return;
+// Compute the live completion state of a day. Used by the progress pill,
+// the confirm card (full / partial / hidden), and the coach-email summary
+// so they all share the same source of truth.
+//   - standard exercises contribute one unit per done set
+//   - circuits + simple count as 1 unit if .checked
+// Returns { done, total, missing[] } where each missing entry describes an
+// unfinished exercise (with a short label like "2/4 sets" or "skipped").
+function getDayCompletion(day) {
+  const total = dayTotals[day] || 0;
   const items = document.querySelectorAll(`[data-day="${day}"]`);
   let done = 0;
+  const missing = [];
   items.forEach(item => {
+    const name = (item.querySelector('.item-name')?.textContent || '').trim();
     if (item.classList.contains('round-group') || !item.dataset.sets) {
       // Circuit or simple — 1 unit, counted iff .checked
-      if (item.classList.contains('checked')) done += 1;
+      const isDone = item.classList.contains('checked');
+      if (isDone) {
+        done += 1;
+      } else if (name) {
+        missing.push({ name, type: 'simple', doneSets: 0, totalSets: 1, label: 'skipped' });
+      }
     } else {
       // Standard — count done sets from the per-set log
-      const name = item.querySelector('.item-name').textContent.trim();
       const totalSets = parseInt(item.dataset.sets, 10) || 1;
       const log = loadSetLog(name, totalSets);
-      done += log.filter(s => s.d).length;
+      const doneSets = log.filter(s => s.d).length;
+      done += doneSets;
+      if (doneSets < totalSets && name) {
+        missing.push({
+          name, type: 'standard', doneSets, totalSets,
+          label: doneSets === 0 ? 'skipped' : `${doneSets}/${totalSets} sets`
+        });
+      }
     }
   });
+  return { done, total, missing };
+}
+
+// Repaint the bottom confirm card based on the day's current completion state.
+// Two visual states:
+//   - full: "All done with Day X?" + "Finish Session ✓"
+//   - partial: "Wrap up Day X early?" + list of unfinished items + "Finish Anyway"
+// Also stores done/total on the card's dataset so confirmSession() can read
+// them on tap (instead of recomputing).
+function refreshConfirmCard(day, status) {
+  const card = document.getElementById('confirm-' + day);
+  if (!card) return;
+  status = status || getDayCompletion(day);
+  const { done, total, missing } = status;
+  const isFull = total > 0 && done === total;
+
+  card.classList.toggle('partial', !isFull);
+  card.dataset.done  = done;
+  card.dataset.total = total;
+
+  const text   = card.querySelector('.confirm-text');
+  const missEl = card.querySelector('.confirm-missing');
+  const btn    = card.querySelector('.confirm-btn');
+
+  if (isFull) {
+    text.textContent = `All done with Day ${day}?`;
+    missEl.innerHTML = '';
+    btn.textContent = 'Finish Session ✓';
+  } else {
+    text.textContent = `Wrap up Day ${day} early?`;
+    const lis = missing.map(m =>
+      `<li><span class="confirm-missing-name">${esc(m.name)}</span>` +
+      `<span class="confirm-missing-tag">${esc(m.label)}</span></li>`
+    ).join('');
+    const label = `${missing.length} unfinished · ${done}/${total} sets done`;
+    missEl.innerHTML =
+      `<div class="confirm-missing-label">${esc(label)}</div><ul>${lis}</ul>`;
+    btn.textContent = 'Finish Anyway';
+  }
+  // Always reset any previous "armed" state when we repaint.
+  btn.classList.remove('arming');
+  if (window['_armT_' + day]) {
+    clearTimeout(window['_armT_' + day]);
+    delete window['_armT_' + day];
+  }
+}
+
+// Set-aware progress: drives the day-tab pill, the side rail v-fill, and the
+// bottom confirm card. The confirm card now shows whenever ANY work is logged
+// (done > 0) so athletes can finish early; getDayCompletion drives the copy.
+function updateProgress(day) {
+  const status = getDayCompletion(day);
+  const { done, total } = status;
+  if (!total) return;
 
   const pill = document.getElementById('pill-' + day);
   if (pill) {
@@ -3120,16 +3242,47 @@ function updateProgress(day) {
 
   const confirmEl  = document.getElementById('confirm-'  + day);
   const completeEl = document.getElementById('complete-' + day);
-  if (done === total && !completeEl.classList.contains('visible') && !isLoading) {
-    confirmEl.classList.add('visible');
-  } else if (done < total) {
+
+  if (done === 0) {
+    // Nothing logged — neither card should be visible. (Also drops the
+    // completion card if a user resets their day all the way back to zero.)
     confirmEl.classList.remove('visible');
     completeEl.classList.remove('visible');
+  } else if (!completeEl.classList.contains('visible') && !isLoading) {
+    // Some work logged — repaint copy and reveal the confirm card.
+    refreshConfirmCard(day, status);
+    confirmEl.classList.add('visible');
   }
 }
 
 function confirmSession(day) {
-  document.getElementById('confirm-' + day).classList.remove('visible');
+  const card = document.getElementById('confirm-' + day);
+  const btn  = card.querySelector('.confirm-btn');
+  const isPartial = card.classList.contains('partial');
+
+  // Partial finishes get a two-tap pattern: first tap arms the button, second
+  // tap (within 4s) commits. This is gentler than a modal but still avoids
+  // accidental "Finish Anyway" taps when the athlete only meant to scroll.
+  if (isPartial && !btn.classList.contains('arming')) {
+    btn.classList.add('arming');
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'Tap again to confirm';
+    if (window['_armT_' + day]) clearTimeout(window['_armT_' + day]);
+    window['_armT_' + day] = setTimeout(() => {
+      btn.classList.remove('arming');
+      btn.textContent = btn.dataset.originalText || 'Finish Anyway';
+      delete window['_armT_' + day];
+    }, 4000);
+    return;
+  }
+
+  if (window['_armT_' + day]) {
+    clearTimeout(window['_armT_' + day]);
+    delete window['_armT_' + day];
+  }
+  btn.classList.remove('arming');
+
+  card.classList.remove('visible');
   // Reveal the completion card (now contains the RPE prompt + coach note + Send button).
   const completeEl = document.getElementById('complete-' + day);
   completeEl.classList.add('visible');
@@ -3343,6 +3496,20 @@ async function sendSession(day) {
   const btn        = completeEl.querySelector('.send-session-btn');
   const status     = document.getElementById('send-status-' + day);
 
+  // Belt-and-braces: refuse zero-effort sends. The UI shouldn't surface the
+  // Send button before any work is logged (the confirm card only appears once
+  // done > 0), but enforce it here too in case state was tampered with.
+  const dayStatus = getDayCompletion(day);
+  if (dayStatus.done === 0) {
+    status.className = 'send-session-status error';
+    status.textContent = 'Log at least one set before sending the session.';
+    return;
+  }
+  const isPartial = dayStatus.done < dayStatus.total;
+  const statusLabel = isPartial
+    ? `Partial (${dayStatus.done} of ${dayStatus.total} sets/units done)`
+    : 'Complete';
+
   // Require RPE before sending — that's the whole point of the rating.
   const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
   if (!sRpe) {
@@ -3361,11 +3528,18 @@ async function sendSession(day) {
     const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day)) || {};
     const dayNote = localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '';
 
-    // Build a human-readable summary for the coach
+    // Build a human-readable summary for the coach. The Status line on top
+    // makes it instantly obvious whether the athlete finished the day or sent
+    // partial data — coaches shouldn't have to scan the per-set lines to tell.
     let summary = `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}\n`;
+    summary += `Status: ${statusLabel}\n`;
     summary += `Session RPE: ${sRpe}/10\n`;
     if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
     summary += `\nExercise log:\n`;
+
+    // Quick lookup so each exercise line in the loop below can be tagged
+    // (✓), (skipped), or (2/4 sets) right next to its name.
+    const missingByName = new Map(dayStatus.missing.map(m => [m.name, m]));
 
     // Pull stored data for one exercise (per-set log for standard, single RPE
     // for circuits, plus the personal note in both cases).
@@ -3387,7 +3561,9 @@ async function sendSession(day) {
       (block.exercises || []).forEach(ex => {
         const isCircuit = ex.type === 'circuit';
         const data = collectFor(ex.name, isCircuit);
-        summary += `• ${ex.name}\n`;
+        const m = missingByName.get(ex.name);
+        const tag = m ? ` (${m.label})` : ' (✓)';
+        summary += `• ${ex.name}${tag}\n`;
         if (data.kind === 'sets' && data.log.length) {
           // One line per set: "    Set 1: 60kg @7 ✓"
           data.log.forEach((s, i) => {
@@ -3412,9 +3588,13 @@ async function sendSession(day) {
     const fd = new FormData();
     fd.append('access_key', 'efc57e0c-997d-4d71-b07a-71c8268ec668');
     fd.append('from_name', `${DATA.athlete.firstName} ${DATA.athlete.lastName} — Session Report`);
-    fd.append('subject', `Session Report · ${DATA.athlete.firstName} ${DATA.athlete.lastName} · Day ${day}`);
+    // Subject is also tagged so a partial session is obvious in the inbox list,
+    // before the coach even opens the email.
+    const subjectTag = isPartial ? ' [Partial]' : '';
+    fd.append('subject', `Session Report${subjectTag} · ${DATA.athlete.firstName} ${DATA.athlete.lastName} · Day ${day}`);
     fd.append('Athlete', `${DATA.athlete.firstName} ${DATA.athlete.lastName}`);
     fd.append('Day', `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}`);
+    fd.append('Status', statusLabel);
     fd.append('Session RPE', sRpe + '/10');
     fd.append('Notes from athlete', dayNote || '(none)');
     fd.append('Full summary', summary);
