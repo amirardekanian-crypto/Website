@@ -163,49 +163,12 @@
   .home-brand strong { color: var(--yellow); }
   .home-brand:hover, .home-brand:hover strong { color: #ffffff; }
 
-  .home-pills { display: flex; gap: 4px; }
-  .home-pill {
-    width: 28px; height: 6px; border-radius: 3px;
-    background: #222; cursor: pointer;
-    transition: all 0.3s ease; position: relative;
-  }
-  .home-pill.completed { background: var(--yellow); opacity: 0.45; }
-  .home-pill.active { background: var(--ice); box-shadow: 0 0 8px var(--ice-glow); }
-  .home-pill.next { background: var(--purple); opacity: 0.4; }
-  .home-pill.locked { background: #222; }
-  .home-pill:hover::after {
-    content: attr(data-label);
-    position: absolute; bottom: 14px; left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Space Mono', monospace;
-    font-size: 9px; letter-spacing: 1px;
-    color: #fff; white-space: nowrap;
-    background: #141414;
-    padding: 3px 8px; border-radius: 4px;
-    border: 1px solid #222;
-  }
-
-  /* Intro */
-  .home-intro {
-    padding: 48px 24px 36px;
-    opacity: 0; transform: translateY(16px);
-    animation: fadeInUp 0.6s ease 0.1s forwards;
-  }
+  /* Shared fade-in animation reused by athlete-card, sub-banner, cycle-meter,
+     cycle-hero and the upcoming-section blocks. */
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-  /* 6-month goal / purpose — shown above the athlete name */
-  .home-eyebrow {
-    display: inline-block;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--yellow);
-    background: var(--yellow-dim);
-    border: 1px solid var(--yellow-mid);
-    padding: 7px 14px; border-radius: 6px;
-    margin-bottom: 18px;
-  }
-
+  /* The big athlete name (used inside the athlete card). The first name is
+     white; the last name is wrapped in <span> to drop to its own line in yellow. */
   .home-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(42px, 12vw, 64px);
@@ -215,48 +178,394 @@
   }
   .home-name span { color: var(--yellow); display: block; }
 
-  .home-meta {
-    font-family: 'Barlow', sans-serif;
-    font-size: 15px; font-weight: 300; letter-spacing: 0.3px;
-    color: #999; margin-bottom: 20px; line-height: 1.6;
+  /* ─── Athlete Card (new) ─────────────────────────────────────────
+     Card-style block at the top of Home: avatar + name + goal + dates */
+  .athlete-card {
+    margin: 4px 24px 24px;
+    padding: 22px;
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 16px;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeInUp 0.6s ease 0.1s forwards;
   }
-  .home-meta strong { color: #ccc; font-weight: 500; }
-
-  .home-phase-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--ice-dim);
-    border: 1px solid var(--ice-mid);
-    color: var(--ice);
+  .athlete-card-row {
+    display: flex; align-items: center; gap: 18px;
+    margin-bottom: 14px;
+  }
+  .athlete-avatar {
+    width: 84px; height: 84px; flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--yellow);
+    background: #1a1a1a;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .athlete-avatar img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .athlete-avatar-initials {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    padding: 4px 12px; border-radius: 6px;
-    font-size: 14px; letter-spacing: 1px;
+    font-weight: 900; font-size: 32px;
+    color: var(--yellow);
+    letter-spacing: 0.5px;
+  }
+  .athlete-card-name {
+    flex: 1; min-width: 0;
+  }
+  /* Athlete card details (goal + dates) under the name row */
+  .athlete-card-detail {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #e8e8e8;
+    margin-top: 10px;
+    line-height: 1.4;
+  }
+  .athlete-card-dates {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 1.5px;
+    color: #777; margin-top: 6px;
     text-transform: uppercase;
   }
 
-  .live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--ice);
-    animation: livePulse 2s ease-in-out infinite;
+  /* ─── Subscription banner (new) ──────────────────────────────────
+     Appears only when current cycle has endDate AND ≤14 days remain */
+  .sub-banner {
+    margin: 0 24px 20px;
+    padding: 12px 16px;
+    border: 1px solid var(--yellow-mid);
+    background: var(--yellow-dim);
+    border-radius: 10px;
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; transform: translateY(8px);
+    animation: fadeInUp 0.5s ease 0.15s forwards;
   }
-  @keyframes livePulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+  .sub-banner-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--yellow);
+    flex-shrink: 0;
+    box-shadow: 0 0 6px var(--yellow);
+  }
+  .sub-banner-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    color: #f0f0f0;
+  }
+  .sub-banner-text strong { color: var(--yellow); }
+
+  /* ─── Cycle meter (new — replaces the old gradient progress bar) ── */
+  .cycle-meter {
+    margin: 0 24px 28px;
+    opacity: 0; transform: translateY(12px);
+    animation: fadeInUp 0.6s ease 0.2s forwards;
+  }
+  .cycle-meter-bars {
+    display: flex; gap: 6px;
+  }
+  .cycle-meter-seg {
+    flex: 1; height: 5px; border-radius: 2px;
+    background: rgba(255,255,255,0.10);
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .cycle-meter-seg.done    { background: var(--yellow); opacity: 0.55; }
+  .cycle-meter-seg.current { background: var(--ice); box-shadow: 0 0 10px var(--ice-glow); }
+  .cycle-meter-labels {
+    display: flex; gap: 6px; margin-top: 10px;
+  }
+  .cycle-meter-label {
+    flex: 1; text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 1.2px;
+    color: #555; font-weight: 500;
+  }
+  .cycle-meter-label.done    { color: rgba(212,255,0,0.55); }
+  .cycle-meter-label.current { color: var(--ice); font-weight: 700; }
+
+  /* ─── Upcoming cycle cards — one card per future cycle ───────── */
+  .upcoming-section {
+    padding: 0 24px 20px;
+    opacity: 0; animation: fadeInUp 0.6s ease 0.4s forwards;
+  }
+  .upcoming-section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase; color: #555;
+    margin-bottom: 14px;
+  }
+  .upcoming-card {
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 10px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .upcoming-card-num {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border: 1.5px solid var(--yellow);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 16px; color: var(--yellow);
+  }
+  .upcoming-card-body { flex: 1; min-width: 0; }
+  .upcoming-card-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px; margin-bottom: 6px; flex-wrap: wrap;
+  }
+  .upcoming-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 20px;
+    text-transform: uppercase; letter-spacing: -0.3px;
+    color: #f0f0f0; line-height: 1.1;
+  }
+  .upcoming-card-weeks {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 1.2px;
+    color: #666;
+  }
+  /* Italic tagline under the card title — mirrors the current cycle hero */
+  .upcoming-card-tagline {
+    font-family: 'Barlow', sans-serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #B794F6;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  /* Numbered plan list — mirrors the current cycle's CYCLE PLAN focuses */
+  .upcoming-card-plan {
+    list-style: none;
+    counter-reset: up-c;
+    margin: 12px 0 0;
+    padding: 0;
+  }
+  .upcoming-card-plan li {
+    counter-increment: up-c;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13.5px;
+    color: #ccc;
+    line-height: 1.5;
+    display: flex;
+    gap: 12px;
+  }
+  .upcoming-card-plan li:last-child {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .upcoming-card-plan li::before {
+    content: counter(up-c, decimal-leading-zero);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    flex-shrink: 0;
+    min-width: 22px;
+    line-height: 1.7;
+  }
+  /* Teaser explanation paragraphs — used by the immediate-next cycle to give
+     a richer preview. Last paragraph is auto-italicised when there are 2+. */
+  .upcoming-card-teaser {
+    margin-top: 14px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13.5px; line-height: 1.65;
+    color: #aaa;
+  }
+  .upcoming-card-teaser p { margin: 0; }
+  .upcoming-card-teaser p + p { margin-top: 10px; }
+  .upcoming-card-teaser em { color: #ddd; font-style: italic; }
+
+  /* ─── Global bottom tab bar (always visible across all screens) ── */
+  .global-tabs {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--grey-dark);
+    display: flex; border-top: 1px solid #333;
+    z-index: 60;
+  }
+  .global-tabs .nav-item {
+    flex: 1; padding: 10px 6px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; border: none; background: transparent;
+  }
+  .global-tabs .nav-icon {
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    color: #777;
+    transition: color 0.2s, filter 0.2s;
+  }
+  .global-tabs .nav-icon svg { width: 100%; height: 100%; display: block; }
+  .global-tabs .nav-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 9px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: #777; transition: color 0.2s;
+  }
+  .global-tabs .nav-item.active .nav-label { color: var(--yellow); }
+  .global-tabs .nav-item.active .nav-icon {
+    color: var(--yellow);
+    filter: drop-shadow(0 0 4px rgba(212,255,0,0.45));
+  }
+  /* Slightly thicker stroke when active so the icon visually weighs more */
+  .global-tabs .nav-item.active .nav-icon svg { stroke-width: 2; }
+  /* Hidden during loading and on the App Guide screen (which keeps its back arrow) */
+  .global-tabs.is-hidden { display: none; }
+
+  /* App Guide button (in Notes screen, styled as a note-card) */
+  .guide-launch-card { cursor: pointer; }
+  .guide-launch-card .note-icon { background: var(--purple); }
+  .guide-launch-card .note-card-title { color: var(--purple); }
+
+  /* ─── HOME-ONLY: yellow-only palette ─────────────────────────────
+     Remap the ice + purple tokens to yellow ONLY inside #screen-home,
+     so the home page reads as a single-accent design without affecting
+     Program / Notes / Archive / Guide. */
+  #screen-home {
+    --ice:       var(--yellow);
+    --ice-dim:   var(--yellow-dim);
+    --ice-mid:   var(--yellow-mid);
+    --ice-glow:  var(--yellow-glow);
+    --purple:      var(--yellow);
+    --purple-dim:  var(--yellow-dim);
+    --purple-mid:  var(--yellow-mid);
+    --purple-glow: var(--yellow-glow);
   }
 
-  .home-progress { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
-  .home-progress-bar {
-    flex: 1; max-width: 220px; height: 3px;
-    background: #222; border-radius: 2px; overflow: hidden;
+  /* Soft steady glow on the current cycle segment — no size change, just light. */
+  @keyframes cycleSegGlow {
+    0%, 100% { box-shadow: 0 0 8px var(--yellow), 0 0 16px rgba(212,255,0,0.25); }
+    50%      { box-shadow: 0 0 14px var(--yellow), 0 0 22px rgba(212,255,0,0.45); }
   }
-  .home-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--yellow), var(--ice));
-    border-radius: 2px;
+  #screen-home .cycle-meter-seg.current {
+    animation: cycleSegGlow 2.6s ease-in-out infinite;
   }
-  .home-progress-label {
+
+  /* ─── HOME-ONLY: scale yellow back so it spotlights, doesn't shout ───
+     The new design uses lime as a single accent, not as a wash. These
+     overrides strip the yellow tint backgrounds, pills, and gradients
+     from the home page and replace them with quiet grey mono labels and
+     thin separator lines. */
+
+  /* Cycle hero — big cycle name + weeks + tagline above the cycle meter.
+     The C-badge for the current cycle now lives next to "CYCLE PLAN" inside
+     the message card (see .cm-num below). */
+  #screen-home .cycle-hero {
+    padding: 8px 24px 18px;
+    opacity: 0; transform: translateY(8px);
+    animation: fadeInUp 0.6s ease 0.18s forwards;
+  }
+  #screen-home .cycle-hero-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  #screen-home .cycle-hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 10vw, 52px);
+    line-height: 0.95;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  #screen-home .cycle-hero-weeks {
     font-family: 'Space Mono', monospace;
-    font-size: 11px; color: #666; letter-spacing: 1px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #888;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  #screen-home .cycle-hero-tagline {
+    font-family: 'Barlow', sans-serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #B794F6;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* "CYCLE PLAN" header — bigger and white, paired with the C-badge to its left. */
+  #screen-home .cm-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  /* Square C-badge next to "CYCLE PLAN" — same design as the upcoming-card badge */
+  #screen-home .cm-num {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border: 1.5px solid var(--yellow);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 16px; color: var(--yellow);
+  }
+  #screen-home .cm-eyebrow {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 2.5px;
+    padding: 0;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  /* Strip the original top accent line + radial glow */
+  #screen-home .current-message::before { display: none; }
+  #screen-home .current-message::after  { display: none; }
+  /* Highlighted frame — soft yellow-tinted border + subtle outer glow so the
+     current cycle card visually stands out from the future cycle cards. */
+  #screen-home .current-message {
+    background: #141414;
+    border: 1px solid var(--yellow-mid);
+    box-shadow:
+      0 0 0 1px rgba(212,255,0,0.04),
+      0 8px 30px rgba(212,255,0,0.06),
+      inset 0 0 24px rgba(212,255,0,0.02);
+  }
+  #screen-home .cm-body-label { color: #555; }
+
+  /* Focus list → numbered list with thin grey separators (no tint background) */
+  #screen-home .focus-list {
+    counter-reset: focus-c;
+    display: block;
+    gap: 0;
+    margin-bottom: 4px;
+  }
+  #screen-home .focus-list-item {
+    background: transparent;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-radius: 0;
+    padding: 14px 0;
+    font-size: 14.5px;
+    color: #ddd;
+    counter-increment: focus-c;
+    line-height: 1.5;
+  }
+  #screen-home .focus-list-item:last-child {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  #screen-home .focus-list-item::before {
+    content: counter(focus-c, decimal-leading-zero);
+    width: auto; height: auto;
+    margin-top: 0;
+    background: transparent;
+    border-radius: 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    flex-shrink: 0;
+    min-width: 24px;
+    line-height: 1.5;
   }
 
   /* Current cycle message card */
@@ -297,34 +606,6 @@
     border: 1px solid var(--ice-mid);
     padding: 5px 12px; border-radius: 6px;
     margin-bottom: 14px;
-  }
-
-  .cm-header {
-    display: flex; align-items: baseline; gap: 10px;
-    margin-bottom: 4px; flex-wrap: wrap;
-  }
-
-  .cm-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(24px, 7vw, 34px);
-    font-weight: 900; letter-spacing: -1px;
-    line-height: 1; color: #fff;
-    text-transform: uppercase;
-  }
-
-  .cm-weeks {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; color: #555;
-    letter-spacing: 1.5px;
-  }
-
-  .cm-subtitle {
-    font-size: 13px; color: var(--purple);
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px;
-    margin-bottom: 18px;
-    opacity: 0.85;
-    text-transform: uppercase;
   }
 
   /* Flexible focus list — unlimited focuses, stacked vertically */
@@ -399,292 +680,10 @@
     line-height: 1.5;
   }
 
-  /* Next cycle card */
-  .next-card-wrap {
-    padding: 0 24px 20px;
-    opacity: 0;
-    animation: fadeInUp 0.6s ease 0.3s forwards;
-  }
-  .next-card {
-    background: linear-gradient(135deg, var(--purple-dim) 0%, #141414 60%);
-    border: 1px solid var(--purple-mid);
-    border-radius: 16px;
-    padding: 24px 26px;
-    position: relative;
-    overflow: hidden;
-  }
-  .next-card::before {
-    content: '';
-    position: absolute; top: 0; right: 0;
-    width: 140px; height: 140px;
-    background: radial-gradient(circle, var(--purple-glow), transparent 70%);
-    pointer-events: none;
-  }
-  /* "COMING NEXT" — highlighted pill (purple to contrast with current) */
-  .next-label {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--purple);
-    background: var(--purple-dim);
-    border: 1px solid var(--purple-mid);
-    padding: 5px 12px; border-radius: 6px;
-    margin-bottom: 12px;
-  }
-  .next-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(22px, 6vw, 28px);
-    font-weight: 900; margin-bottom: 4px;
-    letter-spacing: -0.5px; line-height: 1.1;
-    color: #fff; text-transform: uppercase;
-  }
-  .next-subtitle {
-    font-size: 13px; color: var(--purple);
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px; margin-bottom: 14px;
-    opacity: 0.75;
-  }
-  .next-teaser {
-    font-family: 'Barlow', sans-serif;
-    font-size: 14px; color: #aaa;
-    line-height: 1.7;
-  }
-  .next-teaser p + p { margin-top: 10px; }
-  .next-teaser em {
-    color: #fff; font-style: italic;
-    font-weight: 500;
-  }
-
-  /* Journey / All cycles spine */
-  .section-header {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; letter-spacing: 3px;
-    text-transform: uppercase; color: #555;
-    margin: 0 0 20px; padding: 0 24px 0 96px;
-  }
-  @media (max-width: 600px) {
-    .section-header { padding-left: 72px; }
-  }
-
-  .journey {
-    position: relative;
-    padding: 0 24px 20px;
-    opacity: 0;
-    animation: fadeInUp 0.6s ease 0.4s forwards;
-  }
-  /* Connecting line between cycle dots — kept neutral on purpose so it never
-     misaligns when the cycle list changes. The dots themselves carry the color
-     story (yellow = done, ice = active, purple = next, grey = locked). */
-  .journey::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 52px;
-    width: 2px; height: 100%;
-    background: rgba(255,255,255,0.06);
-  }
-  @media (max-width: 600px) { .journey::before { left: 28px; } }
-
-  .phase-row {
-    display: flex; gap: 24px;
-    padding: 24px 0;
-    position: relative;
-    cursor: pointer;
-    align-items: flex-start;
-  }
-  .phase-row + .phase-row { border-top: 1px solid rgba(255,255,255,0.03); }
-
-  .phase-dot-wrap {
-    flex-shrink: 0; width: 56px;
-    display: flex; justify-content: center;
-    position: relative; z-index: 2;
-    padding-top: 6px;
-  }
-  @media (max-width: 600px) { .phase-dot-wrap { width: 32px; } }
-
-  .phase-dot {
-    width: 14px; height: 14px; border-radius: 50%;
-    transition: all 0.3s ease;
-  }
-  .phase-dot.completed { background: var(--yellow); border: 2px solid var(--yellow); }
-  .phase-dot.active {
-    background: #0A0A0A;
-    border: 3px solid var(--ice);
-    box-shadow: 0 0 12px var(--ice-glow);
-    animation: dotPulse 2.5s ease-in-out infinite;
-  }
-  @keyframes dotPulse {
-    0%, 100% { box-shadow: 0 0 12px var(--ice-glow); }
-    50% { box-shadow: 0 0 22px rgba(184,224,246,0.35); }
-  }
-  .phase-dot.next { background: none; border: 2px dashed var(--purple-mid); }
-  .phase-dot.locked { background: none; border: 2px solid #222; opacity: 0.5; }
-
-  .phase-content { flex: 1; max-width: 620px; }
-
-  .phase-header {
-    display: flex; align-items: baseline; gap: 12px;
-    margin-bottom: 4px; flex-wrap: wrap;
-  }
-  .phase-big-num {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 56px; font-weight: 900;
-    line-height: 1; color: #222;
-    letter-spacing: -3px;
-    transition: color 0.4s ease;
-    user-select: none;
-  }
-  @media (max-width: 600px) { .phase-big-num { font-size: 44px; } }
-
-  .phase-row.is-completed .phase-big-num { color: rgba(212,255,0,0.12); }
-  .phase-row.is-active .phase-big-num { color: rgba(184,224,246,0.18); }
-  .phase-row.is-next .phase-big-num { color: rgba(183,148,246,0.15); }
-  .phase-row.is-locked .phase-big-num { opacity: 0.4; }
-
-  .phase-title-group { flex: 1; min-width: 0; }
-  .phase-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .phase-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 24px; font-weight: 800;
-    letter-spacing: -0.5px;
-    color: #f0f0f0;
-    text-transform: uppercase;
-  }
-  .phase-row.is-locked .phase-name { opacity: 0.4; }
-
-  .phase-badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 4px;
-    flex-shrink: 0;
-  }
-  .badge-active { background: var(--ice); color: #050508; font-weight: 700; }
-  .badge-completed { background: var(--yellow-dim); color: var(--yellow); }
-  .badge-next { background: var(--purple-dim); color: var(--purple); }
-
-  .phase-tagline {
-    font-family: 'Barlow', sans-serif;
-    font-size: 14px; color: #666;
-    font-weight: 400; font-style: italic;
-    margin-top: 2px;
-  }
-  .phase-weeks {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; color: #555;
-    letter-spacing: 1px; margin-top: 4px;
-  }
-
-  .expand-hint {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px; color: #555;
-    letter-spacing: 1px; text-transform: uppercase;
-    margin-top: 10px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .expand-hint .arrow {
-    transition: transform 0.3s ease;
-    display: inline-block;
-  }
-  .phase-row.expanded .expand-hint .arrow { transform: rotate(90deg); }
-
-  .phase-detail {
-    overflow: hidden; max-height: 0;
-    opacity: 0;
-    transition: max-height 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.4s ease, margin 0.4s ease;
-    margin-top: 0;
-  }
-  .phase-row.expanded .phase-detail {
-    max-height: 500px;
-    opacity: 1;
-    margin-top: 14px;
-  }
-
-  .detail-focus + .detail-focus { margin-top: 10px; }
-  .detail-focus-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-    margin-bottom: 3px; color: var(--ice);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .detail-focus.secondary .detail-focus-label { color: var(--purple); }
-  .detail-focus-label::before {
-    content: ''; width: 4px; height: 4px;
-    border-radius: 50%; background: currentColor;
-  }
-  .detail-focus-text {
-    font-family: 'Barlow', sans-serif;
-    font-size: 13.5px; color: #e8e8e8;
-    line-height: 1.55;
-  }
-
-  .locked-hint {
-    font-family: 'Barlow', sans-serif;
-    font-size: 12px; color: #555;
-    font-style: italic;
-    display: flex; align-items: center; gap: 8px;
-    margin-top: 12px;
-    padding: 9px 13px;
-    border: 1px dashed #222;
-    border-radius: 8px;
-  }
-
-  /* Bottom CTA row — fixed so "Open Current Program" is always visible */
-  .home-bottom-cta {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    background: rgba(10,10,10,0.95);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid #222;
-    padding: 14px 24px;
-    display: flex; gap: 10px;
-    z-index: 40;
-  }
-  /* Reserve space so content isn't hidden behind the fixed bar */
+  /* Reserve space so content isn't hidden behind the global tab bar */
   #screen-home { padding-bottom: 90px; }
-
-  .home-cta {
-    flex: 1; padding: 14px 20px; border-radius: 10px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
-    cursor: pointer; transition: all 0.2s ease;
-    text-align: center; border: none;
-  }
-  .cta-main { background: var(--yellow); color: #0A0A0A; }
-  .cta-main:active { transform: scale(0.98); }
-  /* Notes button — highlighted in the design system's blue (ice) */
-  .cta-notes {
-    background: var(--ice-dim);
-    color: var(--ice);
-    border: 1px solid var(--ice-mid);
-  }
-  .cta-notes:active { background: var(--ice-mid); transform: scale(0.98); }
-
-  /* Past Programs button — purple to distinguish from Current + Notes */
-  .cta-history {
-    background: var(--purple-dim);
-    color: var(--purple);
-    border: 1px solid var(--purple-mid);
-  }
-  .cta-history:active { background: var(--purple-mid); transform: scale(0.98); }
-
-  /* When all 3 buttons are visible, tighten padding so labels fit on small screens */
-  .home-bottom-cta.has-three .home-cta { padding: 14px 8px; font-size: 13px; letter-spacing: 0.5px; }
-
-  /* App Guide button — white background with purple lettering */
-  .cta-guide {
-    background: #fff;
-    color: var(--purple);
-    border: 1px solid var(--purple);
-  }
-  .cta-guide:active { background: #f0f0f0; transform: scale(0.98); }
-
-  /* When 4 buttons are visible (App Guide + Past Programs), wrap to 2 rows */
-  .home-bottom-cta.has-four { flex-wrap: wrap; }
-  .home-bottom-cta.has-four .cta-main { flex: 1 1 100%; }
-  .home-bottom-cta.has-four .home-cta:not(.cta-main) {
-    flex: 1 1 0; padding: 12px 6px; font-size: 12px; letter-spacing: 0.5px;
-  }
+  #screen-archive .archive-scroll { padding-bottom: 100px; }
+  #screen-guide .guide-container { padding-bottom: 100px; }
 
   /* ── App Guide screen ── shares cards with Notes for a familiar look */
   #screen-guide { background: var(--grey-bg); }
@@ -777,16 +776,92 @@
   #screen-program { background: var(--grey-bg); }
   .prog-header { background: var(--grey-dark); padding: 48px 24px 0; position: relative; overflow: hidden; }
   .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
-  .prog-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 6px; }
-  .prog-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: var(--white); text-transform: uppercase; line-height: 1; margin-bottom: 4px; }
-  .prog-subtitle { font-size: 12px; color: #777; font-weight: 300; margin-bottom: 24px; }
+  /* Cycle hero on the program page header (mirrors the home cycle-hero, but
+     with a small yellow C-badge to the left of the cycle name). */
+  .prog-cycle-hero { margin-bottom: 22px; }
+  .prog-cycle-row {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .prog-cycle-badge {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border: 1.5px solid var(--yellow);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-size: 14px; color: var(--yellow);
+  }
+  .prog-cycle-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .prog-cycle-tagline {
+    font-family: 'Barlow', sans-serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #B794F6;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
 
-  .day-tabs { display: flex; border-top: 1px solid #3a3a3a; }
-  .day-tab { flex: 1; padding: 14px 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #666; background: transparent; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: color 0.2s, border-color 0.2s; position: relative; }
-  .day-tab.active { color: var(--ice); border-bottom-color: var(--ice); }
+  /* Pill-style day tabs — D1 / D2 / D3 in compact mono. Active = solid ice fill. */
+  .day-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 16px 20px 18px;
+    overflow-x: auto;
+    border-top: 1px solid #3a3a3a;
+  }
+  .day-tab {
+    flex: 1;
+    min-width: 60px;
+    padding: 10px 8px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: rgba(184,224,246,0.75);
+    background: transparent;
+    border: 1px solid var(--ice-mid);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    position: relative;
+    white-space: nowrap;
+  }
+  .day-tab:hover { color: var(--ice); border-color: var(--ice); }
+  .day-tab.active {
+    background: var(--ice);
+    color: #0A0A0A;
+    border-color: var(--ice);
+  }
+  /* Light-mode header keeps a dark background, so the same colors work without
+     a separate dark-mode override. */
 
-  .tab-progress-pill { display: inline-block; background: #3a3a3a; color: #888; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 1px 5px; border-radius: 10px; margin-left: 4px; vertical-align: middle; transition: background 0.3s, color 0.3s; }
-  .day-tab.active .tab-progress-pill { background: var(--ice-dim); color: var(--ice); }
+  /* Tiny progress pill inside each tab (e.g. "5/24") */
+  .tab-progress-pill {
+    display: inline-block;
+    background: rgba(184,224,246,0.15);
+    color: rgba(184,224,246,0.85);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 1px 5px;
+    border-radius: 10px;
+    margin-left: 4px;
+    vertical-align: middle;
+    transition: background 0.3s, color 0.3s;
+  }
+  .day-tab.active .tab-progress-pill {
+    background: rgba(0,0,0,0.18);
+    color: #0A0A0A;
+  }
   .tab-progress-pill.complete { background: var(--yellow) !important; color: var(--grey-dark) !important; }
   /* Brief pop animation whenever the count changes (triggered from updateProgress) */
   .tab-progress-pill.pulse { animation: pillPulse 0.32s ease; }
@@ -948,10 +1023,10 @@
   body[data-dark] .ex-num { color: #666; }
   body[data-dark] .checklist-item.checked .ex-num { color: #444; }
 
-  /* Collapsed state — appears AFTER the client checks the box and logs RPE.
-     Collapses the card to a thin one-liner so the workout list shrinks as
-     they progress. Tapping the collapsed row re-opens it (without unchecking). */
-  .checklist-item.collapsed .item-main { padding: 10px 16px; gap: 12px; }
+  /* Collapsed state is now the DEFAULT — every exercise starts as a thin row
+     and expands when tapped. Hides the expandable detail area + the inline
+     chip/rest/log/etc. sections that exist on circuits. */
+  .checklist-item.collapsed .ex-detail { display: none !important; }
   .checklist-item.collapsed .item-chips,
   .checklist-item.collapsed .item-rest,
   .checklist-item.collapsed .weight-log,
@@ -959,10 +1034,386 @@
   .checklist-item.collapsed .note-row,
   .checklist-item.collapsed .round-list,
   .checklist-item.collapsed .item-actions { display: none !important; }
-  .checklist-item.collapsed .item-name { font-size: 16px; font-weight: 600; }
+  .checklist-item.collapsed .item-name { font-size: 17px; font-weight: 700; }
   .checklist-item.collapsed .ex-num { font-size: 22px; }
-  .checklist-item.collapsed .check-box { width: 28px; height: 28px; }
-  .checklist-item.collapsed .check-box::after { font-size: 14px; }
+  /* Show the summary line + chevron only when the row is collapsed */
+  .checklist-item:not(.collapsed) .ex-summary { display: none; }
+  .checklist-item:not(.collapsed) .ex-chevron { transform: rotate(180deg); }
+
+  /* ── REDESIGNED EXERCISE CARD ──────────────────────────────────────
+     Tap-to-expand list view. The collapsed row shows just name + summary
+     (sets×reps · target · rest). The expanded view shows a video placeholder,
+     a 5-cell stats grid, extra chips (HOLD / Priority / etc.), coaching cues
+     with yellow/red accent lines, the log section (weight + RPE + note),
+     and a rest button. */
+
+  /* Stat pills shown on the collapsed row — flex of small rounded pills. */
+  .ex-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+  }
+  .ex-summary-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    background: var(--grey-card);
+    color: var(--grey-dark);
+    border-radius: 99px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  body[data-dark] .ex-summary-pill { background: #2a2a2a; color: #ddd; }
+  .checklist-item.checked .ex-summary { opacity: 0.5; }
+
+  /* Chevron at the right edge of the row, rotates when expanded */
+  .ex-chevron {
+    flex-shrink: 0;
+    margin-left: auto;
+    color: var(--grey-text);
+    font-size: 11px;
+    line-height: 1;
+    transition: transform 0.22s ease;
+    padding: 4px 6px;
+  }
+  body[data-dark] .ex-chevron { color: #777; }
+
+  /* The expandable detail block — sits below .item-main */
+  .ex-detail {
+    padding: 4px 18px 16px;
+    border-top: 1px solid var(--grey-card);
+    background: rgba(0,0,0,0.015);
+  }
+  body[data-dark] .ex-detail {
+    background: rgba(255,255,255,0.015);
+    border-top-color: #2a2a2a;
+  }
+
+  /* Section labels inside the detail (LOG, COACHING CUES, etc.) */
+  .ex-section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--grey-text);
+    margin: 18px 0 10px;
+  }
+  .ex-section-label:first-child { margin-top: 14px; }
+  body[data-dark] .ex-section-label { color: #777; }
+
+  /* Video placeholder — dark block with diagonal stripes + big yellow play */
+  .ex-video {
+    position: relative;
+    height: 180px;
+    background: #0a0a0c;
+    border-radius: 10px;
+    margin: 14px 0 4px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ex-video::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(135deg, #15151a 0 14px, #0a0a0c 14px 28px);
+    opacity: 0.9;
+  }
+  .ex-video::after {
+    content: 'VIDEO';
+    position: absolute; bottom: 10px; right: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+  }
+  .ex-video-play {
+    position: relative; z-index: 2;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--yellow);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #0A0A0A; font-size: 22px;
+    padding-left: 4px; /* optical centering for the triangle */
+    transition: transform 0.15s;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+  .ex-video-play:hover { transform: scale(1.06); }
+  /* Once playing, an iframe takes over and the play/placeholder hide */
+  .ex-video.playing iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: 0; z-index: 3;
+  }
+  .ex-video.playing .ex-video-play,
+  .ex-video.playing::before,
+  .ex-video.playing::after { display: none; }
+
+  /* 5-cell stats grid: SETS · REPS · TARGET · TEMPO · REST */
+  .ex-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--grey-mid);
+    border-radius: 8px;
+    margin-top: 4px;
+    background: var(--white);
+  }
+  body[data-dark] .ex-stats-grid {
+    background: rgba(255,255,255,0.02);
+    border-color: #333;
+  }
+  .ex-stat {
+    padding: 12px 4px;
+    text-align: center;
+    border-left: 1px solid var(--grey-mid);
+  }
+  .ex-stat:first-child { border-left: none; }
+  body[data-dark] .ex-stat { border-left-color: #333; }
+  .ex-stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+    color: var(--grey-text);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    line-height: 1.25;
+    min-height: 2.4em;  /* reserve space so 1- and 2-line labels still align */
+    display: flex; align-items: center; justify-content: center;
+  }
+  body[data-dark] .ex-stat-label { color: #777; }
+  .ex-stat-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--grey-dark);
+    line-height: 1;
+    word-break: break-word;
+  }
+  body[data-dark] .ex-stat-value { color: #f0f0f0; }
+  .ex-stat-value.dim { color: #bbb; font-weight: 500; }
+  body[data-dark] .ex-stat-value.dim { color: #555; }
+  /* Target stat (RPE target) is always yellow */
+  .ex-stat.target .ex-stat-value { color: var(--yellow); }
+  body[data-dark] .ex-stat.target .ex-stat-value { color: var(--yellow); }
+  /* Tempo can get long — shrink slightly */
+  .ex-stat.tempo .ex-stat-value { font-size: 14px; }
+
+  /* Circuit meta — 2-cell mini grid (Rounds + Rest) shown at the top of an
+     expanded circuit so the round count and rest time stay visible. */
+  .ex-circuit-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--grey-mid);
+    border-radius: 8px;
+    margin-top: 14px;
+    background: var(--white);
+  }
+  body[data-dark] .ex-circuit-meta {
+    background: rgba(255,255,255,0.02);
+    border-color: #333;
+  }
+
+  /* Stats block — wraps extras + grid */
+  .ex-stats-block { margin-top: 14px; }
+
+  /* Big pills for "extras" (HOLD, Priority, Max Intent, etc.). Solid yellow
+     background, fully rounded, bold uppercase — designed to grab attention. */
+  .ex-extra-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ex-extra-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: var(--yellow);
+    color: var(--grey-dark);
+    border: none;
+    border-radius: 99px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    line-height: 1;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+  body[data-dark] .ex-extra-chip {
+    box-shadow: 0 1px 4px rgba(212,255,0,0.18);
+  }
+  /* "yellow"-styled chips (high-priority ones from JSON) — already yellow,
+     just give them a slightly stronger glow so they read as the highest
+     priority among the extras. */
+  .ex-extra-chip.yellow {
+    box-shadow: 0 0 0 2px rgba(212,255,0,0.25), 0 1px 2px rgba(0,0,0,0.08);
+  }
+
+  /* Coaching cues — yellow accent for "good", red accent for "bad". No icons. */
+  .ex-cue {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    padding: 12px 0;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--grey-dark);
+  }
+  body[data-dark] .ex-cue { color: #ddd; border-top-color: rgba(255,255,255,0.08); }
+  .ex-cue:first-of-type { border-top: none; padding-top: 4px; }
+  .ex-cue::before {
+    content: '';
+    width: 3px;
+    flex-shrink: 0;
+    background: var(--yellow);
+    border-radius: 2px;
+    align-self: stretch;
+  }
+  .ex-cue.bad::before { background: #E74C3C; }
+
+  /* Cues nested inside a circuit's round-row — slightly tighter spacing. */
+  .round-row .round-cues { margin-top: 2px; }
+  .round-row .ex-cue {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+
+  /* Log section wraps the per-set log table + the personal note row. */
+  .ex-log {
+    margin-top: 4px;
+    border: 1px solid var(--grey-mid);
+    border-radius: 8px;
+    background: var(--white);
+    overflow: hidden;
+  }
+  body[data-dark] .ex-log {
+    background: rgba(255,255,255,0.02);
+    border-color: #333;
+  }
+  .ex-log .note-row,
+  .ex-log .rpe-row,
+  .ex-log .weight-log {
+    border-top: 1px solid var(--grey-card);
+  }
+  .ex-log > :first-child { border-top: none; }
+  /* Force RPE row visible inside the log (old default was hidden until checked). */
+  .ex-log .rpe-row { display: flex; }
+
+  /* ── Per-set log table (standard exercises) ────────────────────── */
+  .ex-set-header {
+    display: grid;
+    grid-template-columns: 28px 1fr auto 32px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--grey-text);
+  }
+  body[data-dark] .ex-set-header { color: #777; }
+  .ex-set-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto 32px;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 14px;
+    border-top: 1px solid var(--grey-card);
+    transition: opacity 0.2s;
+  }
+  body[data-dark] .ex-set-row { border-top-color: #2a2a2a; }
+  /* Sets that aren't the active one fade slightly so the eye lands on the
+     current set first. The "active" set is the first one not yet marked done. */
+  .ex-set-row.dim { opacity: 0.55; }
+  .ex-set-row.done .ex-set-num { color: var(--yellow); }
+  .ex-set-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    text-align: center;
+    color: var(--grey-dark);
+  }
+  body[data-dark] .ex-set-num { color: #ddd; }
+  .ex-set-weight {
+    width: 100%;
+    background: var(--grey-card);
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: 'Barlow', sans-serif;
+    color: var(--grey-dark);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+  .ex-set-weight:focus { border-color: var(--yellow); }
+  .ex-set-weight::placeholder { color: #bbb; }
+  body[data-dark] .ex-set-weight { background: #2a2a2a; color: #ddd; }
+  body[data-dark] .ex-set-weight::placeholder { color: #555; }
+  .ex-set-rpe {
+    display: flex;
+    gap: 3px;
+  }
+  /* Smaller RPE buttons inside the per-set row so 5 of them fit on mobile */
+  .ex-set-rpe .rpe-btn {
+    width: 26px; height: 26px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid var(--grey-mid);
+    background: transparent;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    color: var(--grey-text);
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .ex-set-rpe .rpe-btn.selected {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--grey-dark);
+  }
+  body[data-dark] .ex-set-rpe .rpe-btn { border-color: #444; color: #888; }
+  body[data-dark] .ex-set-rpe .rpe-btn.selected { color: var(--grey-dark); }
+
+  /* Per-set check circle */
+  .ex-set-check {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--grey-mid);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .ex-set-check::after {
+    content: '✓';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    color: var(--grey-dark);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.15s, transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .ex-set-row.done .ex-set-check { background: var(--yellow); border-color: var(--yellow); }
+  .ex-set-row.done .ex-set-check::after { opacity: 1; transform: scale(1); }
+  body[data-dark] .ex-set-check { border-color: #444; }
+
+  /* Rest button row at the bottom of the detail */
+  .ex-rest-bottom {
+    display: flex; justify-content: flex-end;
+    margin-top: 14px;
+  }
 
   /* Filled-yellow play button — clear, tappable, on-brand */
   .play-btn {
@@ -1052,20 +1503,38 @@
 
   /* ── Round Groups ── */
   .round-list { margin-top: 10px; display: flex; flex-direction: column; gap: 0; }
-  .round-row { display: flex; flex-direction: column; border-bottom: 1px solid var(--grey-card); }
+  .round-row { display: flex; flex-direction: column; border-bottom: 1px solid var(--grey-card); padding: 10px 0; }
   .round-row:last-child { border-bottom: none; }
-  /* Main row (letter · name · detail) — this is the "tap to complete" area, kept compact. */
-  .round-row-main { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; gap: 10px; }
+  /* Main row (letter · name · detail) — the round name is the primary text;
+     letter and detail are supporting info; cues underneath are even smaller. */
+  .round-row-main { display: flex; align-items: center; padding: 2px 0; gap: 12px; }
   .round-letter {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: #bbb;
-    width: 14px; flex-shrink: 0;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--yellow);
+    width: 16px; flex-shrink: 0;
     text-align: center;
   }
-  .round-name { font-size: 15px; color: var(--grey-text); flex: 1; }
-  .round-detail { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; color: #aaa; margin-right: 8px; }
+  .round-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--grey-dark);
+    flex: 1;
+    letter-spacing: 0.2px;
+    line-height: 1.2;
+  }
+  body[data-dark] .round-name { color: #f0f0f0; }
+  .round-detail {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--grey-text);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  body[data-dark] .round-detail { color: #999; }
   .round-group.checked .round-row { opacity: 0.5; }
   /* Round cues (inside a circuit) reuse the same details.cues styling as the
      main exercise cues — single source of truth so they look identical. */
@@ -1209,13 +1678,6 @@
   .note-card.open .note-chevron { transform: rotate(180deg); }
   .note-body { display: none; padding: 14px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
   .note-card.open .note-body { display: block; }
-
-  /* ── Bottom Nav ── */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--grey-dark); display: flex; border-top: 1px solid #333; z-index: 50; }
-  .nav-item { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; border: none; background: transparent; }
-  .nav-icon { font-size: 18px; }
-  .nav-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #555; transition: color 0.2s; }
-  .nav-item.active .nav-label { color: var(--yellow); }
 
   /* ── Timer ── */
   .timer-overlay { position: fixed; inset: 0; background: rgba(20,20,20,0.96); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
@@ -1467,7 +1929,7 @@
   <div class="error-msg" id="error-msg">Could not load athlete data. Check the URL parameter.</div>
 </div>
 
-<!-- ═══ HOME (NEW V5 DESIGN) ═══ -->
+<!-- ═══ HOME ═══ -->
 <div id="screen-home" class="screen">
 
   <!-- Sticky nav -->
@@ -1475,41 +1937,33 @@
     <a href="https://www.amirardekani.com" target="_blank" rel="noopener" class="home-brand">
       <strong>AmirArdekani</strong>.com
     </a>
-    <div class="home-pills" id="homePills"></div>
   </div>
 
-  <!-- Intro -->
-  <div class="home-intro">
-    <div class="home-eyebrow" id="home-eyebrow"></div>
-    <div class="home-name" id="home-name"></div>
-    <div class="home-meta" id="home-meta"></div>
-    <div id="home-cycle-pill-wrap"></div>
-    <div id="home-progress-wrap"></div>
-    <div id="home-simple-meta-wrap"></div>
-  </div>
+  <!-- Athlete card (avatar + name + goal + dates) -->
+  <div id="athlete-card-wrap"></div>
+
+  <!-- Subscription banner (only when ≤14 days remain) -->
+  <div id="sub-banner-wrap"></div>
+
+  <!-- Cycle hero (big cycle name + tagline) — sits ABOVE the meter -->
+  <div id="cycle-hero-wrap"></div>
+
+  <!-- Cycle meter (segments + C1/C2/C3 labels) -->
+  <div id="cycle-meter-wrap"></div>
+
+  <!-- Simple fallback for athletes without cycles -->
+  <div id="home-simple-meta-wrap" style="padding: 0 24px;"></div>
 
   <!-- Current cycle message (optional) -->
   <div id="current-message-wrap"></div>
 
-  <!-- Next cycle (optional) -->
-  <div id="next-card-wrap"></div>
-
-  <!-- Journey spine (optional) -->
-  <div id="journey-wrap"></div>
-
-  <!-- Bottom CTA — the "Past Programs" button is only shown when the athlete has programHistory -->
-  <div class="home-bottom-cta has-three" id="home-bottom-cta">
-    <button class="home-cta cta-main" onclick="goTo('program')">Current Program</button>
-    <button class="home-cta cta-notes" onclick="goTo('notes')">Notes</button>
-    <button class="home-cta cta-guide" onclick="goTo('guide')">App Guide</button>
-    <button class="home-cta cta-history" id="cta-past-programs" onclick="openFirstArchive()" style="display:none">Past Programs</button>
-  </div>
+  <!-- All future cycles (next + upcoming), unified layout -->
+  <div id="upcoming-wrap"></div>
 
 </div>
 
 <!-- ═══ ARCHIVE ═══ -->
 <div id="screen-archive" class="screen">
-  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span></div>
   <div class="archive-banner" id="archive-banner" data-watermark="">
     <div class="archive-label">Completed</div>
     <div class="archive-title" id="archive-title"></div>
@@ -1519,34 +1973,24 @@
 
 <!-- ═══ CURRENT PROGRAM ═══ -->
 <div id="screen-program" class="screen">
-  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span><button class="dark-toggle" onclick="toggleDark(event)">🌙</button></div>
   <div class="prog-header">
-    <div class="prog-eyebrow" id="prog-eyebrow"></div>
-    <div class="prog-title">Training</div>
-    <div class="prog-subtitle" id="prog-subtitle"></div>
+    <button class="dark-toggle" onclick="toggleDark(event)" style="position:absolute;top:14px;right:14px;">🌙</button>
+    <!-- Cycle hero: "C2 · Strength Engine" + tagline (filled by renderProgram) -->
+    <div class="prog-cycle-hero" id="prog-cycle-hero"></div>
     <div class="day-tabs" id="day-tabs"></div>
   </div>
   <div id="day-panels"></div>
   <div class="v-progress" id="v-progress"><div class="v-progress-fill" id="v-fill"></div></div>
-  <div class="bottom-nav" id="nav-program">
-    <button class="nav-item active" onclick="goTo('program')"><span class="nav-icon">💪</span><span class="nav-label">Program</span></button>
-    <button class="nav-item" onclick="goTo('notes')"><span class="nav-icon">📋</span><span class="nav-label">Notes</span></button>
-  </div>
 </div>
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
-  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span></div>
   <div class="notes-header">
     <div class="prog-eyebrow" id="notes-greeting"></div>
     <div class="notes-title">Notes &amp;<br>Details</div>
     <div class="notes-subtitle">Read these before your first session</div>
   </div>
   <div id="notes-container" style="padding: 20px 0 100px;"></div>
-  <div class="bottom-nav" id="nav-notes">
-    <button class="nav-item" onclick="goTo('program')"><span class="nav-icon">💪</span><span class="nav-label">Program</span></button>
-    <button class="nav-item active" onclick="goTo('notes')"><span class="nav-icon">📋</span><span class="nav-label">Notes</span></button>
-  </div>
 </div>
 
 <!-- ═══ APP GUIDE ═══ static how-to-use page, same for every client -->
@@ -1659,6 +2103,27 @@
   </div>
 </div>
 
+<!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Always visible across Home / Program / Notes / Archive.
+     Icons are inline SVGs (line-art) so they inherit currentColor and look crisp at any size. -->
+<div class="global-tabs is-hidden" id="global-tabs">
+  <button class="nav-item" data-tab="home" onclick="goTo('home')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1z"/></svg></span>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-item" data-tab="program" onclick="goTo('program')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6M6 5v14M18 5v14M21 9v6M6 12h12"/></svg></span>
+    <span class="nav-label">Program</span>
+  </button>
+  <button class="nav-item" data-tab="notes" onclick="goTo('notes')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5zM16 4v4h4M8 13h8M8 17h5"/></svg></span>
+    <span class="nav-label">Notes</span>
+  </button>
+  <button class="nav-item" data-tab="archive" onclick="goTo('archive')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v4H3zM5 9v11h14V9M9 13h6"/></svg></span>
+    <span class="nav-label">Archive</span>
+  </button>
+</div>
+
 <!-- ═══ TIMER ═══ -->
 <div class="timer-overlay" id="timerOverlay">
   <div class="timer-exercise-name" id="timer-exercise-name"></div>
@@ -1748,6 +2213,14 @@ function getVideoUrl(ex) {
   setTimeout(() => {
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('screen-home').classList.add('active');
+    // Reveal the global tab bar and mark Home as the active tab on first load
+    const tabs = document.getElementById('global-tabs');
+    if (tabs) {
+      tabs.classList.remove('is-hidden');
+      tabs.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.toggle('active', n.dataset.tab === 'home');
+      });
+    }
   }, 300);
 })();
 
@@ -1778,43 +2251,105 @@ function renderHome() {
     return 'locked';
   };
 
-  // ── Eyebrow (the 6-month goal/purpose pill above the name)
-  document.getElementById('home-eyebrow').textContent =
-    (DATA.sport && DATA.sport.badge) ? DATA.sport.badge : 'Program';
+  // Format an ISO date ("2024-04-28") into "APR 28". Returns '' on failure so
+  // we just hide the dates row when the schema field is missing or malformed.
+  const fmtDate = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    return `${months[d.getMonth()]} ${d.getDate()}`;
+  };
 
-  // ── Athlete name
-  document.getElementById('home-name').innerHTML =
-    `${esc(a.firstName)}<span>${esc(a.lastName)}</span>`;
+  // Days remaining until a date string (returns null if the date is missing/invalid)
+  const daysUntil = (iso) => {
+    if (!iso) return null;
+    const end = new Date(iso);
+    if (isNaN(end)) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    return Math.round((end - today) / 86400000);
+  };
 
-  // ── Meta — coach line is built-in for all clients (no longer pulled from JSON)
-  document.getElementById('home-meta').innerHTML = `<strong>Coach:</strong> Amir Ardekani`;
+  // ── ATHLETE CARD (avatar + name + goal + cycle X/Y · dates) ──────
+  const initials = (a.firstName || ' ').charAt(0).toUpperCase() + (a.lastName || ' ').charAt(0).toUpperCase();
+  const avatarInner = a.avatar
+    ? `<img src="${esc(a.avatar)}" alt="${esc(a.firstName)} ${esc(a.lastName)}">`
+    : `<div class="athlete-avatar-initials">${esc(initials)}</div>`;
+  const goalText = (DATA.sport && DATA.sport.badge) ? esc(DATA.sport.badge) : '';
 
-  // ── Current cycle pill (only if there is a current cycle)
+  // Dates string (e.g. "APR 28 — JUN 1") — only built if cycle has start/end
+  let datesText = '';
   if (current) {
-    document.getElementById('home-cycle-pill-wrap').innerHTML = `
-      <span class="home-phase-chip">
-        <span class="live-dot"></span>
-        ${current.num != null ? 'Cycle ' + current.num + ' — ' : ''}${esc(current.name)}
-      </span>`;
+    const s = fmtDate(current.startDate);
+    const e = fmtDate(current.endDate);
+    if (s && e) datesText = `${s} — ${e}`;
+    else if (s)  datesText = `Starts ${s}`;
+    else if (e)  datesText = `Ends ${e}`;
+  }
+  // Cycle X / Y is shown as the segmented meter below — no need to repeat it
+  // here. Just show the dates if available.
+  document.getElementById('athlete-card-wrap').innerHTML = `
+    <div class="athlete-card">
+      <div class="athlete-card-row">
+        <div class="athlete-avatar">${avatarInner}</div>
+        <div class="athlete-card-name">
+          <div class="home-name">${esc(a.firstName)}<span>${esc(a.lastName)}</span></div>
+        </div>
+      </div>
+      ${goalText ? `<div class="athlete-card-detail">${goalText}</div>` : ''}
+      ${datesText ? `<div class="athlete-card-dates">${datesText}</div>` : ''}
+    </div>`;
+
+  // ── SUBSCRIPTION BANNER (only when ≤14 days remain in current cycle) ──
+  if (current && current.endDate) {
+    const days = daysUntil(current.endDate);
+    if (days !== null && days >= 0 && days <= 14) {
+      const endStr = fmtDate(current.endDate);
+      const daysLabel = days === 1 ? 'day' : 'days';
+      document.getElementById('sub-banner-wrap').innerHTML = `
+        <div class="sub-banner">
+          <div class="sub-banner-dot"></div>
+          <div class="sub-banner-text"><strong>${days} ${daysLabel}</strong> left in cycle · ends ${endStr}</div>
+        </div>`;
+    }
   }
 
-  // ── Progress bar + top nav pills (only if there are cycles)
+  // ── Cycle hero (cycle name + weeks + tagline) — sits above the cycle meter.
+  // The C-badge for the current cycle lives next to "CYCLE PLAN" in the message card.
+  if (current) {
+    let heroHtml = `<div class="cycle-hero"><div class="cycle-hero-head">`;
+    heroHtml += `<div class="cycle-hero-title">${esc(current.name)}</div>`;
+    if (current.weeks) {
+      heroHtml += `<div class="cycle-hero-weeks">${esc(current.weeks)}</div>`;
+    }
+    heroHtml += `</div>`;
+    if (current.tagline) {
+      heroHtml += `<div class="cycle-hero-tagline">${esc(current.tagline)}</div>`;
+    }
+    heroHtml += `</div>`;
+    document.getElementById('cycle-hero-wrap').innerHTML = heroHtml;
+  }
+
+  // ── NEW CYCLE METER (segments + C1/C2/C3 labels) ───────────────────
   if (hasCycles) {
     const total = cycles.length;
-    const progressPct = ((idx + 0.5) / total) * 100;
-    document.getElementById('home-progress-wrap').innerHTML = `
-      <div class="home-progress">
-        <div class="home-progress-bar">
-          <div class="home-progress-fill" style="width: ${progressPct}%"></div>
-        </div>
-        <div class="home-progress-label">${idx + 1} of ${total} cycles</div>
-      </div>`;
-
-    const pills = cycles.map((c, i) => {
-      const cls = statusOf(i);
-      return `<div class="home-pill ${cls}" data-label="${esc(c.name)}" data-num="${c.num}"></div>`;
+    const segs = cycles.map((_, i) => {
+      const status = statusOf(i);
+      const cls = status === 'completed' ? 'done' : status === 'active' ? 'current' : '';
+      return `<div class="cycle-meter-seg ${cls}"></div>`;
     }).join('');
-    document.getElementById('homePills').innerHTML = pills;
+    const labels = cycles.map((_, i) => {
+      const status = statusOf(i);
+      const cls = status === 'completed' ? 'done' : status === 'active' ? 'current' : '';
+      return `<div class="cycle-meter-label ${cls}">C${i+1}</div>`;
+    }).join('');
+    document.getElementById('cycle-meter-wrap').innerHTML = `
+      <div class="cycle-meter">
+        <div class="cycle-meter-bars">${segs}</div>
+        <div class="cycle-meter-labels">${labels}</div>
+      </div>`;
   } else {
     // Simple fallback for athletes without any cycles defined
     const label = DATA.workouts && DATA.workouts.label;
@@ -1827,14 +2362,16 @@ function renderHome() {
   }
 
   // ── Current cycle message card (renders if the current cycle has any rich content)
+  // Cycle name, tagline AND weeks are NOT rendered here — they live in the cycle-hero
+  // above the cycle meter. The card shows the C-badge + "CYCLE PLAN" header, then
+  // paragraphs + focuses + outcomes.
   if (current && (current.message || (current.focuses && current.focuses.length))) {
+    const cmNum = (current.num != null) ? `C${current.num}` : '';
     let html = `<div class="current-message">`;
-    html += `<div class="cm-eyebrow">● CURRENT CYCLE · NOW</div>`;
-    html += `<div class="cm-header">`;
-    html += `<div class="cm-title">${esc(current.name)}</div>`;
-    if (current.weeks) html += `<div class="cm-weeks">${esc(current.weeks)}</div>`;
+    html += `<div class="cm-head">`;
+    if (cmNum) html += `<div class="cm-num">${cmNum}</div>`;
+    html += `<div class="cm-eyebrow">CYCLE PLAN</div>`;
     html += `</div>`;
-    if (current.tagline) html += `<div class="cm-subtitle">${esc(current.tagline)}</div>`;
 
     // Flexible focus list (unlimited)
     if (Array.isArray(current.focuses) && current.focuses.length) {
@@ -1869,106 +2406,54 @@ function renderHome() {
     document.getElementById('current-message-wrap').innerHTML = html;
   }
 
-  // ── Next cycle teaser (uses the cycle right after the current one)
-  if (next) {
-    const teaser = next.teaser || {};
-    let html = `<div class="next-card-wrap"><div class="next-card">`;
-    const labelBits = ['COMING NEXT'];
-    if (next.num != null) labelBits.push('CYCLE ' + String(next.num).padStart(2, '0'));
-    if (next.weeks) labelBits.push(esc(next.weeks).toUpperCase());
-    html += `<div class="next-label">${labelBits.join(' · ')}</div>`;
-    if (next.name) html += `<div class="next-title">${esc(next.name)}</div>`;
-    if (teaser.subtitle) html += `<div class="next-subtitle">${esc(teaser.subtitle)}</div>`;
-    if (Array.isArray(teaser.paragraphs) && teaser.paragraphs.length) {
-      html += `<div class="next-teaser">`;
-      teaser.paragraphs.forEach((para, i) => {
-        // Last paragraph wraps in em (kept for visual consistency)
-        if (i === teaser.paragraphs.length - 1 && teaser.paragraphs.length > 1) {
-          html += `<p><em>${esc(para)}</em></p>`;
-        } else {
-          html += `<p>${esc(para)}</p>`;
-        }
-      });
-      html += `</div>`;
-    }
-    html += `</div></div>`;
-    document.getElementById('next-card-wrap').innerHTML = html;
-  }
-
-  // ── Remaining phases — everything after the next cycle
-  const remaining = cycles.slice(idx + 2);
-  if (remaining.length) {
-    let html = `<div class="section-header">Remaining Phases</div>`;
-    html += `<div class="journey">`;
-    remaining.forEach((c, ri) => {
-      const realIndex = idx + 2 + ri;       // position in original cycles[]
-      const status = statusOf(realIndex);   // 'locked' or 'completed'
-      const statusClass = `is-${status}`;
-
-      let badge = '';
-      if (status === 'completed') badge = '<span class="phase-badge badge-completed">✓ DONE</span>';
-
-      let extra = '';
-      if (status === 'locked') extra = `<div class="locked-hint">🔒 This cycle unlocks when you arrive</div>`;
-
+  // ── All future cycles — one unified list, same layout for every card.
+  // Each card mirrors the current cycle's content shape: C-badge + name + weeks +
+  // tagline + numbered focuses + (optional) teaser paragraphs.
+  const future = cycles.slice(idx + 1);
+  if (future.length) {
+    let html = `<div class="upcoming-section">`;
+    html += `<div class="upcoming-section-label">What's next</div>`;
+    future.forEach((c) => {
       const focuses = Array.isArray(c.focuses) ? c.focuses : [];
-      const focusBlock = focuses.map(f => `
-        <div class="detail-focus">
-          <div class="detail-focus-text">${esc(f)}</div>
-        </div>`).join('');
+      const planList = focuses.length
+        ? `<ol class="upcoming-card-plan">${focuses.map(f => `<li>${esc(f)}</li>`).join('')}</ol>`
+        : '';
 
+      // Optional teaser paragraphs (mainly used on the immediate-next cycle).
+      // Last paragraph wraps in <em> when there are 2+ paragraphs (preserves the
+      // original italic-final-line style the teaser used to have).
+      const teaser = c.teaser || {};
+      const teaserParas = Array.isArray(teaser.paragraphs) ? teaser.paragraphs : [];
+      let teaserBlock = '';
+      if (teaserParas.length) {
+        teaserBlock = `<div class="upcoming-card-teaser">`;
+        teaserParas.forEach((para, i) => {
+          if (i === teaserParas.length - 1 && teaserParas.length > 1) {
+            teaserBlock += `<p><em>${esc(para)}</em></p>`;
+          } else {
+            teaserBlock += `<p>${esc(para)}</p>`;
+          }
+        });
+        teaserBlock += `</div>`;
+      }
+
+      const badge = c.num != null ? `C${c.num}` : '';
       html += `
-        <div class="phase-row ${statusClass}" data-phase="${c.num}">
-          <div class="phase-dot-wrap"><div class="phase-dot ${status}"></div></div>
-          <div class="phase-content">
-            <div class="phase-header">
-              <div class="phase-big-num">${c.num}</div>
-              <div class="phase-title-group">
-                <div class="phase-name-row">
-                  <div class="phase-name">${esc(c.name)}</div>
-                  ${badge}
-                </div>
-                ${c.tagline ? `<div class="phase-tagline">${esc(c.tagline)}</div>` : ''}
-                ${c.weeks ? `<div class="phase-weeks">${esc(c.weeks)}</div>` : ''}
-              </div>
+        <div class="upcoming-card">
+          <div class="upcoming-card-num">${badge}</div>
+          <div class="upcoming-card-body">
+            <div class="upcoming-card-head">
+              <div class="upcoming-card-title">${esc(c.name)}</div>
+              ${c.weeks ? `<div class="upcoming-card-weeks">${esc(c.weeks)}</div>` : ''}
             </div>
-            ${focuses.length ? `<div class="expand-hint"><span class="arrow">→</span> Tap to explore focus</div>` : ''}
-            <div class="phase-detail">
-              ${focusBlock}
-              ${extra}
-            </div>
+            ${c.tagline ? `<div class="upcoming-card-tagline">${esc(c.tagline)}</div>` : ''}
+            ${planList}
+            ${teaserBlock}
           </div>
         </div>`;
     });
     html += `</div>`;
-    document.getElementById('journey-wrap').innerHTML = html;
-
-    // Attach expand handlers
-    document.querySelectorAll('.phase-row').forEach(row => {
-      row.addEventListener('click', () => {
-        const was = row.classList.contains('expanded');
-        document.querySelectorAll('.phase-row.expanded').forEach(r => r.classList.remove('expanded'));
-        if (!was) row.classList.add('expanded');
-      });
-    });
-  }
-
-  // ── Past programs (archives) — reveal the "Past Programs" button in the bottom CTA bar
-  // The bar now has 3 fixed buttons (Current / Notes / App Guide) so showing Past Programs
-  // makes 4 total — switch to the 2-row 'has-four' layout in that case.
-  if (DATA.programHistory && DATA.programHistory.length) {
-    const pastBtn = document.getElementById('cta-past-programs');
-    if (pastBtn) pastBtn.style.display = '';
-    const cta = document.getElementById('home-bottom-cta');
-    cta.classList.remove('has-three');
-    cta.classList.add('has-four');
-  }
-}
-
-// Opens the most recent archived program (first entry of programHistory)
-function openFirstArchive() {
-  if (DATA.programHistory && DATA.programHistory.length) {
-    goTo('archive', DATA.programHistory[0].id);
+    document.getElementById('upcoming-wrap').innerHTML = html;
   }
 }
 
@@ -1977,20 +2462,36 @@ function openFirstArchive() {
 // ═══════════════════════════════════════════════════════════════════════
 function renderProgram() {
   const w = DATA.workouts || { days: [] };
-  const a = DATA.athlete;
 
-  document.getElementById('prog-eyebrow').textContent = w.label || '';
-  document.getElementById('prog-subtitle').textContent =
-    `Designed for ${a.firstName} ${a.lastName} by Amir Ardekani`;
+  // Cycle hero in the program header — same content as the home page hero.
+  // Format: "C2 · STRENGTH ENGINE" + italic purple tagline below.
+  const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
+  const cIdx   = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const cur    = cycles[cIdx];
+  const heroEl = document.getElementById('prog-cycle-hero');
+  if (heroEl) {
+    if (cur) {
+      const badge = (cur.num != null) ? `C${cur.num}` : '';
+      let html = `<div class="prog-cycle-row">`;
+      if (badge) html += `<div class="prog-cycle-badge">${badge}</div>`;
+      html += `<div class="prog-cycle-title">${esc(cur.name || '')}</div>`;
+      html += `</div>`;
+      if (cur.tagline) html += `<div class="prog-cycle-tagline">${esc(cur.tagline)}</div>`;
+      heroEl.innerHTML = html;
+    } else {
+      // Fallback for athletes without cycle data — show the program label.
+      heroEl.innerHTML = `<div class="prog-cycle-title">${esc(w.label || 'Training')}</div>`;
+    }
+  }
 
   const days = w.days || [];
   dayTotals = {};
 
   const tabsHtml = days.map((day, i) => {
-    const total = countExercises(day);
+    const total = countTotalUnits(day);
     dayTotals[String(day.id)] = total;
     return `<button class="day-tab${i === 0 ? ' active' : ''}"
-      onclick="switchDay(${day.id})">Day ${day.id}
+      onclick="switchDay(${day.id})">D${day.id}
       <span class="tab-progress-pill" id="pill-${day.id}">0/${total}</span>
     </button>`;
   }).join('');
@@ -2055,6 +2556,25 @@ function countExercises(day) {
   return count;
 }
 
+// Set-based total: each standard exercise contributes its set count, while
+// circuits and simple exercises count as 1 unit each. The session bar fills
+// proportionally as each individual set is checked, so partial completion
+// (e.g. 2 of 4 sets) still shows progress.
+function countTotalUnits(day) {
+  let total = 0;
+  (day.blocks || []).forEach(b => {
+    (b.exercises || []).forEach(ex => {
+      if (ex.type === 'standard') {
+        const parsed = parseChips(ex.chips);
+        total += (parseInt(parsed.sets, 10) || 1);
+      } else {
+        total += 1;
+      }
+    });
+  });
+  return total;
+}
+
 // Map a block.title (e.g. "Strength", "Warm-Up", "Plyometrics") to a stripe color class.
 // If the title doesn't match any known keyword, fall back to cycling through the three
 // colors by block index so ANY new block type still gets a stripe and the design stays
@@ -2069,49 +2589,215 @@ function blockCategory(title, blockIndex) {
   return fallback[(blockIndex || 0) % fallback.length];
 }
 
-// Build a chip from { label, style } — original behavior, no auto-styling
+// Build a chip from { label, style } — used by renderRoundCues fallback.
 function chipHtml(c) {
   return `<span class="chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`;
+}
+
+// Convert a duration string into seconds. Handles "2 min", "2m", "90 sec",
+// "90s", "1:30", or a bare number (assumed seconds). Returns null on failure.
+function parseDurationToSec(text) {
+  const t = String(text || '').trim().toLowerCase();
+  let m;
+  // "2:30" → 150s
+  m = t.match(/^(\d+):(\d{1,2})$/);
+  if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  // "2 min" / "2min" / "2m"
+  m = t.match(/^(\d+)\s*m(?:in|inutes?)?\b/);
+  if (m) return parseInt(m[1], 10) * 60;
+  // "90 sec" / "90sec" / "90s"
+  m = t.match(/^(\d+)\s*s(?:ec|econds?)?\b/);
+  if (m) return parseInt(m[1], 10);
+  // Bare number → treat as seconds
+  m = t.match(/^(\d+)$/);
+  if (m) return parseInt(m[1], 10);
+  return null;
+}
+
+// Auto-parse the JSON chips into the 5 stats slots + a list of extras.
+// Recognised patterns (case-insensitive):
+//   "3 Sets" | "4 Sets"             → SETS
+//   "×6 Reps", "×10+10", "×5/side"  → REPS (drops the ×, keeps everything after)
+//   "Tempo 3-1-1" | "Tempo 3-1-1-0" → TEMPO
+//   "RPE 7" | "RPE 6–7" | "@8"      → TARGET
+//   "Rest 90 sec" | "Rest 2 min"    → REST (consumed — does NOT end up as a pill)
+// Anything else (e.g. "Priority", "HOLD", "Max Intent", "5 minutes") → extras[]
+function parseChips(chips) {
+  const out = { sets: '', reps: '', target: '', tempo: '', rest: 0, extras: [] };
+  (chips || []).forEach(c => {
+    const label = (c.label || '').trim();
+    let m;
+    // REST — "Rest 2 min" / "Rest 90 sec" / "Rest 1:30"
+    m = label.match(/^rest\s+(.+)/i);
+    if (m) {
+      const secs = parseDurationToSec(m[1]);
+      if (secs && secs > 0) { out.rest = secs; return; }
+    }
+    // SETS
+    m = label.match(/^(\d+)\s*sets?\b/i);
+    if (m) { out.sets = m[1]; return; }
+    // TEMPO
+    m = label.match(/^tempo\s+(.+)/i);
+    if (m) { out.tempo = m[1].trim(); return; }
+    // TARGET (RPE / @)
+    m = label.match(/^rpe\s+(.+)/i);
+    if (m) { out.target = '@' + m[1].trim(); return; }
+    if (/^@/.test(label)) { out.target = label; return; }
+    // REPS (× prefix, or contains "Reps")
+    if (/^×/.test(label)) { out.reps = label.replace(/^×/, '').trim(); return; }
+    if (/reps?$/i.test(label)) { out.reps = label.replace(/\s*reps?$/i, '').trim(); return; }
+    // Anything else — preserve the chip's `style` so "yellow" highlighted ones stand out
+    out.extras.push({ label, style: c.style || '' });
+  });
+
+  // If no REPS were found but one of the extras is a pure duration (e.g. "30s",
+  // "30 sec", "5 minutes", "30s/side", "1:30") — promote it into the REPS slot
+  // so time-based exercises display the duration where reps would normally go.
+  if (!out.reps) {
+    for (let i = 0; i < out.extras.length; i++) {
+      if (isPureDuration(out.extras[i].label)) {
+        out.reps = out.extras[i].label;
+        out.extras.splice(i, 1);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
+// Strict duration check: matches plain time labels only, NOT compound labels
+// like "30s Hard RPE 6-7" (those stay in extras as descriptors).
+//   "30s", "30 sec", "30 seconds", "1 min", "5 minutes", "1:30",
+//   "30s/side", "30 sec each", "20m/side"
+function isPureDuration(label) {
+  const t = String(label || '').trim();
+  if (/^\d+:\d+$/.test(t)) return true;
+  return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?(?:side|leg|each(?:\s+\w+)?))?$/i.test(t);
+}
+
+// Renders the 5-cell stats grid: SETS · REPS · TARGET RPE · TEMPO · REST.
+// Target RPE values are formatted as "X/10" (e.g. "7/10", "6-7/10").
+function renderStatsGrid(parsed, restSec) {
+  const restStr = formatRestLabel(restSec) || '—';
+  // Strip the leading "@" added by parseChips, then append "/10" so the value
+  // reads as "7/10" instead of "@7" or just "7".
+  const targetVal = parsed.target
+    ? parsed.target.replace(/^@/, '').trim() + '/10'
+    : '—';
+  const cells = [
+    { label: 'SETS',       value: parsed.sets   || '—', cls: parsed.sets   ? '' : 'dim' },
+    { label: 'REPS',       value: parsed.reps   || '—', cls: parsed.reps   ? '' : 'dim' },
+    { label: 'TARGET RPE', value: targetVal,            cls: 'target ' + (parsed.target ? '' : 'dim') },
+    { label: 'TEMPO',      value: parsed.tempo  || '—', cls: 'tempo '  + (parsed.tempo  ? '' : 'dim') },
+    { label: 'REST',       value: restStr,              cls: '' },
+  ];
+  return `<div class="ex-stats-grid">${cells.map(c => `
+    <div class="ex-stat ${c.cls}">
+      <div class="ex-stat-label">${c.label}</div>
+      <div class="ex-stat-value">${esc(c.value)}</div>
+    </div>`).join('')}</div>`;
+}
+
+// Stat pills for the collapsed row — each stat is its own small rounded pill.
+// "4×6"  ·  "7/10"  ·  "⏱ 2m" — sized to be glanceable but not loud.
+function renderExSummary(parsed, restSec) {
+  const pills = [];
+  if (parsed.sets && parsed.reps) pills.push(`${parsed.sets}×${parsed.reps}`);
+  else if (parsed.reps)            pills.push(parsed.reps);
+  if (parsed.target) {
+    pills.push(parsed.target.replace(/^@/, '').trim() + '/10');
+  }
+  if (restSec > 0)   pills.push(`⏱ ${formatRestLabel(restSec)}`);
+  if (!pills.length && parsed.extras.length) {
+    parsed.extras.forEach(e => pills.push(e.label));
+  }
+  if (!pills.length) return '';
+  return `<div class="ex-summary">${pills.map(p =>
+    `<span class="ex-summary-pill">${esc(p)}</span>`
+  ).join('')}</div>`;
+}
+
+// Cues — yellow line for good, red line for bad, no icons. Clean.
+function renderInlineCues(cues) {
+  if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
+  let body = '';
+  (cues.good || []).forEach(c => { body += `<div class="ex-cue">${esc(c)}</div>`; });
+  (cues.bad  || []).forEach(c => { body += `<div class="ex-cue bad">${esc(c)}</div>`; });
+  return `<div class="ex-section-label">Coaching Cues</div><div class="ex-cues">${body}</div>`;
+}
+
+// Big video placeholder — only rendered if the exercise has a video.
+// Click ▶ → loadInlineVideo() replaces the placeholder with a YouTube iframe.
+function renderVideoBlock(url) {
+  if (!url) return '';
+  return `<div class="ex-video" data-url="${esc(url)}">
+    <button type="button" class="ex-video-play" onclick="loadInlineVideo(this);event.stopPropagation();">▶</button>
+  </div>`;
 }
 
 function renderExercise(ex, dayId, num, blockClass) {
   if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass);
 
-  const chipsHtml = (ex.chips || []).map(chipHtml).join('');
-
-  const cuesHtml = renderCues(ex.cues);
-  // Every "standard" exercise gets a rest timer (and the weight log, RPE, note are
-  // attached later by initWeightLogs/initRPE/initNotes via .rest-btn presence).
-  // "simple" exercises (warm-ups, cool-downs) never get rest. The legacy `hasRest`
-  // field is no longer needed — type alone decides.
   const isStandard = ex.type === 'standard';
-  const restSec = (typeof ex.restSec === 'number' && ex.restSec > 0) ? ex.restSec : 120;
+  const parsed = parseChips(ex.chips);
+  // Rest priority: explicit ex.restSec → "Rest X" chip → 120s default for standard
+  const restSec = (typeof ex.restSec === 'number' && ex.restSec > 0)
+    ? ex.restSec
+    : (parsed.rest > 0 ? parsed.rest : (isStandard ? 120 : 0));
   const _vid = getVideoUrl(ex);
-  const playBtn = _vid
-    ? `<button class="play-btn" onclick="handlePlayVideo('${_vid}');event.stopPropagation();">▶</button>`
-    : '';
-  const actions = playBtn ? `<div class="item-actions">${playBtn}</div>` : '';
 
-  // Bottom area: cues toggle (if any) + rest button (for standard). Same place as before.
-  let restBlock = '';
-  if (cuesHtml || isStandard) {
-    restBlock = `<div class="item-rest">${cuesHtml}`;
-    if (isStandard) restBlock += `<div class="rest-row"><button class="rest-btn" data-rest="${restSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(restSec)}</button></div>`;
-    restBlock += `</div>`;
+  const summary    = renderExSummary(parsed, restSec);
+  const videoBlock = renderVideoBlock(_vid);
+  // Skip the stats grid entirely if there are no main stats (simple warm-ups
+  // with just a duration chip).
+  const hasGridData = parsed.sets || parsed.reps || parsed.target || parsed.tempo || restSec > 0;
+  const statsGrid  = hasGridData ? renderStatsGrid(parsed, restSec) : '';
+  // Extras (HOLD / Priority / Max Intent / etc.) sit DIRECTLY ABOVE the stats
+  // grid so they read as part of the same headline block. Yellow-tinted strip
+  // makes them eye-catching.
+  const extrasHtml = parsed.extras.length
+    ? `<div class="ex-extra-chips">${parsed.extras.map(c =>
+         `<span class="ex-extra-chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`).join('')}</div>`
+    : '';
+  const cuesHtml   = renderInlineCues(ex.cues);
+  // Glue extras + grid together so they look like one block visually
+  const statsBlock = (extrasHtml || statsGrid)
+    ? `<div class="ex-stats-block">${extrasHtml}${statsGrid}</div>`
+    : '';
+
+  // The log section is only meaningful for "standard" exercises (the ones that
+  // get rest, weight, RPE). Simple warm-ups skip it.
+  let logBlock = '';
+  if (isStandard) {
+    logBlock = `<div class="ex-section-label">Log Sets</div><div class="ex-log"></div>`;
   }
 
-  const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
+  // Rest button — sits at the bottom of the detail, only for standard exercises
+  const restBottom = isStandard
+    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${restSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(restSec)}</button></div>`
+    : '';
 
-  return `<div class="checklist-item ${blockClass}" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
-    <div class="item-main">
-      <div class="check-box"></div>
+  const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
+  // Sets count drives how many rows the per-set log will render.
+  // Falls back to 1 if the chip didn't have a "X Sets" entry.
+  const setsCount = parseInt(parsed.sets, 10) || 1;
+
+  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}">
+    <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
+      <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
         <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
-        ${chipsHtml ? `<div class="item-chips">${chipsHtml}</div>` : ''}
+        ${summary}
       </div>
-      ${actions}
+      <div class="ex-chevron">▾</div>
     </div>
-    ${restBlock}
+    <div class="ex-detail">
+      ${videoBlock}
+      ${statsBlock}
+      ${cuesHtml}
+      ${logBlock}
+      ${restBottom}
+    </div>
   </div>`;
 }
 
@@ -2132,33 +2818,124 @@ function renderCircuit(ex, dayId, num, blockClass) {
   }).join('');
 
   const _vid = getVideoUrl(ex);
-  const playBtn = _vid
-    ? `<button class="play-btn" onclick="handlePlayVideo('${_vid}');event.stopPropagation();">▶</button>`
+  const videoBlock = renderVideoBlock(_vid);
+
+  // Circuits don't fit the standard 5-cell grid (no sets/reps/tempo/rpe), so we
+  // surface the rounds string + rest as the headline info.
+  // Rest priority: ex.restSec → "Rest X" chip → 60s default for circuits
+  const _parsedC = parseChips(ex.chips);
+  const circuitRestSec = (typeof ex.restSec === 'number' && ex.restSec > 0)
+    ? ex.restSec
+    : (_parsedC.rest > 0 ? _parsedC.rest : 60);
+  // Render the same .ex-summary-pill style used on standard exercises so the
+  // collapsed circuit row reads consistently.
+  const summaryPills = [];
+  if (ex.rounds)         summaryPills.push(ex.rounds);
+  if (circuitRestSec)    summaryPills.push(`⏱ ${formatRestLabel(circuitRestSec)}`);
+  const summary = summaryPills.length
+    ? `<div class="ex-summary">${summaryPills.map(p => `<span class="ex-summary-pill">${esc(p)}</span>`).join('')}</div>`
     : '';
-  const actions = playBtn ? `<div class="item-actions">${playBtn}</div>` : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
-  const roundsChip = `<span class="chip yellow">${esc(ex.rounds)}</span>`;
 
-  // Every circuit always rests AFTER all sub-exercises are finished.
-  // restSec from JSON wins; otherwise default to 60s for circuits (vs 120s for
-  // standard exercises) since circuits are usually conditioning/mobility.
-  const circuitRestSec = (typeof ex.restSec === 'number' && ex.restSec > 0) ? ex.restSec : 60;
-  const circuitRestBlock =
-    `<div class="item-rest"><div class="rest-row"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div></div>`;
+  // Rest button at the bottom of the detail
+  const restBottom = `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`;
 
-  return `<div class="checklist-item round-group ${blockClass}" onclick="toggleCheck(this,'${dayId}')" data-day="${dayId}">
-    <div class="item-main">
-      <div class="check-box"></div>
+  return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}">
+    <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
+      <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
         <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
-        <div class="item-chips">${roundsChip}</div>
-        <div class="round-list">${roundsHtml}</div>
+        ${summary}
       </div>
-      ${actions}
+      <div class="ex-chevron">▾</div>
     </div>
-    ${circuitRestBlock}
+    <div class="ex-detail">
+      ${videoBlock}
+      <div class="ex-circuit-meta">
+        <div class="ex-stat">
+          <div class="ex-stat-label">Rounds</div>
+          <div class="ex-stat-value">${esc(ex.rounds || '—')}</div>
+        </div>
+        <div class="ex-stat">
+          <div class="ex-stat-label">Rest</div>
+          <div class="ex-stat-value">${esc(formatRestLabel(circuitRestSec) || '—')}</div>
+        </div>
+      </div>
+      <div class="ex-section-label">Rounds</div>
+      <div class="round-list">${roundsHtml}</div>
+      <div class="ex-section-label">Log</div>
+      <div class="ex-log"></div>
+      ${restBottom}
+    </div>
   </div>`;
+}
+
+// Tap on the row body (anywhere except inputs/buttons) → toggle expand/collapse.
+function onExerciseRowTap(ev, item, day) {
+  // Don't toggle if the user actually tapped a button/input/details inside the row
+  if (ev.target.closest('details, .weight-log, .rpe-row, .play-btn, .rest-btn, .check-box, button, input, textarea')) return;
+  toggleExpand(item);
+}
+
+// Tap on the check circle → toggle completion (existing behavior)
+function onCheckBoxTap(ev, item, day) {
+  ev.stopPropagation();
+  toggleCheckOnly(item, day);
+}
+
+// The row-level check circle is a shortcut: tapping it marks ALL sets done
+// (or undone). Per-set checks below also feed back into this same .checked state.
+// For circuits + simple exercises (no per-set log), behaves like a plain toggle.
+function toggleCheckOnly(item, day) {
+  if (navigator.vibrate) navigator.vibrate(15);
+  const isStandardWithSets = item.dataset.sets && !item.classList.contains('round-group');
+  if (isStandardWithSets) {
+    const willBeChecked = !item.classList.contains('checked');
+    setAllSetsDone(item, willBeChecked);
+    item.classList.toggle('checked', willBeChecked);
+  } else {
+    item.classList.toggle('checked');
+    const rpeRow = item.querySelector('.rpe-row');
+    if (rpeRow) rpeRow.classList.toggle('visible', item.classList.contains('checked'));
+    // Simple items (no RPE): auto-collapse on check, expand on uncheck.
+    if (item.classList.contains('checked') && !rpeRow) item.classList.add('collapsed');
+    if (!item.classList.contains('checked'))           item.classList.remove('collapsed');
+  }
+  saveState();
+  updateProgress(day);
+}
+
+// Toggle the .collapsed class (expand/collapse)
+function toggleExpand(item) {
+  item.classList.toggle('collapsed');
+}
+
+// Replace the video placeholder with a YouTube iframe (inline playback).
+// Supports common YouTube URL shapes: youtu.be/ID, youtube.com/watch?v=ID
+function loadInlineVideo(btn) {
+  const wrap = btn.closest('.ex-video');
+  if (!wrap || wrap.classList.contains('playing')) return;
+  const url = wrap.getAttribute('data-url') || '';
+  let id = '';
+  let m = url.match(/[?&]v=([\w-]+)/);
+  if (m) id = m[1];
+  if (!id) {
+    m = url.match(/youtu\.be\/([\w-]+)/);
+    if (m) id = m[1];
+  }
+  if (!id) {
+    // Unknown URL shape — fall back to opening in a new tab so the user still
+    // has access to the video. (The existing video modal could also be used.)
+    window.open(url, '_blank');
+    return;
+  }
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  iframe.allowFullscreen = true;
+  wrap.appendChild(iframe);
+  wrap.classList.add('playing');
 }
 
 // Tiny helper: turns 90 -> "90s", 120 -> "2m", 150 -> "2:30"
@@ -2191,15 +2968,14 @@ function renderCues(cues) {
   return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
 }
 
-// Round cues use the same details.cues styling as the main exercise cues so
-// every "Cues" toggle in the app looks and behaves identically.
+// Round cues — same yellow/red accent-line design as standard exercise cues.
+// Always visible inside the expanded circuit (no collapse).
 function renderRoundCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
   let body = '';
-  (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
-  (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
-  const summary = `<summary><svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>Cues</summary>`;
-  return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
+  (cues.good || []).forEach(c => { body += `<div class="ex-cue">${esc(c)}</div>`; });
+  (cues.bad  || []).forEach(c => { body += `<div class="ex-cue bad">${esc(c)}</div>`; });
+  return `<div class="round-cues">${body}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -2228,12 +3004,22 @@ function renderArchive(programId) {
 //  5. RENDER: NOTES (unchanged)
 // ═══════════════════════════════════════════════════════════════════════
 function renderNotes() {
-  const notes = DATA.notes;
-  if (!notes) return;
+  const notes = DATA.notes || {};
+  const greetingEl = document.getElementById('notes-greeting');
+  if (greetingEl) greetingEl.textContent = notes.greeting || '';
 
-  document.getElementById('notes-greeting').textContent = notes.greeting;
+  // App Guide launcher — shown at the top of the Notes screen as a tappable card
+  // (replaces the App Guide button that used to live in the home bottom CTA bar)
+  const guideCard = `
+    <div class="note-card guide-launch-card" onclick="goTo('guide')">
+      <div class="note-card-header">
+        <div class="note-icon">📖</div>
+        <div class="note-card-title">App Guide — How to use this app</div>
+        <span class="note-chevron" style="transform: rotate(-90deg);">▼</span>
+      </div>
+    </div>`;
 
-  document.getElementById('notes-container').innerHTML = (notes.cards || []).map(card => `
+  const noteCards = (notes.cards || []).map(card => `
     <div class="note-card" onclick="toggleNote(this)">
       <div class="note-card-header">
         <div class="note-icon">${card.icon}</div>
@@ -2242,6 +3028,8 @@ function renderNotes() {
       </div>
       <div class="note-body">${esc(card.body)}</div>
     </div>`).join('');
+
+  document.getElementById('notes-container').innerHTML = guideCard + noteCards;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -2253,14 +3041,37 @@ function goTo(screen, historyId) {
   const id = screen === 'archive' ? 'screen-archive' : 'screen-' + screen;
   document.getElementById(id).classList.add('active');
   document.getElementById('v-progress').classList.toggle('active', screen === 'program');
-  if (screen === 'archive' && historyId) renderArchive(historyId);
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (screen === 'program') {
-    document.querySelectorAll('#nav-program .nav-item:first-child, #nav-notes .nav-item:first-child').forEach(n => n.classList.add('active'));
-  } else if (screen === 'notes') {
-    document.querySelectorAll('#nav-program .nav-item:last-child, #nav-notes .nav-item:last-child').forEach(n => n.classList.add('active'));
+
+  // Archive tab — if no specific historyId requested, show the most recent past program if any
+  if (screen === 'archive') {
+    const list = (DATA.programHistory && DATA.programHistory.length) ? DATA.programHistory : [];
+    const targetId = historyId || (list[0] && list[0].id);
+    if (targetId) renderArchive(targetId);
+    else renderArchiveEmpty();
   }
+
+  // Update the global tab bar's active button
+  document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.tab === screen);
+  });
+
+  // Hide global tabs on the App Guide screen (it has its own back arrow)
+  document.getElementById('global-tabs').classList.toggle('is-hidden', screen === 'guide');
+
   window.scrollTo(0, 0);
+}
+
+// Empty-state for the Archive tab when there are no past programs yet
+function renderArchiveEmpty() {
+  const banner = document.getElementById('archive-banner');
+  const title  = document.getElementById('archive-title');
+  const scroll = document.getElementById('archive-scroll');
+  if (banner) banner.setAttribute('data-watermark', '');
+  if (title)  title.innerHTML = 'No <span>archives</span> yet';
+  if (scroll) scroll.innerHTML = `
+    <div style="padding: 40px 20px; text-align: center; font-family: 'Barlow', sans-serif; color: #888; font-size: 14px; line-height: 1.6;">
+      Past programs will appear here once your first cycle wraps up.
+    </div>`;
 }
 
 function switchDay(n) {
@@ -2273,50 +3084,33 @@ function switchDay(n) {
   window.scrollTo(0, 0);
 }
 
-function toggleCheck(item, day) {
-  if (event && event.target.closest('details, .weight-log, .rpe-row, .play-btn, .rest-btn')) return;
-
-  // If the card is currently collapsed, a tap should expand it (NOT uncheck).
-  // The user can then change their RPE / weight / note, and uncheck via the box.
-  if (item.classList.contains('collapsed')) {
-    item.classList.remove('collapsed');
-    return;
-  }
-
-  item.classList.toggle('checked');
-  // Haptic feedback on phones (ignored by desktop). 15ms = short, premium tap.
-  if (navigator.vibrate) navigator.vibrate(15);
-  const rpeRow = item.querySelector('.rpe-row');
-  if (rpeRow) rpeRow.classList.toggle('visible', item.classList.contains('checked'));
-
-  // For items WITHOUT an RPE row (simple warm-ups), there's nothing left to log,
-  // so collapse immediately on check. Items with RPE collapse later — see selectRPE.
-  if (item.classList.contains('checked') && !rpeRow) {
-    item.classList.add('collapsed');
-  }
-  // If we just unchecked, make sure we're not also collapsed
-  if (!item.classList.contains('checked')) {
-    item.classList.remove('collapsed');
-  }
-
-  saveState();
-  updateProgress(day);
-}
-
+// Set-aware progress: standard exercises contribute one unit per done set,
+// circuits + simple count as 1 if .checked. So 2/4 sets done in Back Squat
+// adds 2 units to the day's done count — partial completion shows on the bar.
 function updateProgress(day) {
   const total = dayTotals[day];
   if (!total) return;
   const items = document.querySelectorAll(`[data-day="${day}"]`);
-  const done  = Array.from(items).filter(i => i.classList.contains('checked')).length;
+  let done = 0;
+  items.forEach(item => {
+    if (item.classList.contains('round-group') || !item.dataset.sets) {
+      // Circuit or simple — 1 unit, counted iff .checked
+      if (item.classList.contains('checked')) done += 1;
+    } else {
+      // Standard — count done sets from the per-set log
+      const name = item.querySelector('.item-name').textContent.trim();
+      const totalSets = parseInt(item.dataset.sets, 10) || 1;
+      const log = loadSetLog(name, totalSets);
+      done += log.filter(s => s.d).length;
+    }
+  });
 
   const pill = document.getElementById('pill-' + day);
   if (pill) {
     pill.textContent = done + '/' + total;
     pill.classList.toggle('complete', done === total);
-    // Brief pulse animation — only on user actions, not during initial restore
     if (!isLoading) {
       pill.classList.remove('pulse');
-      // force reflow so the same animation can replay if the user taps quickly
       void pill.offsetWidth;
       pill.classList.add('pulse');
     }
@@ -2357,7 +3151,25 @@ function markSuggestedDay() {
 }
 
 function resetDay(day) {
-  document.querySelectorAll(`[data-day="${day}"]`).forEach(i => { i.classList.remove('checked'); i.classList.remove('collapsed'); });
+  // Clear UI state for every exercise in this day
+  document.querySelectorAll(`[data-day="${day}"]`).forEach(card => {
+    card.classList.remove('checked');
+    card.classList.add('collapsed');
+    // Clear per-set done flags + RPE in storage AND in the rendered rows.
+    // Weights and the personal note are preserved (same policy as autoReset).
+    if (card.dataset.sets && !card.classList.contains('round-group')) {
+      const name  = card.querySelector('.item-name').textContent.trim();
+      const total = parseInt(card.dataset.sets, 10) || 1;
+      const log = loadSetLog(name, total).map(s => ({ w: s.w || '', r: '', d: false }));
+      saveSetLogValue(name, log);
+      // Refresh the rendered set rows
+      card.querySelectorAll('.ex-set-row').forEach((row, i) => {
+        row.classList.remove('done');
+        row.querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
+      });
+    }
+  });
+  // Hide RPE row indicator (used by circuits + simple exercises)
   document.querySelectorAll(`[data-day="${day}"] .rpe-row`).forEach(r => r.classList.remove('visible'));
   document.getElementById('confirm-'  + day).classList.remove('visible');
   document.getElementById('complete-' + day).classList.remove('visible');
@@ -2392,11 +3204,22 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_daynote_' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_srpe_'    + day.id);
       localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
-      // Per-exercise RPE for this day's exercises (weights + notes are kept on purpose)
+      // Per-exercise RPE + per-set RPE/done for this day's exercises.
+      // Weights and personal notes are kept on purpose — they're useful starting
+      // points / context for next session.
       (day.blocks || []).forEach(block => {
         (block.exercises || []).forEach(ex => {
           const k = ex.name.replace(/\s+/g, '_');
+          // Legacy single-RPE key (still used by circuits)
           localStorage.removeItem(ATHLETE_ID + '_rpe_' + k);
+          // Per-set log: clear RPE + done, keep weights
+          const setKey = ATHLETE_ID + '_setlog_' + k;
+          let log = [];
+          try { log = JSON.parse(localStorage.getItem(setKey)) || []; } catch (e) {}
+          if (log.length) {
+            log = log.map(s => ({ w: s.w || '', r: '', d: false }));
+            localStorage.setItem(setKey, JSON.stringify(log));
+          }
         });
       });
       // Drop this day's check state from the global state object
@@ -2442,10 +3265,20 @@ function restoreState() {
     updateProgress(day);
   });
 
-  initWeightLogs();
-  initRPE();
+  // Per-set table (or single RPE for circuits) + per-exercise note + day wrapup.
+  // initWeightLogs is no longer called — the per-set log replaces it.
+  initSetOrRPE();
   initNotes();
   initDayWrapup();
+  // Sync exercise-level check from the loaded per-set state (in case all
+  // sets are already done from a previous session reload).
+  document.querySelectorAll('#screen-program .checklist-item[data-sets]').forEach(card => {
+    if (card.classList.contains('round-group')) return;
+    const name  = card.querySelector('.item-name').textContent.trim();
+    const total = parseInt(card.dataset.sets, 10) || 1;
+    const log   = loadSetLog(name, total);
+    syncExerciseCheck(card, log);
+  });
 
   // After RPE buttons are wired up, collapse any card that's checked AND has a
   // saved RPE (or is a simple-type item with no RPE picker). Mirrors the live
@@ -2534,24 +3367,41 @@ async function sendSession(day) {
     if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
     summary += `\nExercise log:\n`;
 
-    const collectFor = name => {
+    // Pull stored data for one exercise (per-set log for standard, single RPE
+    // for circuits, plus the personal note in both cases).
+    const collectFor = (name, isCircuit) => {
       const k = name.replace(/\s+/g, '_');
-      const w = localStorage.getItem(ATHLETE_ID + '_wlog_' + k) || '';
-      const r = localStorage.getItem(ATHLETE_ID + '_rpe_'  + k) || '';
       const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
-      return { w, r, n };
+      if (isCircuit) {
+        const r = localStorage.getItem(ATHLETE_ID + '_rpe_' + k) || '';
+        return { kind: 'circuit', r, n };
+      }
+      let log = [];
+      try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; }
+      catch (e) {}
+      return { kind: 'sets', log, n };
     };
 
     (dayData.blocks || []).forEach(block => {
       summary += `\n[${block.title}]\n`;
       (block.exercises || []).forEach(ex => {
-        const { w, r, n } = collectFor(ex.name);
-        const bits = [];
-        if (w) bits.push('Weight: ' + w);
-        if (r) bits.push('RPE: ' + r);
-        if (n) bits.push('Note: ' + n);
-        summary += `• ${ex.name}` + (bits.length ? '  —  ' + bits.join(' · ') : '') + '\n';
-        // Circuit items
+        const isCircuit = ex.type === 'circuit';
+        const data = collectFor(ex.name, isCircuit);
+        summary += `• ${ex.name}\n`;
+        if (data.kind === 'sets' && data.log.length) {
+          // One line per set: "    Set 1: 60kg @7 ✓"
+          data.log.forEach((s, i) => {
+            const bits = [];
+            if (s.w) bits.push(s.w);
+            if (s.r) bits.push('@' + s.r);
+            const tail = s.d ? '✓' : (s.w || s.r ? '·' : 'skipped');
+            summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
+          });
+        } else if (data.kind === 'circuit') {
+          if (data.r) summary += `    RPE: ${data.r}\n`;
+        }
+        if (data.n) summary += `    Note: ${data.n}\n`;
+        // Circuit sub-exercises (the rounds A/B/C list)
         (ex.items || []).forEach(item => {
           summary += `   · ${item.name}${item.detail ? ' (' + item.detail + ')' : ''}\n`;
         });
@@ -2604,23 +3454,156 @@ function formatSentTime(date) {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-function initWeightLogs() {
-  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
-    if (!card.querySelector('.rest-btn')) return;
-    // Skip circuits — they have multiple sub-exercises so a single "Weight" field
-    // doesn't fit. Clients log weights for each sub-exercise inside the free-form
-    // Note row instead (e.g. "KB 16, slam 6, box 50").
-    if (card.classList.contains('round-group')) return;
-    const name  = card.querySelector('.item-name').textContent.trim();
-    const wKey  = ATHLETE_ID + '_wlog_' + name.replace(/\s+/g, '_');
-    const saved = localStorage.getItem(wKey) || '';
-    const div   = document.createElement('div');
-    div.className = 'weight-log';
-    div.innerHTML = `<label>Weight</label><input class="weight-input" type="text" placeholder="e.g. 60 kg × 6" value="${esc(saved)}">`;
-    div.querySelector('input').addEventListener('input', e => localStorage.setItem(wKey, e.target.value));
-    div.addEventListener('click', e => e.stopPropagation());
-    card.appendChild(div);
+// Helper: where do weight/RPE/note rows go inside a card?
+function logSlotFor(card) {
+  return card.querySelector('.ex-log') || card;
+}
+
+// ── Per-set log helpers ─────────────────────────────────────────────
+// One JSON-stored array per exercise (replaces the old _wlog_ + _rpe_ keys).
+// Format: [{ w: '60', r: '7', d: true }, …] — one entry per set.
+function setLogKey(exName) {
+  return ATHLETE_ID + '_setlog_' + exName.replace(/\s+/g, '_');
+}
+function loadSetLog(exName, totalSets) {
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem(setLogKey(exName))) || []; }
+  catch (e) {}
+  // First time? Seed set 1 with the legacy single weight + RPE so athletes
+  // who already had values entered don't lose them.
+  if (log.length === 0) {
+    const k = exName.replace(/\s+/g, '_');
+    const oldW = localStorage.getItem(ATHLETE_ID + '_wlog_' + k) || '';
+    const oldR = localStorage.getItem(ATHLETE_ID + '_rpe_'  + k) || '';
+    if (oldW || oldR) log.push({ w: oldW, r: oldR, d: false });
+  }
+  // Pad up to totalSets and trim if shrunk.
+  while (log.length < totalSets) log.push({ w: '', r: '', d: false });
+  if (log.length > totalSets) log = log.slice(0, totalSets);
+  return log;
+}
+function saveSetLogValue(exName, log) {
+  localStorage.setItem(setLogKey(exName), JSON.stringify(log));
+}
+
+// Build the per-set log table for a single (standard) exercise card.
+function attachSetLog(card) {
+  const name  = card.querySelector('.item-name').textContent.trim();
+  const total = parseInt(card.dataset.sets, 10) || 1;
+  const log   = loadSetLog(name, total);
+  // Persist any seeding we just did so we don't redo it next load.
+  saveSetLogValue(name, log);
+
+  const slot = logSlotFor(card);
+  const wrap = document.createElement('div');
+  wrap.className = 'ex-set-log';
+  wrap.addEventListener('click', e => e.stopPropagation());
+
+  let html = `<div class="ex-set-header"><div>SET</div><div>WEIGHT</div><div>RPE</div><div></div></div>`;
+  log.forEach((s, i) => {
+    const rpeBtns = [6,7,8,9,10].map(n =>
+      `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button">${n}</button>`
+    ).join('');
+    html += `<div class="ex-set-row${s.d ? ' done' : ''}" data-set-idx="${i}">
+      <div class="ex-set-num">${i+1}</div>
+      <input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}">
+      <div class="ex-set-rpe">${rpeBtns}</div>
+      <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done"></button>
+    </div>`;
   });
+  wrap.innerHTML = html;
+  slot.appendChild(wrap);
+
+  // Wire each row up
+  wrap.querySelectorAll('.ex-set-row').forEach(row => {
+    const idx = parseInt(row.dataset.setIdx, 10);
+    // Weight input — saves on every keystroke
+    row.querySelector('.ex-set-weight').addEventListener('input', e => {
+      const cur = loadSetLog(name, total);
+      cur[idx] = cur[idx] || { w: '', r: '', d: false };
+      cur[idx].w = e.target.value;
+      saveSetLogValue(name, cur);
+    });
+    // RPE buttons — toggle-select (tap selected = deselect)
+    row.querySelectorAll('.ex-set-rpe .rpe-btn').forEach(b => {
+      b.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const wasSelected = b.classList.contains('selected');
+        row.querySelectorAll('.rpe-btn').forEach(x => x.classList.remove('selected'));
+        const cur = loadSetLog(name, total);
+        cur[idx] = cur[idx] || { w: '', r: '', d: false };
+        if (wasSelected) {
+          cur[idx].r = '';
+        } else {
+          b.classList.add('selected');
+          cur[idx].r = b.dataset.rpe;
+        }
+        saveSetLogValue(name, cur);
+      });
+    });
+    // Per-set check circle
+    row.querySelector('.ex-set-check').addEventListener('click', ev => {
+      ev.stopPropagation();
+      const cur = loadSetLog(name, total);
+      cur[idx] = cur[idx] || { w: '', r: '', d: false };
+      cur[idx].d = !cur[idx].d;
+      saveSetLogValue(name, cur);
+      row.classList.toggle('done', cur[idx].d);
+      // Sync the exercise-level check: all sets done = exercise checked.
+      syncExerciseCheck(card, cur);
+      if (navigator.vibrate) navigator.vibrate(12);
+    });
+  });
+}
+
+// Reflect "all sets done?" on the exercise-level check and the day progress.
+function syncExerciseCheck(card, log) {
+  const allDone = log.length > 0 && log.every(s => s.d);
+  card.classList.toggle('checked', allDone);
+  saveState();
+  updateProgress(card.dataset.day);
+}
+
+// Mark every set as done (or undone) — used when the row's check circle is
+// tapped. Provides a quick "I did the whole exercise" shortcut.
+function setAllSetsDone(card, done) {
+  const name  = card.querySelector('.item-name').textContent.trim();
+  const total = parseInt(card.dataset.sets, 10) || 1;
+  const cur = loadSetLog(name, total).map(s => ({ w: s.w, r: s.r, d: !!done }));
+  saveSetLogValue(name, cur);
+  // Reflect on the rendered rows
+  card.querySelectorAll('.ex-set-row').forEach((row, i) => {
+    row.classList.toggle('done', !!done);
+  });
+}
+
+// Public init that decides per-card whether to use per-set log or legacy single-RPE
+function initSetOrRPE() {
+  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
+    if (!card.querySelector('.rest-btn')) return; // simple exercise — skip
+    if (card.classList.contains('round-group')) {
+      // Circuits keep a single overall RPE row (existing behavior)
+      attachOverallRPE(card);
+    } else {
+      // Standard exercise — per-set table
+      attachSetLog(card);
+    }
+  });
+}
+
+// Single-RPE selector for circuits (their multiple sub-exercises share one rating).
+function attachOverallRPE(card) {
+  const name   = card.querySelector('.item-name').textContent.trim();
+  const rpeKey = ATHLETE_ID + '_rpe_' + name.replace(/\s+/g, '_');
+  const saved  = localStorage.getItem(rpeKey);
+  const div    = document.createElement('div');
+  div.className = 'rpe-row';
+  div.innerHTML = '<span class="rpe-label">RPE</span>' +
+    [6,7,8,9,10].map(n =>
+      `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
+    ).join('');
+  div.addEventListener('click', e => e.stopPropagation());
+  logSlotFor(card).appendChild(div);
 }
 
 // Personal note per exercise — saved to localStorage per athlete + exercise.
@@ -2648,25 +3631,14 @@ function initNotes() {
     });
     // Keep clicks inside the note from bubbling up to the card's check-toggle
     det.addEventListener('click', e => e.stopPropagation());
-    card.appendChild(det);
+    logSlotFor(card).appendChild(det);
   });
 }
 
-function initRPE() {
-  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
-    if (!card.querySelector('.rest-btn')) return;
-    const name   = card.querySelector('.item-name').textContent.trim();
-    const rpeKey = ATHLETE_ID + '_rpe_' + name.replace(/\s+/g, '_');
-    const saved  = localStorage.getItem(rpeKey);
-    const div    = document.createElement('div');
-    div.className = 'rpe-row';
-    div.innerHTML = '<span class="rpe-label">RPE</span>' +
-      [6,7,8,9,10].map(n =>
-        `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
-      ).join('');
-    card.appendChild(div);
-  });
-}
+// initRPE was replaced by initSetOrRPE() (per-set table for standard, single
+// overall RPE for circuits). Keeping the name available as an alias for any
+// future caller, but the implementation now delegates.
+function initRPE() { initSetOrRPE(); }
 
 function selectRPE(btn, key, e) {
   e.stopPropagation();
