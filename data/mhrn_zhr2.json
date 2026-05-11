@@ -115,7 +115,7 @@
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "90/90 Hip Rotations",
+                    "name": "90/90 Hip Switch",
                     "detail": "×12",
                     "cues": {
                       "good": [
@@ -193,7 +193,7 @@
               },
               {
                 "type": "standard",
-                "name": "Bulgarian Split Squat",
+                "name": "Dumbbell Bulgarian Split Squat",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -226,7 +226,7 @@
               },
               {
                 "type": "standard",
-                "name": "Heel-Elevated Goblet Squat",
+                "name": "Heels-Elevated Goblet Squat",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -296,7 +296,7 @@
               },
               {
                 "type": "standard",
-                "name": "Single Leg Calf Raise",
+                "name": "Standing Dumbbell Single Leg Calf Raise",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -339,7 +339,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Pallof Press",
+                "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
@@ -376,7 +376,7 @@
               },
               {
                 "type": "standard",
-                "name": "Dead Bug with Resistance Band",
+                "name": "Banded Deadbug",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
