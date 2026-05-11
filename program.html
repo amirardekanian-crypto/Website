@@ -1580,6 +1580,24 @@
     flex-shrink: 0;
   }
   body[data-dark] .round-detail { color: #999; }
+  /* Small play button next to each round item — only shown if that item has a video */
+  .round-play-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--yellow);
+    border: none;
+    color: var(--grey-dark);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .round-play-btn:hover { transform: scale(1.08); }
+  .round-play-btn:active { transform: scale(0.95); }
+  .round-play-btn svg { width: 12px; height: 12px; margin-left: 1px; }
+  body[data-dark] .round-play-btn { background: var(--yellow); color: #0A0A0A; }
   .round-group.checked .round-row { opacity: 0.5; }
   /* Round cues (inside a circuit) reuse the same details.cues styling as the
      main exercise cues — single source of truth so they look identical. */
@@ -2859,11 +2877,20 @@ function renderCircuit(ex, dayId, num, blockClass) {
   const roundsHtml = (ex.items || []).map((item, i) => {
     const letter = String.fromCharCode(65 + i); // 65 = 'A'
     const itemCues = renderRoundCues(item.cues);
+    // Per-item play button — only renders if this sub-exercise has a video
+    // (either an explicit videoUrl, or one resolved via the exercise library).
+    const itemVid = getVideoUrl(item);
+    const itemPlay = itemVid
+      ? `<button class="round-play-btn" type="button" onclick="event.stopPropagation(); handlePlayVideo('${itemVid}');" aria-label="Play ${esc(item.name)} video">
+           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+         </button>`
+      : '';
     return `<div class="round-row">
       <div class="round-row-main">
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
         <span class="round-detail">${esc(item.detail)}</span>
+        ${itemPlay}
       </div>
       ${itemCues}
     </div>`;
