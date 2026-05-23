@@ -304,8 +304,8 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell Rollout",
-                "videoUrl": "https://www.youtube.com/watch?v=6pTAoXD2X6c",
+                "name": "Dead Bug",
+                "videoUrl": "https://www.youtube.com/watch?v=-VykQ1HD0Vw",
                 "hasRest": true,
                 "chips": [
                   {
@@ -313,10 +313,10 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×8-10 Reps"
+                    "label": "20 Reps"
                   },
                   {
-                    "label": "Tempo 3-0-2-0"
+                    "label": "Tempo 2-1-2-1"
                   },
                   {
                     "label": "RPE 8"
@@ -328,11 +328,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Bar rolls out until arms are extended, body stays in one rigid line",
-                    "Feel the deep abdominals brace against the stretch"
+                    "Lower back stays completely pinned to the floor as limbs extend.",
+                    "Feel the deep abdominals brace to hold the spine still."
                   ],
                   "bad": [
-                    "Letting the lower back sag or arch at full extension"
+                    "Allowing the lower back to arch away from the floor — reduce range if needed."
                   ]
                 }
               },

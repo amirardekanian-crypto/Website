@@ -472,7 +472,7 @@
               {
                 "type": "standard",
                 "name": "TRX Fallout",
-                "videoUrl": "https://www.youtube.com/watch?v=idLF4ltm_3g",
+                "videoUrl": null,
                 "hasRest": true,
                 "chips": [
                   {
@@ -480,10 +480,10 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Reps"
+                    "label": "×20 Reps"
                   },
                   {
-                    "label": "Tempo 3-0-2-0"
+                    "label": "Isometric"
                   },
                   {
                     "label": "RPE 6"
@@ -491,11 +491,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Body moves as one rigid unit — no hip break as the arms extend forward overhead",
-                    "Feel the deep core bracing hard to resist the extension force throughout"
+                    "Feel the obliques on the reaching side firing hard to stop the hips from rotating or dropping",
+                    "Body stays rigid as one unit — the only thing moving is the forearm reaching forward, everything else is completely still"
                   ],
                   "bad": [
-                    "Letting the hips sag toward the floor — keep a plank position throughout"
+                    "Letting the hips twist or shift toward the reaching arm — if they move at all, the core has lost the fight"
                   ]
                 }
               },
