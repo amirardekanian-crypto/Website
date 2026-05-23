@@ -174,7 +174,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Back Squat",
+                "name": "Barbell Back Squat",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -231,7 +231,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Pallof Press",
+                "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -262,7 +262,7 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Rowing Erg",
+                "name": "Rowing",
                 "videoUrl": null,
                 "chips": [
                   { "label": "4 min", "style": "dark" },
@@ -330,7 +330,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Dumbbell Shoulder Press",
+                "name": "Seated Dumbbell Overhead Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -569,7 +569,7 @@
               },
               {
                 "type": "standard",
-                "name": "Hip Thrust",
+                "name": "Barbell Hip Thrust",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -592,7 +592,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Bulgarian Split Squat",
+                "name": "Dumbbell Bulgarian Split Squat",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -609,7 +609,7 @@
               },
               {
                 "type": "standard",
-                "name": "Leg Curl",
+                "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -765,7 +765,7 @@
               },
               {
                 "type": "standard",
-                "name": "Medicine Ball Overhead Slam",
+                "name": "Medicine Ball Slam",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
