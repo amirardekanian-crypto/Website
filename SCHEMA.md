@@ -249,8 +249,8 @@ Each cycle describes one training phase.
 | `name` | string | ✅ | Phase name, e.g. `"Foundation Forge"` |
 | `tagline` | string | optional | Short italic line under the name |
 | `weeks` | string | optional | e.g. `"Weeks 1–5"` |
-| `startDate` | string | optional | Cycle start date, ISO format `"YYYY-MM-DD"`. Shown on the athlete card for the current cycle. |
-| `endDate` | string | optional | Cycle end date, ISO format `"YYYY-MM-DD"`. Drives the subscription banner (appears when ≤14 days remain). |
+| `startDate` | string | recommended | Cycle start date, ISO format `"YYYY-MM-DD"`. Shown on the athlete card for the current cycle. Omitting it hides the date range from the athlete card. |
+| `endDate` | string | recommended | Cycle end date, ISO format `"YYYY-MM-DD"`. Drives the subscription/renewal banner (appears when ≤14 days remain). **Omitting this disables the renewal reminder entirely** — the client will see no expiry warning. |
 | `focuses` | string[] | optional | Unlimited list of focus statements |
 | `message` | object | optional | Only used when this is the current cycle (see below) |
 | `teaser` | object | optional | Only used when this is the next cycle (see below) |
