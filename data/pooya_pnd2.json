@@ -161,7 +161,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell Bench Press",
+                "name": "Dumbbell Bench Press",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -173,7 +173,7 @@
                     "label": "×8-10 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 2-1-1-0"
                   },
                   {
                     "label": "RPE 7-8"
@@ -181,11 +181,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Bar path finishes directly over the shoulder joint",
-                    "Feel the chest stretch at the bottom, drive through the palms"
+                    "Press the dumbbells up and slightly toward each other at the top",
+                    "Feel the stretch across the chest at the bottom, then squeeze the pecs to drive the bells up"
                   ],
                   "bad": [
-                    "Flaring the elbows beyond 45 degrees from the torso"
+                    "Flaring the elbows to 90 degrees — keep them at roughly 45 degrees to the torso"
                   ]
                 }
               },
@@ -435,15 +435,16 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell Back Squat",
+                "name": "Hack Squat",
                 "videoUrl": null,
+                "restSec": 120,
                 "chips": [
                   {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8-10 Reps"
+                    "label": "×10-12 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -454,11 +455,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Hips and knees break together, chest stays tall, depth reaches parallel or below",
-                    "Feel the quads load on the way down and the glutes drive at the bottom"
+                    "Drive the platform up by pushing through the middle of the feet",
+                    "Feel the quads lengthen at the bottom, then contract hard as you extend"
                   ],
                   "bad": [
-                    "Knees caving inward on the ascent"
+                    "Letting the knees cave inward as you descend — track them over the middle toes"
                   ]
                 }
               },
@@ -708,7 +709,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Dumbbell Overhead Press",
+                "name": "Machine Shoulder Press",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -720,19 +721,19 @@
                     "label": "×10-12 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 2-1-1-0"
                   },
                   {
-                    "label": "RPE 7"
+                    "label": "RPE 7-8"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Dumbbells press up in a slight arc, finishing over the shoulders",
-                    "Feel the deltoids contract from the shoulder cap outward"
+                    "Press the handles straight up along the line of the machine",
+                    "Feel the contraction across the top of the shoulders without crunching the neck"
                   ],
                   "bad": [
-                    "Arching the lower back excessively to compensate for heavy weight"
+                    "Shrugging the shoulders up toward the ears as you press"
                   ]
                 }
               }
@@ -992,15 +993,20 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell Romanian Deadlift",
+                "name": "Back Extension",
                 "videoUrl": null,
+                "restSec": 90,
                 "chips": [
+                  {
+                    "label": "hold plate at chest",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Reps"
+                    "label": "×12-15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -1011,11 +1017,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Bar stays in contact with the legs, hips push straight back",
-                    "Feel a deep stretch through the hamstrings at the bottom"
+                    "Hinge from the hips and lower the torso toward the floor with a flat back",
+                    "Feel the stretch through the hamstrings and glutes at the bottom, then squeeze the glutes to come up"
                   ],
                   "bad": [
-                    "Rounding the upper back or bending the knees excessively"
+                    "Rounding the lower back at the bottom or hyperextending at the top"
                   ]
                 }
               },
