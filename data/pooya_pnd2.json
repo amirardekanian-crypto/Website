@@ -227,7 +227,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Incline Dumbbell Press",
+                "name": "Incline Machine Press",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -239,7 +239,7 @@
                     "label": "×12 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 2-1-1-0"
                   },
                   {
                     "label": "RPE 7"
@@ -247,17 +247,17 @@
                 ],
                 "cues": {
                   "good": [
-                    "Dumbbells travel in a slight arc, finishing over the upper chest",
-                    "Feel the stretch across the upper pec at the bottom of each rep"
+                    "Press the handles up and slightly together, following the machine's path",
+                    "Feel the upper chest lengthen at the bottom, then contract to drive up"
                   ],
                   "bad": [
-                    "Setting the incline too steep — this shifts load onto the anterior deltoid"
+                    "Letting the shoulders roll forward off the pad at the bottom"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Cable Face Pull",
+                "name": "Reverse Pec Deck",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -277,11 +277,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Hands finish beside the ears, rope splits wide",
-                    "Feel the rear delts and external rotators contract"
+                    "Open the arms wide in a smooth arc and lightly draw the shoulder blades together",
+                    "Feel the rear delts drive the movement, not the upper traps"
                   ],
                   "bad": [
-                    "Pulling with the biceps or leaning backward excessively"
+                    "Bending the elbows through the rep and turning it into a row"
                   ]
                 }
               },
@@ -779,16 +779,20 @@
               },
               {
                 "type": "standard",
-                "name": "Single-Arm Cable Row",
+                "name": "Seated Cable Row",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Each Arm"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -799,11 +803,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Elbow drives straight back, torso stays square to the machine",
-                    "Feel the lat and mid-back on the working side do the pulling"
+                    "Drive the elbows back and down, finishing with the handle at the lower ribs",
+                    "Feel the mid-back squeeze as the shoulder blades draw together"
                   ],
                   "bad": [
-                    "Rotating the torso to create momentum"
+                    "Leaning the torso back to heave the weight with momentum"
                   ]
                 }
               },
@@ -1129,7 +1133,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Hanging Leg Raise",
+                "name": "Cable Woodchop",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -1138,22 +1142,22 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Reps"
+                    "label": "×12 Each Side"
                   },
                   {
-                    "label": "Tempo 2-1-2-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 8"
+                    "label": "RPE 7"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Legs rise to at least parallel, body stays still above the waist",
-                    "Feel the lower abs curl the pelvis upward under control"
+                    "Rotate through the trunk and pivot the back foot as you chop across the body",
+                    "Feel the obliques drive the rotation while the arms stay long"
                   ],
                   "bad": [
-                    "Swinging or using hip flexor momentum to get the legs up"
+                    "Pulling with the arms instead of rotating through the core"
                   ]
                 }
               }
