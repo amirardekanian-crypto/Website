@@ -16,7 +16,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>S&C Program</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#0A0A0A">
+<meta name="theme-color" content="#FAF7F2">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
@@ -39,8 +39,8 @@
       scope: "/",
       display: "standalone",
       orientation: "portrait",
-      background_color: "#0A0A0A",
-      theme_color: "#0A0A0A",
+      background_color: "#FAF7F2",
+      theme_color: "#FAF7F2",
       lang: "en-GB",
       categories: ["fitness", "health", "sports"],
       icons: [
@@ -59,27 +59,31 @@
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <style>
   :root {
-    --yellow: #D4FF00;
-    --yellow-dim: rgba(212,255,0,0.08);
-    --yellow-mid: rgba(212,255,0,0.22);
-    --yellow-glow: rgba(212,255,0,0.2);
+    /* Primary brand = Roland-Garros green; secondary = clay; tertiary = ochre.
+       Token names kept (--yellow/--ice/--purple) so the existing refs need no
+       renaming; only their values changed for the warm-paper light theme. */
+    --yellow: #0E4A36;
+    --yellow-dim: rgba(14,74,54,0.08);
+    --yellow-mid: rgba(14,74,54,0.22);
+    --yellow-glow: rgba(14,74,54,0.2);
 
-    --ice: #B8E0F6;
-    --ice-dim: rgba(184,224,246,0.08);
-    --ice-mid: rgba(184,224,246,0.22);
-    --ice-glow: rgba(184,224,246,0.2);
+    --ice: #C7552F;
+    --ice-dim: rgba(199,85,47,0.08);
+    --ice-mid: rgba(199,85,47,0.22);
+    --ice-glow: rgba(199,85,47,0.2);
 
-    --purple: #B794F6;
-    --purple-dim: rgba(183,148,246,0.08);
-    --purple-mid: rgba(183,148,246,0.22);
-    --purple-glow: rgba(183,148,246,0.2);
+    --purple: #A8741C;
+    --purple-dim: rgba(168,116,28,0.08);
+    --purple-mid: rgba(168,116,28,0.22);
+    --purple-glow: rgba(168,116,28,0.2);
 
-    --grey-bg: #F0F0F0;
-    --grey-mid: #D8D8D8;
-    --grey-dark: #2A2A2A;
-    --grey-card: #E8E8E8;
-    --grey-text: #555;
-    --white: #FAFAFA;
+    --grey-bg: #FAF7F2;
+    --grey-mid: #D8D1C5;
+    --grey-dark: #1A1A1A;
+    --grey-card: #EDE8E0;
+    --grey-text: #5C5C5C;
+    --white: #FFFFFF;
+    --on-accent: #FFFFFF;  /* text/icons that sit on green/clay/ochre fills */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -95,7 +99,7 @@
   /* ── Loading State ── */
   .loading-screen {
     position: fixed; inset: 0; z-index: 9999;
-    background: #0A0A0A;
+    background: var(--grey-bg);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     transition: opacity 0.4s ease;
@@ -103,17 +107,17 @@
   .loading-screen.hidden { opacity: 0; pointer-events: none; }
   .loading-spinner {
     width: 40px; height: 40px;
-    border: 3px solid #222; border-top-color: var(--yellow);
+    border: 3px solid var(--grey-mid); border-top-color: var(--yellow);
     border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   .loading-text {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-    color: #555; margin-top: 20px;
+    color: var(--grey-text); margin-top: 20px;
   }
   .error-screen {
     position: fixed; inset: 0; z-index: 9998;
-    background: #0A0A0A;
+    background: var(--grey-bg);
     display: none; flex-direction: column;
     align-items: center; justify-content: center;
     padding: 40px;
@@ -125,7 +129,7 @@
     font-size: 28px; color: var(--yellow); text-transform: uppercase;
     margin-bottom: 8px; text-align: center;
   }
-  .error-msg { font-size: 14px; color: #777; text-align: center; line-height: 1.6; }
+  .error-msg { font-size: 14px; color: var(--grey-text); text-align: center; line-height: 1.6; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -137,8 +141,8 @@
      HOME SCREEN — NEW V5 DESIGN
      ═══════════════════════════════════════════════════════════════════════ */
   #screen-home {
-    background: #0A0A0A;
-    color: #f0f0f0;
+    background: var(--grey-bg);
+    color: var(--grey-dark);
     font-family: 'Barlow Condensed', sans-serif;
     position: relative;
     overflow: hidden;
@@ -147,9 +151,9 @@
   /* Sticky nav */
   .home-nav {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(10,10,10,0.92);
+    background: rgba(250,247,242,0.9);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid var(--grey-mid);
     padding: 14px 24px;
     display: flex; justify-content: space-between; align-items: center;
   }
@@ -157,11 +161,11 @@
   .home-brand {
     font-family: 'Space Mono', monospace;
     font-size: 12px; font-weight: 700; letter-spacing: 2px;
-    color: #999; text-decoration: none;
+    color: var(--grey-text); text-decoration: none;
     transition: color 0.2s;
   }
   .home-brand strong { color: var(--yellow); }
-  .home-brand:hover, .home-brand:hover strong { color: #ffffff; }
+  .home-brand:hover, .home-brand:hover strong { color: var(--grey-dark); }
 
   /* Shared fade-in animation reused by athlete-card, sub-banner, cycle-meter,
      cycle-hero and the upcoming-section blocks. */
@@ -174,7 +178,7 @@
     font-size: clamp(42px, 12vw, 64px);
     font-weight: 900; letter-spacing: -2px;
     line-height: 0.95; margin-bottom: 10px;
-    color: #fff; text-transform: uppercase;
+    color: var(--grey-dark); text-transform: uppercase;
   }
   .home-name span { color: var(--yellow); display: block; }
 
@@ -183,8 +187,8 @@
   .athlete-card {
     margin: 4px 24px 24px;
     padding: 22px;
-    background: #141414;
-    border: 1px solid #222;
+    background: var(--white);
+    border: 1px solid var(--grey-mid);
     border-radius: 16px;
     opacity: 0; transform: translateY(16px);
     animation: fadeInUp 0.6s ease 0.1s forwards;
@@ -197,7 +201,7 @@
     width: 84px; height: 84px; flex-shrink: 0;
     border-radius: 50%;
     border: 2px solid var(--yellow);
-    background: #1a1a1a;
+    background: var(--grey-card);
     overflow: hidden;
     display: flex; align-items: center; justify-content: center;
   }
@@ -218,14 +222,14 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 17px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase;
-    color: #e8e8e8;
+    color: var(--grey-dark);
     margin-top: 10px;
     line-height: 1.4;
   }
   .athlete-card-dates {
     font-family: 'Space Mono', monospace;
     font-size: 11px; letter-spacing: 1.5px;
-    color: #777; margin-top: 6px;
+    color: var(--grey-text); margin-top: 6px;
     text-transform: uppercase;
   }
 
@@ -251,7 +255,7 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 13px; font-weight: 700;
     letter-spacing: 1.2px; text-transform: uppercase;
-    color: #f0f0f0;
+    color: var(--grey-dark);
   }
   .sub-banner-text strong { color: var(--yellow); }
 
@@ -266,7 +270,7 @@
   }
   .cycle-meter-seg {
     flex: 1; height: 5px; border-radius: 2px;
-    background: rgba(255,255,255,0.10);
+    background: rgba(0,0,0,0.08);
     transition: background 0.3s, box-shadow 0.3s;
   }
   .cycle-meter-seg.done    { background: var(--yellow); opacity: 0.55; }
@@ -278,9 +282,9 @@
     flex: 1; text-align: center;
     font-family: 'Space Mono', monospace;
     font-size: 11px; letter-spacing: 1.2px;
-    color: #555; font-weight: 500;
+    color: var(--grey-text); font-weight: 500;
   }
-  .cycle-meter-label.done    { color: rgba(212,255,0,0.55); }
+  .cycle-meter-label.done    { color: rgba(14,74,54,0.55); }
   .cycle-meter-label.current { color: var(--ice); font-weight: 700; }
 
   /* ─── Upcoming cycle cards — one card per future cycle ───────── */
@@ -291,12 +295,12 @@
   .upcoming-section-label {
     font-family: 'Space Mono', monospace;
     font-size: 11px; letter-spacing: 3px;
-    text-transform: uppercase; color: #555;
+    text-transform: uppercase; color: var(--grey-text);
     margin-bottom: 14px;
   }
   .upcoming-card {
-    background: #141414;
-    border: 1px solid #222;
+    background: var(--white);
+    border: 1px solid var(--grey-mid);
     border-radius: 14px;
     padding: 18px;
     margin-bottom: 10px;
@@ -319,19 +323,19 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 800; font-size: 20px;
     text-transform: uppercase; letter-spacing: -0.3px;
-    color: #f0f0f0; line-height: 1.1;
+    color: var(--grey-dark); line-height: 1.1;
   }
   .upcoming-card-weeks {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 1.2px;
-    color: #666;
+    color: var(--grey-text);
   }
   /* Italic tagline under the card title — mirrors the current cycle hero */
   .upcoming-card-tagline {
     font-family: 'Barlow', sans-serif;
     font-style: italic;
     font-size: 13px;
-    color: #B794F6;
+    color: var(--ice);
     margin-top: 4px;
     line-height: 1.5;
   }
@@ -345,16 +349,16 @@
   .upcoming-card-plan li {
     counter-increment: up-c;
     padding: 10px 0;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--grey-card);
     font-family: 'Barlow', sans-serif;
     font-size: 13.5px;
-    color: #ccc;
+    color: #444;
     line-height: 1.5;
     display: flex;
     gap: 12px;
   }
   .upcoming-card-plan li:last-child {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--grey-card);
   }
   .upcoming-card-plan li::before {
     content: counter(up-c, decimal-leading-zero);
@@ -373,17 +377,17 @@
     margin-top: 14px;
     font-family: 'Barlow', sans-serif;
     font-size: 13.5px; line-height: 1.65;
-    color: #aaa;
+    color: var(--grey-text);
   }
   .upcoming-card-teaser p { margin: 0; }
   .upcoming-card-teaser p + p { margin-top: 10px; }
-  .upcoming-card-teaser em { color: #ddd; font-style: italic; }
+  .upcoming-card-teaser em { color: var(--grey-dark); font-style: italic; }
 
   /* ─── Global bottom tab bar (always visible across all screens) ── */
   .global-tabs {
     position: fixed; left: 0; right: 0; bottom: 0;
-    background: var(--grey-dark);
-    display: flex; border-top: 1px solid #333;
+    background: var(--white);
+    display: flex; border-top: 1px solid var(--grey-mid);
     z-index: 60;
   }
   .global-tabs .nav-item {
@@ -407,7 +411,7 @@
   .global-tabs .nav-item.active .nav-label { color: var(--yellow); }
   .global-tabs .nav-item.active .nav-icon {
     color: var(--yellow);
-    filter: drop-shadow(0 0 4px rgba(212,255,0,0.45));
+    filter: drop-shadow(0 0 4px rgba(14,74,54,0.45));
   }
   /* Slightly thicker stroke when active so the icon visually weighs more */
   .global-tabs .nav-item.active .nav-icon svg { stroke-width: 2; }
@@ -436,8 +440,8 @@
 
   /* Soft steady glow on the current cycle segment — no size change, just light. */
   @keyframes cycleSegGlow {
-    0%, 100% { box-shadow: 0 0 8px var(--yellow), 0 0 16px rgba(212,255,0,0.25); }
-    50%      { box-shadow: 0 0 14px var(--yellow), 0 0 22px rgba(212,255,0,0.45); }
+    0%, 100% { box-shadow: 0 0 8px var(--yellow), 0 0 16px rgba(14,74,54,0.25); }
+    50%      { box-shadow: 0 0 14px var(--yellow), 0 0 22px rgba(14,74,54,0.45); }
   }
   #screen-home .cycle-meter-seg.current {
     animation: cycleSegGlow 2.6s ease-in-out infinite;
@@ -470,13 +474,13 @@
     line-height: 0.95;
     letter-spacing: -1.5px;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--grey-dark);
   }
   #screen-home .cycle-hero-weeks {
     font-family: 'Space Mono', monospace;
     font-size: 11px;
     letter-spacing: 1.5px;
-    color: #888;
+    color: var(--grey-text);
     text-transform: uppercase;
     flex-shrink: 0;
   }
@@ -484,7 +488,7 @@
     font-family: 'Barlow', sans-serif;
     font-style: italic;
     font-size: 14px;
-    color: #B794F6;
+    color: var(--ice);
     margin-top: 8px;
     line-height: 1.5;
   }
@@ -508,7 +512,7 @@
   #screen-home .cm-eyebrow {
     background: transparent;
     border: none;
-    color: #fff;
+    color: var(--grey-dark);
     font-family: 'Space Mono', monospace;
     font-size: 14px; font-weight: 700;
     letter-spacing: 2.5px;
@@ -523,14 +527,14 @@
   /* Highlighted frame — soft yellow-tinted border + subtle outer glow so the
      current cycle card visually stands out from the future cycle cards. */
   #screen-home .current-message {
-    background: #141414;
+    background: var(--white);
     border: 1px solid var(--yellow-mid);
     box-shadow:
-      0 0 0 1px rgba(212,255,0,0.04),
-      0 8px 30px rgba(212,255,0,0.06),
-      inset 0 0 24px rgba(212,255,0,0.02);
+      0 0 0 1px rgba(14,74,54,0.04),
+      0 8px 30px rgba(14,74,54,0.06),
+      inset 0 0 24px rgba(14,74,54,0.02);
   }
-  #screen-home .cm-body-label { color: #555; }
+  #screen-home .cm-body-label { color: var(--grey-text); }
 
   /* Focus list → numbered list with thin grey separators (no tint background) */
   #screen-home .focus-list {
@@ -542,16 +546,16 @@
   #screen-home .focus-list-item {
     background: transparent;
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--grey-card);
     border-radius: 0;
     padding: 14px 0;
     font-size: 14.5px;
-    color: #ddd;
+    color: #444;
     counter-increment: focus-c;
     line-height: 1.5;
   }
   #screen-home .focus-list-item:last-child {
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--grey-card);
   }
   #screen-home .focus-list-item::before {
     content: counter(focus-c, decimal-leading-zero);
@@ -571,8 +575,8 @@
   /* Current cycle message card */
   .current-message {
     margin: 0 24px 20px;
-    background: #141414;
-    border: 1px solid #222;
+    background: var(--white);
+    border: 1px solid var(--grey-mid);
     border-radius: 16px;
     padding: 28px 26px 24px;
     position: relative;
@@ -615,12 +619,12 @@
   }
   .focus-list-item {
     background: var(--ice-dim);
-    border: 1px solid rgba(184,224,246,0.12);
+    border: 1px solid rgba(199,85,47,0.12);
     border-radius: 10px;
     padding: 12px 14px;
     display: flex; align-items: flex-start; gap: 10px;
     font-family: 'Barlow', sans-serif;
-    font-size: 13.5px; color: #e8e8e8;
+    font-size: 13.5px; color: var(--grey-dark);
     line-height: 1.5; font-weight: 400;
   }
   .focus-list-item::before {
@@ -634,13 +638,13 @@
   .cm-body-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: #555; margin-bottom: 10px;
-    padding-top: 16px; border-top: 1px solid #222;
+    color: var(--grey-text); margin-bottom: 10px;
+    padding-top: 16px; border-top: 1px solid var(--grey-card);
   }
 
   .cm-body {
     font-family: 'Barlow', sans-serif;
-    font-size: 14.5px; color: #aaa;
+    font-size: 14.5px; color: var(--grey-text);
     line-height: 1.75; font-weight: 300;
   }
   .cm-body p + p { margin-top: 12px; }
@@ -648,17 +652,17 @@
   .outcomes-block {
     margin-top: 20px;
     padding-top: 18px;
-    border-top: 1px solid #222;
+    border-top: 1px solid var(--grey-card);
   }
   .outcomes-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: #555; margin-bottom: 10px;
+    color: var(--grey-text); margin-bottom: 10px;
   }
   .outcomes-heading {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 16px; font-weight: 700;
-    color: #fff; margin-bottom: 8px;
+    color: var(--grey-dark); margin-bottom: 8px;
     text-transform: uppercase; letter-spacing: 0.5px;
   }
   .outcome-item {
@@ -676,7 +680,7 @@
   }
   .outcome-text {
     font-family: 'Barlow', sans-serif;
-    font-size: 13.5px; color: #e8e8e8;
+    font-size: 13.5px; color: var(--grey-dark);
     line-height: 1.5;
   }
 
@@ -687,21 +691,21 @@
 
   /* ── App Guide screen ── shares cards with Notes for a familiar look */
   #screen-guide { background: var(--grey-bg); }
-  .guide-header { background: var(--grey-dark); padding: 48px 24px 32px; position: relative; }
-  .guide-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
-  .guide-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 8px; }
-  .guide-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: var(--white); text-transform: uppercase; line-height: 1; }
-  .guide-subtitle { font-size: 12px; color: #888; margin-top: 6px; font-weight: 300; }
+  .guide-header { background: var(--yellow); padding: 48px 24px 32px; position: relative; }
+  .guide-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
+  .guide-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ice); margin-bottom: 8px; }
+  .guide-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: #fff; text-transform: uppercase; line-height: 1; }
+  .guide-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
   .guide-container { padding: 20px 0 100px; }
   /* Reuse .note-card styles — but always-open (no chevron, no toggle) */
   .guide-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
   .guide-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; }
-  .guide-icon { width: 32px; height: 32px; background: var(--yellow); color: #0A0A0A; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .guide-icon { width: 32px; height: 32px; background: var(--yellow); color: var(--on-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
   .guide-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; text-transform: uppercase; letter-spacing: 0.5px; }
   .guide-body { padding: 4px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; }
   .guide-body p { margin: 0 0 10px; }
   .guide-body p:last-child { margin-bottom: 0; }
-  .guide-body strong { color: #0A0A0A; font-weight: 700; }
+  .guide-body strong { color: var(--grey-dark); font-weight: 700; }
   .guide-body ul { margin: 4px 0 0; padding-left: 18px; }
   .guide-body li { margin: 4px 0; }
   /* "Important" callout for the Send Data to Coach card */
@@ -711,7 +715,7 @@
     display: inline-block; margin-left: 8px; padding: 2px 8px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px;
     letter-spacing: 2px; text-transform: uppercase;
-    background: var(--yellow); color: #0A0A0A; border-radius: 3px;
+    background: var(--yellow); color: var(--on-accent); border-radius: 3px;
   }
   /* WhatsApp CTA at bottom of the guide */
   .guide-whatsapp {
@@ -744,8 +748,8 @@
     text-transform: uppercase; letter-spacing: 1px;
     font-size: 12px;
   }
-  .home-simple-meta-row strong { color: #999; min-width: 80px; }
-  .home-simple-meta-row span { color: #fff; font-weight: 600; }
+  .home-simple-meta-row strong { color: var(--grey-text); min-width: 80px; }
+  .home-simple-meta-row span { color: var(--grey-dark); font-weight: 600; }
 
   /* ═══════════════════════════════════════════════════════════════════════
      REMAINING SCREENS — UNCHANGED LAYOUT, UPDATED COLORS ONLY
@@ -753,18 +757,18 @@
 
   /* ── Archive ── */
   #screen-archive { background: var(--grey-bg); }
-  .archive-banner { background: var(--grey-dark); padding: 48px 24px 32px; position: relative; overflow: hidden; }
+  .archive-banner { background: var(--yellow); padding: 48px 24px 32px; position: relative; overflow: hidden; }
   .archive-banner::after {
     content: attr(data-watermark); position: absolute; bottom: -10px; right: -8px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 64px;
     color: rgba(255,255,255,0.04); letter-spacing: -2px; pointer-events: none;
   }
-  .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--purple); margin-bottom: 8px; }
-  .archive-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; color: #555; text-transform: uppercase; line-height: 1; }
-  .archive-title span { color: #888; }
+  .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ice); margin-bottom: 8px; }
+  .archive-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; color: #fff; text-transform: uppercase; line-height: 1; }
+  .archive-title span { color: rgba(255,255,255,0.65); }
   .archive-scroll { padding: 20px 20px 100px; }
   .archive-day-block { background: var(--white); border-radius: 8px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--grey-mid); opacity: 0.75; }
-  .archive-day-title { background: #3a3a3a; padding: 14px 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: #999; display: flex; align-items: center; gap: 10px; }
+  .archive-day-title { background: var(--grey-card); padding: 14px 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text); display: flex; align-items: center; gap: 10px; }
   .archive-day-title span { font-size: 10px; font-weight: 400; color: #555; letter-spacing: 2px; }
   .archive-exercise-list { padding: 14px 18px; }
   .archive-ex { padding: 8px 0; border-bottom: 1px solid var(--grey-card); display: flex; justify-content: space-between; align-items: center; }
@@ -774,8 +778,8 @@
 
   /* ── Current Program Header ── */
   #screen-program { background: var(--grey-bg); }
-  .prog-header { background: var(--grey-dark); padding: 48px 24px 0; position: relative; overflow: hidden; }
-  .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
+  .prog-header { background: var(--yellow); padding: 48px 24px 0; position: relative; overflow: hidden; }
+  .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
   /* Cycle hero on the program page header (mirrors the home cycle-hero, but
      with a small yellow C-badge to the left of the cycle name). */
   .prog-cycle-hero { margin-bottom: 22px; }
@@ -785,11 +789,11 @@
   }
   .prog-cycle-badge {
     width: 36px; height: 36px; flex-shrink: 0;
-    border: 1.5px solid var(--yellow);
+    border: 1.5px solid var(--ice);
     border-radius: 7px;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: 14px; color: var(--yellow);
+    font-weight: 900; font-size: 14px; color: var(--ice);
   }
   .prog-cycle-title {
     font-family: 'Barlow Condensed', sans-serif;
@@ -797,14 +801,14 @@
     font-size: 32px;
     line-height: 1;
     letter-spacing: -0.5px;
-    color: var(--white);
+    color: #fff;
     text-transform: uppercase;
   }
   .prog-cycle-tagline {
     font-family: 'Barlow', sans-serif;
     font-style: italic;
     font-size: 13px;
-    color: #B794F6;
+    color: var(--ice);
     margin-top: 8px;
     line-height: 1.4;
   }
@@ -815,7 +819,7 @@
     gap: 6px;
     padding: 16px 20px 18px;
     overflow-x: auto;
-    border-top: 1px solid #3a3a3a;
+    border-top: 1px solid rgba(255,255,255,0.15);
   }
   .day-tab {
     flex: 1;
@@ -826,7 +830,7 @@
     font-size: 11px;
     letter-spacing: 1.4px;
     text-transform: uppercase;
-    color: rgba(184,224,246,0.75);
+    color: rgba(199,85,47,0.75);
     background: transparent;
     border: 1px solid var(--ice-mid);
     border-radius: 6px;
@@ -838,7 +842,7 @@
   .day-tab:hover { color: var(--ice); border-color: var(--ice); }
   .day-tab.active {
     background: var(--ice);
-    color: #0A0A0A;
+    color: var(--on-accent);
     border-color: var(--ice);
   }
   /* Light-mode header keeps a dark background, so the same colors work without
@@ -847,8 +851,8 @@
   /* Tiny progress pill inside each tab (e.g. "5/24") */
   .tab-progress-pill {
     display: inline-block;
-    background: rgba(184,224,246,0.15);
-    color: rgba(184,224,246,0.85);
+    background: rgba(199,85,47,0.15);
+    color: rgba(199,85,47,0.85);
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -859,10 +863,10 @@
     transition: background 0.3s, color 0.3s;
   }
   .day-tab.active .tab-progress-pill {
-    background: rgba(0,0,0,0.18);
-    color: #0A0A0A;
+    background: rgba(255,255,255,0.28);
+    color: var(--on-accent);
   }
-  .tab-progress-pill.complete { background: var(--yellow) !important; color: var(--grey-dark) !important; }
+  .tab-progress-pill.complete { background: var(--yellow) !important; color: var(--on-accent) !important; }
   /* Brief pop animation whenever the count changes (triggered from updateProgress) */
   .tab-progress-pill.pulse { animation: pillPulse 0.32s ease; }
   @keyframes pillPulse {
@@ -876,7 +880,7 @@
   /* ── Vertical Progress Bar ── */
   .v-progress {
     position: fixed; right: 0; top: 120px; bottom: 70px;
-    width: 12px; background: #3a3a3a;
+    width: 12px; background: var(--grey-mid);
     border-radius: 6px 0 0 6px; z-index: 200; overflow: hidden;
     display: none;
   }
@@ -898,8 +902,8 @@
 
   /* ── Session Confirm ── */
   .session-confirm {
-    display: none; background: #1e1e1e; border-radius: 8px;
-    padding: 16px 20px; margin-top: 16px; border: 1px solid #444;
+    display: none; background: var(--white); border-radius: 8px;
+    padding: 16px 20px; margin-top: 16px; border: 1px solid var(--grey-mid);
     flex-direction: row; align-items: center; justify-content: space-between;
     gap: 14px;
   }
@@ -907,12 +911,12 @@
   .confirm-body { flex: 1; min-width: 0; }
   .confirm-text {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: #888;
+    font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text);
   }
   .confirm-btn {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
-    background: var(--yellow); color: var(--grey-dark);
+    background: var(--yellow); color: var(--on-accent);
     border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; white-space: nowrap;
     transition: background 0.15s ease, color 0.15s ease;
   }
@@ -921,12 +925,12 @@
   .session-confirm.partial {
     flex-direction: column; align-items: stretch;
     border-color: rgba(255,180,80,0.45);
-    background: linear-gradient(180deg, rgba(255,180,80,0.06), #1e1e1e);
+    background: linear-gradient(180deg, rgba(255,180,80,0.10), var(--white));
   }
-  .session-confirm.partial .confirm-text { color: #ffb450; }
+  .session-confirm.partial .confirm-text { color: #B26B00; }
   .session-confirm.partial .confirm-btn {
-    background: transparent; color: #ffb450;
-    border: 1px solid rgba(255,180,80,0.55);
+    background: transparent; color: #B26B00;
+    border: 1px solid rgba(178,107,0,0.5);
   }
   .session-confirm.partial .confirm-btn.arming {
     background: #ffb450; color: #1a1a1a; border-color: #ffb450;
@@ -941,10 +945,10 @@
   }
   .confirm-missing ul {
     list-style: none; margin: 0; padding: 0;
-    font-size: 13px; color: #ccc;
+    font-size: 13px; color: var(--grey-dark);
   }
   .confirm-missing li {
-    padding: 5px 0; border-top: 1px solid #2c2c2c;
+    padding: 5px 0; border-top: 1px solid var(--grey-card);
     display: flex; justify-content: space-between; gap: 12px; align-items: center;
   }
   .confirm-missing li:first-child { border-top: none; }
@@ -952,7 +956,7 @@
   .confirm-missing-tag {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-    color: #ffb450; white-space: nowrap;
+    color: #B26B00; white-space: nowrap;
   }
   @keyframes armPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(255,180,80,0.55); }
@@ -1007,27 +1011,27 @@
 
   /* Per-block "done" tints — match the left-edge accent stripe colour */
   .checklist-item.block-warmup.checked {
-    background: rgba(184,224,246,0.12);
-    border-color: rgba(184,224,246,0.40);
+    background: rgba(199,85,47,0.12);
+    border-color: rgba(199,85,47,0.40);
   }
   .checklist-item.block-warmup.checked .check-box { background: var(--ice); border-color: var(--ice); }
 
   .checklist-item.block-strength.checked {
-    background: rgba(212,255,0,0.08);
-    border-color: rgba(212,255,0,0.40);
+    background: rgba(14,74,54,0.08);
+    border-color: rgba(14,74,54,0.40);
   }
   .checklist-item.block-strength.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
 
   .checklist-item.block-power.checked {
-    background: rgba(183,148,246,0.12);
-    border-color: rgba(183,148,246,0.40);
+    background: rgba(168,116,28,0.12);
+    border-color: rgba(168,116,28,0.40);
   }
   .checklist-item.block-power.checked .check-box { background: var(--purple); border-color: var(--purple); }
 
   /* Dark-mode variants — slightly brighter tints so the colour reads on a black bg */
-  body[data-dark] .checklist-item.block-warmup.checked   { background: rgba(184,224,246,0.10); border-color: rgba(184,224,246,0.30); }
-  body[data-dark] .checklist-item.block-strength.checked { background: rgba(212,255,0,0.07);   border-color: rgba(212,255,0,0.30); }
-  body[data-dark] .checklist-item.block-power.checked    { background: rgba(183,148,246,0.10); border-color: rgba(183,148,246,0.30); }
+  body[data-dark] .checklist-item.block-warmup.checked   { background: rgba(199,85,47,0.10); border-color: rgba(199,85,47,0.30); }
+  body[data-dark] .checklist-item.block-strength.checked { background: rgba(14,74,54,0.07);   border-color: rgba(14,74,54,0.30); }
+  body[data-dark] .checklist-item.block-power.checked    { background: rgba(168,116,28,0.10); border-color: rgba(168,116,28,0.30); }
 
   /* Left-edge accent stripe — color matches block type, same palette as the home page */
   .checklist-item::before {
@@ -1046,7 +1050,7 @@
   .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 14px; }
   /* Bigger check circle — feels more tappable and gives a clearer "done" feedback */
   .check-box { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--grey-mid); background: transparent; flex-shrink: 0; position: relative; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
-  .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--grey-dark); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--on-accent); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   .item-body { flex: 1; min-width: 0; }
   /* Number + name now share one line so the number reads as part of the title */
   .item-name-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -1181,7 +1185,7 @@
     background: var(--yellow);
     border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: #0A0A0A; font-size: 22px;
+    color: var(--on-accent); font-size: 22px;
     padding-left: 4px; /* optical centering for the triangle */
     transition: transform 0.15s;
     box-shadow: 0 4px 18px rgba(0,0,0,0.35);
@@ -1275,7 +1279,7 @@
     align-items: center;
     padding: 8px 16px;
     background: var(--yellow);
-    color: var(--grey-dark);
+    color: var(--on-accent);
     border: none;
     border-radius: 99px;
     font-family: 'Barlow Condensed', sans-serif;
@@ -1287,13 +1291,13 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   }
   body[data-dark] .ex-extra-chip {
-    box-shadow: 0 1px 4px rgba(212,255,0,0.18);
+    box-shadow: 0 1px 4px rgba(14,74,54,0.18);
   }
   /* "yellow"-styled chips (high-priority ones from JSON) — already yellow,
      just give them a slightly stronger glow so they read as the highest
      priority among the extras. */
   .ex-extra-chip.yellow {
-    box-shadow: 0 0 0 2px rgba(212,255,0,0.25), 0 1px 2px rgba(0,0,0,0.08);
+    box-shadow: 0 0 0 2px rgba(14,74,54,0.25), 0 1px 2px rgba(0,0,0,0.08);
   }
 
   /* Coaching cues — yellow accent for "good", red accent for "bad". No icons. */
@@ -1423,10 +1427,10 @@
   .ex-set-rpe .rpe-btn.selected {
     background: var(--yellow);
     border-color: var(--yellow);
-    color: var(--grey-dark);
+    color: var(--on-accent);
   }
   body[data-dark] .ex-set-rpe .rpe-btn { border-color: #444; color: #888; }
-  body[data-dark] .ex-set-rpe .rpe-btn.selected { color: var(--grey-dark); }
+  body[data-dark] .ex-set-rpe .rpe-btn.selected { color: var(--on-accent); }
 
   /* Per-set check circle */
   .ex-set-check {
@@ -1445,7 +1449,7 @@
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 700;
-    color: var(--grey-dark);
+    color: var(--on-accent);
     opacity: 0;
     transform: scale(0.5);
     transition: opacity 0.15s, transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1472,25 +1476,25 @@
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0,0,0,0.08);
     transition: transform 0.15s, box-shadow 0.2s;
-    color: var(--grey-dark);
+    color: var(--on-accent);
     font-size: 14px;
     line-height: 1;
     padding-left: 2px; /* visual centering for the ▶ glyph */
   }
   .play-btn:hover { transform: scale(1.05); }
-  body[data-dark] .play-btn { background: var(--yellow); color: var(--grey-dark); }
+  body[data-dark] .play-btn { background: var(--yellow); color: var(--on-accent); }
 
   /* Wrapper so the play button stays right-aligned in the action area */
   .item-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
   .item-actions .play-btn { margin-left: 0; }
   .item-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--grey-card); color: var(--grey-dark); letter-spacing: 0.3px; }
-  .chip.yellow { background: var(--yellow); color: var(--grey-dark); }
-  .chip.dark   { background: #3a3a3a; color: #aaa; }
+  .chip.yellow { background: var(--yellow); color: var(--on-accent); }
+  .chip.dark   { background: var(--grey-card); color: var(--grey-text); }
 
   .item-rest { border-top: 1px solid var(--grey-card); padding: 0; flex-direction: column; align-items: stretch; gap: 0; }
   .rest-row { display: flex; align-items: center; justify-content: flex-end; padding: 10px 16px; }
-  .rest-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--grey-dark); color: var(--yellow); border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .rest-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; background: var(--yellow); color: var(--on-accent); border: none; padding: 7px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
   /* ── Coaching Cues (refreshed: rotating chevron + soft pill cues with circular badges) ── */
   /* Compact "Coaching Cues" toggle — sits at the bottom of the card (in the
@@ -1586,7 +1590,7 @@
     border-radius: 50%;
     background: var(--yellow);
     border: none;
-    color: var(--grey-dark);
+    color: var(--on-accent);
     cursor: pointer;
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -1597,13 +1601,13 @@
   .round-play-btn:hover { transform: scale(1.08); }
   .round-play-btn:active { transform: scale(0.95); }
   .round-play-btn svg { width: 12px; height: 12px; margin-left: 1px; }
-  body[data-dark] .round-play-btn { background: var(--yellow); color: #0A0A0A; }
+  body[data-dark] .round-play-btn { background: var(--yellow); color: var(--on-accent); }
   .round-group.checked .round-row { opacity: 0.5; }
   /* Round cues (inside a circuit) reuse the same details.cues styling as the
      main exercise cues — single source of truth so they look identical. */
 
   /* ── Session Complete ── */
-  .session-complete { display: none; background: var(--grey-dark); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid #3a3a3a; }
+  .session-complete { display: none; background: var(--white); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid var(--grey-mid); }
   .session-complete.visible { display: block; animation: fadeUp 0.4s ease both; }
   /* Refined completion medallion — circular yellow ring with a check, scales in with a glow */
   .complete-emoji {
@@ -1617,7 +1621,7 @@
     font-size: 32px; font-weight: 900;
     line-height: 1;
     animation: completePop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s both;
-    box-shadow: 0 0 36px rgba(212,255,0,0.22);
+    box-shadow: 0 0 36px rgba(14,74,54,0.22);
   }
   @keyframes completePop {
     0%   { transform: scale(0); opacity: 0; }
@@ -1630,32 +1634,32 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700; font-size: 11px;
     letter-spacing: 2px; text-transform: uppercase;
-    color: #888;
+    color: var(--grey-text);
     margin-bottom: 4px;
   }
-  .complete-rpe-hint { font-family: 'Barlow', sans-serif; font-size: 11px; color: #666; margin-bottom: 12px; }
+  .complete-rpe-hint { font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--grey-text); margin-bottom: 12px; }
   .complete-rpe-buttons { display: flex; gap: 5px; }
   .complete-rpe-btn {
     flex: 1 1 0;
     min-width: 0;
     aspect-ratio: 1;
     border-radius: 8px;
-    border: 1px solid #444;
+    border: 1px solid var(--grey-mid);
     background: transparent;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700; font-size: 14px;
-    color: #aaa;
+    color: var(--grey-text);
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
   }
   @media (hover: hover) {
-    .complete-rpe-btn:hover { border-color: #888; color: #fff; }
+    .complete-rpe-btn:hover { border-color: var(--grey-dark); color: var(--grey-dark); }
   }
   .complete-rpe-btn:active { transform: scale(0.92); }
   .complete-rpe-btn.selected {
     background: var(--yellow);
     border-color: var(--yellow);
-    color: var(--grey-dark);
+    color: var(--on-accent);
   }
 
   /* ── Notes for Coach (inside the completion card, under the RPE row) ── */
@@ -1664,7 +1668,7 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700; font-size: 11px;
     letter-spacing: 2px; text-transform: uppercase;
-    color: #888;
+    color: var(--grey-text);
     margin-bottom: 8px;
   }
   .complete-note-input {
@@ -1673,17 +1677,17 @@
     padding: 12px 14px;
     font-family: 'Barlow', sans-serif;
     font-size: 14px; line-height: 1.5;
-    color: #e8e8e8;
-    background: #141414;
-    border: 1px solid #333;
+    color: var(--grey-dark);
+    background: var(--grey-card);
+    border: 1px solid var(--grey-mid);
     border-radius: 8px;
     outline: none;
     resize: vertical;
     display: block; box-sizing: border-box;
     transition: border-color 0.15s;
   }
-  .complete-note-input::placeholder { color: #666; }
-  .complete-note-input:focus { border-color: #555; }
+  .complete-note-input::placeholder { color: #bbb; }
+  .complete-note-input:focus { border-color: var(--yellow); }
 
   /* ── Completion actions (Send + Reset + status) ── */
   .complete-actions {
@@ -1695,7 +1699,7 @@
     font-weight: 700; font-size: 13px;
     letter-spacing: 1.5px; text-transform: uppercase;
     background: var(--yellow);
-    color: var(--grey-dark);
+    color: var(--on-accent);
     border: none;
     padding: 14px 28px;
     border-radius: 4px;
@@ -1705,34 +1709,34 @@
   }
   .send-session-btn:active { transform: scale(0.97); }
   .send-session-btn:disabled {
-    background: #444;
-    color: #777;
+    background: var(--grey-card);
+    color: var(--grey-text);
     cursor: not-allowed;
   }
   .send-session-status {
     font-family: 'Barlow', sans-serif;
     font-size: 12px;
-    color: #888;
+    color: var(--grey-text);
     min-height: 16px;
     text-align: center;
   }
   .send-session-status.success { color: var(--yellow); }
   .send-session-status.error   { color: #E74C3C; }
   .complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 36px; color: var(--yellow); text-transform: uppercase; line-height: 1; margin-bottom: 6px; }
-  .complete-sub { font-size: 13px; color: #666; font-weight: 300; margin-bottom: 20px; }
-  .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: #666; border: 1px solid #444; padding: 12px 24px; border-radius: 4px; cursor: pointer; }
+  .complete-sub { font-size: 13px; color: var(--grey-text); font-weight: 300; margin-bottom: 20px; }
+  .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); padding: 12px 24px; border-radius: 4px; cursor: pointer; }
 
   /* ── Back Bar ── */
-  .back-bar { background: var(--grey-dark); padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-  .back-arrow { color: var(--yellow); font-size: 20px; line-height: 1; }
-  .back-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #888; }
+  .back-bar { background: var(--yellow); padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .back-arrow { color: var(--on-accent); font-size: 20px; line-height: 1; }
+  .back-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.72); }
 
   /* ── Notes ── */
   #screen-notes { background: var(--grey-bg); }
-  .notes-header { background: var(--grey-dark); padding: 48px 24px 32px; position: relative; }
+  .notes-header { background: var(--yellow); padding: 48px 24px 32px; position: relative; }
   .notes-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--purple); }
-  .notes-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: var(--white); text-transform: uppercase; line-height: 1; }
-  .notes-subtitle { font-size: 12px; color: #666; margin-top: 6px; font-weight: 300; }
+  .notes-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: #fff; text-transform: uppercase; line-height: 1; }
+  .notes-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
   .note-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
   .note-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
   .note-icon { width: 32px; height: 32px; background: var(--purple); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
@@ -1743,27 +1747,27 @@
   .note-card.open .note-body { display: block; }
 
   /* ── Timer ── */
-  .timer-overlay { position: fixed; inset: 0; background: rgba(20,20,20,0.96); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+  .timer-overlay { position: fixed; inset: 0; background: rgba(250,247,242,0.97); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
   .timer-overlay.visible { display: flex; }
-  .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 16px; }
+  .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); margin-bottom: 16px; }
   .timer-ring { width: 220px; height: 220px; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
   .timer-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
   .timer-ring circle { fill: none; stroke-width: 4; }
-  .ring-bg { stroke: #333; }
+  .ring-bg { stroke: var(--grey-mid); }
   .ring-progress { stroke: var(--yellow); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
   .timer-inner { position: relative; text-align: center; }
-  .timer-display { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 96px; color: var(--white); line-height: 1; letter-spacing: -2px; }
+  .timer-display { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 96px; color: var(--grey-dark); line-height: 1; letter-spacing: -2px; }
   .timer-display.warning { color: var(--yellow); }
   .timer-presets { display: flex; gap: 10px; margin-top: 32px; }
-  .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid #444; background: transparent; color: #aaa; cursor: pointer; }
+  .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
   .preset-btn.selected { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
   .timer-controls { display: flex; gap: 12px; margin-top: 20px; }
   .timer-ctrl-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 28px; border-radius: 4px; border: none; cursor: pointer; }
-  .btn-start { background: var(--yellow); color: #2A2A2A; }
-  .btn-close { background: #333; color: #aaa; }
-  .btn-reset { background: #222; color: #777; border: 1px solid #444; }
+  .btn-start { background: var(--yellow); color: var(--on-accent); }
+  .btn-close { background: var(--grey-card); color: var(--grey-dark); }
+  .btn-reset { background: var(--grey-card); color: var(--grey-text); border: 1px solid var(--grey-mid); }
 
-  .day-focus-tag { display: inline-block; background: var(--yellow); color: var(--grey-dark); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; margin-bottom: 16px; }
+  .day-focus-tag { display: inline-block; background: var(--yellow); color: var(--on-accent); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; margin-bottom: 16px; }
 
   /* ── Weight Log ── */
   /* ── Personal note per exercise (saves to localStorage per athlete + exercise) ── */
@@ -1773,7 +1777,7 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700; font-size: 10px;
     letter-spacing: 2px; text-transform: uppercase;
-    color: #aaa;
+    color: var(--grey-text);
     cursor: pointer; list-style: none; user-select: none;
     display: flex; align-items: center; gap: 8px;
     transition: color 0.15s, background 0.15s;
@@ -1816,7 +1820,7 @@
   .checklist-item.checked .note-row { opacity: 0.4; }
 
   .weight-log { border-top: 1px solid var(--grey-card); padding: 9px 16px; display: flex; align-items: center; gap: 10px; }
-  .weight-log label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #aaa; white-space: nowrap; flex-shrink: 0; }
+  .weight-log label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); white-space: nowrap; flex-shrink: 0; }
   .weight-input { flex: 1; background: var(--grey-card); border: 1px solid transparent; border-radius: 4px; padding: 6px 10px; font-size: 13px; font-family: 'Barlow', sans-serif; color: var(--grey-dark); outline: none; transition: border-color 0.2s; }
   .weight-input:focus { border-color: var(--yellow); }
   .weight-input::placeholder { color: #bbb; }
@@ -1825,15 +1829,15 @@
   /* ── RPE Selector ── */
   .rpe-row { display: none; border-top: 1px solid var(--grey-card); padding: 9px 16px; align-items: center; gap: 6px; }
   .rpe-row.visible { display: flex; animation: fadeUp 0.2s ease both; }
-  .rpe-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #aaa; margin-right: 2px; flex-shrink: 0; }
+  .rpe-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); margin-right: 2px; flex-shrink: 0; }
   .rpe-btn { width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--grey-text); transition: background 0.15s, border-color 0.15s; flex-shrink: 0; }
-  .rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--grey-dark); }
+  .rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
 
   /* ── Dark Toggle ── */
   .dark-toggle { background: transparent; border: 1px solid #444; border-radius: 4px; padding: 5px 9px; cursor: pointer; font-size: 14px; margin-left: auto; line-height: 1; }
 
   /* ── Dark Mode ── */
-  body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #888; --white: #202020; }
+  body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #888; --white: #202020; --grey-dark: #e8e8e8; }
   body[data-dark] .checklist-item { border-color: #333; }
   body[data-dark] .item-name { color: #ddd; }
   body[data-dark] .section-title { color: #666; }
@@ -1922,9 +1926,9 @@
     z-index: 2000;
     max-width: 380px;
     width: calc(100% - 40px);
-    background: #1A1A1A;
-    color: #E8E8E8;
-    border: 1px solid #333;
+    background: var(--white);
+    color: var(--grey-dark);
+    border: 1px solid var(--grey-mid);
     border-radius: 6px;
     padding: 14px 16px;
     display: flex;
@@ -1942,7 +1946,7 @@
     width: 36px; height: 36px;
     border-radius: 3px;
     background: var(--yellow);
-    color: #0A0A0A;
+    color: var(--on-accent);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1965,15 +1969,15 @@
     padding: 8px 12px;
     border-radius: 3px;
     border: none;
-    background: #0A0A0A;
-    color: #888;
+    background: var(--grey-card);
+    color: var(--grey-text);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
   }
   .a2hs-toast button.primary {
     background: var(--yellow);
-    color: #0A0A0A;
+    color: var(--on-accent);
   }
   .a2hs-toast-actions { display: flex; gap: 6px; flex-shrink: 0; }
 </style>

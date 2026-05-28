@@ -63,7 +63,7 @@ body.grain::before {
   text-transform: uppercase;
   letter-spacing: -0.5px;
 }
-.h-display em { font-style: normal; color: var(--accent); }
+.h-display em { font-style: normal; color: var(--accent-2); }
 
 .h1 {
   font-family: var(--font-display);
@@ -72,7 +72,7 @@ body.grain::before {
   line-height: 0.95;
   text-transform: uppercase;
 }
-.h1 em { font-style: normal; color: var(--accent); }
+.h1 em { font-style: normal; color: var(--accent-2); }
 
 .h2 {
   font-family: var(--font-display);
@@ -81,7 +81,7 @@ body.grain::before {
   line-height: 1;
   text-transform: uppercase;
 }
-.h2 em { font-style: normal; color: var(--accent); }
+.h2 em { font-style: normal; color: var(--accent-2); }
 
 .h3 {
   font-family: var(--font-display);
@@ -112,7 +112,7 @@ body.grain::before {
   font-weight: 500;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-2);
   display: inline-flex;
   align-items: center;
   gap: 12px;
