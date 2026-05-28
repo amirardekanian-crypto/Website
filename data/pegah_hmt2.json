@@ -123,40 +123,40 @@
               },
               {
                 "type": "standard",
-                "name": "Dead Bug",
+                "name": "Bird Dog",
                 "videoUrl": null,
                 "restSec": 30,
                 "chips": [
                   { "label": "2 Sets" },
                   { "label": "×8 Reps/side" },
-                  { "label": "Tempo 4-0-1-0" },
+                  { "label": "Tempo 3-1-1-0" },
                   { "label": "RPE 3" }
                 ],
                 "cues": {
                   "good": [
-                    "Lower back stays pinned to the floor — limbs extend slightly further than Cycle 1",
-                    "Feel the deep abdominals bracing — belly pulled gently inward before every rep"
+                    "Opposite arm and leg extend to form one long line — body stays completely parallel to the floor",
+                    "Feel the core bracing to prevent the hips from rotating as the limbs extend"
                   ],
-                  "bad": ["Any gap forming between lower back and floor — reduce range immediately if it lifts"]
+                  "bad": ["Letting the hips rotate or the lower back arch — reduce the range of motion if either happens"]
                 }
               },
               {
                 "type": "standard",
-                "name": "Band Pull-Apart",
+                "name": "Prone Y-T-W",
                 "videoUrl": null,
                 "restSec": 30,
                 "chips": [
                   { "label": "2 Sets" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "×8 Reps each" },
+                  { "label": "Tempo 2-1-2-0" },
                   { "label": "RPE 3" }
                 ],
                 "cues": {
                   "good": [
-                    "Band stretches to chest width, shoulder blades squeeze firmly at the endpoint",
-                    "Feel the mid-back muscles initiating the pull — not the hands or arms"
+                    "From lying face down, arms form Y, T, and W shapes with thumbs pointing up throughout",
+                    "Feel the mid and lower traps activating to lift the arms — not the neck muscles tensing"
                   ],
-                  "bad": ["Shrugging the shoulders toward the ears during the movement"]
+                  "bad": ["Shrugging the shoulders toward the ears — the movement comes from the shoulder blades, not the neck"]
                 }
               }
             ]
@@ -205,7 +205,7 @@
               },
               {
                 "type": "standard",
-                "name": "Incline Dumbbell Press",
+                "name": "Machine Chest Press",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -216,10 +216,10 @@
                 ],
                 "cues": {
                   "good": [
-                    "Dumbbells lower to the sides of the upper chest, elbows at 45° from the torso",
-                    "Feel the upper chest and front shoulder doing the pressing — not the triceps dominating"
+                    "Handles press in a smooth arc — chest stays proud, shoulders stay back and down throughout",
+                    "Feel the chest muscles doing the pressing — imagine squeezing the elbows toward each other as you push"
                   ],
-                  "bad": ["Letting the elbows flare out to 90° — keep them angled in toward the body"]
+                  "bad": ["Letting the shoulders roll forward at lockout — keep the chest up and shoulder blades gently set throughout"]
                 }
               },
               {
@@ -372,21 +372,21 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Plank to Forearm Reach",
+                "name": "Ab Wheel Rollout",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
                   { "label": "3 Sets" },
-                  { "label": "×8 Reps/side" },
-                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-0-2-0" },
                   { "label": "RPE 6" }
                 ],
                 "cues": {
                   "good": [
-                    "Body stays as one rigid unit — only the reaching forearm moves",
-                    "Feel the obliques fighting the rotation throughout the reach"
+                    "Body moves as one rigid unit as the wheel rolls forward — no hip drop at any point",
+                    "Feel the deep core bracing hard to resist the extension force throughout"
                   ],
-                  "bad": ["Hip twist or shift — any movement means the core has given way"]
+                  "bad": ["Letting the hips sag toward the floor — if they drop, reduce the rollout distance until the core is strong enough"]
                 }
               },
               {
@@ -424,7 +424,7 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Hip 90/90 Stretch",
+                "name": "Kneeling Hip Flexor Stretch",
                 "videoUrl": null,
                 "chips": [
                   { "label": "2 Sets" },
@@ -433,10 +433,10 @@
                 ],
                 "cues": {
                   "good": [
-                    "Torso upright, both hips working through rotation simultaneously",
-                    "Feel the hip capsule releasing — breathe slowly into the tightest point on each exhale"
+                    "Back knee on the floor, front foot forward — tall torso, hips gently driven forward",
+                    "Feel the stretch through the front of the back leg's hip — breathe into it on each exhale"
                   ],
-                  "bad": ["Forcing the range aggressively — let the hip open gradually with each breath"]
+                  "bad": ["Arching the lower back to gain more range — the movement should come from the hip, not the spine"]
                 }
               },
               {
@@ -483,21 +483,21 @@
               },
               {
                 "type": "standard",
-                "name": "Dumbbell Hip Thrust",
+                "name": "Dumbbell Glute Bridge",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
                   { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×12 Reps" },
+                  { "label": "×15 Reps" },
                   { "label": "Tempo 2-1-1-0" },
                   { "label": "RPE 7" }
                 ],
                 "cues": {
                   "good": [
-                    "Dumbbell at the hip crease, upper back on bench — hips drive to a flat horizontal table",
-                    "Feel maximum glute squeeze at lockout — hold one beat before lowering"
+                    "Dumbbell placed across the hips, feet flat on the floor — hips drive straight up to a flat table",
+                    "Feel the glutes contracting hard at the top — squeeze and hold for a full beat before lowering"
                   ],
-                  "bad": ["Hyperextending the lower back at the top — the movement ends at hip level, not above"]
+                  "bad": ["Knees caving inward or the lower back hyperextending — keep knees tracking over toes throughout"]
                 }
               },
               {
@@ -565,7 +565,7 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Face Pull",
+                "name": "Rear Delt Machine",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -576,10 +576,10 @@
                 ],
                 "cues": {
                   "good": [
-                    "Hands pull to face level, elbows flare high — double bicep position at the top",
-                    "Feel the rear delts and external rotators working — not the biceps pulling"
+                    "Arms sweep back in a wide arc to shoulder height — elbows stay high throughout the movement",
+                    "Feel the rear deltoids and upper back doing the work — not the biceps or neck pulling"
                   ],
-                  "bad": ["Elbows dropping below shoulder height — height is everything on this movement"]
+                  "bad": ["Letting the elbows drop below shoulder height or leaning the torso forward to complete the rep"]
                 }
               }
             ]
@@ -590,21 +590,20 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dead Bug",
+                "name": "Hollow Hold",
                 "videoUrl": null,
                 "restSec": 30,
                 "chips": [
                   { "label": "3 Sets" },
-                  { "label": "×8 Reps/side" },
-                  { "label": "Tempo 4-0-1-0" },
+                  { "label": "20s" },
                   { "label": "RPE 5" }
                 ],
                 "cues": {
                   "good": [
-                    "Lower back flat throughout — limbs extend a little further than Cycle 1",
-                    "Feel deep core bracing — belly drawn inward before every rep"
+                    "Lower back pressed flat to the floor, arms overhead, legs extended — body forms a slight curve",
+                    "Feel the entire anterior core working to maintain the position — abs, hip flexors, and obliques all engaged"
                   ],
-                  "bad": ["Lower back arching — reduce range of motion immediately if it lifts"]
+                  "bad": ["Letting the lower back arch away from the floor — raise the legs or bend the knees to make it easier"]
                 }
               }
             ]
@@ -700,27 +699,27 @@
       {
         "icon": "🆕",
         "title": "New Exercises — Learn Before You Load",
-        "body": "Cycle 2 introduces eight new movements: barbell RDL, leg press, lat pulldown, incline dumbbell press, machine shoulder press, lying leg curl, wall ball, and lateral box step-up. In Week 1, treat every new exercise as a technique session — start lighter than you think you need to and focus entirely on the feel. The leg press and machine shoulder press will feel easier to load than the free weight alternatives, which is fine — the machines are there to build confidence and capacity, not replace the skill work. Load progresses from Week 2 once each pattern feels familiar."
+        "body": "Cycle 2 introduces eight new movements: barbell RDL, leg press, lat pulldown, machine chest press, machine shoulder press, lying leg curl, wall ball, and lateral box step-up. In Week 1, treat every new exercise as a technique session — start lighter than you think you need to and focus entirely on the feel. The machines are there to build confidence and capacity. Load progresses from Week 2 once each pattern feels familiar."
       },
       {
         "icon": "🏋️",
         "title": "Barbell RDL — This One Takes a Week to Feel Right",
-        "body": "The barbell RDL is a direct step up from the dumbbell version you did in Cycle 1, but the bar changes the feel significantly — it sits closer to the body and forces better lat engagement to keep it there. Start with just the bar (20kg) in Week 1 regardless of how light it feels. The goal is to feel the hamstrings loading exactly as you did with the dumbbells, but now with a longer lever and more potential to load over the coming weeks. If the bar drifts forward away from your legs at any point, that's your cue to reset — not push through."
+        "body": "The barbell RDL is a direct step up from the dumbbell version you did in Cycle 1, but the bar changes the feel significantly — it sits closer to the body and forces better lat engagement to keep it there. Start with just the bar (20kg) in Week 1 regardless of how light it feels. If the bar drifts forward away from your legs at any point, that's your cue to reset — not push through."
       },
       {
         "icon": "❤️",
         "title": "Your Menstrual Cycle Is a Training Variable — Not an Excuse",
-        "body": "Based on what you experienced in Cycle 1, hard period days are going to land during this cycle too. The protocol is already built in: drop RPE by 1 across all exercises, cut the conditioning circuit to 2 rounds, and use Day 4 as a walk if you need it. You do not skip — you modify and you show up. Consistency across 10 weeks matters far more than any individual session performed at 100%. The athletes who improve fastest are not the ones who train hardest on good days — they are the ones who still train on hard days."
+        "body": "Based on what you experienced in Cycle 1, hard period days are going to land during this cycle too. The protocol is already built in: drop RPE by 1 across all exercises, cut the conditioning circuit to 2 rounds, and use Day 4 as a walk if you need it. You do not skip — you modify and you show up. Consistency across 10 weeks matters far more than any individual session performed at 100%."
       },
       {
         "icon": "🏃",
         "title": "The Run Is Progressing — Trust the Process",
-        "body": "Your Zone 2 target remains 139–152 bpm. The walk-run pattern you used in Cycle 1 is exactly right and will naturally shift toward longer jogging intervals as your aerobic system adapts over the next 5 weeks. Do not try to force continuous running before your heart rate allows it — the moment you push above 152, you step out of the adaptation zone that builds the engine. By the end of Week 10, the goal is to run continuously for 20–25 minutes within your zone. That is a meaningful and realistic target from where you are now."
+        "body": "Your Zone 2 target remains 139–152 bpm. The walk-run pattern you used in Cycle 1 is exactly right and will naturally shift toward longer jogging intervals as your aerobic system adapts. Do not force continuous running before your heart rate allows it — the moment you push above 152, walk to recover. By the end of Week 10, the goal is to run continuously for 20–25 minutes within your zone."
       },
       {
         "icon": "📊",
         "title": "4 Sets Changes the Game — Manage It in Week 1",
-        "body": "Every primary lift moves from 3 sets to 4 this cycle. That is a 33% increase in volume on your most important exercises. Do not add weight and volume at the same time in Week 1 — start at your Cycle 1 finishing weights and add the fourth set first. From Week 2 onwards, add 2kg per exercise per week where all sets and reps were completed cleanly at the target RPE. The volume increase alone will drive adaptation in the early weeks without needing heavier loads."
+        "body": "Every primary lift moves from 3 sets to 4 this cycle — a 33% increase in volume. Do not add weight and volume at the same time in Week 1 — start at your Cycle 1 finishing weights and add the fourth set first. From Week 2 onwards, add 2kg per exercise per week where all sets and reps were completed cleanly at the target RPE."
       },
       {
         "icon": "🧠",
