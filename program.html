@@ -151,21 +151,20 @@
   /* Sticky nav */
   .home-nav {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(250,247,242,0.9);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--grey-mid);
+    background: var(--yellow);
     padding: 14px 24px;
     display: flex; justify-content: space-between; align-items: center;
   }
+  .home-nav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #C7552F; }
 
   .home-brand {
     font-family: 'Space Mono', monospace;
     font-size: 12px; font-weight: 700; letter-spacing: 2px;
-    color: var(--grey-text); text-decoration: none;
-    transition: color 0.2s;
+    color: var(--on-accent); text-decoration: none;
+    transition: opacity 0.2s;
   }
-  .home-brand strong { color: var(--yellow); }
-  .home-brand:hover, .home-brand:hover strong { color: var(--grey-dark); }
+  .home-brand strong { color: var(--on-accent); }
+  .home-brand:hover { opacity: 0.85; }
 
   /* Shared fade-in animation reused by athlete-card, sub-banner, cycle-meter,
      cycle-hero and the upcoming-section blocks. */
@@ -300,7 +299,7 @@
   }
   .upcoming-card {
     background: var(--white);
-    border: 1px solid var(--grey-mid);
+    border: 2px solid var(--yellow-mid);
     border-radius: 14px;
     padding: 18px;
     margin-bottom: 10px;
@@ -308,11 +307,11 @@
   }
   .upcoming-card-num {
     width: 40px; height: 40px; flex-shrink: 0;
-    border: 1.5px solid var(--yellow);
+    border: 1.5px solid #C7552F;
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: 16px; color: var(--yellow);
+    font-weight: 900; font-size: 16px; color: #C7552F;
   }
   .upcoming-card-body { flex: 1; min-width: 0; }
   .upcoming-card-head {
@@ -323,12 +322,12 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 800; font-size: 20px;
     text-transform: uppercase; letter-spacing: -0.3px;
-    color: var(--grey-dark); line-height: 1.1;
+    color: #C7552F; line-height: 1.1;
   }
   .upcoming-card-weeks {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 1.2px;
-    color: var(--grey-text);
+    color: #C7552F;
   }
   /* Italic tagline under the card title — mirrors the current cycle hero */
   .upcoming-card-tagline {
@@ -366,7 +365,7 @@
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1px;
-    color: var(--yellow);
+    color: #C7552F;
     flex-shrink: 0;
     min-width: 22px;
     line-height: 1.7;
@@ -420,8 +419,8 @@
 
   /* App Guide button (in Notes screen, styled as a note-card) */
   .guide-launch-card { cursor: pointer; }
-  .guide-launch-card .note-icon { background: var(--purple); }
-  .guide-launch-card .note-card-title { color: var(--purple); }
+  .guide-launch-card .note-icon { background: var(--ice); }
+  .guide-launch-card .note-card-title { color: var(--ice); }
 
   /* ─── HOME-ONLY: yellow-only palette ─────────────────────────────
      Remap the ice + purple tokens to yellow ONLY inside #screen-home,
@@ -474,13 +473,13 @@
     line-height: 0.95;
     letter-spacing: -1.5px;
     text-transform: uppercase;
-    color: var(--grey-dark);
+    color: #C7552F;
   }
   #screen-home .cycle-hero-weeks {
     font-family: 'Space Mono', monospace;
     font-size: 11px;
     letter-spacing: 1.5px;
-    color: var(--grey-text);
+    color: #C7552F;
     text-transform: uppercase;
     flex-shrink: 0;
   }
@@ -503,11 +502,11 @@
   /* Square C-badge next to "CYCLE PLAN" — same design as the upcoming-card badge */
   #screen-home .cm-num {
     width: 40px; height: 40px; flex-shrink: 0;
-    border: 1.5px solid var(--yellow);
+    border: 1.5px solid #C7552F;
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: 16px; color: var(--yellow);
+    font-weight: 900; font-size: 16px; color: #C7552F;
   }
   #screen-home .cm-eyebrow {
     background: transparent;
@@ -528,7 +527,7 @@
      current cycle card visually stands out from the future cycle cards. */
   #screen-home .current-message {
     background: var(--white);
-    border: 1px solid var(--yellow-mid);
+    border: 2px solid var(--yellow-mid);
     box-shadow:
       0 0 0 1px rgba(14,74,54,0.04),
       0 8px 30px rgba(14,74,54,0.06),
@@ -566,7 +565,7 @@
     font-family: 'Space Mono', monospace;
     font-size: 12px; font-weight: 700;
     letter-spacing: 1px;
-    color: var(--yellow);
+    color: #C7552F;
     flex-shrink: 0;
     min-width: 24px;
     line-height: 1.5;
@@ -758,6 +757,7 @@
   /* ── Archive ── */
   #screen-archive { background: var(--grey-bg); }
   .archive-banner { background: var(--yellow); padding: 48px 24px 32px; position: relative; overflow: hidden; }
+  .archive-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); z-index: 1; }
   .archive-banner::after {
     content: attr(data-watermark); position: absolute; bottom: -10px; right: -8px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 64px;
@@ -768,8 +768,8 @@
   .archive-title span { color: rgba(255,255,255,0.65); }
   .archive-scroll { padding: 20px 20px 100px; }
   .archive-day-block { background: var(--white); border-radius: 8px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--grey-mid); opacity: 0.75; }
-  .archive-day-title { background: var(--grey-card); padding: 14px 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text); display: flex; align-items: center; gap: 10px; }
-  .archive-day-title span { font-size: 10px; font-weight: 400; color: #555; letter-spacing: 2px; }
+  .archive-day-title { background: var(--ice); padding: 14px 18px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .archive-day-title span { font-size: 10px; font-weight: 400; color: rgba(255,255,255,0.7); letter-spacing: 2px; }
   .archive-exercise-list { padding: 14px 18px; }
   .archive-ex { padding: 8px 0; border-bottom: 1px solid var(--grey-card); display: flex; justify-content: space-between; align-items: center; }
   .archive-ex:last-child { border-bottom: none; }
@@ -984,8 +984,8 @@
   .section-header-prog.block-warmup::after           { background: var(--ice); }
   .section-header-prog.block-strength .section-title { color: var(--yellow); }
   .section-header-prog.block-strength::after         { background: var(--yellow); }
-  .section-header-prog.block-power    .section-title { color: var(--purple); }
-  .section-header-prog.block-power::after            { background: var(--purple); }
+  .section-header-prog.block-power    .section-title { color: var(--ice); }
+  .section-header-prog.block-power::after            { background: var(--ice); }
 
   /* ── Checklist Items ── */
   /* ── Exercise card (refreshed: softer shadow, larger radius, premium feel) ── */
@@ -1023,15 +1023,15 @@
   .checklist-item.block-strength.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
 
   .checklist-item.block-power.checked {
-    background: rgba(168,116,28,0.12);
-    border-color: rgba(168,116,28,0.40);
+    background: rgba(199,85,47,0.12);
+    border-color: rgba(199,85,47,0.40);
   }
-  .checklist-item.block-power.checked .check-box { background: var(--purple); border-color: var(--purple); }
+  .checklist-item.block-power.checked .check-box { background: var(--ice); border-color: var(--ice); }
 
   /* Dark-mode variants — slightly brighter tints so the colour reads on a black bg */
   body[data-dark] .checklist-item.block-warmup.checked   { background: rgba(199,85,47,0.10); border-color: rgba(199,85,47,0.30); }
   body[data-dark] .checklist-item.block-strength.checked { background: rgba(14,74,54,0.07);   border-color: rgba(14,74,54,0.30); }
-  body[data-dark] .checklist-item.block-power.checked    { background: rgba(168,116,28,0.10); border-color: rgba(168,116,28,0.30); }
+  body[data-dark] .checklist-item.block-power.checked    { background: rgba(199,85,47,0.10); border-color: rgba(199,85,47,0.30); }
 
   /* Left-edge accent stripe — color matches block type, same palette as the home page */
   .checklist-item::before {
@@ -1044,7 +1044,7 @@
   }
   .checklist-item.block-warmup::before   { background: var(--ice); }
   .checklist-item.block-strength::before { background: var(--yellow); }
-  .checklist-item.block-power::before    { background: var(--purple); }
+  .checklist-item.block-power::before    { background: var(--ice); }
   .checklist-item.checked::before        { opacity: 0.45; }
 
   .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 14px; }
@@ -1727,19 +1727,20 @@
   .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); padding: 12px 24px; border-radius: 4px; cursor: pointer; }
 
   /* ── Back Bar ── */
-  .back-bar { background: var(--yellow); padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .back-bar { background: var(--yellow); padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative; }
+  .back-bar::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
   .back-arrow { color: var(--on-accent); font-size: 20px; line-height: 1; }
   .back-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.72); }
 
   /* ── Notes ── */
   #screen-notes { background: var(--grey-bg); }
   .notes-header { background: var(--yellow); padding: 48px 24px 32px; position: relative; }
-  .notes-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--purple); }
+  .notes-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
   .notes-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: #fff; text-transform: uppercase; line-height: 1; }
   .notes-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
   .note-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
   .note-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
-  .note-icon { width: 32px; height: 32px; background: var(--purple); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .note-icon { width: 32px; height: 32px; background: var(--ice); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
   .note-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; }
   .note-chevron { font-size: 12px; color: var(--grey-text); transition: transform 0.2s; }
   .note-card.open .note-chevron { transform: rotate(180deg); }
