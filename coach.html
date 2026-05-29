@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<!--
+  COACH DASHBOARD (Stage 1)
+  Private view of athlete progress, synced from program.html.
+  Access: Google sign-in, locked to the coach email (client check here +
+  Row Level Security in the database is the real gate).
+  Data source: Supabase table public.athlete_progress — each row holds one
+  athlete's whole localStorage as a JSON blob in `data`, decoded below.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach Dashboard</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FAF7F2">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A; --grey: #6B6B6B;
+    --line: #E7E2D9; --yellow: #E8B84B; --on-accent: #1A1A1A;
+    --green: #3A8F5E; --red: #C0563B; --blue: #2F6DB0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Barlow', sans-serif; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .5px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; gap: 12px; flex-wrap: wrap; }
+  .topbar h1 { font-size: 30px; }
+  .topbar .who { font-size: 13px; color: var(--grey); }
+  .btn { font-family: 'Barlow', sans-serif; font-size: 14px; font-weight: 600; border: 1px solid var(--line);
+         background: var(--card); color: var(--ink); padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+  .btn:hover { border-color: var(--ink); }
+  .btn.primary { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+
+  .gate { max-width: 420px; margin: 12vh auto; text-align: center; background: var(--card);
+          border: 1px solid var(--line); border-radius: 16px; padding: 40px 32px; }
+  .gate h1 { font-size: 32px; margin-bottom: 8px; }
+  .gate p { color: var(--grey); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+  .gate .err { color: var(--red); font-size: 13px; margin-top: 16px; min-height: 18px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; cursor: pointer; transition: border-color .15s, transform .15s; }
+  .card:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .card .name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; text-transform: uppercase; }
+  .card .meta { font-size: 12px; color: var(--grey); margin-top: 2px; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 12px; }
+  .pill.active { background: #E7F4EC; color: var(--green); }
+  .pill.quiet  { background: #FBEAE4; color: var(--red); }
+  .stats { display: flex; gap: 18px; margin-top: 14px; }
+  .stat .n { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+  .stat .l { font-size: 10px; text-transform: uppercase; color: var(--grey); letter-spacing: .5px; }
+
+  .back { font-size: 13px; color: var(--blue); cursor: pointer; margin-bottom: 16px; display: inline-block; }
+  .sec-title { font-size: 16px; color: var(--grey); margin: 26px 0 12px; }
+  .day { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+  .day h3 { font-size: 18px; }
+  .day .when { font-size: 12px; color: var(--grey); font-weight: 400; text-transform: none; font-family: 'Barlow', sans-serif; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--grey); letter-spacing: .5px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 7px 8px; border-bottom: 1px solid #F2EEE7; vertical-align: top; }
+  td.num { font-family: 'Space Mono', monospace; white-space: nowrap; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #F2EEE7; }
+  .tag.done { background: #E7F4EC; color: var(--green); }
+  .note { background: #FBF8F1; border-left: 3px solid var(--yellow); padding: 9px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; }
+  .readiness { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+  .readiness .r { font-size: 12px; color: var(--grey); } .readiness .r b { font-family: 'Space Mono', monospace; color: var(--ink); }
+  .muted { color: var(--grey); font-size: 13px; }
+  .loading { text-align: center; color: var(--grey); padding: 60px 0; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="gate" class="gate" style="display:none">
+  <h1>Coach Dashboard</h1>
+  <p>Private. Sign in with the coach Google account to view athlete progress.</p>
+  <button id="loginBtn" class="btn primary">Sign in with Google</button>
+  <div id="gateErr" class="err"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app" class="wrap" style="display:none">
+  <div class="topbar">
+    <div>
+      <h1>Athletes</h1>
+      <div class="who" id="who"></div>
+    </div>
+    <button id="logoutBtn" class="btn">Sign out</button>
+  </div>
+  <div id="content"><div class="loading">Loading…</div></div>
+</div>
+
+<script>
+// --- config -----------------------------------------------------------------
+const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+const COACH_EMAIL = 'amirardekanian@gmail.com';   // UX-only; the DB (RLS) is the real gate
+const QUIET_DAYS = 7;                              // mark athlete "quiet" after N idle days
+
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const $ = (id) => document.getElementById(id);
+
+// --- auth -------------------------------------------------------------------
+$('loginBtn').onclick = () =>
+  sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href.split('#')[0] } });
+$('logoutBtn').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+let booted = false;
+async function boot() {
+  if (booted) return; booted = true;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { booted = false; return showGate(); }
+  const email = (session.user.email || '').toLowerCase();
+  if (email !== COACH_EMAIL.toLowerCase()) {
+    await sb.auth.signOut();
+    booted = false;
+    return showGate('That account isn’t the coach account. Try again.');
+  }
+  $('gate').style.display = 'none';
+  $('app').style.display = 'block';
+  $('who').textContent = 'Signed in as ' + session.user.email;
+  loadOverview();
+}
+function showGate(err) { $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
+sb.auth.onAuthStateChange(() => { booted = false; boot(); });
+boot();
+
+// --- helpers ----------------------------------------------------------------
+function timeAgo(iso) {
+  if (!iso) return '—';
+  const d = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  if (d <= 0) return 'today'; if (d === 1) return 'yesterday'; return d + ' days ago';
+}
+function daysSince(iso) { return iso ? Math.floor((Date.now() - new Date(iso)) / 86400000) : 9999; }
+function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function jparse(v) { try { return JSON.parse(v); } catch { return null; } }
+
+// Strip the "<athlete_id>_" prefix and bucket the blob into something the
+// dashboard can render. The app stores progress as many flat keys; we decode
+// them back into days + exercise logs here.
+function decode(athleteId, blob) {
+  const prefix = athleteId + '_';
+  const days = {};        // dayNum -> { completed, completedOn, srpe, readiness, note }
+  const ex = {};          // exerciseName -> { sets, rpe, note }
+  const day = n => (days[n] = days[n] || {});
+  const exer = k => (ex[k] = ex[k] || {});
+
+  Object.keys(blob || {}).forEach(fullKey => {
+    if (fullKey.indexOf(prefix) !== 0) return;
+    const key = fullKey.slice(prefix.length);
+    const val = blob[fullKey];
+    let m;
+    if ((m = key.match(/^completed_d(\d+)$/)))   { const d = day(m[1]); d.completed = true; d.completedOn = val; }
+    else if ((m = key.match(/^srpe_(\d+)$/)))    { day(m[1]).srpe = val; }
+    else if ((m = key.match(/^readiness_(\d+)$/))) { day(m[1]).readiness = jparse(val); }
+    else if ((m = key.match(/^daynote_(\d+)$/))) { day(m[1]).note = val; }
+    else if ((m = key.match(/^setlog_(.+)$/)))   { exer(m[1]).sets = jparse(val) || []; }
+    else if ((m = key.match(/^note_(.+)$/)))     { exer(m[1]).note = val; }
+    else if ((m = key.match(/^rpe_(.+)$/)))      { exer(m[1]).rpe = val; }
+    // (timer_, sent_d, prog_state, dark_mode → ignored)
+  });
+  return { days, ex };
+}
+function unslug(s) { return s.replace(/_/g, ' '); }
+
+// --- overview ---------------------------------------------------------------
+async function loadOverview() {
+  $('content').innerHTML = '<div class="loading">Loading…</div>';
+  const { data, error } = await sb.from('athlete_progress').select('*').order('updated_at', { ascending: false });
+  if (error) { $('content').innerHTML = `<p class="muted">Could not load data: ${esc(error.message)}</p>`; return; }
+  if (!data || !data.length) { $('content').innerHTML = '<p class="muted">No athlete activity yet. Once an athlete trains, they’ll appear here.</p>'; return; }
+
+  const cards = data.map(row => {
+    const { days } = decode(row.athlete_id, row.data);
+    const dayNums = Object.keys(days);
+    const completed = dayNums.filter(n => days[n].completed).length;
+    const lastDay = dayNums.map(Number).sort((a,b)=>b-a)[0];
+    const lastRpe = lastDay != null && days[lastDay] ? days[lastDay].srpe : null;
+    const quiet = daysSince(row.updated_at) > QUIET_DAYS;
+    return `<div class="card" onclick="loadAthlete('${esc(row.athlete_id)}')">
+      <div class="name">${esc(row.athlete_name || row.athlete_id)}</div>
+      <div class="meta">last active ${timeAgo(row.updated_at)}</div>
+      <div class="stats">
+        <div class="stat"><div class="n">${completed}</div><div class="l">days done</div></div>
+        <div class="stat"><div class="n">${dayNums.length}</div><div class="l">days touched</div></div>
+        <div class="stat"><div class="n">${lastRpe || '—'}</div><div class="l">last RPE</div></div>
+      </div>
+      <span class="pill ${quiet ? 'quiet' : 'active'}">${quiet ? 'Quiet — may need a nudge' : 'Active'}</span>
+    </div>`;
+  }).join('');
+  $('content').innerHTML = `<div class="grid">${cards}</div>`;
+}
+
+// --- athlete detail ---------------------------------------------------------
+async function loadAthlete(athleteId) {
+  $('content').innerHTML = '<div class="loading">Loading…</div>';
+  const { data, error } = await sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).single();
+  if (error) { $('content').innerHTML = `<p class="muted">Error: ${esc(error.message)}</p>`; return; }
+  const { days, ex } = decode(athleteId, data.data);
+
+  // Days
+  const dayNums = Object.keys(days).map(Number).sort((a,b)=>a-b);
+  const daysHtml = dayNums.map(n => {
+    const d = days[n];
+    const rd = d.readiness;
+    let readinessHtml = '';
+    if (rd) {
+      if (rd.skipped) readinessHtml = '<div class="readiness"><span class="r">Readiness: <b>skipped</b></span></div>';
+      else readinessHtml = `<div class="readiness">
+        ${rd.composite != null ? `<span class="r">Readiness <b>${esc(rd.composite)}/5</b></span>` : ''}
+        ${['sleep','energy','soreness','stress','overall'].filter(k=>rd[k]!=null).map(k=>`<span class="r">${k} <b>${esc(rd[k])}</b></span>`).join('')}
+      </div>`;
+    }
+    return `<div class="day">
+      <h3>Day ${esc(n)} ${d.completed ? '<span class="tag done">✓ completed</span>' : '<span class="tag">in progress</span>'}
+        <span class="when">${d.completedOn ? '· ' + esc(d.completedOn) : ''}${d.srpe ? ' · session RPE ' + esc(d.srpe) + '/10' : ''}</span></h3>
+      ${readinessHtml}
+      ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Exercise logs (keyed by exercise name, across the programme)
+  const exNames = Object.keys(ex).filter(k => (ex[k].sets && ex[k].sets.length) || ex[k].note || ex[k].rpe);
+  const exHtml = exNames.length ? `<table>
+    <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
+    ${exNames.map(k => {
+      const e = ex[k];
+      const sets = (e.sets || []).map(s => {
+        const bits = [s.w, s.r ? '@' + s.r : ''].filter(Boolean).join(' ');
+        return (bits || '·') + (s.d ? ' ✓' : '');
+      }).join(' · ');
+      return `<tr><td>${esc(unslug(k))}</td><td class="num">${esc(sets) || (e.rpe ? 'RPE ' + esc(e.rpe) : '—')}</td><td>${esc(e.note || '')}</td></tr>`;
+    }).join('')}
+  </table>` : '<p class="muted">No exercise logs yet.</p>';
+
+  $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
+    <h2 style="font-size:26px;margin-bottom:4px">${esc(data.athlete_name || athleteId)}</h2>
+    <div class="muted" style="margin-bottom:8px">last active ${timeAgo(data.updated_at)}</div>
+    <div class="sec-title">Days</div>${daysHtml || '<p class="muted">No day data.</p>'}
+    <div class="sec-title">Exercise logs</div>${exHtml}`;
+}
+window.loadAthlete = loadAthlete;
+window.loadOverview = loadOverview;
+</script>
+</body>
+</html>
