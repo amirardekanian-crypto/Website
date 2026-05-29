@@ -908,7 +908,7 @@
      Inline card at the top of each day. Tracks wall-clock session time so the
      coach email can report Duration and Session Load (AU = sRPE × minutes). */
   .session-timer {
-    display: flex; align-items: center; gap: 16px;
+    display: flex; align-items: flex-end; gap: 16px;
     background: var(--white);
     border: 1px solid var(--grey-mid);
     border-radius: 14px;
@@ -945,6 +945,99 @@
   .session-timer.finished .session-timer-btn { display: none; }
   body[data-dark] .session-timer { background: #202020; border-color: #333; }
   body[data-dark] .session-timer-time { color: #f0f0f0; }
+
+  /* ── Readiness Check ──
+     Modal shown when the athlete taps Start, BEFORE the timer begins. Records a
+     1–5 self-report (5 = best/freshest, direction consistent) so the coach sees
+     how the athlete walked in. The app only surfaces this — it never modifies
+     the program or blocks training. The timer does NOT run while this is open,
+     so modal time is excluded from session duration. */
+  .readiness-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,26,26,0.55);
+    backdrop-filter: blur(2px);
+    align-items: flex-end; justify-content: center;
+    padding: 0;
+  }
+  .readiness-overlay.visible { display: flex; animation: fadeUp 0.25s ease both; }
+  .readiness-modal {
+    background: var(--grey-bg);
+    width: 100%; max-width: 520px;
+    max-height: 96vh; overflow-y: auto;
+    border-radius: 18px 18px 0 0;
+    padding: 18px 18px 16px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
+    border-top: 3px solid var(--ice);
+  }
+  @media (min-width: 560px) {
+    .readiness-overlay { align-items: center; }
+    .readiness-modal { border-radius: 18px; border-top: 3px solid var(--ice); padding: 26px 24px 22px; }
+  }
+  .readiness-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--ice); margin-bottom: 3px;
+  }
+  .readiness-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 23px; line-height: 1; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--grey-dark); margin: 0 0 4px;
+  }
+  .readiness-sub {
+    font-family: 'Barlow', sans-serif; font-size: 12.5px; line-height: 1.35;
+    color: var(--grey-text); margin: 0 0 12px;
+  }
+  .readiness-q { margin-bottom: 12px; }
+  .readiness-q-text {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 15px; letter-spacing: 0.4px; color: var(--grey-dark);
+    margin-bottom: 6px;
+  }
+  .readiness-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .readiness-opt {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: var(--white); border: 1px solid var(--grey-mid);
+    border-radius: 10px; padding: 7px 3px 6px; cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  }
+  .readiness-opt:active { transform: scale(0.95); }
+  .readiness-opt-num {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: 16px;
+    color: var(--grey-dark); line-height: 1;
+  }
+  .readiness-opt-lab {
+    font-family: 'Barlow', sans-serif; font-size: 9.5px; line-height: 1.15;
+    text-align: center; color: var(--grey-text); min-height: 22px;
+    display: flex; align-items: center;
+  }
+  .readiness-opt.selected {
+    background: var(--ice); border-color: var(--ice);
+  }
+  .readiness-opt.selected .readiness-opt-num,
+  .readiness-opt.selected .readiness-opt-lab { color: var(--on-accent); }
+  .readiness-actions { margin-top: 14px; }
+  .readiness-begin {
+    width: 100%;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 16px; letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--yellow); color: var(--on-accent);
+    border: none; padding: 13px; border-radius: 8px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .readiness-begin:active { transform: scale(0.98); }
+  .readiness-begin:disabled { opacity: 0.4; cursor: not-allowed; }
+  .readiness-skip {
+    display: block; width: 100%; margin-top: 9px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Barlow', sans-serif; font-size: 13px;
+    color: var(--grey-text); text-decoration: underline; text-underline-offset: 3px;
+  }
+  body[data-dark] .readiness-modal { background: #181818; }
+  body[data-dark] .readiness-title { color: #f0f0f0; }
+  body[data-dark] .readiness-q-text { color: #e8e8e8; }
+  body[data-dark] .readiness-opt { background: #242424; border-color: #3a3a3a; }
+  body[data-dark] .readiness-opt-num { color: #f0f0f0; }
 
   /* ── Session Confirm ── */
   .session-confirm {
@@ -2251,6 +2344,20 @@
   </div>
 </div>
 
+<!-- Readiness check — shown on Start, before the timer runs. Records only. -->
+<div class="readiness-overlay" id="readiness-overlay" onclick="if(event.target===this)cancelReadiness()">
+  <div class="readiness-modal" role="dialog" aria-modal="true" aria-label="Readiness check">
+    <div class="readiness-eyebrow">Before you start</div>
+    <h2 class="readiness-title">Readiness check</h2>
+    <p class="readiness-sub">A quick gut-check so your coach knows how you're walking in today. This doesn't change your plan — just train as written.</p>
+    <div class="readiness-questions" id="readiness-questions"></div>
+    <div class="readiness-actions">
+      <button type="button" class="readiness-begin" id="readiness-begin" disabled onclick="beginSession()">Begin session ▶</button>
+      <button type="button" class="readiness-skip" onclick="skipReadiness()">Skip for today</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════════════════
 //  DYNAMIC S&C PROGRAM ENGINE
@@ -2615,7 +2722,7 @@ function renderProgram() {
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
     html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
       <div class="session-timer-body">
-        <div class="session-timer-label">Session timer · optional</div>
+        <div class="session-timer-label">Click Start to begin</div>
         <div class="session-timer-time">00:00</div>
       </div>
       <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
@@ -3362,16 +3469,35 @@ function fmtClock(ms) {
 }
 // Start / Pause / Resume toggle for one day's timer.
 function toggleSessionTimer(day) {
-  let t = loadTimer(day) || { acc: 0, running: false, resumeAt: null, finished: false };
-  if (t.finished) return;
+  let t = loadTimer(day);
+  if (t && t.finished) return;
+  // A fresh start (no time banked, not running, never stamped) goes through the
+  // readiness check first — the timer only begins once they Begin/Skip. This is
+  // why modal time is naturally excluded from the session duration.
+  if (!t || (!t.running && (t.acc || 0) === 0 && !t.sessionStart)) {
+    openReadiness(day);
+    return;
+  }
   if (t.running) {
-    // Pause → bank the running segment into acc.
+    // Pause → bank the running segment into acc, mark when the pause began.
     t.acc = (t.acc || 0) + (t.resumeAt ? Date.now() - t.resumeAt : 0);
-    t.running = false; t.resumeAt = null;
+    t.running = false; t.resumeAt = null; t.pausedAt = Date.now();
   } else {
-    // Start / Resume.
+    // Resume → fold the paused gap into totalPausedMs (timing record only).
+    if (t.pausedAt) { t.totalPausedMs = (t.totalPausedMs || 0) + (Date.now() - t.pausedAt); t.pausedAt = null; }
     t.running = true; t.resumeAt = Date.now();
   }
+  saveTimer(day, t);
+  renderTimer(day);
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+// Actually starts the clock once readiness is recorded (or skipped). Stamps the
+// session start time so the modal isn't re-shown on later pause/resume.
+function startTimerNow(day) {
+  const now = Date.now();
+  const t = loadTimer(day) || {};
+  t.acc = 0; t.running = true; t.resumeAt = now; t.finished = false;
+  t.sessionStart = now; t.totalPausedMs = 0; t.pausedAt = null; t.sessionEnd = null;
   saveTimer(day, t);
   renderTimer(day);
   if (navigator.vibrate) navigator.vibrate(8);
@@ -3385,6 +3511,7 @@ function finishTimer(day) {
     t.running = false; t.resumeAt = null;
   }
   t.finished = true;
+  t.sessionEnd = Date.now();
   saveTimer(day, t);
   renderTimer(day);
 }
@@ -3410,7 +3537,7 @@ function renderTimer(day) {
     labelEl.textContent = 'Paused';
   } else {
     btn.textContent = 'Start ▶';
-    labelEl.textContent = 'Session timer · optional';
+    labelEl.textContent = 'Click Start to begin';
   }
 }
 // Single shared 1s tick updates every running timer's display.
@@ -3424,6 +3551,106 @@ function initTimers() {
       timeEl.textContent = fmtClock(timerElapsedMs(el.dataset.day));
     });
   }, 1000);
+}
+
+// ── Readiness check ──
+// 1–5 self-report, 5 = best/freshest for EVERY item (direction never flips, so
+// the coach can read scores at a glance). The first four feed the composite; the
+// fifth ("overall") is a standalone gut-check and is excluded from composite.
+const READINESS_QUESTIONS = [
+  { key: 'sleep',    text: 'How well did you sleep last night?',   labels: ['Very poor', 'Poor', 'OK', 'Good', 'Excellent'] },
+  { key: 'energy',   text: 'How are your energy levels right now?', labels: ['Exhausted', 'Tired', 'OK', 'Good', 'Very fresh'] },
+  { key: 'soreness', text: 'How sore are your muscles today?',      labels: ['Very sore', 'Sore', 'Mild', 'Slight', 'None'] },
+  { key: 'stress',   text: "How's your stress / mood today?",       labels: ['Very stressed', 'Stressed', 'Neutral', 'Good', 'Great'] },
+  { key: 'overall',  text: 'Overall, how ready do you feel?',       labels: ['Not ready', 'Bit off', 'OK', 'Good', 'Fully ready'] },
+];
+const READINESS_CORE = ['sleep', 'energy', 'soreness', 'stress'];
+function readinessKey(day) { return ATHLETE_ID + '_readiness_' + day; }
+function loadReadiness(day) {
+  try { return JSON.parse(localStorage.getItem(readinessKey(day))) || null; } catch (e) { return null; }
+}
+
+let _readinessDay = null;     // which day the open modal belongs to
+let _readinessSel = {};       // key → 1..5 selections for the open modal
+
+function openReadiness(day) {
+  _readinessDay = day;
+  _readinessSel = {};
+  const wrap = document.getElementById('readiness-questions');
+  wrap.innerHTML = READINESS_QUESTIONS.map(q => `
+    <div class="readiness-q" data-key="${q.key}">
+      <div class="readiness-q-text">${q.text}</div>
+      <div class="readiness-scale">
+        ${q.labels.map((lab, i) => `
+          <button type="button" class="readiness-opt" data-val="${i + 1}"
+            onclick="pickReadiness('${q.key}', ${i + 1}, this)">
+            <span class="readiness-opt-num">${i + 1}</span>
+            <span class="readiness-opt-lab">${lab}</span>
+          </button>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('readiness-begin').disabled = true;
+  document.getElementById('readiness-overlay').classList.add('visible');
+}
+
+function pickReadiness(key, val, btn) {
+  _readinessSel[key] = val;
+  // Single-select within this question's row.
+  const row = btn.closest('.readiness-scale');
+  row.querySelectorAll('.readiness-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  // Begin only unlocks once every question is answered.
+  const allAnswered = READINESS_QUESTIONS.every(q => _readinessSel[q.key]);
+  document.getElementById('readiness-begin').disabled = !allAnswered;
+  if (navigator.vibrate) navigator.vibrate(5);
+}
+
+function closeReadinessModal() {
+  document.getElementById('readiness-overlay').classList.remove('visible');
+}
+
+// Backdrop tap before answering → cancel. Nothing is saved, no session starts.
+function cancelReadiness() {
+  closeReadinessModal();
+  _readinessDay = null;
+  _readinessSel = {};
+}
+
+function beginSession() {
+  const day = _readinessDay;
+  if (day == null) return;
+  const core = READINESS_CORE.map(k => _readinessSel[k]);
+  const composite = Math.round((core.reduce((a, b) => a + b, 0) / core.length) * 100) / 100;
+  const readiness = {
+    timestamp: new Date().toISOString(),
+    sleep: _readinessSel.sleep,
+    energy: _readinessSel.energy,
+    soreness: _readinessSel.soreness,
+    stress: _readinessSel.stress,
+    overall: _readinessSel.overall,
+    composite,
+    skipped: false,
+  };
+  localStorage.setItem(readinessKey(day), JSON.stringify(readiness));
+  closeReadinessModal();
+  startTimerNow(day);
+  _readinessDay = null;
+  _readinessSel = {};
+}
+
+function skipReadiness() {
+  const day = _readinessDay;
+  if (day == null) return;
+  const readiness = {
+    timestamp: new Date().toISOString(),
+    sleep: null, energy: null, soreness: null, stress: null, overall: null,
+    composite: null, skipped: true,
+  };
+  localStorage.setItem(readinessKey(day), JSON.stringify(readiness));
+  closeReadinessModal();
+  startTimerNow(day);
+  _readinessDay = null;
+  _readinessSel = {};
 }
 
 function confirmSession(day) {
@@ -3502,6 +3729,8 @@ function resetDay(day) {
   localStorage.removeItem(ATHLETE_ID + '_completed_d' + day);
   // Reset the session timer back to 00:00 so the next attempt starts fresh.
   localStorage.removeItem(timerKey(day));
+  // Drop the readiness record so the next start re-asks the check.
+  localStorage.removeItem(readinessKey(day));
   renderTimer(day);
   saveState();
   updateProgress(day);
@@ -3534,6 +3763,7 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_srpe_'    + day.id);
       localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_timer_'   + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_readiness_' + day.id);
       // Per-exercise RPE + per-set RPE/done for this day's exercises.
       // Weights and personal notes are kept on purpose — they're useful starting
       // points / context for next session.
@@ -3724,6 +3954,32 @@ async function sendSession(day) {
       summary += `Duration: ${durMin} min\n`;
       summary += `Session Load: ${auLoad} AU (sRPE ${sRpe} × ${durMin} min)\n`;
     }
+
+    // Readiness (captured at Start, 1–5, 5 = best/freshest). Recorded only — the
+    // app never changes the program or blocks training based on this.
+    const readiness = loadReadiness(day);
+    let readinessSummary = '';
+    let readinessField = '';
+    if (readiness) {
+      if (readiness.skipped) {
+        readinessSummary = 'Readiness (at start): skipped';
+        readinessField = 'Skipped';
+      } else {
+        const lab = (q, v) => (v ? `${v}/5 (${q.labels[v - 1]})` : '—');
+        const byKey = Object.fromEntries(READINESS_QUESTIONS.map(q => [q.key, q]));
+        const lines = READINESS_QUESTIONS.map(q =>
+          `  ${q.text.replace(/\?$/, '')}: ${lab(q, readiness[q.key])}`).join('\n');
+        readinessSummary =
+          `Readiness (at start) — composite ${readiness.composite}/5:\n${lines}`;
+        readinessField =
+          `Composite ${readiness.composite}/5 · ` +
+          `Sleep ${readiness.sleep} · Energy ${readiness.energy} · ` +
+          `Soreness ${readiness.soreness} · Stress ${readiness.stress} · ` +
+          `Overall ${readiness.overall}`;
+      }
+      summary += `\n${readinessSummary}\n`;
+    }
+
     if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
     summary += `\nExercise log:\n`;
 
@@ -3790,6 +4046,7 @@ async function sendSession(day) {
       fd.append('Duration', durMin + ' min');
       fd.append('Session Load (AU)', String(auLoad));
     }
+    if (readinessField) fd.append('Readiness', readinessField);
     fd.append('Notes from athlete', dayNote || '(none)');
     fd.append('Full summary', summary);
 
