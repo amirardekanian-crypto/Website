@@ -61,6 +61,8 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
+<!-- Supabase: cloud backup of progress for the coach dashboard (Stage 1) -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     /* Primary brand = Roland-Garros green; secondary = clay; tertiary = ochre.
@@ -2413,6 +2415,61 @@
 
 let DATA = null;
 let ATHLETE_ID = '';
+
+// ════════════════════════════════════════════════════════════════════
+//  CLOUD BACKUP (Stage 1) — mirror this athlete's localStorage to
+//  Supabase so the coach dashboard can see their progress. Safe by
+//  design: localStorage stays the source of truth, every call is
+//  debounced + wrapped in try/catch, and the public demo is skipped.
+//  One hook on setItem captures every progress write, current & future.
+// ════════════════════════════════════════════════════════════════════
+const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+let _sbClient = null, _sbTimer = null, _sbId = '', _sbName = '';
+function _sb() {
+  if (_sbClient) return _sbClient;
+  if (!window.supabase || !window.supabase.createClient) return null;
+  _sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+  return _sbClient;
+}
+function _snapshot() {
+  const out = {}, prefix = _sbId + '_';
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
+  }
+  return out;
+}
+function _pushSnapshot() {
+  clearTimeout(_sbTimer);
+  _sbTimer = setTimeout(async () => {
+    try {
+      const sb = _sb();
+      if (!sb || !_sbId) return;
+      // Write via a SECURITY DEFINER function: athletes can save but can't
+      // read the table (reads are coach-only). Avoids the upsert read-back
+      // that RLS would otherwise reject.
+      await sb.rpc('save_progress', {
+        p_athlete_id:   _sbId,
+        p_athlete_name: _sbName,
+        p_data:         _snapshot()
+      });
+    } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
+  }, 1500);
+}
+function setupCloudBackup(athleteId, data) {
+  _sbId = athleteId;
+  const a = (data && data.athlete) || {};
+  _sbName = [a.firstName, a.lastName].filter(Boolean).join(' ');
+  const origSet = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function (key, val) {
+    origSet(key, val);                                  // real save always happens first
+    try { if (typeof key === 'string' && key.indexOf(_sbId + '_') === 0) _pushSnapshot(); }
+    catch (e) { /* never let backup interfere with the app */ }
+  };
+  _pushSnapshot();                                       // back up what's already stored
+  window.addEventListener('visibilitychange', () => { if (document.hidden) _pushSnapshot(); });
+}
 let STORAGE_KEY = '';
 let dayTotals = {};
 let isLoading = true;
@@ -2463,6 +2520,9 @@ function getVideoUrl(ex) {
 
   ATHLETE_ID = DATA.athlete.id;
   STORAGE_KEY = ATHLETE_ID + '_prog_state';
+
+  // Stage 1: start mirroring progress to the cloud (skips the public demo).
+  if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA);
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
 
