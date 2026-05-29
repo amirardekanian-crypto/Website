@@ -388,42 +388,67 @@ async function loadAthlete(athleteId) {
     : '<p class="muted">No finished sessions yet — these appear when an athlete taps Finish / send to coach.</p>';
 
   // ── Live activity (rolling snapshot; may be partial / cleared on rollover) ──
+  // The snapshot stores exercise logs keyed by exercise NAME only (no day), so
+  // to group each exercise under its day we load the athlete's program file
+  // (same data/<id>.json the app uses) and map name → day.
   const { days, ex } = prog ? decode(athleteId, prog.data) : { days: {}, ex: {} };
+  let program = null;
+  try { const pr = await fetch(`data/${athleteId}.json`); if (pr.ok) program = await pr.json(); } catch (e) {}
+  const programDays = (program && program.workouts && program.workouts.days) || [];
 
-  // Days
-  const dayNums = Object.keys(days).map(Number).sort((a,b)=>a-b);
-  const daysHtml = dayNums.map(n => {
-    const d = days[n];
-    const rd = d.readiness;
-    let readinessHtml = '';
-    if (rd) {
-      if (rd.skipped) readinessHtml = '<div class="readiness"><span class="r">Readiness: <b>skipped</b></span></div>';
-      else readinessHtml = `<div class="readiness">
-        ${rd.composite != null ? `<span class="r">Readiness <b>${esc(rd.composite)}/5</b></span>` : ''}
-        ${['sleep','energy','soreness','stress','overall'].filter(k=>rd[k]!=null).map(k=>`<span class="r">${k} <b>${esc(rd[k])}</b></span>`).join('')}
+  // exercise slug (name with spaces→_) → that exercise's logged data
+  const exForName = (name) => ex[String(name).replace(/\s+/g, '_')];
+  const setStr = (e) => (e.sets || []).map(s => {
+    const bits = [s.w, s.r ? '@' + s.r : ''].filter(Boolean).join(' ');
+    return (bits || '·') + (s.d ? ' ✓' : '');
+  }).join(' · ');
+  const hasData = (e) => e && ((e.sets && e.sets.some(s => s.w || s.r || s.d)) || e.note || e.rpe);
+
+  // Build one card per program day, with that day's exercises grouped beneath it.
+  let daysHtml = '';
+  if (programDays.length) {
+    daysHtml = programDays.map(pd => {
+      const d = days[pd.id] || {};
+      const rd = d.readiness;
+      let readinessHtml = '';
+      if (rd) {
+        if (rd.skipped) readinessHtml = '<div class="readiness"><span class="r">Readiness: <b>skipped</b></span></div>';
+        else readinessHtml = `<div class="readiness">
+          ${rd.composite != null ? `<span class="r">Readiness <b>${esc(rd.composite)}/5</b></span>` : ''}
+          ${['sleep','energy','soreness','stress','overall'].filter(k=>rd[k]!=null).map(k=>`<span class="r">${k} <b>${esc(rd[k])}</b></span>`).join('')}
+        </div>`;
+      }
+      // exercises for this day, in program order, that actually have logs
+      const rows = [];
+      (pd.blocks || []).forEach(block => (block.exercises || []).forEach(exr => {
+        const e = exForName(exr.name);
+        if (hasData(e)) rows.push({ name: exr.name, sets: setStr(e), rpe: e.rpe, note: e.note });
+      }));
+      const exTable = rows.length ? `<table>
+        <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
+        ${rows.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${esc(r.sets) || (r.rpe ? 'RPE ' + esc(r.rpe) : '—')}</td><td>${esc(r.note || '')}</td></tr>`).join('')}
+      </table>` : '<p class="muted" style="margin-top:8px">No exercise logs recorded for this day yet.</p>';
+
+      const touched = d.completed || d.srpe || d.note || rd || rows.length;
+      return `<div class="day">
+        <div class="day-head">
+          <h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}
+            ${d.completed ? '<span class="tag done">✓ Completed</span>' : (touched ? '<span class="tag">In progress</span>' : '<span class="tag" style="opacity:.6">Not started</span>')}
+            <span class="when">${d.completedOn ? '· ' + esc(d.completedOn) : ''}${d.srpe ? ' · session RPE ' + esc(d.srpe) + '/10' : ''}</span></h3>
+        </div>
+        ${readinessHtml}
+        ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}
+        ${exTable}
       </div>`;
-    }
-    return `<div class="day">
-      <h3>Day ${esc(n)} ${d.completed ? '<span class="tag done">✓ completed</span>' : '<span class="tag">in progress</span>'}
-        <span class="when">${d.completedOn ? '· ' + esc(d.completedOn) : ''}${d.srpe ? ' · session RPE ' + esc(d.srpe) + '/10' : ''}</span></h3>
-      ${readinessHtml}
-      ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}
-    </div>`;
-  }).join('');
-
-  // Exercise logs (keyed by exercise name, across the programme)
-  const exNames = Object.keys(ex).filter(k => (ex[k].sets && ex[k].sets.length) || ex[k].note || ex[k].rpe);
-  const exHtml = exNames.length ? `<table>
-    <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
-    ${exNames.map(k => {
-      const e = ex[k];
-      const sets = (e.sets || []).map(s => {
-        const bits = [s.w, s.r ? '@' + s.r : ''].filter(Boolean).join(' ');
-        return (bits || '·') + (s.d ? ' ✓' : '');
-      }).join(' · ');
-      return `<tr><td>${esc(unslug(k))}</td><td class="num">${esc(sets) || (e.rpe ? 'RPE ' + esc(e.rpe) : '—')}</td><td>${esc(e.note || '')}</td></tr>`;
-    }).join('')}
-  </table>` : '<p class="muted">No exercise logs yet.</p>';
+    }).join('');
+  } else {
+    // Fallback: no program file — flat list (old behaviour) so nothing is lost.
+    const exNames = Object.keys(ex).filter(k => hasData(ex[k]));
+    daysHtml = exNames.length ? `<div class="day"><table>
+      <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
+      ${exNames.map(k => `<tr><td>${esc(unslug(k))}</td><td class="num">${esc(setStr(ex[k])) || (ex[k].rpe ? 'RPE ' + esc(ex[k].rpe) : '—')}</td><td>${esc(ex[k].note || '')}</td></tr>`).join('')}
+    </table></div>` : '<p class="muted">No live day data.</p>';
+  }
 
   $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
     <div class="day-head" style="align-items:center;margin-bottom:8px">
@@ -435,8 +460,7 @@ async function loadAthlete(athleteId) {
     </div>
     ${linkHtml}
     <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
-    <div class="sec-title">Live activity — current snapshot</div>${daysHtml || '<p class="muted">No live day data.</p>'}
-    <div class="sec-title">Exercise logs — live</div>${exHtml}`;
+    <div class="sec-title">Live activity — current snapshot (each day with its own logs)</div>${daysHtml}`;
 }
 
 // --- delete (coach only; enforced by RLS) -----------------------------------
