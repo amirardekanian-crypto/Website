@@ -3813,6 +3813,10 @@ function confirmSession(day) {
   completeEl.classList.add('visible');
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   localStorage.setItem(ATHLETE_ID + '_completed_d' + day, new Date().toDateString());
+  // Record a permanent session to the coach dashboard the moment the day is
+  // finished (full OR partial) — no "send to coach" tap required. Send/email is
+  // unchanged; this just also captures completions the athlete doesn't send.
+  recordSessionToCloud(day);
   markSuggestedDay();
 }
 
@@ -3987,9 +3991,17 @@ function restoreState() {
 // inside the completion card. Tap a number to select; tap the same number again
 // to deselect (so clients can correct a mistap). All values auto-save.
 function initDayWrapup() {
+  // The day number is the trailing part of the storage key (e.g. "..._srpe_3").
+  const dayOf = (key) => (key || '').split('_').pop();
   document.querySelectorAll('.complete-note-input').forEach(ta => {
     const key = ta.dataset.key;
-    ta.addEventListener('input', e => localStorage.setItem(key, e.target.value));
+    let _noteT = null;
+    ta.addEventListener('input', e => {
+      localStorage.setItem(key, e.target.value);
+      // Debounced: refresh the cloud record so a late-added note reaches the coach.
+      clearTimeout(_noteT);
+      _noteT = setTimeout(() => recordSessionToCloud(dayOf(key)), 1200);
+    });
     ta.addEventListener('click', e => e.stopPropagation());
   });
   document.querySelectorAll('.complete-rpe-buttons').forEach(group => {
@@ -4008,6 +4020,8 @@ function initDayWrapup() {
         } else {
           localStorage.removeItem(key);
         }
+        // Update the cloud record so the dashboard shows the session RPE.
+        recordSessionToCloud(dayOf(key));
       });
     });
   });
@@ -4025,6 +4039,136 @@ function initDayWrapup() {
     const btn = document.querySelector('#complete-' + day + ' .send-session-btn');
     if (btn) btn.textContent = 'Update info to Coach';
   });
+}
+
+// Builds everything a finished (or partly finished) day needs: the same
+// human-readable summary the coach email uses, plus structured fields. Returns
+// null if nothing has been logged yet. Unlike emailing, this does NOT require a
+// session RPE — a day can be recorded the moment it's completed, before rating.
+function buildSessionData(day) {
+  const dayStatus = getDayCompletion(day);
+  if (dayStatus.done === 0) return null;
+  const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day)) || {};
+  const dayNote = localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '';
+  const isPartial = dayStatus.done < dayStatus.total;
+  const statusLabel = isPartial
+    ? `Partial (${dayStatus.done} of ${dayStatus.total} sets/units done)`
+    : 'Complete';
+  const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
+
+  const durMs  = timerElapsedMs(day);
+  const durMin = Math.round(durMs / 60000);
+  const hasDur = durMin > 0;
+  const auLoad = (hasDur && sRpe) ? Math.round(Number(sRpe) * durMin) : null;
+
+  let summary = `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}\n`;
+  summary += `Status: ${statusLabel}\n`;
+  summary += `Session RPE: ${sRpe ? sRpe + '/10' : 'not rated yet'}\n`;
+  if (hasDur) {
+    summary += `Duration: ${durMin} min\n`;
+    if (auLoad != null) summary += `Session Load: ${auLoad} AU (sRPE ${sRpe} × ${durMin} min)\n`;
+  }
+
+  const readiness = loadReadiness(day);
+  let readinessSummary = '', readinessField = '';
+  if (readiness) {
+    if (readiness.skipped) { readinessSummary = 'Readiness (at start): skipped'; readinessField = 'Skipped'; }
+    else {
+      const lab = (q, v) => (v ? `${v}/5 (${q.labels[v - 1]})` : '—');
+      const lines = READINESS_QUESTIONS.map(q =>
+        `  ${q.text.replace(/\?$/, '')}: ${lab(q, readiness[q.key])}`).join('\n');
+      readinessSummary = `Readiness (at start) — composite ${readiness.composite}/5:\n${lines}`;
+      readinessField =
+        `Composite ${readiness.composite}/5 · Sleep ${readiness.sleep} · ` +
+        `Energy ${readiness.energy} · Soreness ${readiness.soreness} · ` +
+        `Stress ${readiness.stress} · Overall ${readiness.overall}`;
+    }
+    summary += `\n${readinessSummary}\n`;
+  }
+
+  if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
+  summary += `\nExercise log:\n`;
+
+  const missingByName = new Map(dayStatus.missing.map(m => [m.name, m]));
+  const collectFor = (name, isCircuit) => {
+    const k = name.replace(/\s+/g, '_');
+    const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
+    if (isCircuit) {
+      const card = Array.from(document.querySelectorAll('.round-group'))
+        .find(c => (c.querySelector('.item-name')?.textContent || '').trim() === name);
+      const total = parseInt(card?.dataset.rounds, 10) || 1;
+      const rounds = [];
+      for (let round = 1; round <= total; round++) {
+        const r = localStorage.getItem(circuitRpeKey(name, round)) || '';
+        if (r) rounds.push({ round, r });
+      }
+      return { kind: 'circuit', rounds, n };
+    }
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; } catch (e) {}
+    return { kind: 'sets', log, n };
+  };
+
+  (dayData.blocks || []).forEach(block => {
+    summary += `\n[${block.title}]\n`;
+    (block.exercises || []).forEach(ex => {
+      const isCircuit = ex.type === 'circuit';
+      const data = collectFor(ex.name, isCircuit);
+      const m = missingByName.get(ex.name);
+      const tag = m ? ` (${m.label})` : ' (✓)';
+      summary += `• ${ex.name}${tag}\n`;
+      if (data.kind === 'sets' && data.log.length) {
+        data.log.forEach((s, i) => {
+          const bits = [];
+          if (s.w) bits.push(s.w);
+          if (s.r) bits.push('@' + s.r);
+          const tail = s.d ? '✓' : (s.w || s.r ? '·' : 'skipped');
+          summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
+        });
+      } else if (data.kind === 'circuit') {
+        if (data.rounds.length) {
+          const parts = data.rounds.map(x => `R${x.round} ${x.r}`).join(' · ');
+          summary += `    RPE: ${parts}\n`;
+        }
+      }
+      if (data.n) summary += `    Note: ${data.n}\n`;
+      (ex.items || []).forEach(item => {
+        summary += `   · ${item.name}${item.detail ? ' (' + item.detail + ')' : ''}\n`;
+      });
+    });
+  });
+
+  return { dayStatus, dayData, dayNote, isPartial, statusLabel, sRpe, durMin, hasDur, auLoad, readiness, readinessField, summary };
+}
+
+// Saves a permanent session record to the cloud (coach dashboard). Called on
+// finish (full OR partial), on later RPE/note edits, and on send — all upsert
+// the same (athlete, day, today) row, so the dashboard always has the latest.
+// Fire-and-forget; never blocks or breaks the app.
+function recordSessionToCloud(day) {
+  if (window.IS_DEMO || day == null) return;
+  try {
+    const sb = _sb();
+    if (!sb) return;
+    const D = buildSessionData(day);
+    if (!D) return;
+    sb.rpc('save_session', {
+      p_athlete_id:   ATHLETE_ID,
+      p_athlete_name: `${DATA.athlete.firstName} ${DATA.athlete.lastName}`,
+      p_day:          Number(day),
+      p_completed_on: new Date().toISOString().slice(0, 10),
+      p_session: {
+        status:       D.statusLabel,
+        session_rpe:  String(D.sRpe || ''),
+        duration_min: D.hasDur ? String(D.durMin) : '',
+        readiness:    D.readiness || null,
+        day_note:     D.dayNote || '',
+        focus:        D.dayData.focusTag || '',
+        summary:      D.summary
+      },
+      p_key: _sbKey
+    });
+  } catch (e) { /* never let recording interfere with the app */ }
 }
 
 // Bundles all data for a given day and submits it to Web3Forms (same service
@@ -4053,10 +4197,6 @@ async function sendSession(day) {
     status.textContent = 'Log at least one set before sending the session.';
     return;
   }
-  const isPartial = dayStatus.done < dayStatus.total;
-  const statusLabel = isPartial
-    ? `Partial (${dayStatus.done} of ${dayStatus.total} sets/units done)`
-    : 'Complete';
 
   // Require RPE before sending — that's the whole point of the rating.
   const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
@@ -4073,115 +4213,9 @@ async function sendSession(day) {
   status.textContent = '';
 
   try {
-    const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day)) || {};
-    const dayNote = localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '';
-
-    // Build a human-readable summary for the coach. The Status line on top
-    // makes it instantly obvious whether the athlete finished the day or sent
-    // partial data — coaches shouldn't have to scan the per-set lines to tell.
-    // Session duration + training load (AU). Only included when the athlete
-    // actually used the timer. AU = session RPE × duration in minutes (Foster's
-    // session-RPE method). Minutes rounded to the nearest whole minute.
-    const durMs    = timerElapsedMs(day);
-    const durMin   = Math.round(durMs / 60000);
-    const hasDur   = durMin > 0;
-    const auLoad   = hasDur ? Math.round(Number(sRpe) * durMin) : null;
-
-    let summary = `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}\n`;
-    summary += `Status: ${statusLabel}\n`;
-    summary += `Session RPE: ${sRpe}/10\n`;
-    if (hasDur) {
-      summary += `Duration: ${durMin} min\n`;
-      summary += `Session Load: ${auLoad} AU (sRPE ${sRpe} × ${durMin} min)\n`;
-    }
-
-    // Readiness (captured at Start, 1–5, 5 = best/freshest). Recorded only — the
-    // app never changes the program or blocks training based on this.
-    const readiness = loadReadiness(day);
-    let readinessSummary = '';
-    let readinessField = '';
-    if (readiness) {
-      if (readiness.skipped) {
-        readinessSummary = 'Readiness (at start): skipped';
-        readinessField = 'Skipped';
-      } else {
-        const lab = (q, v) => (v ? `${v}/5 (${q.labels[v - 1]})` : '—');
-        const byKey = Object.fromEntries(READINESS_QUESTIONS.map(q => [q.key, q]));
-        const lines = READINESS_QUESTIONS.map(q =>
-          `  ${q.text.replace(/\?$/, '')}: ${lab(q, readiness[q.key])}`).join('\n');
-        readinessSummary =
-          `Readiness (at start) — composite ${readiness.composite}/5:\n${lines}`;
-        readinessField =
-          `Composite ${readiness.composite}/5 · ` +
-          `Sleep ${readiness.sleep} · Energy ${readiness.energy} · ` +
-          `Soreness ${readiness.soreness} · Stress ${readiness.stress} · ` +
-          `Overall ${readiness.overall}`;
-      }
-      summary += `\n${readinessSummary}\n`;
-    }
-
-    if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
-    summary += `\nExercise log:\n`;
-
-    // Quick lookup so each exercise line in the loop below can be tagged
-    // (✓), (skipped), or (2/4 sets) right next to its name.
-    const missingByName = new Map(dayStatus.missing.map(m => [m.name, m]));
-
-    // Pull stored data for one exercise (per-set log for standard, single RPE
-    // for circuits, plus the personal note in both cases).
-    const collectFor = (name, isCircuit) => {
-      const k = name.replace(/\s+/g, '_');
-      const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
-      if (isCircuit) {
-        // One RPE per round. Round 1 uses the legacy (no-suffix) key; later
-        // rounds use the _r<round> suffix. Read the round count off the
-        // rendered card so we never miss or over-probe.
-        const card = Array.from(document.querySelectorAll('.round-group'))
-          .find(c => (c.querySelector('.item-name')?.textContent || '').trim() === name);
-        const total = parseInt(card?.dataset.rounds, 10) || 1;
-        const rounds = [];
-        for (let round = 1; round <= total; round++) {
-          const r = localStorage.getItem(circuitRpeKey(name, round)) || '';
-          if (r) rounds.push({ round, r });
-        }
-        return { kind: 'circuit', rounds, n };
-      }
-      let log = [];
-      try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; }
-      catch (e) {}
-      return { kind: 'sets', log, n };
-    };
-
-    (dayData.blocks || []).forEach(block => {
-      summary += `\n[${block.title}]\n`;
-      (block.exercises || []).forEach(ex => {
-        const isCircuit = ex.type === 'circuit';
-        const data = collectFor(ex.name, isCircuit);
-        const m = missingByName.get(ex.name);
-        const tag = m ? ` (${m.label})` : ' (✓)';
-        summary += `• ${ex.name}${tag}\n`;
-        if (data.kind === 'sets' && data.log.length) {
-          // One line per set: "    Set 1: 60kg @7 ✓"
-          data.log.forEach((s, i) => {
-            const bits = [];
-            if (s.w) bits.push(s.w);
-            if (s.r) bits.push('@' + s.r);
-            const tail = s.d ? '✓' : (s.w || s.r ? '·' : 'skipped');
-            summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
-          });
-        } else if (data.kind === 'circuit') {
-          if (data.rounds.length) {
-            const parts = data.rounds.map(x => `R${x.round} ${x.r}`).join(' · ');
-            summary += `    RPE: ${parts}\n`;
-          }
-        }
-        if (data.n) summary += `    Note: ${data.n}\n`;
-        // Circuit sub-exercises (the rounds A/B/C list)
-        (ex.items || []).forEach(item => {
-          summary += `   · ${item.name}${item.detail ? ' (' + item.detail + ')' : ''}\n`;
-        });
-      });
-    });
+    // Build the same summary + fields used for the email and the cloud record.
+    const D = buildSessionData(day);
+    const { dayData, dayNote, isPartial, statusLabel, durMin, hasDur, auLoad, readiness, readinessField, summary } = D;
 
     // POST to Web3Forms — same access key used by form.html
     const fd = new FormData();
@@ -4213,31 +4247,9 @@ async function sendSession(day) {
     const sentAt = new Date();
     localStorage.setItem(ATHLETE_ID + '_sent_d' + day, sentAt.toISOString());
 
-    // Stage 1.5: also save a PERMANENT, immutable record of this finished
-    // session to the cloud (for the coach dashboard). Unlike the live snapshot,
-    // this is never cleared by the daily auto-reset, so per-set detail and the
-    // full summary survive forever. Fire-and-forget; never blocks the send.
-    try {
-      const _sbc = (!window.IS_DEMO) ? _sb() : null;
-      if (_sbc) {
-        _sbc.rpc('save_session', {
-          p_athlete_id:   ATHLETE_ID,
-          p_athlete_name: `${DATA.athlete.firstName} ${DATA.athlete.lastName}`,
-          p_day:          Number(day),
-          p_completed_on: sentAt.toISOString().slice(0, 10),
-          p_session: {
-            status:       statusLabel,
-            session_rpe:  String(sRpe || ''),
-            duration_min: hasDur ? String(durMin) : '',
-            readiness:    readiness || null,
-            day_note:     dayNote || '',
-            focus:        dayData.focusTag || '',
-            summary:      summary
-          },
-          p_key: _sbKey
-        });
-      }
-    } catch (e) { /* never let the permanent-record write interfere with sending */ }
+    // Also refresh the permanent cloud record (coach dashboard). It was already
+    // saved on finish; this re-saves with the final RPE/note at send time.
+    recordSessionToCloud(day);
 
     status.className = 'send-session-status success';
     status.textContent = '✓ Sent — your coach will see it shortly.';
