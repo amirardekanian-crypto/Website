@@ -286,6 +286,14 @@
 
   /* ── PROGRAM DEMO ── */
   .demo-section { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg-raised); }
+  .demo-launch {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .demo-launch-note {
+    font-size: 13px; font-weight: 300; color: var(--text-secondary);
+    line-height: 1.5; max-width: 340px;
+  }
   .demo-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-top: 56px; }
   .demo-text-list { display: flex; flex-direction: column; gap: 28px; }
   .demo-feature {
@@ -793,7 +801,7 @@
     <p class="lead hero-sub reveal reveal-d2">The S&amp;C programme used by 500+ competitive tennis and padel players. Improving movement, stroke quality, and resilience — in one season.</p>
     <div class="hero-actions reveal reveal-d3">
       <a href="/form.html" class="btn btn-primary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
-      <a href="#method" class="btn-ghost">See How It Works ↓</a>
+      <a href="/program.html?client=demo" class="btn-ghost" target="_blank" rel="noopener">Try the Live Demo →</a>
     </div>
   </div>
 </section>
@@ -1134,6 +1142,11 @@
     <div class="section-label reveal">Your Training System</div>
     <h2 id="demo-title" class="section-heading reveal reveal-d1">Not a PDF.<br><em>An Experience.</em></h2>
     <p class="lead section-desc reveal reveal-d2">Every athlete receives their programme through a custom-built interactive platform. No app downloads, no spreadsheets — just open the link and train. Your data feeds directly into every check-in I run.</p>
+
+    <div class="demo-launch reveal reveal-d2">
+      <a href="/program.html?client=demo" class="btn btn-primary" target="_blank" rel="noopener">Try the live demo <span class="arrow-r" aria-hidden="true">→</span></a>
+      <span class="demo-launch-note">Opens a real sample program — explore it like an athlete would. No sign-up.</span>
+    </div>
 
     <div class="demo-layout">
       <div class="demo-text-list">

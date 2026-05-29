@@ -28,6 +28,10 @@
 <script>
   (function () {
     var client = new URLSearchParams(window.location.search).get('client');
+    // Public demo mode: a sample athlete anyone can explore from the marketing
+    // site. Disables the coach email, shows a demo banner, and skips the
+    // install nag. Detected purely from the ?client=demo URL.
+    window.IS_DEMO = (client === 'demo');
     var startUrl = client
       ? 'program.html?client=' + encodeURIComponent(client)
       : 'program.html';
@@ -903,6 +907,39 @@
     vertical-align: middle; animation: fadeIn 0.4s ease both;
   }
 
+
+  /* ── Demo banner (public sample-athlete mode) ── */
+  .demo-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 120;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    padding: 8px 14px;
+    background: var(--yellow); color: var(--on-accent);
+    font-family: 'Barlow', sans-serif; font-size: 12.5px; line-height: 1.2;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+  .demo-banner[hidden] { display: none; }
+  .demo-banner-text strong {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .demo-banner-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .demo-banner-cta {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+    background: var(--on-accent); color: var(--yellow);
+    padding: 5px 12px; border-radius: 5px; text-decoration: none;
+  }
+  .demo-banner-exit {
+    color: var(--on-accent); opacity: 0.85; text-decoration: none;
+    font-size: 12px; white-space: nowrap;
+  }
+  .demo-banner-exit:hover { opacity: 1; }
+  /* Push everything below the fixed banner; park the sticky timer beneath it. */
+  body.is-demo { padding-top: 44px; }
+  body.is-demo .session-timer { top: 52px; }
+  @media (max-width: 460px) {
+    .demo-banner { gap: 8px; padding: 7px 10px; font-size: 11px; }
+  }
 
   /* ── Session Timer (sRPE duration) ──
      Inline card at the top of each day. Tracks wall-clock session time so the
@@ -2119,6 +2156,15 @@
 </head>
 <body>
 
+<!-- ═══ DEMO BANNER (shown only when ?client=demo) ═══ -->
+<div class="demo-banner" id="demo-banner" hidden>
+  <span class="demo-banner-text"><strong>Live demo</strong> · sample athlete — your real program is built from scratch.</span>
+  <span class="demo-banner-actions">
+    <a href="/form.html" class="demo-banner-cta">Apply</a>
+    <a href="/" class="demo-banner-exit" aria-label="Exit demo and return to site">Exit ✕</a>
+  </span>
+</div>
+
 <!-- ═══ LOADING ═══ -->
 <div class="loading-screen" id="loading">
   <div class="loading-spinner"></div>
@@ -2387,6 +2433,14 @@ function getVideoUrl(ex) {
   if (!clientId) {
     showError('No client specified. Use: program.html?client=athlete_id');
     return;
+  }
+
+  // Reveal the demo banner up-front (URL tells us it's demo) so there's no
+  // layout shift once data loads.
+  if (window.IS_DEMO) {
+    document.body.classList.add('is-demo');
+    const db = document.getElementById('demo-banner');
+    if (db) db.hidden = false;
   }
 
   try {
@@ -3904,6 +3958,16 @@ async function sendSession(day) {
   const btn        = completeEl.querySelector('.send-session-btn');
   const status     = document.getElementById('send-status-' + day);
 
+  // Demo mode never emails the coach. Show what *would* happen and point the
+  // visitor at the application form instead.
+  if (window.IS_DEMO) {
+    status.className = 'send-session-status';
+    status.innerHTML = 'Demo only — in the real app this instantly emails your coach. <a href="/form.html">Apply to get yours →</a>';
+    btn.disabled = true;
+    btn.textContent = 'Demo — not sent';
+    return;
+  }
+
   // Belt-and-braces: refuse zero-effort sends. The UI shouldn't surface the
   // Send button before any work is logged (the confirm card only appears once
   // done > 0), but enforce it here too in case state was tampered with.
@@ -4370,11 +4434,14 @@ function esc(str) {
 <script defer src="/assets/js/shared.js"></script>
 <script>
   // Offer Add-to-Home-Screen a few seconds after first paint.
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
-    }, 2500);
-  });
+  // Skipped in demo mode — don't nag marketing visitors to install.
+  if (!window.IS_DEMO) {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
+      }, 2500);
+    });
+  }
 </script>
 
 </body>
