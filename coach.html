@@ -198,9 +198,43 @@ async function loadOverview() {
 // --- athlete detail ---------------------------------------------------------
 async function loadAthlete(athleteId) {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
-  const { data, error } = await sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).single();
-  if (error) { $('content').innerHTML = `<p class="muted">Error: ${esc(error.message)}</p>`; return; }
-  const { days, ex } = decode(athleteId, data.data);
+  const [progRes, histRes] = await Promise.all([
+    sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).maybeSingle(),
+    sb.from('session_history').select('*').eq('athlete_id', athleteId)
+      .order('completed_on', { ascending: false }).order('day', { ascending: true })
+  ]);
+  if (progRes.error && histRes.error) {
+    $('content').innerHTML = `<p class="muted">Error: ${esc((progRes.error || histRes.error).message)}</p>`; return;
+  }
+  const prog       = progRes.data;            // may be null if they only have history
+  const history    = histRes.data || [];
+  const name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
+  const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
+
+  // ── Permanent finished sessions (captured on Finish; never degrade) ──
+  const histHtml = history.length ? history.map(s => {
+    const rd = s.readiness;
+    let readinessHtml = '';
+    if (rd) {
+      if (rd.skipped) readinessHtml = '<div class="readiness"><span class="r">Readiness: <b>skipped</b></span></div>';
+      else readinessHtml = `<div class="readiness">
+        ${rd.composite != null ? `<span class="r">Readiness <b>${esc(rd.composite)}/5</b></span>` : ''}
+        ${['sleep','energy','soreness','stress','overall'].filter(k=>rd[k]!=null).map(k=>`<span class="r">${k} <b>${esc(rd[k])}</b></span>`).join('')}
+      </div>`;
+    }
+    const partial = (s.status || '').toLowerCase().indexOf('partial') === 0;
+    return `<div class="day">
+      <h3>Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}
+        <span class="tag ${partial ? '' : 'done'}">${esc(s.status || 'sent')}</span>
+        <span class="when">· ${esc(s.completed_on)}${s.session_rpe != null ? ' · RPE ' + esc(s.session_rpe) + '/10' : ''}${s.duration_min != null ? ' · ' + esc(s.duration_min) + ' min' : ''}</span></h3>
+      ${readinessHtml}
+      ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
+      ${s.summary ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;color:var(--blue)">Full session detail</summary><pre style="white-space:pre-wrap;font-family:'Space Mono',monospace;font-size:12px;background:#FBF8F1;border-radius:8px;padding:12px;margin-top:8px;overflow-x:auto">${esc(s.summary)}</pre></details>` : ''}
+    </div>`;
+  }).join('') : '<p class="muted">No finished sessions yet — these appear when an athlete taps Finish / send to coach.</p>';
+
+  // ── Live activity (rolling snapshot; may be partial / cleared on rollover) ──
+  const { days, ex } = prog ? decode(athleteId, prog.data) : { days: {}, ex: {} };
 
   // Days
   const dayNums = Object.keys(days).map(Number).sort((a,b)=>a-b);
@@ -238,10 +272,11 @@ async function loadAthlete(athleteId) {
   </table>` : '<p class="muted">No exercise logs yet.</p>';
 
   $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
-    <h2 style="font-size:26px;margin-bottom:4px">${esc(data.athlete_name || athleteId)}</h2>
-    <div class="muted" style="margin-bottom:8px">last active ${timeAgo(data.updated_at)}</div>
-    <div class="sec-title">Days</div>${daysHtml || '<p class="muted">No day data.</p>'}
-    <div class="sec-title">Exercise logs</div>${exHtml}`;
+    <h2 style="font-size:26px;margin-bottom:4px">${esc(name)}</h2>
+    <div class="muted" style="margin-bottom:8px">last active ${timeAgo(lastActive)} · ${history.length} finished session${history.length === 1 ? '' : 's'}</div>
+    <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
+    <div class="sec-title">Live activity — current snapshot</div>${daysHtml || '<p class="muted">No live day data.</p>'}
+    <div class="sec-title">Exercise logs — live</div>${exHtml}`;
 }
 window.loadAthlete = loadAthlete;
 window.loadOverview = loadOverview;
