@@ -3110,8 +3110,10 @@ function renderCircuit(ex, dayId, num, blockClass) {
     </div>`;
   }).join('');
 
-  const _vid = getVideoUrl(ex);
-  const videoBlock = renderVideoBlock(_vid);
+  // A circuit is a group, not a single movement — it deliberately has NO
+  // group-level video. Each sub-movement carries its own play button instead
+  // (rendered above via getVideoUrl(item)). This is why circuits behave a bit
+  // differently from standard/simple exercises, which do show one video.
 
   // Circuits don't fit the standard 5-cell grid (no sets/reps/tempo/rpe), so we
   // surface the rounds string + rest as the headline info.
@@ -3131,10 +3133,14 @@ function renderCircuit(ex, dayId, num, blockClass) {
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
 
+  // How many rounds? Parse the leading number out of the rounds string
+  // (e.g. "×3 Rounds" → 3). Drives one RPE row per round below. Min 1.
+  const roundCount = parseRoundCount(ex.rounds);
+
   // Rest button at the bottom of the detail
   const restBottom = `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`;
 
-  return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}">
+  return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -3144,7 +3150,6 @@ function renderCircuit(ex, dayId, num, blockClass) {
       <div class="ex-chevron">▾</div>
     </div>
     <div class="ex-detail">
-      ${videoBlock}
       <div class="ex-circuit-meta">
         <div class="ex-stat">
           <div class="ex-stat-label">Rounds</div>
@@ -3189,10 +3194,10 @@ function toggleCheckOnly(item, day) {
     item.classList.toggle('checked', willBeChecked);
   } else {
     item.classList.toggle('checked');
-    const rpeRow = item.querySelector('.rpe-row');
-    if (rpeRow) rpeRow.classList.toggle('visible', item.classList.contains('checked'));
+    const rpeRows = item.querySelectorAll('.rpe-row');
+    rpeRows.forEach(r => r.classList.toggle('visible', item.classList.contains('checked')));
     // Simple items (no RPE): auto-collapse on check, expand on uncheck.
-    if (item.classList.contains('checked') && !rpeRow) item.classList.add('collapsed');
+    if (item.classList.contains('checked') && !rpeRows.length) item.classList.add('collapsed');
     if (!item.classList.contains('checked'))           item.classList.remove('collapsed');
   }
   saveState();
@@ -3824,8 +3829,13 @@ function autoResetStaleDays() {
       (day.blocks || []).forEach(block => {
         (block.exercises || []).forEach(ex => {
           const k = ex.name.replace(/\s+/g, '_');
-          // Legacy single-RPE key (still used by circuits)
+          // Circuit RPE: round 1 uses the legacy (no-suffix) key, later rounds
+          // use _r<round>. Clear every round this exercise has.
+          const rounds = ex.type === 'circuit' ? parseRoundCount(ex.rounds) : 1;
           localStorage.removeItem(ATHLETE_ID + '_rpe_' + k);
+          for (let round = 2; round <= rounds; round++) {
+            localStorage.removeItem(circuitRpeKey(ex.name, round));
+          }
           // Per-set log: clear RPE + done, keep weights
           const setKey = ATHLETE_ID + '_setlog_' + k;
           let log = [];
@@ -3868,8 +3878,7 @@ function restoreState() {
     (state[day] || []).forEach((checked, idx) => {
       if (checked && items[idx]) {
         items[idx].classList.add('checked');
-        const rpeRow = items[idx].querySelector('.rpe-row');
-        if (rpeRow) rpeRow.classList.add('visible');
+        items[idx].querySelectorAll('.rpe-row').forEach(r => r.classList.add('visible'));
       }
     });
     if (localStorage.getItem(ATHLETE_ID + '_completed_d' + day)) {
@@ -3899,9 +3908,10 @@ function restoreState() {
   // saved RPE (or is a simple-type item with no RPE picker). Mirrors the live
   // behavior so the page picks up where they left off.
   document.querySelectorAll('#screen-program .checklist-item.checked').forEach(card => {
-    const rpeRow = card.querySelector('.rpe-row');
-    const hasSelectedRPE = rpeRow && rpeRow.querySelector('.rpe-btn.selected');
-    if (!rpeRow || hasSelectedRPE) {
+    const rpeRows = card.querySelectorAll('.rpe-row');
+    // Collapse if there's no RPE picker, or every round row already has a rating.
+    const allRated = Array.from(rpeRows).every(r => r.querySelector('.rpe-btn.selected'));
+    if (!rpeRows.length || allRated) {
       card.classList.add('collapsed');
     }
   });
@@ -4057,8 +4067,18 @@ async function sendSession(day) {
       const k = name.replace(/\s+/g, '_');
       const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
       if (isCircuit) {
-        const r = localStorage.getItem(ATHLETE_ID + '_rpe_' + k) || '';
-        return { kind: 'circuit', r, n };
+        // One RPE per round. Round 1 uses the legacy (no-suffix) key; later
+        // rounds use the _r<round> suffix. Read the round count off the
+        // rendered card so we never miss or over-probe.
+        const card = Array.from(document.querySelectorAll('.round-group'))
+          .find(c => (c.querySelector('.item-name')?.textContent || '').trim() === name);
+        const total = parseInt(card?.dataset.rounds, 10) || 1;
+        const rounds = [];
+        for (let round = 1; round <= total; round++) {
+          const r = localStorage.getItem(circuitRpeKey(name, round)) || '';
+          if (r) rounds.push({ round, r });
+        }
+        return { kind: 'circuit', rounds, n };
       }
       let log = [];
       try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; }
@@ -4084,7 +4104,10 @@ async function sendSession(day) {
             summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
           });
         } else if (data.kind === 'circuit') {
-          if (data.r) summary += `    RPE: ${data.r}\n`;
+          if (data.rounds.length) {
+            const parts = data.rounds.map(x => `R${x.round} ${x.r}`).join(' · ');
+            summary += `    RPE: ${parts}\n`;
+          }
         }
         if (data.n) summary += `    Note: ${data.n}\n`;
         // Circuit sub-exercises (the rounds A/B/C list)
@@ -4286,19 +4309,41 @@ function initSetOrRPE() {
   });
 }
 
-// Single-RPE selector for circuits (their multiple sub-exercises share one rating).
+// Parse a round count out of a rounds string ("×3 Rounds" → 3). Min 1.
+function parseRoundCount(roundsStr) {
+  const m = String(roundsStr || '').match(/\d+/);
+  const n = m ? parseInt(m[0], 10) : 1;
+  return n > 0 ? n : 1;
+}
+
+// Per-round RPE storage key for a circuit. Round 1 keeps the legacy
+// (no-suffix) key so previously-saved single ratings are preserved.
+function circuitRpeKey(name, round) {
+  const base = ATHLETE_ID + '_rpe_' + name.replace(/\s+/g, '_');
+  return round <= 1 ? base : base + '_r' + round;
+}
+
+// RPE selector for circuits — one row per round, so the athlete can rate
+// each round of the circuit independently.
 function attachOverallRPE(card) {
   const name   = card.querySelector('.item-name').textContent.trim();
-  const rpeKey = ATHLETE_ID + '_rpe_' + name.replace(/\s+/g, '_');
-  const saved  = localStorage.getItem(rpeKey);
-  const div    = document.createElement('div');
-  div.className = 'rpe-row';
-  div.innerHTML = '<span class="rpe-label">RPE</span>' +
-    [6,7,8,9,10].map(n =>
-      `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
-    ).join('');
-  div.addEventListener('click', e => e.stopPropagation());
-  logSlotFor(card).appendChild(div);
+  const rounds = parseInt(card.dataset.rounds, 10) || 1;
+  const slot   = logSlotFor(card);
+  for (let round = 1; round <= rounds; round++) {
+    const rpeKey = circuitRpeKey(name, round);
+    const saved  = localStorage.getItem(rpeKey);
+    const div    = document.createElement('div');
+    div.className = 'rpe-row';
+    // With more than one round, label each row by its round number; a single
+    // round keeps the plain "RPE" label (unchanged from before).
+    const label = rounds > 1 ? `RPE · R${round}` : 'RPE';
+    div.innerHTML = `<span class="rpe-label">${label}</span>` +
+      [6,7,8,9,10].map(n =>
+        `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
+      ).join('');
+    div.addEventListener('click', e => e.stopPropagation());
+    slot.appendChild(div);
+  }
 }
 
 // Personal note per exercise — saved to localStorage per athlete + exercise.
@@ -4341,11 +4386,14 @@ function selectRPE(btn, key, e) {
   btn.classList.add('selected');
   localStorage.setItem(key, btn.textContent.trim());
 
-  // Collapse the card now — the client has logged everything we need.
-  // They can re-expand by tapping the row to change anything.
+  // Collapse the card once the client has logged everything we need. For a
+  // multi-round circuit that means every round row has a rating — don't
+  // collapse mid-way through rating the rounds.
   const card = btn.closest('.checklist-item');
   if (card && card.classList.contains('checked')) {
-    card.classList.add('collapsed');
+    const rows = card.querySelectorAll('.rpe-row');
+    const allRated = Array.from(rows).every(r => r.querySelector('.rpe-btn.selected'));
+    if (allRated) card.classList.add('collapsed');
   }
 }
 
