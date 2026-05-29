@@ -35,6 +35,11 @@
          background: var(--card); color: var(--ink); padding: 9px 16px; border-radius: 10px; cursor: pointer; }
   .btn:hover { border-color: var(--ink); }
   .btn.primary { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  .btn.sm { padding: 4px 11px; font-size: 12px; border-radius: 8px; }
+  .btn.danger { color: var(--red); }
+  .btn.danger:hover { border-color: var(--red); background: #FBEAE4; }
+  .day-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .day-head h3 { flex: 1; min-width: 0; }
 
   .gate { max-width: 420px; margin: 12vh auto; text-align: center; background: var(--card);
           border: 1px solid var(--line); border-radius: 16px; padding: 40px 32px; }
@@ -168,26 +173,51 @@ function decode(athleteId, blob) {
 function unslug(s) { return s.replace(/_/g, ' '); }
 
 // --- overview ---------------------------------------------------------------
+// One card per athlete, grouped by athlete_id across BOTH tables — so an
+// athlete shows up whether they have a live snapshot, finished sessions, or both.
 async function loadOverview() {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
-  const { data, error } = await sb.from('athlete_progress').select('*').order('updated_at', { ascending: false });
-  if (error) { $('content').innerHTML = `<p class="muted">Could not load data: ${esc(error.message)}</p>`; return; }
-  if (!data || !data.length) { $('content').innerHTML = '<p class="muted">No athlete activity yet. Once an athlete trains, they’ll appear here.</p>'; return; }
+  const [progRes, histRes] = await Promise.all([
+    sb.from('athlete_progress').select('*'),
+    sb.from('session_history').select('athlete_id, athlete_name, updated_at')
+  ]);
+  if (progRes.error && histRes.error) {
+    $('content').innerHTML = `<p class="muted">Could not load data: ${esc((progRes.error || histRes.error).message)}</p>`; return;
+  }
+  const progRows = progRes.data || [];
+  const histRows = histRes.data || [];
+  if (!progRows.length && !histRows.length) {
+    $('content').innerHTML = '<p class="muted">No athlete activity yet. Once an athlete trains, they’ll appear here.</p>'; return;
+  }
 
-  const cards = data.map(row => {
+  // Group everything by athlete.
+  const map = {};
+  const get = (id) => (map[id] = map[id] || { id, name: id, finished: 0, completedDays: 0, lastActive: null });
+  const touch = (a, name, when) => {
+    if (name) a.name = name;
+    if (when && (!a.lastActive || when > a.lastActive)) a.lastActive = when;
+  };
+  progRows.forEach(row => {
+    const a = get(row.athlete_id);
+    touch(a, row.athlete_name, row.updated_at);
     const { days } = decode(row.athlete_id, row.data);
-    const dayNums = Object.keys(days);
-    const completed = dayNums.filter(n => days[n].completed).length;
-    const lastDay = dayNums.map(Number).sort((a,b)=>b-a)[0];
-    const lastRpe = lastDay != null && days[lastDay] ? days[lastDay].srpe : null;
-    const quiet = daysSince(row.updated_at) > QUIET_DAYS;
-    return `<div class="card" onclick="loadAthlete('${esc(row.athlete_id)}')">
-      <div class="name">${esc(row.athlete_name || row.athlete_id)}</div>
-      <div class="meta">last active ${timeAgo(row.updated_at)}</div>
+    a.completedDays = Object.keys(days).filter(n => days[n].completed).length;
+  });
+  histRows.forEach(row => {
+    const a = get(row.athlete_id);
+    touch(a, row.athlete_name, row.updated_at);
+    a.finished++;
+  });
+
+  const athletes = Object.values(map).sort((a, b) => (b.lastActive || '').localeCompare(a.lastActive || ''));
+  const cards = athletes.map(a => {
+    const quiet = daysSince(a.lastActive) > QUIET_DAYS;
+    return `<div class="card" onclick="loadAthlete('${esc(a.id)}')">
+      <div class="name">${esc(a.name)}</div>
+      <div class="meta">last active ${timeAgo(a.lastActive)}</div>
       <div class="stats">
-        <div class="stat"><div class="n">${completed}</div><div class="l">days done</div></div>
-        <div class="stat"><div class="n">${dayNums.length}</div><div class="l">days touched</div></div>
-        <div class="stat"><div class="n">${lastRpe || '—'}</div><div class="l">last RPE</div></div>
+        <div class="stat"><div class="n">${a.finished}</div><div class="l">finished logs</div></div>
+        <div class="stat"><div class="n">${a.completedDays}</div><div class="l">days done (live)</div></div>
       </div>
       <span class="pill ${quiet ? 'quiet' : 'active'}">${quiet ? 'Quiet — may need a nudge' : 'Active'}</span>
     </div>`;
@@ -224,9 +254,12 @@ async function loadAthlete(athleteId) {
     }
     const partial = (s.status || '').toLowerCase().indexOf('partial') === 0;
     return `<div class="day">
-      <h3>Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}
-        <span class="tag ${partial ? '' : 'done'}">${esc(s.status || 'sent')}</span>
-        <span class="when">· ${esc(s.completed_on)}${s.session_rpe != null ? ' · RPE ' + esc(s.session_rpe) + '/10' : ''}${s.duration_min != null ? ' · ' + esc(s.duration_min) + ' min' : ''}</span></h3>
+      <div class="day-head">
+        <h3>Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}
+          <span class="tag ${partial ? '' : 'done'}">${esc(s.status || 'sent')}</span>
+          <span class="when">· ${esc(s.completed_on)}${s.session_rpe != null ? ' · RPE ' + esc(s.session_rpe) + '/10' : ''}${s.duration_min != null ? ' · ' + esc(s.duration_min) + ' min' : ''}</span></h3>
+        <button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete</button>
+      </div>
       ${readinessHtml}
       ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
       ${s.summary ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;color:var(--blue)">Full session detail</summary><pre style="white-space:pre-wrap;font-family:'Space Mono',monospace;font-size:12px;background:#FBF8F1;border-radius:8px;padding:12px;margin-top:8px;overflow-x:auto">${esc(s.summary)}</pre></details>` : ''}
@@ -272,12 +305,35 @@ async function loadAthlete(athleteId) {
   </table>` : '<p class="muted">No exercise logs yet.</p>';
 
   $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
-    <h2 style="font-size:26px;margin-bottom:4px">${esc(name)}</h2>
-    <div class="muted" style="margin-bottom:8px">last active ${timeAgo(lastActive)} · ${history.length} finished session${history.length === 1 ? '' : 's'}</div>
+    <div class="day-head" style="align-items:center;margin-bottom:8px">
+      <div>
+        <h2 style="font-size:26px;margin-bottom:4px">${esc(name)}</h2>
+        <div class="muted">last active ${timeAgo(lastActive)} · ${history.length} finished session${history.length === 1 ? '' : 's'}</div>
+      </div>
+      <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}', '${esc(name)}')">Delete all data</button>
+    </div>
     <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
     <div class="sec-title">Live activity — current snapshot</div>${daysHtml || '<p class="muted">No live day data.</p>'}
     <div class="sec-title">Exercise logs — live</div>${exHtml}`;
 }
+
+// --- delete (coach only; enforced by RLS) -----------------------------------
+async function deleteSession(athleteId, day, completedOn) {
+  if (!confirm(`Delete the Day ${day} log from ${completedOn}?\n\nThis permanently removes that finished session. It cannot be undone.`)) return;
+  const { error } = await sb.from('session_history').delete()
+    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
+  if (error) { alert('Could not delete: ' + error.message); return; }
+  loadAthlete(athleteId);
+}
+async function deleteAthlete(athleteId, name) {
+  if (!confirm(`Delete ALL data for ${name}?\n\nThis removes every finished session AND the live snapshot. It cannot be undone.`)) return;
+  const r1 = await sb.from('session_history').delete().eq('athlete_id', athleteId);
+  const r2 = await sb.from('athlete_progress').delete().eq('athlete_id', athleteId);
+  if (r1.error || r2.error) { alert('Could not delete: ' + ((r1.error || r2.error).message)); return; }
+  loadOverview();
+}
+window.deleteSession = deleteSession;
+window.deleteAthlete = deleteAthlete;
 window.loadAthlete = loadAthlete;
 window.loadOverview = loadOverview;
 </script>
