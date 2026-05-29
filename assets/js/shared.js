@@ -30,16 +30,83 @@
   }
 
   // ── Active nav link ──────────────────────────────────────────────────
+  // Helpers shared by the path matcher and the scroll-spy.
+  function navHeight() {
+    const nav = document.querySelector('.site-nav');
+    return nav ? nav.offsetHeight : 64;
+  }
+  function clearActiveLinks() {
+    document.querySelectorAll('.nav-link.is-active').forEach(a => {
+      a.classList.remove('is-active');
+      a.removeAttribute('aria-current');
+    });
+  }
+  function activateLink(a) {
+    if (a && a.classList.contains('is-active')) return; // already active — no churn
+    clearActiveLinks();
+    if (a) { a.classList.add('is-active'); a.setAttribute('aria-current', 'true'); }
+  }
+
+  // Seeds the active state from the URL. On sub-pages this is the whole story
+  // (e.g. /form.html → the Apply CTA). On the homepage it just sets the initial
+  // state for a deep-link hash; wireScrollSpy() then keeps it in sync on scroll.
   function setActiveNavLink() {
     const pathname = location.pathname.replace(/\/index\.html$/, '/') || '/';
     const hash = location.hash || '';
-    document.querySelectorAll('.nav-link').forEach(a => {
+    const currentNorm = (pathname + hash).replace(/\/$/, '') || '/';
+    document.querySelectorAll('.nav-link, .nav-cta').forEach(a => {
       const match = a.getAttribute('data-match') || a.getAttribute('href') || '';
-      // Trim trailing slash except for root
       const norm = match.replace(/\/$/, '') || '/';
-      const currentNorm = (pathname + hash).replace(/\/$/, '') || '/';
-      if (norm === currentNorm) a.classList.add('is-active');
+      if (norm !== currentNorm) return;
+      if (a.classList.contains('nav-cta')) {
+        // The CTA is already a filled button — mark it current for a11y only,
+        // don't restyle it.
+        a.setAttribute('aria-current', 'page');
+      } else {
+        a.classList.add('is-active');
+        a.setAttribute('aria-current', 'true');
+      }
     });
+  }
+
+  // ── Scroll-spy (homepage one-pager) ──────────────────────────────────
+  // Highlights the nav link for whichever section is currently under the nav.
+  function wireScrollSpy() {
+    const here = location.pathname.replace(/index\.html$/, '');
+    const spied = [];
+    document.querySelectorAll('.nav-link[href*="#"]').forEach(a => {
+      const url = new URL(a.href, location.href);
+      if (!url.hash) return;
+      if (url.pathname.replace(/index\.html$/, '') !== here) return; // link to another page
+      const el = document.querySelector(url.hash);
+      if (el) spied.push({ link: a, el });
+    });
+    // No in-page sections → not the one-pager; leave the path match alone.
+    if (!spied.length) return;
+
+    function update() {
+      const line = navHeight() + 24; // activate a section once it passes just under the nav
+      let active = null;
+      for (const s of spied) {
+        if (s.el.getBoundingClientRect().top - line <= 0) active = s;
+      }
+      // At the very bottom, pin the last spied section (handles short trailing ones).
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) {
+        active = spied[spied.length - 1];
+      }
+      if (active) activateLink(active.link);
+      else clearActiveLinks(); // above the first section (hero) → nothing highlighted
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { update(); ticking = false; });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
   }
 
   // ── Mobile nav toggle ────────────────────────────────────────────────
@@ -248,6 +315,7 @@
       mountPartial('site-footer', 'partials/footer.html'),
     ]);
     setActiveNavLink();
+    wireScrollSpy();
     wireNavToggle();
     wireReveal();
     wireSmoothScroll();
