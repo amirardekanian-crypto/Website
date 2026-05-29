@@ -4209,6 +4209,31 @@ async function sendSession(day) {
     const sentAt = new Date();
     localStorage.setItem(ATHLETE_ID + '_sent_d' + day, sentAt.toISOString());
 
+    // Stage 1.5: also save a PERMANENT, immutable record of this finished
+    // session to the cloud (for the coach dashboard). Unlike the live snapshot,
+    // this is never cleared by the daily auto-reset, so per-set detail and the
+    // full summary survive forever. Fire-and-forget; never blocks the send.
+    try {
+      const _sbc = (!window.IS_DEMO) ? _sb() : null;
+      if (_sbc) {
+        _sbc.rpc('save_session', {
+          p_athlete_id:   ATHLETE_ID,
+          p_athlete_name: `${DATA.athlete.firstName} ${DATA.athlete.lastName}`,
+          p_day:          Number(day),
+          p_completed_on: sentAt.toISOString().slice(0, 10),
+          p_session: {
+            status:       statusLabel,
+            session_rpe:  String(sRpe || ''),
+            duration_min: hasDur ? String(durMin) : '',
+            readiness:    readiness || null,
+            day_note:     dayNote || '',
+            focus:        dayData.focusTag || '',
+            summary:      summary
+          }
+        });
+      }
+    } catch (e) { /* never let the permanent-record write interfere with sending */ }
+
     status.className = 'send-session-status success';
     status.textContent = '✓ Sent — your coach will see it shortly.';
     btn.textContent = 'Sent ✓';
