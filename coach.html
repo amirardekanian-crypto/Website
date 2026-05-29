@@ -85,6 +85,41 @@
   .meta-table td.v { font-family: 'Space Mono', monospace; }
   .elog-title { font-size: 11px; text-transform: uppercase; color: var(--grey); letter-spacing: .5px; margin: 16px 0 6px; }
   .elog-body { white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.65; background: #FBF8F1; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
+
+  /* ── Triage + analytics (Stage 3) ───────────────────────────────────── */
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .controls input, .controls select { font-family: 'Barlow', sans-serif; font-size: 14px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); }
+  .controls input { flex: 1; min-width: 180px; }
+  .tier { margin-bottom: 4px; }
+  .tier-head { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--grey); margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .tier-head .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .dot.red { background: var(--red); } .dot.amber { background: var(--yellow); } .dot.green { background: var(--green); }
+  details.tier-ok summary { cursor: pointer; list-style: none; }
+  details.tier-ok summary::-webkit-details-marker { display: none; }
+  details.tier-ok summary:hover { color: var(--ink); }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card.alert-red { border-left: 3px solid var(--red); }
+  .card.alert-amber { border-left: 3px solid var(--yellow); }
+  .zrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .zpill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: #F2EEE7; color: var(--grey); white-space: nowrap; }
+  .zpill.green { background: #E7F4EC; color: var(--green); }
+  .zpill.amber { background: #FBEFD9; color: #B26B00; }
+  .zpill.red   { background: #FBEAE4; color: var(--red); }
+  .flags { display: flex; flex-direction: column; gap: 4px; margin-top: 11px; }
+  .flag { font-size: 11.5px; color: var(--grey); display: flex; align-items: center; gap: 7px; }
+  .flag .fdot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .spark { margin-top: 10px; min-height: 30px; }
+
+  /* Detail-view charts */
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 6px 0 4px; }
+  @media (max-width: 680px) { .charts { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .chart-card h4 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .5px; font-size: 14px; color: var(--grey); margin-bottom: 6px; }
+  .chart-big { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; line-height: 1.1; }
+  .chart-sub { font-size: 12px; color: var(--grey); margin-top: 3px; }
+  .chart-svg { display: block; width: 100%; height: auto; margin-top: 12px; }
+  .chart-legend { font-size: 11px; color: var(--grey); margin-top: 8px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -226,14 +261,185 @@ function decode(athleteId, blob) {
 }
 function unslug(s) { return s.replace(/_/g, ' '); }
 
-// --- overview ---------------------------------------------------------------
-// One card per athlete, grouped by athlete_id across BOTH tables — so an
-// athlete shows up whether they have a live snapshot, finished sessions, or both.
+// --- training-load + readiness analytics ------------------------------------
+// All derived from session_history. Load uses Foster's session-RPE method
+// (load = session RPE × duration in minutes). ACWR = acute (7-day) ÷ chronic
+// (28-day weekly average). Readiness uses the composite each athlete self-reports.
+// Colours are hex (not CSS vars) because var() isn't reliable inside SVG attrs.
+const C = { blue:'#2F6DB0', green:'#3A8F5E', red:'#C0563B', yellow:'#E8B84B', amber:'#B26B00', grey:'#6B6B6B', ink:'#1A1A1A' };
+function pDate(iso) { const p = String(iso).split('-'); return new Date(+p[0], (+p[1]) - 1, +p[2]); }
+function round1(n) { return Math.round(n * 10) / 10; }
+
+// { 'YYYY-MM-DD' -> total AU that day }
+function dailyLoad(sessions) {
+  const m = {};
+  sessions.forEach(s => {
+    if (s.session_rpe != null && s.duration_min != null && s.completed_on)
+      m[s.completed_on] = (m[s.completed_on] || 0) + Number(s.session_rpe) * Number(s.duration_min);
+  });
+  return m;
+}
+// Rolling-average ACWR as of `ref` (default today). `enough` gates the display
+// so a thin history never produces a misleading ratio.
+function computeAcwr(daily, ref) {
+  const keys = Object.keys(daily);
+  if (!keys.length) return { ratio: null, acute: 0, chronicWeekly: 0, enough: false, spanDays: 0 };
+  const r = ref || new Date();
+  const refMid = new Date(r.getFullYear(), r.getMonth(), r.getDate());
+  let acute = 0, chronic = 0, earliest = null;
+  keys.forEach(iso => {
+    const d = pDate(iso), diff = Math.floor((refMid - d) / 86400000);
+    if (earliest === null || d < earliest) earliest = d;
+    if (diff >= 0 && diff < 7)  acute   += daily[iso];
+    if (diff >= 0 && diff < 28) chronic += daily[iso];
+  });
+  const chronicWeekly = chronic / 4;
+  const spanDays = earliest !== null ? Math.floor((refMid - earliest) / 86400000) : 0;
+  return { ratio: chronicWeekly > 0 ? acute / chronicWeekly : null,
+           acute, chronicWeekly, enough: spanDays >= 14 && chronicWeekly > 0, spanDays };
+}
+function acwrZone(r) {
+  if (r == null) return { label: '—', cls: '' };
+  if (r > 1.5)  return { label: 'High load', cls: 'red' };
+  if (r > 1.3)  return { label: 'Climbing',  cls: 'amber' };
+  if (r >= 0.8) return { label: 'Optimal',   cls: 'green' };
+  return { label: 'Low load', cls: 'amber' };
+}
+// Composite readiness over time (ascending) + baseline/latest.
+function readinessSeries(sessions) {
+  return sessions
+    .filter(s => s.readiness && !s.readiness.skipped && s.readiness.composite != null)
+    .map(s => ({ iso: s.completed_on, v: Number(s.readiness.composite) }))
+    .filter(p => p.iso && !isNaN(p.v))
+    .sort((a, b) => a.iso.localeCompare(b.iso));
+}
+function readinessStats(series) {
+  if (!series.length) return null;
+  const v = series.map(p => p.v), base = v.reduce((a, b) => a + b, 0) / v.length;
+  const latest = v[v.length - 1];
+  return { baseline: base, latest, delta: latest - base, n: v.length };
+}
+// Weekly buckets (Mon-start) of load for the last `weeks` weeks, oldest → newest.
+function weeklyLoad(daily, weeks, ref) {
+  const r = ref || new Date();
+  const monday = new Date(r.getFullYear(), r.getMonth(), r.getDate());
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));   // back to this week's Monday
+  const buckets = [];
+  for (let i = weeks - 1; i >= 0; i--) { const start = new Date(monday); start.setDate(start.getDate() - i * 7); buckets.push({ start, load: 0 }); }
+  Object.keys(daily).forEach(iso => {
+    const d = pDate(iso);
+    for (let i = buckets.length - 1; i >= 0; i--) { if (d >= buckets[i].start) { buckets[i].load += daily[iso]; break; } }
+  });
+  return buckets;
+}
+// Bundle every metric for one athlete from their session rows.
+function athleteMetrics(sessions, lastActive) {
+  const daily = dailyLoad(sessions);
+  const rser  = readinessSeries(sessions);
+  const loadPts = sessions
+    .filter(s => s.session_rpe != null && s.duration_min != null && s.completed_on)
+    .slice().sort((a, b) => String(a.completed_on).localeCompare(String(b.completed_on)))
+    .map(s => Number(s.session_rpe) * Number(s.duration_min));
+  const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
+  const lastPartial = byRecent.length ? (String(byRecent[0].status || '').toLowerCase().indexOf('partial') === 0) : false;
+  return { daily, acwr: computeAcwr(daily), rser, readiness: readinessStats(rser),
+           loadPts, lastPartial, daysIdle: daysSince(lastActive) };
+}
+// Triage signals → { tier:'red'|'amber'|'ok', flags:[{sev,msg}] }
+function triage(m) {
+  const flags = [], rank = { red: 2, amber: 1, ok: 0 }; let tier = 'ok';
+  const add = (sev, msg) => { flags.push({ sev, msg }); if (rank[sev] > rank[tier]) tier = sev; };
+  if (m.daysIdle > 14)            add('red', 'Silent — ' + m.daysIdle + ' days, no training');
+  else if (m.daysIdle > QUIET_DAYS) add('amber', 'Quiet — ' + m.daysIdle + ' days idle');
+  if (m.acwr.enough && m.acwr.ratio != null) {
+    if (m.acwr.ratio > 1.5)      add('red',   'Load spike — ACWR ' + round1(m.acwr.ratio));
+    else if (m.acwr.ratio > 1.3) add('amber', 'Load climbing — ACWR ' + round1(m.acwr.ratio));
+    else if (m.acwr.ratio < 0.8) add('amber', 'Detraining — ACWR ' + round1(m.acwr.ratio));
+  }
+  if (m.readiness) {
+    if (m.readiness.delta <= -1)        add('red',   'Readiness ↓ ' + round1(m.readiness.latest) + ' vs ' + round1(m.readiness.baseline) + ' usual');
+    else if (m.readiness.delta <= -0.5) add('amber', 'Readiness dipping');
+  }
+  if (m.lastPartial) add('amber', 'Last session left partial');
+  flags.sort((a, b) => rank[b.sev] - rank[a.sev]);
+  return { tier, flags };
+}
+
+// --- tiny inline-SVG charts (no dependency) ---------------------------------
+function sparkline(values, color, w, h) {
+  w = w || 400; h = h || 40;   // wide aspect so the full-width SVG stays a compact strip
+  const pts = values.filter(v => v != null && !isNaN(v));
+  if (pts.length < 2) return '<span class="muted" style="font-size:11px">not enough data yet</span>';
+  const min = Math.min(...pts), max = Math.max(...pts), rng = (max - min) || 1;
+  const X = i => (i / (pts.length - 1)) * (w - 2) + 1;
+  const Y = v => h - 2 - ((v - min) / rng) * (h - 4);
+  const d = pts.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+  const lx = X(pts.length - 1), ly = Y(pts[pts.length - 1]);
+  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2.4" fill="${color}"/></svg>`;
+}
+function barsSVG(buckets, color) {
+  const w = 320, h = 96, base = h - 4, top = 8, n = buckets.length || 1;
+  const max = Math.max(1, ...buckets.map(b => b.load)), slot = w / n;
+  const bars = buckets.map((b, i) => {
+    const bh = (b.load / max) * (base - top), x = i * slot + slot * 0.18, bw = slot * 0.64, y = base - bh;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, bh).toFixed(1)}" rx="2" fill="${color}" opacity="${b.load ? 0.85 : 0.18}"></rect>`;
+  }).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${bars}</svg>`;
+}
+function lineSVG(series, opts) {
+  opts = opts || {};
+  const w = 320, h = 96, top = 10, bot = h - 14, left = 4, right = w - 4;
+  const yMin = opts.yMin != null ? opts.yMin : 1, yMax = opts.yMax != null ? opts.yMax : 5;
+  const X = i => series.length > 1 ? left + (i / (series.length - 1)) * (right - left) : (left + right) / 2;
+  const Y = v => bot - ((v - yMin) / ((yMax - yMin) || 1)) * (bot - top);
+  const d = series.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p.v).toFixed(1)).join(' ');
+  const dots = series.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.2" fill="${opts.color}"/>`).join('');
+  let baseLine = '';
+  if (opts.baseline != null) { const by = Y(opts.baseline).toFixed(1); baseLine = `<line x1="${left}" y1="${by}" x2="${right}" y2="${by}" stroke="${C.grey}" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>`; }
+  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${baseLine}<path d="${d}" fill="none" stroke="${opts.color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+}
+// The two-up charts shown at the top of an athlete's detail view.
+function renderCharts(m) {
+  const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
+  const azColor = az.cls === 'red' ? 'var(--red)' : az.cls === 'amber' ? '#B26B00' : az.cls === 'green' ? 'var(--green)' : 'var(--ink)';
+  const hasLoad = Object.keys(m.daily).length > 0;
+  const loadCard = `<div class="chart-card">
+    <h4>Training load</h4>
+    ${m.acwr.enough && m.acwr.ratio != null
+      ? `<div class="chart-big" style="color:${azColor}">${round1(m.acwr.ratio)}<span style="font-size:13px;color:var(--grey);margin-left:6px">ACWR · ${az.label}</span></div>
+         <div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average</div>`
+      : `<div class="chart-big" style="font-size:18px;color:var(--grey)">Building baseline</div>
+         <div class="chart-sub">Needs ~2 weeks of sessions (with duration logged) before the acute:chronic ratio means anything.</div>`}
+    ${hasLoad
+      ? barsSVG(weeklyLoad(m.daily, 8), C.blue) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks</div>`
+      : `<p class="muted" style="margin-top:10px">No load data yet — needs sessions with a logged duration.</p>`}
+  </div>`;
+
+  const r = m.readiness;
+  const rColor = !r ? 'var(--grey)' : r.delta <= -1 ? 'var(--red)' : r.delta <= -0.5 ? '#B26B00' : 'var(--green)';
+  const readyCard = `<div class="chart-card">
+    <h4>Readiness</h4>
+    ${r
+      ? `<div class="chart-big" style="color:${rColor}">${round1(r.latest)}<span style="font-size:13px;color:var(--grey);margin-left:4px">/5 · usual ${round1(r.baseline)}</span></div>
+         <div class="chart-sub">${r.delta >= 0 ? '+' : ''}${round1(r.delta)} vs their ${r.n}-session average</div>
+         ${lineSVG(m.rser, { color: C.green, baseline: r.baseline, yMin: 1, yMax: 5 })}
+         <div class="chart-legend">Composite readiness per session (1–5, higher = fresher) · dashed line = baseline</div>`
+      : `<p class="muted" style="margin-top:10px">No readiness check-ins yet.</p>`}
+  </div>`;
+
+  return `<div class="charts">${loadCard}${readyCard}</div>`;
+}
+
+// --- overview (triage) ------------------------------------------------------
+// One card per athlete, grouped by athlete_id across BOTH tables, then grouped
+// into attention tiers. Full session rows are pulled so the front page can show
+// load/readiness trends and flag who needs the coach right now.
+let _overview = [];
 async function loadOverview() {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
   const [progRes, histRes, keys] = await Promise.all([
     sb.from('athlete_progress').select('*'),
-    sb.from('session_history').select('athlete_id, athlete_name, updated_at'),
+    sb.from('session_history').select('athlete_id, athlete_name, day, completed_on, status, session_rpe, duration_min, readiness, updated_at'),
     fetchKeys()
   ]);
   if (progRes.error && histRes.error) {
@@ -247,7 +453,7 @@ async function loadOverview() {
 
   // Group everything by athlete.
   const map = {};
-  const get = (id) => (map[id] = map[id] || { id, name: id, finished: 0, completedDays: 0, lastActive: null });
+  const get = (id) => (map[id] = map[id] || { id, name: id, finished: 0, completedDays: 0, lastActive: null, sessions: [] });
   const touch = (a, name, when) => {
     if (name) a.name = name;
     if (when && (!a.lastActive || when > a.lastActive)) a.lastActive = when;
@@ -262,27 +468,82 @@ async function loadOverview() {
     const a = get(row.athlete_id);
     touch(a, row.athlete_name, row.updated_at);
     a.finished++;
+    a.sessions.push(row);
   });
 
-  const athletes = Object.values(map).sort((a, b) => (b.lastActive || '').localeCompare(a.lastActive || ''));
-  const cards = athletes.map(a => {
-    const quiet = daysSince(a.lastActive) > QUIET_DAYS;
-    const isProtected = !!keys[a.id];
-    return `<div class="card" onclick="loadAthlete('${esc(a.id)}')">
-      <div class="name">${esc(a.name)}</div>
-      <div class="meta">last active ${timeAgo(a.lastActive)}</div>
-      <div class="stats">
-        <div class="stat"><div class="n">${a.finished}</div><div class="l">finished logs</div></div>
-        <div class="stat"><div class="n">${a.completedDays}</div><div class="l">days done (live)</div></div>
-      </div>
-      <span class="pill ${quiet ? 'quiet' : 'active'}">${quiet ? 'Quiet — may need a nudge' : 'Active'}</span>
-      <span class="pill ${isProtected ? 'active' : 'quiet'}" style="margin-left:6px">${isProtected ? '🔒 Secure link' : '⚠ Legacy link'}</span>
-    </div>`;
-  }).join('');
+  _overview = Object.values(map).map(a => {
+    const metrics = athleteMetrics(a.sessions, a.lastActive);
+    const t = triage(metrics);
+    return Object.assign(a, { metrics, tier: t.tier, flags: t.flags, isProtected: !!keys[a.id] });
+  });
+
   $('content').innerHTML = `
-    <div style="margin-bottom:18px"><button class="btn primary sm" onclick="newAthleteLink()">+ New athlete secure link</button></div>
-    <div class="grid">${cards}</div>`;
+    <div class="controls">
+      <input id="searchBox" placeholder="Search athletes…" oninput="renderCards()">
+      <select id="sortSel" onchange="renderCards()">
+        <option value="attention">Sort: needs attention</option>
+        <option value="recent">Sort: recently active</option>
+        <option value="name">Sort: name</option>
+      </select>
+      <button class="btn primary sm" onclick="newAthleteLink()">+ New secure link</button>
+    </div>
+    <div id="cards"></div>`;
+  renderCards();
 }
+
+function athleteCard(a) {
+  const m = a.metrics;
+  const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
+  const acwrPill = (m.acwr.enough && m.acwr.ratio != null)
+    ? `<span class="zpill ${az.cls}">ACWR ${round1(m.acwr.ratio)} · ${az.label}</span>`
+    : `<span class="zpill">ACWR · building</span>`;
+  const rPill = m.readiness
+    ? `<span class="zpill ${m.readiness.delta <= -1 ? 'red' : (m.readiness.delta <= -0.5 ? 'amber' : 'green')}">Readiness ${round1(m.readiness.latest)}/5</span>`
+    : '';
+  const alertCls = a.tier === 'red' ? 'alert-red' : (a.tier === 'amber' ? 'alert-amber' : '');
+  const flagsHtml = a.flags.length
+    ? `<div class="flags">${a.flags.slice(0, 3).map(f => `<div class="flag"><span class="fdot" style="background:${f.sev === 'red' ? C.red : C.yellow}"></span>${esc(f.msg)}</div>`).join('')}</div>`
+    : '';
+  return `<div class="card ${alertCls}" onclick="loadAthlete('${esc(a.id)}')">
+    <div class="card-top">
+      <div class="name">${esc(a.name)}</div>
+      <span class="zpill ${a.isProtected ? 'green' : 'amber'}" title="${a.isProtected ? 'Secure link' : 'Legacy link'}">${a.isProtected ? '🔒' : '⚠'}</span>
+    </div>
+    <div class="meta">last active ${timeAgo(a.lastActive)} · ${a.finished} session${a.finished === 1 ? '' : 's'}</div>
+    <div class="spark">${sparkline(m.loadPts, C.blue)}</div>
+    <div class="zrow">${acwrPill}${rPill}</div>
+    ${flagsHtml}
+  </div>`;
+}
+
+// Filter + sort + (when sorting by attention) group into tiers. Re-renders only
+// the cards container so the search box keeps focus as you type.
+function renderCards() {
+  const q = (($('searchBox') || {}).value || '').toLowerCase();
+  const sort = (($('sortSel') || {}).value) || 'attention';
+  const rank = { red: 2, amber: 1, ok: 0 };
+  let list = _overview.filter(a => a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q));
+  if (sort === 'name')        list.sort((a, b) => a.name.localeCompare(b.name));
+  else if (sort === 'recent') list.sort((a, b) => (b.lastActive || '').localeCompare(a.lastActive || ''));
+  else                        list.sort((a, b) => (rank[b.tier] - rank[a.tier]) || (b.lastActive || '').localeCompare(a.lastActive || ''));
+
+  if (!list.length) { $('cards').innerHTML = `<p class="muted">No athletes match “${esc(q)}”.</p>`; return; }
+
+  if (sort === 'attention') {
+    const groups = [['red', 'Needs attention', 'red'], ['amber', 'Watch', 'amber'], ['ok', 'On track', 'green']];
+    $('cards').innerHTML = groups.map(([key, label, dot]) => {
+      const g = list.filter(a => a.tier === key);
+      if (!g.length) return '';
+      const cards = `<div class="grid">${g.map(athleteCard).join('')}</div>`;
+      if (key === 'ok')
+        return `<details class="tier tier-ok"><summary class="tier-head"><span class="dot ${dot}"></span>${label} (${g.length}) · tap to show</summary>${cards}</details>`;
+      return `<div class="tier"><div class="tier-head"><span class="dot ${dot}"></span>${label} (${g.length})</div>${cards}</div>`;
+    }).join('');
+  } else {
+    $('cards').innerHTML = `<div class="grid">${list.map(athleteCard).join('')}</div>`;
+  }
+}
+window.renderCards = renderCards;
 
 // --- finished-session card (email-style) ------------------------------------
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -364,6 +625,7 @@ async function loadAthlete(athleteId) {
   const key        = keyRes.data && keyRes.data.secret_key;
   const name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
   const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
+  const metrics    = athleteMetrics(history, lastActive);   // load + readiness trends
 
   // Secure-link panel (Stage 2 / Path B)
   const link = key ? secureLink(athleteId, key) : '';
@@ -459,6 +721,7 @@ async function loadAthlete(athleteId) {
       <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}', '${esc(name)}')">Delete all data</button>
     </div>
     ${linkHtml}
+    ${renderCharts(metrics)}
     <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
     <div class="sec-title">Live activity — current snapshot (each day with its own logs)</div>${daysHtml}`;
 }
