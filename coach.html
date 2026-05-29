@@ -144,6 +144,50 @@ function daysSince(iso) { return iso ? Math.floor((Date.now() - new Date(iso)) /
 function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function jparse(v) { try { return JSON.parse(v); } catch { return null; } }
 
+// --- Stage 2: per-athlete secure keys (Path B) ------------------------------
+const SITE = 'https://www.amirardekani.com';
+function genKey() {
+  const raw = (window.crypto && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+  return raw.replace(/-/g, '');
+}
+async function fetchKeys() {
+  const { data } = await sb.from('athlete_keys').select('athlete_id, secret_key');
+  const m = {};
+  (data || []).forEach(r => { m[r.athlete_id] = r.secret_key; });
+  return m;
+}
+function secureLink(athleteId, key) {
+  return `${SITE}/program.html?client=${encodeURIComponent(athleteId)}&key=${encodeURIComponent(key)}`;
+}
+async function protectAthlete(athleteId) {
+  const key = genKey();
+  const { error } = await sb.from('athlete_keys')
+    .upsert({ athlete_id: athleteId, secret_key: key }, { onConflict: 'athlete_id' });
+  if (error) { alert('Could not save key: ' + error.message); return; }
+  loadAthlete(athleteId);
+}
+function copyText(t, btn) {
+  navigator.clipboard.writeText(t).then(() => {
+    if (btn) { const o = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => btn.textContent = o, 1500); }
+  }, () => alert('Copy failed — here is the link:\n\n' + t));
+}
+async function newAthleteLink() {
+  const id = (prompt('New athlete ID (must match their data/<id>.json file, e.g. john_doe):') || '').trim();
+  if (!id) return;
+  const key = genKey();
+  const { error } = await sb.from('athlete_keys')
+    .upsert({ athlete_id: id, secret_key: key }, { onConflict: 'athlete_id' });
+  if (error) { alert('Could not save key: ' + error.message); return; }
+  const link = secureLink(id, key);
+  copyText(link);
+  alert('Secure link created & copied to clipboard:\n\n' + link + '\n\nMake sure data/' + id + '.json exists, then send this link to the athlete.');
+}
+window.protectAthlete = protectAthlete;
+window.copyText = copyText;
+window.newAthleteLink = newAthleteLink;
+
 // Strip the "<athlete_id>_" prefix and bucket the blob into something the
 // dashboard can render. The app stores progress as many flat keys; we decode
 // them back into days + exercise logs here.
@@ -177,9 +221,10 @@ function unslug(s) { return s.replace(/_/g, ' '); }
 // athlete shows up whether they have a live snapshot, finished sessions, or both.
 async function loadOverview() {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
-  const [progRes, histRes] = await Promise.all([
+  const [progRes, histRes, keys] = await Promise.all([
     sb.from('athlete_progress').select('*'),
-    sb.from('session_history').select('athlete_id, athlete_name, updated_at')
+    sb.from('session_history').select('athlete_id, athlete_name, updated_at'),
+    fetchKeys()
   ]);
   if (progRes.error && histRes.error) {
     $('content').innerHTML = `<p class="muted">Could not load data: ${esc((progRes.error || histRes.error).message)}</p>`; return;
@@ -212,6 +257,7 @@ async function loadOverview() {
   const athletes = Object.values(map).sort((a, b) => (b.lastActive || '').localeCompare(a.lastActive || ''));
   const cards = athletes.map(a => {
     const quiet = daysSince(a.lastActive) > QUIET_DAYS;
+    const isProtected = !!keys[a.id];
     return `<div class="card" onclick="loadAthlete('${esc(a.id)}')">
       <div class="name">${esc(a.name)}</div>
       <div class="meta">last active ${timeAgo(a.lastActive)}</div>
@@ -220,26 +266,47 @@ async function loadOverview() {
         <div class="stat"><div class="n">${a.completedDays}</div><div class="l">days done (live)</div></div>
       </div>
       <span class="pill ${quiet ? 'quiet' : 'active'}">${quiet ? 'Quiet — may need a nudge' : 'Active'}</span>
+      <span class="pill ${isProtected ? 'active' : 'quiet'}" style="margin-left:6px">${isProtected ? '🔒 Secure link' : '⚠ Legacy link'}</span>
     </div>`;
   }).join('');
-  $('content').innerHTML = `<div class="grid">${cards}</div>`;
+  $('content').innerHTML = `
+    <div style="margin-bottom:18px"><button class="btn primary sm" onclick="newAthleteLink()">+ New athlete secure link</button></div>
+    <div class="grid">${cards}</div>`;
 }
 
 // --- athlete detail ---------------------------------------------------------
 async function loadAthlete(athleteId) {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
-  const [progRes, histRes] = await Promise.all([
+  const [progRes, histRes, keyRes] = await Promise.all([
     sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).maybeSingle(),
     sb.from('session_history').select('*').eq('athlete_id', athleteId)
-      .order('completed_on', { ascending: false }).order('day', { ascending: true })
+      .order('completed_on', { ascending: false }).order('day', { ascending: true }),
+    sb.from('athlete_keys').select('secret_key').eq('athlete_id', athleteId).maybeSingle()
   ]);
   if (progRes.error && histRes.error) {
     $('content').innerHTML = `<p class="muted">Error: ${esc((progRes.error || histRes.error).message)}</p>`; return;
   }
   const prog       = progRes.data;            // may be null if they only have history
   const history    = histRes.data || [];
+  const key        = keyRes.data && keyRes.data.secret_key;
   const name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
   const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
+
+  // Secure-link panel (Stage 2 / Path B)
+  const link = key ? secureLink(athleteId, key) : '';
+  const linkHtml = key
+    ? `<div class="note" style="border-left-color:var(--green)">
+         <div style="margin-bottom:8px"><b>🔒 Secure link</b> — only this link can sync ${esc(name)}'s data.</div>
+         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+           <input readonly value="${esc(link)}" onclick="this.select()" style="flex:1;min-width:240px;font-family:'Space Mono',monospace;font-size:12px;padding:8px;border:1px solid var(--line);border-radius:8px">
+           <button class="btn sm" onclick="copyText('${esc(link)}', this)">Copy link</button>
+           <button class="btn sm danger" onclick="if(confirm('Rotate the key? The OLD link will stop syncing immediately and you must send ${esc(name)} the new one.')) protectAthlete('${esc(athleteId)}')">Rotate key</button>
+         </div>
+       </div>`
+    : `<div class="note">
+         <div style="margin-bottom:8px"><b>⚠ Legacy link</b> — anyone with ${esc(name)}'s plain link can write to their record. Generate a secure link to lock it down.</div>
+         <button class="btn sm primary" onclick="protectAthlete('${esc(athleteId)}')">Generate secure link</button>
+       </div>`;
 
   // ── Permanent finished sessions (captured on Finish; never degrade) ──
   const histHtml = history.length ? history.map(s => {
@@ -312,6 +379,7 @@ async function loadAthlete(athleteId) {
       </div>
       <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}', '${esc(name)}')">Delete all data</button>
     </div>
+    ${linkHtml}
     <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
     <div class="sec-title">Live activity — current snapshot</div>${daysHtml || '<p class="muted">No live day data.</p>'}
     <div class="sec-title">Exercise logs — live</div>${exHtml}`;

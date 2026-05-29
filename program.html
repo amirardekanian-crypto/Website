@@ -2425,7 +2425,7 @@ let ATHLETE_ID = '';
 // ════════════════════════════════════════════════════════════════════
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
-let _sbClient = null, _sbTimer = null, _sbId = '', _sbName = '';
+let _sbClient = null, _sbTimer = null, _sbId = '', _sbName = '', _sbKey = null;
 function _sb() {
   if (_sbClient) return _sbClient;
   if (!window.supabase || !window.supabase.createClient) return null;
@@ -2452,13 +2452,15 @@ function _pushSnapshot() {
       await sb.rpc('save_progress', {
         p_athlete_id:   _sbId,
         p_athlete_name: _sbName,
-        p_data:         _snapshot()
+        p_data:         _snapshot(),
+        p_key:          _sbKey
       });
     } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
   }, 1500);
 }
-function setupCloudBackup(athleteId, data) {
+function setupCloudBackup(athleteId, data, key) {
   _sbId = athleteId;
+  _sbKey = key || null;
   const a = (data && data.athlete) || {};
   _sbName = [a.firstName, a.lastName].filter(Boolean).join(' ');
   const origSet = localStorage.setItem.bind(localStorage);
@@ -2488,6 +2490,7 @@ function getVideoUrl(ex) {
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
   const clientId = params.get('client');
+  const clientKey = params.get('key');   // Stage 2: per-athlete secret key
 
   if (!clientId) {
     showError('No client specified. Use: program.html?client=athlete_id');
@@ -2522,7 +2525,8 @@ function getVideoUrl(ex) {
   STORAGE_KEY = ATHLETE_ID + '_prog_state';
 
   // Stage 1: start mirroring progress to the cloud (skips the public demo).
-  if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA);
+  // Stage 2: pass the per-athlete key so keyed athletes can write.
+  if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA, clientKey);
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
 
@@ -4229,7 +4233,8 @@ async function sendSession(day) {
             day_note:     dayNote || '',
             focus:        dayData.focusTag || '',
             summary:      summary
-          }
+          },
+          p_key: _sbKey
         });
       }
     } catch (e) { /* never let the permanent-record write interfere with sending */ }
