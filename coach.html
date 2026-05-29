@@ -75,6 +75,16 @@
   .readiness .r { font-size: 12px; color: var(--grey); } .readiness .r b { font-family: 'Space Mono', monospace; color: var(--ink); }
   .muted { color: var(--grey); font-size: 13px; }
   .loading { text-align: center; color: var(--grey); padding: 60px 0; }
+
+  /* Email-style finished-session card */
+  .day-date { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); text-transform: none; margin-top: 3px; }
+  .tag.partial { background: #FBEFD9; color: #B26B00; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .meta-table td { padding: 5px 0; border: none; font-size: 13px; vertical-align: top; }
+  .meta-table td.k { color: var(--grey); width: 130px; text-transform: uppercase; font-size: 11px; letter-spacing: .5px; padding-right: 12px; }
+  .meta-table td.v { font-family: 'Space Mono', monospace; }
+  .elog-title { font-size: 11px; text-transform: uppercase; color: var(--grey); letter-spacing: .5px; margin: 16px 0 6px; }
+  .elog-body { white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.65; background: #FBF8F1; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -274,6 +284,69 @@ async function loadOverview() {
     <div class="grid">${cards}</div>`;
 }
 
+// --- finished-session card (email-style) ------------------------------------
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function prettyDate(iso) {           // 'YYYY-MM-DD' -> 'Mon 25 May 2026'
+  if (!iso) return '';
+  const p = String(iso).split('-');
+  if (p.length !== 3) return iso;
+  const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  const dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] || '';
+  return `${dow} ${Number(p[2])} ${MONTHS[Number(p[1]) - 1]} ${p[0]}`;
+}
+// The stored `summary` is the full email body (meta + exercise log). We show
+// meta in a clean table, so pull out just the "Exercise log:" section to avoid
+// duplicating it. If the marker isn't found, fall back to the whole summary.
+function exerciseLogPart(summary) {
+  if (!summary) return '';
+  const i = summary.indexOf('Exercise log:');
+  const body = i >= 0 ? summary.slice(i + 'Exercise log:'.length) : summary;
+  return body.replace(/^\s+/, '');
+}
+function renderSessionCard(athleteId, s) {
+  const partial = (s.status || '').toLowerCase().indexOf('partial') === 0;
+  const rd = s.readiness;
+
+  // Session load (AU) = session RPE × duration (Foster's method) — same figure
+  // the email reports. Only meaningful when a duration was recorded.
+  const auLoad = (s.session_rpe != null && s.duration_min != null)
+    ? s.session_rpe * s.duration_min : null;
+
+  let readinessRow = '';
+  if (rd) {
+    if (rd.skipped) readinessRow = `<tr><td class="k">Readiness</td><td class="v">skipped</td></tr>`;
+    else {
+      const parts = ['sleep','energy','soreness','stress','overall']
+        .filter(k => rd[k] != null).map(k => `${k} ${rd[k]}`).join(' · ');
+      readinessRow = `<tr><td class="k">Readiness</td><td class="v">${rd.composite != null ? esc(rd.composite) + '/5' : ''}${parts ? ' · ' + esc(parts) : ''}</td></tr>`;
+    }
+  }
+
+  const meta = `<table class="meta-table">
+    <tr><td class="k">Status</td><td class="v">${esc(s.status || 'sent')}</td></tr>
+    ${s.session_rpe != null ? `<tr><td class="k">Session RPE</td><td class="v">${esc(s.session_rpe)}/10</td></tr>` : ''}
+    ${s.duration_min != null ? `<tr><td class="k">Duration</td><td class="v">${esc(s.duration_min)} min</td></tr>` : ''}
+    ${auLoad != null ? `<tr><td class="k">Session load</td><td class="v">${esc(auLoad)} AU <span style="color:var(--grey)">(RPE ${esc(s.session_rpe)} × ${esc(s.duration_min)} min)</span></td></tr>` : ''}
+    ${readinessRow}
+  </table>`;
+
+  const elog = exerciseLogPart(s.summary);
+
+  return `<div class="day">
+    <div class="day-head">
+      <div>
+        <h3>Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}
+          <span class="tag ${partial ? 'partial' : 'done'}">${partial ? 'Partial' : 'Complete'}</span></h3>
+        <div class="day-date">${esc(prettyDate(s.completed_on))}</div>
+      </div>
+      <button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete</button>
+    </div>
+    ${meta}
+    ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
+    ${elog ? `<div class="elog-title">Exercise log</div><div class="elog-body">${esc(elog)}</div>` : ''}
+  </div>`;
+}
+
 // --- athlete detail ---------------------------------------------------------
 async function loadAthlete(athleteId) {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
@@ -309,29 +382,10 @@ async function loadAthlete(athleteId) {
        </div>`;
 
   // ── Permanent finished sessions (captured on Finish; never degrade) ──
-  const histHtml = history.length ? history.map(s => {
-    const rd = s.readiness;
-    let readinessHtml = '';
-    if (rd) {
-      if (rd.skipped) readinessHtml = '<div class="readiness"><span class="r">Readiness: <b>skipped</b></span></div>';
-      else readinessHtml = `<div class="readiness">
-        ${rd.composite != null ? `<span class="r">Readiness <b>${esc(rd.composite)}/5</b></span>` : ''}
-        ${['sleep','energy','soreness','stress','overall'].filter(k=>rd[k]!=null).map(k=>`<span class="r">${k} <b>${esc(rd[k])}</b></span>`).join('')}
-      </div>`;
-    }
-    const partial = (s.status || '').toLowerCase().indexOf('partial') === 0;
-    return `<div class="day">
-      <div class="day-head">
-        <h3>Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}
-          <span class="tag ${partial ? '' : 'done'}">${esc(s.status || 'sent')}</span>
-          <span class="when">· ${esc(s.completed_on)}${s.session_rpe != null ? ' · RPE ' + esc(s.session_rpe) + '/10' : ''}${s.duration_min != null ? ' · ' + esc(s.duration_min) + ' min' : ''}</span></h3>
-        <button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete</button>
-      </div>
-      ${readinessHtml}
-      ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
-      ${s.summary ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;color:var(--blue)">Full session detail</summary><pre style="white-space:pre-wrap;font-family:'Space Mono',monospace;font-size:12px;background:#FBF8F1;border-radius:8px;padding:12px;margin-top:8px;overflow-x:auto">${esc(s.summary)}</pre></details>` : ''}
-    </div>`;
-  }).join('') : '<p class="muted">No finished sessions yet — these appear when an athlete taps Finish / send to coach.</p>';
+  // Rendered like the original coach email: each completion is its own dated
+  // entry (full OR partial), with the full meta + exercise log laid out openly.
+  const histHtml = history.length ? history.map(s => renderSessionCard(athleteId, s)).join('')
+    : '<p class="muted">No finished sessions yet — these appear when an athlete taps Finish / send to coach.</p>';
 
   // ── Live activity (rolling snapshot; may be partial / cleared on rollover) ──
   const { days, ex } = prog ? decode(athleteId, prog.data) : { days: {}, ex: {} };
