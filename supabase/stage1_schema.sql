@@ -86,6 +86,12 @@ create policy "coach read progress" on public.athlete_progress
 create index if not exists athlete_progress_updated_idx
   on public.athlete_progress (updated_at desc);
 
+-- DELETE: coach only — powers the dashboard "Delete all data" button.
+drop policy if exists "coach delete progress" on public.athlete_progress;
+create policy "coach delete progress" on public.athlete_progress
+  for delete to authenticated
+  using ( (auth.jwt() ->> 'email') = 'amirardekanian@gmail.com' );
+
 
 -- ============================================================================
 --  STAGE 1.5 — permanent, immutable record of each FINISHED session
@@ -120,6 +126,14 @@ alter table public.session_history enable row level security;
 drop policy if exists "coach read sessions" on public.session_history;
 create policy "coach read sessions" on public.session_history
   for select to authenticated
+  using ( (auth.jwt() ->> 'email') = 'amirardekanian@gmail.com' );
+
+-- DELETE: coach only — powers the dashboard "Delete" / "Delete all data"
+-- buttons. Athletes (anon) can never delete; verified an anon delete affects
+-- 0 rows.
+drop policy if exists "coach delete sessions" on public.session_history;
+create policy "coach delete sessions" on public.session_history
+  for delete to authenticated
   using ( (auth.jwt() ->> 'email') = 'amirardekanian@gmail.com' );
 
 create index if not exists session_history_athlete_idx
