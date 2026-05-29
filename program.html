@@ -692,6 +692,10 @@
   #screen-guide { background: var(--grey-bg); }
   .guide-header { background: var(--yellow); padding: 48px 24px 32px; position: relative; }
   .guide-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
+  /* Back arrow lives inside the header's top padding band, so the header box
+     stays the exact same size as the Notes header (no separate bar above it). */
+  .guide-back { position: absolute; top: 14px; left: 18px; background: transparent; border: none; color: var(--on-accent); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 8px; }
+  .guide-back:active { transform: scale(0.9); }
   .guide-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ice); margin-bottom: 8px; }
   .guide-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: #fff; text-transform: uppercase; line-height: 1; }
   .guide-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
@@ -899,6 +903,48 @@
     vertical-align: middle; animation: fadeIn 0.4s ease both;
   }
 
+
+  /* ── Session Timer (sRPE duration) ──
+     Inline card at the top of each day. Tracks wall-clock session time so the
+     coach email can report Duration and Session Load (AU = sRPE × minutes). */
+  .session-timer {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--white);
+    border: 1px solid var(--grey-mid);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin: 0 0 18px;
+    position: sticky; top: 8px; z-index: 40;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  }
+  .session-timer.running { border-color: var(--ice); box-shadow: 0 0 0 3px var(--ice-dim); }
+  .session-timer.finished { opacity: 0.85; }
+  .session-timer-body { flex: 1; min-width: 0; }
+  .session-timer-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--grey-text); margin-bottom: 2px;
+  }
+  .session-timer-time {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 30px; line-height: 1;
+    color: var(--grey-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .session-timer.running .session-timer-time { color: var(--ice); }
+  .session-timer-btn {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+    background: var(--yellow); color: var(--on-accent);
+    border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .session-timer-btn:active { transform: scale(0.96); }
+  .session-timer.running .session-timer-btn { background: var(--ice); }
+  .session-timer.finished .session-timer-btn { display: none; }
+  body[data-dark] .session-timer { background: #202020; border-color: #333; }
+  body[data-dark] .session-timer-time { color: #f0f0f0; }
 
   /* ── Session Confirm ── */
   .session-confirm {
@@ -1726,11 +1772,6 @@
   .complete-sub { font-size: 13px; color: var(--grey-text); font-weight: 300; margin-bottom: 20px; }
   .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); padding: 12px 24px; border-radius: 4px; cursor: pointer; }
 
-  /* ── Back Bar ── */
-  .back-bar { background: var(--yellow); padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; position: relative; }
-  .back-bar::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
-  .back-arrow { color: var(--on-accent); font-size: 20px; line-height: 1; }
-  .back-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.72); }
 
   /* ── Notes ── */
   #screen-notes { background: var(--grey-bg); }
@@ -2063,8 +2104,8 @@
 
 <!-- ═══ APP GUIDE ═══ static how-to-use page, same for every client -->
 <div id="screen-guide" class="screen">
-  <div class="back-bar" onclick="goTo('home')"><span class="back-arrow">←</span><span class="back-label">Back</span></div>
   <div class="guide-header">
+    <button class="guide-back" onclick="goTo('notes')" aria-label="Back to notes">←</button>
     <div class="guide-eyebrow">For everyone</div>
     <div class="guide-title">App<br>Guide</div>
     <div class="guide-subtitle">How to use this app — read once, refer back anytime</div>
@@ -2572,6 +2613,13 @@ function renderProgram() {
   const panelsHtml = days.map((day, i) => {
     let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
+    html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
+      <div class="session-timer-body">
+        <div class="session-timer-label">Session timer · optional</div>
+        <div class="session-timer-time">00:00</div>
+      </div>
+      <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
+    </div>`;
 
     // Continuous numbering across the whole day (1 → total exercises)
     let exerciseNum = 1;
@@ -3287,6 +3335,97 @@ function updateProgress(day) {
   }
 }
 
+// ── Session Timer ───────────────────────────────────────────────────
+// Per-day stopwatch backing the sRPE training-load calc. State is stored as
+// { acc, running, resumeAt, finished } where `acc` is banked ms from finished
+// run segments and `resumeAt` is an absolute timestamp. Using a timestamp (not
+// a tick counter) means elapsed time keeps advancing across app close/reload
+// and only freezes on pause — i.e. true wall-clock session duration.
+function timerKey(day) { return ATHLETE_ID + '_timer_' + day; }
+function loadTimer(day) {
+  try { return JSON.parse(localStorage.getItem(timerKey(day))) || null; } catch (e) { return null; }
+}
+function saveTimer(day, t) { localStorage.setItem(timerKey(day), JSON.stringify(t)); }
+function timerElapsedMs(day) {
+  const t = loadTimer(day);
+  if (!t) return 0;
+  return (t.acc || 0) + (t.running && t.resumeAt ? Date.now() - t.resumeAt : 0);
+}
+function fmtClock(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const ss = s % 60;
+  const hh = Math.floor(m / 60);
+  const mm = m % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return hh ? `${hh}:${pad(mm)}:${pad(ss)}` : `${pad(mm)}:${pad(ss)}`;
+}
+// Start / Pause / Resume toggle for one day's timer.
+function toggleSessionTimer(day) {
+  let t = loadTimer(day) || { acc: 0, running: false, resumeAt: null, finished: false };
+  if (t.finished) return;
+  if (t.running) {
+    // Pause → bank the running segment into acc.
+    t.acc = (t.acc || 0) + (t.resumeAt ? Date.now() - t.resumeAt : 0);
+    t.running = false; t.resumeAt = null;
+  } else {
+    // Start / Resume.
+    t.running = true; t.resumeAt = Date.now();
+  }
+  saveTimer(day, t);
+  renderTimer(day);
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+// Called when the athlete hits "Finish Session" — locks the duration in.
+function finishTimer(day) {
+  let t = loadTimer(day);
+  if (!t || t.finished) return;
+  if (t.running) {
+    t.acc = (t.acc || 0) + (t.resumeAt ? Date.now() - t.resumeAt : 0);
+    t.running = false; t.resumeAt = null;
+  }
+  t.finished = true;
+  saveTimer(day, t);
+  renderTimer(day);
+}
+function renderTimer(day) {
+  const el = document.getElementById('timer-' + day);
+  if (!el) return;
+  const t = loadTimer(day);
+  const timeEl = el.querySelector('.session-timer-time');
+  const btn    = el.querySelector('.session-timer-btn');
+  const labelEl = el.querySelector('.session-timer-label');
+  timeEl.textContent = fmtClock(timerElapsedMs(day));
+  const running  = !!(t && t.running);
+  const finished = !!(t && t.finished);
+  el.classList.toggle('running', running);
+  el.classList.toggle('finished', finished);
+  if (finished) {
+    labelEl.textContent = 'Session duration';
+  } else if (running) {
+    btn.textContent = 'Pause ⏸';
+    labelEl.textContent = 'Session in progress';
+  } else if (t && (t.acc || 0) > 0) {
+    btn.textContent = 'Resume ▶';
+    labelEl.textContent = 'Paused';
+  } else {
+    btn.textContent = 'Start ▶';
+    labelEl.textContent = 'Session timer · optional';
+  }
+}
+// Single shared 1s tick updates every running timer's display.
+let _timerTick = null;
+function initTimers() {
+  document.querySelectorAll('.session-timer').forEach(el => renderTimer(el.dataset.day));
+  if (_timerTick) clearInterval(_timerTick);
+  _timerTick = setInterval(() => {
+    document.querySelectorAll('.session-timer.running').forEach(el => {
+      const timeEl = el.querySelector('.session-timer-time');
+      timeEl.textContent = fmtClock(timerElapsedMs(el.dataset.day));
+    });
+  }, 1000);
+}
+
 function confirmSession(day) {
   const card = document.getElementById('confirm-' + day);
   const btn  = card.querySelector('.confirm-btn');
@@ -3315,6 +3454,8 @@ function confirmSession(day) {
   btn.classList.remove('arming');
 
   card.classList.remove('visible');
+  // Lock in the session duration the moment they finish.
+  finishTimer(day);
   // Reveal the completion card (now contains the RPE prompt + coach note + Send button).
   const completeEl = document.getElementById('complete-' + day);
   completeEl.classList.add('visible');
@@ -3359,6 +3500,9 @@ function resetDay(day) {
   document.getElementById('confirm-'  + day).classList.remove('visible');
   document.getElementById('complete-' + day).classList.remove('visible');
   localStorage.removeItem(ATHLETE_ID + '_completed_d' + day);
+  // Reset the session timer back to 00:00 so the next attempt starts fresh.
+  localStorage.removeItem(timerKey(day));
+  renderTimer(day);
   saveState();
   updateProgress(day);
   markSuggestedDay();
@@ -3389,6 +3533,7 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_daynote_' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_srpe_'    + day.id);
       localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_timer_'   + day.id);
       // Per-exercise RPE + per-set RPE/done for this day's exercises.
       // Weights and personal notes are kept on purpose — they're useful starting
       // points / context for next session.
@@ -3455,6 +3600,7 @@ function restoreState() {
   initSetOrRPE();
   initNotes();
   initDayWrapup();
+  initTimers();
   // Sync exercise-level check from the loaded per-set state (in case all
   // sets are already done from a previous session reload).
   document.querySelectorAll('#screen-program .checklist-item[data-sets]').forEach(card => {
@@ -3563,9 +3709,21 @@ async function sendSession(day) {
     // Build a human-readable summary for the coach. The Status line on top
     // makes it instantly obvious whether the athlete finished the day or sent
     // partial data — coaches shouldn't have to scan the per-set lines to tell.
+    // Session duration + training load (AU). Only included when the athlete
+    // actually used the timer. AU = session RPE × duration in minutes (Foster's
+    // session-RPE method). Minutes rounded to the nearest whole minute.
+    const durMs    = timerElapsedMs(day);
+    const durMin   = Math.round(durMs / 60000);
+    const hasDur   = durMin > 0;
+    const auLoad   = hasDur ? Math.round(Number(sRpe) * durMin) : null;
+
     let summary = `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}\n`;
     summary += `Status: ${statusLabel}\n`;
     summary += `Session RPE: ${sRpe}/10\n`;
+    if (hasDur) {
+      summary += `Duration: ${durMin} min\n`;
+      summary += `Session Load: ${auLoad} AU (sRPE ${sRpe} × ${durMin} min)\n`;
+    }
     if (dayNote) summary += `\nNotes from athlete:\n${dayNote}\n`;
     summary += `\nExercise log:\n`;
 
@@ -3628,6 +3786,10 @@ async function sendSession(day) {
     fd.append('Day', `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}`);
     fd.append('Status', statusLabel);
     fd.append('Session RPE', sRpe + '/10');
+    if (hasDur) {
+      fd.append('Duration', durMin + ' min');
+      fd.append('Session Load (AU)', String(auLoad));
+    }
     fd.append('Notes from athlete', dayNote || '(none)');
     fd.append('Full summary', summary);
 
