@@ -19,25 +19,45 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --bg: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A; --grey: #6B6B6B;
-    --line: #E7E2D9; --yellow: #E8B84B; --on-accent: #1A1A1A;
-    --green: #3A8F5E; --red: #C0563B; --blue: #2F6DB0;
+    /* Roland-Garros palette, shared with program.html: green primary, clay,
+       ochre. Token names kept (--yellow/--blue) so existing refs need no rename. */
+    --bg: #FAF7F2; --card: #FFFFFF; --card-soft: #EDE8E0; --ink: #1A1A1A; --grey: #5C5C5C;
+    --line: #D8D1C5; --on-accent: #FFFFFF;
+    --accent: #0E4A36; --yellow: #0E4A36;                 /* brand green (primary) */
+    --green: #0E4A36;  --green-soft: #E6F0EA;             /* good / optimal */
+    --red:   #C7552F;  --red-soft:   #F6E7E0;             /* clay — danger / high */
+    --amber: #A8741C;  --amber-soft: #F2E9D8;             /* ochre — watch */
+    --blue:  #0E4A36;                                     /* data viz → brand green */
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--ink); font-family: 'Barlow', sans-serif; -webkit-font-smoothing: antialiased; }
   h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .5px; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 26px 24px 80px; }
 
-  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; gap: 12px; flex-wrap: wrap; }
-  .topbar h1 { font-size: 30px; }
-  .topbar .who { font-size: 13px; color: var(--grey); }
+  /* Sticky brand nav, mirrored from program.html's .home-nav */
+  .cnav { position: sticky; top: 0; z-index: 50; background: var(--accent); padding: 14px 24px;
+          display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .cnav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--red); }
+  .cnav-brand { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+                color: var(--on-accent); text-decoration: none; text-transform: uppercase; }
+  .cnav-brand span { opacity: .65; font-weight: 400; }
+  .cnav-right { display: flex; align-items: center; gap: 14px; }
+  .cnav-who { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.85); }
+  .page-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 36px;
+                text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 20px; }
+
   .btn { font-family: 'Barlow', sans-serif; font-size: 14px; font-weight: 600; border: 1px solid var(--line);
          background: var(--card); color: var(--ink); padding: 9px 16px; border-radius: 10px; cursor: pointer; }
-  .btn:hover { border-color: var(--ink); }
-  .btn.primary { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.primary:hover { opacity: .9; }
+  .btn.ghost { background: transparent; border-color: rgba(255,255,255,0.45); color: var(--on-accent); }
+  .btn.ghost:hover { border-color: var(--on-accent); background: rgba(255,255,255,0.12); }
   .btn.sm { padding: 4px 11px; font-size: 12px; border-radius: 8px; }
   .btn.danger { color: var(--red); }
-  .btn.danger:hover { border-color: var(--red); background: #FBEAE4; }
+  .btn.danger:hover { border-color: var(--red); background: var(--red-soft); }
+  .bar { height: 8px; background: var(--card-soft); border-radius: 6px; margin-top: 12px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; }
   .day-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
   .day-head h3 { flex: 1; min-width: 0; }
 
@@ -48,20 +68,20 @@
   .gate .err { color: var(--red); font-size: 13px; margin-top: 16px; min-height: 18px; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; cursor: pointer; transition: border-color .15s, transform .15s; }
-  .card:hover { border-color: var(--ink); transform: translateY(-2px); }
-  .card .name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; text-transform: uppercase; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s; }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(14,74,54,0.08); }
+  .card .name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 23px; text-transform: uppercase; letter-spacing: -0.3px; }
   .card .meta { font-size: 12px; color: var(--grey); margin-top: 2px; }
   .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 12px; }
-  .pill.active { background: #E7F4EC; color: var(--green); }
-  .pill.quiet  { background: #FBEAE4; color: var(--red); }
+  .pill.active { background: var(--green-soft); color: var(--green); }
+  .pill.quiet  { background: var(--red-soft); color: var(--red); }
   .stats { display: flex; gap: 18px; margin-top: 14px; }
   .stat .n { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
   .stat .l { font-size: 10px; text-transform: uppercase; color: var(--grey); letter-spacing: .5px; }
 
-  .back { font-size: 13px; color: var(--blue); cursor: pointer; margin-bottom: 16px; display: inline-block; }
+  .back { font-size: 13px; color: var(--accent); font-weight: 600; cursor: pointer; margin-bottom: 16px; display: inline-block; }
   .sec-title { font-size: 16px; color: var(--grey); margin: 26px 0 12px; }
-  .day { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+  .day { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
   .day h3 { font-size: 18px; }
   .day .when { font-size: 12px; color: var(--grey); font-weight: 400; text-transform: none; font-family: 'Barlow', sans-serif; }
   table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
@@ -69,8 +89,8 @@
   td { padding: 7px 8px; border-bottom: 1px solid #F2EEE7; vertical-align: top; }
   td.num { font-family: 'Space Mono', monospace; white-space: nowrap; }
   .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #F2EEE7; }
-  .tag.done { background: #E7F4EC; color: var(--green); }
-  .note { background: #FBF8F1; border-left: 3px solid var(--yellow); padding: 9px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; }
+  .tag.done { background: var(--green-soft); color: var(--green); }
+  .note { background: #FBF8F1; border-left: 3px solid var(--amber); padding: 9px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; }
   .readiness { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
   .readiness .r { font-size: 12px; color: var(--grey); } .readiness .r b { font-family: 'Space Mono', monospace; color: var(--ink); }
   .muted { color: var(--grey); font-size: 13px; }
@@ -78,7 +98,7 @@
 
   /* Email-style finished-session card */
   .day-date { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); text-transform: none; margin-top: 3px; }
-  .tag.partial { background: #FBEFD9; color: #B26B00; }
+  .tag.partial { background: var(--amber-soft); color: var(--amber); }
   .meta-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
   .meta-table td { padding: 5px 0; border: none; font-size: 13px; vertical-align: top; }
   .meta-table td.k { color: var(--grey); width: 130px; text-transform: uppercase; font-size: 11px; letter-spacing: .5px; padding-right: 12px; }
@@ -93,28 +113,27 @@
   .tier { margin-bottom: 4px; }
   .tier-head { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--grey); margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
   .tier-head .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-  .dot.red { background: var(--red); } .dot.amber { background: var(--yellow); } .dot.green { background: var(--green); }
+  .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.green { background: var(--green); }
   details.tier-ok summary { cursor: pointer; list-style: none; }
   details.tier-ok summary::-webkit-details-marker { display: none; }
   details.tier-ok summary:hover { color: var(--ink); }
 
   .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .card.alert-red { border-left: 3px solid var(--red); }
-  .card.alert-amber { border-left: 3px solid var(--yellow); }
+  .card.alert-amber { border-left: 3px solid var(--amber); }
   .zrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .zpill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: #F2EEE7; color: var(--grey); white-space: nowrap; }
-  .zpill.green { background: #E7F4EC; color: var(--green); }
-  .zpill.amber { background: #FBEFD9; color: #B26B00; }
-  .zpill.red   { background: #FBEAE4; color: var(--red); }
+  .zpill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: var(--card-soft); color: var(--grey); white-space: nowrap; }
+  .zpill.green { background: var(--green-soft); color: var(--green); }
+  .zpill.amber { background: var(--amber-soft); color: var(--amber); }
+  .zpill.red   { background: var(--red-soft); color: var(--red); }
   .flags { display: flex; flex-direction: column; gap: 4px; margin-top: 11px; }
   .flag { font-size: 11.5px; color: var(--grey); display: flex; align-items: center; gap: 7px; }
   .flag .fdot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
   .spark { margin-top: 10px; min-height: 30px; }
 
   /* Detail-view charts */
-  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 6px 0 4px; }
-  @media (max-width: 680px) { .charts { grid-template-columns: 1fr; } }
-  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 6px 0 4px; }
+  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
   .chart-card h4 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .5px; font-size: 14px; color: var(--grey); margin-bottom: 6px; }
   .chart-big { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; line-height: 1.1; }
   .chart-sub { font-size: 12px; color: var(--grey); margin-top: 3px; }
@@ -133,15 +152,18 @@
 </div>
 
 <!-- DASHBOARD -->
-<div id="app" class="wrap" style="display:none">
-  <div class="topbar">
-    <div>
-      <h1>Athletes</h1>
-      <div class="who" id="who"></div>
+<div id="app" style="display:none">
+  <header class="cnav">
+    <a class="cnav-brand" href="/">AMIR ARDEKANI <span>· Coach</span></a>
+    <div class="cnav-right">
+      <span class="cnav-who" id="who"></span>
+      <button id="logoutBtn" class="btn ghost sm">Sign out</button>
     </div>
-    <button id="logoutBtn" class="btn">Sign out</button>
+  </header>
+  <div class="wrap">
+    <h1 class="page-title">Athletes</h1>
+    <div id="content"><div class="loading">Loading…</div></div>
   </div>
-  <div id="content"><div class="loading">Loading…</div></div>
 </div>
 
 <script>
@@ -266,7 +288,8 @@ function unslug(s) { return s.replace(/_/g, ' '); }
 // (load = session RPE × duration in minutes). ACWR = acute (7-day) ÷ chronic
 // (28-day weekly average). Readiness uses the composite each athlete self-reports.
 // Colours are hex (not CSS vars) because var() isn't reliable inside SVG attrs.
-const C = { blue:'#2F6DB0', green:'#3A8F5E', red:'#C0563B', yellow:'#E8B84B', amber:'#B26B00', grey:'#6B6B6B', ink:'#1A1A1A' };
+// Roland-Garros palette (hex, not CSS vars — var() isn't reliable inside SVG attrs).
+const C = { blue:'#0E4A36', green:'#0E4A36', red:'#C7552F', yellow:'#A8741C', amber:'#A8741C', grey:'#5C5C5C', ink:'#1A1A1A' };
 function pDate(iso) { const p = String(iso).split('-'); return new Date(+p[0], (+p[1]) - 1, +p[2]); }
 function round1(n) { return Math.round(n * 10) / 10; }
 
@@ -332,8 +355,32 @@ function weeklyLoad(daily, weeks, ref) {
   });
   return buckets;
 }
+function isPartialStatus(s) { return String(s || '').toLowerCase().indexOf('partial') === 0; }
+// Adherence: sessions completed vs prescribed over the last `weeks` weeks.
+// Prescribed/week = the athlete's program day count (workouts.days.length).
+// The window shrinks for athletes who started <`weeks` ago, so a fresh athlete
+// isn't penalised for weeks before they began. Partials count as half a session.
+function adherence(sessions, daysPerWeek, weeks, ref) {
+  weeks = weeks || 4;
+  if (!daysPerWeek) return null;                       // no program → can't measure
+  let earliest = null;
+  sessions.forEach(s => { if (s.completed_on) { const d = pDate(s.completed_on); if (!earliest || d < earliest) earliest = d; } });
+  const r = ref || new Date();
+  const refMid = new Date(r.getFullYear(), r.getMonth(), r.getDate());
+  if (!earliest) return { done: 0, expected: daysPerWeek * weeks, pct: 0, weeks, perWeek: daysPerWeek };
+  const daysActive = Math.floor((refMid - earliest) / 86400000) + 1;
+  const effWeeks = Math.max(1, Math.min(weeks, Math.ceil(daysActive / 7)));
+  const start = new Date(refMid); start.setDate(start.getDate() - (effWeeks * 7 - 1));
+  let done = 0;
+  sessions.forEach(s => { if (!s.completed_on) return; const d = pDate(s.completed_on);
+    if (d >= start && d <= refMid) done += isPartialStatus(s.status) ? 0.5 : 1; });
+  const expected = daysPerWeek * effWeeks;
+  return { done, expected, pct: expected > 0 ? Math.round((done / expected) * 100) : null, weeks: effWeeks, perWeek: daysPerWeek };
+}
+function adhCls(pct) { if (pct == null) return ''; if (pct >= 85) return 'green'; if (pct >= 60) return 'amber'; return 'red'; }
+
 // Bundle every metric for one athlete from their session rows.
-function athleteMetrics(sessions, lastActive) {
+function athleteMetrics(sessions, lastActive, daysPerWeek) {
   const daily = dailyLoad(sessions);
   const rser  = readinessSeries(sessions);
   const loadPts = sessions
@@ -341,9 +388,9 @@ function athleteMetrics(sessions, lastActive) {
     .slice().sort((a, b) => String(a.completed_on).localeCompare(String(b.completed_on)))
     .map(s => Number(s.session_rpe) * Number(s.duration_min));
   const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
-  const lastPartial = byRecent.length ? (String(byRecent[0].status || '').toLowerCase().indexOf('partial') === 0) : false;
+  const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
   return { daily, acwr: computeAcwr(daily), rser, readiness: readinessStats(rser),
-           loadPts, lastPartial, daysIdle: daysSince(lastActive) };
+           adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial, daysIdle: daysSince(lastActive) };
 }
 // Triage signals → { tier:'red'|'amber'|'ok', flags:[{sev,msg}] }
 function triage(m) {
@@ -359,6 +406,10 @@ function triage(m) {
   if (m.readiness) {
     if (m.readiness.delta <= -1)        add('red',   'Readiness ↓ ' + round1(m.readiness.latest) + ' vs ' + round1(m.readiness.baseline) + ' usual');
     else if (m.readiness.delta <= -0.5) add('amber', 'Readiness dipping');
+  }
+  if (m.adherence && m.adherence.pct != null) {
+    if (m.adherence.pct < 50)      add('red',   'Low adherence — ' + m.adherence.pct + '% of plan');
+    else if (m.adherence.pct < 70) add('amber', 'Adherence slipping — ' + m.adherence.pct + '%');
   }
   if (m.lastPartial) add('amber', 'Last session left partial');
   flags.sort((a, b) => rank[b.sev] - rank[a.sev]);
@@ -401,7 +452,7 @@ function lineSVG(series, opts) {
 // The two-up charts shown at the top of an athlete's detail view.
 function renderCharts(m) {
   const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
-  const azColor = az.cls === 'red' ? 'var(--red)' : az.cls === 'amber' ? '#B26B00' : az.cls === 'green' ? 'var(--green)' : 'var(--ink)';
+  const azColor = az.cls === 'red' ? 'var(--red)' : az.cls === 'amber' ? 'var(--amber)' : az.cls === 'green' ? 'var(--green)' : 'var(--ink)';
   const hasLoad = Object.keys(m.daily).length > 0;
   const loadCard = `<div class="chart-card">
     <h4>Training load</h4>
@@ -416,7 +467,7 @@ function renderCharts(m) {
   </div>`;
 
   const r = m.readiness;
-  const rColor = !r ? 'var(--grey)' : r.delta <= -1 ? 'var(--red)' : r.delta <= -0.5 ? '#B26B00' : 'var(--green)';
+  const rColor = !r ? 'var(--grey)' : r.delta <= -1 ? 'var(--red)' : r.delta <= -0.5 ? 'var(--amber)' : 'var(--green)';
   const readyCard = `<div class="chart-card">
     <h4>Readiness</h4>
     ${r
@@ -427,7 +478,21 @@ function renderCharts(m) {
       : `<p class="muted" style="margin-top:10px">No readiness check-ins yet.</p>`}
   </div>`;
 
-  return `<div class="charts">${loadCard}${readyCard}</div>`;
+  const adh = m.adherence;
+  const adhColor = !adh || adh.pct == null ? 'var(--grey)'
+    : adh.pct >= 85 ? 'var(--green)' : adh.pct >= 60 ? 'var(--amber)' : 'var(--red)';
+  const adhDone = adh ? (adh.done % 1 ? adh.done.toFixed(1) : adh.done) : 0;
+  const adhCard = `<div class="chart-card">
+    <h4>Adherence</h4>
+    ${adh && adh.pct != null
+      ? `<div class="chart-big" style="color:${adhColor}">${adh.pct}%<span style="font-size:13px;color:var(--grey);margin-left:4px">last ${adh.weeks} wk${adh.weeks === 1 ? '' : 's'}</span></div>
+         <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed</div>
+         <div class="bar"><div class="bar-fill" style="width:${Math.min(adh.pct, 100)}%;background:${adhColor}"></div></div>
+         <div class="chart-legend">Planned = ${adh.perWeek} session${adh.perWeek === 1 ? '' : 's'}/week (from their program) × ${adh.weeks} wk${adh.weeks === 1 ? '' : 's'}</div>`
+      : `<p class="muted" style="margin-top:10px">No program file found, so adherence can't be measured.</p>`}
+  </div>`;
+
+  return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
 }
 
 // --- overview (triage) ------------------------------------------------------
@@ -471,8 +536,16 @@ async function loadOverview() {
     a.sessions.push(row);
   });
 
+  // Pull each athlete's program file (in parallel) for their sessions/week, so
+  // adherence can be measured on the overview. Missing files just disable it.
+  const ids = Object.keys(map);
+  const programs = await Promise.all(ids.map(id =>
+    fetch(`data/${id}.json`).then(r => r.ok ? r.json() : null).catch(() => null)));
+  const perWeek = {};
+  ids.forEach((id, i) => { const p = programs[i]; perWeek[id] = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0; });
+
   _overview = Object.values(map).map(a => {
-    const metrics = athleteMetrics(a.sessions, a.lastActive);
+    const metrics = athleteMetrics(a.sessions, a.lastActive, perWeek[a.id]);
     const t = triage(metrics);
     return Object.assign(a, { metrics, tier: t.tier, flags: t.flags, isProtected: !!keys[a.id] });
   });
@@ -500,6 +573,9 @@ function athleteCard(a) {
   const rPill = m.readiness
     ? `<span class="zpill ${m.readiness.delta <= -1 ? 'red' : (m.readiness.delta <= -0.5 ? 'amber' : 'green')}">Readiness ${round1(m.readiness.latest)}/5</span>`
     : '';
+  const adhPill = (m.adherence && m.adherence.pct != null)
+    ? `<span class="zpill ${adhCls(m.adherence.pct)}">Adherence ${m.adherence.pct}%</span>`
+    : '';
   const alertCls = a.tier === 'red' ? 'alert-red' : (a.tier === 'amber' ? 'alert-amber' : '');
   const flagsHtml = a.flags.length
     ? `<div class="flags">${a.flags.slice(0, 3).map(f => `<div class="flag"><span class="fdot" style="background:${f.sev === 'red' ? C.red : C.yellow}"></span>${esc(f.msg)}</div>`).join('')}</div>`
@@ -511,7 +587,7 @@ function athleteCard(a) {
     </div>
     <div class="meta">last active ${timeAgo(a.lastActive)} · ${a.finished} session${a.finished === 1 ? '' : 's'}</div>
     <div class="spark">${sparkline(m.loadPts, C.blue)}</div>
-    <div class="zrow">${acwrPill}${rPill}</div>
+    <div class="zrow">${acwrPill}${rPill}${adhPill}</div>
     ${flagsHtml}
   </div>`;
 }
@@ -625,7 +701,13 @@ async function loadAthlete(athleteId) {
   const key        = keyRes.data && keyRes.data.secret_key;
   const name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
   const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
-  const metrics    = athleteMetrics(history, lastActive);   // load + readiness trends
+
+  // The athlete's program file (same data/<id>.json the app uses): gives the
+  // sessions/week for adherence, and the day list for grouping live activity.
+  let program = null;
+  try { const pr = await fetch(`data/${athleteId}.json`); if (pr.ok) program = await pr.json(); } catch (e) {}
+  const programDays = (program && program.workouts && program.workouts.days) || [];
+  const metrics    = athleteMetrics(history, lastActive, programDays.length);   // load, readiness, adherence
 
   // Secure-link panel (Stage 2 / Path B)
   const link = key ? secureLink(athleteId, key) : '';
@@ -651,12 +733,9 @@ async function loadAthlete(athleteId) {
 
   // ── Live activity (rolling snapshot; may be partial / cleared on rollover) ──
   // The snapshot stores exercise logs keyed by exercise NAME only (no day), so
-  // to group each exercise under its day we load the athlete's program file
-  // (same data/<id>.json the app uses) and map name → day.
+  // to group each exercise under its day we use the program file loaded above
+  // (data/<id>.json) and map name → day.
   const { days, ex } = prog ? decode(athleteId, prog.data) : { days: {}, ex: {} };
-  let program = null;
-  try { const pr = await fetch(`data/${athleteId}.json`); if (pr.ok) program = await pr.json(); } catch (e) {}
-  const programDays = (program && program.workouts && program.workouts.days) || [];
 
   // exercise slug (name with spaces→_) → that exercise's logged data
   const exForName = (name) => ex[String(name).replace(/\s+/g, '_')];
