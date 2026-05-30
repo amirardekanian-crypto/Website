@@ -37,6 +37,14 @@ Instead of a flat list, athletes are sorted by **who needs you most**, in three 
   - *Name* — alphabetical, flat list
 - **+ New secure link** — create a new athlete's private link (unchanged from before).
 
+**Who shows up:** every athlete you've issued a **secure link** to appears here —
+*plus* anyone who has training activity. So a new athlete shows the moment you
+create their link, **before they ever open the app**, as a calm grey
+**"Not started"** card. Click it to view their program. (Athletes appear from
+the `athlete_keys` table + activity; the dashboard can't list the `data/` folder
+directly because it's a static site. So if a legacy athlete has a JSON file but
+no key, just generate their secure link and they'll appear.)
+
 ---
 
 ## 3. What's on each athlete card
@@ -131,8 +139,8 @@ An athlete's group = the **most severe** flag they have. Here's every rule:
 
 ## 6. The athlete detail page
 
-Click any card to open it. Below the secure-link panel you get **two charts**,
-then the existing finished-session records and live activity.
+Click any card to open it. Below the secure-link panel you get **three charts**,
+the **prescribed program**, then the finished-session records and live activity.
 
 **Training load card:**
 
@@ -153,6 +161,21 @@ then the existing finished-session records and live activity.
 - "X of Y planned sessions completed"
 - A **progress bar** coloured green / amber / red
 
+**Prescribed program** (collapsible section)
+
+The plan you wrote, pulled live from their `data/<id>.json` — so it's always in
+sync with what the athlete sees in their app. It shows:
+
+- The **current cycle** — name, weeks, and focuses
+- Each training **day → block → exercise**, with the prescription **chips**
+  (sets · reps · tempo · RPE), any circuit sub-items, and a **▶ video** link
+  (resolved from `exercise_library.json`, same as the athlete's app)
+- Under any exercise they've logged, a subtle **"Last logged: …"** line (weights
+  / RPE / note) — and nothing where there's no log
+
+This works **even before an athlete's first session**, so you can review a new
+athlete's program straight after creating their link.
+
 ---
 
 ## 7. What feeds the dashboard — what athletes must do
@@ -162,7 +185,8 @@ Everything comes from the athlete's app (`program.html`) when they tap
 
 | Metric | Athlete must… |
 |---|---|
-| Appears at all | Complete (or partially complete) a session and finish it |
+| Appears at all | Nothing — they appear as soon as you create their secure link (or once they train) |
+| **Prescribed program** | Have a `data/<id>.json` file — shows immediately, no training needed |
 | **Session RPE** | Rate the session 1–10 (required to send) |
 | **Training load + ACWR + sparkline** | Have a **duration** logged for the session — without it there's no load number |
 | **Readiness** | Complete the readiness check at the **start** of a session (not tap "skip") |
@@ -195,8 +219,10 @@ Three Supabase tables feed the dashboard:
 
 ---
 
-*Features added: triage front page + workload / readiness / adherence charts.
-Charts are hand-rolled inline SVG (no external library), so the dashboard stays
-self-contained and works offline like the rest of the site. The styling matches
-`program.html` — the Roland-Garros palette (green / clay / ochre on warm paper),
-the same fonts, and a sticky brand nav.*
+*Features added: triage front page; workload / readiness / adherence charts; a
+read-only prescribed-program view; and a roster that lists every athlete you've
+issued a secure link to (not just those who've trained). Charts are hand-rolled
+inline SVG (no external library), so the dashboard stays self-contained and works
+offline like the rest of the site. The styling matches `program.html` — the
+Roland-Garros palette (green / clay / ochre on warm paper), the same fonts, and a
+sticky brand nav.*

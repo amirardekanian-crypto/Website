@@ -139,6 +139,26 @@
   .chart-sub { font-size: 12px; color: var(--grey); margin-top: 3px; }
   .chart-svg { display: block; width: 100%; height: auto; margin-top: 12px; }
   .chart-legend { font-size: 11px; color: var(--grey); margin-top: 8px; line-height: 1.4; }
+
+  /* Prescribed-program view */
+  .prog-cycle { margin-bottom: 14px; }
+  .prog-cycle-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 17px; letter-spacing: .3px; }
+  .prog-focus { margin: 6px 0 0 18px; font-size: 13px; color: var(--grey); line-height: 1.5; }
+  .pblock { margin-top: 12px; }
+  .pblock-title { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--grey); border-bottom: 1px solid var(--line); padding-bottom: 5px; margin-bottom: 6px; }
+  .pex { padding: 8px 0; border-bottom: 1px solid #F2EEE7; }
+  .pex:last-child { border-bottom: none; }
+  .pex-top { display: flex; align-items: center; gap: 8px; }
+  .pex-name { font-weight: 600; font-size: 14px; }
+  .pex-vid { text-decoration: none; color: var(--accent); font-size: 13px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .chip { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px; background: var(--card-soft); color: var(--grey); }
+  .chip-y { background: var(--green-soft); color: var(--green); }
+  .chip-d { background: #2A2A2A; color: #fff; }
+  .pex-items { font-size: 12px; color: var(--grey); margin-top: 5px; font-family: 'Space Mono', monospace; line-height: 1.6; }
+  .logline { font-size: 12px; color: var(--accent); margin-top: 6px; font-family: 'Space Mono', monospace; }
+  .prog-section summary { cursor: pointer; list-style: none; }
+  .prog-section summary::-webkit-details-marker { display: none; }
 </style>
 </head>
 <body>
@@ -367,7 +387,7 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   sessions.forEach(s => { if (s.completed_on) { const d = pDate(s.completed_on); if (!earliest || d < earliest) earliest = d; } });
   const r = ref || new Date();
   const refMid = new Date(r.getFullYear(), r.getMonth(), r.getDate());
-  if (!earliest) return { done: 0, expected: daysPerWeek * weeks, pct: 0, weeks, perWeek: daysPerWeek };
+  if (!earliest) return null;                          // never trained → don't measure (avoids a false 0%)
   const daysActive = Math.floor((refMid - earliest) / 86400000) + 1;
   const effWeeks = Math.max(1, Math.min(weeks, Math.ceil(daysActive / 7)));
   const start = new Date(refMid); start.setDate(start.getDate() - (effWeeks * 7 - 1));
@@ -390,13 +410,15 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
   const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
   const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
   return { daily, acwr: computeAcwr(daily), rser, readiness: readinessStats(rser),
-           adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial, daysIdle: daysSince(lastActive) };
+           adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial,
+           daysIdle: daysSince(lastActive), neverActive: !lastActive && !sessions.length };
 }
 // Triage signals → { tier:'red'|'amber'|'ok', flags:[{sev,msg}] }
 function triage(m) {
   const flags = [], rank = { red: 2, amber: 1, ok: 0 }; let tier = 'ok';
   const add = (sev, msg) => { flags.push({ sev, msg }); if (rank[sev] > rank[tier]) tier = sev; };
-  if (m.daysIdle > 14)            add('red', 'Silent — ' + m.daysIdle + ' days, no training');
+  if (m.neverActive) { /* onboarded but hasn't trained yet — no idle/load/adherence flags */ }
+  else if (m.daysIdle > 14)       add('red', 'Silent — ' + m.daysIdle + ' days, no training');
   else if (m.daysIdle > QUIET_DAYS) add('amber', 'Quiet — ' + m.daysIdle + ' days idle');
   if (m.acwr.enough && m.acwr.ratio != null) {
     if (m.acwr.ratio > 1.5)      add('red',   'Load spike — ACWR ' + round1(m.acwr.ratio));
@@ -489,10 +511,26 @@ function renderCharts(m) {
          <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed</div>
          <div class="bar"><div class="bar-fill" style="width:${Math.min(adh.pct, 100)}%;background:${adhColor}"></div></div>
          <div class="chart-legend">Planned = ${adh.perWeek} session${adh.perWeek === 1 ? '' : 's'}/week (from their program) × ${adh.weeks} wk${adh.weeks === 1 ? '' : 's'}</div>`
-      : `<p class="muted" style="margin-top:10px">No program file found, so adherence can't be measured.</p>`}
+      : `<p class="muted" style="margin-top:10px">Not enough data yet — needs a program file and at least one finished session.</p>`}
   </div>`;
 
   return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
+}
+
+// --- prescribed-program view ------------------------------------------------
+// Shared exercise library (name → video URL), same file program.html uses.
+let _exlib = null;
+async function exLib() {
+  if (_exlib) return _exlib;
+  try { const r = await fetch('exercise_library.json', { cache: 'no-cache' }); _exlib = r.ok ? await r.json() : {}; }
+  catch (e) { _exlib = {}; }
+  return _exlib;
+}
+function vidUrl(ex, lib) { return (ex && ex.videoUrl) || (lib && lib[(ex.name || '').trim()]) || ''; }
+function chipsHtml(chips) {
+  if (!chips || !chips.length) return '';
+  return '<span class="chips">' + chips.map(c =>
+    `<span class="chip ${c.style === 'yellow' ? 'chip-y' : c.style === 'dark' ? 'chip-d' : ''}">${esc(c.label)}</span>`).join('') + '</span>';
 }
 
 // --- overview (triage) ------------------------------------------------------
@@ -512,8 +550,8 @@ async function loadOverview() {
   }
   const progRows = progRes.data || [];
   const histRows = histRes.data || [];
-  if (!progRows.length && !histRows.length) {
-    $('content').innerHTML = '<p class="muted">No athlete activity yet. Once an athlete trains, they’ll appear here.</p>'; return;
+  if (!progRows.length && !histRows.length && !Object.keys(keys).length) {
+    $('content').innerHTML = '<p class="muted">No athletes yet. Create a secure link with “+ New secure link”, or wait for an athlete to start training.</p>'; return;
   }
 
   // Group everything by athlete.
@@ -535,14 +573,24 @@ async function loadOverview() {
     a.finished++;
     a.sessions.push(row);
   });
+  // Every athlete you've issued a secure link to appears too — so you can view
+  // their program the moment they're onboarded, before they ever open the app.
+  Object.keys(keys).forEach(id => get(id));
 
-  // Pull each athlete's program file (in parallel) for their sessions/week, so
-  // adherence can be measured on the overview. Missing files just disable it.
+  // Pull each athlete's program file (in parallel) for their sessions/week (for
+  // adherence) and their name. Missing files just disable adherence.
   const ids = Object.keys(map);
   const programs = await Promise.all(ids.map(id =>
     fetch(`data/${id}.json`).then(r => r.ok ? r.json() : null).catch(() => null)));
   const perWeek = {};
-  ids.forEach((id, i) => { const p = programs[i]; perWeek[id] = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0; });
+  ids.forEach((id, i) => {
+    const p = programs[i], a = map[id];
+    perWeek[id] = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0;
+    if (p && p.athlete && a.name === a.id) {
+      const nm = [p.athlete.firstName, p.athlete.lastName].filter(Boolean).join(' ');
+      if (nm) a.name = nm;
+    }
+  });
 
   _overview = Object.values(map).map(a => {
     const metrics = athleteMetrics(a.sessions, a.lastActive, perWeek[a.id]);
@@ -577,14 +625,21 @@ function athleteCard(a) {
     ? `<span class="zpill ${adhCls(m.adherence.pct)}">Adherence ${m.adherence.pct}%</span>`
     : '';
   const alertCls = a.tier === 'red' ? 'alert-red' : (a.tier === 'amber' ? 'alert-amber' : '');
+  const lockPill = `<span class="zpill ${a.isProtected ? 'green' : 'amber'}" title="${a.isProtected ? 'Secure link' : 'Legacy link'}">${a.isProtected ? '🔒' : '⚠'}</span>`;
+  const head = `<div class="card-top"><div class="name">${esc(a.name)}</div>${lockPill}</div>`;
+  // Onboarded but hasn't trained yet — a calm "Not started" card you can still open.
+  if (m.neverActive) {
+    return `<div class="card" onclick="loadAthlete('${esc(a.id)}')">
+      ${head}
+      <div class="meta">not started yet · view their program</div>
+      <div class="zrow"><span class="zpill">Not started</span></div>
+    </div>`;
+  }
   const flagsHtml = a.flags.length
     ? `<div class="flags">${a.flags.slice(0, 3).map(f => `<div class="flag"><span class="fdot" style="background:${f.sev === 'red' ? C.red : C.yellow}"></span>${esc(f.msg)}</div>`).join('')}</div>`
     : '';
   return `<div class="card ${alertCls}" onclick="loadAthlete('${esc(a.id)}')">
-    <div class="card-top">
-      <div class="name">${esc(a.name)}</div>
-      <span class="zpill ${a.isProtected ? 'green' : 'amber'}" title="${a.isProtected ? 'Secure link' : 'Legacy link'}">${a.isProtected ? '🔒' : '⚠'}</span>
-    </div>
+    ${head}
     <div class="meta">last active ${timeAgo(a.lastActive)} · ${a.finished} session${a.finished === 1 ? '' : 's'}</div>
     <div class="spark">${sparkline(m.loadPts, C.blue)}</div>
     <div class="zrow">${acwrPill}${rPill}${adhPill}</div>
@@ -699,14 +754,19 @@ async function loadAthlete(athleteId) {
   const prog       = progRes.data;            // may be null if they only have history
   const history    = histRes.data || [];
   const key        = keyRes.data && keyRes.data.secret_key;
-  const name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
+  let   name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
   const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
 
   // The athlete's program file (same data/<id>.json the app uses): gives the
-  // sessions/week for adherence, and the day list for grouping live activity.
+  // prescribed plan, sessions/week for adherence, and the day list for grouping.
+  // The exercise library resolves video URLs by name, exactly like program.html.
   let program = null;
   try { const pr = await fetch(`data/${athleteId}.json`); if (pr.ok) program = await pr.json(); } catch (e) {}
+  const lib = await exLib();
   const programDays = (program && program.workouts && program.workouts.days) || [];
+  if (program && program.athlete && name === athleteId) {
+    name = [program.athlete.firstName, program.athlete.lastName].filter(Boolean).join(' ') || athleteId;
+  }
   const metrics    = athleteMetrics(history, lastActive, programDays.length);   // load, readiness, adherence
 
   // Secure-link panel (Stage 2 / Path B)
@@ -791,6 +851,38 @@ async function loadAthlete(athleteId) {
     </table></div>` : '<p class="muted">No live day data.</p>';
   }
 
+  // ── Prescribed program (read-only): the current cycle's plan, with a subtle
+  // "Last logged" line under any exercise the athlete has actually logged. ──
+  const cycles = (program && program.cycles) || [];
+  const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
+  const cyc = cycles[ci];
+  const cycleHead = cyc ? `<div class="prog-cycle">
+      <div class="prog-cycle-name">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>
+      ${cyc.focuses && cyc.focuses.length ? `<ul class="prog-focus">${cyc.focuses.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
+    </div>` : '';
+  const progBody = programDays.length ? programDays.map(pd => {
+    const blocks = (pd.blocks || []).map(b => {
+      const exs = (b.exercises || []).map(pex => {
+        const lg = exForName(pex.name);
+        const logged = hasData(lg)
+          ? `<div class="logline">Last logged: ${esc(setStr(lg)) || (lg.rpe ? 'RPE ' + esc(lg.rpe) : '—')}${lg.note ? ' · ' + esc(lg.note) : ''}</div>` : '';
+        const v = vidUrl(pex, lib);
+        const items = (pex.items && pex.items.length)
+          ? `<div class="pex-items">${pex.items.map(it => `· ${esc(it.name)}${it.detail ? ' (' + esc(it.detail) + ')' : ''}`).join('<br>')}</div>` : '';
+        return `<div class="pex">
+            <div class="pex-top"><span class="pex-name">${esc(pex.name)}</span>${v ? `<a class="pex-vid" href="${esc(v)}" target="_blank" rel="noopener">▶ video</a>` : ''}</div>
+            ${chipsHtml(pex.chips)}${items}${logged}
+          </div>`;
+      }).join('');
+      return `<div class="pblock"><div class="pblock-title">${b.icon ? esc(b.icon) + ' ' : ''}${esc(b.title || '')}</div>${exs}</div>`;
+    }).join('');
+    return `<div class="day"><div class="day-head"><h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</h3></div>${blocks}</div>`;
+  }).join('') : `<p class="muted">No program file found for this athlete (looked for data/${esc(athleteId)}.json).</p>`;
+  const programSection = `<details class="prog-section" open>
+      <summary class="sec-title">Prescribed program — current cycle ▾</summary>
+      ${cycleHead}${progBody}
+    </details>`;
+
   $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
     <div class="day-head" style="align-items:center;margin-bottom:8px">
       <div>
@@ -801,6 +893,7 @@ async function loadAthlete(athleteId) {
     </div>
     ${linkHtml}
     ${renderCharts(metrics)}
+    ${programSection}
     <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
     <div class="sec-title">Live activity — current snapshot (each day with its own logs)</div>${daysHtml}`;
 }
