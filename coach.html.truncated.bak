@@ -159,23 +159,6 @@
   .logline { font-size: 12px; color: var(--accent); margin-top: 6px; font-family: 'Space Mono', monospace; }
   .prog-section summary { cursor: pointer; list-style: none; }
   .prog-section summary::-webkit-details-marker { display: none; }
-
-  /* ── Messaging / reply panel ──────────────────────────────────────── */
-  .msg-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 18px; }
-  .cthread { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-  .cmsg { display: flex; flex-direction: column; max-width: 80%; }
-  .cmsg.coach { align-self: flex-end; align-items: flex-end; }
-  .cmsg.ath { align-self: flex-start; align-items: flex-start; }
-  .cmsg-bubble { font-size: 14px; line-height: 1.45; padding: 9px 12px; border-radius: 13px; }
-  .cmsg.coach .cmsg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 3px; }
-  .cmsg.ath .cmsg-bubble { background: var(--card-soft); color: var(--ink); border-bottom-left-radius: 3px; }
-  .cmsg-meta { font-size: 10px; color: var(--grey); margin-top: 3px; }
-  .cmsg-tag { background: var(--red-soft); color: var(--red); padding: 1px 6px; border-radius: 8px; font-weight: 600; }
-  .creply { display: flex; gap: 8px; }
-  .creply textarea, .session-reply textarea { flex: 1; resize: vertical; min-height: 38px; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; font-family: inherit; font-size: 14px; background: var(--bg); color: var(--ink); }
-  .note-actions { display: flex; gap: 8px; margin-top: 8px; }
-  .session-reply { gap: 8px; margin-top: 8px; }
-  .zpill.reply { background: var(--red-soft); color: var(--red); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -247,18 +230,6 @@ function timeAgo(iso) {
 function daysSince(iso) { return iso ? Math.floor((Date.now() - new Date(iso)) / 86400000) : 9999; }
 function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function jparse(v) { try { return JSON.parse(v); } catch { return null; } }
-// Coach-messaging helpers. A session "needs reply" if the athlete left any note
-// (the finish-session note OR a per-exercise note inside the summary) and the
-// coach hasn't acted on it yet (coach_status still 'new').
-function ctxLabel(ctx) { const m = String(ctx || '').match(/^session:(\d+):/); return m ? 'Day ' + m[1] : ''; }
-function sessionHasNote(s) { return !!((s.day_note && s.day_note.trim()) || (s.summary && /\n\s+Note:/.test(s.summary))); }
-function sessionNeedsReply(s) { return sessionHasNote(s) && (s.coach_status || 'new') === 'new'; }
-function sessionNoteText(s) {
-  if (s.day_note && s.day_note.trim()) return s.day_note.trim();
-  const notes = [];
-  (s.summary || '').split('\n').forEach(ln => { const m = ln.match(/^\s+Note:\s*(.+)/); if (m) notes.push(m[1].trim()); });
-  return notes.join(' · ');
-}
 
 // --- Stage 2: per-athlete secure keys (Path B) ------------------------------
 const SITE = 'https://www.amirardekani.com';
@@ -569,20 +540,16 @@ function chipsHtml(chips) {
 let _overview = [];
 async function loadOverview() {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
-  const [progRes, histRes, keys, msgRes] = await Promise.all([
+  const [progRes, histRes, keys] = await Promise.all([
     sb.from('athlete_progress').select('*'),
-    sb.from('session_history').select('athlete_id, athlete_name, day, completed_on, status, session_rpe, duration_min, readiness, updated_at, coach_status, day_note, summary'),
-    fetchKeys(),
-    sb.from('messages').select('athlete_id, sender, read_by_coach')
+    sb.from('session_history').select('athlete_id, athlete_name, day, completed_on, status, session_rpe, duration_min, readiness, updated_at'),
+    fetchKeys()
   ]);
   if (progRes.error && histRes.error) {
     $('content').innerHTML = `<p class="muted">Could not load data: ${esc((progRes.error || histRes.error).message)}</p>`; return;
   }
   const progRows = progRes.data || [];
   const histRows = histRes.data || [];
-  const msgRows = (msgRes && msgRes.data) || [];
-  const unreadMsg = {};
-  msgRows.forEach(r => { if (r.sender === 'athlete' && !r.read_by_coach) unreadMsg[r.athlete_id] = (unreadMsg[r.athlete_id] || 0) + 1; });
   if (!progRows.length && !histRows.length && !Object.keys(keys).length) {
     $('content').innerHTML = '<p class="muted">No athletes yet. Create a secure link with “+ New secure link”, or wait for an athlete to start training.</p>'; return;
   }
@@ -628,10 +595,7 @@ async function loadOverview() {
   _overview = Object.values(map).map(a => {
     const metrics = athleteMetrics(a.sessions, a.lastActive, perWeek[a.id]);
     const t = triage(metrics);
-    const toReply = a.sessions.filter(sessionNeedsReply).length + (unreadMsg[a.id] || 0);
-    let tier = t.tier;
-    if (toReply > 0 && tier === 'ok') tier = 'amber';   // a waiting reply escapes the collapsed "on track" group
-    return Object.assign(a, { metrics, tier, flags: t.flags, isProtected: !!keys[a.id], toReply });
+    return Object.assign(a, { metrics, tier: t.tier, flags: t.flags, isProtected: !!keys[a.id] });
   });
 
   $('content').innerHTML = `
@@ -660,8 +624,6 @@ function athleteCard(a) {
   const adhPill = (m.adherence && m.adherence.pct != null)
     ? `<span class="zpill ${adhCls(m.adherence.pct)}">Adherence ${m.adherence.pct}%</span>`
     : '';
-  const replyChip = a.toReply > 0
-    ? `<span class="zpill reply">${a.toReply} to reply</span>` : '';
   const alertCls = a.tier === 'red' ? 'alert-red' : (a.tier === 'amber' ? 'alert-amber' : '');
   const lockPill = `<span class="zpill ${a.isProtected ? 'green' : 'amber'}" title="${a.isProtected ? 'Secure link' : 'Legacy link'}">${a.isProtected ? '🔒' : '⚠'}</span>`;
   const head = `<div class="card-top"><div class="name">${esc(a.name)}</div>${lockPill}</div>`;
@@ -680,7 +642,7 @@ function athleteCard(a) {
     ${head}
     <div class="meta">last active ${timeAgo(a.lastActive)} · ${a.finished} session${a.finished === 1 ? '' : 's'}</div>
     <div class="spark">${sparkline(m.loadPts, C.blue)}</div>
-    <div class="zrow">${replyChip}${acwrPill}${rPill}${adhPill}</div>
+    <div class="zrow">${acwrPill}${rPill}${adhPill}</div>
     ${flagsHtml}
   </div>`;
 }
@@ -694,7 +656,7 @@ function renderCards() {
   let list = _overview.filter(a => a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q));
   if (sort === 'name')        list.sort((a, b) => a.name.localeCompare(b.name));
   else if (sort === 'recent') list.sort((a, b) => (b.lastActive || '').localeCompare(a.lastActive || ''));
-  else                        list.sort((a, b) => (rank[b.tier] - rank[a.tier]) || ((b.toReply || 0) - (a.toReply || 0)) || (b.lastActive || '').localeCompare(a.lastActive || ''));
+  else                        list.sort((a, b) => (rank[b.tier] - rank[a.tier]) || (b.lastActive || '').localeCompare(a.lastActive || ''));
 
   if (!list.length) { $('cards').innerHTML = `<p class="muted">No athletes match “${esc(q)}”.</p>`; return; }
 
@@ -762,17 +724,6 @@ function renderSessionCard(athleteId, s) {
 
   const elog = exerciseLogPart(s.summary);
 
-  const uid = (athleteId + '_' + s.day + '_' + s.completed_on).replace(/[^a-z0-9]/gi, '_');
-  const actions = sessionNeedsReply(s) ? `
-    <div class="note-actions">
-      <button class="btn sm primary" onclick="openSessionReply('${uid}')">Reply to note</button>
-      <button class="btn sm" onclick="markNoteRead('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Mark read</button>
-    </div>
-    <div class="session-reply" id="sr-${uid}" style="display:none">
-      <textarea id="srinput-${uid}" placeholder="Reply to ${esc(_detailName)}…"></textarea>
-      <button class="btn sm primary" onclick="sendSessionReply('${uid}', '${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Send reply</button>
-    </div>` : '';
-
   return `<div class="day">
     <div class="day-head">
       <div>
@@ -784,90 +735,24 @@ function renderSessionCard(athleteId, s) {
     </div>
     ${meta}
     ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
-    ${actions}
     ${elog ? `<div class="elog-title">Exercise log</div><div class="elog-body">${esc(elog)}</div>` : ''}
   </div>`;
 }
 
-// --- coach messaging (reply panel) ------------------------------------------
-let _detailName = '', _detailHistory = [];
-function sessionMsgPanel(athleteId, msgs) {
-  const bubbles = msgs.map(m => {
-    const coach = m.sender === 'coach';
-    const tag = ctxLabel(m.context);
-    return `<div class="cmsg ${coach ? 'coach' : 'ath'}">
-      <div class="cmsg-bubble">${esc(m.body)}</div>
-      <div class="cmsg-meta">${tag ? '<span class="cmsg-tag">' + esc(tag) + '</span> · ' : ''}${coach ? 'You' : esc(_detailName)}</div>
-    </div>`;
-  }).join('');
-  const body = msgs.length
-    ? `<div class="cthread">${bubbles}</div>
-       <div class="creply">
-         <textarea id="coach-msg-input" placeholder="Message ${esc(_detailName)}…"></textarea>
-         <button class="btn primary sm" onclick="coachSend('${esc(athleteId)}')">Send</button>
-       </div>`
-    : `<p class="muted" style="margin:0">No conversation yet. Use “Reply to note” on a finished session below to start one — only the notes you reply to appear here.</p>`;
-  return `<div class="msg-card"><div class="sec-title" style="margin-top:0">Messages</div>${body}</div>`;
-}
-async function coachSend(athleteId, context) {
-  const ta = document.getElementById('coach-msg-input');
-  if (!ta) return;
-  const body = ta.value.trim();
-  if (!body) return;
-  const ins = await sb.from('messages').insert({ athlete_id: athleteId, sender: 'coach', body, context: context || null, read_by_athlete: false, read_by_coach: true });
-  if (ins.error) { alert('Could not send: ' + ins.error.message); return; }
-  await sb.from('messages').update({ read_by_coach: true }).eq('athlete_id', athleteId).eq('sender', 'athlete').eq('read_by_coach', false);
-  loadAthlete(athleteId);
-}
-function openSessionReply(uid) {
-  const el = document.getElementById('sr-' + uid);
-  if (!el) return;
-  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
-  const ta = document.getElementById('srinput-' + uid);
-  if (ta && el.style.display !== 'none') ta.focus();
-}
-async function sendSessionReply(uid, athleteId, day, completedOn) {
-  const ta = document.getElementById('srinput-' + uid);
-  if (!ta) return;
-  const reply = ta.value.trim();
-  if (!reply) return;
-  const s = _detailHistory.find(x => Number(x.day) === Number(day) && x.completed_on === completedOn);
-  const noteText = s ? sessionNoteText(s) : '';
-  const ctx = 'session:' + day + ':' + completedOn;
-  const rows = [];
-  if (noteText) rows.push({ athlete_id: athleteId, sender: 'athlete', body: noteText, context: ctx, read_by_athlete: true, read_by_coach: true });
-  rows.push({ athlete_id: athleteId, sender: 'coach', body: reply, context: ctx, read_by_athlete: false, read_by_coach: true });
-  const ins = await sb.from('messages').insert(rows);
-  if (ins.error) { alert('Could not send: ' + ins.error.message); return; }
-  await sb.from('session_history').update({ coach_status: 'replied' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  loadAthlete(athleteId);
-}
-async function markNoteRead(athleteId, day, completedOn) {
-  const { error } = await sb.from('session_history').update({ coach_status: 'read' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  if (error) { alert('Could not update: ' + error.message); return; }
-  loadAthlete(athleteId);
-}
-window.coachSend = coachSend;
-window.openSessionReply = openSessionReply;
-window.sendSessionReply = sendSessionReply;
-window.markNoteRead = markNoteRead;
-
 // --- athlete detail ---------------------------------------------------------
 async function loadAthlete(athleteId) {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
-  const [progRes, histRes, keyRes, msgRes] = await Promise.all([
+  const [progRes, histRes, keyRes] = await Promise.all([
     sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).maybeSingle(),
     sb.from('session_history').select('*').eq('athlete_id', athleteId)
       .order('completed_on', { ascending: false }).order('day', { ascending: true }),
-    sb.from('athlete_keys').select('secret_key').eq('athlete_id', athleteId).maybeSingle(),
-    sb.from('messages').select('*').eq('athlete_id', athleteId).order('created_at', { ascending: true })
+    sb.from('athlete_keys').select('secret_key').eq('athlete_id', athleteId).maybeSingle()
   ]);
   if (progRes.error && histRes.error) {
     $('content').innerHTML = `<p class="muted">Error: ${esc((progRes.error || histRes.error).message)}</p>`; return;
   }
   const prog       = progRes.data;            // may be null if they only have history
   const history    = histRes.data || [];
-  const messages   = (msgRes && msgRes.data) || [];
   const key        = keyRes.data && keyRes.data.secret_key;
   let   name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
   const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
@@ -882,7 +767,6 @@ async function loadAthlete(athleteId) {
   if (program && program.athlete && name === athleteId) {
     name = [program.athlete.firstName, program.athlete.lastName].filter(Boolean).join(' ') || athleteId;
   }
-  _detailName = name; _detailHistory = history;   // needed before histHtml builds the session cards
   const metrics    = athleteMetrics(history, lastActive, programDays.length);   // load, readiness, adherence
 
   // Secure-link panel (Stage 2 / Path B)
@@ -942,98 +826,4 @@ async function loadAthlete(athleteId) {
         if (hasData(e)) rows.push({ name: exr.name, sets: setStr(e), rpe: e.rpe, note: e.note });
       }));
       const exTable = rows.length ? `<table>
-        <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
-        ${rows.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${esc(r.sets) || (r.rpe ? 'RPE ' + esc(r.rpe) : '—')}</td><td>${esc(r.note || '')}</td></tr>`).join('')}
-      </table>` : '<p class="muted" style="margin-top:8px">No exercise logs recorded for this day yet.</p>';
-
-      const touched = d.completed || d.srpe || d.note || rd || rows.length;
-      return `<div class="day">
-        <div class="day-head">
-          <h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}
-            ${d.completed ? '<span class="tag done">✓ Completed</span>' : (touched ? '<span class="tag">In progress</span>' : '<span class="tag" style="opacity:.6">Not started</span>')}
-            <span class="when">${d.completedOn ? '· ' + esc(d.completedOn) : ''}${d.srpe ? ' · session RPE ' + esc(d.srpe) + '/10' : ''}</span></h3>
-        </div>
-        ${readinessHtml}
-        ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}
-        ${exTable}
-      </div>`;
-    }).join('');
-  } else {
-    // Fallback: no program file — flat list (old behaviour) so nothing is lost.
-    const exNames = Object.keys(ex).filter(k => hasData(ex[k]));
-    daysHtml = exNames.length ? `<div class="day"><table>
-      <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
-      ${exNames.map(k => `<tr><td>${esc(unslug(k))}</td><td class="num">${esc(setStr(ex[k])) || (ex[k].rpe ? 'RPE ' + esc(ex[k].rpe) : '—')}</td><td>${esc(ex[k].note || '')}</td></tr>`).join('')}
-    </table></div>` : '<p class="muted">No live day data.</p>';
-  }
-
-  // ── Prescribed program (read-only): the current cycle's plan, with a subtle
-  // "Last logged" line under any exercise the athlete has actually logged. ──
-  const cycles = (program && program.cycles) || [];
-  const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
-  const cyc = cycles[ci];
-  const cycleHead = cyc ? `<div class="prog-cycle">
-      <div class="prog-cycle-name">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>
-      ${cyc.focuses && cyc.focuses.length ? `<ul class="prog-focus">${cyc.focuses.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
-    </div>` : '';
-  const progBody = programDays.length ? programDays.map(pd => {
-    const blocks = (pd.blocks || []).map(b => {
-      const exs = (b.exercises || []).map(pex => {
-        const lg = exForName(pex.name);
-        const logged = hasData(lg)
-          ? `<div class="logline">Last logged: ${esc(setStr(lg)) || (lg.rpe ? 'RPE ' + esc(lg.rpe) : '—')}${lg.note ? ' · ' + esc(lg.note) : ''}</div>` : '';
-        const v = vidUrl(pex, lib);
-        const items = (pex.items && pex.items.length)
-          ? `<div class="pex-items">${pex.items.map(it => `· ${esc(it.name)}${it.detail ? ' (' + esc(it.detail) + ')' : ''}`).join('<br>')}</div>` : '';
-        return `<div class="pex">
-            <div class="pex-top"><span class="pex-name">${esc(pex.name)}</span>${v ? `<a class="pex-vid" href="${esc(v)}" target="_blank" rel="noopener">▶ video</a>` : ''}</div>
-            ${chipsHtml(pex.chips)}${items}${logged}
-          </div>`;
-      }).join('');
-      return `<div class="pblock"><div class="pblock-title">${b.icon ? esc(b.icon) + ' ' : ''}${esc(b.title || '')}</div>${exs}</div>`;
-    }).join('');
-    return `<div class="day"><div class="day-head"><h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</h3></div>${blocks}</div>`;
-  }).join('') : `<p class="muted">No program file found for this athlete (looked for data/${esc(athleteId)}.json).</p>`;
-  const programSection = `<details class="prog-section" open>
-      <summary class="sec-title">Prescribed program — current cycle ▾</summary>
-      ${cycleHead}${progBody}
-    </details>`;
-
-  $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
-    <div class="day-head" style="align-items:center;margin-bottom:8px">
-      <div>
-        <h2 style="font-size:26px;margin-bottom:4px">${esc(name)}</h2>
-        <div class="muted">last active ${timeAgo(lastActive)} · ${history.length} finished session${history.length === 1 ? '' : 's'}</div>
-      </div>
-      <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}', '${esc(name)}')">Delete all data</button>
-    </div>
-    ${linkHtml}
-    ${renderCharts(metrics)}
-    ${sessionMsgPanel(athleteId, messages)}
-    ${programSection}
-    <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
-    <div class="sec-title">Live activity — current snapshot (each day with its own logs)</div>${daysHtml}`;
-}
-
-// --- delete (coach only; enforced by RLS) -----------------------------------
-async function deleteSession(athleteId, day, completedOn) {
-  if (!confirm(`Delete the Day ${day} log from ${completedOn}?\n\nThis permanently removes that finished session. It cannot be undone.`)) return;
-  const { error } = await sb.from('session_history').delete()
-    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  if (error) { alert('Could not delete: ' + error.message); return; }
-  loadAthlete(athleteId);
-}
-async function deleteAthlete(athleteId, name) {
-  if (!confirm(`Delete ALL data for ${name}?\n\nThis removes every finished session AND the live snapshot. It cannot be undone.`)) return;
-  const r1 = await sb.from('session_history').delete().eq('athlete_id', athleteId);
-  const r2 = await sb.from('athlete_progress').delete().eq('athlete_id', athleteId);
-  if (r1.error || r2.error) { alert('Could not delete: ' + ((r1.error || r2.error).message)); return; }
-  loadOverview();
-}
-window.deleteSession = deleteSession;
-window.deleteAthlete = deleteAthlete;
-window.loadAthlete = loadAthlete;
-window.loadOverview = loadOverview;
-</script>
-</body>
-</html>
+        <tr><th>Exercise</th><t
