@@ -302,7 +302,13 @@
   #screen-plan .current-message { padding: 0; }      /* banner is edge-to-edge; body re-adds padding */
   #screen-plan .cm-banner {
     position: relative;
-    min-height: 180px;
+    /* Lock the banner to the image's 16:9 ratio so the framing is identical on
+       every device — the whole photo shows, never stretched, never re-cropped.
+       min/max clamp the size on very narrow phones and very wide screens; older
+       browsers that ignore aspect-ratio fall back to the min-height. */
+    aspect-ratio: 16 / 9;
+    min-height: 160px;
+    max-height: 260px;
     display: flex;
     overflow: hidden;
     /* green fallback — shown when the image is missing (.no-img) or still under the photo */
@@ -316,7 +322,7 @@
   }
   #screen-plan .cm-banner-img {
     position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; display: block;
+    object-fit: cover; object-position: center 40%; display: block;
   }
   /* Dark scrim so the caption stays legible over any photo */
   #screen-plan .cm-banner-scrim {
