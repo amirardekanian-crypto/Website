@@ -8,12 +8,15 @@ A human-friendly map of every file in this project. Written for the owner of the
 
 This is a small, hand-built website. It has:
 
-- Five pages you can visit: **home**, **apply form**, **athlete programme**, **privacy**, **terms**
+- Public pages anyone can visit: **home**, **apply form**, **privacy**, **terms**
+- Private pages reached only by a direct link: the **athlete programme** and the **coach dashboard**
 - A shared "look and feel" system so every page matches
 - A tiny bit of JavaScript that adds the menu, footer, video pop-ups, and the "install app" prompt
+- A **Supabase** database (added after this site first launched) that backs up athlete progress to the cloud and powers the coach dashboard and two-way messaging
+- A small **Notion sync** that keeps the exercise-video list up to date
 - Some support files for Google, hosting, and icons
 
-No database. No backend. No build step. When you edit a file, it's live the moment it's pushed to GitHub.
+No build step. When you edit a page, it's live the moment it's pushed to GitHub. The only "backend" is Supabase — a hosted database the pages talk to directly; there is no server of your own to run.
 
 ---
 
@@ -38,9 +41,16 @@ No database. No backend. No build step. When you edit a file, it's live the mome
 #### `program.html` — The athlete app
 - **What it does:** The private training app. Loads an athlete's programme from a JSON file in `/data/`. Shows daily workouts, videos, timers, weight logs, RPE scoring.
 - **If deleted:** All athletes lose access to their programme.
-- **Depends on:** `data/*.json` (one per athlete), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files.
+- **Depends on:** `data/*.json` (one per athlete), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
 - **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, not here. Ask an AI assistant to guide you before structural edits.
+
+#### `coach.html` — Coach dashboard (private)
+- **What it does:** Your private admin view. You sign in with Google (locked to your coach email) and see every athlete's progress synced from `program.html`: who finished sessions, when they were last active, their notes, plus charts. It's also where you **create a secure link** for a new athlete (a per-athlete secret key) and where you **send messages** to athletes.
+- **If deleted:** You lose the dashboard. Athletes are unaffected — their app keeps working — but you can no longer view progress, mint new athlete links, or message anyone from one place.
+- **Depends on:** Supabase (the `supabase-js` library loaded from a CDN, plus the tables in the `supabase/` folder), Google sign-in, `favicon.ico`. It does **not** use the shared CSS/JS partials — it's self-contained.
+- **Edit this when:** You want to change what the dashboard shows, add a chart, or change the messaging flow.
+- **Don't touch:** The Supabase URL/key and the sign-in email check unless you know what they do. This page is `noindex` on purpose — keep it that way.
 
 #### `privacy.html` — Privacy Notice
 - **What it does:** Your GDPR-compliant privacy statement covering the form, analytics, and embedded YouTube.
@@ -122,6 +132,43 @@ No database. No backend. No build step. When you edit a file, it's live the mome
 - **What it does:** Documents every field you can use in an athlete JSON file.
 - **If deleted:** You lose the reference guide. The site keeps working.
 - **Edit this when:** You add a new optional field to your JSON files and want to document it.
+
+---
+
+### The Database (Supabase)
+
+The site started with no backend. It now uses **Supabase** (a hosted Postgres database) so athlete progress survives a phone wipe, the coach dashboard has something to read, and coach↔athlete messaging works. The pages talk to Supabase directly over the internet — there is no server of yours to run or maintain.
+
+#### `supabase/*.sql` — Database setup scripts
+- **What they are:** The exact SQL that built the live database, kept in the repo as a record and so it can be rebuilt. They're applied in order and each one is safe to re-run.
+  - `stage1_schema.sql` — the core: a table that stores each athlete's progress as one JSON blob, plus the coach dashboard's read access.
+  - `stage2_keys.sql` — per-athlete secret keys, so an athlete's link (`program.html?client=<id>&key=<key>`) can write only their own data.
+  - `stage3_messages.sql` — the two-way messaging table used by the coach dashboard.
+- **If deleted:** No effect on the live database (it's already built) — you'd just lose the written record of how it was set up.
+- **Edit this when:** You change the database structure. Edit the SQL here *and* apply the same change in the Supabase dashboard so the two stay in sync.
+- **Don't touch:** Don't run these blind against the live database without understanding them — ask an AI assistant to walk you through any change first.
+
+---
+
+### Keeping Exercise Videos in Sync (Notion)
+
+#### `exercise_library.json` — Exercise-name → video-link list
+- **What it does:** `program.html` reads this at load to turn an exercise name into its demo video. It is **generated**, not hand-edited — the source of truth is a Notion database.
+- **If deleted:** Exercises lose their "watch video" links until you regenerate it.
+
+#### `sync_notion.py` + `NOTION_SYNC.md` — The regenerator
+- **What they do:** `sync_notion.py` pulls every exercise + video URL from the Notion "Exercise Library" database and rewrites `exercise_library.json`. `NOTION_SYNC.md` is the step-by-step guide for running it (setup, the token, troubleshooting).
+- **If deleted:** You lose the ability to refresh videos from Notion (and the guide). The site keeps working with whatever `exercise_library.json` it already has.
+- **Edit this when:** Almost never. You add/change videos *in Notion*, then run `python sync_notion.py` and commit the new `exercise_library.json`.
+- **Don't touch:** `.notion_token` is your private Notion secret — it's gitignored and must never be committed.
+
+---
+
+### Marketing Cards (a side tool, not part of the live site)
+
+#### `card-preview.html` + `instagram-cards/`
+- **What they are:** `card-preview.html` is a standalone designer page for making athlete "results" cards; `instagram-cards/` holds the finished PNGs you've exported. Nothing on the live site links to either — it's a personal tool you open directly when you want to make a card.
+- **If deleted:** The public site is completely unaffected. You'd only lose the card-making tool and the saved images.
 
 ---
 

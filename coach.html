@@ -589,7 +589,7 @@ async function loadOverview() {
 
   // Group everything by athlete.
   const map = {};
-  const get = (id) => (map[id] = map[id] || { id, name: id, finished: 0, completedDays: 0, lastActive: null, sessions: [] });
+  const get = (id) => (map[id] = map[id] || { id, name: id, finished: 0, lastActive: null, sessions: [] });
   const touch = (a, name, when) => {
     if (name) a.name = name;
     if (when && (!a.lastActive || when > a.lastActive)) a.lastActive = when;
@@ -597,8 +597,6 @@ async function loadOverview() {
   progRows.forEach(row => {
     const a = get(row.athlete_id);
     touch(a, row.athlete_name, row.updated_at);
-    const { days } = decode(row.athlete_id, row.data);
-    a.completedDays = Object.keys(days).filter(n => days[n].completed).length;
   });
   histRows.forEach(row => {
     const a = get(row.athlete_id);
@@ -809,12 +807,12 @@ function sessionMsgPanel(athleteId, msgs) {
     : `<p class="muted" style="margin:0">No conversation yet. Use “Reply to note” on a finished session below to start one — only the notes you reply to appear here.</p>`;
   return `<div class="msg-card"><div class="sec-title" style="margin-top:0">Messages</div>${body}</div>`;
 }
-async function coachSend(athleteId, context) {
+async function coachSend(athleteId) {
   const ta = document.getElementById('coach-msg-input');
   if (!ta) return;
   const body = ta.value.trim();
   if (!body) return;
-  const ins = await sb.from('messages').insert({ athlete_id: athleteId, sender: 'coach', body, context: context || null, read_by_athlete: false, read_by_coach: true });
+  const ins = await sb.from('messages').insert({ athlete_id: athleteId, sender: 'coach', body, context: null, read_by_athlete: false, read_by_coach: true });
   if (ins.error) { alert('Could not send: ' + ins.error.message); return; }
   await sb.from('messages').update({ read_by_coach: true }).eq('athlete_id', athleteId).eq('sender', 'athlete').eq('read_by_coach', false);
   loadAthlete(athleteId);

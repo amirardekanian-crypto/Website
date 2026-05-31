@@ -2921,12 +2921,6 @@ function renderProgram() {
   document.getElementById('day-panels').innerHTML = panelsHtml;
 }
 
-function countExercises(day) {
-  let count = 0;
-  day.blocks.forEach(b => { count += b.exercises.length; });
-  return count;
-}
-
 // Set-based total: each standard exercise contributes its set count, while
 // circuits and simple exercises count as 1 unit each. The session bar fills
 // proportionally as each individual set is checked, so partial completion
@@ -2958,11 +2952,6 @@ function blockCategory(title, blockIndex) {
   // Fallback for unknown / future block types — cycles ice → yellow → purple → ice …
   const fallback = ['block-warmup', 'block-strength', 'block-power'];
   return fallback[(blockIndex || 0) % fallback.length];
-}
-
-// Build a chip from { label, style } — used by renderRoundCues fallback.
-function chipHtml(c) {
-  return `<span class="chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`;
 }
 
 // Convert a duration string into seconds. Handles "2 min", "2m", "90 sec",
