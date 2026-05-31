@@ -679,6 +679,18 @@
   .archive-ex-name { font-size: 14px; font-weight: 500; color: #555; }
   .archive-ex-detail { font-size: 12px; color: #aaa; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
 
+  /* ── Workout session (a single opened library workout) ── */
+  #screen-workout { background: var(--grey-bg); padding-bottom: 110px; }
+  .ws-header { background: var(--yellow); padding: 48px 24px 24px; position: relative; }
+  .ws-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
+  .ws-eyebrow { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+  .ws-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; line-height: 1; text-transform: uppercase; color: #fff; }
+  .ws-meta { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.78); margin-top: 8px; }
+  #ws-body { padding: 0 20px; }
+  /* The shared exercise cards use a big top margin on the first section header
+     (designed to sit under the day-tabs); trim it inside the workout body. */
+  #ws-body .section-header-prog:first-child { margin-top: 22px; }
+
   /* ── Workouts library (shared, app-wide) ── */
   #screen-workouts { background: var(--grey-bg); }
   .wl-header { padding: 40px 24px 20px; }
@@ -2168,6 +2180,19 @@
   <div class="wl-scroll" id="wl-scroll"></div>
 </div>
 
+<!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
+     Workouts tab. Reuses the exercise-card visuals, but with its OWN local-only
+     check-off (keyed by workout id) — no athlete data, no cloud, no set-logs. -->
+<div id="screen-workout" class="screen">
+  <div class="ws-header">
+    <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to workouts">←</button>
+    <div class="ws-eyebrow" id="ws-eyebrow"></div>
+    <div class="ws-title" id="ws-title"></div>
+    <div class="ws-meta" id="ws-meta"></div>
+  </div>
+  <div id="ws-body"></div>
+</div>
+
 <!-- ═══ ARCHIVE ═══ a single completed past program. Not a bottom-nav tab —
      opened only by the "Done" card on the My Plan screen. -->
 <div id="screen-archive" class="screen">
@@ -3547,7 +3572,7 @@ async function renderWorkoutsLibrary() {
       </div>`;
     const body = count
       ? list.map(w => `
-          <div class="wl-card" role="button" tabindex="0" data-file="${esc(w.file || '')}" data-id="${esc(w.id || '')}">
+          <div class="wl-card" role="button" tabindex="0" data-file="${esc(w.file || '')}" data-id="${esc(w.id || '')}" onclick="openWorkout(this.dataset.file)">
             <div class="wl-card-thumb"></div>
             <div class="wl-card-body">
               <div class="wl-card-title">${esc(w.title || '')}</div>
@@ -3558,6 +3583,117 @@ async function renderWorkoutsLibrary() {
       : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} workouts — check back soon.</div>`;
     return `<div class="wl-group">${banner}${body}</div>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  WORKOUT SESSION — open one library workout from its card.
+//  Reuses the pure visual exercise renderers (renderExercise / renderCircuit)
+//  but the check-off is LOCAL-ONLY and workout-scoped: it never touches
+//  ATHLETE_ID, set-logs, RPE, the cloud backup, or the Finish/send flow.
+//  Check state persists under "wkout_<id>" so re-opening restores ticks.
+// ═══════════════════════════════════════════════════════════════════════
+let _wsCurrent = null;   // { id, checkKey } for the open workout
+
+async function openWorkout(file) {
+  if (!file) return;
+  const body = document.getElementById('ws-body');
+  document.getElementById('ws-eyebrow').textContent = 'Workout';
+  document.getElementById('ws-title').textContent = 'Loading…';
+  document.getElementById('ws-meta').textContent = '';
+  body.innerHTML = '';
+  goTo('workout');
+
+  let wk;
+  try {
+    const res = await fetch(file, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    wk = await res.json();
+  } catch (e) {
+    document.getElementById('ws-title').textContent = 'Couldn’t load workout';
+    body.innerHTML = `<div class="wl-empty">Please check your connection and try again.</div>`;
+    return;
+  }
+
+  const id = wk.id || file;
+  _wsCurrent = { id, checkKey: 'wkout_' + id };
+
+  // Header
+  document.getElementById('ws-eyebrow').textContent = wk.focusTag || 'Workout';
+  document.getElementById('ws-title').textContent = wk.title || 'Workout';
+  const meta = [wk.duration, wk.equipment].filter(Boolean).join(' · ');
+  document.getElementById('ws-meta').textContent = meta;
+
+  // Body — reuse the SAME exercise card renderers as the training screen. We
+  // pass a fixed dayId of 'ws' purely so the markup is well-formed; the inline
+  // check handlers it generates are neutralised below by re-binding our own.
+  let num = 1;
+  let html = '';
+  (wk.blocks || []).forEach((block, bIdx) => {
+    const blockClass = blockCategory(block.title, bIdx);
+    html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
+    (block.exercises || []).forEach(ex => {
+      html += renderExercise(ex, 'ws', num++, blockClass);
+    });
+  });
+  body.innerHTML = html || `<div class="wl-empty">This workout has no exercises yet.</div>`;
+
+  // Re-bind check-off to our local-only handler. The rendered cards carry the
+  // training screen's inline onclick (onCheckBoxTap / onExerciseRowTap), which
+  // would write athlete set-logs — so we strip those and wire workout-scoped
+  // behaviour instead. Video play + rest timer buttons are left as-is (they're
+  // athlete-independent).
+  const saved = _wsLoadChecks(_wsCurrent.checkKey);
+  // Remove the per-set "Log Sets"/"Log" stub — library workouts have no athlete
+  // logging, so the empty .ex-log block (and its preceding label) aren't used.
+  body.querySelectorAll('.ex-log').forEach(log => {
+    const label = log.previousElementSibling;
+    if (label && label.classList.contains('ex-section-label')) label.remove();
+    log.remove();
+  });
+  body.querySelectorAll('.checklist-item').forEach((item, i) => {
+    const main = item.querySelector('.item-main');
+    const box  = item.querySelector('.check-box');
+    if (main) main.removeAttribute('onclick');
+    if (box)  box.removeAttribute('onclick');
+    // Restore saved tick
+    if (saved[i]) item.classList.add('checked');
+    // Tapping the row toggles expand (unless tapping the check box / a button / video)
+    if (main) main.addEventListener('click', (ev) => {
+      if (ev.target.closest('.check-box, button, .ex-video, a, input, textarea')) return;
+      item.classList.toggle('collapsed');
+    });
+    // Tapping the check box toggles done — local only
+    if (box) box.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      item.classList.toggle('checked');
+      if (navigator.vibrate) navigator.vibrate(15);
+      _wsSaveChecks();
+    });
+  });
+
+  window.scrollTo(0, 0);
+}
+
+// Workout ticks RESET DAILY: the saved blob stores the calendar date it was
+// written on. If that date isn't today, the ticks are treated as empty (and the
+// stale entry is cleared) — so a workout always starts fresh each new day, but
+// progress survives a same-day reload. Mirrors autoResetStaleDays() for the
+// athlete program.
+function _wsLoadChecks(key) {
+  let blob;
+  try { blob = JSON.parse(localStorage.getItem(key)); } catch (e) { blob = null; }
+  if (!blob || !Array.isArray(blob.checks)) return [];
+  if (blob.date !== new Date().toDateString()) {
+    localStorage.removeItem(key);   // stale → clear and start fresh
+    return [];
+  }
+  return blob.checks;
+}
+function _wsSaveChecks() {
+  if (!_wsCurrent) return;
+  const checks = Array.from(document.querySelectorAll('#ws-body .checklist-item'))
+    .map(i => i.classList.contains('checked'));
+  localStorage.setItem(_wsCurrent.checkKey, JSON.stringify({ date: new Date().toDateString(), checks }));
 }
 
 function switchDay(n) {

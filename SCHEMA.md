@@ -642,6 +642,16 @@ stat cells, so leaving them out breaks nothing.
 }
 ```
 
+### Opening a workout (the session view)
+
+Tapping a card opens the workout in its own session screen, which reuses the
+same exercise cards as the training screen (video, sets/reps, coaching cues,
+rest timer). Check-off here is **local-only and resets daily**: ticks are stored
+in the browser under `wkout_<id>` with the date they were made, survive a
+same-day reload, and clear automatically on a new calendar day. Library workouts
+are **not** tied to an athlete — they never write set-logs, RPE, or cloud backup,
+and there is no finish/send-to-coach step.
+
 ### Adding a workout
 
 1. Create the workout JSON in `workouts/<category>/<id>.json` (with `title`,
