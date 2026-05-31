@@ -15,12 +15,16 @@
           "name": "Band External Rotation",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets", "style": "dark" },
-            { "label": "12 / arm", "style": "dark" }
+            { "label": "2 Sets" },
+            { "label": "12 Reps / arm" }
           ],
           "cues": {
-            "good": ["Elbow pinned to the side, rotate from the shoulder"],
-            "bad": ["Letting the elbow drift away from the ribs"]
+            "good": [
+              "Keep the elbow pinned to your side and rotate from the shoulder"
+            ],
+            "bad": [
+              "Letting the elbow drift away from the ribs"
+            ]
           }
         }
       ]
@@ -36,12 +40,16 @@
           "restSec": 75,
           "chips": [
             { "label": "4 Sets", "style": "yellow" },
-            { "label": "×10-12 Reps" },
-            { "label": "RPE 8" }
+            { "label": "×10-12 Reps" }
           ],
           "cues": {
-            "good": ["Press up and slightly together at the top"],
-            "bad": ["Flaring the elbows to 90 degrees"]
+            "good": [
+              "Press the dumbbells up and slightly toward each other at the top",
+              "Feel the stretch across the chest at the bottom, then squeeze to drive up"
+            ],
+            "bad": [
+              "Flaring the elbows straight out to 90 degrees"
+            ]
           }
         },
         {
@@ -51,12 +59,15 @@
           "restSec": 75,
           "chips": [
             { "label": "4 Sets", "style": "yellow" },
-            { "label": "×10-12 / arm" },
-            { "label": "RPE 8" }
+            { "label": "×10-12 Reps / arm" }
           ],
           "cues": {
-            "good": ["Drive the elbow past the ribs, squeeze the lat"],
-            "bad": ["Twisting the torso to heave the weight up"]
+            "good": [
+              "Drive the elbow past the ribs and squeeze the lat at the top"
+            ],
+            "bad": [
+              "Twisting the torso to heave the weight up"
+            ]
           }
         },
         {
@@ -66,12 +77,15 @@
           "restSec": 75,
           "chips": [
             { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps" },
-            { "label": "RPE 8" }
+            { "label": "×10 Reps" }
           ],
           "cues": {
-            "good": ["Ribs down, press straight up to a full lockout"],
-            "bad": ["Arching the lower back to press"]
+            "good": [
+              "Keep the ribs down and press straight up to a full lockout"
+            ],
+            "bad": [
+              "Arching the lower back to press the weight up"
+            ]
           }
         }
       ]
@@ -82,18 +96,25 @@
       "exercises": [
         {
           "type": "circuit",
-          "name": "Curl + Pushdown Superset",
+          "name": "Arm Pump Superset",
           "rounds": "3 Rounds",
+          "restSec": 45,
           "items": [
             {
               "name": "Dumbbell Hammer Curl",
               "detail": "15 reps",
-              "cues": { "good": ["Keep the elbows pinned to your sides"], "bad": ["Swinging the torso to lift"] }
+              "cues": {
+                "good": ["Keep the elbows pinned to your sides through the whole rep"],
+                "bad": ["Swinging the torso to lift the weight"]
+              }
             },
             {
-              "name": "Cable Tricep Pushdown",
+              "name": "Bench Dip",
               "detail": "15 reps",
-              "cues": { "good": ["Lock the elbows in place, extend fully"], "bad": ["Letting the elbows flare out"] }
+              "cues": {
+                "good": ["Keep the elbows tracking straight back, chest tall"],
+                "bad": ["Letting the shoulders shrug up toward the ears"]
+              }
             }
           ]
         }

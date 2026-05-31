@@ -569,6 +569,93 @@ The system adapts to your programming — not the other way around.
 
 ---
 
+## Workouts library (shared, app-wide)
+
+Separate from athlete programmes (`data/*.json`), the **Workouts tab** shows a
+shared library of extra, on-demand sessions available to **every** user. These
+live in their own `workouts/` folder so they never mix with athlete data.
+
+### Folder layout
+
+```
+workouts/
+  index.json                          ← the manifest (drives the Workouts tab)
+  strength/full-body-power.json
+  conditioning/engine-builder.json
+  mobility/daily-flow.json
+  …one JSON per workout, in its category folder
+```
+
+### `workouts/index.json` — the manifest
+
+Lists the categories (with their banner image) and, per category, the workouts
+to show as cards. The manifest is the source of truth for the **card** (name,
+duration, equipment) so the list renders instantly without opening every file.
+
+```jsonc
+{
+  "categories": [
+    {
+      "id": "strength",
+      "title": "Strength",                              // banner heading
+      "banner": "assets/img/workouts/strength.webp",    // 2:1 image (≈1600x800)
+      "workouts": [
+        { "id": "full-body-power", "title": "Full-Body Power",
+          "duration": "45 min", "equipment": "Barbell",
+          "file": "workouts/strength/full-body-power.json" }
+      ]
+    }
+  ]
+}
+```
+
+- **Every category always renders** its banner (with a workout count). A category
+  whose `workouts` array is **empty** shows a "your coach is adding…" note instead
+  of cards — it is not hidden.
+- Banner images are 2:1 (the banner box uses `aspect-ratio: 2/1`, so the whole
+  photo shows on phones). Keep filenames lowercase (GitHub Pages is case-sensitive).
+
+### A workout file
+
+Same shape as an athlete training **day** (so the app can render it with the
+existing exercise cards): `focusTag` + `blocks[].exercises[]`. Each file also
+repeats its own `id` / `title` / `duration` / `equipment` (used when the workout
+is opened). Supported per exercise: **sets, reps, times, cues, videos** — chips
+for sets/reps/duration, `cues.good[]` / `cues.bad[]`, and `videoUrl` (or leave it
+`null` to auto-resolve a video by exercise name from `exercise_library.json`).
+RPE and tempo are intentionally omitted here; the renderer simply shows fewer
+stat cells, so leaving them out breaks nothing.
+
+```jsonc
+{
+  "id": "full-body-power", "title": "Full-Body Power",
+  "category": "strength", "duration": "45 min", "equipment": "Barbell",
+  "focusTag": "Full-Body Strength",
+  "blocks": [
+    { "title": "Strength", "icon": "🎯", "exercises": [
+      { "type": "standard", "name": "Barbell Back Squat", "videoUrl": null,
+        "restSec": 150,
+        "chips": [ {"label":"5 Sets","style":"yellow"}, {"label":"×5 Reps"} ],
+        "cues": { "good": ["Brace before each rep"], "bad": ["Chest collapsing forward"] } }
+    ] }
+  ]
+}
+```
+
+### Adding a workout
+
+1. Create the workout JSON in `workouts/<category>/<id>.json` (with `title`,
+   `duration`, `equipment`, `focusTag`, `blocks`).
+2. Add an entry to that category's `workouts` array in `index.json` with the
+   **same** `title` / `duration` / `equipment` and the `file` path.
+3. Commit + push. The Workouts tab picks it up on next load.
+
+> **Keep them matching:** the name/duration/equipment exist in *both* the manifest
+> (for the card) and the file (for the opened view). If you rename a workout, change
+> it in both places or the card and the opened session will disagree.
+
+---
+
 ## Migration Notes (from the old schema)
 
 The old `currentProgram` + `journey` structure has been replaced. The migration is automatic if you used the migration script; otherwise, the mapping is:

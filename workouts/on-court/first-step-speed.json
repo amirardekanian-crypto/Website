@@ -12,15 +12,20 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "A-Skip",
+          "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets", "style": "dark" },
-            { "label": "20 m", "style": "dark" }
+            { "label": "2 Sets" },
+            { "label": "5 Reps / side" }
           ],
           "cues": {
-            "good": ["Tall posture, drive the knee up and the foot down"],
-            "bad": ["Leaning back or reaching with the foot"]
+            "good": [
+              "Move slowly and reach tall through the top hand",
+              "Feel the hip and upper back open on each rep"
+            ],
+            "bad": [
+              "Rushing through without controlling the position"
+            ]
           }
         }
       ]
@@ -36,28 +41,46 @@
           "restSec": 60,
           "chips": [
             { "label": "6 Sets", "style": "yellow" },
-            { "label": "×5 m" },
-            { "label": "Full effort" }
+            { "label": "×5 m" }
           ],
           "cues": {
-            "good": ["Land the split-step then explode in the first stride"],
-            "bad": ["A slow, flat-footed first step"]
+            "good": [
+              "Land the split-step then explode hard into the first stride",
+              "Stay low for the first two steps before rising up"
+            ],
+            "bad": [
+              "A slow, flat-footed first step",
+              "Standing tall too early out of the start"
+            ]
           }
-        },
+        }
+      ]
+    },
+    {
+      "title": "Footwork",
+      "icon": "👟",
+      "exercises": [
         {
           "type": "circuit",
-          "name": "Ladder Footwork",
+          "name": "Agility Ladder",
           "rounds": "4 Rounds",
+          "restSec": 45,
           "items": [
             {
               "name": "In-In-Out-Out",
               "detail": "1 length",
-              "cues": { "good": ["Quick feet, stay on the balls of the feet"], "bad": ["Looking down at the ladder the whole time"] }
+              "cues": {
+                "good": ["Quick feet, stay light on the balls of the feet"],
+                "bad": ["Looking down at the ladder the whole time"]
+              }
             },
             {
               "name": "Lateral Shuffle",
               "detail": "1 length each way",
-              "cues": { "good": ["Low hips, push off the outside foot"], "bad": ["Crossing the feet over"] }
+              "cues": {
+                "good": ["Stay low through the hips and push off the outside foot"],
+                "bad": ["Crossing the feet over each other"]
+              }
             }
           ]
         }

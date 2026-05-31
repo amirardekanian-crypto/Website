@@ -3503,8 +3503,10 @@ function renderArchiveEmpty() {
 
 // ═══════════════════════════════════════════════════════════════════════
 //  WORKOUTS LIBRARY — shared, app-wide extra sessions, grouped by category.
-//  Driven entirely by workouts/index.json (the manifest). A category with no
-//  workouts is skipped. Same for every user — not tied to the athlete's data.
+//  The manifest (workouts/index.json) carries each card's name/duration/
+//  equipment, so the list renders instantly without opening any workout file.
+//  The full workout JSON is only fetched when a card is tapped (Phase 2).
+//  Same for every user — not tied to the athlete's data.
 // ═══════════════════════════════════════════════════════════════════════
 let _workoutsLibLoaded = false;
 async function renderWorkoutsLibrary() {
@@ -3524,14 +3526,14 @@ async function renderWorkoutsLibrary() {
     return;
   }
 
-  // Show EVERY category, even empty ones. The banner shows only the name + a
-  // workout count; an empty category shows a "coach is adding" note instead of cards.
   const cats = manifest.categories || [];
   if (!cats.length) {
     scroll.innerHTML = `<div class="wl-empty">No workout categories yet — check back soon.</div>`;
     return;
   }
 
+  // Show EVERY category, even empty ones. The banner shows only the name + a
+  // workout count; an empty category shows a "coach is adding" note instead of cards.
   scroll.innerHTML = cats.map(cat => {
     const list = Array.isArray(cat.workouts) ? cat.workouts : [];
     const count = list.length;

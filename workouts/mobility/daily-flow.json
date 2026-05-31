@@ -1,0 +1,92 @@
+{
+  "id": "daily-flow",
+  "title": "Daily Mobility Flow",
+  "category": "mobility",
+  "duration": "15 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Full-Body Mobility",
+  "blocks": [
+    {
+      "title": "Spine & Hips",
+      "icon": "🌀",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Cat-Cow",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "10 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Move one segment of the spine at a time, slow and controlled",
+              "Breathe out as you round, in as you arch"
+            ],
+            "bad": [
+              "Rushing and only moving the lower back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "90/90 Hip Switch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Keep the chest tall and rotate from the hips, not the lower back"
+            ],
+            "bad": [
+              "Collapsing the torso forward to get the knees down"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Open Up",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "5 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Reach tall through the top hand and follow it with the eyes",
+              "Feel the hip flexor and upper back open together"
+            ],
+            "bad": [
+              "Holding the breath or forcing the range"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "10 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over the toes and keep the heel down"
+            ],
+            "bad": [
+              "Letting the heel lift off the floor"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
