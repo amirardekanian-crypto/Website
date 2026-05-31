@@ -2869,6 +2869,13 @@ function cycleImgError(img) {
   if (banner) banner.classList.add('no-img');
 }
 
+// Day-card image failed (category file missing) → drop to the green gradient.
+function dayImgError(img) {
+  img.style.display = 'none';
+  const banner = img.closest('.cm-banner');
+  if (banner) banner.classList.add('no-img');
+}
+
 // Expand/collapse a cycle card's detail section (why-this-matters + outcomes).
 // Toggles the card's `is-open` class; CSS does the show/hide + chevron flip.
 function toggleCycleCard(btn, ev) {
@@ -2902,20 +2909,36 @@ function homeWeekLabel(cycle) {
   return `Week ${wk} of ${totalWeeks}`;
 }
 
-// One day card for the home overview — same image-banner look as the cycle
-// cards (.planlike .cm-*). Tapping it opens that day's workout (openDayView).
-// Drop assets/days/<slug>.<ext> (slug from the day title) to set the image;
-// missing files fall back to the green gradient via cycleImgError().
-// opts.static → a non-clickable repeat of the card (used at the top of a day
-// view): no onclick, no Done pill, since you're already inside that day.
+// Map a day's focus/title to ONE of a small pool of generic category images.
+// Upload these ~8 files ONCE to assets/days/ and every day of every athlete is
+// covered — no per-day images needed. First keyword hit wins (order matters).
+const DAY_IMAGE_RULES = [
+  { cat: 'recovery',     re: /recover|mobility|regen|deload|rest|stretch|flexib/i },
+  { cat: 'power',        re: /power|plyo|explos|speed|jump|sprint|rotational|med.?ball|throw/i },
+  { cat: 'conditioning', re: /condition|cardio|engine|aerobic|hiit|metcon|interval|endur/i },
+  { cat: 'core',         re: /core|abs|trunk|anti.?rot|plank|brace/i },
+  { cat: 'upper',        re: /upper|push|pull|press|shoulder|chest|back|arm|bench|row/i },
+  { cat: 'lower',        re: /lower|leg|squat|hinge|glute|deadlift|hamstring|quad|calf|lunge|knee/i },
+  { cat: 'fullbody',     re: /full.?body|total.?body|whole.?body/i },
+];
+function dayImageCategory(day) {
+  const hay = `${day.title || ''} ${day.focusTag || ''} ${day.subtitle || ''}`;
+  for (const r of DAY_IMAGE_RULES) if (r.re.test(hay)) return r.cat;
+  return 'default';
+}
+
+// One day card for the home overview — image-banner look matching the cycle
+// cards (.planlike .cm-*). The banner image comes from the shared CATEGORY POOL
+// (assets/days/<category>.jpg, chosen by dayImageCategory). Missing files fall
+// back to the green gradient via dayImgError(). Tapping opens openDayView().
+// opts.static → a non-clickable repeat of the card (top of a day view).
 function dayCardHTML(day, dayNum, total, opts) {
   opts = opts || {};
   const id = day.id != null ? day.id : dayNum;
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
-  // Image: assets/days/<slug>.<ext>, slug from the name; falls back to day-<n>.
-  const slug = cycleSlug(name) || ('day-' + dayNum);
-  const base = `assets/days/${slug}`;
+  // Shared category image — one of the ~8 files in assets/days/.
+  const catImg = `assets/days/${dayImageCategory(day)}.jpg`;
   const idStr = esc(String(id));
 
   // Subtitle = "N blocks · M movements". Each exercise entry counts as one
@@ -2934,8 +2957,7 @@ function dayCardHTML(day, dayNum, total, opts) {
   let h = `<div class="${cls}"${attrs}>`;
   h += `<div class="cm-banner">`;
   h += `<img class="cm-banner-img" alt="${esc(name)}" ` +
-       `src="${base}.jpg" data-base="${base}" data-exts="jpg,jpeg,png,webp" data-ext-idx="0" ` +
-       `onerror="cycleImgError(this)">`;
+       `src="${catImg}" onerror="dayImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
   if (isDone) h += `<div class="cm-pill cm-pill-done">Done</div>`;
   h += `<div class="cm-banner-caption">`;
