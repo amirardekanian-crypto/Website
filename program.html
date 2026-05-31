@@ -154,24 +154,6 @@
     overflow: hidden;
   }
 
-  /* Sticky nav */
-  .home-nav {
-    position: sticky; top: 0; z-index: 50;
-    background: var(--yellow);
-    padding: 14px 24px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .home-nav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #C7552F; }
-
-  .home-brand {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px; font-weight: 700; letter-spacing: 2px;
-    color: var(--on-accent); text-decoration: none;
-    transition: opacity 0.2s;
-  }
-  .home-brand strong { color: var(--on-accent); }
-  .home-brand:hover { opacity: 0.85; }
-
   /* Shared fade-in animation reused by athlete-card, sub-banner, cycle-meter,
      cycle-hero and the upcoming-section blocks. */
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
@@ -271,11 +253,11 @@
      Restyle those once and every card on the home page changes together.
      The rules here are only the bits unique to the shared header + the
      clickable "past" variant. */
-  #screen-plan .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  #screen-plan .cm-titlerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  #screen-plan .cm-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: 0.5px; }
-  #screen-plan .cm-weeks { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #C7552F; text-transform: uppercase; }
-  #screen-plan .cm-tagline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 14px; color: var(--grey-dark); }
+  .planlike .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .planlike .cm-titlerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .planlike .cm-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: 0.5px; }
+  .planlike .cm-weeks { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #C7552F; text-transform: uppercase; }
+  .planlike .cm-tagline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 14px; color: var(--grey-dark); }
   /* Clickable variant (past program card → opens the archive) + its "Done" pill */
   .current-message.is-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
   .current-message.is-clickable:hover { border-color: #C7552F; }
@@ -299,8 +281,8 @@
      Full-bleed image at the top of every cycle card with the caption
      (Cycle n of N · name · weeks · tagline) overlaid bottom-left. If no
      image file exists for the cycle, .no-img keeps the green gradient. */
-  #screen-plan .current-message { padding: 0; }      /* banner is edge-to-edge; body re-adds padding */
-  #screen-plan .cm-banner {
+  .planlike .current-message { padding: 0; }      /* banner is edge-to-edge; body re-adds padding */
+  .planlike .cm-banner {
     position: relative;
     /* Lock the banner to the image's 16:9 ratio so the framing is identical on
        every device — the whole photo shows, never stretched, never re-cropped.
@@ -315,28 +297,28 @@
     background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
   }
   /* Subtle diagonal stripes on the green fallback, echoing the reference card */
-  #screen-plan .cm-banner.no-img::after {
+  .planlike .cm-banner.no-img::after {
     content: ''; position: absolute; inset: 0; pointer-events: none;
     background: repeating-linear-gradient(135deg,
       rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px);
   }
-  #screen-plan .cm-banner-img {
+  .planlike .cm-banner-img {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; object-position: center 40%; display: block;
   }
   /* Dark scrim so the caption stays legible over any photo */
-  #screen-plan .cm-banner-scrim {
+  .planlike .cm-banner-scrim {
     position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(to top,
       rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.28) 44%, rgba(0,0,0,0) 74%);
   }
-  #screen-plan .cm-banner-caption {
+  .planlike .cm-banner-caption {
     position: relative; z-index: 2;
     align-self: flex-end;
     width: 100%;
     padding: 16px 18px;
   }
-  #screen-plan .cm-cyclelabel {
+  .planlike .cm-cyclelabel {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
     color: rgba(255,255,255,0.78);
@@ -345,13 +327,13 @@
   /* Caption text sits on the dark banner, so override the dark-on-white colours.
      The weeks + tagline share the bottom band with the toggle pill (bottom-right),
      so reserve a right gutter on those lines to keep text from sliding underneath. */
-  #screen-plan .cm-banner-caption .cm-name    { color: #fff; margin-bottom: 5px; }
-  #screen-plan .cm-banner-caption .cm-weeks   { color: rgba(255,255,255,0.92); padding-right: 112px; }
-  #screen-plan .cm-banner-caption .cm-tagline { color: rgba(255,255,255,0.85); margin-top: 3px; padding-right: 112px; }
+  .planlike .cm-banner-caption .cm-name    { color: #fff; margin-bottom: 5px; }
+  .planlike .cm-banner-caption .cm-weeks   { color: rgba(255,255,255,0.92); padding-right: 112px; }
+  .planlike .cm-banner-caption .cm-tagline { color: rgba(255,255,255,0.85); margin-top: 3px; padding-right: 112px; }
   /* Pill floats top-right over the banner */
-  #screen-plan .cm-pill { top: 14px; right: 14px; }
+  .planlike .cm-pill { top: 14px; right: 14px; }
   /* Toggle becomes a small white pill on the banner, bottom-right */
-  #screen-plan .cm-banner .cm-toggle {
+  .planlike .cm-banner .cm-toggle {
     position: absolute; z-index: 3;
     right: 14px; bottom: 14px;
     width: auto; margin: 0; padding: 5px 11px;
@@ -362,9 +344,9 @@
     gap: 5px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
-  #screen-plan .cm-banner .cm-toggle-chev { margin-left: 0; font-size: 10px; }
+  .planlike .cm-banner .cm-toggle-chev { margin-left: 0; font-size: 10px; }
   /* Padded body that holds the collapsible detail below the banner */
-  #screen-plan .cm-cardbody { padding: 16px 24px 22px; }
+  .planlike .cm-cardbody { padding: 16px 24px 22px; }
 
   /* ─── Global bottom tab bar (always visible across all screens) ── */
   .global-tabs {
@@ -439,14 +421,14 @@
      thin separator lines. */
 
   /* Shared cycle-card header — C-badge sits left of the name/weeks/tagline. */
-  #screen-plan .cm-head {
+  .planlike .cm-head {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
   }
   /* Square C-badge (C1/C2/…) shown on every cycle card */
-  #screen-plan .cm-num {
+  .planlike .cm-num {
     width: 40px; height: 40px; flex-shrink: 0;
     border: 1.5px solid #C7552F;
     border-radius: 8px;
@@ -456,11 +438,11 @@
   }
 
   /* Strip the original top accent line + radial glow */
-  #screen-plan .current-message::before { display: none; }
-  #screen-plan .current-message::after  { display: none; }
+  .planlike .current-message::before { display: none; }
+  .planlike .current-message::after  { display: none; }
   /* Highlighted frame — soft yellow-tinted border + subtle outer glow so the
      current cycle card visually stands out from the future cycle cards. */
-  #screen-plan .current-message {
+  .planlike .current-message {
     background: var(--white);
     border: 2px solid var(--yellow-mid);
     box-shadow:
@@ -468,16 +450,16 @@
       0 8px 30px rgba(14,74,54,0.06),
       inset 0 0 24px rgba(14,74,54,0.02);
   }
-  #screen-plan .cm-body-label { color: #C7552F; }
+  .planlike .cm-body-label { color: #C7552F; }
 
   /* Focus list → numbered list with thin grey separators (no tint background) */
-  #screen-plan .focus-list {
+  .planlike .focus-list {
     counter-reset: focus-c;
     display: block;
     gap: 0;
     margin-bottom: 4px;
   }
-  #screen-plan .focus-list-item {
+  .planlike .focus-list-item {
     background: transparent;
     border: none;
     border-radius: 0;
@@ -487,7 +469,7 @@
     counter-increment: focus-c;
     line-height: 1.5;
   }
-  #screen-plan .focus-list-item::before {
+  .planlike .focus-list-item::before {
     content: counter(focus-c, decimal-leading-zero);
     width: auto; height: auto;
     margin-top: 0;
@@ -757,6 +739,134 @@
   .wl-card-play { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--grey-bg); color: var(--yellow); display: flex; align-items: center; justify-content: center; font-size: 13px; padding-left: 2px; }
   /* Empty-category note (no workouts yet) */
   .wl-coming { padding: 18px 16px; background: var(--white); border: 1px dashed var(--grey-mid); border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: 13.5px; color: var(--grey-text); line-height: 1.5; text-align: center; }
+
+  /* ═══ HOME OVERVIEW (the landing page on #screen-home) ═══
+     Site nav · "Hi name" · current-cycle card · "This Week" + week · day cards.
+     The cards reuse the .planlike .cm-* / .current-message styling. */
+  #home-overview { padding-bottom: 96px; }
+  #home-overview[hidden], #day-view[hidden] { display: none; }
+  /* Give the overview a little top breathing room now that the nav bar is gone */
+  #home-overview { padding-top: 8px; }
+  /* "Hi Alex" — same scale/weight as the My Plan athlete name */
+  .home-greet {
+    margin: 18px 24px 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(42px, 12vw, 64px);
+    font-weight: 900; letter-spacing: -2px; line-height: 0.95;
+    color: var(--grey-dark); text-transform: uppercase;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeInUp 0.6s ease 0.1s forwards;
+  }
+  .home-greet span { color: var(--grey-dark); display: block; }
+  /* Small "Good morning/afternoon/evening" eyebrow above the big first name */
+  .home-greet .home-greet-hi {
+    display: block; color: #C7552F;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; line-height: 1; margin-bottom: 8px;
+  }
+  /* Section header ("This Week") + right-aligned week indicator chip */
+  .home-section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin: 28px 24px 14px;
+  }
+  .home-section-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 22px; letter-spacing: 0.5px; text-transform: uppercase;
+    color: var(--grey-dark);
+  }
+  .home-week-chip {
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; color: #C7552F;
+    background: var(--ice-dim); border: 1px solid var(--ice-mid);
+    padding: 4px 11px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+  }
+  /* "View Plan" pill on the current-cycle card — brand green, tappable look */
+  .cm-pill-view { background: #0E4A36; color: #fff; }
+  /* Brown "Done" pill on completed day cards */
+  .cm-pill-done { background: #7A4A2B; color: #fff; }
+  /* Day view: the repeated day card at the top + overlaid back / dark buttons.
+     Buttons sit over the banner (offset by the card's 24px side margin). */
+  /* These carry CSS display rules that beat the bare [hidden] attribute, so
+     force them off when hidden inside the day view. */
+  #day-view .day-tabs[hidden], #day-view .prog-cycle-hero[hidden] { display: none !important; }
+  /* Full-bleed: the card fills the whole top of the screen — no top gap, no side
+     margins, no rounding. Override the .current-message card chrome + the
+     banner's height clamps so the banner alone spans edge to edge. */
+  #day-view-card { position: relative; }
+  #day-view-card .current-message {
+    margin: 0; border: none; border-radius: 0; box-shadow: none;
+  }
+  #day-view-card .cm-banner {
+    border-radius: 0; max-height: none;
+  }
+  /* The day card above already names the day, so hide the redundant focus chip. */
+  #day-view .day-focus-tag { display: none; }
+  .day-view-back, .day-view-dark {
+    position: absolute; top: 14px; z-index: 5;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(0,0,0,0.34); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; line-height: 1; -webkit-tap-highlight-color: transparent;
+  }
+  .day-view-back { left: 14px; font-size: 19px; }
+  .day-view-dark { right: 14px; font-size: 16px; }
+  .day-view-back:active, .day-view-dark:active { transform: scale(0.9); }
+  /* Day cards: stacked image-banner cards. Fade them in like the cycle cards. */
+  #day-cards-wrap .current-message {
+    opacity: 0; transform: translateY(12px);
+    animation: fadeInUp 0.5s ease 0.18s forwards;
+  }
+  /* Optimized day-card proportion: a calm 5:2 banner, clamped so the card stays
+     comfortable on narrow phones and wide screens without going letterbox-thin.
+     Stripes are layered directly here (over the green gradient) so the texture is
+     guaranteed on the designed, photo-less day cards. */
+  #day-cards-wrap .cm-banner,
+  #day-view-card .cm-banner {
+    background-color: #0E4A36;   /* solid green base — never let card white show */
+    background-image:
+      repeating-linear-gradient(135deg,
+        rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px),
+      linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  #day-cards-wrap .cm-banner {
+    /* width:100% first — otherwise aspect-ratio + the max-height cap makes the
+       browser derive width FROM the clamped height (120×5/2 = 300px), leaving a
+       white strip where the banner doesn't reach the card edge. With full width
+       the photo just crops to the 100–120px band instead. */
+    width: 100%;
+    aspect-ratio: 5 / 2;
+    min-height: 100px;
+    max-height: 120px;
+  }
+  /* While a category image is still cascading/erroring, keep the <img> from
+     painting a white placeholder box over the green banner. */
+  #day-cards-wrap .cm-banner-img,
+  #day-view-card .cm-banner-img { background: transparent; }
+  /* A touch more space between stacked day cards. */
+  #day-cards-wrap .current-message { margin-bottom: 14px; }
+  /* Day cards lead with "Day N"; the day name sits a little smaller beneath it,
+     with even, tight spacing between Day N → name → blocks·movements. */
+  #day-cards-wrap .day-card-num { font-size: 23px; line-height: 1; margin-bottom: 5px; }
+  .day-card-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 15px; line-height: 1.15;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 5px;   /* matches the gap above, so the three lines are even */
+  }
+  #day-cards-wrap .cm-weeks { font-size: 11px; }
+  /* Lift the whole caption up off the bottom edge so Day N + name sit higher. */
+  #day-cards-wrap .cm-banner-caption { padding-bottom: 22px; }
+  /* Suggested day card (next incomplete day) — soft green ring */
+  .day-ov-card.suggested {
+    border-color: var(--yellow) !important;
+    box-shadow: 0 0 0 1px var(--yellow-mid), 0 10px 30px rgba(14,74,54,0.12) !important;
+  }
+  body[data-dark] .home-greet { color: #f0f0f0; }
+  body[data-dark] .home-section-title { color: #f0f0f0; }
 
   /* ── Current Program Header ── */
   #screen-home { background: var(--grey-bg); }
@@ -2175,14 +2285,8 @@
 </div>
 
 <!-- ═══ HOME ═══ -->
-<div id="screen-plan" class="screen">
+<div id="screen-plan" class="screen planlike">
 
-  <!-- Sticky nav -->
-  <div class="home-nav">
-    <a href="https://www.amirardekani.com" target="_blank" rel="noopener" class="home-brand">
-      <strong>AmirArdekani</strong>.com
-    </a>
-  </div>
 
   <!-- Athlete header (name + goal + optional current-cycle dates) -->
   <div id="athlete-card-wrap"></div>
@@ -2243,14 +2347,40 @@
 
 <!-- ═══ CURRENT PROGRAM ═══ -->
 <div id="screen-home" class="screen">
-  <div class="prog-header">
-    <button class="dark-toggle" onclick="toggleDark(event)" style="position:absolute;top:14px;right:14px;">🌙</button>
-    <!-- Cycle hero: "C2 · Strength Engine" + tagline (filled by renderHome) -->
-    <div class="prog-cycle-hero" id="prog-cycle-hero"></div>
-    <div class="day-tabs" id="day-tabs"></div>
+
+  <!-- ── OVERVIEW (the landing page): site nav · "Hi name" · current-cycle card ·
+       "This Week" + week indicator · day cards. .planlike reuses the My Plan
+       cycle-card styling so the cards here look identical. ── -->
+  <div id="home-overview" class="planlike">
+
+    <!-- "Hi Alex" — same scale as the My Plan name (first name only) -->
+    <div id="home-greeting-wrap"></div>
+
+    <!-- Current cycle card (View Plan pill → My Plan, no Read more) -->
+    <div id="home-cycle-wrap"></div>
+
+    <!-- "This Week" header + current-week indicator (only when dates exist) -->
+    <div id="home-week-wrap"></div>
+
+    <!-- Day cards — each opens that day's workout -->
+    <div id="day-cards-wrap"></div>
   </div>
-  <div id="day-panels"></div>
-  <div class="v-progress" id="v-progress"><div class="v-progress-fill" id="v-fill"></div></div>
+
+  <!-- ── DAY VIEW: a single day's workout, opened from a day card. Holds the
+       original program header (cycle hero + day tabs) and the day panels, so the
+       timer / progress / readiness / finish-session machinery is unchanged. ── -->
+  <div id="day-view" hidden>
+    <!-- Top of a day = a repeat of THAT day's card (back + dark toggle overlaid
+         on the banner), then the timer + exercises below. No between-day nav. -->
+    <div id="day-view-card" class="planlike"></div>
+    <!-- Kept but hidden so renderHome()'s writes to these still hit real nodes
+         (the cycle hero + day tabs no longer appear inside a day). -->
+    <div class="prog-cycle-hero" id="prog-cycle-hero" hidden></div>
+    <div class="day-tabs" id="day-tabs" hidden></div>
+    <div id="day-panels"></div>
+    <div class="v-progress" id="v-progress"><div class="v-progress-fill" id="v-fill"></div></div>
+  </div>
+
 </div>
 
 <!-- ═══ NOTES ═══ -->
@@ -2693,6 +2823,10 @@ function cycleCardHTML(cycle, opts) {
     detail += `</div>`;
   }
 
+  // noDetail (used by the home-overview current-cycle card) drops the whole
+  // collapsible section, so the card is just banner + caption + pill — no toggle.
+  if (opts.noDetail) detail = '';
+
   if (detail) {
     // Toggle button lives on the banner (bottom-right); the collapsible body
     // sits below it. Close the banner div first, then add the body.
@@ -2720,6 +2854,16 @@ function cycleImgError(img) {
     img.src = `${img.dataset.base}.${exts[next]}`;
     return;
   }
+  // Day cards: after the per-day override 404s, fall back to the shared category
+  // image (assets/days/<category>.jpg) before giving up to the gradient. Only
+  // tried once (data-fallback is cleared so a missing category image ends here).
+  if (img.dataset.fallback) {
+    const fb = img.dataset.fallback;
+    delete img.dataset.fallback;
+    img.removeAttribute('data-exts');   // category image is a single .jpg, no ext walk
+    img.src = fb;
+    return;
+  }
   img.style.display = 'none';
   const banner = img.closest('.cm-banner');
   if (banner) banner.classList.add('no-img');
@@ -2735,6 +2879,107 @@ function toggleCycleCard(btn, ev) {
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   const label = btn.querySelector('.cm-toggle-label');
   if (label) label.textContent = open ? 'Read less' : 'Read more';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  HOME OVERVIEW HELPERS (landing page on #screen-home)
+// ═══════════════════════════════════════════════════════════════════════
+
+// "Week X of Y" for the current cycle — ONLY when it has both start and end
+// dates; returns '' otherwise so the chip is hidden. Week is derived from
+// today's position between the dates, clamped to the cycle's length.
+function homeWeekLabel(cycle) {
+  if (!cycle || !cycle.startDate || !cycle.endDate) return '';
+  const s = new Date(cycle.startDate);
+  const e = new Date(cycle.endDate);
+  if (isNaN(s) || isNaN(e)) return '';
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); s.setHours(0, 0, 0, 0); e.setHours(0, 0, 0, 0);
+  const WEEK = 7 * 86400000;
+  const totalWeeks = Math.max(1, Math.round((e - s) / WEEK));
+  let wk = Math.floor((today - s) / WEEK) + 1;
+  wk = Math.min(Math.max(wk, 1), totalWeeks);
+  return `Week ${wk} of ${totalWeeks}`;
+}
+
+// One day card for the home overview — same image-banner look as the cycle
+// cards (.planlike .cm-*). Tapping it opens that day's workout (openDayView).
+// Drop assets/days/<slug>.<ext> (slug from the day title) to set the image;
+// missing files fall back to the green gradient via cycleImgError().
+// opts.static → a non-clickable repeat of the card (used at the top of a day
+// view): no onclick, no Done pill, since you're already inside that day.
+function dayCardHTML(day, dayNum, total, opts) {
+  opts = opts || {};
+  const id = day.id != null ? day.id : dayNum;
+  // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
+  const name = day.title || day.focusTag || ('Day ' + dayNum);
+  // Image: assets/days/<slug>.<ext>, slug from the name; falls back to day-<n>.
+  const slug = cycleSlug(name) || ('day-' + dayNum);
+  const base = `assets/days/${slug}`;
+  const idStr = esc(String(id));
+
+  // Subtitle = "N blocks · M movements". Each exercise entry counts as one
+  // movement, so a circuit (one entry holding several items) counts as 1.
+  const blocks = Array.isArray(day.blocks) ? day.blocks : [];
+  const blockCount = blocks.length;
+  const moveCount = blocks.reduce((n, b) => n + ((b.exercises || []).length), 0);
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const sub = `${plural(blockCount, 'block')} · ${plural(moveCount, 'movement')}`;
+
+  // Completed days (the Finish-Session flow sets this key) get a brown Done pill.
+  const isDone = !opts.static && !!localStorage.getItem(ATHLETE_ID + '_completed_d' + id);
+
+  const cls = 'current-message day-ov-card' + (opts.static ? '' : ' is-clickable');
+  const attrs = opts.static ? '' : ` role="button" tabindex="0" onclick="openDayView('${idStr}')"`;
+  let h = `<div class="${cls}"${attrs}>`;
+  h += `<div class="cm-banner">`;
+  h += `<img class="cm-banner-img" alt="${esc(name)}" ` +
+       `src="${base}.jpg" data-base="${base}" data-exts="jpg,jpeg,png,webp" data-ext-idx="0" ` +
+       `onerror="cycleImgError(this)">`;
+  h += `<div class="cm-banner-scrim"></div>`;
+  if (isDone) h += `<div class="cm-pill cm-pill-done">Done</div>`;
+  h += `<div class="cm-banner-caption">`;
+  h += `<div class="cm-name day-card-num">Day ${dayNum}</div>`;
+  h += `<div class="day-card-name">${esc(name)}</div>`;
+  h += `<div class="cm-weeks">${esc(sub)}</div>`;
+  h += `</div></div></div>`;
+  return h;
+}
+
+// Show a single day's workout (the day panels + program header) and hide the
+// overview. switchDay() activates the right panel + recomputes progress.
+function openDayView(dayId) {
+  const ov = document.getElementById('home-overview');
+  const dv = document.getElementById('day-view');
+  if (ov) ov.hidden = true;
+  if (dv) dv.hidden = false;
+
+  // Repeat the tapped day's card at the top (non-clickable), with a back arrow
+  // + dark toggle overlaid on the banner — this replaces the cycle hero + tabs.
+  const days = (DATA.workouts && DATA.workouts.days) || [];
+  const i = days.findIndex(d => String(d.id) === String(dayId));
+  const cardEl = document.getElementById('day-view-card');
+  if (cardEl && i >= 0) {
+    cardEl.innerHTML =
+      `<button class="day-view-back" onclick="closeDayView()" aria-label="Back to overview">←</button>` +
+      `<button class="day-view-dark" onclick="toggleDark(event)" aria-label="Toggle dark mode">🌙</button>` +
+      dayCardHTML(days[i], i + 1, days.length, { static: true });
+  }
+
+  // switchDay() compares against the raw day ids (numbers in the JSON) with ===,
+  // so coerce numeric strings back to Number before handing it over.
+  const n = (typeof dayId === 'string' && /^\d+$/.test(dayId)) ? Number(dayId) : dayId;
+  switchDay(n);
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// Return from a day's workout back to the home overview.
+function closeDayView() {
+  const ov = document.getElementById('home-overview');
+  const dv = document.getElementById('day-view');
+  if (dv) dv.hidden = true;
+  if (ov) ov.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function renderPlan() {
@@ -2925,8 +3170,49 @@ function renderHome() {
     }
   }
 
+  // ── HOME OVERVIEW (landing) ──────────────────────────────────────
+  // "Hi <firstName>" — first name only, same scale as the My Plan name.
+  const greetEl = document.getElementById('home-greeting-wrap');
+  if (greetEl) {
+    const hr = new Date().getHours();
+    const greetWord = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+    greetEl.innerHTML = `<div class="home-greet"><span class="home-greet-hi">${greetWord}</span><span>${esc(DATA.athlete.firstName || '')}</span></div>`;
+  }
+
+  // Current-cycle card — the same builder as My Plan, but with a "View Plan"
+  // pill that opens My Plan, and no Read-more (noDetail).
+  const cycleWrap = document.getElementById('home-cycle-wrap');
+  if (cycleWrap) {
+    cycleWrap.innerHTML = cur
+      ? cycleCardHTML(cur, {
+          pill: 'View Plan',
+          pillStyle: 'view',
+          total: cycles.length,
+          onclick: "goTo('plan')",
+          noDetail: true
+        })
+      : '';
+  }
+
+  // "This Week" header + week indicator (only when the cycle has both dates).
+  const weekWrap = document.getElementById('home-week-wrap');
+  if (weekWrap) {
+    const weekLabel = homeWeekLabel(cur);
+    weekWrap.innerHTML = `
+      <div class="home-section-head">
+        <div class="home-section-title">This Week</div>
+        ${weekLabel ? `<div class="home-week-chip">${esc(weekLabel)}</div>` : ''}
+      </div>`;
+  }
+
   const days = w.days || [];
   dayTotals = {};
+
+  // Day cards — each looks like a cycle card and opens that day's workout.
+  const cardsWrap = document.getElementById('day-cards-wrap');
+  if (cardsWrap) {
+    cardsWrap.innerHTML = days.map((d, i) => dayCardHTML(d, i + 1, days.length)).join('');
+  }
 
   const tabsHtml = days.map((day, i) => {
     const total = countTotalUnits(day);
@@ -3568,6 +3854,9 @@ function goTo(screen, historyId) {
   document.getElementById('screen-' + screen).classList.add('active');
   document.getElementById('v-progress').classList.toggle('active', screen === 'home');
 
+  // Home tab always lands on the overview (not a previously opened day view).
+  if (screen === 'home') closeDayView();
+
   // Archive view (opened from the My Plan "Done" card) — show the requested
   // past program, or the most recent one if none specified.
   if (screen === 'archive') {
@@ -4162,11 +4451,14 @@ function confirmSession(day) {
 
 function markSuggestedDay() {
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('suggested'));
+  document.querySelectorAll('.day-ov-card').forEach(c => c.classList.remove('suggested'));
   const tabs = document.querySelectorAll('.day-tab');
+  const cards = document.querySelectorAll('.day-ov-card');
   const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
   for (let i = 0; i < dayIds.length; i++) {
     if (!localStorage.getItem(ATHLETE_ID + '_completed_d' + dayIds[i])) {
       tabs[i]?.classList.add('suggested');
+      cards[i]?.classList.add('suggested');
       break;
     }
   }
