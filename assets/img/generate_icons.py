@@ -1,113 +1,111 @@
 """
-Generate placeholder PNG icons + OG image from the AA monogram.
-Run once; outputs: icon-192.png, icon-512.png, apple-touch-icon.png, og-image.png
+Generate AA Performance app icons, favicons + social-share (OG) image from the
+brand logo (green/clay on cream).
+
+Sources (committed):  assets/img/source/aa-mark.png  (monogram only, for icons)
+                      assets/img/source/aa-logo.png  (full lockup, for OG)
+Run:  python assets/img/generate_icons.py
+Outputs: icon-192.png, icon-512.png, apple-touch-icon.png, favicon-32.png,
+         favicon.svg, ../../favicon.ico, og-image.png
 """
-from PIL import Image, ImageDraw, ImageFont
+import base64
+from io import BytesIO
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 HERE = Path(__file__).parent
-BG = (10, 10, 10)
-ACCENT = (212, 255, 0)
-TEXT = (232, 232, 232)
+ROOT = HERE.parent.parent
+SRC = HERE / "source"
+
+GREEN = (14, 74, 54)      # #0E4A36
+CLAY = (199, 85, 47)      # #C7552F
+CREAM = (250, 247, 242)   # #FAF7F2
+MUTE = (122, 122, 122)
 
 
-def find_font(size, bold=True):
-    candidates = [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
-        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-        "C:\\Windows\\Fonts\\arialbd.ttf",
-    ]
-    for p in candidates:
+def find_font(size, weight="bold"):
+    bold = ["C:\\Windows\\Fonts\\arialbd.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+            "/System/Library/Fonts/Supplemental/Arial Bold.ttf"]
+    black = ["C:\\Windows\\Fonts\\ariblk.ttf",
+             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+             "/System/Library/Fonts/Supplemental/Arial Black.ttf"]
+    for p in (black if weight == "black" else bold):
         if Path(p).exists():
             return ImageFont.truetype(p, size)
     return ImageFont.load_default()
 
 
-def make_monogram(size: int, corner_radius_ratio: float = 0.19) -> Image.Image:
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    r = int(size * corner_radius_ratio)
-    # Rounded rect
-    d.rounded_rectangle([(0, 0), (size - 1, size - 1)], radius=r, fill=BG)
-    # Accent corner flag
-    flag = int(size * 0.18)
-    d.polygon([(0, 0), (flag, 0), (flag, flag // 2), (flag // 2, flag // 2),
-               (flag // 2, flag), (0, flag)], fill=ACCENT)
-    # AA text
-    font_size = int(size * 0.55)
-    font = find_font(font_size)
-    text = "AA"
-    # Centre the text
-    bbox = d.textbbox((0, 0), text, font=font)
-    tw = bbox[2] - bbox[0]
-    th = bbox[3] - bbox[1]
-    x = (size - tw) / 2 - bbox[0]
-    y = (size - th) / 2 - bbox[1] - size * 0.02
-    d.text((x, y), text, fill=ACCENT, font=font)
-    return img
+def draw_tracked(d, pos, text, font, fill, tracking=0):
+    x, y = pos
+    for ch in text:
+        d.text((x, y), ch, font=font, fill=fill)
+        x += d.textlength(ch, font=font) + tracking
+    return x
 
 
-def save(img: Image.Image, name: str):
-    out = HERE / name
+def load_trimmed(name):
+    """Load a source PNG and crop away its flat cream border. Returns (img, bg)."""
+    im = Image.open(SRC / name).convert("RGB")
+    bg = im.getpixel((4, 4))                       # sampled background colour
+    diff = ImageChops.difference(im, Image.new("RGB", im.size, bg))
+    mask = diff.convert("L").point(lambda p: 255 if p > 22 else 0)
+    bbox = mask.getbbox()
+    return (im.crop(bbox) if bbox else im), bg
+
+
+def icon(size, content_ratio=0.78):
+    """Square icon: trimmed mark centred on a cream field (maskable-safe)."""
+    mark, bg = load_trimmed("aa-mark.png")
+    canvas = Image.new("RGB", (size, size), bg)
+    target = int(size * content_ratio)
+    scale = target / max(mark.size)
+    mw, mh = int(mark.size[0] * scale), int(mark.size[1] * scale)
+    m = mark.resize((mw, mh), Image.LANCZOS)
+    canvas.paste(m, ((size - mw) // 2, (size - mh) // 2))
+    return canvas
+
+
+def save(img, name, root=False):
+    out = (ROOT if root else HERE) / name
     img.save(out, "PNG", optimize=True)
-    print(f"wrote {out}  ({img.size[0]}x{img.size[1]})")
+    print(f"wrote {out.relative_to(ROOT)}  ({img.size[0]}x{img.size[1]})")
 
 
-def make_og(w: int = 1200, h: int = 630) -> Image.Image:
-    # Base dark canvas
-    img = Image.new("RGBA", (w, h), BG + (255,))
+def make_favicon_svg():
+    """SVG favicon = a crisp 128px raster of the icon embedded as base64."""
+    buf = BytesIO()
+    icon(128, content_ratio=0.84).save(buf, "PNG", optimize=True)
+    b64 = base64.b64encode(buf.getvalue()).decode()
+    svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" '
+           'role="img" aria-label="AA Performance">'
+           f'<image width="64" height="64" href="data:image/png;base64,{b64}"/></svg>\n')
+    (HERE / "favicon.svg").write_text(svg, encoding="utf-8")
+    print("wrote assets/img/favicon.svg")
 
-    # Very subtle grid — composited on a separate RGBA layer so alpha is respected
-    grid = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(grid)
-    for x in range(0, w, 80):
-        gd.line([(x, 0), (x, h)], fill=(212, 255, 0, 14), width=1)
-    for y in range(0, h, 80):
-        gd.line([(0, y), (w, y)], fill=(212, 255, 0, 14), width=1)
-    img = Image.alpha_composite(img, grid)
 
-    # Soft accent glow top-right
-    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    ggd = ImageDraw.Draw(glow)
-    for r in range(500, 0, -4):
-        a = int(30 * (1 - r / 500))
-        if a <= 0: continue
-        ggd.ellipse([w - 200 - r, -200 - r, w - 200 + r, -200 + r], fill=(212, 255, 0, a))
-    img = Image.alpha_composite(img, glow)
-
-    d = ImageDraw.Draw(img)
-
-    # Left monogram (paste with its own alpha)
-    mono = make_monogram(140)
-    img.paste(mono, (96, 96), mono)
-
-    # Eyebrow
-    eyebrow_font = find_font(22)
-    d.text((96, 310), "TENNIS STRENGTH & CONDITIONING", fill=ACCENT, font=eyebrow_font)
-
-    # Headline
-    headline_font = find_font(80)
-    d.text((96, 348), "Move Better.", fill=TEXT, font=headline_font)
-    d.text((96, 430), "Hit Harder.", fill=TEXT, font=headline_font)
-    d.text((96, 512), "Last Longer.", fill=ACCENT, font=headline_font)
-
-    # Right vertical rule
-    rule = ImageDraw.Draw(img)
-    rule.rectangle([(w - 6, 0), (w, h)], fill=ACCENT)
-
-    # URL/footer
-    footer_font = find_font(16)
-    d.text((w - 220, h - 40), "amirardekani.com", fill=(136, 136, 136), font=footer_font)
-
-    return img.convert("RGB")
+def make_og(w=1200, h=630):
+    """OG share image = the designed brand banner, fitted to the 1200x630 OG box.
+    Source AR (~1.90) matches OG (1.905), so this is a clean resize with a
+    centre-crop safety net if the source ratio ever drifts."""
+    im = Image.open(SRC / "og-source.png").convert("RGB")
+    sw, sh = im.size
+    scale = max(w / sw, h / sh)               # cover
+    rw, rh = round(sw * scale), round(sh * scale)
+    im = im.resize((rw, rh), Image.LANCZOS)
+    left, top = (rw - w) // 2, (rh - h) // 2
+    return im.crop((left, top, left + w, top + h))
 
 
 if __name__ == "__main__":
-    save(make_monogram(192), "icon-192.png")
-    save(make_monogram(512), "icon-512.png")
-    # Apple touch icon prefers a rounded-square with no inner padding (iOS adds chrome)
-    save(make_monogram(180, corner_radius_ratio=0.22), "apple-touch-icon.png")
+    save(icon(192), "icon-192.png")
+    save(icon(512), "icon-512.png")
+    save(icon(180, content_ratio=0.82), "apple-touch-icon.png")
+    save(icon(32, content_ratio=0.88), "favicon-32.png")
+    make_favicon_svg()
+    # favicon.ico — multi-resolution from the 64px render
+    icon(64, content_ratio=0.88).save(ROOT / "favicon.ico",
+                                      sizes=[(16, 16), (32, 32), (48, 48)])
+    print("wrote favicon.ico")
     save(make_og(), "og-image.png")
     print("done")
