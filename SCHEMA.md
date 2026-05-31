@@ -207,14 +207,23 @@ The current cycle, next cycle, and remaining phases are all **derived from `curr
 
 `currentCycleIndex` is a 0-based pointer into `cycles[]`.
 
+Every cycle on the home screen is drawn with the **same card design** (one shared
+template). What differs is whether a card appears and whether it carries a pill /
+is tappable:
+
 | Position | What the home screen shows |
 |---|---|
-| `i < currentCycleIndex` | A completed phase in the bottom "Remaining Phases" list (with ✓ DONE badge) |
-| `i === currentCycleIndex` | The big blue "CURRENT CYCLE · NOW" card |
-| `i === currentCycleIndex + 1` | The purple "COMING NEXT" teaser card |
-| `i > currentCycleIndex + 1` | A locked phase in the bottom "Remaining Phases" list |
+| `i === currentCycleIndex - 1` | The **past program card** — same card design, with a "Done" pill, tappable to open the archive. **Only shown if `programHistory` is also present** (see below). |
+| `i === currentCycleIndex` | The current cycle card (name + weeks + tagline + focuses + `message`). |
+| `i > currentCycleIndex` | The "What's next" cards (one per future cycle), each with its `teaser` if present. |
 
-To advance the athlete to the next cycle, just **bump `currentCycleIndex` by 1**. Nothing else needs to change.
+Only the single cycle immediately before the current one is surfaced as a past
+card; earlier cycles are not shown on the home screen (they remain reachable via
+the Archive tab).
+
+To advance the athlete to the next cycle, just **bump `currentCycleIndex` by 1**
+— and move the finished cycle's `workouts` into `programHistory` so the new past
+card has something to open (see "Advancing to the Next Cycle").
 
 ---
 
@@ -449,6 +458,27 @@ Both arrays are optional. If omitted or empty, no cues section appears.
 
 Archives are read-only summaries. Add a new object for each completed program block.
 
+#### How `programHistory` powers the home "past program" card
+
+The home screen shows a tappable **past program card** for the cycle immediately
+before the current one. Two independent pieces of the file feed it — both must be
+present for the card to appear:
+
+1. **The card's visible content** (badge, name, weeks, tagline, focuses) comes
+   from **`cycles[currentCycleIndex - 1]`** — the previous cycle's summary. So the
+   athlete must be past cycle 1 (`currentCycleIndex ≥ 1`).
+2. **What opens when tapped** comes from **`programHistory[0]`** — the day-by-day
+   exercise archive. So `programHistory` must have at least one entry.
+
+If `currentCycleIndex ≥ 1` but `programHistory` is empty (or vice-versa), the past
+card silently does **not** render. No fields beyond the normal `cycles[]` entry are
+needed — the past card reuses the same fields every cycle card uses.
+
+> **Keep them in sync:** the card's label comes from `cycles[idx-1].name` while the
+> opened archive's title comes from `programHistory[0].subtitle`. These are separate
+> values in the file — name them consistently (e.g. both "Foundation Forge") so the
+> card and the archive it opens describe the same program.
+
 ---
 
 ### `notes` — Coaching Notes
@@ -481,12 +511,15 @@ No HTML editing required.
 
 ### Advancing to the Next Cycle
 
-1. **Move the previous `workouts` content into `programHistory`** (in the simplified `{label, focus, exercises[{name, detail}]}` shape).
+1. **Move the previous `workouts` content into `programHistory`** (in the simplified `{label, focus, exercises[{name, detail}]}` shape). This is what the new past program card opens — don't skip it, or the card won't appear.
 2. **Replace `workouts.days`** with the new cycle's training days.
 3. **Increment `currentCycleIndex` by 1.**
 4. (Optional) Update `workouts.label`.
 
-The home screen automatically re-derives current / next / completed / locked.
+The home screen automatically re-derives the past / current / next cards from
+`currentCycleIndex` and `programHistory`. Steps 1 and 3 together are exactly what
+makes the past program card show up (see "How `programHistory` powers the home
+'past program' card").
 
 ### Adding More Focuses to a Cycle
 

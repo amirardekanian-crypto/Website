@@ -292,101 +292,35 @@
   .cycle-meter-label.done    { color: rgba(14,74,54,0.55); }
   .cycle-meter-label.current { color: var(--ice); font-weight: 700; }
 
-  /* ─── Upcoming cycle cards — one card per future cycle ───────── */
-  .upcoming-section {
-    padding: 0 24px 20px;
-    opacity: 0; animation: fadeInUp 0.6s ease 0.4s forwards;
+  /* ─── Cycle cards (home) — ONE shared design for past, current & future ───
+     All three render through cycleCardHTML() and reuse the .current-message /
+     .cm-* / .focus-list / .outcomes-* / .cm-body classes (defined further down).
+     Restyle those once and every card on the home page changes together.
+     The rules here are only the bits unique to the shared header + the
+     clickable "past" variant. */
+  #screen-home .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  #screen-home .cm-titlerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  #screen-home .cm-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: 0.5px; }
+  #screen-home .cm-weeks { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #C7552F; text-transform: uppercase; }
+  #screen-home .cm-tagline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 14px; color: var(--grey-dark); }
+  /* Clickable variant (past program card → opens the archive) + its "Done" pill */
+  .current-message.is-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
+  .current-message.is-clickable:hover { border-color: #C7552F; }
+  .current-message.is-clickable:active { transform: scale(0.99); }
+  .current-message.is-clickable .cm-head { padding-right: 56px; }
+  .cm-pill { position: absolute; top: 30px; right: 18px; background: #C7552F; color: #fff; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; z-index: 2; }
+  /* "Active" pill on the current cycle — brand green with a soft on/off glow. */
+  .cm-pill-active { background: #0E4A36; color: #fff; animation: cmPillPulse 2s ease-in-out infinite; }
+  @keyframes cmPillPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(14,74,54,0.55), 0 0 6px rgba(14,74,54,0.5); }
+    50%      { box-shadow: 0 0 0 4px rgba(14,74,54,0), 0 0 14px rgba(14,74,54,0.9); }
   }
-  .upcoming-section-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; letter-spacing: 3px;
-    text-transform: uppercase; color: var(--grey-text);
-    margin-bottom: 14px;
-  }
-  .upcoming-card {
-    background: var(--white);
-    border: 2px solid var(--yellow-mid);
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 10px;
-    display: flex; gap: 14px; align-items: flex-start;
-  }
-  .upcoming-card-num {
-    width: 40px; height: 40px; flex-shrink: 0;
-    border: 1.5px solid #C7552F;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: 16px; color: #C7552F;
-  }
-  .upcoming-card-body { flex: 1; min-width: 0; }
-  .upcoming-card-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    gap: 10px; margin-bottom: 6px; flex-wrap: wrap;
-  }
-  .upcoming-card-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800; font-size: 20px;
-    text-transform: uppercase; letter-spacing: -0.3px;
-    color: #C7552F; line-height: 1.1;
-  }
-  .upcoming-card-weeks {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px; letter-spacing: 1.2px;
-    color: #C7552F;
-  }
-  /* Italic tagline under the card title — mirrors the current cycle hero */
-  .upcoming-card-tagline {
-    font-family: 'Barlow', sans-serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ice);
-    margin-top: 4px;
-    line-height: 1.5;
-  }
-  /* Numbered plan list — mirrors the current cycle's CYCLE PLAN focuses */
-  .upcoming-card-plan {
-    list-style: none;
-    counter-reset: up-c;
-    margin: 12px 0 0;
-    padding: 0;
-  }
-  .upcoming-card-plan li {
-    counter-increment: up-c;
-    padding: 10px 0;
-    border-top: 1px solid var(--grey-card);
-    font-family: 'Barlow', sans-serif;
-    font-size: 13.5px;
-    color: #444;
-    line-height: 1.5;
-    display: flex;
-    gap: 12px;
-  }
-  .upcoming-card-plan li:last-child {
-    border-bottom: 1px solid var(--grey-card);
-  }
-  .upcoming-card-plan li::before {
-    content: counter(up-c, decimal-leading-zero);
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #C7552F;
-    flex-shrink: 0;
-    min-width: 22px;
-    line-height: 1.7;
-  }
-  /* Teaser explanation paragraphs — used by the immediate-next cycle to give
-     a richer preview. Last paragraph is auto-italicised when there are 2+. */
-  .upcoming-card-teaser {
-    margin-top: 14px;
-    font-family: 'Barlow', sans-serif;
-    font-size: 13.5px; line-height: 1.65;
-    color: var(--grey-text);
-  }
-  .upcoming-card-teaser p { margin: 0; }
-  .upcoming-card-teaser p + p { margin-top: 10px; }
-  .upcoming-card-teaser em { color: var(--grey-dark); font-style: italic; }
+  @media (prefers-reduced-motion: reduce) { .cm-pill-active { animation: none; } }
+  /* "Coming soon!" pill on the next cycle — soft tinted clay, quieter than the
+     solid Done/Active pills so it reads as upcoming, not current. */
+  .cm-pill-next { background: rgba(199,85,47,0.12); color: #C7552F; }
+  /* "Locked" pill on cycles further out — quiet grey. */
+  .cm-pill-locked { background: var(--grey-mid); color: var(--grey-dark); }
 
   /* ─── Global bottom tab bar (always visible across all screens) ── */
   .global-tabs {
@@ -460,54 +394,14 @@
      from the home page and replace them with quiet grey mono labels and
      thin separator lines. */
 
-  /* Cycle hero — big cycle name + weeks + tagline above the cycle meter.
-     The C-badge for the current cycle now lives next to "CYCLE PLAN" inside
-     the message card (see .cm-num below). */
-  #screen-home .cycle-hero {
-    padding: 8px 24px 18px;
-    opacity: 0; transform: translateY(8px);
-    animation: fadeInUp 0.6s ease 0.18s forwards;
-  }
-  #screen-home .cycle-hero-head {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-  #screen-home .cycle-hero-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: clamp(36px, 10vw, 52px);
-    line-height: 0.95;
-    letter-spacing: -1.5px;
-    text-transform: uppercase;
-    color: #C7552F;
-  }
-  #screen-home .cycle-hero-weeks {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: #C7552F;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  #screen-home .cycle-hero-tagline {
-    font-family: 'Barlow', sans-serif;
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ice);
-    margin-top: 8px;
-    line-height: 1.5;
-  }
-
-  /* "CYCLE PLAN" header — bigger and white, paired with the C-badge to its left. */
+  /* Shared cycle-card header — C-badge sits left of the name/weeks/tagline. */
   #screen-home .cm-head {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
   }
-  /* Square C-badge next to "CYCLE PLAN" — same design as the upcoming-card badge */
+  /* Square C-badge (C1/C2/…) shown on every cycle card */
   #screen-home .cm-num {
     width: 40px; height: 40px; flex-shrink: 0;
     border: 1.5px solid #C7552F;
@@ -515,17 +409,6 @@
     display: flex; align-items: center; justify-content: center;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900; font-size: 16px; color: #C7552F;
-  }
-  #screen-home .cm-eyebrow {
-    background: transparent;
-    border: none;
-    color: var(--grey-dark);
-    font-family: 'Space Mono', monospace;
-    font-size: 14px; font-weight: 700;
-    letter-spacing: 2.5px;
-    padding: 0;
-    margin: 0;
-    text-transform: uppercase;
   }
 
   /* Strip the original top accent line + radial glow */
@@ -560,9 +443,6 @@
     color: #444;
     counter-increment: focus-c;
     line-height: 1.5;
-  }
-  #screen-home .focus-list-item:last-child {
-    border-bottom: 1px solid var(--grey-card);
   }
   #screen-home .focus-list-item::before {
     content: counter(focus-c, decimal-leading-zero);
@@ -606,18 +486,6 @@
     pointer-events: none;
   }
 
-  /* "CURRENT CYCLE · NOW" — highlighted pill */
-  .cm-eyebrow {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--ice);
-    background: var(--ice-dim);
-    border: 1px solid var(--ice-mid);
-    padding: 5px 12px; border-radius: 6px;
-    margin-bottom: 14px;
-  }
 
   /* Flexible focus list — unlimited focuses, stacked vertically */
   .focus-list {
@@ -642,6 +510,33 @@
     flex-shrink: 0;
   }
 
+  /* Collapsible detail: aims (focus list) stay visible; the why/outcomes hide
+     behind this toggle. Closed by default; .is-open on the card reveals it. */
+  .cm-toggle {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; margin-top: 6px; padding: 4px 0 0;
+    border: none;
+    background: transparent; cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: #C7552F;
+  }
+  .cm-toggle-chev { margin-left: auto; font-size: 12px; transition: transform 0.25s ease; }
+  .current-message.is-open .cm-toggle-chev { transform: rotate(180deg); }
+  .cm-collapse {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+  .current-message.is-open .cm-collapse {
+    max-height: 2000px;
+    opacity: 1;
+  }
+  /* Inside the collapse the first label already has its own top border, so drop
+     the duplicated top padding the standalone .cm-body-label carries. */
+  .cm-collapse > .cm-body-label:first-child { padding-top: 14px; }
+
   .cm-body-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
@@ -665,12 +560,6 @@
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
     color: var(--grey-text); margin-bottom: 10px;
-  }
-  .outcomes-heading {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px; font-weight: 700;
-    color: var(--grey-dark); margin-bottom: 8px;
-    text-transform: uppercase; letter-spacing: 0.5px;
   }
   .outcome-item {
     display: flex; align-items: flex-start; gap: 10px;
@@ -775,6 +664,8 @@
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 64px;
     color: rgba(255,255,255,0.04); letter-spacing: -2px; pointer-events: none;
   }
+  .archive-back { position: absolute; top: 14px; left: 18px; z-index: 2; background: transparent; border: none; color: #fff; font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 8px; }
+  .archive-back:active { transform: scale(0.9); }
   .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ice); margin-bottom: 8px; }
   .archive-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; color: #fff; text-transform: uppercase; line-height: 1; }
   .archive-title span { color: rgba(255,255,255,0.65); }
@@ -792,6 +683,10 @@
   #screen-program { background: var(--grey-bg); }
   .prog-header { background: var(--yellow); padding: 48px 24px 0; position: relative; overflow: hidden; }
   .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
+  /* Shared back-to-home button in nav-page headers (Program, Notes) — matches
+     the archive/guide back buttons. Sits in the header's top padding band. */
+  .nav-back { position: absolute; top: 14px; left: 18px; z-index: 2; background: transparent; border: none; color: var(--on-accent); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 8px; }
+  .nav-back:active { transform: scale(0.9); }
   /* Cycle hero on the program page header (mirrors the home cycle-hero, but
      with a small yellow C-badge to the left of the cycle name). */
   .prog-cycle-hero { margin-bottom: 22px; }
@@ -2216,14 +2111,14 @@
   <!-- Subscription banner (only when ≤14 days remain) -->
   <div id="sub-banner-wrap"></div>
 
-  <!-- Cycle hero (big cycle name + tagline) — sits ABOVE the meter -->
-  <div id="cycle-hero-wrap"></div>
-
   <!-- Cycle meter (segments + C1/C2/C3 labels) -->
   <div id="cycle-meter-wrap"></div>
 
   <!-- Simple fallback for athletes without cycles -->
   <div id="home-simple-meta-wrap" style="padding: 0 24px;"></div>
+
+  <!-- Past program card (completed previous cycle) — opens the archive on tap -->
+  <div id="past-card-wrap"></div>
 
   <!-- Current cycle message (optional) -->
   <div id="current-message-wrap"></div>
@@ -2236,6 +2131,7 @@
 <!-- ═══ ARCHIVE ═══ -->
 <div id="screen-archive" class="screen">
   <div class="archive-banner" id="archive-banner" data-watermark="">
+    <button class="archive-back" onclick="goTo('home')" aria-label="Back to home">←</button>
     <div class="archive-label">Completed</div>
     <div class="archive-title" id="archive-title"></div>
   </div>
@@ -2245,6 +2141,7 @@
 <!-- ═══ CURRENT PROGRAM ═══ -->
 <div id="screen-program" class="screen">
   <div class="prog-header">
+    <button class="nav-back" onclick="goTo('home')" aria-label="Back to home">←</button>
     <button class="dark-toggle" onclick="toggleDark(event)" style="position:absolute;top:14px;right:14px;">🌙</button>
     <!-- Cycle hero: "C2 · Strength Engine" + tagline (filled by renderProgram) -->
     <div class="prog-cycle-hero" id="prog-cycle-hero"></div>
@@ -2257,6 +2154,7 @@
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
   <div class="notes-header">
+    <button class="nav-back" onclick="goTo('home')" aria-label="Back to home">←</button>
     <div class="prog-eyebrow" id="notes-greeting"></div>
     <div class="notes-title">Coach</div>
     <div class="notes-subtitle">Messages &amp; your program notes</div>
@@ -2594,6 +2492,98 @@ function showError(msg) {
 // ═══════════════════════════════════════════════════════════════════════
 //  2. RENDER: HOME (V5 DESIGN, GRACEFUL FALLBACK)
 // ═══════════════════════════════════════════════════════════════════════
+
+// Single source of truth for EVERY cycle card on the home page (past, current
+// and future). Edit this builder (and the .current-message / .cm-* / .focus-list
+// / .outcomes-* CSS it uses) once and all three card types change together.
+//   cycle = a cycles[] entry ({ num, name, weeks, tagline, focuses })
+//   opts  = {
+//     pill:       optional text for the top-right pill (e.g. 'Done'),
+//     onclick:    optional JS string → makes the whole card clickable,
+//     paragraphs: optional body paragraphs (current = message.paragraphs,
+//                 future = teaser.paragraphs),
+//     bodyLabel:  optional label above the paragraphs (e.g. 'Why This Cycle Matters'),
+//     italicLast: italicise the final paragraph when there are 2+ (teaser style),
+//     outcomes:   optional list rendered as the ticked "expected outcomes" block
+//   }
+function cycleCardHTML(cycle, opts) {
+  opts = opts || {};
+  const badge = (cycle.num != null) ? `C${cycle.num}` : '';
+  const cls = 'current-message' + (opts.onclick ? ' is-clickable' : '');
+  const attrs = opts.onclick ? ` role="button" tabindex="0" onclick="${opts.onclick}"` : '';
+  let h = `<div class="${cls}"${attrs}>`;
+  if (opts.pill) h += `<div class="cm-pill${opts.pillStyle ? ' cm-pill-' + opts.pillStyle : ''}">${esc(opts.pill)}</div>`;
+
+  // Header — C-badge + name + weeks + tagline
+  h += `<div class="cm-head">`;
+  if (badge) h += `<div class="cm-num">${badge}</div>`;
+  h += `<div class="cm-headtext"><div class="cm-titlerow">`;
+  h += `<div class="cm-name">${esc(cycle.name)}</div>`;
+  if (cycle.weeks) h += `<div class="cm-weeks">${esc(cycle.weeks)}</div>`;
+  h += `</div>`;
+  if (cycle.tagline) h += `<div class="cm-tagline">${esc(cycle.tagline)}</div>`;
+  h += `</div></div>`;
+
+  // Focus list
+  const focuses = Array.isArray(cycle.focuses) ? cycle.focuses : [];
+  if (focuses.length) {
+    h += `<div class="focus-list">`;
+    focuses.forEach(f => { h += `<div class="focus-list-item">${esc(f)}</div>`; });
+    h += `</div>`;
+  }
+
+  // ── Collapsible detail: the "why this cycle matters" paragraphs + outcomes.
+  // The aims (focus list) above stay always visible; this extra detail is hidden
+  // by default and revealed by the toggle below. Built into its own string first
+  // so we only render the toggle when there's actually something to expand.
+  let detail = '';
+
+  const paras = Array.isArray(opts.paragraphs) ? opts.paragraphs : [];
+  if (paras.length) {
+    if (opts.bodyLabel) detail += `<div class="cm-body-label">${esc(opts.bodyLabel)}</div>`;
+    detail += `<div class="cm-body">`;
+    paras.forEach((p, i) => {
+      if (opts.italicLast && i === paras.length - 1 && paras.length > 1) {
+        detail += `<p><em>${esc(p)}</em></p>`;
+      } else {
+        detail += `<p>${esc(p)}</p>`;
+      }
+    });
+    detail += `</div>`;
+  }
+
+  const outcomes = Array.isArray(opts.outcomes) ? opts.outcomes : [];
+  if (outcomes.length) {
+    detail += `<div class="outcomes-block"><div class="outcomes-label">Expected outcomes after this cycle:</div>`;
+    outcomes.forEach(o => {
+      detail += `<div class="outcome-item"><div class="outcome-check">✓</div><div class="outcome-text">${esc(o)}</div></div>`;
+    });
+    detail += `</div>`;
+  }
+
+  if (detail) {
+    h += `<button class="cm-toggle" aria-expanded="false" onclick="toggleCycleCard(this, event)">`;
+    h += `<span class="cm-toggle-label">Read more</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
+    h += `</button>`;
+    h += `<div class="cm-collapse">${detail}</div>`;
+  }
+
+  h += `</div>`;
+  return h;
+}
+
+// Expand/collapse a cycle card's detail section (why-this-matters + outcomes).
+// Toggles the card's `is-open` class; CSS does the show/hide + chevron flip.
+function toggleCycleCard(btn, ev) {
+  if (ev) ev.stopPropagation();
+  const card = btn.closest('.current-message');
+  if (!card) return;
+  const open = card.classList.toggle('is-open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const label = btn.querySelector('.cm-toggle-label');
+  if (label) label.textContent = open ? 'Read less' : 'Read more';
+}
+
 function renderHome() {
   const a = DATA.athlete;
 
@@ -2677,20 +2667,18 @@ function renderHome() {
     }
   }
 
-  // ── Cycle hero (cycle name + weeks + tagline) — sits above the cycle meter.
-  // The C-badge for the current cycle lives next to "CYCLE PLAN" in the message card.
-  if (current) {
-    let heroHtml = `<div class="cycle-hero"><div class="cycle-hero-head">`;
-    heroHtml += `<div class="cycle-hero-title">${esc(current.name)}</div>`;
-    if (current.weeks) {
-      heroHtml += `<div class="cycle-hero-weeks">${esc(current.weeks)}</div>`;
-    }
-    heroHtml += `</div>`;
-    if (current.tagline) {
-      heroHtml += `<div class="cycle-hero-tagline">${esc(current.tagline)}</div>`;
-    }
-    heroHtml += `</div>`;
-    document.getElementById('cycle-hero-wrap').innerHTML = heroHtml;
+  // ── Past program card — the cycle immediately before the current one.
+  // Uses the same shared card as the current/future cycles, plus a "Done" pill
+  // and an onclick that opens the archive view. Only rendered when there is a
+  // previous cycle AND an archived program to view.
+  const prevCycle = idx >= 1 ? cycles[idx - 1] : null;
+  const archiveList = Array.isArray(DATA.programHistory) ? DATA.programHistory : [];
+  if (prevCycle && archiveList.length) {
+    const histId = archiveList[0].id;
+    document.getElementById('past-card-wrap').innerHTML = cycleCardHTML(prevCycle, {
+      pill: 'Done',
+      onclick: `goTo('archive', '${esc(histId)}')`
+    });
   }
 
   // ── NEW CYCLE METER (segments + C1/C2/C3 labels) ───────────────────
@@ -2723,97 +2711,37 @@ function renderHome() {
   }
 
   // ── Current cycle message card (renders if the current cycle has any rich content)
-  // Cycle name, tagline AND weeks are NOT rendered here — they live in the cycle-hero
-  // above the cycle meter. The card shows the C-badge + "CYCLE PLAN" header, then
-  // paragraphs + focuses + outcomes.
+  // The card header shows the C-badge next to the current cycle's name + weeks +
+  // tagline (these used to live in a separate hero above the meter), then
+  // focuses + paragraphs + outcomes.
   if (current && (current.message || (current.focuses && current.focuses.length))) {
-    const cmNum = (current.num != null) ? `C${current.num}` : '';
-    let html = `<div class="current-message">`;
-    html += `<div class="cm-head">`;
-    if (cmNum) html += `<div class="cm-num">${cmNum}</div>`;
-    html += `<div class="cm-eyebrow">CYCLE PLAN</div>`;
-    html += `</div>`;
-
-    // Flexible focus list (unlimited)
-    if (Array.isArray(current.focuses) && current.focuses.length) {
-      html += `<div class="focus-list">`;
-      current.focuses.forEach(f => {
-        html += `<div class="focus-list-item">${esc(f)}</div>`;
-      });
-      html += `</div>`;
-    }
-
     const msg = current.message || {};
-
-    // Why this cycle matters — paragraphs
-    if (Array.isArray(msg.paragraphs) && msg.paragraphs.length) {
-      html += `<div class="cm-body-label">Why This Cycle Matters</div>`;
-      html += `<div class="cm-body">`;
-      msg.paragraphs.forEach(para => { html += `<p>${esc(para)}</p>`; });
-      html += `</div>`;
-    }
-
-    // Outcomes
-    if (Array.isArray(msg.outcomes) && msg.outcomes.length) {
-      html += `<div class="outcomes-block">`;
-      html += `<div class="outcomes-label">Expected outcomes after this cycle:</div>`;
-      msg.outcomes.forEach(o => {
-        html += `<div class="outcome-item"><div class="outcome-check">✓</div><div class="outcome-text">${esc(o)}</div></div>`;
-      });
-      html += `</div>`;
-    }
-
-    html += `</div>`;
-    document.getElementById('current-message-wrap').innerHTML = html;
+    document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
+      pill: 'Active',
+      pillStyle: 'active',
+      onclick: "goTo('program')",
+      paragraphs: msg.paragraphs,
+      bodyLabel: 'Why This Cycle Matters',
+      outcomes: msg.outcomes
+    });
   }
 
-  // ── All future cycles — one unified list, same layout for every card.
-  // Each card mirrors the current cycle's content shape: C-badge + name + weeks +
-  // tagline + numbered focuses + (optional) teaser paragraphs.
+  // ── All future cycles — rendered through the SAME shared card builder as the
+  // past and current cards, so every card on the home page matches.
   const future = cycles.slice(idx + 1);
   if (future.length) {
-    let html = `<div class="upcoming-section">`;
-    html += `<div class="upcoming-section-label">What's next</div>`;
-    future.forEach((c) => {
-      const focuses = Array.isArray(c.focuses) ? c.focuses : [];
-      const planList = focuses.length
-        ? `<ol class="upcoming-card-plan">${focuses.map(f => `<li>${esc(f)}</li>`).join('')}</ol>`
-        : '';
-
-      // Optional teaser paragraphs (mainly used on the immediate-next cycle).
-      // Last paragraph wraps in <em> when there are 2+ paragraphs (preserves the
-      // original italic-final-line style the teaser used to have).
+    let html = '';
+    future.forEach((c, i) => {
       const teaser = c.teaser || {};
-      const teaserParas = Array.isArray(teaser.paragraphs) ? teaser.paragraphs : [];
-      let teaserBlock = '';
-      if (teaserParas.length) {
-        teaserBlock = `<div class="upcoming-card-teaser">`;
-        teaserParas.forEach((para, i) => {
-          if (i === teaserParas.length - 1 && teaserParas.length > 1) {
-            teaserBlock += `<p><em>${esc(para)}</em></p>`;
-          } else {
-            teaserBlock += `<p>${esc(para)}</p>`;
-          }
-        });
-        teaserBlock += `</div>`;
-      }
-
-      const badge = c.num != null ? `C${c.num}` : '';
-      html += `
-        <div class="upcoming-card">
-          <div class="upcoming-card-num">${badge}</div>
-          <div class="upcoming-card-body">
-            <div class="upcoming-card-head">
-              <div class="upcoming-card-title">${esc(c.name)}</div>
-              ${c.weeks ? `<div class="upcoming-card-weeks">${esc(c.weeks)}</div>` : ''}
-            </div>
-            ${c.tagline ? `<div class="upcoming-card-tagline">${esc(c.tagline)}</div>` : ''}
-            ${planList}
-            ${teaserBlock}
-          </div>
-        </div>`;
+      // First future card is the immediate next cycle; everything after is locked.
+      const isNext = i === 0;
+      html += cycleCardHTML(c, {
+        pill: isNext ? 'Coming soon!' : 'Locked',
+        pillStyle: isNext ? 'next' : 'locked',
+        paragraphs: teaser.paragraphs,
+        italicLast: true
+      });
     });
-    html += `</div>`;
     document.getElementById('upcoming-wrap').innerHTML = html;
   }
 }
