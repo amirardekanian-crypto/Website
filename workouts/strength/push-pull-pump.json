@@ -1,0 +1,103 @@
+{
+  "id": "push-pull-pump",
+  "title": "Push Pull Pump",
+  "category": "strength",
+  "duration": "35 min",
+  "equipment": "Dumbbells",
+  "focusTag": "Upper Body Pump",
+  "blocks": [
+    {
+      "title": "Warm-Up",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Band External Rotation",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets", "style": "dark" },
+            { "label": "12 / arm", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Elbow pinned to the side, rotate from the shoulder"],
+            "bad": ["Letting the elbow drift away from the ribs"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Push / Pull",
+      "icon": "🎯",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Dumbbell Bench Press",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            { "label": "4 Sets", "style": "yellow" },
+            { "label": "×10-12 Reps" },
+            { "label": "RPE 8" }
+          ],
+          "cues": {
+            "good": ["Press up and slightly together at the top"],
+            "bad": ["Flaring the elbows to 90 degrees"]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Single-Arm Dumbbell Row",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            { "label": "4 Sets", "style": "yellow" },
+            { "label": "×10-12 / arm" },
+            { "label": "RPE 8" }
+          ],
+          "cues": {
+            "good": ["Drive the elbow past the ribs, squeeze the lat"],
+            "bad": ["Twisting the torso to heave the weight up"]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Seated Dumbbell Overhead Press",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×10 Reps" },
+            { "label": "RPE 8" }
+          ],
+          "cues": {
+            "good": ["Ribs down, press straight up to a full lockout"],
+            "bad": ["Arching the lower back to press"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Pump Finisher",
+      "icon": "💥",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Curl + Pushdown Superset",
+          "rounds": "3 Rounds",
+          "items": [
+            {
+              "name": "Dumbbell Hammer Curl",
+              "detail": "15 reps",
+              "cues": { "good": ["Keep the elbows pinned to your sides"], "bad": ["Swinging the torso to lift"] }
+            },
+            {
+              "name": "Cable Tricep Pushdown",
+              "detail": "15 reps",
+              "cues": { "good": ["Lock the elbows in place, extend fully"], "bad": ["Letting the elbows flare out"] }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

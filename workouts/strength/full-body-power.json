@@ -1,0 +1,112 @@
+{
+  "id": "full-body-power",
+  "title": "Full-Body Power",
+  "category": "strength",
+  "duration": "45 min",
+  "equipment": "Barbell",
+  "focusTag": "Full-Body Power",
+  "blocks": [
+    {
+      "title": "Warm-Up",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Band Pull-Apart",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets", "style": "dark" },
+            { "label": "15 Reps", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Hands finish wide, squeeze the shoulder blades together"],
+            "bad": ["Shrugging the traps toward the ears"]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Bodyweight Squat",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets", "style": "dark" },
+            { "label": "12 Reps", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Sit between the hips, chest tall, full depth"],
+            "bad": ["Knees caving inward"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Primary",
+      "icon": "🎯",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Barbell Back Squat",
+          "videoUrl": null,
+          "restSec": 120,
+          "chips": [
+            { "label": "5 Sets", "style": "yellow" },
+            { "label": "×5 Reps" },
+            { "label": "RPE 7-8" }
+          ],
+          "cues": {
+            "good": ["Brace the core before each rep, drive through mid-foot"],
+            "bad": ["Letting the chest collapse forward out of the hole"]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Barbell Bench Press",
+          "videoUrl": null,
+          "restSec": 120,
+          "chips": [
+            { "label": "4 Sets", "style": "yellow" },
+            { "label": "×6 Reps" },
+            { "label": "RPE 7-8" }
+          ],
+          "cues": {
+            "good": ["Shoulder blades pinned, bar to mid-chest, full lockout"],
+            "bad": ["Bouncing the bar off the chest"]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Barbell Romanian Deadlift",
+          "videoUrl": null,
+          "restSec": 90,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 Reps" },
+            { "label": "RPE 7" }
+          ],
+          "cues": {
+            "good": ["Hinge at the hips, soft knees, feel the hamstrings load"],
+            "bad": ["Rounding the lower back"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Finisher",
+      "icon": "💥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Kettlebell Swing",
+          "videoUrl": null,
+          "chips": [
+            { "label": "3 Sets", "style": "dark" },
+            { "label": "20 Reps", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Snap the hips through, the arms just guide the bell"],
+            "bad": ["Squatting the swing instead of hinging"]
+          }
+        }
+      ]
+    }
+  ]
+}

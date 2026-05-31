@@ -1,0 +1,71 @@
+{
+  "id": "engine-builder",
+  "title": "Engine Builder",
+  "category": "conditioning",
+  "duration": "30 min",
+  "equipment": "Bike",
+  "focusTag": "Aerobic Engine",
+  "blocks": [
+    {
+      "title": "Warm-Up",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Spin",
+          "videoUrl": null,
+          "chips": [
+            { "label": "5 min", "style": "dark" },
+            { "label": "RPE 3", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Smooth, relaxed cadence to raise the heart rate gradually"],
+            "bad": ["Starting too hard before the body is ready"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Intervals",
+      "icon": "🚴",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Bike Intervals",
+          "rounds": "6 Rounds",
+          "items": [
+            {
+              "name": "Hard Effort",
+              "detail": "90s @ RPE 8",
+              "cues": { "good": ["Strong, sustainable push you can repeat"], "bad": ["Sprinting flat-out and fading early"] }
+            },
+            {
+              "name": "Easy Recovery",
+              "detail": "90s @ RPE 3",
+              "cues": { "good": ["Spin easy and let the breathing settle"], "bad": ["Stopping completely between efforts"] }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Cool-Down",
+      "icon": "🧊",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Spin",
+          "videoUrl": null,
+          "chips": [
+            { "label": "5 min", "style": "dark" },
+            { "label": "RPE 2", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Gradually bring the heart rate back down"],
+            "bad": ["Stopping abruptly after the last interval"]
+          }
+        }
+      ]
+    }
+  ]
+}
