@@ -4,7 +4,7 @@
   "category": "strength",
   "duration": "45 min",
   "equipment": "Barbell",
-  "focusTag": "Full-Body Power",
+  "focusTag": "Full-Body Strength",
   "blocks": [
     {
       "title": "Warm-Up",
@@ -15,12 +15,17 @@
           "name": "Band Pull-Apart",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets", "style": "dark" },
-            { "label": "15 Reps", "style": "dark" }
+            { "label": "2 Sets" },
+            { "label": "15 Reps" }
           ],
           "cues": {
-            "good": ["Hands finish wide, squeeze the shoulder blades together"],
-            "bad": ["Shrugging the traps toward the ears"]
+            "good": [
+              "Hands finish wide, thumbs pointing behind you",
+              "Squeeze the shoulder blades together at the end of each rep"
+            ],
+            "bad": [
+              "Shrugging the traps up toward the ears"
+            ]
           }
         },
         {
@@ -28,63 +33,83 @@
           "name": "Bodyweight Squat",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets", "style": "dark" },
-            { "label": "12 Reps", "style": "dark" }
+            { "label": "2 Sets" },
+            { "label": "12 Reps" }
           ],
           "cues": {
-            "good": ["Sit between the hips, chest tall, full depth"],
-            "bad": ["Knees caving inward"]
+            "good": [
+              "Sit between the hips, chest tall, knees tracking over the toes",
+              "Reach full depth on every rep"
+            ],
+            "bad": [
+              "Letting the knees cave inward"
+            ]
           }
         }
       ]
     },
     {
-      "title": "Primary",
+      "title": "Strength",
       "icon": "🎯",
       "exercises": [
         {
           "type": "standard",
           "name": "Barbell Back Squat",
           "videoUrl": null,
-          "restSec": 120,
+          "restSec": 150,
           "chips": [
             { "label": "5 Sets", "style": "yellow" },
-            { "label": "×5 Reps" },
-            { "label": "RPE 7-8" }
+            { "label": "×5 Reps" }
           ],
           "cues": {
-            "good": ["Brace the core before each rep, drive through mid-foot"],
-            "bad": ["Letting the chest collapse forward out of the hole"]
+            "good": [
+              "Brace the core hard before you unrack and before each rep",
+              "Drive through the whole foot and keep the chest proud out of the hole"
+            ],
+            "bad": [
+              "Letting the chest collapse forward as you stand up",
+              "Cutting depth short under heavier loads"
+            ]
           }
         },
         {
           "type": "standard",
           "name": "Barbell Bench Press",
           "videoUrl": null,
-          "restSec": 120,
+          "restSec": 150,
           "chips": [
             { "label": "4 Sets", "style": "yellow" },
-            { "label": "×6 Reps" },
-            { "label": "RPE 7-8" }
+            { "label": "×6 Reps" }
           ],
           "cues": {
-            "good": ["Shoulder blades pinned, bar to mid-chest, full lockout"],
-            "bad": ["Bouncing the bar off the chest"]
+            "good": [
+              "Pin the shoulder blades down and back into the bench",
+              "Lower the bar to the mid-chest and press to a full lockout"
+            ],
+            "bad": [
+              "Bouncing the bar off the chest",
+              "Letting the elbows flare straight out to 90 degrees"
+            ]
           }
         },
         {
           "type": "standard",
           "name": "Barbell Romanian Deadlift",
           "videoUrl": null,
-          "restSec": 90,
+          "restSec": 120,
           "chips": [
             { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps" },
-            { "label": "RPE 7" }
+            { "label": "×8 Reps" }
           ],
           "cues": {
-            "good": ["Hinge at the hips, soft knees, feel the hamstrings load"],
-            "bad": ["Rounding the lower back"]
+            "good": [
+              "Push the hips back with soft knees and feel the hamstrings load",
+              "Keep the bar close to the legs the whole way down"
+            ],
+            "bad": [
+              "Rounding the lower back to reach the floor",
+              "Turning it into a squat by bending the knees too much"
+            ]
           }
         }
       ]
@@ -94,17 +119,28 @@
       "icon": "💥",
       "exercises": [
         {
-          "type": "simple",
-          "name": "Kettlebell Swing",
-          "videoUrl": null,
-          "chips": [
-            { "label": "3 Sets", "style": "dark" },
-            { "label": "20 Reps", "style": "dark" }
-          ],
-          "cues": {
-            "good": ["Snap the hips through, the arms just guide the bell"],
-            "bad": ["Squatting the swing instead of hinging"]
-          }
+          "type": "circuit",
+          "name": "Power Finisher",
+          "rounds": "3 Rounds",
+          "restSec": 60,
+          "items": [
+            {
+              "name": "Kettlebell Swing",
+              "detail": "20 reps",
+              "cues": {
+                "good": ["Snap the hips through hard — the arms only guide the bell"],
+                "bad": ["Squatting the swing instead of hinging at the hips"]
+              }
+            },
+            {
+              "name": "Goblet Squat",
+              "detail": "12 reps",
+              "cues": {
+                "good": ["Hold the bell tight to the chest and sit straight down"],
+                "bad": ["Letting the elbows drift away from the body"]
+              }
+            }
+          ]
         }
       ]
     }

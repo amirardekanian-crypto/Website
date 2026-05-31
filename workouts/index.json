@@ -1,10 +1,9 @@
 {
-  "_comment": "Manifest for the shared, app-wide Workouts library shown in the Workouts tab. SOURCE OF TRUTH: the app reads this file to build the category banners and workout cards. To add a workout: drop its JSON in the right category folder, then add an entry under that category's 'workouts' array here. A category with an empty 'workouts' array (or omitted entirely) does not render. See SCHEMA.md → 'Workouts library'.",
+  "_comment": "Manifest for the shared Workouts library shown in the Workouts tab. SOURCE OF TRUTH for the CARD (name/duration/equipment shown in the list). Each workout also repeats its name/duration/equipment inside its own JSON file for when the workout is opened — keep the two matching. To add a workout: drop its JSON in the category folder and add an entry here. An empty 'workouts' array shows a 'coach is adding…' note. See SCHEMA.md → 'Workouts library'.",
   "categories": [
     {
       "id": "strength",
       "title": "Strength",
-      "subtitle": "gym, heavy compound lift",
       "banner": "assets/img/workouts/strength.webp",
       "workouts": [
         {
@@ -26,7 +25,6 @@
     {
       "id": "conditioning",
       "title": "Conditioning",
-      "subtitle": "sled push / battle ropes",
       "banner": "assets/img/workouts/conditioning.webp",
       "workouts": [
         {
@@ -41,7 +39,6 @@
     {
       "id": "on-court",
       "title": "On-Court",
-      "subtitle": "tennis footwork ladder drill",
       "banner": "assets/img/workouts/on-court.webp",
       "workouts": [
         {
@@ -56,16 +53,30 @@
     {
       "id": "mobility",
       "title": "Mobility",
-      "subtitle": "joint prep & range work",
       "banner": "assets/img/workouts/mobility.webp",
-      "workouts": []
+      "workouts": [
+        {
+          "id": "daily-flow",
+          "title": "Daily Mobility Flow",
+          "duration": "15 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/mobility/daily-flow.json"
+        }
+      ]
     },
     {
       "id": "recovery",
       "title": "Recovery",
-      "subtitle": "down-regulate & restore",
       "banner": "assets/img/workouts/recovery.webp",
-      "workouts": []
+      "workouts": [
+        {
+          "id": "reset-roll",
+          "title": "Reset & Roll",
+          "duration": "12 min",
+          "equipment": "Foam Roller",
+          "file": "workouts/recovery/reset-roll.json"
+        }
+      ]
     }
   ]
 }

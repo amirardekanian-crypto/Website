@@ -1,0 +1,95 @@
+{
+  "id": "reset-roll",
+  "title": "Reset & Roll",
+  "category": "recovery",
+  "duration": "12 min",
+  "equipment": "Foam Roller",
+  "focusTag": "Down-Regulate & Restore",
+  "blocks": [
+    {
+      "title": "Activate",
+      "icon": "🌱",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "12 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away and squeeze the glutes hard at the top",
+              "Keep the ribs down so the lower back doesn't arch"
+            ],
+            "bad": [
+              "Hyperextending the lower back at the top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Release",
+      "icon": "🧊",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Quad Foam Roll",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60s / side" }
+          ],
+          "cues": {
+            "good": [
+              "Roll slowly and pause on any tender spots for a few breaths"
+            ],
+            "bad": [
+              "Rolling fast and rushing over the tight areas"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Calf Foam Roll",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60s / side" }
+          ],
+          "cues": {
+            "good": [
+              "Cross the other leg on top for more pressure where needed"
+            ],
+            "bad": [
+              "Holding your breath while you roll"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Down-Regulate",
+      "icon": "🌙",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Box Breathing",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 min" }
+          ],
+          "cues": {
+            "good": [
+              "Inhale 4s, hold 4s, exhale 4s, hold 4s — smooth and even",
+              "Let the shoulders drop and the jaw soften"
+            ],
+            "bad": [
+              "Forcing long breaths that feel strained"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

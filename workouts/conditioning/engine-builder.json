@@ -12,15 +12,19 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Spin",
+          "name": "Assault Bike",
           "videoUrl": null,
           "chips": [
-            { "label": "5 min", "style": "dark" },
-            { "label": "RPE 3", "style": "dark" }
+            { "label": "5 min" }
           ],
           "cues": {
-            "good": ["Smooth, relaxed cadence to raise the heart rate gradually"],
-            "bad": ["Starting too hard before the body is ready"]
+            "good": [
+              "Smooth, relaxed pace to raise the heart rate gradually",
+              "Settle into a steady rhythm with the arms and legs"
+            ],
+            "bad": [
+              "Going too hard before the body is warm"
+            ]
           }
         }
       ]
@@ -33,16 +37,23 @@
           "type": "circuit",
           "name": "Bike Intervals",
           "rounds": "6 Rounds",
+          "restSec": 0,
           "items": [
             {
               "name": "Hard Effort",
-              "detail": "90s @ RPE 8",
-              "cues": { "good": ["Strong, sustainable push you can repeat"], "bad": ["Sprinting flat-out and fading early"] }
+              "detail": "90s hard",
+              "cues": {
+                "good": ["A strong, repeatable push — not an all-out sprint"],
+                "bad": ["Blasting the first round and fading early"]
+              }
             },
             {
               "name": "Easy Recovery",
-              "detail": "90s @ RPE 3",
-              "cues": { "good": ["Spin easy and let the breathing settle"], "bad": ["Stopping completely between efforts"] }
+              "detail": "90s easy",
+              "cues": {
+                "good": ["Spin light and let the breathing settle before the next effort"],
+                "bad": ["Stopping completely between efforts"]
+              }
             }
           ]
         }
@@ -54,15 +65,18 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Spin",
+          "name": "Rowing",
           "videoUrl": null,
           "chips": [
-            { "label": "5 min", "style": "dark" },
-            { "label": "RPE 2", "style": "dark" }
+            { "label": "5 min" }
           ],
           "cues": {
-            "good": ["Gradually bring the heart rate back down"],
-            "bad": ["Stopping abruptly after the last interval"]
+            "good": [
+              "Long, easy strokes to bring the heart rate back down"
+            ],
+            "bad": [
+              "Stopping abruptly straight after the last interval"
+            ]
           }
         }
       ]
