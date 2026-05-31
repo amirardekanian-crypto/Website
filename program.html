@@ -322,6 +322,71 @@
   /* "Locked" pill on cycles further out — quiet grey. */
   .cm-pill-locked { background: var(--grey-mid); color: var(--grey-dark); }
 
+  /* ─── Cycle card image banner ──────────────────────────────────────
+     Full-bleed image at the top of every cycle card with the caption
+     (Cycle n of N · name · weeks · tagline) overlaid bottom-left. If no
+     image file exists for the cycle, .no-img keeps the green gradient. */
+  #screen-plan .current-message { padding: 0; }      /* banner is edge-to-edge; body re-adds padding */
+  #screen-plan .cm-banner {
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    overflow: hidden;
+    /* green fallback — shown when the image is missing (.no-img) or still under the photo */
+    background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+  }
+  /* Subtle diagonal stripes on the green fallback, echoing the reference card */
+  #screen-plan .cm-banner.no-img::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(135deg,
+      rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px);
+  }
+  #screen-plan .cm-banner-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  /* Dark scrim so the caption stays legible over any photo */
+  #screen-plan .cm-banner-scrim {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top,
+      rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.28) 44%, rgba(0,0,0,0) 74%);
+  }
+  #screen-plan .cm-banner-caption {
+    position: relative; z-index: 2;
+    align-self: flex-end;
+    width: 100%;
+    padding: 16px 18px;
+  }
+  #screen-plan .cm-cyclelabel {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.78);
+    margin-bottom: 6px;
+  }
+  /* Caption text sits on the dark banner, so override the dark-on-white colours.
+     The weeks + tagline share the bottom band with the toggle pill (bottom-right),
+     so reserve a right gutter on those lines to keep text from sliding underneath. */
+  #screen-plan .cm-banner-caption .cm-name    { color: #fff; margin-bottom: 5px; }
+  #screen-plan .cm-banner-caption .cm-weeks   { color: rgba(255,255,255,0.92); padding-right: 112px; }
+  #screen-plan .cm-banner-caption .cm-tagline { color: rgba(255,255,255,0.85); margin-top: 3px; padding-right: 112px; }
+  /* Pill floats top-right over the banner */
+  #screen-plan .cm-pill { top: 14px; right: 14px; }
+  /* Toggle becomes a small white pill on the banner, bottom-right */
+  #screen-plan .cm-banner .cm-toggle {
+    position: absolute; z-index: 3;
+    right: 14px; bottom: 14px;
+    width: auto; margin: 0; padding: 5px 11px;
+    font-size: 9.5px; letter-spacing: 1px;
+    background: rgba(255,255,255,0.94);
+    border-radius: 999px;
+    color: #0E4A36;
+    gap: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  #screen-plan .cm-banner .cm-toggle-chev { margin-left: 0; font-size: 10px; }
+  /* Padded body that holds the collapsible detail below the banner */
+  #screen-plan .cm-cardbody { padding: 16px 24px 22px; }
+
   /* ─── Global bottom tab bar (always visible across all screens) ── */
   .global-tabs {
     position: fixed; left: 0; right: 0; bottom: 0;
@@ -424,7 +489,7 @@
       0 8px 30px rgba(14,74,54,0.06),
       inset 0 0 24px rgba(14,74,54,0.02);
   }
-  #screen-plan .cm-body-label { color: var(--grey-text); }
+  #screen-plan .cm-body-label { color: #C7552F; }
 
   /* Focus list → numbered list with thin grey separators (no tint background) */
   #screen-plan .focus-list {
@@ -436,9 +501,8 @@
   #screen-plan .focus-list-item {
     background: transparent;
     border: none;
-    border-top: 1px solid var(--grey-card);
     border-radius: 0;
-    padding: 14px 0;
+    padding: 9px 0;
     font-size: 14.5px;
     color: #444;
     counter-increment: focus-c;
@@ -533,15 +597,11 @@
     max-height: 2000px;
     opacity: 1;
   }
-  /* Inside the collapse the first label already has its own top border, so drop
-     the duplicated top padding the standalone .cm-body-label carries. */
-  .cm-collapse > .cm-body-label:first-child { padding-top: 14px; }
 
   .cm-body-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--grey-text); margin-bottom: 10px;
-    padding-top: 16px; border-top: 1px solid var(--grey-card);
+    color: #C7552F; margin-bottom: 10px;
   }
 
   .cm-body {
@@ -552,14 +612,12 @@
   .cm-body p + p { margin-top: 12px; }
 
   .outcomes-block {
-    margin-top: 20px;
-    padding-top: 18px;
-    border-top: 1px solid var(--grey-card);
+    margin-top: 18px;
   }
   .outcomes-label {
     font-family: 'Space Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--grey-text); margin-bottom: 10px;
+    color: #C7552F; margin-bottom: 10px;
   }
   .outcome-item {
     display: flex; align-items: flex-start; gap: 10px;
@@ -2576,37 +2634,62 @@ function showError(msg) {
 //     italicLast: italicise the final paragraph when there are 2+ (teaser style),
 //     outcomes:   optional list rendered as the ticked "expected outcomes" block
 //   }
+// Slugify a cycle name into an image filename stem: lowercase, punctuation/spaces
+// collapse to hyphens. Case-insensitive, so "Load & Build" and "LOAD & BUILD"
+// both map to "load-build" → one image serves every capitalisation.
+function cycleSlug(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function cycleCardHTML(cycle, opts) {
   opts = opts || {};
-  const badge = (cycle.num != null) ? `C${cycle.num}` : '';
   const cls = 'current-message' + (opts.onclick ? ' is-clickable' : '');
   const attrs = opts.onclick ? ` role="button" tabindex="0" onclick="${opts.onclick}"` : '';
   let h = `<div class="${cls}"${attrs}>`;
+
+  // ── Image banner (full-bleed top of the card). We point an <img> at
+  // assets/cycles/<slug>.<ext> and let onerror walk a short list of extensions;
+  // if none of the files exist the handler adds `.no-img` and the green gradient
+  // fallback shows instead. Drop a file named after the cycle into that folder
+  // and it appears here automatically — no JSON or code changes needed.
+  const slug = cycleSlug(cycle.name);
+  const base = `assets/cycles/${slug}`;
+  const bannerCls = 'cm-banner' + (slug ? '' : ' no-img');
+  h += `<div class="${bannerCls}">`;
+  if (slug) {
+    h += `<img class="cm-banner-img" alt="${esc(cycle.name || '')}" ` +
+         `src="${base}.jpg" data-base="${base}" data-exts="jpg,jpeg,png,webp" data-ext-idx="0" ` +
+         `onerror="cycleImgError(this)">`;
+  }
+  h += `<div class="cm-banner-scrim"></div>`;
   if (opts.pill) h += `<div class="cm-pill${opts.pillStyle ? ' cm-pill-' + opts.pillStyle : ''}">${esc(opts.pill)}</div>`;
 
-  // Header — C-badge + name + weeks + tagline
-  h += `<div class="cm-head">`;
-  if (badge) h += `<div class="cm-num">${badge}</div>`;
-  h += `<div class="cm-headtext"><div class="cm-titlerow">`;
-  h += `<div class="cm-name">${esc(cycle.name)}</div>`;
+  // Caption overlay (bottom-left): "Cycle n of N" + name + weeks + tagline.
+  h += `<div class="cm-banner-caption">`;
+  if (cycle.num != null && opts.total) {
+    h += `<div class="cm-cyclelabel">Cycle ${cycle.num} of ${opts.total}</div>`;
+  }
+  h += `<div class="cm-name">${esc(cycle.name || '')}</div>`;
   if (cycle.weeks) h += `<div class="cm-weeks">${esc(cycle.weeks)}</div>`;
-  h += `</div>`;
   if (cycle.tagline) h += `<div class="cm-tagline">${esc(cycle.tagline)}</div>`;
-  h += `</div></div>`;
+  h += `</div>`;
 
-  // Focus list
+  // ── Collapsible detail. Everything below the caption — the aims (focus list),
+  // the "why this cycle matters" paragraphs and the outcomes — is hidden by
+  // default and revealed by the toggle that sits on the banner. Built into its
+  // own string first so the toggle only renders when there's something to show.
+  let detail = '';
+
   const focuses = Array.isArray(cycle.focuses) ? cycle.focuses : [];
   if (focuses.length) {
-    h += `<div class="focus-list">`;
-    focuses.forEach(f => { h += `<div class="focus-list-item">${esc(f)}</div>`; });
-    h += `</div>`;
+    detail += `<div class="cm-body-label">The Aims</div>`;
+    detail += `<div class="focus-list">`;
+    focuses.forEach(f => { detail += `<div class="focus-list-item">${esc(f)}</div>`; });
+    detail += `</div>`;
   }
-
-  // ── Collapsible detail: the "why this cycle matters" paragraphs + outcomes.
-  // The aims (focus list) above stay always visible; this extra detail is hidden
-  // by default and revealed by the toggle below. Built into its own string first
-  // so we only render the toggle when there's actually something to expand.
-  let detail = '';
 
   const paras = Array.isArray(opts.paragraphs) ? opts.paragraphs : [];
   if (paras.length) {
@@ -2632,14 +2715,35 @@ function cycleCardHTML(cycle, opts) {
   }
 
   if (detail) {
+    // Toggle button lives on the banner (bottom-right); the collapsible body
+    // sits below it. Close the banner div first, then add the body.
     h += `<button class="cm-toggle" aria-expanded="false" onclick="toggleCycleCard(this, event)">`;
     h += `<span class="cm-toggle-label">Read more</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
     h += `</button>`;
-    h += `<div class="cm-collapse">${detail}</div>`;
+    h += `</div>`; // .cm-banner
+    h += `<div class="cm-collapse"><div class="cm-cardbody">${detail}</div></div>`;
+  } else {
+    h += `</div>`; // .cm-banner
   }
 
   h += `</div>`;
   return h;
+}
+
+// Cycle banner image fallback. Walks the data-exts list (jpg→jpeg→png→webp);
+// once every extension 404s, hides the broken <img> and flags the banner
+// `.no-img` so the green gradient fallback shows.
+function cycleImgError(img) {
+  const exts = (img.dataset.exts || '').split(',').filter(Boolean);
+  const next = parseInt(img.dataset.extIdx || '0', 10) + 1;
+  if (next < exts.length) {
+    img.dataset.extIdx = String(next);
+    img.src = `${img.dataset.base}.${exts[next]}`;
+    return;
+  }
+  img.style.display = 'none';
+  const banner = img.closest('.cm-banner');
+  if (banner) banner.classList.add('no-img');
 }
 
 // Expand/collapse a cycle card's detail section (why-this-matters + outcomes).
@@ -2747,6 +2851,7 @@ function renderPlan() {
     const histId = archiveList[0].id;
     document.getElementById('past-card-wrap').innerHTML = cycleCardHTML(prevCycle, {
       pill: 'Done',
+      total: cycles.length,
       onclick: `goTo('archive', '${esc(histId)}')`
     });
   }
@@ -2789,6 +2894,7 @@ function renderPlan() {
     document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
       pill: 'Active',
       pillStyle: 'active',
+      total: cycles.length,
       onclick: "goTo('home')",
       paragraphs: msg.paragraphs,
       bodyLabel: 'Why This Cycle Matters',
@@ -2808,6 +2914,7 @@ function renderPlan() {
       html += cycleCardHTML(c, {
         pill: isNext ? 'Coming soon!' : 'Locked',
         pillStyle: isNext ? 'next' : 'locked',
+        total: cycles.length,
         paragraphs: teaser.paragraphs,
         italicLast: true
       });
