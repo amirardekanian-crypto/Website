@@ -1,7 +1,7 @@
 {
-  "name": "Amir Ardekani — Tennis S&C",
-  "short_name": "AA Tennis S&C",
-  "description": "Bespoke tennis strength & conditioning programs with daily workouts, videos, and progress tracking.",
+  "name": "AA Performance — Tennis & Padel S&C",
+  "short_name": "AA Performance",
+  "description": "Bespoke tennis & padel strength & conditioning programs with daily workouts, videos, and progress tracking.",
   "start_url": "/program.html",
   "scope": "/",
   "display": "standalone",
