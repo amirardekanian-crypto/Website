@@ -146,7 +146,7 @@
   /* ═══════════════════════════════════════════════════════════════════════
      HOME SCREEN — NEW V5 DESIGN
      ═══════════════════════════════════════════════════════════════════════ */
-  #screen-home {
+  #screen-plan {
     background: var(--grey-bg);
     color: var(--grey-dark);
     font-family: 'Barlow Condensed', sans-serif;
@@ -298,11 +298,11 @@
      Restyle those once and every card on the home page changes together.
      The rules here are only the bits unique to the shared header + the
      clickable "past" variant. */
-  #screen-home .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  #screen-home .cm-titlerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  #screen-home .cm-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: 0.5px; }
-  #screen-home .cm-weeks { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #C7552F; text-transform: uppercase; }
-  #screen-home .cm-tagline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 14px; color: var(--grey-dark); }
+  #screen-plan .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  #screen-plan .cm-titlerow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  #screen-plan .cm-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: 0.5px; }
+  #screen-plan .cm-weeks { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #C7552F; text-transform: uppercase; }
+  #screen-plan .cm-tagline { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 14px; color: var(--grey-dark); }
   /* Clickable variant (past program card → opens the archive) + its "Done" pill */
   .current-message.is-clickable { cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
   .current-message.is-clickable:hover { border-color: #C7552F; }
@@ -365,10 +365,10 @@
   .guide-launch-card .note-card-title { color: var(--ice); }
 
   /* ─── HOME-ONLY: yellow-only palette ─────────────────────────────
-     Remap the ice + purple tokens to yellow ONLY inside #screen-home,
+     Remap the ice + purple tokens to yellow ONLY inside #screen-plan,
      so the home page reads as a single-accent design without affecting
      Program / Notes / Archive / Guide. */
-  #screen-home {
+  #screen-plan {
     --ice:       var(--yellow);
     --ice-dim:   var(--yellow-dim);
     --ice-mid:   var(--yellow-mid);
@@ -384,7 +384,7 @@
     0%, 100% { box-shadow: 0 0 8px var(--yellow), 0 0 16px rgba(14,74,54,0.25); }
     50%      { box-shadow: 0 0 14px var(--yellow), 0 0 22px rgba(14,74,54,0.45); }
   }
-  #screen-home .cycle-meter-seg.current {
+  #screen-plan .cycle-meter-seg.current {
     animation: cycleSegGlow 2.6s ease-in-out infinite;
   }
 
@@ -395,14 +395,14 @@
      thin separator lines. */
 
   /* Shared cycle-card header — C-badge sits left of the name/weeks/tagline. */
-  #screen-home .cm-head {
+  #screen-plan .cm-head {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
   }
   /* Square C-badge (C1/C2/…) shown on every cycle card */
-  #screen-home .cm-num {
+  #screen-plan .cm-num {
     width: 40px; height: 40px; flex-shrink: 0;
     border: 1.5px solid #C7552F;
     border-radius: 8px;
@@ -412,11 +412,11 @@
   }
 
   /* Strip the original top accent line + radial glow */
-  #screen-home .current-message::before { display: none; }
-  #screen-home .current-message::after  { display: none; }
+  #screen-plan .current-message::before { display: none; }
+  #screen-plan .current-message::after  { display: none; }
   /* Highlighted frame — soft yellow-tinted border + subtle outer glow so the
      current cycle card visually stands out from the future cycle cards. */
-  #screen-home .current-message {
+  #screen-plan .current-message {
     background: var(--white);
     border: 2px solid var(--yellow-mid);
     box-shadow:
@@ -424,16 +424,16 @@
       0 8px 30px rgba(14,74,54,0.06),
       inset 0 0 24px rgba(14,74,54,0.02);
   }
-  #screen-home .cm-body-label { color: var(--grey-text); }
+  #screen-plan .cm-body-label { color: var(--grey-text); }
 
   /* Focus list → numbered list with thin grey separators (no tint background) */
-  #screen-home .focus-list {
+  #screen-plan .focus-list {
     counter-reset: focus-c;
     display: block;
     gap: 0;
     margin-bottom: 4px;
   }
-  #screen-home .focus-list-item {
+  #screen-plan .focus-list-item {
     background: transparent;
     border: none;
     border-top: 1px solid var(--grey-card);
@@ -444,7 +444,7 @@
     counter-increment: focus-c;
     line-height: 1.5;
   }
-  #screen-home .focus-list-item::before {
+  #screen-plan .focus-list-item::before {
     content: counter(focus-c, decimal-leading-zero);
     width: auto; height: auto;
     margin-top: 0;
@@ -581,8 +581,8 @@
   }
 
   /* Reserve space so content isn't hidden behind the global tab bar */
-  #screen-home { padding-bottom: 90px; }
-  #screen-archive .archive-scroll { padding-bottom: 100px; }
+  #screen-plan { padding-bottom: 90px; }
+  #screen-workouts .archive-scroll { padding-bottom: 100px; }
   #screen-guide .guide-container { padding-bottom: 100px; }
 
   /* ── App Guide screen ── shares cards with Notes for a familiar look */
@@ -656,7 +656,7 @@
      ═══════════════════════════════════════════════════════════════════════ */
 
   /* ── Archive ── */
-  #screen-archive { background: var(--grey-bg); }
+  #screen-workouts { background: var(--grey-bg); }
   .archive-banner { background: var(--yellow); padding: 48px 24px 32px; position: relative; overflow: hidden; }
   .archive-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); z-index: 1; }
   .archive-banner::after {
@@ -679,8 +679,38 @@
   .archive-ex-name { font-size: 14px; font-weight: 500; color: #555; }
   .archive-ex-detail { font-size: 12px; color: #aaa; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
 
+  /* ── Workouts library (shared, app-wide) ── */
+  #screen-workouts { background: var(--grey-bg); }
+  .wl-header { padding: 40px 24px 20px; }
+  .wl-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px; line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: -0.5px; }
+  .wl-subtitle { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--grey-text); margin-top: 8px; line-height: 1.5; }
+  .wl-scroll { padding: 0 20px 100px; }
+  .wl-empty { padding: 40px 20px; text-align: center; font-family: 'Barlow', sans-serif; color: #888; font-size: 14px; line-height: 1.6; }
+  .wl-group { margin-bottom: 28px; }
+  /* Category banner — image with a dark gradient so the white title reads. */
+  /* Banner matches the image's native 2:1 ratio, so background-size:cover shows
+     the WHOLE photo (athlete included) with no cropping at any phone width. */
+  .wl-banner { position: relative; border-radius: 14px; overflow: hidden; padding: 18px; aspect-ratio: 2 / 1; display: flex; flex-direction: column; justify-content: flex-end; background-size: cover; background-position: center; margin-bottom: 14px; background-color: var(--yellow); }
+  /* Two overlays: a left-to-right darken (text sits on the dark left side of the
+     photos) plus a bottom darken so the title row always reads. */
+  .wl-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,30,22,0.78) 0%, rgba(8,30,22,0.32) 45%, rgba(8,30,22,0.05) 100%), linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%); }
+  .wl-banner-row { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .wl-banner-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; letter-spacing: 0.5px; }
+  .wl-banner-count { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); white-space: nowrap; }
+  /* Workout card */
+  .wl-card { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--grey-card); border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
+  .wl-card:hover { border-color: #C7552F; }
+  .wl-card:active { transform: scale(0.99); }
+  .wl-card-thumb { width: 56px; height: 56px; flex-shrink: 0; border-radius: 8px; background: repeating-linear-gradient(45deg, var(--grey-bg), var(--grey-bg) 8px, #e8e2d6 8px, #e8e2d6 16px); }
+  .wl-card-body { flex: 1; min-width: 0; }
+  .wl-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; line-height: 1.1; }
+  .wl-card-meta { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+  .wl-card-play { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--grey-bg); color: var(--yellow); display: flex; align-items: center; justify-content: center; font-size: 13px; padding-left: 2px; }
+  /* Empty-category note (no workouts yet) */
+  .wl-coming { padding: 18px 16px; background: var(--white); border: 1px dashed var(--grey-mid); border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: 13.5px; color: var(--grey-text); line-height: 1.5; text-align: center; }
+
   /* ── Current Program Header ── */
-  #screen-program { background: var(--grey-bg); }
+  #screen-home { background: var(--grey-bg); }
   .prog-header { background: var(--yellow); padding: 48px 24px 0; position: relative; overflow: hidden; }
   .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
   /* Shared back-to-home button in nav-page headers (Program, Notes) — matches
@@ -2096,7 +2126,7 @@
 </div>
 
 <!-- ═══ HOME ═══ -->
-<div id="screen-home" class="screen">
+<div id="screen-plan" class="screen">
 
   <!-- Sticky nav -->
   <div class="home-nav">
@@ -2128,10 +2158,21 @@
 
 </div>
 
-<!-- ═══ ARCHIVE ═══ -->
+<!-- ═══ WORKOUTS LIBRARY ═══ shared, app-wide extra sessions, grouped by
+     category. Built from workouts/index.json by renderWorkouts(). -->
+<div id="screen-workouts" class="screen">
+  <div class="wl-header">
+    <div class="wl-title">Browse</div>
+    <div class="wl-subtitle">Extra sessions — do them any time, outside your plan.</div>
+  </div>
+  <div class="wl-scroll" id="wl-scroll"></div>
+</div>
+
+<!-- ═══ ARCHIVE ═══ a single completed past program. Not a bottom-nav tab —
+     opened only by the "Done" card on the My Plan screen. -->
 <div id="screen-archive" class="screen">
   <div class="archive-banner" id="archive-banner" data-watermark="">
-    <button class="archive-back" onclick="goTo('home')" aria-label="Back to home">←</button>
+    <button class="archive-back" onclick="goTo('plan')" aria-label="Back to My Plan">←</button>
     <div class="archive-label">Completed</div>
     <div class="archive-title" id="archive-title"></div>
   </div>
@@ -2139,11 +2180,10 @@
 </div>
 
 <!-- ═══ CURRENT PROGRAM ═══ -->
-<div id="screen-program" class="screen">
+<div id="screen-home" class="screen">
   <div class="prog-header">
-    <button class="nav-back" onclick="goTo('home')" aria-label="Back to home">←</button>
     <button class="dark-toggle" onclick="toggleDark(event)" style="position:absolute;top:14px;right:14px;">🌙</button>
-    <!-- Cycle hero: "C2 · Strength Engine" + tagline (filled by renderProgram) -->
+    <!-- Cycle hero: "C2 · Strength Engine" + tagline (filled by renderHome) -->
     <div class="prog-cycle-hero" id="prog-cycle-hero"></div>
     <div class="day-tabs" id="day-tabs"></div>
   </div>
@@ -2272,25 +2312,28 @@
   </div>
 </div>
 
-<!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Always visible across Home / Program / Notes / Archive.
+<!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Always visible across the nav screens.
+     Order: Program · Coach · Workouts · My Plan. data-tab values are unchanged
+     (home/program/notes/archive) so all goTo() routing still works — only the
+     labels, icons, and order changed.
      Icons are inline SVGs (line-art) so they inherit currentColor and look crisp at any size. -->
 <div class="global-tabs is-hidden" id="global-tabs">
   <button class="nav-item" data-tab="home" onclick="goTo('home')">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1z"/></svg></span>
-    <span class="nav-label">Home</span>
-  </button>
-  <button class="nav-item" data-tab="program" onclick="goTo('program')">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6M6 5v14M18 5v14M21 9v6M6 12h12"/></svg></span>
-    <span class="nav-label">Program</span>
+    <span class="nav-label">Home</span>
   </button>
   <button class="nav-item" data-tab="notes" onclick="goTo('notes')">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
     <span class="nav-dot" id="coach-tab-dot" hidden></span>
     <span class="nav-label">Coach</span>
   </button>
-  <button class="nav-item" data-tab="archive" onclick="goTo('archive')">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v4H3zM5 9v11h14V9M9 13h6"/></svg></span>
-    <span class="nav-label">Archive</span>
+  <button class="nav-item" data-tab="workouts" onclick="goTo('workouts')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+    <span class="nav-label">Workouts</span>
+  </button>
+  <button class="nav-item" data-tab="plan" onclick="goTo('plan')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></span>
+    <span class="nav-label">My Plan</span>
   </button>
 </div>
 
@@ -2457,8 +2500,8 @@ function getVideoUrl(ex) {
   // because they're useful starting points (weights) or personal context (movement notes).
   autoResetStaleDays();
 
+  renderPlan();
   renderHome();
-  renderProgram();
   renderNotes();
 
   restoreState();
@@ -2472,7 +2515,8 @@ function getVideoUrl(ex) {
   setTimeout(() => {
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('screen-home').classList.add('active');
-    // Reveal the global tab bar and mark Home as the active tab on first load
+    // Reveal the global tab bar and mark Home (the training screen) as the
+    // active tab on first load.
     const tabs = document.getElementById('global-tabs');
     if (tabs) {
       tabs.classList.remove('is-hidden');
@@ -2480,6 +2524,7 @@ function getVideoUrl(ex) {
         n.classList.toggle('active', n.dataset.tab === 'home');
       });
     }
+    document.getElementById('v-progress').classList.add('active');
   }, 300);
 })();
 
@@ -2584,7 +2629,7 @@ function toggleCycleCard(btn, ev) {
   if (label) label.textContent = open ? 'Read less' : 'Read more';
 }
 
-function renderHome() {
+function renderPlan() {
   const a = DATA.athlete;
 
   // ── New schema: cycles[] + currentCycleIndex (single source of truth)
@@ -2719,7 +2764,7 @@ function renderHome() {
     document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
       pill: 'Active',
       pillStyle: 'active',
-      onclick: "goTo('program')",
+      onclick: "goTo('home')",
       paragraphs: msg.paragraphs,
       bodyLabel: 'Why This Cycle Matters',
       outcomes: msg.outcomes
@@ -2749,7 +2794,7 @@ function renderHome() {
 // ═══════════════════════════════════════════════════════════════════════
 //  3. RENDER: CURRENT PROGRAM (unchanged)
 // ═══════════════════════════════════════════════════════════════════════
-function renderProgram() {
+function renderHome() {
   const w = DATA.workouts || { days: [] };
 
   // Cycle hero in the program header — same content as the home page hero.
@@ -3281,7 +3326,8 @@ function renderRoundCues(cues) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  4. RENDER: ARCHIVE (unchanged)
+//  4. RENDER: ARCHIVE — a single completed past program (opened from the
+//     "Done" card on My Plan; not a bottom-nav tab).
 // ═══════════════════════════════════════════════════════════════════════
 function renderArchive(programId) {
   const program = (DATA.programHistory || []).find(p => p.id === programId);
@@ -3412,17 +3458,21 @@ window.sendCoachReply = sendCoachReply;
 
 function goTo(screen, historyId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const id = screen === 'archive' ? 'screen-archive' : 'screen-' + screen;
-  document.getElementById(id).classList.add('active');
-  document.getElementById('v-progress').classList.toggle('active', screen === 'program');
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.getElementById('v-progress').classList.toggle('active', screen === 'home');
 
-  // Archive tab — if no specific historyId requested, show the most recent past program if any
+  // Archive view (opened from the My Plan "Done" card) — show the requested
+  // past program, or the most recent one if none specified.
   if (screen === 'archive') {
     const list = (DATA.programHistory && DATA.programHistory.length) ? DATA.programHistory : [];
     const targetId = historyId || (list[0] && list[0].id);
     if (targetId) renderArchive(targetId);
     else renderArchiveEmpty();
   }
+
+  // Workouts tab — shared, app-wide library. Built lazily from the manifest on
+  // first visit; renderWorkoutsLibrary() no-ops if already loaded.
+  if (screen === 'workouts') renderWorkoutsLibrary();
 
   // Update the global tab bar's active button
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
@@ -3438,7 +3488,7 @@ function goTo(screen, historyId) {
   window.scrollTo(0, 0);
 }
 
-// Empty-state for the Archive tab when there are no past programs yet
+// Empty-state for the archive view when there are no past programs yet
 function renderArchiveEmpty() {
   const banner = document.getElementById('archive-banner');
   const title  = document.getElementById('archive-title');
@@ -3449,6 +3499,63 @@ function renderArchiveEmpty() {
     <div style="padding: 40px 20px; text-align: center; font-family: 'Barlow', sans-serif; color: #888; font-size: 14px; line-height: 1.6;">
       Past programs will appear here once your first cycle wraps up.
     </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  WORKOUTS LIBRARY — shared, app-wide extra sessions, grouped by category.
+//  Driven entirely by workouts/index.json (the manifest). A category with no
+//  workouts is skipped. Same for every user — not tied to the athlete's data.
+// ═══════════════════════════════════════════════════════════════════════
+let _workoutsLibLoaded = false;
+async function renderWorkoutsLibrary() {
+  if (_workoutsLibLoaded) return;        // build once per session
+  _workoutsLibLoaded = true;
+  const scroll = document.getElementById('wl-scroll');
+  if (!scroll) return;
+
+  let manifest;
+  try {
+    const res = await fetch('workouts/index.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    manifest = await res.json();
+  } catch (e) {
+    _workoutsLibLoaded = false;          // allow a retry on next visit
+    scroll.innerHTML = `<div class="wl-empty">Couldn't load the workout library. Check your connection and try again.</div>`;
+    return;
+  }
+
+  // Show EVERY category, even empty ones. The banner shows only the name + a
+  // workout count; an empty category shows a "coach is adding" note instead of cards.
+  const cats = manifest.categories || [];
+  if (!cats.length) {
+    scroll.innerHTML = `<div class="wl-empty">No workout categories yet — check back soon.</div>`;
+    return;
+  }
+
+  scroll.innerHTML = cats.map(cat => {
+    const list = Array.isArray(cat.workouts) ? cat.workouts : [];
+    const count = list.length;
+    const countLabel = count + ' ' + (count === 1 ? 'Workout' : 'Workouts');
+    const banner = `
+      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')">
+        <div class="wl-banner-row">
+          <div class="wl-banner-title">${esc(cat.title)}</div>
+          <div class="wl-banner-count">${countLabel}</div>
+        </div>
+      </div>`;
+    const body = count
+      ? list.map(w => `
+          <div class="wl-card" role="button" tabindex="0" data-file="${esc(w.file || '')}" data-id="${esc(w.id || '')}">
+            <div class="wl-card-thumb"></div>
+            <div class="wl-card-body">
+              <div class="wl-card-title">${esc(w.title || '')}</div>
+              <div class="wl-card-meta">${esc(w.duration || '')}${w.duration && w.equipment ? ' · ' : ''}${esc(w.equipment || '')}</div>
+            </div>
+            <div class="wl-card-play" aria-hidden="true">▶</div>
+          </div>`).join('')
+      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} workouts — check back soon.</div>`;
+    return `<div class="wl-group">${banner}${body}</div>`;
+  }).join('');
 }
 
 function switchDay(n) {
@@ -3979,7 +4086,7 @@ function restoreState() {
   initTimers();
   // Sync exercise-level check from the loaded per-set state (in case all
   // sets are already done from a previous session reload).
-  document.querySelectorAll('#screen-program .checklist-item[data-sets]').forEach(card => {
+  document.querySelectorAll('#screen-home .checklist-item[data-sets]').forEach(card => {
     if (card.classList.contains('round-group')) return;
     const name  = card.querySelector('.item-name').textContent.trim();
     const total = parseInt(card.dataset.sets, 10) || 1;
@@ -3990,7 +4097,7 @@ function restoreState() {
   // After RPE buttons are wired up, collapse any card that's checked AND has a
   // saved RPE (or is a simple-type item with no RPE picker). Mirrors the live
   // behavior so the page picks up where they left off.
-  document.querySelectorAll('#screen-program .checklist-item.checked').forEach(card => {
+  document.querySelectorAll('#screen-home .checklist-item.checked').forEach(card => {
     const rpeRows = card.querySelectorAll('.rpe-row');
     // Collapse if there's no RPE picker, or every round row already has a rating.
     const allRated = Array.from(rpeRows).every(r => r.querySelector('.rpe-btn.selected'));
@@ -4414,7 +4521,7 @@ function setAllSetsDone(card, done) {
 
 // Public init that decides per-card whether to use per-set log or legacy single-RPE
 function initSetOrRPE() {
-  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
+  document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
     if (!card.querySelector('.rest-btn')) return; // simple exercise — skip
     if (card.classList.contains('round-group')) {
       // Circuits keep a single overall RPE row (existing behavior)
@@ -4466,7 +4573,7 @@ function attachOverallRPE(card) {
 // Personal note per exercise — saved to localStorage per athlete + exercise.
 // Only added to "main" exercises (those with a rest button), same scope as weight-log.
 function initNotes() {
-  document.querySelectorAll('#screen-program .checklist-item').forEach(card => {
+  document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
     if (!card.querySelector('.rest-btn')) return;
     const name  = card.querySelector('.item-name').textContent.trim();
     const key   = ATHLETE_ID + '_note_' + name.replace(/\s+/g, '_');

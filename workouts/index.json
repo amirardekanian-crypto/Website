@@ -1,0 +1,71 @@
+{
+  "_comment": "Manifest for the shared, app-wide Workouts library shown in the Workouts tab. SOURCE OF TRUTH: the app reads this file to build the category banners and workout cards. To add a workout: drop its JSON in the right category folder, then add an entry under that category's 'workouts' array here. A category with an empty 'workouts' array (or omitted entirely) does not render. See SCHEMA.md → 'Workouts library'.",
+  "categories": [
+    {
+      "id": "strength",
+      "title": "Strength",
+      "subtitle": "gym, heavy compound lift",
+      "banner": "assets/img/workouts/strength.webp",
+      "workouts": [
+        {
+          "id": "full-body-power",
+          "title": "Full-Body Power",
+          "duration": "45 min",
+          "equipment": "Barbell",
+          "file": "workouts/strength/full-body-power.json"
+        },
+        {
+          "id": "push-pull-pump",
+          "title": "Push Pull Pump",
+          "duration": "35 min",
+          "equipment": "Dumbbells",
+          "file": "workouts/strength/push-pull-pump.json"
+        }
+      ]
+    },
+    {
+      "id": "conditioning",
+      "title": "Conditioning",
+      "subtitle": "sled push / battle ropes",
+      "banner": "assets/img/workouts/conditioning.webp",
+      "workouts": [
+        {
+          "id": "engine-builder",
+          "title": "Engine Builder",
+          "duration": "30 min",
+          "equipment": "Bike",
+          "file": "workouts/conditioning/engine-builder.json"
+        }
+      ]
+    },
+    {
+      "id": "on-court",
+      "title": "On-Court",
+      "subtitle": "tennis footwork ladder drill",
+      "banner": "assets/img/workouts/on-court.webp",
+      "workouts": [
+        {
+          "id": "first-step-speed",
+          "title": "First-Step Speed",
+          "duration": "25 min",
+          "equipment": "Court",
+          "file": "workouts/on-court/first-step-speed.json"
+        }
+      ]
+    },
+    {
+      "id": "mobility",
+      "title": "Mobility",
+      "subtitle": "joint prep & range work",
+      "banner": "assets/img/workouts/mobility.webp",
+      "workouts": []
+    },
+    {
+      "id": "recovery",
+      "title": "Recovery",
+      "subtitle": "down-regulate & restore",
+      "banner": "assets/img/workouts/recovery.webp",
+      "workouts": []
+    }
+  ]
+}

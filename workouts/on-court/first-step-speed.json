@@ -1,0 +1,67 @@
+{
+  "id": "first-step-speed",
+  "title": "First-Step Speed",
+  "category": "on-court",
+  "duration": "25 min",
+  "equipment": "Court",
+  "focusTag": "Acceleration & Footwork",
+  "blocks": [
+    {
+      "title": "Movement Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "A-Skip",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets", "style": "dark" },
+            { "label": "20 m", "style": "dark" }
+          ],
+          "cues": {
+            "good": ["Tall posture, drive the knee up and the foot down"],
+            "bad": ["Leaning back or reaching with the foot"]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Speed",
+      "icon": "🎾",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Split-Step to Sprint",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            { "label": "6 Sets", "style": "yellow" },
+            { "label": "×5 m" },
+            { "label": "Full effort" }
+          ],
+          "cues": {
+            "good": ["Land the split-step then explode in the first stride"],
+            "bad": ["A slow, flat-footed first step"]
+          }
+        },
+        {
+          "type": "circuit",
+          "name": "Ladder Footwork",
+          "rounds": "4 Rounds",
+          "items": [
+            {
+              "name": "In-In-Out-Out",
+              "detail": "1 length",
+              "cues": { "good": ["Quick feet, stay on the balls of the feet"], "bad": ["Looking down at the ladder the whole time"] }
+            },
+            {
+              "name": "Lateral Shuffle",
+              "detail": "1 length each way",
+              "cues": { "good": ["Low hips, push off the outside foot"], "bad": ["Crossing the feet over"] }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
