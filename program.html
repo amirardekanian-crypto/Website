@@ -187,49 +187,22 @@
   }
   .home-name span { color: var(--yellow); display: block; }
 
-  /* ─── Athlete Card (new) ─────────────────────────────────────────
-     Card-style block at the top of Home: avatar + name + goal + dates */
-  .athlete-card {
-    margin: 4px 24px 24px;
-    padding: 22px;
-    background: var(--white);
-    border: 1px solid var(--grey-mid);
-    border-radius: 16px;
+  /* ─── Athlete header ─────────────────────────────────────────────
+     Plain page header at the top of the plan: big stacked name (last name
+     in green via .home-name) + goal + dates. No card chrome, no avatar. */
+  .athlete-header {
+    margin: 8px 24px 26px;
     opacity: 0; transform: translateY(16px);
     animation: fadeInUp 0.6s ease 0.1s forwards;
   }
-  .athlete-card-row {
-    display: flex; align-items: center; gap: 18px;
-    margin-bottom: 14px;
-  }
-  .athlete-avatar {
-    width: 84px; height: 84px; flex-shrink: 0;
-    border-radius: 50%;
-    border: 2px solid var(--yellow);
-    background: var(--grey-card);
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .athlete-avatar img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
-  .athlete-avatar-initials {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: 32px;
-    color: var(--yellow);
-    letter-spacing: 0.5px;
-  }
-  .athlete-card-name {
-    flex: 1; min-width: 0;
-  }
-  /* Athlete card details (goal + dates) under the name row */
+  /* Goal subtitle under the name — mono caps, like "CYCLE n OF N" on the cards */
   .athlete-card-detail {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 17px; font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase;
-    color: var(--grey-dark);
-    margin-top: 10px;
-    line-height: 1.4;
+    color: var(--grey-text);
+    margin-top: 4px;
+    line-height: 1.5;
   }
   .athlete-card-dates {
     font-family: 'Space Mono', monospace;
@@ -2797,12 +2770,13 @@ function renderPlan() {
     return Math.round((end - today) / 86400000);
   };
 
-  // ── ATHLETE CARD (avatar + name + goal + cycle X/Y · dates) ──────
-  const initials = (a.firstName || ' ').charAt(0).toUpperCase() + (a.lastName || ' ').charAt(0).toUpperCase();
-  const avatarInner = a.avatar
-    ? `<img src="${esc(a.avatar)}" alt="${esc(a.firstName)} ${esc(a.lastName)}">`
-    : `<div class="athlete-avatar-initials">${esc(initials)}</div>`;
-  const goalText = (DATA.sport && DATA.sport.badge) ? esc(DATA.sport.badge) : '';
+  // ── ATHLETE HEADER (big name + goal + dates) ─────────────────────
+  // Plain page header — no card chrome, no avatar. First name is dark, last
+  // name drops to its own line in brand green (see .home-name). The goal badge
+  // may carry a leading emoji (e.g. "🎾 Tennis Performance"); strip it so the
+  // subtitle reads as clean mono caps like the rest of the page.
+  const rawGoal = (DATA.sport && DATA.sport.badge) ? DATA.sport.badge : '';
+  const goalText = esc(rawGoal.replace(/^[^A-Za-z0-9]+/, '').trim());
 
   // Dates string (e.g. "APR 28 — JUN 1") — only built if cycle has start/end
   let datesText = '';
@@ -2816,13 +2790,8 @@ function renderPlan() {
   // Cycle X / Y is shown as the segmented meter below — no need to repeat it
   // here. Just show the dates if available.
   document.getElementById('athlete-card-wrap').innerHTML = `
-    <div class="athlete-card">
-      <div class="athlete-card-row">
-        <div class="athlete-avatar">${avatarInner}</div>
-        <div class="athlete-card-name">
-          <div class="home-name">${esc(a.firstName)}<span>${esc(a.lastName)}</span></div>
-        </div>
-      </div>
+    <div class="athlete-header">
+      <div class="home-name">${esc(a.firstName)}<span>${esc(a.lastName)}</span></div>
       ${goalText ? `<div class="athlete-card-detail">${goalText}</div>` : ''}
       ${datesText ? `<div class="athlete-card-dates">${datesText}</div>` : ''}
     </div>`;
