@@ -748,11 +748,7 @@
                 "name": "Cable Chest Fly",
                 "videoUrl": null,
                 "restSec": 60,
-                "chips": [
-                  {
-                    "label": "low-to-high",
-                    "style": "dark"
-                  },
+                "chips": [                
                   {
                     "label": "3 Sets",
                     "style": "yellow"
