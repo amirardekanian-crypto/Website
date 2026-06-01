@@ -167,7 +167,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Leg Press Machine",
+                "name": "Machine Leg Press",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -565,7 +565,7 @@
               },
               {
                 "type": "standard",
-                "name": "Rear Delt Machine",
+                "name": "Machine Reverse Fly",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
