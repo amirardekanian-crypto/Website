@@ -728,6 +728,13 @@
   .wl-banner-row { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   .wl-banner-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; letter-spacing: 0.5px; }
   .wl-banner-count { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); white-space: nowrap; }
+  /* Accordion: categories collapsed by default; tap banner to reveal workouts. */
+  .wl-banner { cursor: pointer; }
+  .wl-banner-chev { position: absolute; top: 14px; right: 16px; z-index: 1; color: #fff; font-size: 18px; line-height: 1; transition: transform 0.25s ease; }
+  .wl-group.open .wl-banner-chev { transform: rotate(180deg); }
+  .wl-group:not(.open) .wl-banner { margin-bottom: 0; }
+  .wl-group-body { display: none; }
+  .wl-group.open .wl-group-body { display: block; animation: fadeUp 0.25s ease both; }
   /* Workout card */
   .wl-card { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--grey-card); border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s ease, transform .1s ease; }
   .wl-card:hover { border-color: #C7552F; }
@@ -2025,6 +2032,122 @@
   .note-body { display: none; padding: 14px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
   .note-card.open .note-body { display: block; }
 
+  /* ════════════════════════════════════════════════════════════════════
+     COACH PAGE REDESIGN — hero header · chat composer · banner note cards
+     ════════════════════════════════════════════════════════════════════ */
+
+  /* ── Coach hero (avatar + name + online status) ── */
+  .coach-hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 28px 24px 20px; }
+  .coach-avatar {
+    position: relative;
+    width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; overflow: hidden;
+    background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(14,74,54,0.25);
+  }
+  /* Photo overlays the initials when present; onerror removes it → initials show. */
+  .coach-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .coach-avatar-initials { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px; letter-spacing: 0.5px; color: #fff; }
+  .coach-hero-main { flex: 1; min-width: 0; }
+  /* Same scale/weight as the athlete name on the home/plan pages (.home-name) */
+  .coach-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(38px, 11vw, 60px);
+    font-weight: 900; letter-spacing: -2px; line-height: 0.95;
+    text-transform: uppercase; color: var(--grey-dark); margin: 0;
+  }
+  .coach-status {
+    display: flex; align-items: center; gap: 8px; margin-top: 10px;
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text);
+  }
+  .coach-status-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: #1BB66B;
+    animation: coachOnlinePulse 2.4s ease-in-out infinite;
+  }
+  @keyframes coachOnlinePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(27,182,107,0.55); }
+    50%      { box-shadow: 0 0 0 5px rgba(27,182,107,0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .coach-status-dot { animation: none; } }
+  body[data-dark] .coach-name { color: #f0f0f0; }
+
+  /* ── Section labels ("Personal notes" / "Using the app") ── */
+  .notes-section-label {
+    font-family: 'Space Mono', monospace; font-weight: 700;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--grey-text); margin: 26px 24px 12px;
+  }
+
+  /* ── Chat composer (always visible) — pill input + round green send ── */
+  .coach-chat { margin: 14px 24px 6px; }
+  .coach-thread { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .coach-composer {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--white); border: 1px solid var(--grey-mid);
+    border-radius: 999px; padding: 5px 5px 5px 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .coach-composer textarea {
+    flex: 1; resize: none; border: none; outline: none; background: transparent;
+    font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--grey-dark);
+    line-height: 1.4; max-height: 120px; padding: 9px 0;
+  }
+  .coach-composer textarea::placeholder { color: var(--grey-text); }
+  .coach-send {
+    width: 46px; height: 46px; flex-shrink: 0; border: none; cursor: pointer;
+    border-radius: 50%; background: var(--yellow); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .coach-send:active { transform: scale(0.92); }
+  .coach-send svg { width: 20px; height: 20px; }
+
+  /* ── Note cards: rounder, taller radius for both note types ── */
+  .note-card { border-radius: 14px; }
+
+  /* Personal note card — category-banner thumbnail + dark title + green CTA */
+  .note-card-row { display: flex; align-items: center; gap: 14px; padding: 14px; cursor: pointer; user-select: none; }
+  /* Brand-colour tile (green / clay / ochre) with the day-card diagonal-stripe
+     texture and the note's emoji centred — no photos, fully on-palette. */
+  .note-tile {
+    width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 27px; line-height: 1;
+    background-color: #0E4A36;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.10) 0 9px, rgba(255,255,255,0) 9px 18px),
+      linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+  }
+  .note-tile.tone-clay {
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, rgba(255,255,255,0) 9px 18px),
+      linear-gradient(135deg, #C7552F 0%, #d56b46 100%);
+  }
+  .note-tile.tone-ochre {
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, rgba(255,255,255,0) 9px 18px),
+      linear-gradient(135deg, #A8741C 0%, #c08a2a 100%);
+  }
+  .note-card-main { flex: 1; min-width: 0; }
+  .note-date { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: var(--grey-text); margin-bottom: 4px; }
+  .note-personal .note-card-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+    font-size: 19px; line-height: 1.05; text-transform: uppercase;
+    color: var(--grey-dark); letter-spacing: 0.3px;
+  }
+  .note-cta {
+    font-family: 'Space Mono', monospace; font-weight: 700;
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--yellow); margin-top: 7px;
+  }
+  .note-card.open .note-cta { display: none; }
+  body[data-dark] .note-personal .note-card-title { color: #f0f0f0; }
+
+  /* "Using the app" cards — icon tile + dark title (general, every client) */
+  .app-card .note-card-title { color: var(--grey-dark); }
+  body[data-dark] .app-card .note-card-title { color: #f0f0f0; }
+
   /* ── Timer ── */
   .timer-overlay { position: fixed; inset: 0; background: rgba(250,247,242,0.97); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
   .timer-overlay.visible { display: flex; }
@@ -2385,13 +2508,23 @@
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
-  <div class="notes-header">
-    <button class="nav-back" onclick="goTo('home')" aria-label="Back to home">←</button>
-    <div class="prog-eyebrow" id="notes-greeting"></div>
-    <div class="notes-title">Coach</div>
-    <div class="notes-subtitle">Messages &amp; your program notes</div>
+  <!-- Coach hero — replaces the old green "Coach" header band. Avatar is a
+       placeholder (brand initials) until a real photo is dropped in; set
+       #coach-avatar's background-image or inject an <img> to swap it. -->
+  <div class="coach-hero">
+    <div class="coach-avatar" id="coach-avatar">
+      <img src="assets/img/coach.jpg" alt="Coach Amir" onerror="this.remove()">
+      <span class="coach-avatar-initials">AA</span>
+    </div>
+    <div class="coach-hero-main">
+      <h1 class="coach-name">Coach Amir</h1>
+      <div class="coach-status">
+        <span class="coach-status-dot"></span>
+        <span>Online · usually replies in a few hours</span>
+      </div>
+    </div>
   </div>
-  <div id="notes-container" style="padding: 20px 0 100px;"></div>
+  <div id="notes-container" style="padding: 4px 0 100px;"></div>
 </div>
 
 <!-- ═══ APP GUIDE ═══ static how-to-use page, same for every client -->
@@ -3768,32 +3901,59 @@ function renderArchive(programId) {
 // ═══════════════════════════════════════════════════════════════════════
 function renderNotes() {
   const notes = DATA.notes || {};
-  const greetingEl = document.getElementById('notes-greeting');
-  if (greetingEl) greetingEl.textContent = notes.greeting || '';
 
-  // App Guide launcher — shown at the top of the Notes screen as a tappable card
-  // (replaces the App Guide button that used to live in the home bottom CTA bar)
-  const guideCard = `
-    <div class="note-card guide-launch-card" onclick="goTo('guide')">
-      <div class="note-card-header">
-        <div class="note-icon">📖</div>
-        <div class="note-card-title">App Guide — How to use this app</div>
-        <span class="note-chevron" style="transform: rotate(-90deg);">▼</span>
-      </div>
-    </div>`;
-
-  const noteCards = (notes.cards || []).map(card => `
-    <div class="note-card" onclick="toggleNote(this)">
-      <div class="note-card-header">
-        <div class="note-icon">${card.icon}</div>
-        <div class="note-card-title">${esc(card.title)}</div>
-        <span class="note-chevron">▼</span>
+  // ── Personal notes (per-client, from JSON). Closed by default; tap to open.
+  //    Each card gets an on-brand colour tile (green/clay/ochre, cycled) with the
+  //    note's emoji — no images, fully on-palette.
+  const TONES = ['', 'tone-clay', 'tone-ochre'];
+  const personalCards = (notes.cards || []).map((card, i) => `
+    <div class="note-card note-personal" onclick="toggleNote(this)">
+      <div class="note-card-row">
+        <div class="note-tile ${TONES[i % TONES.length]}">${card.icon || '📝'}</div>
+        <div class="note-card-main">
+          ${card.date ? `<div class="note-date">${esc(card.date)}</div>` : ''}
+          <div class="note-card-title">${esc(card.title)}</div>
+          <div class="note-cta">Tap to read ›</div>
+        </div>
       </div>
       <div class="note-body">${esc(card.body)}</div>
     </div>`).join('');
 
-  document.getElementById('notes-container').innerHTML = '<div id="coach-section"></div>' + guideCard + noteCards;
+  // ── "Using the app" — general cards, same for everyone, built from the
+  //    App Guide content (single source of truth in #screen-guide).
+  const appCards = buildAppGuideCards();
+
+  document.getElementById('notes-container').innerHTML =
+    '<div id="coach-section"></div>' +
+    (personalCards ? `<div class="notes-section-label">Personal notes</div>${personalCards}` : '') +
+    (appCards ? `<div class="notes-section-label">Using the app</div>${appCards}` : '');
+
   renderCoachThread();
+}
+
+// Build the "Using the app" cards from the static App Guide screen so there's
+// one source of truth. Each guide card becomes a collapsible note-style card
+// (title + chevron only — no icons).
+function buildAppGuideCards() {
+  const cards = document.querySelectorAll('#screen-guide .guide-card');
+  if (!cards.length) return '';
+  return [...cards].map(c => {
+    let title = '';
+    const titleEl = c.querySelector('.guide-card-title');
+    if (titleEl) {
+      const clone = titleEl.cloneNode(true);
+      clone.querySelector('.guide-important-tag')?.remove();
+      title = clone.textContent.trim();
+    }
+    const body = c.querySelector('.guide-body')?.innerHTML || '';
+    return `<div class="note-card app-card" onclick="toggleNote(this)">
+      <div class="note-card-header">
+        <div class="note-card-title">${esc(title)}</div>
+        <span class="note-chevron">▼</span>
+      </div>
+      <div class="note-body">${body}</div>
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -3831,7 +3991,8 @@ function ctxLabel(ctx) {
 function renderCoachThread() {
   const wrap = document.getElementById('coach-section');
   if (!wrap) return;
-  if (!_msgs.length) { wrap.innerHTML = ''; return; }   // coach starts the conversation
+  // The composer is ALWAYS shown so the athlete can start a note anytime; any
+  // existing thread bubbles render above it.
   const bubbles = _msgs.map(m => {
     const mine = m.sender === 'athlete';
     const tag = ctxLabel(m.context);
@@ -3840,12 +4001,14 @@ function renderCoachThread() {
       <div class="cmsg-meta">${tag ? '<span class="cmsg-tag">' + esc(tag) + '</span> · ' : ''}${mine ? 'You' : 'Coach'}</div>
     </div>`;
   }).join('');
-  wrap.innerHTML = `<div class="coach-thread-card">
-    <div class="coach-thread-title">Messages with your coach</div>
-    <div class="coach-thread">${bubbles}</div>
-    <div class="coach-reply">
-      <textarea id="coach-reply-input" rows="1" placeholder="Reply to your coach…"></textarea>
-      <button type="button" onclick="sendCoachReply()" aria-label="Send reply">➤</button>
+  wrap.innerHTML = `<div class="coach-chat">
+    <div class="notes-section-label" style="margin:6px 0 12px;">Chat with Amir</div>
+    ${_msgs.length ? `<div class="coach-thread">${bubbles}</div>` : ''}
+    <div class="coach-composer">
+      <textarea id="coach-reply-input" rows="1" placeholder="Send Amir a note…"></textarea>
+      <button type="button" class="coach-send" onclick="sendCoachReply()" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+      </button>
     </div>
   </div>`;
 }
@@ -3950,14 +4113,16 @@ async function renderWorkoutsLibrary() {
     return;
   }
 
-  // Show EVERY category, even empty ones. The banner shows only the name + a
-  // workout count; an empty category shows a "coach is adding" note instead of cards.
+  // Show EVERY category, even empty ones. Each category is collapsed by default;
+  // tapping its banner reveals the workouts and closes any other open category
+  // (accordion — one open at a time). The banner shows the name + workout count.
   scroll.innerHTML = cats.map(cat => {
     const list = Array.isArray(cat.workouts) ? cat.workouts : [];
     const count = list.length;
     const countLabel = count + ' ' + (count === 1 ? 'Workout' : 'Workouts');
     const banner = `
-      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')">
+      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleWorkoutCat(this)">
+        <span class="wl-banner-chev" aria-hidden="true">▾</span>
         <div class="wl-banner-row">
           <div class="wl-banner-title">${esc(cat.title)}</div>
           <div class="wl-banner-count">${countLabel}</div>
@@ -3974,9 +4139,19 @@ async function renderWorkoutsLibrary() {
             <div class="wl-card-play" aria-hidden="true">▶</div>
           </div>`).join('')
       : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} workouts — check back soon.</div>`;
-    return `<div class="wl-group">${banner}${body}</div>`;
+    return `<div class="wl-group">${banner}<div class="wl-group-body">${body}</div></div>`;
   }).join('');
 }
+
+// Accordion for the Workouts browse page: opening one category closes the rest.
+function toggleWorkoutCat(banner) {
+  const group = banner.closest('.wl-group');
+  if (!group) return;
+  const wasOpen = group.classList.contains('open');
+  document.querySelectorAll('#wl-scroll .wl-group.open').forEach(g => g.classList.remove('open'));
+  if (!wasOpen) group.classList.add('open');
+}
+window.toggleWorkoutCat = toggleWorkoutCat;
 
 // ═══════════════════════════════════════════════════════════════════════
 //  WORKOUT SESSION — open one library workout from its card.
@@ -4521,7 +4696,13 @@ function resetDay(day) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function toggleNote(card) { card.classList.toggle('open'); }
+// Accordion: opening a note closes any other open note on the Coach page.
+function toggleNote(card) {
+  const wasOpen = card.classList.contains('open');
+  const scope = card.closest('#notes-container') || document;
+  scope.querySelectorAll('.note-card.open').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) card.classList.add('open');
+}
 
 // Wipes per-session data for any day completed on a previous calendar date.
 // Preserves: weight log inputs, per-exercise notes (personal context).
