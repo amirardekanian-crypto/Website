@@ -160,6 +160,19 @@
   .prog-section summary { cursor: pointer; list-style: none; }
   .prog-section summary::-webkit-details-marker { display: none; }
 
+  /* Collapsible day (detail view) — each program day is its own toggle, closed
+     by default, so the workout is a tidy list of days instead of one long scroll. */
+  details.day-c { background: var(--card); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 12px; overflow: hidden; }
+  details.day-c > summary { list-style: none; cursor: pointer; padding: 15px 18px; display: flex; align-items: center; gap: 12px; }
+  details.day-c > summary::-webkit-details-marker { display: none; }
+  details.day-c > summary:hover { background: rgba(0,0,0,0.02); }
+  details.day-c[open] > summary { border-bottom: 1px solid var(--line); }
+  .day-c-main { flex: 1; min-width: 0; }
+  .day-c-main h3 { font-size: 18px; }
+  .day-c-chev { margin-left: auto; color: var(--grey); transition: transform .2s; flex: none; font-size: 12px; }
+  details.day-c[open] .day-c-chev { transform: rotate(180deg); }
+  .day-c-body { padding: 14px 18px 18px; }
+
   /* ── Messaging / reply panel ──────────────────────────────────────── */
   .msg-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 18px; }
   .cthread { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
@@ -176,6 +189,40 @@
   .note-actions { display: flex; gap: 8px; margin-top: 8px; }
   .session-reply { gap: 8px; margin-top: 8px; }
   .zpill.reply { background: var(--red-soft); color: var(--red); font-weight: 600; }
+
+  /* ── Tab navigation (Athletes | Chats) ────────────────────────────── */
+  .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+  .tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase;
+         letter-spacing: .5px; font-size: 22px; background: none; border: none; cursor: pointer;
+         color: var(--grey); padding: 4px 2px 12px; margin-bottom: -1px; border-bottom: 2px solid transparent;
+         display: inline-flex; align-items: center; gap: 9px; }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab-badge { background: var(--red); color: #fff; font-family: 'Space Mono', monospace; font-size: 11px;
+               font-weight: 700; line-height: 1; padding: 3px 7px; border-radius: 20px; }
+
+  /* ── Chats inbox (conversation list) ──────────────────────────────── */
+  .conv { display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--line);
+          border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, transform .1s; }
+  .conv:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .conv.unread { border-left: 3px solid var(--red); }
+  .conv-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; color: #fff;
+                 background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+                 display: flex; align-items: center; justify-content: center;
+                 font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; }
+  .conv-body { flex: 1; min-width: 0; }
+  .conv-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: .3px; }
+  .conv-preview { font-size: 13px; color: var(--grey); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conv-preview b { color: var(--ink); font-weight: 600; }
+  .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  .conv-time { font-size: 11px; color: var(--grey); font-family: 'Space Mono', monospace; white-space: nowrap; }
+  .conv-unread { background: var(--red); color: #fff; font-family: 'Space Mono', monospace; font-size: 11px;
+                 font-weight: 700; min-width: 20px; text-align: center; padding: 2px 7px; border-radius: 20px; }
+  /* Chat thread view */
+  .chat-head { display: flex; align-items: center; gap: 14px; margin: 6px 0 18px; }
+  .chat-head .conv-avatar { width: 52px; height: 52px; font-size: 19px; }
+  .chat-thread-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .chat-empty { text-align: center; color: var(--grey); padding: 50px 0; }
 </style>
 </head>
 <body>
@@ -198,7 +245,7 @@
     </div>
   </header>
   <div class="wrap">
-    <h1 class="page-title">Athletes</h1>
+    <div id="tabbar"></div>
     <div id="content"><div class="loading">Loading…</div></div>
   </div>
 </div>
@@ -583,6 +630,8 @@ async function loadOverview() {
   const msgRows = (msgRes && msgRes.data) || [];
   const unreadMsg = {};
   msgRows.forEach(r => { if (r.sender === 'athlete' && !r.read_by_coach) unreadMsg[r.athlete_id] = (unreadMsg[r.athlete_id] || 0) + 1; });
+  _chatUnreadTotal = Object.values(unreadMsg).reduce((a, b) => a + b, 0);
+  renderTabbar('athletes');
   if (!progRows.length && !histRows.length && !Object.keys(keys).length) {
     $('content').innerHTML = '<p class="muted">No athletes yet. Create a secure link with “+ New secure link”, or wait for an athlete to start training.</p>'; return;
   }
@@ -712,6 +761,135 @@ function renderCards() {
 }
 window.renderCards = renderCards;
 
+// --- tab bar (Athletes | Chats) ---------------------------------------------
+let _chatUnreadTotal = 0;
+function renderTabbar(active) {
+  const tb = $('tabbar');
+  if (!tb) return;
+  const badge = _chatUnreadTotal > 0 ? ` <span class="tab-badge">${_chatUnreadTotal}</span>` : '';
+  tb.innerHTML = `<div class="tabs">
+      <button class="tab ${active === 'athletes' ? 'active' : ''}" onclick="loadOverview()">Athletes</button>
+      <button class="tab ${active === 'chats' ? 'active' : ''}" onclick="loadChats()">Chats${badge}</button>
+    </div>`;
+}
+window.renderTabbar = renderTabbar;
+
+// --- Chats inbox ------------------------------------------------------------
+// A global view of every conversation, so the coach sees any note an athlete
+// sends from their app in one place — not just buried in each athlete's detail.
+let _chatMsgs = [], _chatNames = {};
+function chatInitials(name) {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
+async function loadChats() {
+  $('content').innerHTML = '<div class="loading">Loading…</div>';
+  renderTabbar('chats');
+  const [msgRes, progRes, histRes] = await Promise.all([
+    sb.from('messages').select('*').order('created_at', { ascending: true }),
+    sb.from('athlete_progress').select('athlete_id, athlete_name'),
+    sb.from('session_history').select('athlete_id, athlete_name')
+  ]);
+  if (msgRes.error) { $('content').innerHTML = `<p class="muted">Could not load messages: ${esc(msgRes.error.message)}</p>`; return; }
+  _chatMsgs = msgRes.data || [];
+  _chatNames = {};
+  (progRes.data || []).concat(histRes.data || []).forEach(r => { if (r.athlete_name) _chatNames[r.athlete_id] = r.athlete_name; });
+  // Resolve any still-unknown names from the program files (parallel).
+  await Promise.all([...new Set(_chatMsgs.map(m => m.athlete_id))]
+    .filter(id => !_chatNames[id])
+    .map(id => fetch(`data/${id}.json`).then(r => r.ok ? r.json() : null).then(p => {
+      if (p && p.athlete) { const nm = [p.athlete.firstName, p.athlete.lastName].filter(Boolean).join(' '); if (nm) _chatNames[id] = nm; }
+    }).catch(() => {})));
+
+  // Group rows (ascending) into one conversation per athlete; last row wins.
+  const conv = {};
+  _chatMsgs.forEach(m => {
+    const c = conv[m.athlete_id] || (conv[m.athlete_id] = { id: m.athlete_id, last: null, unread: 0 });
+    c.last = m;
+    if (m.sender === 'athlete' && !m.read_by_coach) c.unread++;
+  });
+  _chatUnreadTotal = Object.values(conv).reduce((a, c) => a + c.unread, 0);
+  renderTabbar('chats');
+
+  const list = Object.values(conv).sort((a, b) =>
+    ((b.unread > 0) - (a.unread > 0)) || String(b.last.created_at).localeCompare(String(a.last.created_at)));
+  if (!list.length) {
+    $('content').innerHTML = `<p class="muted">No messages yet. When an athlete sends you a note from their app, the conversation shows up here.</p>`;
+    return;
+  }
+  $('content').innerHTML = list.map(c => {
+    const name = _chatNames[c.id] || c.id;
+    const preview = (c.last.sender === 'coach' ? 'You: ' : '') + (c.last.body || '');
+    return `<div class="conv ${c.unread ? 'unread' : ''}" onclick="openChat('${esc(c.id)}')">
+      <div class="conv-avatar">${esc(chatInitials(name))}</div>
+      <div class="conv-body">
+        <div class="conv-name">${esc(name)}</div>
+        <div class="conv-preview">${c.unread ? '<b>' + esc(preview) + '</b>' : esc(preview)}</div>
+      </div>
+      <div class="conv-meta">
+        <div class="conv-time">${esc(timeAgo(c.last.created_at))}</div>
+        ${c.unread ? `<div class="conv-unread">${c.unread}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+window.loadChats = loadChats;
+
+// One conversation: thread + reply composer. Marks athlete messages read.
+async function openChat(athleteId) {
+  $('content').innerHTML = '<div class="loading">Loading…</div>';
+  renderTabbar('chats');
+  const { data, error } = await sb.from('messages').select('*')
+    .eq('athlete_id', athleteId).order('created_at', { ascending: true });
+  if (error) { $('content').innerHTML = `<p class="muted">Could not load chat: ${esc(error.message)}</p>`; return; }
+  const msgs = data || [];
+  const name = _chatNames[athleteId] || athleteId;
+  _detailName = name;
+  if (msgs.some(m => m.sender === 'athlete' && !m.read_by_coach)) {
+    await sb.from('messages').update({ read_by_coach: true })
+      .eq('athlete_id', athleteId).eq('sender', 'athlete').eq('read_by_coach', false);
+  }
+  const bubbles = msgs.map(m => {
+    const coach = m.sender === 'coach';
+    const tag = ctxLabel(m.context);
+    return `<div class="cmsg ${coach ? 'coach' : 'ath'}">
+      <div class="cmsg-bubble">${esc(m.body)}</div>
+      <div class="cmsg-meta">${tag ? '<span class="cmsg-tag">' + esc(tag) + '</span> · ' : ''}${coach ? 'You' : esc(name)} · ${esc(timeAgo(m.created_at))}</div>
+    </div>`;
+  }).join('');
+  $('content').innerHTML = `
+    <span class="back" onclick="loadChats()">← All chats</span>
+    <div class="chat-head">
+      <div class="conv-avatar">${esc(chatInitials(name))}</div>
+      <div>
+        <h2 style="font-size:24px;margin-bottom:2px">${esc(name)}</h2>
+        <div class="muted" style="cursor:pointer;color:var(--accent)" onclick="loadAthlete('${esc(athleteId)}')">View full profile →</div>
+      </div>
+    </div>
+    <div class="chat-thread-card">
+      ${msgs.length ? `<div class="cthread">${bubbles}</div>` : '<p class="chat-empty">No messages yet — say hello.</p>'}
+      <div class="creply">
+        <textarea id="chat-input" placeholder="Message ${esc(name)}…"></textarea>
+        <button class="btn primary sm" onclick="chatSend('${esc(athleteId)}')">Send</button>
+      </div>
+    </div>`;
+  const ta = $('chat-input'); if (ta) ta.focus();
+}
+window.openChat = openChat;
+
+async function chatSend(athleteId) {
+  const ta = $('chat-input');
+  if (!ta) return;
+  const body = ta.value.trim();
+  if (!body) return;
+  ta.value = '';
+  const ins = await sb.from('messages').insert({ athlete_id: athleteId, sender: 'coach', body, context: null, read_by_athlete: false, read_by_coach: true });
+  if (ins.error) { alert('Could not send: ' + ins.error.message); return; }
+  openChat(athleteId);
+}
+window.chatSend = chatSend;
+
 // --- finished-session card (email-style) ------------------------------------
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function prettyDate(iso) {           // 'YYYY-MM-DD' -> 'Mon 25 May 2026'
@@ -731,10 +909,10 @@ function exerciseLogPart(summary) {
   const body = i >= 0 ? summary.slice(i + 'Exercise log:'.length) : summary;
   return body.replace(/^\s+/, '');
 }
-function renderSessionCard(athleteId, s) {
-  const partial = (s.status || '').toLowerCase().indexOf('partial') === 0;
+// Inner detail for ONE finished session: meta table, athlete note, reply panel,
+// exercise log, and a delete button. Rendered inside the per-day groups below.
+function sessionBodyHtml(athleteId, s) {
   const rd = s.readiness;
-
   // Session load (AU) = session RPE × duration (Foster's method) — same figure
   // the email reports. Only meaningful when a duration was recorded.
   const auLoad = (s.session_rpe != null && s.duration_min != null)
@@ -771,20 +949,57 @@ function renderSessionCard(athleteId, s) {
       <button class="btn sm primary" onclick="sendSessionReply('${uid}', '${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Send reply</button>
     </div>` : '';
 
-  return `<div class="day">
-    <div class="day-head">
-      <div>
-        <h3>Day ${esc(s.day)}${s.focus ? ' — ' + esc(s.focus) : ''}
-          <span class="tag ${partial ? 'partial' : 'done'}">${partial ? 'Partial' : 'Complete'}</span></h3>
-        <div class="day-date">${esc(prettyDate(s.completed_on))}</div>
-      </div>
-      <button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete</button>
-    </div>
-    ${meta}
+  return `${meta}
     ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
     ${actions}
     ${elog ? `<div class="elog-title">Exercise log</div><div class="elog-body">${esc(elog)}</div>` : ''}
-  </div>`;
+    <div class="note-actions"><button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete this log</button></div>`;
+}
+
+// Group every finished session by its program day, newest first within each day.
+// Each day is a collapsed toggle showing its LATEST session in full, with any
+// earlier completions of that same day nested beneath — so the coach can open
+// "Day 4" or "Day 2" and read exactly what was logged last time.
+function renderLogsByDay(athleteId, history, programDays) {
+  if (!history.length) return '<p class="muted">No finished sessions yet — these appear the moment an athlete taps Finish on a day (full or partial).</p>';
+  const byDay = {};
+  history.forEach(s => { (byDay[s.day] = byDay[s.day] || []).push(s); });
+  Object.values(byDay).forEach(arr => arr.sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on))));
+  // Order day groups by the program's day order, with any extras after.
+  const order = (programDays || []).map(d => Number(d.id));
+  const dayNums = Object.keys(byDay).map(Number).sort((a, b) => {
+    const ia = order.indexOf(a), ib = order.indexOf(b);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    return a - b;
+  });
+  return dayNums.map(d => {
+    const sessions = byDay[d];
+    const latest = sessions[0];
+    const pd = (programDays || []).find(p => Number(p.id) === d);
+    const focus = latest.focus || (pd && pd.focusTag) || '';
+    const partial = isPartialStatus(latest.status);
+    const earlier = sessions.slice(1);
+    const needsReply = sessions.some(sessionNeedsReply);
+    return `<details class="day-c">
+      <summary>
+        <div class="day-c-main">
+          <h3>Day ${esc(d)}${focus ? ' — ' + esc(focus) : ''}${needsReply ? ' <span class="zpill reply" style="vertical-align:middle">note to reply</span>' : ''}</h3>
+          <div class="day-date">Last done ${esc(prettyDate(latest.completed_on))} · ${partial ? 'Partial' : 'Complete'}${latest.session_rpe != null ? ' · RPE ' + esc(latest.session_rpe) + '/10' : ''}${sessions.length > 1 ? ' · ' + sessions.length + ' logged' : ''}</div>
+        </div>
+        <span class="day-c-chev">▾</span>
+      </summary>
+      <div class="day-c-body">
+        ${sessionBodyHtml(athleteId, latest)}
+        ${earlier.length ? `<div class="elog-title" style="margin-top:20px">Earlier sessions of this day</div>
+          ${earlier.map(s => `<details class="day-c" style="margin-bottom:8px">
+            <summary><div class="day-c-main"><h3 style="font-size:15px">${esc(prettyDate(s.completed_on))} · ${isPartialStatus(s.status) ? 'Partial' : 'Complete'}${s.session_rpe != null ? ' · RPE ' + esc(s.session_rpe) + '/10' : ''}</h3></div><span class="day-c-chev">▾</span></summary>
+            <div class="day-c-body">${sessionBodyHtml(athleteId, s)}</div>
+          </details>`).join('')}` : ''}
+      </div>
+    </details>`;
+  }).join('');
 }
 
 // --- coach messaging (reply panel) ------------------------------------------
@@ -853,6 +1068,7 @@ window.markNoteRead = markNoteRead;
 // --- athlete detail ---------------------------------------------------------
 async function loadAthlete(athleteId) {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
+  renderTabbar('athletes');
   const [progRes, histRes, keyRes, msgRes] = await Promise.all([
     sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).maybeSingle(),
     sb.from('session_history').select('*').eq('athlete_id', athleteId)
@@ -902,8 +1118,7 @@ async function loadAthlete(athleteId) {
   // ── Permanent finished sessions (captured on Finish; never degrade) ──
   // Rendered like the original coach email: each completion is its own dated
   // entry (full OR partial), with the full meta + exercise log laid out openly.
-  const histHtml = history.length ? history.map(s => renderSessionCard(athleteId, s)).join('')
-    : '<p class="muted">No finished sessions yet — these appear when an athlete taps Finish / send to coach.</p>';
+  const histHtml = renderLogsByDay(athleteId, history, programDays);
 
   // ── Live activity (rolling snapshot; may be partial / cleared on rollover) ──
   // The snapshot stores exercise logs keyed by exercise NAME only (no day), so
@@ -990,12 +1205,9 @@ async function loadAthlete(athleteId) {
       }).join('');
       return `<div class="pblock"><div class="pblock-title">${b.icon ? esc(b.icon) + ' ' : ''}${esc(b.title || '')}</div>${exs}</div>`;
     }).join('');
-    return `<div class="day"><div class="day-head"><h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</h3></div>${blocks}</div>`;
+    return `<details class="day-c"><summary><div class="day-c-main"><h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</h3></div><span class="day-c-chev">▾</span></summary><div class="day-c-body">${blocks}</div></details>`;
   }).join('') : `<p class="muted">No program file found for this athlete (looked for data/${esc(athleteId)}.json).</p>`;
-  const programSection = `<details class="prog-section" open>
-      <summary class="sec-title">Prescribed program — current cycle ▾</summary>
-      ${cycleHead}${progBody}
-    </details>`;
+  const programSection = `<div class="sec-title">Prescribed program — current cycle</div>${cycleHead}${progBody}`;
 
   $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
     <div class="day-head" style="align-items:center;margin-bottom:8px">
@@ -1007,9 +1219,8 @@ async function loadAthlete(athleteId) {
     </div>
     ${linkHtml}
     ${renderCharts(metrics)}
-    ${sessionMsgPanel(athleteId, messages)}
     ${programSection}
-    <div class="sec-title">Finished sessions — permanent record</div>${histHtml}
+    <div class="sec-title">Training logs by day — last session of each day</div>${histHtml}
     <div class="sec-title">Live activity — current snapshot (each day with its own logs)</div>${daysHtml}`;
 }
 

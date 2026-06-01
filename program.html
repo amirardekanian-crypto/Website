@@ -27,13 +27,21 @@
      on this page only; other pages still use the static one. -->
 <script>
   (function () {
-    var client = new URLSearchParams(window.location.search).get('client');
+    var params = new URLSearchParams(window.location.search);
+    var client = params.get('client');
+    var clientKey = params.get('key');   // Stage 2 per-athlete secret key
     // Public demo mode: a sample athlete anyone can explore from the marketing
     // site. Disables the coach email, shows a demo banner, and skips the
     // install nag. Detected purely from the ?client=demo URL.
     window.IS_DEMO = (client === 'demo');
+    // IMPORTANT: keep the &key= in the installed-app start_url. Without it, an
+    // athlete who "Add to Home Screen" opens the app with no key, so every
+    // key-checked cloud write (save_session / save_progress / messages) is
+    // rejected server-side and silently dropped — the coach never sees their
+    // finished logs even though the (key-less) Web3Forms email still arrives.
     var startUrl = client
-      ? 'program.html?client=' + encodeURIComponent(client)
+      ? 'program.html?client=' + encodeURIComponent(client) +
+        (clientKey ? '&key=' + encodeURIComponent(clientKey) : '')
       : 'program.html';
     var manifest = {
       name: "AA Performance",
@@ -2744,6 +2752,35 @@ function _pushSnapshot() {
     } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
   }, 1500);
 }
+// Restore this athlete's saved progress from the cloud when the phone has none
+// — i.e. a reinstall or a new device. Only runs if NO local key exists for the
+// athlete (never clobbers live data) and only fills keys that are missing. Must
+// run BEFORE setupCloudBackup so the raw writes don't trigger backup pushes and
+// BEFORE the UI renders, so the restored data shows immediately.
+async function restoreFromCloudIfEmpty(athleteId, key) {
+  if (window.IS_DEMO || !athleteId) return;
+  const prefix = athleteId + '_';
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.indexOf(prefix) === 0) return;   // local data present → leave it alone
+  }
+  // The Supabase library is loaded `defer`, so it may not be ready yet at boot.
+  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
+    await new Promise(r => setTimeout(r, 100));
+  }
+  try {
+    const sb = _sb();
+    if (!sb) return;
+    const { data, error } = await sb.rpc('get_progress', { p_athlete_id: athleteId, p_key: key || null });
+    if (error || !data || typeof data !== 'object') return;
+    Object.keys(data).forEach(k => {
+      if (k.indexOf(prefix) === 0 && localStorage.getItem(k) == null) {
+        try { localStorage.setItem(k, data[k]); } catch (e) { /* storage full — skip */ }
+      }
+    });
+  } catch (e) { /* offline / function not deployed — app still works from scratch */ }
+}
+
 function setupCloudBackup(athleteId, data, key) {
   _sbId = athleteId;
   _sbKey = key || null;
@@ -2810,9 +2847,29 @@ function getVideoUrl(ex) {
   ATHLETE_ID = DATA.athlete.id;
   STORAGE_KEY = ATHLETE_ID + '_prog_state';
 
+  // Stage 2: remember the per-athlete secret key. An installed PWA or a bookmark
+  // can open the app WITHOUT the &key= param (its cached manifest start_url may
+  // predate the key, or the link was saved before going secure). So persist the
+  // key on any keyed visit and reuse the stored one when the URL omits it —
+  // otherwise every key-checked cloud write is rejected server-side and silently
+  // dropped (no finished logs / live snapshot / messages reach the coach, even
+  // though the key-less Web3Forms email still sends).
+  let effectiveKey = clientKey;
+  if (!window.IS_DEMO) {
+    const ks = ATHLETE_ID + '_skey';
+    try {
+      if (clientKey) localStorage.setItem(ks, clientKey);
+      else effectiveKey = localStorage.getItem(ks) || null;
+    } catch (e) { /* storage blocked — fall back to the URL key */ }
+  }
+
+  // Stage 4: on a fresh install / new device (no local data), pull the athlete's
+  // saved progress back from the cloud BEFORE wiring up backup or rendering.
+  if (!window.IS_DEMO) await restoreFromCloudIfEmpty(ATHLETE_ID, effectiveKey);
+
   // Stage 1: start mirroring progress to the cloud (skips the public demo).
   // Stage 2: pass the per-athlete key so keyed athletes can write.
-  if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA, clientKey);
+  if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA, effectiveKey);
   if (!window.IS_DEMO) fetchMessages();   // load coach messages → sets the Coach-tab dot
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
