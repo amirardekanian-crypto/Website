@@ -745,14 +745,10 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Chest Fly",
+                "name": "Standing Cable Chest Fly",
                 "videoUrl": null,
                 "restSec": 60,
-                "chips": [
-                  {
-                    "label": "low-to-high",
-                    "style": "dark"
-                  },
+                "chips": [                
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -779,7 +775,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Cable Row",
+                "name": "Cable Row",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -813,7 +809,7 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Reverse Fly",
+                "name": "Machine Reverse Fly",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
