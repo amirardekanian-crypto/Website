@@ -827,6 +827,19 @@
   .day-view-back { left: 14px; font-size: 19px; }
   .day-view-dark { right: 14px; font-size: 16px; }
   .day-view-back:active, .day-view-dark:active { transform: scale(0.9); }
+  /* Global floating dark-mode toggle — reachable from Home / Coach / Workouts /
+     My Plan (the day view keeps its own .day-view-dark, so this hides there). */
+  .global-dark-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 65;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(0,0,0,0.30); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; line-height: 1; -webkit-tap-highlight-color: transparent;
+    transition: transform 0.08s, background 0.2s;
+  }
+  .global-dark-toggle:active { transform: scale(0.9); }
+  .global-dark-toggle.is-hidden { display: none; }
+  body[data-dark] .global-dark-toggle { background: rgba(255,255,255,0.14); }
   /* Day cards: stacked image-banner cards. Fade them in like the cycle cards. */
   #day-cards-wrap .current-message {
     opacity: 0; transform: translateY(12px);
@@ -1178,6 +1191,9 @@
   body[data-dark] .readiness-q-text { color: #e8e8e8; }
   body[data-dark] .readiness-opt { background: #242424; border-color: #3a3a3a; }
   body[data-dark] .readiness-opt-num { color: #f0f0f0; }
+  /* Selected state must out-specify `body[data-dark] .readiness-opt` above, or
+     the accent background never lands and a tapped choice looks unselected. */
+  body[data-dark] .readiness-opt.selected { background: var(--ice); border-color: var(--ice); }
 
   /* ── Session Confirm ── */
   .session-confirm {
@@ -2670,6 +2686,12 @@
   </button>
 </div>
 
+<!-- Global dark-mode toggle — floats top-right on every nav screen so the theme
+     can be switched (and persisted) without opening a day view. Hidden inside the
+     day view, which carries its own .day-view-dark button. -->
+<button class="global-dark-toggle is-hidden" id="global-dark-toggle"
+  onclick="toggleDark(event)" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+
 <!-- ═══ TIMER ═══ -->
 <div class="timer-overlay" id="timerOverlay">
   <div class="timer-exercise-name" id="timer-exercise-name"></div>
@@ -2906,6 +2928,10 @@ function getVideoUrl(ex) {
         n.classList.toggle('active', n.dataset.tab === 'home');
       });
     }
+    // Reveal the global dark-mode toggle and point its icon at the saved theme.
+    const darkToggle = document.getElementById('global-dark-toggle');
+    if (darkToggle) darkToggle.classList.remove('is-hidden');
+    syncDarkToggle();
     document.getElementById('v-progress').classList.add('active');
   }, 300);
 })();
@@ -3165,6 +3191,9 @@ function openDayView(dayId) {
   const dv = document.getElementById('day-view');
   if (ov) ov.hidden = true;
   if (dv) dv.hidden = false;
+  // The day view carries its own .day-view-dark button — hide the global one.
+  const gToggle = document.getElementById('global-dark-toggle');
+  if (gToggle) gToggle.classList.add('is-hidden');
 
   // Repeat the tapped day's card at the top (non-clickable), with a back arrow
   // + dark toggle overlaid on the banner — this replaces the cycle hero + tabs.
@@ -3191,6 +3220,9 @@ function closeDayView() {
   const dv = document.getElementById('day-view');
   if (dv) dv.hidden = true;
   if (ov) ov.hidden = false;
+  // Back on a nav screen — bring the global dark-mode toggle back.
+  const gToggle = document.getElementById('global-dark-toggle');
+  if (gToggle) gToggle.classList.remove('is-hidden');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -4119,6 +4151,9 @@ function goTo(screen, historyId) {
 
   // Hide global tabs on the App Guide screen (it has its own back arrow)
   document.getElementById('global-tabs').classList.toggle('is-hidden', screen === 'guide');
+  // Keep the global dark-mode toggle in lockstep — hidden on the Guide, and the
+  // Home tab may return from a day view, so re-show it on any nav screen.
+  document.getElementById('global-dark-toggle').classList.toggle('is-hidden', screen === 'guide');
 
   // Coach tab: show the thread and clear the unread dot
   if (screen === 'notes') { renderCoachThread(); markCoachRead(); }
@@ -5394,10 +5429,18 @@ function selectRPE(btn, key, e) {
 }
 
 function toggleDark(e) {
-  e.stopPropagation();
+  if (e) e.stopPropagation();
   const on = document.body.hasAttribute('data-dark');
   on ? document.body.removeAttribute('data-dark') : document.body.setAttribute('data-dark', '');
   localStorage.setItem('dark_mode', on ? '' : '1');
+  syncDarkToggle();
+}
+
+// Reflect the active theme on the floating toggle: 🌙 = tap to go dark,
+// ☀️ = tap to go light. Called on load and after every toggle.
+function syncDarkToggle() {
+  const btn = document.getElementById('global-dark-toggle');
+  if (btn) btn.textContent = document.body.hasAttribute('data-dark') ? '☀️' : '🌙';
 }
 
 // ── Timer ──
