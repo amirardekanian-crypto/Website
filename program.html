@@ -2113,9 +2113,20 @@
   .note-card.open .note-cta { display: none; }
   body[data-dark] .note-personal .note-card-title { color: #f0f0f0; }
 
-  /* "Using the app" cards — icon tile + dark title (general, every client) */
+  /* "Using the app" cards — green icon tile + dark title (general, every client).
+     These are constant app-UI icons, so they always use the brand green tile
+     (the per-note clay/ochre rotation only applies to personal notes above). */
   .app-card .note-card-title { color: var(--grey-dark); }
   body[data-dark] .app-card .note-card-title { color: #f0f0f0; }
+  .app-card-icon {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    background-color: #0E4A36;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.10) 0 9px, rgba(255,255,255,0) 9px 18px),
+      linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+  }
+  .app-card-icon svg { width: 24px; height: 24px; }
 
   /* ── Timer ── */
   .timer-overlay { position: fixed; inset: 0; background: rgba(250,247,242,0.97); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
@@ -3971,6 +3982,7 @@ function buildAppGuideCards() {
   return APP_GUIDE.map(card => `
     <div class="note-card app-card" onclick="toggleNote(this)">
       <div class="note-card-header">
+        <div class="app-card-icon">${window.ICON(card.icon)}</div>
         <div class="note-card-title">${esc(card.title)}</div>
         <span class="note-chevron">▼</span>
       </div>
