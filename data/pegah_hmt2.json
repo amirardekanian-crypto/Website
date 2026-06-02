@@ -249,7 +249,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Lateral Raise",
+                "name": "Dumbbell Lateral Raise",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -268,7 +268,7 @@
               },
               {
                 "type": "standard",
-                "name": "Plank to Forearm Reach",
+                "name": "Plank with Shoulder Taps",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -279,10 +279,10 @@
                 ],
                 "cues": {
                   "good": [
-                    "Body stays completely rigid — the only thing moving is the forearm reaching forward",
+                    "Body stays completely rigid — the only thing moving is the arm tapping your shoulder",
                     "Feel the obliques on the reaching side firing to stop the hips rotating"
                   ],
-                  "bad": ["Any hip twist or shift toward the reaching arm — if they move, the core has lost"]
+                  "bad": ["Any hip twist or shift toward the raised arm — if they move, the core has lost"]
                 }
               }
             ]
