@@ -627,7 +627,8 @@
   /* Reuse .note-card styles — but always-open (no chevron, no toggle) */
   .guide-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
   .guide-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; }
-  .guide-icon { width: 32px; height: 32px; background: var(--yellow); color: var(--on-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .guide-icon { width: 32px; height: 32px; background: var(--yellow); color: var(--on-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .guide-icon svg { width: 18px; height: 18px; }
   .guide-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; text-transform: uppercase; letter-spacing: 0.5px; }
   .guide-body { padding: 4px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; }
   .guide-body p { margin: 0 0 10px; }
@@ -826,6 +827,7 @@
   }
   .day-view-back { left: 14px; font-size: 19px; }
   .day-view-dark { right: 14px; font-size: 16px; }
+  .day-view-dark svg { width: 18px; height: 18px; }
   .day-view-back:active, .day-view-dark:active { transform: scale(0.9); }
   /* Global floating dark-mode toggle — reachable from Home / Coach / Workouts /
      My Plan (the day view keeps its own .day-view-dark, so this hides there). */
@@ -834,9 +836,10 @@
     width: 38px; height: 38px; border-radius: 50%;
     background: rgba(0,0,0,0.30); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px; line-height: 1; -webkit-tap-highlight-color: transparent;
+    font-size: 17px; line-height: 1; color: #fff; -webkit-tap-highlight-color: transparent;
     transition: transform 0.08s, background 0.2s;
   }
+  .global-dark-toggle svg { width: 19px; height: 19px; }
   .global-dark-toggle:active { transform: scale(0.9); }
   .global-dark-toggle.is-hidden { display: none; }
   body[data-dark] .global-dark-toggle { background: rgba(255,255,255,0.14); }
@@ -2137,7 +2140,7 @@
   .note-tile {
     width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
-    font-size: 27px; line-height: 1;
+    font-size: 27px; line-height: 1; color: #fff;
     background-color: #0E4A36;
     background-image:
       repeating-linear-gradient(135deg, rgba(255,255,255,0.10) 0 9px, rgba(255,255,255,0) 9px 18px),
@@ -2153,6 +2156,7 @@
       repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, rgba(255,255,255,0) 9px 18px),
       linear-gradient(135deg, #A8741C 0%, #c08a2a 100%);
   }
+  .note-tile svg { width: 30px; height: 30px; }
   .note-card-main { flex: 1; min-width: 0; }
   .note-date { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: var(--grey-text); margin-bottom: 4px; }
   .note-personal .note-card-title {
@@ -2563,7 +2567,7 @@
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">🧭</div>
+        <div class="guide-icon" data-icon="compass"></div>
         <div class="guide-card-title">Getting around</div>
       </div>
       <div class="guide-body">
@@ -2574,7 +2578,7 @@
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">💪</div>
+        <div class="guide-icon" data-icon="activity"></div>
         <div class="guide-card-title">RPE &amp; Tempo</div>
       </div>
       <div class="guide-body">
@@ -2585,7 +2589,7 @@
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">✏️</div>
+        <div class="guide-icon" data-icon="edit"></div>
         <div class="guide-card-title">Logging your sets</div>
       </div>
       <div class="guide-body">
@@ -2596,7 +2600,7 @@
 
     <div class="guide-card important">
       <div class="guide-card-header">
-        <div class="guide-icon">✅</div>
+        <div class="guide-icon" data-icon="check-circle"></div>
         <div class="guide-card-title">Finish Workout → Send Data to Coach<span class="guide-important-tag">Important</span></div>
       </div>
       <div class="guide-body">
@@ -2607,7 +2611,7 @@
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">📅</div>
+        <div class="guide-icon" data-icon="clipboard"></div>
         <div class="guide-card-title">What to report &amp; how often</div>
       </div>
       <div class="guide-body">
@@ -2619,7 +2623,7 @@
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">📲</div>
+        <div class="guide-icon" data-icon="phone-install"></div>
         <div class="guide-card-title">Install the app on your home screen</div>
       </div>
       <div class="guide-body">
@@ -2631,21 +2635,21 @@
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">🛠️</div>
+        <div class="guide-icon" data-icon="tool"></div>
         <div class="guide-card-title">Built-in tools</div>
       </div>
       <div class="guide-body">
         <ul>
           <li><strong>Rest timer</strong> — tap the timer icon on an exercise to start a countdown between sets.</li>
           <li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li>
-          <li><strong>Dark mode</strong> — tap the 🌙 button on the program screen for low-light gym sessions.</li>
+          <li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li>
         </ul>
       </div>
     </div>
 
     <div class="guide-card">
       <div class="guide-card-header">
-        <div class="guide-icon">💬</div>
+        <div class="guide-icon" data-icon="help"></div>
         <div class="guide-card-title">Questions or problems</div>
       </div>
       <div class="guide-body">
@@ -2690,7 +2694,7 @@
      can be switched (and persisted) without opening a day view. Hidden inside the
      day view, which carries its own .day-view-dark button. -->
 <button class="global-dark-toggle is-hidden" id="global-dark-toggle"
-  onclick="toggleDark(event)" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+  onclick="toggleDark(event)" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
 
 <!-- ═══ TIMER ═══ -->
 <div class="timer-overlay" id="timerOverlay">
@@ -2723,6 +2727,97 @@
     </div>
   </div>
 </div>
+
+<script>
+/* ═══ ICON SYSTEM ═══ Inline line-art, 24px grid, matches the tab bar.
+   White stroke (currentColor) — tile colour comes from CSS. Two contexts:
+   constant app UI (hard-coded keys) and coach notes (emoji → theme resolver). */
+window.__ICONS = {
+  /* — Constant app UI (Icon Set) — */
+  compass:    `<circle cx="12" cy="12" r="9"/><polygon points="15.5 8.5 10.5 10.5 8.5 15.5 13.5 13.5"/>`,
+  activity:   `<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>`,
+  edit:       `<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>`,
+  'check-circle': `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>`,
+  clipboard:  `<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>`,
+  'phone-install': `<rect x="6" y="2" width="12" height="20" rx="2"/><polyline points="9.5 9 12 11.5 14.5 9"/><line x1="12" y1="5.5" x2="12" y2="11.5"/><line x1="10.5" y1="18.5" x2="13.5" y2="18.5"/>`,
+  tool:       `<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>`,
+  help:       `<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
+  book:       `<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>`,
+  moon:       `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`,
+  sun:        `<circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.4" x2="12" y2="4.6"/><line x1="12" y1="19.4" x2="12" y2="21.6"/><line x1="4.5" y1="4.5" x2="6" y2="6"/><line x1="18" y1="18" x2="19.5" y2="19.5"/><line x1="2.4" y1="12" x2="4.6" y2="12"/><line x1="19.4" y1="12" x2="21.6" y2="12"/><line x1="4.5" y1="19.5" x2="6" y2="18"/><line x1="18" y1="6" x2="19.5" y2="4.5"/>`,
+
+  /* — Coach-note themes — */
+  sleep:      `<path d="M3 18v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5"/><path d="M3 18h18"/><path d="M7 11V9a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 13 9v2"/><line x1="3.5" y1="21" x2="3.5" y2="18"/><line x1="20.5" y1="21" x2="20.5" y2="18"/>`,
+  mindset:    `<path d="M9.5 21v-2.2a6 6 0 1 1 5 0V21"/><path d="M9.5 21h5"/><path d="M10 11.5a2 2 0 0 1 4 0c0 1.2-1 1.5-1.6 2.2"/><line x1="12" y1="16.2" x2="12" y2="16.3"/>`,
+  nutrition:  `<path d="M6 3v8a2 2 0 0 0 2 2v8"/><path d="M6 3v4M9 3v4"/><path d="M16.5 3C15 3 14 5.2 14 8s1 4 2.5 4V21"/>`,
+  bodycomp:   `<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8.5 9 12 6.5 15.5 9"/><line x1="12" y1="13" x2="12" y2="13.6"/><path d="M9.5 16h5"/>`,
+  tempo:      `<line x1="9" y1="2.5" x2="15" y2="2.5"/><line x1="12" y1="2.5" x2="12" y2="4.5"/><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.2 2.2"/><line x1="18.6" y1="6.6" x2="20" y2="5.2"/>`,
+  rpe:        `<line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="10"/>`,
+  progress:   `<polyline points="3 16 9 10 13 14 21 6"/><polyline points="16 6 21 6 21 11"/>`,
+  deload:     `<polyline points="3 8 9 14 13 10 21 18"/><polyline points="16 18 21 18 21 13"/>`,
+  schedule:   `<rect x="3" y="4.5" width="18" height="16.5" rx="2"/><line x1="16" y1="2.5" x2="16" y2="6.5"/><line x1="8" y1="2.5" x2="8" y2="6.5"/><line x1="3" y1="10" x2="21" y2="10"/>`,
+  cycle:      `<polyline points="17 1.5 21 5.5 17 9.5"/><path d="M3 11.5v-2a4 4 0 0 1 4-4h14"/><polyline points="7 22.5 3 18.5 7 14.5"/><path d="M21 12.5v2a4 4 0 0 1-4 4H3"/>`,
+  rotation:   `<path d="M12 3a9 9 0 1 0 8.5 6"/><polyline points="21 3 21 8 16 8"/><circle cx="12" cy="12" r="2.4"/>`,
+  injury:     `<path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="9.5" y1="11.5" x2="14.5" y2="11.5"/>`,
+  strength:   `<path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/>`,
+  cardio:     `<path d="M20.8 6.6a4.6 4.6 0 0 0-7.8-2.1L12 5.4l-1-1a4.6 4.6 0 1 0-6.6 6.4l6.6 7 .9-.9"/><polyline points="13 14 15.5 14 17 11.5 19 16 20.5 13 22.5 13"/>`,
+  running:    `<circle cx="15" cy="4.5" r="2"/><path d="M11.5 21l1.5-5-3-2 1-5 3 2 2.5 1"/><path d="M9.5 9.5 7 11l-1.5 3"/><path d="M14 16l3 .5 1.5 3"/>`,
+  tennis:     `<circle cx="12" cy="12" r="9"/><path d="M5 5a9 9 0 0 1 0 14"/><path d="M19 5a9 9 0 0 0 0 14"/>`,
+  lowerbody:  `<path d="M9 2h6l-.5 8.5L16 21h-3l-1-7-1 7H8l1.5-10.5z"/>`,
+  technique:  `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>`,
+  tracking:   `<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>`,
+  mobility:   `<circle cx="12" cy="4" r="2"/><path d="M5 9l4.5 1.5L12 9l2.5 1.5L19 9"/><path d="M9.5 10.5 8 21M14.5 10.5 16 21"/>`,
+  newinfo:    `<polygon points="12 2.5 14.6 8.6 21 9.2 16 13.5 17.6 20 12 16.4 6.4 20 8 13.5 3 9.2 9.4 8.6"/>`,
+  note:       `<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="8.5" y1="13" x2="15.5" y2="13"/><line x1="8.5" y1="16.5" x2="13" y2="16.5"/>`,
+};
+
+/* Emoji → theme key. Coaches keep typing emoji; this maps them. */
+window.__EMOJI_TO_KEY = {
+  '🛌':'sleep','😴':'sleep',
+  '🧠':'mindset',
+  '🍽️':'nutrition','🥗':'nutrition','🍗':'nutrition','🦷':'nutrition',
+  '⚖️':'bodycomp',
+  '⏱':'tempo','⏱️':'tempo',
+  '📊':'rpe',
+  '📈':'progress',
+  '📉':'deload',
+  '📅':'schedule',
+  '🔁':'cycle','🔄':'cycle',
+  '🌀':'rotation','🦾':'rotation','🏐':'rotation','💥':'rotation',
+  '🛡️':'injury','🩺':'injury','🩹':'injury',
+  '💪':'strength','🏋️':'strength','🏋️‍♀️':'strength','🧱':'strength',
+  '❤️':'cardio',
+  '🏃':'running','🚶':'running',
+  '🎾':'tennis',
+  '🦵':'lowerbody','🦶':'lowerbody',
+  '🎯':'technique',
+  '📓':'tracking','📋':'tracking',
+  '🧘':'mobility','🚲':'mobility','🌬️':'mobility',
+  '🆕':'newinfo',
+};
+
+/* Resolve any value (theme key OR emoji) to a known key. Unknown → 'note'. */
+window.resolveIconKey = function (value) {
+  const v = (value || '').trim();
+  if (window.__ICONS[v]) return v;                  // already a theme key
+  if (window.__EMOJI_TO_KEY[v]) return window.__EMOJI_TO_KEY[v];
+  const strip = s => s.replace(/[️‍]/g, ''); // tolerate variation selectors
+  const sv = strip(v);
+  for (const e in window.__EMOJI_TO_KEY) if (strip(e) === sv) return window.__EMOJI_TO_KEY[e];
+  return 'note';
+};
+
+/* Return an <svg> string for a theme key. */
+window.ICON = function (key, stroke) {
+  const d = window.__ICONS[key] || window.__ICONS.note;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke || 1.8}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+};
+
+/* Fill every [data-icon] tile (constant UI) with its line icon, once on load. */
+window.paintStaticIcons = function () {
+  document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = window.ICON(el.dataset.icon); });
+};
+</script>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════
@@ -2907,6 +3002,7 @@ function getVideoUrl(ex) {
   renderPlan();
   renderHome();
   renderNotes();
+  paintStaticIcons();   // fill the static [data-icon] tiles (Guide cards) once
 
   restoreState();
   isLoading = false;
@@ -3203,7 +3299,7 @@ function openDayView(dayId) {
   if (cardEl && i >= 0) {
     cardEl.innerHTML =
       `<button class="day-view-back" onclick="closeDayView()" aria-label="Back to overview">←</button>` +
-      `<button class="day-view-dark" onclick="toggleDark(event)" aria-label="Toggle dark mode">🌙</button>` +
+      `<button class="day-view-dark" onclick="toggleDark(event)" aria-label="Toggle dark mode">${window.ICON('moon', 1.6)}</button>` +
       dayCardHTML(days[i], i + 1, days.length, { static: true });
   }
 
@@ -3614,7 +3710,7 @@ function parseChips(chips) {
     if (m) { out.target = '@' + m[1].trim(); return; }
     if (/^@/.test(label)) { out.target = label; return; }
     // REPS (× prefix, or contains "Reps")
-    if (/^×/.test(label)) { out.reps = label.replace(/^×/, '').trim(); return; }
+    if (/^×/.test(label)) { out.reps = label.replace(/^×/, '').replace(/\s*reps?$/i, '').trim(); return; }
     if (/reps?$/i.test(label)) { out.reps = label.replace(/\s*reps?$/i, '').trim(); return; }
     // Anything else — preserve the chip's `style` so "yellow" highlighted ones stand out
     out.extras.push({ label, style: c.style || '' });
@@ -3657,7 +3753,7 @@ function renderStatsGrid(parsed, restSec) {
   const cells = [
     { label: 'SETS',       value: parsed.sets   || '—', cls: parsed.sets   ? '' : 'dim' },
     { label: 'REPS',       value: parsed.reps   || '—', cls: parsed.reps   ? '' : 'dim' },
-    { label: 'TARGET RPE', value: targetVal,            cls: 'target ' + (parsed.target ? '' : 'dim') },
+    { label: 'RPE',        value: targetVal,            cls: 'target ' + (parsed.target ? '' : 'dim') },
     { label: 'TEMPO',      value: parsed.tempo  || '—', cls: 'tempo '  + (parsed.tempo  ? '' : 'dim') },
     { label: 'REST',       value: restStr,              cls: '' },
   ];
@@ -3992,13 +4088,14 @@ function renderNotes() {
   const notes = DATA.notes || {};
 
   // ── Personal notes (per-client, from JSON). Closed by default; tap to open.
-  //    Each card gets an on-brand colour tile (green/clay/ochre, cycled) with the
-  //    note's emoji — no images, fully on-palette.
+  //    Each card gets an on-brand colour tile (green/clay/ochre, cycled). The
+  //    note's emoji is resolved to a matching line icon via resolveIconKey() —
+  //    coaches keep authoring with emoji; the app translates them. No raw emoji.
   const TONES = ['', 'tone-clay', 'tone-ochre'];
   const personalCards = (notes.cards || []).map((card, i) => `
     <div class="note-card note-personal" onclick="toggleNote(this)">
       <div class="note-card-row">
-        <div class="note-tile ${TONES[i % TONES.length]}">${card.icon || '📝'}</div>
+        <div class="note-tile ${TONES[i % TONES.length]}">${window.ICON(window.resolveIconKey(card.icon))}</div>
         <div class="note-card-main">
           ${card.date ? `<div class="note-date">${esc(card.date)}</div>` : ''}
           <div class="note-card-title">${esc(card.title)}</div>
@@ -5436,11 +5533,11 @@ function toggleDark(e) {
   syncDarkToggle();
 }
 
-// Reflect the active theme on the floating toggle: 🌙 = tap to go dark,
-// ☀️ = tap to go light. Called on load and after every toggle.
+// Reflect the active theme on the floating toggle: sun = tap to go light (dark
+// is on), moon = tap to go dark (light is on). Called on load and every toggle.
 function syncDarkToggle() {
   const btn = document.getElementById('global-dark-toggle');
-  if (btn) btn.textContent = document.body.hasAttribute('data-dark') ? '☀️' : '🌙';
+  if (btn) btn.innerHTML = window.ICON(document.body.hasAttribute('data-dark') ? 'sun' : 'moon', 1.6);
 }
 
 // ── Timer ──
