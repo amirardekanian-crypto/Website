@@ -390,13 +390,8 @@
   }
   /* Slightly thicker stroke when active so the icon visually weighs more */
   .global-tabs .nav-item.active .nav-icon svg { stroke-width: 2; }
-  /* Hidden during loading and on the App Guide screen (which keeps its back arrow) */
+  /* Hidden during loading (revealed once the first screen renders) */
   .global-tabs.is-hidden { display: none; }
-
-  /* App Guide button (in Notes screen, styled as a note-card) */
-  .guide-launch-card { cursor: pointer; }
-  .guide-launch-card .note-icon { background: var(--ice); }
-  .guide-launch-card .note-card-title { color: var(--ice); }
 
   /* ─── HOME-ONLY: yellow-only palette ─────────────────────────────
      Remap the ice + purple tokens to yellow ONLY inside #screen-plan,
@@ -610,60 +605,6 @@
   /* Reserve space so content isn't hidden behind the global tab bar */
   #screen-plan { padding-bottom: 90px; }
   #screen-workouts .archive-scroll { padding-bottom: 100px; }
-  #screen-guide .guide-container { padding-bottom: 100px; }
-
-  /* ── App Guide screen ── shares cards with Notes for a familiar look */
-  #screen-guide { background: var(--grey-bg); }
-  .guide-header { background: var(--yellow); padding: 48px 24px 32px; position: relative; }
-  .guide-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
-  /* Back arrow lives inside the header's top padding band, so the header box
-     stays the exact same size as the Notes header (no separate bar above it). */
-  .guide-back { position: absolute; top: 14px; left: 18px; background: transparent; border: none; color: var(--on-accent); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 8px; }
-  .guide-back:active { transform: scale(0.9); }
-  .guide-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ice); margin-bottom: 8px; }
-  .guide-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: #fff; text-transform: uppercase; line-height: 1; }
-  .guide-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
-  .guide-container { padding: 20px 0 100px; }
-  /* Reuse .note-card styles — but always-open (no chevron, no toggle) */
-  .guide-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
-  .guide-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; }
-  .guide-icon { width: 32px; height: 32px; background: var(--yellow); color: var(--on-accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .guide-icon svg { width: 18px; height: 18px; }
-  .guide-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; text-transform: uppercase; letter-spacing: 0.5px; }
-  .guide-body { padding: 4px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; }
-  .guide-body p { margin: 0 0 10px; }
-  .guide-body p:last-child { margin-bottom: 0; }
-  .guide-body strong { color: var(--grey-dark); font-weight: 700; }
-  .guide-body ul { margin: 4px 0 0; padding-left: 18px; }
-  .guide-body li { margin: 4px 0; }
-  /* "Important" callout for the Send Data to Coach card */
-  .guide-card.important { border: 1px solid var(--yellow); box-shadow: 0 0 0 3px var(--yellow-dim); }
-  .guide-card.important .guide-icon { background: var(--yellow); }
-  .guide-important-tag {
-    display: inline-block; margin-left: 8px; padding: 2px 8px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px;
-    letter-spacing: 2px; text-transform: uppercase;
-    background: var(--yellow); color: var(--on-accent); border-radius: 3px;
-  }
-  /* WhatsApp CTA at bottom of the guide */
-  .guide-whatsapp {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    margin: 24px 20px 0; padding: 16px 20px;
-    background: #25D366; color: #fff;
-    border-radius: 10px; text-decoration: none;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: 16px; letter-spacing: 1px; text-transform: uppercase;
-    transition: transform 0.15s;
-  }
-  .guide-whatsapp:active { transform: scale(0.98); }
-  .guide-whatsapp-num { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 400; opacity: 0.9; }
-
-  /* Dark-mode variants — match the .note-card pattern already in use */
-  body[data-dark] #screen-guide { background: #0a0a0a; }
-  body[data-dark] .guide-card { background: #202020; border-color: #333; }
-  body[data-dark] .guide-card-title { color: #f0f0f0; }
-  body[data-dark] .guide-body { color: #aaa; }
-  body[data-dark] .guide-body strong { color: #fff; }
 
   /* Fallback simple intro for JSONs with no cycle data */
   .home-simple-meta {
@@ -2555,116 +2496,6 @@
   <div id="notes-container" style="padding: 4px 0 100px;"></div>
 </div>
 
-<!-- ═══ APP GUIDE ═══ static how-to-use page, same for every client -->
-<div id="screen-guide" class="screen">
-  <div class="guide-header">
-    <button class="guide-back" onclick="goTo('notes')" aria-label="Back to notes">←</button>
-    <div class="guide-eyebrow">For everyone</div>
-    <div class="guide-title">App<br>Guide</div>
-    <div class="guide-subtitle">How to use this app — read once, refer back anytime</div>
-  </div>
-  <div class="guide-container">
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="compass"></div>
-        <div class="guide-card-title">Getting around</div>
-      </div>
-      <div class="guide-body">
-        <p>Open the app from your home screen. The homepage shows your current cycle and progress.</p>
-        <p>Tap <strong>Current Program</strong> to start training, or <strong>Notes</strong> to read the personal notes I write you each cycle. Inside Current Program, the tabs at the top (D1, D2, D3…) switch between training days.</p>
-      </div>
-    </div>
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="activity"></div>
-        <div class="guide-card-title">RPE &amp; Tempo</div>
-      </div>
-      <div class="guide-body">
-        <p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p>
-        <p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>
-      </div>
-    </div>
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="edit"></div>
-        <div class="guide-card-title">Logging your sets</div>
-      </div>
-      <div class="guide-body">
-        <p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p>
-        <p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>
-      </div>
-    </div>
-
-    <div class="guide-card important">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="check-circle"></div>
-        <div class="guide-card-title">Finish Workout → Send Data to Coach<span class="guide-important-tag">Important</span></div>
-      </div>
-      <div class="guide-body">
-        <p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p>
-        <p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>
-      </div>
-    </div>
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="clipboard"></div>
-        <div class="guide-card-title">What to report &amp; how often</div>
-      </div>
-      <div class="guide-body">
-        <p><strong>Every session</strong> → use the Send Data to Coach button (above).</p>
-        <p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p>
-        <p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>
-      </div>
-    </div>
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="phone-install"></div>
-        <div class="guide-card-title">Install the app on your home screen</div>
-      </div>
-      <div class="guide-body">
-        <p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p>
-        <p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p>
-        <p>Once installed it opens like a normal app — full-screen, no browser bar.</p>
-      </div>
-    </div>
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="tool"></div>
-        <div class="guide-card-title">Built-in tools</div>
-      </div>
-      <div class="guide-body">
-        <ul>
-          <li><strong>Rest timer</strong> — tap the timer icon on an exercise to start a countdown between sets.</li>
-          <li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li>
-          <li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="guide-card">
-      <div class="guide-card-header">
-        <div class="guide-icon" data-icon="help"></div>
-        <div class="guide-card-title">Questions or problems</div>
-      </div>
-      <div class="guide-body">
-        <p>Message me on WhatsApp anytime — form check videos, equipment swaps ("my gym doesn't have this machine, what should I do instead?"), or anything you're unsure about. Don't sit on something for days; quick check-ins beat long waits.</p>
-      </div>
-    </div>
-
-    <a class="guide-whatsapp" href="https://wa.me/447435363461" target="_blank" rel="noopener">
-      <span>Message me on WhatsApp</span>
-      <span class="guide-whatsapp-num">+44 7435 363461</span>
-    </a>
-
-  </div>
-</div>
-
 <!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Always visible across the nav screens.
      Order: Program · Coach · Workouts · My Plan. data-tab values are unchanged
      (home/program/notes/archive) so all goTo() routing still works — only the
@@ -2813,10 +2644,6 @@ window.ICON = function (key, stroke) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke || 1.8}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 };
 
-/* Fill every [data-icon] tile (constant UI) with its line icon, once on load. */
-window.paintStaticIcons = function () {
-  document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = window.ICON(el.dataset.icon); });
-};
 </script>
 
 <script>
@@ -3002,7 +2829,6 @@ function getVideoUrl(ex) {
   renderPlan();
   renderHome();
   renderNotes();
-  paintStaticIcons();   // fill the static [data-icon] tiles (Guide cards) once
 
   restoreState();
   isLoading = false;
@@ -4105,8 +3931,8 @@ function renderNotes() {
       <div class="note-body">${esc(card.body)}</div>
     </div>`).join('');
 
-  // ── "Using the app" — general cards, same for everyone, built from the
-  //    App Guide content (single source of truth in #screen-guide).
+  // ── "Using the app" — general cards, same for everyone (from the APP_GUIDE
+  //    data array; this is the only place the how-to content lives now).
   const appCards = buildAppGuideCards();
 
   document.getElementById('notes-container').innerHTML =
@@ -4117,29 +3943,39 @@ function renderNotes() {
   renderCoachThread();
 }
 
-// Build the "Using the app" cards from the static App Guide screen so there's
-// one source of truth. Each guide card becomes a collapsible note-style card
-// (title + chevron only — no icons).
+// "Using the app" — the general how-to content shown to every athlete in the
+// Coach tab. This is now the single source of truth: the old standalone App
+// Guide screen (#screen-guide) was removed, so the content lives here directly.
+// Each entry renders as a collapsible note-style card. (`icon` is kept per card
+// so the rows can be given line-icon tiles later without re-deriving them.)
+const APP_GUIDE = [
+  { icon: 'compass', title: 'Getting around',
+    body: `<p>Open the app from your home screen. The homepage shows your current cycle and progress.</p><p>Tap <strong>Current Program</strong> to start training, or <strong>Notes</strong> to read the personal notes I write you each cycle. Inside Current Program, the tabs at the top (D1, D2, D3…) switch between training days.</p>` },
+  { icon: 'activity', title: 'RPE & Tempo',
+    body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
+  { icon: 'edit', title: 'Logging your sets',
+    body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
+  { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
+    body: `<p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
+  { icon: 'clipboard', title: 'What to report & how often',
+    body: `<p><strong>Every session</strong> → use the Send Data to Coach button (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
+  { icon: 'phone-install', title: 'Install the app on your home screen',
+    body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
+  { icon: 'tool', title: 'Built-in tools',
+    body: `<ul><li><strong>Rest timer</strong> — tap the timer icon on an exercise to start a countdown between sets.</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
+  { icon: 'help', title: 'Questions or problems',
+    body: `<p>Message me on WhatsApp anytime — form check videos, equipment swaps ("my gym doesn't have this machine, what should I do instead?"), or anything you're unsure about. Don't sit on something for days; quick check-ins beat long waits.</p>` },
+];
+
 function buildAppGuideCards() {
-  const cards = document.querySelectorAll('#screen-guide .guide-card');
-  if (!cards.length) return '';
-  return [...cards].map(c => {
-    let title = '';
-    const titleEl = c.querySelector('.guide-card-title');
-    if (titleEl) {
-      const clone = titleEl.cloneNode(true);
-      clone.querySelector('.guide-important-tag')?.remove();
-      title = clone.textContent.trim();
-    }
-    const body = c.querySelector('.guide-body')?.innerHTML || '';
-    return `<div class="note-card app-card" onclick="toggleNote(this)">
+  return APP_GUIDE.map(card => `
+    <div class="note-card app-card" onclick="toggleNote(this)">
       <div class="note-card-header">
-        <div class="note-card-title">${esc(title)}</div>
+        <div class="note-card-title">${esc(card.title)}</div>
         <span class="note-chevron">▼</span>
       </div>
-      <div class="note-body">${body}</div>
-    </div>`;
-  }).join('');
+      <div class="note-body">${card.body}</div>
+    </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -4246,11 +4082,10 @@ function goTo(screen, historyId) {
     n.classList.toggle('active', n.dataset.tab === screen);
   });
 
-  // Hide global tabs on the App Guide screen (it has its own back arrow)
-  document.getElementById('global-tabs').classList.toggle('is-hidden', screen === 'guide');
-  // Keep the global dark-mode toggle in lockstep — hidden on the Guide, and the
-  // Home tab may return from a day view, so re-show it on any nav screen.
-  document.getElementById('global-dark-toggle').classList.toggle('is-hidden', screen === 'guide');
+  // Every nav screen shows the global tab bar + dark-mode toggle (the Home tab
+  // may return from a day view, which had hidden them).
+  document.getElementById('global-tabs').classList.remove('is-hidden');
+  document.getElementById('global-dark-toggle').classList.remove('is-hidden');
 
   // Coach tab: show the thread and clear the unread dot
   if (screen === 'notes') { renderCoachThread(); markCoachRead(); }
