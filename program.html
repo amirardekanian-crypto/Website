@@ -3086,8 +3086,10 @@ function dayCardHTML(day, dayNum, total, opts) {
   const id = day.id != null ? day.id : dayNum;
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
-  // Shared category image — one of the ~8 files in assets/days/.
-  const catImg = `assets/days/${dayImageCategory(day)}.jpg`;
+  // Shared category image — one of the ~8 .webp files in assets/days/. Extension
+  // is hardcoded to .webp (the format these were uploaded in); a missing file
+  // falls back to the green gradient via dayImgError().
+  const catImg = `assets/days/${dayImageCategory(day)}.webp`;
   const idStr = esc(String(id));
 
   // Subtitle = "N blocks · M movements". Each exercise entry counts as one
