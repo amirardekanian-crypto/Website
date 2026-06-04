@@ -292,10 +292,13 @@
   .planlike .current-message { padding: 0; }      /* banner is edge-to-edge; body re-adds padding */
   .planlike .cm-banner {
     position: relative;
-    /* Lock the banner to the image's 16:9 ratio so the framing is identical on
-       every device — the whole photo shows, never stretched, never re-cropped.
-       min/max clamp the size on very narrow phones and very wide screens; older
-       browsers that ignore aspect-ratio fall back to the min-height. */
+    /* width:100% first — otherwise aspect-ratio + the max-height cap makes the
+       browser derive WIDTH from the clamped height (260×16/9 = 462px), leaving
+       white strips on the sides once the card grows past that (full-bleed home
+       hero, wide screens). With full width the banner always reaches the card
+       edges and the photo just crops to the height band instead. Matches the
+       day-card banner behaviour. */
+    width: 100%;
     aspect-ratio: 16 / 9;
     min-height: 160px;
     max-height: 260px;
@@ -452,6 +455,17 @@
       0 0 0 1px rgba(14,74,54,0.04),
       0 8px 30px rgba(14,74,54,0.06),
       inset 0 0 24px rgba(14,74,54,0.02);
+  }
+  /* Home current-cycle hero: full-bleed edge to edge (mirrors the day-view card)
+     — drop the side margin, rounding and frame so the banner image covers the
+     full screen width instead of sitting inset like the My Plan cards. Keeps the
+     bottom margin for spacing before the "This Week" section. */
+  #home-cycle-wrap .current-message {
+    margin-left: 0;
+    margin-right: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
   .planlike .cm-body-label { color: #C7552F; }
 
