@@ -2725,18 +2725,21 @@ function _pushSnapshot() {
     } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
   }, 1500);
 }
-// Restore this athlete's saved progress from the cloud when the phone has none
-// — i.e. a reinstall or a new device. Only runs if NO local key exists for the
-// athlete (never clobbers live data) and only fills keys that are missing. Must
-// run BEFORE setupCloudBackup so the raw writes don't trigger backup pushes and
-// BEFORE the UI renders, so the restored data shows immediately.
-async function restoreFromCloudIfEmpty(athleteId, key) {
+// Pull this athlete's saved progress from the cloud on EVERY load and merge it
+// into whatever is on this device, so a returning device (the coach's PC, a
+// second phone, a reinstalled PWA) always shows the latest data — not a stale
+// local snapshot. The old version only restored onto a totally empty device,
+// which meant any device that had ever opened the program never pulled updates
+// again (it became upload-only) — that's why the coach's PC showed nothing.
+//
+// The merge is NON-DESTRUCTIVE: a real value never loses to a blank one (in
+// either direction). On a genuine conflict the cloud — the shared latest, last
+// writer wins — takes precedence, which is what a returning viewer wants. We
+// pull (never blind-push) first, so a stale device can never overwrite the
+// cloud's good data. Must run BEFORE setupCloudBackup (raw writes, no push
+// storm) and BEFORE the UI renders, so the merged data shows immediately.
+async function syncFromCloud(athleteId, key) {
   if (window.IS_DEMO || !athleteId) return;
-  const prefix = athleteId + '_';
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.indexOf(prefix) === 0) return;   // local data present → leave it alone
-  }
   // The Supabase library is loaded `defer`, so it may not be ready yet at boot.
   for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
     await new Promise(r => setTimeout(r, 100));
@@ -2745,13 +2748,44 @@ async function restoreFromCloudIfEmpty(athleteId, key) {
     const sb = _sb();
     if (!sb) return;
     const { data, error } = await sb.rpc('get_progress', { p_athlete_id: athleteId, p_key: key || null });
-    if (error || !data || typeof data !== 'object') return;
+    if (error || !data || typeof data !== 'object') return;   // offline / rejected → keep local
+    const prefix = athleteId + '_';
     Object.keys(data).forEach(k => {
-      if (k.indexOf(prefix) === 0 && localStorage.getItem(k) == null) {
-        try { localStorage.setItem(k, data[k]); } catch (e) { /* storage full — skip */ }
+      if (k.indexOf(prefix) !== 0) return;
+      const localVal = localStorage.getItem(k);
+      const merged   = mergeStoredValue(k, localVal, data[k]);
+      if (merged != null && merged !== localVal) {
+        try { localStorage.setItem(k, merged); } catch (e) { /* storage full — skip */ }
       }
     });
-  } catch (e) { /* offline / function not deployed — app still works from scratch */ }
+  } catch (e) { /* offline / function not deployed — app still works from local */ }
+}
+
+// Merge one stored value, local vs cloud. Non-destructive: prefer real data over
+// blanks so a returning device never wipes entered weights/RPE/notes; on a true
+// conflict the cloud value wins (it's the shared latest).
+function mergeStoredValue(key, localVal, cloudVal) {
+  if (cloudVal == null) return localVal;
+  if (localVal == null || localVal === cloudVal) return cloudVal;
+  // Per-set logs: merge field-by-field so a blank set on one side never erases a
+  // real weight/RPE on the other.
+  if (key.indexOf('_setlog_') !== -1) {
+    try {
+      const L = JSON.parse(localVal), C = JSON.parse(cloudVal);
+      if (Array.isArray(L) && Array.isArray(C)) {
+        const n = Math.max(L.length, C.length), out = [];
+        const pick = (a, b) => (b != null && b !== '') ? b : (a || '');   // real value wins; cloud breaks ties
+        for (let i = 0; i < n; i++) {
+          const a = L[i] || {}, b = C[i] || {};
+          out.push({ w: pick(a.w, b.w), r: pick(a.r, b.r), d: !!(a.d || b.d) });
+        }
+        return JSON.stringify(out);
+      }
+    } catch (e) { /* not parseable — fall through */ }
+  }
+  // Scalars (notes, RPE, session note, etc.): a non-empty cloud value wins; an
+  // empty cloud value never overwrites a real local one.
+  return (cloudVal !== '') ? cloudVal : localVal;
 }
 
 function setupCloudBackup(athleteId, data, key) {
@@ -2820,25 +2854,29 @@ function getVideoUrl(ex) {
   ATHLETE_ID = DATA.athlete.id;
   STORAGE_KEY = ATHLETE_ID + '_prog_state';
 
-  // Stage 2: remember the per-athlete secret key. An installed PWA or a bookmark
-  // can open the app WITHOUT the &key= param (its cached manifest start_url may
-  // predate the key, or the link was saved before going secure). So persist the
-  // key on any keyed visit and reuse the stored one when the URL omits it —
-  // otherwise every key-checked cloud write is rejected server-side and silently
-  // dropped (no finished logs / live snapshot / messages reach the coach, even
-  // though the key-less Web3Forms email still sends).
+  // Stage 2: resolve the per-athlete secret key. The key can come from three
+  // places, in priority order: the URL (&key=), this device's stored copy, or
+  // the program JSON itself (DATA.athlete.key). The JSON fallback is the robust
+  // one — an installed PWA or bookmark frequently opens WITHOUT the &key= param
+  // (iOS caches a key-less start_url, or the link was saved before going secure),
+  // and a cleared device has no stored copy either. Because the JSON is only
+  // reachable via the correct ?client= URL, the key stays as private as the link
+  // itself. Without a valid key, every cloud write is rejected server-side and
+  // silently dropped — the coach never sees the athlete's data.
   let effectiveKey = clientKey;
   if (!window.IS_DEMO) {
     const ks = ATHLETE_ID + '_skey';
+    const jsonKey = (DATA.athlete && DATA.athlete.key) || null;
     try {
-      if (clientKey) localStorage.setItem(ks, clientKey);
-      else effectiveKey = localStorage.getItem(ks) || null;
-    } catch (e) { /* storage blocked — fall back to the URL key */ }
+      effectiveKey = clientKey || localStorage.getItem(ks) || jsonKey || null;
+      if (effectiveKey) localStorage.setItem(ks, effectiveKey);   // persist for future key-less opens
+    } catch (e) { effectiveKey = clientKey || jsonKey || null; }  // storage blocked
   }
 
-  // Stage 4: on a fresh install / new device (no local data), pull the athlete's
-  // saved progress back from the cloud BEFORE wiring up backup or rendering.
-  if (!window.IS_DEMO) await restoreFromCloudIfEmpty(ATHLETE_ID, effectiveKey);
+  // Stage 4: pull the athlete's saved progress from the cloud and merge it in on
+  // EVERY load (not just a fresh device), BEFORE wiring up backup or rendering —
+  // so any returning device shows the latest data instead of a stale local copy.
+  if (!window.IS_DEMO) await syncFromCloud(ATHLETE_ID, effectiveKey);
 
   // Stage 1: start mirroring progress to the cloud (skips the public demo).
   // Stage 2: pass the per-athlete key so keyed athletes can write.
@@ -5204,8 +5242,13 @@ function attachSetLog(card) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
   const log   = loadSetLog(name, total);
-  // Persist any seeding we just did so we don't redo it next load.
-  saveSetLogValue(name, log);
+  // Persist seeding ONLY when it carries real content (e.g. migrated legacy
+  // weights/RPE). Saving an all-blank seed would push empty arrays to the cloud,
+  // and the server-side merge would let those blanks overwrite real data synced
+  // from another device. Blank logs are simply (re)created in memory each load.
+  if (log.some(s => (s.w && s.w !== '') || (s.r && s.r !== '') || s.d)) {
+    saveSetLogValue(name, log);
+  }
 
   const slot = logSlotFor(card);
   const wrap = document.createElement('div');
