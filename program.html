@@ -279,7 +279,7 @@
     50%      { box-shadow: 0 0 0 4px rgba(14,74,54,0), 0 0 14px rgba(14,74,54,0.9); }
   }
   @media (prefers-reduced-motion: reduce) { .cm-pill-active { animation: none; } }
-  /* "Coming soon!" pill on the next cycle — soft tinted clay, quieter than the
+  /* "Up next!" pill on the next cycle — soft tinted clay, quieter than the
      solid Done/Active pills so it reads as upcoming, not current. */
   .cm-pill-next { background: rgba(255,255,255,0.92); color: #C7552F; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
   /* "Locked" pill on cycles further out — quiet grey. */
@@ -3329,7 +3329,7 @@ function renderPlan() {
       // First future card is the immediate next cycle; everything after is locked.
       const isNext = i === 0;
       html += cycleCardHTML(c, {
-        pill: isNext ? 'Coming soon!' : 'Locked',
+        pill: isNext ? 'Up next!' : 'Locked',
         pillStyle: isNext ? 'next' : 'locked',
         total: cycles.length,
         paragraphs: teaser.paragraphs,
