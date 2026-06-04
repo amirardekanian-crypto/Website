@@ -805,13 +805,17 @@
   }
   #day-cards-wrap .cm-banner {
     /* width:100% first — otherwise aspect-ratio + the max-height cap makes the
-       browser derive width FROM the clamped height (120×5/2 = 300px), leaving a
+       browser derive width FROM the clamped height (170×5/2 = 425px), leaving a
        white strip where the banner doesn't reach the card edge. With full width
-       the photo just crops to the 100–120px band instead. */
+       the photo just crops to the height band instead. */
     width: 100%;
     aspect-ratio: 5 / 2;
     min-height: 100px;
-    max-height: 120px;
+    /* Cap raised from 120→170: at typical phone widths (~360–430px) the 5:2 ratio
+       now resolves to ~144–172px and stays UNDER the cap, so the whole 5:2 photo
+       shows with no top/bottom crop. The cap only re-engages on wide/desktop
+       viewports, keeping the band from becoming a letterbox there. */
+    max-height: 170px;
   }
   /* While a category image is still cascading/erroring, keep the <img> from
      painting a white placeholder box over the green banner. */
