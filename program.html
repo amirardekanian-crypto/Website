@@ -2836,7 +2836,9 @@ function getVideoUrl(ex) {
   }
 
   try {
-    const res = await fetch(`data/${clientId}.json`);
+    // no-cache: always revalidate so an updated program (e.g. a newly embedded
+    // athlete key) reaches the athlete immediately instead of a stale cached copy.
+    const res = await fetch(`data/${clientId}.json`, { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     DATA = await res.json();
   } catch (e) {
