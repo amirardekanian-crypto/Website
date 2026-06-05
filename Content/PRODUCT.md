@@ -6,7 +6,9 @@ The "what the product actually is" context doc. Pair it with **`DESIGN_SYSTEM.md
 
 ## The business in one breath
 
-**Amir Ardekani** — online **Strength & Conditioning coach**. MSc Strength & Conditioning · MSc Applied Exercise Physiology · **500+ tennis & padel players coached**. He sells **premium, individualised ~6-month S&C programmes** delivered through a private web app. The promise: *not a PDF, not a generic plan* — a bespoke programme **plus a coach who watches your data**.
+**Amir Ardekani** — online **Strength & Conditioning coach** (Farsi-facing title: **«مربیِ بدنسازیِ حرفه‌ای»**). MSc Strength & Conditioning · MSc Applied Exercise Physiology (Farsi: **«ارشد»**, never "MSc") · **500+ tennis & padel players coached**. He sells **premium, individualised ~6-month programmes** delivered through a private web app. The promise: ***not just a program* — a full coaching experience**: a bespoke programme **plus a coach who watches your data**. Iran price: **معادلِ ۲۵ دلار / ماه** (به تومان، با نرخِ روز); abroad → DM.
+
+> **Farsi word choices** (the canonical list lives in `DESIGN_SYSTEM.md` §10): title = «مربیِ بدنسازیِ حرفه‌ای» · «ارشد» not "MSc" · «یه برنامه» not «فایل/PDF» · «شدت» not «سختی» · «شروع کن» not «درخواست» · «تجربه» not «پشتوانه».
 
 **Two audiences, one product:**
 
