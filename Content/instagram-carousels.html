@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Carousels — اسلایدهای آماده</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  /* ═══ Brand tokens (from assets/css/tokens.css — Roland Garros) ═══ */
+  :root{
+    --green:#0E4A36; --clay:#C7552F; --paper:#FAF7F2; --card:#FFFFFF;
+    --ink:#1A1A1A; --ink2:#5C5C5C; --line:#E7E2D9;
+    --good:#1F7A4D; --bad:#C0392B; --gold:#C58A2E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Vazirmatn',sans-serif; background:#23211d; color:#fff;
+    padding:28px 16px 80px;
+  }
+  /* ── page chrome (NOT part of the slides; ignored on export) ── */
+  .page-head{max-width:1080px;margin:0 auto 26px;}
+  .page-head h1{font-weight:900;font-size:26px;margin-bottom:8px;}
+  .page-head p{font-size:14px;line-height:1.9;color:#cfc9bf;}
+  .page-head .how{
+    background:#2e2b26;border:1px solid #44403a;border-radius:12px;
+    padding:14px 18px;margin-top:14px;font-size:13.5px;line-height:2;color:#e7e2d9;
+  }
+  .page-head .how b{color:#fff;}
+  .group-label{
+    max-width:1080px;margin:46px auto 16px;font-weight:800;font-size:20px;
+    border-right:5px solid var(--clay);padding-right:12px;
+  }
+  .group-label span{color:#cfc9bf;font-weight:500;font-size:14px;}
+
+  /* ── each slide is EXACTLY 1080×1350 (Instagram 4:5 portrait) ── */
+  .stage{position:relative;width:1080px;max-width:100%;margin:0 auto 22px;}
+  .dl{
+    position:absolute;top:10px;left:10px;z-index:5;cursor:pointer;
+    background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:8px;
+    padding:8px 12px;font-family:'Vazirmatn';font-size:13px;font-weight:600;
+  }
+  .dl:hover{background:#000;}
+  .slide{
+    width:1080px;height:1350px;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;padding:96px 90px 84px;
+  }
+  /* colour variants */
+  .s-paper{background:var(--paper);color:var(--ink);}
+  .s-green{background:var(--green);color:#fff;}
+  .s-clay {background:var(--clay);color:#fff;}
+
+  /* shared bits */
+  .kicker{font-weight:700;font-size:30px;letter-spacing:.5px;margin-bottom:30px;}
+  .s-paper .kicker{color:var(--clay);}
+  .s-green .kicker,.s-clay .kicker{color:rgba(255,255,255,.72);}
+  .headline{font-weight:900;line-height:1.12;letter-spacing:-.5px;}
+  .h-xl{font-size:104px;}
+  .h-lg{font-size:82px;}
+  .h-md{font-size:62px;}
+  .body{font-weight:500;font-size:42px;line-height:1.6;color:var(--ink2);}
+  .s-green .body,.s-clay .body{color:rgba(255,255,255,.9);}
+  .spacer{flex:1;}
+  .ghost-num{
+    position:absolute;top:40px;left:78px;font-family:'Barlow Condensed';
+    font-weight:900;font-size:300px;line-height:1;opacity:.06;pointer-events:none;
+  }
+  .icon{width:120px;height:120px;margin-bottom:40px;}
+  .icon svg{width:100%;height:100%;fill:none;stroke:var(--green);stroke-width:1.6;
+    stroke-linecap:round;stroke-linejoin:round;}
+  .s-green .icon svg,.s-clay .icon svg{stroke:#fff;}
+
+  .footer{display:flex;align-items:center;justify-content:space-between;
+    font-size:26px;font-weight:600;margin-top:46px;}
+  .s-paper .footer{color:var(--ink2);}
+  .s-green .footer,.s-clay .footer{color:rgba(255,255,255,.8);}
+  .footer .brand{display:flex;align-items:center;gap:14px;}
+  .footer .dot{width:30px;height:30px;border-radius:50%;background:var(--clay);
+    display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';
+    font-weight:900;color:#fff;font-size:20px;}
+  .s-green .footer .dot,.s-clay .footer .dot{background:#fff;color:var(--green);}
+  .swipe{font-weight:800;}
+
+  /* compare cards (carousel 1, slide 2) */
+  .cmp{display:flex;flex-direction:column;gap:30px;margin-top:10px;}
+  .cmp-card{border-radius:22px;padding:42px 44px;}
+  .cmp-bad{background:#fff;border:2px solid var(--line);}
+  .cmp-good{background:var(--green);color:#fff;}
+  .cmp-tag{font-weight:800;font-size:30px;margin-bottom:14px;display:flex;align-items:center;gap:14px;}
+  .cmp-bad .cmp-tag{color:var(--bad);}
+  .cmp-txt{font-weight:600;font-size:44px;line-height:1.4;}
+  .cmp-bad .cmp-txt{color:var(--ink);}
+  .badge{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:26px;font-weight:900;flex-shrink:0;}
+  .badge.x{background:var(--bad);color:#fff;}
+  .badge.v{background:#fff;color:var(--green);}
+
+  /* step pill (carousels 2 & 3) */
+  .step{display:inline-flex;align-items:center;justify-content:center;
+    width:96px;height:96px;border-radius:50%;background:var(--clay);color:#fff;
+    font-family:'Barlow Condensed';font-weight:900;font-size:58px;margin-bottom:40px;}
+  .s-green .step{background:#fff;color:var(--green);}
+
+  @media print{body{background:#fff;padding:0;} .page-head,.group-label,.dl{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="page-head" data-html2canvas-ignore>
+  <h1>اسلایدهای آماده‌ی اینستاگرام — کوچ امیر اردکانی</h1>
+  <p>۳ کاروسلِ آماده، با رنگ‌بندی و فونتِ برندِ خودت. هر اسلاید دقیقاً ۱۰۸۰×۱۳۵۰ پیکسله (سایزِ پُرترهِ اینستاگرام).</p>
+  <div class="how">
+    <b>چطور خروجی بگیرم؟</b><br>
+    ۱) روی هر اسلاید، دکمه‌ی «⬇ PNG» (گوشه‌ی بالا) رو بزن تا همون اسلاید با کیفیتِ کامل دانلود شه.<br>
+    ۲) اگه دکمه کار نکرد: کلِ صفحه رو با <b>Ctrl + −</b> کوچیک کن تا اسلایدها رو ببینی، بعد با ابزارِ اسکرین‌شاتِ ویندوز از خودِ اسلاید عکس بگیر. (زومِ مرورگر روی کیفیتِ خروجیِ دکمه اثری نداره.)<br>
+    ۳) ترتیب رو همون‌جوری که چیده شده تو پستِ کاروسل بذار.
+  </div>
+</div>
+
+<!-- ════════════════ CAROUSEL 1 — فایل یا مربی؟ ════════════════ -->
+<div class="group-label" data-html2canvas-ignore>کاروسل ۱ — «یه فایل، یه مربی نیست» <span>· توجیهِ قیمت</span></div>
+
+<!-- 1/8 cover -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-green" id="c1-1">
+  <div class="kicker">قبل از خریدِ هر برنامه‌ای بخون</div>
+  <div class="spacer"></div>
+  <div class="headline h-xl">یه فایلِ&nbsp;PDF،<br>یه مربی نیست.</div>
+  <div class="body" style="margin-top:34px;">فرقش دقیقاً چیه؟ ورق بزن…</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 2/8 compare -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c1-2">
+  <div class="kicker">فرقِ اصلی</div>
+  <div class="spacer"></div>
+  <div class="cmp">
+    <div class="cmp-card cmp-bad">
+      <div class="cmp-tag"><span class="badge x">✕</span> یه فایل</div>
+      <div class="cmp-txt">فقط بهت می‌گه چی‌کار کنی.</div>
+    </div>
+    <div class="cmp-card cmp-good">
+      <div class="cmp-tag"><span class="badge v">✓</span> یه مربی</div>
+      <div class="cmp-txt">می‌بینه داری چی‌کار می‌کنی — و درستش می‌کنه.</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 3/8 readiness -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c1-3">
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+  <div class="headline h-md">فایل نمی‌پرسه دیشب<br>چه‌جوری خوابیدی.</div>
+  <div class="body" style="margin-top:34px;">من حالتو هر روز می‌بینم و برنامه‌تو هر هفته، بر اساسِ همون اتفاقایی که تو هفته‌ت افتاده، تنظیم می‌کنم.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 4/8 load/ACWR -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c1-4">
+  <div class="icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+  <div class="headline h-md">فایل نمی‌فهمه کی<br>داری زیادی فشار میاری.</div>
+  <div class="body" style="margin-top:34px;">داشبوردِ من لودِ تمرینتو رصد می‌کنه و تا قبل از آسیب، ترمزتو می‌گیره.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 5/8 monthly -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c1-5">
+  <div class="icon"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
+  <div class="headline h-md">فایل سه ماهِ دیگه<br>هم همونه.</div>
+  <div class="body" style="margin-top:34px;">برنامه‌ی تو هر هفته، بر اساسِ همون هفته‌ای که گذروندی، عوض می‌شه — چون هیچ دو هفته‌ت مثلِ هم نیست.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 6/8 message -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c1-6">
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></div>
+  <div class="headline h-md">به فایل نمی‌تونی<br>پیام بدی.</div>
+  <div class="body" style="margin-top:34px;">هر جا گیر کردی، تو همون اپ مستقیم بهم پیام می‌دی و جواب می‌گیری.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 7/8 the point -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-clay" id="c1-7">
+  <div class="kicker">جمع‌بندی</div>
+  <div class="spacer"></div>
+  <div class="headline h-lg">واسه همینه که فایل ارزونه — و یه مربیِ واقعی، نه.</div>
+  <div class="body" style="margin-top:34px;">تو هزینه‌ی یه آدمو می‌دی که حواسش بهته، نه یه کاغذِ ثابت.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 8/8 CTA -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-green" id="c1-8">
+  <div class="spacer"></div>
+  <div class="headline h-lg">آماده‌ای یه مربیِ<br>واقعی داشته باشی؟</div>
+  <div class="body" style="margin-top:34px;">دایرکت بده 📩 — همون سیستمی که با ورزشکارای رقابتی کار می‌کنم، حالا واسه‌ی تو.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">ذخیره‌ش کن ↗</div></div>
+</div></div>
+
+<!-- ════════════════ CAROUSEL 2 — یه جلسه قدم‌به‌قدم ════════════════ -->
+<div class="group-label" data-html2canvas-ignore>کاروسل ۲ — «یه جلسه با اپت، قدم به قدم» <span>· نشون‌دادنِ تجربه</span></div>
+
+<!-- 1 cover -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-green" id="c2-1">
+  <div class="kicker">داخلِ اپ</div>
+  <div class="spacer"></div>
+  <div class="headline h-xl">یه جلسه‌ی تمرین،<br>قدم به قدم.</div>
+  <div class="body" style="margin-top:34px;">ببین تمرین‌کردن با من چه‌شکلیه. ورق بزن…</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- step 1 readiness -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c2-2">
+  <div class="ghost-num">۱</div>
+  <div class="step">۱</div>
+  <div class="headline h-md">چک‌این آمادگی</div>
+  <div class="body" style="margin-top:30px;">۵ تا سؤالِ ۱۰ ثانیه‌ای: خواب، انرژی، کوفتگی، استرس — تا من بدونم با چه حالی اومدی سرِ تمرین.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- step 2 video+cues -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c2-3">
+  <div class="ghost-num">۲</div>
+  <div class="step">۲</div>
+  <div class="headline h-md">ویدیو و نکته‌ی<br>هر حرکت</div>
+  <div class="body" style="margin-top:30px;">رو هر حرکت یه ویدیو هست و دو تا نکته‌ی کلیدی — ✅ چی‌کار کن، ❌ چی‌کار نکن.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- step 3 log -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c2-4">
+  <div class="ghost-num">۳</div>
+  <div class="step">۳</div>
+  <div class="headline h-md">ثبتِ وزنه و سختی</div>
+  <div class="body" style="margin-top:30px;">وزنه‌ی هر ست و سختیشو (RPE) ثبت می‌کنی؛ دفعه‌ی بعد خودِ اپ یادت می‌اندازه چی زدی.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- step 4 rest timer -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c2-5">
+  <div class="ghost-num">۴</div>
+  <div class="step">۴</div>
+  <div class="headline h-md">تایمرِ استراحت</div>
+  <div class="body" style="margin-top:30px;">زمانِ استراحتِ هر حرکت آماده‌ست — یه دکمه می‌زنی و دیگه وسطِ ست با گوشی ور نمی‌ری.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- step 5 finish -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c2-6">
+  <div class="ghost-num">۵</div>
+  <div class="step">۵</div>
+  <div class="headline h-md">پایانِ جلسه</div>
+  <div class="body" style="margin-top:30px;">به کلِ جلسه از ۱ تا ۱۰ امتیاز می‌دی و با یه دکمه می‌فرستیش پیشِ من. لودت خودکار حساب می‌شه.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- step 6 message -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c2-7">
+  <div class="ghost-num">۶</div>
+  <div class="step">۶</div>
+  <div class="headline h-md">هر جا گیر کردی</div>
+  <div class="body" style="margin-top:30px;">تو همون اپ بهم پیام بده — لازم نیست بری سراغِ ده‌تا اپلیکیشنِ مختلف. همه‌چی یه‌جاست.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- CTA -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-green" id="c2-8">
+  <div class="spacer"></div>
+  <div class="headline h-lg">یه برنامه‌ی PDF<br>این کارا رو نمی‌کنه.</div>
+  <div class="body" style="margin-top:34px;">می‌خوای اپِ خودتو داشته باشی؟ دایرکت بده 📩</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">ذخیره‌ش کن ↗</div></div>
+</div></div>
+
+<!-- ════════════════ CAROUSEL 3 — پشتِ صحنه ════════════════ -->
+<div class="group-label" data-html2canvas-ignore>کاروسل ۳ — «۵ کاری که پشتِ صحنه برات می‌کنم» <span>· حفظِ مشتری</span></div>
+
+<!-- cover -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-green" id="c3-1">
+  <div class="kicker">چیزی که نمی‌بینی</div>
+  <div class="spacer"></div>
+  <div class="headline h-lg">۵ کاری که وقتی تمرین می‌کنی، پشتِ صحنه برات می‌کنم.</div>
+  <div class="body" style="margin-top:34px;">این‌ها رو هیچ فایلی برات نمی‌کنه. ورق بزن…</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 1 load -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c3-2">
+  <div class="ghost-num">۱</div>
+  <div class="icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+  <div class="headline h-md">حواسم به لودت هست</div>
+  <div class="body" style="margin-top:30px;">با یه عددِ علمی به اسم ACWR می‌بینم کی فشارت داره از حدِ امن رد می‌شه — یعنی قبل از اینکه آسیب ببینی.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 2 recovery -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c3-3">
+  <div class="ghost-num">۲</div>
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+  <div class="headline h-md">ریکاوری‌تو<br>رصد می‌کنم</div>
+  <div class="body" style="margin-top:30px;">از چک‌این‌های روزانه‌ت می‌فهمم کی خسته‌ای و کی سرِحال — حتی اگه خودت چیزی نگی.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 3 adherence -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c3-4">
+  <div class="ghost-num">۳</div>
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+  <div class="headline h-md">نظمتو می‌بینم</div>
+  <div class="body" style="margin-top:30px;">می‌بینم چند درصدِ جلسه‌هایی که برات گذاشتم رو واقعاً انجام دادی. غیبت بزنی، می‌فهمم و پیگیر می‌شم.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 4 monthly rebuild -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c3-5">
+  <div class="ghost-num">۴</div>
+  <div class="icon"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
+  <div class="headline h-md">هر هفته برنامه‌تو<br>تنظیم می‌کنم</div>
+  <div class="body" style="margin-top:30px;">بر اساسِ همون چیزی که تو هفته‌ت گذشته، نه یه الگوی ثابت. این یعنی همیشه یه قدم جلوتر از پلاتو.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- 5 proactive message -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-paper" id="c3-6">
+  <div class="ghost-num">۵</div>
+  <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></div>
+  <div class="headline h-md">قبل از مشکل،<br>پیام می‌دم</div>
+  <div class="body" style="margin-top:30px;">تا بی‌انگیزه شی یا به آسیب نزدیک شی، خودم پیش‌قدم می‌شم. منتظر نمی‌مونم تو بیای بگی.</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">→</div></div>
+</div></div>
+
+<!-- CTA -->
+<div class="stage"><button class="dl" data-html2canvas-ignore>⬇ PNG</button>
+<div class="slide s-clay" id="c3-7">
+  <div class="spacer"></div>
+  <div class="headline h-lg">این، فرقِ تمرینِ<br>تنها با تمرینِ<br>زیرِ نظره.</div>
+  <div class="body" style="margin-top:34px;">برای شروع دایرکت بده 📩</div>
+  <div class="spacer"></div>
+  <div class="footer"><div class="brand"><span class="dot">A</span> امیر اردکانی</div><div class="swipe">ذخیره‌ش کن ↗</div></div>
+</div></div>
+
+<script>
+  // One-click PNG export per slide. Slides are natural 1080×1350, so scale:1
+  // yields an exact full-resolution export regardless of browser zoom.
+  function initExport(){
+    document.querySelectorAll('.dl').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const slide = btn.parentElement.querySelector('.slide');
+        const label = btn.textContent; btn.textContent = '…';
+        try{
+          const canvas = await html2canvas(slide,{scale:1,useCORS:true,backgroundColor:null,logging:false});
+          const a=document.createElement('a');
+          a.href=canvas.toDataURL('image/png'); a.download=slide.id+'.png'; a.click();
+        }catch(e){ alert('اکسپورتِ خودکار نشد — لطفاً از خودِ اسلاید اسکرین‌شات بگیر.'); }
+        btn.textContent = label;
+      });
+    });
+  }
+  if (window.html2canvas) { document.fonts.ready.then(initExport); }
+  else { /* CDN blocked → buttons just do nothing; screenshot still works */ }
+</script>
+</body>
+</html>

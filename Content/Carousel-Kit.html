@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Carousel Kit — Amir Ardekani (Persian-first)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<script>
+  // -------- Tweakable defaults (edited via the Tweaks panel; persisted to disk) --------
+  window.__TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "#C7552F",
+    "ink": "#0E4A36",
+    "paper": "#FAF7F2",
+    "displayFont": "Inter",
+    "monoFont": "JetBrains Mono",
+    "handle": "AMIRARDEKANI.COM",
+    "totalSlides": "10",
+    "showFooter": false,
+    "showHeader": true,
+    "bgPattern": "frame"
+  }/*EDITMODE-END*/;
+</script>
+
+<style>
+  :root {
+    /* Roland-Garros — green + clay + paper. NO yellow/gold. Clay is the ONE accent. */
+    --accent: #C7552F;        /* clay — the single accent (highlights, eyebrows, dot, CTAs) */
+    --clay:   #C7552F;        /* alias, kept for existing rules */
+    --green:  #0E4A36;
+    --green-2: #156A4D;       /* lighter green for gradients/depth */
+    --ink:    #0E4A36;        /* "dark" slide = deep Roland-Garros green */
+    --paper:  #FAF7F2;        /* warm paper */
+    --paper-warm: #F1ECE3;    /* paper-2, secondary warm surface */
+    --body-ink: #1A1A1A;      /* body text on light surfaces */
+    --good: #1F7A4D;
+    --bad:  #C0392B;
+    --muted: #8a8a82;
+    --purple: #C7552F;        /* save/repost badge → clay (kept var name) */
+    --display: "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --fa: "Vazirmatn", system-ui, sans-serif;
+
+    /* Carousel post = 1080 × 1350 (Instagram 4:5) */
+    --post-w: 1080px;
+    --post-h: 1350px;
+
+    /* In-post type scale */
+    --t-mono: 24px;
+    --t-eyebrow: 28px;
+    --t-display-xl: 152px;
+    --t-display-lg: 132px;
+    --t-display-md: 96px;
+    --t-display-sm: 72px;
+    --t-body: 36px;
+    --t-card-title: 56px;
+    --t-card-sub: 24px;
+    --t-numeric: 32px;
+
+    --pad-edge: 64px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #16161a;
+    color: var(--paper);
+    font-family: var(--display);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ====================== PAGE SHELL ====================== */
+  .shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 80px 40px 160px;
+  }
+
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; padding-bottom: 36px; border-bottom: 1px solid #2a2a2e; margin-bottom: 64px; }
+  .page-head h1 { font-size: 56px; font-weight: 800; letter-spacing: -0.025em; line-height: 1; }
+  .page-head .meta { font-family: var(--mono); font-size: 13px; color: #8a8a92; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; line-height: 1.6; }
+  .page-head .meta b { color: var(--accent); font-weight: 500; }
+
+  .section-title { font-family: var(--mono); font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: #8a8a92; margin: 96px 0 24px; display: flex; align-items: center; gap: 14px; }
+  .section-title::before { content: ""; display: block; width: 28px; height: 1px; background: #5a5a62; }
+  .section-title .num { color: var(--accent); }
+
+  /* ====================== BRAND / SYSTEM PANEL ====================== */
+  .system-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-bottom: 24px; }
+  .tile { background: #1d1d22; border: 1px solid #26262c; border-radius: 14px; padding: 24px; }
+  .tile h3 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: #8a8a92; margin-bottom: 18px; font-weight: 500; }
+
+  .swatch { aspect-ratio: 1.6/1; border-radius: 10px; margin-bottom: 12px; position: relative; overflow: hidden; }
+  .swatch .label { position: absolute; left: 12px; bottom: 10px; font-family: var(--mono); font-size: 11px; }
+  .swatch.ink { background: var(--ink); color: var(--paper); }
+  .swatch.green2 { background: var(--green-2); color: var(--paper); }
+  .swatch.paper { background: var(--paper); color: var(--ink); }
+  .swatch.accent { background: var(--accent); color: #fff; }
+  .swatch.purple { background: var(--purple); color: white; }
+  .tile .name { font-size: 14px; font-weight: 600; }
+  .tile .hex { font-family: var(--mono); font-size: 11px; color: #8a8a92; }
+
+  .typeSpec { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+  .typeSpec .big { font-size: 48px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .typeSpec .sm { font-family: var(--mono); font-size: 11px; color: #8a8a92; text-transform: uppercase; letter-spacing: 0.12em; }
+
+  .span-3 { grid-column: span 3; }
+  .span-4 { grid-column: span 4; }
+  .span-6 { grid-column: span 6; }
+  .span-8 { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+
+  /* ====================== POST CARD (the canvas) ====================== */
+  .post-row {
+    display: grid;
+    grid-template-columns: 540px 1fr;
+    gap: 56px;
+    align-items: start;
+    margin-bottom: 96px;
+    padding-bottom: 96px;
+    border-bottom: 1px dashed #2a2a2e;
+  }
+  .post-row:last-child { border-bottom: none; }
+
+  /* Farsi showcase strip — a real carousel, several slides at once */
+  .fa-intro { color: #b8b8c0; font-size: 15px; line-height: 1.7; max-width: 820px; margin: -8px 0 40px; }
+  .fa-intro b { color: var(--accent); font-weight: 600; }
+  .fa-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 24px; margin-bottom: 40px; }
+  .fa-strip figure { margin: 0; min-width: 0; }
+  .fa-strip figcaption { margin-top: 16px; font-family: var(--mono); font-size: 12px; color: #8a8a92; letter-spacing: 0.06em; line-height: 1.5; display: flex; align-items: baseline; gap: 8px; }
+  .fa-strip figcaption .n { color: var(--accent); }
+  .fa-strip figcaption .fa-t { font-family: var(--fa); direction: rtl; letter-spacing: 0; color: #d8d8de; font-size: 15px; }
+
+  .post-info .kicker { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 16px; }
+  .post-info h2 { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 18px; }
+  .post-info p { font-size: 16px; color: #b8b8c0; line-height: 1.6; max-width: 460px; margin-bottom: 24px; }
+  .post-info ul { list-style: none; }
+  .post-info li { font-family: var(--mono); font-size: 12px; color: #8a8a92; padding: 8px 0; border-top: 1px solid #26262c; display: flex; justify-content: space-between; }
+  .post-info li:last-child { border-bottom: 1px solid #26262c; }
+  .post-info li b { color: var(--paper); font-weight: 500; }
+
+  .post-stage {
+    width: 100%;
+    aspect-ratio: 1080/1350;
+    background: #000;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6), 0 8px 16px -8px rgba(0,0,0,0.4);
+    position: relative;
+    isolation: isolate;
+  }
+  /* Scaling: render at 1080×1350 then scale to fit container width */
+  .post-canvas {
+    width: var(--post-w);
+    height: var(--post-h);
+    transform-origin: top left;
+    position: relative;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--display);
+  }
+  .post-canvas.light { background: var(--paper); color: var(--ink); --accent: #C7552F; }  /* on paper, accent → clay for contrast */
+
+  /* ====================== UNIVERSAL POST CHROME ====================== */
+  .post-header {
+    position: absolute; top: var(--pad-edge); left: var(--pad-edge); right: var(--pad-edge);
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--mono); font-size: var(--t-mono); letter-spacing: 0.06em;
+  }
+  .post-header .who { display: flex; align-items: center; gap: 14px; font-weight: 500; }
+  .post-header .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
+  .post-header .num { color: inherit; opacity: 0.85; }
+
+  .post-footer {
+    position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: var(--pad-edge);
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  }
+  .progress-bar { display: flex; gap: 6px; flex: 1; max-width: 380px; }
+  .progress-bar span { flex: 1; height: 3px; background: rgba(255,255,255,0.18); border-radius: 2px; }
+  .progress-bar span.on { background: var(--paper); }
+  .light .progress-bar span { background: rgba(0,0,0,0.18); }
+  .light .progress-bar span.on { background: var(--ink); }
+
+  .swipe { font-family: var(--mono); font-size: var(--t-mono); letter-spacing: 0.1em; display: flex; align-items: center; gap: 14px; opacity: 0.9; }
+  .swipe .arrow { width: 56px; height: 1.5px; background: currentColor; position: relative; }
+  .swipe .arrow::after { content: ""; position: absolute; right: 0; top: -5px; width: 12px; height: 12px; border-right: 1.5px solid currentColor; border-top: 1.5px solid currentColor; transform: rotate(45deg); }
+
+  .avatars { position: absolute; left: var(--pad-edge); bottom: 116px; display: flex; gap: -8px; }
+  .avatars .av { width: 88px; height: 88px; border-radius: 50%; background: #2a2a2a center/cover; position: relative; border: 2px solid var(--ink); }
+  .avatars .av:not(:first-child) { margin-left: -10px; }
+  .avatars .av .badge { position: absolute; right: -4px; bottom: -4px; width: 32px; height: 32px; border-radius: 50%; background: var(--purple); display: grid; place-items: center; }
+  .avatars .av .badge svg { width: 16px; height: 16px; fill: white; }
+  .av.av-1 { background-image: linear-gradient(135deg, #d4a373, #8a5a3b); }
+  .av.av-2 { background-image: linear-gradient(135deg, #6b8cae, #3a4a66); }
+
+  .light .avatars .av { border-color: var(--paper); }
+
+  /* Section label chip — style A (clay highlight block) */
+  .chip-A { display: inline-block; background: var(--accent); color: var(--ink); font-family: var(--mono); font-size: 26px; font-weight: 600; letter-spacing: 0.06em; padding: 10px 18px 8px; }
+  /* Section label — style B (clay mono with leading dash) */
+  .chip-B { font-family: var(--mono); font-size: 26px; font-weight: 500; color: var(--accent); letter-spacing: 0.12em; display: flex; align-items: center; gap: 18px; }
+  .chip-B::before { content: ""; display: block; width: 64px; height: 2px; background: var(--accent); }
+  .light .chip-B { color: var(--ink); }
+  .light .chip-B::before { background: var(--ink); }
+
+  /* Highlight word (clay background, #fff text) */
+  .hl { background: var(--clay); color: #fff; padding: 0 0.12em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  /* Accent word (clay text) */
+  .acc { color: var(--accent); }
+  /* Strikethrough */
+  .strike { position: relative; }
+  .strike::after { content: ""; position: absolute; left: -0.04em; right: -0.04em; top: 56%; height: 8px; background: var(--accent); transform: translateY(-50%) rotate(-2deg); }
+
+  /* Display headlines */
+  .display-xl { font-size: var(--t-display-xl); font-weight: 800; letter-spacing: -0.035em; line-height: 0.92; }
+  .display-lg { font-size: var(--t-display-lg); font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+  .display-md { font-size: var(--t-display-md); font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; }
+  .display-sm { font-size: var(--t-display-sm); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+
+  .body { font-size: var(--t-body); line-height: 1.4; color: rgba(244,244,240,0.7); }
+  .light .body { color: rgba(10,10,10,0.6); }
+
+  /* ====================== TEMPLATES ====================== */
+
+  /* Template: Cover */
+  .tpl-cover .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; }
+  .tpl-cover .chip-B { margin-bottom: 32px; }
+  .tpl-cover h1 { font-size: 156px; font-weight: 800; letter-spacing: -0.04em; line-height: 0.92; }
+  .tpl-cover .sub { font-size: 40px; font-weight: 500; color: rgba(244,244,240,0.55); margin-top: 28px; letter-spacing: -0.01em; }
+  .tpl-cover .glow { display: none; }
+
+  /* Template: Myth (background pattern + headline) */
+  .tpl-myth .pattern { position: absolute; inset: 0; opacity: 0.55; pointer-events: none; }
+  .tpl-myth .pattern svg { width: 100%; height: 100%; }
+  .tpl-myth .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; }
+  .tpl-myth .chip-A { margin-bottom: 36px; }
+  .tpl-myth h1 { font-size: 148px; font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; }
+
+  /* Template: Big statement */
+  .tpl-big .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 220px; }
+  .tpl-big h1 { font-size: 168px; font-weight: 800; letter-spacing: -0.04em; line-height: 0.92; }
+  .tpl-big .footnote { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; font-family: var(--mono); font-size: 26px; color: rgba(244,244,240,0.55); letter-spacing: 0.06em; }
+
+  /* Template: Heatmap */
+  .tpl-heatmap .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 200px; }
+  .tpl-heatmap h1 { font-size: 128px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+  .tpl-heatmap .grid-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; }
+  .tpl-heatmap .grid-label { font-family: var(--mono); font-size: 24px; color: rgba(244,244,240,0.7); letter-spacing: 0.1em; margin-bottom: 24px; display: flex; align-items: center; gap: 18px; }
+  .tpl-heatmap .grid-label::before { content: ""; width: 56px; height: 2px; background: currentColor; }
+  .heatmap { display: grid; grid-template-columns: repeat(15, 1fr); gap: 8px; }
+  .heatmap .cell { aspect-ratio: 1; background: var(--accent); border-radius: 6px; }
+  .heatmap .cell.off { background: rgba(255,255,255,0.06); }
+  .heatmap .cell.miss { background: rgba(199,85,47,0.28); }
+
+  /* Template: Numbered rules (light) */
+  .tpl-rules .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 200px; }
+  .tpl-rules .chip-B { margin-bottom: 36px; }
+  .tpl-rules h1 { font-size: 124px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+  .tpl-rules .cards { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 220px; display: flex; flex-direction: column; gap: 18px; }
+  .rule-card { background: var(--ink); color: var(--paper); border-radius: 18px; padding: 30px 36px; display: flex; align-items: center; gap: 28px; }
+  .rule-card .check { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+  .rule-card .check svg { width: 38px; height: 38px; }
+  .rule-card .body { flex: 1; color: var(--paper); }
+  .rule-card .ttl { font-size: 56px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+  .rule-card .sub { font-family: var(--mono); font-size: 22px; color: rgba(244,244,240,0.55); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px; }
+  .rule-card .num { font-family: var(--mono); font-size: 28px; color: var(--accent); letter-spacing: 0.06em; }
+
+  /* Template: Stat */
+  .tpl-stat .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 50%; transform: translateY(-55%); }
+  .tpl-stat .stat-value { font-size: 380px; font-weight: 800; letter-spacing: -0.06em; line-height: 0.85; color: var(--accent); }
+  .tpl-stat .stat-label { font-size: 64px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-top: 20px; max-width: 760px; }
+  .tpl-stat .stat-source { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; font-family: var(--mono); font-size: 24px; color: rgba(244,244,240,0.5); letter-spacing: 0.08em; }
+
+  /* Template: Quote */
+  .tpl-quote .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 240px; }
+  .tpl-quote .quote-mark { font-size: 280px; font-weight: 800; line-height: 0.7; color: var(--accent); margin-bottom: 0; height: 120px; }
+  .tpl-quote h1 { font-size: 96px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+  .tpl-quote .attr { position: absolute; left: var(--pad-edge); bottom: 240px; display: flex; align-items: center; gap: 22px; }
+  .tpl-quote .attr-av { width: 92px; height: 92px; border-radius: 50%; background: linear-gradient(135deg, #d4a373, #8a5a3b); }
+  .tpl-quote .attr-name { font-size: 36px; font-weight: 600; letter-spacing: -0.01em; }
+  .tpl-quote .attr-role { font-family: var(--mono); font-size: 22px; color: rgba(244,244,240,0.55); letter-spacing: 0.08em; margin-top: 4px; }
+
+  /* Template: Compare */
+  .tpl-compare .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 200px; }
+  .tpl-compare h1 { font-size: 96px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; max-width: 700px; }
+  .tpl-compare .cols { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .col-card { border-radius: 22px; padding: 36px; min-height: 380px; }
+  .col-card .col-tag { font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 24px; }
+  .col-card .col-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .col-card .col-list li { font-size: 32px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; padding-left: 36px; position: relative; }
+  .col-card .col-list li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 18px; height: 2px; background: currentColor; }
+  .col-card.bad { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(244,244,240,0.5); }
+  .col-card.bad .col-tag { color: rgba(244,244,240,0.4); }
+  .col-card.bad .col-list li { text-decoration: line-through; text-decoration-color: rgba(244,244,240,0.25); }
+  .col-card.good { background: var(--accent); color: var(--ink); }
+  .col-card.good .col-tag { color: var(--ink); opacity: 0.7; }
+
+  /* Template: List */
+  .tpl-list .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 200px; }
+  .tpl-list h1 { font-size: 88px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.05; }
+  .tpl-list .items { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; display: flex; flex-direction: column; gap: 4px; }
+  .list-item { display: grid; grid-template-columns: 80px 1fr auto; gap: 28px; align-items: center; padding: 28px 0; border-top: 1px solid rgba(244,244,240,0.12); }
+  .list-item:last-child { border-bottom: 1px solid rgba(244,244,240,0.12); }
+  .list-item .li-num { font-family: var(--mono); font-size: 28px; color: var(--accent); letter-spacing: 0.06em; }
+  .list-item .li-text { font-size: 42px; font-weight: 600; letter-spacing: -0.015em; }
+  .list-item .li-tag { font-family: var(--mono); font-size: 20px; color: rgba(244,244,240,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Template: CTA / Save */
+  .tpl-cta .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 50%; transform: translateY(-55%); text-align: left; }
+  .tpl-cta .chip-B { margin-bottom: 32px; }
+  .tpl-cta h1 { font-size: 124px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+  .tpl-cta .actions { display: flex; gap: 16px; margin-top: 56px; flex-wrap: wrap; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 14px; padding: 24px 32px; border-radius: 999px; font-family: var(--mono); font-size: 26px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .cta-btn.primary { background: var(--accent); color: var(--ink); font-weight: 600; }
+  .cta-btn.ghost { border: 2px solid rgba(244,244,240,0.3); color: var(--paper); }
+  .cta-btn svg { width: 28px; height: 28px; }
+
+  /* Template: Feature (full-bleed app image) */
+  .tpl-feature .feat-img { position: absolute; inset: 0; }
+  .tpl-feature .feat-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tpl-feature .feat-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,38,27,0.92), rgba(8,38,27,0.12) 52%, rgba(8,38,27,0.45)); }
+  .tpl-feature .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 220px; }
+  .tpl-feature .chip-A { margin-bottom: 28px; }
+  .tpl-feature h1 { font-size: 124px; font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; }
+  .tpl-feature .sub { font-size: 38px; font-weight: 500; color: rgba(255,255,255,0.82); margin-top: 22px; }
+
+  /* Template: Journey (vertical timeline of cycles) */
+  .tpl-journey .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 150px; }
+  .tpl-journey h1 { font-size: 92px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; }
+  .tpl-journey .timeline { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 190px; }
+  .tl-node { display: flex; align-items: center; gap: 30px; }
+  .tl-dot { width: 78px; height: 78px; border-radius: 50%; background: var(--accent); color: var(--ink); font-family: var(--mono); font-weight: 700; font-size: 30px; display: grid; place-items: center; flex-shrink: 0; }
+  .tl-ttl { font-size: 48px; font-weight: 700; letter-spacing: -0.015em; }
+  .tl-sub { font-family: var(--mono); font-size: 22px; color: rgba(244,244,240,0.5); letter-spacing: 0.08em; margin-top: 4px; }
+  .light .tl-sub { color: rgba(10,10,10,0.5); }
+  .tl-line { width: 3px; height: 38px; background: rgba(244,244,240,0.2); margin: 4px 0 4px 37px; }
+  .light .tl-line { background: rgba(10,10,10,0.18); }
+
+  /* Template: Result (proof / testimonial) */
+  .tpl-result .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 170px; }
+  .tpl-result .chip-B { margin-bottom: 26px; }
+  .tpl-result .result-stat { font-size: 300px; font-weight: 800; letter-spacing: -0.05em; line-height: 0.82; color: var(--accent); }
+  .tpl-result .result-label { font-size: 50px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-top: 16px; max-width: 780px; }
+  .tpl-result .quote { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 300px; font-size: 40px; font-weight: 500; line-height: 1.4; color: rgba(244,244,240,0.72); }
+  .tpl-result .attr { position: absolute; left: var(--pad-edge); bottom: 200px; display: flex; align-items: center; gap: 22px; }
+  .tpl-result .attr-av { width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, #d4a373, #8a5a3b); }
+  .tpl-result .attr-name { font-size: 36px; font-weight: 600; letter-spacing: -0.01em; }
+  .tpl-result .attr-role { font-family: var(--mono); font-size: 22px; color: rgba(244,244,240,0.5); letter-spacing: 0.08em; margin-top: 4px; }
+
+  /* Template: Checklist (light) */
+  .tpl-checklist .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 180px; }
+  .tpl-checklist .chip-B { margin-bottom: 28px; }
+  .tpl-checklist h1 { font-size: 104px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.96; }
+  .tpl-checklist .checks { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 200px; display: flex; flex-direction: column; gap: 24px; }
+  .check-row { display: flex; align-items: center; gap: 26px; font-size: 46px; font-weight: 600; letter-spacing: -0.015em; }
+  .check-row .cbox { width: 70px; height: 70px; border-radius: 18px; background: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+  .check-row .cbox svg { width: 38px; height: 38px; }
+
+  /* ====================== IMAGE PLACEHOLDER (reusable) ====================== */
+  .img-ph { width: 100%; height: 100%; background-color: rgba(255,255,255,0.04); background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 16px); display: grid; place-items: center; text-align: center; padding: 24px; }
+  .img-ph span { font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; color: rgba(255,255,255,0.42); text-transform: uppercase; line-height: 1.5; }
+  .light .img-ph { background-color: rgba(0,0,0,0.04); background-image: repeating-linear-gradient(135deg, rgba(0,0,0,0.06) 0 2px, transparent 2px 16px); }
+  .light .img-ph span { color: rgba(0,0,0,0.42); }
+
+  /* ====================== NEW TEMPLATES (15–23) ====================== */
+
+  /* Template 15: Index — table of contents (retention) */
+  .tpl-index .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 200px; }
+  .tpl-index .chip-B { margin-bottom: 32px; }
+  .tpl-index h1 { font-size: 104px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.96; }
+  .tpl-index .toc { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 230px; display: flex; flex-direction: column; }
+  .toc-row { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 28px; padding: 28px 0; border-top: 1px solid rgba(244,244,240,0.12); }
+  .toc-row:last-child { border-bottom: 1px solid rgba(244,244,240,0.12); }
+  .toc-row .toc-num { font-family: var(--mono); font-size: 26px; color: var(--accent); letter-spacing: 0.06em; }
+  .toc-row .toc-text { font-size: 46px; font-weight: 600; letter-spacing: -0.015em; }
+  .toc-row .toc-ref { font-family: var(--mono); font-size: 24px; color: rgba(244,244,240,0.45); letter-spacing: 0.08em; }
+
+  /* Template 16: Step — one technique step, blown up */
+  .tpl-step .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 190px; }
+  .tpl-step .chip-B { margin-bottom: 40px; }
+  .tpl-step .step-no { font-size: 300px; font-weight: 800; letter-spacing: -0.05em; line-height: 0.8; color: var(--accent); }
+  .tpl-step .step-of { font-family: var(--mono); font-size: 30px; color: rgba(244,244,240,0.5); letter-spacing: 0.1em; margin-top: 10px; }
+  .tpl-step .step-body { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 230px; }
+  .tpl-step h1 { font-size: 84px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; }
+  .tpl-step .cue { font-family: var(--mono); font-size: 28px; color: rgba(244,244,240,0.62); letter-spacing: 0.04em; margin-top: 28px; display: flex; align-items: center; gap: 16px; }
+  .tpl-step .cue::before { content: ""; width: 48px; height: 2px; background: var(--accent); flex-shrink: 0; }
+
+  /* Template 17: Split — before / after */
+  .tpl-split .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 150px; }
+  .tpl-split h1 { font-size: 72px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.0; }
+  .tpl-split .pair { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 330px; bottom: 215px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tpl-split .ba { position: relative; border-radius: 18px; overflow: hidden; }
+  .tpl-split .ba .ba-tag { position: absolute; top: 24px; left: 24px; font-family: var(--mono); font-size: 24px; letter-spacing: 0.1em; padding: 9px 16px; background: var(--ink); color: var(--paper); }
+  .tpl-split .ba.is-after .ba-tag { background: var(--accent); color: var(--ink); }
+  .tpl-split .cap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 150px; font-family: var(--mono); font-size: 26px; color: rgba(244,244,240,0.6); letter-spacing: 0.06em; text-align: center; }
+
+  /* Template 18: Define — dictionary term (light) */
+  .tpl-define .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 50%; transform: translateY(-54%); }
+  .tpl-define .term-cat { font-family: var(--mono); font-size: 28px; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 26px; }
+  .tpl-define .term { font-size: 118px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+  .tpl-define .phon { font-family: var(--mono); font-size: 30px; color: rgba(10,10,10,0.45); letter-spacing: 0.04em; margin-top: 20px; }
+  .tpl-define .def { font-size: 44px; font-weight: 500; line-height: 1.35; margin-top: 44px; max-width: 880px; color: rgba(10,10,10,0.78); }
+  .tpl-define .def b { font-weight: 700; background: var(--accent); color: #fff; padding: 0 0.12em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+  /* Template 19: Q&A — question + answer */
+  .tpl-qa .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 200px; }
+  .tpl-qa .qmark { font-family: var(--display); font-size: 200px; font-weight: 800; color: var(--accent); line-height: 0.7; height: 130px; }
+  .tpl-qa h1 { font-size: 88px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; margin-top: 24px; }
+  .tpl-qa .answer { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 230px; }
+  .tpl-qa .a-label { font-family: var(--mono); font-size: 26px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 22px; display: flex; align-items: center; gap: 16px; }
+  .tpl-qa .a-label::before { content: ""; width: 48px; height: 2px; background: var(--accent); }
+  .tpl-qa .a-body { font-size: 42px; font-weight: 500; line-height: 1.35; color: rgba(244,244,240,0.8); }
+  .tpl-qa .a-body b { color: var(--paper); font-weight: 700; }
+
+  /* Template 20: Diagram — labelled image callout */
+  .tpl-diagram .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 150px; }
+  .tpl-diagram h1 { font-size: 64px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.0; }
+  .tpl-diagram .stage-img { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 330px; bottom: 215px; border-radius: 18px; overflow: hidden; }
+  .tpl-diagram .callout { position: absolute; display: flex; align-items: center; gap: 14px; }
+  .tpl-diagram .callout .pin { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--accent); background: rgba(8,38,27,0.55); flex-shrink: 0; }
+  .tpl-diagram .callout .lbl { font-family: var(--mono); font-size: 23px; letter-spacing: 0.04em; background: var(--ink); color: var(--paper); padding: 10px 16px; border: 1px solid rgba(255,255,255,0.16); white-space: nowrap; }
+
+  /* Template 21: Formula — visual equation */
+  .tpl-formula .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 190px; }
+  .tpl-formula h1 { font-size: 84px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; }
+  .tpl-formula .eq { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 240px; display: flex; flex-direction: column; gap: 20px; }
+  .eq-row { display: flex; align-items: center; gap: 22px; }
+  .eq-op { font-size: 66px; font-weight: 800; color: var(--accent); flex-shrink: 0; width: 54px; text-align: center; }
+  .eq-token { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 30px 34px; }
+  .eq-token .t-word { font-size: 52px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+  .eq-token .t-sub { font-family: var(--mono); font-size: 22px; color: rgba(244,244,240,0.5); letter-spacing: 0.08em; margin-top: 10px; }
+  .eq-token.eq-result { background: var(--accent); border-color: transparent; }
+  .eq-token.eq-result .t-word { color: var(--ink); }
+  .eq-token.eq-result .t-sub { color: rgba(14,74,54,0.7); }
+
+  /* Template 22: Schedule — weekly training split table */
+  .tpl-schedule .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); top: 180px; }
+  .tpl-schedule h1 { font-size: 80px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.0; }
+  .tpl-schedule .week { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 210px; display: flex; flex-direction: column; }
+  .day-row { display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 28px; padding: 22px 0; border-top: 1px solid rgba(244,244,240,0.12); }
+  .day-row:last-child { border-bottom: 1px solid rgba(244,244,240,0.12); }
+  .day-row .d-day { font-family: var(--mono); font-size: 28px; color: var(--accent); letter-spacing: 0.08em; }
+  .day-row .d-focus { font-size: 44px; font-weight: 600; letter-spacing: -0.015em; }
+  .day-row .d-tag { font-family: var(--mono); font-size: 22px; color: rgba(244,244,240,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
+  .day-row.rest .d-day { color: rgba(244,244,240,0.35); }
+  .day-row.rest .d-focus { color: rgba(244,244,240,0.42); font-weight: 500; }
+
+  /* Template 23: Bio — coach intro */
+  .tpl-bio .photo { position: absolute; right: var(--pad-edge); top: 180px; width: 400px; height: 500px; border-radius: 20px; overflow: hidden; }
+  .tpl-bio .body-wrap { position: absolute; left: var(--pad-edge); right: var(--pad-edge); bottom: 220px; }
+  .tpl-bio .chip-B { margin-bottom: 30px; }
+  .tpl-bio h1 { font-size: 100px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+  .tpl-bio .role { font-size: 38px; font-weight: 500; color: rgba(244,244,240,0.6); margin-top: 20px; }
+  .tpl-bio .creds { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+  .tpl-bio .cred { font-family: var(--mono); font-size: 24px; letter-spacing: 0.06em; padding: 12px 20px; border: 1px solid rgba(244,244,240,0.2); border-radius: 999px; color: rgba(244,244,240,0.85); }
+
+  /* ====================== FARSI / RTL (Persian-first) ====================== */
+  /* Hard rules enforced: no letter-spacing (breaks cursive joining), no uppercase, Vazirmatn everywhere. */
+  .post-canvas.fa, .post-canvas.fa *, .post-canvas.fa *::before, .post-canvas.fa *::after {
+    font-family: var(--fa) !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+  }
+  .post-canvas.fa { direction: rtl; text-align: right; }
+  /* Persian headlines need breathing room for diacritics */
+  .post-canvas.fa h1, .post-canvas.fa .term, .post-canvas.fa .stat-label,
+  .post-canvas.fa .result-label, .post-canvas.fa .sub, .post-canvas.fa .tl-ttl,
+  .post-canvas.fa .rule-card .ttl, .post-canvas.fa .a-body, .post-canvas.fa .def,
+  .post-canvas.fa .col-list li { line-height: 1.32 !important; }
+  /* Swipe arrow points the RTL way (advance = left) */
+  .post-canvas.fa .swipe .arrow { transform: scaleX(-1); }
+  .post-canvas.fa.tpl-cta .body-wrap { text-align: right; }
+  /* Per-template size tuning — Vazirmatn sits larger than Inter, so dial display sizes down */
+  .post-canvas.fa.tpl-cover h1 { font-size: 112px; line-height: 1.22 !important; }
+  .post-canvas.fa.tpl-cover .sub { font-size: 38px; }
+  .post-canvas.fa.tpl-big h1 { font-size: 124px; line-height: 1.18 !important; }
+  .post-canvas.fa.tpl-stat .stat-label { font-size: 52px; }
+  .post-canvas.fa.tpl-compare h1 { font-size: 82px; }
+  .post-canvas.fa.tpl-compare .col-card .col-list li { font-size: 34px; }
+  .post-canvas.fa.tpl-journey h1 { font-size: 82px; }
+  .post-canvas.fa.tpl-journey .tl-ttl { font-size: 46px; }
+  .post-canvas.fa.tpl-rules h1 { font-size: 92px; line-height: 1.2 !important; }
+  .post-canvas.fa.tpl-rules .rule-card .ttl { font-size: 50px; }
+  .post-canvas.fa.tpl-cta h1 { font-size: 108px; line-height: 1.2 !important; }
+
+  /* ====================== CLAY-CONTRAST FIXES (solid clay block ⇒ #fff text) ====================== */
+  .chip-A { color: #fff; }
+  .col-card.good { color: #fff; }
+  .col-card.good .col-tag { color: #fff; opacity: 0.78; }
+  .col-card.good .col-list li::before { background: #fff; }
+  .eq-token.eq-result .t-word { color: #fff; }
+  .eq-token.eq-result .t-sub { color: rgba(255,255,255,0.72); }
+  .tl-dot { color: #fff; }
+  .cta-btn.primary { color: #fff; }
+  .cta-btn.primary svg path { stroke: #fff; }
+  .rule-card .check svg path { stroke: #fff; }
+
+  /* ====================== BACKGROUND PATTERNS ====================== */
+  .post-canvas[data-bg]::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+  }
+  .post-canvas[data-bg="none"]::before { display: none; }
+  .post-canvas[data-bg="grid"]::before {
+    background-image: linear-gradient(to right, rgba(255,255,255,0.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.10) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+  .light[data-bg="grid"]::before {
+    background-image: linear-gradient(to right, rgba(0,0,0,0.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.10) 1px, transparent 1px);
+  }
+  .post-canvas[data-bg="dots"]::before {
+    background-image: radial-gradient(rgba(255,255,255,0.20) 2.5px, transparent 3px);
+    background-size: 36px 36px;
+  }
+  .light[data-bg="dots"]::before {
+    background-image: radial-gradient(rgba(0,0,0,0.20) 2.5px, transparent 3px);
+  }
+  .post-canvas[data-bg="scanlines"]::before {
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.09) 0 2px, transparent 2px 6px);
+  }
+  .light[data-bg="scanlines"]::before {
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.09) 0 2px, transparent 2px 6px);
+  }
+  .post-canvas[data-bg="diagonal"]::before {
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.10) 0 3px, transparent 3px 28px);
+  }
+  .light[data-bg="diagonal"]::before {
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.10) 0 3px, transparent 3px 28px);
+  }
+  .post-canvas[data-bg="glow"]::before {
+    background: radial-gradient(ellipse at 75% 30%, color-mix(in oklab, var(--accent) 28%, transparent), transparent 55%);
+  }
+  .post-canvas[data-bg="frame"]::before {
+    border: 2px solid rgba(255,255,255,0.16);
+    margin: 28px; border-radius: 14px;
+  }
+  .light[data-bg="frame"]::before {
+    border-color: rgba(0,0,0,0.18);
+  }
+  .post-canvas[data-bg="corner"]::before {
+    background:
+      linear-gradient(var(--accent), var(--accent)) top left / 280px 5px no-repeat,
+      linear-gradient(var(--accent), var(--accent)) top left / 5px 280px no-repeat,
+      linear-gradient(var(--accent), var(--accent)) bottom right / 280px 5px no-repeat,
+      linear-gradient(var(--accent), var(--accent)) bottom right / 5px 280px no-repeat;
+  }
+
+  /* ====================== UTILITY: hide chrome via tweaks ====================== */
+  .hide-header .post-header { display: none; }
+  .hide-footer .post-footer { display: none; }
+  .hide-footer .avatars { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ PAGE HEAD ============ -->
+  <div class="page-head">
+    <div>
+      <h1>Carousel kit</h1>
+      <div style="font-family: var(--mono); color: #8a8a92; font-size: 13px; letter-spacing: 0.1em; margin-top: 14px;">PERSIAN-FIRST SLIDE SYSTEM FOR <span style="color: var(--accent);">@AMIRARDEKANI</span></div>
+    </div>
+    <div class="meta">
+      <div>FORMAT&nbsp;&nbsp;<b>1080 × 1350 (4:5)</b></div>
+      <div>SET&nbsp;&nbsp;<b>23 TEMPLATES</b></div>
+      <div>SELF-CONTAINED · EDIT COLOURS IN :root</div>
+    </div>
+  </div>
+
+  <!-- ============ BRAND SYSTEM ============ -->
+  <div class="section-title"><span class="num">01</span> Brand system</div>
+
+  <div class="system-grid">
+    <div class="tile span-3">
+      <h3>Green · primary</h3>
+      <div class="swatch ink"><span class="label">var(--green)</span></div>
+      <div class="name">Roland-Garros green</div>
+      <div class="hex">#0E4A36 · dark slides &amp; ink</div>
+    </div>
+    <div class="tile span-3">
+      <h3>Clay · the one accent</h3>
+      <div class="swatch accent"><span class="label">var(--accent)</span></div>
+      <div class="name">Roland-Garros clay</div>
+      <div class="hex">#C7552F · solid blocks use #fff</div>
+    </div>
+    <div class="tile span-3">
+      <h3>Paper</h3>
+      <div class="swatch paper"><span class="label">var(--paper)</span></div>
+      <div class="name">Warm paper</div>
+      <div class="hex">#FAF7F2 · light slides</div>
+    </div>
+    <div class="tile span-3">
+      <h3>Green-2</h3>
+      <div class="swatch green2"><span class="label">var(--green-2)</span></div>
+      <div class="name">Lighter green</div>
+      <div class="hex">#156A4D · gradients &amp; depth</div>
+    </div>
+
+    <div class="tile span-12">
+      <h3>Secondary &amp; semantic</h3>
+      <div style="display:flex; gap:28px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+        <div style="display:flex; align-items:center; gap:12px;"><span style="width:40px;height:40px;border-radius:8px;background:#F1ECE3;border:1px solid #26262c;"></span><span style="font-size:13px;color:#b8b8c0;">Paper-2 <span style="font-family:var(--mono);color:#8a8a92;">#F1ECE3</span></span></div>
+        <div style="display:flex; align-items:center; gap:12px;"><span style="width:40px;height:40px;border-radius:8px;background:#1A1A1A;"></span><span style="font-size:13px;color:#b8b8c0;">Body ink <span style="font-family:var(--mono);color:#8a8a92;">#1A1A1A</span></span></div>
+        <div style="display:flex; align-items:center; gap:12px;"><span style="width:40px;height:40px;border-radius:8px;background:#1F7A4D;"></span><span style="font-size:13px;color:#b8b8c0;">Good <span style="font-family:var(--mono);color:#8a8a92;">#1F7A4D</span></span></div>
+        <div style="display:flex; align-items:center; gap:12px;"><span style="width:40px;height:40px;border-radius:8px;background:#C0392B;"></span><span style="font-size:13px;color:#b8b8c0;">Bad <span style="font-family:var(--mono);color:#8a8a92;">#C0392B</span></span></div>
+        <div style="display:flex; align-items:center; gap:12px;"><span style="width:40px;height:40px;border-radius:8px;background:#16161A;border:1px solid #26262c;"></span><span style="font-size:13px;color:#b8b8c0;">Stage bg <span style="font-family:var(--mono);color:#8a8a92;">#16161A</span></span></div>
+      </div>
+      <div class="hex" style="margin-top:18px;">Single accent = clay. No second accent — the old gold/yellow is retired. Good / Bad are semantic (✅ / ❌) only.</div>
+    </div>
+
+    <div class="tile span-6">
+      <h3>Farsi — Vazirmatn (everything)</h3>
+      <div style="font-family: var(--fa); direction: rtl; font-size: 76px; font-weight: 800; line-height: 1.3;">هیچی بی‌دلیل نیست</div>
+      <div style="margin-top: 14px; font-family: var(--fa); direction: rtl; font-size: 22px; font-weight: 500; color: #b8b8c0;">وزن ۸۰۰–۹۰۰ برای تیتر، ۴۰۰–۶۰۰ برای متن.</div>
+    </div>
+    <div class="tile span-6">
+      <h3>Latin — Inter 800 / JetBrains Mono</h3>
+      <div style="font-size: 60px; font-weight: 800; letter-spacing: -0.03em; line-height: 1;">Aa Bb Cc</div>
+      <div style="margin-top: 18px; font-family: var(--mono); font-size: 24px; font-weight: 500;">01 / 08 &nbsp; AMIRARDEKANI.COM</div>
+      <div style="margin-top: 16px; font-family: var(--mono); font-size: 12px; color: #8a8a92; letter-spacing: 0.1em; text-transform: uppercase;">Latin numerals &amp; handle only</div>
+    </div>
+
+    <div class="tile span-12" style="border-color:#5a3326; background: linear-gradient(0deg, rgba(199,85,47,0.06), rgba(199,85,47,0.06)), #1d1d22;">
+      <h3 style="color:#E0916F;">⚠ Two hard Farsi rules — never break these</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:8px;">
+        <div>
+          <div style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">1 · Never apply letter-spacing</div>
+          <div style="font-size:14px; color:#b8b8c0; line-height:1.6;">It breaks Persian cursive joining — letters disconnect. Every <span style="font-family:var(--mono); color:#E0916F;">.fa</span> slide forces <span style="font-family:var(--mono); color:#E0916F;">letter-spacing: 0</span>.</div>
+        </div>
+        <div>
+          <div style="font-size:18px; font-weight:700; color:#fff; margin-bottom:8px;">2 · No UPPERCASE · Persian numerals</div>
+          <div style="font-size:14px; color:#b8b8c0; line-height:1.6;">Uppercase is meaningless in Farsi. Use Persian digits — <span style="font-family:var(--fa); color:#fff;">۰۱ / ۰۸</span>, not 01 / 08.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tile span-4">
+      <h3>Highlight word</h3>
+      <div style="font-size: 64px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1;">You need <span class="hl">this</span></div>
+      <div class="hex" style="margin-top: 20px;">.hl — clay block on key word, #fff text</div>
+    </div>
+    <div class="tile span-4">
+      <h3>Strike-out word</h3>
+      <div style="font-size: 64px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1;">Not <span class="strike">this</span></div>
+      <div class="hex" style="margin-top: 20px;">.strike — clay bar, myth marker</div>
+    </div>
+    <div class="tile span-4">
+      <h3>Accent word</h3>
+      <div style="font-size: 64px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1;">But <span class="acc">this</span></div>
+      <div class="hex" style="margin-top: 20px;">.acc — clay text on key word</div>
+    </div>
+  </div>
+
+  <!-- ============ TEMPLATE LIBRARY ============ -->
+  <div class="section-title"><span class="num">02</span> Templates &middot; 23 ready layouts</div>
+
+
+  <!-- ===== TEMPLATE 01 — COVER ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-01 · COVER</div>
+      <h2>The hook slide</h2>
+      <p>Open every carousel with a section label and a 2–3 line headline. Use a clay background block on the most important word so the post stops the scroll.</p>
+      <ul>
+        <li><span>Use for</span><b>Slide 1 always</b></li>
+        <li><span>Headline length</span><b>4 – 9 words</b></li>
+        <li><span>Hierarchy</span><b>Eyebrow → Headline → Sub</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-cover">
+        <div class="glow"></div>
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">01</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">REAL TALK FOR LIFTERS</div>
+          <h1>You don't need a <span class="hl">perfect</span> program.</h1>
+          <div class="sub">But you need the right one.</div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="swipe">SWIPE <span class="arrow"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 02 — MYTH (with constellation pattern) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-02 · MYTH</div>
+      <h2>The strawman slide</h2>
+      <p>State the conventional wisdom you're about to dismantle. Strike through the cliché word in clay; the headline is what you're rejecting, not your point of view.</p>
+      <ul>
+        <li><span>Use for</span><b>Slide 2 – 3</b></li>
+        <li><span>Voice</span><b>Common belief, set up to be busted</b></li>
+        <li><span>Pairs with</span><b>T-03 (statement)</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-myth">
+        <div class="pattern">
+          <svg viewBox="0 0 1080 1350" preserveAspectRatio="none">
+            <g stroke="rgba(244,244,240,0.18)" stroke-width="1.2" fill="none">
+              <path d="M180 280 L380 220 L540 360 L760 320 L900 460 L820 660 L600 580 L420 720 L260 600 Z" />
+              <path d="M540 800 L780 940 L660 1080 L420 980 Z" />
+            </g>
+            <g fill="rgba(244,244,240,0.18)">
+              <circle cx="180" cy="280" r="6" /><circle cx="380" cy="220" r="4" /><circle cx="540" cy="360" r="10" /><circle cx="760" cy="320" r="5" /><circle cx="900" cy="460" r="7" /><circle cx="820" cy="660" r="4" /><circle cx="600" cy="580" r="9" /><circle cx="420" cy="720" r="5" /><circle cx="260" cy="600" r="4" /><circle cx="780" cy="940" r="6" /><circle cx="660" cy="1080" r="4" />
+            </g>
+            <g fill="rgba(244,244,240,0.32)" font-family="JetBrains Mono, monospace" font-size="20" letter-spacing="0.08em">
+              <text x="200" y="260">deload week 4?</text>
+              <text x="560" y="345">RPE 8</text>
+              <text x="760" y="305">3×8 @ 75%</text>
+              <text x="610" y="565">tempo 3-1-1</text>
+              <text x="280" y="585">1.5× BW</text>
+              <text x="800" y="645">supersets</text>
+            </g>
+          </svg>
+        </div>
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">03</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-A">THE MYTH</div>
+          <h1>You need the <span class="strike">perfect</span> plan to see <span class="hl">results.</span></h1>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 03 — BIG STATEMENT ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-03 · STATEMENT</div>
+      <h2>One sentence, full screen</h2>
+      <p>Your thesis. The line you'd say once and the room would go quiet. Set one or two key words in clay so the eye knows where to land.</p>
+      <ul>
+        <li><span>Use for</span><b>Mid-carousel pivot</b></li>
+        <li><span>Headline length</span><b>3 – 6 words</b></li>
+        <li><span>Style note</span><b>No image. No card. Just type.</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-big">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">05</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1><span class="acc">Consistency</span> beats perfection.</h1>
+        </div>
+        <div class="footnote">— THE THESIS</div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 04 — HEATMAP / DATA ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-04 · HEATMAP</div>
+      <h2>Proof through data</h2>
+      <p>Visualize a streak, calendar, or grid of attempts. Clay = on. Dim = off. Faded-clay = partial. Pairs cleanly with a one-line claim above the grid.</p>
+      <ul>
+        <li><span>Cell count</span><b>15 × 6 (90 days)</b></li>
+        <li><span>Variants</span><b>weeks, habits, sets, days</b></li>
+        <li><span>Best paired with</span><b>T-03 statement above</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-heatmap">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">06</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>What 90 days actually <span class="acc">looks like.</span></h1>
+        </div>
+        <div class="grid-wrap">
+          <div class="grid-label">90 DAYS / SHOW UP</div>
+          <div class="heatmap">
+            <!-- 6 rows × 15 cols = 90 cells -->
+            <!-- row 1 -->
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div>
+            <!-- row 2 -->
+            <div class="cell"></div><div class="cell miss"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div>
+            <!-- row 3 -->
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell miss"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div>
+            <!-- row 4 -->
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell miss"></div><div class="cell"></div>
+            <!-- row 5 -->
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div>
+            <!-- row 6 -->
+            <div class="cell"></div><div class="cell"></div><div class="cell miss"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div><div class="cell off"></div><div class="cell"></div><div class="cell"></div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 05 — RULE CARDS (light) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-05 · RULE CARDS</div>
+      <h2>Numbered takeaways</h2>
+      <p>The summary slide. Light paper background flips the rhythm of the deck. Three cards is the sweet spot — five is a list, not a system.</p>
+      <ul>
+        <li><span>Cards per slide</span><b>3 (max 4)</b></li>
+        <li><span>Each card</span><b>Title · sub-mono · index</b></li>
+        <li><span>Background</span><b>Paper variant for contrast</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-rules light">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">07</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">THE FORMULA</div>
+          <h1>Three rules. That's <span class="hl">really</span> all it takes.</h1>
+        </div>
+        <div class="cards">
+          <div class="rule-card">
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="body">
+              <div class="ttl">Train 2–3× / week</div>
+              <div class="sub">Minimum effective dose</div>
+            </div>
+            <div class="num">01</div>
+          </div>
+          <div class="rule-card">
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="body">
+              <div class="ttl">Lift with effort</div>
+              <div class="sub">Leave 1–2 reps in the tank</div>
+            </div>
+            <div class="num">02</div>
+          </div>
+          <div class="rule-card">
+            <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="body">
+              <div class="ttl">Progress over time</div>
+              <div class="sub">Add weight, reps, or sets</div>
+            </div>
+            <div class="num">03</div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 06 — STAT ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-06 · STAT</div>
+      <h2>One number, full bleed</h2>
+      <p>A single number does the talking. Pair with a tight sub-line and a small source line in mono at the bottom. Excellent for a "scroll-stopper" mid-carousel.</p>
+      <ul>
+        <li><span>Number</span><b>2–4 characters max</b></li>
+        <li><span>Label</span><b>Up to 8 words</b></li>
+        <li><span>Source</span><b>Always cite — builds trust</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-stat">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">04</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="stat-value">73%</div>
+          <div class="stat-label">of lifters who change programs every 4 weeks see no progress in a year.</div>
+        </div>
+        <div class="stat-source">SOURCE / SBS HYPERTROPHY SURVEY 2024</div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 07 — QUOTE ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-07 · QUOTE</div>
+      <h2>Borrowed authority</h2>
+      <p>Cite a coach, athlete, or research voice. Heavy clay quotation mark, then the line, then a small attribution at the bottom-left with avatar + role.</p>
+      <ul>
+        <li><span>Quote length</span><b>2 lines max</b></li>
+        <li><span>Attribution</span><b>Avatar + name + role</b></li>
+        <li><span>Mark</span><b>Clay, oversized</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-quote">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">02</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="quote-mark">"</div>
+          <h1>The best program is the one you'll actually <span class="acc">do every week.</span></h1>
+        </div>
+        <div class="attr">
+          <div class="attr-av"></div>
+          <div>
+            <div class="attr-name">Mike Israetel</div>
+            <div class="attr-role">SPORT SCIENTIST · RP STRENGTH</div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 08 — COMPARE ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-08 · COMPARE</div>
+      <h2>Don't / Do</h2>
+      <p>The reframe. Left column is the trap (struck-through, dim). Right column is the move (clay card, white type). Mirror item count between sides.</p>
+      <ul>
+        <li><span>Items per side</span><b>3 – 4</b></li>
+        <li><span>Voice</span><b>Imperative, clipped</b></li>
+        <li><span>Don't</span><b>Make either side too long</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-compare">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">06</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>Stop doing <span class="hl">this</span>. Start doing this.</h1>
+        </div>
+        <div class="cols">
+          <div class="col-card bad">
+            <div class="col-tag">— STOP</div>
+            <ul class="col-list">
+              <li>Hopping programs monthly</li>
+              <li>Maxing out every session</li>
+              <li>Skipping warmups</li>
+              <li>Comparing week 1 to week 12</li>
+            </ul>
+          </div>
+          <div class="col-card good">
+            <div class="col-tag">→ START</div>
+            <ul class="col-list">
+              <li>Stick a block 8–12 weeks</li>
+              <li>Train at RPE 7–8</li>
+              <li>5 min ramp every lift</li>
+              <li>Track your top set weekly</li>
+            </ul>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 09 — LIST ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-09 · LIST</div>
+      <h2>The breakdown</h2>
+      <p>Long-form numbered list. Slim rows, mono numerals, optional right-side tag for category or count. Great for "5 lifts", "7 mistakes", or "what I'd change".</p>
+      <ul>
+        <li><span>Rows</span><b>4 – 6</b></li>
+        <li><span>Each row</span><b>Index · text · optional tag</b></li>
+        <li><span>Density</span><b>Tighter than rule-cards</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-list">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">06</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>Five lifts that build <span class="acc">most of the body.</span></h1>
+        </div>
+        <div class="items">
+          <div class="list-item"><div class="li-num">01</div><div class="li-text">Squat</div><div class="li-tag">LOWER · COMPOUND</div></div>
+          <div class="list-item"><div class="li-num">02</div><div class="li-text">Bench press</div><div class="li-tag">UPPER · PUSH</div></div>
+          <div class="list-item"><div class="li-num">03</div><div class="li-text">Deadlift</div><div class="li-tag">FULL · HINGE</div></div>
+          <div class="list-item"><div class="li-num">04</div><div class="li-text">Pull-up</div><div class="li-tag">UPPER · PULL</div></div>
+          <div class="list-item"><div class="li-num">05</div><div class="li-text">Overhead press</div><div class="li-tag">UPPER · PUSH</div></div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 10 — CTA ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-10 · CTA</div>
+      <h2>Save &amp; share</h2>
+      <p>Close every carousel with a clear ask. Two pill buttons — primary in clay, ghost in outline — make the action feel native to Instagram chrome without being chrome.</p>
+      <ul>
+        <li><span>Use for</span><b>Final slide</b></li>
+        <li><span>Headline</span><b>Repeat the thesis differently</b></li>
+        <li><span>Buttons</span><b>Save · Share · Follow (pick 2)</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-cta">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">08</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">YOUR MOVE</div>
+          <h1>Save this. Show up <span class="hl">tomorrow.</span></h1>
+          <div class="actions">
+            <div class="cta-btn primary">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 4h14v17l-7-4-7 4z" stroke="#0A0A0A" stroke-width="2.2" stroke-linejoin="round"/></svg>
+              SAVE THIS POST
+            </div>
+            <div class="cta-btn ghost">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v7h16v-7M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              SHARE
+            </div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 11 — FEATURE (app image) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-11 · FEATURE</div>
+      <h2>Let the image talk</h2>
+      <p>Full-bleed photo with the headline over a dark scrim. Drop in a cycle, day, or workout image from the app — image on top, shown big, exactly like the program.</p>
+      <ul>
+        <li><span>Use for</span><b>Cycle / phase reveal</b></li>
+        <li><span>Image</span><b>assets/cycles · /days · /workouts</b></li>
+        <li><span>Headline</span><b>2 – 5 words over scrim</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-feature">
+        <div class="feat-img"><div class="img-ph"><span>CYCLE / PHASE PHOTO &nbsp;·&nbsp; 1080×1350</span></div></div>
+        <div class="feat-scrim"></div>
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">02</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-A">PHASE 01 · WEEKS 1–5</div>
+          <h1>Foundation <span class="acc">Forge.</span></h1>
+          <div class="sub">Build the platform before we load it.</div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="swipe">SWIPE <span class="arrow"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 12 — JOURNEY (timeline) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-12 · JOURNEY</div>
+      <h2>The linked roadmap</h2>
+      <p>Your periodised cycles as one connected path — each phase has a clear aim, and together they build to the goal. The slide that explains your whole 6-month method.</p>
+      <ul>
+        <li><span>Nodes</span><b>4 – 6 phases</b></li>
+        <li><span>Each node</span><b>Phase name + aim</b></li>
+        <li><span>Pairs with</span><b>T-11 feature · T-14 checklist</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-journey">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">03</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">THE 6-MONTH MAP</div>
+          <h1>Five phases. <span class="acc">One goal.</span></h1>
+        </div>
+        <div class="timeline">
+          <div class="tl-node"><div class="tl-dot">01</div><div><div class="tl-ttl">Foundation Forge</div><div class="tl-sub">BUILD THE PLATFORM</div></div></div>
+          <div class="tl-line"></div>
+          <div class="tl-node"><div class="tl-dot">02</div><div><div class="tl-ttl">Strength Engine</div><div class="tl-sub">LOAD THE FOUNDATION</div></div></div>
+          <div class="tl-line"></div>
+          <div class="tl-node"><div class="tl-dot">03</div><div><div class="tl-ttl">Power Transfer</div><div class="tl-sub">STRENGTH → SPEED</div></div></div>
+          <div class="tl-line"></div>
+          <div class="tl-node"><div class="tl-dot">04</div><div><div class="tl-ttl">Performance Peak</div><div class="tl-sub">SHARPEN EVERY OUTPUT</div></div></div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 13 — RESULT (proof) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-13 · RESULT</div>
+      <h2>Proof, with a face</h2>
+      <p>One client outcome — big and undeniable — plus a one-line quote and attribution. The social-proof slide; drop in a real result and photo.</p>
+      <ul>
+        <li><span>Stat</span><b>The headline outcome</b></li>
+        <li><span>Quote</span><b>1 – 2 lines, their words</b></li>
+        <li><span>Attribution</span><b>Photo + name + context</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-result">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">07</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">REAL RESULT</div>
+          <div class="result-stat">−12<span style="font-size:0.4em;font-weight:700;">KG</span></div>
+          <div class="result-label">in 16 weeks — training just 3× a week.</div>
+        </div>
+        <div class="quote">"I stopped guessing. Every week the plan adjusted to me — and it actually stuck."</div>
+        <div class="attr">
+          <div class="attr-av"></div>
+          <div>
+            <div class="attr-name">Sara M.</div>
+            <div class="attr-role">ONLINE CLIENT · 4 MONTHS</div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 14 — CHECKLIST (light) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-14 · CHECKLIST</div>
+      <h2>What you get</h2>
+      <p>An airy "everything included" list on paper — lighter than the rule-cards. Use it for value stacks, what's-included, or a simple do-this list.</p>
+      <ul>
+        <li><span>Rows</span><b>4 – 6</b></li>
+        <li><span>Each row</span><b>Check + short line</b></li>
+        <li><span>Background</span><b>Paper (light)</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-checklist light">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">06</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">WHAT YOU GET</div>
+          <h1>Everything, in <span class="hl">one app.</span></h1>
+        </div>
+        <div class="checks">
+          <div class="check-row"><span class="cbox"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A program built for you</div>
+          <div class="check-row"><span class="cbox"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Video + cues on every move</div>
+          <div class="check-row"><span class="cbox"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Weekly adjustments to your plan</div>
+          <div class="check-row"><span class="cbox"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Chat with me, any time</div>
+          <div class="check-row"><span class="cbox"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Free extra workouts</div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 15 — INDEX ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-15 · INDEX</div>
+      <h2>What's inside</h2>
+      <p>The retention slide. Show what the next few cards deliver so people commit to swiping. Works best as slide 2, right after the cover.</p>
+      <ul>
+        <li><span>Use for</span><b>Slide 2 (retention)</b></li>
+        <li><span>Rows</span><b>3 – 5 with page refs</b></li>
+        <li><span>Pairs with</span><b>T-01 cover</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-index">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">02</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">IN THIS POST</div>
+          <h1>What we'll <span class="acc">cover.</span></h1>
+        </div>
+        <div class="toc">
+          <div class="toc-row"><div class="toc-num">01</div><div class="toc-text">The myth of the perfect plan</div><div class="toc-ref">→ 02</div></div>
+          <div class="toc-row"><div class="toc-num">02</div><div class="toc-text">What a living program is</div><div class="toc-ref">→ 04</div></div>
+          <div class="toc-row"><div class="toc-num">03</div><div class="toc-text">The 5-cycle map</div><div class="toc-ref">→ 06</div></div>
+          <div class="toc-row"><div class="toc-num">04</div><div class="toc-text">What I track for you</div><div class="toc-ref">→ 08</div></div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="swipe">SWIPE <span class="arrow"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 16 — STEP ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-16 · STEP</div>
+      <h2>One step, full screen</h2>
+      <p>For technique breakdowns. Each card is a single step — big index, one instruction, one coaching cue. Run a few in sequence for a how-to.</p>
+      <ul>
+        <li><span>Use for</span><b>Technique / how-to series</b></li>
+        <li><span>Per card</span><b>Step n · instruction · cue</b></li>
+        <li><span>Pairs with</span><b>T-20 diagram</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-step">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">04</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">HOW TO · ROMANIAN DEADLIFT</div>
+          <div class="step-no">02</div>
+          <div class="step-of">STEP 02 / 04</div>
+        </div>
+        <div class="step-body">
+          <h1>Push your hips back — not down.</h1>
+          <div class="cue">FEEL IT IN THE HAMSTRINGS, NOT THE LOWER BACK</div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 17 — SPLIT (before / after) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-17 · SPLIT</div>
+      <h2>Before / after</h2>
+      <p>The transformation slide. Two images side by side, clearly tagged. Keep the claim honest and specific — weeks trained, sessions per week.</p>
+      <ul>
+        <li><span>Images</span><b>Same pose · same light</b></li>
+        <li><span>Tags</span><b>BEFORE (ink) · AFTER (accent)</b></li>
+        <li><span>Caption</span><b>Name · timeframe</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-split">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">05</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>16 weeks. Three sessions a <span class="acc">week.</span></h1>
+        </div>
+        <div class="pair">
+          <div class="ba"><div class="img-ph"><span>BEFORE PHOTO</span></div><div class="ba-tag">BEFORE</div></div>
+          <div class="ba is-after"><div class="img-ph"><span>AFTER PHOTO</span></div><div class="ba-tag">AFTER</div></div>
+        </div>
+        <div class="cap">SARA M. · WEEK 1 → WEEK 16</div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 18 — DEFINE (light) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-18 · DEFINE</div>
+      <h2>Define the term</h2>
+      <p>Teach one concept properly. Dictionary layout on paper — term, category, a one-line gloss, then a plain-language definition. Builds the "evidence-based" authority.</p>
+      <ul>
+        <li><span>Term</span><b>1 – 3 words</b></li>
+        <li><span>Definition</span><b>Plain language, 1 sentence</b></li>
+        <li><span>Background</span><b>Paper (light)</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-define light">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">03</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="term-cat">TRAINING PRINCIPLE</div>
+          <div class="term">Progressive overload</div>
+          <div class="phon">/ the one rule that never changes /</div>
+          <div class="def">Doing <b>a little more</b> over time — load, reps, or quality — so the body always has a reason to adapt.</div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 19 — Q&A ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-19 · Q&amp;A</div>
+      <h2>Question &amp; answer</h2>
+      <p>Answer the objection you hear most. Big question up top, a tight answer below. Great for FAQ content and for handling price/effort doubts.</p>
+      <ul>
+        <li><span>Question</span><b>The real objection</b></li>
+        <li><span>Answer</span><b>1 – 2 lines, no hedging</b></li>
+        <li><span>Use for</span><b>FAQ · objection-handling</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-qa">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">05</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="qmark">Q</div>
+          <h1>Why does my plan change every week?</h1>
+        </div>
+        <div class="answer">
+          <div class="a-label">THE ANSWER</div>
+          <div class="a-body">Because <b>your week changes.</b> Sleep, stress, work, soreness — the plan adapts to the body that actually showed up.</div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 20 — DIAGRAM (callout) ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-20 · DIAGRAM</div>
+      <h2>Labelled callout</h2>
+      <p>Annotate a screenshot or photo. Drop pins with mono labels onto an app screen or an exercise still to point out the parts that matter.</p>
+      <ul>
+        <li><span>Image</span><b>App screen / form still</b></li>
+        <li><span>Callouts</span><b>2 – 3 max</b></li>
+        <li><span>Pairs with</span><b>T-16 step · T-11 feature</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-diagram">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">04</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>What every exercise card <span class="acc">shows you.</span></h1>
+        </div>
+        <div class="stage-img"><div class="img-ph"><span>APP SCREEN / EXERCISE CARD</span></div></div>
+        <div class="callout" style="top: 400px; left: 110px;"><span class="pin"></span><span class="lbl">Sets · reps · tempo · RPE</span></div>
+        <div class="callout" style="top: 670px; left: 150px;"><span class="pin"></span><span class="lbl">Demo video on every move</span></div>
+        <div class="callout" style="top: 940px; left: 110px;"><span class="pin"></span><span class="lbl">✅ do / ❌ avoid cues</span></div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 21 — FORMULA ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-21 · FORMULA</div>
+      <h2>The equation</h2>
+      <p>Make a method feel inevitable. Stack the inputs as tokens with operators, land on the result in the accent block. Demystifies "how it works".</p>
+      <ul>
+        <li><span>Inputs</span><b>2 – 3 tokens</b></li>
+        <li><span>Each token</span><b>Word + mono gloss</b></li>
+        <li><span>Result</span><b>Accent block, last</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-formula">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">06</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>There's no magic. Just <span class="acc">this.</span></h1>
+        </div>
+        <div class="eq">
+          <div class="eq-row"><div class="eq-op">&nbsp;</div><div class="eq-token"><div class="t-word">Volume</div><div class="t-sub">HOW MUCH</div></div></div>
+          <div class="eq-row"><div class="eq-op">×</div><div class="eq-token"><div class="t-word">Intensity</div><div class="t-sub">HOW HARD</div></div></div>
+          <div class="eq-row"><div class="eq-op">×</div><div class="eq-token"><div class="t-word">Consistency</div><div class="t-sub">HOW OFTEN</div></div></div>
+          <div class="eq-row"><div class="eq-op">=</div><div class="eq-token eq-result"><div class="t-word">Growth</div><div class="t-sub">THE RESULT</div></div></div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 22 — SCHEDULE ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-22 · SCHEDULE</div>
+      <h2>The weekly split</h2>
+      <p>Show the shape of a week — including the rest days. Programming recovery on purpose signals you manage load, not just push harder.</p>
+      <ul>
+        <li><span>Rows</span><b>7 (full week)</b></li>
+        <li><span>Each row</span><b>Day · focus · tag</b></li>
+        <li><span>Rest days</span><b>Dimmed, on purpose</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-schedule">
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">05</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <h1>A week that actually <span class="acc">works.</span></h1>
+        </div>
+        <div class="week">
+          <div class="day-row"><div class="d-day">MON</div><div class="d-focus">Lower body</div><div class="d-tag">STRENGTH</div></div>
+          <div class="day-row rest"><div class="d-day">TUE</div><div class="d-focus">Rest</div><div class="d-tag">RECOVERY</div></div>
+          <div class="day-row"><div class="d-day">WED</div><div class="d-focus">Upper body</div><div class="d-tag">PUSH · PULL</div></div>
+          <div class="day-row rest"><div class="d-day">THU</div><div class="d-focus">Rest</div><div class="d-tag">RECOVERY</div></div>
+          <div class="day-row"><div class="d-day">FRI</div><div class="d-focus">Full body</div><div class="d-tag">POWER</div></div>
+          <div class="day-row"><div class="d-day">SAT</div><div class="d-focus">Optional</div><div class="d-tag">CONDITIONING</div></div>
+          <div class="day-row rest"><div class="d-day">SUN</div><div class="d-focus">Rest</div><div class="d-tag">RECOVERY</div></div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== TEMPLATE 23 — BIO ===== -->
+  <div class="post-row">
+    <div class="post-info">
+      <div class="kicker">T-23 · BIO</div>
+      <h2>Meet the coach</h2>
+      <p>Put a face to the brand. Portrait, name, role, and a row of credential chips. Use it as an intro card or a trust slide before the CTA.</p>
+      <ul>
+        <li><span>Photo</span><b>Portrait, upper right</b></li>
+        <li><span>Credentials</span><b>3 – 4 chips</b></li>
+        <li><span>Pairs with</span><b>T-10 CTA</b></li>
+      </ul>
+    </div>
+    <div class="post-stage">
+      <div class="post-canvas tpl-bio">
+        <div class="photo"><div class="img-ph"><span>COACH PORTRAIT</span></div></div>
+        <div class="post-header">
+          <div class="who"><span class="dot"></span><span class="handle">AMIR ARDEKANI</span></div>
+          <div class="num"><span class="cur">01</span> / <span class="total">08</span></div>
+        </div>
+        <div class="body-wrap">
+          <div class="chip-B">MEET YOUR COACH</div>
+          <h1>Amir Ardekani</h1>
+          <div class="role">Strength &amp; conditioning coach</div>
+          <div class="creds">
+            <span class="cred">S&amp;C COACH</span>
+            <span class="cred">EVIDENCE-BASED</span>
+            <span class="cred">10+ YEARS</span>
+            <span class="cred">1:1 ONLINE</span>
+          </div>
+        </div>
+        <div class="post-footer">
+          <div class="progress-bar"><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="swipe">SWIPE <span class="arrow"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============ FARSI SHOWCASE ============ -->
+  <div class="section-title"><span class="num">03</span> In Farsi &middot; a live 6-slide carousel</div>
+  <p class="fa-intro">The same templates, driven by real brand content — <b>Vazirmatn, RTL, clay-only, Persian numerals, zero letter-spacing.</b> A complete myth→method→proof→ask arc carrying both sign-offs: «هیچی بی‌دلیل نیست» on the cover and «یه مربی، تو جیبت» on the close. This is what you'd actually post.</p>
+
+  <div class="fa-strip">
+
+    <!-- FA 01 — COVER -->
+    <figure>
+      <div class="post-stage">
+        <div class="post-canvas tpl-cover fa">
+          <div class="glow"></div>
+          <div class="post-header">
+            <div class="who"><span class="dot"></span><span class="handle">AMIRARDEKANI.COM</span></div>
+            <div class="num">۰۱ / ۰۶</div>
+          </div>
+          <div class="body-wrap">
+            <div class="chip-B">مربیِ شخصی، آنلاین</div>
+            <h1>هیچی <span class="hl">بی‌دلیل</span> نیست.</h1>
+            <div class="sub">هر حرکت توی برنامه‌ت، یه دلیل داره.</div>
+          </div>
+          <div class="post-footer">
+            <div class="progress-bar"><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="swipe">بکش <span class="arrow"></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">01</span> Cover<span class="fa-t">هیچی بی‌دلیل نیست</span></figcaption>
+    </figure>
+
+    <!-- FA 02 — COMPARE (file vs coach) -->
+    <figure>
+      <div class="post-stage">
+        <div class="post-canvas tpl-compare fa">
+          <div class="post-header">
+            <div class="who"><span class="dot"></span><span class="handle">AMIRARDEKANI.COM</span></div>
+            <div class="num">۰۲ / ۰۶</div>
+          </div>
+          <div class="body-wrap">
+            <h1>فایل می‌گه چی‌کار کن. مربی <span class="acc">می‌بینه</span> چی‌کار می‌کنی.</h1>
+          </div>
+          <div class="cols">
+            <div class="col-card bad">
+              <div class="col-tag">یه فایل</div>
+              <ul class="col-list">
+                <li>ثابته، عوض نمی‌شه</li>
+                <li>نمی‌دونه چطور تمرین کردی</li>
+                <li>بازخوردی نداره</li>
+                <li>وقتی کم میاری، بی‌خبره</li>
+              </ul>
+            </div>
+            <div class="col-card good">
+              <div class="col-tag">یه مربی</div>
+              <ul class="col-list">
+                <li>هر هفته آپدیت می‌شه</li>
+                <li>تمرینت رو می‌بینه</li>
+                <li>بهت بازخورد می‌ده</li>
+                <li>قبل از آسیب، حواسش هست</li>
+              </ul>
+            </div>
+          </div>
+          <div class="post-footer">
+            <div class="progress-bar"><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">02</span> Compare<span class="fa-t">فایل یا مربی؟</span></figcaption>
+    </figure>
+
+    <!-- FA 03 — STAT (ACWR) -->
+    <figure>
+      <div class="post-stage">
+        <div class="post-canvas tpl-stat fa">
+          <div class="post-header">
+            <div class="who"><span class="dot"></span><span class="handle">AMIRARDEKANI.COM</span></div>
+            <div class="num">۰۳ / ۰۶</div>
+          </div>
+          <div class="body-wrap">
+            <div class="stat-value">۱.۵</div>
+            <div class="stat-label">نسبتی که بالاتر از اون، ریسکِ آسیب می‌ره بالا — و من هر هفته برات حسابش می‌کنم.</div>
+          </div>
+          <div class="stat-source">ACWR · نسبتِ بارِ حاد به مزمن</div>
+          <div class="post-footer">
+            <div class="progress-bar"><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">03</span> Stat<span class="fa-t">عددی که جلوی آسیبو می‌گیره</span></figcaption>
+    </figure>
+
+    <!-- FA 04 — JOURNEY (6-month map) -->
+    <figure>
+      <div class="post-stage">
+        <div class="post-canvas tpl-journey fa">
+          <div class="post-header">
+            <div class="who"><span class="dot"></span><span class="handle">AMIRARDEKANI.COM</span></div>
+            <div class="num">۰۴ / ۰۶</div>
+          </div>
+          <div class="body-wrap">
+            <div class="chip-B">نقشه‌ی ۶ ماهه</div>
+            <h1>چهار مرحله، <span class="acc">یک هدف.</span></h1>
+          </div>
+          <div class="timeline">
+            <div class="tl-node"><div class="tl-dot">۰۱</div><div><div class="tl-ttl">پایه‌سازی</div><div class="tl-sub">ساختِ پایه</div></div></div>
+            <div class="tl-line"></div>
+            <div class="tl-node"><div class="tl-dot">۰۲</div><div><div class="tl-ttl">قدرت</div><div class="tl-sub">بارگذاریِ پایه</div></div></div>
+            <div class="tl-line"></div>
+            <div class="tl-node"><div class="tl-dot">۰۳</div><div><div class="tl-ttl">توان</div><div class="tl-sub">قدرت به سرعت</div></div></div>
+            <div class="tl-line"></div>
+            <div class="tl-node"><div class="tl-dot">۰۴</div><div><div class="tl-ttl">اوج</div><div class="tl-sub">آماده‌سازیِ نهایی</div></div></div>
+          </div>
+          <div class="post-footer">
+            <div class="progress-bar"><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">04</span> Journey<span class="fa-t">نقشه‌ی ۶ ماهه</span></figcaption>
+    </figure>
+
+    <!-- FA 05 — RULE CARDS (3 pillars, light) -->
+    <figure>
+      <div class="post-stage">
+        <div class="post-canvas tpl-rules light fa">
+          <div class="post-header">
+            <div class="who"><span class="dot"></span><span class="handle">AMIRARDEKANI.COM</span></div>
+            <div class="num">۰۵ / ۰۶</div>
+          </div>
+          <div class="body-wrap">
+            <div class="chip-B">سه ستونِ روش</div>
+            <h1>روش، خلاصه می‌شه تو <span class="hl">سه چیز.</span></h1>
+          </div>
+          <div class="cards">
+            <div class="rule-card">
+              <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="body">
+                <div class="ttl">علم، نه شعار</div>
+                <div class="sub">پریودایزیشن و اضافه‌بارِ تدریجی</div>
+              </div>
+              <div class="num">۰۱</div>
+            </div>
+            <div class="rule-card">
+              <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="body">
+                <div class="ttl">تنظیمِ هفتگی</div>
+                <div class="sub">برنامه با هفته‌ی تو عوض می‌شه</div>
+              </div>
+              <div class="num">۰۲</div>
+            </div>
+            <div class="rule-card">
+              <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="body">
+                <div class="ttl">پشتیبانیِ کامل</div>
+                <div class="sub">چت، فرم‌چک، تغذیه، پیگیری</div>
+              </div>
+              <div class="num">۰۳</div>
+            </div>
+          </div>
+          <div class="post-footer">
+            <div class="progress-bar"><span></span><span></span><span></span><span></span><span class="on"></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">05</span> Rule cards<span class="fa-t">سه ستونِ روش</span></figcaption>
+    </figure>
+
+    <!-- FA 06 — CTA -->
+    <figure>
+      <div class="post-stage">
+        <div class="post-canvas tpl-cta fa">
+          <div class="post-header">
+            <div class="who"><span class="dot"></span><span class="handle">AMIRARDEKANI.COM</span></div>
+            <div class="num">۰۶ / ۰۶</div>
+          </div>
+          <div class="body-wrap">
+            <div class="chip-B">نوبتِ توئه</div>
+            <h1><span class="hl">یه مربی</span>، تو جیبت.</h1>
+            <div class="actions">
+              <div class="cta-btn primary">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 4h14v17l-7-4-7 4z" stroke="#0A0A0A" stroke-width="2.2" stroke-linejoin="round"/></svg>
+                ذخیره‌ش کن
+              </div>
+              <div class="cta-btn ghost">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v7h16v-7M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                بفرست
+              </div>
+            </div>
+          </div>
+          <div class="post-footer">
+            <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">06</span> CTA<span class="fa-t">یه مربی، تو جیبت</span></figcaption>
+    </figure>
+
+  </div>
+
+
+  <!-- ============ HOW TO USE ============ -->
+  <div class="section-title"><span class="num">04</span> Recipes &middot; build a carousel in 60 seconds</div>
+
+  <div class="system-grid" style="margin-bottom: 60px;">
+    <div class="tile span-4">
+      <h3>The myth-buster (8 slides)</h3>
+      <div style="font-family: var(--mono); font-size: 13px; line-height: 1.9; color: #b8b8c0;">
+        01 &nbsp; <b style="color: var(--accent);">COVER</b><br>
+        02 &nbsp; <b style="color: var(--accent);">QUOTE</b> (set up tension)<br>
+        03 &nbsp; <b style="color: var(--accent);">MYTH</b><br>
+        04 &nbsp; <b style="color: var(--accent);">STAT</b> (the proof)<br>
+        05 &nbsp; <b style="color: var(--accent);">STATEMENT</b> (the pivot)<br>
+        06 &nbsp; <b style="color: var(--accent);">HEATMAP</b> (evidence)<br>
+        07 &nbsp; <b style="color: var(--accent);">RULE CARDS</b> (formula)<br>
+        08 &nbsp; <b style="color: var(--accent);">CTA</b>
+      </div>
+    </div>
+    <div class="tile span-4">
+      <h3>The how-to (6 slides)</h3>
+      <div style="font-family: var(--mono); font-size: 13px; line-height: 1.9; color: #b8b8c0;">
+        01 &nbsp; <b style="color: var(--accent);">COVER</b><br>
+        02 &nbsp; <b style="color: var(--accent);">STATEMENT</b> (the why)<br>
+        03 &nbsp; <b style="color: var(--accent);">LIST</b> (5 lifts / steps)<br>
+        04 &nbsp; <b style="color: var(--accent);">COMPARE</b> (do / don't)<br>
+        05 &nbsp; <b style="color: var(--accent);">RULE CARDS</b> (recap)<br>
+        06 &nbsp; <b style="color: var(--accent);">CTA</b>
+      </div>
+    </div>
+    <div class="tile span-4">
+      <h3>The hot take (4 slides)</h3>
+      <div style="font-family: var(--mono); font-size: 13px; line-height: 1.9; color: #b8b8c0;">
+        01 &nbsp; <b style="color: var(--accent);">COVER</b><br>
+        02 &nbsp; <b style="color: var(--accent);">MYTH</b><br>
+        03 &nbsp; <b style="color: var(--accent);">STATEMENT</b><br>
+        04 &nbsp; <b style="color: var(--accent);">CTA</b>
+      </div>
+    </div>
+    <div class="tile span-12" style="margin-top:16px;">
+      <h3>The method explainer (6 slides) &middot; uses the new templates</h3>
+      <div style="font-family: var(--mono); font-size: 13px; line-height: 1.9; color: #b8b8c0;">
+        01 &nbsp; <b style="color: var(--accent);">COVER</b> &nbsp;→&nbsp;
+        02 &nbsp; <b style="color: var(--accent);">FEATURE</b> (a real cycle image) &nbsp;→&nbsp;
+        03 &nbsp; <b style="color: var(--accent);">JOURNEY</b> (the 6-month map) &nbsp;→&nbsp;
+        04 &nbsp; <b style="color: var(--accent);">CHECKLIST</b> (what you get) &nbsp;→&nbsp;
+        05 &nbsp; <b style="color: var(--accent);">RESULT</b> (proof) &nbsp;→&nbsp;
+        06 &nbsp; <b style="color: var(--accent);">CTA</b>
+      </div>
+    </div>
+
+    <div class="tile span-12" style="margin-top:16px;">
+      <h3>Content angles → which templates to reach for</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 48px; margin-top:4px; font-size:13px; line-height:1.6; color:#b8b8c0;">
+        <div><span style="font-family:var(--fa);direction:rtl;color:#fff;font-size:16px;">هیچی بی‌دلیل نیست</span><br><span style="font-family:var(--mono);color:#8a8a92;">MYTH → COMPARE → LIST (what I leave out)</span></div>
+        <div><span style="font-family:var(--fa);direction:rtl;color:#fff;font-size:16px;">یه مربی، تو جیبت</span><br><span style="font-family:var(--mono);color:#8a8a92;">COMPARE (PT vs app) → CHECKLIST → CTA</span></div>
+        <div><span style="color:#fff;">What your coach sees while you train</span><br><span style="font-family:var(--mono);color:#8a8a92;">FEATURE → STAT (ACWR) → RESULT</span></div>
+        <div><span style="color:#fff;">Your 6-month map</span><br><span style="font-family:var(--mono);color:#8a8a92;">JOURNEY → STEP → FEATURE</span></div>
+        <div><span style="color:#fff;">Why your plan changes every week</span><br><span style="font-family:var(--mono);color:#8a8a92;">QA → STATEMENT → SCHEDULE</span></div>
+        <div><span style="color:#fff;">5 questions before every session</span><br><span style="font-family:var(--mono);color:#8a8a92;">STATEMENT → LIST → STEP</span></div>
+        <div><span style="color:#fff;">Every exercise has a video + 2 cues</span><br><span style="font-family:var(--mono);color:#8a8a92;">DIAGRAM → STEP → FEATURE</span></div>
+        <div><span style="color:#fff;">The number that prevents injuries</span><br><span style="font-family:var(--mono);color:#8a8a92;">DEFINE → STAT → RESULT</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot" style="margin-top:80px; padding-top:36px; border-top:1px solid #2a2a2e; display:flex; justify-content:space-between; align-items:baseline; gap:24px; flex-wrap:wrap;">
+    <div style="font-family:var(--mono); font-size:12px; color:#8a8a92; letter-spacing:0.1em; text-transform:uppercase;">Amir Ardekani · carousel kit · 23 templates + Farsi showcase</div>
+    <div style="font-family:var(--fa); direction:rtl; font-size:20px; color:var(--accent);">هیچی بی‌دلیل نیست &nbsp;·&nbsp; یه مربی، تو جیبت</div>
+  </div>
+
+</div>
+
+<!-- ============ GLOBAL CONFIG (vanilla — brand colours live in :root above) ============ -->
+<script>
+  (function () {
+    // Edit these three; the palette is set in :root at the top of the file.
+    var HANDLE = 'AMIRARDEKANI.COM';
+    var TOTAL  = '08';
+    var BG     = 'frame';   // none · grid · dots · scanlines · diagonal · glow · frame · corner
+    document.querySelectorAll('.handle').forEach(function (el) { el.textContent = HANDLE; });
+    document.querySelectorAll('.total').forEach(function (el) { el.textContent = TOTAL; });
+    document.querySelectorAll('.post-canvas').forEach(function (el) { el.setAttribute('data-bg', BG); });
+  })();
+</script>
+
+<!-- ============ POST CARD SCALE ============ -->
+<script>
+  // Scale each .post-canvas to fit its parent .post-stage width.
+  function scaleAll() {
+    document.querySelectorAll('.post-stage').forEach(stage => {
+      const canvas = stage.querySelector('.post-canvas');
+      if (!canvas) return;
+      const w = stage.clientWidth;
+      const scale = w / 1080;
+      canvas.style.transform = `scale(${scale})`;
+    });
+  }
+  window.addEventListener('load', scaleAll);
+  window.addEventListener('resize', scaleAll);
+  // Run early too
+  document.addEventListener('DOMContentLoaded', scaleAll);
+</script>
+
+</body>
+</html>
