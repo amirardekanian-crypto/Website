@@ -48,6 +48,8 @@ Programme (~6 months)
 
 - A programme is a **chain of ~5–6 linked cycles**, each building on the last. Example cycle library: *Foundation Forge → Strength Engine → Structural Build → Durability Build → Armour Build* (also Load Build, Rebuild & Reset, Strength Reclaim…). Cycle/day/workout banner images live in `../assets/cycles/` and `../assets/days/`.
 
+**The app's four tabs (bottom nav):** **Home** (current cycle + progress) · **My Plan** (the training days, exercises, per-set logging) · **Coach** (two-way messaging + the personal notes + the in-app how-to guide) · **Workouts** (a library of extra on-demand sessions, separate from the programme). A finished cycle's "Done" card opens a read-only **Archive** of past programmes.
+
 **What the athlete can do:**
 - See **today's day**; tap an **exercise card** → demo video, stats (sets / reps / target / tempo / rest), **coaching cues** (do / don't), and a per-set **log** (weight + RPE 1–10 + tick).
 - **Readiness check** before a session (sleep · energy · soreness · stress · overall, each 1–5, 5 = best) → auto-regulation; the coach sees the scores.
