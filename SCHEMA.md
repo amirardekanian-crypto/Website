@@ -9,6 +9,7 @@
 
 - Required keys: `athlete.id`, `athlete.firstName`, `athlete.lastName`, `currentCycleIndex`, `cycles`, `workouts`, `workouts.days`.
 - `athlete.id` must be lowercase `firstname_lastname` (appears in the URL and localStorage).
+- `athlete.key` is a 32-char hex secret that authorises this athlete's cloud backup. Generate one per athlete and **also register it server-side** in the Supabase `athlete_keys` table (see "`athlete.key` & cloud backup"). Without it, progress still saves but is unprotected.
 - `currentCycleIndex` is 0-based. `0` means the athlete is on the first cycle in `cycles`.
 - Every `days[]` entry must have a **unique numeric** `id` (1, 2, 3…).
 - Every day must contain at least one `block`; every block must contain at least one `exercise`.
@@ -31,6 +32,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 {
   "athlete": {
     "id": "firstname_lastname",
+    "key": "0123456789abcdef0123456789abcdef",
     "firstName": "First",
     "lastName": "Last",
     "avatar": "https://example.com/photo.jpg"
@@ -72,10 +74,9 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
         "Focus statement for the next cycle."
       ],
       "teaser": {
-        "subtitle": "One-line hook",
         "paragraphs": [
           "Paragraph teasing the next cycle.",
-          "Final paragraph (auto-italicised when there is more than one)."
+          "Punchy one-line hook — auto-italicised as the final paragraph."
         ]
       }
     }
@@ -152,6 +153,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 ### Placeholder guidance
 
 - `athlete.id` → lowercase, underscore-separated (e.g. `john_doe`).
+- `athlete.key` → 32-char hex secret (generate with `crypto.randomUUID().replace(/-/g,'')`). Reused across all of an athlete's cycles. Must also be registered in the Supabase `athlete_keys` table — see "`athlete.key` & cloud backup".
 - `sport.badge` → short line shown above the name, e.g. `"🎾 Tennis Performance"`. Omit the whole `sport` object if not relevant.
 - `focuses[]` → one-line training focus statements. Any number allowed.
 - `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
@@ -234,6 +236,7 @@ card has something to open (see "Advancing to the Next Cycle").
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `athlete.id` | string | ✅ | Unique ID, used for localStorage. Format: `firstname_lastname` |
+| `athlete.key` | string | recommended | 32-char hex secret for protected cloud backup. Must match the athlete's row in the Supabase `athlete_keys` table (see below). |
 | `athlete.firstName` | string | ✅ | First name (white in hero) |
 | `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
 | `athlete.avatar` | string | optional | URL or path to athlete's photo. Falls back to initials when missing. |
@@ -245,6 +248,36 @@ card has something to open (see "Advancing to the Next Cycle").
 | `notes` | object | optional | Coaching notes (Notes tab) |
 
 > **Note:** The coach line was removed from the home screen — Amir is always the coach.
+
+#### `athlete.key` & cloud backup
+
+Every athlete gets a private 32-char hex `key` (a UUID with dashes stripped:
+`crypto.randomUUID().replace(/-/g,'')`). It authorises that athlete's progress
+writes to the cloud. **Two places must hold the same value:**
+
+1. **The JSON** — `athlete.key` in `data/<id>.json`.
+2. **The database** — a row in the Supabase `athlete_keys` table
+   (`athlete_id`, `secret_key`).
+
+The app sends the key on every cloud write; `save_progress` rejects the write
+only when a row exists for that `athlete_id` and the key doesn't match:
+
+| JSON key | DB row | Result |
+|---|---|---|
+| present | present & matching | writes succeed, **protected** ✅ (do this) |
+| present | none | writes succeed but **unprotected** (anyone could write as that athlete) |
+| missing/wrong | present | writes **rejected** — the coach never sees the data |
+
+Register the key once when creating the athlete:
+
+```sql
+insert into public.athlete_keys (athlete_id, secret_key)
+values ('firstname_lastname', '<32-char-hex>')
+on conflict (athlete_id) do nothing;
+```
+
+Reuse the **same** key across all of an athlete's cycles/programs — don't
+regenerate (e.g. `mhrn_zhr1` and `mhrn_zhr2` share one key).
 
 ---
 
@@ -275,8 +308,8 @@ Each cycle describes one training phase.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `subtitle` | string | One-line hook |
-| `paragraphs` | string[] | Body text. The last paragraph is auto-italicised when there is more than one. |
+| `paragraphs` | string[] | Body text on the "Up next!" card. The last paragraph is auto-italicised when there are 2+ — put the punchy one-line hook there. |
+| `subtitle` | string | ⚠️ **Not currently rendered** by `program.html` (the future-card builder only passes `teaser.paragraphs`). For a one-liner under the cycle name use the cycle's `tagline`; for the closing hook use the final `paragraphs` entry. |
 
 #### Example cycle
 
@@ -301,7 +334,6 @@ Each cycle describes one training phase.
     ]
   },
   "teaser": {
-    "subtitle": "You've built the foundation. Now we load it.",
     "paragraphs": [
       "Cycle 2 is where the body begins to genuinely change.",
       "Earn it in these five weeks."
@@ -420,6 +452,8 @@ Any exercise (any type) can include a `videoUrl`. When present, a play button ap
 | `"yellow"` | Yellow pill | Priority items, primary sets |
 | `"dark"` | Dark pill | Duration, equipment notes |
 
+Technique **modifiers** (e.g. `"2s hold at top"`, `"3s eccentric"`, `"band assisted"`, `"constant tension"`) are written as a leading `"dark"` chip, placed before the yellow set-count chip.
+
 ### Coaching Cues
 
 Every exercise (including circuit sub-items) can have optional cues:
@@ -432,6 +466,15 @@ Every exercise (including circuit sub-items) can have optional cues:
 ```
 
 Both arrays are optional. If omitted or empty, no cues section appears.
+
+**Mapping External / Internal / Avoid cues:** when a program specifies an external (what to do), internal (what to feel), and avoid cue per exercise, put the external + internal cues together in `good[]` and the avoid cue in `bad[]`:
+
+```json
+"cues": {
+  "good": ["Press in a smooth arc to just short of lockout", "Feel the delts drive the weight, not the chest"],
+  "bad":  ["Letting the lower back arch off the pad"]
+}
+```
 
 ---
 
@@ -505,7 +548,8 @@ needed — the past card reuses the same fields every cycle card uses.
 1. Copy any existing JSON file (e.g. `john_doe.json`)
 2. Rename to `new_athlete.json`
 3. Update `athlete`, `sport`, `cycles`, and `workouts`
-4. Send the athlete: `yoursite.github.io/program.html?client=new_athlete`
+4. Generate a fresh `athlete.key` and register it in the Supabase `athlete_keys` table (see "`athlete.key` & cloud backup")
+5. Send the athlete: `yoursite.github.io/program.html?client=new_athlete`
 
 No HTML editing required.
 
