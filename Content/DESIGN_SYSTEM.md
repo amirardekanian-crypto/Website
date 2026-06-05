@@ -206,5 +206,15 @@ A persistent device, app UI animating inside:
 - **Audience:** general-fitness clients in the Farsi market (not only athletes), even though the English site speaks to competitive tennis/padel players. Speak to the everyday trainee.
 - **Goal of content:** justify the premium price & retain clients (show depth and the behind-the-scenes work) — not cheap lead-gen.
 - **Format:** vertical reels/carousels, hook in the first 2 seconds, **burned-in captions** (many watch muted).
-- **Credibility to lean on when useful:** MSc Strength & Conditioning · MSc Applied Exercise Physiology · 500+ tennis & padel players coached.
+- **Credibility to lean on when useful:** ارشدِ قدرت و آمادگی · ارشدِ فیزیولوژیِ ورزشی (two MSc degrees) · ۵۰۰+ ورزشکار. *(In Farsi say «ارشد», never "MSc".)*
 - Lead with the **no-BS / "everything has a reason"** idea; close with the **canonical outro** + handle.
+
+**Farsi word choices — use these exact terms (decided with the client):**
+- **His title:** «مربیِ بدنسازیِ حرفه‌ای» — *not* «مربیِ قدرت و آمادگی». Keep «قدرت و آمادگی» only inside the real degree names.
+- **Degrees:** «ارشد» — never "MSc" → «ارشدِ قدرت و آمادگی» · «ارشدِ فیزیولوژیِ ورزشی».
+- **The cheap alternative:** call it «یه برنامه» / «یه برنامه‌ی آماده» — *never* «فایل» or «PDF». Frame the offer as *«فقط یه برنامه نیست — یه تجربه‌ی کاملِ مربی‌گریه»* (it's not just a program, it's a full coaching experience).
+- **Training intensity / RPE:** «شدت» — *not* «سختی».
+- **Call-to-action verb:** «شروع کن» (begin) — *not* «درخواست» (apply).
+- **Proof / credentials word:** «تجربه» (experience) — *not* «پشتوانه».
+- **Pricing (Iran residents):** «معادلِ ۲۵ دلار در ماه — به تومان، با نرخِ روز» (pegged to USD, charged in Toman); abroad → DM. Pricing headline: «یه مربیِ کامل، با قیمتی کم‌تر از اون‌چه فکرشو می‌کنی.»
+- **Handle:** Instagram **@amirardekanian** · site **amirardekani.com** *(the reels use @amirardekani — confirm which is canonical).*
