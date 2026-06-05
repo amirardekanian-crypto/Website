@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>امیر اردکانی — مربیِ آنلاینِ قدرت و آمادگی | یه مربی، تو جیبت</title>
-<meta name="description" content="مربیِ آنلاینِ قدرت و آمادگی. نه یه فایلِ PDF — یه مربیِ واقعی که برنامه‌تو اختصاصی می‌نویسه، حواسش به تمرینت هست و هر هفته باهات جلو میاد. ۵۰۰+ ورزشکار، MSc قدرت و آمادگی.">
+<title>امیر اردکانی — مربیِ بدنسازیِ حرفه‌ای | یه مربی، تو جیبت</title>
+<meta name="description" content="مربیِ بدنسازیِ حرفه‌ای. فقط یه برنامه نیست — یه مربیِ واقعی که برنامه‌تو اختصاصی می‌نویسه، حواسش به تمرینت هست و هر هفته باهات جلو میاد. ۵۰۰+ ورزشکار، ارشدِ قدرت و آمادگی.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.amirardekani.com/">
 <link rel="alternate" hreflang="fa" href="https://www.amirardekani.com/">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.amirardekani.com/">
 <meta property="og:title" content="امیر اردکانی — یه مربی، تو جیبت">
-<meta property="og:description" content="مربیِ آنلاینِ قدرت و آمادگی. نه یه فایلِ PDF — یه مربیِ واقعی که حواسش به تمرینت هست.">
+<meta property="og:description" content="مربیِ بدنسازیِ حرفه‌ای. فقط یه برنامه نیست — یه مربیِ واقعی که حواسش به تمرینت هست.">
 <meta property="og:image" content="https://www.amirardekani.com/assets/img/og-image.png">
 <meta property="og:locale" content="fa_IR">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -169,9 +169,17 @@
   .quote .who b{font-weight:700;font-size:19px;}
   .quote .who span{display:block;font-weight:500;font-size:14px;color:rgba(255,255,255,.6);}
   .ph-note{margin-top:18px;font-size:14px;color:rgba(255,255,255,.5);}
-  /* testimonials */
-  .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:22px;margin-top:48px;}
-  .tcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;}
+  /* testimonials — auto-scrolling rail (like the English site) */
+  .trail{position:relative;margin-top:48px;}
+  .tviewport{direction:ltr;overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);}
+  .tviewport::-webkit-scrollbar{display:none;}
+  .ttrack{display:flex;gap:22px;width:max-content;padding:4px 6px;}
+  .tcard{direction:rtl;width:360px;flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;}
+  .tnav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);border:none;color:var(--green);font-size:26px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:background .2s,color .2s;}
+  .tnav:hover{background:var(--clay);color:#fff;}
+  .tprev{right:6px;} .tnext{left:6px;}
+  @media(max-width:560px){.tcard{width:300px;}}
   .tcard .ph{width:100%;height:210px;object-fit:cover;object-position:center 28%;display:block;}
   .tcard .body{padding:24px 26px 28px;display:flex;flex-direction:column;flex:1;}
   .tcard .nm{font-weight:800;font-size:23px;color:#fff;}
@@ -251,7 +259,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:14px;">
       <a href="index-en.html" class="lang-toggle" title="English site">EN</a>
-      <a class="btn btn-primary" href="form-fa.html">درخواست بده</a>
+      <a class="btn btn-primary" href="form-fa.html">شروع کن</a>
     </div>
   </div>
 </nav>
@@ -260,11 +268,11 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
-      <span class="eyebrow" style="color:var(--clay-2)">مربیِ آنلاینِ قدرت و آمادگی</span>
+      <span class="eyebrow" style="color:var(--clay-2)">مربیِ بدنسازیِ حرفه‌ای</span>
       <h1>یه <span class="acc">مربی</span>،<br>تو جیبت.</h1>
-      <p class="sub">نه یه فایلِ PDF — یه مربیِ واقعی که برنامه‌تو اختصاصی می‌نویسه، حواسش به تمرینت هست، و هر هفته باهات جلو میاد.</p>
+      <p class="sub">فقط یه برنامه نیست — یه مربیِ واقعیه که برنامه‌تو اختصاصی می‌نویسه، حواسش به تمرینت هست، و هر هفته باهات جلو میاد.</p>
       <div class="actions">
-        <a class="btn btn-primary" href="form-fa.html">درخواست بده 📩</a>
+        <a class="btn btn-primary" href="form-fa.html">شروع کن 📩</a>
         <a class="btn btn-ghost" href="program.html?client=demo">اپ رو از نزدیک ببین</a>
       </div>
     </div>
@@ -291,8 +299,8 @@
 <div class="trust">
   <div class="wrap">
     <div class="trust-item"><b>۵۰۰+</b> ورزشکارِ همراهی‌شده</div>
-    <div class="trust-item"><b>MSc</b> قدرت و آمادگی</div>
-    <div class="trust-item"><b>MSc</b> فیزیولوژیِ ورزشی</div>
+    <div class="trust-item"><b>ارشدِ</b> قدرت و آمادگی</div>
+    <div class="trust-item"><b>ارشدِ</b> فیزیولوژیِ ورزشی</div>
     <div class="trust-item">برنامه‌ی کاملاً اختصاصی</div>
   </div>
 </div>
@@ -301,11 +309,11 @@
 <section class="pad" id="why">
   <div class="wrap">
     <span class="eyebrow">حرفِ راست</span>
-    <h2 class="sec-h">یه فایل، <span class="acc">یه مربی نیست.</span></h2>
+    <h2 class="sec-h">یه برنامه، <span class="acc">یه مربی نیست.</span></h2>
     <p class="sec-sub">«هر برنامه‌ای جواب می‌ده، فقط بهش بچسب» بزرگ‌ترین دروغیه که شنیدی. برنامه‌ای جواب می‌ده که یکی پشتش حواسش بهت باشه.</p>
     <div class="cmp">
       <div class="cmp-card cmp-bad">
-        <div class="cmp-tag"><span class="cmp-badge x">✕</span>یه فایل</div>
+        <div class="cmp-tag"><span class="cmp-badge x">✕</span>یه برنامه‌ی آماده</div>
         <ul class="cmp-list">
           <li>فقط بهت می‌گه چی‌کار کنی</li>
           <li>سه ماهِ دیگه هم دقیقاً همونه</li>
@@ -355,7 +363,7 @@
     <div class="feat-grid">
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></div><h3>برنامه‌ی امروزت</h3><p>هر روز دقیقاً می‌دونی چی‌کار کنی — با سیکل، روز و حرکت‌های مشخص.</p></div>
       <div class="feat clay"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9l5 3-5 3z"/></svg></div><h3>ویدیو و نکته‌ی هر حرکت</h3><p>رو هر حرکت یه ویدیو هست و دو نکته‌ی کلیدی؛ فرمتو درست انجام می‌دی.</p></div>
-      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 15l5-5 4 3 7-7"/></svg></div><h3>ثبتِ وزنه و سختی</h3><p>وزنه و RPE هر ست رو ثبت می‌کنی؛ پیشرفتت ثبت و رصد می‌شه.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 15l5-5 4 3 7-7"/></svg></div><h3>ثبتِ وزنه و شدت</h3><p>وزنه و شدتِ هر ست (RPE) رو ثبت می‌کنی؛ پیشرفتت ثبت و رصد می‌شه.</p></div>
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><h3>چک‌این آمادگی</h3><p>قبلِ هر جلسه می‌پرسه چه حالی داری تا برنامه با تو هماهنگ بمونه.</p></div>
       <div class="feat clay"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg></div><h3>پیام مستقیم با من</h3><p>هر جا سؤال داشتی، تو همون اپ بهم پیام بده و جواب بگیر.</p></div>
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M22 12A10 10 0 1 1 12 2"/><path d="M22 4 12 14l-3-3"/></svg></div><h3>مربی، همون‌لحظه می‌بینه</h3><p>هر چی ثبت می‌کنی، فوری می‌رسه دستِ من — آمادگی، لود، پیشرفت.</p></div>
@@ -368,8 +376,10 @@
   <div class="wrap">
     <span class="eyebrow" style="color:var(--clay-2)">اعتماد</span>
     <h2 class="sec-h">پشتوانه‌ای که می‌تونی روش حساب کنی.</h2>
-    <p class="sec-sub">دو فوقِ‌لیسانسِ تخصصی و بیش از ۵۰۰ ورزشکار — از مبتدی تا حرفه‌ای — که باهاشون کار کردم.</p>
-    <div class="tgrid">
+    <p class="sec-sub">دو مدرکِ ارشدِ تخصصی و بیش از ۵۰۰ ورزشکار — از مبتدی تا حرفه‌ای — که باهاشون کار کردم.</p>
+    <div class="trail">
+      <button class="tnav tprev" id="tPrev" type="button" aria-label="قبلی">‹</button>
+      <div class="tviewport" id="tViewport"><div class="ttrack">
       <div class="tcard">
         <img class="ph" src="assets/img/athletes/Mehraneh.jpg" alt="مهرانه ظهوریان">
         <div class="body">
@@ -435,6 +445,8 @@
           </div>
         </div>
       </div>
+      </div></div>
+      <button class="tnav tnext" id="tNext" type="button" aria-label="بعدی">›</button>
     </div>
   </div>
 </section>
@@ -443,7 +455,7 @@
 <section class="pad-sm method" id="pricing">
   <div class="wrap">
     <span class="eyebrow">هزینه</span>
-    <h2 class="sec-h">یه مربیِ کامل، <span class="acc">کم‌تر از فکرت.</span></h2>
+    <h2 class="sec-h">یه مربیِ کامل، <span class="acc">با قیمتی کم‌تر از اون‌چه فکرشو می‌کنی.</span></h2>
     <p class="sec-sub">یه قیمتِ شفاف، شاملِ همه‌چیز — بدونِ هزینه‌ی پنهان، بدونِ قراردادِ بلندمدت.</p>
     <div class="price-card">
       <div class="price-eq">برای ساکنینِ ایران، معادلِ</div>
@@ -451,14 +463,14 @@
       <div class="price-term">در ماه</div>
       <div class="price-note">به تومان، با نرخِ روز پرداخت می‌شه</div>
       <ul class="inc">
-        <li><span class="ck">✓</span>برنامه‌ی قدرت و آمادگیِ کاملاً اختصاصی</li>
+        <li><span class="ck">✓</span>برنامه‌ی بدنسازیِ کاملاً اختصاصی</li>
         <li><span class="ck">✓</span>اپِ اختصاصی روی گوشیت</li>
         <li><span class="ck">✓</span>ویدیو و نکته‌ی فنیِ هر حرکت</li>
         <li><span class="ck">✓</span>آپدیتِ هفتگیِ برنامه</li>
         <li><span class="ck">✓</span>رصدِ آمادگی و لودِ تمرین</li>
         <li><span class="ck">✓</span>پیام مستقیم و پشتیبانی</li>
       </ul>
-      <a class="btn btn-primary" href="form-fa.html">شروع کن — درخواست بده 📩</a>
+      <a class="btn btn-primary" href="form-fa.html">شروع کن 📩</a>
       <div class="price-abroad">خارج از ایران زندگی می‌کنی؟ <a href="form-fa.html">دایرکت بده 📩</a></div>
     </div>
   </div>
@@ -493,7 +505,7 @@
         <div class="cic">💬</div><div class="clab">واتساپ</div><div class="cval" dir="ltr">+44 7435 363461</div>
       </a>
       <a class="contact-card" href="form-fa.html">
-        <div class="cic">📝</div><div class="clab">فرمِ درخواست</div><div class="cval">پُرش کن، خودم باهات تماس می‌گیرم</div>
+        <div class="cic">📝</div><div class="clab">شروع کن</div><div class="cval">فرمو پُر کن، خودم باهات تماس می‌گیرم</div>
       </a>
     </div>
   </div>
@@ -505,7 +517,7 @@
     <h2>آماده‌ای یه مربیِ<br><span style="color:var(--clay-2)">واقعی</span> داشته باشی؟</h2>
     <div class="sig">یه مربی، تو جیبت.</div>
     <div class="actions">
-      <a class="btn btn-primary" href="form-fa.html">درخواست بده 📩</a>
+      <a class="btn btn-primary" href="form-fa.html">شروع کن 📩</a>
       <a class="btn btn-ghost" href="program.html?client=demo">اول اپ رو ببین</a>
     </div>
   </div>
@@ -514,7 +526,7 @@
 <!-- FOOTER -->
 <footer class="foot">
   <div class="wrap">
-    <div>© <span id="yr"></span> امیر اردکانی — مربیِ قدرت و آمادگی</div>
+    <div>© <span id="yr"></span> امیر اردکانی — مربیِ بدنسازیِ حرفه‌ای</div>
     <div style="display:flex;gap:24px;">
       <a href="https://instagram.com/amirardekanian" target="_blank" rel="noopener">اینستاگرام</a>
       <a href="https://wa.me/447435363461" target="_blank" rel="noopener">واتساپ</a>
@@ -524,6 +536,30 @@
   </div>
 </footer>
 
-<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+(function(){
+  var vp=document.getElementById('tViewport'); if(!vp) return;
+  var prev=document.getElementById('tPrev'), next=document.getElementById('tNext');
+  var SPEED=28, paused=false, returning=false, last=0;
+  function maxS(){return vp.scrollWidth-vp.clientWidth;}
+  function cardW(){var c=vp.querySelector('.tcard');return c?c.offsetWidth+22:382;}
+  function pauseTmp(){paused=true;clearTimeout(vp._t);vp._t=setTimeout(function(){paused=false;},4500);}
+  function tick(now){
+    if(!last)last=now; var d=now-last; last=now;
+    if(!paused&&!returning){var m=maxS(),n=vp.scrollLeft+SPEED*d/1000;
+      if(m>0&&n>=m){returning=true;vp.scrollTo({left:0,behavior:'smooth'});setTimeout(function(){returning=false;},900);}
+      else vp.scrollLeft=n;}
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  vp.addEventListener('mouseenter',function(){paused=true;});
+  vp.addEventListener('mouseleave',function(){paused=false;});
+  vp.addEventListener('touchstart',function(){paused=true;},{passive:true});
+  vp.addEventListener('touchend',pauseTmp);
+  if(next)next.addEventListener('click',function(){pauseTmp();var t=vp.scrollLeft+cardW();vp.scrollTo({left:t>maxS()-10?0:t,behavior:'smooth'});});
+  if(prev)prev.addEventListener('click',function(){pauseTmp();var t=vp.scrollLeft-cardW();vp.scrollTo({left:t<0?maxS():t,behavior:'smooth'});});
+})();
+</script>
 </body>
 </html>
