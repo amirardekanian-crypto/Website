@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reel 3 — «یه مربی تو جیبت» (animated)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0E4A36; --green2:#156a4d; --clay:#C7552F; --paper:#FAF7F2; --card:#FFFFFF;
+    --ink:#1A1A1A; --ink2:#5C5C5C; --line:#E7E2D9; --gold:#E9B949; --bad:#D33B2C;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#1b1916;font-family:'Vazirmatn',sans-serif;overflow:hidden;height:100vh;}
+  .viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  .fitwrap{width:1080px;height:1920px;transform-origin:center;}
+
+  .reel{width:1080px;height:1920px;position:relative;overflow:hidden;background:var(--paper);}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:120px 96px;text-align:center;opacity:0;transition:opacity .55s var(--ease);}
+  .scene.on{opacity:1;}
+  .s-green{background:var(--green);color:#fff;}
+  .s-paper{background:var(--paper);color:var(--ink);}
+  .s-clay{background:var(--clay);color:#fff;}
+
+  .rise{opacity:0;transform:translateY(48px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+  .scene.on .rise{opacity:1;transform:none;}
+
+  .eyebrow{font-weight:700;font-size:36px;letter-spacing:.5px;margin-bottom:38px;}
+  .s-green .eyebrow{color:rgba(255,255,255,.72);}
+  .s-paper .eyebrow{color:var(--clay);}
+  .big{font-weight:900;font-size:98px;line-height:1.16;letter-spacing:-1px;}
+  .mid{font-weight:800;font-size:66px;line-height:1.25;}
+  .accent{color:var(--clay);}
+  .s-green .accent,.s-clay .accent{color:var(--gold);}
+  .sub{font-weight:500;font-size:44px;line-height:1.55;color:var(--ink2);margin-top:32px;}
+  .s-green .sub,.s-clay .sub{color:rgba(255,255,255,.88);}
+
+  /* cost counter (scene 0) */
+  .cost{margin-top:54px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .cost-num{font-family:'Barlow Condensed';font-weight:900;font-size:170px;line-height:.95;color:var(--bad);}
+  .cost-unit{font-weight:700;font-size:44px;color:var(--ink2);}
+  .cost-emoji{font-size:80px;margin-bottom:8px;}
+
+  /* checklist (scene 2) */
+  .checklist{width:100%;max-width:780px;text-align:right;display:flex;flex-direction:column;gap:22px;margin-top:14px;}
+  .cl-item{display:flex;align-items:center;gap:26px;background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:30px 34px;box-shadow:0 8px 26px rgba(40,30,20,.06);
+    opacity:0;transform:translateX(50px);transition:opacity .5s var(--ease),transform .5s var(--ease);}
+  .scene.on .cl-item{opacity:1;transform:none;}
+  .cl-check{width:66px;height:66px;border-radius:50%;background:var(--green);color:#fff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;}
+  .cl-text{font-weight:700;font-size:38px;line-height:1.35;}
+
+  /* brand / cta */
+  .brand{display:flex;align-items:center;gap:22px;margin-top:54px;font-weight:700;font-size:42px;}
+  .brand .d{width:62px;height:62px;border-radius:50%;background:#fff;color:var(--green);
+    font-family:'Barlow Condensed';font-weight:900;font-size:40px;display:flex;align-items:center;justify-content:center;}
+  .dm{margin-top:24px;font-weight:800;font-size:50px;}
+
+  .controls{position:fixed;bottom:18px;left:0;right:0;display:flex;gap:14px;justify-content:center;align-items:center;z-index:50;}
+  .controls button{font-family:'Vazirmatn';font-weight:700;font-size:15px;background:#2e2b26;color:#fff;
+    border:1px solid #45413a;border-radius:10px;padding:10px 18px;cursor:pointer;}
+  .controls .hint{color:#b8b2a6;font-size:13px;}
+  .progress{position:absolute;top:0;left:0;right:0;height:8px;background:rgba(0,0,0,.12);z-index:10;}
+  .progress .fill{height:100%;width:0;background:var(--clay);}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="fitwrap" id="fitwrap">
+    <div class="reel" id="reel">
+      <div class="progress"><div class="fill" id="pfill"></div></div>
+
+      <!-- 0 · THE PT COST (figure is an editable example) -->
+      <div class="scene s-paper" data-dur="4000">
+        <div class="eyebrow rise">بیا روراست باشیم</div>
+        <div class="big rise" style="transition-delay:.12s">مربیِ شخصی،<br>گرونه.</div>
+        <div class="cost rise" style="transition-delay:.4s">
+          <div class="cost-emoji">💸</div>
+          <div class="cost-num" data-count="16000000">۰</div>
+          <div class="cost-unit">تومن / ماه — و فقط چند ساعت باهاته</div>
+        </div>
+      </div>
+
+      <!-- 1 · THE OTHER WAY -->
+      <div class="scene s-green" data-dur="3200">
+        <div class="mid rise">ولی یه راهِ دیگه هست…</div>
+        <div class="big rise" style="transition-delay:.25s">یه <span class="accent">مربی</span>،<br>تو جیبت.</div>
+      </div>
+
+      <!-- 2 · EVERYTHING A PT DOES -->
+      <div class="scene s-paper" data-dur="6400">
+        <div class="eyebrow rise">هر کاری که یه مربی می‌کنه — بهتر انجامش می‌ده:</div>
+        <div class="checklist">
+          <div class="cl-item" style="transition-delay:.15s"><span class="cl-check">✓</span><span class="cl-text">برنامه‌ی کاملاً اختصاصی برات می‌نویسه</span></div>
+          <div class="cl-item" style="transition-delay:.45s"><span class="cl-check">✓</span><span class="cl-text">فرمتو با ویدیوی هر حرکت درست می‌کنه</span></div>
+          <div class="cl-item" style="transition-delay:.75s"><span class="cl-check">✓</span><span class="cl-text">هر هفته جلوت می‌بره و آپدیت می‌کنه</span></div>
+          <div class="cl-item" style="transition-delay:1.05s"><span class="cl-check">✓</span><span class="cl-text">هر وقت سؤال داری، جواب می‌ده</span></div>
+          <div class="cl-item" style="transition-delay:1.35s"><span class="cl-check">✓</span><span class="cl-text">جلوی آسیب و زیاده‌روی‌تو می‌گیره</span></div>
+        </div>
+      </div>
+
+      <!-- 3 · THE VALUE PUNCH -->
+      <div class="scene s-clay" data-dur="3400">
+        <div class="mid rise">همه‌ی این‌ها…</div>
+        <div class="big rise" style="transition-delay:.2s;font-size:84px">بدونِ هزینه‌ی<br>جلسه‌ایِ مربی شخصی.</div>
+      </div>
+
+      <!-- 4 · CTA + SIGNATURE LINE -->
+      <div class="scene s-green" data-dur="4600">
+        <div class="mid rise">یه نقشه‌ی کامل تا هدفت.</div>
+        <div class="big rise" style="transition-delay:.2s">یه <span class="accent">مربی</span>،<br>تو جیبت.</div>
+        <div class="brand rise" style="transition-delay:.5s"><span class="d">A</span> امیر اردکانی</div>
+        <div class="dm rise accent" style="transition-delay:.65s">دایرکت بده 📩</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="REEL.play()">▶ پخشِ دوباره</button>
+  <span class="hint">عددِ هزینه نمونه‌ست — هر جا خواستی عوضش کن (data-count). برای ضبط: دکمه رو بزن و از کادر اسکرین‌رکورد بگیر.</span>
+</div>
+
+<script>
+  const REEL = (function(){
+    const reel = document.getElementById('reel');
+    const scenes = [...reel.querySelectorAll('.scene')];
+    const pfill = document.getElementById('pfill');
+    let timers=[];
+    const faGroup = n => Math.round(n).toLocaleString('en-US').replace(/,/g,'٬').replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+    function fit(){ const s=Math.min(window.innerWidth/1080,(window.innerHeight-70)/1920);
+      document.getElementById('fitwrap').style.transform='scale('+s+')'; }
+    window.addEventListener('resize', fit); fit();
+    function easeOut(p){return 1-Math.pow(1-p,3);}
+    function countUp(el){
+      const to=parseFloat(el.dataset.count), dur=1300, t0=performance.now();
+      (function step(now){ const p=Math.min(1,(now-t0)/dur); el.textContent=faGroup(to*easeOut(p));
+        if(p<1) requestAnimationFrame(step); })(performance.now());
+    }
+    function clear(){ timers.forEach(clearTimeout); timers=[]; }
+    function play(){
+      clear();
+      scenes.forEach(s=>s.classList.remove('on'));
+      void reel.offsetWidth;
+      const total = scenes.reduce((a,s)=>a+(+s.dataset.dur),0);
+      let t=150;
+      scenes.forEach(sc=>{ const dur=+sc.dataset.dur;
+        timers.push(setTimeout(()=>{
+          scenes.forEach(s=>s.classList.remove('on')); sc.classList.add('on');
+          sc.querySelectorAll('[data-count]').forEach(countUp);
+        }, t));
+        t+=dur; });
+      const t0=performance.now();
+      (function prog(now){ const p=Math.min(1,(now-t0)/(total+150)); pfill.style.width=(p*100)+'%';
+        if(p<1 && timers.length) requestAnimationFrame(prog); })(performance.now());
+      timers.push(setTimeout(play, t+400));
+    }
+    window.__show = i => { scenes.forEach(s=>s.classList.remove('on')); scenes[i].classList.add('on');
+      scenes[i].querySelectorAll('[data-count]').forEach(countUp); };
+    document.fonts.ready.then(play);
+    return { play };
+  })();
+</script>
+</body>
+</html>
