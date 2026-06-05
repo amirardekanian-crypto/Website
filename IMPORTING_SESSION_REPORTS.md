@@ -108,8 +108,12 @@ on conflict (athlete_id, day, completed_on) do update set
 
 ## Known data issues (tracked separately)
 
-- Program files misnamed vs their id, so the plan won't render in coach view on a
+- ~~Program files misnamed vs their id, so the plan won't render in coach view on a
   case-sensitive host: `data/Ghzl_pak.json` should be `data/ghazal_pakbaten.json`;
-  `data/mhrnz_khdm1.json` should be `data/Mhrnz_khdm1.json`. Rename to match the id.
+  `data/mhrnz_khdm1.json` should be `data/Mhrnz_khdm1.json`.~~ **Fixed 5 Jun 2026** —
+  both files renamed to match their `athlete_id` exactly.
+- Stale / duplicate athlete records to clean up: `pooya_pasandideh` (progress row, no
+  key or data file; live id is `pooya_pnd2`), the orphan `data/pooya_pnd1.json`, and
+  `mhrn_zhr1` vs `mhrn_zhr2` (live id is `mhrn_zhr2`).
 
 _Last full backfill: 5 Jun 2026 — 85 sessions, 8 athletes, 21 Apr–5 Jun._
