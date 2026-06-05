@@ -1,0 +1,765 @@
+{
+  "athlete": {
+    "id": "elmira_askari",
+    "key": "01a82a0989c54e51acf65f6cc30bc961",
+    "firstName": "Elmira",
+    "lastName": "Askari"
+  },
+  "sport": {
+    "badge": "💪 Physique & Posture"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "tagline": "Shoulders, Glutes & Posture",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-06-06",
+      "endDate": "2026-07-10",
+      "focuses": [
+        "Groove the hip-dominant glute and posterior-shoulder patterns and build a posture base.",
+        "Establish a recovery rhythm and a strong mind-muscle connection in the delts and glutes."
+      ],
+      "message": {
+        "paragraphs": [
+          "This first block isn't about chasing big numbers — it's about building the platform everything else stands on. Your job right now is to own the hip-hinge and shoulder patterns, wake up the glutes and rear delts that drive both your shape and your posture, and get your recovery working for you.",
+          "Mentally, chase the feeling, not the load: every rep at the prescribed tempo, every squeeze felt exactly where it should be. By the end of five weeks you'll move cleaner, stand taller, feel your delts and glutes switch on the way they should — and you'll have laid the foundation for the visible change that starts in Cycle 2."
+        ],
+        "outcomes": [
+          "Cleaner, more controlled hip-hinge and pressing patterns",
+          "Glutes and rear delts that switch on when they should — real mind-muscle connection",
+          "Better posture — shoulders sitting back, ribs and pelvis stacked",
+          "A recovery rhythm that works for you: steadier sleep quality and protected rest days",
+          "Confident tempo and RPE control on every main lift",
+          "A foundation set for the visible change that starts in Cycle 2"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Growth Engine",
+      "weeks": "Weeks 6–11",
+      "focuses": [
+        "Drive shoulder and glute hypertrophy with added volume and reps taken closer to failure.",
+        "Progressively load the supported primaries — press, hip thrust, hack squat."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Cycle 2 is where the effort starts to show in the mirror. Once the foundation is set, we turn up the volume and let your shoulders and glutes genuinely begin to change shape. This is the block that rewards everything you bank now — but it only opens once you've earned it here.",
+          "Build the base. Then we load it."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Metabolic Shift",
+      "weeks": "Weeks 12–16",
+      "focuses": [
+        "Strip body fat while preserving the muscle already built to sharpen overall shape.",
+        "Hold training intensity in a deficit with strategic low-impact conditioning and steps."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Strength Engine",
+      "weeks": "Weeks 17–21",
+      "focuses": [
+        "Intensify load on the primary lifts to raise the strength ceiling that future growth sits on.",
+        "Reinforce posture and bracing under heavier loads."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Sculpt & Define",
+      "weeks": "Weeks 22–27",
+      "focuses": [
+        "A specialised shoulder-cap and glute-shaping block to maximise the target aesthetic.",
+        "Lock in balanced 3-D delt development and the corrected posture."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Foundation Forge",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Shoulders · Push/Pull",
+        "completionTitle": "Shoulders Built",
+        "completionMessage": "Pressed and pulled in balance — exactly how we grow delts without feeding the slouch. Recover well.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Upper-Body Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Keep arms straight, squeeze the shoulder blades"],
+                      "bad": ["Don't shrug the traps up"]
+                    }
+                  },
+                  {
+                    "name": "Band Pass-Through",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Move slowly through a full overhead arc"],
+                      "bad": ["Don't force range if the shoulder pinches"]
+                    }
+                  },
+                  {
+                    "name": "Scapular Wall Slide",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Keep low back and arms on the wall"],
+                      "bad": ["Don't let the ribs flare"]
+                    }
+                  },
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Move one segment at a time"],
+                      "bad": ["Don't rush the transitions"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Main",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Shoulder Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8–10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the handles in a smooth arc to just short of lockout",
+                    "Feel the front and side delt driving the weight, not the chest"
+                  ],
+                  "bad": ["Letting the lower back arch off the pad as you press"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Lateral Raise",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "constant tension", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lead with the elbows to shoulder height, little-finger edge slightly up",
+                    "Keep tension on the side delt the whole time — no rest at the bottom"
+                  ],
+                  "bad": ["Swinging or shrugging the traps to throw the weight up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8–10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the bar to the top of the chest, elbows down and back",
+                    "Feel the lats initiate the pull, not the biceps"
+                  ],
+                  "bad": ["Leaning back excessively or using momentum to finish"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Cable Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Row the handle to the lower ribs, squeezing the blades together",
+                    "Feel the mid-back contract with a tall chest"
+                  ],
+                  "bad": ["Rounding the lower back or rocking for momentum"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15–20 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the rope toward your eyes, splitting the ends apart at the finish",
+                    "Feel the rear delts and the muscles between the blades working"
+                  ],
+                  "bad": ["Letting the elbows drop and turning it into a straight row"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Glutes · Hip-Dominant",
+        "completionTitle": "Hips Loaded",
+        "completionMessage": "The heaviest glute work of the week is in the bank — supported, low on the back, hard on the glutes. Recover well.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Lower-Body Activation Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Drive through the heels, squeeze at the top"],
+                      "bad": ["Don't push through the lower back"]
+                    }
+                  },
+                  {
+                    "name": "Banded Clamshell",
+                    "detail": "×12/side",
+                    "cues": {
+                      "good": ["Heels together, open the knees against the band"],
+                      "bad": ["Don't roll the pelvis back"]
+                    }
+                  },
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10/side",
+                    "cues": {
+                      "good": ["Stay in a quarter-squat with band tension"],
+                      "bad": ["Don't let the knees cave in"]
+                    }
+                  },
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Flow smoothly between flexion and extension"],
+                      "bad": ["Don't hold your breath"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Activation & Core",
+            "icon": "🧠",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8/side" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower the opposite arm and leg slowly while keeping the back flat",
+                    "Feel the deep core bracing to stop the back arching"
+                  ],
+                  "bad": ["Letting the lower back lift off the floor"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Main",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 150,
+                "chips": [
+                  { "label": "2s hold at top", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8–10 Reps" },
+                  { "label": "Tempo 2-0-1-2" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the hips up until torso and thighs form a straight line",
+                    "Feel the glutes squeeze hard at the top, ribs down"
+                  ],
+                  "bad": ["Overextending the lower back at the top"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Romanian Deadlift",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8–10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the hips back, lowering the bar along the thighs with a flat back",
+                    "Feel a deep hamstring stretch before driving the hips forward"
+                  ],
+                  "bad": ["Rounding the back or letting the bar drift away from the legs"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Hack Squat",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Descend until the thighs pass parallel, knees tracking over the toes",
+                    "Feel the quads and glutes loading evenly through full depth"
+                  ],
+                  "bad": ["Cutting the depth short or letting the heels lift"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Hip Abduction Machine",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "lean forward", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15–20 Reps" },
+                  { "label": "Tempo 2-1-1-1" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lean the torso slightly forward and push the knees outward",
+                    "Feel the outer/upper glutes contract; brief pause at end range"
+                  ],
+                  "bad": ["Using momentum or letting the knees snap back in"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Back · Rear Delts",
+        "completionTitle": "Posture Work Done",
+        "completionMessage": "Second shoulder hit of the week, tilted to the back — this is the session that pulls you upright. Recover well.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Upper Pull Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Arms straight, squeeze the shoulder blades"],
+                      "bad": ["Don't shrug"]
+                    }
+                  },
+                  {
+                    "name": "Band External Rotation",
+                    "detail": "×12/side",
+                    "cues": {
+                      "good": ["Elbow pinned to your side, rotate the forearm out"],
+                      "bad": ["Don't let the elbow drift away"]
+                    }
+                  },
+                  {
+                    "name": "Scapular Wall Slide",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Back and arms on the wall"],
+                      "bad": ["Don't flare the ribs"]
+                    }
+                  },
+                  {
+                    "name": "Thoracic Rotation",
+                    "detail": "×8/side",
+                    "cues": {
+                      "good": ["Rotate from the mid-back, reach to the ceiling"],
+                      "bad": ["Don't twist from the lower back"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Main",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Pull-Up",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "band assisted", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6–10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the chest toward the bar, driving the elbows down to your sides",
+                    "Feel the lats pulling you up rather than the arms"
+                  ],
+                  "bad": ["Kipping or shortening the range at the top or bottom"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Row",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8–12 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Row toward the waist, squeezing the shoulder blades together",
+                    "Feel the mid-back and rear delts pulling, chest glued to the pad"
+                  ],
+                  "bad": ["Lifting the chest off the pad to gain leverage"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Reverse Pec Deck",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15–20 Reps" },
+                  { "label": "Tempo 2-1-1-1" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Open the arms out and back in a wide arc to shoulder height",
+                    "Feel the rear delts squeezing the handles apart"
+                  ],
+                  "bad": ["Bending the elbows more through the set to cheat the weight"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Lateral Raise",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Raise the handle out to shoulder height, elbow leading",
+                    "Keep constant tension on the side delt across the full range"
+                  ],
+                  "bad": ["Letting the cable yank your arm back down quickly"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Biceps Curl",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl up keeping the elbows fixed at your sides",
+                    "Feel the biceps working through the whole range"
+                  ],
+                  "bad": ["Swinging the torso or letting the elbows drift forward"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Glutes · Single-Leg",
+        "completionTitle": "Single-Leg Sorted",
+        "completionMessage": "Unilateral and abduction work done — side-glute and pelvic control earned without piling on systemic fatigue. Recover well.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Lower Activation Circuit B",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Drive through the heels, squeeze at the top"],
+                      "bad": ["Don't push through the lower back"]
+                    }
+                  },
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10/side",
+                    "cues": {
+                      "good": ["Quarter-squat with band tension"],
+                      "bad": ["Don't let the knees cave"]
+                    }
+                  },
+                  {
+                    "name": "Hip Airplane",
+                    "detail": "×6/side",
+                    "cues": {
+                      "good": ["Hinge and rotate the hips slowly"],
+                      "bad": ["Don't rush — stay braced and balanced"]
+                    }
+                  },
+                  {
+                    "name": "Banded Clamshell",
+                    "detail": "×12/side",
+                    "cues": {
+                      "good": ["Heels together, knees open against the band"],
+                      "bad": ["Don't roll the pelvis back"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Activation & Core",
+            "icon": "🧠",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Pallof Press",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10/side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the handle straight out and resist it pulling you toward the cable",
+                    "Feel the core bracing to stop your torso rotating"
+                  ],
+                  "bad": ["Letting the hips or shoulders twist toward the machine"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Main",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Bulgarian Split Squat",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "forward lean", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8–10/leg" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower straight down until the back knee nearly touches, torso leaning slightly forward",
+                    "Feel the front-leg glute stretch and drive you back up"
+                  ],
+                  "bad": ["Letting the front knee cave in or pushing off the back foot"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Back Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "45° bench", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Rise to a straight line, squeezing the glutes at the top",
+                    "Feel the glutes and hamstrings driving the movement"
+                  ],
+                  "bad": ["Hyperextending the lower back past neutral at the top"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Glute Kickback",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15/side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the leg back and up, squeezing the glute at end range",
+                    "Keep the working glute contracted; minimal lower-back movement"
+                  ],
+                  "bad": ["Arching the back to push the leg higher"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Hip Abduction",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15–20/side" },
+                  { "label": "Tempo 2-1-1-1" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lift the leg out to the side, keeping the torso upright",
+                    "Feel the upper/outer glute working; brief squeeze at the top"
+                  ],
+                  "bad": ["Leaning away or swinging the leg with momentum"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Elmira",
+    "cards": [
+      {
+        "icon": "😴",
+        "title": "Quality Beats Quantity in Bed",
+        "body": "You're getting 9+ hours but rating your sleep a 5/10 — that gap is the single biggest thing holding back your recovery and your results, more than any training tweak I could make. This cycle, treat sleep as part of the program: a consistent sleep and wake time, a cool dark room, and no screens or caffeine in the hours before bed. Improving how well you sleep will do more for your glutes, shoulders, and fat loss than an extra session ever could."
+      },
+      {
+        "icon": "🔋",
+        "title": "Why We Dropped to Four Days",
+        "body": "With your stress sitting at 7/10 and your sleep quality where it is, training 5+ days was almost certainly working against you rather than for you. Four focused sessions give your body the room to actually recover and adapt between them — and that's when muscle is built. Protect your rest days as part of the plan and resist the urge to \"add a little extra.\" We're trading frequency for quality on purpose."
+      },
+      {
+        "icon": "🎯",
+        "title": "Feel It Before You Load It",
+        "body": "This whole first block is about learning to truly feel your delts and glutes work — that connection is what makes them grow. On the lateral raises, rear-delt work, hip thrusts, and abduction, slow down and respect the tempo: the squeeze matters more than the number on the stack right now. Nail this in Cycle 1 and everything you load later will pay off far more."
+      },
+      {
+        "icon": "🧍‍♀️",
+        "title": "Posture Is the Quiet Goal",
+        "body": "The pulling work, face pulls, rear-delt sets, and the dead bug and Pallof press aren't filler — they're aimed directly at the form correction (اصلاح فرم) you asked for. Together they pull your shoulders back into a stronger position and teach your core to keep your ribs and pelvis stacked. Carry that awareness out of the gym too: check your shoulder and rib position at your desk through the day."
+      },
+      {
+        "icon": "🩺",
+        "title": "You Set the Pace on the Cyst",
+        "body": "You've told me there are no movement restrictions, so we're training everything fully — and your program already leans on supported, lower-pressure options. That said, if any movement (especially the hip thrust, Romanian deadlift, or deeper hip work) ever creates pain, pressure, or anything that doesn't feel right in that area, stop the set and message me. We adjust on the spot, no hesitation — you know your body, and I'd always rather hear about it early."
+      },
+      {
+        "icon": "🍽️",
+        "title": "Fat Loss Lives Outside the Session",
+        "body": "Your fat-loss goal won't come from grinding extra cardio — with your current recovery load, that would cost you the muscle that actually creates \"shape.\" Instead, let a modest nutrition deficit and your daily step count do that job, and keep protein high to protect what we build. The lifting is here to keep and grow muscle; the deficit is what reveals it. We keep the two jobs separate so neither one suffers."
+      }
+    ]
+  }
+}
