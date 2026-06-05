@@ -8,7 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  /* ── Live app palette (mirrors program.html / coach.html — Roland-Garros) ── */
+  /* ── Live app palette (mirrors program.html / coach.html — Roland-Garros) ──
+     The app's own tokens map like this: --yellow = green (primary), --ice = clay,
+     --grey-card = soft, --grey-mid = line, --grey-dark = ink, --grey-text = muted. */
   :root{
     --green:#0E4A36; --green2:#156A4D; --clay:#C7552F; --ochre:#A8741C;
     --paper:#FAF7F2; --card:#FFFFFF; --soft:#EDE8E0; --ink:#1A1A1A; --muted:#5C5C5C;
@@ -30,24 +32,22 @@
   .head .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
 
   /* section + gallery */
-  .section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2.5px;
+  .section-title-h{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2.5px;
     text-transform:uppercase;color:var(--green);margin:42px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--line);}
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:24px;align-items:start;}
-  .specimen{}
   .specimen.wide{grid-column:1 / -1;max-width:560px;}
   .spec-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;
     text-transform:uppercase;color:var(--ochre);margin-bottom:4px;}
   .spec-desc{font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.4;}
 
-  /* generic chips/pills shared with the app */
+  /* generic chips/pills */
   .chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--soft);color:var(--ink);}
-  .chip.stat{font-family:'Space Mono',monospace;font-weight:700;background:var(--green);color:#fff;letter-spacing:0;}
   .pill{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.3px;}
   .pill.active{background:rgba(31,122,77,.14);color:var(--good);}
   .pill.quiet{background:rgba(192,57,44,.13);color:var(--bad);}
   .pill.live{background:var(--clay);color:#fff;}
 
-  /* ═════════ 1 · CYCLE CARD ═════════ */
+  /* ═════════ CYCLE CARD ═════════ */
   .cyc{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(40,30,20,.10);}
   .cyc-img{position:relative;aspect-ratio:16/9;background:var(--green) center/cover;}
   .cyc-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,33,24,.92),rgba(8,33,24,.05) 64%);}
@@ -56,7 +56,7 @@
   .cyc-no{font-weight:800;font-size:12px;letter-spacing:1px;opacity:.95;}
   .cyc-week{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:34px;line-height:1;margin-top:4px;}
 
-  /* ═════════ 2 · DAY CARD ═════════ */
+  /* ═════════ DAY CARD ═════════ */
   .day{position:relative;aspect-ratio:5/2.3;border-radius:18px;overflow:hidden;
     background:var(--green) center 40%/cover;box-shadow:0 10px 30px rgba(40,30,20,.10);}
   .day-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,33,24,.93),rgba(8,33,24,0) 66%);}
@@ -67,62 +67,138 @@
   .day-name{font-weight:900;font-size:26px;line-height:1.05;margin-top:2px;}
   .day-meta{font-weight:600;font-size:13px;opacity:.86;margin-top:5px;}
 
-  /* ═════════ 3 · CYCLE METER ═════════ */
-  .meter{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(40,30,20,.07);}
-  .meter-bars{display:flex;gap:5px;}
-  .meter-seg{height:6px;flex:1;border-radius:4px;background:var(--soft);}
-  .meter-seg.done{background:rgba(14,74,54,.55);}
-  .meter-seg.current{background:var(--clay);box-shadow:0 0 0 2px rgba(199,85,47,.25);}
-  .meter-labels{display:flex;gap:5px;margin-top:8px;}
-  .meter-labels span{flex:1;text-align:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--muted);}
+  /* ═════════ CYCLE METER (exact app reproduction) ═════════ */
+  .meter-frame{background:var(--card);border-radius:16px;padding:22px 20px;box-shadow:0 6px 20px rgba(40,30,20,.07);}
+  .cycle-meter-bars{display:flex;gap:6px;}
+  .cycle-meter-seg{flex:1;height:5px;border-radius:2px;background:rgba(0,0,0,0.08);}
+  .cycle-meter-seg.done{background:var(--green);opacity:.55;}
+  .cycle-meter-seg.current{background:var(--clay);box-shadow:0 0 10px rgba(199,85,47,.20);}
+  .cycle-meter-labels{display:flex;gap:6px;margin-top:10px;}
+  .cycle-meter-label{flex:1;text-align:center;font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:1.2px;color:var(--muted);font-weight:500;}
+  .cycle-meter-label.done{color:rgba(14,74,54,.55);}
+  .cycle-meter-label.current{color:var(--clay);font-weight:700;}
 
-  /* ═════════ 4 · EXERCISE CARD ═════════ */
-  .ex{position:relative;background:var(--card);border-radius:14px;margin-bottom:10px;overflow:hidden;
-    box-shadow:0 2px 8px rgba(40,30,20,.06);}
-  .ex::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--line);}
-  .ex.warmup::before{background:var(--clay);}
-  .ex.strength::before{background:var(--green);}
-  .ex.power::before{background:var(--ochre);}
-  .ex-main{display:flex;align-items:center;gap:14px;padding:15px 16px;}
-  .ex-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;position:relative;}
-  .ex-check.on{background:var(--green);border-color:var(--green);}
-  .ex-check.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    color:#fff;font-size:15px;font-weight:800;}
-  .ex-body{flex:1;min-width:0;}
-  .ex-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:21px;line-height:1.05;letter-spacing:.3px;}
-  .ex.warmup .ex-name,.ex.warmup.checked .ex-name{}
-  .ex-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
-  .ex-play{width:36px;height:36px;border-radius:50%;background:var(--green);border:none;color:#fff;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;}
-  .ex-cues{padding:2px 16px 12px;display:flex;flex-direction:column;gap:7px;}
-  .cue{font-size:13px;line-height:1.4;padding:9px 12px 9px 13px;border-radius:7px;display:flex;align-items:flex-start;gap:9px;}
-  .cue::before{flex-shrink:0;width:17px;height:17px;border-radius:50%;color:#fff;font-size:10px;font-weight:800;
-    display:flex;align-items:center;justify-content:center;margin-top:1px;}
-  .cue.good{background:rgba(31,122,77,.09);color:#234d1b;border-left:3px solid var(--good);}
-  .cue.good::before{content:'✓';background:var(--good);}
-  .cue.bad{background:rgba(192,57,44,.08);color:#6b1a10;border-left:3px solid var(--bad);}
-  .cue.bad::before{content:'✕';background:var(--bad);}
-  .ex-log{border-top:1px solid var(--soft);padding:10px 16px 14px;}
-  .ex-log-head{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:8px;}
-  .set{display:flex;align-items:center;gap:10px;padding:7px 0;}
-  .set-n{width:24px;height:24px;border-radius:6px;background:var(--soft);display:flex;align-items:center;justify-content:center;
-    font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;color:var(--ink);}
-  .set-w{font-family:'Space Mono',monospace;font-weight:700;font-size:14px;background:#1a1a1a;color:#fff;padding:4px 10px;border-radius:6px;}
-  .set-rpe{display:flex;gap:4px;margin-left:auto;}
-  .set-rpe b{width:30px;height:30px;border-radius:7px;background:var(--soft);display:flex;align-items:center;justify-content:center;
-    font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;color:var(--muted);}
-  .set-rpe b.sel{background:var(--green);color:#fff;}
-  .set-check{width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;
-    justify-content:center;font-size:13px;font-weight:800;}
+  /* ═════════ WORKOUT — section header + exercise cards (exact app reproduction) ═════════ */
+  .workout-demo{max-width:500px;}
+  /* section headers */
+  .section-header-prog{display:flex;align-items:center;gap:14px;margin:30px 0 14px;}
+  .section-header-prog:first-child{margin-top:0;}
+  .section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--muted);flex-shrink:0;line-height:1;}
+  .section-header-prog::after{content:'';flex:1;height:3px;border-radius:2px;background:var(--line);}
+  .section-header-prog.block-warmup   .section-title{color:var(--clay);}
+  .section-header-prog.block-warmup::after{background:var(--clay);}
+  .section-header-prog.block-strength .section-title{color:var(--green);}
+  .section-header-prog.block-strength::after{background:var(--green);}
+  .section-header-prog.block-power    .section-title{color:var(--clay);}
+  .section-header-prog.block-power::after{background:var(--clay);}
 
-  /* section header specimen */
-  .sec-h{display:flex;align-items:center;gap:14px;}
-  .sec-h span{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;letter-spacing:2px;text-transform:uppercase;}
-  .sec-h.strength span{color:var(--green);} .sec-h.warmup span{color:var(--clay);} .sec-h.power span{color:var(--ochre);}
-  .sec-h::after{content:'';flex:1;height:2px;border-radius:2px;}
-  .sec-h.strength::after{background:var(--green);} .sec-h.warmup::after{background:var(--clay);} .sec-h.power::after{background:var(--ochre);}
+  /* exercise card shell */
+  .checklist-item{position:relative;background:var(--card);border-radius:14px;margin-bottom:10px;
+    border:1px solid rgba(0,0,0,0.04);box-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 6px rgba(0,0,0,0.04);overflow:hidden;}
+  .checklist-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;}
+  .checklist-item.block-warmup::before{background:var(--clay);}
+  .checklist-item.block-strength::before{background:var(--green);}
+  .checklist-item.block-power::before{background:var(--clay);}
+  .checklist-item.checked::before{opacity:.45;}
+  .checklist-item.block-strength.checked{background:rgba(14,74,54,.08);border-color:rgba(14,74,54,.40);}
+  .checklist-item.block-warmup.checked,.checklist-item.block-power.checked{background:rgba(199,85,47,.12);border-color:rgba(199,85,47,.40);}
+  .checklist-item.checked .item-name{text-decoration:line-through;color:#888;}
 
-  /* ═════════ 5 · READINESS ═════════ */
+  .item-main{display:flex;align-items:center;padding:16px 18px;gap:14px;}
+  .check-box{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:transparent;
+    flex-shrink:0;position:relative;}
+  .check-box::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:700;color:#fff;opacity:0;}
+  .checklist-item.checked.block-strength .check-box{background:var(--green);border-color:var(--green);}
+  .checklist-item.checked.block-warmup .check-box,.checklist-item.checked.block-power .check-box{background:var(--clay);border-color:var(--clay);}
+  .checklist-item.checked .check-box::after{opacity:1;}
+  .item-body{flex:1;min-width:0;}
+  .item-name-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .ex-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;color:#999;line-height:1;
+    flex-shrink:0;letter-spacing:-1px;}
+  .checklist-item.collapsed .ex-num{font-size:22px;}
+  .checklist-item.checked .ex-num{color:#c5c5c5;}
+  .item-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:21px;line-height:1.1;
+    letter-spacing:.3px;color:var(--ink);}
+  .checklist-item.collapsed .item-name{font-size:17px;font-weight:700;}
+  /* collapsed summary pills */
+  .ex-summary{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+  .checklist-item:not(.collapsed) .ex-summary{display:none;}
+  .ex-summary-pill{display:inline-flex;align-items:center;padding:3px 9px;background:var(--soft);color:var(--ink);
+    border-radius:99px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.3px;
+    line-height:1.4;white-space:nowrap;}
+  .checklist-item.checked .ex-summary{opacity:.5;}
+  /* chevron */
+  .ex-chevron{flex-shrink:0;margin-left:auto;color:var(--muted);font-size:11px;line-height:1;padding:4px 6px;}
+  .checklist-item:not(.collapsed) .ex-chevron{transform:rotate(180deg);}
+  .checklist-item.collapsed .ex-detail{display:none;}
+
+  /* expanded detail */
+  .ex-detail{padding:4px 18px 16px;border-top:1px solid var(--soft);background:rgba(0,0,0,0.015);}
+  .ex-section-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--muted);margin:18px 0 10px;}
+  .ex-section-label:first-child{margin-top:14px;}
+  /* video placeholder */
+  .ex-video{position:relative;height:180px;background:#0a0a0c;border-radius:10px;margin:14px 0 4px;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;}
+  .ex-video::before{content:'';position:absolute;inset:0;
+    background:repeating-linear-gradient(135deg,#15151a 0 14px,#0a0a0c 14px 28px);opacity:.9;}
+  .ex-video::after{content:'VIDEO';position:absolute;bottom:10px;right:14px;font-family:'Space Mono',monospace;
+    font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.35);}
+  .ex-video-play{position:relative;z-index:2;width:64px;height:64px;border-radius:50%;background:var(--green);
+    border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;
+    padding-left:4px;box-shadow:0 4px 18px rgba(0,0,0,.35);}
+  /* extras + stats grid */
+  .ex-stats-block{margin-top:14px;}
+  .ex-extra-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .ex-extra-chip{display:inline-flex;align-items:center;padding:8px 16px;background:var(--green);color:#fff;border:none;
+    border-radius:99px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:1.5px;
+    text-transform:uppercase;line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.06);}
+  .ex-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:8px;
+    margin-top:4px;background:var(--card);}
+  .ex-stat{padding:12px 4px;text-align:center;border-left:1px solid var(--line);}
+  .ex-stat:first-child{border-left:none;}
+  .ex-stat-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.3px;color:var(--muted);
+    margin-bottom:6px;text-transform:uppercase;line-height:1.25;min-height:2.4em;display:flex;align-items:center;justify-content:center;}
+  .ex-stat-value{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--ink);line-height:1;}
+  .ex-stat.target .ex-stat-value{color:var(--green);}
+  .ex-stat.tempo .ex-stat-value{font-size:14px;}
+  /* coaching cues — colored left bar, no icons */
+  .ex-cue{display:flex;gap:12px;align-items:stretch;padding:12px 0;border-top:1px solid rgba(0,0,0,0.06);
+    font-family:'Barlow',sans-serif;font-size:14px;line-height:1.5;color:var(--ink);}
+  .ex-cue:first-of-type{border-top:none;padding-top:4px;}
+  .ex-cue::before{content:'';width:3px;flex-shrink:0;background:var(--green);border-radius:2px;align-self:stretch;}
+  .ex-cue.bad::before{background:#E74C3C;}
+  /* per-set log */
+  .ex-log{margin-top:4px;border:1px solid var(--line);border-radius:8px;background:var(--card);overflow:hidden;}
+  .ex-set-header{display:grid;grid-template-columns:28px 1fr auto 32px;gap:10px;align-items:center;padding:10px 14px 8px;
+    font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);}
+  .ex-set-row{display:grid;grid-template-columns:28px 1fr auto 32px;gap:10px;align-items:center;padding:8px 14px;
+    border-top:1px solid var(--soft);}
+  .ex-set-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;text-align:center;color:var(--ink);}
+  .ex-set-row.done .ex-set-num{color:var(--green);}
+  .ex-set-weight{width:100%;background:var(--soft);border:1px solid transparent;border-radius:5px;padding:7px 10px;
+    font-size:13px;font-family:'Barlow',sans-serif;color:var(--ink);outline:none;}
+  .ex-set-weight::placeholder{color:#bbb;}
+  .ex-set-rpe{display:flex;gap:3px;}
+  .ex-set-rpe .rpe-btn{width:26px;height:26px;font-size:12px;border-radius:4px;border:1px solid var(--line);
+    background:transparent;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--muted);cursor:pointer;
+    flex-shrink:0;padding:0;}
+  .ex-set-rpe .rpe-btn.selected{background:var(--green);border-color:var(--green);color:#fff;}
+  .ex-set-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:transparent;
+    cursor:pointer;padding:0;flex-shrink:0;position:relative;}
+  .ex-set-check::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;color:#fff;opacity:0;}
+  .ex-set-row.done .ex-set-check{background:var(--green);border-color:var(--green);}
+  .ex-set-row.done .ex-set-check::after{opacity:1;}
+  /* rest button */
+  .ex-rest-bottom{display:flex;justify-content:flex-end;margin-top:14px;}
+  .rest-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:1px;
+    text-transform:uppercase;background:var(--green);color:#fff;border:none;padding:7px 12px;border-radius:4px;cursor:pointer;}
+
+  /* ═════════ READINESS ═════════ */
   .rd{background:var(--card);border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(40,30,20,.08);border-top:3px solid var(--clay);}
   .rd-ey{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--clay);}
   .rd-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;margin:4px 0 4px;}
@@ -135,8 +211,8 @@
   .rd-opt.sel{background:var(--green);border-color:var(--green);}
   .rd-opt.sel .n,.rd-opt.sel .l{color:#fff;}
 
-  /* ═════════ 6 · SESSION COMPLETE ═════════ */
-  .done{background:var(--card);border-radius:18px;padding:24px;text-align:center;box-shadow:0 8px 24px rgba(40,30,20,.08);}
+  /* ═════════ SESSION COMPLETE ═════════ */
+  .complete-card{background:var(--card);border-radius:18px;padding:24px;text-align:center;box-shadow:0 8px 24px rgba(40,30,20,.08);}
   .medal{width:64px;height:64px;border-radius:50%;margin:0 auto 14px;border:3px solid var(--green);color:var(--green);
     display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;box-shadow:0 0 0 6px rgba(14,74,54,.08);}
   .done-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;color:var(--green);letter-spacing:1px;}
@@ -149,7 +225,7 @@
   .send-btn{margin-top:18px;width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:15px;
     font-family:'Barlow';font-weight:800;font-size:15px;letter-spacing:.3px;cursor:pointer;}
 
-  /* ═════════ 7 · CHAT ═════════ */
+  /* ═════════ CHAT ═════════ */
   .chat{background:var(--card);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;
     box-shadow:0 8px 24px rgba(40,30,20,.07);}
   .bub{max-width:80%;font-size:14px;line-height:1.4;padding:11px 14px;border-radius:14px;}
@@ -158,7 +234,7 @@
   .bub-meta{font-size:10.5px;color:var(--muted);margin-top:3px;}
   .bub.mine .bub-meta{text-align:right;}
 
-  /* ═════════ 8 · PERSONAL NOTE ═════════ */
+  /* ═════════ PERSONAL NOTE ═════════ */
   .note{background:var(--card);border-radius:16px;padding:16px;display:flex;align-items:center;gap:16px;
     box-shadow:0 6px 20px rgba(40,30,20,.07);}
   .note-tile{width:58px;height:58px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
@@ -170,7 +246,7 @@
   .note-cta{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--clay);margin-top:5px;}
   .note-chev{color:var(--muted);font-size:22px;}
 
-  /* ═════════ 9 · WORKOUT LIBRARY ═════════ */
+  /* ═════════ WORKOUT LIBRARY ═════════ */
   .wl{background:var(--card);border-radius:14px;padding:12px;display:flex;align-items:center;gap:14px;
     box-shadow:0 4px 16px rgba(40,30,20,.06);}
   .wl-thumb{width:58px;height:58px;border-radius:12px;flex-shrink:0;
@@ -181,7 +257,7 @@
   .wl-play{width:40px;height:40px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line);color:var(--green);
     display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;cursor:pointer;}
 
-  /* ═════════ 10 · COACH — ATHLETE CARD ═════════ */
+  /* ═════════ COACH — ATHLETE CARD ═════════ */
   .ath{position:relative;background:var(--card);border-radius:16px;padding:18px;box-shadow:0 6px 20px rgba(40,30,20,.07);
     border-left:3px solid transparent;}
   .ath.amber{border-left-color:var(--amber);} .ath.red{border-left-color:var(--red);}
@@ -194,7 +270,7 @@
   .ath-flag{margin-top:14px;font-size:12.5px;font-weight:700;color:#8a5a12;background:rgba(184,134,47,.13);
     border-radius:8px;padding:8px 11px;}
 
-  /* ═════════ 11 · COACH — CHART CARD ═════════ */
+  /* ═════════ COACH — CHART CARD ═════════ */
   .chart{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(40,30,20,.07);}
   .chart-lab{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
   .chart-big{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:56px;line-height:1;margin:8px 0 2px;}
@@ -204,7 +280,7 @@
   .chart-bars i{flex:1;background:var(--soft);border-radius:5px 5px 0 0;}
   .chart-bars i.hot{background:var(--amber);}
 
-  /* ═════════ 12 · STATUS SWATCH ═════════ */
+  /* ═════════ STATUS SWATCH ═════════ */
   .swatch{background:var(--card);border-radius:16px;padding:18px;display:flex;flex-wrap:wrap;gap:10px;
     box-shadow:0 6px 20px rgba(40,30,20,.07);}
   .tag{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;}
@@ -223,17 +299,17 @@
   <div class="head">
     <div class="kicker">AA Performance · App Card Library</div>
     <h1>Every card the app uses</h1>
-    <p>A living catalog of the card components in the athlete app (<code style="font-family:'Space Mono'">program.html</code>) and coach dashboard, rendered in the live brand palette. Use it as the reference when you want a reel, carousel, or ad to mirror the real product UI.</p>
+    <p>A living catalog of the card components in the athlete app (<code style="font-family:'Space Mono'">program.html</code>) and coach dashboard. The cycle meter and workout cards are reproduced from the real app code — same classes, same structure. Use it as the reference when a reel, carousel, or ad should mirror the product.</p>
     <div class="legend">
-      <span><i style="background:#0E4A36"></i>Green — primary / strength</span>
-      <span><i style="background:#C7552F"></i>Clay — accent / warm-up</span>
-      <span><i style="background:#A8741C"></i>Ochre — power</span>
+      <span><i style="background:#0E4A36"></i>Green — primary / strength block</span>
+      <span><i style="background:#C7552F"></i>Clay — accent / warm-up &amp; power blocks</span>
+      <span><i style="background:#A8741C"></i>Ochre — tertiary (notes, accents)</span>
       <span><i style="background:#FAF7F2;border:1px solid #D8D1C5"></i>Paper — surface</span>
     </div>
   </div>
 
   <!-- ───────── HOME & CYCLE ───────── -->
-  <div class="section-title">Home &amp; cycle</div>
+  <div class="section-title-h">Home &amp; cycle</div>
   <div class="gallery">
     <div class="specimen">
       <div class="spec-label">Cycle card</div>
@@ -266,88 +342,125 @@
 
     <div class="specimen">
       <div class="spec-label">Cycle meter</div>
-      <div class="spec-desc">Programme progress — done / current / locked segments.</div>
-      <div class="meter">
-        <div class="meter-bars">
-          <div class="meter-seg done"></div><div class="meter-seg current"></div>
-          <div class="meter-seg"></div><div class="meter-seg"></div><div class="meter-seg"></div>
+      <div class="spec-desc">Programme progress — thin segments + C-labels. Done (green, faded) · current (clay, glow) · locked.</div>
+      <div class="meter-frame">
+        <div class="cycle-meter-bars">
+          <div class="cycle-meter-seg done"></div>
+          <div class="cycle-meter-seg current"></div>
+          <div class="cycle-meter-seg"></div>
+          <div class="cycle-meter-seg"></div>
+          <div class="cycle-meter-seg"></div>
         </div>
-        <div class="meter-labels"><span>C1</span><span>C2</span><span>C3</span><span>C4</span><span>C5</span></div>
+        <div class="cycle-meter-labels">
+          <div class="cycle-meter-label done">C1</div>
+          <div class="cycle-meter-label current">C2</div>
+          <div class="cycle-meter-label">C3</div>
+          <div class="cycle-meter-label">C4</div>
+          <div class="cycle-meter-label">C5</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ───────── WORKOUT ───────── -->
-  <div class="section-title">Workout — exercise cards</div>
-  <div class="gallery">
-    <div class="specimen wide">
-      <div class="spec-label">Exercise card · expanded (strength)</div>
-      <div class="spec-desc">Tap-to-expand: name, chips, video, coaching cues, per-set log. Left stripe = block type.</div>
+  <!-- ───────── WORKOUT (real day-view layout) ───────── -->
+  <div class="section-title-h">Workout — section headers &amp; exercise cards</div>
+  <div class="spec-label">Day view · tap-to-expand list (reproduced from the app)</div>
+  <div class="spec-desc">Each block gets a colour-coded header; exercises are thin collapsed rows (name + summary pills + chevron) that expand to video, a 5-cell stats grid, coaching cues, and a per-set log.</div>
+  <div class="workout-demo">
 
-      <div class="sec-h strength" style="margin-bottom:12px"><span>Strength</span></div>
-
-      <div class="ex strength">
-        <div class="ex-main">
-          <div class="ex-check"></div>
-          <div class="ex-body">
-            <div class="ex-name">Barbell Back Squat</div>
-            <div class="ex-chips"><span class="chip">STRENGTH</span><span class="chip stat">3×8</span><span class="chip stat">RPE 8</span><span class="chip stat">Tempo 3-1-1</span><span class="chip stat">Rest 2:00</span></div>
-          </div>
-          <button class="ex-play">▶</button>
+    <!-- WARM-UP block -->
+    <div class="section-header-prog block-warmup"><div class="section-title">Warm-up</div></div>
+    <div class="checklist-item collapsed block-warmup">
+      <div class="item-main">
+        <div class="check-box"></div>
+        <div class="item-body">
+          <div class="item-name-row"><div class="ex-num">1</div><div class="item-name">Bike — Easy Spin</div></div>
+          <div class="ex-summary"><span class="ex-summary-pill">5 min</span></div>
         </div>
+        <div class="ex-chevron">▾</div>
+      </div>
+    </div>
+
+    <!-- STRENGTH block -->
+    <div class="section-header-prog block-strength"><div class="section-title">Strength</div></div>
+
+    <!-- collapsed + checked (done) -->
+    <div class="checklist-item collapsed block-strength checked">
+      <div class="item-main">
+        <div class="check-box"></div>
+        <div class="item-body">
+          <div class="item-name-row"><div class="ex-num">2</div><div class="item-name">Barbell Back Squat</div></div>
+          <div class="ex-summary"><span class="ex-summary-pill">4×6</span><span class="ex-summary-pill">8/10</span><span class="ex-summary-pill">⏱ 2m</span></div>
+        </div>
+        <div class="ex-chevron">▾</div>
+      </div>
+    </div>
+
+    <!-- EXPANDED -->
+    <div class="checklist-item block-strength">
+      <div class="item-main">
+        <div class="check-box"></div>
+        <div class="item-body">
+          <div class="item-name-row"><div class="ex-num">3</div><div class="item-name">Romanian Deadlift</div></div>
+          <div class="ex-summary"><span class="ex-summary-pill">3×8</span><span class="ex-summary-pill">8/10</span><span class="ex-summary-pill">⏱ 2m</span></div>
+        </div>
+        <div class="ex-chevron">▾</div>
+      </div>
+      <div class="ex-detail">
+        <div class="ex-video"><button class="ex-video-play">▶</button></div>
+        <div class="ex-stats-block">
+          <div class="ex-extra-chips"><span class="ex-extra-chip">Tempo Focus</span></div>
+          <div class="ex-stats-grid">
+            <div class="ex-stat"><div class="ex-stat-label">SETS</div><div class="ex-stat-value">3</div></div>
+            <div class="ex-stat"><div class="ex-stat-label">REPS</div><div class="ex-stat-value">8</div></div>
+            <div class="ex-stat target"><div class="ex-stat-label">RPE</div><div class="ex-stat-value">8/10</div></div>
+            <div class="ex-stat tempo"><div class="ex-stat-label">TEMPO</div><div class="ex-stat-value">3-1-1</div></div>
+            <div class="ex-stat"><div class="ex-stat-label">REST</div><div class="ex-stat-value">2m</div></div>
+          </div>
+        </div>
+        <div class="ex-section-label">Coaching Cues</div>
         <div class="ex-cues">
-          <div class="cue good">Chest tall, brace your core before you descend</div>
-          <div class="cue good">Drive your knees out in line with your toes</div>
-          <div class="cue bad">Don't let your heels lift off the floor</div>
+          <div class="ex-cue">Hinge from the hips, soft knees — push your hips back</div>
+          <div class="ex-cue">Keep the bar close, dragging up your legs</div>
+          <div class="ex-cue bad">Don't round your lower back at the bottom</div>
         </div>
+        <div class="ex-section-label">Log Sets</div>
         <div class="ex-log">
-          <div class="ex-log-head">SET LOG · WEIGHT · RPE</div>
-          <div class="set">
-            <span class="set-n">1</span><span class="set-w">80 kg</span>
-            <span class="set-rpe"><b>7</b><b class="sel">8</b><b>9</b></span>
-            <span class="set-check">✓</span>
+          <div class="ex-set-header"><div>SET</div><div>WEIGHT</div><div>RPE</div><div></div></div>
+          <div class="ex-set-row done">
+            <div class="ex-set-num">1</div>
+            <input class="ex-set-weight" type="text" value="82.5">
+            <div class="ex-set-rpe"><button class="rpe-btn">6</button><button class="rpe-btn">7</button><button class="rpe-btn selected">8</button><button class="rpe-btn">9</button><button class="rpe-btn">10</button></div>
+            <button class="ex-set-check"></button>
           </div>
-          <div class="set">
-            <span class="set-n">2</span><span class="set-w">82.5 kg</span>
-            <span class="set-rpe"><b>7</b><b>8</b><b class="sel">9</b></span>
-            <span class="set-check">✓</span>
+          <div class="ex-set-row">
+            <div class="ex-set-num">2</div>
+            <input class="ex-set-weight" type="text" placeholder="kg">
+            <div class="ex-set-rpe"><button class="rpe-btn">6</button><button class="rpe-btn">7</button><button class="rpe-btn">8</button><button class="rpe-btn">9</button><button class="rpe-btn">10</button></div>
+            <button class="ex-set-check"></button>
           </div>
         </div>
+        <div class="ex-rest-bottom"><button class="rest-btn">Rest ⏱ 2m</button></div>
       </div>
     </div>
 
-    <div class="specimen">
-      <div class="spec-label">Exercise card · collapsed, block variants</div>
-      <div class="spec-desc">Warm-up (clay), strength (green), power (ochre) — scan a day by colour.</div>
-      <div class="ex warmup">
-        <div class="ex-main">
-          <div class="ex-check"></div>
-          <div class="ex-body"><div class="ex-name">Bike — Easy Spin</div>
-            <div class="ex-chips"><span class="chip">WARM-UP</span><span class="chip stat">5 min</span></div></div>
-          <button class="ex-play">▶</button>
+    <!-- POWER block -->
+    <div class="section-header-prog block-power"><div class="section-title">Power</div></div>
+    <div class="checklist-item collapsed block-power">
+      <div class="item-main">
+        <div class="check-box"></div>
+        <div class="item-body">
+          <div class="item-name-row"><div class="ex-num">4</div><div class="item-name">Box Jump</div></div>
+          <div class="ex-summary"><span class="ex-summary-pill">4×3</span><span class="ex-summary-pill">Max intent</span><span class="ex-summary-pill">⏱ 2m</span></div>
         </div>
-      </div>
-      <div class="ex strength">
-        <div class="ex-main">
-          <div class="ex-check on"></div>
-          <div class="ex-body"><div class="ex-name" style="text-decoration:line-through;color:#999">Romanian Deadlift</div>
-            <div class="ex-chips"><span class="chip">STRENGTH</span><span class="chip stat">3×10</span></div></div>
-          <button class="ex-play">▶</button>
-        </div>
-      </div>
-      <div class="ex power">
-        <div class="ex-main">
-          <div class="ex-check"></div>
-          <div class="ex-body"><div class="ex-name">Box Jump</div>
-            <div class="ex-chips"><span class="chip">POWER</span><span class="chip stat">4×3</span><span class="chip stat">Max intent</span></div></div>
-          <button class="ex-play">▶</button>
-        </div>
+        <div class="ex-chevron">▾</div>
       </div>
     </div>
+
   </div>
 
-  <!-- ───────── LOGGING & READINESS ───────── -->
-  <div class="section-title">Readiness &amp; completion</div>
+  <!-- ───────── READINESS & COMPLETION ───────── -->
+  <div class="section-title-h">Readiness &amp; completion</div>
   <div class="gallery">
     <div class="specimen">
       <div class="spec-label">Readiness check</div>
@@ -370,7 +483,7 @@
     <div class="specimen">
       <div class="spec-label">Session complete</div>
       <div class="spec-desc">After "Finish": medallion, session-RPE rating, note, send-to-coach.</div>
-      <div class="done">
+      <div class="complete-card">
         <div class="medal">✓</div>
         <div class="done-title">Session complete</div>
         <div class="done-rpe-lab">How hard was that session?</div>
@@ -380,8 +493,8 @@
     </div>
   </div>
 
-  <!-- ───────── MESSAGING & NOTES ───────── -->
-  <div class="section-title">Messaging, notes &amp; library</div>
+  <!-- ───────── MESSAGING & LIBRARY ───────── -->
+  <div class="section-title-h">Messaging, notes &amp; library</div>
   <div class="gallery">
     <div class="specimen">
       <div class="spec-label">Coach message thread</div>
@@ -409,7 +522,7 @@
   </div>
 
   <!-- ───────── COACH DASHBOARD ───────── -->
-  <div class="section-title">Coach dashboard</div>
+  <div class="section-title-h">Coach dashboard</div>
   <div class="gallery">
     <div class="specimen">
       <div class="spec-label">Athlete card</div>
@@ -457,8 +570,8 @@
   </div>
 
   <div class="foot">
-    Mirrors the live palette in <code>program.html</code> / <code>coach.html</code> — green <code>#0E4A36</code> · clay <code>#C7552F</code> · ochre <code>#A8741C</code> · paper <code>#FAF7F2</code>, Barlow + Barlow&nbsp;Condensed.<br>
-    Banner images load from <code>../assets/cycles/</code> and <code>../assets/days/</code>, so keep this file in the <code>Content/</code> folder. Representative renders, not pixel copies — tweak any card and ask me to fold it back into the real app.
+    Cycle meter &amp; workout cards are reproduced from <code>program.html</code> (same class names &amp; structure); the rest are representative renders in the live palette — green <code>#0E4A36</code> · clay <code>#C7552F</code> · ochre <code>#A8741C</code> · paper <code>#FAF7F2</code>, Barlow + Barlow&nbsp;Condensed.<br>
+    Banner images load from <code>../assets/cycles/</code> and <code>../assets/days/</code>, so keep this file in the <code>Content/</code> folder.
   </div>
 
 </div>
