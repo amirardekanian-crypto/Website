@@ -2924,6 +2924,13 @@ function getVideoUrl(ex) {
     if (darkToggle) darkToggle.classList.remove('is-hidden');
     syncDarkToggle();
     document.getElementById('v-progress').classList.add('active');
+
+    // Deep-link: ?workout=<id|category/slug|path.json> opens that library
+    // workout immediately, while the full app stays loaded behind it. Tapping
+    // Back lands on the Workouts tab, so a visitor can browse the rest of the
+    // sample — the "get your own program" hook. No param → normal home load.
+    const wParam = params.get('workout');
+    if (wParam) openWorkoutDeepLink(wParam);
   }, 300);
 })();
 
@@ -4261,6 +4268,37 @@ window.toggleWorkoutCat = toggleWorkoutCat;
 //  Check state persists under "wkout_<id>" so re-opening restores ticks.
 // ═══════════════════════════════════════════════════════════════════════
 let _wsCurrent = null;   // { id, checkKey } for the open workout
+
+// Deep-link resolver for the ?workout= URL param (see the init reveal). Accepts:
+//   • a workout id from workouts/index.json   → ?workout=full-body-power
+//   • a "category/slug" pair                  → ?workout=strength/full-body-power
+//   • a direct .json path                     → ?workout=workouts/strength/full-body-power.json
+// Resolves to the workout file, then reuses openWorkout(). On a bad/unknown id
+// it quietly no-ops (visitor just stays on home); openWorkout() shows its own
+// error if a resolved file fails to load. The rest of the app remains loaded.
+async function openWorkoutDeepLink(idOrPath) {
+  if (!idOrPath) return;
+  let file = idOrPath;
+  if (!/\.json$/i.test(idOrPath)) {
+    // Not a direct path — try to resolve it as an id via the manifest.
+    let resolved = null;
+    try {
+      const res = await fetch('workouts/index.json', { cache: 'no-cache' });
+      if (res.ok) {
+        const manifest = await res.json();
+        for (const cat of (manifest.categories || [])) {
+          const hit = (cat.workouts || []).find(w => w.id === idOrPath);
+          if (hit && hit.file) { resolved = hit.file; break; }
+        }
+      }
+    } catch (e) { /* fall back to the path heuristic below */ }
+    if (resolved) file = resolved;
+    else if (idOrPath.includes('/')) file = `workouts/${idOrPath}.json`;  // category/slug
+    else { console.warn('Deep-link workout not found:', idOrPath); return; }
+  }
+  openWorkout(file);
+}
+window.openWorkoutDeepLink = openWorkoutDeepLink;
 
 async function openWorkout(file) {
   if (!file) return;
