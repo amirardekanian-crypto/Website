@@ -463,11 +463,10 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Pull-Up",
+                "name": "Machine Chest Press",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
-                  { "label": "band assisted", "style": "dark" },
                   { "label": "4 Sets", "style": "yellow" },
                   { "label": "×6–10 Reps" },
                   { "label": "Tempo 2-0-1-1" },
@@ -475,10 +474,10 @@
                 ],
                 "cues": {
                   "good": [
-                    "Pull the chest toward the bar, driving the elbows down to your sides",
-                    "Feel the lats pulling you up rather than the arms"
+                    "Feel the chest squeeze hard at the top of each rep.",
+                    "Adjust the seat so the handles align with the mid-chest, then press with elbows on a stable path."
                   ],
-                  "bad": ["Kipping or shortening the range at the top or bottom"]
+                  "bad": ["Avoid letting the head and shoulders come off the pad."]
                 }
               },
               {
