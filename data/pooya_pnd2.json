@@ -228,7 +228,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Incline Machine Press",
+                "name": "Machine Incline Chest Press",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -258,7 +258,7 @@
               },
               {
                 "type": "standard",
-                "name": "Reverse Pec Deck",
+                "name": "Machine Reverse Fly",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -354,7 +354,7 @@
               },
               {
                 "type": "standard",
-                "name": "Pallof Press",
+                "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
