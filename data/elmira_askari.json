@@ -199,7 +199,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Cable Row",
+                "name": "Cable Row",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -218,7 +218,7 @@
               },
               {
                 "type": "standard",
-                "name": "Face Pull",
+                "name": "Cable Face Pull",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
