@@ -343,7 +343,7 @@
               },
               {
                 "type": "standard",
-                "name": "Romanian Deadlift",
+                "name": "Barbell Romanian Deadlift",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -382,7 +382,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Hip Abduction Machine",
+                "name": "Seated Machine Hip Abduction",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -665,7 +665,7 @@
               },
               {
                 "type": "standard",
-                "name": "Back Extension",
+                "name": "45° Back Extension",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
