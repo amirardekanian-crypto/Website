@@ -436,7 +436,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Hack Squat",
+                "name": "Machine Hack Squat",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -502,7 +502,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Leg Press",
+                "name": "Machine Leg Press",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -532,7 +532,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Leg Curl",
+                "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -568,7 +568,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Crunch",
+                "name": "Decline Sit Ups",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -592,7 +592,7 @@
                     "Feel the rectus abdominis shorten from the ribcage down"
                   ],
                   "bad": [
-                    "Pulling with the arms or sitting back onto the heels"
+                    "Pulling with the neck or pulling neck with arms"
                   ]
                 }
               },
@@ -994,7 +994,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Back Extension",
+                "name": "45° Back Extension",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -1064,7 +1064,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Leg Extension",
+                "name": "Machine Leg Extension",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -1094,7 +1094,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Calf Raise",
+                "name": "Seated Machine Calf Raise",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
@@ -1130,7 +1130,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Woodchop",
+                "name": "Cable Wood chop",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
