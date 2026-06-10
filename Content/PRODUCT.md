@@ -100,7 +100,7 @@ This is the proof behind "the coach actually watches you" — the payoff beat in
 | `DESIGN_SYSTEM.md` | brand + motion spec (colours, type, reel/phone patterns) |
 | `reel-1-dashboard.html` … `reel-4-app.html` | finished Instagram reels (1080×1920, self-contained) |
 | `card-preview.html` | visual catalog of the app's card components, in the live brand palette |
-| `instagram-carousels.html` · `Carousel-Kit.html` · `carousel-method.html` · `carousel-1-file-vs-coach.html` | carousels + the 14-template kit |
+| `instagram-carousels.html` · `Carousel-Kit.html` · `carousel-method.html` · `carousel-1-file-vs-coach.html` · `carousel-recovery-run.html` | carousels + the **23-template kit** (RALLY graphics layer: rally arc, court lines, tennis-ball pagination). New carousels are generated with the **`/carousel` Claude Code skill** — give it a script, get a finished file + caption. |
 | `instagram-cards/` | exported athlete "results" card PNGs |
 | `phone-links.html` | QR launcher to open any of the above on your phone over Wi-Fi |
 

@@ -29,12 +29,14 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 ## Signature sign-offs (use one on every piece)
 
 - **«هیچی بی‌دلیل نیست»** — *nothing (in your program) is without a reason*
-- **«یه مربی، تو جیبت»** — *a coach in your pocket*
+- **«یه مربی تو جیبت»** — *a coach in your pocket*
+
+**The mantra** — the two-line lockup, setup → payoff: **«یه نقشه تا هدفت»** (*a map to your goal*) → **«یه مربی تو جیبت»** (*a coach in your pocket*). This is the canonical close. *(Confirmed wording — drops the older «کامل» and the comma. The «نقشه/map» line is also the literal idea behind the Carousel-Kit's rally-arc + court motif.)*
 
 **The canonical outro** (the close we use to end reels — setup line, then payoff, then brand row):
 
-> یه نقشه‌ی کامل تا هدفت.
-> ## یه مربی، تو جیبت.
+> یه نقشه تا هدفت.
+> ## یه مربی تو جیبت.
 > Ⓐ امیر اردکانی · دایرکت بده 📩
 
 - Setup line ≈ `mid` weight, full white. Payoff = the big line, with **مربی** in clay.
@@ -98,8 +100,8 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 ## 4. Core components
 
-- **Header:** handle + clay dot on one side, page counter «۰۱ / ۰۵» on the other (Barlow Condensed, 24px, **ltr**).
-- **Footer:** segmented **progress bar** (active segment = paper on dark / green on light) + a **swipe** indicator (arrow points left, the RTL direction).
+- **Header:** handle + clay dot only. *(The page counter «۰۱ / ۰۵» is **retired** — position is shown by the pagination balls instead.)*
+- **Footer:** **tennis-ball pagination** — one small ball per slide (grey = other slides, **orange/clay = the current slide**, slightly scaled + glow), the row laid out **ltr** even on RTL slides — plus a **swipe** indicator on slide 1 only («بکش», arrow points left, the RTL direction). *(Replaces the old segmented progress bar.)*
 - **chip-A** — solid clay block, white text (a hard label, e.g. «اشتباهِ رایج»).
 - **chip-B** — clay text + a 64px clay leading dash (an eyebrow, e.g. «حرفِ راست»).
 - **.hl** — clay highlight block behind a key word, white text.
@@ -117,11 +119,25 @@ A portable brand + design spec for generating on-brand content (Instagram carous
   - Cycle banner **16/9** · Day banner **5/2** (give it room — at 5/2.5 a 2-line title won't collide with the eyebrow) · Workout banner **2/1**
 - **Real assets to reuse:** `../assets/cycles/*.jpg` (foundation-forge, strength-engine, structural-build, durability-build, armour-build…) and `../assets/days/*.webp` (lower, upper, power, conditioning…). Use these, not stock — they *are* the product.
 
+**Photo-led carousels (lifestyle / personal photography)** — a whole narrative deck can ride on **real photos** (you training, your kit, the city at night), not just type. Reference build: `carousel-recovery-run.html`.
+- Each photo is **full-bleed** (`object-fit:cover`; shoot/crop **portrait 4:5**, ≈1122×1402) behind a green scrim, headline + sub in the lower third. Set an **`object-position` focal point per photo** so a face / the watch / the subject never crops to the edge.
+- **Standard photo scrim** (keeps white text legible on any image *and* tints it brand-green): `linear-gradient(to top, rgba(8,38,27,.94), rgba(8,38,27,.18) 56%, rgba(8,38,27,.58))`. Push the bottom stop toward `.96` if a bright/busy frame fights the text.
+- **The photography "look" — grade before you place.** Cinematic and moody, *not* bright-and-poppy: deep, slightly **green-leaning shadows**; **warm paper-cream highlights**; **muted, controlled saturation** — except where a **clay/terracotta** accent already lives in-frame (a lifebuoy, brake-lights, sodium street-lamps), which you let pop. Filmic contrast, faint grain, soft vignette. Grade **all** slides off one base so the set reads as one world, even mixing a dim living-room and a blue-hour dock.
+- **Proof / data slide** — to show real receipts (a logged run, a dashboard): frame the **actual screenshot inside a phone card** (rounded, hairline border, soft shadow) on a green canvas, and restate the 2–3 headline numbers as **branded KPIs** (big clay Persian numerals + muted label). Authentic artifact + on-brand readout. (Slide 8 of the recovery-run deck.)
+
 ---
 
 ## 6. Slide & reel template library
 
-Cover · Myth (strike) · Statement · Stat (one big number) · Quote · **Compare** (file/coach) · List · **Rule-cards** · Heatmap · **CTA** (canonical outro) · **Feature** (full-bleed app image) · **Journey** (linked cycle timeline) · **Result** (proof + face) · **Checklist** · **App-as-Product** (cinematic phone — see §7).
+Cover · Myth (strike) · Statement · Stat (one big number) · Quote · **Compare** (file/coach) · List · **Rule-cards** · Heatmap · **CTA** (canonical outro) · **Feature** (full-bleed app image) · **Journey** (linked cycle timeline) · **Result** (proof + face) · **Checklist** · **Photo-story** (full-bleed lifestyle photo + green scrim) · **Proof** (real screenshot in a phone card + branded KPIs) · **App-as-Product** (cinematic phone — see §7).
+
+**Carousel graphics layer — "RALLY"** (lives in `Carousel-Kit.html`, the 23-template kit):
+- **The rally arc** — ONE dashed clay ball-path per slide (`stroke:var(--clay)`, clay-2 on dark, `stroke-dasharray: 2 26`, round caps), placed in negative space, ending in a **clay tennis ball** (a real ball PNG, base64-embedded as the `#tennis-ball` SVG symbol, ~32px). Under `.fa` the arc group is mirrored `scaleX(-1)` so the shot travels the RTL reading direction — an authored dot at `cx` displays at `1080−cx`. On the CTA the ball lands near the mantra payoff.
+- **Court-line substrate** — faint court geometry (baseline + service box + centre line) raked across the lower third; white `rgba(255,255,255,.16)` on green, green `rgba(14,74,54,.10)` on paper. Open type-led slides only — never on dense card/grid slides.
+- **Film grain** — a barely-there fractal-noise texture on every canvas (SVG data-URI tile, opacity ~.05, **no blend-mode** — compositing blend layers across many canvases hangs the page).
+- **Tennis-ball pagination** — see §4. Page counters are retired.
+- Backgrounds are **flat** green/paper (a clay "stadium-lamp" glow was tried and rejected). The **AA monogram is not used as in-slide chrome** (header chips/sign-off seals were tried and rejected as messy) — the Bio slide's photo + AA PERFORMANCE card are the only logo carriers.
+- Carousels are **generated via the `/carousel` Claude Code skill** (`.claude/skills/carousel/SKILL.md`): script in → finished `Content/carousel-<slug>.html` + IG caption out. It reads `PRODUCT.md` + this file first, every run.
 
 ---
 
@@ -208,6 +224,7 @@ A persistent device, app UI animating inside:
 - **Format:** vertical reels/carousels, hook in the first 2 seconds, **burned-in captions** (many watch muted).
 - **Credibility to lean on when useful:** ارشدِ قدرت و آمادگی · ارشدِ فیزیولوژیِ ورزشی (two MSc degrees) · ۵۰۰+ ورزشکار. *(In Farsi say «ارشد», never "MSc".)*
 - Lead with the **no-BS / "everything has a reason"** idea; close with the **canonical outro** + handle.
+- **Accuracy of claims:** he holds an exercise-physiology ارشد and fact-checks, so every training/physiology number must be right. Prefer a **simple round figure with no on-slide math** (e.g. «ضربانِ قلب، زیرِ ۱۴۰») over a formula or a percentage you haven't verified. Note: Zone 2 is a metabolic threshold (LT1/VT1 ≈ lactate 2 mmol/L), **not** a fixed % of max HR — don't publish "60–70% of max" as if it were exact.
 
 **Farsi word choices — use these exact terms (decided with the client):**
 - **His title:** «مربیِ بدنسازیِ حرفه‌ای» — *not* «مربیِ قدرت و آمادگی». Keep «قدرت و آمادگی» only inside the real degree names.
