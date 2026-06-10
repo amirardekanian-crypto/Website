@@ -1,0 +1,719 @@
+{
+  "athlete": {
+    "id": "amirabbas_esh1",
+    "key": "ffa4e2b080ae49b7ab20491a42fa1acb",
+    "firstName": "AmirAbbas",
+    "lastName": "Eshraghi"
+  },
+  "sport": {
+    "badge": "🏋️ Strength & Physique"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "tagline": "Control Before Load",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-06-10",
+      "endDate": "2026-07-14",
+      "focuses": [
+        "Own every movement pattern with full control and calibrated effort on the new exercise selections.",
+        "Establish baseline loads and a complete set-logging habit that drives every cycle after this."
+      ],
+      "message": {
+        "paragraphs": [
+          "These five weeks exist to build the platform everything else stands on. Every exercise in this block was chosen to give your muscles maximum work with minimum wear on your joints and your recovery — because with your work life running at full throttle, training has to add to you, not drain you.",
+          "Your only mental job this cycle: control. Lower every rep slowly, exactly as written, and log every weight you lift. Don't chase numbers yet — chase perfect reps and leave a little in the tank when the program says to.",
+          "Do that, and by Week 5 the numbers rise on their own: heavier presses, a stronger lower body, and sessions that leave you sharper than they found you."
+        ],
+        "outcomes": [
+          "Leg press load up 10–15% at the same effort",
+          "Dumbbell bench press up at least 2 kg per hand",
+          "Every lowering phase at full 3-second control — no shortcuts",
+          "All 15 sessions completed and logged",
+          "Split squats rock-steady — no knee wobble"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Volume Engine",
+      "tagline": "Work Becomes Muscle",
+      "weeks": "Weeks 6–10",
+      "focuses": [
+        "Drive muscle growth through progressive volume on a rotated accessory layer.",
+        "Keep the primary lifts climbing in load on the foundation built in Cycle 1."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Foundation Forge teaches your body to move; Volume Engine makes it grow. The control you're building right now becomes the engine we load — more work, more density, and the first cycle where the mirror starts reporting back. The accessories change, the workload climbs, and the base you earned decides how far it goes.",
+          "First control. Now growth."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Strength Engine",
+      "tagline": "Heavy. Controlled. Earned.",
+      "weeks": "Weeks 11–15",
+      "focuses": [
+        "Intensify the primaries — heavier loads, lower reps, strength as the headline adaptation.",
+        "Hold new muscle with maintenance-dose accessory volume."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Growth Surge",
+      "tagline": "New Stimulus, New Size",
+      "weeks": "Weeks 16–20",
+      "focuses": [
+        "Second hypertrophy wave — fresh accessory rotation at a higher volume ceiling than Cycle 2.",
+        "Primaries continue progressing on the strength gained in Cycle 3."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Apex Armor",
+      "tagline": "Strong and Bulletproof",
+      "weeks": "Weeks 21–25",
+      "focuses": [
+        "Peak strength — the heaviest controlled loads of the entire program on every primary lift.",
+        "Lock in the injury-proofing: unilateral stability and core standards consolidated for the long term."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Foundation Forge",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Lower Strength",
+        "completionTitle": "Base Loaded",
+        "completionMessage": "Heavy, controlled work through the legs — that's the engine of this entire program running. Eat well tonight; the growing happens while you rest.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Easy, conversational pace — just raising body temperature",
+                    "Legs loosening, breathing slightly elevated by the end"
+                  ],
+                  "bad": ["Don't turn the warm-up into a workout"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Lower Activation Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "90/90 Hip Rotation",
+                    "detail": "×8/side",
+                    "cues": {
+                      "good": ["Move slowly through the hips, chest tall"],
+                      "bad": ["Don't let your hands carry the movement"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Squeeze the glutes hard at the top"],
+                      "bad": ["Don't arch the lower back to get higher"]
+                    }
+                  },
+                  {
+                    "name": "Bodyweight Squat",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Full depth, heels glued to the floor"],
+                      "bad": ["Don't let the knees collapse inward"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Leg Press",
+                "videoUrl": null,
+                "restSec": 180,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower the platform for 3 seconds until the knees come comfortably toward the chest",
+                    "Drive through the whole foot, quads doing the work"
+                  ],
+                  "bad": ["Don't let the hips curl off the pad at the bottom"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drag the heels down smoothly, resist the weight back up slowly",
+                    "A deep hamstring stretch at the top of every rep"
+                  ],
+                  "bad": ["Don't let the hips lift off the seat"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Leg Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Kick to full lockout on every rep, lower with control",
+                    "Quads squeezing hard at the very top"
+                  ],
+                  "bad": ["Don't swing the weight up with momentum"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Calf Raise",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Full stretch at the bottom, pause there, then rise to the toes",
+                    "Calves loaded in the stretch — that pause is where the work is"
+                  ],
+                  "bad": ["Don't bounce out of the bottom"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core & Stability",
+            "icon": "🛡️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Pallof Press",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2s hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 per side" },
+                  { "label": "Tempo 1-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press straight out from the chest and hold — shoulders and hips stay square",
+                    "The whole midsection braced against the cable's pull"
+                  ],
+                  "bad": ["Don't let the cable rotate you toward the machine"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "30s hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "per side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "One straight line from head to feet, hips stacked",
+                    "The bottom-side waist holding you up"
+                  ],
+                  "bad": ["Don't let the hips sag toward the floor"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Upper Strength",
+        "completionTitle": "Pressed and Pulled",
+        "completionMessage": "Every press matched with a pull — that's how a chest and back grow together and shoulders stay quiet for years. Session banked; recovery starts now.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Easy spin, nothing more",
+                    "Gradually warming through"
+                  ],
+                  "bad": ["Don't drain energy you'll need on the bench"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Upper Activation Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Push the floor away at the top, arms straight"],
+                      "bad": ["Don't bend the elbows — this isn't a push-up"]
+                    }
+                  },
+                  {
+                    "name": "Cable External Rotation",
+                    "detail": "×10/side",
+                    "cues": {
+                      "good": ["Elbow pinned to your side, rotate out slowly"],
+                      "bad": ["Don't shrug the shoulder up"]
+                    }
+                  },
+                  {
+                    "name": "Prone Y Raise",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Thumbs up, reach long and lift light"],
+                      "bad": ["Don't yank with momentum"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Flat Dumbbell Bench Press",
+                "videoUrl": null,
+                "restSec": 180,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6–8 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower the dumbbells for 3 seconds to chest level, press up and slightly in",
+                    "Chest stretching at the bottom, driving the press from the chest not the shoulders"
+                  ],
+                  "bad": ["Don't let the dumbbells drift apart at the top"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Row",
+                "videoUrl": null,
+                "restSec": 150,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the handles to the lower ribs and pause briefly",
+                    "Shoulder blades squeezing together at the top of every rep"
+                  ],
+                  "bad": ["Don't lift the chest off the pad to cheat the weight up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Shoulder Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press to full lockout without the lower back leaving the pad",
+                    "Shoulders doing the pressing — not the neck, not the arch"
+                  ],
+                  "bad": ["Don't flare the ribs to grind out reps"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the bar to the collarbone, chest tall, pause briefly",
+                    "Elbows driving down into the back pockets — lats, not biceps"
+                  ],
+                  "bad": ["Don't lean back and turn it into a row"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessories",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Lateral Raise",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Raise out to the side until arms are parallel with the floor",
+                    "The side of the shoulder lifting the weight, not the traps"
+                  ],
+                  "bad": ["Don't swing the dumbbells up with body momentum"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "rope", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the rope toward the face, ends finishing beside the ears",
+                    "Rear shoulders and upper back squeezing — feel it behind you"
+                  ],
+                  "bad": ["Don't pull down to the chest like a row"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Full Body Hybrid",
+        "completionTitle": "Week Sealed",
+        "completionMessage": "Third session down — every muscle in your body has now been trained twice this week. Walk out tall and take the rest days; you've earned both.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "5 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Relaxed spin to raise temperature",
+                    "Body waking up, nothing taxing"
+                  ],
+                  "bad": ["Don't push the pace"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Full Body Activation Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Dead Bug",
+                    "detail": "×8/side",
+                    "cues": {
+                      "good": ["Press the lower back into the floor the whole time"],
+                      "bad": ["Don't let the ribs flare as the arm reaches back"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Drive through the heels, squeeze at the top"],
+                      "bad": ["Don't push through the toes"]
+                    }
+                  },
+                  {
+                    "name": "Leg Swings",
+                    "detail": "×10/side",
+                    "cues": {
+                      "good": ["Hold the rack, swing loose and controlled front to back"],
+                      "bad": ["Don't force the height — let the range open up rep by rep"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Back Extension",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "45° bench", "style": "dark" },
+                  { "label": "dumbbell loaded", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Hinge at the hips, rise until the body forms one straight line — no higher",
+                    "Glutes and hamstrings lifting you up, lower back just along for the ride"
+                  ],
+                  "bad": ["Don't hyperextend past straight at the top"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Split Squat",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 per side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Take a long stance and drop the back knee straight down toward the floor",
+                    "The front leg doing all the work — glute and quad"
+                  ],
+                  "bad": ["Don't let the front knee cave inward"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Incline Dumbbell Bench Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower slowly to the upper chest, press up without the elbows flaring wide",
+                    "Upper chest stretching and doing the pressing"
+                  ],
+                  "bad": ["Don't turn it into a shoulder press by setting the bench too steep"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Cable Row",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull to the belly button, chest stays proud, brief squeeze",
+                    "Mid-back pinching together on every rep"
+                  ],
+                  "bad": ["Don't rock the torso back and forth for momentum"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Arms",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Triceps Pushdown",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "rope", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press down to full lockout, elbows staying by the ribs",
+                    "The back of the arm squeezing hard at the bottom"
+                  ],
+                  "bad": ["Don't let the elbows drift forward as you press"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Curl",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 9" }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl up without the elbows travelling forward, lower slowly",
+                    "Biceps under tension the whole way down, not just the way up"
+                  ],
+                  "bad": ["Don't lean back to swing the weight up"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Carry & Core",
+            "icon": "🛡️",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Farmer Carry",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30m" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Walk tall, like a string is pulling the top of your head up",
+                    "Ribs down, grip crushing the handles, midsection locked"
+                  ],
+                  "bad": ["Don't lean to one side or rush the steps"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, AmirAbbas",
+    "cards": [
+      {
+        "icon": "🧠",
+        "title": "Three Days Is the Plan, Not the Limit",
+        "body": "You have five-plus days available, and we're deliberately using three. Your stress level is running high, and stress eats the same recovery your muscles need to grow. Spaced this way, every session is performed at full output — that's what drives progress. Adding extra gym days right now would slow your results, not speed them up."
+      },
+      {
+        "icon": "🛌",
+        "title": "Sleep Is Your Edge",
+        "body": "Your 7–8 hours of quality sleep is the single reason you can train this hard with a demanding life. Protect it like a training session — especially the nights before gym days. If a rough week cuts your sleep short, drop one or two of the lighter sets that session and keep the big lifts intact."
+      },
+      {
+        "icon": "⏱",
+        "title": "The Slow Lowering Is the Work",
+        "body": "Leg press, bench press, curls — the 3-second lowering written on them is where muscle is built and joints get conditioned. If you can't control the descent for the full three seconds, the weight is too heavy. Lowering fast to lift more defeats the entire point of this cycle."
+      },
+      {
+        "icon": "📊",
+        "title": "Log Every Working Set",
+        "body": "Cycle 2 will be built directly from this cycle's numbers. After each exercise, record the weight in the app — every working set, every session. Weeks 1–2 are for finding the right loads; Weeks 3–5 are for nudging them up while the control stays perfect."
+      },
+      {
+        "icon": "🏃",
+        "title": "If You Run This Cycle",
+        "body": "Running is welcome, but keep it easy — a pace where you could hold a conversation, no more than two short runs a week. Avoid running hard the day before a lower-body session. Done this way, your cardio supports recovery instead of competing with it."
+      },
+      {
+        "icon": "🔀",
+        "title": "Busy Gym, Same Session",
+        "body": "The first strength exercise of each day is non-negotiable — start there. If a machine is taken later in the session, swap the order of the remaining accessories instead of standing in line. The work gets done either way; just keep your rest times honest."
+      }
+    ]
+  }
+}
