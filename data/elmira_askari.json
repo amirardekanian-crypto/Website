@@ -463,7 +463,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Chest Press",
+                "name": "Barbell Chest Press",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -475,14 +475,14 @@
                 "cues": {
                   "good": [
                     "Feel the chest squeeze hard at the top of each rep.",
-                    "Adjust the seat so the handles align with the mid-chest, then press with elbows on a stable path."
+                    "Adjust your body so the eyes align with the barbell, then press and start the movement."
                   ],
                   "bad": ["Avoid letting the head and shoulders come off the pad."]
                 }
               },
               {
                 "type": "standard",
-                "name": "Chest-Supported Row",
+                "name": "Chest-Supported Dumbbell Row",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
