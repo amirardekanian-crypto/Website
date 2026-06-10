@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کاروسلِ ریکاوری — «نظمِ سبک رفتن»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  /* ===== brand tokens (synced to Carousel-Kit.html · Roland-Garros) ===== */
+  :root{
+    --accent:#C7552F; --clay:#C7552F; --green:#0E4A36; --green-2:#156A4D; --ink:#0E4A36;
+    --paper:#FAF7F2; --paper-warm:#F1ECE3; --body-ink:#1A1A1A;
+    --mono:'Vazirmatn',sans-serif; --display:'Vazirmatn',sans-serif;
+    --pad-edge:64px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:#16161a;color:var(--paper);font-family:var(--display);}
+  body{letter-spacing:0;}
+
+  .topbar{max-width:1080px;margin:0 auto;padding:26px 20px 6px;color:#cfc9bf;}
+  .topbar h1{font-size:24px;font-weight:800;margin-bottom:8px;}
+  .topbar p{font-size:14px;line-height:1.9;color:#b8b2a6;}
+  .topbar b{color:#fff;}
+  .topbar code{font-family:monospace;color:#E0916F;direction:ltr;display:inline-block;}
+
+  .deck{display:flex;flex-direction:column;align-items:center;gap:26px;padding:18px 12px 80px;}
+  .shot{position:relative;width:1080px;max-width:100%;}
+  .dl{position:absolute;top:12px;left:12px;z-index:6;cursor:pointer;background:rgba(0,0,0,.55);color:#fff;
+    border:none;border-radius:9px;padding:9px 14px;font-family:'Vazirmatn';font-size:14px;font-weight:600;}
+  .dl:hover{background:#000;}
+
+  /* ===== post canvas (1080×1350 · IG 4:5) ===== */
+  .post-canvas{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--ink);color:var(--paper);}
+  .post-canvas::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+    border:2px solid rgba(255,255,255,.16);margin:28px;border-radius:14px;}
+
+  /* chrome */
+  .post-header{position:absolute;top:var(--pad-edge);left:var(--pad-edge);right:var(--pad-edge);z-index:4;
+    display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:24px;}
+  .post-header .who{display:flex;align-items:center;gap:14px;font-weight:600;}
+  .post-header .dot{width:14px;height:14px;border-radius:50%;background:var(--accent);}
+  .post-header .num{opacity:.85;direction:ltr;}
+  .post-footer{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:var(--pad-edge);z-index:4;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:24px;}
+  .progress-bar{display:flex;gap:6px;flex:1;max-width:420px;direction:ltr;}
+  .progress-bar span{flex:1;height:3px;background:rgba(255,255,255,.18);border-radius:2px;}
+  .progress-bar span.on{background:var(--paper);}
+  .swipe{font-family:var(--mono);font-size:24px;display:flex;align-items:center;gap:14px;opacity:.92;}
+  .swipe .arrow{width:56px;height:1.5px;background:currentColor;position:relative;}
+  .swipe .arrow::after{content:"";position:absolute;left:0;top:-5px;width:12px;height:12px;
+    border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);}
+
+  /* type bits */
+  .chip-A{display:inline-block;background:var(--accent);color:#fff;font-family:var(--mono);
+    font-size:26px;font-weight:600;padding:11px 22px 9px;}
+  .chip-B{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--accent);display:flex;align-items:center;gap:18px;}
+  .chip-B::before{content:"";display:block;width:64px;height:2px;background:var(--accent);}
+  .hl{background:var(--clay);color:#fff;padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+  .acc{color:var(--accent);}
+
+  /* ===== tpl-feature (full-bleed photo) ===== */
+  .tpl-feature .feat-img{position:absolute;inset:0;}
+  .tpl-feature .feat-img .img-ph{position:absolute;inset:0;}
+  .tpl-feature .feat-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  .tpl-feature .feat-scrim{position:absolute;inset:0;
+    background:linear-gradient(to top, rgba(8,38,27,0.94), rgba(8,38,27,0.18) 56%, rgba(8,38,27,0.58));}
+  .tpl-feature .body-wrap{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:230px;z-index:3;}
+  .tpl-feature .chip-A{margin-bottom:28px;}
+  .tpl-feature h1{font-weight:800;}
+  .tpl-feature .sub{font-weight:500;color:rgba(255,255,255,0.85);margin-top:24px;}
+
+  /* ===== tpl-big (statement, type only) ===== */
+  .tpl-big .body-wrap{position:absolute;left:var(--pad-edge);right:var(--pad-edge);top:230px;}
+  .tpl-big h1{font-weight:800;}
+  .tpl-big .footnote{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:230px;
+    font-family:var(--mono);font-size:30px;color:rgba(244,244,240,0.6);line-height:1.7;}
+
+  /* ===== tpl-proof (real run data) ===== */
+  .tpl-proof .body-wrap{position:absolute;left:var(--pad-edge);right:var(--pad-edge);top:130px;}
+  .tpl-proof .chip-A{margin-bottom:24px;}
+  .tpl-proof h1{font-weight:800;}
+  .proof-stage{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:165px;
+    display:flex;align-items:center;gap:46px;}
+  .proof-stage .phone{position:relative;width:384px;flex-shrink:0;min-height:540px;
+    border-radius:32px;overflow:hidden;border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 30px 70px rgba(0,0,0,.5);}
+  .proof-stage .phone .img-ph{position:absolute;inset:0;}
+  .proof-stage .phone img{position:relative;width:100%;display:block;}
+  .proof-stage .kpis{flex:1;display:flex;flex-direction:column;gap:30px;}
+  .proof-stage .kpi{display:flex;align-items:baseline;gap:18px;}
+  .proof-stage .k-val{font-size:96px;font-weight:800;color:var(--accent);line-height:.9;direction:ltr;}
+  .proof-stage .k-lab{font-family:var(--mono);font-size:27px;color:rgba(244,244,240,.62);}
+  .proof-stage .k-note{font-family:var(--mono);font-size:27px;color:rgba(244,244,240,.62);line-height:1.65;margin-top:6px;}
+
+  /* ===== tpl-cta ===== */
+  .tpl-cta .body-wrap{position:absolute;left:var(--pad-edge);right:var(--pad-edge);top:50%;transform:translateY(-54%);}
+  .tpl-cta .chip-B{margin-bottom:32px;}
+  .tpl-cta h1{font-weight:800;}
+  .tpl-cta .cta-prompt{font-family:var(--mono);font-size:30px;color:rgba(244,244,240,.7);margin-top:40px;}
+  .tpl-cta .actions{display:flex;gap:16px;margin-top:30px;flex-wrap:wrap;}
+  .cta-btn{display:inline-flex;align-items:center;gap:14px;padding:24px 34px;border-radius:999px;
+    font-family:var(--mono);font-size:30px;font-weight:600;}
+  .cta-btn.primary{background:var(--accent);color:#fff;}
+  .cta-btn.ghost{border:2px solid rgba(244,244,240,.3);color:var(--paper);}
+  .cta-btn svg{width:30px;height:30px;}
+  .tpl-cta .signoff{font-family:var(--mono);font-size:26px;color:rgba(244,244,240,.55);margin-top:44px;direction:rtl;}
+  .tpl-cta .signoff b{color:var(--accent);font-weight:700;direction:ltr;display:inline-block;}
+
+  /* ===== image placeholder (shows if a photo file is missing) ===== */
+  .img-ph{width:100%;height:100%;min-height:540px;background-color:rgba(255,255,255,0.05);
+    background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 16px);
+    display:grid;place-items:center;text-align:center;padding:24px;}
+  .img-ph span{font-family:var(--mono);font-size:22px;letter-spacing:0;color:rgba(255,255,255,0.5);line-height:1.6;direction:ltr;}
+
+  /* ===== Farsi rules (Vazirmatn, RTL, no letter-spacing — keeps cursive joining) ===== */
+  .post-canvas.fa, .post-canvas.fa *, .post-canvas.fa *::before, .post-canvas.fa *::after{
+    font-family:var(--mono)!important;letter-spacing:0!important;text-transform:none!important;}
+  .post-canvas.fa{direction:rtl;text-align:right;}
+  .post-canvas.fa h1, .post-canvas.fa .sub, .post-canvas.fa .footnote, .post-canvas.fa .k-note{line-height:1.32;}
+  .post-canvas.fa .swipe .arrow{transform:scaleX(-1);}
+
+  /* per-template size tuning (Vazirmatn runs larger than Latin — dial down) */
+  .fa.tpl-feature h1{font-size:100px;line-height:1.24!important;}
+  .fa.tpl-feature .sub{font-size:36px;line-height:1.5!important;}
+  .fa.tpl-big h1{font-size:104px;line-height:1.26!important;}
+  .fa.tpl-proof h1{font-size:72px;line-height:1.3!important;}
+  .fa.tpl-cta h1{font-size:96px;line-height:1.26!important;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>کاروسلِ ریکاوری — «نظمِ سبک رفتن»</h1>
+  <p>۹ اسلاید (۱۰۸۰×۱۳۵۰)، هم‌رنگ با <b>Carousel-Kit</b>. عکس‌ها رو با همین اسم‌ها بذار توی پوشه‌ی <code>recovery-run/</code> کنارِ همین فایل:
+  <code>1-couch.jpg</code> · <code>2-shoes.jpg</code> · <code>3-watch.jpg</code> · <code>4-dock.jpg</code> · <code>5-liverbuilding.jpg</code> · <code>6-log.png</code>.
+  بعد روی هر اسلاید دکمه‌ی <b>⬇ PNG</b> رو بزن (برای اکسپورت، فایل رو از طریقِ یه سرورِ محلی باز کن، وگرنه ازش اسکرین‌شات بگیر).</p>
+</div>
+
+<div class="deck">
+
+  <!-- 1 · COVER (couch) -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-feature fa" id="s1">
+    <div class="feat-img">
+      <div class="img-ph"><span>1-couch.jpg<br>man on couch</span></div>
+      <img src="recovery-run/1-couch.png" alt="" style="object-position:center 32%" onerror="this.remove()">
+    </div>
+    <div class="feat-scrim"></div>
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۱ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-A">یه اعتراف</div>
+      <h1>من مربی‌ام. امشب نزدیک بود <span class="hl">تمرین نکنم</span>.</h1>
+      <div class="sub">چی از رو مبل بلندم کرد — و چرا جلوی خودمو گرفتم؟</div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="swipe">بکش <span class="arrow"></span></div>
+    </div>
+  </div></div>
+
+  <!-- 2 · STATEMENT (the decision) -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-big fa" id="s2">
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۲ / ۰۹</div></div>
+    <div class="body-wrap">
+      <h1>سؤال این نبود که تمرین کنم یا نه. سؤال این بود: <span class="acc">با چه شدتی؟</span></h1>
+    </div>
+    <div class="footnote">— روزِ کاریِ طولانی. انگیزه صفر.</div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 3 · STATEMENT (the thesis) -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-big fa" id="s3">
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۳ / ۰۹</div></div>
+    <div class="body-wrap">
+      <h1>انتخاب کردم: <span class="acc">سبک</span>. عمداً.</h1>
+    </div>
+    <div class="footnote">— ریکاوری، نبودِ تمرین نیست؛ خودش یه تصمیمِ تمرینیه.</div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 4 · FEATURE (shoes) — first rep -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-feature fa" id="s4">
+    <div class="feat-img">
+      <div class="img-ph"><span>2-shoes.jpg<br>tying laces</span></div>
+      <img src="recovery-run/2-shoes.png" alt="" style="object-position:center 45%" onerror="this.remove()">
+    </div>
+    <div class="feat-scrim"></div>
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۴ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-A">مشکلِ اول: مبل</div>
+      <h1>فقط کفشتو بپوش. بقیه‌ش <span class="hl">راحته</span>.</h1>
+      <div class="sub">سخت‌ترین حرکت، همیشه اولیه.</div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 5 · FEATURE (watch) — the rule -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-feature fa" id="s5">
+    <div class="feat-img">
+      <div class="img-ph"><span>3-watch.jpg<br>checking watch</span></div>
+      <img src="recovery-run/3-watch.png" alt="" style="object-position:center 40%" onerror="this.remove()">
+    </div>
+    <div class="feat-scrim"></div>
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۵ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-A">قانونی که اگو نتونه باهاش چونه بزنه</div>
+      <h1>ضربانِ قلب، <span class="hl">زیرِ ۱۴۰</span>.</h1>
+      <div class="sub">روی مچ، جلوی چشم. همین.</div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 6 · FEATURE (dock) — what recovery feels like -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-feature fa" id="s6">
+    <div class="feat-img">
+      <div class="img-ph"><span>4-dock.jpg<br>Albert Dock night</span></div>
+      <img src="recovery-run/4-dock.png" alt="" style="object-position:center 50%" onerror="this.remove()">
+    </div>
+    <div class="feat-scrim"></div>
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۶ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-A">جلسه‌ی ریکاوری</div>
+      <h1>حسش زیادی راحت بود. <span class="hl">دقیقاً</span> باید همین باشه.</h1>
+      <div class="sub">دو، قدم، دو — تا عدد می‌رفت بالا، آروم می‌کردم.</div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 7 · FEATURE (Liver Building) — the system -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-feature fa" id="s7">
+    <div class="feat-img">
+      <div class="img-ph"><span>5-liverbuilding.jpg<br>Liver Building night</span></div>
+      <img src="recovery-run/5-liverbuilding.png" alt="" style="object-position:center 35%" onerror="this.remove()">
+    </div>
+    <div class="feat-scrim"></div>
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۷ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-A">چرا نه بیشتر؟</div>
+      <h1>می‌تونستم بیشتر فشار بیارم. ولی فردا، <span class="hl">باشگاهه</span>.</h1>
+      <div class="sub">تمرین یه جلسه نیست، یه سیستمه. کارِ امشب، محافظت از فردا بود.</div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 8 · PROOF (real run log) -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-proof fa" id="s8">
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۸ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-A">ثبت شد</div>
+      <h1>هر چی رو اندازه بگیری، <span class="acc">می‌تونی مدیریتش کنی</span>.</h1>
+    </div>
+    <div class="proof-stage">
+      <div class="phone">
+        <div class="img-ph"><span>6-log.png<br>run screenshot</span></div>
+        <img src="recovery-run/6-log.jpg" alt="" onerror="this.remove()">
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k-val">۳٫۳۰</div><div class="k-lab">کیلومتر</div></div>
+        <div class="kpi"><div class="k-val">۹۵</div><div class="k-lab">میانگینِ ضربان</div></div>
+        <div class="kpi"><div class="k-val">۱۰:۵۲</div><div class="k-lab">تمپو · دقیقه/کیلومتر</div></div>
+        <div class="k-note">۹۵ ضربان برای یه «دویدن» خیلی پایینه. هدف هم دقیقاً همین بود.</div>
+      </div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span><span></span></div>
+    </div>
+  </div></div>
+
+  <!-- 9 · CTA (close) -->
+  <div class="shot"><button class="dl">⬇ PNG</button>
+  <div class="post-canvas tpl-cta fa" id="s9">
+    <div class="post-header"><div class="who"><span class="dot"></span>AMIRARDEKANI.COM</div><div class="num">۰۹ / ۰۹</div></div>
+    <div class="body-wrap">
+      <div class="chip-B">جمع‌بندی</div>
+      <h1>نظم، همیشه <span class="acc">سخت رفتن</span> نیست. گاهی، نظمه که <span class="hl">سبک</span> بری.</h1>
+      <div class="cta-prompt">تو آخرین‌بار کِی عمداً سبک رفتی؟ بنویس 👇</div>
+      <div class="actions">
+        <div class="cta-btn primary"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h14v17l-7-4-7 4z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>ذخیره‌ش کن</div>
+        <div class="cta-btn ghost">فالو کن</div>
+      </div>
+      <div class="signoff"><b>@amirardekanian</b> · با نیّت تمرین کن، با نیّت ریکاوری کن.</div>
+    </div>
+    <div class="post-footer">
+      <div class="progress-bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="on"></span></div>
+    </div>
+  </div></div>
+
+</div>
+
+<script>
+  function initExport(){
+    document.querySelectorAll('.dl').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        var slide = btn.parentElement.querySelector('.post-canvas');
+        var label = btn.textContent; btn.textContent = '…';
+        try{
+          var canvas = await html2canvas(slide,{scale:1,useCORS:true,backgroundColor:null,logging:false});
+          var a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download=slide.id+'.png'; a.click();
+        }catch(e){ alert('اکسپورت نشد — احتمالاً عکس‌ها local هستن. فایل رو از طریقِ سرورِ محلی باز کن یا از خودِ اسلاید اسکرین‌شات بگیر.'); }
+        btn.textContent = label;
+      });
+    });
+  }
+  if (window.html2canvas) document.fonts.ready.then(initExport);
+</script>
+</body>
+</html>
