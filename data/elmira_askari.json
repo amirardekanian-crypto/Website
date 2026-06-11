@@ -446,7 +446,7 @@
                     }
                   },
                   {
-                    "name": "Thoracic Rotation",
+                    "name": "Quadruped Throacic Rotation",
                     "detail": "×8/side",
                     "cues": {
                       "good": ["Rotate from the mid-back, reach to the ceiling"],
