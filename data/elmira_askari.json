@@ -501,7 +501,7 @@
               },
               {
                 "type": "standard",
-                "name": "Reverse Pec Deck",
+                "name": "Machine Reverse Fly",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -539,7 +539,7 @@
               },
               {
                 "type": "standard",
-                "name": "Dumbbell Biceps Curl",
+                "name": "Dumbbell Bicep Curl",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -619,7 +619,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Pallof Press",
+                "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
@@ -644,11 +644,10 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Bulgarian Split Squat",
+                "name": "Dumbbell Bulgarian Split Squat",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "forward lean", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×8–10/leg" },
                   { "label": "Tempo 3-0-1-0" },
