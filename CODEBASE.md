@@ -51,6 +51,15 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Depends on:** Supabase (the `supabase-js` library loaded from a CDN, plus the tables in the `supabase/` folder), Google sign-in, `favicon.ico`. It does **not** use the shared CSS/JS partials — it's self-contained.
 - **Edit this when:** You want to change what the dashboard shows, add a chart, or change the messaging flow.
 - **Don't touch:** The Supabase URL/key and the sign-in email check unless you know what they do. This page is `noindex` on purpose — keep it that way.
+- **See also:** `COACH_DASHBOARD.md` — the full user manual for this page.
+
+#### `call-log.html` — Weekly check-in log (private)
+- **What it does:** Your tool for running and recording the **weekly athlete check-in call** — a structured 8-section script with /10 scores, wins, goals and flags. Same Google sign-in as the dashboard. Also builds **copy-and-paste AI prompts** (run in any free AI chat) for a weekly summary and an end-of-cycle report, and per-question **Farsi** prompts for running the check-in over WhatsApp.
+- **If deleted:** You lose the check-in tool. Athletes and the dashboard are unaffected; saved logs stay in the database.
+- **Depends on:** Supabase (`supabase-js` from a CDN, the `call_logs` / `cycle_reports` tables, plus `athlete_keys` / `athlete_progress` / `session_history` as inputs), Google sign-in. Self-contained — no shared partials.
+- **Edit this when:** You want to change the check-in questions, the score fields, or the wording of the AI prompts (the `WEEKLY_PROMPT` / `CYCLE_PROMPT` constants in the page).
+- **Don't touch:** The Supabase URL/key and the coach-email check. `noindex` on purpose.
+- **See also:** `CALL_LOG.md` — the full user manual for this page.
 
 #### `privacy.html` — Privacy Notice
 - **What it does:** Your GDPR-compliant privacy statement covering the form, analytics, and embedded YouTube.

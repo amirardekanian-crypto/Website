@@ -29,6 +29,7 @@ Static site on GitHub Pages → **amirardekani.com**, backed by Supabase.
 - **`form.html` — Apply:** a 7-section intake questionnaire (progress bar + success screen); submissions email Amir via Web3Forms.
 - **`privacy.html` / `terms.html`:** legal.
 - **`coach.html` — Coach dashboard (private):** Amir's admin view (see below).
+- **`call-log.html` — Weekly check-in log (private):** Amir's tool for logging the weekly athlete check-in calls, with AI-assisted weekly summaries and end-of-cycle reports (see below).
 
 ---
 
@@ -74,9 +75,19 @@ This is the proof behind "the coach actually watches you" — the payoff beat in
 
 ---
 
+## Weekly check-ins & cycle reviews (the coaching loop)
+
+The coaching doesn't stop at the app data. Every week Amir runs a **structured check-in** with each athlete — wellbeing, sleep, energy, soreness, training response, wins, niggles, and what they want next — logged in a private tool (**`call-log.html`**, Google-gated like the dashboard). Each weekly check-in is one of ~4–5 that make up a cycle, and it can run over a call **or WhatsApp** (the tool generates the questions in Farsi, ready to send).
+
+At cycle-end, all of that cycle's weekly check-ins are read **together with the athlete's workout logs** to produce a cycle review: the trends that decide what the next cycle should do, plus the standout wins worth turning into content. (AI does the heavy lifting from Amir's own coaching framework; he reviews and decides.) It's available both in the check-in tool and from each athlete's card on the dashboard.
+
+This is the human half of *"the coach actually watches you"* — the live app data **plus** a real weekly touchpoint and a data-driven decision at every cycle.
+
+---
+
 ## Backend & plumbing (no server to run)
 
-- **Supabase** (hosted Postgres): backs up each athlete's progress to the cloud, powers the dashboard + two-way messaging, and enforces **per-athlete secret keys**.
+- **Supabase** (hosted Postgres): backs up each athlete's progress to the cloud, powers the dashboard + two-way messaging, stores the weekly **call logs** and **cycle reports**, and enforces **per-athlete secret keys**.
 - **Notion sync** (`sync_notion.py`): the exercise → demo-video library is generated from a Notion database, not hand-edited.
 
 ---
@@ -86,6 +97,7 @@ This is the proof behind "the coach actually watches you" — the payoff beat in
 - **The depth behind a programme** — cycles have a reason; show the structure/science. *(Justifies the price.)*
 - **"A coach in your pocket"** — the app IS the product → the cinematic phone reel.
 - **The coach actually watches** — readiness + ACWR + the live dashboard: *"before you get injured, I message you."*
+- **The weekly check-in** — it's a relationship, not a file drop: every week the coach reviews your data *and talks to you*, then the cycle's trends shape what comes next.
 - **Video + cues for every move** — this is not a PDF.
 - **Auto-regulation** — the readiness check adapts the session to how you walk in.
 - **Proof & retention** — athlete "results" cards, the 6-month journey.
