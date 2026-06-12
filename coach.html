@@ -1269,12 +1269,13 @@ window.markNoteRead = markNoteRead;
 async function loadAthlete(athleteId) {
   $('content').innerHTML = '<div class="loading">Loading…</div>';
   renderTabbar('athletes');
-  const [progRes, histRes, keyRes, msgRes] = await Promise.all([
+  const [progRes, histRes, keyRes, msgRes, callRes] = await Promise.all([
     sb.from('athlete_progress').select('*').eq('athlete_id', athleteId).maybeSingle(),
     sb.from('session_history').select('*').eq('athlete_id', athleteId)
       .order('completed_on', { ascending: false }).order('day', { ascending: true }),
     sb.from('athlete_keys').select('secret_key').eq('athlete_id', athleteId).maybeSingle(),
-    sb.from('messages').select('*').eq('athlete_id', athleteId).order('created_at', { ascending: true })
+    sb.from('messages').select('*').eq('athlete_id', athleteId).order('created_at', { ascending: true }),
+    sb.from('call_logs').select('*').eq('athlete_id', athleteId).order('call_date', { ascending: false })
   ]);
   if (progRes.error && histRes.error) {
     $('content').innerHTML = `<p class="muted">Error: ${esc((progRes.error || histRes.error).message)}</p>`; return;
@@ -1282,6 +1283,7 @@ async function loadAthlete(athleteId) {
   const prog       = progRes.data;            // may be null if they only have history
   const history    = histRes.data || [];
   const messages   = (msgRes && msgRes.data) || [];
+  const callLogs   = (callRes && callRes.data) || [];
   const key        = keyRes.data && keyRes.data.secret_key;
   let   name       = (prog && prog.athlete_name) || (history[0] && history[0].athlete_name) || athleteId;
   const lastActive = (prog && prog.updated_at) || (history[0] && history[0].updated_at) || null;
@@ -1409,6 +1411,30 @@ async function loadAthlete(athleteId) {
   }).join('') : `<p class="muted">No program file found for this athlete (looked for data/${esc(athleteId)}.json).</p>`;
   const programSection = `<div class="sec-title">Prescribed program — current cycle</div>${cycleHead}${progBody}`;
 
+  // ── Weekly check-in call logs (coach-authored in call-log.html) ──
+  const stars = n => n ? '★'.repeat(n) : '—';
+  const callLogsBody = callLogs.length ? callLogs.map(l => {
+    const s = l.scores || {};
+    const ans = l.answers || {};
+    const meta = [l.week, l.tier, l.duration].filter(Boolean).join(' · ');
+    const scoreBits = [['Well',s.well],['Sleep',s.sleep],['Energy',s.energy],['Sore',s.sore],['RPE',s.rpe],['Court',s.court]]
+      .filter(([,v]) => v != null).map(([k,v]) => `${k} <b>${esc(v)}</b>`).join(' · ');
+    const ansHtml = Object.values(ans).map(a => `<div class="note" style="margin-top:6px"><b>${esc(a.label)}:</b> ${esc(a.value)}</div>`).join('');
+    return `<details class="day-c"><summary><div class="day-c-main">
+        <h3>${esc(l.call_date)} <span class="when">${meta ? '· ' + esc(meta) : ''} · call ${esc(stars(l.rating))}</span></h3>
+      </div><span class="day-c-chev">▾</span></summary>
+      <div class="day-c-body">
+        <div class="readiness">${scoreBits ? `<span class="r">${scoreBits}</span>` : ''}${(l.sessions_done!=null||l.sessions_planned!=null)?`<span class="r">Sessions <b>${esc(l.sessions_done??'?')}/${esc(l.sessions_planned??'?')}</b></span>`:''}</div>
+        ${l.win_vault ? `<div class="note" style="border-left-color:var(--green);margin-top:6px"><b>🏆 Win vault:</b> ${esc(l.win_vault)}</div>` : ''}
+        ${ansHtml}
+        <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog('${esc(l.id)}','${esc(athleteId)}','${esc(l.call_date)}')">Delete</button></div>
+      </div></details>`;
+  }).join('') : '<p class="muted">No call logs yet.</p>';
+  const callLogsSection = `<div class="sec-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <span>Weekly check-in calls</span>
+      <a class="btn sm primary" href="call-log.html?athlete=${encodeURIComponent(athleteId)}" style="text-decoration:none">+ New call log</a>
+    </div>${callLogsBody}`;
+
   $('content').innerHTML = `<span class="back" onclick="loadOverview()">← All athletes</span>
     <div class="day-head" style="align-items:center;margin-bottom:8px">
       <div>
@@ -1419,6 +1445,7 @@ async function loadAthlete(athleteId) {
     </div>
     ${linkHtml}
     ${renderCharts(metrics)}
+    ${callLogsSection}
     ${programSection}
     <div class="sec-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
       <span>Training logs by day — last session of each day</span>
@@ -1453,6 +1480,13 @@ async function deleteAthlete(athleteId, name) {
   if (r1.error || r2.error) { alert('Could not delete: ' + ((r1.error || r2.error).message)); return; }
   loadOverview();
 }
+async function deleteCallLog(id, athleteId, callDate) {
+  if (!confirm(`Delete the call log from ${callDate}?\n\nThis permanently removes that weekly check-in. It cannot be undone.`)) return;
+  const { error } = await sb.from('call_logs').delete().eq('id', id);
+  if (error) { alert('Could not delete: ' + error.message); return; }
+  loadAthlete(athleteId);
+}
+window.deleteCallLog = deleteCallLog;
 window.deleteSession = deleteSession;
 window.deleteAthlete = deleteAthlete;
 window.loadAthlete = loadAthlete;
