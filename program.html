@@ -2802,6 +2802,38 @@ function setupCloudBackup(athleteId, data, key) {
   _pushSnapshot();                                       // back up what's already stored
   window.addEventListener('visibilitychange', () => { if (document.hidden) _pushSnapshot(); });
 }
+
+// ── Cloud-session retry queue ──────────────────────────────────────────
+// When save_session fails for any reason (wrong key, offline, Supabase
+// not loaded yet), we store the payload in localStorage and retry on
+// the next load — using the CURRENT key so a key-rotation or a fresh
+// secure-link open automatically heals past failures.
+function _enqueueSession(base) {
+  if (!ATHLETE_ID) return;
+  try {
+    const k = ATHLETE_ID + '_csq';
+    let q = JSON.parse(localStorage.getItem(k) || '[]');
+    q = q.filter(s => Number(s.p_day) !== Number(base.p_day));  // one entry per day
+    q.push(base);
+    localStorage.setItem(k, JSON.stringify(q.slice(-20)));       // cap at 20
+  } catch (e) {}
+}
+async function _replayQueue() {
+  if (window.IS_DEMO || !ATHLETE_ID || !_sbKey) return;
+  const k = ATHLETE_ID + '_csq';
+  let q; try { q = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return; }
+  if (!q.length) return;
+  const sb = _sb(); if (!sb) return;
+  const failed = [];
+  for (const base of q) {
+    try {
+      const { error } = await sb.rpc('save_session', { ...base, p_key: _sbKey });
+      if (error) failed.push(base);
+    } catch (e) { failed.push(base); }
+  }
+  localStorage.setItem(k, JSON.stringify(failed));
+}
+// ──────────────────────────────────────────────────────────────────────
 let STORAGE_KEY = '';
 let dayTotals = {};
 let isLoading = true;
@@ -2883,6 +2915,7 @@ function getVideoUrl(ex) {
   // Stage 1: start mirroring progress to the cloud (skips the public demo).
   // Stage 2: pass the per-athlete key so keyed athletes can write.
   if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA, effectiveKey);
+  if (!window.IS_DEMO) _replayQueue();   // replay any sessions that failed to save last time
   if (!window.IS_DEMO) fetchMessages();   // load coach messages → sets the Coach-tab dot
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
@@ -5117,31 +5150,32 @@ function buildSessionData(day) {
 // Saves a permanent session record to the cloud (coach dashboard). Called on
 // finish (full OR partial), on later RPE/note edits, and on send — all upsert
 // the same (athlete, day, today) row, so the dashboard always has the latest.
-// Fire-and-forget; never blocks or breaks the app.
-function recordSessionToCloud(day) {
+// On failure the payload is queued in localStorage and replayed on next load.
+async function recordSessionToCloud(day) {
   if (window.IS_DEMO || day == null) return;
+  const D = buildSessionData(day);
+  if (!D) return;
+  const base = {
+    p_athlete_id:   ATHLETE_ID,
+    p_athlete_name: `${DATA.athlete.firstName} ${DATA.athlete.lastName}`,
+    p_day:          Number(day),
+    p_completed_on: new Date().toISOString().slice(0, 10),
+    p_session: {
+      status:       D.statusLabel,
+      session_rpe:  String(D.sRpe || ''),
+      duration_min: D.hasDur ? String(D.durMin) : '',
+      readiness:    D.readiness || null,
+      day_note:     D.dayNote || '',
+      focus:        D.dayData.focusTag || '',
+      summary:      D.summary
+    }
+  };
+  const sb = _sb();
+  if (!sb) { _enqueueSession(base); return; }
   try {
-    const sb = _sb();
-    if (!sb) return;
-    const D = buildSessionData(day);
-    if (!D) return;
-    sb.rpc('save_session', {
-      p_athlete_id:   ATHLETE_ID,
-      p_athlete_name: `${DATA.athlete.firstName} ${DATA.athlete.lastName}`,
-      p_day:          Number(day),
-      p_completed_on: new Date().toISOString().slice(0, 10),
-      p_session: {
-        status:       D.statusLabel,
-        session_rpe:  String(D.sRpe || ''),
-        duration_min: D.hasDur ? String(D.durMin) : '',
-        readiness:    D.readiness || null,
-        day_note:     D.dayNote || '',
-        focus:        D.dayData.focusTag || '',
-        summary:      D.summary
-      },
-      p_key: _sbKey
-    });
-  } catch (e) { /* never let recording interfere with the app */ }
+    const { error } = await sb.rpc('save_session', { ...base, p_key: _sbKey });
+    if (error) _enqueueSession(base);
+  } catch (e) { _enqueueSession(base); }
 }
 
 // Bundles all data for a given day and submits it to Web3Forms (same service
