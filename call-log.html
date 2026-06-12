@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<!--
+  WEEKLY CHECK-IN / CALL LOG (Stage 5/6)
+  Private coach tool for logging weekly athlete check-in calls.
+  Access: Google sign-in, locked to the coach email (client check here +
+  Row Level Security in the database is the real gate — same model as coach.html).
+  Data: public.call_logs (one row per athlete per call). The athlete dropdown is
+  built from public.athlete_keys + public.athlete_progress (no extra tables).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call Log — AA Performance</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* Roland-Garros palette, mirrored from coach.html so the two coach tools match */
+  :root{
+    --bg:#FAF7F2;--card:#FFFFFF;--card-soft:#EDE8E0;--ink:#1A1A1A;--grey:#5C5C5C;
+    --line:#D8D1C5;--line-soft:#E7E2D9;--on-accent:#FFFFFF;
+    --accent:#0E4A36;--accent-dim:rgba(14,74,54,.08);--accent-mid:rgba(14,74,54,.16);
+    --green:#0E4A36;--green-soft:#E6F0EA;
+    --red:#C7552F;--red-soft:#F6E7E0;
+    --amber:#A8741C;--amber-soft:#F2E9D8;
+    --radius:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;font-size:15px;}
+  h1,h2,h3{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.5px;}
+  .mono{font-family:'Space Mono',monospace;}
+  .wrap{max-width:880px;margin:0 auto;padding:22px 22px 90px;}
+
+  /* Sticky brand nav (mirrors coach.html .cnav) */
+  .cnav{position:sticky;top:0;z-index:50;background:var(--accent);padding:13px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .cnav::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);}
+  .cnav-title{color:#fff;font-size:18px;font-weight:900;letter-spacing:1px;}
+  .cnav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .cnav-who{color:rgba(255,255,255,.8);font-size:12px;}
+
+  .brand{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);}
+  .doc-title{font-size:30px;font-weight:900;text-transform:uppercase;letter-spacing:.02em;line-height:1.05;color:var(--ink);margin-top:2px;}
+
+  /* Buttons */
+  .btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid var(--line);background:var(--card);color:var(--grey);}
+  .btn.sm{font-size:12px;padding:6px 12px;}
+  .btn.lg{font-size:14px;padding:12px 22px;}
+  .btn:hover{border-color:var(--accent);color:var(--accent);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{opacity:.9;color:#fff;}
+  .btn.ghost-light{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff;}
+  .btn.ghost-light:hover{background:rgba(255,255,255,.22);color:#fff;}
+  .btn.danger{border-color:var(--red);color:var(--red);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  /* Inputs */
+  .field-label{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--grey);margin-bottom:4px;display:block;}
+  .inp,select.inp{background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:'Barlow',sans-serif;font-size:14px;padding:8px 10px;outline:none;width:100%;transition:border-color .15s;}
+  .inp:focus,select.inp:focus{border-color:var(--accent);}
+  select.inp{cursor:pointer;}
+
+  /* Header / athlete bar */
+  .header{margin-bottom:16px;padding:20px 0 18px;border-bottom:1px solid var(--line-soft);}
+  .picker{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(40,30,20,.04);}
+  .picker-grid{display:grid;grid-template-columns:1.7fr .6fr .6fr .9fr .8fr;gap:12px;}
+  @media(max-width:680px){.picker-grid{grid-template-columns:1fr 1fr;}}
+  .prog-badge{display:inline-flex;align-items:center;gap:8px;margin-top:12px;background:var(--green-soft);border:1px solid var(--accent-mid);border-radius:100px;padding:5px 13px;font-size:12px;font-weight:600;color:var(--accent);}
+  .prog-badge .pb-num{background:var(--accent);color:#fff;border-radius:100px;padding:1px 9px;font-weight:700;font-family:'Barlow Condensed',sans-serif;}
+  .prog-badge .pb-file{font-family:'Space Mono',monospace;font-size:11px;color:var(--grey);}
+  .prog-badge.hidden{display:none;}
+
+  .tier-select{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .tier-btn{background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--grey);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;padding:6px 14px;text-transform:uppercase;transition:all .15s;}
+  .tier-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .tier-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  /* Inline previous logs */
+  .inline-logs{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+  .il-label{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--grey);margin-bottom:8px;}
+  .il-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .log-chip{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer;transition:all .15s;font-size:13px;display:flex;align-items:center;gap:8px;}
+  .log-chip:hover{border-color:var(--accent);background:var(--accent-dim);}
+  .log-chip .lc-date{font-weight:600;}
+  .log-chip .lc-stars{color:var(--amber);font-size:11px;}
+  .log-chip.new{border-style:dashed;color:var(--accent);font-weight:600;}
+  .log-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .log-chip.active .lc-stars{color:#FFE08A;}
+
+  /* Sections */
+  .section{margin-bottom:12px;background:var(--card);border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden;box-shadow:0 2px 10px rgba(40,30,20,.04);}
+  .section.win-section{border-left:3px solid var(--accent);}
+  .section.goal-section{border-left:3px solid var(--amber);}
+  .section-header{display:flex;align-items:center;gap:10px;padding:13px 16px;background:var(--card-soft);border-bottom:1px solid var(--line-soft);cursor:pointer;user-select:none;}
+  .section-header:hover{background:#E6E0D6;}
+  .section-num{font-size:13px;font-weight:900;letter-spacing:.1em;color:var(--accent);min-width:24px;font-family:'Barlow Condensed',sans-serif;}
+  .section-title{font-size:16px;font-weight:700;letter-spacing:.04em;flex:1;}
+  .section-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:var(--green-soft);color:var(--accent);}
+  .section-tag.goal{background:var(--amber-soft);color:var(--amber);}
+  .chevron{font-size:11px;color:var(--grey);transition:transform .2s;}
+  .chevron.open{transform:rotate(180deg);}
+  .section-body{padding:16px;display:none;}
+  .section-body.open{display:block;}
+
+  /* Question blocks */
+  .q-block{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--line-soft);}
+  .q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .q-top{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;}
+  .q-label{font-size:14px;font-weight:600;color:var(--ink);line-height:1.4;flex:1;}
+  .q-flags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
+  .flag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;padding:2px 7px;}
+  .flag.win{color:var(--accent);background:var(--green-soft);}
+  .flag.content{color:var(--red);background:var(--red-soft);}
+
+  /* Question action buttons (tip + farsi) */
+  .q-act{flex-shrink:0;display:flex;gap:4px;}
+  .icon-btn{background:var(--card);border:1px solid var(--line);border-radius:50%;color:var(--grey);cursor:pointer;font-family:inherit;font-size:10px;font-weight:700;width:22px;height:22px;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0;line-height:1;}
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .icon-btn.fa{font-size:11px;width:auto;border-radius:11px;padding:0 9px;font-weight:700;}
+  .icon-btn.fa:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  /* Tooltip */
+  .tip-wrap{position:relative;}
+  .tip-popup{display:none;position:absolute;right:0;top:26px;width:280px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:13px;z-index:200;box-shadow:var(--shadow-md,0 8px 32px rgba(40,30,20,.18));}
+  .tip-popup.open{display:block;}
+  .tip-head{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+  .tip-why{font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:8px;}
+  .tip-ex-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted,#8A8A8A);margin-bottom:4px;}
+  .tip-ex{font-size:11px;color:var(--grey);background:var(--bg);border-left:2px solid var(--accent);border-radius:4px;padding:5px 8px;margin-bottom:4px;line-height:1.4;font-style:italic;}
+
+  /* Textareas */
+  .aa{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:'Barlow',sans-serif;font-size:14px;padding:9px 11px;resize:vertical;width:100%;min-height:50px;outline:none;transition:border-color .15s;line-height:1.5;}
+  .aa:focus{border-color:var(--accent);background:var(--card);}
+  .aa.goal-f:focus{border-color:var(--amber);}
+
+  /* Scores */
+  .score-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;}
+  .score-btn{background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--grey);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;min-width:36px;padding:6px 0;text-align:center;transition:all .12s;}
+  .score-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .score-btn.al{background:var(--red);border-color:var(--red);color:#fff;}
+  .score-btn.am{background:var(--amber);border-color:var(--amber);color:#fff;}
+  .score-btn.ah{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .score-hint{font-size:11px;color:var(--grey);font-style:italic;}
+
+  /* Win vault */
+  .win-vault{background:var(--green-soft);border:1px solid var(--accent-mid);border-radius:6px;padding:13px;margin-top:8px;}
+  .win-vault-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+
+  /* Goals */
+  .div-label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);display:flex;align-items:center;gap:10px;margin:14px 0 8px;}
+  .div-label::after{content:'';flex:1;height:1px;background:var(--line);}
+  .goal-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+  .gp{background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--grey);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;padding:6px 9px;text-transform:uppercase;transition:all .12s;white-space:nowrap;min-width:36px;text-align:center;}
+  .gp.p1.active,.gp.p1:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .gp.p2.active,.gp.p2:hover{background:var(--amber);border-color:var(--amber);color:#fff;}
+  .gp.p3.active,.gp.p3:hover{background:var(--grey);border-color:var(--grey);color:#fff;}
+  .add-goal{background:transparent;border:1px dashed var(--line);border-radius:6px;color:var(--grey);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;padding:9px 14px;text-transform:uppercase;transition:all .15s;width:100%;margin-top:4px;}
+  .add-goal:hover{border-color:var(--amber);color:var(--amber);}
+
+  /* Stars */
+  .star-row{display:flex;gap:8px;}
+  .star-btn{background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--line);cursor:pointer;font-size:18px;padding:7px 12px;transition:all .12s;}
+  .star-btn:hover,.star-btn.lit{color:var(--amber);border-color:var(--amber);background:var(--amber-soft);}
+
+  /* Actions */
+  .action-row{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,20,14,.55);z-index:300;align-items:center;justify-content:center;padding:16px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:600px;width:100%;max-height:84vh;overflow-y:auto;box-shadow:0 20px 60px rgba(40,30,20,.3);}
+  .modal-title{font-size:20px;font-weight:900;text-transform:uppercase;letter-spacing:.03em;color:var(--ink);margin-bottom:3px;}
+  .modal-sub{font-size:12px;color:var(--grey);margin-bottom:14px;}
+  .modal-close{float:right;}
+  .mf{margin-bottom:10px;}
+  .ml{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-bottom:4px;}
+  .mv{font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line-soft);border-radius:6px;padding:8px 11px;line-height:1.5;white-space:pre-wrap;}
+  .mw{font-size:14px;color:var(--accent);background:var(--green-soft);border:1px solid var(--accent-mid);border-radius:6px;padding:10px;white-space:pre-wrap;line-height:1.6;}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;padding:12px 20px;border-radius:8px;text-transform:uppercase;opacity:0;transform:translateY(12px);transition:all .2s;pointer-events:none;z-index:400;box-shadow:var(--shadow-md,0 8px 32px rgba(40,30,20,.18));}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.err{background:var(--red);}
+
+  /* Gate */
+  #gate{max-width:420px;margin:12vh auto 0;text-align:center;background:var(--card);border:1px solid var(--line-soft);border-radius:12px;padding:36px 28px;box-shadow:var(--shadow-md,0 8px 32px rgba(40,30,20,.12));}
+  #gate .doc-title{margin:8px 0 6px;}
+  .gate-sub{font-size:14px;color:var(--grey);line-height:1.5;margin-bottom:20px;}
+  .gate-err{font-size:12px;color:var(--red);min-height:16px;margin-top:12px;}
+  #app{display:none;}
+  .muted{color:var(--grey);}
+</style>
+</head>
+<body>
+
+<!-- SIGN-IN GATE -->
+<div id="gate">
+  <div class="brand">AA Performance · Coach Only</div>
+  <div class="doc-title">Call Log</div>
+  <div class="gate-sub">Sign in with your coach Google account to log and read athlete check-in calls.</div>
+  <button class="btn primary lg" id="loginBtn">Sign in with Google</button>
+  <div class="gate-err" id="gateErr"></div>
+</div>
+
+<div id="app">
+  <div class="cnav">
+    <div class="cnav-title">Athlete Call Log</div>
+    <div class="cnav-right">
+      <span class="cnav-who" id="who"></span>
+      <a class="btn sm ghost-light" href="coach.html" style="text-decoration:none">Dashboard</a>
+      <button class="btn sm ghost-light" id="logoutBtn">Sign out</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="header">
+      <div class="brand">AA Performance · Weekly Check-In</div>
+      <div class="doc-title">Athlete Call Log</div>
+    </div>
+
+    <!-- ATHLETE + PROGRAM + CYCLE PICKER -->
+    <div class="picker">
+      <div class="picker-grid">
+        <div>
+          <label class="field-label" for="athleteSelect">Athlete · Program</label>
+          <select class="inp" id="athleteSelect" onchange="onAthlete()"><option value="">Loading…</option></select>
+        </div>
+        <div>
+          <label class="field-label" for="weekSelect">Week</label>
+          <select class="inp" id="weekSelect"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+        </div>
+        <div>
+          <label class="field-label" for="cycleNumSelect">Cycle</label>
+          <select class="inp" id="cycleNumSelect"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+        </div>
+        <div>
+          <label class="field-label" for="callDate">Date</label>
+          <input class="inp" id="callDate" type="date">
+        </div>
+        <div>
+          <label class="field-label" for="callDuration">Duration</label>
+          <input class="inp" id="callDuration" type="text" placeholder="15 min">
+        </div>
+      </div>
+
+      <div class="prog-badge hidden" id="progBadge"></div>
+
+      <div class="tier-select">
+        <button class="tier-btn" onclick="setTier(this)">Foundation</button>
+        <button class="tier-btn" onclick="setTier(this)">Performance</button>
+        <button class="tier-btn" onclick="setTier(this)">Elite</button>
+      </div>
+
+      <div class="inline-logs" id="inlineLogs" style="display:none">
+        <div class="il-label">Previous logs — click to open, or start a new one</div>
+        <div class="il-row" id="ilRow"></div>
+      </div>
+    </div>
+
+<!-- 01 WELLBEING -->
+<div class="section" id="s1">
+  <div class="section-header" onclick="tog('s1')"><span class="section-num">01</span><span class="section-title">Open & Wellbeing</span><span class="section-tag">~5 min</span><span class="chevron open" id="c-s1">▼</span></div>
+  <div class="section-body open" id="b-s1">
+
+    <div class="q-block" data-fa="این هفته به‌طور کلی چه حسی داشتی؟ از ۱۰ چند می‌دی؟ 🙂">
+      <div class="q-top"><div class="q-label">Overall feeling this week (/10)</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t1')">?</button>
+          <div class="tip-popup" id="t1"><div class="tip-head">Why ask this</div><div class="tip-why">Sets the emotional tone for everything. A 4/10 changes how you read missed sessions — it's context, not failure. Never rush past this question.</div><div class="tip-ex-label">Sample answers</div><div class="tip-ex">"7/10 — work's been hectic but training felt like a release."</div><div class="tip-ex">"4/10 — tired from travel, didn't sleep well Mon–Wed."</div></div>
+        </div></div>
+      </div>
+      <div class="score-row" id="sc-well"></div>
+      <div class="score-hint">1–3 = Struggling · 4–6 = Moderate · 7–10 = Good</div>
+      <textarea class="aa" data-akey="well_ctx" data-label="Overall feeling — context" placeholder="Brief context — what's driving the score?" style="margin-top:8px;"></textarea>
+    </div>
+
+    <div class="q-block" data-fa="کیفیت خوابت این هفته چطور بود؟ از ۱۰ چند؟ 😴">
+      <div class="q-top"><div class="q-label">Sleep quality this week (/10)</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t2')">?</button>
+          <div class="tip-popup" id="t2"><div class="tip-head">Why ask this</div><div class="tip-why">One bad night is noise. Three in a row is a signal. If consistently below 5, pull intensity back — you can't force adaptation in a sleep-depleted athlete.</div></div>
+        </div></div>
+      </div>
+      <div class="score-row" id="sc-sleep"></div>
+    </div>
+
+    <div class="q-block" data-fa="سطح انرژی‌ات در طول هفته چطور بود؟ از ۱۰ چند؟ ⚡">
+      <div class="q-top"><div class="q-label">Energy levels across the week (/10)</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t3')">?</button>
+          <div class="tip-popup" id="t3"><div class="tip-head">Why ask this</div><div class="tip-why">Distinct from sleep. Someone can sleep 9hrs and feel flat — nutrition, stress, and accumulated fatigue show up here.</div></div>
+        </div></div>
+      </div>
+      <div class="score-row" id="sc-energy"></div>
+    </div>
+
+    <div class="q-block" data-fa="این هفته استرس، بیماری یا اتفاق خاصی توی زندگی‌ات بود که روی تمرین اثر گذاشته باشه؟ (کار، سفر، شخصی)">
+      <div class="q-top"><div class="q-label">Any stress, illness, or life context I should know about?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t4')">?</button>
+          <div class="tip-popup" id="t4"><div class="tip-head">Why ask this</div><div class="tip-why">Life load IS training load. A missed session during deadline week is a scheduling win, not a failure.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="life_context" data-label="Stress / illness / life context" placeholder="Travel / work / personal — anything that affected training..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="الان عضله‌هات چقدر درد یا خستگی دارن؟ از ۱۰ چند؟ بیشتر کدوم قسمت؟">
+      <div class="q-top"><div class="q-label">Muscle soreness or fatigue right now (/10)</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t5')">?</button>
+          <div class="tip-popup" id="t5"><div class="tip-head">Why ask this</div><div class="tip-why">Persistent 7+ soreness two days post-session = accumulated fatigue. Your primary cue to progress / maintain / reduce load.</div></div>
+        </div></div>
+      </div>
+      <div class="score-row" id="sc-sore"></div>
+      <textarea class="aa" data-akey="sore_areas" data-label="Soreness — areas" placeholder="Which areas? Lower body / upper / general..." style="margin-top:8px;"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 02 TRAINING REVIEW -->
+<div class="section" id="s2">
+  <div class="section-header" onclick="tog('s2')"><span class="section-num">02</span><span class="section-title">Last Week's Training</span><span class="section-tag">~5 min</span><span class="chevron open" id="c-s2">▼</span></div>
+  <div class="section-body open" id="b-s2">
+
+    <div class="q-block" data-fa="این هفته از برنامه‌ت چند تا جلسه رو انجام دادی؟ (از چند تا برنامه‌ریزی‌شده)">
+      <div class="q-top"><div class="q-label">Sessions completed vs. planned</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t6')">?</button>
+          <div class="tip-popup" id="t6"><div class="tip-head">Coach tip</div><div class="tip-why">Arrive knowing this from the app. Use the call to understand WHY — not to discover WHAT.</div></div>
+        </div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+        <input class="inp" id="sDone" placeholder="Done" style="width:70px;">
+        <span class="muted" style="font-weight:700;">/</span>
+        <input class="inp" id="sPlan" placeholder="Planned" style="width:70px;">
+      </div>
+    </div>
+
+    <div class="q-block" data-fa="کدوم جلسه‌ی این هفته بهترین حس رو بهت داد و چرا؟ 💪">
+      <div class="q-top"><div class="q-label">Which session felt best — and why?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t7')">?</button>
+          <div class="tip-popup" id="t7"><div class="tip-head">Win-surfacing</div><div class="tip-why">Probe past "it felt good." What specifically? These moments become content and build confidence.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 Win capture</span></div>
+      <textarea class="aa" data-akey="best_session" data-label="Best session — why" data-win="1" placeholder="Session name + what felt different from usual..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="کدوم جلسه برات سخت‌ترین یا بدترین بود و چرا؟">
+      <div class="q-top"><div class="q-label">Which session felt hardest or worst — and why?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t8')">?</button>
+          <div class="tip-popup" id="t8"><div class="tip-head">Pattern-spot, not blame</div><div class="tip-why">Same day of week? After a match? That's a programming insight — adjust scheduling, don't criticise.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="worst_session" data-label="Hardest session — why" placeholder="Session + possible reasons (load, timing, life context)..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="جلسات این هفته به‌اندازه‌ی مناسب سخت بودن؟ به‌طور میانگین از ۱۰ چند؟ چیزی خیلی سبک یا خیلی سنگین بود؟">
+      <div class="q-top"><div class="q-label">RPE trend — did sessions feel appropriately hard? (/10)</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t9')">?</button>
+          <div class="tip-popup" id="t9"><div class="tip-head">Cross-check app data</div><div class="tip-why">Consistently too easy = progress load. Everything 9-10 = check recovery before adding more.</div></div>
+        </div></div>
+      </div>
+      <div class="score-row" id="sc-rpe"></div>
+      <textarea class="aa" data-akey="rpe_ctx" data-label="RPE trend — context" placeholder="Anything that felt way too easy or too hard?..." style="margin-top:8px;"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 03 WINS -->
+<div class="section win-section" id="s3">
+  <div class="section-header" onclick="tog('s3')"><span class="section-num">03</span><span class="section-title">Wins & Progress Moments</span><span class="section-tag">🏆 Capture</span><span class="chevron open" id="c-s3">▼</span></div>
+  <div class="section-body open" id="b-s3">
+
+    <div class="q-block" data-fa="این هفته یه کاری که بهش افتخار می‌کنی چی بود؟ 🌟">
+      <div class="q-top"><div class="q-label">What's one thing you did this week you're proud of?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t10')">?</button>
+          <div class="tip-popup" id="t10"><div class="tip-head">Don't narrow it</div><div class="tip-why">Training, mindset, recovery, consistency — anything. Pride can be showing up on a hard day more than any PB.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 Win capture</span><span class="flag content">📸 Content potential</span></div>
+      <textarea class="aa" data-akey="proud" data-label="Proud of this week" data-win="1" placeholder="Their exact words — quote them if it's powerful..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="چیزی هست که الان نسبت به یه ماه پیش برات راحت‌تر شده باشه؟">
+      <div class="q-top"><div class="q-label">Did anything feel easier than it did a month ago?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t11')">?</button>
+          <div class="tip-popup" id="t11"><div class="tip-head">Progress hides here</div><div class="tip-why">Athletes don't notice gradual adaptation — you surface it. "Same weight that destroyed you 6 weeks ago."</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 Win capture</span></div>
+      <textarea class="aa" data-akey="easier" data-label="Easier than a month ago" data-win="1" placeholder="Specific movement, drill, or feeling — before vs. now..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="این هفته رکورد، دستاورد یا «اولین»ای داشتی؟ 🏆">
+      <div class="q-top"><div class="q-label">Any PBs, milestones, or firsts this week?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t12')">?</button>
+          <div class="tip-popup" id="t12"><div class="tip-head">Numbers make it real</div><div class="tip-why">Weight PRs, fastest split, first unbroken set, first match win — centre your content on these.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 Win capture</span><span class="flag content">📸 Content potential</span></div>
+      <textarea class="aa" data-akey="pbs" data-label="PBs / milestones / firsts" data-win="1" placeholder="Numbers where possible — specificity makes better content..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="نسبت به وقتی که با هم شروع کردیم، الان چه حسی داری؟">
+      <div class="q-top"><div class="q-label">How do you feel vs. when we started? <span class="muted" style="font-size:10px;font-weight:400;">(ask every 3–4 weeks)</span></div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t13')">?</button>
+          <div class="tip-popup" id="t13"><div class="tip-head">Transformation language</div><div class="tip-why">Their own words about their own transformation are your most powerful testimonial material.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag content">📸 Content potential</span></div>
+      <textarea class="aa" data-akey="vs_start" data-label="Vs. when we started" placeholder="Their words — these become your best testimonials..."></textarea>
+    </div>
+
+    <div class="win-vault">
+      <div class="win-vault-label">📋 Win Vault — Best Quote This Call</div>
+      <textarea class="aa" id="winVault" placeholder="Paste the single best line from this call here..." style="background:rgba(255,255,255,.6);border-color:var(--accent-mid);min-height:56px;"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 04 PHYSICAL -->
+<div class="section" id="s4">
+  <div class="section-header" onclick="tog('s4')"><span class="section-num">04</span><span class="section-title">Physical Status & Injury</span><span class="section-tag">~2 min</span><span class="chevron" id="c-s4">▼</span></div>
+  <div class="section-body" id="b-s4">
+
+    <div class="q-block" data-fa="این هفته درد، گرفتگی یا ناراحتی‌ای داشتی؟ (محل، شدت از ۱۰، موقع تمرین یا بعدش)">
+      <div class="q-top"><div class="q-label">Any pain, tightness, or niggles this week?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t14')">?</button>
+          <div class="tip-popup" id="t14"><div class="tip-head">Ask every week</div><div class="tip-why">Athletes normalise discomfort. Catch niggles at 2/10 before they become 8/10 injuries.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="pain" data-label="Pain / tightness / niggles" placeholder="Location, onset, severity /10, pattern (during / after session)..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="چیزی از هفته‌ی قبل ادامه داشته؟ بهتر شده، بدتر یا همون‌طور مونده؟">
+      <div class="q-top"><div class="q-label">Anything carried over from last week?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t15')">?</button>
+          <div class="tip-popup" id="t15"><div class="tip-head">Track the trend</div><div class="tip-why">Worse = modify or refer. Same = manage load. Three weeks of the same = refer to physio.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="carried_over" data-label="Carried over from last week" placeholder="Worse / same / better? Any physio or treatment done?..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="این هفته چقدر روی زمین بودی؟ چند تا مسابقه و چند ساعت تمرین؟ 🎾">
+      <div class="q-top"><div class="q-label">Court load this week</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t16')">?</button>
+          <div class="tip-popup" id="t16"><div class="tip-head">Total load picture</div><div class="tip-why">Court load is part of ACWR. Heavy match week + heavy gym = spike risk. See TOTAL load.</div></div>
+        </div></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;">
+        <div><label class="field-label">Matches</label><input class="inp" id="courtMatches" placeholder="0" style="width:80px;"></div>
+        <div><label class="field-label">Practice hrs</label><input class="inp" id="courtPractice" placeholder="hrs" style="width:90px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 ON-COURT -->
+<div class="section" id="s5">
+  <div class="section-header" onclick="tog('s5')"><span class="section-num">05</span><span class="section-title">On-Court Performance</span><span class="section-tag">~3 min</span><span class="chevron" id="c-s5">▼</span></div>
+  <div class="section-body" id="b-s5">
+
+    <div class="q-block" data-fa="این هفته روی زمین چطور حرکت کردی؟ از ۱۰ چند؟">
+      <div class="q-top"><div class="q-label">How did you move on court this week? (/10)</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t17')">?</button>
+          <div class="tip-popup" id="t17"><div class="tip-head">S&C transfer check</div><div class="tip-why">Consistently low despite good gym numbers = the exercises aren't transferring. Enough lateral work?</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 Win capture</span></div>
+      <div class="score-row" id="sc-court"></div>
+      <textarea class="aa" data-akey="court_ctx" data-label="On-court movement — context" data-win="1" placeholder="Speed / agility / endurance / recovery between points..." style="margin-top:8px;"></textarea>
+    </div>
+
+    <div class="q-block" data-fa="چیزی از تمرینای بدنسازی توی بازی‌ات خودش رو نشون داد؟">
+      <div class="q-top"><div class="q-label">Did anything from gym training show up in your game?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t18')">?</button>
+          <div class="tip-popup" id="t18"><div class="tip-head">The bridge question</div><div class="tip-why">THE most important retention question. When athletes feel training working on court, they never drop off.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 Win capture</span><span class="flag content">📸 Content potential</span></div>
+      <textarea class="aa" data-akey="gym_transfer" data-label="Gym training showing on court" data-win="1" placeholder="'Legs felt fresher in the 3rd set' / 'Split step is quicker'..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="این هفته مسابقه داشتی؟ نتیجه چی شد و بدنت چطور دووم آورد؟">
+      <div class="q-top"><div class="q-label">Any matches this week? Result + how body held up?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t19')">?</button>
+          <div class="tip-popup" id="t19"><div class="tip-head">Result is secondary</div><div class="tip-why">Did they cramp? Fatigue in the final set? Match data tells you things gym data can't.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="match_result" data-label="Matches — result + body" placeholder="Score / opponent level / physical performance notes..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 06 GOALS -->
+<div class="section goal-section" id="s6">
+  <div class="section-header" onclick="tog('s6')"><span class="section-num">06</span><span class="section-title">Next Week — Goals & Adjustments</span><span class="section-tag goal">🎯 Goal Set</span><span class="chevron open" id="c-s6">▼</span></div>
+  <div class="section-body open" id="b-s6">
+    <div class="div-label">Coach-Side</div>
+
+    <div class="q-block">
+      <div class="q-top"><div class="q-label">Programme adjustments for next week</div>
+        <div class="q-act"><div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t20')">?</button>
+          <div class="tip-popup" id="t20"><div class="tip-head">Decision framework</div><div class="tip-why">Progress (compliant + recovered) · Maintain (compliant but fatigued) · Reduce (missed + sore + low wellbeing) · Deload (3rd-week accumulation)</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa goal-f" data-akey="prog_adjust" data-label="Programme adjustments" placeholder="Progress / Maintain / Reduce / Deload — and why, linked to this week's data..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-top"><div class="q-label">Sessions target next week</div></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:6px;"><input class="inp" id="nextTarget" placeholder="e.g. 3" style="width:70px;"><span class="muted" style="font-size:13px;">sessions</span></div>
+    </div>
+
+    <div class="div-label">Athlete-Led</div>
+
+    <div class="q-block" data-fa="هفته‌ی بعد می‌خوای روی کدوم یک چیز تمرکز کنی و حتماً انجامش بدی؟ 🎯">
+      <div class="q-top"><div class="q-label">The ONE thing you want to nail next week</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t22')">?</button>
+          <div class="tip-popup" id="t22"><div class="tip-head">Why one thing</div><div class="tip-why">Three goals = zero goals. Make it specific and measurable.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa goal-f" data-akey="one_thing" data-label="The ONE thing to nail" placeholder="Specific and measurable — not 'train harder' but 'nail the hip hinge cue'..."></textarea>
+    </div>
+
+    <div id="goalList">
+      <div class="goal-row"><textarea class="aa goal-f goal-extra" placeholder="Additional goal (optional)..." style="min-height:40px;resize:none;"></textarea><button class="gp p2" onclick="togP(this,'p2')">P2</button></div>
+    </div>
+    <button class="add-goal" onclick="addGoal()">+ Add Goal</button>
+
+    <div class="q-block" style="margin-top:14px;" data-fa="الان یه «هفته‌ی عالی» برات چه شکلیه؟">
+      <div class="q-top"><div class="q-label">What does "a great week" look like for you right now? <span class="muted" style="font-size:10px;font-weight:400;">(ask every 3–4 weeks)</span></div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t23')">?</button>
+          <div class="tip-popup" id="t23"><div class="tip-head">Lens check</div><div class="tip-why">Their definition evolves: showing up → metrics → competitive results. Pitch goals at the right level.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag content">📸 Content potential</span></div>
+      <textarea class="aa goal-f" data-akey="great_week" data-label="What a great week looks like" placeholder="Their vision in their words..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="هفته‌ی بعد چه چالشی داری که باید براش برنامه بریزیم؟ (سفر، مسابقه، کار)">
+      <div class="q-top"><div class="q-label">Any challenges to plan around next week?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t24')">?</button>
+          <div class="tip-popup" id="t24"><div class="tip-head">Proactive planning</div><div class="tip-why">Build the plan around their real schedule. Breaks the "life happened" loop before it starts.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa goal-f" data-akey="challenges" data-label="Challenges to plan around" placeholder="Travel / tournaments / work — and how we'll programme around them..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 07 PROGRAMME FIT -->
+<div class="section" id="s7">
+  <div class="section-header" onclick="tog('s7')"><span class="section-num">07</span><span class="section-title">Programme Fit & Feedback</span><span class="section-tag">~2 min</span><span class="chevron" id="c-s7">▼</span></div>
+  <div class="section-body" id="b-s7">
+
+    <div class="q-block" data-fa="چیزی توی برنامه بود که گیج‌کننده یا سخت برای دنبال‌کردن باشه؟">
+      <div class="q-top"><div class="q-label">Anything in the programme confusing or hard to follow?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t25')">?</button>
+          <div class="tip-popup" id="t25"><div class="tip-head">Clarity = compliance</div><div class="tip-why">If the same thing confuses multiple athletes, it's an app or cue problem, not an athlete problem.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="confusing" data-label="Confusing in the programme" placeholder="Exercise, cue, structure, notation — log here to fix in the app..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="حرکتی بود که حس کردی درست نیست یا وزنه‌اش مناسب نبود؟">
+      <div class="q-top"><div class="q-label">Did any exercise feel wrong or load incorrectly?</div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t26')">?</button>
+          <div class="tip-popup" id="t26"><div class="tip-head">Movement quality flag</div><div class="tip-why">Don't dismiss discomfort as technique. Swap or regress — never push through "feels wrong."</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="wrong_exercise" data-label="Exercise felt wrong / loaded wrong" placeholder="Which exercise + what felt off..."></textarea>
+    </div>
+
+    <div class="q-block" data-fa="دوست داری از چیزی توی برنامه بیشتر یا کمتر داشته باشی؟">
+      <div class="q-top"><div class="q-label">More or less of anything? <span class="muted" style="font-size:10px;font-weight:400;">(ask every 3–4 weeks)</span></div>
+        <div class="q-act"><button class="icon-btn fa" onclick="copyFa(this)" title="Copy this question in Farsi">فا</button>
+          <div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t27')">?</button>
+          <div class="tip-popup" id="t27"><div class="tip-head">Preference check</div><div class="tip-why">Ask monthly, not weekly. Genuine preference data surfaces insights that improve adherence.</div></div>
+        </div></div>
+      </div>
+      <textarea class="aa" data-akey="more_less" data-label="More or less of anything" placeholder="More court-specific / less volume / different exercise type..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- 08 CLOSE -->
+<div class="section" id="s8">
+  <div class="section-header" onclick="tog('s8')"><span class="section-num">08</span><span class="section-title">Close the Call</span><span class="section-tag">~1 min</span><span class="chevron open" id="c-s8">▼</span></div>
+  <div class="section-body open" id="b-s8">
+
+    <div class="q-block">
+      <div class="q-top"><div class="q-label">Specific positive acknowledgement to close on</div>
+        <div class="q-act"><div class="tip-wrap"><button class="icon-btn" onclick="tip(event,'t28')">?</button>
+          <div class="tip-popup" id="t28"><div class="tip-head">Never close neutral</div><div class="tip-why">Name one specific thing — not generic praise. "You're doing great" lands nowhere.</div></div>
+        </div></div>
+      </div>
+      <div class="q-flags"><span class="flag win">🏆 End on a win — always</span></div>
+      <textarea class="aa" data-akey="positive_ack" data-label="Positive acknowledgement to close on" placeholder="Name ONE specific thing they did — personalised, not generic..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Action items before next call</div>
+      <textarea class="aa" data-akey="action_items" data-label="Action items before next call" placeholder="What you'll update in the app / form check videos / what they'll do..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-top"><div class="q-label">Call quality rating</div></div>
+      <div class="star-row" id="starRow">
+        <button class="star-btn" onclick="rateStar(1)">★</button>
+        <button class="star-btn" onclick="rateStar(2)">★</button>
+        <button class="star-btn" onclick="rateStar(3)">★</button>
+        <button class="star-btn" onclick="rateStar(4)">★</button>
+        <button class="star-btn" onclick="rateStar(5)">★</button>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Private coach notes</div>
+      <textarea class="aa" data-akey="private_notes" data-label="Private coach notes" placeholder="Patterns, red flags, content ideas, next block thinking..."></textarea>
+    </div>
+  </div>
+</div>
+
+    <div class="action-row">
+      <button class="btn primary lg" id="saveBtn" onclick="saveLog()">💾 Save Call Log</button>
+      <button class="btn lg" onclick="copyFullFa()">📲 Copy full check-in (Farsi)</button>
+      <button class="btn lg" onclick="copyWins()">📋 Copy Wins</button>
+      <button class="btn lg" onclick="clearForm()">Clear</button>
+    </div>
+  </div><!-- /.wrap -->
+</div><!-- /#app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal">
+    <button class="btn sm modal-close" onclick="closeModal()">✕ Close</button>
+    <div class="modal-title" id="mTitle">Call Log</div>
+    <div class="modal-sub" id="mSub"></div>
+    <div id="mBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// --- config (mirrors coach.html) -------------------------------------------
+const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+const COACH_EMAIL = 'amirardekanian@gmail.com';   // UX gate; the DB (RLS) is the real one
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const $ = (id) => document.getElementById(id);
+
+let currentRating = 0, goalCount = 1, openTip = null;
+let athletes = [];          // [{athlete_id, display_name, program_num, base_id, multi}]
+let logCache = {};
+let activeLogId = null;
+const preselect = new URLSearchParams(location.search).get('athlete') || '';
+
+// --- auth -------------------------------------------------------------------
+$('loginBtn').onclick = () =>
+  sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href.split('#')[0] } });
+$('logoutBtn').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+let booted = false;
+async function boot() {
+  if (booted) return; booted = true;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { booted = false; return showGate(); }
+  const email = (session.user.email || '').toLowerCase();
+  if (email !== COACH_EMAIL.toLowerCase()) {
+    await sb.auth.signOut(); booted = false;
+    return showGate('That account isn’t the coach account. Try again.');
+  }
+  $('gate').style.display = 'none';
+  $('app').style.display = 'block';
+  $('who').textContent = session.user.email;
+  $('callDate').valueAsDate = new Date();
+  await loadAthletes();
+}
+function showGate(err) { $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
+sb.auth.onAuthStateChange(() => { booted = false; boot(); });
+boot();
+
+// --- athlete dropdown (from the secure-link list you already keep) ----------
+// Source = athlete_keys (every athlete you've issued a secure link to) merged
+// with athlete_progress (gives the friendly name once they've synced). The
+// program number is read straight off the id (e.g. mhrn_zhr2 → P2).
+async function loadAthletes() {
+  const [keysRes, progRes] = await Promise.all([
+    sb.from('athlete_keys').select('athlete_id'),
+    sb.from('athlete_progress').select('athlete_id, athlete_name')
+  ]);
+  const sel = $('athleteSelect');
+  if (keysRes.error && progRes.error) {
+    sel.innerHTML = '<option value="">— could not load —</option>';
+    showToast('Athlete list failed: ' + (keysRes.error || progRes.error).message, 'err');
+    return;
+  }
+  const names = {};
+  (progRes.data || []).forEach(r => { if (r.athlete_name) names[r.athlete_id] = r.athlete_name; });
+  const ids = new Set([
+    ...(keysRes.data || []).map(r => r.athlete_id),
+    ...(progRes.data || []).map(r => r.athlete_id)
+  ]);
+  athletes = [...ids].map(id => {
+    const m = String(id).match(/(\d+)$/);
+    return {
+      athlete_id: id,
+      base_id: String(id).replace(/\d+$/, ''),
+      program_num: m ? parseInt(m[1], 10) : 1,
+      display_name: names[id] || id
+    };
+  });
+  // mark athletes that have more than one program file (so the number matters)
+  const cnt = {};
+  athletes.forEach(a => { cnt[a.base_id] = (cnt[a.base_id] || 0) + 1; });
+  athletes.forEach(a => { a.multi = cnt[a.base_id] > 1; });
+  athletes.sort((a, b) => a.display_name.localeCompare(b.display_name) || a.program_num - b.program_num);
+
+  if (!athletes.length) {
+    sel.innerHTML = '<option value="">— no athletes yet (issue a secure link in the dashboard) —</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">— select athlete —</option>' + athletes.map(a =>
+    `<option value="${esc(a.athlete_id)}">${esc(a.display_name + (a.multi ? ` — P${a.program_num}` : ''))}</option>`
+  ).join('');
+
+  if (preselect && athletes.some(a => a.athlete_id === preselect)) { sel.value = preselect; onAthlete(); }
+}
+
+// --- on athlete change: program badge, cycle dropdown, inline logs ----------
+function currentAthlete() { return athletes.find(a => a.athlete_id === $('athleteSelect').value) || null; }
+
+function onAthlete() {
+  const a = currentAthlete();
+  const badge = $('progBadge');
+  if (!a) {
+    badge.className = 'prog-badge hidden';
+    $('inlineLogs').style.display = 'none';
+    return;
+  }
+  // Program badge — makes it unmistakable which JSON file you're logging against
+  badge.className = 'prog-badge';
+  badge.innerHTML = a.multi
+    ? `<span class="pb-num">Program ${esc(a.program_num)}</span><span>of this athlete's ${counts(a.base_id)} programs</span><span class="pb-file">${esc(a.athlete_id)}.json</span>`
+    : `<span class="pb-file">${esc(a.athlete_id)}.json</span>`;
+  loadInlineLogs(a.athlete_id);
+}
+function counts(baseId) { return athletes.filter(a => a.base_id === baseId).length; }
+
+async function loadInlineLogs(athleteId) {
+  const box = $('inlineLogs'), row = $('ilRow');
+  box.style.display = 'block';
+  row.innerHTML = '<span class="muted" style="font-size:13px">Loading…</span>';
+  const { data: logs, error } = await sb.from('call_logs').select('*')
+    .eq('athlete_id', athleteId).order('call_date', { ascending: false });
+  logCache = {};
+  if (error) { row.innerHTML = `<span class="muted" style="font-size:13px">Error: ${esc(error.message)}</span>`; return; }
+  (logs || []).forEach(l => { logCache[l.id] = l; });
+  const chips = (logs || []).map(l => {
+    const stars = l.rating ? `<span class="lc-stars">${'★'.repeat(l.rating)}</span>` : '';
+    return `<div class="log-chip" data-id="${esc(l.id)}" onclick="openLogInForm('${esc(l.id)}')">
+      <span class="lc-date">${esc(fmtDate(l.call_date))}</span>${l.week?`<span class="muted">${esc(shortCycle(l.week))}</span>`:''}${stars}</div>`;
+  }).join('');
+  row.innerHTML = `<div class="log-chip new" onclick="newLog()">+ New log</div>` + chips;
+  markActiveChip();
+}
+function weekCycleLabel(){ const w=$('weekSelect').value, c=$('cycleNumSelect').value; return (w||c) ? `Week ${w||'?'} · Cycle ${c||'?'}` : null; }
+function shortCycle(w){ const wm=String(w).match(/Week\s*(\d+)/i), cm=String(w).match(/Cycle\s*(\d+)/i); return [wm?'W'+wm[1]:'', cm?'C'+cm[1]:''].filter(Boolean).join('·'); }
+function fmtDate(d){ if(!d) return '—'; const [y,mo,da]=d.split('-'); const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return `${+da} ${M[+mo-1]}`; }
+function markActiveChip(){ document.querySelectorAll('.log-chip[data-id]').forEach(c=>c.classList.toggle('active', c.dataset.id===activeLogId)); }
+
+// --- small helpers ----------------------------------------------------------
+function esc(s){return String(s ?? '').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function setTier(btn){document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+function tog(id){const b=$('b-'+id),c=$('c-'+id);b.classList.toggle('open');c.classList.toggle('open');}
+
+function tip(e,id){e.stopPropagation();const el=$(id);if(!el)return;if(openTip&&openTip!==el)openTip.classList.remove('open');el.classList.toggle('open');openTip=el.classList.contains('open')?el:null;}
+document.addEventListener('click',()=>{if(openTip){openTip.classList.remove('open');openTip=null;}});
+
+function buildScore(id){const r=$(id);if(!r)return;for(let i=1;i<=10;i++){const b=document.createElement('button');b.className='score-btn';b.textContent=i;b.onclick=function(){r.querySelectorAll('.score-btn').forEach(x=>x.classList.remove('al','am','ah'));b.classList.add(i<=3?'al':i<=6?'am':'ah');};r.appendChild(b);}}
+['sc-well','sc-sleep','sc-energy','sc-sore','sc-rpe','sc-court'].forEach(buildScore);
+function getScore(id){const a=document.querySelector('#'+id+' .score-btn.al, #'+id+' .score-btn.am, #'+id+' .score-btn.ah');return a?Number(a.textContent):null;}
+function setScore(id,val){const r=$(id);if(!r)return;r.querySelectorAll('.score-btn').forEach(b=>{b.classList.remove('al','am','ah');if(val!=null&&Number(b.textContent)===Number(val)){const i=Number(val);b.classList.add(i<=3?'al':i<=6?'am':'ah');}});}
+
+function rateStar(n){currentRating=n;document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('lit',i<n));}
+function togP(btn){btn.classList.toggle('active');}
+function addGoal(){goalCount++;const row=document.createElement('div');row.className='goal-row';const p=goalCount===2?'p2':'p3',l=goalCount===2?'P2':'P3';row.innerHTML=`<textarea class="aa goal-f goal-extra" placeholder="Goal ${goalCount}..." style="min-height:40px;resize:none;"></textarea><button class="gp ${p}" onclick="togP(this,'${p}')">${l}</button>`;$('goalList').appendChild(row);}
+
+// --- Farsi WhatsApp prompts -------------------------------------------------
+function copyFa(btn){
+  const fa = btn.closest('.q-block')?.dataset.fa;
+  if(!fa){showToast('No Farsi for this one','err');return;}
+  navigator.clipboard.writeText(fa).then(()=>{const o=btn.textContent;btn.textContent='✓';setTimeout(()=>btn.textContent=o,1200);showToast('📋 سوال کپی شد');});
+}
+function copyFullFa(){
+  const a = currentAthlete();
+  const first = a ? (a.display_name.split(' ')[0]) : '';
+  const qs = [...document.querySelectorAll('.q-block[data-fa]')].map(b=>b.dataset.fa);
+  if(!qs.length){showToast('No questions','err');return;}
+  const intro = `سلام ${first ? first + ' جان' : 'دوست من'} 👋\nوقتِ چک‌این هفتگیه. هر وقت رسیدی این‌ها رو برام جواب بده 🙏\n`;
+  const body = qs.map((q,i)=>`${i+1}. ${q}`).join('\n');
+  const out = `${intro}\n${body}\n\nمرسی! 🙌`;
+  navigator.clipboard.writeText(out).then(()=>showToast('📲 کل چک‌این کپی شد'));
+}
+
+// --- collect form into a row -----------------------------------------------
+function collect(){
+  const a = currentAthlete();
+  const answers = {};
+  document.querySelectorAll('textarea[data-akey]').forEach(t=>{ if(t.value.trim()) answers[t.dataset.akey]={label:t.dataset.label||t.dataset.akey,value:t.value.trim()}; });
+  const goals=[...document.querySelectorAll('.goal-extra')].map(t=>t.value.trim()).filter(Boolean);
+  if(goals.length) answers.extra_goals={label:'Additional goals',value:goals.join('\n')};
+  const cm=$('courtMatches').value.trim(),cp=$('courtPractice').value.trim();
+  if(cm||cp) answers.court_load={label:'Court load',value:`${cm||'0'} matches · ${cp||'?'} practice hrs`};
+  const nt=$('nextTarget').value.trim();
+  if(nt) answers.next_target={label:'Sessions target next week',value:nt};
+
+  return {
+    athlete_id: a ? a.athlete_id : '',
+    athlete_name: a ? a.display_name : '',
+    call_date: $('callDate').value,
+    week: weekCycleLabel(),
+    duration: $('callDuration').value.trim() || null,
+    tier: document.querySelector('.tier-btn.active')?.textContent || null,
+    rating: currentRating || null,
+    scores: {well:getScore('sc-well'),sleep:getScore('sc-sleep'),energy:getScore('sc-energy'),sore:getScore('sc-sore'),rpe:getScore('sc-rpe'),court:getScore('sc-court')},
+    sessions_done: $('sDone').value.trim() ? Number($('sDone').value.trim()) : null,
+    sessions_planned: $('sPlan').value.trim() ? Number($('sPlan').value.trim()) : null,
+    win_vault: $('winVault').value.trim() || null,
+    answers
+  };
+}
+function buildSummary(d){
+  const s=d.scores||{},sc=(l,v)=>`${l}: ${v??'—'}/10`;
+  let out=`ATHLETE: ${d.athlete_name} (${d.athlete_id})\nDATE: ${d.call_date} | CYCLE: ${d.week||'—'} | TIER: ${d.tier||'—'} | DURATION: ${d.duration||'—'}\nCALL RATING: ${d.rating||'—'}/5\n\n`;
+  out+=`SCORES:\n${sc('Wellbeing',s.well)} | ${sc('Sleep',s.sleep)} | ${sc('Energy',s.energy)}\n${sc('Soreness',s.sore)} | ${sc('RPE',s.rpe)} | ${sc('Court',s.court)}\nSessions: ${d.sessions_done??'—'}/${d.sessions_planned??'—'}\n\n`;
+  if(d.win_vault) out+=`WIN VAULT: ${d.win_vault}\n\n`;
+  out+='NOTES:\n'+Object.values(d.answers).map(a=>`${a.label}: ${a.value}`).join('\n\n');
+  return out;
+}
+
+// --- save -------------------------------------------------------------------
+async function saveLog(){
+  const data=collect();
+  if(!data.athlete_id){showToast('Select an athlete first','err');return;}
+  if(!data.call_date){showToast('Pick a call date','err');return;}
+  data.summary=buildSummary(data);
+  const btn=$('saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  const { error } = await sb.from('call_logs').upsert(data,{onConflict:'athlete_id,call_date'});
+  btn.disabled=false;btn.textContent='💾 Save Call Log';
+  if(error){showToast('Save failed: '+error.message,'err');return;}
+  showToast('✓ Saved to your Coaching Hub');
+  loadInlineLogs(data.athlete_id);
+}
+
+// --- open a past log into the form (view + edit) ----------------------------
+function openLogInForm(id){
+  const d=logCache[id]; if(!d) return;
+  activeLogId=id;
+  // athlete is already selected (these are that athlete's logs)
+  $('callDate').value=d.call_date;
+  $('callDuration').value=d.duration||'';
+  const wm=String(d.week||'').match(/Week\s*(\d+)/i), cm=String(d.week||'').match(/Cycle\s*(\d+)/i);
+  $('weekSelect').value=wm?wm[1]:''; $('cycleNumSelect').value=cm?cm[1]:'';
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.toggle('active',b.textContent===d.tier));
+  rateStar(d.rating||0);
+  const s=d.scores||{};
+  setScore('sc-well',s.well);setScore('sc-sleep',s.sleep);setScore('sc-energy',s.energy);setScore('sc-sore',s.sore);setScore('sc-rpe',s.rpe);setScore('sc-court',s.court);
+  $('sDone').value=d.sessions_done??'';$('sPlan').value=d.sessions_planned??'';
+  $('winVault').value=d.win_vault||'';
+  const ans=d.answers||{};
+  document.querySelectorAll('textarea[data-akey]').forEach(t=>{t.value=ans[t.dataset.akey]?.value||'';});
+  $('courtMatches').value='';$('courtPractice').value='';
+  if(ans.court_load){const m=String(ans.court_load.value).match(/(\d+)\s*matches?\s*·\s*([^ ]+)/);if(m){$('courtMatches').value=m[1];$('courtPractice').value=(m[2]==='?'?'':m[2]);}}
+  $('nextTarget').value=ans.next_target?.value||'';
+  markActiveChip();
+  window.scrollTo({top:0,behavior:'smooth'});
+  showToast(`Opened ${fmtDate(d.call_date)} — edit & Save to update`);
+}
+function newLog(){
+  activeLogId=null;
+  // keep athlete + cycle + date(today); clear the rest
+  document.querySelectorAll('textarea').forEach(t=>t.value='');
+  document.querySelectorAll('input[type=text]').forEach(el=>{ if(el.id!=='callDuration') el.value=''; });
+  $('callDuration').value='';
+  document.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('al','am','ah'));
+  document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('lit'));
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  $('callDate').valueAsDate=new Date();
+  currentRating=0;markActiveChip();
+  window.scrollTo({top:0,behavior:'smooth'});
+  showToast('New log — start writing');
+}
+
+async function deleteLog(id){
+  if(!confirm('Delete this call log? Cannot be undone.'))return;
+  const { error } = await sb.from('call_logs').delete().eq('id',id);
+  if(error){showToast('Delete failed: '+error.message,'err');return;}
+  if(activeLogId===id) newLog();
+  closeModal(); loadInlineLogs($('athleteSelect').value); showToast('Log deleted');
+}
+function closeModal(){$('logModal').classList.remove('open');}
+$('logModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// --- copy wins --------------------------------------------------------------
+function copyWins(){
+  const a=currentAthlete();
+  const athlete=a?a.display_name:'Athlete';
+  const date=$('callDate').value||'This week';
+  let out=`WINS — ${athlete} — ${date}\n${'─'.repeat(40)}\n\n`;
+  document.querySelectorAll('textarea[data-win="1"]').forEach(t=>{if(t.value.trim())out+=`▸ ${t.dataset.label}\n${t.value.trim()}\n\n`;});
+  const v=$('winVault');if(v&&v.value.trim())out+=`WIN VAULT:\n${v.value.trim()}\n`;
+  if(out.trim().length<60){showToast('No wins logged yet','err');return;}
+  navigator.clipboard.writeText(out).then(()=>showToast('📋 Wins copied'));
+}
+
+function clearForm(){
+  if(!confirm('Clear all fields for a new call?'))return;
+  newLog();
+  $('weekSelect').value='';$('cycleNumSelect').value='';
+  $('athleteSelect').value='';onAthlete();
+}
+
+function showToast(msg,type=''){const t=$('toast');t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+</script>
+</body>
+</html>
