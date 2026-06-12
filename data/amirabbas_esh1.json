@@ -119,7 +119,7 @@
                 "restSec": 45,
                 "items": [
                   {
-                    "name": "90/90 Hip Rotation",
+                    "name": "90/90 Hip Switch",
                     "detail": "×8/side",
                     "cues": {
                       "good": ["Move slowly through the hips, chest tall"],
@@ -152,7 +152,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Leg Press",
+                "name": "Machine Leg Press",
                 "videoUrl": null,
                 "restSec": 180,
                 "chips": [
@@ -171,7 +171,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Leg Curl",
+                "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -190,7 +190,7 @@
               },
               {
                 "type": "standard",
-                "name": "Leg Extension",
+                "name": "Machine Leg Extension",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -209,7 +209,7 @@
               },
               {
                 "type": "standard",
-                "name": "Standing Calf Raise",
+                "name": "Standing Machine Calf Raise",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -234,7 +234,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Pallof Press",
+                "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -324,7 +324,7 @@
                     }
                   },
                   {
-                    "name": "Prone Y Raise",
+                    "name": "Prone Y-T-W",
                     "detail": "×10",
                     "cues": {
                       "good": ["Thumbs up, reach long and lift light"],
@@ -341,7 +341,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Flat Dumbbell Bench Press",
+                "name": "Dumbbell Bench Press",
                 "videoUrl": null,
                 "restSec": 180,
                 "chips": [
@@ -360,7 +360,7 @@
               },
               {
                 "type": "standard",
-                "name": "Chest-Supported Row",
+                "name": "Chest-Supported Dumbbell Row",
                 "videoUrl": null,
                 "restSec": 150,
                 "chips": [
@@ -442,7 +442,7 @@
               },
               {
                 "type": "standard",
-                "name": "Face Pull",
+                "name": "Cable Face Pull",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -530,7 +530,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Back Extension",
+                "name": "45° Back Extension",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -570,7 +570,7 @@
               },
               {
                 "type": "standard",
-                "name": "Incline Dumbbell Bench Press",
+                "name": "Incline Dumbbell Press",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -589,7 +589,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Cable Row",
+                "name": "Cable Row",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -614,7 +614,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Triceps Pushdown",
+                "name": "Cable Tricep Pushdown",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -634,7 +634,7 @@
               },
               {
                 "type": "standard",
-                "name": "Dumbbell Curl",
+                "name": "Dumbbell Bicep Curl",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -659,7 +659,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dumbbell Farmer Carry",
+                "name": "Farmer's Carry",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
