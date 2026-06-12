@@ -678,9 +678,20 @@
     <div class="action-row">
       <button class="btn primary lg" id="saveBtn" onclick="saveLog()">💾 Save Call Log</button>
       <button class="btn lg" id="aiBtn" onclick="summariseCall()">✨ Summarise (AI)</button>
+      <button class="btn lg" id="cycleBtn" onclick="generateCycleReport()">📊 Cycle report</button>
       <button class="btn lg" onclick="copyFullFa()">📲 Copy full check-in (Farsi)</button>
       <button class="btn lg" onclick="copyWins()">📋 Copy Wins</button>
       <button class="btn lg" onclick="clearForm()">Clear</button>
+    </div>
+
+    <!-- END-OF-CYCLE REPORT (reads all weekly check-ins + workout logs for the selected Cycle) -->
+    <div class="section" id="cycleSection" style="display:none;border-left:3px solid var(--amber)">
+      <div class="section-header" style="cursor:default">
+        <span class="section-num">📊</span><span class="section-title" id="cycleTitle">Cycle Report</span>
+        <span class="section-tag goal" id="cycleLoadTag"></span>
+        <button class="btn sm" onclick="copyCycleReport()" style="margin-left:auto">📋 Copy</button>
+      </div>
+      <div class="section-body open" id="cycleBody"></div>
     </div>
   </div><!-- /.wrap -->
 </div><!-- /#app -->
@@ -789,6 +800,7 @@ function currentAthlete() { return athletes.find(a => a.athlete_id === $('athlet
 
 function onAthlete() {
   const a = currentAthlete();
+  hideCyclePanel();
   const badge = $('progBadge');
   if (!a) {
     badge.className = 'prog-badge hidden';
@@ -941,6 +953,57 @@ function collectAiSummary(){
     flags: lines($('ai_flags').value)
   };
 }
+
+// --- end-of-cycle report (via the cycle-report Edge Function) ---------------
+let lastCycle = null;
+async function generateCycleReport(){
+  const a=currentAthlete();
+  if(!a){showToast('Select an athlete first','err');return;}
+  const cyc=$('cycleNumSelect').value;
+  if(!cyc){showToast('Pick the Cycle number first','err');return;}
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){showToast('Sign in again','err');return;}
+  const btn=$('cycleBtn');btn.disabled=true;btn.textContent='Analysing…';
+  try{
+    const r=await fetch(SB_URL+'/functions/v1/cycle-report',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':SB_KEY},body:JSON.stringify({athlete_id:a.athlete_id,athlete_name:a.display_name,cycle:cyc})});
+    const j=await r.json();
+    if(!r.ok||!j.ok){ throw new Error(j.error||('HTTP '+r.status)); }
+    renderCycleReport(a.display_name, cyc, j);
+    showToast('📊 Cycle report ready');
+  }catch(e){ showToast('Cycle report failed: '+e.message,'err'); }
+  btn.disabled=false;btn.textContent='📊 Cycle report';
+}
+function ul(arr){ return (arr&&arr.length)?('<ul style="margin:4px 0 0 18px">'+arr.map(x=>`<li style="margin-bottom:3px">${esc(x)}</li>`).join('')+'</ul>'):'<div class="muted" style="font-size:13px">—</div>'; }
+function renderCycleReport(name, cyc, j){
+  const rep=j.report||{};
+  lastCycle={name,cyc,rep};
+  $('cycleTitle').textContent=`${name} — Cycle ${cyc}`;
+  $('cycleLoadTag').textContent='Load: '+(rep.load_direction||'—');
+  const sec=(t,html)=>`<div class="q-block"><div class="q-label">${t}</div>${html}</div>`;
+  $('cycleBody').innerHTML =
+    `<div class="muted" style="font-size:12px;margin-bottom:10px">From ${j.weeks_count} weekly check-in(s) + ${j.sessions_count} logged session(s) · ${esc(j.model||'')}</div>`+
+    sec('Overview',`<div style="font-size:14px;line-height:1.5">${esc(rep.cycle_overview||'')}</div>`)+
+    sec('📈 Trends',ul(rep.trends))+
+    sec('✅ What worked',ul(rep.what_worked))+
+    sec('🔧 What to change',ul(rep.what_to_change))+
+    sec('🎯 Programming decisions — next cycle',ul(rep.programming_decisions))+
+    sec('📸 Content-worthy wins',ul(rep.content_wins))+
+    `<div class="q-block" style="border-bottom:none"><div class="q-label" style="color:var(--red)">⚑ Flags</div>${ul(rep.flags)}</div>`;
+  $('cycleSection').style.display='block';
+  $('cycleSection').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function copyCycleReport(){
+  if(!lastCycle){showToast('Generate a report first','err');return;}
+  const {name,cyc,rep}=lastCycle;
+  const blk=(t,arr)=>`${t}\n`+((arr&&arr.length)?arr.map(x=>'• '+x).join('\n'):'—')+'\n';
+  let out=`CYCLE REPORT — ${name} — Cycle ${cyc}\n${'─'.repeat(44)}\n\n`;
+  out+=(rep.cycle_overview||'')+'\n\n';
+  out+=blk('TRENDS',rep.trends)+'\n'+blk('WHAT WORKED',rep.what_worked)+'\n'+blk('WHAT TO CHANGE',rep.what_to_change)+'\n';
+  out+=blk('PROGRAMMING DECISIONS (NEXT CYCLE)',rep.programming_decisions)+'\n'+`LOAD DIRECTION: ${rep.load_direction||'—'}\n\n`;
+  out+=blk('CONTENT-WORTHY WINS',rep.content_wins)+'\n'+blk('FLAGS',rep.flags);
+  navigator.clipboard.writeText(out).then(()=>showToast('📋 Cycle report copied'));
+}
+function hideCyclePanel(){ const el=$('cycleSection'); if(el) el.style.display='none'; lastCycle=null; }
 
 // --- save -------------------------------------------------------------------
 async function saveLog(){
