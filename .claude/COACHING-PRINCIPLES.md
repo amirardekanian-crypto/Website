@@ -26,6 +26,10 @@ publish it. No athlete health/chat detail goes here — principles only.
   (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
 - **Knee-history clients:** reverse lunge over forward lunge; reintroduce plyometrics
   with stick-landings / step-downs; lateral bounds are the highest-risk item — ramp last. *(2026-06-15)*
+- **Chronic-back clients:** lead the hinge with trunk-supported options (45° Back
+  Extension + Hip Thrust) and defer the loaded *free* hinge (barbell RDL/deadlift) one
+  cycle — build the brace first, then load the free pattern (the brace is its permission
+  slip). Also high-SFR, so little stimulus is lost. *(2026-06-15)*
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
 
