@@ -39,11 +39,11 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The Web3Forms `access_key` value (breaks submissions). The `<script>` at the bottom that runs the progress bar, unless you're ready to test it carefully.
 
 #### `program.html` — The athlete app
-- **What it does:** The private training app. Loads an athlete's programme from a JSON file in `/data/`. Shows daily workouts, videos, timers, weight logs, RPE scoring.
+- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **My Plan** (daily workouts, videos, timers, weight logs, RPE scoring), **Coach** (messaging + notes), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads an athlete's programme from `/data/`. Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
 - **If deleted:** All athletes lose access to their programme.
-- **Depends on:** `data/*.json` (one per athlete), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
+- **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
-- **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, not here. Ask an AI assistant to guide you before structural edits.
+- **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, `content/`, and `workouts/`, not here. Ask an AI assistant to guide you before structural edits.
 
 #### `coach.html` — Coach dashboard (private)
 - **What it does:** Your private admin view. You sign in with Google (locked to your coach email) and see every athlete's progress synced from `program.html`: who finished sessions, when they were last active, their notes, plus charts. It's also where you **create a secure link** for a new athlete (a per-athlete secret key) and where you **send messages** to athletes.
@@ -137,8 +137,26 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Edit this when:** You're updating an athlete's weekly workouts, adding video links, changing their focus, or creating a new client.
 - **See also:** `SCHEMA.md` — the cheat-sheet for what fields each JSON can contain.
 
+#### `content/index.json` — Read library manifest
+- **What it does:** The table of contents for the Library → Read tab. Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The app reads this file to build the Read list instantly, then fetches individual articles on demand.
+- **If deleted:** The Read tab shows nothing.
+- **Depends on:** `program.html` reads it; individual article files in `content/<category>/` are fetched lazily.
+- **Edit this when:** You add a new article or create a new category. Always add an entry here alongside the article JSON.
+- **See also:** `SCHEMA.md → "Library tab — Read section"` for the exact format.
+
+#### `content/<category>/*.json` — Article files
+- **What it does:** One file per article. Contains the title, read time, and an array of `blocks` (paragraphs, headings, lists, callout boxes, images, and embedded workout cards). Each article is reachable at `program.html?article=<id>` — a shareable public URL.
+- **If deleted:** That article 404s when opened; the card still shows in the list until you also remove it from `content/index.json`.
+- **Edit this when:** You're writing a new article or updating an existing one.
+- **See also:** `SCHEMA.md → "Article block types"` for all supported block formats.
+
+#### `workouts/index.json` + `workouts/<category>/*.json` — Train library
+- **What it does:** The manifest and individual session files for the Library → Train tab. Works exactly like the Read library but for on-demand workout sessions. Each workout is reachable at `program.html?workout=<id>`.
+- **Edit this when:** Adding a new shared workout session. Always create the JSON file and add the entry to the manifest together.
+- **See also:** `SCHEMA.md → "Library tab — Train section"` for the exact format.
+
 #### `SCHEMA.md` — The JSON field guide
-- **What it does:** Documents every field you can use in an athlete JSON file.
+- **What it does:** Documents every field you can use in an athlete JSON file, a workout file, and an article file — plus how to add new content to the Library tab.
 - **If deleted:** You lose the reference guide. The site keeps working.
 - **Edit this when:** You add a new optional field to your JSON files and want to document it.
 
@@ -266,10 +284,12 @@ Think of it like a house:
 In rough order of how often you'll touch them:
 
 1. **`data/*.json`** — Every time you write, update, or rotate an athlete's programme. This is your daily work.
-2. **`index.html`** — When you reword your pitch, update the FAQ, swap a testimonial, or change a CTA.
-3. **`form.html`** — When you want to add or tweak an application question.
-4. **`partials/nav.html`** and **`partials/footer.html`** — When you add a new page, rename a menu item, or add a social link.
-5. **`assets/css/tokens.css`** — If you ever rebrand (new accent colour, new font).
+2. **`content/<category>/*.json` + `content/index.json`** — Every time you publish a new article. Create the file, register it in the manifest.
+3. **`workouts/<category>/*.json` + `workouts/index.json`** — Every time you add a shared workout session. Create the file, register it in the manifest.
+4. **`index.html`** — When you reword your pitch, update the FAQ, swap a testimonial, or change a CTA.
+5. **`form.html`** — When you want to add or tweak an application question.
+6. **`partials/nav.html`** and **`partials/footer.html`** — When you add a new page, rename a menu item, or add a social link.
+7. **`assets/css/tokens.css`** — If you ever rebrand (new accent colour, new font).
 
 Everything else you can usually leave alone. If an AI assistant tells you to edit something outside this list, ask it to explain why first.
 

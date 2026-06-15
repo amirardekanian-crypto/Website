@@ -680,9 +680,9 @@ The system adapts to your programming — not the other way around.
 
 ---
 
-## Workouts library (shared, app-wide)
+## Library tab — Train section (on-demand workouts)
 
-Separate from athlete programmes (`data/*.json`), the **Workouts tab** shows a
+Separate from athlete programmes (`data/*.json`), the **Library tab → Train** section shows a
 shared library of extra, on-demand sessions available to **every** user. These
 live in their own `workouts/` folder so they never mix with athlete data.
 
@@ -701,7 +701,7 @@ workouts/
 
 Lists the categories (with their banner image) and, per category, the workouts
 to show as cards. The manifest is the source of truth for the **card** (name,
-duration, equipment) so the list renders instantly without opening every file.
+duration, equipment) so the Train list renders instantly without opening every file.
 
 ```jsonc
 {
@@ -774,6 +774,127 @@ and there is no finish/send-to-coach step.
 > **Keep them matching:** the name/duration/equipment exist in *both* the manifest
 > (for the card) and the file (for the opened view). If you rename a workout, change
 > it in both places or the card and the opened session will disagree.
+
+---
+
+---
+
+## Library tab — Read section (articles / blog)
+
+The **Library tab → Read** section is a coach-published article library. Articles are static JSON files — no backend, no CMS. Each article gets its own shareable URL: `program.html?article=<id>`.
+
+### Folder layout
+
+```
+content/
+  index.json                               ← the manifest (drives the Read tab)
+  for-coaches/pre-session-warm-up.json
+  pre-competition/tennis-warm-up.json
+  recovery/<slug>.json
+  mental/<slug>.json
+  …one JSON per article, in its category folder
+```
+
+### `content/index.json` — the manifest
+
+Lists the categories (with their icon and banner image) and, per category, the articles to show as cards. The manifest is the source of truth for the **card** (title, read time) so the list renders instantly without fetching every article file.
+
+```jsonc
+{
+  "categories": [
+    {
+      "id": "for-coaches",
+      "title": "For Coaches",
+      "icon": "book",                              // key from window.__ICONS
+      "banner": "assets/img/workouts/strength.webp",
+      "articles": [
+        {
+          "id": "pre-session-warm-up",
+          "title": "The Pre-Session Warm-Up",
+          "category": "For Coaches",
+          "readMins": 7,
+          "file": "content/for-coaches/pre-session-warm-up.json"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Icon keys** (from `window.__ICONS` in `program.html`): `book`, `mindset`, `sleep`, `nutrition`, `bodycomp`, `tennis`, `strength`, `clipboard`, `note`, `schedule`, `progress`, `cardio`, `mobility`, `running` — and every other key in `__ICONS`. A category whose `articles` array is **empty** shows a "coach is adding…" note instead of cards.
+
+**Current categories and their icons:**
+
+| id | Title | Icon |
+|---|---|---|
+| `for-coaches` | For Coaches | `book` |
+| `pre-competition` | Pre-Competition | `tennis` |
+| `recovery` | Recovery | `sleep` |
+| `mental` | Mental | `mindset` |
+| `nutrition` | Nutrition | `nutrition` |
+| `supplements` | Supplements | `bodycomp` |
+
+### An article file
+
+```jsonc
+{
+  "id": "pre-session-warm-up",
+  "title": "The Pre-Session Warm-Up",
+  "category": "For Coaches",
+  "readMins": 7,
+  "date": "June 2026",
+  "blocks": [
+    { "type": "p", "text": "Opening paragraph..." },
+    { "type": "h", "text": "Section heading" },
+    { "type": "list", "items": ["Point one", "Point two"] },
+    { "type": "callout", "label": "Rule", "text": "Callout body text." },
+    { "type": "img", "src": "assets/img/example.webp", "caption": "Optional caption." },
+    { "type": "workout", "file": "workouts/on-court/tennis-warm-up-routine.json",
+      "label": "Tennis Warm-Up Routine", "meta": "12–15 min · Bodyweight · On-Court" }
+  ]
+}
+```
+
+### Article block types
+
+| Type | Required fields | What it renders |
+|---|---|---|
+| `p` | `text` | Paragraph. The **first** `p` block in an article gets a large clay drop-cap on its first letter. |
+| `h` | `text` | Section heading. Auto-numbered §01, §02… with a clay leading dash. |
+| `list` | `items[]` | Bullet list with clay tennis-ball bullets. |
+| `callout` | `label`, `text` | Tinted box with a small label badge at the top. Use for rules, key points, or step labels ("Step 1 — Raise"). |
+| `img` | `src` | Full-width image. Optional `caption` (string) adds a captionline below. |
+| `workout` | `file`, `label` | Tappable card that opens a workout from the Train library. Optional `meta` (string) shows duration/equipment under the label. |
+
+### Article hero design
+
+The first block never appears in the hero — the hero is built from the article's top-level fields:
+- **Kicker** — `category` value (e.g. "For Coaches"), shown above the title in clay
+- **Title** — `title` value; the **last word** is automatically wrapped in a clay highlight
+- **Meta line** — `readMins` + `date`
+
+### Adding an article
+
+1. Create the article JSON in `content/<category-id>/<slug>.json` (with `id`, `title`, `category`, `readMins`, `date`, `blocks`).
+2. Add an entry to that category's `articles` array in `content/index.json` (with `id`, `title`, `category`, `readMins`, `file`).
+3. Commit + push. The Read tab picks it up on next load.
+
+**Deep-link:** `program.html?article=pre-session-warm-up` opens the article directly — usable as a shareable public URL.
+
+### Embedding a workout inside an article
+
+Use a `workout` block with the path to the workout JSON:
+
+```json
+{
+  "type": "workout",
+  "file": "workouts/on-court/tennis-warm-up-routine.json",
+  "label": "Tennis Warm-Up Routine",
+  "meta": "12–15 min · Bodyweight · On-Court"
+}
+```
+
+Tapping the card opens the full workout in the Train session view. The workout must already exist in `workouts/` and be registered in `workouts/index.json` (see the Train section above).
 
 ---
 
