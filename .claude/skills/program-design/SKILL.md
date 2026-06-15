@@ -123,11 +123,14 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   hits, in this priority order: **recovery → power → conditioning → core → upper → lower →
   fullbody → default**. So lead the tag with the keyword for the image you want, and don't
   let a higher-priority word hijack it: `"Lower + Brace"` renders a *core* image (brace
-  outranks lower); `"Total + Carry"` hits no keyword → bare gradient. Use the dominant
-  theme's word — leg-led → `"Lower Body …"`, upper-led → `"Upper Body …"`, true full-body →
-  `"Full-Body …"`, power → `"… Power"`, conditioning → `"… Engine"`, brace/core-led →
-  `"Core …"`. Keep it descriptive and clean — the *cool* naming lives at the cycle level.
-  Full keyword map: SCHEMA.md → "Day `focusTag` → banner image."
+  outranks lower); `"Total + Carry"` hits no keyword → bare gradient. **Make the tag VIVID —
+  sports-headline energy that makes the athlete want to train — while embedding the keyword
+  so the banner still lands.** Don't ship dry spreadsheet labels (`"Upper Body & Press"` ✗).
+  Names that read well AND map right: leg/lower-led → `"Built From The Legs Up"`, `"Hinge &
+  Hammer"` (lower); upper-led → `"Press, Pull, Repeat"`, `"The Upper Hand"` (upper); true
+  full-body → `"Whole-Body Workhorse"`, `"Full-Body, Full Send"` (fullbody). Beware cool
+  words that are themselves higher-priority keywords and steal the image (`"engine"` →
+  conditioning, `"power"` → power). Full keyword map: SCHEMA.md → "Day `focusTag` → banner image."
 
 ---
 
