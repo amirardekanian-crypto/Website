@@ -86,6 +86,15 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
   never in the athlete app or the athlete JSON. *(2026-06-15)*
 
+## Naming
+- **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
+  Volume Engine, Bedrock), never dry labels. Set in /program-roadmap. *(2026-06-15)*
+- **Day names (`focusTag`) have sports-headline energy** — vivid, write them like a sports
+  writer trying to make the athlete *want* to train ("Built From The Legs Up", "Press, Pull,
+  Repeat", "Whole-Body Workhorse"), never spreadsheet labels ("Upper Body & Press" ✗). The
+  catch: the name must still embed the keyword that lands the right banner image, and avoid
+  cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
+
 ## Process
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
