@@ -308,15 +308,13 @@
     max-height: 260px;
     display: flex;
     overflow: hidden;
-    /* green fallback — shown when the image is missing (.no-img) or still under the photo */
-    background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+    /* court photo fallback — shown when the image is missing (.no-img) or still under the photo */
+    background-color: #0E4A36;
+    background-image: linear-gradient(to bottom, rgba(14,74,54,0.3) 0%, rgba(14,74,54,0.65) 100%), url('court-sessions.jpg');
+    background-size: cover;
+    background-position: center;
   }
-  /* Subtle diagonal stripes on the green fallback, echoing the reference card */
-  .planlike .cm-banner.no-img::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: repeating-linear-gradient(135deg,
-      rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px);
-  }
+  .planlike .cm-banner.no-img::after { display: none; }
   .planlike .cm-banner-img {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; object-position: center 40%; display: block;
@@ -731,9 +729,8 @@
   /* ════ LIBRARY — Two Doors landing + Sessions / Playbook worlds ════ */
   .lib-pane { position: relative; }
   .lib-pane[hidden] { display: none; }
-  .lib-back { position: absolute; top: 14px; left: 14px; z-index: 6; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.28); color: #fff; border: none; font-size: 19px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .lib-back:active { transform: scale(0.9); }
-  .lib-back.dark { background: rgba(255,255,255,0.14); }
+  .lib-back { position: absolute; top: 16px; left: 18px; z-index: 6; background: none; border: none; color: rgba(255,255,255,0.82); font-family: 'Space Mono', monospace; font-weight: 700; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 4px 0; }
+  .lib-back:active { opacity: 0.65; }
 
   /* Landing — two doors */
   .lib-head { padding: 48px 24px 18px; }
@@ -742,9 +739,9 @@
   .lib-doors { padding: 0 18px 110px; }
   .lib-door { position: relative; overflow: hidden; height: 248px; border-radius: 22px; margin-bottom: 16px; display: flex; flex-direction: column; justify-content: flex-end; padding: 22px; cursor: pointer; transition: transform .12s ease; }
   .lib-door:active { transform: scale(0.985); }
-  .lib-door.door-sessions { background: #0E4A36; }
-  .lib-door.door-playbook { background: #C7552F; }
-  .lib-door-court { position: absolute; inset: 0; z-index: 0; color: rgba(255,255,255,0.20); pointer-events: none; }
+  .lib-door.door-sessions { background: #0E4A36 url('court-sessions.jpg') center/cover no-repeat; background-image: linear-gradient(to top, rgba(14,74,54,0.82) 0%, rgba(14,74,54,0.28) 65%), url('court-sessions.jpg'); }
+  .lib-door.door-playbook { background: #C7552F url('court-playbook.jpg') center/cover no-repeat; background-image: linear-gradient(to top, rgba(199,85,47,0.82) 0%, rgba(199,85,47,0.28) 65%), url('court-playbook.jpg'); }
+  .lib-door-court { display: none; }
   .lib-door-court svg { width: 100%; height: 100%; display: block; }
   .lib-door > *:not(.lib-door-court) { position: relative; z-index: 2; }
   .lib-door-k { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.82); }
@@ -754,11 +751,12 @@
   .lib-door-ct { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; min-height: 13px; }
   .lib-door-arr { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.16); border: 1.5px solid rgba(255,255,255,0.7); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
 
-  /* Sessions world — header + numbered shelves */
-  .w-head { padding: 54px 22px 4px; }
-  .w-kick { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ice); }
-  .w-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; color: var(--ink); margin-top: 7px; }
-  .w-sub { font-family: 'Space Mono', monospace; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 8px; }
+  /* Sessions world — green hero header + numbered shelves */
+  .w-head { position: relative; overflow: hidden; background-color: #0E4A36; background-image: linear-gradient(to top, rgba(14,74,54,0.88) 0%, rgba(14,74,54,0.4) 100%), url('court-sessions.jpg'); background-size: cover; background-position: center; min-height: 220px; padding: 54px 22px 26px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .w-head > *:not(.pb-court):not(.nav-back) { position: relative; z-index: 2; }
+  .w-kick { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  .w-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 48px; line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; color: #fff; margin-top: 7px; }
+  .w-sub { font-family: 'Space Mono', monospace; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 8px; }
   .w-scroll { padding: 0 0 110px; }
   .w-shelf { margin-bottom: 2px; }
   .shelf-head { display: flex; align-items: baseline; gap: 11px; padding: 22px 20px 12px; }
@@ -770,48 +768,51 @@
   .vcard { flex-shrink: 0; width: 176px; cursor: pointer; }
   .vcard:active { transform: scale(0.99); }
   .vthumb { position: relative; height: 118px; border-radius: 16px; overflow: hidden; background-color: #0E4A36; background-size: cover; background-position: center; }
-  .vbadge { position: absolute; top: 9px; left: 9px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 9.5px; letter-spacing: 0.05em; color: #fff; background: rgba(0,0,0,0.42); padding: 3px 8px; border-radius: 6px; }
-  .veq { position: absolute; bottom: 9px; right: 9px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; background: var(--ice); padding: 3px 8px; border-radius: 5px; }
+  .veq { position: absolute; bottom: 9px; left: 9px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.85); }
   .vt { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; line-height: 1.05; text-transform: uppercase; color: var(--ink); margin: 10px 2px 0; }
   .vm { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin: 3px 2px 0; }
   .w-rail .wl-coming { flex-shrink: 0; width: 240px; margin: 0; }
 
-  /* Playbook world — broadcast dark */
-  .lib-pane-dark { background: #0c0c0e; min-height: 100vh; padding-bottom: 90px; }
-  .pb-hero { position: relative; overflow: hidden; min-height: 320px; background: #0E4A36; display: flex; flex-direction: column; justify-content: flex-end; padding: 24px 22px 22px; cursor: pointer; }
-  .pb-court { position: absolute; inset: 0; z-index: 0; color: rgba(255,255,255,0.15); pointer-events: none; }
+  /* Playbook world — clay hero + paper body */
+  .lib-pane-dark { background: var(--grey-bg); min-height: 100vh; padding-bottom: 90px; }
+  .pb-hero { position: relative; overflow: hidden; min-height: 220px; background-color: #C7552F; background-image: linear-gradient(to top, rgba(199,85,47,0.88) 0%, rgba(199,85,47,0.4) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 54px 22px 26px; }
+  .pb-court { display: none; }
   .pb-court svg { width: 100%; height: 100%; display: block; }
-  .pb-hero > *:not(.pb-court):not(.lib-back) { position: relative; z-index: 2; }
-  .pb-tag { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ice); display: flex; align-items: center; gap: 8px; }
-  .pb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ice); }
-  .pb-hk { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(250,247,242,0.7); margin-top: 18px; }
-  .pb-ht { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px; line-height: 0.94; letter-spacing: -0.4px; text-transform: uppercase; color: #FAF7F2; margin-top: 7px; }
-  .pb-hm { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(250,247,242,0.62); margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(250,247,242,0.2); display: flex; align-items: center; gap: 8px; }
-  .pb-read { margin-left: auto; color: var(--ice); font-weight: 700; }
-  .pb-tagline { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.5; color: #c9c9d0; padding: 18px 20px; border-bottom: 1px solid #1c1c20; }
-  .pb-tagline b { color: #FAF7F2; font-weight: 700; }
-  .pb-block { display: flex; align-items: center; gap: 10px; padding: 20px 18px 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 1.5px; text-transform: uppercase; color: #FAF7F2; }
+  .pb-hero > *:not(.pb-court):not(.nav-back) { position: relative; z-index: 2; }
+  .pb-tag { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 8px; }
+  .pb-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.75); }
+  .pb-hk { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 14px; }
+  .pb-ht { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 48px; line-height: 1; letter-spacing: -0.4px; text-transform: uppercase; color: #fff; margin-top: 7px; }
+  .pb-hm { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-top: 10px; }
+  .pb-block { display: flex; align-items: center; gap: 10px; padding: 20px 18px 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey-dark); }
   .pb-s { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--ice); }
-  .pb-ct { font-family: 'Space Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.08em; color: #6b6b73; margin-left: auto; }
-  .pb-disp { display: flex; align-items: center; gap: 13px; padding: 13px 18px; border-top: 1px solid #1c1c20; cursor: pointer; }
-  .pb-disp:active { background: rgba(255,255,255,0.03); }
-  .pb-dn { width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px; background: var(--ice); position: relative; }
+  .pb-ct { font-family: 'Space Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.08em; color: var(--grey-text); margin-left: auto; }
+  .pb-disp { display: flex; align-items: center; gap: 13px; padding: 13px 18px; border-top: 1px solid var(--grey-mid); cursor: pointer; }
+  .pb-disp:active { background: rgba(0,0,0,0.03); }
+  .pb-dn { width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px; background-color: #C7552F; background-image: linear-gradient(135deg, rgba(199,85,47,0.65) 0%, rgba(199,85,47,0.5) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; position: relative; }
   .pb-dn b { position: absolute; left: 8px; top: 9px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: #fff; }
   .pb-dn i { position: absolute; right: 6px; bottom: 6px; width: 8px; height: 8px; border-radius: 50%; background: #fff; opacity: 0.85; }
   .pb-db { flex: 1; min-width: 0; }
   .pb-dk { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); }
-  .pb-dt { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; line-height: 1.02; text-transform: uppercase; color: #FAF7F2; margin-top: 2px; }
-  .pb-dm { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; color: #7a7a82; margin-top: 3px; }
+  .pb-dt { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; line-height: 1.02; text-transform: uppercase; color: var(--grey-dark); margin-top: 2px; }
+  .pb-dm { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 3px; }
   .pb-dgo { margin-left: auto; flex-shrink: 0; color: var(--ice); font-size: 19px; }
-  .pb-empty { padding: 70px 24px; text-align: center; font-family: 'Barlow', sans-serif; color: #8a8a92; font-size: 14px; line-height: 1.6; }
+  .pb-empty { padding: 70px 24px; text-align: center; font-family: 'Barlow', sans-serif; color: var(--grey-text); font-size: 14px; line-height: 1.6; }
+  .pb-latest { margin: 18px 18px 8px; background-color: #0E4A36; background-image: linear-gradient(135deg, rgba(14,74,54,0.72) 0%, rgba(14,74,54,0.55) 100%), url('court-sessions.jpg'); background-size: cover; background-position: center; border-radius: 16px; padding: 22px 20px 20px; cursor: pointer; transition: opacity .15s ease; }
+  .pb-latest:active { opacity: 0.75; }
+  .pb-latest-label { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 10px; }
+  .pb-latest-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 34px; line-height: 0.95; letter-spacing: -0.3px; text-transform: uppercase; color: #fff; }
+  .pb-latest-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .pb-latest-go { font-size: 20px; color: rgba(255,255,255,0.85); }
+  body[data-dark] .pb-disp:active { background: rgba(255,255,255,0.04); }
 
   /* ════ ARTICLE READER — "Center Court" (broadcast scoreboard) ════ */
   #screen-article { background: var(--grey-bg); }
   /* Hero: deep-green band with court lines + grain; clay kicker, scoreboard meta */
-  .ar-hero { position: relative; overflow: hidden; background: var(--yellow); padding: 46px 20px 22px; }
-  .ar-hero .ar-court { position: absolute; inset: 0; pointer-events: none; z-index: 0; color: rgba(255,255,255,0.16); }
+  .ar-hero { position: relative; overflow: hidden; background-color: #0E4A36; background-image: linear-gradient(to top, rgba(14,74,54,0.88) 0%, rgba(14,74,54,0.45) 100%), url('court-sessions.jpg'); background-size: cover; background-position: center; padding: 46px 20px 22px; }
+  .ar-hero .ar-court { display: none; }
   .ar-hero .ar-court svg { width: 100%; height: 100%; display: block; }
-  .ar-hero::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.06; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+  .ar-hero::after { display: none; }
   .ar-hero > *:not(.ar-court) { position: relative; z-index: 2; }
   .ar-hero .nav-back { position: absolute; top: 12px; left: 12px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.28); color: #fff; border: none; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .ar-hero .nav-back:active { transform: scale(0.9); }
@@ -2141,7 +2142,7 @@
   .notes-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
 
   /* ── Coach messaging (two-way) ────────────────────────────────────── */
-  .coach-thread-card { background: var(--white); border: 1px solid var(--grey-mid); border-radius: 14px; padding: 14px; margin: 0 16px 18px; }
+  .coach-thread-card { background-color: var(--white); background-image: linear-gradient(rgba(250,247,242,0.88), rgba(250,247,242,0.88)), url('court-sessions.jpg'); background-size: cover; background-position: center; border: 1px solid var(--grey-mid); border-radius: 14px; padding: 14px; margin: 0 16px 18px; }
   .coach-thread-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; color: var(--ice); margin-bottom: 10px; }
   .coach-thread { display: flex; flex-direction: column; gap: 10px; }
   .cmsg { display: flex; flex-direction: column; max-width: 84%; }
@@ -2160,7 +2161,7 @@
   #coach-tab-dot[hidden] { display: none; }
   .note-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
   .note-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
-  .note-icon { width: 32px; height: 32px; background: var(--ice); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .note-icon { width: 32px; height: 32px; background-color: #C7552F; background-image: linear-gradient(135deg, rgba(199,85,47,0.65) 0%, rgba(199,85,47,0.5) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
   .note-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; flex: 1; color: var(--yellow); }
   .note-chevron { font-size: 12px; color: var(--grey-text); transition: transform 0.2s; }
   .note-card.open .note-chevron { transform: rotate(180deg); }
@@ -2250,16 +2251,18 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 27px; line-height: 1; color: #fff;
     background-color: #0E4A36;
-    background-image:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.10) 0 9px, rgba(255,255,255,0) 9px 18px),
-      linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
+    background-image: linear-gradient(135deg, rgba(14,74,54,0.6) 0%, rgba(14,74,54,0.45) 100%), url('court-sessions.jpg');
+    background-size: cover;
+    background-position: center;
   }
   .note-tile.tone-clay {
-    background-image:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, rgba(255,255,255,0) 9px 18px),
-      linear-gradient(135deg, #C7552F 0%, #d56b46 100%);
+    background-color: #C7552F;
+    background-image: linear-gradient(135deg, rgba(199,85,47,0.6) 0%, rgba(199,85,47,0.45) 100%), url('court-playbook.jpg');
+    background-size: cover;
+    background-position: center;
   }
   .note-tile.tone-ochre {
+    background-color: #A8741C;
     background-image:
       repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, rgba(255,255,255,0) 9px 18px),
       linear-gradient(135deg, #A8741C 0%, #c08a2a 100%);
@@ -2612,9 +2615,10 @@
 
   <!-- Sessions world: numbered photo shelves (no tabs / no filters) -->
   <div id="lib-sessions" class="lib-pane" hidden>
-    <button class="nav-back lib-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
     <div class="w-head">
-      <div class="w-kick">Library · Train</div>
+      <button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
+      <div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M90 100 L270 100 L340 220 L20 220 Z"/><line x1="56" y1="178" x2="304" y2="178"/><line x1="180" y1="100" x2="180" y2="220"/></g></svg></div>
+      <div class="w-kick">— Train</div>
       <div class="w-title">Sessions</div>
       <div class="w-sub">Pick a session and press play.</div>
     </div>
@@ -4492,9 +4496,9 @@ async function enterWorld(which) {
   showLibPane(which);
   if (which === 'sessions') await renderSessionsWorld();
   if (which === 'playbook') await renderPlaybook();
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
-function exitWorld() { showLibPane('doors'); window.scrollTo(0, 0); }
+function exitWorld() { showLibPane('doors'); window.scrollTo({ top: 0, behavior: 'instant' }); }
 window.enterWorld = enterWorld;
 window.exitWorld = exitWorld;
 
@@ -4537,11 +4541,10 @@ async function renderSessionsWorld() {
       ? list.map(w => `
           <div class="vcard" role="button" tabindex="0" data-file="${esc(w.file || '')}" onclick="openWorkout(this.dataset.file)">
             <div class="vthumb" style="background-image:url('${banner}')">
-              ${w.duration ? `<span class="vbadge">${esc(w.duration)}</span>` : ''}
               ${w.equipment ? `<span class="veq">${esc(w.equipment)}</span>` : ''}
             </div>
             <div class="vt">${esc(w.title || '')}</div>
-            <div class="vm">${esc(cat.title || '')}</div>
+            ${w.duration ? `<div class="vm">${esc(w.duration)}</div>` : ''}
           </div>`).join('')
       : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} sessions — check back soon.</div>`;
     return `<div class="w-shelf"><div class="shelf-head"><span class="shelf-n">${num}</span><span class="shelf-t">${esc(cat.title || '')}</span><span class="shelf-more" aria-hidden="true">›</span></div><div class="w-rail">${cards}</div></div>`;
@@ -4549,24 +4552,31 @@ async function renderSessionsWorld() {
   _sessionsRendered = true;
 }
 
-// ── PLAYBOOK world — broadcast: latest-article hero + numbered list of all. ──
+// ── PLAYBOOK world — latest-article card + per-category numbered sections. ──
 async function renderPlaybook() {
   if (_playbookRendered) return;
   const host = document.getElementById('lib-playbook');
   if (!host) return;
   await ensureLibManifests();
-  const backBtn = '<button class="nav-back lib-back dark" onclick="event.stopPropagation(); exitWorld()" aria-label="Back to Library">←</button>';
+  const backBtn = '<button class="nav-back" onclick="event.stopPropagation(); exitWorld()" aria-label="Back to Library">←</button>';
   if (!_readManifest) { host.innerHTML = backBtn + '<div class="pb-empty">Couldn\'t load the Playbook. Check your connection and try again.</div>'; return; }
   const all = [];
   (_readManifest.categories || []).forEach(c => (c.articles || []).forEach(a => all.push({ title: a.title, file: a.file, readMins: a.readMins, cat: c.title })));
   if (!all.length) { host.innerHTML = backBtn + '<div class="pb-empty">Your coach is adding the Playbook — check back soon.</div>'; _playbookRendered = true; return; }
-  const hero = all[0];
-  const court = '<div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 320" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M110 150 L250 150 L320 320 L40 320 Z"/><line x1="76" y1="240" x2="284" y2="240"/><line x1="180" y1="150" x2="180" y2="320"/></g></svg></div>';
-  const heroHtml = `<div class="pb-hero" role="button" tabindex="0" data-file="${esc(hero.file || '')}" onclick="openArticle(this.dataset.file)">${backBtn}${court}<div class="pb-tag"><span class="pb-dot"></span>Latest in the Playbook</div><div class="pb-hk">${esc(hero.cat || '')}</div><div class="pb-ht">${esc(hero.title || '')}</div><div class="pb-hm">${hero.readMins ? esc(String(hero.readMins)) + ' min read' : ''}<span class="pb-read">Read →</span></div></div>`;
-  const tagline = '<div class="pb-tagline"><b>Everything you need to know to play better tennis.</b> No fluff — just what moves your game.</div>';
-  const block = `<div class="pb-block"><span class="pb-s">§</span>All Reads<span class="pb-ct">${all.length} ${all.length === 1 ? 'article' : 'articles'}</span></div>`;
-  const rows = all.map((a, i) => `<div class="pb-disp" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-dn"><b>${String(i + 1).padStart(2, '0')}</b><i></i></div><div class="pb-db"><div class="pb-dk">${esc(a.cat || '')}</div><div class="pb-dt">${esc(a.title || '')}</div><div class="pb-dm">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}</div></div><span class="pb-dgo" aria-hidden="true">›</span></div>`).join('');
-  host.innerHTML = heroHtml + tagline + block + rows;
+  const court = '<div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M90 100 L270 100 L340 220 L20 220 Z"/><line x1="56" y1="178" x2="304" y2="178"/><line x1="180" y1="100" x2="180" y2="220"/></g></svg></div>';
+  const heroHtml = `<div class="pb-hero">${backBtn}${court}<div class="pb-hk">— Learn</div><div class="pb-ht">Playbook</div><div class="pb-hm">${all.length} ${all.length === 1 ? 'article' : 'articles'} inside</div></div>`;
+  const latest = all[0];
+  const latestCard = `<div class="pb-latest" role="button" tabindex="0" data-file="${esc(latest.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-latest-label">— Latest · ${esc(latest.cat || '')}</div><div class="pb-latest-title">${esc(latest.title || '')}</div><div class="pb-latest-meta"><span>${latest.readMins ? esc(String(latest.readMins)) + ' min read' : ''}</span><span class="pb-latest-go">→</span></div></div>`;
+  let catNum = 0;
+  const catSections = (_readManifest.categories || []).map(c => {
+    catNum++;
+    const num = String(catNum).padStart(2, '0');
+    const count = (c.articles || []).length;
+    const header = `<div class="pb-block"><span class="pb-s">${num}</span>${esc(c.title)}<span class="pb-ct">${count ? count + ' ' + (count === 1 ? 'article' : 'articles') : 'coming soon'}</span></div>`;
+    const rows = (c.articles || []).map((a, i) => `<div class="pb-disp" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-dn"><b>${String(i + 1).padStart(2, '0')}</b><i></i></div><div class="pb-db"><div class="pb-dk">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}</div><div class="pb-dt">${esc(a.title || '')}</div></div><span class="pb-dgo" aria-hidden="true">›</span></div>`).join('');
+    return header + rows;
+  }).join('');
+  host.innerHTML = heroHtml + latestCard + catSections;
   _playbookRendered = true;
 }
 

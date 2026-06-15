@@ -163,7 +163,10 @@
     height: var(--post-h);
     transform-origin: top left;
     position: relative;
-    background: var(--ink);
+    background-color: var(--ink);
+    background-image: linear-gradient(to bottom, rgba(14,74,54,0.42) 0%, rgba(14,74,54,0.72) 100%), url('../court-sessions.jpg');
+    background-size: cover;
+    background-position: center;
     color: var(--paper);
     font-family: var(--display);
     overflow: hidden;
@@ -188,7 +191,7 @@
   /* ---- Court-line substrate (faint white tennis-court geometry, raked low) ----
      z-index:0 + placed as the FIRST children of .post-canvas so they paint below the
      text content (which is z-index:auto, later in the DOM). */
-  .court { position: absolute; inset: 0; pointer-events: none; z-index: 0; color: var(--court); }
+  .court { display: none; }
   .court svg { width: 100%; height: 100%; display: block; }
 
   /* ---- The Rally Arc (dashed clay ball-path + bounce dot) — the signature gesture ---- */
