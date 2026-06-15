@@ -233,6 +233,24 @@
   .chat-head .conv-avatar { width: 52px; height: 52px; font-size: 19px; }
   .chat-thread-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
   .chat-empty { text-align: center; color: var(--grey); padding: 50px 0; }
+  /* Links tab */
+  .links-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin: 28px 0 8px;
+    padding-bottom: 7px; border-bottom: 1px solid var(--line); }
+  .links-section-title:first-child { margin-top: 0; }
+  .links-cat { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+    color: var(--grey); margin: 16px 0 6px; }
+  .link-row { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 7px; display: flex; align-items: center; gap: 12px; }
+  .link-row-info { flex: 1; min-width: 0; }
+  .link-row-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .link-row-url { font-size: 11px; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Space Mono', monospace; }
+  .link-row-meta { font-size: 11px; color: var(--grey); margin-top: 1px; }
+  .copy-btn { flex-shrink: 0; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 14px;
+    cursor: pointer; transition: background .15s; white-space: nowrap; }
+  .copy-btn:hover { background: #0a3828; }
+  .copy-btn.copied { background: #2d8a4e; }
 </style>
 </head>
 <body>
@@ -796,9 +814,71 @@ function renderTabbar(active) {
   tb.innerHTML = `<div class="tabs">
       <button class="tab ${active === 'athletes' ? 'active' : ''}" onclick="loadOverview()">Athletes</button>
       <button class="tab ${active === 'chats' ? 'active' : ''}" onclick="loadChats()">Chats${badge}</button>
+      <button class="tab ${active === 'links' ? 'active' : ''}" onclick="loadLinks()">Links</button>
     </div>`;
 }
 window.renderTabbar = renderTabbar;
+
+// --- Links tab --------------------------------------------------------------
+async function loadLinks() {
+  $('content').innerHTML = '<div class="loading">Loading…</div>';
+  renderTabbar('links');
+  const BASE = 'https://amirardekani.com/program.html';
+  try {
+    const [artData, wrkData] = await Promise.all([
+      fetch('articles/index.json').then(r => r.json()),
+      fetch('workouts/index.json').then(r => r.json()),
+    ]);
+    let html = '<div class="links-section-title">Articles — Read Library</div>';
+    let any = false;
+    for (const cat of artData.categories) {
+      if (!cat.articles || !cat.articles.length) continue;
+      any = true;
+      html += `<div class="links-cat">${esc(cat.title)}</div>`;
+      for (const a of cat.articles) {
+        const url = `${BASE}?article=${a.id}`;
+        html += linkRow(a.title, url, `${a.readMins} min read · ${esc(a.category)}`);
+      }
+    }
+    if (!any) html += '<p class="muted">No articles published yet.</p>';
+    html += '<div class="links-section-title">Workouts — Train Library</div>';
+    any = false;
+    for (const cat of wrkData.categories) {
+      if (!cat.workouts || !cat.workouts.length) continue;
+      any = true;
+      html += `<div class="links-cat">${esc(cat.title)}</div>`;
+      for (const w of cat.workouts) {
+        const url = `${BASE}?workout=${w.id}`;
+        html += linkRow(w.title, url, `${esc(w.duration)} · ${esc(w.equipment)} · ${esc(cat.title)}`);
+      }
+    }
+    if (!any) html += '<p class="muted">No workouts published yet.</p>';
+    $('content').innerHTML = html;
+    $('content').querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(btn.dataset.url).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+        });
+      });
+    });
+  } catch (e) {
+    $('content').innerHTML = '<p class="muted">Could not load manifests.</p>';
+  }
+}
+function linkRow(title, url, meta) {
+  return `<div class="link-row">
+    <div class="link-row-info">
+      <div class="link-row-title">${esc(title)}</div>
+      <div class="link-row-url">${esc(url)}</div>
+      <div class="link-row-meta">${meta}</div>
+    </div>
+    <button class="copy-btn" data-url="${esc(url)}">Copy</button>
+  </div>`;
+}
+window.loadLinks = loadLinks;
 
 // --- Chats inbox ------------------------------------------------------------
 // A global view of every conversation, so the coach sees any note an athlete
