@@ -30,6 +30,10 @@
     var params = new URLSearchParams(window.location.search);
     var client = params.get('client');
     var clientKey = params.get('key');   // Stage 2 per-athlete secret key
+    // Article and workout deep-links are public — anyone can open them.
+    // When no client is set but a content deep-link is present, fall back to
+    // demo data silently so the article/workout loads without an error page.
+    if (!client && (params.get('article') || params.get('workout'))) client = 'demo';
     // Public demo mode: a sample athlete anyone can explore from the marketing
     // site. Disables the coach email, shows a demo banner, and skips the
     // install nag. Detected purely from the ?client=demo URL.
@@ -2968,8 +2972,11 @@ function getVideoUrl(ex) {
 // ── 1. BOOT ──
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
-  const clientId = params.get('client');
+  let clientId = params.get('client');
   const clientKey = params.get('key');   // Stage 2: per-athlete secret key
+
+  // Article/workout deep-links are public — fall back to demo when no client set.
+  if (!clientId && (params.get('article') || params.get('workout'))) clientId = 'demo';
 
   if (!clientId) {
     showError('No client specified. Use: program.html?client=athlete_id');
