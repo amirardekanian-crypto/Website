@@ -5,7 +5,11 @@ description: Design one athlete's training program for a cycle — the core S&C 
 
 # Program Designer — Prompt 1 (Stage B)
 
-This is the highest-value work in the pipeline. **Spend the reasoning budget here.**
+This is the highest-value work in the pipeline. **Spend the reasoning budget here** — and
+spend it on the **programming** (the analysis + training decisions), not on polish. Exercise
+names, chips, day names, and formatting are a later pass once the program exists
+(/program-assemble lints format; names finalize in Notion) — if a name or chip is rough,
+flag it and keep moving; don't burn analysis budget perfecting wording.
 Work like an **assistant coach sitting next to Amir**: do the thinking, but consult him
 on real decisions, and get smarter every cycle by reading and adding to his principles.
 
@@ -114,6 +118,16 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   cycle get programmed like hypertrophy.
 - **Sequencing within a day:** power/CNS → primary strength → accessories → corrective/core.
 - **Superset** non-competing pairs to fit the time ceiling.
+- **DAY NAMING (the `FOCUS TAG`):** name each day for *what it trains* AND so it earns the
+  right banner image. The app auto-picks a day's image by the **first** keyword its name
+  hits, in this priority order: **recovery → power → conditioning → core → upper → lower →
+  fullbody → default**. So lead the tag with the keyword for the image you want, and don't
+  let a higher-priority word hijack it: `"Lower + Brace"` renders a *core* image (brace
+  outranks lower); `"Total + Carry"` hits no keyword → bare gradient. Use the dominant
+  theme's word — leg-led → `"Lower Body …"`, upper-led → `"Upper Body …"`, true full-body →
+  `"Full-Body …"`, power → `"… Power"`, conditioning → `"… Engine"`, brace/core-led →
+  `"Core …"`. Keep it descriptive and clean — the *cool* naming lives at the cycle level.
+  Full keyword map: SCHEMA.md → "Day `focusTag` → banner image."
 
 ---
 
@@ -132,12 +146,15 @@ qualifier · tempo emphasis · holds/durations · digits · parentheses · colon
 
 **CHIPS:** order = dark modifiers → (yellow) set count → grey (reps/tempo/RPE). 0–3 dark
 chips, ≤4 words, lowercase, "3s" not "three-second". Holds/durations always a dark chip.
+Reps chip always uses `×` prefix; embed side info in the same chip — never a separate chip
+(`"×10 Each Side"` ✓, `"×10"` + `"Each Side"` ✗).
 
 **PRESCRIPTION (with carve-out):**
 - standard grinding lift → Sets · reps/duration · tempo · RPE · restSec
 - ballistic (jumps/throws/Olympic) → Sets · reps · RPE · restSec + `max intent` chip — **no tempo**
 - loaded carry → Sets · distance/duration · RPE · restSec — **no tempo**
 - circuit → rounds + restSec + per-item reps + one overall RPE — **no per-item tempo**
+- **simple (warm-up/activation)** → exactly two chips: one dark (reps/duration) + one grey RPE. No sets, no rest, no tempo. RPE 3–5 typical.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
@@ -179,7 +196,7 @@ items:
 
 [Exercise Name]
 type: simple
-chips: [label](dark)
+chips: [label](dark) · RPE X
 ext: [cue]
 int: [cue]
 avoid: [cue]

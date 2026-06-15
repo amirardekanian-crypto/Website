@@ -21,7 +21,12 @@ never drift from the plan.
   /program-design will build.
 - **Cycle count is dictated by the goal and the science** — not a fixed number. A
   general-fitness client and a competitive athlete need different arcs.
-- Strong professional **name** + a **2–5 word tagline** per cycle.
+- **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
+  the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /
+  combat imagery, and still hint at the phase's job. House library to draw on or extend:
+  *Foundation Forge · Strength Engine · Structural Build · Durability Build · Armour Build ·
+  Load Build · Rebuild & Reset · Strength Reclaim · Power Transfer · Metabolic Override ·
+  Bedrock · Volume Engine*. Pair each with a **2–5 word tagline**.
 - One-line **primary** focus + one-line **secondary** focus per cycle.
 - Compute calendar **start–end dates** for every cycle from PROGRAM_START_DATE,
   carried forward cycle to cycle (the runtime cannot call `Date.now()` — derive from
