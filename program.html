@@ -716,25 +716,58 @@
   .lib-seg-btn { flex: 1; padding: 9px 0; border: none; border-radius: 7px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; background: transparent; color: var(--grey-text); transition: background .18s ease, color .18s ease; }
   .lib-seg-btn.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
 
-  /* ── Article card (in the Read accordion) ── */
-  .wl-card-read-mins { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+  /* ── Read list: striped brand-tile cards (icons, à la the Notes screen) ── */
+  .wl-tile { width: 60px; height: 60px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; background-color: #0E4A36; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, transparent 9px 18px), linear-gradient(135deg, #0E4A36, #156A4D); }
+  .wl-tile svg { width: 26px; height: 26px; }
+  .wl-tile.tone-clay  { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.13) 0 9px, transparent 9px 18px), linear-gradient(135deg, #C7552F, #d56b46); }
+  .wl-tile.tone-ochre { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.13) 0 9px, transparent 9px 18px), linear-gradient(135deg, #A8741C, #c08a2a); }
+  .wl-card-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-text); }
+  .wl-card-cta { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); margin-top: 6px; }
 
-  /* ── Article reader body (#ar-body) ── */
-  #ar-body { padding: 20px 20px 110px; }
-  #ar-body img.ar-img { width: 100%; border-radius: 12px; margin: 4px 0 16px; display: block; }
-  #ar-body figcaption.ar-caption { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey-text); text-align: center; margin-top: -10px; margin-bottom: 18px; }
+  /* ════ ARTICLE READER — "Center Court" (broadcast scoreboard) ════ */
+  #screen-article { background: var(--grey-bg); }
+  /* Hero: deep-green band with court lines + grain; clay kicker, scoreboard meta */
+  .ar-hero { position: relative; overflow: hidden; background: var(--yellow); padding: 46px 20px 22px; }
+  .ar-hero .ar-court { position: absolute; inset: 0; pointer-events: none; z-index: 0; color: rgba(255,255,255,0.16); }
+  .ar-hero .ar-court svg { width: 100%; height: 100%; display: block; }
+  .ar-hero::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.06; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+  .ar-hero > *:not(.ar-court) { position: relative; z-index: 2; }
+  .ar-hero .nav-back { position: absolute; top: 12px; left: 12px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.28); color: #fff; border: none; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .ar-hero .nav-back:active { transform: scale(0.9); }
+  .ar-kicker { display: inline-flex; align-items: center; gap: 11px; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #E06B43; margin-top: 12px; }
+  .ar-kicker::before { content: ''; width: 34px; height: 2px; background: #E06B43; }
+  .ar-htitle { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: clamp(33px, 9vw, 44px); line-height: 0.94; letter-spacing: -0.3px; text-transform: uppercase; color: var(--grey-bg); margin: 12px 0 14px; }
+  .ar-htitle .hl { background: var(--ice); color: #fff; padding: 0 0.1em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .ar-hmeta { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(250,247,242,0.72); padding-top: 11px; border-top: 1px solid rgba(250,247,242,0.18); }
+
+  /* Body */
+  #ar-body { padding: 22px 20px 110px; }
   #ar-body .ar-p { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.7; color: var(--ink); margin: 0 0 14px; }
-  #ar-body .ar-h { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; margin: 24px 0 10px; }
-  #ar-body .ar-list { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.7; color: var(--ink); margin: 0 0 14px; padding-left: 20px; }
-  #ar-body .ar-list li { margin-bottom: 6px; }
-  #ar-body .ar-callout { background: var(--grey-bg); border-left: 3px solid var(--ice); border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 0 0 16px; font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.6; color: var(--ink); }
-  #ar-body .ar-workout-card { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--grey-card); border-radius: 12px; padding: 14px; margin: 16px 0; cursor: pointer; transition: border-color .15s ease; }
-  #ar-body .ar-workout-card:hover { border-color: var(--ice); }
-  #ar-body .ar-workout-card-icon { width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; background: var(--yellow-dim); display: flex; align-items: center; justify-content: center; color: var(--yellow); font-size: 18px; }
+  /* Drop-cap on the opening paragraph (one per article) */
+  #ar-body .ar-p.ar-lead::first-letter { float: left; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 58px; line-height: 0.7; color: var(--ice); margin: 7px 10px 0 0; text-transform: uppercase; }
+  /* Section heading = §NN + condensed title + a scoreboard divider rule */
+  #ar-body .ar-h { display: flex; align-items: center; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; margin: 26px 0 11px; }
+  #ar-body .ar-h::before { content: ''; width: 22px; height: 2px; background: var(--ice); flex-shrink: 0; }
+  #ar-body .ar-h .ar-sn { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--ice); flex-shrink: 0; }
+  #ar-body .ar-h .ar-h-t { flex-shrink: 0; }
+  /* List = tennis-ball bullets */
+  #ar-body .ar-list { list-style: none; padding-left: 0; margin: 0 0 14px; }
+  #ar-body .ar-list li { position: relative; padding-left: 28px; margin-bottom: 7px; font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.7; color: var(--ink); }
+  #ar-body .ar-list li::before { content: ''; position: absolute; left: 1px; top: 4px; width: 17px; height: 17px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='9' fill='%23C7552F'/%3E%3Cpath d='M3.2 6 Q10 11 3.2 16 M16.8 4 Q10 9 16.8 14' stroke='%23FAF7F2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  /* Callout = RULE card */
+  #ar-body .ar-callout { position: relative; background: rgba(199,85,47,0.06); border-left: 3px solid var(--ice); border-radius: 0 10px 10px 0; padding: 20px 16px 13px; margin: 0 0 16px; font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  #ar-body .ar-callout::before { content: attr(data-label); position: absolute; top: 0; left: 13px; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; color: var(--ice); background: var(--ice-dim); padding: 3px 7px; border-radius: 0 0 4px 4px; }
+  #ar-body img.ar-img { width: 100%; border-radius: 12px; margin: 4px 0 6px; display: block; filter: saturate(0.94) contrast(1.02); }
+  #ar-body figcaption.ar-caption { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey-text); text-align: center; margin: 0 0 18px; }
+  #ar-body figcaption.ar-caption::before { content: '▸ '; color: var(--ice); }
+  /* Inline workout = a scoreboard fixture card */
+  #ar-body .ar-workout-card { display: flex; align-items: center; gap: 13px; background: var(--white); border: 1px solid var(--grey-card); border-left: 3px solid var(--ice); border-radius: 0 12px 12px 0; padding: 13px; margin: 18px 0 6px; cursor: pointer; transition: border-color .15s ease; }
+  #ar-body .ar-workout-card-icon { width: 44px; height: 44px; flex-shrink: 0; border-radius: 8px; background: var(--ice-dim); display: flex; align-items: center; justify-content: center; color: var(--ice); font-size: 15px; }
   #ar-body .ar-workout-card-body { flex: 1; }
   #ar-body .ar-workout-card-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; text-transform: uppercase; color: var(--ink); }
-  #ar-body .ar-workout-card-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey-text); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
-  #ar-body .ar-workout-card-play { width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; background: var(--grey-bg); color: var(--yellow); display: flex; align-items: center; justify-content: center; font-size: 12px; padding-left: 2px; }
+  #ar-body .ar-workout-card-sub { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey-text); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  #ar-body .ar-workout-card-play { width: 32px; height: 32px; flex-shrink: 0; margin-left: auto; border-radius: 50%; border: 1.5px solid var(--ice); color: var(--ice); display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  body[data-dark] #ar-body .ar-callout { background: rgba(199,85,47,0.10); }
 
   /* ═══ HOME OVERVIEW (the landing page on #screen-home) ═══
      Site nav · "Hi name" · current-cycle card · "This Week" + week · day cards.
@@ -2499,11 +2532,12 @@
 <!-- ═══ ARTICLE ═══ a single blog/read article opened from the Library Read tab
      or via ?article= deep-link. Mirrors #screen-workout. -->
 <div id="screen-article" class="screen">
-  <div class="ws-header">
+  <div class="ar-hero">
     <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to library">←</button>
-    <div class="ws-eyebrow" id="ar-eyebrow"></div>
-    <div class="ws-title" id="ar-title"></div>
-    <div class="ws-meta" id="ar-meta"></div>
+    <div class="ar-court" aria-hidden="true"><svg viewBox="0 0 330 150" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M95 80 L235 80 L300 150 L30 150 Z"/><line x1="60" y1="118" x2="270" y2="118"/><line x1="165" y1="80" x2="165" y2="150"/></g></svg></div>
+    <div class="ar-kicker" id="ar-eyebrow"></div>
+    <h1 class="ar-htitle" id="ar-title"></h1>
+    <div class="ar-hmeta" id="ar-meta"></div>
   </div>
   <div id="ar-body"></div>
 </div>
@@ -4406,10 +4440,13 @@ async function renderReadLibrary() {
     return;
   }
 
-  scroll.innerHTML = cats.map(cat => {
+  const TONES = ['', 'tone-clay', 'tone-ochre'];   // rotate the tile colour per category
+  scroll.innerHTML = cats.map((cat, ci) => {
     const list = Array.isArray(cat.articles) ? cat.articles : [];
     const count = list.length;
     const countLabel = count + ' ' + (count === 1 ? 'Article' : 'Articles');
+    const tone = TONES[ci % TONES.length];
+    const icon = window.ICON(window.resolveIconKey(cat.icon || 'note'));
     const banner = `
       <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleLibCat(this,'wl-scroll-read')">
         <span class="wl-banner-chev" aria-hidden="true">▾</span>
@@ -4421,12 +4458,12 @@ async function renderReadLibrary() {
     const body = count
       ? list.map(a => `
           <div class="wl-card" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)">
-            <div class="wl-card-thumb" style="${a.cover ? `background-image:url('${esc(a.cover)}');background-size:cover;background-position:center;` : ''}"></div>
+            <div class="wl-tile ${tone}">${icon}</div>
             <div class="wl-card-body">
+              <div class="wl-card-eyebrow">${esc(cat.title || '')}</div>
               <div class="wl-card-title">${esc(a.title || '')}</div>
-              <div class="wl-card-read-mins">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}${a.readMins && a.category ? ' · ' : ''}${esc(a.category || '')}</div>
+              <div class="wl-card-cta">Read${a.readMins ? ' · ' + esc(String(a.readMins)) + ' min' : ''} →</div>
             </div>
-            <div class="wl-card-play" aria-hidden="true">›</div>
           </div>`).join('')
       : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} articles — check back soon.</div>`;
     return `<div class="wl-group">${banner}<div class="wl-group-body">${body}</div></div>`;
@@ -4466,7 +4503,15 @@ async function openArticle(file) {
   }
 
   eyebrow.textContent = article.category || '';
-  titleEl.textContent = article.title || '';
+  // Title with the last word wrapped in the clay highlight block (the scoreboard
+  // "on-air" word). esc() each part so the title stays safe.
+  const words = String(article.title || '').trim().split(/\s+/);
+  if (words.length > 1) {
+    const last = words.pop();
+    titleEl.innerHTML = esc(words.join(' ')) + ' <span class="hl">' + esc(last) + '</span>';
+  } else {
+    titleEl.innerHTML = '<span class="hl">' + esc(words[0] || '') + '</span>';
+  }
   metaEl.textContent  = [
     article.readMins ? article.readMins + ' min read' : '',
     article.date || ''
@@ -4479,16 +4524,22 @@ window.openArticle = openArticle;
 // Renders an array of typed content blocks to HTML.
 // Block types: p · h · list · callout · img · workout
 function renderArticleBlocks(blocks) {
+  let hNum = 0;        // running §-number for section headings
+  let leadDone = false; // the first paragraph gets the drop-cap
   return blocks.map(b => {
     switch (b.type) {
-      case 'p':
-        return `<p class="ar-p">${esc(b.text || '')}</p>`;
+      case 'p': {
+        const lead = !leadDone;
+        leadDone = true;
+        return `<p class="ar-p${lead ? ' ar-lead' : ''}">${esc(b.text || '')}</p>`;
+      }
       case 'h':
-        return `<h3 class="ar-h">${esc(b.text || '')}</h3>`;
+        hNum++;
+        return `<h3 class="ar-h"><span class="ar-sn">§${String(hNum).padStart(2, '0')}</span><span class="ar-h-t">${esc(b.text || '')}</span></h3>`;
       case 'list':
         return `<ul class="ar-list">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
       case 'callout':
-        return `<div class="ar-callout">${esc(b.text || '')}</div>`;
+        return `<div class="ar-callout" data-label="${esc(b.label || 'Rule')}">${esc(b.text || '')}</div>`;
       case 'img':
         return `<figure style="margin:0 0 4px">
           <img class="ar-img" src="${esc(b.src || '')}" alt="${esc(b.caption || '')}" loading="lazy">

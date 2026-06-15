@@ -1,0 +1,176 @@
+{
+  "id": "tennis-warm-up-routine",
+  "title": "Tennis Warm-Up Routine",
+  "category": "on-court",
+  "duration": "12 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Warm-Up & Prep",
+  "blocks": [
+    {
+      "title": "Raise",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "chips": [{ "label": "3 min" }],
+          "cues": {
+            "good": [
+              "Keep effort low — you should be able to talk",
+              "Breathe through your nose if you can"
+            ],
+            "bad": [
+              "Going too hard — you're warming the engine, not racing it"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Side Shuffles",
+          "chips": [{ "label": "3 lengths" }],
+          "cues": {
+            "good": [
+              "Face the net, stay low through the hips",
+              "Push off the outside foot each time"
+            ],
+            "bad": [
+              "Crossing your feet over each other"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "High Knees",
+          "chips": [{ "label": "1 baseline length" }],
+          "cues": {
+            "good": [
+              "Drive each knee up to hip height",
+              "Stay on the balls of your feet"
+            ],
+            "bad": [
+              "Leaning back — stay tall"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Butt Kicks",
+          "chips": [{ "label": "1 baseline length" }],
+          "cues": {
+            "good": [
+              "Quick tempo, heels flicking up behind you",
+              "Arms pumping in rhythm"
+            ],
+            "bad": [
+              "Big, slow strides — this should be fast and tight"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Activate & Mobilise",
+      "icon": "🎾",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Leg Swings — Front & Back",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each leg" }],
+          "cues": {
+            "good": [
+              "Let momentum carry the leg — don't force the range",
+              "Hold a fence or wall for balance"
+            ],
+            "bad": [
+              "Swinging so hard you lose your standing foot position"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings — Side to Side",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each leg" }],
+          "cues": {
+            "good": [
+              "Rotate through the hip, not just the knee",
+              "Keep the standing leg slightly bent"
+            ],
+            "bad": [
+              "Twisting your whole torso to get more range"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Hip Circles",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each direction" }],
+          "cues": {
+            "good": [
+              "Hands on hips, make the circle as wide as possible",
+              "Slow and controlled"
+            ],
+            "bad": [
+              "Small, lazy circles that don't open the hip"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Walking Lunges with Twist",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each leg" }],
+          "cues": {
+            "good": [
+              "Step forward, lower into the lunge, then twist your chest toward your front knee",
+              "Keep your back knee close to the floor"
+            ],
+            "bad": [
+              "Twisting before you're fully in the lunge position"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Arm Circles",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each direction" }],
+          "cues": {
+            "good": [
+              "Start small and build to full shoulder range",
+              "Slow to fast — let the shoulder open gradually"
+            ],
+            "bad": [
+              "Going straight to big circles with a cold shoulder"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Shoulder Cross-Body Swings",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each arm" }],
+          "cues": {
+            "good": [
+              "Swing across the chest and let momentum carry it back",
+              "Alternate arms in a relaxed rhythm"
+            ],
+            "bad": [
+              "Forcing the range — it should swing freely, not be pulled"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Trunk Rotations",
+          "chips": [{ "label": "10 Reps" }, { "label": "Each side" }],
+          "cues": {
+            "good": [
+              "Feet shoulder-width, arms out, rotate from the thoracic spine",
+              "Eyes follow the hands through the full rotation"
+            ],
+            "bad": [
+              "Rotating from the hips — this should come from the upper back"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

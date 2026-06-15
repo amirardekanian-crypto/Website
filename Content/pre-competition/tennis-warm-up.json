@@ -1,0 +1,87 @@
+{
+  "id": "tennis-warm-up",
+  "title": "The Tennis Warm-Up",
+  "category": "Pre-Competition",
+  "readMins": 4,
+  "date": "June 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players jog a lap, hit a few forehands, and call it a warm-up. Then they wonder why they feel slow in the first set and their shoulder is stiff by the third."
+    },
+    {
+      "type": "p",
+      "text": "A warm-up isn't a ritual. It's preparation. And if you understand what tennis actually demands of your body, the warm-up almost designs itself."
+    },
+    {
+      "type": "h",
+      "text": "What tennis demands"
+    },
+    {
+      "type": "p",
+      "text": "Tennis is explosive, multidirectional, and rotational. Every point starts with a split step — a reactive jump. Every shot uses rotation through the hips and thoracic spine. Every rally involves repeated acceleration, deceleration, and change of direction on one leg."
+    },
+    {
+      "type": "p",
+      "text": "Your warm-up needs to prepare all of that. A gentle jog prepares almost none of it."
+    },
+    {
+      "type": "h",
+      "text": "The four things a warm-up must do"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Raise your core temperature — muscles work better warm. Cold muscles are slow and stiff.",
+        "Open up the joints you'll actually use — hips, thoracic spine, ankles, shoulders.",
+        "Wake up the muscles that tend to be quiet — glutes, rotator cuff, hip stabilisers.",
+        "Prime your nervous system — your brain needs to be ready to fire fast before you ask it to."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "How to hit each one"
+    },
+    {
+      "type": "callout",
+      "label": "Warm",
+      "text": "Raise temperature: 3–5 minutes of movement that gradually increases effort. Skipping, lateral shuffles, carioca. Not jogging in a straight line — move like you will in the match."
+    },
+    {
+      "type": "callout",
+      "label": "Mobilise",
+      "text": "Open up the joints: leg swings (front/back and side to side), hip 90/90 rotations, thoracic rotations in a half-kneeling position, arm circles progressing to full shoulder circles. 5–6 reps each, slow and controlled."
+    },
+    {
+      "type": "callout",
+      "label": "Activate",
+      "text": "Activate key muscles: glute bridges or banded clamshells for the hips, band pull-aparts or shoulder CARs for the rotator cuff. You're not training here — you're just switching muscles on. 10–12 reps is enough."
+    },
+    {
+      "type": "callout",
+      "label": "Prime",
+      "text": "Prime the nervous system: 4–6 explosive movements before you touch a racket. Jump squats, split jumps, lateral bounds, or fast feet. These tell your nervous system it's time to move fast. Skip this and your first 20 minutes on court feel like wading through mud."
+    },
+    {
+      "type": "h",
+      "text": "What to skip"
+    },
+    {
+      "type": "p",
+      "text": "Static stretching before you play. Holding a stretch for 30–60 seconds before a match reduces power output. It relaxes the muscle — which is the opposite of what you want. Save static stretching for after the session."
+    },
+    {
+      "type": "p",
+      "text": "Also skip the 'I'll warm up on court' approach. Feeding balls while half-awake is not preparation. You get one chance to set the tone for the session — use the 12 minutes before you walk on properly."
+    },
+    {
+      "type": "h",
+      "text": "The rule of thumb"
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "10–15 minutes total. You should feel warm, loose, and slightly ready to go by the time the racket comes out. Not tired — ready. If you're sweating before hitting the first ball, that's the right sign."
+    }
+  ]
+}
