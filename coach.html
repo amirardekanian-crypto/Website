@@ -346,16 +346,32 @@ function copyText(t, btn) {
     if (btn) { const o = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => btn.textContent = o, 1500); }
   }, () => alert('Copy failed — here is the link:\n\n' + t));
 }
+// Canonicalise a typed athlete ID to the firstname_lastname convention so a
+// stray space / capital / punctuation can never create a malformed duplicate
+// row (e.g. "amir ardekani" -> "amir_ardekani"). Keeps existing case-sensitive
+// IDs (Sina_rzgh2) intact — only collapses whitespace and strips junk chars.
+function normalizeAthleteId(raw) {
+  return (raw || '').trim().replace(/\s+/g, '_').replace(/[^A-Za-z0-9_]/g, '');
+}
 async function newAthleteLink() {
-  const id = (prompt('New athlete ID (must match their data/<id>.json file, e.g. john_doe):') || '').trim();
-  if (!id) return;
-  const key = genKey();
-  const { error } = await sb.from('athlete_keys')
-    .upsert({ athlete_id: id, secret_key: key }, { onConflict: 'athlete_id' });
-  if (error) { alert('Could not save key: ' + error.message); return; }
+  const raw = prompt('New athlete ID (must match their data/<id>.json file, e.g. john_doe):') || '';
+  const id = normalizeAthleteId(raw);
+  if (!id) { if (raw.trim()) alert('That ID had no usable characters. Use letters, numbers and underscores, e.g. john_doe.'); return; }
+  if (id !== raw.trim() && !confirm('Using normalised ID "' + id + '"\n(must match data/' + id + '.json). Continue?')) return;
+  // Reuse the athlete's existing key if they're already protected — never
+  // rotate a live key (it would break their saved link) or create a duplicate.
+  const existing = await sb.from('athlete_keys').select('secret_key').eq('athlete_id', id).maybeSingle();
+  let key = existing.data && existing.data.secret_key;
+  if (!key) {
+    key = genKey();
+    const { error } = await sb.from('athlete_keys')
+      .upsert({ athlete_id: id, secret_key: key }, { onConflict: 'athlete_id' });
+    if (error) { alert('Could not save key: ' + error.message); return; }
+  }
   const link = secureLink(id, key);
   copyText(link);
-  alert('Secure link created & copied to clipboard:\n\n' + link + '\n\nMake sure data/' + id + '.json exists, then send this link to the athlete.');
+  alert((existing.data ? 'Existing secure link copied to clipboard:' : 'Secure link created & copied to clipboard:') +
+        '\n\n' + link + '\n\nMake sure data/' + id + '.json exists, then send this link to the athlete.');
 }
 window.protectAthlete = protectAthlete;
 window.copyText = copyText;
