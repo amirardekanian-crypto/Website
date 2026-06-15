@@ -5904,6 +5904,11 @@ function esc(str) {
 <!-- Shared helpers: VideoModal + A2HS prompt -->
 <script defer src="/assets/js/shared.js"></script>
 <script>
+  // Register service worker — keeps the installed app up to date automatically.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+
   // Offer Add-to-Home-Screen a few seconds after first paint.
   // Skipped in demo mode — don't nag marketing visitors to install.
   if (!window.IS_DEMO) {
