@@ -42,24 +42,22 @@ Map the spec into the schema shape:
   RPE·restSec; ballistic/carry correctly OMIT tempo and carry a `max intent` chip;
   chip order = dark → yellow set count → grey; every exercise has exactly 3 cues
   (ext+int in good, avoid in bad).
-- **Naming** (see COACHING-PRINCIPLES.md › Exercise naming): names are
-  `[modification] [equipment] [movement]`, bodyweight bare; grip / intent / holds live
-  in chips, never the name. Don't strip digits from established library names (45°, 90/90).
-- **Name ↔ library check (catches dead video links):** every exercise name is the video
-  join key — it must resolve in `exercise_library.json`. Run the snippet below: it matches
-  exact, then normalized (case/punctuation/accents, mirroring the app resolver). For any
-  **MISS**, rename to the suggested canonical key before ship. For a name that resolves but
-  whose library URL is **empty (GAP)**, keep the name and flag it to Amir as a Notion
-  content gap (the video gets added there, not here).
-  ```
-  node -e "const fs=require('fs');const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\x00-\x7f]/g,'').replace(/'/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();const lib=JSON.parse(fs.readFileSync('exercise_library.json','utf8'));const N={};for(const k of Object.keys(lib)){const n=norm(k);if(!(n in N))N[n]=k;}const d=JSON.parse(fs.readFileSync('data/<id>.json','utf8'));const seen=new Set();for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exercises)for(const it of (e.items||[e])){const nm=it.name;if(!nm||seen.has(nm))continue;seen.add(nm);if(nm in lib){if(!lib[nm])console.log('GAP   '+nm+'  (in library, no video — add in Notion)');}else{const c=N[norm(nm)];console.log('MISS  '+nm+(c?'  -> rename to: '+c:'  -> no library match'));}}console.log('checked '+seen.size+' names');"
-  ```
-- Report any violation and fix before finishing.
+- Report any structural violation and fix before finishing. Do NOT spend time on exercise names here.
 
 ## Step 4 — Ship
 - Summarise the diff (cycle advanced N→N+1, days, swaps).
 - Commit + push **only if Amir asks**. End commit messages with the project's
   Co-Authored-By line.
+
+## Step 5 — Name scan (last, non-blocking)
+Run this after shipping. It's informational only — no fixing required now, names get
+corrected in Notion when the video is added.
+
+```
+node -e "const fs=require('fs');const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\x00-\x7f]/g,'').replace(/'/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();const lib=JSON.parse(fs.readFileSync('exercise_library.json','utf8'));const N={};for(const k of Object.keys(lib)){const n=norm(k);if(!(n in N))N[n]=k;}const d=JSON.parse(fs.readFileSync('data/<id>.json','utf8'));const seen=new Set();for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exercises)for(const it of (e.items||[e])){const nm=it.name;if(!nm||seen.has(nm))continue;seen.add(nm);if(nm in lib){if(!lib[nm])console.log('GAP   '+nm);}else{const c=N[norm(nm)];console.log('MISS  '+nm+(c?'  (lib has: '+c+')':''));}}console.log('done');"
+```
+
+Print the output as a short list for Amir. GAP = in library, no video yet (fine). MISS = not in library at all (add to Notion when adding the video).
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.
