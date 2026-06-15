@@ -1,33 +1,61 @@
 {
-  "_comment": "Manifest for the shared Read library shown in the Library tab. Each category has a banner image and an articles[] array. To add an article: drop its JSON in the category folder and add an entry here. An empty articles[] shows a 'coach is adding…' note. Article block types: p · h · list · callout · img · workout.",
+  "_comment": "Manifest for the shared Read library shown in the Library tab. Each category has a banner image, an icon (a key from the app icon set — used on the list-card tile), and an articles[] array. To add an article: drop its JSON in the category folder and add an entry here. An empty articles[] shows a 'coach is adding…' note. Article block types: p · h · list · callout · img · workout.",
   "categories": [
     {
-      "id": "recovery",
-      "title": "Recovery",
-      "banner": "assets/img/workouts/recovery.webp",
-      "articles": []
+      "id": "for-coaches",
+      "title": "For Coaches",
+      "icon": "book",
+      "banner": "assets/img/workouts/strength.webp",
+      "articles": [
+        {
+          "id": "pre-session-warm-up",
+          "title": "The Pre-Session Warm-Up",
+          "category": "For Coaches",
+          "readMins": 7,
+          "file": "content/for-coaches/pre-session-warm-up.json"
+        }
+      ]
     },
     {
       "id": "pre-competition",
       "title": "Pre-Competition",
+      "icon": "tennis",
       "banner": "assets/img/workouts/on-court.webp",
+      "articles": [
+        {
+          "id": "tennis-warm-up",
+          "title": "The Tennis Warm-Up",
+          "category": "Pre-Competition",
+          "readMins": 4,
+          "file": "content/pre-competition/tennis-warm-up.json"
+        }
+      ]
+    },
+    {
+      "id": "recovery",
+      "title": "Recovery",
+      "icon": "sleep",
+      "banner": "assets/img/workouts/recovery.webp",
       "articles": []
     },
     {
       "id": "mental",
       "title": "Mental",
+      "icon": "mindset",
       "banner": "assets/img/workouts/conditioning.webp",
       "articles": []
     },
     {
       "id": "nutrition",
       "title": "Nutrition",
+      "icon": "nutrition",
       "banner": "assets/img/workouts/strength.webp",
       "articles": []
     },
     {
       "id": "supplements",
       "title": "Supplements",
+      "icon": "bodycomp",
       "banner": "assets/img/workouts/mobility.webp",
       "articles": []
     }

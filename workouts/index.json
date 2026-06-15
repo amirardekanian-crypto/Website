@@ -42,6 +42,13 @@
       "banner": "assets/img/workouts/on-court.webp",
       "workouts": [
         {
+          "id": "tennis-warm-up-routine",
+          "title": "Tennis Warm-Up Routine",
+          "duration": "12 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/on-court/tennis-warm-up-routine.json"
+        },
+        {
           "id": "first-step-speed",
           "title": "First-Step Speed",
           "duration": "25 min",

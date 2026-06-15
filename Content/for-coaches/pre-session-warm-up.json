@@ -1,0 +1,109 @@
+{
+  "id": "pre-session-warm-up",
+  "title": "The Pre-Session Warm-Up",
+  "category": "For Coaches",
+  "readMins": 7,
+  "date": "June 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Here's something most tennis players do before every session: they jog one lap, stretch their legs, hold it for a bit, then pick up their racket."
+    },
+    {
+      "type": "p",
+      "text": "It feels like warming up. But it's not really helping them. In fact, the stretching part might actually be making them slower."
+    },
+    {
+      "type": "p",
+      "text": "Here's what actually works — and why."
+    },
+    {
+      "type": "h",
+      "text": "Why warming up matters"
+    },
+    {
+      "type": "p",
+      "text": "When muscles are cold, they can't fire fast. They're sluggish. The first step is late. The serve feels stiff. Reactions are slow."
+    },
+    {
+      "type": "p",
+      "text": "When you warm up properly, muscle temperature goes up — and that literally makes muscles move faster. For every degree muscles warm up, explosive power goes up by about 3–4%. Faster serves, quicker feet, sharper reactions."
+    },
+    {
+      "type": "p",
+      "text": "But here's the catch: the effect doesn't last long. If players warm up and then stand around for an hour, they're basically cold again. Time the warm-up so it ends close to when the session starts — right before, not 30 minutes before."
+    },
+    {
+      "type": "h",
+      "text": "The one thing to cut"
+    },
+    {
+      "type": "p",
+      "text": "Static stretching before training. Those long holds where players bend down and count to 30 — research is very clear on this: it slows them down. It makes muscles too loose, too floppy, and that actually hurts sprint speed and serve power."
+    },
+    {
+      "type": "p",
+      "text": "Dynamic stretching — moving through range instead of holding it — gives the same flexibility benefit without the speed cost. Cut the held stretches. Move instead."
+    },
+    {
+      "type": "h",
+      "text": "The 4-step structure"
+    },
+    {
+      "type": "callout",
+      "label": "Step 1 — Raise (3–5 min)",
+      "text": "Get the blood moving and the muscles warm. Low-effort movement — players are not working hard yet, just waking up. Jog easy, side shuffles, high knees, butt kicks. Think of it like warming up a car engine — you don't floor it straight away."
+    },
+    {
+      "type": "callout",
+      "label": "Step 2 — Activate & Mobilise (7–10 min)",
+      "text": "Move the joints through the ranges tennis actually needs. Leg swings, hip circles, walking lunges with a twist, arm swings, trunk rotations. No holding — keep it flowing. Research on tennis players showed a dynamic warm-up like this made serve speed 4% faster and sprint times 4% quicker compared to a static warm-up."
+    },
+    {
+      "type": "callout",
+      "label": "Step 3 — Potentiate (10 seconds)",
+      "text": "Optional, but worth building in before serving. Right before players serve — not 10 minutes before, right before — they press their hitting arm hard against a fence post or wall as if trying to swing it forward. Hold 5 seconds, twice. In a study on real tennis players, serve speed went up 4.6 km/h just from this. No equipment, no extra time."
+    },
+    {
+      "type": "callout",
+      "label": "Step 4 — Start immediately",
+      "text": "The warm-up keeps players ready for about 30 minutes. After 60, it's mostly gone. Don't let them stand around after it. If there's a long break mid-session, run a quick 2-minute re-raise before going hard again."
+    },
+    {
+      "type": "h",
+      "text": "At a glance"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Raise — easy jogging, shuffles, high knees (3–5 min)",
+        "Activate & Mobilise — leg swings, arm swings, walking lunges, trunk rotations (7–10 min)",
+        "Potentiate — 2 × 5-second arm press against wall (10 seconds, right before serving)",
+        "Start — do not wait around"
+      ]
+    },
+    {
+      "type": "h",
+      "text": "The rule"
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Move, don't hold. Everything in the warm-up should be moving. If players are standing still counting seconds, it's wrong before a session. Static stretches are for after training — when they're warm, the session is done, and you want to cool down and loosen up. Before training: move. After training: hold."
+    },
+    {
+      "type": "h",
+      "text": "The routine"
+    },
+    {
+      "type": "p",
+      "text": "This follows the Raise + Activate & Mobilise sequence above as a structured group warm-up. Brief your players while they move — between the raise and the mobility work is a natural time to cue what's coming in the session. No equipment needed."
+    },
+    {
+      "type": "workout",
+      "file": "workouts/on-court/tennis-warm-up-routine.json",
+      "label": "Tennis Warm-Up Routine",
+      "meta": "12–15 min · Bodyweight · On-Court"
+    }
+  ]
+}
