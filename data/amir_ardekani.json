@@ -99,7 +99,7 @@
                 "name": "World's Greatest Stretch",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "4 Each Side", "style": "dark" },
+                  { "label": "×4 Each Side" },
                   { "label": "RPE 4" }
                 ],
                 "cues": {
@@ -117,7 +117,7 @@
                 "name": "Bird Dog",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "6 Each Side", "style": "dark" },
+                  { "label": "×6 Each Side" },
                   { "label": "RPE 4" }
                 ],
                 "cues": {
@@ -484,7 +484,7 @@
                 "name": "World's Greatest Stretch",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "4 Each Side", "style": "dark" },
+                  { "label": "×4 Each Side" },
                   { "label": "RPE 4" }
                 ],
                 "cues": {
