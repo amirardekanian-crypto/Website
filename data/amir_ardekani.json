@@ -1,0 +1,685 @@
+{
+  "athlete": {
+    "id": "amir_ardekani",
+    "firstName": "Amir",
+    "lastName": "Ardekani",
+    "key": "4afd4f83446c45b192f15e7ca098f4a8"
+  },
+  "sport": {
+    "badge": "🏃 Hybrid — Strength & Run"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bedrock",
+      "tagline": "Brace, Move, Base",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-06-15",
+      "endDate": "2026-07-19",
+      "focuses": [
+        "Build a bulletproof, spine-sparing strength foundation and anti-movement core that makes the lower back robust under load.",
+        "Establish an easy aerobic base — self-managed Zone-2 walk/run at a sub-140 heart rate."
+      ],
+      "message": {
+        "paragraphs": [
+          "This is the foundation everything else gets built on. Before we make you a hybrid athlete, we make your back unbreakable and your movement clean — that's the platform Forge, Crossover and Hybrid all stand on. Skip it and the whole arc cracks.",
+          "Your job this block: own the brace before you chase the weight. Every working set leaves 1–2 reps in the tank — we're building tissue and trust, not testing limits.",
+          "By week 5: load climbing on every main lift, carries noticeably heavier, side planks rock-solid both sides — and a back that takes training instead of fearing it."
+        ],
+        "outcomes": [
+          "Three sessions a week banked with zero back flare-ups",
+          "Load up every week on Leg Press and Hip Thrust",
+          "Clean 30-second side plank, both sides equal",
+          "Carry weight up across the block — suitcase and farmer",
+          "Brace locked on every main lift — no low-back cheat",
+          "Easy-run base started: two sub-140 runs a week in the bank"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Forge",
+      "tagline": "Earn the Load",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-07-20",
+      "endDate": "2026-08-23",
+      "focuses": [
+        "Progressively overload the main spine-sparing patterns to build real strength and lean muscle on the foundation.",
+        "Extend the aerobic base toward continuous easy running — volume before intensity."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Once the base holds, we stop protecting and start loading. Forge is where the strength actually gets built — heavier, and with the free movements your back will have earned the right to load.",
+          "The brace you build now is the permission slip.",
+          "Lay the bedrock. Then we forge."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Crossover",
+      "tagline": "Strength Meets Stride",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-08-24",
+      "endDate": "2026-09-27",
+      "focuses": [
+        "Run heavier, lower-volume strength alongside the first structured run intensity, managing the interference between them.",
+        "Hold trunk durability and movement quality as total weekly training load climbs."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Hybrid",
+      "tagline": "All Engines, All Terrain",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-09-28",
+      "endDate": "2026-11-01",
+      "focuses": [
+        "Integrate strength and running into genuine hybrid capacity — perform and stay durable under combined demand.",
+        "Lock back resilience as a permanent baseline and reassess to set the next training arc."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bedrock",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Lower + Brace",
+        "completionTitle": "Base Laid",
+        "completionMessage": "Legs loaded, trunk braced — that's the foundation of every run and every lift to come. Walk easy, hydrate, let the hips recover.",
+        "blocks": [
+          {
+            "title": "Prime",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "World's Greatest Stretch",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 Each Side", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Step into a deep lunge, drop the back knee tall",
+                    "Feel the hip and mid-back open as you rotate"
+                  ],
+                  "bad": [
+                    "Don't rush — move slow and own each position"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Bird Dog",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "6 Each Side", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Long arm and opposite leg, body in one straight line",
+                    "Feel the trunk lock to resist any twist"
+                  ],
+                  "bad": [
+                    "Don't let the low back sag or the hips tip"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Leg Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Push through the mid-foot, knees track over the toes",
+                    "Feel the quads and glutes drive the sled"
+                  ],
+                  "bad": [
+                    "Don't let the low back round off the pad at the bottom"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Back Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "glute focus", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Hinge from the hips, lift to a straight line — no higher",
+                    "Feel the glutes and hamstrings, not the low back"
+                  ],
+                  "bad": [
+                    "Don't hyperextend or crank past neutral at the top"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Incline Dumbbell Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower to the upper chest, elbows at roughly 45 degrees",
+                    "Feel the upper chest stretch, then drive"
+                  ],
+                  "bad": [
+                    "Don't flare the elbows wide or bounce off the chest"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the elbows back and pause at the top",
+                    "Feel the mid-back squeeze the shoulder blades"
+                  ],
+                  "bad": [
+                    "Don't shrug or yank with the arms"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Brace",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "slow", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the low back flat, extend opposite arm and leg",
+                    "Feel the deep abs hold the ribs down"
+                  ],
+                  "bad": [
+                    "Don't let the back arch off the floor"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "40m", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Stand tall and walk with one heavy dumbbell at your side",
+                    "Feel the opposite obliques fight the lean"
+                  ],
+                  "bad": [
+                    "Don't tip toward the weight or shrug it up"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Upper + Posterior",
+        "completionTitle": "Engine On",
+        "completionMessage": "Pressed strong and built the back that protects your spine. Roll the shoulders out tonight and keep that sleep honest.",
+        "blocks": [
+          {
+            "title": "Prime",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Cat-Cow",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "8 Reps", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Slowly round then arch the whole spine",
+                    "Feel each segment move one at a time"
+                  ],
+                  "bad": [
+                    "Don't force the end range — stay smooth"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Band Pull-Apart",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "15 Reps", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Arms straight, pull the band to your chest",
+                    "Feel the rear delts and mid-back switch on"
+                  ],
+                  "bad": [
+                    "Don't shrug the shoulders to your ears"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Seated Machine Shoulder Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press straight up with the back flat on the pad",
+                    "Feel the shoulders drive without the low back arching"
+                  ],
+                  "bad": [
+                    "Don't push the ribs forward to cheat the press"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the bar to the upper chest, chest proud",
+                    "Feel the lats drive the elbows down"
+                  ],
+                  "bad": [
+                    "Don't lean way back or use momentum"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "1s squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the hips to a flat tabletop and squeeze at the top",
+                    "Feel the glutes finish the lockout"
+                  ],
+                  "bad": [
+                    "Don't arch the low back to fake extra height"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the rope to your forehead, elbows high",
+                    "Feel the rear delts and upper back"
+                  ],
+                  "bad": [
+                    "Don't let the elbows drop or the head jut forward"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Lateral Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Raise to shoulder height, leading with the elbows",
+                    "Feel the side delts do the work"
+                  ],
+                  "bad": [
+                    "Don't swing or shrug to lift the dumbbells"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Brace",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Press",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2s hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "Tempo 1-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the handle straight out, hold, then return",
+                    "Feel the trunk resist the cable's pull to rotate"
+                  ],
+                  "bad": [
+                    "Don't let your torso twist toward the stack"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Total + Carry",
+        "completionTitle": "Carried It",
+        "completionMessage": "Full-body work and a heavy carry to finish — that's real-world strength and conditioning in one. Loose walk later, and you've earned the rest day.",
+        "blocks": [
+          {
+            "title": "Prime",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "World's Greatest Stretch",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 Each Side", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Deep lunge, rotate the top arm to the ceiling",
+                    "Feel the hip flexor and T-spine open"
+                  ],
+                  "bad": [
+                    "Don't let the front knee cave inward"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Glute Bridge",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "12 Reps", "style": "dark" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the hips up and squeeze the glutes at the top",
+                    "Feel the glutes switch on before you load them"
+                  ],
+                  "bad": [
+                    "Don't push through the low back instead of the hips"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Heels-Elevated Goblet Squat",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Sit straight down, chest tall, heels elevated",
+                    "Feel the quads load through full depth"
+                  ],
+                  "bad": [
+                    "Don't round the low back at the bottom"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "1s squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the hips to a flat tabletop and squeeze at the top",
+                    "Feel the glutes finish the lockout"
+                  ],
+                  "bad": [
+                    "Don't arch the low back to fake extra height"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the elbows back and pause at the top",
+                    "Feel the mid-back squeeze the shoulder blades"
+                  ],
+                  "bad": [
+                    "Don't shrug or yank with the arms"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Bench Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": [
+                    "Lower to mid-chest, elbows at roughly 45 degrees",
+                    "Feel the chest stretch, then press"
+                  ],
+                  "bad": [
+                    "Don't flare the elbows or bounce the dumbbells"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Brace",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "30s hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Stack the body in one straight line, hips high",
+                    "Feel the side of the trunk hold the line"
+                  ],
+                  "bad": [
+                    "Don't let the hips sag toward the floor"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Farmer Carry",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "40m", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Stand tall and walk with a heavy dumbbell in each hand",
+                    "Feel the whole trunk and grip stay braced"
+                  ],
+                  "bad": [
+                    "Don't lean back or let the shoulders round forward"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Amir",
+    "cards": [
+      {
+        "icon": "🧱",
+        "title": "Your back leads every session",
+        "body": "Every day finishes with brace work — dead bugs, Pallof, side planks, carries — and that's not filler, it's the main event. Your back is chronic but manageable, so we make it bulletproof by teaching the trunk to resist movement, never by crunching it. If any lift sharpens past a dull stretch, stop and switch to its fallback. Protect this and the loading in Forge becomes easy."
+      },
+      {
+        "icon": "⏱",
+        "title": "RPE 8 is the ceiling — on purpose",
+        "body": "You're newer to structured progression and your sleep quality is sitting around 6 out of 10, so we cap effort at RPE 8 and keep tempos controlled. That's not playing small — it's where a newer lifter makes the fastest clean gains without digging a recovery hole. On a rough-sleep or tight-back day, drop every RPE by 1 and add rest. Trust the leave-2-in-the-tank rule."
+      },
+      {
+        "icon": "🏃",
+        "title": "Running is yours to own",
+        "body": "You're running on your own this cycle — keep it to two easy runs a week, walk/run intervals, all at a sub-140 heart rate where you can still hold a conversation. This block is pure base and tissue tolerance: no tempo, no intervals, no chasing pace. If the back talks, shift the ratio toward walking. The faster running gets earned later, in Crossover."
+      },
+      {
+        "icon": "🎯",
+        "title": "Load is the lever",
+        "body": "The app shows one number per lift — that's your starting point, not a ceiling. When Leg Press or Hip Thrust feels clean at the top of the rep range and your back's quiet, add weight next session. Drive load on the big mains first and reps on the rest. Log honestly and the weekly progression takes care of itself."
+      }
+    ]
+  }
+}
