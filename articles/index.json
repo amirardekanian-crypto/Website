@@ -12,7 +12,7 @@
           "title": "The Pre-Session Warm-Up",
           "category": "For Coaches",
           "readMins": 7,
-          "file": "content/for-coaches/pre-session-warm-up.json"
+          "file": "articles/for-coaches/pre-session-warm-up.json"
         }
       ]
     },
@@ -27,7 +27,7 @@
           "title": "The Tennis Warm-Up",
           "category": "Pre-Competition",
           "readMins": 4,
-          "file": "content/pre-competition/tennis-warm-up.json"
+          "file": "articles/pre-competition/tennis-warm-up.json"
         }
       ]
     },
