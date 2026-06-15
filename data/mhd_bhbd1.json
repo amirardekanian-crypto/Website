@@ -130,7 +130,7 @@
               },
               {
                 "type": "standard",
-                "name": "Lateral Band Walk",
+                "name": "Banded Lateral Walk",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
@@ -246,10 +246,14 @@
               },
               {
                 "type": "standard",
-                "name": "Nordic Hamstring Curl (Eccentric)",
+                "name": "Nordic Hamstring Curl",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "eccentric",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -280,10 +284,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Lateral Bound & Stick",
+                "name": "Lateral Bound",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "stick landing",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -385,7 +393,7 @@
                     "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
                   },
                   {
-                    "name": "Wall Slide",
+                    "name": "Scapular Wall Slide",
                     "detail": "×10",
                     "cues": {
                       "good": [
@@ -397,7 +405,7 @@
                     }
                   },
                   {
-                    "name": "Scap Push-Up",
+                    "name": "Scapular Push-Up",
                     "detail": "×10",
                     "cues": {
                       "good": [
@@ -426,10 +434,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "DB Bench Press (Neutral Grip)",
+                "name": "Dumbbell Bench Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
@@ -517,7 +529,7 @@
               },
               {
                 "type": "standard",
-                "name": "Half-Kneeling Single-Arm Cable Row",
+                "name": "Half Kneeling Single Arm Cable Row",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -568,7 +580,7 @@
                     }
                   },
                   {
-                    "name": "Face Pull",
+                    "name": "Cable Face Pull",
                     "detail": "×15",
                     "cues": {
                       "good": [
@@ -580,7 +592,7 @@
                     }
                   },
                   {
-                    "name": "Prone Y-Raise",
+                    "name": "Prone Y Raise",
                     "detail": "×10",
                     "cues": {
                       "good": [
@@ -694,10 +706,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Medicine Ball Rotational Throw (Wall)",
+                "name": "Medicine Ball Rotational Throw",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "wall",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
@@ -819,10 +835,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Heavy Farmer's Carry",
+                "name": "Farmer's Carry",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "heavy",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -845,10 +865,14 @@
               },
               {
                 "type": "standard",
-                "name": "Kettlebell Swing (Russian)",
+                "name": "Kettlebell Swing",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "Russian",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },

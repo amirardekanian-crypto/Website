@@ -568,7 +568,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Decline Sit Ups",
+                "name": "Decline Sit-Ups",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -749,7 +749,7 @@
                 "name": "Standing Cable Chest Fly",
                 "videoUrl": null,
                 "restSec": 60,
-                "chips": [                
+                "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -956,7 +956,7 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Bodyweight Reverse Lunge",
+                "name": "Reverse Lunge",
                 "videoUrl": null,
                 "chips": [
                   {
@@ -1257,7 +1257,7 @@
               "detail": "3×8-10"
             },
             {
-              "name": "Pallof Press",
+              "name": "Cable Pallof Press",
               "detail": "2×10/side"
             }
           ]
@@ -1279,11 +1279,11 @@
               "detail": "3×8-10"
             },
             {
-              "name": "Leg Press",
+              "name": "Machine Leg Press",
               "detail": "3×10-12"
             },
             {
-              "name": "Lying Leg Curl",
+              "name": "Machine Lying Leg Curl",
               "detail": "3×10-12"
             },
             {
@@ -1305,7 +1305,7 @@
               "detail": "2×12/arm"
             },
             {
-              "name": "Pull-Up (Assisted)",
+              "name": "Machine Assisted Pull-Up",
               "detail": "3×8-10"
             },
             {
@@ -1343,7 +1343,7 @@
           "focus": "Lower Body — Hypertrophy + Metabolic",
           "exercises": [
             {
-              "name": "Bodyweight Reverse Lunge",
+              "name": "Reverse Lunge",
               "detail": "2×8/leg"
             },
             {
@@ -1351,15 +1351,15 @@
               "detail": "4×6-8"
             },
             {
-              "name": "Bulgarian Split Squat",
+              "name": "Dumbbell Bulgarian Split Squat",
               "detail": "3×10-12/leg"
             },
             {
-              "name": "Leg Extension",
+              "name": "Machine Leg Extension",
               "detail": "3×12-15"
             },
             {
-              "name": "Standing Calf Raise",
+              "name": "Standing Machine Calf Raise",
               "detail": "3×12-15"
             },
             {

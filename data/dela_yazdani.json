@@ -130,7 +130,7 @@
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "Bodyweight Squat",
+                    "name": "Squat",
                     "detail": "×15",
                     "cues": {
                       "good": [
@@ -294,7 +294,7 @@
               },
               {
                 "type": "standard",
-                "name": "Leg Press",
+                "name": "Machine Leg Press",
                 "hasRest": true,
                 "chips": [
                   {
@@ -322,7 +322,7 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Leg Curl",
+                "name": "Machine Seated Leg Curl",
                 "hasRest": true,
                 "chips": [
                   {
@@ -459,7 +459,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Seated Machine Chest Press",
+                "name": "Machine Chest Press",
                 "hasRest": true,
                 "chips": [
                   {
@@ -491,7 +491,7 @@
               },
               {
                 "type": "standard",
-                "name": "Lat Pulldown (Cable)",
+                "name": "Lat Pulldown",
                 "hasRest": true,
                 "chips": [
                   {
@@ -635,7 +635,7 @@
               },
               {
                 "type": "standard",
-                "name": "DB Bicep Curl",
+                "name": "Dumbbell Bicep Curl",
                 "hasRest": true,
                 "chips": [
                   {
@@ -733,7 +733,7 @@
                     }
                   },
                   {
-                    "name": "Glute Bridge Hold (3s at top)",
+                    "name": "Glute Bridge",
                     "detail": "×15",
                     "cues": {
                       "good": [
@@ -743,7 +743,13 @@
                       "bad": [
                         "Feet placed too far forward — keep them directly under the knees"
                       ]
-                    }
+                    },
+                    "chips": [
+                      {
+                        "label": "3s hold",
+                        "style": "dark"
+                      }
+                    ]
                   }
                 ]
               }
@@ -755,9 +761,13 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Box Step-Up with Knee Drive",
+                "name": "Box Step-Up",
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "knee drive",
+                    "style": "dark"
+                  },
                   {
                     "label": "Movement Prep",
                     "style": "yellow"
@@ -809,7 +819,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "DB Sumo Deadlift",
+                "name": "Dumbbell Sumo Deadlift",
                 "hasRest": true,
                 "chips": [
                   {
@@ -841,7 +851,7 @@
               },
               {
                 "type": "standard",
-                "name": "DB Reverse Lunge",
+                "name": "Dumbbell Reverse Lunge",
                 "hasRest": true,
                 "chips": [
                   {
@@ -898,7 +908,7 @@
               },
               {
                 "type": "standard",
-                "name": "DB Arnold Press",
+                "name": "Dumbbell Arnold Press",
                 "hasRest": true,
                 "chips": [
                   {
@@ -999,7 +1009,7 @@
                     }
                   },
                   {
-                    "name": "Clamshell",
+                    "name": "Banded Clamshell",
                     "detail": "×15 each side",
                     "cues": {
                       "good": [
@@ -1021,7 +1031,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Squat-to-Stand",
+                "name": "Squat to Stand",
                 "hasRest": true,
                 "chips": [
                   {
@@ -1136,7 +1146,7 @@
               },
               {
                 "type": "standard",
-                "name": "DB Sumo Squat",
+                "name": "Dumbbell Sumo Squat",
                 "hasRest": true,
                 "chips": [
                   {
@@ -1164,7 +1174,7 @@
               },
               {
                 "type": "standard",
-                "name": "Lying Leg Curl",
+                "name": "Machine Lying Leg Curl",
                 "hasRest": true,
                 "chips": [
                   {

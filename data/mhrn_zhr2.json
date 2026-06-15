@@ -109,7 +109,10 @@
                 "name": "Bike",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 min", "style": "dark" }
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -132,24 +135,36 @@
                     "name": "90/90 Hip Switch",
                     "detail": "×12",
                     "cues": {
-                      "good": [ "Both sit bones stay heavy — rotate the spine, not the pelvis" ],
-                      "bad": [ "Don't tilt the pelvis to fake range" ]
+                      "good": [
+                        "Both sit bones stay heavy — rotate the spine, not the pelvis"
+                      ],
+                      "bad": [
+                        "Don't tilt the pelvis to fake range"
+                      ]
                     }
                   },
                   {
-                    "name": "Bodyweight Squat",
+                    "name": "Squat",
                     "detail": "×8 · 3s Eccentric",
                     "cues": {
-                      "good": [ "Sit back and down slow — you can now go full depth, knees are clear" ],
-                      "bad": [ "Don't rush the descent" ]
+                      "good": [
+                        "Sit back and down slow — you can now go full depth, knees are clear"
+                      ],
+                      "bad": [
+                        "Don't rush the descent"
+                      ]
                     }
                   },
                   {
                     "name": "Ankle Dorsiflexion Rocks",
                     "detail": "×8 each side",
                     "cues": {
-                      "good": [ "Drive the knee forward directly over the pinky toe" ],
-                      "bad": [ "Don't let the heel rise — range comes from the ankle, not the foot" ]
+                      "good": [
+                        "Drive the knee forward directly over the pinky toe"
+                      ],
+                      "bad": [
+                        "Don't let the heel rise — range comes from the ankle, not the foot"
+                      ]
                     }
                   }
                 ]
@@ -171,24 +186,36 @@
                     "name": "Pogo Jump",
                     "detail": "×20",
                     "cues": {
-                      "good": [ "Stiff ankles, minimal ground time — bounce off the floor like a spring" ],
-                      "bad": [ "Don't sink into a deep squat between jumps" ]
+                      "good": [
+                        "Stiff ankles, minimal ground time — bounce off the floor like a spring"
+                      ],
+                      "bad": [
+                        "Don't sink into a deep squat between jumps"
+                      ]
                     }
                   },
                   {
                     "name": "Lateral Bound",
                     "detail": "×6+6",
                     "cues": {
-                      "good": [ "Push off the outside leg, fly sideways, stick the landing for 1 second" ],
-                      "bad": [ "Don't let the landing knee cave inward" ]
+                      "good": [
+                        "Push off the outside leg, fly sideways, stick the landing for 1 second"
+                      ],
+                      "bad": [
+                        "Don't let the landing knee cave inward"
+                      ]
                     }
                   },
                   {
                     "name": "Box Jump",
                     "detail": "×5",
                     "cues": {
-                      "good": [ "Explode up, land soft and quiet on the box, then step down" ],
-                      "bad": [ "Don't jump back down — step off to protect the knees" ]
+                      "good": [
+                        "Explode up, land soft and quiet on the box, then step down"
+                      ],
+                      "bad": [
+                        "Don't jump back down — step off to protect the knees"
+                      ]
                     }
                   }
                 ]
@@ -204,12 +231,26 @@
                 "name": "Barbell Back Squat",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "full depth", "style": "dark" },
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×5 Reps" },
-                  { "label": "Tempo 3-1-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Rest 3 min" }
+                  {
+                    "label": "full depth",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 3 min"
+                  }
                 ],
                 "restSec": 180,
                 "cues": {
@@ -227,11 +268,22 @@
                 "name": "Dumbbell Reverse Lunge",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8+8 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 90 sec" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 90 sec"
+                  }
                 ],
                 "restSec": 90,
                 "cues": {
@@ -249,11 +301,22 @@
                 "name": "Dumbbell B-Stance Romanian Deadlift",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8+8 Reps" },
-                  { "label": "Tempo 3-1-1-0" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 90 sec" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-1-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 90 sec"
+                  }
                 ],
                 "restSec": 90,
                 "cues": {
@@ -277,12 +340,26 @@
                 "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "long lever", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10+10 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 6" },
-                  { "label": "Rest 60 sec" }
+                  {
+                    "label": "long lever",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  },
+                  {
+                    "label": "Rest 60 sec"
+                  }
                 ],
                 "restSec": 60,
                 "cues": {
@@ -300,12 +377,26 @@
                 "name": "Banded Dead Bug",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "banded", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8+8 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 6" },
-                  { "label": "Rest 60 sec" }
+                  {
+                    "label": "banded",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  },
+                  {
+                    "label": "Rest 60 sec"
+                  }
                 ],
                 "restSec": 60,
                 "cues": {
@@ -337,7 +428,10 @@
                 "name": "Arm Bike / Ski Erg",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 min", "style": "dark" }
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -360,24 +454,36 @@
                     "name": "Band Pull-Apart",
                     "detail": "×15",
                     "cues": {
-                      "good": [ "Pull through the rear delts, wide arc, squeeze the blades" ],
-                      "bad": [ "Don't shrug — keep the neck long" ]
+                      "good": [
+                        "Pull through the rear delts, wide arc, squeeze the blades"
+                      ],
+                      "bad": [
+                        "Don't shrug — keep the neck long"
+                      ]
                     }
                   },
                   {
                     "name": "Scapular Wall Slide",
                     "detail": "×10",
                     "cues": {
-                      "good": [ "Wrists and elbows stay on the wall throughout" ],
-                      "bad": [ "Don't arch the low back off the wall" ]
+                      "good": [
+                        "Wrists and elbows stay on the wall throughout"
+                      ],
+                      "bad": [
+                        "Don't arch the low back off the wall"
+                      ]
                     }
                   },
                   {
-                    "name": "Banded External Rotation",
+                    "name": "Band External Rotation",
                     "detail": "×12+12 · Elbow by Side",
                     "cues": {
-                      "good": [ "Forearm opens like a door, nothing else moves" ],
-                      "bad": [ "Don't let the elbow drift off the ribs" ]
+                      "good": [
+                        "Forearm opens like a door, nothing else moves"
+                      ],
+                      "bad": [
+                        "Don't let the elbow drift off the ribs"
+                      ]
                     }
                   }
                 ]
@@ -393,12 +499,26 @@
                 "name": "Single-Arm Landmine Push Press",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "leg drive", "style": "dark" },
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6+6 Reps" },
-                  { "label": "Tempo 1-0-1-0" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 90 sec" }
+                  {
+                    "label": "leg drive",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6+6 Reps"
+                  },
+                  {
+                    "label": "Tempo 1-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 90 sec"
+                  }
                 ],
                 "restSec": 90,
                 "cues": {
@@ -416,11 +536,22 @@
                 "name": "Chest-Supported Dumbbell Row",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×8 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Rest 90 sec" }
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 90 sec"
+                  }
                 ],
                 "restSec": 90,
                 "cues": {
@@ -435,15 +566,29 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Lat Pulldown",
+                "name": "Lat Pulldown",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "neutral grip", "style": "dark" },
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×8 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 8" },
-                  { "label": "Rest 90 sec" }
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 90 sec"
+                  }
                 ],
                 "restSec": 90,
                 "cues": {
@@ -461,11 +606,22 @@
                 "name": "Single-Arm Dumbbell Row",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10+10 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 75 sec" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75 sec"
+                  }
                 ],
                 "restSec": 75,
                 "cues": {
@@ -486,14 +642,25 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Side-Lying Dumbbell External Rotation",
+                "name": "Side Lying Dumbbell External Rotation",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12+12 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 5" },
-                  { "label": "Rest 60 sec" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12+12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 5"
+                  },
+                  {
+                    "label": "Rest 60 sec"
+                  }
                 ],
                 "restSec": 60,
                 "cues": {
@@ -511,11 +678,22 @@
                 "name": "Half-Kneeling Bottoms-Up Kettlebell Press",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8+8 Reps" },
-                  { "label": "Tempo 2-1-1-0" },
-                  { "label": "RPE 5" },
-                  { "label": "Rest 60 sec" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 5"
+                  },
+                  {
+                    "label": "Rest 60 sec"
+                  }
                 ],
                 "restSec": 60,
                 "cues": {
@@ -533,12 +711,26 @@
                 "name": "Prone Dumbbell Reverse Fly",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "thumbs up", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-1-2-0" },
-                  { "label": "RPE 5" },
-                  { "label": "Rest 60 sec" }
+                  {
+                    "label": "thumbs up",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 5"
+                  },
+                  {
+                    "label": "Rest 60 sec"
+                  }
                 ],
                 "restSec": 60,
                 "cues": {
@@ -570,7 +762,10 @@
                 "name": "Bike",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 min", "style": "dark" }
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -590,27 +785,39 @@
                 "restSec": 45,
                 "items": [
                   {
-                    "name": "Airplane Hold",
+                    "name": "Hip Airplane",
                     "detail": "×5+5 · 3s Hold",
                     "cues": {
-                      "good": [ "Hips level — imagine a full cup of water on your lower back" ],
-                      "bad": [ "Don't let the free hip drop below the standing hip" ]
+                      "good": [
+                        "Hips level — imagine a full cup of water on your lower back"
+                      ],
+                      "bad": [
+                        "Don't let the free hip drop below the standing hip"
+                      ]
                     }
                   },
                   {
                     "name": "Dead Bug",
                     "detail": "×8+8",
                     "cues": {
-                      "good": [ "Limbs move like they're underwater — slow and controlled" ],
-                      "bad": [ "Don't let the lumbar arch break contact with the floor" ]
+                      "good": [
+                        "Limbs move like they're underwater — slow and controlled"
+                      ],
+                      "bad": [
+                        "Don't let the lumbar arch break contact with the floor"
+                      ]
                     }
                   },
                   {
-                    "name": "Lateral Band Walk",
+                    "name": "Banded Lateral Walk",
                     "detail": "×12+12",
                     "cues": {
-                      "good": [ "Band stays taut throughout, glute med firing on the stance leg" ],
-                      "bad": [ "Don't lean the torso to assist the step — stay upright" ]
+                      "good": [
+                        "Band stays taut throughout, glute med firing on the stance leg"
+                      ],
+                      "bad": [
+                        "Don't lean the torso to assist the step — stay upright"
+                      ]
                     }
                   }
                 ]
@@ -626,12 +833,27 @@
                 "name": "Medicine Ball Rotational Throw",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "with step", "style": "dark" },
-                  { "label": "max intent", "style": "dark" },
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6+6" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 75 sec" }
+                  {
+                    "label": "with step",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6+6"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75 sec"
+                  }
                 ],
                 "restSec": 75,
                 "cues": {
@@ -649,11 +871,23 @@
                 "name": "Medicine Ball Overhead Slam",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "max intent", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 75 sec" }
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75 sec"
+                  }
                 ],
                 "restSec": 75,
                 "cues": {
@@ -677,12 +911,26 @@
                 "name": "Trap Bar Deadlift",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "speed pull", "style": "dark" },
-                  { "label": "5 Sets", "style": "yellow" },
-                  { "label": "×3 Reps" },
-                  { "label": "Tempo 1-0-1-0" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 90 sec" }
+                  {
+                    "label": "speed pull",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "5 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×3 Reps"
+                  },
+                  {
+                    "label": "Tempo 1-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 90 sec"
+                  }
                 ],
                 "restSec": 90,
                 "cues": {
@@ -700,11 +948,22 @@
                 "name": "Dumbbell Lateral Lunge",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8+8 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 75 sec" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75 sec"
+                  }
                 ],
                 "restSec": 75,
                 "cues": {
@@ -722,11 +981,24 @@
                 "name": "Suitcase Carry",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "unilateral", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "40 sec", "style": "dark" },
-                  { "label": "RPE 7" },
-                  { "label": "Rest 75 sec" }
+                  {
+                    "label": "unilateral",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "40 sec",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75 sec"
+                  }
                 ],
                 "restSec": 75,
                 "cues": {
@@ -758,7 +1030,10 @@
                 "name": "Bike or Rower",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "5 min", "style": "dark" }
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -781,9 +1056,18 @@
                 "name": "Zone 2 Cardio",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "Bike / Rower / Treadmill", "style": "dark" },
-                  { "label": "28 min", "style": "dark" },
-                  { "label": "HR 125–140 bpm", "style": "yellow" }
+                  {
+                    "label": "Bike / Rower / Treadmill",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "28 min",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "HR 125–140 bpm",
+                    "style": "yellow"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -806,8 +1090,13 @@
                 "name": "World's Greatest Stretch",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "×5+5" },
-                  { "label": "3s hold", "style": "dark" }
+                  {
+                    "label": "×5+5"
+                  },
+                  {
+                    "label": "3s hold",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -821,11 +1110,16 @@
               },
               {
                 "type": "simple",
-                "name": "90/90 Hip Rotations",
+                "name": "90/90 Hip Rotation",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "×15" },
-                  { "label": "slow", "style": "dark" }
+                  {
+                    "label": "×15"
+                  },
+                  {
+                    "label": "slow",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -842,7 +1136,9 @@
                 "name": "Thread the Needle",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "×8+8" }
+                  {
+                    "label": "×8+8"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -859,8 +1155,13 @@
                 "name": "Couch Stretch",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "×3+3" },
-                  { "label": "30s hold", "style": "dark" }
+                  {
+                    "label": "×3+3"
+                  },
+                  {
+                    "label": "30s hold",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -874,11 +1175,16 @@
               },
               {
                 "type": "simple",
-                "name": "Cat-Camel",
+                "name": "Cat-Cow",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "×10" },
-                  { "label": "segmental", "style": "dark" }
+                  {
+                    "label": "×10"
+                  },
+                  {
+                    "label": "segmental",
+                    "style": "dark"
+                  }
                 ],
                 "cues": {
                   "good": [
@@ -906,73 +1212,202 @@
           "label": "Day 1",
           "focus": "Lower Body & Core",
           "exercises": [
-            { "name": "Bike", "detail": "5 min" },
-            { "name": "90/90 Hip Rotations", "detail": "×12" },
-            { "name": "Bodyweight Squat", "detail": "×6 · 3s Eccentric" },
-            { "name": "Ankle Dorsiflexion Rocks", "detail": "×8 each side" },
-            { "name": "Pogo Jumps", "detail": "3×20" },
-            { "name": "Lateral Line Hops", "detail": "3×15 contacts/side" },
-            { "name": "Barbell Back Squat", "detail": "3×10" },
-            { "name": "Dumbbell Split Squat", "detail": "3×8+8" },
-            { "name": "Lateral Step-Down", "detail": "3×8+8" },
-            { "name": "Standing Dumbbell Single Leg Calf Raise", "detail": "3×15+15" },
-            { "name": "Cable Pallof Press", "detail": "3×20–30 sec hold" }
+            {
+              "name": "Bike",
+              "detail": "5 min"
+            },
+            {
+              "name": "90/90 Hip Rotation",
+              "detail": "×12"
+            },
+            {
+              "name": "Squat",
+              "detail": "×6 · 3s Eccentric"
+            },
+            {
+              "name": "Ankle Dorsiflexion Rocks",
+              "detail": "×8 each side"
+            },
+            {
+              "name": "Pogo Jump",
+              "detail": "3×20"
+            },
+            {
+              "name": "Lateral Line Hop",
+              "detail": "3×15 contacts/side"
+            },
+            {
+              "name": "Barbell Back Squat",
+              "detail": "3×10"
+            },
+            {
+              "name": "Dumbbell Split Squat",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Lateral Step-Down",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Standing Dumbbell Single Leg Calf Raise",
+              "detail": "3×15+15"
+            },
+            {
+              "name": "Cable Pallof Press",
+              "detail": "3×20–30 sec hold"
+            }
           ]
         },
         {
           "label": "Day 2",
           "focus": "Upper Body & Shoulder Health",
           "exercises": [
-            { "name": "Arm Bike / Ski Erg", "detail": "5 min" },
-            { "name": "Band Pull-Apart", "detail": "×10" },
-            { "name": "Scapular Push-Up", "detail": "×8" },
-            { "name": "Band External Rotation", "detail": "×8 each side" },
-            { "name": "Single-Arm Dumbbell Overhead Press", "detail": "3×10+10" },
-            { "name": "Dumbbell 3-Point Row", "detail": "3×8+8" },
-            { "name": "Barbell Chest Press", "detail": "3×10" },
-            { "name": "Cable Lat Pulldown", "detail": "3×8" },
-            { "name": "Cable External Rotation", "detail": "3×12+12" },
-            { "name": "Incline Y Raise", "detail": "3×10" },
-            { "name": "Farmer's Carry", "detail": "3×30–40 sec each side" }
+            {
+              "name": "Arm Bike / Ski Erg",
+              "detail": "5 min"
+            },
+            {
+              "name": "Band Pull-Apart",
+              "detail": "×10"
+            },
+            {
+              "name": "Scapular Push-Up",
+              "detail": "×8"
+            },
+            {
+              "name": "Band External Rotation",
+              "detail": "×8 each side"
+            },
+            {
+              "name": "Single-Arm Dumbbell Overhead Press",
+              "detail": "3×10+10"
+            },
+            {
+              "name": "Dumbbell 3-Point Row",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Barbell Chest Press",
+              "detail": "3×10"
+            },
+            {
+              "name": "Lat Pulldown",
+              "detail": "3×8"
+            },
+            {
+              "name": "Cable External Rotation",
+              "detail": "3×12+12"
+            },
+            {
+              "name": "Incline Y Raise",
+              "detail": "3×10"
+            },
+            {
+              "name": "Farmer's Carry",
+              "detail": "3×30–40 sec each side"
+            }
           ]
         },
         {
           "label": "Day 3",
           "focus": "Full Body Power & Stability",
           "exercises": [
-            { "name": "Bike", "detail": "5 min" },
-            { "name": "Walking Lunges", "detail": "×6+6" },
-            { "name": "Airplane Hold", "detail": "×4+4 · 3s hold" },
-            { "name": "Dead Bug", "detail": "×6+6" },
-            { "name": "Low Box Rebound Jump", "detail": "3×8" },
-            { "name": "Single Leg Pogos", "detail": "3×12 each side" },
-            { "name": "Barbell Squat to Press", "detail": "4×8" },
-            { "name": "Dumbbell Single Leg RDL", "detail": "3×8+8" },
-            { "name": "Cable Chop", "detail": "3×10+10" },
-            { "name": "Plank Leg Lifts", "detail": "3×24" }
+            {
+              "name": "Bike",
+              "detail": "5 min"
+            },
+            {
+              "name": "Dumbbell Walking Lunge",
+              "detail": "×6+6"
+            },
+            {
+              "name": "Hip Airplane",
+              "detail": "×4+4 · 3s hold"
+            },
+            {
+              "name": "Dead Bug",
+              "detail": "×6+6"
+            },
+            {
+              "name": "Low Box Rebound Jump",
+              "detail": "3×8"
+            },
+            {
+              "name": "Single-Leg Pogo Jump",
+              "detail": "3×12 each side"
+            },
+            {
+              "name": "Barbell Squat to Press",
+              "detail": "4×8"
+            },
+            {
+              "name": "Dumbbell Single-Leg Romanian Deadlift",
+              "detail": "3×8+8"
+            },
+            {
+              "name": "Cable Wood Chop",
+              "detail": "3×10+10"
+            },
+            {
+              "name": "Plank Leg Lift",
+              "detail": "3×24"
+            }
           ]
         },
         {
           "label": "Day 4",
           "focus": "Aerobic Conditioning",
           "exercises": [
-            { "name": "Bike or Treadmill", "detail": "5 min" },
-            { "name": "World's Greatest Stretch", "detail": "×4+4" },
-            { "name": "90/90 Hip Rotations", "detail": "×12" },
-            { "name": "Cat-Camel", "detail": "×6" },
-            { "name": "Quadruped Thoracic Rotation", "detail": "×6+6" },
-            { "name": "Zone 2 Cardio", "detail": "30 min · HR 130–145 bpm" }
+            {
+              "name": "Bike or Treadmill",
+              "detail": "5 min"
+            },
+            {
+              "name": "World's Greatest Stretch",
+              "detail": "×4+4"
+            },
+            {
+              "name": "90/90 Hip Rotation",
+              "detail": "×12"
+            },
+            {
+              "name": "Cat-Cow",
+              "detail": "×6"
+            },
+            {
+              "name": "Quadruped Thoracic Rotation",
+              "detail": "×6+6"
+            },
+            {
+              "name": "Zone 2 Cardio",
+              "detail": "30 min · HR 130–145 bpm"
+            }
           ]
         },
         {
           "label": "Day 5",
           "focus": "Interval Conditioning",
           "exercises": [
-            { "name": "Bike or Rower", "detail": "5 min" },
-            { "name": "Walking Lunges with Rotation", "detail": "×12" },
-            { "name": "Ankle Dorsiflexion Rocks", "detail": "×8 each side" },
-            { "name": "Dead Bug", "detail": "×12" },
-            { "name": "Bike or Rower Intervals", "detail": "15 rounds · 30 sec on / 60 sec off" }
+            {
+              "name": "Bike or Rower",
+              "detail": "5 min"
+            },
+            {
+              "name": "Dumbbell Walking Lunge",
+              "detail": "×12"
+            },
+            {
+              "name": "Ankle Dorsiflexion Rocks",
+              "detail": "×8 each side"
+            },
+            {
+              "name": "Dead Bug",
+              "detail": "×12"
+            },
+            {
+              "name": "Bike or Rower Intervals",
+              "detail": "15 rounds · 30 sec on / 60 sec off"
+            }
           ]
         }
       ]
@@ -986,51 +1421,132 @@
           "label": "Day 1",
           "focus": "Lower Body Strength",
           "exercises": [
-            { "name": "Barbell Back Squat", "detail": "4×8 · Tempo 3-1-1-0 · RPE 7" },
-            { "name": "Dumbbell Bulgarian Split Squat", "detail": "3×8+8 · Tempo 3-1-1-0 · RPE 7" },
-            { "name": "Heels-Elevated Goblet Squat", "detail": "3×10 · Tempo 3-0-1-0 · RPE 6" },
-            { "name": "Stability Ball Leg Curl", "detail": "3×8 · Eccentric focus · RPE 7" },
-            { "name": "Standing Dumbbell Single Leg Calf Raise", "detail": "3×12+12 · RPE 7" },
-            { "name": "Cable Pallof Press", "detail": "3×12+12 · Long lever" },
-            { "name": "Banded Dead Bug", "detail": "3×8+8" }
+            {
+              "name": "Barbell Back Squat",
+              "detail": "4×8 · Tempo 3-1-1-0 · RPE 7"
+            },
+            {
+              "name": "Dumbbell Bulgarian Split Squat",
+              "detail": "3×8+8 · Tempo 3-1-1-0 · RPE 7"
+            },
+            {
+              "name": "Heels-Elevated Goblet Squat",
+              "detail": "3×10 · Tempo 3-0-1-0 · RPE 6"
+            },
+            {
+              "name": "Stability Ball Leg Curl",
+              "detail": "3×8 · Eccentric focus · RPE 7"
+            },
+            {
+              "name": "Standing Dumbbell Single Leg Calf Raise",
+              "detail": "3×12+12 · RPE 7"
+            },
+            {
+              "name": "Cable Pallof Press",
+              "detail": "3×12+12 · Long lever"
+            },
+            {
+              "name": "Banded Dead Bug",
+              "detail": "3×8+8"
+            }
           ]
         },
         {
           "label": "Day 2",
           "focus": "Upper Body & Shoulder Health",
           "exercises": [
-            { "name": "Chest-Supported Dumbbell Row", "detail": "4×10 · RPE 7" },
-            { "name": "Cable Lat Pulldown", "detail": "4×8 · Neutral grip · RPE 7" },
-            { "name": "Single-Arm Dumbbell Overhead Press", "detail": "3×10+10 · RPE 6" },
-            { "name": "Half Kneeling Single-Arm Cable Row", "detail": "3×10+10 · RPE 7" },
-            { "name": "Cable External Rotation", "detail": "3×12+12 · 90° abduction" },
-            { "name": "Incline Y-T-W Raise", "detail": "3×10 each position" },
-            { "name": "Cable Face Pull", "detail": "3×15" }
+            {
+              "name": "Chest-Supported Dumbbell Row",
+              "detail": "4×10 · RPE 7"
+            },
+            {
+              "name": "Lat Pulldown",
+              "detail": "4×8 · Neutral grip · RPE 7"
+            },
+            {
+              "name": "Single-Arm Dumbbell Overhead Press",
+              "detail": "3×10+10 · RPE 6"
+            },
+            {
+              "name": "Half Kneeling Single Arm Cable Row",
+              "detail": "3×10+10 · RPE 7"
+            },
+            {
+              "name": "Cable External Rotation",
+              "detail": "3×12+12 · 90° abduction"
+            },
+            {
+              "name": "Incline Y-T-W Raise",
+              "detail": "3×10 each position"
+            },
+            {
+              "name": "Cable Face Pull",
+              "detail": "3×15"
+            }
           ]
         },
         {
           "label": "Day 3",
           "focus": "Full Body Power & Rotation",
           "exercises": [
-            { "name": "Medicine Ball Rotational Slam", "detail": "3×8 each side · RPE 7" },
-            { "name": "Medicine Ball Side Throw", "detail": "3×10 each side · Wall · RPE 7" },
-            { "name": "Box Step-Up with Drive", "detail": "3×8+8 · RPE 6" },
-            { "name": "Trap Bar Deadlift", "detail": "4×6 · Tempo 3-1-1-0 · RPE 8" },
-            { "name": "Dumbbell Single Leg RDL", "detail": "3×8+8 · Tempo 3-1-1-0 · RPE 7" },
-            { "name": "Farmer's Carry", "detail": "3×40 sec · RPE 7" }
+            {
+              "name": "Medicine Ball Rotational Slam",
+              "detail": "3×8 each side · RPE 7"
+            },
+            {
+              "name": "Medicine Ball Side Throw",
+              "detail": "3×10 each side · Wall · RPE 7"
+            },
+            {
+              "name": "Box Step-Up",
+              "detail": "3×8+8 · RPE 6"
+            },
+            {
+              "name": "Trap Bar Deadlift",
+              "detail": "4×6 · Tempo 3-1-1-0 · RPE 8"
+            },
+            {
+              "name": "Dumbbell Single-Leg Romanian Deadlift",
+              "detail": "3×8+8 · Tempo 3-1-1-0 · RPE 7"
+            },
+            {
+              "name": "Farmer's Carry",
+              "detail": "3×40 sec · RPE 7"
+            }
           ]
         },
         {
           "label": "Day 4",
           "focus": "Conditioning & Mobility",
           "exercises": [
-            { "name": "Zone 2 Cardio", "detail": "30 min · HR 125–140 bpm" },
-            { "name": "World's Greatest Stretch", "detail": "×5+5 · 3s hold" },
-            { "name": "90/90 Hip Rotations", "detail": "×15" },
-            { "name": "Quadruped Thoracic Rotation", "detail": "×8+8" },
-            { "name": "Child's Pose with Lateral Reach", "detail": "×6+6 · 5s hold" },
-            { "name": "Doorframe Pec Stretch", "detail": "×3+3 · 30s hold" },
-            { "name": "Cat-Camel", "detail": "×10" }
+            {
+              "name": "Zone 2 Cardio",
+              "detail": "30 min · HR 125–140 bpm"
+            },
+            {
+              "name": "World's Greatest Stretch",
+              "detail": "×5+5 · 3s hold"
+            },
+            {
+              "name": "90/90 Hip Rotation",
+              "detail": "×15"
+            },
+            {
+              "name": "Quadruped Thoracic Rotation",
+              "detail": "×8+8"
+            },
+            {
+              "name": "Child's Pose with Lateral Reach",
+              "detail": "×6+6 · 5s hold"
+            },
+            {
+              "name": "Doorframe Pec Stretch",
+              "detail": "×3+3 · 30s hold"
+            },
+            {
+              "name": "Cat-Cow",
+              "detail": "×10"
+            }
           ]
         }
       ]

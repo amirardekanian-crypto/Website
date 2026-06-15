@@ -742,10 +742,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Chest Fly (Low-to-High)",
+                "name": "Cable Chest Fly",
                 "videoUrl": "https://www.youtube.com/watch?v=8bAUxZlIR38",
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "low-to-high",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -952,7 +956,7 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Bodyweight Reverse Lunge",
+                "name": "Reverse Lunge",
                 "videoUrl": "https://www.youtube.com/watch?v=xrPteyQLGAo",
                 "chips": [
                   {
@@ -1188,7 +1192,7 @@
                     }
                   },
                   {
-                    "name": "Dumbbell Farmer's Walk",
+                    "name": "Farmer's Walk",
                     "detail": "30m · Controlled · RPE 8 · 30s Rest",
                     "cues": {
                       "good": [

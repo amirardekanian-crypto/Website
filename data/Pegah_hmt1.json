@@ -96,10 +96,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Glute Bridge Hold",
+                "name": "Glute Bridge",
                 "videoUrl": "https://www.youtube.com/watch?v=hV6mCbTESoM",
                 "hasRest": false,
                 "chips": [
+                  {
+                    "label": "hold",
+                    "style": "dark"
+                  },
                   {
                     "label": "2 Sets",
                     "style": "yellow"
@@ -542,7 +546,7 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Hip 90/90 Stretch",
+                "name": "90/90 Hip Stretch",
                 "videoUrl": "https://www.youtube.com/watch?v=VBBnG1TTeL8",
                 "chips": [
                   {
@@ -794,7 +798,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dead Bug (Progression)",
+                "name": "Dead Bug",
                 "videoUrl": "https://www.youtube.com/watch?v=ZSYRZKYOf28",
                 "hasRest": false,
                 "chips": [

@@ -112,7 +112,7 @@
               },
               {
                 "type": "standard",
-                "name": "90/90 Hip Switches",
+                "name": "90/90 Hip Switch",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
@@ -141,7 +141,7 @@
               },
               {
                 "type": "standard",
-                "name": "Cossack Squat (Bodyweight)",
+                "name": "Cossack Squat",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
@@ -270,10 +270,14 @@
               },
               {
                 "type": "standard",
-                "name": "Copenhagen Plank (Short Lever)",
+                "name": "Copenhagen Plank",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "short lever",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -306,10 +310,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Single-Leg Calf Raise (Bent Knee, Soleus)",
+                "name": "Single-Leg Calf Raise",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "bent knee",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -463,10 +471,14 @@
               },
               {
                 "type": "standard",
-                "name": "Wall Slide (Banded)",
+                "name": "Scapular Wall Slide",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
+                  {
+                    "label": "banded",
+                    "style": "dark"
+                  },
                   {
                     "label": "2 Sets"
                   },
@@ -498,10 +510,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dumbbell Bench Press (Neutral Grip)",
+                "name": "Dumbbell Bench Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
@@ -528,7 +544,7 @@
               },
               {
                 "type": "standard",
-                "name": "Half-Kneeling Single-Arm DB Overhead Press",
+                "name": "Half-Kneeling Single-Arm Dumbbell Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -593,10 +609,14 @@
               },
               {
                 "type": "standard",
-                "name": "Neutral-Grip Lat Pulldown",
+                "name": "Lat Pulldown",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -628,7 +648,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Eccentric Wrist Extension (Single Arm)",
+                "name": "Single-Arm Eccentric Wrist Extension",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -658,10 +678,14 @@
               },
               {
                 "type": "standard",
-                "name": "Cross-Body Hammer Curl",
+                "name": "Dumbbell Hammer Curl",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "cross-body",
+                    "style": "dark"
+                  },
                   {
                     "label": "2 Sets"
                   },
@@ -760,7 +784,7 @@
               },
               {
                 "type": "standard",
-                "name": "Bodyweight Squat to Stand",
+                "name": "Squat to Stand",
                 "videoUrl": null,
                 "hasRest": false,
                 "chips": [
@@ -824,7 +848,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Kettlebell Swing (Two-Hand)",
+                "name": "Kettlebell Swing",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -854,10 +878,14 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Rotational Chop (High-to-Low)",
+                "name": "Cable Wood Chop",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "high-to-low",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -918,7 +946,7 @@
               },
               {
                 "type": "standard",
-                "name": "Half-Kneeling Single-Arm Cable Row",
+                "name": "Half Kneeling Single Arm Cable Row",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -980,10 +1008,14 @@
               },
               {
                 "type": "standard",
-                "name": "Side Plank with Top-Leg Lift",
+                "name": "Side Plank",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "top-leg lift",
+                    "style": "dark"
+                  },
                   {
                     "label": "2 Sets"
                   },

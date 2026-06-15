@@ -132,7 +132,7 @@
                 "rounds": "×3 Rounds",
                 "items": [
                   {
-                    "name": "90/90 Hip Rotations",
+                    "name": "90/90 Hip Rotation",
                     "detail": "×12",
                     "cues": {
                       "good": [
@@ -145,7 +145,7 @@
                     }
                   },
                   {
-                    "name": "Goblet Squat — 3-sec eccentric",
+                    "name": "Goblet Squat",
                     "detail": "×6",
                     "cues": {
                       "good": [
@@ -202,8 +202,12 @@
               },
               {
                 "type": "standard",
-                "name": "Lateral Bound → Stick",
+                "name": "Lateral Bound",
                 "chips": [
+                  {
+                    "label": "stick landing",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -230,7 +234,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Back Squat",
+                "name": "Barbell Back Squat",
                 "videoUrl": "https://www.youtube.com/watch?v=ultWZbUMPL8",
                 "chips": [
                   {
@@ -307,7 +311,7 @@
               },
               {
                 "type": "standard",
-                "name": "Pallof Press",
+                "name": "Cable Pallof Press",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -385,7 +389,7 @@
                     "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
                   },
                   {
-                    "name": "Wall Slide",
+                    "name": "Scapular Wall Slide",
                     "detail": "×10",
                     "cues": {
                       "good": [
@@ -398,7 +402,7 @@
                     }
                   },
                   {
-                    "name": "Band ER at Side",
+                    "name": "Band External Rotation",
                     "detail": "×12/side",
                     "cues": {
                       "good": [
@@ -411,7 +415,7 @@
                     }
                   },
                   {
-                    "name": "Side-Lying ER",
+                    "name": "Side Lying Dumbbell External Rotation",
                     "detail": "×10/side",
                     "cues": {
                       "good": [
@@ -463,7 +467,7 @@
               },
               {
                 "type": "standard",
-                "name": "Half-Kneeling Single-Arm DB Press",
+                "name": "Half-Kneeling Single-Arm Dumbbell Press",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -491,7 +495,7 @@
               },
               {
                 "type": "standard",
-                "name": "3-Point Row",
+                "name": "Dumbbell 3-Point Row",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -545,7 +549,7 @@
               },
               {
                 "type": "standard",
-                "name": "Lat Pull-Down",
+                "name": "Lat Pulldown",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -656,7 +660,7 @@
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "Walking Lunges",
+                    "name": "Dumbbell Walking Lunge",
                     "detail": "×6+6",
                     "cues": {
                       "good": [
@@ -669,7 +673,7 @@
                     }
                   },
                   {
-                    "name": "Airplane Hold",
+                    "name": "Hip Airplane",
                     "detail": "×4+4 · 3s hold",
                     "cues": {
                       "good": [
@@ -727,8 +731,12 @@
               },
               {
                 "type": "standard",
-                "name": "Single-Leg Lateral Hop → Stick",
+                "name": "Single-Leg Lateral Hop",
                 "chips": [
+                  {
+                    "label": "stick landing",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -820,7 +828,7 @@
               },
               {
                 "type": "standard",
-                "name": "Single-Leg RDL (DB)",
+                "name": "Dumbbell Single-Leg Romanian Deadlift",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -842,7 +850,7 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Chop",
+                "name": "Cable Wood Chop",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -864,7 +872,7 @@
               },
               {
                 "type": "standard",
-                "name": "Plank Shoulder Tap",
+                "name": "Plank with Shoulder Taps",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -901,7 +909,7 @@
           "focus": "Lower Body Power",
           "exercises": [
             {
-              "name": "Back Squat",
+              "name": "Barbell Back Squat",
               "detail": "3×10"
             },
             {
@@ -913,15 +921,15 @@
               "detail": "3×5+5"
             },
             {
-              "name": "Pallof Press Hold",
+              "name": "Cable Pallof Press",
               "detail": "3×20–30s"
             },
             {
-              "name": "Pogo Jumps",
+              "name": "Pogo Jump",
               "detail": "3×20"
             },
             {
-              "name": "Lateral Line Hops",
+              "name": "Lateral Line Hop",
               "detail": "3×15/side"
             }
           ]
@@ -931,11 +939,11 @@
           "focus": "Upper / Shoulder",
           "exercises": [
             {
-              "name": "Half-Kneeling Shoulder Press",
+              "name": "Half-Kneeling Single-Arm Dumbbell Press",
               "detail": "3×10+10"
             },
             {
-              "name": "3-Point Row",
+              "name": "Dumbbell 3-Point Row",
               "detail": "3×8+8"
             },
             {
@@ -943,7 +951,7 @@
               "detail": "3×10"
             },
             {
-              "name": "Lat Pull-Down",
+              "name": "Lat Pulldown",
               "detail": "3×8"
             },
             {
@@ -951,11 +959,11 @@
               "detail": "3×12+12"
             },
             {
-              "name": "Inclined Y Raise",
+              "name": "Incline Y Raise",
               "detail": "3×10"
             },
             {
-              "name": "Farmers Carry",
+              "name": "Farmer's Carry",
               "detail": "3×30–40s"
             }
           ]
@@ -969,15 +977,15 @@
               "detail": "4×8"
             },
             {
-              "name": "Single-Leg RDL",
+              "name": "Dumbbell Single-Leg Romanian Deadlift",
               "detail": "3×8+8"
             },
             {
-              "name": "Cable Chop",
+              "name": "Cable Wood Chop",
               "detail": "3×10+10"
             },
             {
-              "name": "Plank Leg Lifts",
+              "name": "Plank Leg Lift",
               "detail": "3×24"
             },
             {
@@ -985,7 +993,7 @@
               "detail": "3×8"
             },
             {
-              "name": "Single-Leg Pogos",
+              "name": "Single-Leg Pogo Jump",
               "detail": "3×12/side"
             }
           ]

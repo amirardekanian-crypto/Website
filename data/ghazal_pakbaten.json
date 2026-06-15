@@ -124,7 +124,7 @@
                 "rounds": "×3 Rounds",
                 "items": [
                   {
-                    "name": "90/90 Hip Rotations",
+                    "name": "90/90 Hip Rotation",
                     "detail": "×12",
                     "cues": {
                       "good": [
@@ -137,7 +137,7 @@
                     }
                   },
                   {
-                    "name": "Bodyweight Squat",
+                    "name": "Squat",
                     "detail": "×6 · Tempo 3-0-1-0",
                     "cues": {
                       "good": [
@@ -172,7 +172,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Low Box Jump",
+                "name": "Box Jump",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -304,10 +304,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Pallof Press Hold",
+                "name": "Cable Pallof Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "hold",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -392,7 +396,7 @@
                     }
                   },
                   {
-                    "name": "90/90 Hip",
+                    "name": "90/90 Hip Stretch",
                     "detail": "×12",
                     "cues": {
                       "good": [
@@ -405,7 +409,7 @@
                     }
                   },
                   {
-                    "name": "Cat-Camel",
+                    "name": "Cat-Cow",
                     "detail": "×6",
                     "cues": {
                       "good": [
@@ -531,7 +535,7 @@
                     "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
                   },
                   {
-                    "name": "Scap Push-Up",
+                    "name": "Scapular Push-Up",
                     "detail": "×10",
                     "cues": {
                       "good": [
@@ -566,7 +570,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Half-Kneeling Shoulder Press",
+                "name": "Half-Kneeling Single-Arm Dumbbell Press",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -596,7 +600,7 @@
               },
               {
                 "type": "standard",
-                "name": "3-Point Row",
+                "name": "Dumbbell 3-Point Row",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -833,7 +837,7 @@
                 "rounds": "×3 Rounds",
                 "items": [
                   {
-                    "name": "Walking Lunges + Rotation",
+                    "name": "Dumbbell Walking Lunge",
                     "detail": "×12",
                     "cues": {
                       "good": [
@@ -843,10 +847,16 @@
                       "bad": [
                         "Don't let front knee cave inward"
                       ]
-                    }
+                    },
+                    "chips": [
+                      {
+                        "label": "rotation",
+                        "style": "dark"
+                      }
+                    ]
                   },
                   {
-                    "name": "Ankle Rocks",
+                    "name": "Ankle Dorsiflexion Rocks",
                     "detail": "×8/side",
                     "cues": {
                       "good": [
@@ -958,7 +968,7 @@
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "Walking Lunges",
+                    "name": "Dumbbell Walking Lunge",
                     "detail": "×6/side",
                     "cues": {
                       "good": [
@@ -971,7 +981,7 @@
                     }
                   },
                   {
-                    "name": "Airplane Hold",
+                    "name": "Hip Airplane",
                     "detail": "×4/side · 3s hold",
                     "cues": {
                       "good": [
@@ -1036,7 +1046,7 @@
               },
               {
                 "type": "standard",
-                "name": "Single-Leg Pogos",
+                "name": "Single-Leg Pogo Jump",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -1102,7 +1112,7 @@
               },
               {
                 "type": "standard",
-                "name": "Single-Leg RDL",
+                "name": "Dumbbell Single-Leg Romanian Deadlift",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
@@ -1138,7 +1148,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Chop",
+                "name": "Cable Wood Chop",
                 "videoUrl": null,
                 "hasRest": true,
                 "chips": [
