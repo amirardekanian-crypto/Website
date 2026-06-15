@@ -4432,7 +4432,7 @@ async function renderReadLibrary() {
 
   let manifest;
   try {
-    const res = await fetch('content/index.json', { cache: 'no-cache' });
+    const res = await fetch('articles/index.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     manifest = await res.json();
   } catch (e) {
@@ -4573,13 +4573,13 @@ async function openArticleDeepLink(idOrPath) {
   // Direct file path (contains a slash or .json)
   if (idOrPath.includes('/') || /\.json$/i.test(idOrPath)) {
     openArticle(idOrPath.includes('/') && !/\.json$/i.test(idOrPath)
-      ? `content/${idOrPath}.json`
+      ? `articles/${idOrPath}.json`
       : idOrPath);
     return;
   }
   // Resolve by id via the manifest
   try {
-    const res = await fetch('content/index.json', { cache: 'no-cache' });
+    const res = await fetch('articles/index.json', { cache: 'no-cache' });
     if (res.ok) {
       const manifest = await res.json();
       for (const cat of (manifest.categories || [])) {
