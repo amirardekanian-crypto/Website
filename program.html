@@ -728,6 +728,83 @@
   .wl-card-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-text); }
   .wl-card-cta { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); margin-top: 6px; }
 
+  /* ════ LIBRARY — Two Doors landing + Sessions / Playbook worlds ════ */
+  .lib-pane { position: relative; }
+  .lib-pane[hidden] { display: none; }
+  .lib-back { position: absolute; top: 14px; left: 14px; z-index: 6; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.28); color: #fff; border: none; font-size: 19px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .lib-back:active { transform: scale(0.9); }
+  .lib-back.dark { background: rgba(255,255,255,0.14); }
+
+  /* Landing — two doors */
+  .lib-head { padding: 48px 24px 18px; }
+  .lib-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.6px; text-transform: uppercase; color: var(--ink); }
+  .lib-sub { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 9px; }
+  .lib-doors { padding: 0 18px 110px; }
+  .lib-door { position: relative; overflow: hidden; height: 248px; border-radius: 22px; margin-bottom: 16px; display: flex; flex-direction: column; justify-content: flex-end; padding: 22px; cursor: pointer; transition: transform .12s ease; }
+  .lib-door:active { transform: scale(0.985); }
+  .lib-door.door-sessions { background: #0E4A36; }
+  .lib-door.door-playbook { background: #C7552F; }
+  .lib-door-court { position: absolute; inset: 0; z-index: 0; color: rgba(255,255,255,0.20); pointer-events: none; }
+  .lib-door-court svg { width: 100%; height: 100%; display: block; }
+  .lib-door > *:not(.lib-door-court) { position: relative; z-index: 2; }
+  .lib-door-k { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.82); }
+  .lib-door-big { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: 0.84; letter-spacing: -1px; text-transform: uppercase; color: #fff; margin-top: 5px; }
+  .lib-door-d { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.4; color: rgba(255,255,255,0.9); margin-top: 9px; max-width: 92%; }
+  .lib-door-row { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; }
+  .lib-door-ct { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; min-height: 13px; }
+  .lib-door-arr { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.16); border: 1.5px solid rgba(255,255,255,0.7); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+
+  /* Sessions world — header + numbered shelves */
+  .w-head { padding: 54px 22px 4px; }
+  .w-kick { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ice); }
+  .w-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; color: var(--ink); margin-top: 7px; }
+  .w-sub { font-family: 'Space Mono', monospace; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 8px; }
+  .w-scroll { padding: 0 0 110px; }
+  .w-shelf { margin-bottom: 2px; }
+  .shelf-head { display: flex; align-items: baseline; gap: 11px; padding: 22px 20px 12px; }
+  .shelf-n { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; color: var(--ice); }
+  .shelf-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 23px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--ink); }
+  .shelf-more { margin-left: auto; color: var(--ice); font-size: 19px; }
+  .w-rail { display: flex; gap: 14px; overflow-x: auto; padding: 0 18px 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .w-rail::-webkit-scrollbar { height: 0; }
+  .vcard { flex-shrink: 0; width: 176px; cursor: pointer; }
+  .vcard:active { transform: scale(0.99); }
+  .vthumb { position: relative; height: 118px; border-radius: 16px; overflow: hidden; background-color: #0E4A36; background-size: cover; background-position: center; }
+  .vbadge { position: absolute; top: 9px; left: 9px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 9.5px; letter-spacing: 0.05em; color: #fff; background: rgba(0,0,0,0.42); padding: 3px 8px; border-radius: 6px; }
+  .veq { position: absolute; bottom: 9px; right: 9px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; background: var(--ice); padding: 3px 8px; border-radius: 5px; }
+  .vt { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; line-height: 1.05; text-transform: uppercase; color: var(--ink); margin: 10px 2px 0; }
+  .vm { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin: 3px 2px 0; }
+  .w-rail .wl-coming { flex-shrink: 0; width: 240px; margin: 0; }
+
+  /* Playbook world — broadcast dark */
+  .lib-pane-dark { background: #0c0c0e; min-height: 100vh; padding-bottom: 90px; }
+  .pb-hero { position: relative; overflow: hidden; min-height: 320px; background: #0E4A36; display: flex; flex-direction: column; justify-content: flex-end; padding: 24px 22px 22px; cursor: pointer; }
+  .pb-court { position: absolute; inset: 0; z-index: 0; color: rgba(255,255,255,0.15); pointer-events: none; }
+  .pb-court svg { width: 100%; height: 100%; display: block; }
+  .pb-hero > *:not(.pb-court):not(.lib-back) { position: relative; z-index: 2; }
+  .pb-tag { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ice); display: flex; align-items: center; gap: 8px; }
+  .pb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ice); }
+  .pb-hk { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(250,247,242,0.7); margin-top: 18px; }
+  .pb-ht { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px; line-height: 0.94; letter-spacing: -0.4px; text-transform: uppercase; color: #FAF7F2; margin-top: 7px; }
+  .pb-hm { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(250,247,242,0.62); margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(250,247,242,0.2); display: flex; align-items: center; gap: 8px; }
+  .pb-read { margin-left: auto; color: var(--ice); font-weight: 700; }
+  .pb-tagline { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.5; color: #c9c9d0; padding: 18px 20px; border-bottom: 1px solid #1c1c20; }
+  .pb-tagline b { color: #FAF7F2; font-weight: 700; }
+  .pb-block { display: flex; align-items: center; gap: 10px; padding: 20px 18px 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 1.5px; text-transform: uppercase; color: #FAF7F2; }
+  .pb-s { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--ice); }
+  .pb-ct { font-family: 'Space Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.08em; color: #6b6b73; margin-left: auto; }
+  .pb-disp { display: flex; align-items: center; gap: 13px; padding: 13px 18px; border-top: 1px solid #1c1c20; cursor: pointer; }
+  .pb-disp:active { background: rgba(255,255,255,0.03); }
+  .pb-dn { width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px; background: var(--ice); position: relative; }
+  .pb-dn b { position: absolute; left: 8px; top: 9px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: #fff; }
+  .pb-dn i { position: absolute; right: 6px; bottom: 6px; width: 8px; height: 8px; border-radius: 50%; background: #fff; opacity: 0.85; }
+  .pb-db { flex: 1; min-width: 0; }
+  .pb-dk { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); }
+  .pb-dt { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 19px; line-height: 1.02; text-transform: uppercase; color: #FAF7F2; margin-top: 2px; }
+  .pb-dm { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; color: #7a7a82; margin-top: 3px; }
+  .pb-dgo { margin-left: auto; flex-shrink: 0; color: var(--ice); font-size: 19px; }
+  .pb-empty { padding: 70px 24px; text-align: center; font-family: 'Barlow', sans-serif; color: #8a8a92; font-size: 14px; line-height: 1.6; }
+
   /* ════ ARTICLE READER — "Center Court" (broadcast scoreboard) ════ */
   #screen-article { background: var(--grey-bg); }
   /* Hero: deep-green band with court lines + grain; clay kicker, scoreboard meta */
@@ -2504,20 +2581,48 @@
 
 </div>
 
-<!-- ═══ LIBRARY ═══ shared, app-wide content — reading (blog) + training (extra
-     sessions). Two sections toggled by the segmented control at the top.
-     data-tab stays 'workouts' so all goTo() routing is untouched. -->
+<!-- ═══ LIBRARY ═══ shared, app-wide content. A "two doors" landing — Sessions
+     (free workouts) and Playbook (blog articles) — each opening into its own
+     world. data-tab stays 'workouts' so all goTo() routing is untouched. -->
 <div id="screen-workouts" class="screen">
-  <div class="wl-header">
-    <div class="wl-title">Library</div>
-    <div class="wl-subtitle">Reading and training — everything outside your plan.</div>
+
+  <!-- Landing: the two doors -->
+  <div id="lib-doors" class="lib-pane">
+    <div class="lib-head">
+      <div class="lib-title">Library</div>
+      <div class="lib-sub">Two ways in — work, or wisdom.</div>
+    </div>
+    <div class="lib-doors">
+      <div class="lib-door door-sessions" role="button" tabindex="0" onclick="enterWorld('sessions')">
+        <div class="lib-door-court" aria-hidden="true"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M108 70 L252 70 L320 250 L40 250 Z"/><line x1="74" y1="172" x2="286" y2="172"/><line x1="180" y1="70" x2="180" y2="250"/></g></svg></div>
+        <div class="lib-door-k">— Train</div>
+        <div class="lib-door-big">Sessions</div>
+        <div class="lib-door-d">Workouts, drills &amp; resets — ready to run on your own.</div>
+        <div class="lib-door-row"><span class="lib-door-ct" id="sessions-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
+      </div>
+      <div class="lib-door door-playbook" role="button" tabindex="0" onclick="enterWorld('playbook')">
+        <div class="lib-door-court" aria-hidden="true"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M108 70 L252 70 L320 250 L40 250 Z"/><line x1="74" y1="172" x2="286" y2="172"/><line x1="180" y1="70" x2="180" y2="250"/></g></svg></div>
+        <div class="lib-door-k">— Learn</div>
+        <div class="lib-door-big">Playbook</div>
+        <div class="lib-door-d">Everything you need to know to play better tennis — in one place.</div>
+        <div class="lib-door-row"><span class="lib-door-ct" id="playbook-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
+      </div>
+    </div>
   </div>
-  <div class="lib-seg" id="lib-seg">
-    <button class="lib-seg-btn active" data-lib="read" onclick="switchLibTab('read')">Read</button>
-    <button class="lib-seg-btn" data-lib="train" onclick="switchLibTab('train')">Train</button>
+
+  <!-- Sessions world: numbered photo shelves (no tabs / no filters) -->
+  <div id="lib-sessions" class="lib-pane" hidden>
+    <button class="nav-back lib-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
+    <div class="w-head">
+      <div class="w-kick">Library · Train</div>
+      <div class="w-title">Sessions</div>
+      <div class="w-sub">Pick a session and press play.</div>
+    </div>
+    <div class="w-scroll" id="wl-scroll-train"></div>
   </div>
-  <div class="wl-scroll" id="wl-scroll-read"></div>
-  <div class="wl-scroll" id="wl-scroll-train" hidden></div>
+
+  <!-- Playbook world: broadcast feed — latest hero + list (filled by renderPlaybook) -->
+  <div id="lib-playbook" class="lib-pane lib-pane-dark" hidden></div>
 </div>
 
 <!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
@@ -2631,7 +2736,7 @@
     <span class="nav-dot" id="coach-tab-dot" hidden></span>
     <span class="nav-label">Coach</span>
   </button>
-  <button class="nav-item" data-tab="workouts" onclick="goTo('workouts')">
+  <button class="nav-item" data-tab="workouts" onclick="goLibrary()">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
     <span class="nav-label">Library</span>
   </button>
@@ -4354,21 +4459,116 @@ function renderArchiveEmpty() {
 //  manifests. Same for every user — not tied to the athlete's data.
 // ═══════════════════════════════════════════════════════════════════════
 
-// Entry point — called by goTo('workouts'). Renders both sections if needed.
+// Which Library pane is showing: 'doors' | 'sessions' | 'playbook'. Remembered
+// so returning from an opened session/article lands back in the right world.
+let _libPane = 'doors';
+let _trainManifest = null, _readManifest = null;
+let _sessionsRendered = false, _playbookRendered = false, _libCountsLoaded = false;
+
+// Entry point — called by goTo('workouts'). Shows the remembered pane and makes
+// sure the door counts are filled. The bottom-nav Library tab uses goLibrary(),
+// which resets to the doors first.
 function renderLibrary() {
-  renderTrainLibrary();
-  renderReadLibrary();
+  showLibPane(_libPane);
+  loadLibCounts();
 }
 
-// ── Segmented control: switch between Read and Train ──
-function switchLibTab(tab) {
-  document.getElementById('wl-scroll-read').hidden  = (tab !== 'read');
-  document.getElementById('wl-scroll-train').hidden = (tab !== 'train');
-  document.querySelectorAll('#lib-seg .lib-seg-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.lib === tab);
+// Bottom-nav "Library" tap → always open on the two doors.
+function goLibrary() {
+  _libPane = 'doors';
+  goTo('workouts');
+}
+window.goLibrary = goLibrary;
+
+function showLibPane(which) {
+  _libPane = which;
+  ['doors', 'sessions', 'playbook'].forEach(p => {
+    const el = document.getElementById('lib-' + p);
+    if (el) el.hidden = (p !== which);
   });
 }
-window.switchLibTab = switchLibTab;
+
+async function enterWorld(which) {
+  showLibPane(which);
+  if (which === 'sessions') await renderSessionsWorld();
+  if (which === 'playbook') await renderPlaybook();
+  window.scrollTo(0, 0);
+}
+function exitWorld() { showLibPane('doors'); window.scrollTo(0, 0); }
+window.enterWorld = enterWorld;
+window.exitWorld = exitWorld;
+
+// Fetch both manifests once and fill the "N Sessions / N Reads" door counts.
+async function loadLibCounts() {
+  if (_libCountsLoaded) return;
+  await ensureLibManifests();
+  const sCount = ((_trainManifest && _trainManifest.categories) || []).reduce((n, c) => n + ((c.workouts || []).length), 0);
+  const rCount = ((_readManifest && _readManifest.categories) || []).reduce((n, c) => n + ((c.articles || []).length), 0);
+  const sEl = document.getElementById('sessions-count');
+  const rEl = document.getElementById('playbook-count');
+  if (sEl) sEl.textContent = sCount + ' ' + (sCount === 1 ? 'Session' : 'Sessions');
+  if (rEl) rEl.textContent = rCount + ' ' + (rCount === 1 ? 'Read' : 'Reads');
+  _libCountsLoaded = true;
+}
+
+async function ensureLibManifests() {
+  if (!_trainManifest) {
+    try { const r = await fetch('workouts/index.json', { cache: 'no-cache' }); if (r.ok) _trainManifest = await r.json(); } catch (e) {}
+  }
+  if (!_readManifest) {
+    try { const r = await fetch('articles/index.json', { cache: 'no-cache' }); if (r.ok) _readManifest = await r.json(); } catch (e) {}
+  }
+}
+
+// ── SESSIONS world — numbered category shelves (rails). No tabs, no filters. ──
+async function renderSessionsWorld() {
+  if (_sessionsRendered) return;
+  const scroll = document.getElementById('wl-scroll-train');
+  if (!scroll) return;
+  await ensureLibManifests();
+  if (!_trainManifest) { scroll.innerHTML = '<div class="wl-empty">Couldn\'t load sessions. Check your connection and try again.</div>'; return; }
+  const cats = _trainManifest.categories || [];
+  if (!cats.length) { scroll.innerHTML = '<div class="wl-empty">No sessions yet — check back soon.</div>'; return; }
+  scroll.innerHTML = cats.map((cat, i) => {
+    const list = Array.isArray(cat.workouts) ? cat.workouts : [];
+    const num = String(i + 1).padStart(2, '0');
+    const banner = esc(cat.banner || '');
+    const cards = list.length
+      ? list.map(w => `
+          <div class="vcard" role="button" tabindex="0" data-file="${esc(w.file || '')}" onclick="openWorkout(this.dataset.file)">
+            <div class="vthumb" style="background-image:url('${banner}')">
+              ${w.duration ? `<span class="vbadge">${esc(w.duration)}</span>` : ''}
+              ${w.equipment ? `<span class="veq">${esc(w.equipment)}</span>` : ''}
+            </div>
+            <div class="vt">${esc(w.title || '')}</div>
+            <div class="vm">${esc(cat.title || '')}</div>
+          </div>`).join('')
+      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} sessions — check back soon.</div>`;
+    return `<div class="w-shelf"><div class="shelf-head"><span class="shelf-n">${num}</span><span class="shelf-t">${esc(cat.title || '')}</span><span class="shelf-more" aria-hidden="true">›</span></div><div class="w-rail">${cards}</div></div>`;
+  }).join('');
+  _sessionsRendered = true;
+}
+
+// ── PLAYBOOK world — broadcast: latest-article hero + numbered list of all. ──
+async function renderPlaybook() {
+  if (_playbookRendered) return;
+  const host = document.getElementById('lib-playbook');
+  if (!host) return;
+  await ensureLibManifests();
+  const backBtn = '<button class="nav-back lib-back dark" onclick="event.stopPropagation(); exitWorld()" aria-label="Back to Library">←</button>';
+  if (!_readManifest) { host.innerHTML = backBtn + '<div class="pb-empty">Couldn\'t load the Playbook. Check your connection and try again.</div>'; return; }
+  const all = [];
+  (_readManifest.categories || []).forEach(c => (c.articles || []).forEach(a => all.push({ title: a.title, file: a.file, readMins: a.readMins, cat: c.title })));
+  if (!all.length) { host.innerHTML = backBtn + '<div class="pb-empty">Your coach is adding the Playbook — check back soon.</div>'; _playbookRendered = true; return; }
+  const hero = all[0];
+  const court = '<div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 320" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M110 150 L250 150 L320 320 L40 320 Z"/><line x1="76" y1="240" x2="284" y2="240"/><line x1="180" y1="150" x2="180" y2="320"/></g></svg></div>';
+  const heroHtml = `<div class="pb-hero" role="button" tabindex="0" data-file="${esc(hero.file || '')}" onclick="openArticle(this.dataset.file)">${backBtn}${court}<div class="pb-tag"><span class="pb-dot"></span>Latest in the Playbook</div><div class="pb-hk">${esc(hero.cat || '')}</div><div class="pb-ht">${esc(hero.title || '')}</div><div class="pb-hm">${hero.readMins ? esc(String(hero.readMins)) + ' min read' : ''}<span class="pb-read">Read →</span></div></div>`;
+  const tagline = '<div class="pb-tagline"><b>Everything you need to know to play better tennis.</b> No fluff — just what moves your game.</div>';
+  const block = `<div class="pb-block"><span class="pb-s">§</span>All Reads<span class="pb-ct">${all.length} ${all.length === 1 ? 'article' : 'articles'}</span></div>`;
+  const rows = all.map((a, i) => `<div class="pb-disp" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-dn"><b>${String(i + 1).padStart(2, '0')}</b><i></i></div><div class="pb-db"><div class="pb-dk">${esc(a.cat || '')}</div><div class="pb-dt">${esc(a.title || '')}</div><div class="pb-dm">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}</div></div><span class="pb-dgo" aria-hidden="true">›</span></div>`).join('');
+  host.innerHTML = heroHtml + tagline + block + rows;
+  _playbookRendered = true;
+}
 
 // ── TRAIN: free workouts ──
 let _trainLibLoaded = false;
