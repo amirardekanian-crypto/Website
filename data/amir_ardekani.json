@@ -86,7 +86,7 @@
     "days": [
       {
         "id": 1,
-        "focusTag": "Lower Body & Hinge",
+        "focusTag": "Built From The Legs Up",
         "completionTitle": "Base Laid",
         "completionMessage": "Legs loaded, trunk braced — that's the foundation of every run and every lift to come. Walk easy, hydrate, let the hips recover.",
         "blocks": [
@@ -278,7 +278,7 @@
       },
       {
         "id": 2,
-        "focusTag": "Upper Body & Press",
+        "focusTag": "Press, Pull, Repeat",
         "completionTitle": "Engine On",
         "completionMessage": "Pressed strong and built the back that protects your spine. Roll the shoulders out tonight and keep that sleep honest.",
         "blocks": [
@@ -471,7 +471,7 @@
       },
       {
         "id": 3,
-        "focusTag": "Full-Body & Carry",
+        "focusTag": "Whole-Body Workhorse",
         "completionTitle": "Carried It",
         "completionMessage": "Full-body work and a heavy carry to finish — that's real-world strength and conditioning in one. Loose walk later, and you've earned the rest day.",
         "blocks": [
