@@ -1342,8 +1342,12 @@
   .checklist-item.collapsed .item-actions { display: none !important; }
   .checklist-item.collapsed .item-name { font-size: 17px; font-weight: 700; }
   .checklist-item.collapsed .ex-num { font-size: 22px; }
-  /* Show the summary line + chevron only when the row is collapsed */
-  .checklist-item:not(.collapsed) .ex-summary { display: none; }
+  /* Stat pills (sets×reps · RPE · rest) show only when collapsed. The green
+     "modifier" pills persist when expanded, anchored under the exercise name.
+     When an exercise has no modifier pills, hide the whole summary on expand so
+     no empty gap is left. */
+  .checklist-item:not(.collapsed) .ex-summary-pill.stat { display: none; }
+  .checklist-item:not(.collapsed):not(.has-mods) .ex-summary { display: none; }
   .checklist-item:not(.collapsed) .ex-chevron { transform: rotate(180deg); }
 
   /* ── REDESIGNED EXERCISE CARD ──────────────────────────────────────
@@ -1375,6 +1379,12 @@
     white-space: nowrap;
   }
   body[data-dark] .ex-summary-pill { background: #2a2a2a; color: #ddd; }
+  /* Modifier pills (technique chips: 3s eccentric · 1s squeeze · glute focus ·
+     max intent · holds…). Green so they stand out next to the grey stat pills,
+     and they stay next to the name when the card is opened. */
+  .ex-summary-pill.modifier { background: var(--yellow); color: var(--on-accent); }
+  body[data-dark] .ex-summary-pill.modifier { background: var(--yellow); color: var(--on-accent); }
+  .ex-summary-pill.modifier.priority { box-shadow: 0 0 0 1.5px rgba(14,74,54,0.30); }
   .checklist-item.checked .ex-summary { opacity: 0.5; }
 
   /* Chevron at the right edge of the row, rotates when expanded */
@@ -3734,20 +3744,21 @@ function renderStatsGrid(parsed, restSec) {
 // Stat pills for the collapsed row — each stat is its own small rounded pill.
 // "4×6"  ·  "7/10"  ·  "⏱ 2m" — sized to be glanceable but not loud.
 function renderExSummary(parsed, restSec) {
-  const pills = [];
-  if (parsed.sets && parsed.reps) pills.push(`${parsed.sets}×${parsed.reps}`);
-  else if (parsed.reps)            pills.push(parsed.reps);
-  if (parsed.target) {
-    pills.push(parsed.target.replace(/^@/, '').trim() + '/10');
-  }
-  if (restSec > 0)   pills.push(`⏱ ${formatRestLabel(restSec)}`);
-  if (!pills.length && parsed.extras.length) {
-    parsed.extras.forEach(e => pills.push(e.label));
-  }
-  if (!pills.length) return '';
-  return `<div class="ex-summary">${pills.map(p =>
-    `<span class="ex-summary-pill">${esc(p)}</span>`
-  ).join('')}</div>`;
+  // Green "modifier" pills lead the row (the technique chips: 3s eccentric, 1s
+  // squeeze, glute focus, max intent, holds…). They STAY under the name when the
+  // card is expanded. Grey "stat" pills (sets×reps · RPE · rest) follow and show
+  // only on the collapsed row.
+  const mods = (parsed.extras || []).map(e =>
+    `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}">${esc(e.label)}</span>`
+  );
+  const stats = [];
+  if (parsed.sets && parsed.reps) stats.push(`${parsed.sets}×${parsed.reps}`);
+  else if (parsed.reps)           stats.push(parsed.reps);
+  if (parsed.target)              stats.push(parsed.target.replace(/^@/, '').trim() + '/10');
+  if (restSec > 0)                stats.push(`⏱ ${formatRestLabel(restSec)}`);
+  const statPills = stats.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`);
+  if (!mods.length && !statPills.length) return '';
+  return `<div class="ex-summary">${mods.join('')}${statPills.join('')}</div>`;
 }
 
 // Cues — yellow line for good, red line for bad, no icons. Clean.
@@ -3785,17 +3796,12 @@ function renderExercise(ex, dayId, num, blockClass) {
   // with just a duration chip).
   const hasGridData = parsed.sets || parsed.reps || parsed.target || parsed.tempo || restSec > 0;
   const statsGrid  = hasGridData ? renderStatsGrid(parsed, restSec) : '';
-  // Extras (HOLD / Priority / Max Intent / etc.) sit DIRECTLY ABOVE the stats
-  // grid so they read as part of the same headline block. Yellow-tinted strip
-  // makes them eye-catching.
-  const extrasHtml = parsed.extras.length
-    ? `<div class="ex-extra-chips">${parsed.extras.map(c =>
-         `<span class="ex-extra-chip${c.style ? ' ' + c.style : ''}">${esc(c.label)}</span>`).join('')}</div>`
-    : '';
+  // Modifier chips (HOLD / Max Intent / 3s eccentric / glute focus…) now render
+  // as green pills next to the name via renderExSummary — visible collapsed AND
+  // expanded — so the expanded block is just the stats grid.
   const cuesHtml   = renderInlineCues(ex.cues);
-  // Glue extras + grid together so they look like one block visually
-  const statsBlock = (extrasHtml || statsGrid)
-    ? `<div class="ex-stats-block">${extrasHtml}${statsGrid}</div>`
+  const statsBlock = statsGrid
+    ? `<div class="ex-stats-block">${statsGrid}</div>`
     : '';
 
   // The log section is only meaningful for "standard" exercises (the ones that
@@ -3815,7 +3821,7 @@ function renderExercise(ex, dayId, num, blockClass) {
   // Falls back to 1 if the chip didn't have a "X Sets" entry.
   const setsCount = parseInt(parsed.sets, 10) || 1;
 
-  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}">
+  return `<div class="checklist-item collapsed ${blockClass}${parsed.extras.length ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -3877,7 +3883,7 @@ function renderCircuit(ex, dayId, num, blockClass) {
   if (ex.rounds)         summaryPills.push(ex.rounds);
   if (circuitRestSec)    summaryPills.push(`⏱ ${formatRestLabel(circuitRestSec)}`);
   const summary = summaryPills.length
-    ? `<div class="ex-summary">${summaryPills.map(p => `<span class="ex-summary-pill">${esc(p)}</span>`).join('')}</div>`
+    ? `<div class="ex-summary">${summaryPills.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`).join('')}</div>`
     : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
