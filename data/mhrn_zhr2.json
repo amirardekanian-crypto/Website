@@ -486,34 +486,11 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable External Rotation",
+                "name": "Side-Lying Dumbbell External Rotation",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "90° abduction", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×12+12 Reps" },
-                  { "label": "Tempo 2-2-2-0" },
-                  { "label": "RPE 5" },
-                  { "label": "Rest 60 sec" }
-                ],
-                "restSec": 60,
-                "cues": {
-                  "good": [
-                    "Slow and deliberate — precision, not strength",
-                    "Posterior cuff controlling the whole arc"
-                  ],
-                  "bad": [
-                    "Don't go heavy — perfect control or reduce load"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Incline Y-T-W Raise",
-                "videoUrl": null,
-                "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 each position" },
                   { "label": "Tempo 2-1-2-0" },
                   { "label": "RPE 5" },
                   { "label": "Rest 60 sec" }
@@ -521,19 +498,42 @@
                 "restSec": 60,
                 "cues": {
                   "good": [
-                    "Each letter hits a different upper-back zone — own each one",
-                    "Lower and mid traps loading as the arms form each shape"
+                    "Elbow pinned to the ribs — rotate only the forearm up, like a gate opening",
+                    "The back of the shoulder doing the work, never the front"
                   ],
                   "bad": [
-                    "Don't shrug into it — keep the neck long"
+                    "Don't go heavy — if the elbow lifts off the side, the load is too much"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Cable Face Pull",
+                "name": "Half-Kneeling Bottoms-Up Kettlebell Press",
                 "videoUrl": null,
                 "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8+8 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 5" },
+                  { "label": "Rest 60 sec" }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Press straight up with the bell balanced upside-down, wrist stacked over the elbow",
+                    "The whole shoulder and the side of your trunk gripping to keep it from tipping"
+                  ],
+                  "bad": [
+                    "Don't rush — if the bell tips back, slow down and reset the balance"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Prone Dumbbell Reverse Fly",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "thumbs up", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×15 Reps" },
                   { "label": "Tempo 2-1-2-0" },
@@ -543,11 +543,11 @@
                 "restSec": 60,
                 "cues": {
                   "good": [
-                    "Pull to the ears, elbows high and wide at the finish",
-                    "Rear delts and external rotators squeezing at the end position"
+                    "Open the arms wide to a T, thumbs leading toward the ceiling",
+                    "Rear delts lifting and the shoulder blades squeezing together"
                   ],
                   "bad": [
-                    "Don't let the body swing forward to assist"
+                    "Don't swing or use momentum — light and controlled is the whole point"
                   ]
                 }
               }
@@ -1052,7 +1052,7 @@
       {
         "icon": "🛡️",
         "title": "The Shoulder Under Velocity — A New Test",
-        "body": "Your shoulder resolved through the last cycle — the integrity block worked. This cycle introduces a new challenge: velocity-based pressing through the landmine. The angle is shoulder-friendly (diagonal, not vertical), and the leg drive takes the grinding pressure off the joint. What to watch: any pinching or catching sensation at the top of the press means the load or angle needs adjusting — not pushing through. The three integrity exercises (external rotation, Y-T-W, face pull) stay exactly as they are. They are the reason your shoulder is healthy. Don't skip them on hard days."
+        "body": "Your shoulder resolved through the last cycle — the integrity block worked. This cycle introduces a new challenge: velocity-based pressing through the landmine. The angle is shoulder-friendly (diagonal, not vertical), and the leg drive takes the grinding pressure off the joint. What to watch: any pinching or catching sensation at the top of the press means the load or angle needs adjusting — not pushing through. The integrity block is refreshed this cycle — side-lying external rotation, bottoms-up kettlebell press, and reverse fly — but it does the exact same job: keeping the rotator cuff and scapular stabilizers strong. This block is the reason your shoulder is healthy. Don't skip it on hard days."
       },
       {
         "icon": "🧠",
