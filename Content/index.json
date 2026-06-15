@@ -1,0 +1,35 @@
+{
+  "_comment": "Manifest for the shared Read library shown in the Library tab. Each category has a banner image and an articles[] array. To add an article: drop its JSON in the category folder and add an entry here. An empty articles[] shows a 'coach is adding…' note. Article block types: p · h · list · callout · img · workout.",
+  "categories": [
+    {
+      "id": "recovery",
+      "title": "Recovery",
+      "banner": "assets/img/workouts/recovery.webp",
+      "articles": []
+    },
+    {
+      "id": "pre-competition",
+      "title": "Pre-Competition",
+      "banner": "assets/img/workouts/on-court.webp",
+      "articles": []
+    },
+    {
+      "id": "mental",
+      "title": "Mental",
+      "banner": "assets/img/workouts/conditioning.webp",
+      "articles": []
+    },
+    {
+      "id": "nutrition",
+      "title": "Nutrition",
+      "banner": "assets/img/workouts/strength.webp",
+      "articles": []
+    },
+    {
+      "id": "supplements",
+      "title": "Supplements",
+      "banner": "assets/img/workouts/mobility.webp",
+      "articles": []
+    }
+  ]
+}

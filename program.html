@@ -711,6 +711,31 @@
   /* Empty-category note (no workouts yet) */
   .wl-coming { padding: 18px 16px; background: var(--white); border: 1px dashed var(--grey-mid); border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: 13.5px; color: var(--grey-text); line-height: 1.5; text-align: center; }
 
+  /* ── Library segmented control (Read | Train) ── */
+  .lib-seg { display: flex; gap: 6px; margin: 0 20px 20px; background: var(--grey-bg); border-radius: 10px; padding: 4px; }
+  .lib-seg-btn { flex: 1; padding: 9px 0; border: none; border-radius: 7px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; background: transparent; color: var(--grey-text); transition: background .18s ease, color .18s ease; }
+  .lib-seg-btn.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
+
+  /* ── Article card (in the Read accordion) ── */
+  .wl-card-read-mins { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+
+  /* ── Article reader body (#ar-body) ── */
+  #ar-body { padding: 20px 20px 110px; }
+  #ar-body img.ar-img { width: 100%; border-radius: 12px; margin: 4px 0 16px; display: block; }
+  #ar-body figcaption.ar-caption { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey-text); text-align: center; margin-top: -10px; margin-bottom: 18px; }
+  #ar-body .ar-p { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.7; color: var(--ink); margin: 0 0 14px; }
+  #ar-body .ar-h { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; margin: 24px 0 10px; }
+  #ar-body .ar-list { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.7; color: var(--ink); margin: 0 0 14px; padding-left: 20px; }
+  #ar-body .ar-list li { margin-bottom: 6px; }
+  #ar-body .ar-callout { background: var(--grey-bg); border-left: 3px solid var(--ice); border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 0 0 16px; font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  #ar-body .ar-workout-card { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--grey-card); border-radius: 12px; padding: 14px; margin: 16px 0; cursor: pointer; transition: border-color .15s ease; }
+  #ar-body .ar-workout-card:hover { border-color: var(--ice); }
+  #ar-body .ar-workout-card-icon { width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; background: var(--yellow-dim); display: flex; align-items: center; justify-content: center; color: var(--yellow); font-size: 18px; }
+  #ar-body .ar-workout-card-body { flex: 1; }
+  #ar-body .ar-workout-card-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; text-transform: uppercase; color: var(--ink); }
+  #ar-body .ar-workout-card-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey-text); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  #ar-body .ar-workout-card-play { width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; background: var(--grey-bg); color: var(--yellow); display: flex; align-items: center; justify-content: center; font-size: 12px; padding-left: 2px; }
+
   /* ═══ HOME OVERVIEW (the landing page on #screen-home) ═══
      Site nav · "Hi name" · current-cycle card · "This Week" + week · day cards.
      The cards reuse the .planlike .cm-* / .current-message styling. */
@@ -2442,14 +2467,20 @@
 
 </div>
 
-<!-- ═══ WORKOUTS LIBRARY ═══ shared, app-wide extra sessions, grouped by
-     category. Built from workouts/index.json by renderWorkouts(). -->
+<!-- ═══ LIBRARY ═══ shared, app-wide content — reading (blog) + training (extra
+     sessions). Two sections toggled by the segmented control at the top.
+     data-tab stays 'workouts' so all goTo() routing is untouched. -->
 <div id="screen-workouts" class="screen">
   <div class="wl-header">
-    <div class="wl-title">Browse</div>
-    <div class="wl-subtitle">Extra sessions — do them any time, outside your plan.</div>
+    <div class="wl-title">Library</div>
+    <div class="wl-subtitle">Reading and training — everything outside your plan.</div>
   </div>
-  <div class="wl-scroll" id="wl-scroll"></div>
+  <div class="lib-seg" id="lib-seg">
+    <button class="lib-seg-btn active" data-lib="read" onclick="switchLibTab('read')">Read</button>
+    <button class="lib-seg-btn" data-lib="train" onclick="switchLibTab('train')">Train</button>
+  </div>
+  <div class="wl-scroll" id="wl-scroll-read"></div>
+  <div class="wl-scroll" id="wl-scroll-train" hidden></div>
 </div>
 
 <!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
@@ -2463,6 +2494,18 @@
     <div class="ws-meta" id="ws-meta"></div>
   </div>
   <div id="ws-body"></div>
+</div>
+
+<!-- ═══ ARTICLE ═══ a single blog/read article opened from the Library Read tab
+     or via ?article= deep-link. Mirrors #screen-workout. -->
+<div id="screen-article" class="screen">
+  <div class="ws-header">
+    <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to library">←</button>
+    <div class="ws-eyebrow" id="ar-eyebrow"></div>
+    <div class="ws-title" id="ar-title"></div>
+    <div class="ws-meta" id="ar-meta"></div>
+  </div>
+  <div id="ar-body"></div>
 </div>
 
 <!-- ═══ ARCHIVE ═══ a single completed past program. Not a bottom-nav tab —
@@ -2552,7 +2595,7 @@
   </button>
   <button class="nav-item" data-tab="workouts" onclick="goTo('workouts')">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
-    <span class="nav-label">Workouts</span>
+    <span class="nav-label">Library</span>
   </button>
   <button class="nav-item" data-tab="plan" onclick="goTo('plan')">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></span>
@@ -3004,6 +3047,8 @@ function getVideoUrl(ex) {
     // sample — the "get your own program" hook. No param → normal home load.
     const wParam = params.get('workout');
     if (wParam) openWorkoutDeepLink(wParam);
+    const aParam = params.get('article');
+    if (aParam) openArticleDeepLink(aParam);
   }, 300);
 })();
 
@@ -4230,9 +4275,8 @@ function goTo(screen, historyId) {
     else renderArchiveEmpty();
   }
 
-  // Workouts tab — shared, app-wide library. Built lazily from the manifest on
-  // first visit; renderWorkoutsLibrary() no-ops if already loaded.
-  if (screen === 'workouts') renderWorkoutsLibrary();
+  // Library tab — Read + Train sections. Both built lazily on first visit.
+  if (screen === 'workouts') renderLibrary();
 
   // Update the global tab bar's active button
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
@@ -4264,17 +4308,33 @@ function renderArchiveEmpty() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  WORKOUTS LIBRARY — shared, app-wide extra sessions, grouped by category.
-//  The manifest (workouts/index.json) carries each card's name/duration/
-//  equipment, so the list renders instantly without opening any workout file.
-//  The full workout JSON is only fetched when a card is tapped (Phase 2).
-//  Same for every user — not tied to the athlete's data.
+//  LIBRARY — Read (blog articles) + Train (extra workouts), grouped by
+//  category. Both sections are built lazily from their own index.json
+//  manifests. Same for every user — not tied to the athlete's data.
 // ═══════════════════════════════════════════════════════════════════════
-let _workoutsLibLoaded = false;
-async function renderWorkoutsLibrary() {
-  if (_workoutsLibLoaded) return;        // build once per session
-  _workoutsLibLoaded = true;
-  const scroll = document.getElementById('wl-scroll');
+
+// Entry point — called by goTo('workouts'). Renders both sections if needed.
+function renderLibrary() {
+  renderTrainLibrary();
+  renderReadLibrary();
+}
+
+// ── Segmented control: switch between Read and Train ──
+function switchLibTab(tab) {
+  document.getElementById('wl-scroll-read').hidden  = (tab !== 'read');
+  document.getElementById('wl-scroll-train').hidden = (tab !== 'train');
+  document.querySelectorAll('#lib-seg .lib-seg-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lib === tab);
+  });
+}
+window.switchLibTab = switchLibTab;
+
+// ── TRAIN: free workouts ──
+let _trainLibLoaded = false;
+async function renderTrainLibrary() {
+  if (_trainLibLoaded) return;
+  _trainLibLoaded = true;
+  const scroll = document.getElementById('wl-scroll-train');
   if (!scroll) return;
 
   let manifest;
@@ -4283,8 +4343,8 @@ async function renderWorkoutsLibrary() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     manifest = await res.json();
   } catch (e) {
-    _workoutsLibLoaded = false;          // allow a retry on next visit
-    scroll.innerHTML = `<div class="wl-empty">Couldn't load the workout library. Check your connection and try again.</div>`;
+    _trainLibLoaded = false;
+    scroll.innerHTML = `<div class="wl-empty">Couldn't load workouts. Check your connection and try again.</div>`;
     return;
   }
 
@@ -4294,15 +4354,12 @@ async function renderWorkoutsLibrary() {
     return;
   }
 
-  // Show EVERY category, even empty ones. Each category is collapsed by default;
-  // tapping its banner reveals the workouts and closes any other open category
-  // (accordion — one open at a time). The banner shows the name + workout count.
   scroll.innerHTML = cats.map(cat => {
     const list = Array.isArray(cat.workouts) ? cat.workouts : [];
     const count = list.length;
     const countLabel = count + ' ' + (count === 1 ? 'Workout' : 'Workouts');
     const banner = `
-      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleWorkoutCat(this)">
+      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleLibCat(this,'wl-scroll-train')">
         <span class="wl-banner-chev" aria-hidden="true">▾</span>
         <div class="wl-banner-row">
           <div class="wl-banner-title">${esc(cat.title)}</div>
@@ -4311,7 +4368,7 @@ async function renderWorkoutsLibrary() {
       </div>`;
     const body = count
       ? list.map(w => `
-          <div class="wl-card" role="button" tabindex="0" data-file="${esc(w.file || '')}" data-id="${esc(w.id || '')}" onclick="openWorkout(this.dataset.file)">
+          <div class="wl-card" role="button" tabindex="0" data-file="${esc(w.file || '')}" onclick="openWorkout(this.dataset.file)">
             <div class="wl-card-thumb"></div>
             <div class="wl-card-body">
               <div class="wl-card-title">${esc(w.title || '')}</div>
@@ -4324,15 +4381,158 @@ async function renderWorkoutsLibrary() {
   }).join('');
 }
 
-// Accordion for the Workouts browse page: opening one category closes the rest.
-function toggleWorkoutCat(banner) {
+// ── READ: blog articles ──
+let _readLibLoaded = false;
+async function renderReadLibrary() {
+  if (_readLibLoaded) return;
+  _readLibLoaded = true;
+  const scroll = document.getElementById('wl-scroll-read');
+  if (!scroll) return;
+
+  let manifest;
+  try {
+    const res = await fetch('content/index.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    manifest = await res.json();
+  } catch (e) {
+    _readLibLoaded = false;
+    scroll.innerHTML = `<div class="wl-empty">Couldn't load articles. Check your connection and try again.</div>`;
+    return;
+  }
+
+  const cats = manifest.categories || [];
+  if (!cats.length) {
+    scroll.innerHTML = `<div class="wl-empty">No articles yet — check back soon.</div>`;
+    return;
+  }
+
+  scroll.innerHTML = cats.map(cat => {
+    const list = Array.isArray(cat.articles) ? cat.articles : [];
+    const count = list.length;
+    const countLabel = count + ' ' + (count === 1 ? 'Article' : 'Articles');
+    const banner = `
+      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleLibCat(this,'wl-scroll-read')">
+        <span class="wl-banner-chev" aria-hidden="true">▾</span>
+        <div class="wl-banner-row">
+          <div class="wl-banner-title">${esc(cat.title)}</div>
+          <div class="wl-banner-count">${countLabel}</div>
+        </div>
+      </div>`;
+    const body = count
+      ? list.map(a => `
+          <div class="wl-card" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)">
+            <div class="wl-card-thumb" style="${a.cover ? `background-image:url('${esc(a.cover)}');background-size:cover;background-position:center;` : ''}"></div>
+            <div class="wl-card-body">
+              <div class="wl-card-title">${esc(a.title || '')}</div>
+              <div class="wl-card-read-mins">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}${a.readMins && a.category ? ' · ' : ''}${esc(a.category || '')}</div>
+            </div>
+            <div class="wl-card-play" aria-hidden="true">›</div>
+          </div>`).join('')
+      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} articles — check back soon.</div>`;
+    return `<div class="wl-group">${banner}<div class="wl-group-body">${body}</div></div>`;
+  }).join('');
+}
+
+// Shared accordion toggle — scoped to whichever scroll container called it.
+function toggleLibCat(banner, scrollId) {
   const group = banner.closest('.wl-group');
   if (!group) return;
   const wasOpen = group.classList.contains('open');
-  document.querySelectorAll('#wl-scroll .wl-group.open').forEach(g => g.classList.remove('open'));
+  document.querySelectorAll(`#${scrollId} .wl-group.open`).forEach(g => g.classList.remove('open'));
   if (!wasOpen) group.classList.add('open');
 }
-window.toggleWorkoutCat = toggleWorkoutCat;
+window.toggleLibCat = toggleLibCat;
+
+// ── OPEN ARTICLE (single article reader) ──
+async function openArticle(file) {
+  if (!file) return;
+  const body  = document.getElementById('ar-body');
+  const eyebrow = document.getElementById('ar-eyebrow');
+  const titleEl  = document.getElementById('ar-title');
+  const metaEl   = document.getElementById('ar-meta');
+  if (!body) return;
+
+  body.innerHTML = '<div class="wl-empty">Loading…</div>';
+  goTo('article');
+
+  let article;
+  try {
+    const res = await fetch(file, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    article = await res.json();
+  } catch (e) {
+    body.innerHTML = `<div class="wl-empty">Couldn't load this article. Try again.</div>`;
+    return;
+  }
+
+  eyebrow.textContent = article.category || '';
+  titleEl.textContent = article.title || '';
+  metaEl.textContent  = [
+    article.readMins ? article.readMins + ' min read' : '',
+    article.date || ''
+  ].filter(Boolean).join(' · ');
+
+  body.innerHTML = renderArticleBlocks(article.blocks || []);
+}
+window.openArticle = openArticle;
+
+// Renders an array of typed content blocks to HTML.
+// Block types: p · h · list · callout · img · workout
+function renderArticleBlocks(blocks) {
+  return blocks.map(b => {
+    switch (b.type) {
+      case 'p':
+        return `<p class="ar-p">${esc(b.text || '')}</p>`;
+      case 'h':
+        return `<h3 class="ar-h">${esc(b.text || '')}</h3>`;
+      case 'list':
+        return `<ul class="ar-list">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
+      case 'callout':
+        return `<div class="ar-callout">${esc(b.text || '')}</div>`;
+      case 'img':
+        return `<figure style="margin:0 0 4px">
+          <img class="ar-img" src="${esc(b.src || '')}" alt="${esc(b.caption || '')}" loading="lazy">
+          ${b.caption ? `<figcaption class="ar-caption">${esc(b.caption)}</figcaption>` : ''}
+        </figure>`;
+      case 'workout':
+        return `<div class="ar-workout-card" role="button" tabindex="0" onclick="openWorkout('${esc(b.file || '')}')">
+          <div class="ar-workout-card-icon">▶</div>
+          <div class="ar-workout-card-body">
+            <div class="ar-workout-card-label">${esc(b.label || b.id || 'Workout')}</div>
+            ${b.meta ? `<div class="ar-workout-card-sub">${esc(b.meta)}</div>` : ''}
+          </div>
+          <div class="ar-workout-card-play">›</div>
+        </div>`;
+      default:
+        return '';
+    }
+  }).join('');
+}
+
+// ?article= deep-link: resolves an article id via the manifest, then opens it.
+async function openArticleDeepLink(idOrPath) {
+  if (!idOrPath) return;
+  // Direct file path (contains a slash or .json)
+  if (idOrPath.includes('/') || /\.json$/i.test(idOrPath)) {
+    openArticle(idOrPath.includes('/') && !/\.json$/i.test(idOrPath)
+      ? `content/${idOrPath}.json`
+      : idOrPath);
+    return;
+  }
+  // Resolve by id via the manifest
+  try {
+    const res = await fetch('content/index.json', { cache: 'no-cache' });
+    if (res.ok) {
+      const manifest = await res.json();
+      for (const cat of (manifest.categories || [])) {
+        const hit = (cat.articles || []).find(a => a.id === idOrPath);
+        if (hit && hit.file) { openArticle(hit.file); return; }
+      }
+    }
+  } catch (e) { /* fall through */ }
+  console.warn('Deep-link article not found:', idOrPath);
+}
+window.openArticleDeepLink = openArticleDeepLink;
 
 // ═══════════════════════════════════════════════════════════════════════
 //  WORKOUT SESSION — open one library workout from its card.

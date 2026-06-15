@@ -474,55 +474,51 @@ Any exercise (any type) can include a `videoUrl`. When present, a play button ap
 
 ### Chip Styles
 
-| Style | Appearance | Use For |
+Chips route to the stats grid by their **label pattern** (next section), not their style.
+`style` only matters for the leftover **modifier** chips — the ones that match no stat:
+
+| Style | Appearance | Use for |
 |-------|-----------|---------|
-| *(none)* | Grey pill | Reps, tempo, RPE — parsed into the stats grid |
-| `"yellow"` | Yellow pill | Set count (exactly one per `standard` exercise) |
-| `"dark"` | Dark pill | Technique modifiers: `"3s eccentric"`, `"1s squeeze"`, `"glute focus"`, `"superset"` |
+| *(none)* | Grey stat cell / pill | Reps, RPE, tempo — the parsed stats |
+| `"yellow"` | Yellow pill | The set count (`"N Sets"`), one per `standard` exercise |
+| `"dark"` | **Green** modifier pill, anchored by the name | Technique cues only: `"3s eccentric"`, `"1s squeeze"`, `"glute focus"`, `"superset"`, `"max intent"` |
 
-### Chip parsing — how labels become the stats grid (`standard` only)
+### Chip parsing — how every label becomes a stat or a modifier pill
 
-`program.html` reads every chip label and routes it to one of five stat cells (SETS · REPS · RPE · TEMPO · REST). **`simple` exercises skip parsing entirely — their chips always render as grey/dark pills.**
+`program.html` parses **every** chip label — on `standard` AND `simple` exercises — and routes it to one of five stat cells (SETS · REPS · RPE · TEMPO · REST). Whatever matches **no** stat pattern becomes a **green modifier pill** anchored next to the exercise name (visible collapsed *and* expanded). Circuits are the exception: they show only their `rounds` + rest.
 
 | Chip label pattern | Routes to | Example |
 |---|---|---|
 | `"N Sets"` | SETS cell | `"3 Sets"` |
-| Starts with `×` | REPS cell (strips `×`, strips trailing "Reps") | `"×8 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"` |
+| Starts with `×` | REPS cell (strips `×` + trailing "Reps") | `"×8 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"` |
 | Ends with "reps" / "rep" | REPS cell | `"8 Reps"` |
-| Pure duration / distance (no other words) | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"1:30"` |
-| `"Tempo X-X-X-X"` | TEMPO cell | `"Tempo 3-0-1-0"` |
+| `"N Each Side/Leg/Arm"` (no `×`) | REPS cell | `"4 Each Side"`, `"10-12 Each Leg"` |
+| Bare number or range | REPS cell | `"8"`, `"10-12"` |
+| Pure duration / distance | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"5 min"`, `"1:30"` |
+| `"Tempo a-b-c-d"` | TEMPO cell | `"Tempo 3-0-1-0"` |
 | `"RPE N"` | RPE cell | `"RPE 8"` |
-| Anything else | Extra pill (visible below the stats grid) | `"superset"` dark chip |
+| **Anything else** | **Green modifier pill** (by the name) | `"3s eccentric"`, `"max intent"`, `"superset"` |
 
-**Rule: always use `×` as the reps prefix on `standard` exercises.** This guarantees routing to the REPS cell regardless of what follows:
-
-```json
-{ "label": "×10 Reps" }           // bilateral count
-{ "label": "×10 Each Side" }      // unilateral — side info embedded here, never a separate chip
-{ "label": "×10 Each Leg" }       // same rule
-{ "label": "×10 Each Arm" }       // same rule
-{ "label": "×30s Each Side" }     // duration-based unilateral (plank, carry)
-{ "label": "×40m" }               // distance-based bilateral (farmer carry)
-{ "label": "×40m Each Side" }     // distance-based unilateral (suitcase carry)
-```
-
-**Never** put `"Each Side"` / `"Each Leg"` / `"Each Arm"` in a separate chip on a `standard` exercise — it will render as an extra pill instead of appearing in the REPS cell.
+**Authoring rules — so chips land where you intend:**
+- **Reps → one `×`-prefixed chip:** `"×10 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"`. Embed side/leg/arm info in that *same* chip — never a separate `"Each Side"` chip. (Bare `"4 Each Side"` and bare numbers still route to REPS as a fallback, but `×` is the rule.)
+- **Modifier (green) chips are technique cues ONLY** — `"3s eccentric"`, `"glute focus"`, `"max intent"`, a `"2s hold"` pause-emphasis. **Never put a rep count, dose, or duration in a bare modifier chip**, or it shows as a green pill with an empty REPS cell (the `"4 Each Side"`-as-green-pill bug).
+- **One set count per `standard`** — `"N Sets"`, yellow.
 
 ### `simple` exercise chip convention
 
-`simple` exercises have no stats grid — all chips render as pills. The standard pattern is **two chips only**:
+A `simple` exercise (warm-up / activation) takes **two chips**, parsed into the stats just like a `standard` one:
 
-1. **Dark chip** — reps, duration, or distance (the "how much"): `"8 Reps"`, `"6 Each Side"`, `"5 min"`, `"30s"`
-2. **Grey RPE chip** — effort level: `"RPE 4"` (warm-ups typically RPE 3–5)
+1. **Reps / duration** — a `×`-prefixed count (`"×6 Each Side"`, `"×8"`) or a bare duration/distance (`"5 min"`, `"30s"`) → REPS cell.
+2. **RPE** — `"RPE 4"` (warm-ups are typically RPE 3–5) → RPE cell.
 
-No sets chip. No rest chip. No tempo chip.
+No sets, tempo, or rest chip. Don't add a separate chip for the rep count (it *is* the reps chip above), and only add a modifier chip if there's a genuine technique cue — it renders green.
 
 ```json
 { "type": "simple", "name": "Bird Dog",
-  "chips": [{ "label": "6 Each Side", "style": "dark" }, { "label": "RPE 4" }] }
+  "chips": [{ "label": "×6 Each Side" }, { "label": "RPE 4" }] }
 
 { "type": "simple", "name": "Assault Bike",
-  "chips": [{ "label": "5 min", "style": "dark" }, { "label": "RPE 5" }] }
+  "chips": [{ "label": "5 min" }, { "label": "RPE 5" }] }
 ```
 
 ### Coaching Cues

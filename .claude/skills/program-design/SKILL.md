@@ -144,20 +144,25 @@ a repeat. For a **resolving injury**, place the current rehab stage.
 variation. Equipment in the name when the move has multiple implements (cable/dumbbell/
 barbell/machine/kettlebell); omit when equipment-agnostic. **Defining setups DO belong in
 the name** (Chest-Supported, Heels-Elevated, Half-Kneeling, Incline, B-Stance, Bottoms-Up,
-Single-Arm, Single-Leg). **Never in the name** (→ dark chips): grip · focus/intent · range
+Single-Arm, Single-Leg). **Never in the name** (→ chips, not the name): grip · focus/intent · range
 qualifier · tempo emphasis · holds/durations · digits · parentheses · colons · commas.
+(A dose duration like a 30s plank → the `×`-prefixed reps chip; a pause/hold *emphasis* → a modifier chip.)
 
-**CHIPS:** order = dark modifiers → (yellow) set count → grey (reps/tempo/RPE). 0–3 dark
-chips, ≤4 words, lowercase, "3s" not "three-second". Holds/durations always a dark chip.
-Reps chip always uses `×` prefix; embed side info in the same chip — never a separate chip
-(`"×10 Each Side"` ✓, `"×10"` + `"Each Side"` ✗).
+**CHIPS:** order = green modifiers → (yellow) set count → grey stats (reps · tempo · RPE).
+**Reps/duration/distance dose = one `×`-prefixed chip** (`"×8"`, `"×10 Each Side"`,
+`"×30s Each Side"`, `"×40m"`); embed side info there, never a separate `"Each Side"` chip
+(`"×10 Each Side"` ✓, `"×10"` + `"Each Side"` ✗). **Modifier chips = technique cues ONLY**
+— the green pills by the name (`3s eccentric`, `glute focus`, `1s squeeze`, `superset`,
+`max intent`, a `2s hold` pause-emphasis); ≤4 words, lowercase, "3s" not "three-second",
+0–3 per exercise. **Never put a rep/dose count in a modifier chip** — it renders as a green
+pill with an empty REPS cell. Full map: SCHEMA.md → "Chip parsing".
 
 **PRESCRIPTION (with carve-out):**
 - standard grinding lift → Sets · reps/duration · tempo · RPE · restSec
 - ballistic (jumps/throws/Olympic) → Sets · reps · RPE · restSec + `max intent` chip — **no tempo**
 - loaded carry → Sets · distance/duration · RPE · restSec — **no tempo**
 - circuit → rounds + restSec + per-item reps + one overall RPE — **no per-item tempo**
-- **simple (warm-up/activation)** → exactly two chips: one dark (reps/duration) + one grey RPE. No sets, no rest, no tempo. RPE 3–5 typical.
+- **simple (warm-up/activation)** → two chips: a `×`-prefixed reps/duration chip + an `RPE N` chip. No sets, tempo, or rest. RPE 3–5 typical.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
@@ -199,7 +204,7 @@ items:
 
 [Exercise Name]
 type: simple
-chips: [label](dark) · RPE X
+chips: ×[reps] · RPE X
 ext: [cue]
 int: [cue]
 avoid: [cue]
