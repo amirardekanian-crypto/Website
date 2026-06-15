@@ -3689,6 +3689,11 @@ function parseChips(chips) {
     // REPS (× prefix, or contains "Reps")
     if (/^×/.test(label)) { out.reps = label.replace(/^×/, '').replace(/\s*reps?$/i, '').trim(); return; }
     if (/reps?$/i.test(label)) { out.reps = label.replace(/\s*reps?$/i, '').trim(); return; }
+    // Per-side / leg / arm / hand counts written WITHOUT the leading × (e.g.
+    // "4 Each Side", "10-12 Each Leg") — these are REPS, not modifier chips.
+    if (/^\d+(?:\s*[-–]\s*\d+)?\s+each\s+(?:side|leg|arm|hand)s?$/i.test(label)) { out.reps = label; return; }
+    // A bare rep count / count-with-unit (e.g. "8", "10-12") with no other word — also REPS.
+    if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(label)) { out.reps = label; return; }
     // Anything else — preserve the chip's `style` so "yellow" highlighted ones stand out
     out.extras.push({ label, style: c.style || '' });
   });
