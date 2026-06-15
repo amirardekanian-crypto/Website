@@ -33,6 +33,21 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
 
+## Exercise naming
+- **Name = `[modification] [equipment] [movement]`** (e.g. Standing Dumbbell Shoulder
+  Press); bodyweight moves take the bare movement, no "Bodyweight" prefix (e.g. Reverse
+  Lunge). *(2026-06-15)*
+- **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
+  `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
+- **`exercise_library.json` (generated from Notion) is the source of truth for names —
+  it is the video join key.** Author each exercise to the library's canonical spelling
+  exactly; `/program-assemble` validates and flags misses. Established names keep their
+  digits (45° Back Extension, 90/90, B-Stance) — don't mangle them. *(2026-06-15)*
+- **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
+  drift still finds the video and Notion renames don't break old programs — but
+  word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
+  still need the exact canonical name. *(2026-06-15)*
+
 ## Recovery & autoregulation
 - **Recovery capacity gates everything** — set the weekly volume ceiling *before*
   choosing session count. *(2026-06-15)*

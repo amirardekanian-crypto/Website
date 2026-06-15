@@ -2841,11 +2841,41 @@ let isLoading = true;
 // Exercise name -> video URL, sourced from Notion via sync_notion.py.
 // Looked up by exercise name when an exercise's own videoUrl is empty.
 let EXERCISE_LIBRARY = {};
+let EXERCISE_LIBRARY_NORM = {};   // normalized name -> video URL (forgiving fallback)
+
+// Collapse trivial spelling drift so a program name still finds its video when
+// it differs from the library key only by case, punctuation, accents, or an
+// apostrophe (e.g. "Farmer Carry" -> "Farmer's Carry", "Cat Cow" -> "Cat-Cow").
+// Deliberately does NOT strip words or digits — that would risk matching the
+// wrong exercise. Word-level differences are fixed at authoring time instead.
+function normExName(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFKD').replace(/[^\x00-\x7f]/g, '') // fold accents, drop non-ASCII (incl. curly ')
+    .replace(/'/g, '')                              // drop straight apostrophes
+    .replace(/[^a-z0-9]+/g, ' ')                         // other punctuation -> space
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Build the normalized index once after the library loads. Exact keys win at
+// lookup, so a collision in the normalized space can only affect the fallback.
+function buildExerciseLibraryIndex() {
+  EXERCISE_LIBRARY_NORM = {};
+  for (const [name, url] of Object.entries(EXERCISE_LIBRARY)) {
+    if (!url) continue;                                  // skip entries with no video
+    const k = normExName(name);
+    if (k && !(k in EXERCISE_LIBRARY_NORM)) EXERCISE_LIBRARY_NORM[k] = url;
+  }
+}
+
 function getVideoUrl(ex) {
   if (!ex) return '';
   if (ex.videoUrl) return ex.videoUrl;
   const name = (ex.name || '').trim();
-  return (name && EXERCISE_LIBRARY[name]) || '';
+  if (!name) return '';
+  if (EXERCISE_LIBRARY[name]) return EXERCISE_LIBRARY[name];   // exact match first
+  return EXERCISE_LIBRARY_NORM[normExName(name)] || '';        // forgiving fallback
 }
 
 // ── 1. BOOT ──

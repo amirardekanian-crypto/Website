@@ -40,8 +40,20 @@ Map the spec into the schema shape:
   day count, and exercise count print as expected.
 - **Format lint** against /program-design rules: every `standard` has sets·reps·tempo·
   RPE·restSec; ballistic/carry correctly OMIT tempo and carry a `max intent` chip;
-  chip order = dark → yellow set count → grey; no digits/grip/holds in any `name`;
-  every exercise has exactly 3 cues (ext+int in good, avoid in bad).
+  chip order = dark → yellow set count → grey; every exercise has exactly 3 cues
+  (ext+int in good, avoid in bad).
+- **Naming** (see COACHING-PRINCIPLES.md › Exercise naming): names are
+  `[modification] [equipment] [movement]`, bodyweight bare; grip / intent / holds live
+  in chips, never the name. Don't strip digits from established library names (45°, 90/90).
+- **Name ↔ library check (catches dead video links):** every exercise name is the video
+  join key — it must resolve in `exercise_library.json`. Run the snippet below: it matches
+  exact, then normalized (case/punctuation/accents, mirroring the app resolver). For any
+  **MISS**, rename to the suggested canonical key before ship. For a name that resolves but
+  whose library URL is **empty (GAP)**, keep the name and flag it to Amir as a Notion
+  content gap (the video gets added there, not here).
+  ```
+  node -e "const fs=require('fs');const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\x00-\x7f]/g,'').replace(/'/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();const lib=JSON.parse(fs.readFileSync('exercise_library.json','utf8'));const N={};for(const k of Object.keys(lib)){const n=norm(k);if(!(n in N))N[n]=k;}const d=JSON.parse(fs.readFileSync('data/<id>.json','utf8'));const seen=new Set();for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exercises)for(const it of (e.items||[e])){const nm=it.name;if(!nm||seen.has(nm))continue;seen.add(nm);if(nm in lib){if(!lib[nm])console.log('GAP   '+nm+'  (in library, no video — add in Notion)');}else{const c=N[norm(nm)];console.log('MISS  '+nm+(c?'  -> rename to: '+c:'  -> no library match'));}}console.log('checked '+seen.size+' names');"
+  ```
 - Report any violation and fix before finishing.
 
 ## Step 4 — Ship
