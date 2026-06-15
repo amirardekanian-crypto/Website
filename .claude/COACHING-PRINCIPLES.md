@@ -89,3 +89,10 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Process
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
+- **Design pass = programming first; polish later.** During /program-design put ALL the
+  reasoning into the coaching decisions + analysis (athlete read, SFR/transfer selection,
+  volume, sequencing, progression). Exercise **names, chips, day names, and formatting are a
+  polish pass AFTER the program exists** — nail the right movement + dose first; wording is
+  tidied later (/program-assemble format-lints, names finalize in Notion when videos are
+  added). Don't burn design budget perfecting names/chips mid-analysis; if a name/chip is
+  rough, flag it and move on. *(2026-06-15)*

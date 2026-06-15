@@ -86,7 +86,7 @@
     "days": [
       {
         "id": 1,
-        "focusTag": "Lower + Brace",
+        "focusTag": "Lower Body & Hinge",
         "completionTitle": "Base Laid",
         "completionMessage": "Legs loaded, trunk braced — that's the foundation of every run and every lift to come. Walk easy, hydrate, let the hips recover.",
         "blocks": [
@@ -99,7 +99,8 @@
                 "name": "World's Greatest Stretch",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "4 Each Side", "style": "dark" }
+                  { "label": "4 Each Side", "style": "dark" },
+                  { "label": "RPE 4" }
                 ],
                 "cues": {
                   "good": [
@@ -116,7 +117,8 @@
                 "name": "Bird Dog",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "6 Each Side", "style": "dark" }
+                  { "label": "6 Each Side", "style": "dark" },
+                  { "label": "RPE 4" }
                 ],
                 "cues": {
                   "good": [
@@ -256,9 +258,8 @@
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
-                  { "label": "40m", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "Each Side" },
+                  { "label": "×40m Each Side" },
                   { "label": "RPE 7" }
                 ],
                 "cues": {
@@ -277,7 +278,7 @@
       },
       {
         "id": 2,
-        "focusTag": "Upper + Posterior",
+        "focusTag": "Upper Body & Press",
         "completionTitle": "Engine On",
         "completionMessage": "Pressed strong and built the back that protects your spine. Roll the shoulders out tonight and keep that sleep honest.",
         "blocks": [
@@ -290,7 +291,8 @@
                 "name": "Cat-Cow",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "8 Reps", "style": "dark" }
+                  { "label": "8 Reps", "style": "dark" },
+                  { "label": "RPE 3" }
                 ],
                 "cues": {
                   "good": [
@@ -307,7 +309,8 @@
                 "name": "Band Pull-Apart",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "15 Reps", "style": "dark" }
+                  { "label": "15 Reps", "style": "dark" },
+                  { "label": "RPE 4" }
                 ],
                 "cues": {
                   "good": [
@@ -468,7 +471,7 @@
       },
       {
         "id": 3,
-        "focusTag": "Total + Carry",
+        "focusTag": "Full-Body & Carry",
         "completionTitle": "Carried It",
         "completionMessage": "Full-body work and a heavy carry to finish — that's real-world strength and conditioning in one. Loose walk later, and you've earned the rest day.",
         "blocks": [
@@ -481,7 +484,8 @@
                 "name": "World's Greatest Stretch",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "4 Each Side", "style": "dark" }
+                  { "label": "4 Each Side", "style": "dark" },
+                  { "label": "RPE 4" }
                 ],
                 "cues": {
                   "good": [
@@ -498,7 +502,8 @@
                 "name": "Glute Bridge",
                 "videoUrl": null,
                 "chips": [
-                  { "label": "12 Reps", "style": "dark" }
+                  { "label": "12 Reps", "style": "dark" },
+                  { "label": "RPE 5" }
                 ],
                 "cues": {
                   "good": [
@@ -616,9 +621,8 @@
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
-                  { "label": "30s hold", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "Each Side" },
+                  { "label": "×30s Each Side" },
                   { "label": "RPE 7" }
                 ],
                 "cues": {
@@ -637,8 +641,8 @@
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
-                  { "label": "40m", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×40m" },
                   { "label": "RPE 7" }
                 ],
                 "cues": {
@@ -662,23 +666,43 @@
     "cards": [
       {
         "icon": "🧱",
-        "title": "Your back leads every session",
-        "body": "Every day finishes with brace work — dead bugs, Pallof, side planks, carries — and that's not filler, it's the main event. Your back is chronic but manageable, so we make it bulletproof by teaching the trunk to resist movement, never by crunching it. If any lift sharpens past a dull stretch, stop and switch to its fallback. Protect this and the loading in Forge becomes easy."
+        "title": "Brace Off The Gym Floor",
+        "body": "The Pallof, dead bug, and suitcase carry aren't just session work — they're a rehearsal for the 23 hours a day you're not training. Picking your bag off the floor, loading the car, standing up from a low chair: hinge at the hips, brace the trunk like you do under the Hip Thrust bar, and keep the load close. Whether your back stays manageable instead of flaring comes down to carrying that pattern into ordinary life, not just nailing three gym sessions. At 90 kg, bending badly over a sink is a bigger axial dose than most of what's in this program — so own the brace everywhere."
       },
       {
-        "icon": "⏱",
-        "title": "RPE 8 is the ceiling — on purpose",
-        "body": "You're newer to structured progression and your sleep quality is sitting around 6 out of 10, so we cap effort at RPE 8 and keep tempos controlled. That's not playing small — it's where a newer lifter makes the fastest clean gains without digging a recovery hole. On a rough-sleep or tight-back day, drop every RPE by 1 and add rest. Trust the leave-2-in-the-tank rule."
+        "icon": "🌙",
+        "title": "Fix The 6/10, Not The 7 Hours",
+        "body": "You're banking 7–8 hours but only rating it 6/10 — non-restorative sleep is the single biggest brake on this cycle, because moderate recovery is what sets your RPE-8 cap and your conservative volume. Quantity is fine; quality is the lever, so attack the inputs: screens off 60 minutes before bed, room cold and black, no caffeine after midday. Your Day 1 and Day 3 sessions both finish on heavy carries, and your nervous system clears that load overnight — protect the window or you carry yesterday's fatigue into the Leg Press. Push the 6 toward an 8 and every main lift moves faster without changing a single set."
       },
       {
-        "icon": "🏃",
-        "title": "Running is yours to own",
-        "body": "You're running on your own this cycle — keep it to two easy runs a week, walk/run intervals, all at a sub-140 heart rate where you can still hold a conversation. This block is pure base and tissue tolerance: no tempo, no intervals, no chasing pace. If the back talks, shift the ratio toward walking. The faster running gets earned later, in Crossover."
+        "icon": "🚪",
+        "title": "Three Lifts — Leave The Fourth Alone",
+        "body": "You have 4 training days but the app is deliberately 3 full-body sessions, and that gap is intentional, not a hole to fill. The fourth day is for your runs and recovery, not a bonus lift — your sleep quality is sitting at 6/10, and that's what's actually gating how much you can absorb right now. You're newer to structured progression, so there are months of clean linear gains ahead IF you don't borrow against recovery to chase them early. The discipline this cycle isn't doing more — it's showing up for exactly the three sessions and stopping when the prescription says stop. Bank the consistency now; we earn the right to add volume in Forge."
       },
       {
         "icon": "🎯",
-        "title": "Load is the lever",
-        "body": "The app shows one number per lift — that's your starting point, not a ceiling. When Leg Press or Hip Thrust feels clean at the top of the rep range and your back's quiet, add weight next session. Drive load on the big mains first and reps on the rest. Log honestly and the weekly progression takes care of itself."
+        "title": "The App Number Is Your Floor",
+        "body": "You're 1–2 years into structured progression, which means clean linear gains are still on the table — so treat the single number on each lift as the floor you start from, never a ceiling. Drive LOAD first on the two big mains, Leg Press and Hip Thrust: when you hit the top of the range clean at RPE 8 with two in the tank and your back is quiet, add weight next session. Add REPS, not load, on everything else — Goblet Squat, Back Extension, the carries — until those top out too. Two levers, two jobs: load the mains, build reps on the rest. Log it honestly each week and I drive the next jump from your numbers."
+      },
+      {
+        "icon": "🥩",
+        "title": "Protein Floor: 180g A Day",
+        "body": "No food data came in at intake, so we set a baseline and refine it from your check-ins — start here, don't guess. At 90 kg, anchor to a protein floor of 2.0 g/kg: that's 180 g a day, the non-negotiable that lets a newer-to-progression lifter actually build the lean muscle this hybrid arc is chasing. Split it across four feeds of ~40 g so the signal stays high all day rather than one big dinner hit. This is the one number I want locked before we touch calories — recomp lives or dies on protein, and we'll only adjust it if the weekly logs say so."
+      },
+      {
+        "icon": "🐢",
+        "title": "Bank The Runs, Don't Race Them",
+        "body": "You're a fresh runner, so your two easy runs this week have one job: keep your heart rate under 140 and your breathing conversational, walk-run intervals included. The most common way new hybrid athletes blow up Cycle 1 is turning easy runs into hard ones because they feel fine in the moment — and that overcooks the recovery your lifts need. There's zero run intensity in your plan until Crossover, so going faster now buys you nothing and costs you a quiet back. Treat sub-140 as a hard ceiling, the same way RPE 8 is a hard ceiling in the gym. Showing up easy and consistent is the win, not the pace on the watch."
+      },
+      {
+        "icon": "🚫",
+        "title": "Why No Deadlift Yet",
+        "body": "You know the deadlift builds backs — so let's be clear this isn't fear, it's sequencing. With a chronic back and only 1–2 years of structured progression, the loaded free hinge is the highest-skill, least-forgiving way to load your spine, and right now your brace hasn't earned the right to defend it under a moving bar. So Bedrock gives you the same hinge stimulus through the 45° Back Extension and Hip Thrust — trunk-supported, high-SFR, almost nothing lost — while we build the anti-extension and anti-rotation strength that becomes the deadlift's permission slip. Forge is where the free hinge returns. Five clean weeks of bracing buys you that bar."
+      },
+      {
+        "icon": "🧠",
+        "title": "Capped At 8 Is The Fast Lane",
+        "body": "You've got 1–2 years of gym time but you're new to programmed progression — and that's exactly why leaving 2 reps in the tank wins. With clean linear progress still on the table, the limiter on your gains isn't how hard a single set feels, it's how many quality sessions you stack without a back flare or a recovery hole. RPE 8 on Leg Press and Hip Thrust means you finish every set repeatable, log it honestly, and add load next week — that compounding beats any heroic top set that costs you the next session. You're not holding back; you're refusing to trade three good weeks for one ego rep."
       }
     ]
   }

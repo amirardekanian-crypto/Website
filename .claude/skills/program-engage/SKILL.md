@@ -12,6 +12,13 @@ programming.** Read the roadmap — never rewrite it (that's /program-roadmap, l
 
 First, read **`.claude/COACHING-PRINCIPLES.md`** for voice and communication preferences.
 
+This is the right place for the **NOTES** work: it runs *after* /program-design, so it
+never competes with the design pass's budget, and *before* /program-assemble builds the
+JSON. Notes draw on the **full athlete picture** — the program spec + the brief that's in
+the conversation from design (data, loads, readiness, injuries, the check-in chat). If
+engage is run standalone without that context, re-pull it via the **`athlete-brief`**
+subagent first.
+
 All athlete-facing **in-app** text is **English** (Farsi briefs for WhatsApp/IG are a
 separate request). Tone: direct, confident, coach-to-athlete, no filler.
 
@@ -31,13 +38,25 @@ phrases, not sentences (they render as a ticked checklist).
 End with a single punchy hook on its own line (it auto-italicises). Omit entirely if
 there is no next cycle in the roadmap.
 
-## PART 3 — NOTES
+## PART 3 — NOTES (5–8 cards)
 First line: **GREETING** (e.g. "For You, [FirstName]").
-Then notes that could **only** have been written for THIS athlete in THIS cycle — draw
-from her data, the check-in chat, this block's session types, technique priorities, and
-any autoregulation/lifestyle decision /program-design made. No padding, no generic
-fitness advice.
-Per note: `ICON:` (emoji) · `TITLE:` (short) · `BODY:` (2–5 sentences, specific).
+Then **5–8 notes** that could **only** have been written for THIS athlete in THIS cycle,
+drawn from the **full athlete picture** (the brief — data, loads, readiness, injuries +
+the check-in chat; this block's session types + technique priorities; every
+autoregulation / lifestyle / nutrition decision design made).
+
+**Span the breadth.** These are everything the athlete must think about or address to get
+closer to the goal — *not* just lifting. Across the set, cover the levers that matter for
+THIS athlete: this-cycle **training/technique** · **recovery & sleep** · **stress / life
+load** · **nutrition / fueling** · **consistency / adherence / logging** ·
+**injury / movement** · **conditioning / concurrent training** · **mindset / expectations**.
+Don't force all of them — pick the 5–8 that move *this* athlete, and lead with the biggest lever.
+
+Rules: athlete-specific only — cite real numbers/situation; no padding, no generic fitness
+advice that could fit anyone. **Never invent data** — if a domain has no intake data (e.g.
+diet), prescribe an elite baseline framed as setup to refine via check-ins, never fabricated
+macros/numbers.
+Per note: `ICON:` (emoji) · `TITLE:` (≤6 words) · `BODY:` (3–6 sentences, prescriptive).
 
 ## PART 4 — DAY COMPLETION MESSAGES
 For each training day in the program spec (Day 1…N), tied to that day's focus and how

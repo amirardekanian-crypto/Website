@@ -45,6 +45,14 @@ You can talk normally — "design Mehraneh's next cycle," "write her notes,"
 
 ---
 
+## Where the effort goes
+
+When I design (**prompt 1**) I pour everything into the **programming** — the analysis and
+the real training decisions. Exercise **names, chips, day names, and formatting are a polish
+pass *after*** the program exists, so I never spend the design on wording. If a name or chip
+looks rough mid-design, I'll flag it and fix it later (or you can). Tell me anytime if you'd
+rather I stop and sort a name out on the spot.
+
 ## How it gets smarter
 
 When you make a coaching call that should apply to *all* clients, I'll ask

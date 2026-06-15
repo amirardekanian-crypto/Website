@@ -358,10 +358,38 @@ The actual training content for the current cycle.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | number | ✅ | Day number (1, 2, 3...) — used for tab labels |
-| `focusTag` | string | optional | Yellow badge at top of day |
+| `focusTag` | string | optional | Day name + yellow badge. **Also picks the banner image** — see below |
 | `completionTitle` | string | optional | Heading shown when day is finished |
 | `completionMessage` | string | optional | Body text on completion |
 | `blocks` | array | ✅ | List of training sections — any order, any count |
+
+#### Day `focusTag` → banner image
+
+A day has no per-day image. The app derives one from a small shared pool by scanning the
+day's `title` + `focusTag` for the **first** matching keyword, in this fixed priority order
+(first hit wins — earlier categories outrank later ones):
+
+| Priority | Image category | Trigger keywords (case-insensitive) |
+|---|---|---|
+| 1 | `recovery` | recover, mobility, regen, deload, rest, stretch, flexib |
+| 2 | `power` | power, plyo, explos, speed, jump, sprint, rotational, med ball, throw |
+| 3 | `conditioning` | condition, cardio, engine, aerobic, hiit, metcon, interval, endur |
+| 4 | `core` | core, abs, trunk, anti-rot, plank, brace |
+| 5 | `upper` | upper, push, pull, press, shoulder, chest, back, arm, bench, row |
+| 6 | `lower` | lower, leg, squat, hinge, glute, deadlift, hamstring, quad, calf, lunge, knee |
+| 7 | `fullbody` | full body, total body, whole body |
+| — | `default` | (no keyword matched → green gradient) |
+
+**Naming consequences (get these right):**
+- Lead the `focusTag` with the keyword for the image you want; a *higher-priority* keyword
+  hijacks it. `"Lower + Brace"` → **core** image (brace, pri 4, beats lower, pri 6).
+  `"Upper Body & Conditioning"` → **conditioning** (pri 3 beats upper, pri 5).
+- A name with **no** keyword falls to the bare gradient. `"Total + Carry"` matches nothing
+  ("carry" isn't a keyword; "total" only counts as `total body`) → `default`.
+- For a true full-body day use the literal phrase **`Full-Body`** / `Total Body` so it hits
+  `fullbody` rather than nothing.
+
+(Source of truth: `DAY_IMAGE_RULES` in `program.html`. Keep this table in sync if those change.)
 
 ### `blocks[n]` — Training Section
 
@@ -448,11 +476,54 @@ Any exercise (any type) can include a `videoUrl`. When present, a play button ap
 
 | Style | Appearance | Use For |
 |-------|-----------|---------|
-| *(none)* | Grey pill | Default — sets, reps, tempo |
-| `"yellow"` | Yellow pill | Priority items, primary sets |
-| `"dark"` | Dark pill | Duration, equipment notes |
+| *(none)* | Grey pill | Reps, tempo, RPE — parsed into the stats grid |
+| `"yellow"` | Yellow pill | Set count (exactly one per `standard` exercise) |
+| `"dark"` | Dark pill | Technique modifiers: `"3s eccentric"`, `"1s squeeze"`, `"glute focus"`, `"superset"` |
 
-Technique **modifiers** (e.g. `"2s hold at top"`, `"3s eccentric"`, `"band assisted"`, `"constant tension"`) are written as a leading `"dark"` chip, placed before the yellow set-count chip.
+### Chip parsing — how labels become the stats grid (`standard` only)
+
+`program.html` reads every chip label and routes it to one of five stat cells (SETS · REPS · RPE · TEMPO · REST). **`simple` exercises skip parsing entirely — their chips always render as grey/dark pills.**
+
+| Chip label pattern | Routes to | Example |
+|---|---|---|
+| `"N Sets"` | SETS cell | `"3 Sets"` |
+| Starts with `×` | REPS cell (strips `×`, strips trailing "Reps") | `"×8 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"` |
+| Ends with "reps" / "rep" | REPS cell | `"8 Reps"` |
+| Pure duration / distance (no other words) | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"1:30"` |
+| `"Tempo X-X-X-X"` | TEMPO cell | `"Tempo 3-0-1-0"` |
+| `"RPE N"` | RPE cell | `"RPE 8"` |
+| Anything else | Extra pill (visible below the stats grid) | `"superset"` dark chip |
+
+**Rule: always use `×` as the reps prefix on `standard` exercises.** This guarantees routing to the REPS cell regardless of what follows:
+
+```json
+{ "label": "×10 Reps" }           // bilateral count
+{ "label": "×10 Each Side" }      // unilateral — side info embedded here, never a separate chip
+{ "label": "×10 Each Leg" }       // same rule
+{ "label": "×10 Each Arm" }       // same rule
+{ "label": "×30s Each Side" }     // duration-based unilateral (plank, carry)
+{ "label": "×40m" }               // distance-based bilateral (farmer carry)
+{ "label": "×40m Each Side" }     // distance-based unilateral (suitcase carry)
+```
+
+**Never** put `"Each Side"` / `"Each Leg"` / `"Each Arm"` in a separate chip on a `standard` exercise — it will render as an extra pill instead of appearing in the REPS cell.
+
+### `simple` exercise chip convention
+
+`simple` exercises have no stats grid — all chips render as pills. The standard pattern is **two chips only**:
+
+1. **Dark chip** — reps, duration, or distance (the "how much"): `"8 Reps"`, `"6 Each Side"`, `"5 min"`, `"30s"`
+2. **Grey RPE chip** — effort level: `"RPE 4"` (warm-ups typically RPE 3–5)
+
+No sets chip. No rest chip. No tempo chip.
+
+```json
+{ "type": "simple", "name": "Bird Dog",
+  "chips": [{ "label": "6 Each Side", "style": "dark" }, { "label": "RPE 4" }] }
+
+{ "type": "simple", "name": "Assault Bike",
+  "chips": [{ "label": "5 min", "style": "dark" }, { "label": "RPE 5" }] }
+```
 
 ### Coaching Cues
 
