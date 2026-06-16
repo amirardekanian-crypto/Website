@@ -88,18 +88,34 @@ Create **`Content/carousel-<slug>.html`** (kebab-case English slug). Self-contai
 
 **App-preview slides:** when a "see it in the app" slide needs to show the real UI (e.g. a workout session screen Amir provides), embed the screenshot as base64 and use this pattern:
 ```css
-.app-screen{position:absolute;left:50%;transform:translateX(-50%);top:360px;
+/* left = (1080 - width) / 2 — NO transform (html2canvas ignores it, see pitfalls) */
+.app-screen{position:absolute;left:355px;top:360px;
   width:370px;border-radius:28px;overflow:hidden;
   box-shadow:0 28px 72px rgba(0,0,0,.60),0 0 0 1px rgba(255,255,255,.10);}
 .app-screen img{width:100%;display:block;}
-#sN .body-wrap{top:120px;}  /* pull headline up to make room */
-#sN h1{font-size:108px;}    /* scale headline down slightly */
+#sN .body-wrap{top:120px;}
+#sN h1{font-size:108px;}
 ```
-Place `<div class="app-screen"><img src="{base64}" alt=""></div>` as a sibling of body-wrap. Move the arc to the top of the slide (e.g. `M-40 200 Q 480 80 1015 220`) so the ball lands in the clear band above the headline, not overlapping the screenshot. App screenshot files live in the repo root (e.g. `app-warmup-preview.jpg`).
+Place `<div class="app-screen"><img src="{base64}" alt=""></div>` as a sibling of body-wrap. Move the arc to the top of the slide (e.g. `M-40 200 Q 480 80 1015 220`) so the ball lands above the headline. App screenshot files live in the repo root (e.g. `app-warmup-preview.jpg`).
 
-**Stat slide body-wrap:** use a fixed `top` value (e.g. `top:240px`) instead of `top:50%;transform:translateY(-55%)` — the latter can cause the stat-label to overlap the stat-source at the bottom when the label wraps to multiple lines.
+**Stat slide body-wrap:** use a fixed `top` value (e.g. `top:240px`) instead of `top:50%;transform:translateY(-55%)` — the latter can cause the stat-label to overlap the stat-source when the label wraps to multiple lines.
+
+**`.hl` inline highlight and line-height:** headlines using `.hl` (clay background span) require `line-height` ≥ `1.0` — the clay block fills the full line box, and sub-1.0 line-height causes adjacent line boxes to overlap, making the highlight visually bleed into the line above. Kit default is `.92`; override per template if any headline uses `.hl`.
 
 **Images** (cycle/day banners from `../assets/`, athlete photos): embed as **base64 data URIs** (smallest source that covers the display size). Don't reuse the kit's `.avatars`/attribution gradient placeholders (off-palette) — real photos or drop the avatar.
+
+## html2canvas known pitfalls (PNG export breaks silently)
+
+These are confirmed rendering failures that look fine in the browser but are wrong or invisible in the downloaded PNG. Check every new technique against this list before shipping.
+
+| Technique | What html2canvas does | Correct alternative |
+|---|---|---|
+| SVG `<use href="#symbol">` | Silently renders nothing — the ball/icon disappears | Extract the PNG from inside the `<symbol>` and embed as SVG `<image href="data:...">` directly at each arc endpoint |
+| CSS `transform: translateX/Y(...)` | Ignored — element renders at its untransformed position | Use hard pixel coordinates: `left:(1080−w)/2` instead of `left:50%;transform:translateX(-50%)` |
+| `top:50%;transform:translateY(-N%)` | Same — transform ignored, element snaps to raw 50% top | Use a fixed `top` value (e.g. `top:240px`) |
+| SVG `<symbol>` + `<use>` anywhere | Same as row 1 | Inline the content or use `<image>` |
+
+**Rule of thumb:** if a CSS or SVG technique relies on a computed/dynamic offset rather than a hard pixel value, test the PNG export before shipping — html2canvas often handles static layout but misses transforms and SVG indirection.
 
 ## Step 6 — Verify (before delivering)
 
