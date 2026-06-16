@@ -40,9 +40,9 @@ Classify the content: **story** · **coaching tip / how-to** · **myth-bust** ·
 
 **Photo-led decks:** if Amir's script references real photos, follow the photo-story pattern in DESIGN_SYSTEM §5 (full-bleed 4:5, green scrim, per-photo `object-position`, cinematic grade). Ask him for the photo files if they're not in the repo.
 
-## Step 3 — Write the copy (Farsi, adapt freely)
+## Step 3 — Write the copy (Farsi default; English on request)
 
-- Output is **always Farsi/RTL** (Vazirmatn), colloquial Tehrani — warm, direct, confident, no fluff. English only if Amir explicitly asks.
+- Output is **Farsi/RTL** (Vazirmatn) by default — colloquial Tehrani, warm, direct, confident, no fluff. **If Amir explicitly asks for English**, switch to English/LTR with Barlow Condensed + Barlow (not Vazirmatn), `<html lang="en" dir="ltr">`, no Persian numerals, standard punctuation. For English builds use a **Python build script** (`Content/build_<slug>_en.py`) that mechanically extracts base64 assets from the kit (grey/orange ball PNGs, tennis-ball `<symbol>`, court photo) via regex and outputs a self-contained HTML — never retype base64 through generation; silent corruption only shows up visually.
 - Treat his script as **raw material**: tighten the hook, split into slide-sized beats (headline ≤ 9 words; one idea per slide), rewrite lines in brand voice. Keep his meaning and any specific numbers/names.
 - **Two hard Farsi rules:** never apply `letter-spacing` (breaks cursive joining), and no UPPERCASE; use Persian numerals (۰۱/۰۶). Mixed/numeric counters and KPI values get `direction:ltr`.
 - **Canonical word choices (DESIGN_SYSTEM §10):** «مربیِ بدنسازیِ حرفه‌ای» (his title) · «ارشد» never "MSc" · «یه برنامه / یه برنامه‌ی آماده» never «فایل/PDF» · «شدت» not «سختی» · «شروع کن» not «درخواست» · «تجربه» not «پشتوانه».
@@ -69,8 +69,12 @@ Create **`Content/carousel-<slug>.html`** (kebab-case English slug). Self-contai
 
 **Copy list from `Carousel-Kit.html` (current state):**
 - `:root` tokens — **EXCEPT** `--seal` (retired monogram, unused) and the dead lamp tokens (`--lx/--ly/--lx-sign/--accent-glow`; nothing consumes them — also skip the `.fa` rule's `--lx` re-set and the opt-in `data-bg="glow"` variant). Take `--coach`/`--og` (large base64) **only when the deck uses `tpl-bio`**.
+- **Canvas backgrounds (critical — Amir confirmed twice):**
+  - **Dark slides**: `background-color:var(--ink); background-image:linear-gradient(to bottom,rgba(14,74,54,0.42),rgba(14,74,54,0.72)),url("{court_base64}"); background-size:cover; background-position:center` — the court photo (`court-sessions.jpg`, 33KB in repo root) embedded as base64 IS the court. **Do NOT emit any `<div class="court">` SVG** — the kit's `.court{display:none}` hides that element for a reason.
+  - **Light slides**: `background:var(--paper); color:var(--body-ink)` — flat cream, no photo.
+  - **Clay/warm variant**: `court-playbook.jpg` (repo root) is a terracotta-toned court surface — good for variety or Playbook-style slides. Embed the same way.
 - Canvas base — flat `var(--ink)` / `var(--paper)` backgrounds + the grain `::after`.
-- **The frame, inlined** (do NOT copy the kit's `[data-bg]` machinery or its GLOBAL CONFIG script): `.post-canvas::before{content:"";position:absolute;inset:0;pointer-events:none;border:2px solid rgba(255,255,255,.16);margin:28px;border-radius:14px;z-index:5}` — `z-index:5` keeps it above full-bleed photos (recovery-run's approach). On `.light` canvases the border is `rgba(0,0,0,.18)`.
+- **The frame, inlined** (do NOT copy the kit's `[data-bg]` machinery or its GLOBAL CONFIG script): `.post-canvas::before{content:"";position:absolute;inset:0;pointer-events:none;border:2px solid rgba(255,255,255,.30);margin:28px;border-radius:14px;z-index:5}` — `z-index:5` keeps it above full-bleed photos. On `.light` canvases the border is `rgba(0,0,0,.18)`. Note: `.30` opacity (not `.16`) — confirmed by Amir as the right visibility level.
 - Header chrome — clay dot + handle. **Take slide markup from the kit's FA showcase section** (handle hardcoded correctly as `AMIRARDEKANI.COM`); if copying EN template examples, fix the stale `AMIR ARDEKANI` handle and **delete the `.num` counter div** (counter is retired).
 - **The FARSI/RTL base block** (kit section `====== FARSI / RTL ======`) — the `.fa` font/letter-spacing/text-transform `!important` enforcement, `direction:rtl`, the Persian line-height fixes, and the swipe-arrow mirror — **plus** the per-template `.fa.tpl-X` size overrides for your chosen templates. Without this block, Farsi renders in the wrong font with Latin tracking.
 - **The CLAY-CONTRAST FIXES block** (kit section `====== CLAY-CONTRAST FIXES ======`) — the kit's base `chip-A`/`cta-btn.primary`/`col-card.good`/`rule-card`/`eq-token`/`tl-dot` rules ship `var(--ink)` text; this later block corrects them to `#fff`. If you skip it, clay blocks get dark-green text. Also: if copying the FA CTA markup, change the bookmark icon's `stroke="#0A0A0A"` to `#fff`.
@@ -79,6 +83,21 @@ Create **`Content/carousel-<slug>.html`** (kebab-case English slug). Self-contai
 - The html2canvas export script from `carousel-recovery-run.html`.
 
 **Graphics:** one rally arc per slide max, in negative space; court lines only on open type-led slides — never on dense card/grid slides. **Author arcs by starting from the kit's example arc for the same template** and moving only the landing point into your slide's clear space. Under `.fa` the arc group is mirrored (`scaleX(-1)`), so an authored dot at `cx` **displays** at `1080−cx` — do the math when aiming at a word. **Swipe hint:** footer of slide 1 only — «بکش» + the `.swipe .arrow` (the `.fa` rule mirrors it); omit on other slides; never Latin "SWIPE" on a Farsi deck.
+
+**Chip-B decorative line:** `.chip-B::before` defaults to clay. On dark slides override to white: `.post-canvas:not(.light) .chip-B::before{background:rgba(255,255,255,.60)}` — clay disappears against the dark court photo.
+
+**App-preview slides:** when a "see it in the app" slide needs to show the real UI (e.g. a workout session screen Amir provides), embed the screenshot as base64 and use this pattern:
+```css
+.app-screen{position:absolute;left:50%;transform:translateX(-50%);top:360px;
+  width:370px;border-radius:28px;overflow:hidden;
+  box-shadow:0 28px 72px rgba(0,0,0,.60),0 0 0 1px rgba(255,255,255,.10);}
+.app-screen img{width:100%;display:block;}
+#sN .body-wrap{top:120px;}  /* pull headline up to make room */
+#sN h1{font-size:108px;}    /* scale headline down slightly */
+```
+Place `<div class="app-screen"><img src="{base64}" alt=""></div>` as a sibling of body-wrap. Move the arc to the top of the slide (e.g. `M-40 200 Q 480 80 1015 220`) so the ball lands in the clear band above the headline, not overlapping the screenshot. App screenshot files live in the repo root (e.g. `app-warmup-preview.jpg`).
+
+**Stat slide body-wrap:** use a fixed `top` value (e.g. `top:240px`) instead of `top:50%;transform:translateY(-55%)` — the latter can cause the stat-label to overlap the stat-source at the bottom when the label wraps to multiple lines.
 
 **Images** (cycle/day banners from `../assets/`, athlete photos): embed as **base64 data URIs** (smallest source that covers the display size). Don't reuse the kit's `.avatars`/attribution gradient placeholders (off-palette) — real photos or drop the avatar.
 
