@@ -2,7 +2,7 @@
   "id": "tennis-warm-up-routine",
   "title": "Tennis Warm-Up Routine",
   "category": "on-court",
-  "duration": "12 min",
+  "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Warm-Up & Prep",
   "blocks": [
@@ -12,11 +12,12 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Jog / Skip",
           "chips": [{ "label": "3 min" }],
           "cues": {
             "good": [
-              "Keep effort low — you should be able to talk",
+              "Alternate between jogging and skipping — jog a length, skip a length",
+              "Keep effort very low — you should be able to hold a conversation",
               "Breathe through your nose if you can"
             ],
             "bad": [
@@ -27,7 +28,7 @@
         {
           "type": "simple",
           "name": "Side Shuffles",
-          "chips": [{ "label": "3 lengths" }],
+          "chips": [{ "label": "×3 Lengths" }],
           "cues": {
             "good": [
               "Face the net, stay low through the hips",
@@ -41,7 +42,7 @@
         {
           "type": "simple",
           "name": "High Knees",
-          "chips": [{ "label": "1 baseline length" }],
+          "chips": [{ "label": "×1 Length" }],
           "cues": {
             "good": [
               "Drive each knee up to hip height",
@@ -55,7 +56,7 @@
         {
           "type": "simple",
           "name": "Butt Kicks",
-          "chips": [{ "label": "1 baseline length" }],
+          "chips": [{ "label": "×1 Length" }],
           "cues": {
             "good": [
               "Quick tempo, heels flicking up behind you",
@@ -74,64 +75,72 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Leg Swings — Front & Back",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each leg" }],
+          "name": "Prisoner Squats",
+          "chips": [{ "label": "×10" }],
           "cues": {
             "good": [
-              "Let momentum carry the leg — don't force the range",
-              "Hold a fence or wall for balance"
+              "Hands laced behind your head, elbows wide — keep them there throughout",
+              "Sit into the squat with your chest proud and knees tracking over your toes",
+              "Stand tall at the top, squeeze the glutes"
             ],
             "bad": [
-              "Swinging so hard you lose your standing foot position"
+              "Letting the elbows collapse forward — if they drop, your chest is following",
+              "Rushing the descent — control the way down"
             ]
           }
         },
         {
           "type": "simple",
-          "name": "Leg Swings — Side to Side",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each leg" }],
+          "name": "Airplane",
+          "chips": [{ "label": "×6 Each Side" }],
           "cues": {
             "good": [
-              "Rotate through the hip, not just the knee",
-              "Keep the standing leg slightly bent"
+              "Stand on one leg, hinge forward until your torso and free leg are parallel to the floor",
+              "Arms out wide like wings — use them for balance and to open the chest",
+              "Squeeze the glute of the standing leg at the top as you return to upright"
             ],
             "bad": [
-              "Twisting your whole torso to get more range"
+              "Letting the hip of the raised leg hike up — keep both hips level",
+              "Rushing through — hold a beat at the bottom to feel the balance challenge"
             ]
           }
         },
         {
           "type": "simple",
-          "name": "Hip Circles",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each direction" }],
+          "name": "Hip Openers",
+          "chips": [{ "label": "×10 Each Side" }],
           "cues": {
             "good": [
-              "Hands on hips, make the circle as wide as possible",
-              "Slow and controlled"
+              "Standing tall, drive one knee up to hip height then rotate it out to the side",
+              "Think 'step over a fence' — full circle through the hip",
+              "Hold onto a wall or racket for balance if needed"
             ],
             "bad": [
-              "Small, lazy circles that don't open the hip"
+              "Leaning away from the working leg — stay upright and let the hip do the work",
+              "Small, lazy circles — open the hip as wide as you can each rep"
             ]
           }
         },
         {
           "type": "simple",
-          "name": "Walking Lunges with Twist",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each leg" }],
+          "name": "Reverse Lunge with Knee Drive",
+          "chips": [{ "label": "×10 Each Leg" }],
           "cues": {
             "good": [
-              "Step forward, lower into the lunge, then twist your chest toward your front knee",
-              "Keep your back knee close to the floor"
+              "Step back and lower until your back knee is just above the floor",
+              "Drive that same knee forward and up to hip height as you return to standing",
+              "Use the knee drive to load the hip and glute — feel it working"
             ],
             "bad": [
-              "Twisting before you're fully in the lunge position"
+              "Letting the front knee cave inward — keep it tracking over your second toe",
+              "Rushing the drive — the knee lift should be deliberate, not a flick"
             ]
           }
         },
         {
           "type": "simple",
           "name": "Arm Circles",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each direction" }],
+          "chips": [{ "label": "×10 Each Direction" }],
           "cues": {
             "good": [
               "Start small and build to full shoulder range",
@@ -145,7 +154,7 @@
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each arm" }],
+          "chips": [{ "label": "×10 Each Arm" }],
           "cues": {
             "good": [
               "Swing across the chest and let momentum carry it back",
@@ -158,15 +167,89 @@
         },
         {
           "type": "simple",
-          "name": "Trunk Rotations",
-          "chips": [{ "label": "10 Reps" }, { "label": "Each side" }],
+          "name": "Half Kneeling T-Spine Rotations",
+          "chips": [{ "label": "×8 Each Side" }],
           "cues": {
             "good": [
-              "Feet shoulder-width, arms out, rotate from the thoracic spine",
-              "Eyes follow the hands through the full rotation"
+              "Take a half-kneeling position — one knee down, one foot forward at 90°",
+              "Place both hands behind your head, elbows wide",
+              "Rotate your upper back, reaching the top elbow toward the sky",
+              "Keep your hips square to the floor — all movement from the thoracic spine"
             ],
             "bad": [
-              "Rotating from the hips — this should come from the upper back"
+              "Rotating from the lower back or letting the hips open — lock them in place",
+              "Collapsing the chest forward between reps"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Potentiate",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Ankle Pogos",
+          "videoUrl": null,
+          "restSec": 20,
+          "chips": [
+            { "label": "2 Sets", "style": "yellow" },
+            { "label": "×10" },
+            { "label": "fast turnover", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Feet hip-width, bounce through the ankles — minimal knee bend",
+              "Think stiff springs, not pogo sticks — fast ground contact",
+              "Land softly on the balls of your feet and rebound immediately"
+            ],
+            "bad": [
+              "Bending too much at the knee — the ankle should be doing the work",
+              "Slow, lazy bounces — this should feel snappy"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Countermovement Jumps (CMJ)",
+          "videoUrl": null,
+          "restSec": 30,
+          "chips": [
+            { "label": "2 Sets", "style": "yellow" },
+            { "label": "×3" },
+            { "label": "max intent", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Quick dip into a quarter squat, then drive arms up and explode off the floor",
+              "Land softly with bent knees, absorbing the force — stick each landing for a beat",
+              "Full intent on every rep — this should feel like max effort"
+            ],
+            "bad": [
+              "Slow, stiff take-off — you want a sharp, fast countermovement",
+              "Crashing the landing — control it, don't collapse"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "10m Accelerations",
+          "videoUrl": null,
+          "restSec": 30,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "max speed", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Start from a split stance, lean forward and drive hard for the first 3–4 steps",
+              "Pump the arms aggressively — your legs follow your arms",
+              "Stay low for the first few metres, then rise naturally"
+            ],
+            "bad": [
+              "Standing tall from the start — you need that forward lean to accelerate",
+              "Jogging it — these are maximal sprints, not strides"
             ]
           }
         }

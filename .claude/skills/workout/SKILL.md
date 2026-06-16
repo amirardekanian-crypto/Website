@@ -72,7 +72,17 @@ Best for: warm-up drills, mobility movements, cool-down, time/distance entries t
 }
 ```
 
-Chip rules for `simple`: use `"×N Reps"` / `"×N Each Side"` for reps, or a bare duration/distance (`"5 min"`, `"30s"`, `"20m"`). Optionally add `"RPE N"`. No set count chip.
+Chip rules for `simple`: use `"×N Reps"` / `"×N Each Side"` / `"×N Each Leg"` for reps, or a bare duration/distance (`"5 min"`, `"30s"`, `"20m"`). Optionally add `"RPE N"`. No set count chip.
+
+**Critical rule — always embed side/leg/arm info in the same chip as the rep count.** Never use a separate `"Each Side"` chip — it doesn't match any stat pattern and renders as a green modifier pill with an empty REPS cell.
+
+| ✅ Correct | ❌ Wrong |
+|---|---|
+| `{ "label": "×6 Each Side" }` | `{ "label": "6 Reps" }` + `{ "label": "Each side" }` |
+| `{ "label": "×10 Each Leg" }` | `{ "label": "10 Reps" }` + `{ "label": "Each leg" }` |
+| `{ "label": "×10 Each Direction" }` | `{ "label": "10 Reps" }` + `{ "label": "Each direction" }` |
+
+The `×`-prefix routes the chip to the REPS stat cell (visible in the expanded stats grid). Without `×`, a bare label like `"Each Side"` becomes a green modifier pill — always visible, including in the collapsed row.
 
 ---
 
@@ -103,8 +113,22 @@ Chip rules for `standard`:
 - Reps: `"×N Reps"`, `"×N Each Side"` — start with `×`
 - Tempo: `"Tempo 3-0-1-0"` format
 - RPE: `"RPE N"`
-- Modifier (green pill, technique cue only): `"3s eccentric"`, `"max intent"`, `"pause at bottom"` — no rep counts in modifiers
+- Modifier (green pill, intention/technique only): `"3s eccentric"`, `"max intent"`, `"max speed"`, `"fast turnover"`, `"pause at bottom"` — **never put a rep count or dose here**
 - `restSec`: seconds of rest. Common values: 60, 90, 120, 150, 180, 240. Default is 120s if omitted.
+
+**Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer via `restSec`. Use a modifier chip to communicate the movement intention to the athlete:
+
+| Movement type | Intention chip |
+|---|---|
+| Ankle pogos, fast hops | `"fast turnover"` |
+| CMJ, box jumps, bounding | `"max intent"` |
+| Short sprints, accelerations | `"max speed"` |
+| Med-ball throws | `"max power"` |
+
+**Chip visibility rules (how the renderer handles chips):**
+- Grey stat chips (REPS/SETS/RPE/TEMPO/REST-matched): shown as a compact summary on the **collapsed** row, then hidden when expanded — replaced by the full stats grid.
+- Green modifier pills (`style: "dark"`, no stat match): visible **both collapsed and expanded**, anchored next to the exercise name.
+- Use this distinction deliberately: modifier pills are always in the athlete's face — only put things there worth seeing every time (intentions, key technique cues).
 
 ---
 

@@ -61,8 +61,8 @@
     },
     {
       "type": "callout",
-      "label": "Step 3 — Potentiate (10 seconds)",
-      "text": "Optional, but worth building in before serving. Right before players serve — not 10 minutes before, right before — they press their hitting arm hard against a fence post or wall as if trying to swing it forward. Hold 5 seconds, twice. In a study on real tennis players, serve speed went up 4.6 km/h just from this. No equipment, no extra time."
+      "label": "Step 3 — Potentiate (3–5 min)",
+      "text": "Right before the session starts — not 10 minutes before, right before — run 2–3 short maximal sprints (10–15 metres), do a set of sharp jumps (countermovement jumps or ankle pogos), and for players who serve, press the hitting arm hard against a wall for 5 seconds twice. This fires up the nervous system and spikes muscle power just before it's needed. In a study on real tennis players, a potentiation protocol before serving improved serve speed by 4.6 km/h. Keep this under 5 minutes and go straight into the session."
     },
     {
       "type": "callout",
@@ -78,7 +78,7 @@
       "items": [
         "Raise — easy jogging, shuffles, high knees (3–5 min)",
         "Activate & Mobilise — leg swings, arm swings, walking lunges, trunk rotations (7–10 min)",
-        "Potentiate — 2 × 5-second arm press against wall (10 seconds, right before serving)",
+        "Potentiate — 2–3 × 10m sprints, 2 × 3 jumps, arm press × 2 (3–5 min, right before starting)",
         "Start — do not wait around"
       ]
     },
@@ -97,13 +97,13 @@
     },
     {
       "type": "p",
-      "text": "This follows the Raise + Activate & Mobilise sequence above as a structured group warm-up. Brief your players while they move — between the raise and the mobility work is a natural time to cue what's coming in the session. No equipment needed."
+      "text": "This follows the Raise + Activate & Mobilise + Potentiation sequence above as a structured warm-up. No equipment needed. Here is a sample warm-up you can run before you begin your tennis session."
     },
     {
       "type": "workout",
       "file": "workouts/on-court/tennis-warm-up-routine.json",
       "label": "Tennis Warm-Up Routine",
-      "meta": "12–15 min · Bodyweight · On-Court"
+      "meta": "15 min · Bodyweight · On-Court"
     }
   ]
 }

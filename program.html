@@ -4751,8 +4751,7 @@ function renderArticleBlocks(blocks) {
         return `<p class="ar-p${lead ? ' ar-lead' : ''}">${esc(b.text || '')}</p>`;
       }
       case 'h':
-        hNum++;
-        return `<h3 class="ar-h"><span class="ar-sn">§${String(hNum).padStart(2, '0')}</span><span class="ar-h-t">${esc(b.text || '')}</span></h3>`;
+        return `<h3 class="ar-h"><span class="ar-h-t">${esc(b.text || '')}</span></h3>`;
       case 'list':
         return `<ul class="ar-list">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
       case 'callout':
