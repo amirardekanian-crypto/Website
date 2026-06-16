@@ -13,6 +13,10 @@ tb_m    = re.search(r'(<symbol id="tennis-ball".*?</symbol>)', kit, re.DOTALL)
 grey   = grey_m.group(1)
 orange = orange_m.group(1)
 tb     = tb_m.group(1)
+# Extract clay-ball PNG from the symbol — embed directly as SVG <image> in each arc
+# so html2canvas renders it (it silently drops SVG <use>/<symbol> references)
+tb_img_m = re.search(r'(data:image/png;base64,[^"\']+)', tb)
+tb_img = tb_img_m.group(1) if tb_img_m else ''
 
 # Real court photo (the kit's canvas background — court-sessions.jpg, NOT a drawn SVG court).
 # Embed as base64 so PNG export + offline open keep working.
@@ -28,8 +32,10 @@ print(f"grey={len(grey)} orange={len(orange)} tb={len(tb)} court={len(court)} ap
 COURT = ''
 
 def arc(d, cx, cy, r=12):
+    sz = 52  # viewBox units; direct <image> so html2canvas renders it (no <use>/<symbol>)
     return (f'<div class="ballarc" aria-hidden="true"><svg viewBox="0 0 1080 1350"><g>'
-            f'<path class="path" d="{d}"/><circle class="dot" cx="{cx}" cy="{cy}" r="{r}"/>'
+            f'<path class="path" d="{d}"/>'
+            f'<image href="{tb_img}" x="{int(cx-sz/2)}" y="{int(cy-sz/2)}" width="{sz}" height="{sz}"/>'
             f'</g></svg></div>')
 
 def bars(n, k):  # n spans, k-th active (1-based)
@@ -39,20 +45,21 @@ HEADER = '<div class="post-header"><div class="who"><span class="dot"></span>AMI
 
 IG = """Stretching before tennis is making you slower.
 
-That pre-match jog-and-hold feels like a warm-up — but the static stretching part is quietly costing you serve speed and a sharp first step.
+The classic pre-match jog-and-hold *feels* productive. But the static stretching part is quietly costing you serve speed and a sharp first step.
 
-Here's what actually works:
-• Cold muscle fires slow — warm it first
-• Cut the long held stretches before you play
-• 4 simple steps + a 10-second trick that added 4.6 km/h to serve speed in tennis players
+Here's what actually works in 15 minutes:
 
-How long is your warm-up before a match? Tell me below 👇
+↳ Raise — get blood moving (jog, shuffle, high knees)
+↳ Activate & mobilise — move joints through range, don't hold
+↳ Potentiate — one 10-second press before serving added 4.6 km/h to serve speed in a study on tennis players
+↳ Start — and don't wait around after
 
-Comment "warm-up" and I'll DM you a full session you can run before your next match.
+Comment "warm-up" and I'll send you the full routine 👇
+(It's the exact session in the app — 15 min, bodyweight, ready to follow.)
 
 @amirardekanian
 
-#tennis #tenniscoach #padel #tennisfitness #warmup #servespeed #strengthandconditioning #tennisperformance #sportscience #tennistraining"""
+#tennis #tenniscoach #tennisfitness #warmup #servespeed #tennistraining #strengthandconditioning #tennisperformance #sportscience #padel"""
 
 # ===================== SLIDES =====================
 slides = []
@@ -291,7 +298,7 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--display);}}
 /* ===== TPL-COVER ===== */
 .tpl-cover .body-wrap{{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:240px;}}
 .tpl-cover .chip-B{{margin-bottom:32px;}}
-.tpl-cover h1{{font-size:150px;font-weight:800;letter-spacing:-0.04em;line-height:.92;}}
+.tpl-cover h1{{font-size:150px;font-weight:800;letter-spacing:-0.04em;line-height:1.0;}}
 .tpl-cover .sub{{font-size:50px;font-weight:500;font-family:var(--latin);color:rgba(244,244,240,.55);margin-top:28px;letter-spacing:0;}}
 
 /* ===== TPL-BIG ===== */
@@ -361,7 +368,8 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--display);}}
 .cta-btn svg{{width:28px;height:28px;}}
 
 /* ===== APP SCREEN PREVIEW (slide 7) ===== */
-.app-screen{{position:absolute;left:50%;transform:translateX(-50%);top:360px;
+/* left:(1080-370)/2=355px — no CSS transform (html2canvas ignores translateX) */
+.app-screen{{position:absolute;left:355px;top:360px;
   width:370px;border-radius:28px;overflow:hidden;
   box-shadow:0 28px 72px rgba(0,0,0,.60),0 0 0 1px rgba(255,255,255,.10);}}
 .app-screen img{{width:100%;display:block;}}
@@ -407,21 +415,7 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--display);}}
   if(window.html2canvas) document.fonts.ready.then(initExport);
 </script>
 
-<!-- rally-arc dot -> tennis ball -->
-<script>
-  (function(){{
-    var NS='http://www.w3.org/2000/svg',XL='http://www.w3.org/1999/xlink';
-    document.querySelectorAll('.ballarc .dot').forEach(function(c){{
-      var cx=parseFloat(c.getAttribute('cx')),cy=parseFloat(c.getAttribute('cy'));
-      var r=parseFloat(c.getAttribute('r'))||12, d=Math.max(r,16)*2;
-      var u=document.createElementNS(NS,'use');
-      u.setAttribute('href','#tennis-ball'); u.setAttributeNS(XL,'href','#tennis-ball');
-      u.setAttribute('x',cx-d/2); u.setAttribute('y',cy-d/2);
-      u.setAttribute('width',d); u.setAttribute('height',d);
-      c.replaceWith(u);
-    }});
-  }})();
-</script>
+<!-- clay ball embedded directly as SVG <image> in each arc — no JS swap needed -->
 </body>
 </html>"""
 
