@@ -1865,6 +1865,26 @@
   .ex-set-row.done .ex-set-check::after { opacity: 1; transform: scale(1); }
   body[data-dark] .ex-set-check { border-color: #444; }
 
+  /* ── Inline per-exercise weight field on round-format circuits / supersets ──
+     A small box folded into each round row (one weight per exercise). Per-round
+     RPE lives below in the standard .rpe-row rows. */
+  .round-wt {
+    width: 62px; flex-shrink: 0;
+    background: var(--grey-card);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-family: 'Barlow', sans-serif;
+    color: var(--grey-dark);
+    outline: none; text-align: center; box-sizing: border-box;
+    transition: border-color 0.15s;
+  }
+  .round-wt::placeholder { color: #b3ada2; }
+  .round-wt:focus { border-color: var(--yellow); }
+  body[data-dark] .round-wt { background: #2a2a2a; color: #ddd; }
+  body[data-dark] .round-wt::placeholder { color: #555; }
+
   /* Rest button row at the bottom of the detail */
   .ex-rest-bottom {
     display: flex; justify-content: flex-end;
@@ -4041,6 +4061,16 @@ function renderExercise(ex, dayId, num, blockClass) {
 }
 
 function renderCircuit(ex, dayId, num, blockClass) {
+  // Circuits log weight (a small field per exercise) + one RPE per round BY
+  // DEFAULT — that covers supersets, complexes AND conditioning circuits alike.
+  // A warm-up opts out with "warmup": true (logs nothing — the pre-session
+  // readiness check covers how the athlete feels). logWeight / logRPE remain as
+  // optional fine-grained overrides (e.g. a no-weight RPE-only circuit).
+  const isWarmup  = ex.warmup === true;
+  const logWeight = !isWarmup && ex.logWeight !== false;
+  const logRPE    = !isWarmup && ex.logRPE   !== false;
+  const showLog   = logRPE; // the Log section holds the per-round RPE rows
+
   // The circuit itself takes ONE number from the day's running counter.
   // Each item inside is labelled A, B, C…
   const roundsHtml = (ex.items || []).map((item, i) => {
@@ -4059,6 +4089,7 @@ function renderCircuit(ex, dayId, num, blockClass) {
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
         <span class="round-detail">${esc(item.detail)}</span>
+        ${logWeight ? `<input class="round-wt" type="text" inputmode="decimal" placeholder="kg" data-item="${i}">` : ''}
         ${itemPlay}
       </div>
       ${itemCues}
@@ -4095,7 +4126,7 @@ function renderCircuit(ex, dayId, num, blockClass) {
   // Rest button at the bottom of the detail
   const restBottom = `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`;
 
-  return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}">
+  return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}" data-log-weight="${logWeight ? '1' : '0'}" data-log-rpe="${logRPE ? '1' : '0'}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -4117,8 +4148,8 @@ function renderCircuit(ex, dayId, num, blockClass) {
       </div>
       <div class="ex-section-label">Rounds</div>
       <div class="round-list">${roundsHtml}</div>
-      <div class="ex-section-label">Log</div>
-      <div class="ex-log"></div>
+      ${showLog ? `<div class="ex-section-label">Log</div>
+      <div class="ex-log"></div>` : ''}
       ${restBottom}
     </div>
   </div>`;
@@ -5604,19 +5635,26 @@ function buildSessionData(day) {
   summary += `\nExercise log:\n`;
 
   const missingByName = new Map(dayStatus.missing.map(m => [m.name, m]));
-  const collectFor = (name, isCircuit) => {
+  const collectFor = (ex, isCircuit) => {
+    const name = ex.name;
     const k = name.replace(/\s+/g, '_');
     const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
     if (isCircuit) {
       const card = Array.from(document.querySelectorAll('.round-group'))
         .find(c => (c.querySelector('.item-name')?.textContent || '').trim() === name);
       const total = parseInt(card?.dataset.rounds, 10) || 1;
-      const rounds = [];
+      const logWeight = card?.dataset.logWeight === '1';
+      const itemNames = (ex.items || []).map(it => it.name);
+      let weights = [];
+      if (logWeight) {
+        try { weights = (JSON.parse(localStorage.getItem(circuitWKey(name))) || []).map(x => typeof x === 'string' ? x : ''); } catch (e) {}
+      }
+      const rpeRounds = [];
       for (let round = 1; round <= total; round++) {
         const r = localStorage.getItem(circuitRpeKey(name, round)) || '';
-        if (r) rounds.push({ round, r });
+        if (r) rpeRounds.push({ round, r });
       }
-      return { kind: 'circuit', rounds, n };
+      return { kind: 'circuit', itemNames, weights, logWeight, rpeRounds, n };
     }
     let log = [];
     try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; } catch (e) {}
@@ -5627,7 +5665,7 @@ function buildSessionData(day) {
     summary += `\n[${block.title}]\n`;
     (block.exercises || []).forEach(ex => {
       const isCircuit = ex.type === 'circuit';
-      const data = collectFor(ex.name, isCircuit);
+      const data = collectFor(ex, isCircuit);
       const m = missingByName.get(ex.name);
       const tag = m ? ` (${m.label})` : ' (✓)';
       summary += `• ${ex.name}${tag}\n`;
@@ -5640,9 +5678,14 @@ function buildSessionData(day) {
           summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
         });
       } else if (data.kind === 'circuit') {
-        if (data.rounds.length) {
-          const parts = data.rounds.map(x => `R${x.round} ${x.r}`).join(' · ');
-          summary += `    RPE: ${parts}\n`;
+        if (data.logWeight) {
+          const wbits = data.itemNames
+            .map((nm, ii) => data.weights[ii] ? `${nm} ${data.weights[ii]}` : null)
+            .filter(Boolean);
+          if (wbits.length) summary += '    ' + wbits.join(' · ') + '\n';
+        }
+        if (data.rpeRounds.length) {
+          summary += '    RPE: ' + data.rpeRounds.map(x => `R${x.round} ${x.r}`).join(' · ') + '\n';
         }
       }
       if (data.n) summary += `    Note: ${data.n}\n`;
@@ -5924,8 +5967,8 @@ function initSetOrRPE() {
   document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
     if (!card.querySelector('.rest-btn')) return; // simple exercise — skip
     if (card.classList.contains('round-group')) {
-      // Circuits keep a single overall RPE row (existing behavior)
-      attachOverallRPE(card);
+      // Circuit logging — weight grid and/or per-round RPE, per the JSON flags.
+      attachCircuitLog(card);
     } else {
       // Standard exercise — per-set table
       attachSetLog(card);
@@ -5947,27 +5990,65 @@ function circuitRpeKey(name, round) {
   return round <= 1 ? base : base + '_r' + round;
 }
 
-// RPE selector for circuits — one row per round, so the athlete can rate
-// each round of the circuit independently.
-function attachOverallRPE(card) {
-  const name   = card.querySelector('.item-name').textContent.trim();
-  const rounds = parseInt(card.dataset.rounds, 10) || 1;
-  const slot   = logSlotFor(card);
-  for (let round = 1; round <= rounds; round++) {
-    const rpeKey = circuitRpeKey(name, round);
-    const saved  = localStorage.getItem(rpeKey);
-    const div    = document.createElement('div');
-    div.className = 'rpe-row';
-    // With more than one round, label each row by its round number; a single
-    // round keeps the plain "RPE" label (unchanged from before).
-    const label = rounds > 1 ? `RPE · R${round}` : 'RPE';
-    div.innerHTML = `<span class="rpe-label">${label}</span>` +
-      [6,7,8,9,10].map(n =>
-        `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
-      ).join('');
-    div.addEventListener('click', e => e.stopPropagation());
-    slot.appendChild(div);
+// Circuit logging (Direction B). Driven by the JSON flags read off the card:
+//   logWeight=true  → a small inline weight field on each exercise (one weight
+//                     per item, rendered in the round rows by renderCircuit)
+//   logRPE  (≠'0')  → one RPE row per round (the whole superset, per round)
+//   both off        → nothing (warm-up; the readiness check covers it)
+function attachCircuitLog(card) {
+  const name      = card.querySelector('.item-name').textContent.trim();
+  const rounds    = parseInt(card.dataset.rounds, 10) || 1;
+  const logWeight = card.dataset.logWeight === '1';
+  const logRPE    = card.dataset.logRpe !== '0';
+
+  // Inline per-exercise weights — populate from storage + save on input.
+  if (logWeight) {
+    const inputs = card.querySelectorAll('.round-wt');
+    const stored = loadCircuitWeights(name, inputs.length);
+    inputs.forEach((inp, i) => {
+      inp.value = stored[i] || '';
+      inp.addEventListener('click', e => e.stopPropagation());
+      inp.addEventListener('input', () => {
+        const g = loadCircuitWeights(name, inputs.length);
+        g[i] = inp.value;
+        saveCircuitWeights(name, g);
+      });
+    });
   }
+
+  // One RPE per round — the whole superset/circuit gets a single rating per round.
+  if (logRPE) {
+    const slot = logSlotFor(card);
+    for (let round = 1; round <= rounds; round++) {
+      const rpeKey = circuitRpeKey(name, round);
+      const saved  = localStorage.getItem(rpeKey);
+      const div    = document.createElement('div');
+      div.className = 'rpe-row';
+      const label = rounds > 1 ? `RPE · R${round}` : 'RPE';
+      div.innerHTML = `<span class="rpe-label">${label}</span>` +
+        [6,7,8,9,10].map(n =>
+          `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
+        ).join('');
+      div.addEventListener('click', e => e.stopPropagation());
+      slot.appendChild(div);
+    }
+  }
+}
+
+// Circuit per-exercise weight store: a flat array [item] of weight strings, one
+// localStorage entry per circuit. Kept across stale-day resets (like the per-set
+// weights) so it carries forward as a starting point.
+function circuitWKey(name) { return ATHLETE_ID + '_cwlog_' + name.replace(/\s+/g, '_'); }
+function loadCircuitWeights(name, nItems) {
+  let g = [];
+  try { g = JSON.parse(localStorage.getItem(circuitWKey(name))) || []; } catch (e) {}
+  if (!Array.isArray(g)) g = [];
+  g = g.map(x => (typeof x === 'string' ? x : '')); // tolerate older formats
+  while (g.length < nItems) g.push('');
+  return g.slice(0, nItems);
+}
+function saveCircuitWeights(name, g) {
+  localStorage.setItem(circuitWKey(name), JSON.stringify(g));
 }
 
 // Personal note per exercise — saved to localStorage per athlete + exercise.

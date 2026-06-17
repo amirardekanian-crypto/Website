@@ -18,7 +18,7 @@
 - The `type` field decides what tools an exercise gets — no separate flags needed:
   - `"simple"` → just the row. No rest, no weight, no RPE, no note.
   - `"standard"` → always has rest timer + weight log + RPE selector + personal note.
-  - `"circuit"` → always has rest timer at the end + one overall RPE + personal note. (No weight input — weights are written into the note, e.g. "KB 16, slam 6, box 50".)
+  - `"circuit"` → rest timer at the end + personal note, and **by default** an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning all log load this way). Add `"warmup": true` to make a circuit log nothing (prep/mobility). See "Circuit logging" below.
 - `"restSec"` (number, seconds) controls the rest timer duration. Defaults if omitted: **120s for `standard`**, **60s for `circuit`**. Override per exercise as needed.
 - A `"circuit"` exercise must include `rounds` (string) and `items[]` (array).
 - The legacy `"hasRest"` field is no longer used and can be removed. Old files that still contain it will keep working — the field is simply ignored.
@@ -441,8 +441,21 @@ Best for: mobility circuits, activation circuits, conditioning circuits, combina
 
 Every circuit gets, automatically:
 - A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — default **60s**, override with `restSec`).
-- An **RPE** selector for the whole circuit.
+- An **RPE** selector for the whole circuit (one per round).
 - A free-form **Note** row where the client can log weights, equipment, and how it felt (e.g. *"KB 16, slam 6, box 50, third round felt heavy"*).
+
+##### Circuit logging (`warmup`, and optional `logWeight` / `logRPE`)
+
+**By default every circuit logs** — a small inline **weight field on each exercise** (one weight per item, folded into the round row) **plus one RPE per round**. This covers supersets, complexes, *and* conditioning circuits (load can be added to any of them). A **warm-up** is the exception: it logs nothing.
+
+| Flag | Default | Effect |
+|---|---|---|
+| `warmup` | `false` | `true` → the circuit logs **nothing** (no weight, no RPE) — for prep/mobility. The pre-session readiness check already captures how the athlete feels. |
+| `logWeight` | `true` | Optional override — set `false` to hide the weight field on a non-warm-up circuit. |
+| `logRPE` | `true` | Optional override — set `false` to hide the per-round RPE rows. |
+
+- **Superset / conditioning / complex** → no flags needed: each item gets its own inline weight box + one RPE per round. Syncs to the coach as two lines — `Incline Dumbbell Press 30 · Chest-Supported Dumbbell Row 25` then `RPE: R1 8 · R2 8 · R3 9`.
+- **Warm-up / prep** → `"warmup": true`: logs nothing.
 
 #### `type: "standard"` — Loaded exercise with rest, weight, RPE
 Best for: all loaded exercises (strength, plyos, accessories) — and any single-exercise row that should be logged.

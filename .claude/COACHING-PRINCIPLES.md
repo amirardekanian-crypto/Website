@@ -65,6 +65,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
 - **Superset non-competing pairs** to save time. *(2026-06-15)*
+- **Round-format circuits log load by default** — any superset / complex / conditioning
+  circuit gets an inline weight field *per exercise* + one RPE *per round* (each exercise
+  its own weight; the RPE rates the whole round). Only **warm-up / prep** circuits opt out
+  with `"warmup": true` (they log nothing — the pre-session readiness check covers feel).
+  Authored in the JSON; see SCHEMA.md "Circuit logging". *(2026-06-17)*
 
 ## Progression (coach-driven)
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
@@ -85,6 +90,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
 - **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
   never in the athlete app or the athlete JSON. *(2026-06-15)*
+
+## Coaching cues
+- **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
+  action/focus *outside* the body — where to push, what to move toward), one **internal**
+  cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
+  mistake that most risks injury). Calibrate the wording to training age. In the JSON the
+  external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`. *(2026-06-17)*
 
 ## Naming
 - **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
