@@ -95,40 +95,40 @@
             "icon": "🔥",
             "exercises": [
               {
-                "type": "simple",
-                "name": "World's Greatest Stretch",
+                "type": "circuit",
+                "name": "Movement Prep",
                 "videoUrl": null,
-                "chips": [
-                  { "label": "×4 Each Side" },
-                  { "label": "RPE 4" }
-                ],
-                "cues": {
-                  "good": [
-                    "Step into a deep lunge, drop the back knee tall",
-                    "Feel the hip and mid-back open as you rotate"
-                  ],
-                  "bad": [
-                    "Don't rush — move slow and own each position"
-                  ]
-                }
-              },
-              {
-                "type": "simple",
-                "name": "Bird Dog",
-                "videoUrl": null,
-                "chips": [
-                  { "label": "×6 Each Side" },
-                  { "label": "RPE 4" }
-                ],
-                "cues": {
-                  "good": [
-                    "Long arm and opposite leg, body in one straight line",
-                    "Feel the trunk lock to resist any twist"
-                  ],
-                  "bad": [
-                    "Don't let the low back sag or the hips tip"
-                  ]
-                }
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "World's Greatest Stretch",
+                    "detail": "×4 Each Side",
+                    "cues": {
+                      "good": [
+                        "Step into a deep lunge, drop the back knee tall",
+                        "Feel the hip and mid-back open as you rotate"
+                      ],
+                      "bad": [
+                        "Don't rush — move slow and own each position"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Bird Dog",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Long arm and opposite leg, body in one straight line",
+                        "Feel the trunk lock to resist any twist"
+                      ],
+                      "bad": [
+                        "Don't let the low back sag or the hips tip"
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -181,48 +181,39 @@
                 }
               },
               {
-                "type": "standard",
-                "name": "Incline Dumbbell Press",
+                "type": "circuit",
+                "name": "Push-Pull Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 8" }
-                ],
-                "cues": {
-                  "good": [
-                    "Lower to the upper chest, elbows at roughly 45 degrees",
-                    "Feel the upper chest stretch, then drive"
-                  ],
-                  "bad": [
-                    "Don't flare the elbows wide or bounce off the chest"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Chest-Supported Dumbbell Row",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 8" }
-                ],
-                "cues": {
-                  "good": [
-                    "Drive the elbows back and pause at the top",
-                    "Feel the mid-back squeeze the shoulder blades"
-                  ],
-                  "bad": [
-                    "Don't shrug or yank with the arms"
-                  ]
-                }
+                "items": [
+                  {
+                    "name": "Incline Dumbbell Press",
+                    "detail": "×10 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Lower for 3 seconds to the upper chest, elbows at roughly 45 degrees",
+                        "Feel the upper chest stretch, then drive"
+                      ],
+                      "bad": [
+                        "Don't flare the elbows wide or bounce off the chest"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Chest-Supported Dumbbell Row",
+                    "detail": "×12 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Drive the elbows back and pause at the top",
+                        "Feel the mid-back squeeze the shoulder blades"
+                      ],
+                      "bad": [
+                        "Don't shrug or yank with the arms"
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -287,40 +278,40 @@
             "icon": "🔥",
             "exercises": [
               {
-                "type": "simple",
-                "name": "Cat-Cow",
+                "type": "circuit",
+                "name": "Movement Prep",
                 "videoUrl": null,
-                "chips": [
-                  { "label": "8 Reps", "style": "dark" },
-                  { "label": "RPE 3" }
-                ],
-                "cues": {
-                  "good": [
-                    "Slowly round then arch the whole spine",
-                    "Feel each segment move one at a time"
-                  ],
-                  "bad": [
-                    "Don't force the end range — stay smooth"
-                  ]
-                }
-              },
-              {
-                "type": "simple",
-                "name": "Band Pull-Apart",
-                "videoUrl": null,
-                "chips": [
-                  { "label": "15 Reps", "style": "dark" },
-                  { "label": "RPE 4" }
-                ],
-                "cues": {
-                  "good": [
-                    "Arms straight, pull the band to your chest",
-                    "Feel the rear delts and mid-back switch on"
-                  ],
-                  "bad": [
-                    "Don't shrug the shoulders to your ears"
-                  ]
-                }
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8 Reps",
+                    "cues": {
+                      "good": [
+                        "Slowly round then arch the whole spine",
+                        "Feel each segment move one at a time"
+                      ],
+                      "bad": [
+                        "Don't force the end range — stay smooth"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15 Reps",
+                    "cues": {
+                      "good": [
+                        "Arms straight, pull the band to your chest",
+                        "Feel the rear delts and mid-back switch on"
+                      ],
+                      "bad": [
+                        "Don't shrug the shoulders to your ears"
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -394,48 +385,39 @@
                 }
               },
               {
-                "type": "standard",
-                "name": "Cable Face Pull",
+                "type": "circuit",
+                "name": "Delt Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 7" }
-                ],
-                "cues": {
-                  "good": [
-                    "Pull the rope to your forehead, elbows high",
-                    "Feel the rear delts and upper back"
-                  ],
-                  "bad": [
-                    "Don't let the elbows drop or the head jut forward"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Dumbbell Lateral Raise",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 8" }
-                ],
-                "cues": {
-                  "good": [
-                    "Raise to shoulder height, leading with the elbows",
-                    "Feel the side delts do the work"
-                  ],
-                  "bad": [
-                    "Don't swing or shrug to lift the dumbbells"
-                  ]
-                }
+                "items": [
+                  {
+                    "name": "Cable Face Pull",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Pull the rope to your forehead, elbows high",
+                        "Feel the rear delts and upper back"
+                      ],
+                      "bad": [
+                        "Don't let the elbows drop or the head jut forward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Dumbbell Lateral Raise",
+                    "detail": "×15 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Raise to shoulder height, leading with the elbows",
+                        "Feel the side delts do the work"
+                      ],
+                      "bad": [
+                        "Don't swing or shrug to lift the dumbbells"
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -480,40 +462,40 @@
             "icon": "🔥",
             "exercises": [
               {
-                "type": "simple",
-                "name": "World's Greatest Stretch",
+                "type": "circuit",
+                "name": "Movement Prep",
                 "videoUrl": null,
-                "chips": [
-                  { "label": "×4 Each Side" },
-                  { "label": "RPE 4" }
-                ],
-                "cues": {
-                  "good": [
-                    "Deep lunge, rotate the top arm to the ceiling",
-                    "Feel the hip flexor and T-spine open"
-                  ],
-                  "bad": [
-                    "Don't let the front knee cave inward"
-                  ]
-                }
-              },
-              {
-                "type": "simple",
-                "name": "Glute Bridge",
-                "videoUrl": null,
-                "chips": [
-                  { "label": "12 Reps", "style": "dark" },
-                  { "label": "RPE 5" }
-                ],
-                "cues": {
-                  "good": [
-                    "Drive the hips up and squeeze the glutes at the top",
-                    "Feel the glutes switch on before you load them"
-                  ],
-                  "bad": [
-                    "Don't push through the low back instead of the hips"
-                  ]
-                }
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "World's Greatest Stretch",
+                    "detail": "×4 Each Side",
+                    "cues": {
+                      "good": [
+                        "Deep lunge, rotate the top arm to the ceiling",
+                        "Feel the hip flexor and T-spine open"
+                      ],
+                      "bad": [
+                        "Don't let the front knee cave inward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12 Reps",
+                    "cues": {
+                      "good": [
+                        "Drive the hips up and squeeze the glutes at the top",
+                        "Feel the glutes switch on before you load them"
+                      ],
+                      "bad": [
+                        "Don't push through the low back instead of the hips"
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -566,48 +548,39 @@
                 }
               },
               {
-                "type": "standard",
-                "name": "Chest-Supported Dumbbell Row",
+                "type": "circuit",
+                "name": "Push-Pull Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 8" }
-                ],
-                "cues": {
-                  "good": [
-                    "Drive the elbows back and pause at the top",
-                    "Feel the mid-back squeeze the shoulder blades"
-                  ],
-                  "bad": [
-                    "Don't shrug or yank with the arms"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Dumbbell Bench Press",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 8" }
-                ],
-                "cues": {
-                  "good": [
-                    "Lower to mid-chest, elbows at roughly 45 degrees",
-                    "Feel the chest stretch, then press"
-                  ],
-                  "bad": [
-                    "Don't flare the elbows or bounce the dumbbells"
-                  ]
-                }
+                "items": [
+                  {
+                    "name": "Chest-Supported Dumbbell Row",
+                    "detail": "×12 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Drive the elbows back and pause at the top",
+                        "Feel the mid-back squeeze the shoulder blades"
+                      ],
+                      "bad": [
+                        "Don't shrug or yank with the arms"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Dumbbell Bench Press",
+                    "detail": "×10 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Lower for 3 seconds to mid-chest, elbows at roughly 45 degrees",
+                        "Feel the chest stretch, then press"
+                      ],
+                      "bad": [
+                        "Don't flare the elbows or bounce the dumbbells"
+                      ]
+                    }
+                  }
+                ]
               }
             ]
           },
