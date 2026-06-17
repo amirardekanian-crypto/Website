@@ -64,6 +64,13 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Time-limited clients (esp. tennis): cap sessions ~45–50 min.** Power work (low volume,
   long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
+- **Standard section (block) names, in order:** **Prime** *or* **Activation & Prep**
+  (the whole warm-up — interchangeable, general) → **[power/explosive]** (free-name by
+  content — Power / Plyometrics / Speed / Med Ball — no fixed icon needed) → **Primary**
+  (the main lifts) → **Accessory** (assistance work) → **Core** (any core work, *including
+  bracing/anti-movement & carries*) → **[conditioning]** (free-named by content, always
+  **last**, after everything). Use these names so the app's section headers stay
+  consistent across athletes. *(2026-06-17)*
 - **Superset non-competing pairs** to save time. *(2026-06-15)*
 - **Round-format circuits log load by default** — any superset / complex / conditioning
   circuit gets an inline weight field *per exercise* + one RPE *per round* (each exercise
@@ -110,6 +117,11 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Process
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
+- **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
+  the athlete* — get the format, exercise selection and dose right first. Categorizing,
+  section names, chips and styling are a mechanical layer applied *after* that, and must
+  **never bend the programming logic or burn design energy**. Right training first; correct
+  labels and styling fall out afterward. *(2026-06-17)*
 - **Design pass = programming first; polish later.** During /program-design put ALL the
   reasoning into the coaching decisions + analysis (athlete read, SFR/transfer selection,
   volume, sequencing, progression). Exercise **names, chips, day names, and formatting are a

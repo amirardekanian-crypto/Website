@@ -395,9 +395,22 @@ day's `title` + `focusTag` for the **first** matching keyword, in this fixed pri
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `title` | string | ✅ | Section label, e.g. `"Warm-Up"`, `"Plyometrics"` |
+| `title` | string | ✅ | Section label — see standard names below |
 | `icon` | string | optional | Emoji icon |
 | `exercises` | array | ✅ | Exercises within this block |
+
+**Standard section names (use these, in this order):**
+
+| Order | Section | Holds | Icon |
+|---|---|---|---|
+| 1 | **Prime** *or* **Activation & Prep** | the whole warm-up (interchangeable, general) | 🔥 |
+| 2 | *(free-named)* — **Power** / **Plyometrics** / **Speed** / **Med Ball** … | explosive / CNS work, while fresh — name by content, icon optional | ⚡ |
+| 3 | **Primary** | the main lifts (the progression drivers) | 🎯 |
+| 4 | **Accessory** | assistance / hypertrophy support | 💪 |
+| 5 | **Core** | any core work — **including bracing / anti-movement & carries** | 🧱 |
+| 6 | *(free-named)* — **Conditioning** / **Finisher** … | energy-systems work — name by content, **always last** | 🫀 |
+
+Only the sections a given day needs appear. Power and conditioning sections are free-named by their content (no fixed name/icon required); the others use the fixed names so the app's section headers read consistently across athletes.
 
 ---
 

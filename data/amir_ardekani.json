@@ -133,8 +133,8 @@
             ]
           },
           {
-            "title": "Strength",
-            "icon": "💪",
+            "title": "Primary",
+            "icon": "🎯",
             "exercises": [
               {
                 "type": "standard",
@@ -179,7 +179,13 @@
                     "Don't hyperextend or crank past neutral at the top"
                   ]
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
               {
                 "type": "circuit",
                 "name": "Push-Pull Superset",
@@ -218,7 +224,7 @@
             ]
           },
           {
-            "title": "Brace",
+            "title": "Core",
             "icon": "🧱",
             "exercises": [
               {
@@ -316,8 +322,8 @@
             ]
           },
           {
-            "title": "Strength",
-            "icon": "💪",
+            "title": "Primary",
+            "icon": "🎯",
             "exercises": [
               {
                 "type": "standard",
@@ -383,7 +389,13 @@
                     "Don't arch the low back to fake extra height"
                   ]
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
               {
                 "type": "circuit",
                 "name": "Delt Superset",
@@ -422,7 +434,7 @@
             ]
           },
           {
-            "title": "Brace",
+            "title": "Core",
             "icon": "🧱",
             "exercises": [
               {
@@ -500,8 +512,8 @@
             ]
           },
           {
-            "title": "Strength",
-            "icon": "💪",
+            "title": "Primary",
+            "icon": "🎯",
             "exercises": [
               {
                 "type": "standard",
@@ -546,7 +558,13 @@
                     "Don't arch the low back to fake extra height"
                   ]
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
               {
                 "type": "circuit",
                 "name": "Push-Pull Superset",
@@ -585,7 +603,7 @@
             ]
           },
           {
-            "title": "Brace",
+            "title": "Core",
             "icon": "🧱",
             "exercises": [
               {
