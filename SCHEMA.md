@@ -104,6 +104,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
                 "name": "Dynamic Mobility",
                 "rounds": "×3 Rounds",
                 "restSec": 60,
+                "warmup": true,
                 "items": [
                   {
                     "name": "90/90 Hip Rotations",
@@ -532,19 +533,22 @@ Chips route to the stats grid by their **label pattern** (next section), not the
 
 ### `simple` exercise chip convention
 
-A `simple` exercise (warm-up / activation) takes **two chips**, parsed into the stats just like a `standard` one:
+A `simple` exercise (warm-up / activation / cool-down) takes a **dose chip**, parsed into the stats just like a `standard` one:
 
-1. **Reps / duration** — a `×`-prefixed count (`"×6 Each Side"`, `"×8"`) or a bare duration/distance (`"5 min"`, `"30s"`) → REPS cell.
-2. **RPE** — `"RPE 4"` (warm-ups are typically RPE 3–5) → RPE cell.
+1. **Reps / duration** *(required)* — a `×`-prefixed count (`"×6 Each Side"`, `"×8"`) or a bare duration/distance (`"5 min"`, `"30s"`) → REPS cell.
+2. **RPE** *(optional — omit for warm-up / prep)* — `"RPE 4"` → RPE cell. **Warm-up and prep items carry NO RPE chip** (an RPE on a warm-up is noise; the pre-session readiness check covers feel). Add an RPE chip only on a genuinely effort-graded `simple` — a cool-down jog or a conditioning finisher.
 
 No sets, tempo, or rest chip. Don't add a separate chip for the rep count (it *is* the reps chip above), and only add a modifier chip if there's a genuine technique cue — it renders green.
 
 ```json
 { "type": "simple", "name": "Bird Dog",
-  "chips": [{ "label": "×6 Each Side" }, { "label": "RPE 4" }] }
+  "chips": [{ "label": "×6 Each Side" }] }
 
 { "type": "simple", "name": "Assault Bike",
-  "chips": [{ "label": "5 min" }, { "label": "RPE 5" }] }
+  "chips": [{ "label": "5 min" }] }
+
+{ "type": "simple", "name": "Cool-Down Jog",
+  "chips": [{ "label": "5 min" }, { "label": "RPE 4" }] }
 ```
 
 ### Coaching Cues
@@ -675,11 +679,12 @@ makes the past program card show up (see "How `programHistory` powers the home
 
 ## Flexible Day Structure Examples
 
-**Strength-only day:**
+**Lifting-only day:**
 ```json
 "blocks": [
-  { "title": "Warm-Up", "exercises": [...] },
-  { "title": "Strength", "exercises": [...] }
+  { "title": "Activation & Prep", "exercises": [...] },
+  { "title": "Primary",   "exercises": [...] },
+  { "title": "Accessory",  "exercises": [...] }
 ]
 ```
 

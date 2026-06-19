@@ -32,7 +32,7 @@ These belong in **on-court sessions** (speed, acceleration, footwork) only — n
 
 **Fine to keep in gym sessions:**
 - Bodyweight squats, lunges, glute bridges in a prep circuit — these serve as mobilisation + activation + micro-dosing of the main patterns
-- Box step-ups as a **strength** exercise (loaded, logged, in the strength block)
+- Box step-ups as a loaded, logged lift in the **Primary** (or **Accessory**) block
 
 ### Rule 1b — No FRC-style isolation drills; use movements
 
@@ -47,7 +47,7 @@ Joint-isolation mobility drills do **not** belong in the prep circuit. Replace t
 - Hip mobility → Reverse Lunge, Lateral Lunge, Cossack Squat, World's Greatest Stretch
 - Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Cat-Cow
 
-Bodyweight moves take the bare movement name — no "Bodyweight" prefix (Reverse Lunge, not Bodyweight Reverse Lunge). The replacement should prime the patterns trained later that session.
+The replacement should prime the patterns trained later that session. (Name it per COACHING-PRINCIPLES → "Exercise naming" — bare movement for bodyweight, etc.; don't restate the rule here.)
 
 ### Rule 1c — Warm-ups use gym equipment when the client has gym access
 
@@ -59,17 +59,22 @@ Postural or scap-control correctives (scapular wall slides, postural-specific wo
 
 ### Rule 2 — Core exercises go at the end
 
-Core isolation work (dead bug, bird dog, plank variations, ab work, Pallof press, hollow body) must appear in the **last block** of the session, never in the warm-up or prep circuit.
+Core isolation work (dead bug, bird dog, plank variations, ab work, Pallof press, hollow body) must appear in the **Core block, after Primary/Accessory** (before any conditioning), never in the warm-up or prep circuit.
 
 The only exception: an exercise doubles as activation AND core (e.g. dead bug as a breathing drill before a heavy hinge session) — flag it for Amir's judgement, don't auto-move it.
 
 ### Rule 3 — Gym session block order
 
-Correct structure for a gym-based session:
+Correct structure for a gym-based session — standard section names + order per SCHEMA "Standard section names" (the single source):
 
-1. **Warm-Up + Activation & Prep** — must total **10–15 minutes** (cardio raise + mobilisation/activation circuit). Never a token 5-min cardio bookend — this is programmed dose that primes the session's patterns. The block `title` is always exactly "Activation & Prep"; the circuit `name` inside can be descriptive ("Glute Activation", "Shoulder & Upper Back Prep", etc.).
-2. **Strength** — all loaded work, compound before isolation
-3. **Core** — if prescribed, always last
+1. **Activation & Prep** — Warm-Up + prep, must total **10–15 minutes** (cardio raise + mobilisation/activation circuit). Never a token 5-min bookend — this is programmed dose that primes the session's patterns. Block `title` is always exactly "Activation & Prep"; the circuit `name` inside can be descriptive ("Glute Activation", etc.). Logs nothing — no RPE chip.
+2. **[Power]** — if present (explosive/CNS work); free-named by content
+3. **Primary** — the main lifts (progression drivers), compound first
+4. **Accessory** — assistance / isolation work
+5. **Core** — if prescribed, after Primary/Accessory
+6. **[Conditioning]** — if present, always last; free-named by content
+
+Never collapse Primary + Accessory into one "Strength" block.
 
 ### Rule 4 — Set / muscle review AND per-day load before changing load
 
@@ -78,7 +83,7 @@ Two tallies, both before touching any numbers and both shown to Amir for sign-of
 **4a. Weekly sets per muscle** — tally and present. Targets for a foundation/beginner cycle (adjust upward in later cycles):
 - Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
 - Small muscles (shoulders, biceps, triceps): 6–12 sets/week
-- Core: count every set regardless of where it sits — activation circuit rounds count as sets just like strength block sets
+- Core: count every set regardless of where it sits — activation circuit rounds count as sets just like Primary/Accessory block sets
 
 Flag anything very low (chest at 3 sets) or disproportionately high.
 

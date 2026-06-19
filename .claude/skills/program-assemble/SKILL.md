@@ -14,14 +14,52 @@ plumbing — it makes no coaching decisions. Read `SCHEMA.md` first if unsure of
 - No file → **NEW**.
 
 ## Step 2 — Build the JSON
-Map the spec into the schema shape:
-- `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from the spec
-  (each exercise → `type` + `chips[]` {label, style?} + `cues` {good:[ext,int], bad:[avoid]}
-  + `restSec`; circuits → `rounds` + `items[]`).
-- Apply the chip→field mapping: ext+int → `cues.good[]`, avoid → `cues.bad[]`.
-- `completionTitle` / `completionMessage` per day from /program-engage PART 4.
-- `cycles[currentCycleIndex].message` = PART 1 message + outcomes; next cycle's
-  `teaser` = PART 2. Leave `videoUrl: null` (auto-resolved by name downstream).
+This stage owns ALL serialization the design spec deliberately left out — chips, section
+titles/icons, the vivid `focusTag`, names. The spec gives you decisions; you render them.
+
+**2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
+the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[avoid]} +
+`restSec`; circuits → `rounds` + `items[]`. Map cues: ext+int → `cues.good[]`, avoid →
+`cues.bad[]`. `sport.badge` ← design's `SPORT_BADGE` line. `completionTitle`/
+`completionMessage` per day from /program-engage PART 4; `cycles[currentCycleIndex].message`
+= PART 1 message + outcomes; next cycle's `teaser` = PART 2. Leave `videoUrl: null`
+(auto-resolved by name downstream).
+- **Set `type` from the design category** (the spec never emits it): standard grinding lift
+  / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
+  `simple` item (bike, mobility drill) → `"simple"`.
+
+**2b — Render chips from the spec's plain dose fields** (per SCHEMA "Chip parsing"):
+- set count → `{label:"N Sets", style:"yellow"}` (first; one per standard exercise)
+- reps/duration/distance → ONE `×`-prefixed grey chip (`"×8"`, `"×10 Each Side"`,
+  `"×30s Each Side"`, `"×40m"`) — embed side/leg info in that same chip, never a separate
+  `"Each Side"` chip
+- tempo → `"Tempo 3-0-1-0"`; RPE → `"RPE N"` (grey)
+- `intent` → a green modifier chip `{style:"dark"}` (`3s eccentric`, `glute focus`,
+  `superset`, `max intent`, `2s hold`); ≤4 words, lowercase; **never a rep/dose count here**
+- Chip order: green modifier(s) → yellow set count → grey stats. Carve-outs: ballistic/carry
+  omit tempo; warm-up/prep omit RPE (see 2e).
+- **Working (non-warm-up) circuits:** build each item's `detail` from the spec's per-item
+  reps (`"×12"`), and if the spec gives one overall circuit RPE append it (`"×12 · RPE 7"`).
+  Do **not** set `warmup` — working circuits log a weight field per item + one RPE per round
+  by default (per SCHEMA "Circuit logging"). Only prep circuits get `warmup: true` (2e).
+
+**2c — Section titles + icons** (per SCHEMA "Standard section names", fixed order):
+Activation & Prep 🔥 → [power/explosive: free-named by content] → **Primary** 🎯 →
+**Accessory** 💪 → **Core** → [conditioning: free-named, last]. Use the role from the spec
+(primary→Primary block, accessory→Accessory block). Never collapse Primary+Accessory into a
+single "Strength" block.
+
+**2d — Finalize the `focusTag`** (design only gave a plain working title). Make it VIVID —
+sports-headline energy that makes the athlete want to train — AND embed the keyword that
+lands the right banner image per SCHEMA "Day `focusTag` → banner image" (first-keyword-wins
+priority: recovery → power → conditioning → core → upper → lower → fullbody). Don't let a
+higher-priority word hijack the image (`"engine"`→conditioning, `"power"`→power). E.g.
+"Lower — squat/quad" → `"Built From The Legs Up"`; "Upper push & pull" → `"Press, Pull,
+Repeat"`. Never ship a dry label (`"Upper Body & Press"` ✗).
+
+**2e — Warm-up / prep logs nothing.** Prep circuits get `"warmup": true` (no weight/RPE).
+Warm-up `simple` items carry the dose chip only — **no RPE chip** (an RPE on a warm-up is
+noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure & time".
 
 **RETURNING — advance the cycle (per SCHEMA.md "Advancing to the Next Cycle"):**
 1. Move the OLD `workouts` into `programHistory` in the simplified
@@ -40,24 +78,55 @@ Map the spec into the schema shape:
   day count, and exercise count print as expected.
 - **Format lint** against /program-design rules: every `standard` has sets·reps·tempo·
   RPE·restSec; ballistic/carry correctly OMIT tempo and carry a `max intent` chip;
+  warm-up/prep items carry NO RPE chip and prep circuits have `"warmup": true`;
   chip order = dark → yellow set count → grey; every exercise has exactly 3 cues
-  (ext+int in good, avoid in bad).
-- Report any structural violation and fix before finishing. Do NOT spend time on exercise names here.
+  (ext+int in good, avoid in bad); section titles use the standard names (Primary/Accessory
+  /etc, never "Strength").
+- Report any structural violation and fix before finishing. (Exercise-name normalization is
+  the next step — a required pass, not optional.)
 
-## Step 4 — Ship
+## Step 4 — Normalize exercise names (required, blocking)
+Names from /program-design are rough by design — **this is the correction pass.** It enforces
+COACHING-PRINCIPLES "Exercise naming" + the `exercise_library.json` canonical spelling. Run
+the scan, FIX every mechanical issue in the JSON, then surface only the judgment calls.
+
+```
+node -e "
+const fs=require('fs');
+const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\x00-\x7f]/g,'').replace(/'/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+const lib=JSON.parse(fs.readFileSync('exercise_library.json','utf8'));
+const N={};for(const k of Object.keys(lib)){const n=norm(k);if(!(n in N))N[n]=k;}
+const d=JSON.parse(fs.readFileSync('data/<id>.json','utf8'));
+const seen=new Set();
+for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exercises)for(const it of (e.items||[e])){
+  const nm=it.name;if(!nm||seen.has(nm))continue;seen.add(nm);
+  const flags=[];
+  if(/^bodyweight\s+/i.test(nm))flags.push('DROP \"Bodyweight\" prefix');
+  if(/[(),:]/.test(nm))flags.push('REMOVE punctuation ()/:,');
+  let lm;
+  if(nm in lib){lm=lib[nm]?'OK':'GAP (in lib, no video yet)';}
+  else{const c=N[norm(nm)]||N[norm(nm.replace(/^bodyweight\s+/i,''))];lm=c?('MISS -> canonical: '+c):'MISS (not in library)';}
+  console.log((flags.length?'[FIX] '+flags.join('; ')+' | ':'')+lm+'  <- '+nm);
+}
+console.log('done');
+"
+```
+
+**Then act on the output:**
+- **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
+  remove `()` `:` `,` (if the qualifier carried meaning, move it to a chip); snap spelling/
+  casing to the library's canonical key whenever `MISS -> canonical:` shows one. Edit the JSON,
+  then **re-run until clean** (every line `OK`/`GAP`, no `[FIX]`, no fixable `MISS`).
+- **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` (new
+  movement → add to Notion when the video is added), an exercise that looks like the *wrong*
+  movement, or a corrective/postural drill with no noted indication (per COACHING-PRINCIPLES).
+
+`GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
+
+## Step 5 — Ship
 - Summarise the diff (cycle advanced N→N+1, days, swaps).
 - Commit + push **only if Amir asks**. End commit messages with the project's
   Co-Authored-By line.
-
-## Step 5 — Name scan (last, non-blocking)
-Run this after shipping. It's informational only — no fixing required now, names get
-corrected in Notion when the video is added.
-
-```
-node -e "const fs=require('fs');const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\x00-\x7f]/g,'').replace(/'/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();const lib=JSON.parse(fs.readFileSync('exercise_library.json','utf8'));const N={};for(const k of Object.keys(lib)){const n=norm(k);if(!(n in N))N[n]=k;}const d=JSON.parse(fs.readFileSync('data/<id>.json','utf8'));const seen=new Set();for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exercises)for(const it of (e.items||[e])){const nm=it.name;if(!nm||seen.has(nm))continue;seen.add(nm);if(nm in lib){if(!lib[nm])console.log('GAP   '+nm);}else{const c=N[norm(nm)];console.log('MISS  '+nm+(c?'  (lib has: '+c+')':''));}}console.log('done');"
-```
-
-Print the output as a short list for Amir. GAP = in library, no video yet (fine). MISS = not in library at all (add to Notion when adding the video).
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.

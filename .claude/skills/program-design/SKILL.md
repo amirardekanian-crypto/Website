@@ -7,9 +7,11 @@ description: Design one athlete's training program for a cycle — the core S&C 
 
 This is the highest-value work in the pipeline. **Spend the reasoning budget here** — and
 spend it on the **programming** (the analysis + training decisions), not on polish. Exercise
-names, chips, day names, and formatting are a later pass once the program exists
-(/program-assemble lints format; names finalize in Notion) — if a name or chip is rough,
-flag it and keep moving; don't burn analysis budget perfecting wording.
+names, chips, day titles, banner keywords, and formatting are all rendered downstream by
+**/program-assemble** (it normalizes names to the library, renders chips, writes the vivid
+`focusTag`, lint-checks the JSON) — so if a name or chip is rough, flag it and keep moving;
+don't burn analysis budget perfecting wording. The cleaner your domain spec, the better the
+program — let the machine handle serialization.
 Work like an **assistant coach sitting next to Amir**: do the thinking, but consult him
 on real decisions, and get smarter every cycle by reading and adding to his principles.
 
@@ -126,29 +128,24 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   — see COACHING-PRINCIPLES.md → "Volume & dosing".
 - **Warm-up + prep = 10–15 min** every session (cardio raise + mobilisation/activation
   circuit) — never a token 5-min bookend. It's programmed dose, not filler.
-- **Sequencing within a day:** power/CNS → primary strength → accessories → corrective/core.
+- **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
+  conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
 - **Superset** non-competing pairs to fit the time ceiling.
-- **DAY NAMING (the `FOCUS TAG`):** name each day for *what it trains* AND so it earns the
-  right banner image. The app auto-picks a day's image by the **first** keyword its name
-  hits, in this priority order: **recovery → power → conditioning → core → upper → lower →
-  fullbody → default**. So lead the tag with the keyword for the image you want, and don't
-  let a higher-priority word hijack it: `"Lower + Brace"` renders a *core* image (brace
-  outranks lower); `"Total + Carry"` hits no keyword → bare gradient. **Make the tag VIVID —
-  sports-headline energy that makes the athlete want to train — while embedding the keyword
-  so the banner still lands.** Don't ship dry spreadsheet labels (`"Upper Body & Press"` ✗).
-  Names that read well AND map right: leg/lower-led → `"Built From The Legs Up"`, `"Hinge &
-  Hammer"` (lower); upper-led → `"Press, Pull, Repeat"`, `"The Upper Hand"` (upper); true
-  full-body → `"Whole-Body Workhorse"`, `"Full-Body, Full Send"` (fullbody). Beware cool
-  words that are themselves higher-priority keywords and steal the image (`"engine"` →
-  conditioning, `"power"` → power). Full keyword map: SCHEMA.md → "Day `focusTag` → banner image."
+- **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
+  squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
+  /program-assemble** (it owns the keyword→image matching per SCHEMA) — don't do
+  headline-writing or keyword gymnastics here; it spends design budget on cosmetics.
 
 ---
 
 ## STEP 3 — FULL PROGRAM
 
-**CLASSIFICATION:** primary (stable, progress via load — use Step 1 selections) ·
-accessory (rotate between cycles) · activation/corrective (keep if excellent). No cycle is
-a repeat. For a **resolving injury**, place the current rehab stage.
+**CLASSIFICATION:** every exercise gets a role, and the role IS its section block:
+primary (stable, progress via load — use Step 1 selections) → **Primary** block ·
+accessory (rotate between cycles) → **Accessory** block · activation/corrective →
+**Activation & Prep** (or **Core** if it's core work). No cycle is a repeat. For a
+**resolving injury**, place the current rehab stage. (Section names + order are fixed by
+SCHEMA "Standard section names"; assemble assigns titles + icons.)
 
 **NAMING:** Follow COACHING-PRINCIPLES.md → "Exercise naming" (read at STEP 0 — it is the
 single source of truth; don't restate or re-derive it here). In one line: `[modification]
@@ -157,21 +154,17 @@ in the name, everything else (grip/intent/range/tempo/holds/digits/punctuation) 
 and match the `exercise_library.json` spelling. If a name is rough mid-design, flag it and
 move on — /program-assemble lint-checks names against the library.
 
-**CHIPS:** order = green modifiers → (yellow) set count → grey stats (reps · tempo · RPE).
-**Reps/duration/distance dose = one `×`-prefixed chip** (`"×8"`, `"×10 Each Side"`,
-`"×30s Each Side"`, `"×40m"`); embed side info there, never a separate `"Each Side"` chip
-(`"×10 Each Side"` ✓, `"×10"` + `"Each Side"` ✗). **Modifier chips = technique cues ONLY**
-— the green pills by the name (`3s eccentric`, `glute focus`, `1s squeeze`, `superset`,
-`max intent`, a `2s hold` pause-emphasis); ≤4 words, lowercase, "3s" not "three-second",
-0–3 per exercise. **Never put a rep/dose count in a modifier chip** — it renders as a green
-pill with an empty REPS cell. Full map: SCHEMA.md → "Chip parsing".
-
-**PRESCRIPTION (with carve-out):**
-- standard grinding lift → Sets · reps/duration · tempo · RPE · restSec
-- ballistic (jumps/throws/Olympic) → Sets · reps · RPE · restSec + `max intent` chip — **no tempo**
-- loaded carry → Sets · distance/duration · RPE · restSec — **no tempo**
-- circuit → rounds + restSec + per-item reps + one overall RPE — **no per-item tempo**
-- **simple (warm-up/activation)** → two chips: a `×`-prefixed reps/duration chip + an `RPE N` chip. No sets, tempo, or rest. RPE 3–5 typical.
+**PRESCRIPTION — emit the DOSE as plain fields, not chips.** Chip styling/order/`×`-prefix
+is /program-assemble's job (it renders chips per SCHEMA "Chip parsing"). You just decide the
+numbers + the coaching intent:
+- standard grinding lift → sets · reps/duration · tempo · RPE · rest · intent (e.g. `3s eccentric`, or none)
+- ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
+- loaded carry → sets · distance/duration · RPE · rest — **no tempo**
+- circuit (working) → rounds + rest + per-item reps + one overall RPE — **no per-item tempo**
+- **warm-up / prep (simple or circuit)** → dose only (reps/duration); **no RPE, logs nothing**
+  (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
+- `intent` is the coaching intention in plain words (`3s eccentric`, `glute focus`, `superset`,
+  `max intent`, `2s hold`) — assemble renders it as the green modifier chip. Leave blank if none.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
@@ -186,37 +179,39 @@ be reordered. Leans on the app's readiness check + ACWR.
 **Do NOT output:** videoUrl · completionTitle/Message · currentCycleIndex · cycles[] ·
 programHistory. /program-engage and /program-assemble own those.
 
-**OUTPUT FORMAT** (parsed downstream — be exact):
+**OUTPUT FORMAT — a light DESIGN SPEC, not final formatting.** Express the training
+decisions in plain domain terms. No chip styling, no `×`-prefixes, no emoji, no JSON — those
+are /program-assemble's job. Use the semantic SECTION names (Activation & Prep · [power] ·
+Primary · Accessory · Core · [conditioning]); assemble assigns titles, icons, chips, the
+vivid `focusTag`, and canonical names.
 ```
 ATHLETE_ID: [id]
 SPORT_BADGE: [emoji] [label]
 PROGRAM: [number] | [N] days | [one-line focus]
 
 ---
-DAY [N] | [FOCUS TAG]
+DAY [N] — [plain working title: what it trains] | load identity: [peak/moderate/low]
 
-BLOCK: [Name] | [emoji]
+SECTION: Activation & Prep   (logs nothing — no RPE)
+  • [Movement] | [reps or duration] | ext: "[cue]" | int: "[cue]" | avoid: "[cue]"
+  • ...
 
-[Exercise Name]
-type: standard
-chips: [label](dark) · [label](yellow) · [label] · [label]
-sets: X | reps: X | tempo: X-X-X-X | RPE: X | restSec: X
+SECTION: Primary
+[Movement] | role: primary
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [e.g. 3s eccentric / none]
 ext: [cue]
 int: [cue]
 avoid: [cue]
 
-[Circuit Name]
-type: circuit
-rounds: ×X | restSec: X
-items:
-  • [Item Name] | ×X | good: "[cue]" | bad: "[cue]"
+SECTION: Accessory
+[Movement] | role: accessory
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [none / superset / …]
+ext / int / avoid
 
-[Exercise Name]
-type: simple
-chips: ×[reps] · RPE X
-ext: [cue]
-int: [cue]
-avoid: [cue]
+SECTION: Core
+[Movement or circuit] | dose | ext / int / avoid
+
+(fallback per primary: one same-pattern swap if pain / station busy)
 ---
 [repeat for all days]
 ```
