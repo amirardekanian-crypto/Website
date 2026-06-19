@@ -156,15 +156,15 @@
                     }
                   },
                   {
-                    "name": "Standing Hip Circle",
-                    "detail": "×10 each direction",
+                    "name": "Bodyweight Reverse Lunge",
+                    "detail": "×8 each leg",
                     "cues": {
                       "good": [
-                        "Draw the biggest circle you can with your knee",
-                        "Feel the hip joint rotating and opening"
+                        "Step back and lower under control — open the hip as you go",
+                        "Feel the front glute and the back hip flexor lengthen each rep"
                       ],
                       "bad": [
-                        "Moving the torso instead of isolating the hip"
+                        "Rushing — this primes the squat and hinge that follow"
                       ]
                     }
                   }
@@ -414,15 +414,15 @@
                     }
                   },
                   {
-                    "name": "Shoulder CARs",
-                    "detail": "×5 each direction",
+                    "name": "Band Shoulder Pass-Through",
+                    "detail": "×10",
                     "cues": {
                       "good": [
-                        "Trace the biggest, smoothest circle you can with your arm",
-                        "Feel the shoulder joint move through its full available range"
+                        "Hold the band wide and take it overhead and behind, then back",
+                        "Keep the arms long — only widen your grip if it feels tight"
                       ],
                       "bad": [
-                        "Compensating with the torso — keep the core still"
+                        "Bending the elbows to cheat the range — keep them straight"
                       ]
                     }
                   }
@@ -654,20 +654,24 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Walk or March in Place",
+                "name": "Stationary Bike or Rower",
                 "chips": [
                   {
                     "label": "5 minutes",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "Easy Pace",
                     "style": "dark"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Walk at a comfortable pace — arms swinging naturally at your sides",
+                    "Keep it easy — just raise the heart rate and warm the body",
                     "Use this time to breathe, arrive mentally, and prepare for the session"
                   ],
                   "bad": [
-                    "Don't sit and rest instead — active warm-up is part of the work"
+                    "Don't push hard — this is preparation, not conditioning"
                   ]
                 }
               }
@@ -943,15 +947,15 @@
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "Standing Hip Circle",
-                    "detail": "×10 each direction",
+                    "name": "Bodyweight Lateral Lunge",
+                    "detail": "×8 each side",
                     "cues": {
                       "good": [
-                        "Draw the biggest circle possible with your knee",
-                        "Feel the hip capsule opening with each rotation"
+                        "Step wide and sit into the bent hip — keep the other leg long",
+                        "Feel the inner thigh and glute open and load each rep"
                       ],
                       "bad": [
-                        "Swaying the torso — the movement is hip-only"
+                        "Letting the knee cave — track it over the foot"
                       ]
                     }
                   },
