@@ -150,13 +150,12 @@ Day count + type of each day; one line of rationale per day citing Step 1.
 accessory (rotate between cycles) · activation/corrective (keep if excellent). No cycle is
 a repeat. For a **resolving injury**, place the current rehab stage.
 
-**NAMING (strict):** Name = movement + equipment + stance + unilateral + established
-variation. Equipment in the name when the move has multiple implements (cable/dumbbell/
-barbell/machine/kettlebell); omit when equipment-agnostic. **Defining setups DO belong in
-the name** (Chest-Supported, Heels-Elevated, Half-Kneeling, Incline, B-Stance, Bottoms-Up,
-Single-Arm, Single-Leg). **Never in the name** (→ chips, not the name): grip · focus/intent · range
-qualifier · tempo emphasis · holds/durations · digits · parentheses · colons · commas.
-(A dose duration like a 30s plank → the `×`-prefixed reps chip; a pause/hold *emphasis* → a modifier chip.)
+**NAMING:** Follow COACHING-PRINCIPLES.md → "Exercise naming" (read at STEP 0 — it is the
+single source of truth; don't restate or re-derive it here). In one line: `[modification]
+[equipment] [movement]`, bodyweight = bare name (no "Bodyweight" prefix), defining setups
+in the name, everything else (grip/intent/range/tempo/holds/digits/punctuation) → chips,
+and match the `exercise_library.json` spelling. If a name is rough mid-design, flag it and
+move on — /program-assemble lint-checks names against the library.
 
 **CHIPS:** order = green modifiers → (yellow) set count → grey stats (reps · tempo · RPE).
 **Reps/duration/distance dose = one `×`-prefixed chip** (`"×8"`, `"×10 Each Side"`,
