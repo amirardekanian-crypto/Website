@@ -61,8 +61,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
 - **`exercise_library.json` (generated from Notion) is the source of truth for names —
   it is the video join key.** Author each exercise to the library's canonical spelling
-  exactly; `/program-assemble` validates and flags misses. Established names keep their
-  digits (45° Back Extension, 90/90, B-Stance) — don't mangle them. *(2026-06-15)*
+  exactly; `/program-assemble` validates and normalizes misses. *(2026-06-15)*
 - **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
   drift still finds the video and Notion renames don't break old programs — but
   word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
@@ -85,16 +84,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   The full prep (cardio raise + mobilisation/activation circuit) should occupy 10 min
   minimum, up to 15. This is programmed time, not filler: it primes the patterns trained
   that session and is part of the dose. *(2026-06-19)*
+- **Warm-up / prep logs nothing — and carries no RPE.** Prep circuits use `warmup: true`
+  (no weight, no RPE field); warm-up `simple` items (bike, treadmill, mobility drills) carry
+  only their dose chip (duration or reps) — **no RPE chip**. An RPE on a warm-up is noise;
+  the pre-session readiness check already captures how the athlete feels. RPE on a `simple`
+  item is reserved for a genuinely effort-graded piece (a cool-down jog, a conditioning
+  finisher), never the warm-up. *(2026-06-19)*
 - **Time-limited clients (esp. tennis): cap sessions ~45–50 min.** Power work (low volume,
   long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
-- **Standard section (block) names, in order:** **Prime** *or* **Activation & Prep**
-  (the whole warm-up — interchangeable, general) → **[power/explosive]** (free-name by
-  content — Power / Plyometrics / Speed / Med Ball — no fixed icon needed) → **Primary**
-  (the main lifts) → **Accessory** (assistance work) → **Core** (any core work, *including
-  bracing/anti-movement & carries*) → **[conditioning]** (free-named by content, always
-  **last**, after everything). Use these names so the app's section headers stay
-  consistent across athletes. *(2026-06-17)*
+- **Standard section (block) names** — Activation & Prep → [power] → Primary → Accessory →
+  Core → [conditioning]; use these so the app's section headers stay consistent across
+  athletes (Core holds all core work *including bracing/anti-movement & carries*). The full
+  list with order + holds + icons lives in **SCHEMA.md → "Standard section names"** (single
+  source — don't re-enumerate it here). *(2026-06-17)*
 - **Superset non-competing pairs** to save time. *(2026-06-15)*
 - **Round-format circuits log load by default** — any superset / complex / conditioning
   circuit gets an inline weight field *per exercise* + one RPE *per round* (each exercise
