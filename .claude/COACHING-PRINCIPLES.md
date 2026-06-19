@@ -32,6 +32,12 @@ publish it. No athlete health/chat detail goes here — principles only.
   slip). Also high-SFR, so little stimulus is lost. *(2026-06-15)*
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
+- **No corrective/postural drills without an indication.** Postural or scap-control
+  correctives (scapular wall slides, postural-specific work) only go in when the athlete
+  has a *noted* posture issue/restriction. For a general client with none, prep is
+  mobilisation + activation of the day's patterns — not corrective theatre. (General
+  shoulder mobility/activation before pressing — band pull-apart, pass-through, cat-cow —
+  is fine; it preps the lift, it doesn't "fix posture.") *(2026-06-19)*
 
 ## Exercise naming
 - **Name = `[modification] [equipment] [movement]`** (e.g. Standing Dumbbell Shoulder
