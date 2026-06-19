@@ -62,29 +62,36 @@ The only exception: an exercise doubles as activation AND core (e.g. dead bug as
 
 Correct structure for a gym-based session:
 
-1. **Warm-Up** — cardio machine (bike, treadmill, rower), 5 min, low intensity
-2. **Activation & Prep** — bodyweight circuit: mobilisation + activation of the day's target muscles. The block `title` is always exactly "Activation & Prep". The circuit `name` inside can be descriptive and specific to the day's content — "Glute Activation", "Shoulder & Upper Back Prep", "Hip & Core Activation", etc.
-3. **Strength** — all loaded work, compound before isolation
-4. **Core** — if prescribed, always last
+1. **Warm-Up + Activation & Prep** — must total **10–15 minutes** (cardio raise + mobilisation/activation circuit). Never a token 5-min cardio bookend — this is programmed dose that primes the session's patterns. The block `title` is always exactly "Activation & Prep"; the circuit `name` inside can be descriptive ("Glute Activation", "Shoulder & Upper Back Prep", etc.).
+2. **Strength** — all loaded work, compound before isolation
+3. **Core** — if prescribed, always last
 
-### Rule 4 — Set / muscle review before changing load
+### Rule 4 — Set / muscle review AND per-day load before changing load
 
-Before adjusting any sets, reps, or exercise selection, tally weekly sets per muscle group and present the summary to Amir. Don't change numbers without his sign-off.
+Two tallies, both before touching any numbers and both shown to Amir for sign-off.
 
-Standard volume targets for a foundation/beginner cycle (adjust upward in later cycles):
+**4a. Weekly sets per muscle** — tally and present. Targets for a foundation/beginner cycle (adjust upward in later cycles):
 - Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
 - Small muscles (shoulders, biceps, triceps): 6–12 sets/week
-- Core: count every set of core work regardless of where it sits in the session — activation circuit rounds count as sets just like strength block sets do
+- Core: count every set regardless of where it sits — activation circuit rounds count as sets just like strength block sets
 
-Flag anything that looks very low (chest at 3 sets) or disproportionately high.
+Flag anything very low (chest at 3 sets) or disproportionately high.
+
+**4b. Per-day load distribution** — raw set count lies, so weight each working set by systemic cost (**heavy compound ×1.5, moderate compound ×1.0, isolation ×0.5**) and tally the cost-weighted load per day. Then check:
+- Does each day have a deliberate **load identity**, and does the week **undulate** (one peak / one–two moderate / one low day) — or is it four flat "RPE 6, everything matters" days?
+- Do two high-load days for the **same pattern** sit back-to-back (e.g. heavy hinge on consecutive days)?
+- Is any day a **grind** (≫6 working exercises) — a long session spikes cortisol even at low RPE, which matters most for poor-recovery clients.
+
+For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the cost-weighted table and a recommended undulation before proposing changes. See COACHING-PRINCIPLES.md → "Volume & dosing".
 
 ## Step 2 — Present the audit
 
 Before editing anything, show:
 
 1. Structural violations found (Rule 1–3)
-2. Weekly set tally per muscle (Rule 4)
-3. Proposed changes — list each one and ask for confirmation
+2. Weekly set tally per muscle (Rule 4a)
+3. Per-day cost-weighted load + recommended undulation (Rule 4b)
+4. Proposed changes — list each one and ask for confirmation
 
 Format:
 
@@ -93,7 +100,7 @@ STRUCTURAL
 - Day 1 Movement Drills block: remove (forward skip, lateral step-touch — gym session)
 - Day 3 core exercises (dead bug, bird dog) in prep circuit: move to end
 
-VOLUME
+VOLUME (per muscle / week)
 | Muscle    | Sets |
 |-----------|------|
 | Glutes    | 19   |
@@ -101,10 +108,18 @@ VOLUME
 | Chest     | 3 ← low |
 ...
 
+PER-DAY LOAD (cost-weighted)
+| Day | Identity      | Sets | Weighted load | Peak RPE |
+|-----|---------------|------|---------------|----------|
+| 1   | Lower squat   | 15   | 16.5          | 6        |
+| 2   | Upper         | 21   | 16.5 (grind)  | 6        |
+| 4   | Glute (peak)  | 13   | 13.5          | 7        |
+→ Recommend: 4 = peak, 1 = mod-high, 2 = moderate (trim), 3 = low day
+
 PROPOSED CHANGES
-1. Remove movement drills from Days 1, 3, 4
-2. Move dead bug + bird dog to Core block at end of Day 3
-3. Add DB Chest Fly 3×15 RPE 5 to Day 3 (raises chest to 6 sets)
+1. Trim Day 2 from 7 → 5–6 exercises (cut the grind)
+2. Lighten Day 3 (drop one heavy lower compound → genuine low day)
+3. ...
 ```
 
 Wait for Amir's go-ahead before touching the file.
