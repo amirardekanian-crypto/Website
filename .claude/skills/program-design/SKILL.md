@@ -116,6 +116,16 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   3–6 reps, RPE 7–9, rest 2–4′ · Hypertrophy → 6–12, RPE 7–9, 1–2′ · Power → 1–5
   explosive, RPE 6–8, full rest · Endurance/conditioning → 15+ / time. Don't let a Power
   cycle get programmed like hypertrophy.
+- **PER-DAY LOAD DISTRIBUTION (required — not just weekly volume):** give each day a
+  deliberate **load identity** and **undulate the week**. Weight each working set by systemic
+  cost (heavy compound ×1.5, moderate compound ×1.0, isolation ×0.5) to read true per-day
+  load — raw set count lies. Aim for one peak / one–two moderate / one low day, not four flat
+  days. Verify: (1) cost-weighted load per day is intentional, (2) no two high-load days for
+  the same pattern land back-to-back, (3) no session is a grind (≫6 working exercises spikes
+  cortisol even at low RPE). For poor-recovery clients this distribution is the primary lever
+  — see COACHING-PRINCIPLES.md → "Volume & dosing".
+- **Warm-up + prep = 10–15 min** every session (cardio raise + mobilisation/activation
+  circuit) — never a token 5-min bookend. It's programmed dose, not filler.
 - **Sequencing within a day:** power/CNS → primary strength → accessories → corrective/core.
 - **Superset** non-competing pairs to fit the time ceiling.
 - **DAY NAMING (the `FOCUS TAG`):** name each day for *what it trains* AND so it earns the

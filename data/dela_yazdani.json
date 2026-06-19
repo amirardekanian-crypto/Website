@@ -554,38 +554,13 @@
               },
               {
                 "type": "standard",
-                "name": "Dumbbell Lateral Raise",
-                "hasRest": true,
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 3-0-1-0"
-                  },
-                  {
-                    "label": "RPE 5"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Lead with your elbows — like you're slowly pouring a pitcher",
-                    "Feel the outside of the shoulder — not the traps — working"
-                  ],
-                  "bad": [
-                    "Swinging the dumbbells up with momentum"
-                  ]
-                },
-                "videoUrl": "https://www.youtube.com/watch?v=8aUc9snLOxU"
-              },
-              {
-                "type": "standard",
                 "name": "Cable Tricep Pushdown",
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -615,6 +590,10 @@
                 "name": "Dumbbell Bicep Curl",
                 "hasRest": true,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets"
                   },
@@ -683,9 +662,22 @@
             "exercises": [
               {
                 "type": "circuit",
-                "name": "Hip Activation",
+                "name": "Full-Body Prep",
                 "rounds": "×2 Rounds",
                 "items": [
+                  {
+                    "name": "Squat",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Sit back and down, weight spread through the whole foot",
+                        "Open the knees over the toes as you descend"
+                      ],
+                      "bad": [
+                        "Heels lifting or knees caving inward"
+                      ]
+                    }
+                  },
                   {
                     "name": "Glute Bridge",
                     "detail": "×15",
@@ -704,6 +696,20 @@
                         "style": "dark"
                       }
                     ]
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": [
+                        "Pull the band apart to chest height, leading with the knuckles",
+                        "Squeeze the muscles between your shoulder blades together"
+                      ],
+                      "bad": [
+                        "Shrugging the shoulders up toward the ears"
+                      ]
+                    },
+                    "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
                   }
                 ]
               }
@@ -715,41 +721,13 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dumbbell Sumo Deadlift",
+                "name": "Dumbbell Reverse Lunge",
                 "hasRest": true,
                 "chips": [
                   {
                     "label": "Priority",
                     "style": "yellow"
                   },
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×10 Reps"
-                  },
-                  {
-                    "label": "Tempo 3-0-1-1"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Push the floor away and stand tall — chest leads the way up",
-                    "Feel your inner thighs and glutes working together to drive you up"
-                  ],
-                  "bad": [
-                    "Rounding the upper or lower back — chest stays tall throughout"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Dumbbell Reverse Lunge",
-                "hasRest": true,
-                "chips": [
                   {
                     "label": "3 Sets"
                   },

@@ -61,6 +61,10 @@ publish it. No athlete health/chat detail goes here — principles only.
   (Mehraneh ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)*
 
 ## Session structure & time
+- **Warm-up + preparation is always 10–15 minutes** — never a token 5-min cardio bookend.
+  The full prep (cardio raise + mobilisation/activation circuit) should occupy 10 min
+  minimum, up to 15. This is programmed time, not filler: it primes the patterns trained
+  that session and is part of the dose. *(2026-06-19)*
 - **Time-limited clients (esp. tennis): cap sessions ~45–50 min.** Power work (low volume,
   long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
@@ -87,6 +91,16 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Volume is a report, not a rule.** Show programmed sets/muscle vs the goal range vs a
   verdict; frame an under-dose as "maintenance" for time-limited clients (not failure),
   and say where to invest if/when time allows. *(2026-06-15)*
+- **Manage load per DAY, not just per week — weight by systemic cost, then undulate.**
+  Raw set count lies: 21 isolation sets ≠ 13 heavy-compound sets. Weight each working set
+  by neural/systemic cost (heavy compound ≈ ×1.5, moderate compound ≈ ×1.0, isolation ≈
+  ×0.5) to read the true per-day load. Then give each day a deliberate **load identity** and
+  **undulate the week** (one peak / one–two moderate / one low day) rather than four flat
+  "RPE 6, everything matters" days. For poor-recovery clients (low sleep, high stress) this
+  is the *primary* lever — distribution beats total volume. Check three things every review:
+  (1) cost-weighted load per day, (2) that no two high-load days for the same pattern sit
+  back-to-back, (3) session **length/grind** (a 7-exercise day spikes cortisol even at low
+  RPE). *(2026-06-19)*
 
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
