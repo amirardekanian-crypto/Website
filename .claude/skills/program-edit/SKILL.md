@@ -44,7 +44,7 @@ The only exception: an exercise doubles as activation AND core (e.g. dead bug as
 Correct structure for a gym-based session:
 
 1. **Warm-Up** — cardio machine (bike, treadmill, rower), 5 min, low intensity
-2. **Activation & Prep** — bodyweight circuit: mobilisation + activation of the day's target muscles (squats, glute bridges, lunges, band work, upper back prep). This block is always called "Activation & Prep" regardless of the day's focus — never "Movement Prep", "Glute Activation", "Hip Activation", "Shoulder Prep", etc.
+2. **Activation & Prep** — bodyweight circuit: mobilisation + activation of the day's target muscles. The block `title` is always exactly "Activation & Prep". The circuit `name` inside can be descriptive and specific to the day's content — "Glute Activation", "Shoulder & Upper Back Prep", "Hip & Core Activation", etc.
 3. **Strength** — all loaded work, compound before isolation
 4. **Core** — if prescribed, always last
 
@@ -54,7 +54,8 @@ Before adjusting any sets, reps, or exercise selection, tally weekly sets per mu
 
 Standard volume targets for a foundation/beginner cycle (adjust upward in later cycles):
 - Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
-- Small muscles (shoulders, biceps, triceps, core): 6–12 sets/week
+- Small muscles (shoulders, biceps, triceps): 6–12 sets/week
+- Core: count every set of core work regardless of where it sits in the session — activation circuit rounds count as sets just like strength block sets do
 
 Flag anything that looks very low (chest at 3 sets) or disproportionately high.
 
