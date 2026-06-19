@@ -7,9 +7,10 @@ description: Review and edit an athlete's program JSON — apply Amir's coaching
 
 Review a program JSON against Amir's coaching principles, flag issues, then apply agreed changes.
 
-## Step 0 — Read the file
+## Step 0 — Read principles, then the file
 
-Read `data/<athlete_id>.json`. Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts.
+1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it.
+2. Read `data/<athlete_id>.json`. Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts.
 
 ## Step 1 — Apply the structural checklist
 

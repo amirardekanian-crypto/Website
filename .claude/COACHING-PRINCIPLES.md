@@ -40,9 +40,23 @@ publish it. No athlete health/chat detail goes here — principles only.
   is fine; it preps the lift, it doesn't "fix posture.") *(2026-06-19)*
 
 ## Exercise naming
-- **Name = `[modification] [equipment] [movement]`** (e.g. Standing Dumbbell Shoulder
-  Press); bodyweight moves take the bare movement, no "Bodyweight" prefix (e.g. Reverse
-  Lunge). *(2026-06-15)*
+*(This is the single source of truth for exercise names — `/program-design`,
+`/program-assemble`, and `/program-edit` all defer here; none should restate the rule.)*
+- **Word order = `[modification] [equipment] [movement]`** — modifications first
+  (stance / unilateral / defining setup), then equipment, then the movement. E.g.
+  "Standing Dumbbell Shoulder Press", "Chest-Supported Dumbbell Row", "Single-Arm Cable
+  Row". *(2026-06-15)*
+- **Equipment in the name only when the move has multiple implements** (cable / dumbbell /
+  barbell / machine / kettlebell); omit when equipment-agnostic. *(2026-06-15)*
+- **Bodyweight moves take the bare movement — no "Bodyweight" prefix** (Reverse Lunge,
+  Lateral Lunge, Glute Bridge — not "Bodyweight Reverse Lunge"). *(2026-06-19)*
+- **Defining setups DO belong in the name** (Chest-Supported, Heels-Elevated,
+  Half-Kneeling, Incline, B-Stance, Bottoms-Up, Single-Arm, Single-Leg). *(2026-06-15)*
+- **Never in the name → these are chips, not the name:** grip · focus/intent · range
+  qualifier · tempo emphasis · holds/durations · bare digits · parentheses · colons ·
+  commas. (A dose like a 30s plank → the `×`-prefixed reps chip; a pause/hold emphasis →
+  a modifier chip.) **Exception — digits in an established/canonical name stay** (45° Back
+  Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19)*
 - **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
   `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
 - **`exercise_library.json` (generated from Notion) is the source of truth for names —
