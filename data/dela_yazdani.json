@@ -156,7 +156,7 @@
                     }
                   },
                   {
-                    "name": "Bodyweight Reverse Lunge",
+                    "name": "Reverse Lunge",
                     "detail": "×8 each leg",
                     "cues": {
                       "good": [
@@ -182,7 +182,7 @@
                 "hasRest": true,
                 "chips": [
                   {
-                    "label": "Priority",
+                    "label": "Priority 🔥",
                     "style": "yellow"
                   },
                   {
@@ -341,7 +341,7 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Rowing Machine or Arm Swings + March",
+                "name": "Rowing Machine or Stationary Bike",
                 "chips": [
                   {
                     "label": "5 minutes",
@@ -386,19 +386,6 @@
                       ]
                     },
                     "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
-                  },
-                  {
-                    "name": "Scapular Wall Slide",
-                    "detail": "×10",
-                    "cues": {
-                      "good": [
-                        "Keep arms, elbows, and backs of hands against the wall the whole time",
-                        "Feel your shoulder blades glide down as your arms raise"
-                      ],
-                      "bad": [
-                        "Lower back arching away from the wall"
-                      ]
-                    }
                   },
                   {
                     "name": "Cat-Cow",
@@ -725,7 +712,7 @@
                 "hasRest": true,
                 "chips": [
                   {
-                    "label": "Priority",
+                    "label": "Priority 🔥",
                     "style": "yellow"
                   },
                   {
@@ -925,7 +912,7 @@
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "Bodyweight Lateral Lunge",
+                    "name": "Lateral Lunge",
                     "detail": "×8 each side",
                     "cues": {
                       "good": [
