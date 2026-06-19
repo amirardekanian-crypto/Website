@@ -33,6 +33,25 @@ These belong in **on-court sessions** (speed, acceleration, footwork) only — n
 - Bodyweight squats, lunges, glute bridges in a prep circuit — these serve as mobilisation + activation + micro-dosing of the main patterns
 - Box step-ups as a **strength** exercise (loaded, logged, in the strength block)
 
+### Rule 1b — No FRC-style isolation drills; use movements
+
+Joint-isolation mobility drills do **not** belong in the prep circuit. Replace them with actual movements that mobilise + activate + micro-dose the day's pattern:
+
+**Remove:**
+- CARs (shoulder CARs, hip CARs — any "controlled articular rotation")
+- Standing hip circles, leg circles, joint circles
+- Any drill cued as "isolate the joint" / "biggest circle you can"
+
+**Replace with a movement that fits the day:**
+- Hip mobility → Bodyweight Reverse Lunge, Lateral Lunge, Cossack Squat, World's Greatest Stretch
+- Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Scapular Wall Slide
+
+The replacement should prime the patterns trained later that session.
+
+### Rule 1c — Warm-ups use gym equipment when the client has gym access
+
+If the athlete trains in a gym, the Warm-Up block uses a cardio machine — Bike, Treadmill, or Rower (5 min, easy pace). **Never** "Walk", "March in Place", or other equipment-free filler for a gym-based client. Equipment-free warm-ups are only for home/bodyweight programs.
+
 ### Rule 2 — Core exercises go at the end
 
 Core isolation work (dead bug, bird dog, plank variations, ab work, Pallof press, hollow body) must appear in the **last block** of the session, never in the warm-up or prep circuit.
