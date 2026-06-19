@@ -295,6 +295,37 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Core",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Russian Twist",
+                "hasRest": true,
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×15 each side"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Lean back slightly and keep your feet off the floor",
+                    "Rotate from the ribcage — feel the obliques doing the work"
+                  ],
+                  "bad": [
+                    "Rotating just the arms — the movement comes from the torso, not the shoulders"
+                  ]
+                }
+              }
+            ]
           }
         ]
       },
@@ -863,31 +894,6 @@
                   }
                 ]
               },
-              {
-                "type": "standard",
-                "name": "Russian Twist",
-                "hasRest": true,
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×15 each side"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Lean back slightly and keep your feet off the floor",
-                    "Rotate from the ribcage — feel the obliques doing the work"
-                  ],
-                  "bad": [
-                    "Rotating just the arms — the movement comes from the torso, not the shoulders"
-                  ]
-                }
-              }
             ]
           }
         ]
