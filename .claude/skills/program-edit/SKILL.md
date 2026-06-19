@@ -43,14 +43,18 @@ Joint-isolation mobility drills do **not** belong in the prep circuit. Replace t
 - Any drill cued as "isolate the joint" / "biggest circle you can"
 
 **Replace with a movement that fits the day:**
-- Hip mobility → Bodyweight Reverse Lunge, Lateral Lunge, Cossack Squat, World's Greatest Stretch
-- Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Scapular Wall Slide
+- Hip mobility → Reverse Lunge, Lateral Lunge, Cossack Squat, World's Greatest Stretch
+- Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Cat-Cow
 
-The replacement should prime the patterns trained later that session.
+Bodyweight moves take the bare movement name — no "Bodyweight" prefix (Reverse Lunge, not Bodyweight Reverse Lunge). The replacement should prime the patterns trained later that session.
 
 ### Rule 1c — Warm-ups use gym equipment when the client has gym access
 
-If the athlete trains in a gym, the Warm-Up block uses a cardio machine — Bike, Treadmill, or Rower (5 min, easy pace). **Never** "Walk", "March in Place", or other equipment-free filler for a gym-based client. Equipment-free warm-ups are only for home/bodyweight programs.
+If the athlete trains in a gym, the Warm-Up block uses a cardio machine — Bike, Treadmill, or Rower (easy pace). **Never** "Walk", "March in Place", "Arm Swings", or other equipment-free filler for a gym-based client. Equipment-free warm-ups are only for home/bodyweight programs.
+
+### Rule 1d — No corrective/postural drills without an indication
+
+Postural or scap-control correctives (scapular wall slides, postural-specific work) only belong in when the athlete has a **noted** posture issue or restriction. For a general client with none, remove them — prep is mobilisation + activation of the day's patterns, not corrective theatre. General shoulder mobility/activation before pressing (band pull-apart, pass-through, cat-cow) is fine; it preps the lift, it doesn't "fix posture."
 
 ### Rule 2 — Core exercises go at the end
 
