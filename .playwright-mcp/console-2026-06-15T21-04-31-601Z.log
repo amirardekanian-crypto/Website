@@ -1,0 +1,17 @@
+[      24ms] [WARNING] Manifest: property 'start_url' ignored, URL is invalid. @ blob:http://localhost:8000/ea809d2a-34aa-4b4d-97f8-baeea144621e:0
+[      25ms] [WARNING] Manifest: property 'scope' ignored, URL is invalid. @ blob:http://localhost:8000/ea809d2a-34aa-4b4d-97f8-baeea144621e:0
+[      25ms] [WARNING] Manifest: property 'src' ignored, URL is invalid. @ blob:http://localhost:8000/ea809d2a-34aa-4b4d-97f8-baeea144621e:0
+[      25ms] [WARNING] Manifest: property 'src' ignored, URL is invalid. @ blob:http://localhost:8000/ea809d2a-34aa-4b4d-97f8-baeea144621e:0
+[     121ms] [WARNING] Ignoring Event: localhost @ https://plausible.io/js/script.js:0
+[     338ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/volume-engine.jpg:0
+[     340ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/metabolic-override.jpg:0
+[     340ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/the-reveal.jpg:0
+[     347ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/volume-engine.jpeg:0
+[     347ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/metabolic-override.jpeg:0
+[     348ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/the-reveal.jpeg:0
+[     352ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/volume-engine.png:0
+[     353ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/metabolic-override.png:0
+[     353ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/the-reveal.png:0
+[     355ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/volume-engine.webp:0
+[     356ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/metabolic-override.webp:0
+[     356ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8000/assets/cycles/the-reveal.webp:0

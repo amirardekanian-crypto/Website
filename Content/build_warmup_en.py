@@ -25,7 +25,17 @@ with open(r'C:\Users\Amir\OneDrive\Документы\GitHub\Website\court-sessi
     court = 'data:image/jpeg;base64,' + base64.b64encode(cf.read()).decode('ascii')
 with open(r'C:\Users\Amir\OneDrive\Документы\GitHub\Website\app-warmup-preview.jpg','rb') as af:
     app_img = 'data:image/jpeg;base64,' + base64.b64encode(af.read()).decode('ascii')
-print(f"grey={len(grey)} orange={len(orange)} tb={len(tb)} court={len(court)} app={len(app_img)}")
+
+# Tennis player — resize to 900px tall (PIL) before base64 to keep file size sane
+from PIL import Image
+import io as _io
+with Image.open(r'C:\Users\Amir\OneDrive\Документы\GitHub\Website\Content\tennis-player.png') as _p:
+    _ratio = 900 / _p.height
+    _p2 = _p.resize((int(_p.width * _ratio), 900), Image.LANCZOS)
+    _buf = _io.BytesIO()
+    _p2.save(_buf, 'PNG', optimize=True, compress_level=9)
+    player = 'data:image/png;base64,' + base64.b64encode(_buf.getvalue()).decode('ascii')
+print(f"grey={len(grey)} orange={len(orange)} tb={len(tb)} court={len(court)} app={len(app_img)} player={len(player)}")
 
 # The court is the photographic background on .post-canvas (court-sessions.jpg), exactly
 # like the kit — there is NO drawn SVG court in the markup.
@@ -145,10 +155,11 @@ slides.append(('stat','', f'''
   <div class="stat-source">Source: Isometric Conditioning in Tennis Players</div>
   <div class="post-footer"><div class="progress-bar">{bars(8,5)}</div></div>'''))
 
-# 6 · RULES (LIGHT, NO court) — kit arc: M-40 500 Q540 440 1015 510 dot(1015,510)
+# 6 · RULES (LIGHT, NO court) — player on right; arc on left so ball clears player
 CHK = '<div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
 slides.append(('rules light','', f'''
-  {arc("M-40 500 Q 540 440 1015 510", 1015, 510)}
+  {arc("M-40 500 Q 300 440 540 510", 540, 510)}
+  <img class="player-img" src="{player}" alt="" aria-hidden="true">
   {HEADER}
   <div class="body-wrap">
     <div class="chip-B">The one rule</div>
@@ -366,6 +377,15 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--display);}}
 .cta-btn.primary{{background:var(--accent);color:#fff;}}
 .cta-btn.ghost{{border:2px solid rgba(244,244,240,.3);color:var(--paper);}}
 .cta-btn svg{{width:28px;height:28px;}}
+
+/* ===== PLAYER (slide 6) ===== */
+/* No z-index — DOM order makes cards/text render above the player naturally */
+.player-img{{position:absolute;right:-44px;bottom:0;height:980px;pointer-events:none;}}
+/* Push text content to left third so the player has clear space on the right */
+#s6 .body-wrap{{right:430px;}}
+#s6 .cards{{right:430px;}}
+#s6 .rule-card .ttl{{font-size:46px;}}
+#s6 .rule-card .sub{{font-size:20px;}}
 
 /* ===== APP SCREEN PREVIEW (slide 7) ===== */
 /* left:(1080-370)/2=355px — no CSS transform (html2canvas ignores translateX) */

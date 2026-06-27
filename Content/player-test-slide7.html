@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#0E4A36; --clay:#C7552F; --clay-2:#E2703C;
+  --paper:#FAF7F2; --body-ink:#1A1A1A;
+}
+body{background:#111;display:flex;justify-content:center;padding:24px;min-height:100vh;}
+
+/* Canvas at full 1080×1350, zoomed to 55% = 594×742 on screen */
+.canvas{
+  zoom:0.55;
+  width:1080px; height:1350px;
+  position:relative; overflow:hidden; flex-shrink:0;
+  background-color:var(--green);
+  background-image:url('../court-sessions.jpg');
+  background-size:cover; background-position:center;
+  font-family:'Barlow Condensed',sans-serif;
+  color:var(--paper);
+}
+.canvas::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:9;
+  border:2px solid rgba(255,255,255,.28);margin:28px;border-radius:14px;
+}
+.canvas::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:6;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size:220px 220px;opacity:.06;
+}
+
+/* Header */
+.hdr{position:absolute;top:60px;left:60px;right:60px;z-index:8;
+  display:flex;align-items:center;font-size:24px;font-weight:500;letter-spacing:.08em;}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--clay-2);margin-right:14px;}
+
+/* Headline */
+.h1{position:absolute;left:60px;right:60px;top:200px;z-index:8;
+  font-size:162px;font-weight:800;letter-spacing:-0.04em;line-height:.93;}
+.acc{color:var(--clay-2);}
+
+/* Player — tall, right-anchored, above card */
+.player{
+  position:absolute;
+  right:-10px; bottom:0;
+  height:1180px;
+  object-fit:contain; object-position:bottom right;
+  z-index:7;
+}
+
+/* App card — left side, below headline */
+.card{
+  position:absolute;left:60px;top:650px;width:410px;
+  background:var(--paper);border-radius:20px;
+  padding:36px 32px 32px;z-index:6;
+  color:var(--body-ink);font-family:'Barlow Condensed',sans-serif;
+}
+.c-title{font-size:24px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.c-meta{font-size:20px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(26,26,26,.4);margin-bottom:30px;}
+.sec{font-size:19px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--clay);display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.sec::after{content:"";flex:1;height:2px;background:var(--clay);opacity:.3;}
+.row{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:12px;
+  padding:14px 0;border-top:1px solid rgba(26,26,26,.08);}
+.ring{width:28px;height:28px;border-radius:50%;border:2px solid rgba(26,26,26,.22);}
+.rname{font-size:22px;font-weight:600;}
+.rtag{font-size:17px;font-weight:500;background:rgba(26,26,26,.07);
+  border-radius:6px;padding:3px 10px;color:rgba(26,26,26,.55);white-space:nowrap;}
+.gap{height:22px;}
+
+/* Footer dots */
+.ftr{position:absolute;bottom:60px;left:60px;right:60px;z-index:10;
+  display:flex;align-items:center;}
+.dots{display:flex;gap:14px;}
+.d{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.28);}
+.d.on{background:var(--clay-2);}
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="hdr"><div class="dot"></div>AMIRARDEKANI.COM</div>
+
+  <div class="h1">The full routine? <span class="acc">In the app.</span></div>
+
+  <img class="player" src="tennis-players/serve-jump-cutout.png" alt="">
+
+  <div class="card">
+    <div class="c-title">Tennis Warm-Up Routine</div>
+    <div class="c-meta">15 Min &middot; Bodyweight</div>
+    <div class="sec">Raise</div>
+    <div class="row"><div class="ring"></div><span class="rname">Easy Jog / Skip</span><span class="rtag">3 min</span></div>
+    <div class="row"><div class="ring"></div><span class="rname">Side Shuffles</span><span class="rtag">3 Lengths</span></div>
+    <div class="row"><div class="ring"></div><span class="rname">High Knees</span><span class="rtag">1 Length</span></div>
+    <div class="row"><div class="ring"></div><span class="rname">Butt Kicks</span><span class="rtag">1 Length</span></div>
+    <div class="gap"></div>
+    <div class="sec">Activate &amp; Mobilise</div>
+    <div class="row"><div class="ring"></div><span class="rname">Prisoner Squats</span><span class="rtag">10</span></div>
+    <div class="row"><div class="ring"></div><span class="rname">Airplane</span><span class="rtag">6 Each Side</span></div>
+  </div>
+
+  <div class="ftr">
+    <div class="dots">
+      <div class="d"></div><div class="d"></div><div class="d"></div>
+      <div class="d"></div><div class="d"></div><div class="d"></div>
+      <div class="d on"></div><div class="d"></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
