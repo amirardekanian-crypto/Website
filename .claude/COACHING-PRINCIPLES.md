@@ -109,6 +109,14 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
   per exercise, so the program is a starting point Amir adjusts each week. *(2026-06-15)*
 - **Set increments from logged data** (RPE/RIR, bar speed), not guesswork. *(2026-06-15)*
+- **Anchor selection, rep range, AND dose to the athlete's REAL numbers — never to the
+  pattern's textbook prescription.** A "strength" cycle does not mean 4×5 near-max for
+  someone who back-squats 30–40 kg: a true novice on a lift is building *skill + load
+  tolerance*, so program moderate reps (6–8), submaximal RPE (6–7), and let load climb
+  weekly from a coachable starting weight — the strength shows up by adding kilos to a
+  clean pattern, not by grinding low reps early. Always sanity-check a primary's
+  prescription against the athlete's actual logged/reported load before locking it; if
+  you don't know their number, ask. *(2026-06-27)*
 
 ## Volume & dosing
 - **Volume is a report, not a rule.** Show programmed sets/muscle vs the goal range vs a
