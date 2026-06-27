@@ -2,7 +2,8 @@
   "athlete": {
     "id": "sina_razeghi",
     "firstName": "Sina",
-    "lastName": "Razeghi"
+    "lastName": "Razeghi",
+    "key": "654cb60b11154baaa9153ceba0777686"
   },
   "sport": {
     "badge": "🎾 Tennis / Padel Performance"
