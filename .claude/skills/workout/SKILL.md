@@ -21,8 +21,8 @@ Amir will either:
 
 Identify:
 - **Category** — one of: `strength`, `conditioning`, `on-court`, `mobility`, `recovery`. Ask if genuinely unclear.
-- **Slug** — short, lowercase, hyphenated, descriptive (e.g. `first-step-speed`, `upper-body-power`).
-- **Title** — clean, descriptive (e.g. "First-Step Speed", "Upper Body Power").
+- **Slug** — short, lowercase, hyphenated, descriptive (e.g. `first-step-speed`, `upper-body-power`). The slug is permanent (it's the shareable URL), so it can stay literal even when the title is punchy.
+- **Title** — make it **cool, punchy, and evocative** — this is marketing copy on the card, not a file label. It should still telegraph the focus (body part, vibe, or setting). **Amir hates flat, literal names** like "Bodyweight & Band Strength" or "Lower Body Workout" — never ship those. Aim for 2–3 words with energy: "Banded Lower Burner", "First-Step Speed", "Engine Builder", "Living Room Legs". The literal description belongs in the `focusTag`, not the title. **When in doubt, offer Amir 3–4 name options and let him pick** rather than guessing.
 - **Duration** — total session time as a string: `"25 min"`, `"45 min"`, `"12 min"`.
 - **Equipment** — primary piece only: `"Barbell"`, `"Dumbbells"`, `"Bodyweight"`, `"Court"`, `"Foam Roller"`, `"Bike"`, `"Bands"`.
 - **focusTag** — short descriptor for the session focus, e.g. `"Acceleration & Footwork"`, `"Full-Body Strength"`. This is displayed on the workout header screen.
