@@ -1,0 +1,182 @@
+{
+  "id": "bodyweight-band-strength",
+  "title": "Bodyweight & Band Strength",
+  "category": "strength",
+  "duration": "40 min",
+  "equipment": "Bands",
+  "focusTag": "Legs & Glutes",
+  "blocks": [
+    {
+      "title": "Warm-Up & Activation",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Glute Activation Circuit",
+          "rounds": "2 Rounds",
+          "restSec": 0,
+          "warmup": true,
+          "items": [
+            {
+              "name": "Banded Glute Bridge",
+              "detail": "15 reps · mini band above knees",
+              "cues": {
+                "good": ["Drive the hips up and squeeze the glutes hard at the top", "Push the knees out gently against the band the whole set"],
+                "bad": ["Arching the lower back to finish the rep"]
+              }
+            },
+            {
+              "name": "Banded Lateral Walk",
+              "detail": "10 steps each way",
+              "cues": {
+                "good": ["Stay in a quarter-squat and keep tension on the band the whole time"],
+                "bad": ["Letting the feet snap together between steps"]
+              }
+            },
+            {
+              "name": "Bodyweight Squat",
+              "detail": "10 reps · 3s lower",
+              "cues": {
+                "good": ["Take a slow 3-second count on the way down, then stand normally"],
+                "bad": ["Dropping into the bottom fast"]
+              }
+            },
+            {
+              "name": "World's Greatest Stretch",
+              "detail": "4 each side",
+              "cues": {
+                "good": ["Drop the back knee, drive the front elbow to the instep, then rotate open"],
+                "bad": ["Rushing through — move slowly and find range"]
+              }
+            },
+            {
+              "name": "Banded Monster Walk",
+              "detail": "10 steps fwd & back",
+              "cues": {
+                "good": ["Short, controlled steps with the knees pushed out against the band"],
+                "bad": ["Standing tall — stay low to keep the glutes loaded"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Main Strength",
+      "icon": "🏋️",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Superset A",
+          "rounds": "3 Rounds",
+          "restSec": 90,
+          "items": [
+            {
+              "name": "Bulgarian Split Squat",
+              "detail": "×8 / leg · 3s down",
+              "cues": {
+                "good": ["Drop the back knee straight down toward the floor", "Keep the front shin close to vertical and the weight through the front heel", "Control the full 3-second descent — that's where the strength is built"],
+                "bad": ["Pushing the front knee way past the toes", "Bouncing out of the bottom"]
+              }
+            },
+            {
+              "name": "Push-Up",
+              "detail": "10–12 reps",
+              "cues": {
+                "good": ["Lower under control to chest height, body in one straight line", "Squeeze the glutes and brace to keep the hips from sagging"],
+                "bad": ["Letting the hips drop or pike up", "Flaring the elbows out to 90 degrees"]
+              }
+            }
+          ]
+        },
+        {
+          "type": "circuit",
+          "name": "Superset B",
+          "rounds": "3 Rounds",
+          "restSec": 75,
+          "items": [
+            {
+              "name": "Single-Leg Romanian Deadlift",
+              "detail": "×8 / leg · 3s down",
+              "cues": {
+                "good": ["Hinge the hips back slowly and feel the hamstring of the standing leg load", "Keep the pelvis square — hips level, don't let the free side rotate open"],
+                "bad": ["Rounding the back to reach lower", "Rushing the descent"]
+              }
+            },
+            {
+              "name": "Single-Leg Glute Bridge",
+              "detail": "12 / leg · band above knees",
+              "cues": {
+                "good": ["Drive through the heel and squeeze the glute at the top", "Keep the band pushed out so the knee doesn't cave"],
+                "bad": ["Letting the hips drop or twist toward the working side"]
+              }
+            }
+          ]
+        },
+        {
+          "type": "circuit",
+          "name": "Superset C",
+          "rounds": "3 Rounds",
+          "restSec": 60,
+          "items": [
+            {
+              "name": "Reverse Lunge",
+              "detail": "×10 / leg · 3s down",
+              "cues": {
+                "good": ["Step back and lower under control until both knees hit 90 degrees", "Drive through the front heel to stand"],
+                "bad": ["Crashing the back knee into the floor", "Letting the front knee drift inward"]
+              }
+            },
+            {
+              "name": "Pike Push-Up",
+              "detail": "8–10 reps (or 40s front plank)",
+              "cues": {
+                "good": ["Hips high, lower the crown of the head toward the floor between the hands", "Swap in a 40-second front plank if pike push-ups are too much today"],
+                "bad": ["Letting the elbows flare wide", "Losing the strong hip-piked position"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Glute Finisher",
+      "icon": "💥",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Glute Burnout",
+          "rounds": "2 Rounds",
+          "restSec": 30,
+          "warmup": true,
+          "items": [
+            {
+              "name": "Banded Lateral Walk",
+              "detail": "12 each side · band above knees",
+              "cues": {
+                "good": ["Stay low and keep constant tension on the band"],
+                "bad": ["Standing up tall between steps"]
+              }
+            },
+            {
+              "name": "Glute Bridge",
+              "detail": "30s hold + 12 pulses",
+              "cues": {
+                "good": ["Hold the top hard for 30 seconds, then pulse from a high hip position", "Keep the glutes switched on the whole time"],
+                "bad": ["Letting the hips sink during the hold"]
+              }
+            },
+            {
+              "name": "Wall Sit",
+              "detail": "40–45s",
+              "cues": {
+                "good": ["Thighs parallel to the floor, back flat on the wall, breathe through the burn"],
+                "bad": ["Sliding the hips up to take the load off the quads"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
