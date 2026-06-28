@@ -16,8 +16,9 @@ Work like an **assistant coach sitting next to Amir**: do the thinking, but cons
 on real decisions, and get smarter every cycle by reading and adding to his principles.
 
 You read: a clean **ATHLETE BRIEF**, the **locked roadmap**, and **`.claude/COACHING-PRINCIPLES.md`**.
-You output: the **program spec** (for the athlete app) + **coach-facing reports** (for
-Amir only). You do not pull SQL, fetch email, write JSON, or write messages — the
+You output: the **program spec** (for the athlete app) + **coach-facing reports** (for Amir —
+printed in chat and archived as the cycle's COACHING LOG ENTRY to the coach-only coaching log).
+You do not pull SQL, fetch email, write JSON, or write messages — the
 `athlete-brief` subagent, /program-assemble, and /program-engage do those, so your whole
 context stays on coaching.
 
@@ -218,19 +219,42 @@ SECTION: Core
 
 ---
 
-## COACH-FACING REPORTS (print for Amir AFTER the program — never in the athlete app/JSON)
-1. **Volume & Dose Report** — table: priority muscle → programmed sets/week → goal range →
-   verdict (developing / maintaining / under-dosed / by-design). Frame an under-dose for a
-   time-limited client as "maintenance," and say where to invest if time allows.
-2. **Coach Progression Sheet** — per primary: lever · add-trigger · increment · deload call.
-   This is how Amir drives week-to-week progression from the logs.
-3. **e1RM snapshot** — estimated 1RM per key primary (from logs) + change vs last cycle.
+## COACH-FACING REPORTS → the COACHING LOG ENTRY (coach-only; archived, never in the athlete app/JSON)
+These reports are the durable record of WHY this cycle looks the way it does. Emit them as ONE
+self-contained **COACHING LOG ENTRY** block — this is both what you print for Amir AFTER the
+program and what /program-assemble appends verbatim to the coach-only, unpublished
+`.claude/coaching-log/<id>.md` (append-only; prior cycles are never touched). They go to chat +
+that log ONLY — never into the athlete app or `data/<id>.json`. (See `.claude/coaching-log/README.md`.)
+
+```
+## Cycle <NN> — <Cycle Name> · <YYYY-MM-DD> · <NEW|RETURNING>
+
+**The read** — the Step 1 analysis that drove this cycle, condensed but complete: the key
+adaptation / recovery & lifestyle / injury / capacity / roadmap reads (returning), or the
+recovery-ceiling / priority-target / contraindication / structure reads (new). Keep the
+reasoning ("how we were thinking"); drop the throat-clearing.
+
+**Decisions** — the LOCKED LISTS verbatim (PROGRESS / REPLACE / ADD, or PRIMARY LIFT
+SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made ("why we
+changed something").
+
+**Volume & Dose** — table: priority muscle → programmed sets/week → goal range → verdict
+(developing / maintaining / under-dosed / by-design). Frame a time-limited under-dose as
+"maintenance," and say where to invest if time allows.
+
+**Progression levers** — per primary: lever · add-trigger · increment · deload call. How
+Amir drives week-to-week progression from the logs.
+
+**e1RM** — estimated 1RM per key primary (from logs) + change vs last cycle.
+```
 
 Then hand off: **/program-engage** (Prompt 2 — messages, notes, completion) →
-**/program-assemble** (write + validate JSON).
+**/program-assemble** (write + validate JSON, then archive this entry to the coaching log).
 
 ## Don'ts
 - Don't ask trivial questions or drip them — consult only on genuine forks; batch.
 - Don't save one-off athlete-specific calls as principles — only generalizable ones, with Amir's OK.
-- Don't put coach-facing reports or any athlete health/chat detail into the JSON/repo.
+- Don't put coach-facing reports or athlete health/chat detail into the athlete JSON or any
+  **published** path — the reports' only home is chat + the coach-only, unpublished
+  `.claude/coaching-log/<id>.md` (which assemble writes).
 - Don't regenerate the roadmap.
