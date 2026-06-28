@@ -24,6 +24,23 @@ read + decisions + reports.
 
 ---
 
+## Athletes from before the log existed
+
+**No retroactive back-fill — and no special seeding step.** New athletes get their log from
+cycle 1 automatically. Athletes who were already training when the log was introduced start
+empty, and that's expected: the first entry is written *naturally, the next time you design
+that athlete's cycle*. `/program-design` reads whatever info is available (brief, roadmap,
+current program), you write that cycle, and its ordinary entry becomes the baseline the next
+cycle continues. From then on it's normal read-back + append.
+
+- The first entry is just that cycle's entry (e.g. `## Cycle <NN> — …`). Optionally note
+  `(first logged cycle — earlier cycles predate the log)` so a later reader knows the history
+  starts here, not at cycle 1.
+- **The "why" is the coach's.** `data/<id>.json` + `session_history` show *what* the program is
+  and *what happened* (exercises, loads, injuries); they do NOT contain *why* a choice was made.
+  Capture the standing logic in your own words as you design the cycle. **Never invent a
+  rationale** — a fabricated "why" poisons every future cycle that reads it.
+
 ## File template
 
 When an athlete's log is first created, it starts with this header:
