@@ -15,9 +15,10 @@ publish it. No athlete health/chat detail goes here — principles only.
 ---
 
 ## Intake & assessment
-- **Intake captures recovery inputs, not just goals.** Alongside goal / time / equipment,
-  gather **sleep, stress, nutrition, age and weekly life-load** at intake — *Recovery capacity
-  gates everything*, so the volume ceiling can't be set without them. *(2026-06-28)*
+- **Intake captures recovery inputs, not just goals.** The volume ceiling needs **sleep,
+  stress, nutrition, age and weekly life-load** — *Recovery capacity gates everything*. The
+  web intake form already collects sleep (quality + hours), stress, and age; **nutrition and
+  weekly life-load are the coach-collected remainder** (the form doesn't ask them). *(2026-06-28)*
 - **Always take injury history up front.** Ask past injuries, surgeries and recurring pain at
   intake — prior injury is the best predictor of the next one, and it pre-loads the
   contraindications (knee history → reverse lunge, chronic back → trunk-supported hinge). Don't
