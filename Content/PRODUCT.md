@@ -49,7 +49,7 @@ Programme (~6 months)
 
 - A programme is a **chain of ~5–6 linked cycles**, each building on the last. Example cycle library: *Foundation Forge → Strength Engine → Structural Build → Durability Build → Armour Build* (also Load Build, Rebuild & Reset, Strength Reclaim…). Cycle/day/workout banner images live in `../assets/cycles/` and `../assets/days/`.
 
-**The app's four tabs (bottom nav):** **Home** (current cycle + progress) · **My Plan** (the training days, exercises, per-set logging) · **Coach** (two-way messaging + the personal notes + the in-app how-to guide) · **Library** (a split [Read | Train] tab: **Train** shows on-demand workout sessions; **Read** is a coach-published article library organised into categories — For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements). A finished cycle's "Done" card opens a read-only **Archive** of past programmes.
+**The app's four tabs (bottom nav):** **Home** (current cycle + progress) · **My Plan** (the training days, exercises, per-set logging) · **Coach** (two-way messaging + the personal notes + the in-app how-to guide) · **Library** (a **"two doors"** landing → **Sessions** = free on-demand workouts, drills & resets to run on your own; **Playbook** = the coach-published tennis article library — *"everything you need to know to play better tennis, in one place"* — across Pre-Competition, Recovery, Mental, Nutrition, Supplements, For Coaches). A finished cycle's "Done" card opens a read-only **Archive** of past programmes.
 
 **What the athlete can do:**
 - See **today's day**; tap an **exercise card** → demo video, stats (sets / reps / target / tempo / rest), **coaching cues** (do / don't), and a per-set **log** (weight + RPE 1–10 + tick).
@@ -57,7 +57,7 @@ Programme (~6 months)
 - **Session timer** + a full-screen **rest timer** between sets.
 - **Finish session** → rate session RPE, leave a note, **send data to coach**.
 - **Two-way messaging** with the coach; coach-authored **personal notes** + an in-app **guide**.
-- **Library — Read** articles (coach-published; deep-link `?article=<id>` gives each article its own shareable URL) + **Train** on-demand workouts (deep-link `?workout=<id>`), **archive** of past cycles, **dark mode**, add-to-home-screen.
+- **Library — Playbook** articles (coach-published; deep-link `?article=<id>` gives each article its own shareable URL) + **Sessions** on-demand workouts (deep-link `?workout=<id>`), **archive** of past cycles, **dark mode**, add-to-home-screen.
 
 > A visual catalog of every card the app uses lives in **`card-preview.html`** (in this folder) — handy when you want content to mirror the real UI.
 
@@ -101,7 +101,7 @@ This is the human half of *"the coach actually watches you"* — the live app da
 - **Video + cues for every move** — this is not a PDF.
 - **Auto-regulation** — the readiness check adapts the session to how you walk in.
 - **Proof & retention** — athlete "results" cards, the 6-month journey.
-- **Free content as a funnel** — Read articles (`?article=<id>`) and workouts (`?workout=<id>`) are each their own URL; share them as content, they open inside the app experience, and the "try the app" demo (`?client=demo`) is one tap away.
+- **Free content as a funnel** — Playbook articles (`?article=<id>`) and Sessions workouts (`?workout=<id>`) are each their own URL; share them as content, they open inside the app experience, and the "try the app" demo (`?client=demo`) is one tap away.
 
 ---
 
