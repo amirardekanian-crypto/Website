@@ -740,6 +740,13 @@
         <label class="pill"><input type="checkbox" name="Training Types" value="None"><span>None</span></label>
       </div>
     </div>
+
+    <div class="f-field">
+      <label for="bestLifts">Current best lifts
+        <span class="hint">Optional — a few top sets help me gauge your starting strength</span>
+      </label>
+      <textarea id="bestLifts" name="Current Best Lifts" rows="2" placeholder="e.g. Squat 80 kg × 5, Bench 60 kg × 5, Deadlift 100 kg × 3 — leave blank if unsure"></textarea>
+    </div>
   </section>
 
   <!-- ─── 4. GOALS ─── -->
@@ -884,6 +891,30 @@
         <span class="slider-edge">High</span>
         <span class="slider-val" id="stressVal" aria-live="polite">5</span>
       </div>
+    </div>
+
+    <div class="f-field">
+      <label for="nutrition">How would you describe your current nutrition?</label>
+      <select id="nutrition" name="Nutrition" required>
+        <option value="" disabled selected>Select</option>
+        <option value="Dialed in — consistent & intentional">Dialed in — consistent &amp; intentional</option>
+        <option value="Pretty good — mostly on track">Pretty good — mostly on track</option>
+        <option value="Average — inconsistent">Average — inconsistent</option>
+        <option value="Needs work — little structure">Needs work — little structure</option>
+      </select>
+    </div>
+
+    <div class="f-field">
+      <label for="lifeLoad">Outside training, how demanding is a typical week?
+        <span class="hint">Work, study, caregiving, travel — your real recovery budget</span>
+      </label>
+      <select id="lifeLoad" name="Weekly Life Load" required>
+        <option value="" disabled selected>Select</option>
+        <option value="Light — plenty of downtime">Light — plenty of downtime</option>
+        <option value="Moderate — busy but manageable">Moderate — busy but manageable</option>
+        <option value="Heavy — long days, little downtime">Heavy — long days, little downtime</option>
+        <option value="Very heavy — constantly stretched">Very heavy — constantly stretched</option>
+      </select>
     </div>
   </section>
 

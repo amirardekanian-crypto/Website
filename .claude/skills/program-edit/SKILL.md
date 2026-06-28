@@ -10,7 +10,7 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 ## Step 0 — Read principles, then the file
 
 1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it.
-2. Read `data/<athlete_id>.json`. Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts.
+2. Read `data/<athlete_id>.json`. Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim `.claude/coaching-log/<athlete_id>.md` (if it exists) for this cycle's rationale, so edits respect *why* each piece was chosen.
 
 ## Step 1 — Apply the structural checklist
 
@@ -143,3 +143,11 @@ After editing, re-tally the set counts to confirm the numbers match what was agr
 ## Step 4 — Confirm
 
 Report what changed, the updated set tally, and flag anything left for a future session.
+
+**Then log the change.** Append a dated in-cycle note under the *current* cycle's section in
+`.claude/coaching-log/<athlete_id>.md` — what changed + why (e.g. *In-cycle edit (2026-06-28):
+Bulgarian Split Squat → Split Squat — R-knee pain on BSS*). This keeps the coaching log the
+complete running record (design rationale + in-cycle adaptations) that the next /program-design
+reads, so a swap-for-pain isn't silently reversed next cycle. **Append-only** — never edit a
+prior cycle's section. (No log yet? Note the change for Amir; the file is created at the next
+/program-assemble.)

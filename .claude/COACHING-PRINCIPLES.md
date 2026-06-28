@@ -2,8 +2,7 @@
 
 This is Amir's codified coaching philosophy. `/program-design` and `/program-engage`
 **read this file first, every run**, and apply it — so settled questions are never
-re-asked; `/athlete-intake` and `/program-roadmap` defer to its **"Design process"** front
-end (Phase 1). It grows as we design together: when Amir makes a **generalizable** call
+re-asked. It grows as we design together: when Amir makes a **generalizable** call
 during design, the skill offers to append it here (he approves; one-off athlete-specific
 calls are NOT saved). Amir can open and edit this file anytime.
 
@@ -15,63 +14,25 @@ publish it. No athlete health/chat detail goes here — principles only.
 
 ---
 
-## Design process
-*(The canonical method for every design pass. `/program-design` defers here and executes
-it; `/athlete-intake` and `/program-roadmap` feed its front end. The two rules below are
-not steps — they govern the whole method. The detailed sections further down this file
-(exercise selection, recovery, structure, volume, progression…) are the rules that live
-inside individual steps; this section is the skeleton they hang on.)*
-
-**The shape: assess at the front, design in the middle, then deliver.** Three phases, ten
-steps. Phase 1 understands before prescribing; Phase 2 designs; Phase 3 delivers it to the
-athlete. Close with the standing coach-facing reports. *(2026-06-27)*
-
-- **RULE 1 (most important) — the thinking is editable, not just the program.** Everything
-  in Phases 1–2 (steps 1–8 — the whole analysis and design logic) is written OUT to Amir in
-  plain head-coach-facing prose, the way an assistant coach briefs his head coach, and
-  presented as one **Analysis Brief at the checkpoint, before any exercise is built.** The
-  goal is that Amir corrects the *logic at its source*, not just tweaks the output. No
-  load-bearing decision stays silent inside the program. *(2026-06-27)*
-- **RULE 2 — online-first, always.** Assume no physical access to any client, ever. All
-  assessment is desk-based, from three sources only: (a) the intake form, (b) what Amir
-  tells me, (c) what I interpret from the athlete's in-app logs — loads, reps, RPE,
-  readiness, session notes, adherence, **e1RM from the heaviest logged sets.** Infer
-  movement quality and loading tolerance from logs + Amir's notes; never invent a screen.
-  Where something is genuinely unknowable from the desk (e.g. an undiagnosed injury), flag
-  it and **ASK Amir** — don't assume. *(2026-06-27)*
-
-**PHASE 1 — ASSESS (understand before prescribing)**
-1. **Needs analysis** — the demands of the goal/sport AND the athlete profile (training age,
-   injury history, lifestyle). For sport athletes this means the physical demands of the
-   sport (energy systems, movement patterns, injury epidemiology), not just the stated goal.
-2. **Screen & baseline — online.** There is no in-person movement screen (RULE 2): baseline
-   comes from intake + Amir's notes + log interpretation. Infer; don't invent; flag-and-ask
-   the genuinely unknowable.
-3. **Priority gate** — the one goal that unlocks the rest; everything downstream serves it.
-4. **Recovery capacity** — set the weekly volume ceiling BEFORE the session count. (See
-   "Recovery & autoregulation" + "Volume & dosing".)
-
-**PHASE 2 — DESIGN (iterative — a 5/6/7/8 loop, not a waterfall)**
-5. **Constraints** — equipment, time, environment.
-6. **Adaptation target + minimum effective dose** — name the training effect this block
-   drives (it is the locked roadmap's focus for this cycle), then the least work that drives
-   it.
-7. **Select exercises** — highest SFR (or transfer, for athletes), filtered by the injury
-   rules; defer what the athlete hasn't earned the brace for. (See "Exercise selection".)
-8. **Structure** — split/frequency, weekly undulation by systemic cost, and within-session
-   sequencing (power → primary → accessory → core). (See "Session structure & time" +
-   "Volume & dosing".) **Guiding rule — lead with the MOST-constrained dimension and let it
-   cascade:** for general clients that is usually the exercises (selection leads structure);
-   for in-season athletes it is the calendar (structure leads selection).
-
-**→ CHECKPOINT (RULE 1):** present steps 1–8 as the editable Analysis Brief and take Amir's
-edits before building anything.
-
-**PHASE 3 — DELIVER**
-9.  **Autoregulation + safety** — readiness rules, symptom veto, fallbacks. (See "Recovery
-    & autoregulation".)
-10. **Buy-in** — the why, the expected outcomes, the messaging. (The in-app text is
-    /program-engage's job; the *rationale* it sells originates here.)
+## Intake & assessment
+- **Intake captures recovery inputs, not just goals.** The volume ceiling needs **sleep,
+  stress, nutrition, age and weekly life-load** — *Recovery capacity gates everything* — and
+  the web intake form now collects all of them (sleep quality + hours, stress, nutrition,
+  weekly life-load, age), so the brief arrives with the full recovery picture. *(2026-06-28)*
+- **Always take injury history up front.** Ask past injuries, surgeries and recurring pain at
+  intake — prior injury is the best predictor of the next one, and it pre-loads the
+  contraindications (knee history → reverse lunge, chronic back → trunk-supported hinge). Don't
+  wait for pain to surface under load. *(2026-06-28)*
+- **Trust the bar over the résumé.** Establish baseline numbers early; when stated training age
+  and demonstrated capacity conflict (the "4-year pro" with a 40 kg squat), program for what's
+  shown and log the hidden weakness as a target for next cycle. *(2026-06-28)*
+- **Negotiate the minimum effective frequency, but only against a real limit.** If availability
+  can't support the goal (strength + power + injury-prevention in 2×30 min/wk), ask for more
+  time; if the limit is genuine, reframe the goal honestly rather than promising it on the
+  available dose (see *Volume is a report* — under-dose = maintenance, not failure). *(2026-06-28)*
+- **Know the referral line.** Program *around* minor pain, but a red flag — sharp, persistent,
+  worsening, radiating pain, numbness, or a suspected real injury — means refer out to a
+  physio/doctor before loading it further. Coaching is not diagnosis. *(2026-06-28)*
 
 ## Exercise selection
 - **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
@@ -97,6 +58,10 @@ edits before building anything.
   mobilisation + activation of the day's patterns — not corrective theatre. (General
   shoulder mobility/activation before pressing — band pull-apart, pass-through, cat-cow —
   is fine; it preps the lift, it doesn't "fix posture.") *(2026-06-19)*
+- **A removed exercise stays removed unless re-earned.** When something is dropped for dislike,
+  inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
+  without a real reason and evidence the athlete has earned it back (pain resolved, capacity
+  built). The log is what stops a bad fit silently reappearing months later. *(2026-06-28)*
 
 ## Exercise naming
 *(This is the single source of truth for exercise names — `/program-design`,
@@ -192,7 +157,8 @@ edits before building anything.
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
 - **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
-  never in the athlete app or the athlete JSON. *(2026-06-15)*
+  never in the athlete app or the athlete JSON. They are also archived per-athlete to the
+  coach-only `.claude/coaching-log/<id>.md` (append-only, git-tracked but unpublished). *(2026-06-15, archive added 2026-06-28)*
 
 ## Coaching cues
 - **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
@@ -211,7 +177,27 @@ edits before building anything.
   cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
 
 ## Process
+- **Reassessment is scheduled, not only reactive.** You adjust day-to-day on what you observe
+  (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
+  trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
+  deliberate re-read even when nothing visibly broke. *(2026-06-28)*
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
+- **Every cycle's design rationale is archived.** /program-assemble appends the design read +
+  locked decisions + coach reports (volume, progression, e1RM) to the coach-only
+  `.claude/coaching-log/<id>.md` as its last step — append-only, git-tracked but unpublished,
+  never the athlete JSON. Prior cycles are never overwritten, so months later you can see how a
+  cycle was thought through and why something changed. (Convention: `.claude/coaching-log/README.md`.) *(2026-06-28)*
+- **Cycles continue; they don't reset.** Each cycle reads the prior rationale (the coaching
+  log) alongside the data, then **progresses or edits the same logic** — it does not invent a
+  new program each month. Change the underlying logic only when a data point forces it (pain,
+  a stall, a plateau), and record the why. The locked roadmap is the path; the coaching log is
+  the reasoning + what actually happened — read both before designing the next cycle. *(2026-06-28)*
+- **Rationale can be set or revised at any cycle, and the latest is the operative logic.** When
+  you land on (or change) the real logic mid-journey — a new rationale at cycle 3 — it becomes
+  the baseline the next cycle continues (the log reads most-recent-first). New athletes are
+  logged from cycle 1; athletes who predate the log start empty and get their first entry
+  naturally on the next design pass — no separate seeding step (the why is Amir's to supply;
+  the data only scaffolds it). *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,

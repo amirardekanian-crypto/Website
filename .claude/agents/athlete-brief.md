@@ -35,18 +35,22 @@ MCP `execute_sql` tool and the Gmail MCP `search_threads` / `get_thread` tools.
 ## NEW athlete
 1. Gmail — find the Web3Forms **intake** submission for this athlete (name +
    `newer_than:180d`). Extract every field.
-2. List what intake does NOT establish that design needs — return as OPEN QUESTIONS,
-   never invented: training age, injury detail/stage, equipment access, days/week,
-   session-length ceiling, goal specificity, athlete type (general-fitness vs
-   sport-performance), sleep/stress baseline.
+2. The form already supplies age, sex, body weight, gym experience, goals, current
+   pain/injury + description, **past injuries/surgeries**, movements-to-avoid, days/week,
+   session length, **sleep quality + hours**, **stress**, **nutrition**, **weekly life-load**,
+   **current best lifts** (optional), equipment, environment — put those in the brief, don't
+   list them as missing. Return as OPEN QUESTIONS only what the form does NOT establish (or
+   the athlete left blank), never invented: goal specificity, athlete type (general-fitness vs
+   sport-performance), baseline lifts *if the optional field was left blank*, red-flag triage
+   on any reported pain, and whether the stated days/week + session ceiling can support the goal.
 
 ## OUTPUT — the ATHLETE BRIEF (return as plain text, ~one page, no preamble)
 - **IDENTITY** — id, name, athlete type, goal, days/week, session ceiling, equipment
 - **ADHERENCE** *(returning)* — sessions done vs planned per week; partials; gaps
 - **LOADS & RPE** *(returning)* — compact table: primary-lift load progression + RPE trend + **estimated 1RM** per key lift (Epley from the heaviest logged set, adjusted for reps-in-reserve at the logged RPE)
 - **READINESS** *(returning)* — sleep/energy/soreness/stress/overall trend; any decline
-- **RECOVERY & LIFE** — subjective picture (chat/intake); separate training fatigue from life load
-- **INJURY / MOVEMENT** — each item + current stage (active / resolving / resolved)
+- **RECOVERY & LIFE** — subjective picture (chat/intake): sleep, stress, nutrition, age, weekly life-load; separate training fatigue from life load
+- **INJURY / MOVEMENT** — history (past injuries / surgeries / recurring pain) + each current item with stage (active / resolving / resolved); flag any red flag needing referral
 - **DATA COVERAGE** — sessions found, gaps imported *(returning)* / OPEN QUESTIONS *(new)*
 
 Privacy: never write athlete chat/health detail to disk — this repo is published via
