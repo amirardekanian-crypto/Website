@@ -32,7 +32,8 @@ You can talk normally — "design Mehraneh's next cycle," "write her notes,"
 4. Say **"go ahead."** → I write the full program + your coach-only reports
    (volume, progression sheet, e1RM).
 5. Say **"do prompt 2."** → app message & notes.
-6. Say **"build the json."** → updates their file and advances the cycle.
+6. Say **"build the json."** → updates their file, advances the cycle, and saves this
+   cycle's reasoning to your private coaching log (below).
 7. Say **"commit and push."** → live.
 
 ## New client — onboarding
@@ -52,6 +53,16 @@ the real training decisions. Exercise **names, chips, day names, and formatting 
 pass *after*** the program exists, so I never spend the design on wording. If a name or chip
 looks rough mid-design, I'll flag it and fix it later (or you can). Tell me anytime if you'd
 rather I stop and sort a name out on the spot.
+
+## Your private coaching log
+
+Every time you ship a cycle, I save **why** that cycle looks the way it does — the read, the
+decisions, and your coach reports (volume, progression, e1RM) — to a private per-athlete file
+(`.claude/coaching-log/[id].md`). It's **append-only**: each cycle adds a new entry and old
+ones are never overwritten, so six months later you can open it and see exactly how we were
+thinking and why we changed something. It's **coach-only** — never shown in the athlete's app
+and never published on the site (it lives in `.claude/`, the same private spot as your
+principles).
 
 ## How it gets smarter
 

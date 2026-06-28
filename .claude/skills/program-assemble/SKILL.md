@@ -123,12 +123,30 @@ console.log('done');
 
 `GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
 
-## Step 5 — Ship
-- Summarise the diff (cycle advanced N→N+1, days, swaps).
-- Commit + push **only if Amir asks**. End commit messages with the project's
+## Step 5 — Archive the cycle rationale (coach-only, append-only)
+Persist the **COACHING LOG ENTRY** from /program-design to `.claude/coaching-log/<id>.md` — the
+coach-only record of WHY this cycle looks the way it does (the read, decisions, volume,
+progression levers, e1RM). This file is git-tracked but **unpublished** (inside `.claude/`, so
+GitHub Pages never serves it) and the athlete app never reads it — it is the one place the design
+reasoning is allowed to live. See `.claude/coaching-log/README.md` for the convention + template.
+- **File missing (new athlete):** create it with the README's header
+  (`# Coaching Log — <First Last> (<id>)` + the coach-only note), then add the entry.
+- **File exists (returning):** **append** the new `## Cycle NN — …` section to the end.
+  **Never edit, reorder, or delete any existing cycle section** — this archive is append-only, so
+  a cycle's original reasoning survives even after the program is later changed. (It grows in
+  lockstep with `programHistory` / `currentCycleIndex`.)
+- Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
+- Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
+
+## Step 6 — Ship
+- Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm the coaching-log entry was appended.
+- Commit + push **only if Amir asks** — include **both** `data/<id>.json` and
+  `.claude/coaching-log/<id>.md` in the commit. End commit messages with the project's
   Co-Authored-By line.
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.
 - Don't regenerate `athlete.key`; reuse across all of an athlete's cycles.
-- Don't write athlete chat/health detail into the JSON or repo.
+- Don't write athlete chat/health detail or coach reasoning into `data/<id>.json` or any
+  **published** path — the design rationale's only home is the coach-only, unpublished
+  `.claude/coaching-log/<id>.md` (never the athlete JSON).

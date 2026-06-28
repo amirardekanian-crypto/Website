@@ -133,7 +133,8 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
 - **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
-  never in the athlete app or the athlete JSON. *(2026-06-15)*
+  never in the athlete app or the athlete JSON. They are also archived per-athlete to the
+  coach-only `.claude/coaching-log/<id>.md` (append-only, git-tracked but unpublished). *(2026-06-15, archive added 2026-06-28)*
 
 ## Coaching cues
 - **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
@@ -153,6 +154,11 @@ publish it. No athlete health/chat detail goes here — principles only.
 
 ## Process
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
+- **Every cycle's design rationale is archived.** /program-assemble appends the design read +
+  locked decisions + coach reports (volume, progression, e1RM) to the coach-only
+  `.claude/coaching-log/<id>.md` as its last step — append-only, git-tracked but unpublished,
+  never the athlete JSON. Prior cycles are never overwritten, so months later you can see how a
+  cycle was thought through and why something changed. (Convention: `.claude/coaching-log/README.md`.) *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,
