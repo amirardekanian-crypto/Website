@@ -17,15 +17,25 @@ designs nothing.
   Amir pasted.)
 
 ## Step 2 — Fill the gaps (ask Amir; never invent)
-Confirm/collect, grouped into one round of questions:
+Confirm/collect, grouped into one round of questions. This mirrors
+`COACHING-PRINCIPLES.md → Intake & assessment` — gather the recovery and injury picture
+now, because design can't set the volume ceiling or the contraindications without it.
 - **Goal** (specific) + any competition / season timeline
 - **Athlete type**: general-fitness  OR  sport-performance (+ sport) — this decides
   whether SFR or sport-transfer leads exercise selection in design
-- **Training age** / experience
-- **Injuries & restrictions** — each with current stage (active / resolving / resolved)
+- **Training age** / experience + **any known baseline lifts** — note so design can
+  sanity-check claims vs reality when watching them train (trust the bar over the résumé)
+- **Injury history** — *past* injuries, surgeries and recurring pain, **plus** any current
+  restriction with its stage (active / resolving / resolved). Prior injury is the best
+  predictor of the next and pre-loads the contraindications. **Red flag** (sharp /
+  persistent / worsening / radiating pain, numbness, suspected real injury) → flag for
+  referral to a physio/doctor before loading it.
 - **Equipment access** (full gym / home / which machines) — gates the SFR selections
-- **Days/week** available + **session-length ceiling**
-- **Sleep & stress baseline** — gates recovery capacity
+- **Days/week** available + **session-length ceiling** — if this can't support the goal,
+  note it to renegotiate (ask for a bit more time *if the limit isn't real*; otherwise
+  design honestly reframes the goal as maintenance, not failure)
+- **Recovery & lifestyle baseline** — **sleep, stress, nutrition, age, weekly life-load** —
+  gates recovery capacity / the volume ceiling
 
 ## Step 3 — Emit the brief + register the athlete
 - Output the **ATHLETE BRIEF** (same structure the subagent uses).
