@@ -9,6 +9,13 @@ Produce a complete **ATHLETE BRIEF** for a brand-new client so the roadmap and f
 program can be designed from a full picture. This stage assembles the input only — it
 designs nothing.
 
+This brief is the front end of the **Design process → Phase 1 (ASSESS)** in
+`.claude/COACHING-PRINCIPLES.md`. **Online-first (RULE 2): there is never an in-person
+screen** — this brief plus Amir's notes (and later the in-app logs) are the *entire*
+baseline the designer ever gets. So gather it completely and from evidence: capture what
+the intake establishes, ask Amir for the rest, and **flag what's genuinely unknowable
+without a clinician (e.g. an undiagnosed injury) as an OPEN QUESTION — never infer it.**
+
 ## Step 1 — Pull what already exists
 - Establish the `athlete_id` (lowercase `firstname_lastname`). If Amir pasted athlete
   info, use it.
@@ -21,6 +28,10 @@ Confirm/collect, grouped into one round of questions:
 - **Goal** (specific) + any competition / season timeline
 - **Athlete type**: general-fitness  OR  sport-performance (+ sport) — this decides
   whether SFR or sport-transfer leads exercise selection in design
+- **For sport-performance clients — the sport's demands** (design's needs analysis, step 1):
+  level/position, in- vs off-season + key competition dates, dominant movement patterns, and
+  the sport's common injuries — so design serves the demands of the sport, not just the
+  stated goal
 - **Training age** / experience
 - **Injuries & restrictions** — each with current stage (active / resolving / resolved)
 - **Equipment access** (full gym / home / which machines) — gates the SFR selections
