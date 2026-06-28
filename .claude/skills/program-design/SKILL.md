@@ -66,9 +66,10 @@ change before I build?"* before writing exercises.
    cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
    Read the most recent entry in full, skim older ones for context, and never reintroduce
    something a prior entry flagged as causing pain/regression without a stated reason. If the
-   log is **empty or missing** (an athlete from before the log existed), say so and offer to
-   capture a one-time **SEED** entry of the current rationale — the why is Amir's to supply —
-   before building, so this cycle's reasoning carries forward (see `.claude/coaching-log/README.md`).
+   log is **empty or missing** (an athlete from before the log existed), that's expected — no
+   back-fill, no separate seeding step: just design from the info you have (brief, roadmap,
+   current program), and the entry written for THIS cycle becomes the baseline the next cycle
+   continues. The logic is captured the first time you design their next cycle.
 6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
    state the data point + reason.
