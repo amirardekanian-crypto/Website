@@ -14,6 +14,25 @@ publish it. No athlete health/chat detail goes here — principles only.
 
 ---
 
+## Intake & assessment
+- **Intake captures recovery inputs, not just goals.** Alongside goal / time / equipment,
+  gather **sleep, stress, nutrition, age and weekly life-load** at intake — *Recovery capacity
+  gates everything*, so the volume ceiling can't be set without them. *(2026-06-28)*
+- **Always take injury history up front.** Ask past injuries, surgeries and recurring pain at
+  intake — prior injury is the best predictor of the next one, and it pre-loads the
+  contraindications (knee history → reverse lunge, chronic back → trunk-supported hinge). Don't
+  wait for pain to surface under load. *(2026-06-28)*
+- **Trust the bar over the résumé.** Establish baseline numbers early; when stated training age
+  and demonstrated capacity conflict (the "4-year pro" with a 40 kg squat), program for what's
+  shown and log the hidden weakness as a target for next cycle. *(2026-06-28)*
+- **Negotiate the minimum effective frequency, but only against a real limit.** If availability
+  can't support the goal (strength + power + injury-prevention in 2×30 min/wk), ask for more
+  time; if the limit is genuine, reframe the goal honestly rather than promising it on the
+  available dose (see *Volume is a report* — under-dose = maintenance, not failure). *(2026-06-28)*
+- **Know the referral line.** Program *around* minor pain, but a red flag — sharp, persistent,
+  worsening, radiating pain, numbness, or a suspected real injury — means refer out to a
+  physio/doctor before loading it further. Coaching is not diagnosis. *(2026-06-28)*
+
 ## Exercise selection
 - **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
   per pattern: Machine Shoulder Press > DB OHP · Leg Press > Back Squat · 45° Back
@@ -38,6 +57,10 @@ publish it. No athlete health/chat detail goes here — principles only.
   mobilisation + activation of the day's patterns — not corrective theatre. (General
   shoulder mobility/activation before pressing — band pull-apart, pass-through, cat-cow —
   is fine; it preps the lift, it doesn't "fix posture.") *(2026-06-19)*
+- **A removed exercise stays removed unless re-earned.** When something is dropped for dislike,
+  inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
+  without a real reason and evidence the athlete has earned it back (pain resolved, capacity
+  built). The log is what stops a bad fit silently reappearing months later. *(2026-06-28)*
 
 ## Exercise naming
 *(This is the single source of truth for exercise names — `/program-design`,
@@ -153,6 +176,10 @@ publish it. No athlete health/chat detail goes here — principles only.
   cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
 
 ## Process
+- **Reassessment is scheduled, not only reactive.** You adjust day-to-day on what you observe
+  (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
+  trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
+  deliberate re-read even when nothing visibly broke. *(2026-06-28)*
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + coach reports (volume, progression, e1RM) to the coach-only
@@ -166,9 +193,10 @@ publish it. No athlete health/chat detail goes here — principles only.
   the reasoning + what actually happened — read both before designing the next cycle. *(2026-06-28)*
 - **Rationale can be set or revised at any cycle, and the latest is the operative logic.** When
   you land on (or change) the real logic mid-journey — a new rationale at cycle 3 — it becomes
-  the baseline the next cycle continues (the log reads most-recent-first). Existing athletes get
-  a one-time **SEED** entry at their current cycle (the why is Amir's to supply; the data only
-  scaffolds it); new athletes are logged from cycle 1. *(2026-06-28)*
+  the baseline the next cycle continues (the log reads most-recent-first). New athletes are
+  logged from cycle 1; athletes who predate the log start empty and get their first entry
+  naturally on the next design pass — no separate seeding step (the why is Amir's to supply;
+  the data only scaffolds it). *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,
