@@ -235,6 +235,10 @@
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
     margin-top: 56px; background: var(--border); border-radius: var(--radius-md); overflow: hidden;
   }
+  .library-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px;
+    margin-top: 56px; background: var(--border); border-radius: var(--radius-md); overflow: hidden;
+  }
   .method-card { background: var(--bg-card); padding: 40px 32px 36px; position: relative; }
   .method-number {
     font-family: var(--font-display);
@@ -585,7 +589,7 @@
     .for-grid, .cred-deep-grid { grid-template-columns: 1fr; }
     .for-grid { gap: 32px; }
     .cred-deep-grid { gap: 20px; }
-    .method-grid, .demo-layout, .commit-layout, .pricing-grid, .contact-grid { grid-template-columns: 1fr; }
+    .method-grid, .library-grid, .demo-layout, .commit-layout, .pricing-grid, .contact-grid { grid-template-columns: 1fr; }
     .demo-layout { gap: 40px; }
     .commit-layout { gap: 32px; }
     .phone-mockup { order: -1; }
@@ -1096,29 +1100,29 @@
   <div class="container">
     <div class="section-label reveal">The Process</div>
     <h2 id="method-title" class="section-heading reveal reveal-d1">How <em>It Works</em></h2>
-    <p class="lead section-desc reveal reveal-d2">Three phases. One system. Your programme is built around your sport, your season, and your body — then adjusted continuously as you progress over the 6 months.</p>
+    <p class="lead section-desc reveal reveal-d2">Three phases. One system. Your programme is built around your sport, your body, and your real life — then adjusted every week as you progress across the 6 months.</p>
 
     <div class="method-grid">
       <article class="method-card reveal reveal-d2">
         <div class="method-number">01</div>
         <h3 class="method-card-title">Assess</h3>
-        <div class="method-card-body">We start with a detailed intake — training history, injury profile, competition calendar, movement screening. I learn how you move, where you're limited, and what your season demands before anything is designed.</div>
+        <div class="method-card-body">We start with a detailed intake — training history, injury profile, competition calendar, how you recover, and a movement screen. For your sport I run a needs analysis: what tennis actually demands of your body. I learn how you move and where you're limited before anything is designed.</div>
         <div class="method-tag">Application + Video Call</div>
       </article>
       <article class="method-card reveal reveal-d3">
         <div class="method-number">02</div>
         <h3 class="method-card-title">Build</h3>
-        <div class="method-card-body">Your programme is designed from scratch. Periodised across your competitive calendar — strength, power, speed, mobility — structured in phases that integrate with your on-court work and progress month to month.</div>
+        <div class="method-card-body">Your programme is designed from scratch and mapped across all 6 months — a chain of ~5-week cycles, each one a mission with its own focus, its reason, and a target you'll hit. Strength, power, speed and mobility, periodised to your calendar and shaped to your recovery, not someone else's ideal.</div>
         <div class="method-tag">Bespoke Programming</div>
       </article>
       <article class="method-card reveal reveal-d4">
         <div class="method-number">03</div>
         <h3 class="method-card-title">Evolve</h3>
-        <div class="method-card-body">Your programme isn't static. Through 4 monthly check-ins, I review your data, assess your response, and adjust. Load, volume, exercise selection — everything adapts based on how your body responds and where your season takes you.</div>
-        <div class="method-tag">Ongoing Coaching Loop</div>
+        <div class="method-card-body">Your programme isn't static. Every week I review your logs and readiness, check in with you, and adjust — load, volume, exercise selection all adapt to how your body is responding and where your season takes you. Nothing without a reason.</div>
+        <div class="method-tag">Weekly Coaching Loop</div>
       </article>
     </div>
-    <div class="method-loop reveal reveal-d5"><span>↻</span> &nbsp; Assess → Build → Evolve — this cycle repeats every month for 6 months</div>
+    <div class="method-loop reveal reveal-d5"><span>↻</span> &nbsp; Assess → Build → Evolve — a weekly loop across your 6 months</div>
   </div>
 </section>
 
@@ -1153,6 +1157,13 @@
 
     <div class="demo-layout">
       <div class="demo-text-list">
+        <div class="demo-feature reveal reveal-d2">
+          <div class="demo-feature-icon" aria-hidden="true">🧭</div>
+          <div>
+            <div class="demo-feature-title">Pre-Session Readiness Check</div>
+            <div class="demo-feature-body">Before each session you rate your sleep, energy, soreness and stress. The session adapts to how you actually walked in — and your scores feed straight to me.</div>
+          </div>
+        </div>
         <div class="demo-feature reveal reveal-d2">
           <div class="demo-feature-icon" aria-hidden="true">✓</div>
           <div>
@@ -1240,6 +1251,29 @@
   </div>
 </section>
 
+<!-- ═══ LIBRARY / PLAYBOOK ═══ -->
+<section id="library" aria-labelledby="library-title">
+  <div class="container">
+    <div class="section-label reveal">More Than Your Programme</div>
+    <h2 id="library-title" class="section-heading reveal reveal-d1">Sessions &amp; the <em>Tennis Playbook</em></h2>
+    <p class="lead section-desc reveal reveal-d2">Your programme is the core — but inside the app you also get two extras, at no extra cost: workouts to run on your own, and a growing knowledge base for your game.</p>
+    <div class="library-grid">
+      <article class="method-card reveal reveal-d2">
+        <div class="method-number">＋</div>
+        <h3 class="method-card-title">Free Sessions</h3>
+        <div class="method-card-body">A shelf of ready-to-run workouts, drills and resets — for a travel day, a busy week, or active recovery. Pick one, press play, and follow the same clear exercise cards with video and cues. A bonus, there whenever you want it.</div>
+        <div class="method-tag">On-Demand Workouts</div>
+      </article>
+      <article class="method-card reveal reveal-d3">
+        <div class="method-number">★</div>
+        <h3 class="method-card-title">The Tennis Playbook</h3>
+        <div class="method-card-body">Everything a tennis player or coach needs to improve on court, in one place — coach-published guides on pre-competition prep, recovery, the mental game, nutrition &amp; supplements, and deeper material for coaches. The same evidence base behind your programme, opened up.</div>
+        <div class="method-tag">Knowledge Library</div>
+      </article>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ CREDENTIALS DEEP ═══ -->
 <section id="about" aria-labelledby="about-title">
   <div class="container">
@@ -1285,7 +1319,7 @@
         <ul class="cred-block-list">
           <li>Every programme is built from scratch — no templates, no shortcuts</li>
           <li>Interactive programme delivery with session tracking built in</li>
-          <li>4 monthly check-ins with continuous programme adjustment</li>
+          <li>Weekly check-ins with continuous programme adjustment</li>
           <li>Deload weeks, load management, and competition tapering built into the structure</li>
         </ul>
       </div>
