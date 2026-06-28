@@ -110,6 +110,7 @@ This is the human half of *"the coach actually watches you"* — the live app da
 | File | What it is |
 |---|---|
 | `PRODUCT.md` | this file — what the product is |
+| `HOW-IT-WORKS.md` | **customer-facing** explainer — the full coaching process end to end (Discovery → Analysis → Programming → Training → the weekly loop → Sessions & the Tennis Playbook). Plain-language source for a website "How it works" page, sales replies, or onboarding. |
 | `DESIGN_SYSTEM.md` | brand + motion spec (colours, type, reel/phone patterns) |
 | `reel-1-dashboard.html` … `reel-4-app.html` | finished Instagram reels (1080×1920, self-contained) |
 | `card-preview.html` | visual catalog of the app's card components, in the live brand palette |
