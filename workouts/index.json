@@ -19,6 +19,13 @@
           "duration": "35 min",
           "equipment": "Dumbbells",
           "file": "workouts/strength/push-pull-pump.json"
+        },
+        {
+          "id": "bodyweight-band-strength",
+          "title": "Bodyweight & Band Strength",
+          "duration": "40 min",
+          "equipment": "Bands",
+          "file": "workouts/strength/bodyweight-band-strength.json"
         }
       ]
     },
