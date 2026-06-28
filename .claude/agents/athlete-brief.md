@@ -37,12 +37,12 @@ MCP `execute_sql` tool and the Gmail MCP `search_threads` / `get_thread` tools.
    `newer_than:180d`). Extract every field.
 2. The form already supplies age, sex, body weight, gym experience, goals, current
    pain/injury + description, **past injuries/surgeries**, movements-to-avoid, days/week,
-   session length, **sleep quality + hours**, **stress**, equipment, environment — put
-   those in the brief, don't list them as missing. Return as OPEN QUESTIONS only what the
-   form does NOT establish (or the athlete left blank), never invented: goal specificity,
-   athlete type (general-fitness vs sport-performance), any known baseline lifts,
-   **nutrition** and **weekly life-load**, red-flag triage on any reported pain, and whether
-   the stated days/week + session ceiling can actually support the goal.
+   session length, **sleep quality + hours**, **stress**, **nutrition**, **weekly life-load**,
+   **current best lifts** (optional), equipment, environment — put those in the brief, don't
+   list them as missing. Return as OPEN QUESTIONS only what the form does NOT establish (or
+   the athlete left blank), never invented: goal specificity, athlete type (general-fitness vs
+   sport-performance), baseline lifts *if the optional field was left blank*, red-flag triage
+   on any reported pain, and whether the stated days/week + session ceiling can support the goal.
 
 ## OUTPUT — the ATHLETE BRIEF (return as plain text, ~one page, no preamble)
 - **IDENTITY** — id, name, athlete type, goal, days/week, session ceiling, equipment
