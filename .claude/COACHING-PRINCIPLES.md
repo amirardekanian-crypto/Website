@@ -164,6 +164,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   new program each month. Change the underlying logic only when a data point forces it (pain,
   a stall, a plateau), and record the why. The locked roadmap is the path; the coaching log is
   the reasoning + what actually happened — read both before designing the next cycle. *(2026-06-28)*
+- **Rationale can be set or revised at any cycle, and the latest is the operative logic.** When
+  you land on (or change) the real logic mid-journey — a new rationale at cycle 3 — it becomes
+  the baseline the next cycle continues (the log reads most-recent-first). Existing athletes get
+  a one-time **SEED** entry at their current cycle (the why is Amir's to supply; the data only
+  scaffolds it); new athletes are logged from cycle 1. *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,
