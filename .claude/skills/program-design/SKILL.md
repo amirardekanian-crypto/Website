@@ -60,14 +60,24 @@ change before I build?"* before writing exercises.
      the brief — don't re-pull raw data.
    - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
      /athlete-intake first.
-5. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
+5. **RETURNING — read the prior rationale:** read `.claude/coaching-log/<id>.md` if it exists.
+   This is the *why* behind the last cycle(s) — why each primary was chosen, what changed
+   mid-cycle and why, the progression levers — and it is the thread you continue. The next
+   cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
+   Read the most recent entry in full, skim older ones for context, and never reintroduce
+   something a prior entry flagged as causing pain/regression without a stated reason.
+6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
    state the data point + reason.
-6. Run STEP 1A (returning) or STEP 1B (new).
+7. Run STEP 1A (returning) or STEP 1B (new).
 
 ---
 
 ## STEP 1A — CYCLE REVIEW (RETURNING)
+**Start from the prior rationale** (the coaching log, read at STEP 0): you are continuing one
+coherent multi-cycle logic, not designing fresh. Progress and edit from the data; change the
+*logic* only when a data point forces it — and when you do, name the why (it becomes this
+cycle's log entry).
 - **ADAPTATION RESPONSE** — strength/RPE trends, loads progressed, rep ranges hit; the
   **e1RM trend** per primary (from the brief); where she over/under-performed + the read.
 - **RECOVERY & LIFESTYLE INTEGRATION** *(required)* — sleep, stress, session-RPE trend AND

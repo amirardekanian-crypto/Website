@@ -159,6 +159,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   `.claude/coaching-log/<id>.md` as its last step — append-only, git-tracked but unpublished,
   never the athlete JSON. Prior cycles are never overwritten, so months later you can see how a
   cycle was thought through and why something changed. (Convention: `.claude/coaching-log/README.md`.) *(2026-06-28)*
+- **Cycles continue; they don't reset.** Each cycle reads the prior rationale (the coaching
+  log) alongside the data, then **progresses or edits the same logic** — it does not invent a
+  new program each month. Change the underlying logic only when a data point forces it (pain,
+  a stall, a plateau), and record the why. The locked roadmap is the path; the coaching log is
+  the reasoning + what actually happened — read both before designing the next cycle. *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,

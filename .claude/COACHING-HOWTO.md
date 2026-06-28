@@ -27,8 +27,9 @@ You can talk normally — "design Mehraneh's next cycle," "write her notes,"
 
 1. *(Best)* Paste their latest weekly/monthly check-in chat.
 2. Say **"design [name]'s next program."**
-3. I pull their logs (quietly, in the background), review the cycle, and **stop to
-   check with you** on any real decision. Answer my questions.
+3. I pull their logs (quietly, in the background), re-read *why* we built the last cycle the
+   way we did (your coaching log), review the cycle, and **stop to check with you** on any
+   real decision. Answer my questions.
 4. Say **"go ahead."** → I write the full program + your coach-only reports
    (volume, progression sheet, e1RM).
 5. Say **"do prompt 2."** → app message & notes.
