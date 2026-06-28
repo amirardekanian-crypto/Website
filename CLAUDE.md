@@ -35,6 +35,9 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - **Push back** when something's wrong or stale; fix at the **source** and keep the two language
   sites consistent on facts. He gives blunt feedback — that's normal, not a problem.
 - **Verify before merging.** Render changes headless and check them.
+- **Names should be cool, not literal.** Workout titles, article headlines, post hooks — Amir wants
+  evocative, punchy names (e.g. "Banded Lower Burner"), not flat descriptions ("Bodyweight & Band
+  Strength"). Put the literal description in a tag/subtitle. When unsure, offer 3–4 options and let him pick.
 
 ## Verifying the live site (important gotchas)
 - This sandbox **cannot reach amirardekani.com** (proxy blocks the host). Confirm deploys via the
