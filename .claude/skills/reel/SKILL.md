@@ -12,9 +12,10 @@ retains clients** (show depth) — never cheap lead-gen.
 
 ## Step 0 — Required reading (EVERY run, before designing)
 
-1. **`Content/BUILD-MAP.md`** — the system index. Read **§8 (Reels)**, **§3 (one type system)**,
-   **§2 (colour canon)**, and **§4–§6** (real app cards / coach data / cycle-day images) so the reel
-   mirrors the real product.
+1. **`Content/BUILD-MAP.md`** — the master system index. Read **§7 (the content engine — Reels)**,
+   **§2–§3 (brand marks + colour/type canon — incl. the orange ball & court backgrounds)**, **§5–§6
+   (the app screens + coach data to mirror)**, and **§8 (the real image library)** so the reel mirrors
+   the real product.
 2. **`Content/PRODUCT.md`** — the offer, the app's four tabs, readiness/ACWR, the coach dashboard,
    pricing, and the **"Content angles that work"** list.
 3. **`Content/DESIGN_SYSTEM.md`** — palette, type (§2), and **§7 Reels & motion** (the beat/scene

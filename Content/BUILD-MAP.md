@@ -1,250 +1,299 @@
-# 🗺️ Content Build Map — AA Performance
+# 🗺️ Content Build Map — AA Performance (master reference)
 
-**Purpose.** The one place that ties the *real product* (the app, the coach dashboard, the
-weekly check-in, the site) to *content production* (carousels & reels), so anything we
-make mirrors the actual UI instead of approximating it. Read this **before building a
-carousel or reel.**
+**Purpose.** The single hub that ties the *whole system* — both websites, the app, the coach tools, the
+brand marks, every image, the data, and the content kit — to *content production* (carousels, reels, any
+design). Read this first; it links to the deep docs for everything else. **Goal: find anything in seconds.**
 
-**Canon / read order:**
-1. `PRODUCT.md` — what the business & app are.
-2. `DESIGN_SYSTEM.md` — palette, type, motion, voice (§10).
-3. **this file** — the asset inventory + real tokens + card anatomy + build recipes.
-4. `card-preview.html` — the visual catalog of every app card (exact classes/structure). Open it.
-5. `Carousel-Kit.html` — the 23-template carousel library (latest design work).
-6. The `/carousel` skill (`.claude/skills/carousel/SKILL.md`) for the carousel pipeline.
+**Read order for content work:** this file → `PRODUCT.md` (the offer) → `DESIGN_SYSTEM.md` (look/type/motion)
+→ `card-preview.html` (open it — every app card) → `Carousel-Kit.html` (the slide library).
+Build with the **`/carousel`** or **`/reel`** skills (both read this map every run).
 
 ---
 
-## 1. Where everything lives
+## 0. "Where do I find X?" quick index
 
-| Thing | Path |
+| I want… | Look here |
 |---|---|
-| **App (the PWA)** | `program.html` — "AA Performance", the product the reels sell |
-| **Coach dashboard** | `coach.html` (private, Google-gated) |
-| **Weekly check-in tool** | `call-log.html` (private) |
-| **Marketing site** | `index.html` (+ `index-en/fa`), `form.html` (+ `-fa`), legal |
-| **Site stylesheet (tokens)** | `assets/css/tokens.css` · `base.css` · `components.css` |
-| **App-card catalog** | `Content/card-preview.html` ← the keystone reference |
-| **Carousel kit (23 templates)** | `Content/Carousel-Kit.html` |
-| **Finished carousels** | `Content/carousel-*.html` |
-| **Finished reels** | `Content/reel-1-dashboard … reel-5-how-it-works.html` |
-| **Cycle banner images** | `assets/cycles/*.jpg` (16:9) |
-| **Day banner images** | `assets/days/*.webp` (≈5:2) |
-| **Brand marks** | `assets/img/icon-192.png` (monogram) · `og-image.png` (wordmark lockup) · `coach.jpg` (Amir's photo) · `tennis-ball-clay.png` |
-| **Court photos (carousel bg)** | `court-sessions.jpg` (green) · `court-playbook.jpg` (clay/terracotta) — repo root |
+| The offer / pricing / app overview | `Content/PRODUCT.md` |
+| The coaching method (Discovery→…→weekly loop) | `Content/HOW-IT-WORKS.md` |
+| Palette, type, motion, voice, Farsi rules | `Content/DESIGN_SYSTEM.md` |
+| Every app **card** (exact classes) | `Content/card-preview.html` |
+| The **carousel** slide library (court bg + orange ball) | `Content/Carousel-Kit.html` → build via `/carousel` |
+| The **reel** engine + 5 existing reels | `Content/reel-*.html` → build via `/reel` |
+| What every **image** is, sizes, where wired | **`IMAGES.md`** + §8 below |
+| Plain-English **file-by-file** guide to the repo | **`CODEBASE.md`** |
+| The athlete **program JSON** shape | **`SCHEMA.md`** + `data/*.json` |
+| Coach **dashboard** manual / metrics | **`COACH_DASHBOARD.md`** + `coach.html` (§6) |
+| Weekly **check-in** tool / questions | **`CALL_LOG.md`** + `call-log.html` (§6) |
+| Exercise→video library / Notion sync | `exercise_library.json` + **`NOTION_SYNC.md`** |
+| Brand marks (icon, OG, logo, ball, courts) | §2 below + `assets/img/` & repo root |
+| Canonical strings (prices, handles, mantras) | §10 below |
 
 ---
 
-## 2. Colour canon (single source of truth)
+## 1. The whole repo at a glance
 
-NO yellow/gold — it's **retired**. One accent only: **clay**.
+**Pages (HTML):** `index.html` (EN home) · `index-fa.html` (FA home) · `index-en.html` (redirect stub) ·
+`form.html` / `form-fa.html` (intake) · `program.html` (**the app/PWA**) · `coach.html` (dashboard, private)
+· `call-log.html` (weekly check-in, private) · `privacy.html` / `terms.html` / `terms-fa.html` (legal).
+Nav + footer are **injected** by `assets/js/shared.js` from `partials/nav.html` + `partials/footer.html`.
+
+**Styles:** `assets/css/tokens.css` (palette/type/space — the foundation) · `base.css` · `components.css`.
+
+**Data & content:** `data/*.json` (one program per athlete; `demo.json`/`john_doe.json` = templates) ·
+`exercise_library.json` (exercise→demo video, Notion-generated) · `articles/` (Playbook: `index.json` +
+category folders) · `workouts/` (Sessions: `index.json` + category folders) · `supabase/` (DB migrations:
+progress, messages, `call_logs`, `cycle_reports`, `athlete_keys`) · `sync_notion.py` (rebuilds the library).
+
+**Content/ (design + marketing):** `PRODUCT.md` · `HOW-IT-WORKS.md` · `DESIGN_SYSTEM.md` · **`BUILD-MAP.md`**
+(this) · `card-preview.html` · `Carousel-Kit.html` · `carousel-*.html` · `reel-*.html` · `instagram-cards/`
+· `for-coaches/` · `pre-competition/` · `recovery-run/` · `tennis-players/`.
+
+**Existing docs to lean on (don't duplicate — link):** `CODEBASE.md` · `IMAGES.md` · `SCHEMA.md` ·
+`COACH_DASHBOARD.md` · `CALL_LOG.md` · `NOTION_SYNC.md` · `IMPORTING_SESSION_REPORTS.md`.
+
+---
+
+## 2. Brand marks & identity
+
+Roland-Garros: deep green + clay on warm paper. **Files (reuse these, don't recreate):**
+
+- **Monogram / app icon** — interlocking green "A"s with a clay parallelogram on cream. Master:
+  `assets/img/source/aa-mark.png`. Rasters: `assets/img/icon-192.png` · `icon-512.png` ·
+  `apple-touch-icon.png` (180) · `favicon-32.png` · `favicon.svg` · root `favicon.ico`. Regenerate with
+  `assets/img/generate_icons.py`. Also the nav brand mark (`.nav-logo-mark`).
+- **Wordmark lockup** — `assets/img/source/aa-logo.png` (stacked AA + PERFORMANCE). **"AA" clay + "PERFORMANCE"
+  green**, Barlow Condensed heavy **italic**; eyebrow **"STRENGTH & CONDITIONING"** (green, tracked); tagline
+  **"Move Better. Hit Harder. *Last Longer.*"** with a clay dash; sport motif = green court panel + white
+  court lines + dashed clay ball-arc.
+- **OG / social card** — `assets/img/og-image.png` (1200×630; master `source/og-source.png`). It *is* the
+  wordmark lockup. Wired via `og:image`/`twitter:image` on public pages.
+- **Coach photo** — `assets/img/coach.jpg` (Amir, black "COACH" quarter-zip, moody studio). Used in the app
+  Coach tab (`.coach-avatar`, falls back to "AA" initials) and the `tpl-bio` carousel slide.
+- **The orange tennis ball** — `assets/img/tennis-ball-clay.png` (clay-orange felt ball, transparent). This
+  is the brand object: it's the **rally-arc endpoint + the pagination ball** in the Carousel-Kit (§7).
+- **Court backgrounds (repo root)** — `court-sessions.jpg` (deep **green** court) and `court-playbook.jpg`
+  (**clay/terracotta** court). These are the carousel slide backgrounds (§7).
+- **App screenshots (root)** — `app-warmup-preview.jpg`, `library-doors*.jpg`, `library-playbook*.jpg`,
+  `library-sessions*.jpg` (the library UI, incl. `-mobile`/`-2` variants).
+
+**Type system (one stack everywhere — the app is the source of truth):** Barlow (body) · Barlow Condensed
+(display / big numbers) · Space Mono (small mono labels/eyebrows/counters) · Vazirmatn (Farsi). *DM Sans +
+JetBrains Mono are retired.*
+
+**theme-color** (browser/PWA) = paper `#FAF7F2` on every page.
+
+---
+
+## 3. Colour canon & tokens (truthful names everywhere)
+
+One accent: **clay**. **No gold/yellow.**
 
 | Role | Hex | Notes |
 |---|---|---|
-| **Green (primary "ink"/brand)** | `#0E4A36` | app primary UI, dark slides, strength block |
+| **Green** (primary/brand) | `#0E4A36` | app primary, dark slides, strength block |
 | Green-2 | `#156A4D` | gradients/depth |
-| **Clay (the one accent)** | `#C7552F` | highlights, eyebrows, header dot, CTAs, warm-up & power blocks |
+| **Clay** (the one accent) | `#C7552F` | highlights, eyebrows, header dot, CTAs, warm-up & power blocks, the rally arc/ball |
 | Clay-2 (lift on dark) | `#E06B43` | clay text/arc on dark surfaces |
-| Ochre (tertiary) | `#A8741C` | notes, the coach "amber/watch" zone |
-| Paper | `#FAF7F2` | light slides, app background |
-| Paper-2 / soft | `#F1ECE3` / `#EDE8E0` | secondary warm surface / card fill |
+| Ochre (tertiary) | `#A8741C` | notes, coach "watch/amber" zone |
+| Paper / Paper-2 / soft | `#FAF7F2` / `#F1ECE3` / `#EDE8E0` | light surfaces / card fills |
 | Card | `#FFFFFF` | raised card |
 | Line | `#D8D1C5` (app) · `#E7E2D9` (site) | hairline |
 | Ink / Muted | `#1A1A1A` / `#5C5C5C` | body / captions |
 | Good / Bad | `#1F7A4D` / `#C0392B` | ✅ / ❌ semantic |
 
-**✅ Token names are truthful (the old alias trap was fixed).** Everywhere now: **`--green`
-`#0E4A36` · `--clay` `#C7552F` · `--ochre` `#A8741C`** (plus `--green-soft` / `--clay-soft` /
-`--ochre-soft` for the soft coach-zone fills, and `--accent` = green). The old misleading aliases —
-`--yellow`/`--ice`/`--purple`/`--blue`, and `--red`/`--amber` standing in for clay/ochre — were
-renamed across `program.html`, `coach.html`, `call-log.html`, and the kit (incl. coach's JS `const C`
-chart palette → `{green, clay, ochre, grey, ink}`). **Don't reintroduce them.** Genuine semantics keep
-truthful names: `--red-soft` `#C0392B` (site error red) and `--amber` `#B8862F` (card-preview only).
-*(Known pre-existing quirk: `program.html` references `var(--ink)` in ~12 spots without defining
-`--ink` — it inherits today; unify it to `--ink` when convenient.)*
+Tokens are now **truthful** (`--green` / `--clay` / `--ochre`, + `-soft` for coach zones; `--accent` = green).
+The old misleading aliases (`--yellow`/`--ice`/`--purple`/`--blue`, `--red`/`--amber`-as-clay/ochre) were
+removed app-wide; don't reintroduce them. *(Pre-existing quirk: `program.html` uses `var(--ink)` undefined
+in ~12 spots — inherits today; unify to `--ink` when convenient.)*
 
 ---
 
-## 3. One type system (the app is the source of truth)
+## 4. The two websites — "two audiences, one product"
 
-Fonts are now unified across **every** surface — site, app, coach tools, carousels, reels — to the
-app's stack. (DM Sans + JetBrains Mono are retired; the marketing site `assets/css/tokens.css` + page
-links were switched to match the app.)
-
-| Role | Font | Notes |
+| | **English** `index.html` | **Farsi/RTL** `index-fa.html` |
 |---|---|---|
-| **Body / UI** | **Barlow** (300–900) | what the real app renders in |
-| **Display / wordmark / big numbers** | **Barlow Condensed** (700–900) | uppercase headlines, large stat numerals |
-| **Small mono labels, eyebrows, pills, counters** | **Space Mono** (400/700) | the app's tiny tracked-uppercase labels |
-| **Farsi (carousels/reels)** | **Vazirmatn** | everything Persian |
+| Audience | competitive **tennis & padel** | general-fitness **Tehrani** |
+| Title | "Amir Ardekani — Tennis Strength & Conditioning Coach" | «امیر اردکانی — مربیِ بدنسازیِ حرفه‌ای \| یه مربی، تو جیبت» |
+| Hero | **Move Better. Hit Harder. *Last Longer.*** + "used by 500+ competitive tennis & padel players…" | **«یه ‹مربی›، تو جیبت.»** («مربی» in clay) |
+| Pricing | **Foundation £149/3mo · Performance £349/6mo · Elite £599/6mo** (+ "Every programme includes" strip) | **«معادلِ ۲۵ دلار در ماه»** (~$25, paid in Toman at day rate); abroad → DM |
+| CTA | "Apply Now →" `form.html` · "Try the Live Demo →" `program.html?client=demo` | «شروع کن» `form-fa.html` · «اپ رو از نزدیک ببین» (demo) |
+| Voice | sharp, athletic, evidence-based | warm, colloquial Tehrani, no-fluff |
 
-**Two radius feels still differ by surface** (this is layout, not type): the marketing site is tight
-(3 / 6 / 12 / 100px, editorial); the app + cards are softer (cards 14–22, stats/log 8, buttons 4–5,
-friendly product UI). Content that mirrors the *app* uses the soft radii.
+**EN sections in order:** nav (Results/Programmes/Process/Platform/Library/Background/FAQ/فارسی/Apply) → hero
+→ stats strip (**2×MSc · 500+ · 7+ · 🎾**) → "Fit Check" (built for / not for) → "Athlete Voices" (auto-scroll
+testimonials, photos from `assets/img/athletes/`) → Programmes (3 tiers) → 84-Day Promise → "How it works"
+(**01 Assess · 02 Build · 03 Evolve**) → "Not a PDF. An experience." (feature list + phone mock) → Sessions &
+the Tennis Playbook → Background (2×MSc / 7+ yrs / 500+; Education/Experience/Approach/The Difference) → FAQ →
+Contact → final CTA "Ready to train with intent?". The **7 named testimonials**: Mehraneh Zohourian, Mahdi
+Behboodi, Sarina Akhavan, Hamed Navakhti, Mehdi Rahmani, Helen Taheri, Dr. Shahin Nazarpour (real proof —
+reuse their photos/quotes for results content).
 
-**Carousels & reels** use this system (Barlow / Barlow Condensed / Space Mono + Vazirmatn for Farsi).
-*Nuance:* the **Carousel-Kit** maps `--mono` to Barlow Condensed (its larger eyebrow/label role); the
-app uses Space Mono for the *tiny* labels and Barlow Condensed for *large* ones — both are app-family,
-so the kit stays as-is unless you specifically want tiny carousel labels in Space Mono.
+**FA sections in order:** nav → hero → trust bar (۵۰۰+ ورزشکار / two ارشد degrees) → WHY «یه برنامه، یه مربی
+نیست» (compare) → METHOD «پشتِ هر حرکت، یه دلیل هست» (3 pillars + flow chips برنامه→سیکل→روز→حرکت) → APP
+6-card feature grid → LIBRARY (free sessions + playbook) → PROOF (green, 5 testimonials) → ABOUT → PRICING
+($25) → FAQ → contact (IG **@amirardekanian**, WhatsApp **+44 7435 363461**) → final CTA «آماده‌ای یه مربیِ
+‹واقعی› داشته باشی؟». Language toggle EN⇄FA in the nav.
 
----
-
-## 4. The real app, card by card
-
-Open `card-preview.html` to see these rendered. Key structures (classes are the app's real ones):
-
-- **App shell** — 4 bottom-nav tabs: **Home · Coach · Library · My Plan** (`.global-tabs .nav-item`; active label turns green). Full **dark mode** (`body[data-dark]`, bg `#181818`, card `#252525`). PWA name everywhere: **"AA Performance."**
-- **Cycle card** (`.cyc`) — **16:9** banner from `assets/cycles/`, scrim `linear-gradient(to top,rgba(8,33,24,.92),rgba(8,33,24,.05) 64%)`, status pill top-right, eyebrow `CYCLE 2 OF 5 · STRENGTH ENGINE`, `Week 2 of 5` in Barlow Condensed 900/34. Radius 18.
-- **Day card** (`.day`) — **≈5/2.3** banner from `assets/days/`, scrim to-top `rgba(8,33,24,.93)→0`, `✓ Done` badge (brown `#7A4A2B`), `DAY 1` in `#E6B493`, name 900/26, meta `3 blocks · 6 movements · ~55 min`. Radius 18.
-- **Cycle meter** (`.cycle-meter`) — thin segments: **done** = green faded, **current** = clay + glow, locked = grey; `C1…C5` labels in Space Mono.
-- **Exercise card** (`.checklist-item`) — colour-coded **3px left bar** by block (`block-warmup`=clay, `block-strength`=green, `block-power`=clay). Collapsed row = big `ex-num` (Barlow Condensed 900) + name + summary pills (`4×6`, `8/10`, `⏱2m`). Expands to: dark **video** box (green play btn), green **ex-extra-chip** label, **5-cell stats grid** `SETS · REPS · RPE · TEMPO · REST`, **coaching cues** (green left bar; `.bad` = red `#E74C3C`), **per-set log** (set #, weight input on soft bg, **RPE buttons 6–10** green-when-selected, check-circle green-when-done), green **Rest ⏱** button.
-- **Section header** (`.section-header-prog`) — block name (Barlow Condensed 900, uppercase, tracked) + a 3px rule, coloured by block.
-- **Readiness check** (`.readiness-*`) — clay top-border card, eyebrow **"Before you start"**, title **"Readiness check"**. **Five** questions, 1–5 scale (5 = best), selected = green. Exact set:
-  1. *How well did you sleep last night?* — Very poor · Poor · OK · Good · Excellent
-  2. *How are your energy levels right now?* — Exhausted · Tired · OK · Good · Very fresh
-  3. *How sore are your muscles today?* — Very sore · Sore · Mild · Slight · None
-  4. *How's your stress / mood today?* — Very stressed · Stressed · Neutral · Good · Great
-  5. *Overall, how ready do you feel?* — Not ready · Bit off · OK · Good · Fully ready
-- **Session complete** (`.complete-card`) — green medal ✓, "Session complete", session-RPE 5–10 (selected clay), **"Send data to coach ↗"** (green).
-- **Timers** — **session timer** (mini card, "Start ▶", clay border+glow when running) and **rest timer** (big ring, grey track + green progress arc, time in Barlow Condensed 900/96).
-- **Coach tab** (`.coach-hero`) — Amir avatar (`assets/img/coach.jpg`), "Coach Amir", "Online · usually replies in a few hours".
-- **Chat** (`.bub`) — coach bubble green (left), yours soft (right).
-- **Personal note** (`.note`) — clay gradient tile + "TAP TO READ ›".
-- **Library — two doors** (`.lib-door`, radius 22): **Sessions** (green, `— Train`, *"Workouts, drills & resets — ready to run on your own."*) · **Playbook** (clay, `— Learn`, *"Everything you need to know to play better tennis — in one place."*).
+**Intake forms** (`form.html` / `form-fa.html`) — the **Discovery** step; ~8 sections, progress bar, submits
+to email via **Web3Forms**: `00` programme choice (the 3 tiers + durations) · `01` about you · `02` activity
+(sport & level) · `03` training history (+ current best lifts) · `04` goals (pick ≤3) · `05` injury & health
+· `06` recovery & availability (sleep/stress/nutrition) · `07` equipment & environment.
 
 ---
 
-## 5. The coach side — "the coach actually watches you"
+## 5. The app (`program.html`) — screen by screen
 
-For any "before you get hurt, I message you" / proof content, these are the real metrics & thresholds (`coach.html`). Charts: big number (Barlow Condensed 900/56) colour-coded by zone + trend bars.
+Single-file PWA, name **"AA Performance"**. Four bottom tabs (`goTo()`, `data-tab`): **Home** (`home`) ·
+**Coach** (`notes`) · **Library** (`workouts`) · **My Plan** (`plan`). Full **dark mode** (`body[data-dark]`).
+**Open `card-preview.html` to see every card rendered** — it reproduces the real classes.
 
-**Per-athlete card:** name · `last active … · N sessions` · load sparkline · pills `ACWR · Readiness · Adherence` · up to 3 triage flags. Left border: amber/red by tier.
-
-**Zones & thresholds:**
-- **ACWR** (acute 7d ÷ chronic 28d): `>1.5` High load → **red(clay)** · `>1.3` Climbing → **amber(ochre)** · `≥0.8` Optimal → **green** · `<0.8` Low/Detraining → amber.
-- **Adherence** (done/expected, 4 wks): `≥85%` green · `≥60%` amber · `<60%` red.
-- **Readiness** (composite /5 vs baseline): delta `≤-1` red · `≤-0.5` amber.
-- **Idle:** `>14d` Silent (red) · `>7d` Quiet (amber).
-
-**Exact triage flag strings** (use verbatim if depicting the dashboard):
-`Silent — N days, no training` · `Quiet — N days idle` · `Load spike — ACWR x.x` ·
-`Load climbing — ACWR x.x` · `Detraining — ACWR x.x` · `Readiness ↓ a vs b usual` ·
-`Readiness dipping` · `Low adherence — n% of plan` · `Adherence slipping — n%` ·
-`Last session left partial`.
-
-**Weekly check-in (`call-log.html`)** — a real call/WhatsApp every week, 8 sections:
-*01 Open & Wellbeing · 02 Last Week's Training · 03 Wins & Progress (🏆 Win Vault) · 04 Physical
-Status & Injury · 05 On-Court Performance · 06 Next Week — Goals & Adjustments · 07 Programme Fit
-· 08 Close the Call.* Each question carries a Farsi `data-fa` (sent to the athlete) and some carry a
-**📸 Content potential** flag — the wins captured here are the source for "results/proof" content.
-End-of-cycle: all the week's logs + workout data → an AI cycle review that sets the next cycle.
-
----
-
-## 6. Cycle & day image inventory (use these, never stock — they *are* the product)
-
-**Cycles** `assets/cycles/*.jpg` (16:9): `foundation-forge` · `strength-engine` · `structural-build`
-· `structural-strength` · `durability-build` · `armour-build` · `load-build` · `rebuild-reset` ·
-`strength-reclaim`. Canonical chain: **Foundation Forge → Strength Engine → Structural Build →
-Durability Build → Armour Build** (others are alternates).
-
-**Days** `assets/days/*.webp` (≈5:2): `lower` · `upper` · `power` · `conditioning` · `core` ·
-`fullbody` · `recovery` · `default`.
-
-Display them the app way: full image + green scrim + caption overlay (see §4). In carousels/reels,
-**embed as base64** so the file is portable (DESIGN_SYSTEM §9).
+- **Home / My Plan** — greeting "Hi {name}", current **cycle card** (16:9 banner, status pill, "Week x of y"),
+  **cycle meter** (`C1…C5`: done=green-faded, current=clay+glow), **day cards** (≈5:2 banner, "Day n", focus,
+  "3 blocks · 6 movements · ~55 min", ✓ Done), session timer.
+- **Exercise card** (`.checklist-item`) — 3px **left bar** by block (warm-up=clay, strength=green, power=clay);
+  collapsed row (big `ex-num`, name, summary pills) → expands to video, **5-cell stats grid** SETS·REPS·RPE·
+  TEMPO·REST, coaching cues (green bar; `.bad`=red), **per-set log** (weight + RPE 6–10 + tick), Rest timer
+  (big ring). **Readiness check** before a session (5 Qs, 1–5; sleep/energy/soreness/stress/overall).
+- **Coach tab** — `.coach-hero` ("Coach Amir", avatar `coach.jpg`→"AA", "Online · usually replies in a few
+  hours"); **chat** (`.cmsg.coach` green-left / `.cmsg.mine` grey-right, optional `.cmsg-tag` clay "Day 2"
+  pill; composer "Send Amir a note…"); **Personal notes** (`.note-card`, tone green/clay/ochre, "Tap to read");
+  **in-app guide** (`APP_GUIDE`, 10 cards incl. iPhone/Android install). Unread = clay `nav-dot` on the tab.
+- **Library — two doors** (`.lib-door`, radius 22): **Sessions** (green, "— Train", *"Workouts, drills &
+  resets — ready to run on your own."*) · **Playbook** (clay, "— Learn", *"Everything you need to know to play
+  better tennis — in one place."*).
+  - **Playbook** = coach articles (`articles/index.json`): list (`.pb-*`) → **article reader** `#screen-article`
+    (green `.ar-hero`, drop-cap `.ar-lead`, `.ar-callout`, tennis-ball-bullet lists, `.ar-workout-card`).
+    Deep-link **`?article=<id>`**.
+  - **Sessions** = on-demand workouts (`workouts/index.json`): category rails of `.vcard` → **workout player**
+    `#screen-workout` (reuses exercise cards; local-only ticks in `localStorage`, reset daily; no RPE/cloud).
+    Deep-link **`?workout=<id>`**.
+- **Archive** (`#screen-archive`) — not a tab; opens from My Plan's "Done" card → read-only past cycles.
+- **Install / states** — dynamic per-client manifest (keeps `?client&key`); no install nag (guide card only);
+  splash = "Loading Program"; error = "Program Not Found"; **demo banner** on `?client=demo` ("Live demo ·
+  sample athlete…", Apply / Exit). Try-the-app: `program.html?client=demo`.
 
 ---
 
-## 7. Carousels — how they're built
+## 6. Coach side — "the coach actually watches you"
 
-**Pipeline:** the `/carousel` skill turns a script/topic into `Content/carousel-<slug>.html`
-(per-slide PNG buttons) + an IG caption. It reads `PRODUCT.md` + `DESIGN_SYSTEM.md` +
-`Carousel-Kit.html` every run. **Default language Farsi/RTL** (Vazirmatn); English on request
-(Barlow + Barlow Condensed, LTR).
+For proof / "before you get hurt, I message you" content (full manuals: `COACH_DASHBOARD.md`, `CALL_LOG.md`).
 
-**Canvas** 1080×1350 (4:5). **Kit tokens:** accent clay `#C7552F`, `--display`/`--mono` = Barlow
-Condensed, `--latin` = Barlow, `--fa` = Vazirmatn. Type scale: display 72–152, body 36, edge pad 64.
-
-**Backgrounds:** *dark* = `court-sessions.jpg` + green scrim `linear-gradient(to bottom,
-rgba(14,74,54,.42),rgba(14,74,54,.72))`; *light* = flat paper; *clay variant* = `court-playbook.jpg`;
-**film grain** (fractal-noise SVG, opacity ~.05, no blend-mode) on every canvas.
-
-**RALLY graphics:** one dashed **clay rally arc** (`stroke-dasharray:2 26`, clay-2 on dark) ending in a
-**tennis ball** in negative space; faint **court lines** on open type-led slides only; **tennis-ball
-pagination** (one ball/slide, current = clay, row forced `direction:ltr`). Page counters retired.
-
-**23 templates** (in the kit): `tpl-cover` (hook, slide 1) · `tpl-myth` (strike) · `tpl-big` (one
-sentence) · `tpl-stat` (one number) · `tpl-quote` · `tpl-compare` (don't/do) · `tpl-list` · `tpl-rules`
-(numbered, light) · `tpl-checklist` (light) · `tpl-cta` (canonical outro, last slide) · `tpl-feature`
-(full-bleed app image) · `tpl-journey` (cycle timeline) · `tpl-result` (proof + face) · `tpl-index`
-(retention) · `tpl-step` · `tpl-split` (before/after) · `tpl-define` (light) · `tpl-qa` · `tpl-diagram`
-(annotated screenshot) · `tpl-formula` · `tpl-schedule` (week shape) · `tpl-bio` (coach intro) ·
-`tpl-heatmap`. Recipes & per-type sequences live in the `/carousel` skill.
-
-**Hard Farsi rules:** never `letter-spacing`, no UPPERCASE, Persian numerals (۰۱/۰۵), counters get
-`direction:ltr`. **html2canvas traps:** SVG `<use>`/`<symbol>` render nothing → extract the PNG and
-use `<image href>`; `transform:` is ignored → use hard pixel coords.
+- **Dashboard `coach.html`** — per-athlete card: name · last active · sessions · load sparkline · pills
+  **ACWR · Readiness · Adherence** · up to 3 triage flags (left border amber/red). Charts: big number colour-
+  coded by zone + trend bars. **ACWR zones:** `>1.5` high (red→**clay**) · `>1.3` climbing (amber→**ochre**) ·
+  `≥0.8` optimal (green) · `<0.8` detraining. **Adherence:** ≥85 green · ≥60 amber · <60 red. **Idle:** >14d
+  silent (red) · >7d quiet (amber). Exact flag strings: `Silent — N days, no training`, `Load spike — ACWR
+  x.x`, `Readiness ↓ a vs b usual`, `Low adherence — n% of plan`, etc.
+- **Weekly check-in `call-log.html`** — 8 sections (Open & Wellbeing · Last Week's Training · **Wins &
+  Progress** [🏆 Win Vault, 📸 content hooks] · Physical/Injury · On-Court · Next Week Goals · Programme Fit ·
+  Close). Each question has a Farsi `data-fa` (WhatsApp send). Wins captured here are the source of results
+  content. Cycle-end → AI cycle review sets the next cycle.
 
 ---
 
-## 8. Reels — how they're built
+## 7. The content engine — the part that makes posts
 
-**Format:** self-contained **1080×1920 (9:16)** HTML; auto-scales to the viewport (`scale(min(w/1080,
-h/1920))` on a `.fitwrap`), auto-loops, and you **screen-record** the frame (controls/progress sit
-outside it). Pure CSS animation — no library.
+### Carousel-Kit — `Content/Carousel-Kit.html` (the latest design, the one Amir likes ⭐)
+Canvas **1080×1350** (4:5). **23 templates** (`tpl-*`) + Farsi/RTL variants. Build with the **`/carousel`** skill.
+The signature look (rendered in the kit):
+- **Background = a real tennis court.** Dark slides use `court-sessions.jpg` (green) behind a green scrim
+  `linear-gradient(to bottom, rgba(14,74,54,.42), rgba(14,74,54,.72))`; the clay variant uses
+  `court-playbook.jpg`. Light slides = flat paper. Faint film-grain on every canvas.
+- **The orange tennis ball + rally arc.** One dashed **clay rally-arc** (`stroke-dasharray:2 26`, clay-2 on
+  dark) curving through negative space, ending in the **orange ball** (from `tennis-ball-clay.png`). And the
+  footer **tennis-ball pagination** — one ball per slide, **current = orange**, row forced `direction:ltr`.
+- **Type:** Barlow Condensed heavy headlines (clay accent word, or a clay **`.hl`** highlight block — white
+  text); **chip-B eyebrow** = clay text + a clay leading dash ("— REAL TALK FOR LIFTERS"). Handle header
+  "● AMIRARDEKANI.COM" (clay dot). Slide 1 footer shows **SWIPE →**. Inset frame border on every slide.
+- **Templates:** cover · myth · big · stat · quote · compare · list · rules(light) · checklist(light) · cta ·
+  feature · journey · result · index · step · split · define(light) · qa · diagram · formula · schedule · bio ·
+  heatmap. Recipes per content-type live in the `/carousel` skill.
+- **Hard Farsi rules:** no letter-spacing, no UPPERCASE, Persian numerals, counters `direction:ltr`.
+  **html2canvas traps:** no SVG `<use>`/`<symbol>` (extract PNG → `<image href>`), no `transform:` (hard px).
 
-**Scene engine** (copy from `reel-1-dashboard.html` or `reel-5-how-it-works.html`): a JS driver gives
-each `.scene[data-dur]` an `.on` class in sequence, runs a progress bar, loops; `.rise` children
-stagger in via `transition-delay`; numbers count up. House ease `cubic-bezier(.16,1,.3,1)`.
-
-**Two scene models:** *scene-swap* (reels 1–3, 5 — full-screen scenes) and *persistent-subject* (reel 4
-— a phone stays on screen while UI swaps inside; the cinematic "App-as-Product" option, see DESIGN_SYSTEM §7).
-
-**Type scale @1080×1920:** big 92–104 · mid 62–66 · sub 42–46 · eyebrow 34–36 · edge pad 88.
-**Language:** Farsi default (Vazirmatn); English → Barlow Condensed (display/headlines) + Barlow (body),
-`<html lang="en" dir="ltr">`. **Accent = clay only** (clay-2 `#E06B43` on dark) — the old reel-1 gold is
-retired; don't reuse it. Inset frame per scene (`inset:28px` border, white .18 on dark / black .14 on light).
-
-**Existing reels (don't duplicate the angle):** 1 = the coach dashboard / "what your coach sees" · 2 =
-the 6-month roadmap · 3 = "a coach in your pocket" · 4 = the app (phone, App-as-Product) · 5 = the full
-5-step "how it works" journey (EN).
-
-**Verify** before delivering: render each scene with headless Chromium at 1080×1920 (Playwright via
-`/opt/pw-browsers/chromium`), check no overflow / no collisions, then eyeball. Fonts load from Google
-Fonts (needs internet) — sandbox previews fall back to a default sans; the real browser shows Barlow.
-
-**Build via the `/reel` skill** (`.claude/skills/reel/SKILL.md`) — give it a script/topic, get a
-finished `Content/reel-N-<slug>.html` + IG caption. It reads this map every run (counterpart to
-`/carousel`).
+### Reels — `Content/reel-*.html` (build with the `/reel` skill)
+Self-contained **1080×1920**, auto-scale + auto-loop, **screen-record** the frame. Clay-only accent (clay-2 on
+dark; old reel-1 gold is retired). Type @reel: big 92–104 · mid 62–66 · sub 42–46 · eyebrow 34–36 · pad 88.
+**Existing reels (don't duplicate the angle):** 1 = coach dashboard · 2 = 6-month roadmap · 3 = "a coach in
+your pocket" · 4 = the app (phone, App-as-Product) · 5 = the full 5-step "how it works" (EN). Verify each scene
+with headless Chromium (`/opt/pw-browsers/chromium`), no overflow/collisions; fonts need internet.
 
 ---
 
-## 9. Canonical strings & facts (don't reinvent)
+## 8. Image library (use the real product imagery, never stock)
 
-- **Person / product:** Amir Ardekani · **AA Performance** (the app).
-- **Handle:** Instagram **@amirardekanian** · site **amirardekani.com**.
-- **Credentials:** MSc Strength & Conditioning · MSc Applied Exercise Physiology · **500+ tennis & padel
-  players coached**. *(Farsi: «ارشد», never "MSc".)* Farsi title: «مربیِ بدنسازیِ حرفه‌ای».
-- **Tagline (EN wordmark voice):** *Move Better. Hit Harder. Last Longer.* (last clause italic).
-- **Signature lines:** «هیچی بی‌دلیل نیست» (nothing without a reason) · «یه مربی تو جیبت» (a coach in your
-  pocket). Canonical outro: setup «یه نقشه تا هدفت» → payoff «یه مربی تو جیبت» (مربی in clay) + brand row.
-- **The contrast to sell:** *not «یه برنامه/فایل/PDF» — «یه تجربه‌ی کاملِ مربی‌گری»* (not a program/file —
-  a full coaching experience).
-- **Pricing:** Iran «معادلِ ۲۵ دلار در ماه — به تومان، با نرخِ روز»; abroad → DM. CTA verb «شروع کن» (not «درخواست»).
-- **Voice:** Farsi = warm, direct, colloquial Tehrani, no fluff; audience = general-fitness Tehrani market
-  (not only athletes). Goal of content: **justify the premium & retain** (show depth), not cheap lead-gen.
-  Hook in first 2s; **captions burned in** (watched muted). **Accuracy gate:** every physiology number must
-  be right — prefer a simple round figure over unverified math (Amir holds an exercise-physiology ارشد).
+Full spec in **`IMAGES.md`** (aspect ratios, sizes, the cycle-banner generation prompt, where each is wired).
+
+- **Cycle banners** `assets/cycles/*.jpg` — **16:9**, neutral-graded gym photos. 9 files: `foundation-forge`,
+  `strength-engine`, `structural-build`, `structural-strength`, `durability-build`, `armour-build`,
+  `load-build`, `rebuild-reset`, `strength-reclaim`. Filename = slugified cycle name (loader falls back to a
+  green gradient). Canonical chain: **Foundation Forge → Strength Engine → Structural Build → Durability Build
+  → Armour Build**.
+- **Day banners** `assets/days/*.webp` — **≈5:2**, warmer clay-graded. 8 files: `lower upper power conditioning
+  core fullbody recovery default` (keyword-matched per day focus).
+- **Athlete photos** `assets/img/athletes/*.jpg` — **~4:5 portrait**, *real clients* for results/proof:
+  `Hamed Helen Mahdi Mehraneh Sarina Shahin mehdi-rahmani`.
+- **Session banners** `assets/img/workouts/*.webp` — **2:1**, moody: `strength conditioning mobility recovery
+  on-court`.
+- **Court bgs (root):** `court-sessions.jpg` (green) · `court-playbook.jpg` (clay). **Ball:**
+  `assets/img/tennis-ball-clay.png`.
+
+In carousels/reels, **embed images as base64** for portability (DESIGN_SYSTEM §9). Display the app way (full
+image + green scrim + caption).
 
 ---
 
-## 10. Gotchas checklist
+## 9. Data & content sources
 
-- [ ] Clay is the only accent. **No gold/yellow**, anywhere.
-- [ ] App-mirroring content → **Barlow / Barlow Condensed / Space Mono**, soft radii (14–22).
-- [ ] Color vars are truthful now — `--green` / `--clay` / `--ochre` (+ `-soft`). Never reintroduce `--yellow`/`--ice`/`--purple`/`--blue`, or `--red`/`--amber` standing in for clay/ochre.
-- [ ] Cycle 16:9, Day ≈5:2; use the **real** `assets/cycles` / `assets/days` images, base64-embedded.
+- **`data/*.json`** — one **athlete program** each (cycles → days → blocks → exercises with sets/reps/RPE/
+  tempo/rest/video/cues). `demo.json` + `john_doe.json` are safe templates. **Shape documented in `SCHEMA.md`.**
+  Athlete chip `style:"yellow"` is a *data* token meaning "high-priority" (renders green) — leave it as-is.
+- **`exercise_library.json`** — exercise name → demo video + cues. Generated from Notion by `sync_notion.py`
+  (see **`NOTION_SYNC.md`**); don't hand-edit.
+- **`articles/`** — the **Playbook** (`index.json` + category folders e.g. `pre-competition/`, `for-coaches/`).
+  Each article has `?article=<id>`. (Content/ mirrors some as design drafts.)
+- **`workouts/`** — the **Sessions** library (`index.json` + categories), banners in `assets/img/workouts/`.
+- **`supabase/`** — DB migrations: progress sync, two-way messages, `call_logs`, `cycle_reports`,
+  per-athlete `athlete_keys`. **`partials/`** = `nav.html` + `footer.html` (injected by `assets/js/shared.js`).
+
+---
+
+## 10. Canonical strings & facts (don't reinvent)
+
+- **Person / product:** Amir Ardekani · **AA Performance** (the app). Farsi title «مربیِ بدنسازیِ حرفه‌ای».
+- **Handles:** Instagram **@amirardekanian** · site **amirardekani.com** · WhatsApp **+44 7435 363461**.
+  *(Note the one-letter difference: domain `amirardekani`, IG `amirardekanian`. The Carousel-Kit header prints
+  `AMIRARDEKANI.COM`.)*
+- **Credentials:** **2×MSc** — Strength & Conditioning + Applied Exercise Physiology · **7+ years** · **500+
+  tennis & padel players**. *(Farsi: «ارشد», never "MSc".)*
+- **Tagline (EN):** *Move Better. Hit Harder. Last Longer.* (last clause italic).
+- **Signatures (FA):** «هیچی بی‌دلیل نیست» (nothing without a reason) · «یه مربی تو جیبت» (a coach in your
+  pocket). Canonical outro: setup «یه نقشه تا هدفت» → payoff «یه مربی تو جیبت» (مربی clay) + brand row.
+- **The contrast to sell:** *not «یه برنامه/فایل/PDF» — «یه تجربه‌ی کاملِ مربی‌گری»*.
+- **Pricing:** **EN** Foundation £149 (3mo) / Performance £349 (6mo) / Elite £599 (6mo); "Every programme
+  includes: dashboard & app · intake call ≤30 min · fully personalised programme · 6–7 monthly performance
+  notes · WhatsApp & email support · 15% loyalty renewal discount." **FA** «معادلِ ۲۵ دلار در ماه» (Toman,
+  day rate); abroad → DM. CTA verb «شروع کن» (not «درخواست»).
+- **Voice / content goal:** justify the premium & retain (show depth), not cheap lead-gen. Hook in first 2s,
+  burned-in captions. **Accuracy gate:** every physiology number must be right (Amir holds an exercise-phys
+  ارشد) — round figures over unverified math. ACWR danger threshold in content = **1.5**.
+
+---
+
+## 11. Build recipes & gotchas
+
+- **Carousel** → `/carousel` skill: script/topic in → `Content/carousel-<slug>.html` + IG caption. Farsi/RTL
+  default (Vazirmatn); English on request. Court bg + orange ball + tennis-ball pagination + clay `.hl`.
+- **Reel** → `/reel` skill: script/topic in → `Content/reel-N-<slug>.html` + caption; 1080×1920, screen-record.
+- **Mirror the real app** when showing UI: copy the real classes from `card-preview.html`; embed cycle/day
+  banners base64. **Use real athlete photos** for proof, never stock.
+
+**Gotchas checklist:**
+- [ ] Clay is the only accent. **No gold/yellow.** Background = the tennis court; the ball is the orange one.
+- [ ] One type system: **Barlow / Barlow Condensed / Space Mono** (+ Vazirmatn FA). Soft app radii (14–22).
+- [ ] Color vars are truthful (`--green`/`--clay`/`--ochre`); never reintroduce `--yellow`/`--ice`/`--purple`/`--blue`/`--red`(as clay)/`--amber`(as ochre).
+- [ ] Cycle 16:9 (neutral grade) · Day ≈5:2 (clay grade) · Athlete ~4:5 · Session 2:1 — real files, base64-embedded.
 - [ ] Farsi: no letter-spacing, no UPPERCASE, Persian numerals, counters `direction:ltr`.
 - [ ] html2canvas: no SVG `<use>`/`<symbol>`, no `transform:` — use `<image href>` + hard pixels.
-- [ ] Reels: clay-only, screen-record the 1080×1920 frame, fonts need internet.
+- [ ] Two audiences/prices: EN tennis/£ tiers, FA general/$25 — pick the right one for the post.
