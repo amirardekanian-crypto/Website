@@ -112,7 +112,8 @@ This is the human half of *"the coach actually watches you"* — the live app da
 | `PRODUCT.md` | this file — what the product is |
 | `HOW-IT-WORKS.md` | **customer-facing** explainer — the full coaching process end to end (Discovery → Analysis → Programming → Training → the weekly loop → Sessions & the Tennis Playbook). Plain-language source for a website "How it works" page, sales replies, or onboarding. |
 | `DESIGN_SYSTEM.md` | brand + motion spec (colours, type, reel/phone patterns) |
-| `reel-1-dashboard.html` … `reel-4-app.html` | finished Instagram reels (1080×1920, self-contained) |
+| **`BUILD-MAP.md`** | **the content build map** — asset inventory, the real app/coach tokens & card anatomy, and carousel/reel recipes. Read it before building any carousel or reel. |
+| `reel-1-dashboard.html` … `reel-5-how-it-works.html` | finished Instagram reels (1080×1920, self-contained) |
 | `card-preview.html` | visual catalog of the app's card components, in the live brand palette |
 | `instagram-carousels.html` · `Carousel-Kit.html` · `carousel-method.html` · `carousel-1-file-vs-coach.html` · `carousel-recovery-run.html` | carousels + the **23-template kit** (RALLY graphics layer: rally arc, court lines, tennis-ball pagination). New carousels are generated with the **`/carousel` Claude Code skill** — give it a script, get a finished file + caption. |
 | `instagram-cards/` | exported athlete "results" card PNGs |
