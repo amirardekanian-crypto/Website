@@ -382,6 +382,17 @@
   .mini-cue.bad  { background: rgba(192,57,43,0.10); color: #C0392B; }
   .mini-v-bar { position: absolute; right: 0; top: 100px; bottom: 0; width: 6px; background: var(--border); border-radius: 3px 0 0 3px; }
   .mini-v-fill { position: absolute; top: 0; left: 0; right: 0; height: 40%; background: var(--accent); border-radius: 3px 0 0 3px; animation: v-grow 3s ease-in-out infinite alternate; }
+  /* Real cycle/day banner art in the preview (mirrors the live app + the Farsi site) */
+  .mini-header.has-banner {
+    background-image: linear-gradient(to top, rgba(10,40,28,0.94), rgba(10,40,28,0.5)), url('/assets/cycles/strength-engine.jpg');
+    background-color: var(--accent); background-size: cover; background-position: center;
+  }
+  .mini-day { position: relative; border-radius: 7px; overflow: hidden; margin-bottom: 8px; aspect-ratio: 5 / 2.2; }
+  .mini-day img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mini-day-sc { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,40,28,0.9), transparent 68%); }
+  .mini-day-cap { position: absolute; left: 10px; right: 10px; bottom: 7px; color: #fff; }
+  .mini-day-cap b { font-family: var(--font-display); font-weight: 900; font-size: 14px; display: block; line-height: 1.1; text-transform: uppercase; }
+  .mini-day-cap span { font-weight: 600; font-size: 8px; color: #E6B493; text-transform: uppercase; letter-spacing: 0.5px; }
   @keyframes v-grow { 0%{height:25%} 100%{height:65%} }
 
   /* ── CREDENTIALS DEEP ── */
@@ -1198,8 +1209,8 @@
         <div class="phone-mockup" aria-hidden="true">
           <div class="phone-notch"></div>
           <div class="phone-screen">
-            <div class="mini-header">
-              <div class="mini-eyebrow">Program 02 · Month Two</div>
+            <div class="mini-header has-banner">
+              <div class="mini-eyebrow">Cycle 2 of 5 · Strength Engine</div>
               <div class="mini-title">Training</div>
               <div class="mini-sub">Designed for you by Amir Ardekani</div>
               <div class="mini-tabs">
@@ -1209,7 +1220,11 @@
               </div>
             </div>
             <div class="mini-body">
-              <div class="mini-focus">Squat &amp; Glute Activation</div>
+              <div class="mini-day">
+                <img src="/assets/days/lower.webp" alt="">
+                <div class="mini-day-sc"></div>
+                <div class="mini-day-cap"><span>Day 1 · Today</span><b>Lower Body &amp; Glutes</b></div>
+              </div>
               <div class="mini-section-label">Warm-Up</div>
               <div class="mini-exercise">
                 <div class="mini-ex-main">
