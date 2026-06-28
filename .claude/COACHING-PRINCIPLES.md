@@ -2,7 +2,8 @@
 
 This is Amir's codified coaching philosophy. `/program-design` and `/program-engage`
 **read this file first, every run**, and apply it — so settled questions are never
-re-asked. It grows as we design together: when Amir makes a **generalizable** call
+re-asked; `/athlete-intake` and `/program-roadmap` defer to its **"Design process"** front
+end (Phase 1). It grows as we design together: when Amir makes a **generalizable** call
 during design, the skill offers to append it here (he approves; one-off athlete-specific
 calls are NOT saved). Amir can open and edit this file anytime.
 
@@ -13,6 +14,64 @@ publish it. No athlete health/chat detail goes here — principles only.
 > two lines, general (applies across athletes), and actionable.
 
 ---
+
+## Design process
+*(The canonical method for every design pass. `/program-design` defers here and executes
+it; `/athlete-intake` and `/program-roadmap` feed its front end. The two rules below are
+not steps — they govern the whole method. The detailed sections further down this file
+(exercise selection, recovery, structure, volume, progression…) are the rules that live
+inside individual steps; this section is the skeleton they hang on.)*
+
+**The shape: assess at the front, design in the middle, then deliver.** Three phases, ten
+steps. Phase 1 understands before prescribing; Phase 2 designs; Phase 3 delivers it to the
+athlete. Close with the standing coach-facing reports. *(2026-06-27)*
+
+- **RULE 1 (most important) — the thinking is editable, not just the program.** Everything
+  in Phases 1–2 (steps 1–8 — the whole analysis and design logic) is written OUT to Amir in
+  plain head-coach-facing prose, the way an assistant coach briefs his head coach, and
+  presented as one **Analysis Brief at the checkpoint, before any exercise is built.** The
+  goal is that Amir corrects the *logic at its source*, not just tweaks the output. No
+  load-bearing decision stays silent inside the program. *(2026-06-27)*
+- **RULE 2 — online-first, always.** Assume no physical access to any client, ever. All
+  assessment is desk-based, from three sources only: (a) the intake form, (b) what Amir
+  tells me, (c) what I interpret from the athlete's in-app logs — loads, reps, RPE,
+  readiness, session notes, adherence, **e1RM from the heaviest logged sets.** Infer
+  movement quality and loading tolerance from logs + Amir's notes; never invent a screen.
+  Where something is genuinely unknowable from the desk (e.g. an undiagnosed injury), flag
+  it and **ASK Amir** — don't assume. *(2026-06-27)*
+
+**PHASE 1 — ASSESS (understand before prescribing)**
+1. **Needs analysis** — the demands of the goal/sport AND the athlete profile (training age,
+   injury history, lifestyle). For sport athletes this means the physical demands of the
+   sport (energy systems, movement patterns, injury epidemiology), not just the stated goal.
+2. **Screen & baseline — online.** There is no in-person movement screen (RULE 2): baseline
+   comes from intake + Amir's notes + log interpretation. Infer; don't invent; flag-and-ask
+   the genuinely unknowable.
+3. **Priority gate** — the one goal that unlocks the rest; everything downstream serves it.
+4. **Recovery capacity** — set the weekly volume ceiling BEFORE the session count. (See
+   "Recovery & autoregulation" + "Volume & dosing".)
+
+**PHASE 2 — DESIGN (iterative — a 5/6/7/8 loop, not a waterfall)**
+5. **Constraints** — equipment, time, environment.
+6. **Adaptation target + minimum effective dose** — name the training effect this block
+   drives (it is the locked roadmap's focus for this cycle), then the least work that drives
+   it.
+7. **Select exercises** — highest SFR (or transfer, for athletes), filtered by the injury
+   rules; defer what the athlete hasn't earned the brace for. (See "Exercise selection".)
+8. **Structure** — split/frequency, weekly undulation by systemic cost, and within-session
+   sequencing (power → primary → accessory → core). (See "Session structure & time" +
+   "Volume & dosing".) **Guiding rule — lead with the MOST-constrained dimension and let it
+   cascade:** for general clients that is usually the exercises (selection leads structure);
+   for in-season athletes it is the calendar (structure leads selection).
+
+**→ CHECKPOINT (RULE 1):** present steps 1–8 as the editable Analysis Brief and take Amir's
+edits before building anything.
+
+**PHASE 3 — DELIVER**
+9.  **Autoregulation + safety** — readiness rules, symptom veto, fallbacks. (See "Recovery
+    & autoregulation".)
+10. **Buy-in** — the why, the expected outcomes, the messaging. (The in-app text is
+    /program-engage's job; the *rationale* it sells originates here.)
 
 ## Exercise selection
 - **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
