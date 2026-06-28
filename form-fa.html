@@ -252,6 +252,8 @@
         <label class="pill"><input type="checkbox" name="Training Types" value="None"><span>هیچ‌کدوم</span></label>
       </div>
     </div>
+    <div class="f"><label for="bestLifts">رکوردهای فعلیت <span class="hint">اختیاری — چند ست سنگین کمک می‌کنه قدرتِ شروعت رو بسنجم</span></label>
+      <textarea id="bestLifts" name="Current Best Lifts" rows="2" placeholder="مثلاً اسکوات ۸۰kg×۵، پرس سینه ۶۰kg×۵، ددلیفت ۱۰۰kg×۳ — اگه مطمئن نیستی خالی بذار"></textarea></div>
   </section>
 
   <!-- 4 · GOALS -->
@@ -326,6 +328,12 @@
         <option value="Under 5 hours">زیرِ ۵ ساعت</option><option value="5-6 hours">۵–۶ ساعت</option><option value="7-8 hours">۷–۸ ساعت</option><option value="9+ hours">۹+ ساعت</option></select></div>
     <div class="f"><label for="stressS">سطحِ استرسِ فعلی</label>
       <div class="slider"><span class="sedge">کم</span><input type="range" id="stressS" name="Stress Level (1-10)" min="1" max="10" value="5"><span class="sedge">زیاد</span><span class="sval" id="stressV">۵</span></div></div>
+    <div class="f"><label for="nutrition">تغذیه‌ی فعلیت رو چطور توصیف می‌کنی؟</label>
+      <select id="nutrition" name="Nutrition" required><option value="" disabled selected>انتخاب</option>
+        <option value="Dialed in — consistent & intentional">منظم — ثابت و هدفمند</option><option value="Pretty good — mostly on track">خوب — بیشترِ مواقع روی روال</option><option value="Average — inconsistent">متوسط — بی‌نظم</option><option value="Needs work — little structure">نیاز به کار داره — بدونِ ساختار</option></select></div>
+    <div class="f"><label for="lifeLoad">بیرون از تمرین، یه هفته‌ی معمولیت چقدر پرفشاره؟ <span class="hint">کار، درس، مراقبت از خانواده، سفر</span></label>
+      <select id="lifeLoad" name="Weekly Life Load" required><option value="" disabled selected>انتخاب</option>
+        <option value="Light — plenty of downtime">سبک — وقتِ آزادِ زیاد</option><option value="Moderate — busy but manageable">متوسط — شلوغ ولی قابل‌مدیریت</option><option value="Heavy — long days, little downtime">سنگین — روزهای طولانی، وقتِ کم</option><option value="Very heavy — constantly stretched">خیلی سنگین — همیشه تحتِ فشار</option></select></div>
   </section>
 
   <!-- 7 · EQUIPMENT -->

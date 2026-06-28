@@ -20,18 +20,16 @@ designs nothing.
 The **Web3Forms intake form already captures most of this** — age, sex, body weight,
 gym experience (training age), goals, current pain/injury + description (stage & severity),
 **past injuries/surgeries**, movements-to-avoid, days/week, session length, **sleep quality
-+ hours**, **stress**, equipment, environment. Step 1's brief should already hold those, so
-**don't re-ask them** — confirm, then only collect what the form omits or the athlete left
-blank. Grouped into one round of questions, the genuine gaps to close:
++ hours**, **stress**, **nutrition**, **weekly life-load**, **current best lifts** (optional),
+equipment, environment. Step 1's brief should already hold those, so **don't re-ask them** —
+confirm, then only resolve what's left to coach judgement or what the athlete left blank.
+Grouped into one round of questions, the genuine gaps to close:
 - **Goal specificity + timeline** — turn the goal checkboxes into one concrete target
   (+ any competition / season date)
 - **Athlete type**: general-fitness OR sport-performance (+ sport) — decides whether SFR or
   sport-transfer leads exercise selection in design
-- **Known baseline lifts** (if any) — so design can sanity-check claims vs reality when
-  watching them train (trust the bar over the résumé)
-- **Nutrition** and **weekly life-load** (work hours / caregiving / travel) — the recovery
-  inputs the form does *not* collect; they finish the volume-ceiling picture alongside the
-  form's sleep + stress
+- **Baseline lifts** — the form asks them but they're *optional*; if blank, plan to gauge
+  strength by watching them train (trust the bar over the résumé)
 - **Red-flag triage** on any reported pain — if the injury description reads sharp /
   persistent / worsening / radiating, or numbness / suspected real injury, flag for
   referral to a physio/doctor before loading it
