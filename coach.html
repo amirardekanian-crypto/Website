@@ -19,15 +19,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    /* Roland-Garros palette, shared with program.html: green primary, clay,
-       ochre. Token names kept (--yellow/--blue) so existing refs need no rename. */
+    /* Roland-Garros palette, shared with program.html: green primary, clay, ochre. */
     --bg: #FAF7F2; --card: #FFFFFF; --card-soft: #EDE8E0; --ink: #1A1A1A; --grey: #5C5C5C;
     --line: #D8D1C5; --on-accent: #FFFFFF;
-    --accent: #0E4A36; --yellow: #0E4A36;                 /* brand green (primary) */
-    --green: #0E4A36;  --green-soft: #E6F0EA;             /* good / optimal */
-    --red:   #C7552F;  --red-soft:   #F6E7E0;             /* clay — danger / high */
-    --amber: #A8741C;  --amber-soft: #F2E9D8;             /* ochre — watch */
-    --blue:  #0E4A36;                                     /* data viz → brand green */
+    --accent: #0E4A36; --green: #0E4A36; --green-soft: #E6F0EA;  /* brand green / optimal */
+    --clay:   #C7552F;  --clay-soft:   #F6E7E0;                  /* clay — danger / high */
+    --ochre:  #A8741C;  --ochre-soft:  #F2E9D8;                  /* ochre — watch */
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--ink); font-family: 'Barlow', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -37,7 +34,7 @@
   /* Sticky brand nav, mirrored from program.html's .home-nav */
   .cnav { position: sticky; top: 0; z-index: 50; background: var(--accent); padding: 14px 24px;
           display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-  .cnav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--red); }
+  .cnav::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--clay); }
   .cnav-brand { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 2px;
                 color: var(--on-accent); text-decoration: none; text-transform: uppercase; }
   .cnav-brand span { opacity: .65; font-weight: 400; }
@@ -54,8 +51,8 @@
   .btn.ghost { background: transparent; border-color: rgba(255,255,255,0.45); color: var(--on-accent); }
   .btn.ghost:hover { border-color: var(--on-accent); background: rgba(255,255,255,0.12); }
   .btn.sm { padding: 4px 11px; font-size: 12px; border-radius: 8px; }
-  .btn.danger { color: var(--red); }
-  .btn.danger:hover { border-color: var(--red); background: var(--red-soft); }
+  .btn.danger { color: var(--clay); }
+  .btn.danger:hover { border-color: var(--clay); background: var(--clay-soft); }
   .bar { height: 8px; background: var(--card-soft); border-radius: 6px; margin-top: 12px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 6px; }
   .day-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
@@ -65,7 +62,7 @@
           border: 1px solid var(--line); border-radius: 16px; padding: 40px 32px; }
   .gate h1 { font-size: 32px; margin-bottom: 8px; }
   .gate p { color: var(--grey); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
-  .gate .err { color: var(--red); font-size: 13px; margin-top: 16px; min-height: 18px; }
+  .gate .err { color: var(--clay); font-size: 13px; margin-top: 16px; min-height: 18px; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s; }
@@ -74,7 +71,7 @@
   .card .meta { font-size: 12px; color: var(--grey); margin-top: 2px; }
   .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 12px; }
   .pill.active { background: var(--green-soft); color: var(--green); }
-  .pill.quiet  { background: var(--red-soft); color: var(--red); }
+  .pill.quiet  { background: var(--clay-soft); color: var(--clay); }
   .stats { display: flex; gap: 18px; margin-top: 14px; }
   .stat .n { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
   .stat .l { font-size: 10px; text-transform: uppercase; color: var(--grey); letter-spacing: .5px; }
@@ -90,7 +87,7 @@
   td.num { font-family: 'Space Mono', monospace; white-space: nowrap; }
   .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #F2EEE7; }
   .tag.done { background: var(--green-soft); color: var(--green); }
-  .note { background: #FBF8F1; border-left: 3px solid var(--amber); padding: 9px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; }
+  .note { background: #FBF8F1; border-left: 3px solid var(--ochre); padding: 9px 12px; border-radius: 6px; margin-top: 10px; font-size: 13px; }
   .readiness { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
   .readiness .r { font-size: 12px; color: var(--grey); } .readiness .r b { font-family: 'Space Mono', monospace; color: var(--ink); }
   .muted { color: var(--grey); font-size: 13px; }
@@ -98,7 +95,7 @@
 
   /* Email-style finished-session card */
   .day-date { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: var(--ink); text-transform: none; margin-top: 3px; }
-  .tag.partial { background: var(--amber-soft); color: var(--amber); }
+  .tag.partial { background: var(--ochre-soft); color: var(--ochre); }
   .meta-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
   .meta-table td { padding: 5px 0; border: none; font-size: 13px; vertical-align: top; }
   .meta-table td.k { color: var(--grey); width: 130px; text-transform: uppercase; font-size: 11px; letter-spacing: .5px; padding-right: 12px; }
@@ -113,19 +110,19 @@
   .tier { margin-bottom: 4px; }
   .tier-head { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--grey); margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
   .tier-head .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-  .dot.red { background: var(--red); } .dot.amber { background: var(--amber); } .dot.green { background: var(--green); }
+  .dot.red { background: var(--clay); } .dot.amber { background: var(--ochre); } .dot.green { background: var(--green); }
   details.tier-ok summary { cursor: pointer; list-style: none; }
   details.tier-ok summary::-webkit-details-marker { display: none; }
   details.tier-ok summary:hover { color: var(--ink); }
 
   .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .card.alert-red { border-left: 3px solid var(--red); }
-  .card.alert-amber { border-left: 3px solid var(--amber); }
+  .card.alert-red { border-left: 3px solid var(--clay); }
+  .card.alert-amber { border-left: 3px solid var(--ochre); }
   .zrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
   .zpill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: var(--card-soft); color: var(--grey); white-space: nowrap; }
   .zpill.green { background: var(--green-soft); color: var(--green); }
-  .zpill.amber { background: var(--amber-soft); color: var(--amber); }
-  .zpill.red   { background: var(--red-soft); color: var(--red); }
+  .zpill.amber { background: var(--ochre-soft); color: var(--ochre); }
+  .zpill.red   { background: var(--clay-soft); color: var(--clay); }
   .flags { display: flex; flex-direction: column; gap: 4px; margin-top: 11px; }
   .flag { font-size: 11.5px; color: var(--grey); display: flex; align-items: center; gap: 7px; }
   .flag .fdot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
@@ -193,12 +190,12 @@
   .cmsg.coach .cmsg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 3px; }
   .cmsg.ath .cmsg-bubble { background: var(--card-soft); color: var(--ink); border-bottom-left-radius: 3px; }
   .cmsg-meta { font-size: 10px; color: var(--grey); margin-top: 3px; }
-  .cmsg-tag { background: var(--red-soft); color: var(--red); padding: 1px 6px; border-radius: 8px; font-weight: 600; }
+  .cmsg-tag { background: var(--clay-soft); color: var(--clay); padding: 1px 6px; border-radius: 8px; font-weight: 600; }
   .creply { display: flex; gap: 8px; }
   .creply textarea, .session-reply textarea { flex: 1; resize: vertical; min-height: 38px; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; font-family: inherit; font-size: 14px; background: var(--bg); color: var(--ink); }
   .note-actions { display: flex; gap: 8px; margin-top: 8px; }
   .session-reply { gap: 8px; margin-top: 8px; }
-  .zpill.reply { background: var(--red-soft); color: var(--red); font-weight: 600; }
+  .zpill.reply { background: var(--clay-soft); color: var(--clay); font-weight: 600; }
 
   /* ── Tab navigation (Athletes | Chats) ────────────────────────────── */
   .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
@@ -208,14 +205,14 @@
          display: inline-flex; align-items: center; gap: 9px; }
   .tab:hover { color: var(--ink); }
   .tab.active { color: var(--ink); border-bottom-color: var(--accent); }
-  .tab-badge { background: var(--red); color: #fff; font-family: 'Space Mono', monospace; font-size: 11px;
+  .tab-badge { background: var(--clay); color: #fff; font-family: 'Space Mono', monospace; font-size: 11px;
                font-weight: 700; line-height: 1; padding: 3px 7px; border-radius: 20px; }
 
   /* ── Chats inbox (conversation list) ──────────────────────────────── */
   .conv { display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--line);
           border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, transform .1s; }
   .conv:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .conv.unread { border-left: 3px solid var(--red); }
+  .conv.unread { border-left: 3px solid var(--clay); }
   .conv-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; color: #fff;
                  background: linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
                  display: flex; align-items: center; justify-content: center;
@@ -226,7 +223,7 @@
   .conv-preview b { color: var(--ink); font-weight: 600; }
   .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
   .conv-time { font-size: 11px; color: var(--grey); font-family: 'Space Mono', monospace; white-space: nowrap; }
-  .conv-unread { background: var(--red); color: #fff; font-family: 'Space Mono', monospace; font-size: 11px;
+  .conv-unread { background: var(--clay); color: #fff; font-family: 'Space Mono', monospace; font-size: 11px;
                  font-weight: 700; min-width: 20px; text-align: center; padding: 2px 7px; border-radius: 20px; }
   /* Chat thread view */
   .chat-head { display: flex; align-items: center; gap: 14px; margin: 6px 0 18px; }
@@ -429,7 +426,7 @@ function unslug(s) { return s.replace(/_/g, ' '); }
 // (28-day weekly average). Readiness uses the composite each athlete self-reports.
 // Colours are hex (not CSS vars) because var() isn't reliable inside SVG attrs.
 // Roland-Garros palette (hex, not CSS vars — var() isn't reliable inside SVG attrs).
-const C = { blue:'#0E4A36', green:'#0E4A36', red:'#C7552F', yellow:'#A8741C', amber:'#A8741C', grey:'#5C5C5C', ink:'#1A1A1A' };
+const C = { green:'#0E4A36', clay:'#C7552F', ochre:'#A8741C', grey:'#5C5C5C', ink:'#1A1A1A' };
 function pDate(iso) { const p = String(iso).split('-'); return new Date(+p[0], (+p[1]) - 1, +p[2]); }
 function round1(n) { return Math.round(n * 10) / 10; }
 
@@ -594,7 +591,7 @@ function lineSVG(series, opts) {
 // The two-up charts shown at the top of an athlete's detail view.
 function renderCharts(m) {
   const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
-  const azColor = az.cls === 'red' ? 'var(--red)' : az.cls === 'amber' ? 'var(--amber)' : az.cls === 'green' ? 'var(--green)' : 'var(--ink)';
+  const azColor = az.cls === 'red' ? 'var(--clay)' : az.cls === 'amber' ? 'var(--ochre)' : az.cls === 'green' ? 'var(--green)' : 'var(--ink)';
   const hasLoad = Object.keys(m.daily).length > 0;
   const loadCard = `<div class="chart-card">
     <h4>Training load</h4>
@@ -604,12 +601,12 @@ function renderCharts(m) {
       : `<div class="chart-big" style="font-size:18px;color:var(--grey)">Building baseline</div>
          <div class="chart-sub">Needs ~2 weeks of sessions (with duration logged) before the acute:chronic ratio means anything.</div>`}
     ${hasLoad
-      ? barsSVG(weeklyLoad(m.daily, 8), C.blue) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks</div>`
+      ? barsSVG(weeklyLoad(m.daily, 8), C.green) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks</div>`
       : `<p class="muted" style="margin-top:10px">No load data yet — needs sessions with a logged duration.</p>`}
   </div>`;
 
   const r = m.readiness;
-  const rColor = !r ? 'var(--grey)' : r.delta <= -1 ? 'var(--red)' : r.delta <= -0.5 ? 'var(--amber)' : 'var(--green)';
+  const rColor = !r ? 'var(--grey)' : r.delta <= -1 ? 'var(--clay)' : r.delta <= -0.5 ? 'var(--ochre)' : 'var(--green)';
   const readyCard = `<div class="chart-card">
     <h4>Readiness</h4>
     ${r
@@ -622,7 +619,7 @@ function renderCharts(m) {
 
   const adh = m.adherence;
   const adhColor = !adh || adh.pct == null ? 'var(--grey)'
-    : adh.pct >= 85 ? 'var(--green)' : adh.pct >= 60 ? 'var(--amber)' : 'var(--red)';
+    : adh.pct >= 85 ? 'var(--green)' : adh.pct >= 60 ? 'var(--ochre)' : 'var(--clay)';
   const adhDone = adh ? (adh.done % 1 ? adh.done.toFixed(1) : adh.done) : 0;
   const adhCard = `<div class="chart-card">
     <h4>Adherence</h4>
@@ -765,12 +762,12 @@ function athleteCard(a) {
     </div>`;
   }
   const flagsHtml = a.flags.length
-    ? `<div class="flags">${a.flags.slice(0, 3).map(f => `<div class="flag"><span class="fdot" style="background:${f.sev === 'red' ? C.red : C.yellow}"></span>${esc(f.msg)}</div>`).join('')}</div>`
+    ? `<div class="flags">${a.flags.slice(0, 3).map(f => `<div class="flag"><span class="fdot" style="background:${f.sev === 'red' ? C.clay : C.ochre}"></span>${esc(f.msg)}</div>`).join('')}</div>`
     : '';
   return `<div class="card ${alertCls}" onclick="loadAthlete('${esc(a.id)}')">
     ${head}
     <div class="meta">last active ${timeAgo(a.lastActive)} · ${a.finished} session${a.finished === 1 ? '' : 's'}</div>
-    <div class="spark">${sparkline(m.loadPts, C.blue)}</div>
+    <div class="spark">${sparkline(m.loadPts, C.green)}</div>
     <div class="zrow">${replyChip}${acwrPill}${rPill}${adhPill}</div>
     ${flagsHtml}
   </div>`;
@@ -1105,15 +1102,15 @@ function comparisonTableHtml(s, programDays) {
   if (pd) (pd.blocks || []).forEach(b => (b.exercises || []).forEach(ex => prescribed.push(ex)));
 
   const loggedCell = e => {
-    if (!e) return '<span style="color:var(--red)">— not logged</span>';
+    if (!e) return '<span style="color:var(--clay)">— not logged</span>';
     const done = e.sets.filter(x => x.done).length, tot = e.sets.length;
     const lbl = e.tag && e.tag !== '✓' ? ' (' + esc(e.tag) + ')' : '';
     if (!e.done) {
       return done > 0
-        ? `<span style="color:var(--amber)">partial${tot ? ' ' + done + '/' + tot + ' sets' : ''}${lbl}</span>`
-        : `<span style="color:var(--red)">skipped${lbl}</span>`;
+        ? `<span style="color:var(--ochre)">partial${tot ? ' ' + done + '/' + tot + ' sets' : ''}${lbl}</span>`
+        : `<span style="color:var(--clay)">skipped${lbl}</span>`;
     }
-    if (tot && done < tot) return `<span style="color:var(--amber)">${done}/${tot} sets</span>`;
+    if (tot && done < tot) return `<span style="color:var(--ochre)">${done}/${tot} sets</span>`;
     return `<span style="color:var(--green)">✓${tot ? ' ' + done + '/' + tot + ' sets' : ''}</span>`;
   };
 
@@ -1136,7 +1133,7 @@ function comparisonTableHtml(s, programDays) {
     parsed.forEach(e => { if (!e.done) skipped++; rows.push(`<tr><td>${esc(e.name)}</td><td class="muted">—</td><td>${loggedCell(e)}</td></tr>`); });
   }
   const tag = skipped
-    ? `<span style="color:var(--red)">${skipped} skipped/partial</span>`
+    ? `<span style="color:var(--clay)">${skipped} skipped/partial</span>`
     : `<span style="color:var(--green)">all prescribed work done</span>`;
   const note = prescribed.length ? '' : ' <span class="muted">(no program file — showing what was logged)</span>';
   return `<div class="elog-title" style="margin-top:18px">Prescribed vs done · ${tag}${note}</div>
@@ -1253,7 +1250,7 @@ function parseAndFillSession() {
   const r = p.readiness;
   const rTxt = !r ? '—' : r.skipped ? 'skipped' : `${r.composite != null ? r.composite + '/5' : ''}`;
   $('as-preview').innerHTML = !p.day
-    ? '<span style="color:var(--red)">Couldn\'t find a "Day N" line — paste the full email (including the Full summary block).</span>'
+    ? '<span style="color:var(--clay)">Couldn\'t find a "Day N" line — paste the full email (including the Full summary block).</span>'
     : `<table class="meta-table">
         <tr><td class="k">Day</td><td class="v">Day ${esc(p.day)}${p.focus ? ' — ' + esc(p.focus) : ''}</td></tr>
         <tr><td class="k">Status</td><td class="v">${esc(p.status)}</td></tr>
