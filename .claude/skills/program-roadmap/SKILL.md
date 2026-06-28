@@ -10,14 +10,6 @@ the full multi-cycle roadmap for the athlete's goal. This is the ONLY stage that
 creates the roadmap — its existence is why /program-design and /program-engage can
 never drift from the plan.
 
-This roadmap is the multi-cycle expression of the brief's **needs analysis + priority gate**
-(Design process → Phase 1, in `.claude/COACHING-PRINCIPLES.md`): the demands of the goal/sport
-set the arc and the cycle count, and the priority gate sets what each cycle serves. Each
-cycle's **primary/secondary focus becomes the adaptation target** that /program-design's
-Phase 2 inherits (step 6) — so name them as real training effects, not vibes. **Online-first
-(RULE 2):** the roadmap is built from the brief alone — there is no in-person testing day;
-cycle-to-cycle progress is later read from the in-app logs.
-
 ## Inputs
 - The **ATHLETE BRIEF** (goal, athlete type, timeline, days/week, constraints). For a
   returning athlete who somehow has no roadmap yet, the `athlete-brief` subagent can

@@ -9,13 +9,6 @@ Produce a complete **ATHLETE BRIEF** for a brand-new client so the roadmap and f
 program can be designed from a full picture. This stage assembles the input only — it
 designs nothing.
 
-This brief is the front end of the **Design process → Phase 1 (ASSESS)** in
-`.claude/COACHING-PRINCIPLES.md`. **Online-first (RULE 2): there is never an in-person
-screen** — this brief plus Amir's notes (and later the in-app logs) are the *entire*
-baseline the designer ever gets. So gather it completely and from evidence: capture what
-the intake establishes, ask Amir for the rest, and **flag what's genuinely unknowable
-without a clinician (e.g. an undiagnosed injury) as an OPEN QUESTION — never infer it.**
-
 ## Step 1 — Pull what already exists
 - Establish the `athlete_id` (lowercase `firstname_lastname`). If Amir pasted athlete
   info, use it.
@@ -24,19 +17,25 @@ without a clinician (e.g. an undiagnosed injury) as an OPEN QUESTION — never i
   Amir pasted.)
 
 ## Step 2 — Fill the gaps (ask Amir; never invent)
-Confirm/collect, grouped into one round of questions:
-- **Goal** (specific) + any competition / season timeline
-- **Athlete type**: general-fitness  OR  sport-performance (+ sport) — this decides
-  whether SFR or sport-transfer leads exercise selection in design
-- **For sport-performance clients — the sport's demands** (design's needs analysis, step 1):
-  level/position, in- vs off-season + key competition dates, dominant movement patterns, and
-  the sport's common injuries — so design serves the demands of the sport, not just the
-  stated goal
-- **Training age** / experience
-- **Injuries & restrictions** — each with current stage (active / resolving / resolved)
-- **Equipment access** (full gym / home / which machines) — gates the SFR selections
-- **Days/week** available + **session-length ceiling**
-- **Sleep & stress baseline** — gates recovery capacity
+The **Web3Forms intake form already captures most of this** — age, sex, body weight,
+gym experience (training age), goals, current pain/injury + description (stage & severity),
+**past injuries/surgeries**, movements-to-avoid, days/week, session length, **sleep quality
++ hours**, **stress**, **nutrition**, **weekly life-load**, **current best lifts** (optional),
+equipment, environment. Step 1's brief should already hold those, so **don't re-ask them** —
+confirm, then only resolve what's left to coach judgement or what the athlete left blank.
+Grouped into one round of questions, the genuine gaps to close:
+- **Goal specificity + timeline** — turn the goal checkboxes into one concrete target
+  (+ any competition / season date)
+- **Athlete type**: general-fitness OR sport-performance (+ sport) — decides whether SFR or
+  sport-transfer leads exercise selection in design
+- **Baseline lifts** — the form asks them but they're *optional*; if blank, plan to gauge
+  strength by watching them train (trust the bar over the résumé)
+- **Red-flag triage** on any reported pain — if the injury description reads sharp /
+  persistent / worsening / radiating, or numbness / suspected real injury, flag for
+  referral to a physio/doctor before loading it
+- **Frequency vs goal** — if the form's days/week + session ceiling can't support the goal,
+  note it to renegotiate (ask for a bit more time *if the limit isn't real*; otherwise
+  design honestly reframes the goal as maintenance, not failure)
 
 ## Step 3 — Emit the brief + register the athlete
 - Output the **ATHLETE BRIEF** (same structure the subagent uses).
