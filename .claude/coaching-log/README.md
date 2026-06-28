@@ -24,22 +24,22 @@ read + decisions + reports.
 
 ---
 
-## Seeding an existing athlete (one-time, mid-journey)
+## Athletes from before the log existed
 
-New athletes get their log from cycle 1 automatically. Athletes who were already training when
-the log was introduced start empty — so they get a **one-time SEED entry** that captures the
-rationale *as of their current cycle*, and from then on it's normal read-back + append.
+**No retroactive back-fill — and no special seeding step.** New athletes get their log from
+cycle 1 automatically. Athletes who were already training when the log was introduced start
+empty, and that's expected: the first entry is written *naturally, the next time you design
+that athlete's cycle*. `/program-design` reads whatever info is available (brief, roadmap,
+current program), you write that cycle, and its ordinary entry becomes the baseline the next
+cycle continues. From then on it's normal read-back + append.
 
-- Heading: `## Cycle <current NN> — <Cycle Name> · <YYYY-MM-DD> · SEED` (SEED marks it as the
-  baseline established mid-journey, not written at design time).
-- Content is the **current operative logic**: why the program looks the way it does now — the
-  priority targets + primary selections, what's been progressed or swapped and why (especially
-  injury-driven swaps), and where they sit on the roadmap.
+- The first entry is just that cycle's entry (e.g. `## Cycle <NN> — …`). Optionally note
+  `(first logged cycle — earlier cycles predate the log)` so a later reader knows the history
+  starts here, not at cycle 1.
 - **The "why" is the coach's.** `data/<id>.json` + `session_history` show *what* the program is
   and *what happened* (exercises, loads, injuries); they do NOT contain *why* a choice was made.
-  Build the data-grounded skeleton, then Amir supplies the reasoning. **Never invent a
+  Capture the standing logic in your own words as you design the cycle. **Never invent a
   rationale** — a fabricated "why" poisons every future cycle that reads it.
-- After the seed, the next `/program-design` reads it like any other entry and continues it.
 
 ## File template
 
