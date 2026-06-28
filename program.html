@@ -170,7 +170,7 @@
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
   /* The big athlete name (used inside the athlete card). The first name is
-     white; the last name is wrapped in <span> to drop to its own line in yellow. */
+     white; the last name is wrapped in <span> to drop to its own line in green. */
   .home-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(42px, 12vw, 64px);
@@ -421,9 +421,9 @@
     animation: cycleSegGlow 2.6s ease-in-out infinite;
   }
 
-  /* ─── HOME-ONLY: scale yellow back so it spotlights, doesn't shout ───
-     The new design uses lime as a single accent, not as a wash. These
-     overrides strip the yellow tint backgrounds, pills, and gradients
+  /* ─── HOME-ONLY: scale green back so it spotlights, doesn't shout ───
+     The new design uses green as a single accent, not as a wash. These
+     overrides strip the green tint backgrounds, pills, and gradients
      from the home page and replace them with quiet grey mono labels and
      thin separator lines. */
 
@@ -447,7 +447,7 @@
   /* Strip the original top accent line + radial glow */
   .planlike .current-message::before { display: none; }
   .planlike .current-message::after  { display: none; }
-  /* Highlighted frame — soft yellow-tinted border + subtle outer glow so the
+  /* Highlighted frame — soft green-tinted border + subtle outer glow so the
      current cycle card visually stands out from the future cycle cards. */
   .planlike .current-message {
     background: var(--white);
@@ -1006,7 +1006,7 @@
   .nav-back { position: absolute; top: 14px; left: 18px; z-index: 2; background: transparent; border: none; color: var(--on-accent); font-size: 22px; line-height: 1; cursor: pointer; padding: 6px 8px; }
   .nav-back:active { transform: scale(0.9); }
   /* Cycle hero on the program page header (mirrors the home cycle-hero, but
-     with a small yellow C-badge to the left of the cycle name). */
+     with a small green C-badge to the left of the cycle name). */
   .prog-cycle-hero { margin-bottom: 22px; }
   .prog-cycle-row {
     display: flex; align-items: center; gap: 12px;
@@ -1038,7 +1038,7 @@
     line-height: 1.4;
   }
 
-  /* Pill-style day tabs — D1 / D2 / D3 in compact mono. Active = solid ice fill. */
+  /* Pill-style day tabs — D1 / D2 / D3 in compact mono. Active = solid clay fill. */
   .day-tabs {
     display: flex;
     gap: 6px;
@@ -1369,7 +1369,7 @@
   /* ── Section Headers ── */
   .section-header-prog { display: flex; align-items: center; gap: 14px; margin: 38px 0 14px; }
   .section-icon { display: none; }
-  /* Bigger, bolder title — coloured per block (warm-up = ice, strength = yellow, power = purple) */
+  /* Bigger, bolder title — coloured per block (warm-up = clay, strength = green, power = ochre) */
   .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; line-height: 1; transition: color 0.2s; }
   /* Thicker trailing line — colour matches the block accent for a strong section break */
   .section-header-prog::after { content: ''; flex: 1; height: 3px; border-radius: 2px; background: var(--grey-mid); transition: background 0.2s; }
@@ -1400,7 +1400,7 @@
   /* Press feedback — small scale on tap for tactile feel */
   .checklist-item:active { transform: scale(0.99); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
   /* Checked state — base styling. The actual tint colour is overridden below
-     per block type (warm-up = ice, strength = yellow, power = purple) so the
+     per block type (warm-up = clay, strength = green, power = ochre) so the
      "done" colour matches the section colour the client already sees. */
   .checklist-item.checked .item-name { text-decoration: line-through; color: #888; }
   .checklist-item.checked .check-box::after { opacity: 1; transform: scale(1); }
@@ -1493,7 +1493,7 @@
      Tap-to-expand list view. The collapsed row shows just name + summary
      (sets×reps · target · rest). The expanded view shows a video placeholder,
      a 5-cell stats grid, extra chips (HOLD / Priority / etc.), coaching cues
-     with yellow/red accent lines, the log section (weight + RPE + note),
+     with green/red accent lines, the log section (weight + RPE + note),
      and a rest button. */
 
   /* Stat pills shown on the collapsed row — flex of small rounded pills. */
@@ -1561,7 +1561,7 @@
   .ex-section-label:first-child { margin-top: 14px; }
   body[data-dark] .ex-section-label { color: #777; }
 
-  /* Video placeholder — dark block with diagonal stripes + big yellow play */
+  /* Video placeholder — dark block with diagonal stripes + big green play */
   .ex-video {
     position: relative;
     height: 180px;
@@ -1650,7 +1650,7 @@
   body[data-dark] .ex-stat-value { color: #f0f0f0; }
   .ex-stat-value.dim { color: #bbb; font-weight: 500; }
   body[data-dark] .ex-stat-value.dim { color: #555; }
-  /* Target stat (RPE target) is always yellow */
+  /* Target stat (RPE target) is always green */
   .ex-stat.target .ex-stat-value { color: var(--green); }
   body[data-dark] .ex-stat.target .ex-stat-value { color: var(--green); }
   /* Tempo can get long — shrink slightly */
@@ -1674,7 +1674,7 @@
   /* Stats block — wraps extras + grid */
   .ex-stats-block { margin-top: 14px; }
 
-  /* Big pills for "extras" (HOLD, Priority, Max Intent, etc.). Solid yellow
+  /* Big pills for "extras" (HOLD, Priority, Max Intent, etc.). Solid green
      background, fully rounded, bold uppercase — designed to grab attention. */
   .ex-extra-chips {
     display: flex; flex-wrap: wrap; gap: 8px;
@@ -1699,14 +1699,14 @@
   body[data-dark] .ex-extra-chip {
     box-shadow: 0 1px 4px rgba(14,74,54,0.18);
   }
-  /* "yellow"-styled chips (high-priority ones from JSON) — already yellow,
+  /* "yellow"-styled chips (high-priority ones from JSON) — already green,
      just give them a slightly stronger glow so they read as the highest
      priority among the extras. */
   .ex-extra-chip.yellow {
     box-shadow: 0 0 0 2px rgba(14,74,54,0.25), 0 1px 2px rgba(0,0,0,0.08);
   }
 
-  /* Coaching cues — yellow accent for "good", red accent for "bad". No icons. */
+  /* Coaching cues — green accent for "good", red accent for "bad". No icons. */
   .ex-cue {
     display: flex;
     gap: 12px;
@@ -1890,7 +1890,7 @@
     margin-top: 14px;
   }
 
-  /* Filled-yellow play button — clear, tappable, on-brand */
+  /* Filled-green play button — clear, tappable, on-brand */
   .play-btn {
     width: 36px; height: 36px;
     border-radius: 50%;
@@ -2035,7 +2035,7 @@
   /* ── Session Complete ── */
   .session-complete { display: none; background: var(--white); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid var(--grey-mid); }
   .session-complete.visible { display: block; animation: fadeUp 0.4s ease both; }
-  /* Refined completion medallion — circular yellow ring with a check, scales in with a glow */
+  /* Refined completion medallion — circular green ring with a check, scales in with a glow */
   .complete-emoji {
     width: 64px; height: 64px;
     margin: 0 auto 18px;
@@ -3681,7 +3681,7 @@ function renderHome() {
   const w = DATA.workouts || { days: [] };
 
   // Cycle hero in the program header — same content as the home page hero.
-  // Format: "C2 · STRENGTH ENGINE" + italic purple tagline below.
+  // Format: "C2 · STRENGTH ENGINE" + italic ochre tagline below.
   const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
   const cIdx   = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
   const cur    = cycles[cIdx];
@@ -3846,7 +3846,7 @@ function blockCategory(title, blockIndex) {
   if (t.includes('warm') || t.includes('mobility') || t.includes('activation') || t.includes('cool')) return 'block-warmup';
   if (t.includes('plyo') || t.includes('power') || t.includes('jump') || t.includes('med ball') || t.includes('rotational') || t.includes('explosive')) return 'block-power';
   if (t.includes('strength')) return 'block-strength';
-  // Fallback for unknown / future block types — cycles ice → yellow → purple → ice …
+  // Fallback for unknown / future block types — cycles clay → green → ochre → clay …
   const fallback = ['block-warmup', 'block-strength', 'block-power'];
   return fallback[(blockIndex || 0) % fallback.length];
 }
@@ -3980,7 +3980,7 @@ function renderExSummary(parsed, restSec) {
   return `<div class="ex-summary">${mods.join('')}${statPills.join('')}</div>`;
 }
 
-// Cues — yellow line for good, red line for bad, no icons. Clean.
+// Cues — green line for good, red line for bad, no icons. Clean.
 function renderInlineCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
   let body = '';
@@ -4251,7 +4251,7 @@ function renderCues(cues) {
   return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
 }
 
-// Round cues — same yellow/red accent-line design as standard exercise cues.
+// Round cues — same green/red accent-line design as standard exercise cues.
 // Always visible inside the expanded circuit (no collapse).
 function renderRoundCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
