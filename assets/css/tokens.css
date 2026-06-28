@@ -35,8 +35,8 @@
 
   /* ── Typography ── */
   --font-display:  'Barlow Condensed', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body:     'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:     'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-body:     'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:     'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ── Layout ── */
   --container-max: 1120px;

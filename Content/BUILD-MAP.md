@@ -53,29 +53,39 @@ NO yellow/gold — it's **retired**. One accent only: **clay**.
 | Ink / Muted | `#1A1A1A` / `#5C5C5C` | body / captions |
 | Good / Bad | `#1F7A4D` / `#C0392B` | ✅ / ❌ semantic |
 
-**⚠️ Legacy alias trap.** Inside `program.html` & `coach.html` the CSS vars are mis-named for
-historical reasons: **green = `--yellow`/`--accent`/`--green`/`--blue`, clay = `--ice`/`--red`,
-ochre = `--purple`/`--amber`.** So in the coach charts the **"red" zone renders clay `#C7552F`**
-and the **"amber" zone renders ochre `#A8741C`** — never literal red/orange. Trust the hex, not the var name.
+**✅ Token names are truthful (the old alias trap was fixed).** Everywhere now: **`--green`
+`#0E4A36` · `--clay` `#C7552F` · `--ochre` `#A8741C`** (plus `--green-soft` / `--clay-soft` /
+`--ochre-soft` for the soft coach-zone fills, and `--accent` = green). The old misleading aliases —
+`--yellow`/`--ice`/`--purple`/`--blue`, and `--red`/`--amber` standing in for clay/ochre — were
+renamed across `program.html`, `coach.html`, `call-log.html`, and the kit (incl. coach's JS `const C`
+chart palette → `{green, clay, ochre, grey, ink}`). **Don't reintroduce them.** Genuine semantics keep
+truthful names: `--red-soft` `#C0392B` (site error red) and `--amber` `#B8862F` (card-preview only).
+*(Known pre-existing quirk: `program.html` references `var(--ink)` in ~12 spots without defining
+`--ink` — it inherits today; unify it to `--ink` when convenient.)*
 
 ---
 
-## 3. Two visual registers — pick the right one
+## 3. One type system (the app is the source of truth)
 
-The brand has **two** looks. Match content to whichever surface it's depicting.
+Fonts are now unified across **every** surface — site, app, coach tools, carousels, reels — to the
+app's stack. (DM Sans + JetBrains Mono are retired; the marketing site `assets/css/tokens.css` + page
+links were switched to match the app.)
 
-| | **Marketing site** (`index.html`, `assets/css`) | **The app + coach + cards** (`program.html`, `card-preview.html`) |
+| Role | Font | Notes |
 |---|---|---|
-| **Body font** | **DM Sans** | **Barlow** |
-| **Display** | Barlow Condensed (900, uppercase) | Barlow Condensed (700–900) |
-| **Mono / numerals** | JetBrains Mono | **Space Mono** |
-| **Radii** | tight: 3 / 6 / 12 / 100px | soft: cards 14–22, stats/log 8, buttons 4–5 |
-| **Feel** | editorial, clinical, lots of air | friendly product UI, colour-coded blocks |
+| **Body / UI** | **Barlow** (300–900) | what the real app renders in |
+| **Display / wordmark / big numbers** | **Barlow Condensed** (700–900) | uppercase headlines, large stat numerals |
+| **Small mono labels, eyebrows, pills, counters** | **Space Mono** (400/700) | the app's tiny tracked-uppercase labels |
+| **Farsi (carousels/reels)** | **Vazirmatn** | everything Persian |
 
-**Carousels & reels** use the **app register** (Barlow / Barlow Condensed / Space Mono),
-because they sell the app. Reels add **Vazirmatn** for Farsi. (DESIGN_SYSTEM.md still says "Barlow
-for UI" — the running *site* actually uses DM Sans; the *app* uses Barlow. The app register is what
-content should mirror.)
+**Two radius feels still differ by surface** (this is layout, not type): the marketing site is tight
+(3 / 6 / 12 / 100px, editorial); the app + cards are softer (cards 14–22, stats/log 8, buttons 4–5,
+friendly product UI). Content that mirrors the *app* uses the soft radii.
+
+**Carousels & reels** use this system (Barlow / Barlow Condensed / Space Mono + Vazirmatn for Farsi).
+*Nuance:* the **Carousel-Kit** maps `--mono` to Barlow Condensed (its larger eyebrow/label role); the
+app uses Space Mono for the *tiny* labels and Barlow Condensed for *large* ones — both are app-family,
+so the kit stays as-is unless you specifically want tiny carousel labels in Space Mono.
 
 ---
 
@@ -204,6 +214,10 @@ the 6-month roadmap · 3 = "a coach in your pocket" · 4 = the app (phone, App-a
 `/opt/pw-browsers/chromium`), check no overflow / no collisions, then eyeball. Fonts load from Google
 Fonts (needs internet) — sandbox previews fall back to a default sans; the real browser shows Barlow.
 
+**Build via the `/reel` skill** (`.claude/skills/reel/SKILL.md`) — give it a script/topic, get a
+finished `Content/reel-N-<slug>.html` + IG caption. It reads this map every run (counterpart to
+`/carousel`).
+
 ---
 
 ## 9. Canonical strings & facts (don't reinvent)
@@ -229,7 +243,7 @@ Fonts (needs internet) — sandbox previews fall back to a default sans; the rea
 
 - [ ] Clay is the only accent. **No gold/yellow**, anywhere.
 - [ ] App-mirroring content → **Barlow / Barlow Condensed / Space Mono**, soft radii (14–22).
-- [ ] In `coach.html`/`program.html` code, **var names lie** — green is `--yellow`, clay is `--ice`/`--red`, ochre is `--purple`/`--amber`. Use the hex.
+- [ ] Color vars are truthful now — `--green` / `--clay` / `--ochre` (+ `-soft`). Never reintroduce `--yellow`/`--ice`/`--purple`/`--blue`, or `--red`/`--amber` standing in for clay/ochre.
 - [ ] Cycle 16:9, Day ≈5:2; use the **real** `assets/cycles` / `assets/days` images, base64-embedded.
 - [ ] Farsi: no letter-spacing, no UPPERCASE, Persian numerals, counters `direction:ltr`.
 - [ ] html2canvas: no SVG `<use>`/`<symbol>`, no `transform:` — use `<image href>` + hard pixels.

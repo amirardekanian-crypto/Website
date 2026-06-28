@@ -70,10 +70,12 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 ## 2. Typography
 
+**The app is the single source of truth for type. One Latin system everywhere — site, app, coach tools, carousels, reels:** Barlow (body) · Barlow Condensed (display) · Space Mono (small mono labels). *(DM Sans and JetBrains Mono are retired — do not reintroduce them.)*
+
 - **Farsi: Vazirmatn** (400–900) — used for *everything* Persian. Headlines 800–900, body 400–600.
-- **Latin display / wordmark: Barlow Condensed** (700–900, **italic** for the AA PERFORMANCE lockup; big stat numbers use it upright at 900).
-- **Latin UI / app text / labels: Barlow** (500–900). This is what the real app renders in, so any "screen inside a phone" uses Barlow.
-- **Latin numerals & counters: Barlow Condensed.** (JetBrains Mono is an optional alt only if you want a deliberately technical look — not the default.)
+- **Latin display / wordmark: Barlow Condensed** (700–900, **italic** for the AA PERFORMANCE lockup; **big stat numbers** use it upright at 900).
+- **Latin UI / body / app text: Barlow** (300–900). This is what the real app renders in, so any "screen inside a phone" uses Barlow.
+- **Latin small labels, eyebrows, pills, metric labels & counters: Space Mono** (400/700) — the app's mono. Use it for the tiny tracked-uppercase labels; reserve Barlow Condensed for *large* display numbers/labels.
 
 **⚠️ Two hard Farsi rules**
 1. **Never apply `letter-spacing`** — it breaks Persian cursive joining (letters disconnect).
