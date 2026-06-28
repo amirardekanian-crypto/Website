@@ -24,6 +24,23 @@ read + decisions + reports.
 
 ---
 
+## Seeding an existing athlete (one-time, mid-journey)
+
+New athletes get their log from cycle 1 automatically. Athletes who were already training when
+the log was introduced start empty — so they get a **one-time SEED entry** that captures the
+rationale *as of their current cycle*, and from then on it's normal read-back + append.
+
+- Heading: `## Cycle <current NN> — <Cycle Name> · <YYYY-MM-DD> · SEED` (SEED marks it as the
+  baseline established mid-journey, not written at design time).
+- Content is the **current operative logic**: why the program looks the way it does now — the
+  priority targets + primary selections, what's been progressed or swapped and why (especially
+  injury-driven swaps), and where they sit on the roadmap.
+- **The "why" is the coach's.** `data/<id>.json` + `session_history` show *what* the program is
+  and *what happened* (exercises, loads, injuries); they do NOT contain *why* a choice was made.
+  Build the data-grounded skeleton, then Amir supplies the reasoning. **Never invent a
+  rationale** — a fabricated "why" poisons every future cycle that reads it.
+- After the seed, the next `/program-design` reads it like any other entry and continues it.
+
 ## File template
 
 When an athlete's log is first created, it starts with this header:
