@@ -1,0 +1,213 @@
+{
+  "id": "run-warm-up",
+  "title": "Rolling Start",
+  "category": "conditioning",
+  "duration": "15 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Zone 2 Run Warm-Up",
+  "blocks": [
+    {
+      "title": "Raise",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            { "label": "3 min" }
+          ],
+          "cues": {
+            "good": [
+              "Shuffle pace — slower than your Zone 2 pace",
+              "Relaxed shoulders, easy breathing"
+            ],
+            "bad": [
+              "Starting at run pace — this is circulation, not the session"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Mobilize",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Walking Lunge with Overhead Reach",
+          "videoUrl": null,
+          "chips": [
+            { "label": "×6 Each Side" }
+          ],
+          "cues": {
+            "good": [
+              "Reach tall on the same side as the back leg",
+              "Feel the stretch down the front of the back hip"
+            ],
+            "bad": [
+              "Short, choppy steps — take a full stride"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "×6 Each Side" }
+          ],
+          "cues": {
+            "good": [
+              "Sit back into the bending hip",
+              "Feel the inner thigh of the straight leg lengthen"
+            ],
+            "bad": [
+              "Letting the heel of the bending leg lift"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Walking Hamstring Sweep",
+          "videoUrl": null,
+          "chips": [
+            { "label": "×6 Each Side" }
+          ],
+          "cues": {
+            "good": [
+              "Heel down, toes up, sweep the hands past the shin",
+              "Hinge from the hips with a long spine"
+            ],
+            "bad": [
+              "Rounding the back to reach lower"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Front-to-Back Leg Swing",
+          "videoUrl": null,
+          "chips": [
+            { "label": "×10 Each Side" }
+          ],
+          "cues": {
+            "good": [
+              "Hand on a lamppost or wall for balance",
+              "Swing through the running stride arc, a little bigger each rep"
+            ],
+            "bad": [
+              "Forcing range — let momentum open it up gradually"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Side-to-Side Leg Swing",
+          "videoUrl": null,
+          "chips": [
+            { "label": "×10 Each Side" }
+          ],
+          "cues": {
+            "good": [
+              "Face the wall, swing the leg across and away from the body",
+              "Keep the torso tall and still — the leg does the moving"
+            ],
+            "bad": [
+              "Twisting the hips to fake a bigger swing"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Activate & Micro-Dose",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Micro-Dose Circuit",
+          "rounds": "2 Rounds",
+          "restSec": 45,
+          "items": [
+            {
+              "name": "Single-Leg Calf Raise",
+              "detail": "×10 Each Side",
+              "cues": {
+                "good": ["Ball of the foot on a curb edge, lower slowly below level"],
+                "bad": ["Bouncing out of the bottom"]
+              }
+            },
+            {
+              "name": "Single-Leg Romanian Deadlift Reach",
+              "detail": "×6 Each Side",
+              "cues": {
+                "good": ["Reach long, hips square, feel the standing-leg hamstring and glute"],
+                "bad": ["Letting the back hip open to the sky"]
+              }
+            },
+            {
+              "name": "Pogo Hop",
+              "detail": "×20",
+              "cues": {
+                "good": ["Stiff ankles, bounce off the ground like it's hot"],
+                "bad": ["Landing heavy or bending the knees to jump"]
+              }
+            },
+            {
+              "name": "A-Skip",
+              "detail": "20m",
+              "cues": {
+                "good": ["Tall posture, snappy knee drive, land under the hips"],
+                "bad": ["Leaning back or reaching the foot out in front"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Prime",
+      "icon": "👟",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Build-Up",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×15 s" },
+            { "label": "fast but relaxed", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Accelerate smoothly to fast-but-relaxed, then coast",
+              "Tall posture, quick light feet — walk back between reps"
+            ],
+            "bad": [
+              "Sprinting — stay smooth, never strained"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Start the Run",
+          "videoUrl": null,
+          "chips": [
+            { "label": "Zone 2" }
+          ],
+          "cues": {
+            "good": [
+              "Hold the first 5 minutes at the bottom of the zone",
+              "Settle into a rhythm you could hold a conversation at"
+            ],
+            "bad": [
+              "Letting the build-ups drag you out too fast"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
