@@ -45,14 +45,26 @@ Standing role: Amir asks for carousels, reels, posts, result cards, web/app rede
 animations. **Always start at `Content/DESIGN-ATLAS.md`** — the designer's working file
 (asset shelf, format recipes, current-vs-retired rulings, app-look cheat sheet, his taste),
 with `Content/DESIGN_SYSTEM.md` as the brand bible. Newest-taste references:
-`Content/carousel-warmup-tennis.html` (carousel), `Content/reel-4-app.html` (reel),
-`index-fa.html` (web). Non-negotiables in one line: clay `#C7552F` is the ONLY accent
-(clay-2 `#E06B43` on dark) — **no yellow/gold, ever**; green `#0E4A36` / paper `#FAF7F2`;
-Vazirmatn (FA) + Barlow Condensed (display) + Barlow (app UI); Farsi: no letter-spacing,
-no uppercase, Persian numerals, LTR counters; canvases 1080×1350 / 1080×1920; real
-assets over stock; outputs self-contained (base64); html2canvas drops SVG `<use>` and
-CSS transforms — inline images, hard px. Instagram handle in new designs =
-**@amirardekanian** (site: AMIRARDEKANI.COM); never retro-edit already-shipped designs.
+`Content/carousel-warmup-tennis.html` (carousel), `Content/reel-6-system.html` (reel, EN),
+`index-fa.html` (web — visual style only, see note below). Non-negotiables in one line: clay
+`#C7552F` is the ONLY accent (clay-2 `#E06B43` on dark) — **no yellow/gold, ever**; green
+`#0E4A36` / paper `#FAF7F2`; Barlow Condensed (display, uppercase) + Barlow (body/app-UI);
+canvases 1080×1350 / 1080×1920; real assets over stock; outputs self-contained (base64);
+html2canvas drops SVG `<use>` and CSS transforms — inline images, hard px. Instagram handle
+in new designs = **@amirardekanian** (site: AMIRARDEKANI.COM); never retro-edit
+already-shipped designs.
+
+**2026-07-02 — content language directive (Amir, verbatim): "we changed everything to
+english, im not creating content in farsi anymore."** Effective immediately: all NEW social
+content (carousels, reels, posts, result cards) is **English**, sharp/uppercase Barlow
+Condensed display per the EN site voice — not a translation of the Farsi template.
+Farsi-specific rules (Vazirmatn, no letter-spacing, no uppercase, Persian numerals, RTL
+mirroring) still apply only if Amir explicitly asks for Farsi again. Older Farsi social
+files (`reel-1..3`, `reel-5-system`, the `carousel-*` Farsi decks) are left as shipped —
+reference for mechanics only, not for language/voice.
+**Open question, not yet resolved:** whether this also means retiring/redirecting the live
+Farsi **website** (`index-fa.html`, `form-fa.html`, `terms-fa.html`) — that's a bigger,
+separate decision. Don't assume either way; ask Amir before touching those pages.
 
 ## Verifying the live site (important gotchas)
 - This sandbox **cannot reach amirardekani.com** (proxy blocks the host). Confirm deploys via the
