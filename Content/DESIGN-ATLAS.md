@@ -11,7 +11,8 @@ The brand *why* lives in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) — read the two
 
 **Newest-taste references** (imitate these, not older files):
 [`carousel-warmup-tennis.html`](carousel-warmup-tennis.html) for carousels ·
-[`reel-4-app.html`](reel-4-app.html) for reels · [`../index-fa.html`](../index-fa.html) for web.
+[`reel-5-system.html`](reel-5-system.html) (scene-swap) + [`reel-4-app.html`](reel-4-app.html)
+(App-as-Product phone) for reels · [`../index-fa.html`](../index-fa.html) for web.
 
 ---
 
@@ -87,7 +88,7 @@ Never reuse anything in the right column, even though old files still contain it
 
 ## Recipe: reel (9:16, 1080×1920)
 
-- **Signature pattern = "App-as-Product"** ([`reel-4-app.html`](reel-4-app.html)): one persistent phone in a dark radial room, screens swap inside it, burned-in Farsi captions below, endcard takeover. Older scene-swap pattern: reels 1–3 (full-screen `.scene`s + `data-dur` driver).
+- **Signature pattern = "App-as-Product"** ([`reel-4-app.html`](reel-4-app.html)): one persistent phone in a dark radial room, screens swap inside it, burned-in Farsi captions below, endcard takeover. Scene-swap pattern (full-screen `.scene`s + `data-dur` driver): newest-rules reference = [`reel-5-system.html`](reel-5-system.html) (adaptive topbar w/ @amirardekanian + LTR beat counter, `?beat=N` still-capture mode for screenshots, clay-2 accents, canonical outro); reels 1–3 are the older generation.
 - **Phone spec:** device 556×1136, radius 62, pad 14, dark gradient body, shadow + **clay halo** `0 0 140px rgba(199,85,47,.16)`, 6.5s idle float. Screen radius 48, paper bg, **`dir=ltr` + Barlow** (the real English app), dynamic island 128×34, status bar 58px. Screen transition: `opacity 0 / translateY(22px) scale(.985)` → on.
 - **Rhythm:** hook in first 2s · 2–6s per beat · ~30–40s total · text cascades `.rise` (translateY ~44px, delays in .12s steps) · count-ups ease-out with Persian digits (`'۰۱۲۳۴۵۶۷۸۹'[d]`, decimal «٫»), counters LTR.
 - **Canonical app beats:** lock screen → splash → today's program → exercise video → log weight+RPE → readiness check → coach chat → coach dashboard → canonical outro endcard.

@@ -168,9 +168,10 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   [`method`](Content/carousel-method.html), [`recovery-run`](Content/carousel-recovery-run.html),
   [`file-vs-coach`](Content/carousel-1-file-vs-coach.html) (stale chrome — see atlas) ·
   oldest: [`instagram-carousels.html`](Content/instagram-carousels.html).
-- **Reels** (1080×1920): **signature reference** = [`reel-4-app`](Content/reel-4-app.html)
-  ("App-as-Product") · earlier scene-swap generation:
-  [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
+- **Reels** (1080×1920): **newest** = [`reel-5-system`](Content/reel-5-system.html)
+  (the 5-step system; current-rules scene-swap, `?beat=N` still mode) ·
+  **signature product pattern** = [`reel-4-app`](Content/reel-4-app.html) ("App-as-Product") ·
+  earlier scene-swap generation: [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
   [`reel-2-roadmap`](Content/reel-2-roadmap.html) ·
   [`reel-3-pocket`](Content/reel-3-pocket.html) (pre-date the no-gold rule).
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
