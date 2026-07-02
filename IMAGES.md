@@ -17,7 +17,7 @@ path, so **every device loads the exact same file** — nothing can get lost or
 | **Cycle banners** | `assets/cycles/` | 16:9 | 1200×675 | JPG/WebP | < 120 KB |
 | **Workout banners** | `assets/img/workouts/` | 2:1 | 1600×800 | WebP | < 80 KB |
 | **Landing photos** | `assets/img/athletes/` | portrait ~4:5 | ~1080×1350 | JPG | < 150 KB |
-| **Social share (OG)** | `assets/img/og-image.png` | 1.91:1 | 1200×630 | PNG/JPG | < 100 KB |
+| **Social share (OG)** | `assets/img/og-image.jpg` | 1.91:1 | 1200×630 | JPG | < 100 KB |
 | **App icons** | `assets/img/` + root | 1:1 | see icons section | PNG/SVG/ICO | tiny |
 
 ---
@@ -91,12 +91,13 @@ Testimonial/showcase photos on the public homepage (`index.html`).
 
 ---
 
-## 4. Social share image (Open Graph) — `assets/img/og-image.png`
+## 4. Social share image (Open Graph) — `assets/img/og-image.jpg`
 
 The preview card shown when the site link is shared (WhatsApp, iMessage, etc.).
 
-- **Size:** **1200×630** (1.91:1) — the standard OG size. Current file 36 KB.
-- **Format:** PNG or JPG.
+- **Size:** **1200×630** (1.91:1) — the standard OG size. Current file ~52 KB.
+- **Format:** JPG (q85, progressive) — the banner's grain bloats PNG past the
+  <100 KB budget. Regenerated from `source/og-source.png` by `generate_icons.py`.
 - **Where it's wired:** `<meta property="og:image">` / `twitter:image` in the
   `<head>` of the public pages (`index.html`, etc.).
 - Replace this one file to change every link preview.
@@ -112,7 +113,7 @@ PWA / browser icons. Set once for branding; rarely change.
 | `assets/img/icon-192.png` | 192×192 | PWA home-screen icon (manifest) |
 | `assets/img/icon-512.png` | 512×512 | PWA splash / store icon (manifest) |
 | `assets/img/apple-touch-icon.png` | 180×180 | iOS "Add to Home Screen" |
-| `assets/img/favicon-32.png` | 192×192 | browser tab (PNG) |
+| `assets/img/favicon-32.png` | 32×32 | browser tab (PNG) |
 | `assets/img/favicon.svg` | vector | browser tab (modern) |
 | `favicon.ico` (repo root) | multi | browser tab (legacy) |
 

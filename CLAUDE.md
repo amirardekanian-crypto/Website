@@ -51,7 +51,8 @@ with `Content/DESIGN_SYSTEM.md` as the brand bible. Newest-taste references:
 Vazirmatn (FA) + Barlow Condensed (display) + Barlow (app UI); Farsi: no letter-spacing,
 no uppercase, Persian numerals, LTR counters; canvases 1080×1350 / 1080×1920; real
 assets over stock; outputs self-contained (base64); html2canvas drops SVG `<use>` and
-CSS transforms — inline images, hard px.
+CSS transforms — inline images, hard px. Instagram handle in new designs =
+**@amirardekanian** (site: AMIRARDEKANI.COM); never retro-edit already-shipped designs.
 
 ## Verifying the live site (important gotchas)
 - This sandbox **cannot reach amirardekani.com** (proxy blocks the host). Confirm deploys via the

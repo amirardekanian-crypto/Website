@@ -6,7 +6,7 @@ Sources (committed):  assets/img/source/aa-mark.png  (monogram only, for icons)
                       assets/img/source/aa-logo.png  (full lockup, for OG)
 Run:  python assets/img/generate_icons.py
 Outputs: icon-192.png, icon-512.png, apple-touch-icon.png, favicon-32.png,
-         favicon.svg, ../../favicon.ico, og-image.png
+         favicon.svg, ../../favicon.ico, og-image.jpg
 """
 import base64
 from io import BytesIO
@@ -107,5 +107,9 @@ if __name__ == "__main__":
     icon(64, content_ratio=0.88).save(ROOT / "favicon.ico",
                                       sizes=[(16, 16), (32, 32), (48, 48)])
     print("wrote favicon.ico")
-    save(make_og(), "og-image.png")
+    # OG ships as JPEG: the banner's grain/gradients bloat PNG past the
+    # <100 KB share-image budget (548 KB); q85 progressive lands ~52 KB.
+    make_og().save(HERE / "og-image.jpg", "JPEG",
+                   quality=85, optimize=True, progressive=True)
+    print("wrote assets/img/og-image.jpg  (1200x630)")
     print("done")
