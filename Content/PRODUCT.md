@@ -118,4 +118,4 @@ This is the human half of *"the coach actually watches you"* — the live app da
 | `instagram-cards/` | exported athlete "results" card PNGs |
 | `phone-links.html` | QR launcher to open any of the above on your phone over Wi-Fi |
 
-*Images the content pulls from live one level up in `../assets/` (`cycles/`, `days/`, `img/icon-192.png`, `img/og-image.png`).*
+*Images the content pulls from live one level up in `../assets/` (`cycles/`, `days/`, `img/icon-192.png`, `img/og-image.jpg`).*
