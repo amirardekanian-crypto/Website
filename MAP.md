@@ -16,7 +16,10 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 
 | I'm looking for… | Go to |
 |---|---|
+| **Anything design** — assets, format recipes, current rules, app look | [`Content/DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md) ← the designer's working file |
 | The look/brand rules (colours, fonts, marks, reels) | [`Content/DESIGN_SYSTEM.md`](Content/DESIGN_SYSTEM.md) · [colour tokens](assets/css/tokens.css) |
+| A specific image (logo, court photo, cutout, banner, headshot) | [Asset shelf](Content/DESIGN-ATLAS.md#asset-shelf--grab--go) in the atlas |
+| How to build a carousel / reel / result card | [Recipes](Content/DESIGN-ATLAS.md#recipe-carousel-ig-45-10801350) in the atlas |
 | What the business *is* (pricing, voice, backend) | [`Content/PRODUCT.md`](Content/PRODUCT.md) |
 | How the coaching process works (customer-facing) | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) |
 | Amir's coaching philosophy (the *why* behind sets/reps) | [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) |
@@ -62,9 +65,11 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 
 ## 🎨 Design system
 
-The single source of truth for how everything looks. The brand bible plus the
-*coded* tokens that actually render the site.
+Three layers, in the order a designer should read them:
 
+- **Designer's atlas:** [`Content/DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md) — **open this
+  when designing anything.** Grab-and-go asset shelf, carousel/reel/card recipes,
+  current-vs-retired rulings, the app-look cheat sheet, Amir's taste, open flags.
 - **Brand bible:** [`Content/DESIGN_SYSTEM.md`](Content/DESIGN_SYSTEM.md) — palette
   (RG green `#0E4A36` + clay `#C7552F` on warm paper, **no yellow/gold**), marks &
   wordmark lockup, Persian sign-offs, the canonical **reel outro**, carousel/reel/web rules.
@@ -74,9 +79,11 @@ The single source of truth for how everything looks. The brand bible plus the
 - **Shared chrome:** [`partials/nav.html`](partials/nav.html) ·
   [`partials/footer.html`](partials/footer.html) — injected by
   [`assets/js/shared.js`](assets/js/shared.js) (nav, footer, video pop-ups, install prompt, scroll reveal).
-- **Master marks:** [`icon-192.png`](assets/img/icon-192.png) (app tile) ·
+- **Master marks:** [`icon-192.png`](assets/img/icon-192.png) (app tile; masters in
+  [`assets/img/source/`](assets/img/source/)) ·
   [`og-image.png`](assets/img/og-image.png) (wordmark lockup / share image) ·
-  [`tennis-ball-clay.png`](assets/img/tennis-ball-clay.png) (sport motif).
+  court textures [`court-sessions.jpg`](court-sessions.jpg) /
+  [`court-playbook.jpg`](court-playbook.jpg) (the signature backgrounds).
 
 ---
 
@@ -152,19 +159,25 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 
 ## 📱 Social / marketing studio — `Content/`
 
-Standalone tools, **not** linked from the live site — open them directly to design social posts.
+Standalone tools, **not** linked from the live site — open them directly to design social
+posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md).
 
-- **Carousels:** [`Carousel-Kit.html`](Content/Carousel-Kit.html) (the template kit) +
-  `carousel-*.html` (method, war-up-tennis, recovery-run, file-vs-coach) ·
-  index: [`instagram-carousels.html`](Content/instagram-carousels.html).
-- **Reels:** [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
+- **Carousels** (1080×1350): kit = [`Carousel-Kit.html`](Content/Carousel-Kit.html)
+  (23 slide templates) · **newest reference** =
+  [`carousel-warmup-tennis.html`](Content/carousel-warmup-tennis.html) · older decks:
+  [`method`](Content/carousel-method.html), [`recovery-run`](Content/carousel-recovery-run.html),
+  [`file-vs-coach`](Content/carousel-1-file-vs-coach.html) (stale chrome — see atlas) ·
+  oldest: [`instagram-carousels.html`](Content/instagram-carousels.html).
+- **Reels** (1080×1920): **signature reference** = [`reel-4-app`](Content/reel-4-app.html)
+  ("App-as-Product") · earlier scene-swap generation:
+  [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
   [`reel-2-roadmap`](Content/reel-2-roadmap.html) ·
-  [`reel-3-pocket`](Content/reel-3-pocket.html) ·
-  [`reel-4-app`](Content/reel-4-app.html).
-- **Result cards:** [`card-preview.html`](Content/card-preview.html) → exports to
-  [`instagram-cards/`](Content/instagram-cards/).
-- **Image kits:** [`tennis-players/`](Content/tennis-players/) (cutouts) ·
-  [`recovery-run/`](Content/recovery-run/) (scene frames).
+  [`reel-3-pocket`](Content/reel-3-pocket.html) (pre-date the no-gold rule).
+- **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
+  (rebuilds every app card with real class names) → exports in
+  [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).
+- **Image kits:** [`tennis-players/`](Content/tennis-players/) (transparent player cutouts) ·
+  [`recovery-run/`](Content/recovery-run/) (graded photo-story frames).
 
 ---
 
@@ -172,6 +185,7 @@ Standalone tools, **not** linked from the live site — open them directly to de
 
 | Doc | Covers |
 |---|---|
+| [`Content/DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md) | Designer's working file — assets, recipes, rulings |
 | [`CODEBASE.md`](CODEBASE.md) | Plain-English file-by-file guide |
 | [`SCHEMA.md`](SCHEMA.md) | Every JSON field (program / article / workout) |
 | [`Content/PRODUCT.md`](Content/PRODUCT.md) | The business/product brief |
