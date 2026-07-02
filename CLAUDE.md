@@ -54,6 +54,17 @@ html2canvas drops SVG `<use>` and CSS transforms — inline images, hard px. Ins
 in new designs = **@amirardekanian** (site: AMIRARDEKANI.COM); never retro-edit
 already-shipped designs.
 
+**Reel delivery process (Amir, 2026-07-02 — was too slow first time, fix this):** For a reel,
+the deliverable is **the HTML file itself**, sent via SendUserFile so he can open/preview and
+screen-record it himself. **Do NOT render an MP4 unless he explicitly asks for one** — skip
+the whole Playwright/ffmpeg pipeline by default. **Do NOT send static per-beat screenshots**
+as the review artifact — the interactive file *is* the review. Keep the iteration loop fast:
+no multi-agent audit workflow, no video pipeline, for a routine draft/revision — save those
+for when he asks to finalize/export. Design direction: he wants reels **"fully animational,
+lots of moving things, being cool"** — not a slideshow of static cards with an entrance fade.
+Favor continuous motion (ambient background drift, drawing/dashed lines, count-ups, Ken Burns
+zoom on photos, pulsing indicators, typing dots, bouncing arrows) over one-shot transitions.
+
 **2026-07-02 — content language directive (Amir, verbatim): "we changed everything to
 english, im not creating content in farsi anymore."** Effective immediately: all NEW social
 content (carousels, reels, posts, result cards) is **English**, sharp/uppercase Barlow
