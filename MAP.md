@@ -110,7 +110,8 @@ The brain behind every program. Read the principles before touching sets/reps.
 
 **Content skills:** [`article`](.claude/skills/article/SKILL.md) (publish a blog) ·
 [`workout`](.claude/skills/workout/SKILL.md) (publish a Train session) ·
-[`carousel`](.claude/skills/carousel/SKILL.md) (build an Instagram carousel).
+[`carousel`](.claude/skills/carousel/SKILL.md) (build an Instagram carousel) ·
+[`reel`](.claude/skills/reel/SKILL.md) (build an animated Instagram reel).
 
 ---
 
@@ -168,10 +169,12 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   [`method`](Content/carousel-method.html), [`recovery-run`](Content/carousel-recovery-run.html),
   [`file-vs-coach`](Content/carousel-1-file-vs-coach.html) (stale chrome — see atlas) ·
   oldest: [`instagram-carousels.html`](Content/instagram-carousels.html).
-- **Reels** (1080×1920): **newest** = [`reel-5-system`](Content/reel-5-system.html)
-  (the 5-step system; current-rules scene-swap, `?beat=N` still mode) ·
+- **Reels** (1080×1920): build with the [`/reel` skill](.claude/skills/reel/SKILL.md) ·
+  **newest** = [`reel-6-system`](Content/reel-6-system.html) (English, continuously animated —
+  ambient motion, Ken Burns, typing dots, etc. — `?beat=N` still mode, `?capture=1` export mode) ·
   **signature product pattern** = [`reel-4-app`](Content/reel-4-app.html) ("App-as-Product") ·
-  earlier scene-swap generation: [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
+  earlier/retired-language generation: [`reel-5-system`](Content/reel-5-system.html) (Farsi) ·
+  [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
   [`reel-2-roadmap`](Content/reel-2-roadmap.html) ·
   [`reel-3-pocket`](Content/reel-3-pocket.html) (pre-date the no-gold rule).
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)

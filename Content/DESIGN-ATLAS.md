@@ -88,12 +88,24 @@ Never reuse anything in the right column, even though old files still contain it
 
 ## Recipe: reel (9:16, 1080×1920)
 
-- **Signature pattern = "App-as-Product"** ([`reel-4-app.html`](reel-4-app.html)): one persistent phone in a dark radial room, screens swap inside it, burned-in Farsi captions below, endcard takeover. Scene-swap pattern (full-screen `.scene`s + `data-dur` driver): newest-rules reference = [`reel-5-system.html`](reel-5-system.html) (adaptive topbar w/ @amirardekanian + LTR beat counter, `?beat=N` still-capture mode for screenshots, clay-2 accents, canonical outro); reels 1–3 are the older generation.
+**Build with the [`/reel` skill](../.claude/skills/reel/SKILL.md)** — the full how-to (motion
+techniques, the three URL modes, known gotchas, the MP4 export pipeline) lives there now; this
+is just the quick-reference.
+
+- **Newest reference = [`reel-6-system.html`](reel-6-system.html)** (English, current rules,
+  **continuously animated** — not a slideshow): drifting ambient orb + a drawn/marching dashed
+  clay arc behind every scene, pulsing live topbar dot, Ken Burns on photos, bouncing directional
+  cues, staggered card-row reveals, typing dots before a message lands, blinking timer colon,
+  breathing headline, bouncing CTA arrow. Amir's direction: **"fully animational, lots of moving
+  things, being cool"** — every scene needs 2–3+ concurrent motion techniques, not just an
+  entrance fade. Ships with three URL modes: default (autoplay+loop), `?beat=N` (frozen still),
+  `?capture=1` (chrome-free, exact-viewport — what the MP4 pipeline records).
+- **Signature pattern = "App-as-Product"** ([`reel-4-app.html`](reel-4-app.html)): one persistent phone in a dark radial room, screens swap inside it, burned-in Farsi captions below, endcard takeover. Use this pattern when the whole reel is a tour of the app; use reel-6's scene-swap pattern for a numbered-steps narrative.
 - **Phone spec:** device 556×1136, radius 62, pad 14, dark gradient body, shadow + **clay halo** `0 0 140px rgba(199,85,47,.16)`, 6.5s idle float. Screen radius 48, paper bg, **`dir=ltr` + Barlow** (the real English app), dynamic island 128×34, status bar 58px. Screen transition: `opacity 0 / translateY(22px) scale(.985)` → on.
-- **Rhythm:** hook in first 2s · 2–6s per beat · ~30–40s total · text cascades `.rise` (translateY ~44px, delays in .12s steps) · count-ups ease-out with Persian digits (`'۰۱۲۳۴۵۶۷۸۹'[d]`, decimal «٫»), counters LTR.
+- **Rhythm:** hook in first 2s · 2–6s per beat · ~30–40s total · text cascades `.rise` (translateY ~44px, delays in .12s steps) · count-ups ease-out.
 - **Canonical app beats:** lock screen → splash → today's program → exercise video → log weight+RPE → readiness check → coach chat → coach dashboard → canonical outro endcard.
-- **Export:** silent HTML; press replay + screen-record the 1080×1920 stage (controls sit outside the crop). Self-contained base64 imagery mandatory.
-- ⚠ Reels 1–3 predate the rules (gold accents, old outro wording, reel-1's non-canonical CTA) — copy the *mechanics*, not the styling. Reel-4's topbar shows the old `@amirardekani`: leave shipped reels as built; new work uses **@amirardekanian**.
+- **Delivery — the deliverable is the HTML file itself**, sent directly so Amir can open/preview/screen-record it himself. **No MP4 unless explicitly asked**; no per-beat screenshot walls; no audit workflow for a routine draft. The `/reel` skill's Step 9 covers the Playwright+ffmpeg export pipeline for when an MP4 *is* requested.
+- ⚠ Reels 1–3 (and reel-5, Farsi) predate the current rules or the language directive — copy mechanics only, not styling/language, from those files. Never retro-edit shipped reels; start a new numbered file.
 
 ## Recipe: result cards & app mockups
 

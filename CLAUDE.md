@@ -44,7 +44,10 @@ Durable context for working in this repo. Read the linked docs before diving in.
 Standing role: Amir asks for carousels, reels, posts, result cards, web/app redesigns,
 animations. **Always start at `Content/DESIGN-ATLAS.md`** — the designer's working file
 (asset shelf, format recipes, current-vs-retired rulings, app-look cheat sheet, his taste),
-with `Content/DESIGN_SYSTEM.md` as the brand bible. Newest-taste references:
+with `Content/DESIGN_SYSTEM.md` as the brand bible. For reels specifically, use the
+**`/reel` skill** (`.claude/skills/reel/SKILL.md`) — it has the full build process, the
+continuous-motion technique library, known stillmode gotchas, and the MP4 export pipeline.
+Newest-taste references:
 `Content/carousel-warmup-tennis.html` (carousel), `Content/reel-6-system.html` (reel, EN),
 `index-fa.html` (web — visual style only, see note below). Non-negotiables in one line: clay
 `#C7552F` is the ONLY accent (clay-2 `#E06B43` on dark) — **no yellow/gold, ever**; green
