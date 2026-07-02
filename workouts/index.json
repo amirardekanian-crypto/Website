@@ -40,6 +40,13 @@
           "duration": "30 min",
           "equipment": "Bike",
           "file": "workouts/conditioning/engine-builder.json"
+        },
+        {
+          "id": "run-warm-up",
+          "title": "Rolling Start",
+          "duration": "15 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/conditioning/run-warm-up.json"
         }
       ]
     },
