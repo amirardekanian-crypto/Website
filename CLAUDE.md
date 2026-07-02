@@ -62,9 +62,9 @@ Farsi-specific rules (Vazirmatn, no letter-spacing, no uppercase, Persian numera
 mirroring) still apply only if Amir explicitly asks for Farsi again. Older Farsi social
 files (`reel-1..3`, `reel-5-system`, the `carousel-*` Farsi decks) are left as shipped —
 reference for mechanics only, not for language/voice.
-**Open question, not yet resolved:** whether this also means retiring/redirecting the live
-Farsi **website** (`index-fa.html`, `form-fa.html`, `terms-fa.html`) — that's a bigger,
-separate decision. Don't assume either way; ask Amir before touching those pages.
+**Scope confirmed (Amir, same day): social content only** — the live Farsi **website**
+(`index-fa.html`, `form-fa.html`, `terms-fa.html`) is unaffected and stays exactly as-is
+for the Tehran general-fitness audience. Don't touch those pages over this directive.
 
 ## Verifying the live site (important gotchas)
 - This sandbox **cannot reach amirardekani.com** (proxy blocks the host). Confirm deploys via the
