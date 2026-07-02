@@ -12,6 +12,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   - **Farsi** site = broader **general-fitness** Tehran market. Voice: warm, colloquial.
 
 ## Reference docs (read these, don't re-derive)
+- `MAP.md` — **start here.** The atlas: one linked index to every page, asset, skill, doc and design element.
 - `CODEBASE.md` — technical map of the repo.
 - `Content/PRODUCT.md` — what the product/business actually is (internal brief; pricing, voice, backend).
 - `Content/HOW-IT-WORKS.md` — customer-facing explainer of the coaching process.
@@ -38,6 +39,19 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - **Names should be cool, not literal.** Workout titles, article headlines, post hooks — Amir wants
   evocative, punchy names (e.g. "Banded Lower Burner"), not flat descriptions ("Bodyweight & Band
   Strength"). Put the literal description in a tag/subtitle. When unsure, offer 3–4 options and let him pick.
+
+## Design work (Claude is Amir's visual designer)
+Standing role: Amir asks for carousels, reels, posts, result cards, web/app redesigns,
+animations. **Always start at `Content/DESIGN-ATLAS.md`** — the designer's working file
+(asset shelf, format recipes, current-vs-retired rulings, app-look cheat sheet, his taste),
+with `Content/DESIGN_SYSTEM.md` as the brand bible. Newest-taste references:
+`Content/carousel-warmup-tennis.html` (carousel), `Content/reel-4-app.html` (reel),
+`index-fa.html` (web). Non-negotiables in one line: clay `#C7552F` is the ONLY accent
+(clay-2 `#E06B43` on dark) — **no yellow/gold, ever**; green `#0E4A36` / paper `#FAF7F2`;
+Vazirmatn (FA) + Barlow Condensed (display) + Barlow (app UI); Farsi: no letter-spacing,
+no uppercase, Persian numerals, LTR counters; canvases 1080×1350 / 1080×1920; real
+assets over stock; outputs self-contained (base64); html2canvas drops SVG `<use>` and
+CSS transforms — inline images, hard px.
 
 ## Verifying the live site (important gotchas)
 - This sandbox **cannot reach amirardekani.com** (proxy blocks the host). Confirm deploys via the
