@@ -40,11 +40,12 @@
   /* persistent topbar — colour adapts to the active scene skin */
   .topbar{position:absolute;top:58px;left:88px;right:88px;z-index:15;display:flex;align-items:center;
     justify-content:space-between;font-weight:700;font-size:30px;transition:color .55s var(--ease);}
-  .topbar .handle{direction:ltr;display:flex;align-items:center;gap:14px;font-family:'Barlow',sans-serif;font-weight:600;}
+  .topbar .handle{direction:ltr;display:flex;align-items:center;gap:14px;font-weight:600;}
   .topbar .dot{width:16px;height:16px;border-radius:50%;background:var(--clay);}
   .topbar .beatn{direction:ltr;font-weight:600;font-size:28px;opacity:.75;}
   .reel[data-skin="light"] .topbar{color:var(--ink2);}
-  .reel[data-skin="dark"] .topbar{color:rgba(255,255,255,.85);}
+  .reel[data-skin="dark"] .topbar,.reel[data-skin="clay"] .topbar{color:rgba(255,255,255,.85);}
+  .reel[data-skin="clay"] .topbar .dot{background:#fff;}
 
   .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
     padding:150px 96px 130px;text-align:center;opacity:0;transition:opacity .55s var(--ease);}
@@ -111,7 +112,7 @@
   .ac-head .d{font-weight:600;font-size:24px;letter-spacing:2px;opacity:.75;}
   .ac-head .t{font-weight:900;font-size:44px;letter-spacing:1px;line-height:1.05;margin-top:4px;}
   .ac-ex{display:flex;align-items:center;gap:22px;padding:26px 32px;border-bottom:1px solid var(--line);font-family:'Barlow',sans-serif;}
-  .ac-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:40px;color:#C9C2B6;width:52px;}
+  .ac-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:40px;color:var(--ink2);opacity:.42;width:52px;}
   .ac-name{font-weight:700;font-size:32px;color:var(--ink);flex:1;}
   .ac-pill{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;letter-spacing:1px;
     background:var(--paper2);color:var(--ink2);border-radius:100px;padding:8px 18px;white-space:nowrap;}
@@ -162,11 +163,11 @@
       <!-- 1 · STEP 1 — شناخت -->
       <div class="scene s-paper" data-dur="5200">
         <div class="step-tag rise"><span class="n">۱</span><span class="t">شناخت</span></div>
-        <div class="big rise" style="transition-delay:.1s;font-size:88px">اول می‌شناسمت.</div>
+        <div class="big rise" style="transition-delay:.1s">اول می‌شناسمت.</div>
         <div class="checklist" style="margin-top:44px">
           <div class="cl-item" style="transition-delay:.3s"><span class="cl-check">✓</span><span class="cl-text">هدفت و سابقه‌ی تمرینت</span></div>
           <div class="cl-item" style="transition-delay:.55s"><span class="cl-check">✓</span><span class="cl-text">آسیب‌ها و محدودیت‌های بدنت</span></div>
-          <div class="cl-item" style="transition-delay:.8s"><span class="cl-check">✓</span><span class="cl-text">خواب، استرس و ریکاوری‌ت</span></div>
+          <div class="cl-item" style="transition-delay:.8s"><span class="cl-check">✓</span><span class="cl-text">خواب، استرس و ریکاوریت</span></div>
           <div class="cl-item" style="transition-delay:1.05s"><span class="cl-check">✓</span><span class="cl-text">روزهای خالی و تجهیزاتت</span></div>
         </div>
         <div class="sub rise" style="transition-delay:1.3s;font-size:38px">برنامه‌ای که نشه اجراش کرد، برنامه‌ی خوبی نیست.</div>
@@ -176,7 +177,7 @@
       <div class="scene s-green" data-dur="4400">
         <div class="step-tag rise"><span class="n">۲</span><span class="t">تحلیل</span></div>
         <div class="big rise" style="transition-delay:.12s">قبل از تجویز،<br>تحلیل.</div>
-        <div class="sub rise" style="transition-delay:.36s">هدف‌هات رو اولویت می‌چینم و روراست می‌گم چی شدنیه —<br><span class="accent" style="font-weight:800">اول سلامت، بعد رکورد.</span></div>
+        <div class="sub rise" style="transition-delay:.36s">اولویتِ هدف‌هات رو می‌چینم و روراست می‌گم چی شدنیه —<br><span class="accent" style="font-weight:800">اول سلامت، بعد رکورد.</span></div>
       </div>
 
       <!-- 3 · STEP 3 — نقشه -->
@@ -250,13 +251,13 @@
     let timers=[];
     const faNum = n => String(n).replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
     function fit(){ const still=document.body.classList.contains('stillmode');
-      const s= still?1:Math.min(window.innerWidth/1080,(window.innerHeight-70)/1920);
+      const s= still?1:Math.min(window.innerWidth/1080,(window.innerHeight-150)/1920);
       document.getElementById('fitwrap').style.transform='scale('+s+')'; }
     window.addEventListener('resize', fit);
     function setScene(i){
       scenes.forEach(s=>s.classList.remove('on'));
       const sc=scenes[i]; sc.classList.add('on');
-      reel.dataset.skin = sc.classList.contains('s-paper') ? 'light' : 'dark';
+      reel.dataset.skin = sc.classList.contains('s-paper') ? 'light' : sc.classList.contains('s-clay') ? 'clay' : 'dark';
       beatn.textContent = faNum(i+1)+' / '+faNum(scenes.length);
     }
     function clear(){ timers.forEach(clearTimeout); timers=[]; }
