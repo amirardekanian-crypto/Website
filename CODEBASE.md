@@ -27,7 +27,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 #### `index.html` — Home page
 - **What it does:** The front door. Hero headline, benefits, credentials, FAQ, and calls-to-action that send visitors to the apply form.
 - **If deleted:** The site has no home page. Visitors landing on `amirardekani.com` see a "not found" error.
-- **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, `partials/nav.html`, `partials/footer.html`, `assets/img/og-image.png`, `manifest.json`.
+- **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, `partials/nav.html`, `partials/footer.html`, `assets/img/og-image.jpg`, `manifest.json`.
 - **Edit this when:** Changing headline copy, rewording sections, updating your credentials, changing the FAQ, swapping the hero image.
 - **Don't touch:** The `<script type="application/ld+json">` block near the top (Google reads this) unless you know what it does. The `<meta>` tags at the top (these are SEO).
 
@@ -201,7 +201,7 @@ The site started with no backend. It now uses **Supabase** (a hosted Postgres da
 
 ### Assets (Images and Icons)
 
-#### `assets/img/og-image.png` — Social share image
+#### `assets/img/og-image.jpg` — Social share image
 - **What it does:** The image that shows up when someone shares your link on WhatsApp, Twitter, LinkedIn, etc.
 - **If deleted:** Shared links show no preview image.
 - **Edit this when:** You refresh your branding.

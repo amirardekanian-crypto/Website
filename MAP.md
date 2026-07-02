@@ -81,7 +81,7 @@ Three layers, in the order a designer should read them:
   [`assets/js/shared.js`](assets/js/shared.js) (nav, footer, video pop-ups, install prompt, scroll reveal).
 - **Master marks:** [`icon-192.png`](assets/img/icon-192.png) (app tile; masters in
   [`assets/img/source/`](assets/img/source/)) ·
-  [`og-image.png`](assets/img/og-image.png) (wordmark lockup / share image) ·
+  [`og-image.jpg`](assets/img/og-image.jpg) (wordmark lockup / share image) ·
   court textures [`court-sessions.jpg`](court-sessions.jpg) /
   [`court-playbook.jpg`](court-playbook.jpg) (the signature backgrounds).
 

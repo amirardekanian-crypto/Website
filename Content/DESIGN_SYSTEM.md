@@ -14,15 +14,15 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 <br clear="left">
 
-**Wordmark lockup** (see `../assets/img/og-image.png`):
+**Wordmark lockup** (see `../assets/img/og-image.jpg`):
 - **`AA`** in **clay** + **`PERFORMANCE`** in **green**, set in **Barlow Condensed, heavy, italic**.
 - Eyebrow above: **`STRENGTH & CONDITIONING`** (green, small, tracked — Latin only).
 - Tagline: **`Move Better. Hit Harder. Last Longer.`** (last clause in *italic*), with a short clay dash before it.
 - Sport motif: a green panel carrying **white court lines** (low opacity) and a **dashed clay arc** (the ball path). Use it as a corner/background accent, never busy.
 
-![AA Performance wordmark lockup — paper left, green court panel right](../assets/img/og-image.png)
+![AA Performance wordmark lockup — paper left, green court panel right](../assets/img/og-image.jpg)
 
-**Names:** brand person = **Amir Ardekani** · app/product = **AA Performance** · handle = **@amirardekani · AMIRARDEKANI.COM**
+**Names:** brand person = **Amir Ardekani** · app/product = **AA Performance** · handle = **@amirardekanian · AMIRARDEKANI.COM**
 
 ---
 
@@ -94,7 +94,7 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 - **Reel:** 1080×1920 (9:16).
 - Always `dir="rtl"` for Farsi. **Exception:** force `direction:ltr` on numeric counters/handles (e.g. «۱ / ۸»), or RTL flips them to «۸ / ۱». A phone mock-up rendering the (English) app is also `dir="ltr"`.
 - Generous negative space — text sits in the lower or center third, never crammed.
-- **Frame:** a thin inset border — `margin:28px; border-radius:14px;` color `rgba(255,255,255,.16)` on dark / `rgba(0,0,0,.18)` on light.
+- **Frame:** a thin inset border — `margin:28px; border-radius:14px;` color `rgba(255,255,255,.30)` on dark / `rgba(0,0,0,.18)` on light. *(.30 confirmed by Amir; the kit CSS still ships the older `.16` — override it.)*
 
 ---
 
@@ -234,4 +234,4 @@ A persistent device, app UI animating inside:
 - **Call-to-action verb:** «شروع کن» (begin) — *not* «درخواست» (apply).
 - **Proof / credentials word:** «تجربه» (experience) — *not* «پشتوانه».
 - **Pricing (Iran residents):** «معادلِ ۲۵ دلار در ماه — به تومان، با نرخِ روز» (pegged to USD, charged in Toman); abroad → DM. Pricing headline: «یه مربیِ کامل، با قیمتی کم‌تر از اون‌چه فکرشو می‌کنی.»
-- **Handle:** Instagram **@amirardekanian** · site **amirardekani.com** *(the reels use @amirardekani — confirm which is canonical).*
+- **Handle:** Instagram **@amirardekanian** · site **amirardekani.com** — confirmed canonical. *(Already-shipped reels show @amirardekani; leave them as built — use @amirardekanian in all new work.)*
