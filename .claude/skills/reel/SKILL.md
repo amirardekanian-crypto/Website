@@ -51,25 +51,32 @@ Farsi canonical outro from `DESIGN_SYSTEM.md` §0 instead — see `reel-5-system
 
 ## Step 4 — Make it move (this is what separates a reel from a slideshow)
 
-Amir's standing direction: **"fully animational, lots of moving things, being cool."** Every
-scene needs motion beyond its one-shot entrance fade. Reusable techniques, all in
-`reel-6-system.html` — copy the exact CSS:
+**The principle, not a recipe:** Amir's standing direction is **"fully animational, lots of
+moving things, being cool"** — but he's explicit that this is a *feeling* to hit, not a fixed
+list of effects to reuse reel after reel. **Don't treat the toolbox below as a checklist to tick
+off.** Nothing on screen should ever sit completely still for no reason — that's the bar. How you
+clear it should change every time: invent motion that fits *this* topic's mood and content,
+even if that means techniques that aren't in the list below at all. A reel that mechanically
+reapplies the same ten effects every time is its own kind of dead, just dressed up.
 
-- **Ambient background drift** — a blurred radial-gradient orb, slow alternating translate+scale loop (`@keyframes orbdrift`, ~9s). One `.orb` div per scene.
-- **Drawn/marching dashed line** — the brand's rally-arc motif, animated: an SVG path with `stroke-dasharray` + a `@keyframes` looping `stroke-dashoffset` (`arcmarch`, ~6s linear infinite). Reinforces brand identity while adding continuous motion "for free."
-- **Pulsing live-dot** — the topbar handle's clay dot gets a `::after` expanding-ring pulse (`dotcore` + `dotring` keyframes) — reads as "live," runs the whole reel.
-- **Pop-in + settle glow** — list/checklist items enter with a small overshoot bounce (`itemPop`: translateX + scale(.92→1.03→1)), then their icon keeps a very subtle infinite glow pulse once landed.
-- **Ken Burns zoom** — any photo (`kenburns`: `scale(1)→scale(1.1)` over the scene's duration, `ease-out both`) — cheap, cinematic, always worth adding to a real photo.
-- **Bouncing directional cues** — arrows/chevrons in a sequence (roadmap chain, etc.) get a small infinite `translateY` bounce loop, staggered.
-- **Typing dots before a message lands** — three dots bouncing (`typingdot`, staggered `animation-delay`), cross-fading into the actual message via a shared `.bubblewrap{position:relative}` + both children `position:absolute` at the same anchor (**don't** stack them in normal flow — see the gotcha below).
-- **Blinking colon on a timer/clock display** — wrap just the `:` in a `<span class="colon">`, `@keyframes blink{50%{opacity:0}} .colon{animation:blink 1s step-start infinite}`.
-- **Staggered internal reveals** — don't just fade in a whole card as one block; give its *rows* their own delayed opacity/translateY so content cascades in (see the app-card exercise rows in Step 6's gotcha — use explicit position classes, not `:nth-of-type`).
-- **Breathing text** — a headline that matters gets a very subtle infinite `scale(1)→scale(1.02)` loop (`breathe`, ~2.6s) — don't overdo the magnitude, this should read as alive, not distracting.
-- **Bouncing CTA pointer** — an arrow/chevron after the CTA line, small infinite `translateX` loop, plus a pulsing ring on the brand-mark circle.
+**Toolbox from `reel-6-system.html`** (starting inspiration, pick and remix, don't copy wholesale):
+ambient background drift (a blurred drifting glow orb), a drawn/marching dashed line (the brand's
+rally-arc motif, animated via `stroke-dashoffset`), a pulsing live-dot, pop-in-and-settle list
+items, Ken Burns zoom on photos, bouncing directional cues, typing dots before a message lands,
+a blinking clock colon, staggered internal card reveals (rows cascading in, not fading as one
+block), a breathing headline, a bouncing CTA pointer. The exact CSS for each is in that file —
+read it for mechanics, not as the definitive list of what's allowed.
 
-Budget: every scene should have at least 2–3 of these running simultaneously. The existing
-progress bar at the top (`.progress .fill`, width animated 0→100% via `requestAnimationFrame`)
-already provides one continuous motion cue for free — keep it.
+**Push past it when the content calls for something else:** a parallax layer, a number that
+visibly counts/ticks, a shape that morphs, a path that draws itself into an icon, a card that
+tilts on a fake 3D axis, elements that enter from different directions instead of always the
+same slide-up, a background that shifts hue over the scene's duration, text that types itself
+out letter by letter. If a technique would sell *this* topic better than anything already
+shipped, build it — that's the point of asking for a designer instead of a template.
+
+One mechanical constraint that isn't optional: whatever you build must survive the two gotchas
+in Step 6 (works in `?beat=N` stillmode, doesn't rely on tag-position selectors) and be captured
+correctly by `?capture=1` — new motion ideas are welcome, breaking the export pipeline isn't.
 
 ## Step 5 — Build the file
 

@@ -65,8 +65,10 @@ as the review artifact — the interactive file *is* the review. Keep the iterat
 no multi-agent audit workflow, no video pipeline, for a routine draft/revision — save those
 for when he asks to finalize/export. Design direction: he wants reels **"fully animational,
 lots of moving things, being cool"** — not a slideshow of static cards with an entrance fade.
-Favor continuous motion (ambient background drift, drawing/dashed lines, count-ups, Ken Burns
-zoom on photos, pulsing indicators, typing dots, bouncing arrows) over one-shot transitions.
+**This is a feeling, not a fixed effect list — don't lower creativity to a recipe.** He said
+explicitly: keep inventing, don't reuse the same set of animations every reel. The `/reel`
+skill has a toolbox (ambient drift, drawn lines, Ken Burns, typing dots, etc.) as inspiration
+only — treat it as a floor to riff past, not a checklist to satisfy.
 
 **2026-07-02 — content language directive (Amir, verbatim): "we changed everything to
 english, im not creating content in farsi anymore."** Effective immediately: all NEW social
