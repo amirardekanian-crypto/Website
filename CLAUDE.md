@@ -12,6 +12,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   - **Farsi** site = broader **general-fitness** Tehran market. Voice: warm, colloquial.
 
 ## Reference docs (read these, don't re-derive)
+- `MAP.md` — **start here.** The atlas: one linked index to every page, asset, skill, doc and design element.
 - `CODEBASE.md` — technical map of the repo.
 - `Content/PRODUCT.md` — what the product/business actually is (internal brief; pricing, voice, backend).
 - `Content/HOW-IT-WORKS.md` — customer-facing explainer of the coaching process.
