@@ -36,7 +36,15 @@
       "title": "Recovery",
       "icon": "sleep",
       "banner": "assets/img/workouts/recovery.webp",
-      "articles": []
+      "articles": [
+        {
+          "id": "comeback-rules",
+          "title": "The Comeback Rules",
+          "category": "Recovery",
+          "readMins": 4,
+          "file": "articles/recovery/comeback-rules.json"
+        }
+      ]
     },
     {
       "id": "mental",
