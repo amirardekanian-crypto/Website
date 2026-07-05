@@ -1,0 +1,15 @@
+# Jekyll build config for GitHub Pages.
+# Keeps internal working files out of the published deployment — they stay in
+# the repo (git-tracked, versioned) but are never bundled/served on the live site.
+exclude:
+  - Content/          # design-reference workspace (reels, carousels, business docs) — not site content
+  - supabase/          # DB schema/migration SQL — internal infra, not public
+  - CLAUDE.md
+  - CALL_LOG.md
+  - COACH_DASHBOARD.md
+  - CODEBASE.md
+  - IMAGES.md
+  - IMPORTING_SESSION_REPORTS.md
+  - MAP.md
+  - NOTION_SYNC.md
+  - SCHEMA.md
