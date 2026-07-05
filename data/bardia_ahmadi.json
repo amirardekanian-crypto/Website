@@ -1,0 +1,808 @@
+{
+  "athlete": {
+    "id": "bardia_ahmadi",
+    "key": "b30a56e311f3441a897740c3746d25f0",
+    "firstName": "Bardia",
+    "lastName": "Ahmadi Yazdi"
+  },
+  "sport": {
+    "badge": "🎾 Padel — Return to Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bedrock",
+      "tagline": "Own every pain-free inch.",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-07-11",
+      "endDate": "2026-08-14",
+      "focuses": [
+        "Re-establish loading capacity around the right hip and knee in pain-free hinge, split-stance and lateral patterns while establishing true working weights.",
+        "Carry physio glute-med and trunk work into real gym loading; audit squat-pattern tolerance at bodyweight depth only."
+      ],
+      "message": {
+        "paragraphs": [
+          "You've spent five months getting back to the court. This block is where we make sure you stay on it — Bedrock rebuilds the loading capacity around your right hip and knee in the patterns they tolerate (hinge, split-stance, lateral) so the joints stop being the thing you plan around.",
+          "The mental focus: precision over weight. Week 1 runs one gear below your effort ceiling — you're a lifelong lifter, but the bar hasn't met this version of you yet. Log everything honestly, respect the pain traffic light, and let the numbers climb on their own.",
+          "By the end of five weeks: working weights established on every lift, a right leg that matches the left rep-for-rep, and a hip that finishes gym sessions and padel in the same week without complaint."
+        ],
+        "outcomes": [
+          "Working weights locked on all 5 primary lifts",
+          "Right/left split squat gap closed to ≤1 rep",
+          "Pain-free hinge at 4 challenging sets",
+          "Bodyweight squat depth mapped, pain-free",
+          "4 gym days + 2–3 padel sessions coexisting, no flare-ups",
+          "20 logged sessions of clean data"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Armour Build",
+      "tagline": "Plating the joints in muscle.",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-08-15",
+      "endDate": "2026-09-18",
+      "focuses": [
+        "Build hypertrophy and capacity around the hip and knee, progressively expanding range of motion under load as tolerance grows.",
+        "Introduce controlled rotation and early deceleration mechanics — the padel patterns, at rehearsal speed."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Bedrock gives the joints their base. What comes next builds on top of it.",
+          "Five weeks of putting muscle exactly where your hip and knee need it most, in ranges you'll have earned by then.",
+          "The movements start looking more like padel — rotation comes back, deceleration gets rehearsed, and the gym stops being separate from the court.",
+          "First we pour the foundation. Then we plate it in armour."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Strength Reclaim",
+      "tagline": "Take back the heavy lifts.",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-09-19",
+      "endDate": "2026-10-23",
+      "focuses": [
+        "Build max-strength in the reclaimed patterns, including re-testing a loaded squat variation if the hip now tolerates it.",
+        "Build eccentric and deceleration strength for the knee — the ACL's insurance policy."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Power Transfer",
+      "tagline": "Strength becomes speed.",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-10-24",
+      "endDate": "2026-11-27",
+      "focuses": [
+        "Develop power and reactive strength — jump/land mechanics, lateral bounds, progressive change-of-direction under fatigue.",
+        "Build rotational power for the padel swing while maintaining, not chasing, strength."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Court Proof",
+      "tagline": "Durable at full speed.",
+      "weeks": "Weeks 21–24",
+      "startDate": "2026-11-28",
+      "endDate": "2026-12-25",
+      "focuses": [
+        "Integrate sport-speed — reactive change-of-direction and full-intensity movement prep, with no gym restrictions left unearned.",
+        "Lock in permanent hip-durability minimums as a compact, keep-forever maintenance slot."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bedrock",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Hinge Like You Mean It",
+        "completionTitle": "Foundation Poured",
+        "completionMessage": "That's the heaviest day of the week banked — hamstrings and glutes loaded, hip untouched by anything it hates. Protein within a couple of hours, and give this one a full night's sleep before you think about the court.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Spin light, build a sweat", "Let the knee warm into rhythm"],
+                  "bad": ["No resistance grinding"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Hip & Knee Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Push the ground away sideways", "Burn on the side of the hip"],
+                      "bad": ["Don't let the knees cave in"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Drive heels through the floor", "Glutes finish the lift, not lower back"],
+                      "bad": ["Don't arch past flat at the top"]
+                    }
+                  },
+                  {
+                    "name": "Squat to Stand",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Sit between your hips, chest tall", "Feel where depth stays comfortable — that's today's range"],
+                      "bad": ["Never push through a hip pinch"]
+                    }
+                  },
+                  {
+                    "name": "Dead Bug",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": ["Press your low back into the floor", "Ribs stay down as limbs move"],
+                      "bad": ["Don't let the back arch off the mat"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Romanian Deadlift",
+                "videoUrl": null,
+                "restSec": 150,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6-8 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the hips back to the wall behind you", "Hamstrings load like springs — the bar just hangs"],
+                  "bad": ["Don't round the lower back to chase depth"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "2s top hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 1-2-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive the bar to the ceiling through your heels", "Squeeze the glutes to finish — tuck the pelvis, ribs down"],
+                  "bad": ["Don't hyperextend the lower back at the top"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Lying Leg Curl",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the pad to your glutes", "Hamstrings only — hips stay pinned"],
+                  "bad": ["Don't lift the hips off the pad"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Step-Down",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "knee control", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Tap the heel to the floor like it's glass", "Stance-side glute holds the pelvis level"],
+                  "bad": ["Don't let the knee dive inward"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Copenhagen Plank",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "adductor focus", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×15-20s Each Side" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Make one straight line from shoulder to knee", "Inner thigh holds you up"],
+                  "bad": ["Don't let the hips sag"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Pull With Purpose",
+        "completionTitle": "Armour the Smash",
+        "completionMessage": "Every row and face pull today is insurance on your overhead game — a back that pulls hard keeps shoulders healthy through a long season. Easy day tomorrow if the legs need it; the week bends around you.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rowing",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Long smooth strokes", "Feel the upper back open"],
+                  "bad": ["Don't yank with the arms"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Shoulder Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Snap the band to your chest", "Shoulder blades squeeze together"],
+                      "bad": ["Don't shrug up"]
+                    }
+                  },
+                  {
+                    "name": "Band Pass-Through",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Big slow circles", "Chest opens as the band travels"],
+                      "bad": ["Don't bend the elbows to cheat"]
+                    }
+                  },
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Push the floor away at the top", "Shoulder blades slide around the ribcage"],
+                      "bad": ["Don't bend the elbows"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "1s squeeze", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8-10 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the dumbbells to your hips", "Elbows drive back, lats do the work"],
+                  "bad": ["Don't bounce your chest off the pad"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10-12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the bar to your collarbone", "Elbows to back pockets"],
+                  "bad": ["Don't lean back and heave"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm Landmine Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press along the bar's angle, tall spine", "Down-knee glute squeezed, ribs stacked"],
+                  "bad": ["Don't flare the ribs to finish the press"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Pull the rope to your eyebrows", "Rear delts and mid-back own it"],
+                  "bad": ["Don't turn it into a row — keep elbows high"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Press",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "anti-rotation", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press straight out, fight the pull", "Obliques lock the ribs to the pelvis"],
+                  "bad": ["Don't let the hips twist toward the stack"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Built From The Knees Up",
+        "completionTitle": "Stability Earned",
+        "completionMessage": "This is the day that does the hip's missing job — every step-up and side plank is structure your socket doesn't give you for free. If the right leg matched the left today, that's the win. Log how it felt.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Spin light, build a sweat", "Let the knee warm into rhythm"],
+                  "bad": ["No resistance grinding"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Lateral Hip Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Banded Clamshell",
+                    "detail": "×12 Each Side",
+                    "cues": {
+                      "good": ["Open the knee against the band", "The muscle behind your hip pocket fires"],
+                      "bad": ["Don't roll the pelvis backward"]
+                    }
+                  },
+                  {
+                    "name": "Single-Leg Glute Bridge",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": ["Drive one heel down, hips square", "One glute does all the work"],
+                      "bad": ["Don't let the pelvis tilt or drop"]
+                    }
+                  },
+                  {
+                    "name": "Ankle Dorsiflexion Rocks",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Knee glides past the toes", "Stretch low in the calf/ankle, heel down"],
+                      "bad": ["Don't lift the heel"]
+                    }
+                  },
+                  {
+                    "name": "Squat to Stand",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Sit between your hips, chest tall", "Feel where depth stays comfortable — that's today's range"],
+                      "bad": ["Never push through a hip pinch"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Split Squat",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "right leg first", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drop the back knee straight down to the floor", "Front quad and glute share the load, torso tall"],
+                  "bad": ["Don't lean the chest forward to dodge the front leg"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lateral Box Step-Up",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "no push-off", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Step up sideways, drive through the top heel", "Outside of the hip hauls you up"],
+                  "bad": ["Don't bounce off the bottom foot"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "superset", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Kick to a full stop at the top", "Quad squeezes hard at lockout"],
+                  "bad": ["Don't swing or let the weight slam down"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Machine Hip Abduction",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the pads apart and hold a beat", "Both sides of the hip working"],
+                  "bad": ["Don't lean forward to fake range"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Modified Side Plank with Hip Abduction",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "dysplasia stability", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×8-10 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Lift the top leg while the body stays a plank", "Both hip sides fire — bottom holds, top lifts"],
+                  "bad": ["Don't let the hips drop or roll back"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Push, Press, Carry",
+        "completionTitle": "Week Complete",
+        "completionMessage": "Four for four — pressed, carried, and braced like someone rebuilding on purpose. That's a full week of deposits in the bank; the readiness data will tell us how well you cashed it. Go play.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min", "style": "dark" }
+                ],
+                "cues": {
+                  "good": ["Easy building pace", "Let the whole body warm through"],
+                  "bad": ["Don't start at high resistance"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Upper Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Move one vertebra at a time", "Breathe into the stretch both ways"],
+                      "bad": ["Don't rush through the middle"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Snap the band to your chest", "Shoulder blades squeeze together"],
+                      "bad": ["Don't shrug up"]
+                    }
+                  },
+                  {
+                    "name": "Push-Up",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Push the floor away", "Body moves as one plank"],
+                      "bad": ["Don't let the hips sag"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Bench Press",
+                "videoUrl": null,
+                "restSec": 150,
+                "chips": [
+                  { "label": "1s pause", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6-8 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Bend the bar and press to the ceiling", "Chest loads in the pause, whole body stays tight"],
+                  "bad": ["Don't bounce the bar off your chest"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Single-Arm Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the dumbbell to your hip", "Lat drives, arm just connects"],
+                  "bad": ["Don't rotate the torso to heave it up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Prone Y Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12-15 Reps" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Thumbs to the sky, arms make a Y", "Lower traps lift, neck stays quiet"],
+                  "bad": ["Don't shrug into your ears"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "right hand first", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30-40m Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Walk tall like the weight isn't there", "Opposite-side hip and obliques hold you level"],
+                  "bad": ["Don't lean away from the weight"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Banded Dead Bug",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-2-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press the band away as the legs move", "Low back glued to the floor"],
+                  "bad": ["Don't hold your breath"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Bardia",
+    "cards": [
+      {
+        "icon": "🚦",
+        "title": "The Pain Traffic Light",
+        "body": "This is the one rule that runs the whole cycle. During any set: pain up to 3/10 that settles by the next morning is green — keep going. Anything sharp, pinching, or still there the next day means drop the range or the load and log it in your session note. You don't push through, and you don't panic either — you report it and I adjust. That loop is how we load a healing knee and a dysplastic hip safely."
+      },
+      {
+        "icon": "🦵",
+        "title": "Right Side Goes First",
+        "body": "Every single-leg exercise starts on the right — the injured side sets the day's dose. If the right manages 8 clean reps, the left gets 8, even if it could do 12. The 2-rep asymmetry cap in your split squat is deliberate: we're closing the gap, not letting the strong side sprint ahead. Log each side separately so I can watch the gap shrink week to week."
+      },
+      {
+        "icon": "🧘",
+        "title": "Never Stretch That Hip",
+        "body": "Your hip sockets are shallower than average — that's what the MRI showed. It means your hips likely have more passive motion than they can control, not less. So no deep pigeon poses, no aggressive hip stretching, no yanking into end range, ever — including outside the gym. What that hip needs is strength and control at the edges, and this program feeds it exactly that. If something feels tight, it's asking for activation, not stretching."
+      },
+      {
+        "icon": "🎾",
+        "title": "Padel Is Part of the Program",
+        "body": "Your 2–3 court sessions count as training load — I see them in your readiness data even if you don't log them. Two rules: never play the day after Lower A (the heavy hinge day), and keep at least one full day between the two lower-body sessions. If a match runs long or turns competitive, treat the next gym day as a low-readiness day and drop every RPE by 1. The goal this cycle is the gym and the court coexisting without the hip complaining."
+      },
+      {
+        "icon": "📊",
+        "title": "Week 1 Sets the Baseline",
+        "body": "You know how to lift — but I don't have your numbers yet, and neither does your post-injury body. Week 1 runs everything one effort-notch easier than prescribed: find weights that leave 3–4 clean reps in the tank. That's not caution for caution's sake — those logs become your working weights for the next four weeks and the baseline your whole 24-week roadmap progresses from. Bad week-1 data means five weeks of guessing."
+      },
+      {
+        "icon": "💊",
+        "title": "Keep the Creatine, Time the Whey",
+        "body": "Your supplement stack is already right — don't change it. Creatine: 5g daily, every day, gym day or not; consistency is the entire mechanism. Whey: anchor it to training — a serving after each gym session, and on padel days too. Target roughly 1.8–2g of protein per kg per day (about 140–150g at your weight) with the whey filling what food doesn't reach. Healing tissue is expensive — this is how you pay for it. We'll refine in check-ins."
+      },
+      {
+        "icon": "😴",
+        "title": "Sleep Is Rehab Hours",
+        "body": "You rated your sleep 7/10 — decent, but tissue repair happens almost entirely while you sleep, and you're asking your body to remodel a knee and stabilize a hip while playing padel. Protect 7.5–8 hours on the nights after Lower A and after matches; those are your two biggest recovery bills. Tell me your usual hours in the first check-in and we'll see whether that 7/10 has room to become the cheapest performance upgrade you own."
+      },
+      {
+        "icon": "✍️",
+        "title": "Log Like a Pro",
+        "body": "Twenty sessions this cycle, and every one feeds decisions: weight, RPE, and the readiness check before you start. The readiness check matters double for you — it's how I separate a hard padel week from a hip that's actually irritated, and it's what triggers your reduced-dose option on rough days. Minimum effective dose when life happens: warm-up plus the day's first primary lift, done well. That still counts. Silence is the only thing I can't coach."
+      }
+    ]
+  }
+}
