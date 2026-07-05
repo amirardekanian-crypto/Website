@@ -213,7 +213,6 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "superset", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×10-12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
@@ -230,7 +229,6 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "knee control", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×8 Each Side" },
                   { "label": "Tempo 3-0-1-0" },
@@ -253,7 +251,6 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "adductor focus", "style": "dark" },
                   { "label": "2 Sets", "style": "yellow" },
                   { "label": "×15-20s Each Side" },
                   { "label": "Tempo Iso" },
@@ -375,7 +372,6 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "superset", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×8 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
@@ -414,7 +410,6 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "anti-rotation", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×10 Each Side" },
                   { "label": "Tempo 2-1-1-0" },
@@ -528,7 +523,6 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "no push-off", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×8 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
@@ -545,7 +539,6 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "superset", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×12-15 Reps" },
                   { "label": "Tempo 2-0-2-0" },
@@ -584,7 +577,6 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "dysplasia stability", "style": "dark" },
                   { "label": "2 Sets", "style": "yellow" },
                   { "label": "×8-10 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
