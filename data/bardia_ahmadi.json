@@ -208,38 +208,29 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Machine Lying Leg Curl",
+                "type": "circuit",
+                "name": "Leg Curl & Step-Down Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10-12 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
-                ],
-                "cues": {
-                  "good": ["Pull the pad to your glutes", "Hamstrings only — hips stay pinned"],
-                  "bad": ["Don't lift the hips off the pad"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Lateral Step-Down",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  { "label": "knee control", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8 Each Side" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Tap the heel to the floor like it's glass", "Stance-side glute holds the pelvis level"],
-                  "bad": ["Don't let the knee dive inward"]
-                }
+                "items": [
+                  {
+                    "name": "Machine Lying Leg Curl",
+                    "detail": "×10-12 · Tempo 2-0-1-0 · RPE 7",
+                    "cues": {
+                      "good": ["Pull the pad to your glutes", "Hamstrings only — hips stay pinned"],
+                      "bad": ["Don't lift the hips off the pad"]
+                    }
+                  },
+                  {
+                    "name": "Lateral Step-Down",
+                    "detail": "×8 Each Side · Tempo 3-0-1-0 · RPE 6",
+                    "cues": {
+                      "good": ["Tap the heel to the floor like it's glass", "Stance-side glute holds the pelvis level"],
+                      "bad": ["Don't let the knee dive inward"]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -253,7 +244,6 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "adductor focus", "style": "dark" },
                   { "label": "2 Sets", "style": "yellow" },
                   { "label": "×15-20s Each Side" },
                   { "label": "Tempo Iso" },
@@ -370,37 +360,29 @@
                 }
               },
               {
-                "type": "standard",
-                "name": "Half-Kneeling Single-Arm Landmine Press",
+                "type": "circuit",
+                "name": "Landmine Press & Face Pull Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8 Each Side" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
-                ],
-                "cues": {
-                  "good": ["Press along the bar's angle, tall spine", "Down-knee glute squeezed, ribs stacked"],
-                  "bad": ["Don't flare the ribs to finish the press"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Face Pull",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Pull the rope to your eyebrows", "Rear delts and mid-back own it"],
-                  "bad": ["Don't turn it into a row — keep elbows high"]
-                }
+                "items": [
+                  {
+                    "name": "Half-Kneeling Single-Arm Landmine Press",
+                    "detail": "×8 Each Side · Tempo 2-0-1-0 · RPE 7",
+                    "cues": {
+                      "good": ["Press along the bar's angle, tall spine", "Down-knee glute squeezed, ribs stacked"],
+                      "bad": ["Don't flare the ribs to finish the press"]
+                    }
+                  },
+                  {
+                    "name": "Cable Face Pull",
+                    "detail": "×12-15 · Tempo 2-0-1-1 · RPE 6",
+                    "cues": {
+                      "good": ["Pull the rope to your eyebrows", "Rear delts and mid-back own it"],
+                      "bad": ["Don't turn it into a row — keep elbows high"]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -414,7 +396,6 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "anti-rotation", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×10 Each Side" },
                   { "label": "Tempo 2-1-1-0" },
@@ -528,7 +509,6 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "no push-off", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×8 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
@@ -540,37 +520,29 @@
                 }
               },
               {
-                "type": "standard",
-                "name": "Machine Leg Extension",
+                "type": "circuit",
+                "name": "Leg Extension & Hip Abduction Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 90,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-0-2-0" },
-                  { "label": "RPE 7" }
-                ],
-                "cues": {
-                  "good": ["Kick to a full stop at the top", "Quad squeezes hard at lockout"],
-                  "bad": ["Don't swing or let the weight slam down"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Seated Machine Hip Abduction",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12-15 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 7" }
-                ],
-                "cues": {
-                  "good": ["Push the pads apart and hold a beat", "Both sides of the hip working"],
-                  "bad": ["Don't lean forward to fake range"]
-                }
+                "items": [
+                  {
+                    "name": "Machine Leg Extension",
+                    "detail": "×12-15 · Tempo 2-0-2-0 · RPE 7",
+                    "cues": {
+                      "good": ["Kick to a full stop at the top", "Quad squeezes hard at lockout"],
+                      "bad": ["Don't swing or let the weight slam down"]
+                    }
+                  },
+                  {
+                    "name": "Seated Machine Hip Abduction",
+                    "detail": "×12-15 · Tempo 2-0-1-1 · RPE 7",
+                    "cues": {
+                      "good": ["Push the pads apart and hold a beat", "Both sides of the hip working"],
+                      "bad": ["Don't lean forward to fake range"]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -584,7 +556,6 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "dysplasia stability", "style": "dark" },
                   { "label": "2 Sets", "style": "yellow" },
                   { "label": "×8-10 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
