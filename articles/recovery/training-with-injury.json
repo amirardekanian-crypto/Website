@@ -1,0 +1,123 @@
+{
+  "id": "training-with-injury",
+  "title": "Training With Injury",
+  "category": "Recovery",
+  "readMins": 4,
+  "date": "July 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Every athlete coming back from an injury wants to know what the program is going to do for them. That's only half the equation — the other half is entirely yours, and it has nothing to do with sets or reps."
+    },
+    {
+      "type": "p",
+      "text": "Your coach handles the programming — exercise choice, loading, how the week is built. What's actually in your control is smaller, simpler, and arguably more important: how accurately you report what's happening in your body, and how honestly you follow a handful of rules that have nothing to do with program design."
+    },
+    {
+      "type": "p",
+      "text": "Here's what's yours to own."
+    },
+    {
+      "type": "h",
+      "text": "Pain is information, not a stop sign"
+    },
+    {
+      "type": "p",
+      "text": "Training around an injury without ever feeling anything isn't realistic, and chasing that just means you stay under-loaded for months. The skill isn't avoiding pain — it's reading it correctly, and that reading is entirely yours to make."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Discomfort that stays mild during a set and settles by the next morning is a green light — keep going. Anything sharp, anything that gets worse rep to rep, or anything still there the next day is a red flag: stop, back off, and tell your coach before you push further. Apply this every session and you stop guessing."
+    },
+    {
+      "type": "h",
+      "text": "Know which kind of finding you're dealing with"
+    },
+    {
+      "type": "p",
+      "text": "A scan report full of unfamiliar terms doesn't mean much on its own — but the distinction underneath it changes how you should think about your own body for years, not weeks."
+    },
+    {
+      "type": "p",
+      "text": "A torn structure — a ligament, a tendon, a meniscus — genuinely follows a healing timeline and needs progressive load over time, not permanent avoidance. A structural trait — a shape or a laxity your body has always had — is different. It isn't damage on a clock. It's architecture, and it calls for permanent strength and control built around it, for as long as you train."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Ask directly: is this something that heals, or something I train around forever? Don't guess, and don't assume last year's answer still applies if you get new imaging. Knowing which one you have is the difference between being patient for six weeks and being consistent for years."
+    },
+    {
+      "type": "h",
+      "text": "Your sport is training load too — say so"
+    },
+    {
+      "type": "p",
+      "text": "If you're already back playing while you're still rehabbing in the gym, your coach can only manage that combined load if they actually know about it. A program built as if your matches don't exist will eventually stack on top of them."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Tell your coach about every match or session you play, not just the gym days",
+        "Say how it actually felt — competitive and grinding is different information than easy and social",
+        "Flag soreness that shows up after playing, not just after training"
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Don't downplay a hard match because you don't want to sound like you're behind schedule. A coach working off half the picture isn't a coaching failure — it's a reporting gap, and it's yours to close."
+    },
+    {
+      "type": "h",
+      "text": "Let your weaker side set the pace"
+    },
+    {
+      "type": "p",
+      "text": "On any single-limb exercise, your job is simple: don't let your strong side run ahead of your weak one. If your injured side manages eight clean reps, stop the healthy side at eight too — even though it clearly has more in it."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "This is a discipline you practice yourself, set by set — no program can enforce it for you. Let the strong side chase extra reps and the gap between your two sides doesn't close. It widens, quietly, until it becomes the next injury."
+    },
+    {
+      "type": "h",
+      "text": "Report honestly, every time"
+    },
+    {
+      "type": "p",
+      "text": "Every program lives or dies on the accuracy of what you report back — your readiness, your effort, your pain. A coach adjusting your training off inflated numbers is adjusting to a version of you that doesn't exist."
+    },
+    {
+      "type": "p",
+      "text": "Log the real weight, the real effort, the real pain score — including on the days it's unflattering. The plan you get next week is only as good as the truth you gave it this week."
+    },
+    {
+      "type": "h",
+      "text": "The comeback is staged, not switched on"
+    },
+    {
+      "type": "p",
+      "text": "There's no single moment where you go from hurt to fine. A real return moves through stages, and expecting a switch to flip is how athletes talk themselves into skipping the ones that matter."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Rebuilding basic capacity in ranges that don't provoke anything",
+        "Reintroducing your sport's movement patterns, at low intensity, on purpose",
+        "Pushing real strength back into those same patterns",
+        "Adding power and reactive work once strength holds under fatigue",
+        "Returning to full sport-speed last — not first"
+      ]
+    },
+    {
+      "type": "h",
+      "text": "The rule"
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "None of this depends on your coach getting the programming right — that part isn't yours to carry. It depends on you doing your five jobs: read pain correctly, know what you're actually dealing with, report your full load, protect your weak side, and log the truth. Do those, and the program can finally do its job."
+    }
+  ]
+}
