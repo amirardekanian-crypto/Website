@@ -145,7 +145,9 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   circuit) — never a token 5-min bookend. It's programmed dose, not filler.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
   conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
-- **Superset** non-competing pairs to fit the time ceiling.
+- **Superset** non-competing pairs to fit the time ceiling — **except** an athlete's first
+  cycle, or any exercise new to that client: straight sets until each has a cycle of logged
+  working weights (see COACHING-PRINCIPLES.md → "Session structure & time").
 - **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
   squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
   /program-assemble** (it owns the keyword→image matching per SCHEMA) — don't do
@@ -180,6 +182,8 @@ numbers + the coaching intent:
   (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
 - `intent` is the coaching intention in plain words (`3s eccentric`, `glute focus`, `superset`,
   `max intent`, `2s hold`) — assemble renders it as the green modifier chip. Leave blank if none.
+  It must be something the athlete actively does mid-set, never a restatement of the target
+  muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).

@@ -123,6 +123,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   list with order + holds + icons lives in **SCHEMA.md → "Standard section names"** (single
   source — don't re-enumerate it here). *(2026-06-17)*
 - **Superset non-competing pairs** to save time. *(2026-06-15)*
+- **No supersets in an athlete's first cycle, or on any exercise new to that client** (even in
+  a later cycle). Pairing two not-yet-calibrated loads/movements adds logistics friction
+  exactly when you need clean baseline data — run straight sets with independent rest until
+  each movement has at least one cycle of logged working weights, then superset from there.
+  *(2026-07-05, Bardia C1)*
 - **Round-format circuits log load by default** — any superset / complex / conditioning
   circuit gets an inline weight field *per exercise* + one RPE *per round* (each exercise
   its own weight; the RPE rates the whole round). Only **warm-up / prep** circuits opt out
@@ -166,6 +171,17 @@ publish it. No athlete health/chat detail goes here — principles only.
   cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
   mistake that most risks injury). Calibrate the wording to training age. In the JSON the
   external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`. *(2026-06-17)*
+
+## Chips & modifiers
+- **A modifier (`intent`) chip must be something the athlete actively does or holds in mind
+  that set** — a tempo/pause emphasis (`3s eccentric`, `2s top hold`), a sequencing order
+  (`right leg first`), an effort cue (`max intent`), or a structural pairing (`superset`).
+  It is never a restatement of the target muscle or exercise category — if it just re-labels
+  what the exercise already trains, especially when that's already said in the internal cue
+  right next to it, drop it; it's a label, not an instruction. Test before adding one: could
+  the athlete act on this mid-set, or would removing it lose nothing? *(2026-07-05, Bardia
+  C1 — dropped "knee control," "adductor focus," "anti-rotation," "no push-off," "dysplasia
+  stability" as redundant with cues/rationale already stated elsewhere on the card.)*
 
 ## Naming
 - **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
