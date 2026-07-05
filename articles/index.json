@@ -38,11 +38,11 @@
       "banner": "assets/img/workouts/recovery.webp",
       "articles": [
         {
-          "id": "comeback-rules",
-          "title": "The Comeback Rules",
+          "id": "training-with-injury",
+          "title": "Training With Injury",
           "category": "Recovery",
           "readMins": 4,
-          "file": "articles/recovery/comeback-rules.json"
+          "file": "articles/recovery/training-with-injury.json"
         }
       ]
     },
