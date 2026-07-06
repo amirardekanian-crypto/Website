@@ -30,6 +30,7 @@ The brand *why* lives in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) — read the two
 | Assets | real product art & real photos, never stock — the cycle/day banners *are* the product |
 | Names | cool, not literal ("Banded Lower Burner", never "Bodyweight & Band Strength") — offer 3–4 options; the literal description goes in a tag/subtitle |
 | Sign-offs | mantra «یه نقشه تا هدفت» → «یه مربی تو جیبت» (**no «کامل», no comma**) · «هیچی بی‌دلیل نیست» · EN: *Move Better. Hit Harder. Last Longer.* |
+| **EN mantra (2026-07-06)** | **"A path to your target." → "A coach in your pocket."** — the English setup→payoff pair, same shape as the Farsi mantra ("coach" in clay = «مربی» in clay). A CTA needing just one line uses "A coach in your pocket." alone. |
 | Canonical reel/CTA outro | `یه نقشه تا هدفت.` → `یه مربی تو جیبت.` (big, **مربی** in clay) → `Ⓐ امیر اردکانی · دایرکت بده 📩` · CTA verb «شروع کن», never «درخواست» |
 | Farsi word choices (client-decided) | «مربیِ بدنسازیِ حرفه‌ای» (title) · «ارشد» never "MSc" · «یه برنامه» never «فایل/PDF» · «شدت» not «سختی» · «تجربه» not «پشتوانه» |
 | Handles | Instagram **@amirardekanian** (confirmed by Amir) · site **AMIRARDEKANI.COM** — use in all NEW work; never retro-edit shipped designs that carry the old @amirardekani |
@@ -53,6 +54,11 @@ Never reuse anything in the right column, even though old files still contain it
 | Library "Two Doors" (Sessions green / Playbook clay) | Read\|Train segmented control (dead CSS in program.html) |
 | Cycle-name system ("Cycle 2 of 5 · Strength Engine") | "Program 02 · Month Two" |
 | Kit's `.avatars` real photos or none | Gradient avatar placeholders (off-palette) |
+| **Huge translucent background page-number per slide** (`ghost-num`, ~460–640px, one per slide, low-opacity) — the number itself signals position | Tennis-ball pagination dots (row of grey/orange balls) — retired once the ghost number does that job. Header/footer chrome otherwise unchanged (clay dot + handle; swipe hint stays, slide 1 only). |
+| **Plain tennis-ball marker**, no path — one real ball image placed once per slide in clear negative space | The dashed clay rally-arc (curved path + ball) |
+| **Eyebrow = solid "stamp-tag" box** (hard corners; white/paper bg + black text by default on dark/photo canvases; dark-green bg + paper text on light/paper canvases) | Thin chip-B dash-line eyebrow |
+| **Darker, black-blend court-photo overlay** (`rgba(10,10,10,.30→.88)` over the photo) on every slide that would otherwise be a flat green/clay canvas — green or clay canvases now **always** show the real court photo underneath, never a flat color | Flat solid green/clay canvases with no photo; the earlier green-tinted (`rgba(14,74,54,…)`) wash |
+| **Highlight/`.hl` key-word boxes default to clay** (occasionally green) | All-black highlight boxes as the default — tried once during a redesign pass, corrected same day: black is an occasional accent (e.g. one slide in a deck), not the new default |
 
 ---
 
@@ -79,12 +85,33 @@ Never reuse anything in the right column, even though old files still contain it
 
 ## Recipe: carousel (IG 4:5, 1080×1350)
 
-- **Build with** the [`/carousel` skill](../.claude/skills/carousel/SKILL.md); templates + chrome = [`Carousel-Kit.html`](Carousel-Kit.html) (23 `tpl-*` classes: cover, myth, big, heatmap, rules, stat, quote, compare, list, cta, feature, journey, result, checklist, index, step, split, define, qa, diagram, formula, schedule, bio). Current best output: [`carousel-warmup-tennis.html`](carousel-warmup-tennis.html) (EN, base64, all latest chrome).
-- **Chrome:** header = clay dot + handle · footer = tennis-ball pagination (LTR) · swipe hint «بکش» slide 1 only (arrow mirrored RTL) · inset frame `.30`/dark · grain `.06` dark / `.045` light.
-- **Backgrounds:** dark slide = green gradient over base64 court photo; light slide = flat paper. One dashed clay rally-arc max per slide (`stroke-dasharray:2 26`), ball lands in negative space; under `.fa` the arc group mirrors `scaleX(-1)`.
-- **Slide 1** = `tpl-cover` (chip-B eyebrow, h1 with ONE `.hl` clay word, sub) or full-bleed `tpl-feature`. **Last slide** = `tpl-cta` with the canonical outro.
-- **Export:** html2canvas 1.4.1, per-slide PNG buttons. **Pitfalls (silent failures):** SVG `<use>` renders nothing → inline `<image href="data:...">`; CSS transforms ignored → hard px positions; `.hl` needs `line-height ≥ 1.0`. Everything base64 so the file opens/export anywhere; EN builds via a `build_<slug>_en.py` script that transplants blobs by regex.
+- **Build with** the [`/carousel` skill](../.claude/skills/carousel/SKILL.md); templates + chrome = [`Carousel-Kit.html`](Carousel-Kit.html) (23 `tpl-*` classes: cover, myth, big, heatmap, rules, stat, quote, compare, list, cta, feature, journey, result, checklist, index, step, split, define, qa, diagram, formula, schedule, bio). **Current best output / newest chrome reference: [`carousel-period-training.html`](carousel-period-training.html)** (EN, base64) — supersedes `carousel-warmup-tennis.html` for chrome mechanics (see the pagination/ball/eyebrow bullet below); warmup-tennis is still fine as a template-variety reference (list, stat, rules-with-player-photo).
+- **Chrome (current, 2026-07-06):** header = clay dot + handle (unchanged) · **footer pagination is gone — a huge translucent background page-number (`ghost-num`, one per slide, ~460–640px) tells you which slide you're on instead** · swipe hint «Swipe →» slide 1 only, no dots · inset frame `.30`/dark · grain `.06` dark / `.045` light · **eyebrow is a solid hard-corner "stamp-tag" box** (white/paper bg + black text on dark/photo slides; dark-green bg + paper text on light/paper slides) — replaces the old thin chip-B dash-line eyebrow.
+- **Backgrounds:** dark slide = **black-blend** gradient (`rgba(10,10,10,.30→.88)`, moodier than the old green-tinted wash) over base64 court photo; light slide = flat paper. **Every green- or clay-toned slide keeps the real court photo behind it — never a flat color.** One **plain tennis-ball image** (no path/arc) per slide, placed once in clear negative space — the dashed rally-arc is retired.
+- **Ball placement is deliberately scattered, not formulaic (2026-07-06, Amir: "completely random... maybe even funny places").** Don't default to "float it beside the highlighted word" on every slide — that reads as a template. Vary corner/edge per slide across the deck: peeking half-cropped off the top edge or a corner (the canvas's own `overflow:hidden` crops it — a nice "flying in" effect), resting on a rule/border line, tucked top-left on one slide and bottom-right on another, etc. A few degrees of rotation (`transform:rotate(Ndeg)` on the plain `<img>`, confirmed html2canvas-safe when it's not standing in for position/centering) adds a tumbled, un-arranged feel. The one hard constraint: never over text.
+- **Slide 1** = `tpl-cover` (stamp-tag eyebrow, h1 with ONE `.hl` word, sub). **Last slide** = `tpl-cta` with the canonical outro. `.hl` highlight boxes default to **clay** (occasionally green) — black is an occasional accent for one deliberate slide (e.g. a manifesto/protocol layout), never the default across a whole deck.
+- **Manifesto/protocol layout** (a `tpl-manifesto`-style slide, first built for the period-training deck): no rounded cards — a stacked list on paper, huge numerals bleeding off the left margin behind each row, thick horizontal rules, one row visually de-emphasised (muted/smaller, no bleed color) if it's an exclusion rather than an instruction, optionally with a small rotated stamp badge (e.g. "Skip"). Use this instead of rule-cards when a protocol has 2–4 steps that deserve to look like a manifesto, not a checklist.
+- **Export:** html2canvas 1.4.1, per-slide PNG buttons. **Pitfalls (silent failures) — full table + how to actually test the real export in this sandbox: [`/carousel` skill § html2canvas known pitfalls](../.claude/skills/carousel/SKILL.md).** Headline: SVG `<use>` renders nothing → inline `<image href="data:...">`; CSS transforms ignored → hard px positions; `.hl` needs `line-height ≥ 1.0`; **a `.hl` highlight must wrap only a single word** — a two-word phrase that line-wraps renders correctly in the browser but scrambles in the actual PNG (confirmed 2026-07-06). Everything base64 so the file opens/export anywhere; EN builds via a `build_<slug>_en.py` script that transplants blobs by regex.
 - Farsi type sizes run ~25% smaller than Latin equivalents (Vazirmatn sits large); headlines lh 1.22–1.32.
+- **Legibility floor for supporting copy (2026-07-06, Amir: "very hard to read on Instagram").**
+  Sub-copy under a cover/statement headline (`.tpl-cover .sub`, `.tpl-big .footnote`) needs a real
+  size + contrast floor, not eyebrow-caption treatment — **~44–56px, ~.75–.80 opacity**, not the
+  kit's default 34–46px / .55–.60. On a **compare** slide the `col-tag` labels ("— Backs off" /
+  "→ Stays full") function as **column headers** — size them like one (~34px, bold, .9+ opacity /
+  full white on the clay card), not a small eyebrow tag. On a **rules** card stack, the `.sub` line
+  is the actual coaching cue an athlete has to act on (not a caption) — give it real weight
+  (~27–32px, ~.9+ opacity/bold) even when the card itself is deliberately de-emphasised (muted
+  "avoid" cards can stay smaller/quieter than "do" cards, but never illegible). Whenever a template's
+  default text size is bumped like this, re-screenshot — taller cards/footnotes can collide with
+  the headline above them (bottom-anchored `.cards`/`.footnote` blocks eat into the header's last
+  line first).
+- **Coaching-cue / instruction lines get clay, not muted grey (2026-07-06, Amir on the manifesto
+  slide's cue text).** When a line of copy is the literal instruction an athlete has to follow
+  (e.g. `.m-cue` under a manifesto row's title: "Full sets — don't cut it short"), it's not a
+  caption — treat it like a second, smaller headline: **~32–34px, weight 800, `color:var(--clay)`**,
+  not the muted `rgba(ink,.4–.6)` a caption/eyebrow would use. This applies even on a
+  de-emphasised/muted row (the row's *title* can still recede; the actionable cue line itself
+  should still pop clay so it's never missed at a glance).
 
 ## Recipe: reel (9:16, 1080×1920)
 

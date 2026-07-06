@@ -33,6 +33,8 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 
 **The mantra** — the two-line lockup, setup → payoff: **«یه نقشه تا هدفت»** (*a map to your goal*) → **«یه مربی تو جیبت»** (*a coach in your pocket*). This is the canonical close. *(Confirmed wording — drops the older «کامل» and the comma. The «نقشه/map» line is also the literal idea behind the Carousel-Kit's rally-arc + court motif.)*
 
+**English mantra (confirmed by Amir, 2026-07-06):** *"A coach in your pocket, a path to your target."* Same setup → payoff shape as the Farsi mantra — payoff = **"A coach in your pocket."** (mirrors «یه مربی تو جیبت»; "coach" gets the clay highlight, same as «مربی»), setup = **"A path to your target."** (the EN equivalent of «یه نقشه تا هدفت» — "path/target" instead of a literal "map/goal" translation). Use this pair for an EN canonical CTA close the same way the Farsi two-liner is used; a CTA that only needs one line uses "A coach in your pocket." alone (already the standard payoff line in EN carousel CTAs).
+
 **The canonical outro** (the close we use to end reels — setup line, then payoff, then brand row):
 
 > یه نقشه تا هدفت.
