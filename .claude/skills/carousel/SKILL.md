@@ -120,8 +120,11 @@ These are confirmed rendering failures that look fine in the browser but are wro
 | CSS `transform: translateX/Y(...)` | Ignored — element renders at its untransformed position | Use hard pixel coordinates: `left:(1080−w)/2` instead of `left:50%;transform:translateX(-50%)` |
 | `top:50%;transform:translateY(-N%)` | Same — transform ignored, element snaps to raw 50% top | Use a fixed `top` value (e.g. `top:240px`) |
 | SVG `<symbol>` + `<use>` anywhere | Same as row 1 | Inline the content or use `<image>` |
+| `.hl`/highlight span whose text **wraps across a line break** (`box-decoration-break:clone`) | The clone-per-line behavior doesn't happen — html2canvas draws one bounding box using one line's geometry while the text of the other line renders in the wrong place (words shift/misalign inside or outside the box) | Only ever highlight a **single word** inside a `.hl` span (a lone word can't wrap across lines) — confirmed 2026-07-06 on a two-word "backs off." highlight that broke exactly this way |
 
 **Rule of thumb:** if a CSS or SVG technique relies on a computed/dynamic offset rather than a hard pixel value, test the PNG export before shipping — html2canvas often handles static layout but misses transforms and SVG indirection.
+
+**Testing the real PNG export when the CDN is unreachable:** this sandbox's network policy blocks `cdnjs.cloudflare.com`, so the file's own `<script src="https://cdnjs...">` tag never loads here — browser screenshots alone will NOT catch html2canvas-specific bugs (like the row above). Work around it for verification only: `npm install html2canvas` in a scratch dir, copy `node_modules/html2canvas/dist/html2canvas.min.js` next to a **copy** of the carousel file, swap the `<script src>` to point at the local copy, then drive a real `html2canvas(el)` call per slide via Playwright's `page.evaluate` and inspect the resulting canvas `toDataURL()`. Delete the local copies before committing — the shipped file must still reference the CDN URL.
 
 ## Step 6 — Verify (before delivering)
 
