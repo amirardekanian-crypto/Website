@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="robots" content="noindex, follow">
+<title>همکاری با مربی‌ها — امیر اردکانی</title>
+<meta name="description" content="برنامه‌ی همکاریِ امیر اردکانی با مربی‌ها: هر شاگردی که با کدِ تو ثبت‌نام کنه و پرداخت کنه، ۱۰٪ سهمِ توئه — سرِ تمدید هم همینطور.">
+<link rel="canonical" href="https://www.amirardekani.com/partner-fa.html">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0E4A36; --clay:#C7552F; --clay-2:#E06B43; --paper:#FAF7F2; --paper-2:#F1ECE3;
+    --card:#FFFFFF; --ink:#1A1A1A; --ink-2:#5C5C5C; --muted:#8A8A8A; --line:#E7E2D9; --line-2:#D8D1C5;
+    --accent:var(--green); --accent-dim:rgba(14,74,54,.08); --bad:#C0392B;
+    --disp:'Barlow Condensed',sans-serif; --fa:'Vazirmatn',sans-serif;
+    --ease:cubic-bezier(.16,1,.3,1); --r:10px; --max:760px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--fa);background:var(--paper);color:var(--ink);line-height:1.7;letter-spacing:0;-webkit-font-smoothing:antialiased;}
+  a{color:var(--clay);}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:100;background:rgba(14,74,54,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);}
+  .nav-in{max-width:var(--max);margin:0 auto;padding:0 22px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+  .nav a{color:#fff;text-decoration:none;}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:19px;}
+  .brand .mk{width:38px;height:38px;border-radius:10px;overflow:hidden;background:#fff;}
+  .brand .mk img{width:100%;height:100%;object-fit:cover;display:block;}
+  .nav .back{font-weight:600;font-size:15px;opacity:.85;}
+
+  /* hero */
+  .hero{text-align:center;padding:56px 20px 20px;}
+  .badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-dim);color:var(--green);font-weight:700;font-size:13px;padding:7px 16px;border-radius:100px;margin-bottom:18px;border:1px solid rgba(14,74,54,.18);}
+  .hero h1{font-weight:900;font-size:clamp(34px,6.5vw,56px);line-height:1.08;margin-bottom:14px;}
+  .hero h1 .acc{color:var(--clay);}
+  .hero p{color:var(--ink-2);font-size:17px;max-width:540px;margin:0 auto;line-height:1.8;}
+
+  /* wrap + sections */
+  .wrap{max-width:var(--max);margin:0 auto;padding:26px 20px 80px;}
+  .fsec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px 26px;margin-bottom:18px;position:relative;}
+  .sbadge{position:absolute;top:-1px;right:26px;background:var(--green);color:#fff;font-weight:700;font-size:12px;padding:5px 13px;border-radius:0 0 8px 8px;}
+  .fsec h2{font-weight:800;font-size:25px;margin:18px 0 6px;}
+  .sdesc{color:var(--muted);font-size:14px;margin-bottom:22px;line-height:1.7;}
+
+  /* how-it-works steps */
+  .steps{display:grid;gap:12px;}
+  .step{display:flex;gap:16px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;}
+  .step .n{flex:0 0 auto;width:38px;height:38px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:900;font-size:20px;}
+  .step .b{flex:1;}
+  .step .b h3{font-weight:800;font-size:17px;margin-bottom:3px;}
+  .step .b p{color:var(--ink-2);font-size:15px;line-height:1.7;}
+  .step .b p b{color:var(--clay);}
+
+  /* headline number band */
+  .cut{background:linear-gradient(135deg,var(--green),#0a3527);color:#fff;border-radius:14px;padding:26px 26px;margin:4px 0 0;text-align:center;}
+  .cut .big{font-family:var(--disp);font-weight:900;font-size:64px;line-height:1;color:#fff;}
+  .cut .big small{font-size:34px;}
+  .cut p{color:rgba(255,255,255,.82);font-size:15px;margin-top:8px;line-height:1.7;}
+  .cut .clay{color:var(--clay-2);}
+
+  /* terms list */
+  .terms{list-style:none;}
+  .terms li{position:relative;padding:0 30px 0 0;margin-bottom:15px;font-size:16px;color:var(--ink-2);line-height:1.75;}
+  .terms li:last-child{margin-bottom:0;}
+  .terms li::before{content:"✓";position:absolute;right:0;top:0;color:var(--green);font-weight:800;font-size:16px;}
+  .terms li b{color:var(--ink);font-weight:700;}
+  .terms li.warn::before{content:"!";color:var(--clay);}
+
+  /* tactics ladder */
+  .tactic{display:flex;gap:15px;align-items:flex-start;padding:16px 0;border-bottom:1px dashed var(--line-2);}
+  .tactic:last-child{border-bottom:none;padding-bottom:0;}
+  .tactic .rank{flex:0 0 auto;font-family:var(--disp);font-weight:900;font-size:30px;color:var(--clay);width:34px;text-align:center;line-height:1;}
+  .tactic .b h3{font-weight:800;font-size:17px;margin-bottom:2px;}
+  .tactic .b p{color:var(--ink-2);font-size:15px;line-height:1.7;}
+  .tt-note{margin-top:18px;background:var(--accent-dim);border:1px solid rgba(14,74,54,.18);border-radius:12px;padding:16px 18px;font-size:15px;color:var(--green);line-height:1.75;}
+
+  /* form */
+  .f{margin-bottom:20px;}.f:last-child{margin-bottom:0;}
+  .f label{display:block;font-weight:600;font-size:15px;margin-bottom:8px;}
+  .f label .hint{display:block;margin-top:2px;font-weight:400;color:var(--muted);font-size:13px;}
+  .req{color:var(--clay);}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.row-2{grid-template-columns:1fr;}}
+  input[type=text],input[type=email],input[type=tel],select,textarea{
+    width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r);padding:13px 14px;
+    font-family:var(--fa);font-size:15px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-dim);}
+  select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:left 14px center;padding-left:36px;}
+  textarea{resize:vertical;min-height:78px;}
+  ::placeholder{color:var(--muted);}
+
+  /* agree checkbox */
+  .agree{display:flex;gap:12px;align-items:flex-start;background:var(--paper);border:1px solid var(--line-2);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s;}
+  .agree:hover{border-color:var(--green);}
+  .agree input{margin-top:3px;width:20px;height:20px;accent-color:var(--green);flex:0 0 auto;cursor:pointer;}
+  .agree span{font-size:15px;color:var(--ink);line-height:1.6;}
+
+  /* submit */
+  .submit{text-align:center;padding:22px 0 0;}
+  .sbtn{display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;}
+  .sbtn:hover{transform:translateY(-2px);}
+  .sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .snote{color:var(--muted);font-size:13px;margin-top:14px;line-height:1.6;}
+
+  /* success overlay */
+  .ok{display:none;position:fixed;inset:0;background:rgba(250,247,242,.97);backdrop-filter:blur(12px);z-index:1000;align-items:center;justify-content:center;padding:24px;}
+  .ok.on{display:flex;}
+  .ok-card{text-align:center;max-width:460px;}
+  .ok-check{width:78px;height:78px;margin:0 auto 22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;}
+  .ok-card h2{font-weight:900;font-size:38px;margin-bottom:14px;}
+  .ok-card p{color:var(--ink-2);font-size:16px;line-height:1.8;}
+  .ok-card p+p{color:var(--muted);font-size:14px;margin-top:12px;}
+
+  .foot{background:#0a3527;color:rgba(255,255,255,.7);padding:30px 0;text-align:center;font-size:15px;}
+  .foot a{color:rgba(255,255,255,.85);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="/index-fa.html"><span class="mk"><img src="/assets/img/icon-192.png" alt="AA"></span>امیر اردکانی</a>
+    <a class="back" href="/index-fa.html">→ خانه</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="badge">🤝 همکاری با مربی‌ها</div>
+  <h1>هم‌تیمیِ <span class="acc">من</span> شو</h1>
+  <p>شاگردهات رو به یه سیستمِ تمرینِ حرفه‌ای وصل کن — و بابتِ هر کسی که معرفی می‌کنی، سهمِ همیشگی بگیر. این‌جا دقیق می‌گم چطوری کار می‌کنه و چی به تو می‌رسه.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- 00 · HOW IT WORKS -->
+  <section class="fsec">
+    <div class="sbadge">۰۰ — چطوری کار می‌کنه</div>
+    <h2>خیلی ساده‌ست</h2>
+    <p class="sdesc">یه کدِ اختصاصی می‌گیری. هر جا معرفی‌ش کنی، هم شاگردت تخفیف می‌گیره، هم تو سهمت رو.</p>
+    <div class="steps">
+      <div class="step"><div class="n">۱</div><div class="b">
+        <h3>یه کدِ تخفیفِ مخصوصِ خودت می‌گیری</h3>
+        <p>یه کد که فقط مالِ توئه (مثلاً <b>YOURNAME10</b>). این کد هم تخفیف می‌ده، هم مشخص می‌کنه معرفی از طرفِ تو بوده.</p>
+      </div></div>
+      <div class="step"><div class="n">۲</div><div class="b">
+        <h3>شاگردت با کدِ تو ثبت‌نام می‌کنه</h3>
+        <p>هر کسی کدِ تو رو بزنه، <b>۱۰٪ تخفیف</b> می‌گیره. یعنی معرفیِ تو براش هم ارزش داره، نه فقط یه اسم.</p>
+      </div></div>
+      <div class="step"><div class="n">۳</div><div class="b">
+        <h3>وقتی پرداخت کرد، ۱۰٪ سهمِ توئه</h3>
+        <p><b>۱۰٪ از مبلغی که واقعاً پرداخت می‌کنه</b> می‌شه پورسانتِ تو. هیچ سقفی هم روی تعدادِ معرفی‌ها نیست.</p>
+      </div></div>
+      <div class="step"><div class="n">۴</div><div class="b">
+        <h3>سرِ تمدید هم بازم ۱۰٪ می‌گیری</h3>
+        <p>تا وقتی اون شاگرد با کدِ تو فعال بمونه و سرویسش رو تمدید کنه، <b>هر بار بازم ۱۰٪</b> بهت می‌رسه — نه فقط بارِ اول.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- highlight band -->
+  <section>
+    <div class="cut">
+      <div class="big">۱۰<small>٪</small></div>
+      <p>از <span class="clay">هر پرداخت</span> و <span class="clay">هر تمدیدِ</span> هر شاگردی که معرفی می‌کنی — همیشگی.</p>
+    </div>
+  </section>
+
+  <!-- 01 · TERMS -->
+  <section class="fsec" style="margin-top:18px;">
+    <div class="sbadge">۰۱ — شرایطِ همکاری</div>
+    <h2>شفاف و بی‌حاشیه</h2>
+    <p class="sdesc">شرایط رو ساده نوشتم که هیچ ابهامی نمونه.</p>
+    <ul class="terms">
+      <li><b>پورسانت ۱۰٪ ثابته</b> — روی مبلغی که شاگرد بعد از تخفیفِ خودش واقعاً پرداخت می‌کنه حساب می‌شه.</li>
+      <li><b>هم بارِ اول، هم تمدیدها</b> — تا وقتی شاگرد فعال بمونه و با کدِ تو تمدید کنه، پورسانتت ادامه داره.</li>
+      <li><b>پرداختِ پورسانت</b> معمولاً تا ۷ روزِ کاری بعد از قطعی‌شدنِ پرداختِ شاگرد، به روشی که با هم توافق می‌کنیم (کارت‌به‌کارت، پی‌پال و…).</li>
+      <li><b>کدِ اختصاصیِ تو</b> بعد از تأییدِ درخواستت بهت داده می‌شه؛ می‌تونی کدِ دلخواهت رو هم پیشنهاد بدی.</li>
+      <li>این یک <b>همکاریِ معرفیه، نه استخدام</b> — تو مربیِ مستقلِ خودتی و رابطه‌ی کارفرما-کارمند نیست.</li>
+      <li><b>مالیات و عوارضِ درآمدت</b> به عهده‌ی خودته.</li>
+      <li>امیر <b>حقِ بررسی و ردِ هر درخواست یا شاگرد</b> رو داره؛ همه‌ی متقاضی‌ها بررسی می‌شن.</li>
+      <li>هر دو طرف می‌تونن هر وقت با <b>اطلاعِ قبلی</b> همکاری رو تموم کنن؛ پورسانتِ شاگردهای فعالِ قبلی سرِ جاش می‌مونه.</li>
+      <li class="warn">کدِ تو فقط برای معرفیِ درسته؛ استفاده‌ی نادرست (کدهای تقلبی، اسپم، وعده‌های بی‌پایه) به لغوِ همکاری منجر می‌شه.</li>
+    </ul>
+  </section>
+
+  <!-- 02 · SUGGESTED ACTIONS -->
+  <section class="fsec">
+    <div class="sbadge">۰۲ — چطور بیشترین نتیجه رو بگیری</div>
+    <h2>پیشنهادهای من به تو</h2>
+    <p class="sdesc">این‌ها اجباری نیست — ولی از بالا به پایین، از پُربازده‌ترین شروع کردم. بهترین معرفی، معرفیِ شخصیه.</p>
+    <div class="tactic"><div class="rank">۱</div><div class="b">
+      <h3>مستقیم به شاگردهای خودت پیشنهاد بده</h3>
+      <p>قوی‌ترین حالت: به کسی که بهت اعتماد داره بگو «برای بخشِ قدرت و بدنسازی، برنامه‌ی امیر رو بگیر، با کدِ من». تبدیلش از هر تبلیغی بالاتره.</p>
+    </div></div>
+    <div class="tactic"><div class="rank">۲</div><div class="b">
+      <h3>لینک تو بیوی اینستاگرامت</h3>
+      <p>لینکِ فرمِ ثبت‌نام رو بذار تو بیو، کنارش کدت. همیشه در دسترسه و هر کی پیجتو ببینه می‌تونه اقدام کنه.</p>
+    </div></div>
+    <div class="tactic"><div class="rank">۳</div><div class="b">
+      <h3>یه پست یا استوری با تگِ <span dir="ltr">@amirardekanian</span></h3>
+      <p>یه نتیجه یا تجربه‌ی واقعی رو تعریف کن و منو تگ کن. اعتبارِ تو + کارِ من = اعتماد.</p>
+    </div></div>
+    <div class="tactic"><div class="rank">۴</div><div class="b">
+      <h3>کدت رو تو پیج/کپشن‌هات بذار</h3>
+      <p>ساده‌ترین حالتِ همیشه‌فعال. فقط حواست باشه کدِ عمومی ممکنه دست‌به‌دست بشه — برای همین بهتره کنارِ معرفیِ شخصی باشه، نه به‌جاش.</p>
+    </div></div>
+    <div class="tt-note">💡 خواستی برات استوری و کاورِ آماده طراحی می‌کنم که فقط بذاری و بری — بگو تا بسازم.</div>
+  </section>
+
+  <!-- 03 · ACCEPTANCE FORM -->
+  <section class="fsec">
+    <div class="sbadge">۰۳ — بزن بریم</div>
+    <h2>درخواستِ همکاری</h2>
+    <p class="sdesc">فرم رو پر کن؛ بررسی‌ش می‌کنم و کدِ اختصاصیت رو برات می‌فرستم.</p>
+
+    <form id="frm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+      <input type="hidden" name="access_key" value="efc57e0c-997d-4d71-b07a-71c8268ec668">
+      <input type="hidden" name="from_name" value="فرمِ همکاریِ مربی">
+      <input type="hidden" id="subj" name="subject" value="درخواستِ همکاری (Affiliate)">
+      <input type="hidden" name="redirect" value="">
+      <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+      <div class="row-2">
+        <div class="f"><label for="fn">نام و نام‌خانوادگی <span class="req">*</span></label>
+          <input type="text" id="fn" name="Coach Name" required placeholder="مثلاً مهران نوازی"></div>
+        <div class="f"><label for="ig">آیدیِ اینستاگرام <span class="req">*</span></label>
+          <input type="text" id="ig" name="Instagram" required placeholder="@yourhandle" dir="ltr" style="text-align:right"></div>
+      </div>
+
+      <div class="row-2">
+        <div class="f"><label for="wa">شماره‌ی واتساپ <span class="req">*</span></label>
+          <input type="tel" id="wa" name="WhatsApp" required placeholder="۰۹۱۲..." dir="ltr" style="text-align:right"></div>
+        <div class="f"><label for="em">ایمیل <span class="hint">اختیاری</span></label>
+          <input type="email" id="em" name="Email" placeholder="you@email.com" dir="ltr" style="text-align:right"></div>
+      </div>
+
+      <div class="f"><label for="code">کدِ دلخواهت <span class="hint">اختیاری — اگه کدِ خاصی می‌خوای بنویس، وگرنه خودم برات می‌سازم</span></label>
+        <input type="text" id="code" name="Requested Code" placeholder="مثلاً MEHRAN10" dir="ltr" style="text-align:right"></div>
+
+      <div class="row-2">
+        <div class="f"><label for="pm">روشِ دریافتِ پورسانت <span class="req">*</span></label>
+          <select id="pm" name="Payout Method" required>
+            <option value="" disabled selected>انتخاب کن</option>
+            <option value="Card-to-card (Iran)">کارت‌به‌کارت (ایران)</option>
+            <option value="PayPal">پی‌پال</option>
+            <option value="Wise">Wise</option>
+            <option value="Crypto">ارزِ دیجیتال</option>
+            <option value="Other">دیگه</option>
+          </select></div>
+        <div class="f"><label for="pd">اطلاعاتِ واریز <span class="hint">شماره‌ی کارت / ایمیلِ پی‌پال / …</span></label>
+          <input type="text" id="pd" name="Payout Details" placeholder="مثلاً ۶۰۳۷-…" dir="ltr" style="text-align:right"></div>
+      </div>
+
+      <div class="f"><label for="about">یه کم از خودت و شاگردهات بگو <span class="hint">اختیاری — کمکم می‌کنه بهتر تصمیم بگیرم</span></label>
+        <textarea id="about" name="About / Audience" rows="3" placeholder="چی کار می‌کنی، چند نفر رو مربی‌گری می‌کنی، تو کدوم رشته…"></textarea></div>
+
+      <div class="f">
+        <label class="agree">
+          <input type="checkbox" id="agree" name="Agreed" value="بله، شرایط را خواندم و پذیرفتم" required>
+          <span>شرایطِ همکاریِ بالا رو خوندم و قبول دارم. می‌دونم که این یه همکاریِ معرفیه و پورسانتِ ۱۰٪ روی پرداخت‌ها و تمدیدهای شاگردهای معرفی‌شده‌ی منه.</span>
+        </label>
+      </div>
+
+      <div class="submit">
+        <button type="submit" id="sbtn" class="sbtn">ارسالِ درخواست ←</button>
+        <p class="snote">درخواستت مستقیم برای من ارسال می‌شه.<br>سؤالی داشتی؟ راحت دایرکت بده <a href="https://instagram.com/amirardekanian" dir="ltr">@amirardekanian</a>.</p>
+      </div>
+    </form>
+  </section>
+
+</div>
+
+<div id="ok" class="ok" role="dialog" aria-modal="true">
+  <div class="ok-card">
+    <div class="ok-check">✓</div>
+    <h2>درخواستت رسید!</h2>
+    <p>مرسی که خواستی هم‌تیمی شیم. بررسی‌ش می‌کنم و ظرفِ ۴۸ ساعت بهت پیام می‌دم تا کدِ اختصاصیت رو بسازیم و شروع کنیم.</p>
+    <p>تا اون موقع، هر سؤالی داشتی راحت دایرکت بده.</p>
+  </div>
+</div>
+
+<footer class="foot">© <span id="yr"></span> امیر اردکانی — مربیِ قدرت و آمادگی · <a href="/index-fa.html">خانه</a></footer>
+
+<script>
+(function(){
+  'use strict';
+  var fa=function(s){return String(s).replace(/[0-9]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[d];});};
+  document.getElementById('yr').textContent=fa(new Date().getFullYear());
+
+  // dynamic subject with coach name
+  var fn=document.getElementById('fn'),subj=document.getElementById('subj');
+  fn.addEventListener('input',function(){
+    var n=fn.value.trim();
+    subj.value=n?'درخواستِ همکاری (Affiliate) — '+n:'درخواستِ همکاری (Affiliate)';
+  });
+
+  // submit
+  var form=document.getElementById('frm');
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();
+    if(form.querySelector('[name="botcheck"]').checked)return;
+    if(!document.getElementById('agree').checked){alert('لطفاً شرایطِ همکاری رو تأیید کن.');return;}
+    var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
+    try{
+      var r=await fetch(this.action,{method:'POST',body:new FormData(this)});
+      if(r.ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});}
+      else throw new Error('fail');
+    }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
+  });
+})();
+</script>
+</body>
+</html>
