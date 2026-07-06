@@ -85,6 +85,18 @@ Never reuse anything in the right column, even though old files still contain it
 - **Slide 1** = `tpl-cover` (chip-B eyebrow, h1 with ONE `.hl` clay word, sub) or full-bleed `tpl-feature`. **Last slide** = `tpl-cta` with the canonical outro.
 - **Export:** html2canvas 1.4.1, per-slide PNG buttons. **Pitfalls (silent failures):** SVG `<use>` renders nothing → inline `<image href="data:...">`; CSS transforms ignored → hard px positions; `.hl` needs `line-height ≥ 1.0`. Everything base64 so the file opens/export anywhere; EN builds via a `build_<slug>_en.py` script that transplants blobs by regex.
 - Farsi type sizes run ~25% smaller than Latin equivalents (Vazirmatn sits large); headlines lh 1.22–1.32.
+- **Legibility floor for supporting copy (2026-07-06, Amir: "very hard to read on Instagram").**
+  Sub-copy under a cover/statement headline (`.tpl-cover .sub`, `.tpl-big .footnote`) needs a real
+  size + contrast floor, not eyebrow-caption treatment — **~44–56px, ~.75–.80 opacity**, not the
+  kit's default 34–46px / .55–.60. On a **compare** slide the `col-tag` labels ("— Backs off" /
+  "→ Stays full") function as **column headers** — size them like one (~34px, bold, .9+ opacity /
+  full white on the clay card), not a small eyebrow tag. On a **rules** card stack, the `.sub` line
+  is the actual coaching cue an athlete has to act on (not a caption) — give it real weight
+  (~27–32px, ~.9+ opacity/bold) even when the card itself is deliberately de-emphasised (muted
+  "avoid" cards can stay smaller/quieter than "do" cards, but never illegible). Whenever a template's
+  default text size is bumped like this, re-screenshot — taller cards/footnotes can collide with
+  the headline above them (bottom-anchored `.cards`/`.footnote` blocks eat into the header's last
+  line first).
 
 ## Recipe: reel (9:16, 1080×1920)
 
