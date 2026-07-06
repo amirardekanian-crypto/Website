@@ -32,8 +32,9 @@ with open('/tmp/claude-0/-home-user-Website/e6aade57-d976-5942-8746-511ef5135eda
 
 print(f"tb={len(tb)} court={len(court)} clay_court={len(court_clay)} playbook={len(playbook_img)}")
 
-def ball(cx, cy, sz=64):
-    return f'<img class="ball-img" src="{tb_img}" style="left:{int(cx-sz/2)}px;top:{int(cy-sz/2)}px;width:{sz}px;height:{sz}px;">'
+def ball(cx, cy, sz=64, rot=0):
+    return (f'<img class="ball-img" src="{tb_img}" style="left:{int(cx-sz/2)}px;top:{int(cy-sz/2)}px;'
+            f'width:{sz}px;height:{sz}px;transform:rotate({rot}deg);">')
 
 def ghost(n, x, y, size=560):
     return f'<div class="ghost-num" style="left:{x}px;top:{y}px;font-size:{size}px;">{n:02d}</div>'
@@ -67,7 +68,7 @@ slides = []
 # 1 · COVER (dark, green court, darker mood) — hook
 slides.append(('cover', '', f'''
   {ghost(1, -70, 96, 640)}
-  {ball(980, 510, 66)}
+  {ball(1035, 25, 70, -15)}
   {HEADER}
   <div class="body-wrap">
     <div class="stamp-tag">Period-Week Protocol</div>
@@ -81,7 +82,7 @@ slides.append(('cover', '', f'''
 # 2 · BIG (dark, green court, darker mood) — debunk the phasing myth, set up simplicity
 slides.append(('big', '', f'''
   {ghost(2, 640, 900, 560)}
-  {ball(1015, 800, 64)}
+  {ball(100, 1250, 60, 20)}
   {HEADER}
   <div class="body-wrap">
     <h1>This isn't about phasing your <span class="acc">cycle.</span></h1>
@@ -91,7 +92,7 @@ slides.append(('big', '', f'''
 # 3 · COMPARE (dark, green court, darker mood) — what stays vs what backs off
 slides.append(('compare', '', f'''
   {ghost(3, 660, 360, 460)}
-  {ball(780, 605, 64)}
+  {ball(540, 20, 70, -8)}
   {HEADER}
   <div class="body-wrap">
     <h1>What stays. What <span class="hl">backs</span> off.</h1>
@@ -121,7 +122,7 @@ slides.append(('compare', '', f'''
 # every other slide, without competing with the row numerals for attention.
 slides.append(('manifesto light', '', f'''
   {ghost(4, 860, 8, 280)}
-  {ball(1010, 470, 60)}
+  {ball(1015, 1010, 56, 12)}
   {HEADER}
   <div class="body-wrap">
     <div class="stamp-tag stamp-tag-dark">The protocol</div>
@@ -146,7 +147,7 @@ slides.append(('manifesto light', '', f'''
 # 5 · BIG (dark, green court, darker mood) — the mindset reframe
 slides.append(('big', '', f'''
   {ghost(5, 620, -60, 620)}
-  {ball(1015, 800, 64)}
+  {ball(70, 1260, 60, -20)}
   {HEADER}
   <div class="body-wrap">
     <h1>A lighter session isn't <span class="acc">inconsistency.</span></h1>
@@ -154,9 +155,10 @@ slides.append(('big', '', f'''
   <div class="footnote">— It's the correct response to what your body is doing that week.</div>''', court))
 
 # 6 · BIG variant w/ app-screen (clay court, darker mood, ties to the Playbook's own
-# clay branding). No ball — the app-screen mock fills the clear space.
+# clay branding)
 slides.append(('big', '', f'''
   {ghost(6, -80, 860, 560)}
+  {ball(930, 250, 54, 18)}
   {HEADER}
   <div class="body-wrap">
     <div class="stamp-tag">Added to the Playbook</div>
@@ -167,7 +169,7 @@ slides.append(('big', '', f'''
 # 7 · CTA (dark, green court, darker mood)
 slides.append(('cta', '', f'''
   {ghost(7, 660, 40, 620)}
-  {ball(980, 880, 68)}
+  {ball(150, 220, 64, -10)}
   {HEADER}
   <div class="body-wrap">
     <div class="stamp-tag">Your move</div>
@@ -326,10 +328,9 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--display);}}
   font-size:190px;font-weight:900;letter-spacing:-0.06em;color:rgba(10,10,10,.92);line-height:1;}}
 .manifesto-row.avoid .m-num{{color:rgba(10,10,10,.28);}}
 .m-ttl{{font-size:62px;font-weight:800;letter-spacing:-0.02em;line-height:1.15;}}
-.m-cue{{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
-  color:rgba(10,10,10,.6);margin-top:20px;}}
+.m-cue{{font-family:var(--mono);font-size:34px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--clay);margin-top:20px;}}
 .manifesto-row.avoid .m-ttl{{color:rgba(10,10,10,.45);font-weight:700;}}
-.manifesto-row.avoid .m-cue{{color:rgba(10,10,10,.4);}}
 .stamp-skip{{position:absolute;right:64px;top:0;bottom:0;display:flex;align-items:center;}}
 .stamp-skip span{{display:inline-block;transform:rotate(-9deg);
   border:5px solid var(--accent);color:var(--accent);font-family:var(--mono);font-weight:900;
