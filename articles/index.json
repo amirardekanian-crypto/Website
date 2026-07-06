@@ -43,6 +43,13 @@
           "category": "Recovery",
           "readMins": 4,
           "file": "articles/recovery/training-with-injury.json"
+        },
+        {
+          "id": "training-on-your-period",
+          "title": "Training On Your Period",
+          "category": "Recovery",
+          "readMins": 4,
+          "file": "articles/recovery/training-on-your-period.json"
         }
       ]
     },
