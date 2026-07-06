@@ -30,6 +30,7 @@ The brand *why* lives in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) — read the two
 | Assets | real product art & real photos, never stock — the cycle/day banners *are* the product |
 | Names | cool, not literal ("Banded Lower Burner", never "Bodyweight & Band Strength") — offer 3–4 options; the literal description goes in a tag/subtitle |
 | Sign-offs | mantra «یه نقشه تا هدفت» → «یه مربی تو جیبت» (**no «کامل», no comma**) · «هیچی بی‌دلیل نیست» · EN: *Move Better. Hit Harder. Last Longer.* |
+| **EN mantra (2026-07-06)** | **"A path to your target." → "A coach in your pocket."** — the English setup→payoff pair, same shape as the Farsi mantra ("coach" in clay = «مربی» in clay). A CTA needing just one line uses "A coach in your pocket." alone. |
 | Canonical reel/CTA outro | `یه نقشه تا هدفت.` → `یه مربی تو جیبت.` (big, **مربی** in clay) → `Ⓐ امیر اردکانی · دایرکت بده 📩` · CTA verb «شروع کن», never «درخواست» |
 | Farsi word choices (client-decided) | «مربیِ بدنسازیِ حرفه‌ای» (title) · «ارشد» never "MSc" · «یه برنامه» never «فایل/PDF» · «شدت» not «سختی» · «تجربه» not «پشتوانه» |
 | Handles | Instagram **@amirardekanian** (confirmed by Amir) · site **AMIRARDEKANI.COM** — use in all NEW work; never retro-edit shipped designs that carry the old @amirardekani |
