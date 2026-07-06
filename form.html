@@ -423,6 +423,30 @@
   .conditional { display: none; }
   .conditional.visible { display: block; margin-top: 14px; }
 
+  /* ── DISCOUNT CODE FEEDBACK ── */
+  .discount-msg {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .discount-msg.show { display: flex; }
+  .discount-msg.ok {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(14, 74, 54, 0.20);
+  }
+  .discount-msg.err {
+    background: rgba(199, 85, 47, 0.08);
+    color: var(--accent-2);
+    border: 1px solid rgba(199, 85, 47, 0.20);
+  }
+
   /* ── SUCCESS OVERLAY ── */
   .success-overlay {
     display: none;
@@ -543,6 +567,15 @@
           <label for="prog_elite"><span class="rc-icon" aria-hidden="true">🔴</span>Elite — £599 / 6 months</label>
         </div>
       </div>
+    </div>
+
+    <div class="f-field">
+      <label for="discountCode">Discount code
+        <span class="hint">Optional — enter it here if you have one</span>
+      </label>
+      <input type="text" id="discountCode" name="Discount Code" data-skip-progress autocomplete="off" placeholder="e.g. TENNIS10">
+      <div class="discount-msg" id="discountMsg" aria-live="polite"></div>
+      <input type="hidden" id="discountApplied" name="Discount Applied" value="">
     </div>
   </section>
 
@@ -1038,6 +1071,48 @@
       updateProgress();
     });
 
+    // ═══════════════════════════════════════════════════════════════════
+    // DISCOUNT CODES — edit this list to add, change, or remove codes.
+    //   'CODE': percent        (codes are matched case-insensitively,
+    //                           so 'SIALASH10' also matches "sialash10")
+    //   e.g. 'SUMMER25': 25  →  someone typing "summer25" gets 25% off
+    // To remove a code, delete its line. To add one, copy a line and
+    // change the text + number. Keep the same format on the Farsi form
+    // (form-fa.html) so a code works on both.
+    // ═══════════════════════════════════════════════════════════════════
+    const DISCOUNT_CODES = {
+      'SIALASH10': 10,
+      'MHRN10':    10,
+      'NAVAZI10':  10,
+    };
+
+    const discountInput   = document.getElementById('discountCode');
+    const discountMsg     = document.getElementById('discountMsg');
+    const discountApplied = document.getElementById('discountApplied');
+
+    function checkDiscount(showError) {
+      const raw  = discountInput.value.trim();
+      const code = raw.toUpperCase();
+      if (Object.prototype.hasOwnProperty.call(DISCOUNT_CODES, code)) {
+        const pct = DISCOUNT_CODES[code];
+        discountMsg.className = 'discount-msg show ok';
+        discountMsg.textContent = '✓ Code approved — ' + pct + '% off';
+        discountApplied.value = code + ' (' + pct + '% off)';
+      } else {
+        discountApplied.value = '';
+        if (raw && showError) {
+          discountMsg.className = 'discount-msg show err';
+          discountMsg.textContent = 'Code not recognized — check the spelling';
+        } else {
+          discountMsg.className = 'discount-msg';
+          discountMsg.textContent = '';
+        }
+      }
+    }
+    // Success shows as you type; "not recognized" only after you click away.
+    discountInput.addEventListener('input', function () { checkDiscount(false); });
+    discountInput.addEventListener('blur',  function () { checkDiscount(true); });
+
     // ── Slider live value ────────────────────────────────────────────────
     function wireSlider(sliderId, valId) {
       const s = document.getElementById(sliderId);
@@ -1083,6 +1158,7 @@
         if (el.type === 'hidden') return;
         if (el.name === 'botcheck') return;
         if (!el.name) return;
+        if (el.hasAttribute('data-skip-progress')) return;
         const condParent = el.closest('.conditional');
         if (condParent && !condParent.classList.contains('visible')) return;
         if (seen.has(el.name)) return;
