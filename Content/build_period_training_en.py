@@ -116,19 +116,22 @@ slides.append(('compare', '', f'''
   </div>
   <div class="post-footer"><div class="progress-bar">{bars(7,3)}</div></div>''', None))
 
-# 4 · RULES (light) — the exact protocol recap
+# 4 · RULES (light) — the exact protocol recap. The two DO's (cardio/mobility, main
+# lifts) are the actual coaching — loud and big. The one AVOID (ab-bracing) is a
+# small, muted exclusion — it recedes instead of competing for attention.
 CHK = '<div class="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11" stroke="#0A0A0A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
+XMARK = '<div class="check xmark"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg></div>'
 slides.append(('rules light', '', f'''
-  {arc("M-40 470 Q 480 340 1010 480", 1010, 480)}
+  {arc("M-40 460 Q 480 330 1010 470", 1010, 470)}
   {HEADER}
   <div class="body-wrap">
     <div class="chip-B">The protocol</div>
     <h1>Run this <span class="hl">version</span> of the week.</h1>
   </div>
   <div class="cards">
-    <div class="rule-card">{CHK}<div class="body"><div class="ttl">Cardio & mobility</div><div class="sub">Full sets — don't cut it short</div></div><div class="num">01</div></div>
-    <div class="rule-card">{CHK}<div class="body"><div class="ttl">Main lifts</div><div class="sub">~2 sets, lighter load &amp; RPE</div></div><div class="num">02</div></div>
-    <div class="rule-card">{CHK}<div class="body"><div class="ttl">Ab-bracing work</div><div class="sub">Zero for the week</div></div><div class="num">03</div></div>
+    <div class="rule-card do">{CHK}<div class="body"><div class="ttl">Cardio & mobility</div><div class="sub">Full sets — don't cut it short</div></div><div class="num">01</div></div>
+    <div class="rule-card do">{CHK}<div class="body"><div class="ttl">Main lifts</div><div class="sub">~2 sets, lighter load &amp; RPE</div></div><div class="num">02</div></div>
+    <div class="rule-card avoid">{XMARK}<div class="body"><div class="ttl">Ab-bracing work</div><div class="sub">Zero for the week</div></div><div class="num">03</div></div>
   </div>
   <div class="post-footer"><div class="progress-bar">{bars(7,4)}</div></div>''', None))
 
@@ -161,9 +164,9 @@ slides.append(('cta', '', f'''
   <div class="body-wrap">
     <div class="chip-B">Your move</div>
     <h1>A <span class="hl">coach</span> in your pocket.</h1>
-    <div class="cta-prompt">It's already in your Playbook — comment "PERIOD" and I'll send the link. Free, no login needed.</div>
+    <div class="cta-prompt">Want customised coaching — with attention to every need? Send me a DM to start.</div>
     <div class="actions">
-      <div class="cta-btn primary"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h14v17l-7-4-7 4z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>Save this post</div>
+      <div class="cta-btn primary"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H8l-4 4V4z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>DM to start</div>
       <div class="cta-btn ghost">Follow</div>
     </div>
   </div>
@@ -319,6 +322,23 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--display);}}
 .rule-card .ttl{{font-size:54px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;}}
 .rule-card .sub{{font-family:var(--mono);font-size:22px;color:rgba(244,244,240,.55);letter-spacing:.08em;text-transform:uppercase;margin-top:6px;}}
 .rule-card .num{{font-family:var(--mono);font-size:28px;color:var(--clay-2);letter-spacing:.06em;}}
+
+/* DO cards — the actual coaching, loud and big */
+.rule-card.do{{padding:38px 42px;gap:32px;}}
+.rule-card.do .check{{width:96px;height:96px;}}
+.rule-card.do .check svg{{width:46px;height:46px;}}
+.rule-card.do .ttl{{font-size:70px;font-weight:800;}}
+.rule-card.do .sub{{font-size:25px;}}
+
+/* AVOID card — one exclusion, deliberately smaller and muted so it doesn't compete */
+.rule-card.avoid{{background:rgba(10,10,10,.05);border:1.5px solid rgba(10,10,10,.14);
+  color:var(--body-ink);padding:20px 32px;gap:22px;}}
+.rule-card.avoid .check{{background:rgba(10,10,10,.3);width:56px;height:56px;}}
+.rule-card.avoid .check svg{{width:24px;height:24px;}}
+.rule-card.avoid .body{{color:var(--body-ink);}}
+.rule-card.avoid .ttl{{font-size:36px;font-weight:600;color:var(--body-ink);opacity:.62;}}
+.rule-card.avoid .sub{{font-family:var(--mono);color:rgba(26,26,26,.45);font-size:18px;}}
+.rule-card.avoid .num{{color:rgba(26,26,26,.32);}}
 
 /* ===== TPL-CTA ===== */
 .tpl-cta .body-wrap{{position:absolute;left:var(--pad-edge);right:var(--pad-edge);top:50%;transform:translateY(-55%);}}
