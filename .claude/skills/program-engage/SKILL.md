@@ -52,6 +52,11 @@ load** · **nutrition / fueling** · **consistency / adherence / logging** ·
 **injury / movement** · **conditioning / concurrent training** · **mindset / expectations**.
 Don't force all of them — pick the 5–8 that move *this* athlete, and lead with the biggest lever.
 
+**Female athletes: always include the period-week protocol.** One of the 5–8 notes is the
+standing period-week fallback (see COACHING-PRINCIPLES.md → Process — an adherence tool, not
+performance phasing) — restated in that cycle's actual exercises (which lifts cut to 2 sets,
+which get skipped for direct ab-bracing), never copy-pasted from a prior cycle.
+
 Rules: athlete-specific only — cite real numbers/situation; no padding, no generic fitness
 advice that could fit anyone. **Never invent data** — if a domain has no intake data (e.g.
 diet), prescribe an elite baseline framed as setup to refine via check-ins, never fabricated
