@@ -94,7 +94,7 @@ slides.append(('compare', '', f'''
   {ball(780, 605, 64)}
   {HEADER}
   <div class="body-wrap">
-    <h1>What stays. What <span class="hl">backs off.</span></h1>
+    <h1>What stays. What <span class="hl">backs</span> off.</h1>
   </div>
   <div class="cols">
     <div class="col-card bad">
