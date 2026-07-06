@@ -101,6 +101,12 @@
   /* conditional */
   .cond{display:none;}.cond.on{display:block;margin-top:14px;}
 
+  /* discount code feedback (own class names — avoid the .ok/.on overlay classes) */
+  .dmsg{display:none;align-items:center;gap:7px;margin-top:10px;padding:11px 15px;border-radius:var(--r);font-size:14px;font-weight:600;line-height:1.5;}
+  .dmsg.show{display:flex;}
+  .dmsg.valid{background:var(--accent-dim);color:var(--green);border:1px solid rgba(14,74,54,.18);}
+  .dmsg.invalid{background:rgba(199,85,47,.08);color:var(--clay);border:1px solid rgba(199,85,47,.2);}
+
   /* submit */
   .submit{text-align:center;padding:22px 0 0;}
   .sbtn{display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;}
@@ -159,6 +165,10 @@
       <div class="rcard"><input type="radio" id="loc_ir" name="Location" value="Iran resident" required><label for="loc_ir"><span class="ic">🇮🇷</span>ساکنِ ایران</label></div>
       <div class="rcard"><input type="radio" id="loc_ab" name="Location" value="Abroad"><label for="loc_ab"><span class="ic">🌍</span>خارج از ایران</label></div>
     </div></div>
+    <div class="f"><label for="dcode">کدِ تخفیف <span class="hint">اختیاری — اگه کدِ تخفیف داری اینجا وارد کن</span></label>
+      <input type="text" id="dcode" name="Discount Code" data-skip-progress autocomplete="off" placeholder="مثلاً TENNIS10">
+      <div class="dmsg" id="dmsg" aria-live="polite"></div>
+      <input type="hidden" id="dapplied" name="Discount Applied" value=""></div>
   </section>
 
   <!-- 1 · ABOUT YOU -->
@@ -417,6 +427,33 @@
     var s=document.getElementById(p[0]),v=document.getElementById(p[1]);
     s.addEventListener('input',function(){v.textContent=fa(s.value);});
   });
+  // ═══════════════════════════════════════════════════════════════════
+  // DISCOUNT CODES — edit this list to add, change, or remove codes.
+  //   'CODE': percent   (matched case-insensitively → 'MHRN10' also
+  //                      matches "mhrn10"). Keep the SAME codes on the
+  //                      English form (form.html) so a code works on both.
+  // ═══════════════════════════════════════════════════════════════════
+  var DISCOUNT_CODES={
+    'SIALASH10':10,
+    'MHRN10':10,
+    'NAVAZI10':10
+  };
+  var dcode=document.getElementById('dcode'),dmsg=document.getElementById('dmsg'),dapplied=document.getElementById('dapplied');
+  function checkDiscount(showErr){
+    var raw=dcode.value.trim(),code=raw.toUpperCase();
+    if(Object.prototype.hasOwnProperty.call(DISCOUNT_CODES,code)){
+      var pct=DISCOUNT_CODES[code];
+      dmsg.className='dmsg show valid';dmsg.textContent='✓ کد تایید شد — '+fa(pct)+'٪ تخفیف';
+      dapplied.value=code+' ('+pct+'% off)';
+    }else{
+      dapplied.value='';
+      if(raw&&showErr){dmsg.className='dmsg show invalid';dmsg.textContent='این کد معتبر نیست — املا رو چک کن';}
+      else{dmsg.className='dmsg';dmsg.textContent='';}
+    }
+  }
+  dcode.addEventListener('input',function(){checkDiscount(false);});
+  dcode.addEventListener('blur',function(){checkDiscount(true);});
+
   // dynamic subject
   function subj(){var n=[document.getElementById('fn').value.trim(),document.getElementById('ln').value.trim()].filter(Boolean).join(' ');
     document.getElementById('subj').value=n?'درخواستِ جدید (فارسی) — '+n:'درخواستِ جدید (فارسی)';}
@@ -430,6 +467,7 @@
     if(el.tagName==='SELECT')return el.value&&el.value!=='';return (el.value||'').trim().length>0;}
   function collect(){var seen={},q=[];form.querySelectorAll('input,select,textarea').forEach(function(el){
     if(el.type==='hidden'||el.name==='botcheck'||!el.name)return;
+    if(el.hasAttribute('data-skip-progress'))return;
     var c=el.closest('.cond');if(c&&!c.classList.contains('on'))return;
     if(seen[el.name])return;seen[el.name]=1;q.push(el);});return q;}
   function upd(){var f=collect(),tot=f.length,fl=f.filter(filled).length,p=tot?Math.round(fl/tot*100):0;
