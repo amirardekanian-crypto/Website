@@ -215,6 +215,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   naturally on the next design pass — no separate seeding step (the why is Amir's to supply;
   the data only scaffolds it). *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
+- **Period-week protocol IS used — as an adherence fallback, not performance phasing.**
+  Distinct from the rule above: every female athlete gets a standing low-friction menu for
+  period days, built into her notes each cycle so she never has to build a plan from scratch
+  under discomfort. Logic: full sets on cardio/mobility/light hip work (walking, stretching,
+  glute bridges) — light movement eases cramping; primary lifts cut to ~2 sets at a visibly
+  lighter weight/RPE — move the pattern, don't grind; anything with direct heavy ab-bracing or
+  intra-abdominal pressure (weighted rollouts, planks, hollow holds) skipped outright for those
+  days. Restate it in that cycle's actual exercises, not copied verbatim cycle to cycle. The aim
+  is protecting the training habit through a hard week, not adjusting the training stimulus for
+  performance. *(2026-07-06)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,
   section names, chips and styling are a mechanical layer applied *after* that, and must
