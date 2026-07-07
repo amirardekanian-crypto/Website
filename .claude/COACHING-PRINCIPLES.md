@@ -138,6 +138,18 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
   per exercise, so the program is a starting point Amir adjusts each week. *(2026-06-15)*
 - **Set increments from logged data** (RPE/RIR, bar speed), not guesswork. *(2026-06-15)*
+- **The program is written once per cycle and adjusted reactively, not on a fixed rewrite
+  cadence.** Amir doesn't rebuild the program every week by default — he steps in on a real
+  signal: a logged difficulty pattern (RPE consistently over/under the target) or a wellbeing/
+  readiness dip. No signal, no rewrite. *(2026-07-08)*
+- **Never tell the athlete the coach assigns/prescribes a specific weight.** The app has no
+  weight-target field for a reason: the athlete self-selects load against the prescribed
+  RPE/rep target, and that's the whole mechanism — Amir doesn't hand her a number. Athlete-
+  facing text (cycle message, notes, completion messages) must never imply otherwise (e.g.
+  "I'm setting your loads", "I calculate your weight next cycle"). Frame progression as the
+  *program* changing — RPE targets, rep ranges, exercise selection — driven by what she logs,
+  never as "here's your number." *(2026-07-08, Niloufar C1 — caught two athlete-facing lines
+  that implied weight assignment and reworded them.)*
 
 ## Volume & dosing
 - **Volume is a report, not a rule.** Show programmed sets/muscle vs the goal range vs a
@@ -153,6 +165,21 @@ publish it. No athlete health/chat detail goes here — principles only.
   (1) cost-weighted load per day, (2) that no two high-load days for the same pattern sit
   back-to-back, (3) session **length/grind** (a 7-exercise day spikes cortisol even at low
   RPE). *(2026-06-19)*
+- **Evidence-based volume ceiling for hypertrophy: ~10–20 hard sets/muscle/week, most of the
+  benefit captured by ~10; per-session, ~5–10 sets/muscle is likely near the sweet spot in
+  trained lifters** (Barbalho 2019 RCT in trained women found 5–10 sets/session matched or beat
+  15–20). Don't stack a single session past ~10 direct sets on one muscle — spread it instead.
+  Use this as the working ceiling when sizing weekly/per-day muscle volume, not just intuition.
+  *(2026-07-08, sc-research brief — Schoenfeld 2017, Iversen 2022 umbrella review, Pelland 2025
+  meta-regression, Barbalho 2019, Krause Neto 2025 for glute-specific)*
+- **Check for unused session-time budget before calling a day "done."** Estimate the day's
+  actual working time (sets × rest + set duration) against its time cap — if there's real
+  headroom (15+ min) and the athlete's recovery capacity allows it, that's free volume, not a
+  reason to stop. Fill it with low-priority, low-CNS-cost work (arms, calves, a secondary
+  muscle under its dose range) rather than leaving the session light. A session with room to
+  spare and nothing added in it is an under-dosed session, even if every individual exercise
+  looks reasonable on its own. *(2026-07-08, Niloufar C1 — first draft left 20–25 min unused
+  on three lifting days; caught only because Amir compared it against her training age.)*
 
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
