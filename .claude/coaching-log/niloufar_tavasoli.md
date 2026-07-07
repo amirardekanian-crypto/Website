@@ -34,11 +34,24 @@ Structure: 2 lower + 1 upper + 1 full-body + 1 zone-2 run; no supersets (first c
 Fallbacks: Hip Thrust → Dumbbell Hip Thrust · Leg Press → Heels-Elevated Goblet Squat ·
 BSS → Dumbbell Reverse Lunge · CS Row → Seated Cable Row · Seated OHP → Machine Shoulder Press.
 
-**Volume & Dose**
+**Revision (2026-07-08, pre-launch, Amir):** first draft under-filled the time budget for a
+3+ yr lifter already training 5×/wk — Day 1/2/4 each landed at only 4 working exercises
+against a ~60-min session cap that had 20–25 min of unused headroom, and Day 3's pre-run prep
+was a bare 2-item list while every other day had a proper 3-item circuit. Fixed: added Cable
+Hip Abduction to Day 1 (glute medius — rounds out the glute goal beyond hip thrust/kickback,
+low-cost isolation, keeps Day 1 spine-safe), added Box Step-Up to Day 4 (second unilateral
+glute/quad driver alongside BSS, vertical loading pattern — no axial spine load, high SFR for
+the glute goal), and rebuilt Day 3's prep into a proper Run Prep Circuit (Leg Swings + Ankle
+Dorsiflexion Rocks + Forward Skip) matching the other days' warm-up depth. Days 1/2/4 now all
+sit at 5 working exercises, Day 5 at 6 — undulation shape (peak/mod/low/mod-high/low) unchanged,
+still fits the time cap, still zero new axial spinal load. No change to the locked primary
+selections or the spine-safety rules.
+
+**Volume & Dose** (post-revision)
 | Muscle       | Sets/wk (hard)        | Goal range | Verdict     |
 |--------------|-----------------------|------------|-------------|
-| Glutes       | ~16 (+3 groove)       | 12–20      | developing  |
-| Quads        | ~9                    | 8–12       | developing- |
+| Glutes       | ~19 (+3 groove)       | 12–20      | developing, upper end |
+| Quads        | ~12                   | 8–12       | developing  |
 | Hamstrings   | ~6 (co-work + groove) | 6–10       | by-design (free hinge deferred to C2) |
 | Upper pull   | ~9–10                 | 8–12       | maintaining+ |
 | Upper push   | ~9                    | 6–10       | maintaining+ |
@@ -49,6 +62,8 @@ BSS → Dumbbell Reverse Lunge · CS Row → Seated Cable Row · Seated OHP → 
   wk5 back-off: drop to 3 sets if readiness trends down
 - Machine Leg Press — lever: load · trigger: 3×12 @ RPE ≤7 · increment: +5–10kg
 - Dumbbell Bulgarian Split Squat — lever: load · trigger: 10/side @ RPE ≤7 · increment: +2kg/hand
+- Box Step-Up — lever: load · trigger: 10/side @ RPE ≤7 · increment: +2kg/hand
+- Cable Hip Abduction — lever: load · trigger: 15/side @ RPE ≤7 · increment: +1 plate/small jump
 - Rows/Presses — lever: load · trigger: top of rep range @ RPE ≤7 · increment: +2–2.5kg
 - Zone 2 Run — lever: duration · trigger: avg HR ≤145 with no late-run drift · increment:
   +5 min/wk (35→~50) · if HR drifts, repeat the week's duration — never chase pace in C1
