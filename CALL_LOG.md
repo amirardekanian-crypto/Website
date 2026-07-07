@@ -34,7 +34,7 @@ A single row sets the context for the whole call:
 | **Cycle** | Plain **1–6** picker — which cycle of the program. *(This is the tag the end-of-cycle report groups by — §7.)* |
 | **Date** | Defaults to today. |
 | **Duration** | Free text (e.g. "15 min"). |
-| **Tier buttons** | Foundation / Performance / Elite — your service tier for this athlete. |
+| **Tier buttons** | Game / Set / Match — your service tier for this athlete (1 / 3 / 6-month programme). |
 
 **Where the athlete list comes from:** every athlete you've issued a **secure
 link** to (`athlete_keys`) plus anyone who has synced progress (`athlete_progress`).
