@@ -75,6 +75,15 @@ notes implied Amir sets/assigns weight ("I'm reading your numbers to set the rea
 picks the weight via RPE and the logs only tell Amir whether the *program* needs to shift.
 Saved as a durable principle — see COACHING-PRINCIPLES.md.
 
+**Revision 3 (2026-07-08, Amir — warm-up structure):** Day 3's Run Prep Circuit was built as
+×2 rounds of 3 items, matching the lifting-day warm-up pattern from Revision 1. Amir's call:
+that's the right shape for a *lifting* day prep (repeat a tight set of movements), but a
+*cardio/running* day warm-up should build progressively through more distinct movements
+rather than repeat the same short list twice. Rebuilt as ×1 round of 5 movements (Leg Swings →
+Ankle Dorsiflexion Rocks → Glute Bridge → Reverse Lunge → Forward Skip) — mobility → activation
+→ dynamic movement → plyo primer, straight into the run. Saved as a durable principle — see
+COACHING-PRINCIPLES.md.
+
 **Volume & Dose** (post-revision 2)
 | Muscle       | Sets/wk (hard)        | Goal range | Verdict     |
 |--------------|-----------------------|------------|-------------|
