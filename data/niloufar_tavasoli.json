@@ -1,0 +1,798 @@
+{
+  "athlete": {
+    "id": "niloufar_tavasoli",
+    "key": "e45a51fa82484cbd93c16d719dcc797b",
+    "firstName": "Niloufar",
+    "lastName": "Tavasoli"
+  },
+  "sport": {
+    "badge": "🏋️‍♀️ General Fitness"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bedrock",
+      "tagline": "Build the base, earn the load.",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-07-13",
+      "endDate": "2026-08-16",
+      "focuses": [
+        "Calibrate every load and re-pattern the hinge trunk-supported — spine-safe glute foundation.",
+        "Zone-2 aerobic base on the run day: cap the heart rate, slow the pace, grow the engine."
+      ],
+      "message": {
+        "paragraphs": [
+          "This cycle lays the two foundations everything else gets built on: glutes that respond to load, and an engine that doesn't redline at an easy pace. The hip thrust is your anchor lift — we're going to calibrate it, groove it, and start loading it week by week, with every other exercise chosen to support that goal while keeping your spine completely out of the argument.",
+          "Mental focus for these 5 weeks: precision over heroics. Week 1 will feel easy on purpose — I'm reading your numbers to set the real loads. Log every set honestly and the program sharpens itself around you.",
+          "By the end of Bedrock: heavier hip thrusts than you've ever done, a hinge pattern ready to earn the next cycle's new lift, and a run pace that finally matches your heart instead of fighting it."
+        ],
+        "outcomes": [
+          "Hip thrust loaded and progressing week over week",
+          "All working weights calibrated from your own logs",
+          "Zone-2 run built from 35 to ~50 minutes",
+          "Lower average HR at the same easy pace",
+          "Hinge pattern grooved — next cycle's key lift earned",
+          "5-day rhythm locked in around real life"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Volume Engine",
+      "tagline": "Glutes take the biggest slice.",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-08-17",
+      "endDate": "2026-09-20",
+      "focuses": [
+        "Glute hypertrophy volume build on the calibrated patterns; the loaded free hinge arrives.",
+        "Extend zone-2 duration; HR at a fixed pace becomes the tracked fitness marker."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Bedrock builds the platform. What comes next is the payoff phase every glute goal actually requires — more volume, aimed exactly where you want it, on patterns you'll have already earned. There's one lift waiting in Cycle 2 that only unlocks if these five weeks are done right.",
+          "First you build the base. Then we turn up the volume."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Strength Engine",
+      "tagline": "Heavier on proven patterns.",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-09-21",
+      "endDate": "2026-10-25",
+      "focuses": [
+        "Progressive overload — push intensity on the glute drivers built in Cycle 2.",
+        "Steady-state runs lengthen; expect a visibly lower HR at Cycle 1's pace."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Metabolic Override",
+      "tagline": "Leaner without losing the build.",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-10-26",
+      "endDate": "2026-11-29",
+      "focuses": [
+        "Density + conditioning emphasis for the fat-loss goal while holding glute strength.",
+        "Run day adds controlled tempo touches on top of the base."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Capstone",
+      "tagline": "Everything, heavier and leaner.",
+      "weeks": "Weeks 21–26",
+      "startDate": "2026-11-30",
+      "endDate": "2027-01-10",
+      "focuses": [
+        "Peak glute volume + intensity on the best-responding movers from the whole arc.",
+        "Consolidate aerobic gains; end-of-arc reassessment against the starting run baseline."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bedrock",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Built From The Glutes Up",
+        "completionTitle": "Anchor Set",
+        "completionMessage": "That thrust number is the one we build the whole program around — logged and climbing. Protein within a couple of hours, and tomorrow the upper body gets its turn.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Incline Treadmill Walk",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Walk tall and push the belt away", "Warm, not winded"],
+                  "bad": ["Don't grip the rails"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Glute Wake-Up Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Push the floor away as you round", "Move one vertebra at a time"],
+                      "bad": ["Don't force the low back into a deep arch"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Drive heels through the floor", "Squeeze the glutes at the top, not the low back"],
+                      "bad": ["Don't finish by arching the spine"]
+                    }
+                  },
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Push the ground sideways", "Feel the side of the hip burn"],
+                      "bad": ["Don't let the knees cave in"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 150,
+                "chips": [
+                  { "label": "1s top hold", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8–10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive the bar to the ceiling with your hips", "Glutes finish the rep — squeeze them like you're cracking a walnut"],
+                  "bad": ["Don't hyperextend the low back at the top — ribs stay down, chin tucked"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the sled away through mid-foot and heel", "Feel quads and glutes share the work"],
+                  "bad": ["Never let the low back peel off the pad at the bottom — cut depth before that happens"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Glute Kickback",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Sweep the leg back and slightly up", "One glute does everything — the standing leg just balances"],
+                  "bad": ["Don't swing from the low back to move more weight"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Pallof Press",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2s hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press straight out and freeze — beat the cable's pull", "Brace like someone's about to poke your stomach"],
+                  "bad": ["Don't let the hips or shoulders twist toward the stack"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Press, Pull, Repeat",
+        "completionTitle": "Strong Frame",
+        "completionMessage": "Presses and rows done with your spine fully supported — strength built, back protected. Tomorrow is the slow run: leave the ego at home and keep it under 145.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Smooth circles", "Raise the temperature"],
+                  "bad": ["Don't race it"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Shoulder Prep Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Band Pass-Through",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Wide grip, big slow arc", "Open the chest"],
+                      "bad": ["Don't bend the elbows to cheat the arc"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Stretch the band to your chest", "Squeeze between the shoulder blades"],
+                      "bad": ["Don't shrug into your ears"]
+                    }
+                  },
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Push the floor away as you round", "Segment by segment"],
+                      "bad": ["Don't rush the extension"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Seated Dumbbell Overhead Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8–10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press both bells to the ceiling until elbows lock", "Shoulders do the work — not the neck"],
+                  "bad": ["Don't arch off the backrest to grind a rep — the backrest protects your spine, use it"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the bells to your hips, elbows brushing your sides", "Shoulder blades start every rep"],
+                  "bad": ["Don't lift the chest off the pad for momentum"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Incline Dumbbell Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press up and slightly back over the collarbones", "Upper chest stretches at the bottom, squeezes at the top"],
+                  "bad": ["Don't flare the elbows straight out — keep them about 45 degrees"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Arm Cable Row",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Row the handle to your hip pocket", "The lat drives, the arm just connects"],
+                  "bad": ["Don't rotate the torso open to yank the weight"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30m Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Walk a perfectly straight line, tall", "The free side of your waist fights the lean"],
+                  "bad": ["Don't let the weight tip your shoulder down"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Slow Burn, Big Engine",
+        "completionTitle": "Engine Work",
+        "completionMessage": "Every minute under that HR ceiling was a deposit into your aerobic base — the slowness IS the training. Watch that pace-at-145 number over the next five weeks.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Brisk Walk",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Arms swinging, building pace", "Legs waking up"],
+                  "bad": ["Don't jump straight into the run cold"]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Leg Swings",
+                "videoUrl": null,
+                "chips": [{ "label": "×10 Each Side" }],
+                "cues": {
+                  "good": ["Swing tall holding a support — front-to-back, then side-to-side", "Hips loosening with each swing"],
+                  "bad": ["Don't round the back to swing higher"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Conditioning",
+            "icon": "🫀",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Zone 2 Run",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "hr cap 145", "style": "dark" },
+                  { "label": "35 min" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Run slow enough to hold a full conversation out loud", "This should feel almost embarrassingly easy — that's the target, not a failure"],
+                  "bad": ["Don't chase pace — if HR passes 145, walk until it drops under 135, then resume"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "The Single-Leg Standard",
+        "completionTitle": "One Leg, No Excuses",
+        "completionMessage": "Split squats and single-leg bridges — each glute earned its own paycheck today, and that pull-through is quietly unlocking next cycle's lift. Eat, stretch, sleep.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Smooth circles", "Warm legs"],
+                  "bad": ["Don't sprint it"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Hip Opener Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Rotate both knees side to side", "Hips opening, spine quiet"],
+                      "bad": ["Don't force range with the low back"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Heels through the floor", "Glutes, not low back"],
+                      "bad": ["Don't arch to finish"]
+                    }
+                  },
+                  {
+                    "name": "Reverse Lunge",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Step back onto a rail", "Front leg owns the movement"],
+                      "bad": ["Don't let the front knee dive inward"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Bulgarian Split Squat",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "right leg first", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8–10 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drop the back knee straight down to the floor", "The front glute stretches at the bottom and drives you up"],
+                  "bad": ["Don't bounce out of the bottom — control down, drive up"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Pull Through",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Push your hips back to the wall behind you, then snap them through", "Hamstrings load like rubber bands, spine stays a straight bar"],
+                  "bad": ["Never round the low back — the hips move, the spine doesn't"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Leg Glute Bridge",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Drive one heel through the floor to lift the hips level", "One glute lifts your whole body"],
+                  "bad": ["Don't let the pelvis tilt or drop to one side"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30s Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Make a straight ramp from shoulders to feet", "The bottom side of your waist holds everything"],
+                  "bad": ["Don't let the hips sag toward the floor"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "focusTag": "Full-Body Finish Line",
+        "completionTitle": "Week Sealed",
+        "completionMessage": "Lightest day of the week, and it still moved you forward — pattern practice, pump, and a core that protects your spine. Five for five. That consistency is the real program.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Smooth and light", "Loosen the week off"],
+                  "bad": ["Don't turn it into cardio"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Full-Body Prep Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "World's Greatest Stretch",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": ["Long lunge, reach to the ceiling", "Hips and mid-back opening"],
+                      "bad": ["Don't collapse into the front hip"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Heels down, hips up", "Glutes on"],
+                      "bad": ["No low-back arch"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Band to chest", "Shoulder blades squeeze"],
+                      "bad": ["Don't shrug"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Heels-Elevated Goblet Squat",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Sit straight down between your heels", "Quads stretch, torso stays tall the whole way"],
+                  "bad": ["Keep it LIGHT — this squat is practice, not a test; stop the set if the low back speaks up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Glute Bridge",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "1s top hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive the bell up with your hips", "Glutes squeeze hard at the top"],
+                  "bad": ["Don't finish with the low back"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Push-Up",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8–15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the floor away until elbows lock", "Whole body moves as one plank — stop 2 reps short of failure"],
+                  "bad": ["Don't let the hips sag — that's your spine flexing under load"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the rope to your eyebrows, elbows high and wide", "Rear shoulders and shoulder blades finish the pull"],
+                  "bad": ["Don't turn it into a row — elbows stay above shoulder line"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Bird Dog",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "2s hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Reach one arm and the opposite heel to opposite walls", "Nothing moves except the reaching limbs — hips stay level"],
+                  "bad": ["Don't let the low back arch as the leg extends"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30s" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Forearms down, make one straight line", "Glutes and abs both squeezing"],
+                  "bad": ["Don't sag through the hips or pike them up"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Niloufar",
+    "cards": [
+      {
+        "icon": "❤️",
+        "title": "Your Heart Rate Isn't \"Natural\"",
+        "body": "On your July 4th run you averaged 177 bpm at an easy-conversation pace — that's not \"just how your body is,\" it's a sign your aerobic base is underbuilt, and it's very fixable. That's why your run day has a hard ceiling of 145 bpm: run slow enough to talk out loud, and the moment your watch crosses 145, walk until it drops under 135, then resume. Walk breaks are the program working, not you failing. Do this for five weeks and watch what happens to your pace at the same heart rate — that number dropping is your engine growing."
+      },
+      {
+        "icon": "🍑",
+        "title": "The Glute Rule: Feel It There",
+        "body": "Your goal is written all over this program — glutes get touched on three of your four lifting days, with the hip thrust as the anchor. One rule on every glute exercise: if you feel it in your low back, the set is over — reset your ribs down, squeeze the glutes to finish the rep, and go again lighter. A set of 8 you feel entirely in your glutes beats a set of 12 your back helped with. That's how the load climbs safely week after week."
+      },
+      {
+        "icon": "🛡️",
+        "title": "Your Spine Rules, Built In",
+        "body": "Everything here already respects your three rules: no heavy squatting (the leg press and goblet squat stay light-to-moderate — they're pattern work, not tests), nothing lying on your back raising your legs (your core work is planks, bird dogs, Pallof presses and carries instead — genuinely better for your back anyway), and your own rule stands: pain means stop, message me. You've been pain-free and I intend to keep you that way. Strong glutes and a braced core are the best insurance your back can own."
+      },
+      {
+        "icon": "🎯",
+        "title": "Week One Is Calibration",
+        "body": "You didn't give me your lift numbers — so week 1 finds them. Every RPE target this week, treat as a ceiling: finish each set feeling you had 3 clean reps left. Log the weight and RPE on every single set, because those logs are what I set your week 2–5 progressions from. The more honest the first week, the faster the next four move."
+      },
+      {
+        "icon": "🔋",
+        "title": "Long Days: The Readiness Rule",
+        "body": "Your life-load is heavy — long days, little downtime — so this program bends instead of breaking. Do the readiness check before every session, honestly. On a rough day: drop every RPE by one, and if time or energy collapses, do just the first main lift and leave — that counts as a completed session, not a failure. You can also reorder days within the week. Five imperfect sessions beat three perfect ones and two skipped."
+      },
+      {
+        "icon": "🩸",
+        "title": "Period Week: The Fallback Menu",
+        "body": "For the hard days of your cycle, don't negotiate with yourself from zero — the plan is already made. Keep in full: the zone-2 run (or swap it for a walk), all warm-up circuits, glute bridges and lateral band walks — light movement genuinely eases cramping. Cut to 2 lighter sets: hip thrust, leg press, split squats, rows and presses — move the pattern, don't grind it. Skip outright those days: Pallof press, planks, side planks, bird dogs and suitcase carries (anything that squeezes your abs hard). The goal of that week is protecting the habit, not chasing progress."
+      },
+      {
+        "icon": "🍳",
+        "title": "Protein Anchors The Whole Goal",
+        "body": "You said nutrition is mostly on track — here's the one lever that decides whether this cycle builds glutes while losing fat: protein at every meal, roughly a palm-sized portion four times a day (for you that's in the range of 100–120g daily). Don't overhaul anything else yet. We'll refine the details on our weekly check-ins once I see how your body responds to the first two weeks of training."
+      },
+      {
+        "icon": "😴",
+        "title": "Make Sleep Quality Match Hours",
+        "body": "You get 7–8 hours but rate the quality 6/10 — and with your schedule, sleep is where your training actually turns into results. One change this cycle: a hard screen-off 30 minutes before bed, same wake time every day, even weekends. Recovery is the ceiling on everything in this program; raise it and every number in the app climbs faster."
+      }
+    ]
+  }
+}
