@@ -208,6 +208,22 @@
                   "good": ["Sweep the leg back and slightly up", "One glute does everything — the standing leg just balances"],
                   "bad": ["Don't swing from the low back to move more weight"]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Hip Abduction",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the ankle straight out to the side against the cable", "Feel the side of the hip, not the low back"],
+                  "bad": ["Don't lean the torso away to cheat the range"]
+                }
               }
             ]
           },
@@ -410,14 +426,37 @@
                 }
               },
               {
-                "type": "simple",
-                "name": "Leg Swings",
-                "videoUrl": null,
-                "chips": [{ "label": "×10 Each Side" }],
-                "cues": {
-                  "good": ["Swing tall holding a support — front-to-back, then side-to-side", "Hips loosening with each swing"],
-                  "bad": ["Don't round the back to swing higher"]
-                }
+                "type": "circuit",
+                "name": "Run Prep Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Leg Swings",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Swing tall holding a support — front-to-back, then side-to-side", "Hips loosening with each swing"],
+                      "bad": ["Don't round the back to swing higher"]
+                    }
+                  },
+                  {
+                    "name": "Ankle Dorsiflexion Rocks",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Rock the knee over the toes, heel glued down", "Feel the ankle open up, not the calf stretch"],
+                      "bad": ["Don't let the arch collapse inward"]
+                    }
+                  },
+                  {
+                    "name": "Forward Skip",
+                    "detail": "×20m",
+                    "cues": {
+                      "good": ["Light and quick — pop off the ground", "Feel the rhythm build, not the effort"],
+                      "bad": ["Don't turn it into a sprint — this primes the pattern, it isn't the workout"]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -525,6 +564,22 @@
             "title": "Accessory",
             "icon": "💪",
             "exercises": [
+              {
+                "type": "standard",
+                "name": "Box Step-Up",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8–10 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive through the whole foot on the box, not a push off the back leg", "The top glute finishes the rep, standing tall"],
+                  "bad": ["Don't let the back leg do the work — that's cheating the stimulus you came here for"]
+                }
+              },
               {
                 "type": "standard",
                 "name": "Cable Pull Through",
