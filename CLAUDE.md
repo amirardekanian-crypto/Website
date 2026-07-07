@@ -4,8 +4,9 @@ Durable context for working in this repo. Read the linked docs before diving in.
 
 ## Who / what this is
 - **Amir Ardekani** — online **strength & conditioning coach** (MSc S&C + MSc Applied
-  Exercise Physiology; 500+ tennis & padel players). Sells premium ~6-month individualised
-  programmes delivered through a private web app (`program.html`, a PWA), backed by Supabase.
+  Exercise Physiology; 500+ tennis & padel players). Sells premium individualised
+  programmes (USD tiers: $70/1mo · $180/3mo · $300/6mo — see `Content/PRODUCT.md`)
+  delivered through a private web app (`program.html`, a PWA), backed by Supabase.
 - **Two audiences, deliberately different** (don't force them identical — match *facts &
   features*, not wording):
   - **English** site = competitive **tennis/padel** players. Voice: sharp, athletic, evidence-based.
