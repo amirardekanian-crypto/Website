@@ -24,12 +24,12 @@
       "message": {
         "paragraphs": [
           "This cycle lays the two foundations everything else gets built on: glutes that respond to load, and an engine that doesn't redline at an easy pace. The hip thrust is your anchor lift — we're going to calibrate it, groove it, and start loading it week by week, with every other exercise chosen to support that goal while keeping your spine completely out of the argument.",
-          "Mental focus for these 5 weeks: precision over heroics. Week 1 will feel easy on purpose — I'm reading your numbers to set the real loads. Log every set honestly and the program sharpens itself around you.",
+          "Mental focus for these 5 weeks: precision over heroics. Week 1 will feel easy on purpose — you're finding your own working weights against the RPE targets, not me assigning them. Log every set honestly and the program sharpens itself around what you report.",
           "By the end of Bedrock: heavier hip thrusts than you've ever done, a hinge pattern ready to earn the next cycle's new lift, and a run pace that finally matches your heart instead of fighting it."
         ],
         "outcomes": [
           "Hip thrust loaded and progressing week over week",
-          "All working weights calibrated from your own logs",
+          "Working weights dialed in through your own RPE feedback",
           "Zone-2 run built from 35 to ~50 minutes",
           "Lower average HR at the same easy pace",
           "Hinge pattern grooved — next cycle's key lift earned",
@@ -379,6 +379,38 @@
                   "good": ["Row the handle to your hip pocket", "The lat drives, the arm just connects"],
                   "bad": ["Don't rotate the torso open to yank the weight"]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Bicep Curl",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Curl straight up without swinging", "Biceps do the lifting, elbows stay pinned to your sides"],
+                  "bad": ["Don't rock the torso to sling the weight up"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Tricep Pushdown",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12–15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the bar down until arms are straight", "Triceps lock out the last inch"],
+                  "bad": ["Don't let the elbows drift forward away from your ribs"]
+                }
               }
             ]
           },
@@ -598,6 +630,22 @@
               },
               {
                 "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10–12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Curl the pad toward your heels", "Hamstrings do all the work — hips stay pinned to the seat"],
+                  "bad": ["Don't let the hips rise off the pad to cheat the rep"]
+                }
+              },
+              {
+                "type": "standard",
                 "name": "Single-Leg Glute Bridge",
                 "videoUrl": null,
                 "restSec": 60,
@@ -761,6 +809,22 @@
                   "good": ["Pull the rope to your eyebrows, elbows high and wide", "Rear shoulders and shoulder blades finish the pull"],
                   "bad": ["Don't turn it into a row — elbows stay above shoulder line"]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Machine Calf Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15–20 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press through the balls of your feet as high as possible", "Feel the calf fully squeeze at the top"],
+                  "bad": ["Don't bounce out of the bottom stretch"]
+                }
               }
             ]
           },
@@ -826,7 +890,7 @@
       {
         "icon": "🎯",
         "title": "Week One Is Calibration",
-        "body": "You didn't give me your lift numbers — so week 1 finds them. Every RPE target this week, treat as a ceiling: finish each set feeling you had 3 clean reps left. Log the weight and RPE on every single set, because those logs are what I set your week 2–5 progressions from. The more honest the first week, the faster the next four move."
+        "body": "You didn't give me your lift numbers — so week 1 is about finding your own working weights, not me assigning them. Every RPE target this week, treat as a ceiling: pick a weight that leaves about 3 clean reps in the tank at that RPE. Log the weight and RPE on every single set — that's the data I read to decide whether your targets and exercises need to shift next cycle. The more honest the first week, the sharper the read."
       },
       {
         "icon": "🔋",
