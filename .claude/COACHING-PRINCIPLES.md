@@ -114,6 +114,12 @@ publish it. No athlete health/chat detail goes here — principles only.
   the pre-session readiness check already captures how the athlete feels. RPE on a `simple`
   item is reserved for a genuinely effort-graded piece (a cool-down jog, a conditioning
   finisher), never the warm-up. *(2026-06-19)*
+- **Lifting-day warm-ups can repeat rounds; cardio/running-day warm-ups shouldn't.** A prep
+  circuit before a *lifting* session is fine at ×2 rounds of a tight movement list (repetition
+  reinforces the pattern before loading it). A prep circuit before a *cardio/running* session
+  should instead build progressively through **more distinct movements in a single pass**
+  (mobility → activation → dynamic movement → plyo/stride primer) rather than repeating the
+  same short list twice — that progression is the point, not the rep count. *(2026-07-08)*
 - **Time-limited clients (esp. tennis): cap sessions ~45–50 min.** Power work (low volume,
   long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
