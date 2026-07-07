@@ -460,8 +460,8 @@
               {
                 "type": "circuit",
                 "name": "Run Prep Circuit",
-                "rounds": "×2 Rounds",
-                "restSec": 45,
+                "rounds": "×1 Round",
+                "restSec": 30,
                 "warmup": true,
                 "items": [
                   {
@@ -478,6 +478,22 @@
                     "cues": {
                       "good": ["Rock the knee over the toes, heel glued down", "Feel the ankle open up, not the calf stretch"],
                       "bad": ["Don't let the arch collapse inward"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Drive heels through the floor", "Wake the glutes up before they do the work of holding you upright"],
+                      "bad": ["Don't finish by arching the spine"]
+                    }
+                  },
+                  {
+                    "name": "Reverse Lunge",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Step back onto a rail, tall through the chest", "Front leg controls the whole movement"],
+                      "bad": ["Don't let the front knee dive inward"]
                     }
                   },
                   {
