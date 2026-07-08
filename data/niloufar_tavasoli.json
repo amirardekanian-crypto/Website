@@ -162,7 +162,7 @@
                 "chips": [
                   { "label": "1s top hold", "style": "dark" },
                   { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×8–10 Reps" },
+                  { "label": "×10 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -178,7 +178,7 @@
                 "restSec": 120,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10–12 Reps" },
+                  { "label": "×12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -200,7 +200,7 @@
                 "restSec": 60,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12–15 Each Side" },
+                  { "label": "×15 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 8" }
                 ],
@@ -317,7 +317,7 @@
                 "restSec": 120,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8–10 Reps" },
+                  { "label": "×10 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -333,7 +333,7 @@
                 "restSec": 120,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10–12 Reps" },
+                  { "label": "×12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -355,7 +355,7 @@
                 "restSec": 90,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10–12 Reps" },
+                  { "label": "×12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -387,7 +387,7 @@
                 "restSec": 60,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10–12 Reps" },
+                  { "label": "×12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -403,7 +403,7 @@
                 "restSec": 60,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12–15 Reps" },
+                  { "label": "×15 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -597,7 +597,7 @@
                 "chips": [
                   { "label": "right leg first", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8–10 Each Side" },
+                  { "label": "×10 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -619,7 +619,7 @@
                 "restSec": 90,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8–10 Each Side" },
+                  { "label": "×10 Each Side" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -635,7 +635,7 @@
                 "restSec": 90,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12–15 Reps" },
+                  { "label": "×15 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 6" }
                 ],
@@ -651,7 +651,7 @@
                 "restSec": 75,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10–12 Reps" },
+                  { "label": "×12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -785,7 +785,7 @@
                 "chips": [
                   { "label": "1s top hold", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12–15 Reps" },
+                  { "label": "×15 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -801,7 +801,7 @@
                 "restSec": 60,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8–15 Reps" },
+                  { "label": "×15 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
@@ -833,7 +833,7 @@
                 "restSec": 60,
                 "chips": [
                   { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×15–20 Reps" },
+                  { "label": "×20 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 7" }
                 ],
