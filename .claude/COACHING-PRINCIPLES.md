@@ -162,6 +162,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   *program* changing — RPE targets, rep ranges, exercise selection — driven by what she logs,
   never as "here's your number." *(2026-07-08, Niloufar C1 — caught two athlete-facing lines
   that implied weight assignment and reworded them.)*
+- **Every athlete gets a progression/regression explainer note — mandatory, every cycle.**
+  Since the app never assigns weight (see above), every athlete needs to be taught the
+  mechanism directly: how to calibrate a **new movement** (pick conservative, let the first
+  set's RPE say go up or down), how to **progress week-to-week** on the same exercise (hit
+  prescribed reps at/under target RPE → small jump; RPE at ceiling or reps missed → hold and
+  repeat), and that **regression isn't failure** (a rough-readiness day or a harder-than-target
+  set is a signal to drop weight, not push through). /program-engage writes this into the notes
+  every cycle, in that cycle's own voice — for a new athlete it doubles as the week-1
+  calibration note. *(2026-07-08)*
 
 ## Volume & dosing
 - **Volume is a report, not a rule.** Show programmed sets/muscle vs the goal range vs a

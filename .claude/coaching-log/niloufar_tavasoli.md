@@ -119,5 +119,13 @@ number, taking the top of the original range (matches the progression triggers a
 documented above, most of which referenced the top number). No change to sets, tempo, RPE,
 or exercise selection. Saved as a durable rule — see COACHING-PRINCIPLES.md.
 
+**Revision 5 (2026-07-08, Amir — mandatory progression/regression note):** Amir wants every
+athlete taught, explicitly, how the weight-selection system works — new-movement calibration,
+week-to-week progression, and that regression on a bad day isn't failure. Replaced the
+"Week One Is Calibration" note with a fuller "How To Progress & Regress" note covering all
+three (it subsumes week-1 calibration rather than duplicating it). Made mandatory for every
+athlete's notes going forward — see /program-engage SKILL.md PART 3 and
+COACHING-PRINCIPLES.md → Progression.
+
 **e1RM** — none yet (first cycle; no self-reported lifts). Baselines will be derived from
 the heaviest logged sets of C1 and become the C2 reference.
