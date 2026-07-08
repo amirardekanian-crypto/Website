@@ -124,6 +124,40 @@
   .ok-card p+p{color:var(--muted);font-size:14px;margin-top:12px;}
   .foot{background:#0a3527;color:rgba(255,255,255,.7);padding:30px 0;text-align:center;font-size:15px;}
   .foot a{color:rgba(255,255,255,.85);}
+
+  /* ═══ لایه‌ی زنده — motion touches (matches the FA homepage) ═══ */
+  .scroll-progress{position:fixed;top:0;right:0;left:0;height:3px;z-index:300;pointer-events:none;
+    background:linear-gradient(-90deg,var(--clay),var(--clay-2));transform-origin:100% 50%;transform:scaleX(0);}
+  .hero h1{overflow:hidden;}
+  .hero h1>.hw{display:inline-block;transform:translateY(112%);animation:word-rise .9s var(--ease) .1s forwards;}
+  @keyframes word-rise{to{transform:translateY(0);}}
+  .hero h1 .acc{position:relative;}
+  .hero h1 .acc::after{content:'';position:absolute;right:-2px;left:-3px;bottom:8%;height:.14em;background:var(--clay);opacity:.18;
+    transform:scaleX(0);transform-origin:right center;animation:sweep-in .7s var(--ease) 1s forwards;}
+  @keyframes sweep-in{to{transform:scaleX(1);}}
+  .badge{animation:soft-pulse 2.8s ease-in-out infinite;}
+  @keyframes soft-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+  .pfill{background:linear-gradient(-90deg,var(--clay),var(--clay-2));box-shadow:0 0 12px rgba(199,85,47,.45);}
+  .fsec,.submit{transition:opacity .7s var(--ease),transform .7s var(--ease),box-shadow .3s var(--ease);}
+  .fsec.rv,.submit.rv{opacity:0;transform:translateY(26px);}
+  .fsec.rv.visible,.submit.rv.visible{opacity:1;transform:translateY(0);}
+  .fsec:hover{box-shadow:0 14px 36px rgba(40,30,20,.07);}
+  .rcard label{transition:border-color .2s,background .2s,color .2s,transform .25s var(--ease),box-shadow .25s var(--ease);}
+  .rcard label:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(40,30,20,.08);}
+  .pill span{transition:border-color .2s,background .2s,color .2s,transform .2s var(--ease);}
+  .pill span:hover{transform:translateY(-1px);}
+  .sbtn{position:relative;overflow:hidden;}
+  .sbtn::before{content:'';position:absolute;top:0;bottom:0;left:0;width:40%;
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.3),transparent);
+    transform:translateX(-180%) skewX(-18deg);pointer-events:none;}
+  .sbtn:hover::before{animation:sheen .8s ease;}
+  @keyframes sheen{to{transform:translateX(340%) skewX(-18deg);}}
+  .ok.on .ok-check{animation:pop-in .6s var(--ease);}
+  @keyframes pop-in{0%{transform:scale(0);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+    html{scroll-behavior:auto;}
+  }
 </style>
 </head>
 <body>
@@ -137,7 +171,7 @@
 
 <header class="hero">
   <div class="badge">⏱ حدودِ ۵ دقیقه</div>
-  <h1>بریم <span class="acc">شروع</span> کنیم</h1>
+  <h1><span class="hw">بریم <span class="acc">شروع</span> کنیم</span></h1>
   <p>یه‌کم از خودت بگو. از جواب‌هات استفاده می‌کنم تا برنامه‌ای بنویسم که با بدن، برنامه‌ی روزانه و هدفِ تو جور باشه.</p>
 </header>
 
@@ -485,6 +519,31 @@
       else throw new Error('fail');
     }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
   });
+
+  // ── لایه‌ی زنده: reveal سکشن‌ها + نوار پیشرفتِ اسکرول ──
+  (function(){
+    var secs=document.querySelectorAll('.fsec, .submit');
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(es){es.forEach(function(e){
+        if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+      });},{threshold:.08});
+      secs.forEach(function(el){el.classList.add('rv');io.observe(el);});
+      // هر چی توی دیدِ اول هست، همون لحظه نشون بده
+      requestAnimationFrame(function(){secs.forEach(function(el){
+        if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('visible');
+      });});
+    }
+    var bar=document.createElement('div');bar.className='scroll-progress';bar.setAttribute('aria-hidden','true');
+    document.body.appendChild(bar);
+    var tick=false;
+    window.addEventListener('scroll',function(){
+      if(tick)return;tick=true;
+      requestAnimationFrame(function(){
+        var h=document.documentElement,m=h.scrollHeight-h.clientHeight;
+        bar.style.transform='scaleX('+(m>0?h.scrollTop/m:0)+')';tick=false;
+      });
+    },{passive:true});
+  })();
 })();
 </script>
 </body>
