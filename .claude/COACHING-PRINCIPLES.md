@@ -144,6 +144,12 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
   per exercise, so the program is a starting point Amir adjusts each week. *(2026-06-15)*
 - **Set increments from logged data** (RPE/RIR, bar speed), not guesswork. *(2026-06-15)*
+- **Never prescribe a rep range — always a single rep number.** The app has no rep-range
+  field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
+  When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
+  number — by convention, the top of the intended range — and write that. This applies to
+  every exercise on every day, including circuit items and unilateral (`Each Side`) reps.
+  *(2026-07-08, Niloufar C1 — caught 15 rep-range chips across the program and converted them.)*
 - **The program is written once per cycle and adjusted reactively, not on a fixed rewrite
   cadence.** Amir doesn't rebuild the program every week by default — he steps in on a real
   signal: a logged difficulty pattern (RPE consistently over/under the target) or a wellbeing/
