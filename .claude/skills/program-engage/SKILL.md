@@ -83,6 +83,14 @@ diet), prescribe an elite baseline framed as setup to refine via check-ins, neve
 macros/numbers.
 Per note: `ICON:` (emoji) · `TITLE:` (≤6 words) · `BODY:` (3–6 sentences, prescriptive).
 
+**Format the body as real HTML, not one paragraph.** `card.body` renders as HTML in the app
+(see SCHEMA.md → "notes") — write **2–4 short `<p>` paragraphs** (one idea per paragraph, not
+a wall of sentences run together), and reach for a **`<ul><li>` list** the moment content is
+naturally enumerable (a set of rules, a sequence of steps, a keep/cut/skip breakdown — the
+period-week note is almost always a list). Bold the single most important phrase per paragraph
+with `<strong>`. A note that reads as one dense paragraph when opened is a formatting bug, not
+just a style nit — rewrite it before shipping.
+
 ## PART 4 — DAY COMPLETION MESSAGES
 For each training day in the program spec (Day 1…N), tied to that day's focus and how
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.
