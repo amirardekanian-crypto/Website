@@ -212,6 +212,14 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
   never in the athlete app or the athlete JSON. They are also archived per-athlete to the
   coach-only `.claude/coaching-log/<id>.md` (append-only, git-tracked but unpublished). *(2026-06-15, archive added 2026-06-28)*
+- **Personal note bodies (`notes.cards[].body`) render as real HTML, not one paragraph.**
+  The app used to escape this field to plain text — it now renders `<p>`, `<ul><li>`,
+  `<strong>`, `<em>` (fixed `2026-07-08`, see `program.html` "note-body" CSS + `renderNotes()`).
+  Write 2–4 short paragraphs (one idea each), reach for a bullet list the instant content is
+  enumerable (rules, steps, a keep/cut/skip breakdown), bold the one key phrase per paragraph.
+  A note that opens as a dense wall of text is a bug, not a style choice — see SCHEMA.md →
+  "notes" and program-engage SKILL.md PART 3. *(2026-07-08, caught on Niloufar's "How To
+  Progress & Regress" note.)*
 
 ## Coaching cues
 - **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an

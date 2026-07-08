@@ -2187,6 +2187,17 @@
   .note-card.open .note-chevron { transform: rotate(180deg); }
   .note-body { display: none; padding: 14px 18px 18px; font-size: 14px; line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
   .note-card.open .note-body { display: block; }
+  /* Note bodies render real HTML (paragraphs/lists/bold) — the global `* { margin:0; padding:0 }`
+     reset strips default browser spacing, so restore it explicitly here. Applies to both
+     personal notes (data/<id>.json) and the "Using the app" guide cards. */
+  .note-body p { margin: 0 0 10px; }
+  .note-body p:last-child { margin-bottom: 0; }
+  .note-body ul { margin: 4px 0 10px; padding-left: 20px; }
+  .note-body ul:last-child { margin-bottom: 0; }
+  .note-body li { margin-bottom: 6px; }
+  .note-body li:last-child { margin-bottom: 0; }
+  .note-body strong { font-weight: 700; color: var(--grey-dark); }
+  body[data-dark] .note-body strong { color: #f0f0f0; }
 
   /* ════════════════════════════════════════════════════════════════════
      COACH PAGE REDESIGN — hero header · chat composer · banner note cards
@@ -4306,7 +4317,7 @@ function renderNotes() {
           <div class="note-cta">Tap to read ›</div>
         </div>
       </div>
-      <div class="note-body">${esc(card.body)}</div>
+      <div class="note-body">${card.body}</div>
     </div>`).join('');
 
   // ── "Using the app" — general cards, same for everyone (from the APP_GUIDE
