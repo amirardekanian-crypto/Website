@@ -104,13 +104,20 @@ COACHING-PRINCIPLES.md.
 - Box Step-Up — lever: load · trigger: 10/side @ RPE ≤7 · increment: +2kg/hand
 - Cable Hip Abduction — lever: load · trigger: 15/side @ RPE ≤7 · increment: +1 plate/small jump
 - Machine Seated Leg Curl — lever: load · trigger: 3×12 @ RPE ≤7 · increment: +1 plate/small jump
-- Rows/Presses — lever: load · trigger: top of rep range @ RPE ≤7 · increment: +2–2.5kg
-- Bicep Curl/Tricep Pushdown — lever: load · trigger: top of rep range @ RPE ≤7 · increment:
-  +1–2kg/hand or small cable jump · low priority, progress opportunistically
-- Seated Machine Calf Raise — lever: load · trigger: top of rep range @ RPE ≤7 · increment:
-  +1 plate/small jump · low priority, progress opportunistically
+- Rows/Presses — lever: load · trigger: hits prescribed reps @ RPE ≤7 · increment: +2–2.5kg
+- Bicep Curl/Tricep Pushdown — lever: load · trigger: hits prescribed reps @ RPE ≤7 ·
+  increment: +1–2kg/hand or small cable jump · low priority, progress opportunistically
+- Seated Machine Calf Raise — lever: load · trigger: hits prescribed reps @ RPE ≤7 ·
+  increment: +1 plate/small jump · low priority, progress opportunistically
 - Zone 2 Run — lever: duration · trigger: avg HR ≤145 with no late-run drift · increment:
   +5 min/wk (35→~50) · if HR drifts, repeat the week's duration — never chase pace in C1
+
+**Revision 4 (2026-07-08, Amir — single-rep prescription):** the app has no rep-*range* field —
+it prescribes one rep number per exercise, never a range. Several exercises had been authored
+as ranges (e.g. "×8–10 Reps"). Fixed: every rep chip across all 5 days converted to a single
+number, taking the top of the original range (matches the progression triggers already
+documented above, most of which referenced the top number). No change to sets, tempo, RPE,
+or exercise selection. Saved as a durable rule — see COACHING-PRINCIPLES.md.
 
 **e1RM** — none yet (first cycle; no self-reported lifts). Baselines will be derived from
 the heaviest logged sets of C1 and become the C2 reference.
