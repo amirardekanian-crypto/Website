@@ -33,6 +33,19 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Know the referral line.** Program *around* minor pain, but a red flag — sharp, persistent,
   worsening, radiating pain, numbness, or a suspected real injury — means refer out to a
   physio/doctor before loading it further. Coaching is not diagnosis. *(2026-06-28)*
+- **Every athlete with an active injury or a rehab/managed history gets a mandatory
+  in-gym pain-management note.** Anyone whose brief carries an injury, a rehab stage, or a
+  managed/standing restriction (not just a fresh red flag) must have a note that translates
+  "know the referral line" into what *they* actually do mid-session:
+  - **What's OK** — normal fatigue/burn/next-day stiffness; keep training through it.
+  - **What's not OK** — sharp pain, anything radiating, numbness/tingling, or pain that builds
+    through a set instead of staying flat.
+  - **A simple stop-rule ladder**: mild + fading → finish the set, note it · building or
+    changes how you move → stop that exercise, use the card's fallback, message the coach ·
+    sharp/radiating/numb/unfamiliar → stop the session, message before the next one.
+  - Ties back to *their own specific restriction* (their actual diagnosis/history), not a
+    generic disclaimer. /program-engage PART 3 makes this mandatory — see that skill.
+  *(2026-07-08)*
 
 ## Exercise selection
 - **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
