@@ -243,6 +243,116 @@
   /* draft ribbon */
   .draft{position:fixed;bottom:16px;left:16px;z-index:200;background:var(--clay);color:#fff;
     font-weight:700;font-size:13px;padding:9px 16px;border-radius:100px;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+
+  /* ═══ لایه‌ی زنده — motion layer (ported from the EN redesign, RTL-aware) ═══ */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .scroll-progress{position:fixed;top:0;right:0;left:0;height:3px;z-index:300;pointer-events:none;
+    background:linear-gradient(-90deg,var(--clay),var(--clay-2));transform-origin:100% 50%;transform:scaleX(0);}
+  .cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;margin:-18px 0 0 -18px;border:1.5px solid var(--clay-2);
+    border-radius:50%;pointer-events:none;z-index:9999;opacity:0;
+    transition:opacity .3s,width .25s var(--ease),height .25s var(--ease),margin .25s var(--ease),background .25s;}
+  .cursor-ring.on{opacity:.8;}
+  .cursor-ring.hot{width:56px;height:56px;margin:-28px 0 0 -28px;background:rgba(199,85,47,.08);}
+  @media(pointer:coarse){.cursor-ring{display:none;}}
+
+  /* hero: breathing orbs + word cascade + heartbeat + scroll cue */
+  .hero .orb{position:absolute;border-radius:50%;pointer-events:none;}
+  .orb-g{width:480px;height:480px;filter:blur(120px);background:#1d7a59;top:-140px;left:-90px;animation:orb-a 16s ease-in-out infinite alternate;}
+  .orb-c{width:400px;height:400px;filter:blur(130px);background:var(--clay);bottom:-150px;right:-110px;animation:orb-b 20s ease-in-out infinite alternate;}
+  @keyframes orb-a{0%{opacity:.32;transform:translate(0,0) scale(1);}50%{opacity:.5;transform:translate(60px,45px) scale(1.12);}100%{opacity:.38;transform:translate(-30px,-30px) scale(1.05);}}
+  @keyframes orb-b{0%{opacity:.10;transform:translate(0,0) scale(1);}100%{opacity:.18;transform:translate(-80px,-60px) scale(1.15);}}
+  .hero h1 .hw{display:block;overflow:hidden;transform-origin:right center;animation:heartbeat 3.2s ease-in-out 2s infinite;}
+  .hero h1 .hw:nth-child(2){animation-delay:2.25s;}
+  @keyframes heartbeat{0%,24%,100%{transform:scale(1);}7%{transform:scale(1.02);}13%{transform:scale(1);}18%{transform:scale(1.035);}}
+  .hero h1 .hw>span{display:inline-block;transform:translateY(112%);animation:word-rise 1s var(--ease) forwards;}
+  .hero h1 .hw:nth-child(1)>span{animation-delay:.12s;}
+  .hero h1 .hw:nth-child(2)>span{animation-delay:.3s;}
+  @keyframes word-rise{to{transform:translateY(0);}}
+  .eyebrow::before{animation:dash-pulse 2.4s ease-in-out infinite;}
+  @keyframes dash-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
+  .hero-cue{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);width:1px;height:44px;background:rgba(255,255,255,.18);overflow:hidden;}
+  .hero-cue::after{content:'';position:absolute;top:-40%;left:0;width:100%;height:40%;background:var(--clay-2);animation:cue-drop 2.2s var(--ease) infinite;}
+  @keyframes cue-drop{0%{top:-40%;}65%,100%{top:110%;}}
+  @media(max-width:880px){.hero-cue{display:none;}}
+
+  /* hero phone: idle float + rotating dashed orbit + Ken Burns + self-ticking checklist */
+  .phone-wrap{position:relative;display:flex;align-items:center;justify-content:center;justify-self:center;}
+  .phone-orbit{position:absolute;width:min(470px,96vw);aspect-ratio:1;border-radius:50%;border:1.5px dashed rgba(224,107,67,.4);animation:spin-slow 24s linear infinite;}
+  .phone-orbit::after{content:'';position:absolute;top:-7px;left:50%;width:13px;height:13px;border-radius:50%;background:var(--clay);}
+  @keyframes spin-slow{to{transform:rotate(360deg);}}
+  .phone{animation:phone-float 6.5s ease-in-out infinite alternate;position:relative;z-index:1;}
+  @keyframes phone-float{from{transform:translateY(-8px) rotate(.5deg);}to{transform:translateY(10px) rotate(-.5deg);}}
+  .pcyc img,.pday img{animation:kenburns 9s ease-in-out infinite alternate;}
+  @keyframes kenburns{from{transform:scale(1);}to{transform:scale(1.08);}}
+  .pex .ck{transition:background .3s,border-color .3s;}
+  .pex .ck:not(.on){animation:ck-hint 2.6s ease-in-out infinite;}
+  @keyframes ck-hint{0%,100%{box-shadow:0 0 0 0 rgba(199,85,47,0);}50%{box-shadow:0 0 0 5px rgba(199,85,47,.16);border-color:var(--clay);}}
+  .pex .ck.just{animation:ck-pop .5s var(--ease);}
+  @keyframes ck-pop{40%{transform:scale(1.4);}}
+
+  /* marquee ticker */
+  .marquee{background:#0a3527;overflow:hidden;padding:14px 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);direction:ltr;}
+  .marquee-track{display:flex;width:max-content;gap:52px;animation:marq 30s linear infinite;}
+  .marquee:hover .marquee-track{animation-play-state:paused;}
+  .marquee-seq{display:flex;gap:52px;align-items:center;flex-shrink:0;}
+  .marquee-item{display:flex;align-items:center;gap:52px;white-space:nowrap;font-weight:700;font-size:17px;color:rgba(255,255,255,.85);direction:rtl;}
+  .marquee-item::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--clay);flex-shrink:0;}
+  @keyframes marq{from{transform:translateX(calc(-50% - 26px));}to{transform:translateX(0);}}
+
+  /* trust bar numbers pop in */
+  .trust .wrap.visible .trust-item b{animation:num-pop .65s var(--ease) backwards;}
+  .trust .wrap.visible .trust-item:nth-child(2) b{animation-delay:.1s;}
+  .trust .wrap.visible .trust-item:nth-child(3) b{animation-delay:.2s;}
+  @keyframes num-pop{0%{transform:scale(.5);opacity:0;}70%{transform:scale(1.08);}100%{transform:scale(1);opacity:1;}}
+
+  /* section headings: clay highlighter sweeps under the accent on reveal */
+  .sec-h .acc{position:relative;}
+  .sec-h .acc::after{content:'';position:absolute;right:-2px;left:-4px;bottom:6%;height:.12em;background:var(--clay);opacity:.16;
+    transform:scaleX(0);transform-origin:right center;transition:transform .8s var(--ease) .45s;}
+  .sec-h.visible .acc::after{transform:scaleX(1);}
+
+  /* cards get life */
+  .pillar{transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .2s;}
+  .pillar:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(40,30,20,.10);border-color:var(--clay);}
+  .cmp-good{animation:good-breathe 4.5s ease-in-out infinite;}
+  @keyframes good-breathe{0%,100%{box-shadow:0 24px 60px rgba(14,74,54,.22);}50%{box-shadow:0 24px 80px rgba(14,74,54,.34),0 0 34px rgba(199,85,47,.10);}}
+  .price-card{animation:price-breathe 4.5s ease-in-out infinite;}
+  @keyframes price-breathe{0%,100%{box-shadow:0 24px 60px rgba(40,30,20,.10);}50%{box-shadow:0 24px 70px rgba(40,30,20,.14),0 0 44px rgba(199,85,47,.12);}}
+
+  /* faq */
+  .faq summary{transition:color .2s,padding-right .3s var(--ease);}
+  .faq summary:hover{color:var(--clay);padding-right:10px;}
+  .faq summary::after{transition:transform .3s var(--ease);}
+  .faq details[open] summary::after{transform:rotate(180deg);}
+  .faq details[open] p{animation:faq-in .5s var(--ease);}
+  @keyframes faq-in{from{opacity:0;transform:translateY(-8px);}}
+
+  /* mantra pull-quote (closes the app section) */
+  .mantra{margin-top:84px;text-align:center;}
+  .mantra-line{display:block;overflow:hidden;font-weight:900;font-size:clamp(30px,4.6vw,54px);line-height:1.4;color:var(--ink);}
+  .mantra-line>span{display:inline-block;transform:translateY(112%);transition:transform .9s var(--ease);}
+  .mantra.visible .mantra-line>span{transform:translateY(0);}
+  .mantra.visible .mantra-line:nth-child(2)>span{transition-delay:.18s;}
+  .mantra-line.clay>span{color:var(--clay);}
+  .mantra-rule{width:64px;height:3px;background:var(--clay);margin:22px auto 0;transform:scaleX(0);transition:transform .7s var(--ease) .55s;}
+  .mantra.visible .mantra-rule{transform:scaleX(1);}
+
+  /* cta: breathing accent + button sheen */
+  .cta{overflow:hidden;position:relative;}
+  .cta h2 span{display:inline-block;animation:breathe 5s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
+  .btn-primary{position:relative;overflow:hidden;}
+  .btn-primary::before{content:'';position:absolute;top:0;bottom:0;left:0;width:40%;
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.3),transparent);
+    transform:translateX(-180%) skewX(-18deg);pointer-events:none;}
+  .btn-primary:hover::before{animation:sheen .8s ease;}
+  @keyframes sheen{to{transform:translateX(340%) skewX(-18deg);}}
+
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+    html{scroll-behavior:auto;}
+  }
 </style>
 </head>
 <body>
@@ -270,17 +380,21 @@
 
 <!-- HERO -->
 <header class="hero">
+  <div class="orb orb-g" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <div>
       <span class="eyebrow" style="color:var(--clay-2)">مربیِ بدنسازیِ حرفه‌ای</span>
-      <h1>یه <span class="acc">مربی</span>،<br>تو جیبت.</h1>
+      <h1><span class="hw"><span>یه <span class="acc">مربی</span>،</span></span><span class="hw"><span>تو جیبت.</span></span></h1>
       <p class="sub">فقط یه برنامه نیست — یه مربیِ واقعیه که برنامه‌تو اختصاصی می‌نویسه، حواسش به تمرینت هست، و هر هفته باهات جلو میاد.</p>
       <div class="actions">
         <a class="btn btn-primary" href="form-fa.html">شروع کن 📩</a>
         <a class="btn btn-ghost" href="program.html?client=demo">اپ رو از نزدیک ببین</a>
       </div>
     </div>
-    <div class="phone">
+    <div class="phone-wrap">
+      <div class="phone-orbit" aria-hidden="true"></div>
+      <div class="phone">
       <div class="pscreen">
         <div class="pstatus"><span>9:41</span><span>●●● 5G ▮</span></div>
         <div class="pbody">
@@ -295,14 +409,44 @@
           <div class="pex"><span class="ck"></span><span class="nm">ددلیفت رومانیایی</span><span class="pl">۳×۸</span></div>
         </div>
       </div>
+      </div>
     </div>
   </div>
+  <div class="hero-cue" aria-hidden="true"></div>
 </header>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-seq">
+      <span class="marquee-item">یه مربی تو جیبت</span>
+      <span class="marquee-item">یه نقشه تا هدفت</span>
+      <span class="marquee-item">هیچی بی‌دلیل نیست</span>
+      <span class="marquee-item">۱۰۰۰+ ورزشکار</span>
+      <span class="marquee-item">برنامه‌ی کاملاً اختصاصی</span>
+      <span class="marquee-item">آپدیتِ هفتگی</span>
+      <span class="marquee-item">قدرت</span>
+      <span class="marquee-item">سرعت</span>
+      <span class="marquee-item">ریکاوری</span>
+    </div>
+    <div class="marquee-seq">
+      <span class="marquee-item">یه مربی تو جیبت</span>
+      <span class="marquee-item">یه نقشه تا هدفت</span>
+      <span class="marquee-item">هیچی بی‌دلیل نیست</span>
+      <span class="marquee-item">۱۰۰۰+ ورزشکار</span>
+      <span class="marquee-item">برنامه‌ی کاملاً اختصاصی</span>
+      <span class="marquee-item">آپدیتِ هفتگی</span>
+      <span class="marquee-item">قدرت</span>
+      <span class="marquee-item">سرعت</span>
+      <span class="marquee-item">ریکاوری</span>
+    </div>
+  </div>
+</div>
 
 <!-- TRUST -->
 <div class="trust">
   <div class="wrap">
-    <div class="trust-item"><b>۱۰۰۰+</b> ورزشکارِ همراهی‌شده</div>
+    <div class="trust-item"><b data-count="1000" data-suffix="+">۱۰۰۰+</b> ورزشکارِ همراهی‌شده</div>
     <div class="trust-item"><b>ارشدِ</b> قدرت و آمادگی</div>
     <div class="trust-item"><b>ارشدِ</b> فیزیولوژیِ ورزشی</div>
     <div class="trust-item">برنامه‌ی کاملاً اختصاصی</div>
@@ -371,6 +515,13 @@
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><h3>چک‌این آمادگی</h3><p>قبلِ هر جلسه می‌پرسه چه حالی داری تا برنامه با تو هماهنگ بمونه.</p></div>
       <div class="feat clay"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg></div><h3>پیام مستقیم با من</h3><p>هر جا سؤال داشتی، تو همون اپ بهم پیام بده و جواب بگیر.</p></div>
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M22 12A10 10 0 1 1 12 2"/><path d="M22 4 12 14l-3-3"/></svg></div><h3>مربی، همون‌لحظه می‌بینه</h3><p>هر چی ثبت می‌کنی، فوری می‌رسه دستِ من — آمادگی، لود، پیشرفت.</p></div>
+    </div>
+
+    <!-- شعار -->
+    <div class="mantra reveal">
+      <span class="mantra-line"><span>یه نقشه تا هدفت،</span></span>
+      <span class="mantra-line clay"><span>یه مربی تو جیبت.</span></span>
+      <div class="mantra-rule" aria-hidden="true"></div>
     </div>
   </div>
 </section>
@@ -591,6 +742,86 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   vp.addEventListener('touchend',pauseTmp);
   if(next)next.addEventListener('click',function(){pauseTmp();var t=vp.scrollLeft+cardW();vp.scrollTo({left:t>maxS()-10?0:t,behavior:'smooth'});});
   if(prev)prev.addEventListener('click',function(){pauseTmp();var t=vp.scrollLeft-cardW();vp.scrollTo({left:t<0?maxS():t,behavior:'smooth'});});
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine=window.matchMedia('(pointer: fine)').matches;
+  function fa(n){return String(n).replace(/[0-9]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[d];});}
+
+  /* scroll-reveal: tag the page, then observe */
+  var stagger={};
+  document.querySelectorAll('.eyebrow,.sec-h,.sec-sub,.pillar,.feat,.cmp-card,.contact-card,.price-card,.faq details,.trust .wrap,.flow').forEach(function(el){
+    el.classList.add('reveal');
+    var p=el.parentElement,k;
+    if(p&&(p.classList.contains('pillars')||p.classList.contains('feat-grid')||p.classList.contains('cmp')||p.classList.contains('contact-grid')||p.classList.contains('libgrid'))){
+      k=p.className; stagger[k]=(stagger[k]||0);
+      el.style.transitionDelay=(stagger[k]*0.09)+'s'; stagger[k]++;
+    }
+  });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+    });},{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+  }else{document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('visible');});}
+
+  /* scroll progress bar */
+  var bar=document.createElement('div');bar.className='scroll-progress';bar.setAttribute('aria-hidden','true');
+  document.body.appendChild(bar);
+  var tick=false;
+  window.addEventListener('scroll',function(){
+    if(tick)return;tick=true;
+    requestAnimationFrame(function(){
+      var h=document.documentElement,m=h.scrollHeight-h.clientHeight;
+      bar.style.transform='scaleX('+(m>0?h.scrollTop/m:0)+')';tick=false;
+    });
+  },{passive:true});
+
+  /* count-up (Persian digits) */
+  var counters=document.querySelectorAll('[data-count]');
+  if('IntersectionObserver' in window&&counters.length){
+    var cio=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(!e.isIntersecting)return;cio.unobserve(e.target);
+      var el=e.target,t=parseInt(el.getAttribute('data-count'),10),
+          suf=el.getAttribute('data-suffix')||'',latin=el.hasAttribute('data-latin');
+      function out(n){el.textContent=(latin?String(n):fa(n))+suf;}
+      if(reduced){out(t);return;}
+      var t0=performance.now(),dur=1400;
+      (function step(now){var p=Math.min(1,(now-t0)/dur),e2=1-Math.pow(1-p,4);
+        out(Math.round(t*e2));if(p<1)requestAnimationFrame(step);})(t0);
+    });},{threshold:.5});
+    counters.forEach(function(c){cio.observe(c);});
+  }
+
+  /* hero phone: checklist ticks itself */
+  var cks=Array.prototype.slice.call(document.querySelectorAll('.phone .pex .ck'));
+  if(cks.length&&!reduced){
+    setInterval(function(){
+      var next=null;
+      for(var i=0;i<cks.length;i++){if(!cks[i].classList.contains('on')){next=cks[i];break;}}
+      if(!next){cks.forEach(function(c){c.classList.remove('on');});return;}
+      next.classList.add('on','just');
+      setTimeout(function(){next.classList.remove('just');},600);
+    },2400);
+  }
+
+  /* trailing cursor ring (fine pointers only) */
+  if(!reduced&&fine){
+    var ring=document.createElement('div');ring.className='cursor-ring';ring.setAttribute('aria-hidden','true');
+    document.body.appendChild(ring);
+    var mx=-100,my=-100,rx=-100,ry=-100,shown=false;
+    window.addEventListener('pointermove',function(ev){
+      mx=ev.clientX;my=ev.clientY;
+      if(!shown){ring.classList.add('on');shown=true;}
+      var t=ev.target,hot=t.closest&&t.closest('a,button,summary,.tnav');
+      ring.classList.toggle('hot',!!hot);
+    },{passive:true});
+    (function follow(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;
+      ring.style.transform='translate('+rx+'px,'+ry+'px)';requestAnimationFrame(follow);})();
+  }
 })();
 </script>
 </body>
