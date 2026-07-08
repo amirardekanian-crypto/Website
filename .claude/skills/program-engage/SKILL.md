@@ -38,9 +38,9 @@ phrases, not sentences (they render as a ticked checklist).
 End with a single punchy hook on its own line (it auto-italicises). Omit entirely if
 there is no next cycle in the roadmap.
 
-## PART 3 — NOTES (5–8 cards)
+## PART 3 — NOTES (6–9 cards)
 First line: **GREETING** (e.g. "For You, [FirstName]").
-Then **5–8 notes** that could **only** have been written for THIS athlete in THIS cycle,
+Then **6–9 notes** that could **only** have been written for THIS athlete in THIS cycle,
 drawn from the **full athlete picture** (the brief — data, loads, readiness, injuries +
 the check-in chat; this block's session types + technique priorities; every
 autoregulation / lifestyle / nutrition decision design made).
@@ -50,10 +50,23 @@ closer to the goal — *not* just lifting. Across the set, cover the levers that
 THIS athlete: this-cycle **training/technique** · **recovery & sleep** · **stress / life
 load** · **nutrition / fueling** · **consistency / adherence / logging** ·
 **injury / movement** · **conditioning / concurrent training** · **mindset / expectations**.
-Don't force all of them — pick the 5–8 that move *this* athlete, and lead with the biggest lever.
+Don't force all of them — pick the rest that move *this* athlete, and lead with the biggest lever.
 
-**Female athletes: always include the period-week protocol.** One of the 5–8 notes is the
-standing period-week fallback (see COACHING-PRINCIPLES.md → Process — an adherence tool, not
+**Mandatory for every athlete: the progression/regression explainer.** One note teaches how
+the weight-selection system actually works, because the app never assigns a weight — the
+athlete finds it every time against the RPE target (see COACHING-PRINCIPLES.md → Progression).
+Cover, in one note: (1) calibrating a **new movement** — pick conservative, let the first
+set's RPE tell you whether to go up or down; (2) **week-to-week progression** on the same
+exercise — hit the prescribed reps at or under target RPE → small jump next week; RPE at the
+ceiling or reps missed → hold and repeat; (3) **regression is not failure** — a rough-readiness
+day or a set grinding harder than the target RPE says it should is a signal to drop the weight,
+not push through. Write it in this cycle's own voice/specifics, don't template it verbatim
+cycle to cycle. For a NEW athlete this doubles as the week-1 calibration note (no separate one
+needed); for a RETURNING athlete it can be shorter since the mechanics are already familiar —
+still include it.
+
+**Female athletes: always include the period-week protocol.** Another note is the standing
+period-week fallback (see COACHING-PRINCIPLES.md → Process — an adherence tool, not
 performance phasing) — restated in that cycle's actual exercises (which lifts cut to 2 sets,
 which get skipped for direct ab-bracing), never copy-pasted from a prior cycle.
 
