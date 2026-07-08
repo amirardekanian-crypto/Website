@@ -109,7 +109,11 @@ ADD:      [new element → why THIS cycle]
 ## STEP 1B — ATHLETE ANALYSIS (NEW)
 - **RECOVERY CAPACITY — assess first; it gates everything.** Sleep quality + hours +
   stress → real recovery capacity. State the weekly **volume ceiling** before any session
-  count. If desired frequency exceeds capacity, say so and justify the cut.
+  count — anchor it to the evidence-based range (~10–20 hard sets/muscle/week, most benefit
+  captured by ~10; ~5–10 sets/muscle/session is likely near-optimal, don't stack a single
+  session much past ~10 direct sets on one muscle — see COACHING-PRINCIPLES.md → "Volume &
+  dosing"), not just intuition. If desired frequency exceeds capacity, say so and justify
+  the cut.
 - **PRIORITY TARGETS** — for each priority muscle/pattern pick the highest-**SFR** option
   from available equipment and say why (baseline hierarchy in COACHING-PRINCIPLES.md;
   extend as equipment dictates). **For sport-performance athletes, transfer may override
@@ -143,6 +147,20 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   — see COACHING-PRINCIPLES.md → "Volume & dosing".
 - **Warm-up + prep = 10–15 min** every session (cardio raise + mobilisation/activation
   circuit) — never a token 5-min bookend. It's programmed dose, not filler.
+- **Lifting-day warm-ups can repeat rounds (×2); cardio/running-day warm-ups shouldn't.** A
+  lifting-day prep circuit is fine at ×2 rounds of a tight movement list. A cardio/running-day
+  warm-up should instead build through **more distinct movements in a single pass**
+  (mobility → activation → dynamic movement → plyo/stride primer) rather than repeat the same
+  short list twice.
+- **Time-budget check (required — not optional):** estimate each day's actual working time
+  (Σ sets × (rest + ~30–45s per set), plus warm-up) against its session-length cap. If there's
+  real headroom (15+ min) and recovery capacity allows it, that's under-dosed, not "done" —
+  fill it with genuine volume: push a target muscle further toward its evidence-based ceiling
+  (~10–20 hard sets/muscle/week, most benefit by ~10 — see COACHING-PRINCIPLES.md → "Volume &
+  dosing"), or add a low-priority/low-CNS-cost exercise (arms, calves) if the priority muscles
+  are already well-dosed. A session that fits comfortably under its cap with nothing added is a
+  design miss, not a light day — light days should be a deliberate undulation choice (see
+  PER-DAY LOAD DISTRIBUTION above), not leftover time.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
   conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
 - **Superset** non-competing pairs to fit the time ceiling — **except** an athlete's first
@@ -174,6 +192,11 @@ move on — /program-assemble lint-checks names against the library.
 **PRESCRIPTION — emit the DOSE as plain fields, not chips.** Chip styling/order/`×`-prefix
 is /program-assemble's job (it renders chips per SCHEMA "Chip parsing"). You just decide the
 numbers + the coaching intent:
+- **Reps: always a single number, never a range.** The app has no rep-range field — write
+  `reps: 10`, not `reps: 8-10`. If the natural design intent is a range (e.g. a hypertrophy
+  8–10 zone), pick one number — by convention the top of the intended range — and commit to
+  it; see COACHING-PRINCIPLES.md → "Progression (coach-driven)". Applies to every reps field:
+  standard lifts, circuit items, unilateral (each-side) counts.
 - standard grinding lift → sets · reps/duration · tempo · RPE · rest · intent (e.g. `3s eccentric`, or none)
 - ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
 - loaded carry → sets · distance/duration · RPE · rest — **no tempo**
