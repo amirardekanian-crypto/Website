@@ -30,6 +30,13 @@ separate request). Tone: direct, confident, coach-to-athlete, no filler.
 toward · the mental focus for this block · the physical/performance progress to expect
 by the end. Reference the real review (e.g. "squat went 10→50 kg") when it motivates.
 
+**Never imply the coach assigns/prescribes a specific weight** — the app has no weight-target
+field; the athlete self-selects load against the prescribed RPE/rep target every time. Lines
+like "I'm reading your numbers to set the real loads" or "those logs are what I calculate your
+weight from" are wrong and must not appear in the cycle message, outcomes, or notes. Progression
+is the *program* changing (RPE targets, rep numbers, exercise selection) driven by what she
+logs — never "here's your number." See COACHING-PRINCIPLES.md → "Progression (coach-driven)".
+
 **OUTCOMES** — 3–6 concrete, measurable, athlete-specific results for THIS cycle. Short
 phrases, not sentences (they render as a ticked checklist).
 
@@ -88,3 +95,7 @@ Hand off to **/program-assemble** to write everything into `data/<id>.json`.
 - Don't regenerate the roadmap.
 - Don't write Farsi in the JSON; in-app is English.
 - Don't invent results or numbers — use the real review.
+- Don't write any line implying the coach assigns/calculates a specific weight for the
+  athlete — she self-selects load via RPE; see PART 1.
+- Don't skip the mandatory progression/regression note (PART 3) or the period-week note for
+  female athletes (PART 3) — both are required every cycle, not optional inclusions.

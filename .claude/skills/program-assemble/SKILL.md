@@ -81,7 +81,10 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
   warm-up/prep items carry NO RPE chip and prep circuits have `"warmup": true`;
   chip order = dark → yellow set count → grey; every exercise has exactly 3 cues
   (ext+int in good, avoid in bad); section titles use the standard names (Primary/Accessory
-  /etc, never "Strength").
+  /etc, never "Strength"); **no rep chip is a range** — grep for an en-dash/hyphen inside a
+  `×`-prefixed or bare rep chip (`×8–10`, `8-10 Reps`) and collapse any hit to a single number
+  (the top of the range) per COACHING-PRINCIPLES.md → "Progression (coach-driven)". The app has
+  no rep-range field; this is a hard reject, not a style preference.
 - Report any structural violation and fix before finishing. (Exercise-name normalization is
   the next step — a required pass, not optional.)
 
