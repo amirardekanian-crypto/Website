@@ -40,9 +40,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <!-- Shared design system -->
-<link rel="stylesheet" href="/assets/css/tokens.css">
-<link rel="stylesheet" href="/assets/css/base.css">
-<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/tokens.css?v=20260708">
+<link rel="stylesheet" href="/assets/css/base.css?v=20260708">
+<link rel="stylesheet" href="/assets/css/components.css?v=20260708">
 
 <!-- Structured data: Person + Service -->
 <script type="application/ld+json">
@@ -117,9 +117,11 @@
   }
 
   /* ── Nav on the dark home stage ── */
-  body.is-home .site-nav { background: rgba(10,53,39,0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  /* No backdrop-filter here: it would make the bar the containing block for the
+     fixed mobile menu panel and collapse it (see components.css mobile note). */
+  body.is-home .site-nav { background: rgba(10,53,39,0.95); }
   body.is-home .nav-logo { color: #fff; }
-  body.is-home .nav-logo span { color: var(--accent-2); }
+  body.is-home .nav-logo .dot { color: var(--accent-2); }
   body.is-home .nav-link { color: rgba(255,255,255,0.78); }
   body.is-home .nav-link:hover { color: #fff; }
   body.is-home .nav-link.is-active { color: #fff; }
@@ -127,7 +129,7 @@
   body.is-home .nav-cta { background: var(--accent-2); color: #fff; }
   body.is-home .nav-toggle { color: #fff; }
   @media (max-width: 900px) {
-    body.is-home .nav-links { background: rgba(10,45,32,0.98); }
+    body.is-home .nav-links { background: #0a2d20; }
   }
 
   /* ── Scroll progress bar + cursor ring (injected by JS) ── */
