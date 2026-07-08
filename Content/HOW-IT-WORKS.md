@@ -186,7 +186,7 @@ sharpening your own craft, it's all in one place — and it grows over time.
 - **A coach actually watches.** Live data plus a real weekly conversation means someone is paying attention to *you*, every week.
 - **It adapts.** Your plan changes as you change — that's the whole point.
 - **It's a real app, not a document.** Video, cues, logging, timers, messaging — a genuine coaching experience in your pocket.
-- **It's evidence-based.** The methods come from sport science, applied by a coach with an MSc in Strength & Conditioning, an MSc in Applied Exercise Physiology, and 500+ tennis and padel players coached.
+- **It's evidence-based.** The methods come from sport science, applied by a coach with an MSc in Strength & Conditioning, an MSc in Applied Exercise Physiology, and 1000+ tennis and padel players coached.
 
 ---
 

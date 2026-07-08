@@ -55,7 +55,7 @@
       "name": "Amir Ardekani",
       "url": "https://www.amirardekani.com/",
       "jobTitle": "Tennis Strength & Conditioning Coach",
-      "description": "Tennis strength & conditioning coach. MSc Strength & Conditioning and MSc Applied Exercise Physiology. 500+ tennis and padel players coached.",
+      "description": "Tennis strength & conditioning coach. MSc Strength & Conditioning and MSc Applied Exercise Physiology. 1000+ tennis and padel players coached.",
       "alumniOf": [
         { "@type": "CollegeOrUniversity", "name": "MSc Strength & Conditioning" },
         { "@type": "CollegeOrUniversity", "name": "MSc Applied Exercise Physiology" }
@@ -267,7 +267,21 @@
     text-transform: uppercase; letter-spacing: .5px;
     margin: 26px 0 30px; color: #fff;
   }
-  .hero-h1 .hw { display: block; overflow: hidden; }
+  .hero-h1 .hw {
+    display: block; overflow: hidden;
+    /* heartbeat: lub-dub pulse rolling down the stack, starts after the
+       entrance cascade lands */
+    transform-origin: left center;
+    animation: heartbeat 3.2s ease-in-out 2s infinite;
+  }
+  .hero-h1 .hw:nth-child(2) { animation-delay: 2.22s; }
+  .hero-h1 .hw:nth-child(3) { animation-delay: 2.44s; }
+  @keyframes heartbeat {
+    0%, 24%, 100% { transform: scale(1); }
+    7%  { transform: scale(1.02); }
+    13% { transform: scale(1); }
+    18% { transform: scale(1.035); }
+  }
   .hero-h1 .hw > span {
     display: inline-block; transform: translateY(112%);
     animation: word-rise 1s var(--ease) forwards;
@@ -906,7 +920,7 @@
       <span class="hw"><span class="outline">Hit Harder.</span></span>
       <span class="hw"><span class="clay">Last Longer.</span></span>
     </h1>
-    <p class="lead hero-sub reveal reveal-d3">The S&amp;C programme used by 500+ competitive tennis and padel players. Improving movement, stroke quality, and resilience — in one season.</p>
+    <p class="lead hero-sub reveal reveal-d3">The S&amp;C programme used by 1000+ competitive tennis and padel players. Improving movement, stroke quality, and resilience — in one season.</p>
     <div class="hero-actions reveal reveal-d4">
       <a href="/form.html" class="btn btn-primary" data-magnet>Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
       <a href="/program.html?client=demo" class="btn-ghost" target="_blank" rel="noopener">Try the Live Demo →</a>
@@ -922,7 +936,7 @@
       <span class="marquee-item">Move Better</span>
       <span class="marquee-item">Hit Harder</span>
       <span class="marquee-item">Last Longer</span>
-      <span class="marquee-item">500+ Players Coached</span>
+      <span class="marquee-item">1000+ Players Coached</span>
       <span class="marquee-item">2× MSc</span>
       <span class="marquee-item">Evidence-Based</span>
       <span class="marquee-item">Nothing Without a Reason</span>
@@ -932,7 +946,7 @@
       <span class="marquee-item">Move Better</span>
       <span class="marquee-item">Hit Harder</span>
       <span class="marquee-item">Last Longer</span>
-      <span class="marquee-item">500+ Players Coached</span>
+      <span class="marquee-item">1000+ Players Coached</span>
       <span class="marquee-item">2× MSc</span>
       <span class="marquee-item">Evidence-Based</span>
       <span class="marquee-item">Nothing Without a Reason</span>
@@ -950,7 +964,7 @@
         <div class="cred-label">S&amp;C + Exercise<br>Physiology</div>
       </div>
       <div class="cred-item">
-        <div class="cred-number" data-count="500" data-suffix="+">500+</div>
+        <div class="cred-number" data-count="1000" data-suffix="+">1000+</div>
         <div class="cred-label">Tennis Players<br>Coached</div>
       </div>
       <div class="cred-item">
@@ -1500,7 +1514,7 @@
           <h3 class="about-block-title">Coaching Experience</h3>
           <ul>
             <li>7+ years as a strength &amp; conditioning coach</li>
-            <li>500+ tennis and padel players coached across competition levels</li>
+            <li>1000+ tennis and padel players coached across competition levels</li>
             <li>Experience with Olympic-level and international athletes</li>
             <li><span class="about-hl">Tennis coaching qualified</span> — understands the sport from both sides</li>
             <li>15 years of competitive tennis playing experience</li>
