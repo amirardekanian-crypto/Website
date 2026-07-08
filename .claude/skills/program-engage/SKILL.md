@@ -77,6 +77,19 @@ period-week fallback (see COACHING-PRINCIPLES.md → Process — an adherence to
 performance phasing) — restated in that cycle's actual exercises (which lifts cut to 2 sets,
 which get skipped for direct ab-bracing), never copy-pasted from a prior cycle.
 
+**Any athlete with an active injury or a rehab/managed history: always include an in-gym
+pain-management note.** Check the brief for an injury flag, rehab stage, or a standing
+restriction (not just intake's fresh-red-flag triage — an old, managed history counts too).
+If present, one note must cover, specific to *their* actual diagnosis/restriction:
+- **What's OK** — normal fatigue/burn/next-day stiffness; keep training through it.
+- **What's not OK** — sharp pain, anything radiating, numbness/tingling, or pain building
+  through a set instead of staying flat.
+- **The stop-rule ladder**: mild + fading → finish the set, note it in your log · building or
+  changing how you move → stop that exercise, use the card's fallback, message the coach ·
+  sharp/radiating/numb/unfamiliar → stop the session, message before the next one.
+Never generic — anchor it to their real restriction (e.g. "your L4-L5 history" not "your back").
+See COACHING-PRINCIPLES.md → "Intake & assessment".
+
 Rules: athlete-specific only — cite real numbers/situation; no padding, no generic fitness
 advice that could fit anyone. **Never invent data** — if a domain has no intake data (e.g.
 diet), prescribe an elite baseline framed as setup to refine via check-ins, never fabricated
