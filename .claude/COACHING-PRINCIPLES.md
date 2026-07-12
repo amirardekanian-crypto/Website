@@ -160,6 +160,9 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
   per exercise, so the program is a starting point Amir adjusts each week. *(2026-06-15)*
 - **Set increments from logged data** (RPE/RIR, bar speed), not guesswork. *(2026-06-15)*
+- **Write once per cycle; adjust only on a report.** The program is authored once at design;
+  mid-cycle changes happen only when a session report / check-in gives a reason (pain, a
+  stall, flagged RPE drift) — never routine tweaking for its own sake. *(2026-07-12)*
 - **Prescribe RPE, never load.** Athlete-facing text (chips, notes, messages, completion)
   never contains target weights or kg increments — the athlete picks whatever load lands at
   the prescribed RPE. If they need load guidance ("this will feel lighter than last cycle"),

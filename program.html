@@ -1731,6 +1731,37 @@
   }
   .ex-cue.bad::before { background: #E74C3C; }
 
+  /* ── Coach's note on an exercise (JSON "note") ─────────────────────
+     Exercise-scoped guidance the athlete must see — an injury caveat, how
+     to pick the starting load, a staged-return rule. Renders as a clay
+     callout at the top of the expanded detail plus a clay pill on the
+     collapsed row so it can't be missed. Program-wide guidance stays in
+     the Notes tab. */
+  .ex-summary-pill.coach-note-pill { background: var(--accent-2, #C7552F); color: #fff; }
+  body[data-dark] .ex-summary-pill.coach-note-pill { background: #C7552F; color: #fff; }
+  .ex-coach-note {
+    margin: 10px 0 4px;
+    padding: 10px 12px 11px;
+    background: rgba(199,85,47,0.08);
+    border-left: 3px solid #C7552F;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--grey-dark);
+  }
+  .ex-coach-note .ex-coach-note-label {
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #C7552F;
+    margin-bottom: 3px;
+  }
+  body[data-dark] .ex-coach-note { background: rgba(199,85,47,0.16); color: #e8e8e8; }
+
   /* Cues nested inside a circuit's round-row — slightly tighter spacing. */
   .round-row .round-cues { margin-top: 2px; }
   .round-row .ex-cue {
@@ -5146,6 +5177,15 @@ function fmtClock(ms) {
 // Start / Pause / Resume toggle for one day's timer.
 function toggleSessionTimer(day) {
   let t = loadTimer(day);
+  // A timer stamped on a previous calendar date is leftover state, not today's
+  // session (long-lived PWA that never reloaded, so autoResetStaleDays never
+  // swept it). Clear it — and its readiness — and treat this tap as a fresh start.
+  if (t && t.sessionStart && new Date(t.sessionStart).toDateString() !== new Date().toDateString()) {
+    localStorage.removeItem(timerKey(day));
+    localStorage.removeItem(readinessKey(day));
+    t = null;
+    renderTimer(day);
+  }
   if (t && t.finished) return;
   // A fresh start (no time banked, not running, never stamped) goes through the
   // readiness check first — the timer only begins once they Begin/Skip. This is
@@ -5445,6 +5485,20 @@ function autoResetStaleDays() {
   days.forEach(day => {
     const completedKey = ATHLETE_ID + '_completed_d' + day.id;
     const completedOn  = localStorage.getItem(completedKey);
+    // A session that was started but never finished leaves its timer + readiness
+    // behind with NO completed stamp, so the completed-day branch below never
+    // touches them — the timer keeps counting wall-clock for days and the stale
+    // readiness gets re-sent with every later session. Sweep them independently.
+    if (!completedOn) {
+      const t = loadTimer(day.id);
+      const r = loadReadiness(day.id);
+      const staleT = t && t.sessionStart && new Date(t.sessionStart).toDateString() !== today;
+      const staleR = r && r.timestamp && new Date(r.timestamp).toDateString() !== today;
+      if (staleT || staleR) {
+        localStorage.removeItem(timerKey(day.id));
+        localStorage.removeItem(readinessKey(day.id));
+      }
+    }
     if (completedOn && completedOn !== today) {
       // Per-day per-session data
       localStorage.removeItem(completedKey);
@@ -5616,9 +5670,16 @@ function buildSessionData(day) {
     : 'Complete';
   const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
 
-  const durMs  = timerElapsedMs(day);
+  // Duration is only trustworthy from a timer that belongs to today's session
+  // (or one legitimately finished, e.g. just past midnight) — a stale timer
+  // left running by a never-finished day measures days, not minutes, and
+  // poisons the sRPE load. Belt-and-braces: no real session is 12+ hours.
+  const timerState = loadTimer(day);
+  const timerStartedToday = !!(timerState && timerState.sessionStart &&
+    new Date(timerState.sessionStart).toDateString() === new Date().toDateString());
+  const durMs  = (timerStartedToday || (timerState && timerState.finished)) ? timerElapsedMs(day) : 0;
   const durMin = Math.round(durMs / 60000);
-  const hasDur = durMin > 0;
+  const hasDur = durMin > 0 && durMin <= 720;
   const auLoad = (hasDur && sRpe) ? Math.round(Number(sRpe) * durMin) : null;
 
   let summary = `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}\n`;
@@ -5629,7 +5690,13 @@ function buildSessionData(day) {
     if (auLoad != null) summary += `Session Load: ${auLoad} AU (sRPE ${sRpe} × ${durMin} min)\n`;
   }
 
-  const readiness = loadReadiness(day);
+  // Readiness is captured at today's session start; a record stamped on a
+  // previous date is leftover state from an unfinished day — never re-send it.
+  let readiness = loadReadiness(day);
+  if (readiness && readiness.timestamp &&
+      new Date(readiness.timestamp).toDateString() !== new Date().toDateString()) {
+    readiness = null;
+  }
   let readinessSummary = '', readinessField = '';
   if (readiness) {
     if (readiness.skipped) { readinessSummary = 'Readiness (at start): skipped'; readinessField = 'Skipped'; }
