@@ -54,6 +54,9 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Sport-performance athletes: transfer can override SFR** — state the trade-off
   explicitly (e.g. Back Squat over Leg Press for a tennis player: lower SFR, higher
   athletic transfer). *(2026-06-15)*
+- **Hypertrophy-accumulation blocks: machine/SFR primaries are acceptable even for sport
+  athletes** — transfer isn't lost, it's deferred to the later power/translation cycle
+  (e.g. Leg Press over Back Squat for a tennis player in a mass block). *(2026-07-12)*
 - **Accessories rotate every cycle** for variety — always to a *safe* alternative. *(2026-06-15)*
 - **Rehab/corrective:** keep the best-in-class pieces; rotate the rest for freshness.
   (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
