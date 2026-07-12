@@ -4009,11 +4009,15 @@ function renderStatsGrid(parsed, restSec) {
 
 // Stat pills for the collapsed row — each stat is its own small rounded pill.
 // "4×6"  ·  "7/10"  ·  "⏱ 2m" — sized to be glanceable but not loud.
-function renderExSummary(parsed, restSec) {
+function renderExSummary(parsed, restSec, hasNote) {
   // Green "modifier" pills lead the row (the technique chips: 3s eccentric, 1s
   // squeeze, glute focus, max intent, holds…). They STAY under the name when the
   // card is expanded. Grey "stat" pills (sets×reps · RPE · rest) follow and show
-  // only on the collapsed row.
+  // only on the collapsed row. A coach's note adds a clay pill up front so the
+  // athlete spots it before expanding.
+  const notePill = hasNote
+    ? `<span class="ex-summary-pill modifier coach-note-pill">Coach's Note</span>`
+    : '';
   const mods = (parsed.extras || []).map(e =>
     `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}">${esc(e.label)}</span>`
   );
@@ -4023,8 +4027,17 @@ function renderExSummary(parsed, restSec) {
   if (parsed.target)              stats.push(parsed.target.replace(/^@/, '').trim() + '/10');
   if (restSec > 0)                stats.push(`⏱ ${formatRestLabel(restSec)}`);
   const statPills = stats.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`);
-  if (!mods.length && !statPills.length) return '';
-  return `<div class="ex-summary">${mods.join('')}${statPills.join('')}</div>`;
+  if (!notePill && !mods.length && !statPills.length) return '';
+  return `<div class="ex-summary">${notePill}${mods.join('')}${statPills.join('')}</div>`;
+}
+
+// Coach's note — exercise-scoped guidance from the JSON ("note" on any
+// exercise): an injury caveat, how to pick the starting load, a staged-return
+// rule. Clay callout at the top of the expanded detail; program-wide guidance
+// belongs in the Notes tab, not here.
+function renderCoachNote(note) {
+  if (!note) return '';
+  return `<div class="ex-coach-note"><span class="ex-coach-note-label">Coach's Note</span>${esc(note)}</div>`;
 }
 
 // Cues — yellow line for good, red line for bad, no icons. Clean.
@@ -4056,7 +4069,8 @@ function renderExercise(ex, dayId, num, blockClass) {
     : (parsed.rest > 0 ? parsed.rest : (isStandard ? 120 : 0));
   const _vid = getVideoUrl(ex);
 
-  const summary    = renderExSummary(parsed, restSec);
+  const summary    = renderExSummary(parsed, restSec, !!ex.note);
+  const noteHtml   = renderCoachNote(ex.note);
   const videoBlock = renderVideoBlock(_vid);
   // Skip the stats grid entirely if there are no main stats (simple warm-ups
   // with just a duration chip).
@@ -4087,7 +4101,7 @@ function renderExercise(ex, dayId, num, blockClass) {
   // Falls back to 1 if the chip didn't have a "X Sets" entry.
   const setsCount = parseInt(parsed.sets, 10) || 1;
 
-  return `<div class="checklist-item collapsed ${blockClass}${parsed.extras.length ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}">
+  return `<div class="checklist-item collapsed ${blockClass}${(parsed.extras.length || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -4097,6 +4111,7 @@ function renderExercise(ex, dayId, num, blockClass) {
       <div class="ex-chevron">▾</div>
     </div>
     <div class="ex-detail">
+      ${noteHtml}
       ${videoBlock}
       ${statsBlock}
       ${cuesHtml}
@@ -4159,8 +4174,11 @@ function renderCircuit(ex, dayId, num, blockClass) {
   const summaryPills = [];
   if (ex.rounds)         summaryPills.push(ex.rounds);
   if (circuitRestSec)    summaryPills.push(`⏱ ${formatRestLabel(circuitRestSec)}`);
-  const summary = summaryPills.length
-    ? `<div class="ex-summary">${summaryPills.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`).join('')}</div>`
+  const circuitNotePill = ex.note
+    ? `<span class="ex-summary-pill modifier coach-note-pill">Coach's Note</span>`
+    : '';
+  const summary = (summaryPills.length || circuitNotePill)
+    ? `<div class="ex-summary">${circuitNotePill}${summaryPills.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`).join('')}</div>`
     : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
@@ -4182,6 +4200,7 @@ function renderCircuit(ex, dayId, num, blockClass) {
       <div class="ex-chevron">▾</div>
     </div>
     <div class="ex-detail">
+      ${renderCoachNote(ex.note)}
       <div class="ex-circuit-meta">
         <div class="ex-stat">
           <div class="ex-stat-label">Rounds</div>

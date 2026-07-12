@@ -163,11 +163,12 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Write once per cycle; adjust only on a report.** The program is authored once at design;
   mid-cycle changes happen only when a session report / check-in gives a reason (pain, a
   stall, flagged RPE drift) — never routine tweaking for its own sake. *(2026-07-12)*
-- **Prescribe RPE, never load.** Athlete-facing text (chips, notes, messages, completion)
-  never contains target weights or kg increments — the athlete picks whatever load lands at
-  the prescribed RPE. If they need load guidance ("this will feel lighter than last cycle"),
-  it goes in a note framed around the RPE, with no numbers. Starting/target loads live only
-  in coach-facing reports and the coaching log. *(2026-07-12)*
+- **Prescribe RPE, never load — with ONE exception: the exercise note.** Chips, cycle notes
+  cards, messages, and completion text never contain target weights or kg increments — the
+  athlete picks whatever load lands at the prescribed RPE. The one place load guidance may
+  appear is that exercise's own `note` field (see *Communication*): a starting-weight
+  suggestion drawn from the athlete's own past logs, or how to load, framed around the RPE.
+  Coach-side load targets stay in the coaching log. *(2026-07-12)*
 - **Mid-cycle adjustments are report-driven only.** No self-progression rules in the program
   ("add 2.5 kg when you complete all sets…") — Amir adjusts from the weekly logs and check-ins
   when something is reported. The athlete's job is to hit the RPE and log. *(2026-07-12)*
@@ -236,6 +237,12 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Communication & in-app text
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
+- **Exercise-scoped guidance goes ON the exercise — the `note` field.** Anything about one
+  specific exercise (an injury caveat like "start slower", a starting-weight suggestion from
+  the athlete's past logs, how to load it) is authored as that exercise's `note`, which the
+  app renders as a highlighted clay "Coach's Note" (pill on the collapsed row + callout in
+  the expanded card) so the athlete pays attention. The cycle notes cards carry only
+  program-wide guidance. See SCHEMA.md → "Exercise coach's note". *(2026-07-12)*
 - **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
   never in the athlete app or the athlete JSON. They are also archived per-athlete to the
   coach-only `.claude/coaching-log/<id>.md` (append-only, git-tracked but unpublished). *(2026-06-15, archive added 2026-06-28)*

@@ -208,6 +208,12 @@ numbers + the coaching intent:
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
+- `note` (optional, athlete-facing): emit when guidance is **exercise-scoped** — an injury
+  caveat ("shallow, pain-free only"), a starting-weight suggestion from the athlete's own
+  logs, how to load it. Assemble copies it to the exercise's `note` field, rendered as the
+  app's clay "Coach's Note". This is the ONLY athlete-facing place a weight number may
+  appear. Program-wide guidance goes to /program-engage's notes cards instead — see
+  COACHING-PRINCIPLES.md → "Communication & in-app text".
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 

@@ -27,6 +27,10 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
+- **Copy the spec's exercise `note` verbatim** to that exercise's `note` field (any type) —
+  the app renders it as the clay "Coach's Note" (per SCHEMA "Exercise coach's note"). Never
+  move exercise-scoped guidance into the notes cards, and never invent a note the spec
+  didn't give.
 
 **2b — Render chips from the spec's plain dose fields** (per SCHEMA "Chip parsing"):
 - set count → `{label:"N Sets", style:"yellow"}` (first; one per standard exercise)
