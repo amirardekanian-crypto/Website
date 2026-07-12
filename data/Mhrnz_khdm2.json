@@ -1,0 +1,1217 @@
+{
+  "athlete": {
+    "id": "Mhrnz_khdm2",
+    "key": "893eeb53d6a342b4916ecd9a3d1cd6f3",
+    "firstName": "Mehrnaz",
+    "lastName": "Khadem"
+  },
+  "sport": {
+    "badge": "🎾 Padel Performance"
+  },
+  "currentCycleIndex": 1,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Foundation Forge",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-05-23",
+      "endDate": "2026-06-27",
+      "focuses": [
+        "Build the strength base that powers every movement on court.",
+        "Lock in clean technique while starting fat loss."
+      ]
+    },
+    {
+      "num": 2,
+      "name": "Power Engine",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-07-18",
+      "endDate": "2026-08-22",
+      "focuses": [
+        "Turn that new strength into fast, explosive movement.",
+        "Keep stripping body fat while protecting hard-earned muscle."
+      ],
+      "message": {
+        "paragraphs": [
+          "Cycle 1 built more than you think. Your Lat Pulldown went 26 to 33 kilograms, your leg curl jumped 60 percent, and in fifteen sessions you never once reported pain. That's a base. What the logs also show: the barbell lifts sat still — your last squat session was an RPE 6, which means the weight on the bar was lighter than the athlete under it. This cycle fixes that.",
+          "Power Engine has two jobs. First, teach your body to move fast — jumps, bounds, throws, and a new kind of pressing where the legs launch the weight. This is what \"more fast in padel\" is actually made of. Second, march the barbell lifts up on a schedule. Every primary lift now has a written weekly target. The bar goes up because the plan says so, not when it feels like a good day.",
+          "Three days. Denser, sharper, built around your padel week. By the end of these five weeks the first step, the smash, and the numbers on the bar will all say the same thing: faster and stronger than the athlete who finished Cycle 1."
+        ],
+        "outcomes": [
+          "Squat at 35 kg+ moving fast — up from a stuck 20",
+          "Deadlift and hip thrust progressing every single week",
+          "First cycle of true ballistic pressing completed",
+          "Continuous lateral bounds — spring, land, spring again",
+          "All three days trained, every week — no dead zones",
+          "Rotational throws visibly faster by week five"
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Athlete Sculpt",
+      "weeks": "Weeks 11–15",
+      "focuses": [
+        "Sharpen power, speed, and on-court agility.",
+        "Dial in the lean, defined look — including visible abs."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Cycle 3 is called Athlete Sculpt, and the name is literal. The strength you build now and the speed you sharpen here become the raw material — Cycle 3 carves it into the fastest, leanest version of you this programme has seen. The agility work gets court-specific. The definition work gets visible. But none of it can be carved from soft stone — the density gets built here first.",
+          "Earn the sculpt."
+        ]
+      }
+    },
+    {
+      "num": 4,
+      "name": "Peak & Polish",
+      "weeks": "Weeks 16–20",
+      "focuses": [
+        "Bring everything together — strength, speed, and conditioning.",
+        "Look and move like the athlete you've been building toward."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 02 · Power Engine",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Jump First, Squat Heavy",
+        "completionTitle": "Springs Loaded",
+        "completionMessage": "Jumps fired the system, then the squat loaded it heavier than last cycle ever did — that combination is the first step on court getting faster. Refuel and protect tonight's sleep; the bar goes up again next week.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Build the pace gradually across five minutes",
+                    "Legs warming, breathing opening"
+                  ],
+                  "bad": [
+                    "Don't spike the heart rate early — it's a primer"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "World's Greatest Stretch",
+                    "detail": "×5+5",
+                    "cues": {
+                      "good": [
+                        "Rotate the chest fully to the ceiling",
+                        "Hip flexor and T-spine opening"
+                      ],
+                      "bad": [
+                        "Don't rush the rotation phase"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Goblet Squat",
+                    "detail": "×6 · 3s Eccentric · light",
+                    "cues": {
+                      "good": [
+                        "Sit straight down between the heels",
+                        "Quads and glutes loading evenly"
+                      ],
+                      "bad": [
+                        "Don't let the chest collapse forward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×12+12",
+                    "cues": {
+                      "good": [
+                        "Band stays taut on every step",
+                        "Side glute firing on the stance leg"
+                      ],
+                      "bad": [
+                        "Don't lean the torso to assist the step"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Power",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Box Jump",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×3 Reps"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 90s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Explode off the floor, land soft and quiet on top",
+                    "Hips snap through, the floor pushes away"
+                  ],
+                  "bad": [
+                    "Don't jump back down — step off"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Bound",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "continuous",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5+5 Reps"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push off the outside leg and fly sideways",
+                    "Outside hip loads then fires like a spring — minimal ground time"
+                  ],
+                  "bad": [
+                    "Don't let the landing knee cave inward"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Back Squat",
+                "videoUrl": null,
+                "restSec": 180,
+                "chips": [
+                  {
+                    "label": "drive up fast",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×4 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 3 min"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor apart through mid-foot",
+                    "Glutes and quads drive as one piece"
+                  ],
+                  "bad": [
+                    "Don't self-select light — the bar goes up when the target says so"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Lateral Lunge",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 75s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Step wide and sit into that hip, other leg long",
+                    "Inner thigh and glute of the bent leg loading"
+                  ],
+                  "bad": [
+                    "Don't push the hips down — push them sideways"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 75s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl the heels to the glutes",
+                    "Hamstrings shortening under full tension"
+                  ],
+                  "bad": [
+                    "Don't let the hips lift off the pad"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Wood Chop",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 60s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the cable high-to-low across the body",
+                    "Obliques rotate and brace — the arms just hold on"
+                  ],
+                  "bad": [
+                    "Don't pull with the arms"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Press Fast, Pull Heavy",
+        "completionTitle": "Launch Complete",
+        "completionMessage": "First cycle of pressing with real velocity — legs launching the bells is a skill, and you just trained it. Protein in within the hour; the pulldown run that carried Cycle 1 continues from 33.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rowing",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Long stroke with full leg drive",
+                    "Back and lats warming progressively"
+                  ],
+                  "bad": [
+                    "Don't pull with the arms only"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Shoulder Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": [
+                        "Pull wide with straight arms",
+                        "Mid-back squeezing"
+                      ],
+                      "bad": [
+                        "Don't shrug the shoulders up"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away without bending the elbows",
+                        "Shoulder blades spreading wide"
+                      ],
+                      "bad": [
+                        "Don't bend the arms"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band External Rotation",
+                    "detail": "×12+12",
+                    "cues": {
+                      "good": [
+                        "Forearm opens like a door",
+                        "Back of the shoulder working"
+                      ],
+                      "bad": [
+                        "Don't let the elbow leave the ribs"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Power",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Push Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5 Reps"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 90s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Dip the knees, then drive the bells straight up fast",
+                    "Legs start it, shoulders finish it"
+                  ],
+                  "bad": [
+                    "Don't grind a slow rep — if it stalls, that's the top set"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Bench Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 90s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the bells together at the top",
+                    "Deep stretch across the chest on the way down"
+                  ],
+                  "bad": [
+                    "Don't flare the elbows to 90 degrees"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 75s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the bar to the upper chest",
+                    "Lats compressing from the armpit down"
+                  ],
+                  "bad": [
+                    "Don't lean back to finish the rep"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Arm Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10+10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 60s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the bell to the hip",
+                    "One side of the back working at a time"
+                  ],
+                  "bad": [
+                    "Don't rotate the torso open to assist"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Arm Superset",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "items": [
+                  {
+                    "name": "Dumbbell Bicep Curl",
+                    "detail": "×12 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Curl without the elbows drifting forward",
+                        "Biceps fully lengthen and shorten"
+                      ],
+                      "bad": [
+                        "Don't swing the torso"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Cable Tricep Pushdown",
+                    "detail": "×12 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Press the rope down and slightly apart",
+                        "Triceps fully lengthening then locking out"
+                      ],
+                      "bad": [
+                        "Don't let the elbows drift forward"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Hanging Knee Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 60s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl the pelvis up toward the ribs",
+                    "Lower abs doing the lifting"
+                  ],
+                  "bad": [
+                    "Don't swing the legs up"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Hinge Heavy, Empty the Engine",
+        "completionTitle": "Engine Emptied",
+        "completionMessage": "Throws, heavy hinges, and eight all-out intervals — that's a padel match compressed into one session. This is the day that changes the third set on court; eat properly and take tomorrow easy.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Light sweat by the end",
+                    "Hips and trunk waking up"
+                  ],
+                  "bad": [
+                    "Don't make it a workout"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Activation Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Drive the hips to the ceiling",
+                        "Glutes fully squeezing at the top"
+                      ],
+                      "bad": [
+                        "Don't hyperextend the low back"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Dead Bug",
+                    "detail": "×8+8",
+                    "cues": {
+                      "good": [
+                        "Limbs move like they're underwater",
+                        "Low back pinned to the floor"
+                      ],
+                      "bad": [
+                        "Don't let the lumbar arch"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Cossack Squat",
+                    "detail": "×6+6",
+                    "cues": {
+                      "good": [
+                        "Sink into one hip, other leg long",
+                        "Adductors and groin opening"
+                      ],
+                      "bad": [
+                        "Don't let the working heel lift"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Rotational Power",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Medicine Ball Rotational Slam",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5+5 Reps"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 75s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Whip the ball high-to-low across the body like a smash",
+                    "Ground force up through the hip, arms last"
+                  ],
+                  "bad": [
+                    "Don't arm it — a soft throw is a wasted rep"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Conventional Deadlift",
+                "videoUrl": null,
+                "restSec": 150,
+                "chips": [
+                  {
+                    "label": "fast off the floor",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×4 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7.5"
+                  },
+                  {
+                    "label": "Rest 150s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor away with both feet",
+                    "Lats locked down, glutes driving the hips through"
+                  ],
+                  "bad": [
+                    "Don't pull with a rounded lower back"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 105,
+                "chips": [
+                  {
+                    "label": "1s squeeze",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-1"
+                  },
+                  {
+                    "label": "RPE 8"
+                  },
+                  {
+                    "label": "Rest 105s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the hips to a full, flat lockout",
+                    "Glutes doing all of it, ribs stay down"
+                  ],
+                  "bad": [
+                    "Don't overextend the low back at the top"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×40s Each Side"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 60s"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Walk tall and dead level, heavy on one side",
+                    "Opposite-side trunk fighting the tip"
+                  ],
+                  "bad": [
+                    "Don't lean away from the weight"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Conditioning",
+            "icon": "🫀",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Assault Bike Intervals",
+                "videoUrl": null,
+                "restSec": 40,
+                "chips": [
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "8 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "20s on / 40s off",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 9"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive every 20 seconds like the third set of a tiebreak",
+                    "Legs and lungs burning together"
+                  ],
+                  "bad": [
+                    "Don't pace the early rounds to survive the late ones"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "programHistory": [
+    {
+      "id": "prog1",
+      "label": "Program 1",
+      "subtitle": "Foundation Forge",
+      "days": [
+        {
+          "label": "Day 1",
+          "focus": "Lower Power & Strength",
+          "exercises": [
+            {
+              "name": "Assault Bike",
+              "detail": "5 min"
+            },
+            {
+              "name": "World's Greatest Stretch",
+              "detail": "2×5+5"
+            },
+            {
+              "name": "Goblet Squat",
+              "detail": "2×8 · Tempo 3-1-1-0"
+            },
+            {
+              "name": "Box Jump",
+              "detail": "5×3 · RPE 7"
+            },
+            {
+              "name": "Lateral Bound",
+              "detail": "4×4+4 · RPE 7"
+            },
+            {
+              "name": "Barbell Back Squat",
+              "detail": "4×5 · RPE 8"
+            },
+            {
+              "name": "Dumbbell Reverse Lunge",
+              "detail": "3×8+8 · RPE 7"
+            },
+            {
+              "name": "Barbell Romanian Deadlift",
+              "detail": "3×8 · RPE 7"
+            },
+            {
+              "name": "Cable Pallof Press",
+              "detail": "3×10+10 · RPE 6"
+            }
+          ]
+        },
+        {
+          "label": "Day 2",
+          "focus": "Upper Hypertrophy & Core",
+          "exercises": [
+            {
+              "name": "Rowing",
+              "detail": "4 min"
+            },
+            {
+              "name": "Band Pull-Apart",
+              "detail": "2×15"
+            },
+            {
+              "name": "Scapular Pull-Up",
+              "detail": "2×8"
+            },
+            {
+              "name": "Dumbbell Bench Press",
+              "detail": "4×8 · RPE 8"
+            },
+            {
+              "name": "Seated Dumbbell Overhead Press",
+              "detail": "3×10 · RPE 7"
+            },
+            {
+              "name": "Lat Pulldown",
+              "detail": "4×10 · wide grip · RPE 7"
+            },
+            {
+              "name": "Chest-Supported Dumbbell Row",
+              "detail": "3×10 · RPE 7"
+            },
+            {
+              "name": "Dumbbell Bicep Curl",
+              "detail": "3×12 · RPE 7"
+            },
+            {
+              "name": "Cable Tricep Pushdown",
+              "detail": "3×12 · RPE 7"
+            },
+            {
+              "name": "Cable External Rotation",
+              "detail": "3×12+12 · RPE 5"
+            },
+            {
+              "name": "Hanging Knee Raise",
+              "detail": "3×12 · RPE 7"
+            },
+            {
+              "name": "Cable Wood Chop",
+              "detail": "3×10+10 · RPE 7"
+            }
+          ]
+        },
+        {
+          "label": "Day 3",
+          "focus": "Lower Strength & Hypertrophy",
+          "exercises": [
+            {
+              "name": "Assault Bike",
+              "detail": "5 min"
+            },
+            {
+              "name": "Cossack Squat",
+              "detail": "2×6+6"
+            },
+            {
+              "name": "Glute Bridge",
+              "detail": "2×10"
+            },
+            {
+              "name": "Conventional Deadlift",
+              "detail": "4×5 · RPE 8"
+            },
+            {
+              "name": "Barbell Hip Thrust",
+              "detail": "4×8 · RPE 8"
+            },
+            {
+              "name": "Dumbbell Bulgarian Split Squat",
+              "detail": "3×10+10 · RPE 8"
+            },
+            {
+              "name": "Machine Seated Leg Curl",
+              "detail": "3×12 · RPE 8"
+            },
+            {
+              "name": "Cable Hip Abduction",
+              "detail": "3×12+12 · RPE 7"
+            },
+            {
+              "name": "Side Plank",
+              "detail": "3×30s each side · RPE 7"
+            },
+            {
+              "name": "Dead Bug",
+              "detail": "3×8+8 · RPE 6"
+            }
+          ]
+        },
+        {
+          "label": "Day 4",
+          "focus": "Upper Power & Conditioning",
+          "exercises": [
+            {
+              "name": "Jump Rope",
+              "detail": "3 min"
+            },
+            {
+              "name": "Band Pull-Apart",
+              "detail": "2×15"
+            },
+            {
+              "name": "Scapular Push-Up",
+              "detail": "2×10"
+            },
+            {
+              "name": "Medicine Ball Rotational Slam",
+              "detail": "4×5+5 · RPE 8"
+            },
+            {
+              "name": "Medicine Ball Slam",
+              "detail": "4×5 · RPE 8"
+            },
+            {
+              "name": "Push-Up",
+              "detail": "3×8 · RPE 7"
+            },
+            {
+              "name": "Single-Arm Dumbbell Row",
+              "detail": "3×10+10 · RPE 7"
+            },
+            {
+              "name": "Assault Bike Intervals",
+              "detail": "8 × 20s on / 40s off · RPE 9"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": {
+    "greeting": "For You, Mehrnaz",
+    "cards": [
+      {
+        "icon": "🎯",
+        "title": "Three Days Is the Whole Assignment",
+        "body": "Last cycle prescribed four days and got about sixty percent — including one stretch of ten days with nothing logged. So we redesigned around reality: three days, nothing wasted, conditioning folded in. That means the maths changed too — three of three is 100 percent, and there is no \"optional\" session anymore. Miss one and you've missed a third of the week. Put the three days in your calendar next to your padel sessions every Saturday, and treat them with the same respect you give a booked court."
+      },
+      {
+        "icon": "📈",
+        "title": "The Bar Goes Up on Schedule",
+        "body": "Your squat sat at 20 kg for a month — and your last squat session was RPE 6, which tells me the plateau was the loading, not you. So this cycle the guesswork is gone: every primary lift has a written weekly target (squat +2.5 kg per week, hip thrust +5). When the session says add weight, add it — don't wait to \"feel ready\", because your logs prove you underestimate yourself. If a jump is genuinely above RPE 8, hold once and tell me in the report. That's the only exception."
+      },
+      {
+        "icon": "🤔",
+        "title": "One Question From Your Logs",
+        "body": "On June 3rd you logged a 30 kg deadlift — then every session after went back to 20 and never returned. Either that was a real lift (in which case you're stronger than this programme assumed and we'll raise the targets), or it was a logging slip. Tell me in your next session report which one it was — one sentence is enough. Your logs are how I coach you between sessions, so this one number actually matters."
+      },
+      {
+        "icon": "⚡",
+        "title": "Fast Is a Skill, Not an Effort",
+        "body": "This cycle adds jumps with fewer reps, continuous bounds, rotational slams, and push presses — and every one of them is graded on speed, not sweat. A slow throw is a wasted rep even if it's heavy; a crisp one at max intent is the whole point. If bar speed dies mid-set on the deadlift, stop the set — that's not quitting, that's power training done correctly. Your body learns whatever you repeat: repeat fast."
+      },
+      {
+        "icon": "🍽️",
+        "title": "The Six-Pack Is Still in the Kitchen",
+        "body": "Nothing about the abs goal changed: a small daily calorie deficit plus around 130 g of protein, every day, is what makes the core work visible. The training side is covered — wood chops, hanging knee raises, carries, and the highest-intent conditioning yet. What I can't program is the plate. If the last cycle's nutrition drifted with the missed sessions, this is the reset: three trained days, seven fed-right days."
+      },
+      {
+        "icon": "🎾",
+        "title": "Space the Heavy Days",
+        "body": "Day 1 and Day 3 are both heavy lower-body days — squat on one, deadlift and hip thrust on the other. One rule for arranging your week: never put them back-to-back. Slot padel or Day 2 between them, and your legs will be fresh enough to actually hit the weekly load targets. If a week goes sideways and only one session fits, do Day 1 — and remember the minimum that still counts: the first power move plus the first primary lift."
+      },
+      {
+        "icon": "💥",
+        "title": "The Finisher Is Your Third Set",
+        "body": "The old conditioning day didn't survive contact with your calendar — you did it once — so its best weapon moved into Day 3: eight rounds of 20 seconds on, 40 off, at full intent. This is the exact energy demand of a long padel rally: explode, recover fast, explode again. Don't pace the early rounds to survive the late ones. It's eight minutes; empty the tank."
+      }
+    ]
+  }
+}
