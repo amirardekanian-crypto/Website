@@ -499,6 +499,23 @@ Every `standard` exercise gets, automatically: rest timer + weight log + RPE sel
 
 Any exercise (any type) can include a `videoUrl`. When present, a play button appears next to the name. When omitted, no button renders.
 
+### `note` — Exercise coach's note (optional, any exercise type)
+
+Exercise-scoped guidance the athlete must see, attached to that exercise:
+
+```json
+{
+  "type": "standard",
+  "name": "Machine Hack Squat",
+  "note": "Work up from 35 kg in week one and let the RPE decide — wherever 12 clean reps lands at RPE 7–8 is your working weight.",
+  "chips": [ ... ]
+}
+```
+
+Renders as a clay **"Coach's Note"** pill on the collapsed row plus a highlighted callout at the top of the expanded card (works on `standard`, `simple`, and `circuit`).
+
+**Placement rule (per COACHING-PRINCIPLES → Communication):** anything about ONE exercise — an injury caveat ("start shallow, pain-free only"), a starting-weight suggestion drawn from the athlete's own past logs, how to load it — belongs here, so the athlete sees it exactly where it applies. Program-wide guidance belongs in the `notes` cards instead. This is also the only athlete-facing place a weight number may appear (as a suggestion based on their logs — chips never carry weights).
+
 ### Chip Styles
 
 Chips route to the stats grid by their **label pattern** (next section), not their style.

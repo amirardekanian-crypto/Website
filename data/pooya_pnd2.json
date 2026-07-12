@@ -172,6 +172,7 @@
               {
                 "type": "standard",
                 "name": "Dumbbell Bench Press",
+                "note": "Start with the 20 kg dumbbells you finished Cycle 2 on. At 60-second rests they'll feel heavier than you remember — if the RPE creeps past 8, step down a pair instead of stretching the rest.",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -184,7 +185,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×8-10 Reps"
+                    "label": "×10 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -218,7 +219,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -258,7 +259,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -322,7 +323,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-0-2-0"
@@ -358,7 +359,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-2-0"
@@ -437,6 +438,7 @@
               {
                 "type": "simple",
                 "name": "Split Squat",
+                "note": "The knee's comeback drill. Shallow, slow, zero pain — go a little deeper each week it feels good. If the knee complains, skip it and mention it in your session note.",
                 "videoUrl": null,
                 "chips": [
                   {
@@ -470,6 +472,7 @@
               {
                 "type": "standard",
                 "name": "Machine Hack Squat",
+                "note": "Your last log showed 40 kg with no RPE next to it. In week one, work up from 35 kg and let the RPE decide — wherever 12 clean reps lands at RPE 7–8 is your working weight.",
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
@@ -478,7 +481,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -500,6 +503,7 @@
               {
                 "type": "standard",
                 "name": "Machine Leg Press",
+                "note": "Start from the weight we used in our July 12 session — strong and completely pain-free. It should sit at RPE 7–8 for 15 reps; if it's easier than that, go up.",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -508,7 +512,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -548,7 +552,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -582,7 +586,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-2-1-0"
@@ -618,7 +622,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×8-10 Reps"
+                    "label": "×10 Reps"
                   },
                   {
                     "label": "Tempo 2-0-2-0"
@@ -726,6 +730,7 @@
               {
                 "type": "standard",
                 "name": "Lat Pulldown",
+                "note": "A deliberate reset after six stuck weeks. With the neutral grip, start around 42–44 kg — lighter than the 47 you were parked at. Week one should feel smooth; that's the plan, not a mistake.",
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
@@ -738,7 +743,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-1-2-0"
@@ -768,7 +773,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -808,7 +813,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -842,7 +847,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10-12 Each Arm"
+                    "label": "×12 Each Arm"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -946,7 +951,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-2-0"
@@ -1053,6 +1058,7 @@
               {
                 "type": "simple",
                 "name": "Split Squat",
+                "note": "The knee's comeback drill. Shallow, slow, zero pain — go a little deeper each week it feels good. If the knee complains, skip it and mention it in your session note.",
                 "videoUrl": null,
                 "chips": [
                   {
@@ -1098,7 +1104,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -1138,7 +1144,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-2-0"
@@ -1172,7 +1178,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -1609,42 +1615,42 @@
       {
         "icon": "🍽️",
         "title": "The Scale Has to Move",
-        "body": "Honest talk: through Cycle 2 your weight stayed at 88 kg, which means the deficit we discussed never actually happened. Training was excellent — nutrition is now the single biggest thing between you and the goal. Keep protein at 160–175 g daily and aim for a weekly weight average dropping 0.3–0.5 kg. If the average hasn't moved after two weeks, cut 200–300 kcal from daily intake and hold there. This cycle burns more than any before it, but no training phase can out-run intake — the deficit is your job, the muscle protection is mine."
+        "body": "<p>Honest talk: through Cycle 2 your weight stayed at <strong>88 kg</strong> — the deficit we discussed never actually happened. Training was excellent; nutrition is now the single biggest thing between you and the goal.</p><ul><li>Protein: <strong>160–175 g every day</strong></li><li>Weekly weight average: trending down <strong>0.3–0.5 kg</strong></li><li>Flat after two weeks? Cut 200–300 kcal from daily intake and hold.</li></ul><p>This cycle burns more than any before it, but <strong>no training phase can out-run intake</strong> — the deficit is your job, the muscle protection is mine.</p>"
       },
       {
         "icon": "💧",
         "title": "Water Up, Sugar Down",
-        "body": "Following up on your blood work: more water every day, less sugar, and book the re-test — don't let it slide to next cycle. This matters double now because Metabolic Override makes you sweat more than anything you've done so far. Take a bottle to every session and finish it. Simple, boring, non-negotiable."
+        "body": "<p>Following up on your blood work: <strong>more water every day, less sugar, and book the re-test</strong> — don't let it slide to next cycle.</p><p>It matters double now: Metabolic Override makes you sweat more than anything you've done so far. Take a bottle to every session and finish it. Simple, boring, non-negotiable.</p>"
       },
       {
         "icon": "🦵",
         "title": "The Knee Plan",
-        "body": "After the lunge pain, all your main leg work this cycle is machine-based and two-legged — hack squat and leg press, both of which you've already proven pain-free at full load. Single-leg work survives only as the shallow split squat in your warm-up: six easy reps, only as deep as stays completely pain-free. Each week it feels good, go slightly deeper. That's how single-leg strength gets earned back — and if anything in the knee talks during any exercise, message me the same day, not at the next check-in."
+        "body": "<p>After the lunge pain, all your main leg work this cycle is <strong>machine-based and two-legged</strong> — hack squat and leg press, both already proven pain-free at full load.</p><p>Single-leg work survives only as the shallow split squat in your warm-up: six easy reps, only as deep as stays completely pain-free. Each week it feels good, go slightly deeper — <strong>that's how single-leg strength gets earned back</strong>.</p><p>Know the difference mid-session: normal muscle burn and next-day stiffness are fine — keep training. Sharp pain, pain that builds through a set, or anything unfamiliar in the knee: stop that exercise, use the fallback, and <strong>message me the same day</strong>, not at the next check-in.</p>"
       },
       {
         "icon": "⏱️",
         "title": "Lighter and Faster Is the Point",
-        "body": "Supersets with 45–90 second rests mean you cannot lift your Cycle 2 weights — and you're not supposed to. The stimulus this cycle is total work per minute, not load on the bar. If you catch yourself stretching rest periods to protect a number, you're training the wrong quality. Drop the weight, respect the clock, own the pace."
+        "body": "<p>Supersets with 45–90 second rests mean you cannot lift your Cycle 2 weights — <strong>and you're not supposed to</strong>. The stimulus this cycle is total work per minute, not load on the bar.</p><p>If you catch yourself stretching rest periods to protect a number, you're training the wrong quality. Drop the weight, <strong>respect the clock</strong>, own the pace.</p>"
       },
       {
         "icon": "🎯",
         "title": "The Pulldown Reset",
-        "body": "Your lat pulldown hasn't moved in six weeks — a genuine plateau, so we're breaking it deliberately. New neutral grip, new rep range: pick whatever weight lands you at the prescribed RPE, and don't be surprised if that's lighter than you're used to. That's the plan, not a setback — a plateau breaks by changing the stimulus, not by pulling harder at the same wall. If your logs show it climbing by week 3, we ride it; if not, I swap the exercise. Either way, it moves."
+        "body": "<p>Your lat pulldown hasn't moved in six weeks — a genuine plateau, so we're breaking it deliberately: <strong>new neutral grip, new rep target, lighter start</strong> (your exact starting point is on the exercise card as a Coach's Note).</p><p>A plateau breaks by changing the stimulus, not by pulling harder at the same wall. If your logs show it climbing by week 3, we ride it; if not, I swap the exercise. <strong>Either way, it moves.</strong></p>"
       },
       {
         "icon": "📈",
         "title": "The RPE Is the Prescription",
-        "body": "Your only job on load is the RPE: pick the weight that puts you at the prescribed RPE inside the prescribed rest, and log every set honestly. If a set comes in below the target RPE, go heavier; if it blows past it, back off — the RPE is the prescription, not the number on the plate. I read your logs every week and adjust the program when they tell me something, so you never need to run your own progression math. What you record now also builds your Cycle 4 strength baselines — the log is the whole game."
+        "body": "<p>Your only job on load is the RPE: <strong>pick the weight that puts you at the prescribed RPE inside the prescribed rest</strong>, and log every set honestly.</p><ul><li>Set lands below the target RPE → go heavier next set.</li><li>Set blows past it → back off.</li></ul><p>I read your logs every week and adjust the program when they tell me something — <strong>you never need to run your own progression math</strong>. What you record now also builds your Cycle 4 strength baselines; the log is the whole game.</p>"
       },
       {
         "icon": "🧱",
         "title": "Peak Ab Season",
-        "body": "Twelve direct ab sets a week — cable crunch, hanging knee raises, body saw, wood chops — is the highest core dose of your programme, timed exactly when the fat over them is coming off. The body saw is the new test: drift back only as far as your lower back can stay locked flat. This dose is deliberately maximal, so add nothing on rest days; more is not better here, it's just recovery debt."
+        "body": "<p><strong>Twelve direct ab sets a week</strong> — cable crunch, hanging knee raises, body saw, wood chops — is the highest core dose of your programme, timed exactly when the fat over them is coming off.</p><p>The body saw is the new test: drift back only as far as your lower back can stay locked flat.</p><p>This dose is deliberately maximal — <strong>add nothing on rest days</strong>. More isn't better here; it's just recovery debt.</p>"
       },
       {
         "icon": "🎾",
         "title": "The Energy Budget Still Rules",
-        "body": "Four gym sessions plus one tennis session — that ceiling stays, and it matters more now, not less, because you'll be in a real deficit while training denser than ever. The conditioning you need is already built into Days 3 and 4; do not add runs or extra cardio on top. Remember Cycle 1's near-fainting episode: that was total demand exceeding recovery. On low-readiness days, drop every RPE by 1 and know the finisher is always the first thing to cut — never the first lift."
+        "body": "<p><strong>Four gym sessions plus one tennis session — that ceiling stays.</strong> It matters more now, not less: you'll be in a real deficit while training denser than ever.</p><p>The conditioning you need is already built into Days 3 and 4 — do not add runs or extra cardio on top. Remember Cycle 1's near-fainting episode: that was total demand exceeding recovery.</p><p>On low-readiness days, drop every RPE by 1 — and the finisher is always the first thing to cut, <strong>never the first lift</strong>.</p>"
       }
     ]
   }
