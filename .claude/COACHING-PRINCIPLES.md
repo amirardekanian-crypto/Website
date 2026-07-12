@@ -160,6 +160,14 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
   per exercise, so the program is a starting point Amir adjusts each week. *(2026-06-15)*
 - **Set increments from logged data** (RPE/RIR, bar speed), not guesswork. *(2026-06-15)*
+- **Prescribe RPE, never load.** Athlete-facing text (chips, notes, messages, completion)
+  never contains target weights or kg increments — the athlete picks whatever load lands at
+  the prescribed RPE. If they need load guidance ("this will feel lighter than last cycle"),
+  it goes in a note framed around the RPE, with no numbers. Starting/target loads live only
+  in coach-facing reports and the coaching log. *(2026-07-12)*
+- **Mid-cycle adjustments are report-driven only.** No self-progression rules in the program
+  ("add 2.5 kg when you complete all sets…") — Amir adjusts from the weekly logs and check-ins
+  when something is reported. The athlete's job is to hit the RPE and log. *(2026-07-12)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
   When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
