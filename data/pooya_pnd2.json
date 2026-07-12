@@ -8,7 +8,7 @@
   "sport": {
     "badge": "🏋️ General Fitness — Body Recomposition"
   },
-  "currentCycleIndex": 1,
+  "currentCycleIndex": 2,
   "cycles": [
     {
       "num": 1,
@@ -30,35 +30,32 @@
       "focuses": [
         "Increase hypertrophy volume per muscle group with higher training density and shorter rest periods.",
         "Advance core loading from bodyweight to stability-based variations and introduce structured conditioning blocks."
-      ],
-      "message": {
-        "paragraphs": [
-          "You proved something in the first five weeks — you can show up, follow a structure, and get stronger doing it. Now the training has to change because you have.",
-          "Cycle 2 is built around one principle: more work in less time. Rep ranges go up, rest periods come down, and every session should feel noticeably denser than what you were doing before. This is where your body is forced to adapt — not just neurally, but structurally. Muscle tissue has to grow to keep up with the demand.",
-          "Your job is the same as Cycle 1: own every rep, log every set, and trust the process."
-        ],
-        "outcomes": [
-          "Visible changes in upper body size and shape",
-          "Significantly more comfort and confidence under the bar on leg days",
-          "Noticeable jump in work capacity — sessions that would have buried you five weeks ago will feel routine",
-          "Improved RPE calibration and tempo discipline across all movements"
-        ]
-      }
+      ]
     },
     {
       "num": 3,
       "name": "Metabolic Override",
+      "tagline": "The Volume Becomes the Fuel.",
       "weeks": "Weeks 11–16",
+      "startDate": "2026-07-13",
+      "endDate": "2026-08-23",
       "focuses": [
         "Shift training toward high-density supersets and circuit-based resistance work to maximise energy expenditure while preserving muscle.",
         "Peak direct abdominal volume and introduce advanced anti-extension progressions."
       ],
-      "teaser": {
-        "subtitle": "The volume you built becomes the fuel.",
+      "message": {
         "paragraphs": [
-          "Cycle 3 changes the rules entirely. The volume you are building now becomes the fuel for a training style designed to strip body fat while keeping every kilogram of muscle you have earned.",
-          "Sessions will move faster, rest will shrink further, and the intensity will test a version of you that does not exist yet. This is the phase where the six-pack stops being a goal and starts becoming visible.",
-          "What you build in these five weeks determines whether your body is ready for what comes next."
+          "Cycle 2 did its job: bench up 25%, shoulder press up 21%, and three straight perfect weeks to finish. You're stronger and you've proven you can handle density. But the scale didn't move — and the goal was never just to be a bigger 88 kg. Cycle 3 is where that changes.",
+          "Metabolic Override turns the volume you built into fuel. Every session now runs on supersets — two exercises back to back, short rests, no dead time. The weights come down slightly and the pace goes up; that's not a compromise, it's the design. You'll burn more, keep every gram of muscle, and your conditioning finishers get sharper teeth.",
+          "Your job: respect the rest clock, log every set, and let the nutrition finally match the training. This is the cycle where the work becomes visible."
+        ],
+        "outcomes": [
+          "Weekly weight average trending down 0.3–0.5 kg",
+          "Every superset completed inside the prescribed rest — no clock-stretching",
+          "Lat pulldown moving again after a six-week plateau",
+          "Pain-free lower body all cycle, split squat depth growing week by week",
+          "12 direct ab sets per week handled — your highest core dose yet",
+          "Conditioning circuit at 4 rounds feeling routine by week 5"
         ]
       }
     },
@@ -69,7 +66,13 @@
       "focuses": [
         "Restore and surpass Cycle 1 strength levels with reduced volume and higher intensity to protect lean mass through the deepening deficit.",
         "Reduce conditioning volume, refine muscular detail through isolation and contraction-focused work."
-      ]
+      ],
+      "teaser": {
+        "paragraphs": [
+          "After this cycle strips the fat, Cycle 4 flips the script. The rests get long again, the bar gets heavy again, and every number you set back in Cycle 1 goes on the table to be beaten — at a lighter, leaner bodyweight.",
+          "Less of you, lifting more than ever."
+        ]
+      }
     },
     {
       "num": 5,
@@ -82,18 +85,38 @@
     }
   ],
   "workouts": {
-    "label": "Program 02 · Month Two",
+    "label": "Program 03 · Metabolic Override",
     "days": [
       {
         "id": 1,
-        "focusTag": "Upper Hypertrophy A",
-        "completionTitle": "Density Delivered",
-        "completionMessage": "Shorter rest, higher reps, same precision. Your upper body just did more total work than any session in Cycle 1. That is how muscle gets built.",
+        "focusTag": "Upper Body On the Clock",
+        "completionTitle": "Pace Set",
+        "completionMessage": "Four supersets deep with the clock in charge — that's more upper-body work per minute than any session in Cycle 2. Eat your protein tonight; the pace only builds from here.",
         "blocks": [
           {
             "title": "Activation & Prep",
             "icon": "🔥",
             "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Smooth circles, build the pace gently through the five minutes",
+                    "Feel the whole body warm and the breathing lift"
+                  ],
+                  "bad": [
+                    "Racing it — this is a raise, not a workout"
+                  ]
+                }
+              },
               {
                 "type": "simple",
                 "name": "Band Pull-Apart",
@@ -104,16 +127,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "15 Reps",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "RPE 5",
-                    "style": "dark"
+                    "label": "×15 Reps"
                   }
                 ],
                 "cues": {
@@ -136,12 +150,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "20s Hold",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "RPE 4",
-                    "style": "dark"
+                    "label": "×25s Hold"
                   }
                 ],
                 "cues": {
@@ -164,8 +173,12 @@
                 "type": "standard",
                 "name": "Dumbbell Bench Press",
                 "videoUrl": null,
-                "restSec": 90,
+                "restSec": 60,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
@@ -174,7 +187,7 @@
                     "label": "×8-10 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7-8"
@@ -197,6 +210,10 @@
                 "restSec": 90,
                 "chips": [
                   {
+                    "label": "superset",
+                    "style": "dark"
+                  },
+                  {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
@@ -204,7 +221,7 @@
                     "label": "×10-12 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7-8"
@@ -230,17 +247,21 @@
                 "type": "standard",
                 "name": "Machine Incline Chest Press",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 45,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×12-15 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7"
@@ -263,6 +284,10 @@
                 "restSec": 60,
                 "chips": [
                   {
+                    "label": "superset",
+                    "style": "dark"
+                  },
+                  {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
@@ -270,7 +295,7 @@
                     "label": "×15 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7"
@@ -324,49 +349,19 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Stability Ball Rollout",
+                "name": "Cable Crunch",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 45,
                 "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8-10 Reps"
+                    "label": "×12-15 Reps"
                   },
                   {
-                    "label": "Tempo 3-0-2-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Ball rolls out until arms are extended, body stays in one rigid line",
-                    "Feel the deep abdominals brace against the stretch"
-                  ],
-                  "bad": [
-                    "Letting the lower back sag or arch at full extension"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Pallof Press",
-                "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "2 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×10 Each Side"
-                  },
-                  {
-                    "label": "Tempo 2-2-2-0"
+                    "label": "Tempo 2-1-2-0"
                   },
                   {
                     "label": "RPE 7"
@@ -374,11 +369,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Arms extend straight out, hips and shoulders stay square",
-                    "Feel the obliques resist the cable's pull"
+                    "Curl the ribcage down toward the pelvis while the hips stay still",
+                    "Feel the abs shorten with every rep, not the arms pulling"
                   ],
                   "bad": [
-                    "Rotating the torso toward the cable stack"
+                    "Pulling with the arms or hinging at the hips"
                   ]
                 }
               }
@@ -388,14 +383,34 @@
       },
       {
         "id": 2,
-        "focusTag": "Lower Hypertrophy — Quad Emphasis",
-        "completionTitle": "Legs Loading",
-        "completionMessage": "Full volume on the lower body — squats, lunges, and all the accessory work your legs need to catch up. This is where the foundation gets thicker.",
+        "focusTag": "Squat Heavy, Stand Taller",
+        "completionTitle": "Heavy and Honest",
+        "completionMessage": "The one day the rest stays long and the load stays serious — hack squat and leg press carrying your leg strength forward, completely on your terms. Pain-free and progressing is exactly the plan.",
         "blocks": [
           {
             "title": "Activation & Prep",
             "icon": "🔥",
             "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Smooth circles, build the pace gently through the five minutes",
+                    "Feel the legs flush warm before the first squat"
+                  ],
+                  "bad": [
+                    "Racing it — this is a raise, not a workout"
+                  ]
+                }
+              },
               {
                 "type": "simple",
                 "name": "Banded Glute Bridge",
@@ -406,16 +421,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "15 Reps",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "Tempo 2-2-1-0",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "RPE 5",
-                    "style": "dark"
+                    "label": "×15 Reps"
                   }
                 ],
                 "cues": {
@@ -425,6 +431,33 @@
                   ],
                   "bad": [
                     "Hyperextending the lumbar spine at lockout"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Split Squat",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "shallow range",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "×6 Each Leg"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Short stance, lower only as far as stays completely pain-free",
+                    "Feel the front leg do the work — the back leg is just a kickstand"
+                  ],
+                  "bad": [
+                    "Pushing through any knee discomfort — depth is earned, not forced"
                   ]
                 }
               }
@@ -448,7 +481,7 @@
                     "label": "×10-12 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7-8"
@@ -466,45 +499,9 @@
               },
               {
                 "type": "standard",
-                "name": "Dumbbell Walking Lunge",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×10 Each Leg"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Front shin stays vertical at the bottom, steps are long and controlled",
-                    "Feel the front-leg quad and glute load each stride"
-                  ],
-                  "bad": [
-                    "Letting the torso fall forward or rushing the steps"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "title": "Accessory",
-            "icon": "💪",
-            "exercises": [
-              {
-                "type": "standard",
                 "name": "Machine Leg Press",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 90,
                 "chips": [
                   {
                     "label": "3 Sets",
@@ -517,7 +514,7 @@
                     "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 7"
+                    "label": "RPE 7-8"
                   }
                 ],
                 "cues": {
@@ -529,13 +526,23 @@
                     "Letting the lower back lift off the pad at the bottom"
                   ]
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
               {
                 "type": "standard",
                 "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 45,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -559,6 +566,40 @@
                     "Lifting the hips off the seat to generate momentum"
                   ]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Machine Calf Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12-15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-2-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Heels drop below the platform, then rise as high as possible",
+                    "Feel the soleus load under the knee as the heel lifts"
+                  ],
+                  "bad": [
+                    "Bouncing at the bottom without pausing"
+                  ]
+                }
               }
             ]
           },
@@ -568,7 +609,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Decline Sit-Ups",
+                "name": "Body Saw",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -577,10 +618,10 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12-15 Reps"
+                    "label": "×8-10 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-2-0"
+                    "label": "Tempo 2-0-2-0"
                   },
                   {
                     "label": "RPE 7"
@@ -588,41 +629,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Elbows drive toward the knees, the spine rounds deliberately",
-                    "Feel the rectus abdominis shorten from the ribcage down"
+                    "From a forearm plank, shift the whole body back a few centimetres, then pull forward",
+                    "Feel the deep abs brace harder the further back you drift"
                   ],
                   "bad": [
-                    "Pulling with the neck or pulling neck with arms"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Dead Bug",
-                "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "2 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×10 Each Side"
-                  },
-                  {
-                    "label": "Tempo 2-1-2-0"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Opposite arm and leg extend while the lower back stays pressed to the floor",
-                    "Feel the deep core brace to prevent the spine from arching"
-                  ],
-                  "bad": [
-                    "Letting the lower back lift off the floor as limbs extend"
+                    "Letting the hips sag or pike as you slide"
                   ]
                 }
               }
@@ -632,14 +643,34 @@
       },
       {
         "id": 3,
-        "focusTag": "Upper Hypertrophy B",
-        "completionTitle": "Pull Day Locked",
-        "completionMessage": "Back, shoulders, arms, and core — all loaded with volume. The lat pulldown is building the strength your pull-up needs. Keep progressing.",
+        "focusTag": "Pull Until It Moves",
+        "completionTitle": "Plateau on Notice",
+        "completionMessage": "New grip, new pace, and intervals to finish — the pulldown that sat still for six weeks just got a new problem to solve. Hydrate hard tonight.",
         "blocks": [
           {
             "title": "Activation & Prep",
             "icon": "🔥",
             "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Smooth circles, build the pace gently through the five minutes",
+                    "Feel the whole body warm and the breathing lift"
+                  ],
+                  "bad": [
+                    "Racing it — this is a raise, not a workout"
+                  ]
+                }
+              },
               {
                 "type": "simple",
                 "name": "Band External Rotation",
@@ -650,16 +681,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "12 Each Arm",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "Tempo 2-1-2-0",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "RPE 5",
-                    "style": "dark"
+                    "label": "×12 Each Arm"
                   }
                 ],
                 "cues": {
@@ -669,6 +691,29 @@
                   ],
                   "bad": [
                     "Letting the elbow drift away from the body"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Band Pass-Through",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Wide grip, take the band over the head and behind in one smooth arc",
+                    "Feel the chest and the front of the shoulders open"
+                  ],
+                  "bad": [
+                    "Bending the elbows to cheat the arc — go wider instead"
                   ]
                 }
               }
@@ -682,8 +727,12 @@
                 "type": "standard",
                 "name": "Lat Pulldown",
                 "videoUrl": null,
-                "restSec": 90,
+                "restSec": 75,
                 "chips": [
+                  {
+                    "label": "neutral grip",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
@@ -712,7 +761,7 @@
                 "type": "standard",
                 "name": "Machine Shoulder Press",
                 "videoUrl": null,
-                "restSec": 90,
+                "restSec": 75,
                 "chips": [
                   {
                     "label": "3 Sets",
@@ -722,7 +771,7 @@
                     "label": "×10-12 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7-8"
@@ -748,8 +797,12 @@
                 "type": "standard",
                 "name": "Standing Cable Chest Fly",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 45,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -776,12 +829,12 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Row",
+                "name": "Single-Arm Cable Row",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
                   {
-                    "label": "neutral grip",
+                    "label": "superset",
                     "style": "dark"
                   },
                   {
@@ -789,7 +842,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×10-12 Each Arm"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -800,56 +853,24 @@
                 ],
                 "cues": {
                   "good": [
-                    "Drive the elbows back and down, finishing with the handle at the lower ribs",
-                    "Feel the mid-back squeeze as the shoulder blades draw together"
+                    "Drive the elbow back past the ribs, hips square to the stack",
+                    "Feel one side of the mid-back contract fully on every rep"
                   ],
                   "bad": [
-                    "Leaning the torso back to heave the weight with momentum"
+                    "Rotating the torso to yank the weight back"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Machine Reverse Fly",
+                "name": "Dumbbell Hammer Curl",
                 "videoUrl": null,
-                "restSec": 45,
+                "restSec": 30,
                 "chips": [
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
+                    "label": "superset",
+                    "style": "dark"
                   },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Arms sweep wide at shoulder height, handles finish in line with the ears",
-                    "Feel the rear deltoids and mid-traps contract as the arms open"
-                  ],
-                  "bad": [
-                    "Bending the elbows to turn this into a row"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "title": "Arms",
-            "icon": "💪",
-            "exercises": [
-              {
-                "type": "standard",
-                "name": "Incline Dumbbell Curl",
-                "videoUrl": null,
-                "restSec": 45,
-                "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -866,20 +887,24 @@
                 ],
                 "cues": {
                   "good": [
-                    "Back stays against the incline bench, only the forearms move",
-                    "Feel the bicep stretch at the bottom and peak contraction at the top"
+                    "Palms face each other, curl to shoulder height with the elbows pinned",
+                    "Feel the outer bicep and forearm take the load"
                   ],
                   "bad": [
-                    "Swinging the body or lifting the elbows forward"
+                    "Swinging the elbows forward to lift the weight"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Cable Overhead Tricep Extension",
+                "name": "Cable Tricep Pushdown",
                 "videoUrl": null,
-                "restSec": 45,
+                "restSec": 60,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -888,7 +913,7 @@
                     "label": "×12 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-2-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 7"
@@ -896,11 +921,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Hands extend forward until the arms are fully straight, upper arms stay by the ears",
-                    "Feel the triceps stretch behind the head and lock out at full extension"
+                    "Press the bar to full lockout with the elbows glued to the sides",
+                    "Feel the back of the arm squeeze hard at the bottom"
                   ],
                   "bad": [
-                    "Flaring the elbows wide or moving the upper arms"
+                    "Leaning over the cable and pressing with bodyweight"
                   ]
                 }
               }
@@ -921,7 +946,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×12-15 Reps"
                   },
                   {
                     "label": "Tempo 2-1-2-0"
@@ -941,14 +966,42 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Conditioning",
+            "icon": "🫀",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike Intervals",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "8 min"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "30 seconds hard, 30 seconds easy — eight rounds, no skipping the hard halves",
+                    "Feel the legs flood on the hard half and flush on the easy half"
+                  ],
+                  "bad": [
+                    "Pacing so evenly that the hard 30 seconds stops being hard"
+                  ]
+                }
+              }
+            ]
           }
         ]
       },
       {
         "id": 4,
-        "focusTag": "Lower Hypertrophy — Hip Emphasis + Conditioning",
-        "completionTitle": "Full Week Complete",
-        "completionMessage": "Four sessions done. Hinges, splits, isolation, core, and a conditioning finisher. You earned your rest days — recover hard and come back ready.",
+        "focusTag": "The Override Engine",
+        "completionTitle": "Override Complete",
+        "completionMessage": "Four rounds of the circuit on top of a full posterior session — the biggest burn of your week, done. Recover properly: water, protein, sleep. You've earned all three.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -956,7 +1009,27 @@
             "exercises": [
               {
                 "type": "simple",
-                "name": "Reverse Lunge",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Smooth circles, build the pace gently through the five minutes",
+                    "Feel the legs flush warm before the first hinge"
+                  ],
+                  "bad": [
+                    "Racing it — this is a raise, not a workout"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Glute Bridge",
                 "videoUrl": null,
                 "chips": [
                   {
@@ -964,25 +1037,43 @@
                     "style": "dark"
                   },
                   {
-                    "label": "8 Each Leg",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "RPE 4",
-                    "style": "dark"
+                    "label": "×12 Reps"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Back knee lowers toward the floor, front shin stays vertical",
-                    "Feel the front-leg glute and quad load each rep"
+                    "Hips rise until the body forms a straight line from knees to shoulders",
+                    "Feel the glutes squeeze hard at the top, not the lower back"
                   ],
                   "bad": [
-                    "Letting the torso collapse forward"
+                    "Hyperextending the lumbar spine at lockout"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Split Squat",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "shallow range",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "2 Sets",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "×6 Each Leg"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Short stance, lower only as far as stays completely pain-free",
+                    "Feel the front leg do the work — the back leg is just a kickstand"
+                  ],
+                  "bad": [
+                    "Pushing through any knee discomfort — depth is earned, not forced"
                   ]
                 }
               }
@@ -1025,36 +1116,6 @@
                     "Rounding the lower back at the bottom or hyperextending at the top"
                   ]
                 }
-              },
-              {
-                "type": "standard",
-                "name": "Dumbbell Bulgarian Split Squat",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×10-12 Each Leg"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7-8"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Front knee tracks over the toe, rear foot rests lightly on the bench",
-                    "Feel the front-leg quad and glute do all the work"
-                  ],
-                  "bad": [
-                    "Pushing off the back foot or leaning excessively forward"
-                  ]
-                }
               }
             ]
           },
@@ -1066,8 +1127,12 @@
                 "type": "standard",
                 "name": "Machine Leg Extension",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 45,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -1094,10 +1159,14 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Machine Calf Raise",
+                "name": "Machine Lying Leg Curl",
                 "videoUrl": null,
-                "restSec": 45,
+                "restSec": 60,
                 "chips": [
+                  {
+                    "label": "superset",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -1106,7 +1175,7 @@
                     "label": "×12-15 Reps"
                   },
                   {
-                    "label": "Tempo 2-2-1-0"
+                    "label": "Tempo 2-1-1-0"
                   },
                   {
                     "label": "RPE 7"
@@ -1114,11 +1183,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Heels drop below the platform, then rise as high as possible",
-                    "Feel the soleus load under the knee as the heel lifts"
+                    "Heels curl toward the glutes while the hips stay pressed into the pad",
+                    "Feel the hamstrings do the pulling from behind the knee"
                   ],
                   "bad": [
-                    "Bouncing at the bottom without pausing"
+                    "Lifting the hips off the pad to cheat the weight up"
                   ]
                 }
               }
@@ -1168,8 +1237,8 @@
                 "type": "circuit",
                 "name": "Conditioning Circuit",
                 "videoUrl": null,
-                "rounds": "×3 Rounds",
-                "restSec": 60,
+                "rounds": "×4 Rounds",
+                "restSec": 75,
                 "items": [
                   {
                     "name": "Kettlebell Swing",
@@ -1186,7 +1255,7 @@
                   },
                   {
                     "name": "Medicine Ball Slam",
-                    "detail": "×10 · RPE 9",
+                    "detail": "×10 · RPE 8-9",
                     "cues": {
                       "good": [
                         "Ball reaches full overhead, slams into the floor with maximum force",
@@ -1219,6 +1288,165 @@
     ]
   },
   "programHistory": [
+    {
+      "id": "prog2",
+      "label": "Program 2",
+      "subtitle": "Volume Engine",
+      "days": [
+        {
+          "label": "Day 1",
+          "focus": "Upper Hypertrophy A",
+          "exercises": [
+            {
+              "name": "Band Pull-Apart",
+              "detail": "2×15"
+            },
+            {
+              "name": "Dead Hang",
+              "detail": "2×20s"
+            },
+            {
+              "name": "Dumbbell Bench Press",
+              "detail": "4×8-10"
+            },
+            {
+              "name": "Chest-Supported Dumbbell Row",
+              "detail": "4×10-12"
+            },
+            {
+              "name": "Machine Incline Chest Press",
+              "detail": "3×12"
+            },
+            {
+              "name": "Machine Reverse Fly",
+              "detail": "3×15"
+            },
+            {
+              "name": "Dumbbell Lateral Raise",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Stability Ball Rollout",
+              "detail": "3×8-10"
+            },
+            {
+              "name": "Cable Pallof Press",
+              "detail": "2×10/side"
+            }
+          ]
+        },
+        {
+          "label": "Day 2",
+          "focus": "Lower Hypertrophy — Quad Emphasis",
+          "exercises": [
+            {
+              "name": "Banded Glute Bridge",
+              "detail": "2×15"
+            },
+            {
+              "name": "Machine Hack Squat",
+              "detail": "4×10-12"
+            },
+            {
+              "name": "Dumbbell Walking Lunge",
+              "detail": "3×10/leg"
+            },
+            {
+              "name": "Machine Leg Press",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Machine Seated Leg Curl",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Decline Sit-Ups",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Dead Bug",
+              "detail": "2×10/side"
+            }
+          ]
+        },
+        {
+          "label": "Day 3",
+          "focus": "Upper Hypertrophy B",
+          "exercises": [
+            {
+              "name": "Band External Rotation",
+              "detail": "2×12/arm"
+            },
+            {
+              "name": "Lat Pulldown",
+              "detail": "4×10-12"
+            },
+            {
+              "name": "Machine Shoulder Press",
+              "detail": "3×10-12"
+            },
+            {
+              "name": "Standing Cable Chest Fly",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Cable Row",
+              "detail": "3×12"
+            },
+            {
+              "name": "Machine Reverse Fly",
+              "detail": "3×15"
+            },
+            {
+              "name": "Incline Dumbbell Curl",
+              "detail": "3×12"
+            },
+            {
+              "name": "Cable Overhead Tricep Extension",
+              "detail": "3×12"
+            },
+            {
+              "name": "Hanging Knee Raise",
+              "detail": "3×12"
+            }
+          ]
+        },
+        {
+          "label": "Day 4",
+          "focus": "Lower Hypertrophy — Hip Emphasis + Conditioning",
+          "exercises": [
+            {
+              "name": "Reverse Lunge",
+              "detail": "2×8/leg"
+            },
+            {
+              "name": "45° Back Extension",
+              "detail": "4×12-15"
+            },
+            {
+              "name": "Dumbbell Bulgarian Split Squat",
+              "detail": "3×10-12/leg"
+            },
+            {
+              "name": "Machine Leg Extension",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Seated Machine Calf Raise",
+              "detail": "3×12-15"
+            },
+            {
+              "name": "Cable Wood Chop",
+              "detail": "3×12/side"
+            },
+            {
+              "name": "Conditioning Circuit",
+              "detail": "3 rounds"
+            }
+          ]
+        }
+      ]
+    },
     {
       "id": "prog1",
       "label": "Program 1",
@@ -1379,39 +1607,44 @@
     "greeting": "For You, Pooya",
     "cards": [
       {
-        "icon": "🔄",
-        "title": "What Changed and Why",
-        "body": "Cycle 2 shifts from building strength foundations to driving hypertrophy through higher rep ranges, shorter rest periods, and greater training density. Rep ranges on compounds have moved from 6–8 to 8–12. Rest periods have dropped from 120–180s to 90–120s on compounds and 45–60s on accessories. Conventional deadlift has been removed — RDL covers your hinge pattern more effectively for muscle growth. Assisted pull-up has been replaced with lat pulldown, which gives you a more honest load to progress with at your current pulling strength. Each change responds directly to what we learned from your first five weeks."
+        "icon": "🍽️",
+        "title": "The Scale Has to Move",
+        "body": "Honest talk: through Cycle 2 your weight stayed at 88 kg, which means the deficit we discussed never actually happened. Training was excellent — nutrition is now the single biggest thing between you and the goal. Keep protein at 160–175 g daily and aim for a weekly weight average dropping 0.3–0.5 kg. If the average hasn't moved after two weeks, cut 200–300 kcal from daily intake and hold there. This cycle burns more than any before it, but no training phase can out-run intake — the deficit is your job, the muscle protection is mine."
+      },
+      {
+        "icon": "💧",
+        "title": "Water Up, Sugar Down",
+        "body": "Following up on your blood work: more water every day, less sugar, and book the re-test — don't let it slide to next cycle. This matters double now because Metabolic Override makes you sweat more than anything you've done so far. Take a bottle to every session and finish it. Simple, boring, non-negotiable."
       },
       {
         "icon": "🦵",
-        "title": "Lower Body Is Still Catching Up",
-        "body": "Your legs responded well to the adjusted volume in Cycle 1, but your lower body training age is still well behind your upper body. Squat at 50 kg and deadlift at 50 kg for an 88 kg male tells us these muscles are still in early adaptation. This cycle restores full set counts on lower body compounds but keeps eccentrics at 2 seconds rather than 3 to manage muscle damage. Do not chase heavy weight on legs — chase perfect reps at moderate load. The strength will come from consistency, not from one heroic session."
+        "title": "The Knee Plan",
+        "body": "After the lunge pain, all your main leg work this cycle is machine-based and two-legged — hack squat and leg press, both of which you've already proven pain-free at full load. Single-leg work survives only as the shallow split squat in your warm-up: six easy reps, only as deep as stays completely pain-free. Each week it feels good, go slightly deeper. That's how single-leg strength gets earned back — and if anything in the knee talks during any exercise, message me the same day, not at the next check-in."
+      },
+      {
+        "icon": "⏱️",
+        "title": "Lighter and Faster Is the Point",
+        "body": "Supersets with 45–90 second rests mean you cannot lift your Cycle 2 weights — and you're not supposed to. The stimulus this cycle is total work per minute, not load on the bar. If you catch yourself stretching rest periods to protect a number, you're training the wrong quality. Drop the weight, respect the clock, own the pace."
       },
       {
         "icon": "🎯",
-        "title": "Shorter Rest Means Lower Weight — That Is the Point",
-        "body": "When rest drops from 3 minutes to 90 seconds on bench press, you will not be able to use the same weight. That is expected and correct. The goal in this cycle is not to lift the heaviest load possible — it is to accumulate more total work in the same time window. If you find yourself resting longer than prescribed to maintain your Cycle 1 weights, you are missing the point. Drop the load 10–15% from where you ended Cycle 1 and respect the rest periods."
-      },
-      {
-        "icon": "🍽️",
-        "title": "The Deficit Conversation",
-        "body": "You gained 2 kg in Cycle 1 — from 86 to 88 kg. You feel bigger and stronger, which is great, but visible abs require fat loss, and fat loss requires a caloric deficit that was likely not present in Cycle 1. This cycle is where nutrition needs to tighten. Target 1.8–2.0 g/kg protein daily (160–175 g) and aim for a weekly weight average that trends downward by 0.3–0.5 kg. If your weight is still climbing after two weeks, reduce daily intake by 200–300 kcal."
-      },
-      {
-        "icon": "🎾",
-        "title": "Tennis Is Fine — Nothing Else",
-        "body": "One tennis session per week is manageable alongside this programme. Do not add boxing, extra cardio, or pickup games on top. Your near-fainting episode in Cycle 1 was your body telling you that the total energy demand exceeded your recovery capacity while in a deficit. If you want to add another activity, we remove a gym session to make room. Four gym days plus tennis is your ceiling this cycle."
+        "title": "The Pulldown Reset",
+        "body": "Your lat pulldown sat at 47 kg for six weeks — a genuine plateau, so we're breaking it deliberately. New neutral grip, about 10% lighter, new rep range: it will feel easy in week one, and that's the plan. A plateau breaks by changing the stimulus, not by pulling harder at the same wall. If it's climbing by week 3, we ride it; if not, I swap the exercise. Either way, it moves."
       },
       {
         "icon": "📈",
-        "title": "Progression Rules for This Cycle",
-        "body": "Compounds — bench, squat, row, RDL, lat pulldown: when you can complete the top end of the rep range on all sets at the prescribed RPE, add 2.5 kg next session. Accessories and isolation — flies, curls, raises, extensions: add 1–2 reps per set before increasing load. Core exercises: add reps or extend the hold before adding external load. Log every session — the weights you record now determine your Cycle 3 starting point."
+        "title": "How to Progress This Cycle",
+        "body": "The rule is density first, load second: when you hit the top of the rep range on every set at RPE 8 or under — inside the prescribed rest — add weight next session (2 kg per dumbbell on bench, 2.5–5 kg on machines). On the hack squat, week one's job is confirming that 40 kg you logged without an RPE. And log everything: your Cycle 4 strength numbers will be built directly from what you record here."
       },
       {
         "icon": "🧱",
-        "title": "Core Is Progressing — Stay Patient",
-        "body": "Stability ball rollout replaces dead bug as your primary anti-extension movement this cycle. This is a genuine progression — the unstable surface and longer lever arm demand significantly more from your deep abdominals. If you cannot maintain a rigid torso through the full range, shorten the rollout distance rather than letting your back arch. Cable crunch returns this cycle now that your core foundation is stronger. Focus on curling the ribcage toward the pelvis, not pulling with your arms. The ab work across four sessions per week is a high dose — do not add more on rest days."
+        "title": "Peak Ab Season",
+        "body": "Twelve direct ab sets a week — cable crunch, hanging knee raises, body saw, wood chops — is the highest core dose of your programme, timed exactly when the fat over them is coming off. The body saw is the new test: drift back only as far as your lower back can stay locked flat. This dose is deliberately maximal, so add nothing on rest days; more is not better here, it's just recovery debt."
+      },
+      {
+        "icon": "🎾",
+        "title": "The Energy Budget Still Rules",
+        "body": "Four gym sessions plus one tennis session — that ceiling stays, and it matters more now, not less, because you'll be in a real deficit while training denser than ever. The conditioning you need is already built into Days 3 and 4; do not add runs or extra cardio on top. Remember Cycle 1's near-fainting episode: that was total demand exceeding recovery. On low-readiness days, drop every RPE by 1 and know the finisher is always the first thing to cut — never the first lift."
       }
     ]
   }
