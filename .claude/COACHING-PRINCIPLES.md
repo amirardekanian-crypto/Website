@@ -77,9 +77,26 @@ publish it. No athlete health/chat detail goes here — principles only.
   stated exception if used, never a silent default. Exception: an isolation slot with no genuine
   SFR-equivalent alternative in the library (e.g. Leg Extension for direct knee extension) can
   stay — say so, don't force a worse substitute just to rotate. *(2026-06-15, clarified 2026-07-13
-  — Pooya C3 shipped with ~half its accessories unrotated by oversight, not by stated exception)*
+  — Pooya C3 shipped with ~half its accessories unrotated by oversight, not by stated exception;
+  same failure mode hit Mehrnaz C2 the same day, at an 83% overlap with Cycle 1, caught on review
+  not at design time — two independent hits in one day means this is a recurring gap, not a
+  one-off)*
 - **Rehab/corrective:** keep the best-in-class pieces; rotate the rest for freshness.
   (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
+- **The "keep best-in-class" exception above is for rehab/corrective work only.** Don't stretch
+  it to general accessories just because their load is progressing well on paper — that kind of
+  progress is invisible to the athlete; new movements are what read as forward motion, and she's
+  paying monthly expecting to feel it. *(2026-07-13)*
+- **Anything genuinely kept must still show a visible dose progression — never re-ship an
+  identical prescription cycle to cycle.** Rotation isn't the only lever: a kept exercise's sets,
+  rounds, load, or difficulty should move. Mehrnaz C2 initially re-shipped Medicine Ball
+  Rotational Slam and Assault Bike Intervals with the exact same numbers as Cycle 1 — caught on
+  review, not by design. *(2026-07-13)*
+- **A fresh-exercise swap must fit the athlete's demonstrated capacity, not the most
+  advanced-sounding progression.** Nordic Curl and Depth Jump to Box were both proposed as
+  Mehrnaz C2 swaps and both rejected as too advanced; Stability Ball Leg Curl and a lower-box
+  Single-Leg Box Jump were the right calibration. Same logic as "Trust the bar over the résumé"
+  (Intake & assessment) — program for what's shown, not what sounds impressive. *(2026-07-13)*
 - **Knee-history clients:** reverse lunge over forward lunge; reintroduce plyometrics
   with stick-landings / step-downs; lateral bounds are the highest-risk item — ramp last. *(2026-06-15)*
 - **Chronic-back clients:** lead the hinge with trunk-supported options (45° Back
