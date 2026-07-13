@@ -319,7 +319,12 @@ publish it. No athlete health/chat detail goes here — principles only.
   the athlete* — get the format, exercise selection and dose right first. Categorizing,
   section names, chips and styling are a mechanical layer applied *after* that, and must
   **never bend the programming logic or burn design energy**. Right training first; correct
-  labels and styling fall out afterward. *(2026-06-17)*
+  labels and styling fall out afterward. *(2026-06-17)* Two concrete applications: **reps** —
+  design writes `8-10` if that's the natural hypertrophy zone, never spends budget
+  pre-picking one number; assemble mechanically takes the top of the range. **Exercise
+  Coach's Notes** — design only flags which exercise needs one + why (a `note_flag`, one
+  domain-language line); engage drafts the athlete-facing sentence; assemble places it.
+  Design's job is *deciding* what needs a note, never *writing* it. *(2026-07-12)*
 - **Design pass = programming first; polish later.** During /program-design put ALL the
   reasoning into the coaching decisions + analysis (athlete read, SFR/transfer selection,
   volume, sequencing, progression). Exercise **names, chips, day names, and formatting are a

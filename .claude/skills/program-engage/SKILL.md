@@ -104,6 +104,15 @@ period-week note is almost always a list). Bold the single most important phrase
 with `<strong>`. A note that reads as one dense paragraph when opened is a formatting bug, not
 just a style nit — rewrite it before shipping.
 
+**Exercise-scoped Coach's Notes (from design's `note_flag`s).** For every exercise design
+flagged with a `note_flag`, write the actual athlete-facing note text — 1–3 short sentences,
+**plain text, no HTML** (it renders as a short callout on the exercise card, not a notes
+card). This is the one place a specific starting weight may appear, when the flag calls for
+it — draw the number from the athlete's own logs, never invent one. Tie it directly to the
+flag's reason (injury, plateau, unclear log) so it reads as coaching, not filler. List these
+separately from the 6–9 cycle notes cards — tag each with the exercise name so assemble can
+place it. Skip an exercise with no flag; don't invent notes design didn't ask for.
+
 ## PART 4 — DAY COMPLETION MESSAGES
 For each training day in the program spec (Day 1…N), tied to that day's focus and how
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.
@@ -120,3 +129,5 @@ Hand off to **/program-assemble** to write everything into `data/<id>.json`.
   athlete — she self-selects load via RPE; see PART 1.
 - Don't skip the mandatory progression/regression note (PART 3) or the period-week note for
   female athletes (PART 3) — both are required every cycle, not optional inclusions.
+- Don't write an exercise Coach's Note as HTML — it's a short plain-text callout, not a
+  notes card. Don't invent one for an exercise design didn't flag.

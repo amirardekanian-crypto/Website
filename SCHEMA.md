@@ -512,9 +512,11 @@ Exercise-scoped guidance the athlete must see, attached to that exercise:
 }
 ```
 
-Renders as a clay **"Coach's Note"** pill on the collapsed row plus a highlighted callout at the top of the expanded card (works on `standard`, `simple`, and `circuit`).
+Renders as a clay **"Coach's Note"** pill on the collapsed row plus a highlighted callout at the top of the expanded card (works on `standard`, `simple`, and `circuit`). **Plain text — no HTML.** It's a short 1–3 sentence callout, not a notes card; `program.html` renders it escaped, not as innerHTML, so any markup would show as literal characters.
 
 **Placement rule (per COACHING-PRINCIPLES → Communication):** anything about ONE exercise — an injury caveat ("start shallow, pain-free only"), a starting-weight suggestion drawn from the athlete's own past logs, how to load it — belongs here, so the athlete sees it exactly where it applies. Program-wide guidance belongs in the `notes` cards instead. This is also the only athlete-facing place a weight number may appear (as a suggestion based on their logs — chips never carry weights).
+
+**Authorship split (pipeline convention):** /program-design only flags *which* exercise needs one and *why*, in one short coaching-domain line (a `note_flag`, not athlete-facing prose) — it doesn't draft the sentence. /program-engage writes the actual copy from that flag plus the full athlete picture. /program-assemble places the finished text on the exercise. This keeps wording/formatting decisions out of the programming pass, same as chips and `focusTag` — see COACHING-PRINCIPLES.md → "Athlete-first; naming & styling are downstream."
 
 ### Chip Styles
 

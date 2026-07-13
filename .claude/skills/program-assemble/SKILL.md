@@ -27,16 +27,22 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
-- **Copy the spec's exercise `note` verbatim** to that exercise's `note` field (any type) —
-  the app renders it as the clay "Coach's Note" (per SCHEMA "Exercise coach's note"). Never
-  move exercise-scoped guidance into the notes cards, and never invent a note the spec
-  didn't give.
+- **Place engage's exercise Coach's Notes**, matched by exercise name, into that exercise's
+  `note` field (any type) — the app renders it as the clay "Coach's Note" (per SCHEMA
+  "Exercise coach's note"). The text comes from /program-engage (which wrote it from
+  design's `note_flag`), not from design directly. Copy verbatim, plain text — never wrap it
+  in HTML (that's the cycle notes cards' convention, not this field's). Never move
+  exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
 
 **2b — Render chips from the spec's plain dose fields** (per SCHEMA "Chip parsing"):
 - set count → `{label:"N Sets", style:"yellow"}` (first; one per standard exercise)
 - reps/duration/distance → ONE `×`-prefixed grey chip (`"×8"`, `"×10 Each Side"`,
   `"×30s Each Side"`, `"×40m"`) — embed side/leg info in that same chip, never a separate
   `"Each Side"` chip
+- **Reps given as a range (`8-10`, `10-12`) → mechanically collapse to the top of the range**
+  (`8-10` → `×10`) before building the chip. Design writes ranges freely by design (see its
+  SKILL.md); this conversion is routine here, not an error to flag — the app has no
+  rep-range field, so every chip that reaches it must already be a single number.
 - tempo → `"Tempo 3-0-1-0"`; RPE → `"RPE N"` (grey)
 - `intent` → a green modifier chip `{style:"dark"}` (`3s eccentric`, `glute focus`,
   `superset`, `max intent`, `2s hold`); ≤4 words, lowercase; **never a rep/dose count here**
@@ -85,10 +91,11 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
   warm-up/prep items carry NO RPE chip and prep circuits have `"warmup": true`;
   chip order = dark → yellow set count → grey; every exercise has exactly 3 cues
   (ext+int in good, avoid in bad); section titles use the standard names (Primary/Accessory
-  /etc, never "Strength"); **no rep chip is a range** — grep for an en-dash/hyphen inside a
-  `×`-prefixed or bare rep chip (`×8–10`, `8-10 Reps`) and collapse any hit to a single number
-  (the top of the range) per COACHING-PRINCIPLES.md → "Progression (coach-driven)". The app has
-  no rep-range field; this is a hard reject, not a style preference.
+  /etc, never "Strength"); **no rep chip is a range** — final sweep for anything 2b missed:
+  grep for an en-dash/hyphen inside a `×`-prefixed or bare rep chip (`×8–10`, `8-10 Reps`) and
+  collapse any hit to a single number (the top of the range) per COACHING-PRINCIPLES.md →
+  "Progression (coach-driven)". The app has no rep-range field; this is a hard reject, not a
+  style preference.
 - **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
   `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
   and SCHEMA "notes". A body that is one plain-text paragraph is a hard reject: rewrite it
