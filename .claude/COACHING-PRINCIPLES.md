@@ -46,6 +46,19 @@ publish it. No athlete health/chat detail goes here — principles only.
   - Ties back to *their own specific restriction* (their actual diagnosis/history), not a
     generic disclaimer. /program-engage PART 3 makes this mandatory — see that skill.
   *(2026-07-08)*
+- **Logs are filled in by humans and go stale — confirm before a repeated complaint drives a
+  decision.** A pain/cramp/complaint that repeats verbatim across sessions with no other
+  corroboration, or that reads inconsistent with the readiness/adherence trend, may be a
+  carried-forward log artifact rather than a live issue (it has happened — a verbatim ab-cramp
+  note across three sessions turned out to be an unedited log, not a recurring problem).
+  /program-design flags it and asks Amir before it drives an exercise swap, a regression, or a
+  mandatory note — never silently assumed either way. *(2026-07-12)*
+- **When a standing issue is confirmed resolved, close the loop — don't let it silently
+  vanish.** An athlete who was told to watch something (an injury protocol, a regression) and
+  then simply stops hearing about it next cycle may wonder if it was dropped by mistake rather
+  than resolved. /program-design flags the resolution; /program-engage writes one genuine
+  acknowledgment line (not a full card) — pairs naturally with a wins note when the resolution
+  itself is the win. *(2026-07-12)*
 
 ## Exercise selection
 - **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
@@ -190,15 +203,17 @@ publish it. No athlete health/chat detail goes here — principles only.
   *program* changing — RPE targets, rep ranges, exercise selection — driven by what she logs,
   never as "here's your number." *(2026-07-08, Niloufar C1 — caught two athlete-facing lines
   that implied weight assignment and reworded them.)*
-- **Every athlete gets a progression/regression explainer note — mandatory, every cycle.**
-  Since the app never assigns weight (see above), every athlete needs to be taught the
-  mechanism directly: how to calibrate a **new movement** (pick conservative, let the first
-  set's RPE say go up or down), how to **progress week-to-week** on the same exercise (hit
-  prescribed reps at/under target RPE → small jump; RPE at ceiling or reps missed → hold and
-  repeat), and that **regression isn't failure** (a rough-readiness day or a harder-than-target
-  set is a signal to drop weight, not push through). /program-engage writes this into the notes
-  every cycle, in that cycle's own voice — for a new athlete it doubles as the week-1
-  calibration note. *(2026-07-08)*
+- **Progression/regression explainer note: mandatory for a NEW athlete, conditional after
+  that.** Since the app never assigns weight (see above), a NEW athlete needs the mechanism
+  taught directly (week-1 calibration note): how to calibrate a **new movement** (pick
+  conservative, let the first set's RPE say go up or down), how to **progress week-to-week**
+  on the same exercise (hit prescribed reps at/under target RPE → small jump; RPE at ceiling
+  or reps missed → hold and repeat), and that **regression isn't failure** (a rough-readiness
+  day or a harder-than-target set is a signal to drop weight, not push through). For a
+  RETURNING athlete, only repeat it when the cycle review actually flags a reason (RPE drift,
+  missed reps, confusion in logs/chat) — not on a fixed cadence. Repeating an already-learned
+  mechanism every cycle regardless dilutes the promise that notes are written for *this*
+  cycle. *(2026-07-08, made conditional 2026-07-12)*
 
 ## Volume & dosing
 - **Volume is a report, not a rule.** Show programmed sets/muscle vs the goal range vs a
@@ -254,6 +269,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   A note that opens as a dense wall of text is a bug, not a style choice — see SCHEMA.md →
   "notes" and program-engage SKILL.md PART 3. *(2026-07-08, caught on Niloufar's "How To
   Progress & Regress" note.)*
+- **Notes card count is a byproduct, not a target — never pad.** Write every mandatory note
+  that applies plus whatever else is genuinely load-bearing this cycle; a simple cycle with
+  less to say gets fewer, sharper cards. Manufacturing a card to hit a number produces exactly
+  the generic filler the "athlete-specific only" rule forbids. *(2026-07-12)*
+- **Celebrate a genuine win every cycle, on its own card — never manufacture one.** A lift
+  that moved, a habit that stuck, a hard week survived, an adherence streak: give it its own
+  card, not a caveat buried inside a corrective note. Retention runs on the athlete feeling
+  seen for what's working, not only corrected on what isn't — but an invented win reads as
+  hollow and undercuts the real ones. Some cycles genuinely have no big one; don't force it.
+  *(2026-07-12)*
+- **A cycle notes card and its matching exercise Coach's Note don't repeat each other.** When
+  the same issue has both (e.g. a standing injury protocol), the card states the full
+  protocol/stop-rule ladder once; the exercise note gives only the point-of-action specifics
+  for that exercise (starting depth, load, cue) — it never re-explains the ladder. *(2026-07-12)*
 
 ## Coaching cues
 - **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
@@ -305,16 +334,19 @@ publish it. No athlete health/chat detail goes here — principles only.
   naturally on the next design pass — no separate seeding step (the why is Amir's to supply;
   the data only scaffolds it). *(2026-06-28)*
 - **Menstrual-cycle phasing is NOT used** in programming (coach's decision). *(2026-06-15)*
-- **Period-week protocol IS used — as an adherence fallback, not performance phasing.**
-  Distinct from the rule above: every female athlete gets a standing low-friction menu for
-  period days, built into her notes each cycle so she never has to build a plan from scratch
-  under discomfort. Logic: full sets on cardio/mobility/light hip work (walking, stretching,
-  glute bridges) — light movement eases cramping; primary lifts cut to ~2 sets at a visibly
-  lighter weight/RPE — move the pattern, don't grind; anything with direct heavy ab-bracing or
-  intra-abdominal pressure (weighted rollouts, planks, hollow holds) skipped outright for those
-  days. Restate it in that cycle's actual exercises, not copied verbatim cycle to cycle. The aim
-  is protecting the training habit through a hard week, not adjusting the training stimulus for
-  performance. *(2026-07-06)*
+- **Period-week protocol IS used — as an adherence fallback, not performance phasing —
+  confirmed per cycle, never auto-included.** Distinct from the rule above: this is a standing
+  low-friction menu for period days (so she never has to build a plan from scratch under
+  discomfort), but whether it belongs in *this* cycle's notes is something Amir checks with
+  her at the cycle's check-in each time — not a stored preference and not carried forward
+  automatically from a prior cycle. /program-design flags the question for Amir at the STEP 1
+  checkpoint; /program-engage only writes it once confirmed. Logic when confirmed: full sets on
+  cardio/mobility/light hip work (walking, stretching, glute bridges) — light movement eases
+  cramping; primary lifts cut to ~2 sets at a visibly lighter weight/RPE — move the pattern,
+  don't grind; anything with direct heavy ab-bracing or intra-abdominal pressure (weighted
+  rollouts, planks, hollow holds) skipped outright for those days. Restate it in that cycle's
+  actual exercises, not copied verbatim cycle to cycle. *(2026-07-06, confirm-per-cycle
+  2026-07-12)*
 - **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
   the athlete* — get the format, exercise selection and dose right first. Categorizing,
   section names, chips and styling are a mechanical layer applied *after* that, and must

@@ -78,7 +78,11 @@ change before I build?"* before writing exercises.
 6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
    state the data point + reason.
-7. Run STEP 1A (returning) or STEP 1B (new).
+7. **Female athlete — flag, don't assume, the period-week note.** Whether the period-week
+   protocol (COACHING-PRINCIPLES → Process) belongs in this cycle's notes is confirmed with
+   Amir every cycle — never stored, never auto-included. Add it to the questions you batch
+   at the STEP 1 checkpoint below, don't decide it yourself.
+8. Run STEP 1A (returning) or STEP 1B (new).
 
 ---
 
@@ -95,7 +99,15 @@ cycle's log entry).
   adjustment needed" + why. Never ignore the chat.
 - **INJURY / MOVEMENT STATUS** — emerged / persisted / resolved; per item, the exercise-
   level implication. For anything **resolving**, plan a staged return (isometric →
-  eccentric → full ROM → loaded → reactive) across the weeks.
+  eccentric → full ROM → loaded → reactive) across the weeks. **Logs are filled in by
+  humans and go stale.** A pain/cramp/complaint that repeats verbatim across sessions with
+  no other corroboration, or that reads inconsistent with the readiness/adherence trend,
+  may be a carried-forward log artifact rather than a live issue (it has happened — see
+  the coaching log). Don't silently classify it either way and don't let it drive an
+  exercise swap, a regression, or a mandatory note on your own read — ask Amir to confirm
+  current status (batch it into the STEP 1 checkpoint). When something standing IS
+  confirmed resolved this cycle, flag it clearly in your output so /program-engage can
+  close the loop with a one-line acknowledgment instead of letting it silently vanish.
 - **CAPACITY** — increase, hold, or cut volume/intensity? State it.
 - **ROADMAP CHECK** — confirm the locked plan fits, or name the data point forcing a
   deviation + the adjustment.
