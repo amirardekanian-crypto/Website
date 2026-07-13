@@ -162,20 +162,24 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Box Jump",
+                "name": "Single-Leg Box Jump",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
+                  {
+                    "label": "lower box",
+                    "style": "dark"
+                  },
                   {
                     "label": "max intent",
                     "style": "dark"
                   },
                   {
-                    "label": "4 Sets",
+                    "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×3 Reps"
+                    "label": "×3 Each Side"
                   },
                   {
                     "label": "RPE 7"
@@ -186,8 +190,8 @@
                 ],
                 "cues": {
                   "good": [
-                    "Explode off the floor, land soft and quiet on top",
-                    "Hips snap through, the floor pushes away"
+                    "Explode off one leg onto a lower box, land soft",
+                    "That single leg loads then drives, the other stays out of it"
                   ],
                   "bad": [
                     "Don't jump back down — step off"
@@ -316,7 +320,7 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Seated Leg Curl",
+                "name": "Stability Ball Leg Curl",
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
@@ -329,13 +333,13 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 3-0-1-0"
                   },
                   {
-                    "label": "RPE 8"
+                    "label": "RPE 7"
                   },
                   {
                     "label": "Rest 75s"
@@ -343,7 +347,7 @@
                 ],
                 "cues": {
                   "good": [
-                    "Curl the heels to the glutes",
+                    "Curl the ball in toward the glutes with the heels",
                     "Hamstrings shortening under full tension"
                   ],
                   "bad": [
@@ -359,7 +363,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Wood Chop",
+                "name": "Half-Kneeling Cable Wood Chop",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -368,7 +372,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10+10 Reps"
+                    "label": "×10 Each Side"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -382,11 +386,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Drive the cable high-to-low across the body",
-                    "Obliques rotate and brace — the arms just hold on"
+                    "Half-kneeling, drive the cable high-to-low across the body",
+                    "Obliques rotate and brace while the back hip stays pinned down"
                   ],
                   "bad": [
-                    "Don't pull with the arms"
+                    "Don't let the back knee lift or the hips rotate open"
                   ]
                 }
               }
@@ -560,20 +564,16 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Lat Pulldown",
+                "name": "Half-Kneeling Single-Arm Lat Pulldown",
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
-                  {
-                    "label": "neutral grip",
-                    "style": "dark"
-                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Reps"
+                    "label": "×8 Each Side"
                   },
                   {
                     "label": "Tempo 2-1-2-0"
@@ -587,17 +587,17 @@
                 ],
                 "cues": {
                   "good": [
-                    "Pull the bar to the upper chest",
-                    "Lats compressing from the armpit down"
+                    "Half-kneeling, pull the handle down to the ribs",
+                    "One lat compressing hard while the hips stay square"
                   ],
                   "bad": [
-                    "Don't lean back to finish the rep"
+                    "Don't rotate the torso to help pull"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Single-Arm Dumbbell Row",
+                "name": "Half Kneeling Single Arm Cable Row",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -606,7 +606,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10+10 Reps"
+                    "label": "×10 Each Side"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -620,8 +620,8 @@
                 ],
                 "cues": {
                   "good": [
-                    "Pull the bell to the hip",
-                    "One side of the back working at a time"
+                    "Half-kneeling, pull the handle back to the hip",
+                    "One side of the back working while the hips stay locked square"
                   ],
                   "bad": [
                     "Don't rotate the torso open to assist"
@@ -636,12 +636,12 @@
                 "restSec": 60,
                 "items": [
                   {
-                    "name": "Dumbbell Bicep Curl",
+                    "name": "Dumbbell Hammer Curl",
                     "detail": "×12 · RPE 8",
                     "cues": {
                       "good": [
-                        "Curl without the elbows drifting forward",
-                        "Biceps fully lengthen and shorten"
+                        "Curl with a neutral, thumbs-up grip",
+                        "Biceps and forearm both loading together"
                       ],
                       "bad": [
                         "Don't swing the torso"
@@ -649,15 +649,15 @@
                     }
                   },
                   {
-                    "name": "Cable Tricep Pushdown",
+                    "name": "Cable Overhead Tricep Extension",
                     "detail": "×12 · RPE 8",
                     "cues": {
                       "good": [
-                        "Press the rope down and slightly apart",
-                        "Triceps fully lengthening then locking out"
+                        "Reach overhead, then extend the forearm up and forward",
+                        "Triceps stretching deep then locking out overhead"
                       ],
                       "bad": [
-                        "Don't let the elbows drift forward"
+                        "Don't let the elbows flare out wide"
                       ]
                     }
                   }
@@ -671,7 +671,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Hanging Knee Raise",
+                "name": "Reverse Crunch",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -680,7 +680,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-1"
@@ -694,11 +694,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Curl the pelvis up toward the ribs",
-                    "Lower abs doing the lifting"
+                    "Curl the hips up off the floor toward the ribs",
+                    "Lower abs doing the lifting, not the hip flexors"
                   ],
                   "bad": [
-                    "Don't swing the legs up"
+                    "Don't use momentum to swing the legs up"
                   ]
                 }
               }
@@ -793,10 +793,14 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Medicine Ball Rotational Slam",
+                "name": "Medicine Ball Rotational Throw",
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
+                  {
+                    "label": "with step",
+                    "style": "dark"
+                  },
                   {
                     "label": "max intent",
                     "style": "dark"
@@ -817,11 +821,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Whip the ball high-to-low across the body like a smash",
-                    "Ground force up through the hip, arms last"
+                    "Step, load the back hip, then release into the wall like a forehand",
+                    "Hips fire first, the arm releases the ball last"
                   ],
                   "bad": [
-                    "Don't arm it — a soft throw is a wasted rep"
+                    "Don't arm it — the release comes from the hip turn"
                   ]
                 }
               }
@@ -958,7 +962,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "8 Sets",
+                    "label": "10 Sets",
                     "style": "yellow"
                   },
                   {
