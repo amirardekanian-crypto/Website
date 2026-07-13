@@ -197,11 +197,12 @@ move on — /program-assemble lint-checks names against the library.
 **PRESCRIPTION — emit the DOSE as plain fields, not chips.** Chip styling/order/`×`-prefix
 is /program-assemble's job (it renders chips per SCHEMA "Chip parsing"). You just decide the
 numbers + the coaching intent:
-- **Reps: always a single number, never a range.** The app has no rep-range field — write
-  `reps: 10`, not `reps: 8-10`. If the natural design intent is a range (e.g. a hypertrophy
-  8–10 zone), pick one number — by convention the top of the intended range — and commit to
-  it; see COACHING-PRINCIPLES.md → "Progression (coach-driven)". Applies to every reps field:
-  standard lifts, circuit items, unilateral (each-side) counts.
+- **Reps: write it however you naturally think about it — a single number or a range** (e.g.
+  `8-10` for a hypertrophy zone). Don't spend design budget pre-converting to one number —
+  that's mechanical, and /program-assemble does it automatically (top of the range) before it
+  ever reaches the app, which has no rep-range field. See COACHING-PRINCIPLES.md → "Progression
+  (coach-driven)". Applies to every reps field: standard lifts, circuit items, unilateral
+  (each-side) counts.
 - standard grinding lift → sets · reps/duration · tempo · RPE · rest · intent (e.g. `3s eccentric`, or none)
 - ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
 - loaded carry → sets · distance/duration · RPE · rest — **no tempo**
@@ -213,12 +214,16 @@ numbers + the coaching intent:
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
-- `note` (optional, athlete-facing): emit when guidance is **exercise-scoped** — an injury
-  caveat ("shallow, pain-free only"), a starting-weight suggestion from the athlete's own
-  logs, how to load it. Assemble copies it to the exercise's `note` field, rendered as the
-  app's clay "Coach's Note". This is the ONLY athlete-facing place a weight number may
-  appear. Program-wide guidance goes to /program-engage's notes cards instead — see
-  COACHING-PRINCIPLES.md → "Communication & in-app text".
+- `note_flag` (optional, NOT athlete-facing wording): when an exercise carries guidance that
+  belongs on the card itself — an injury caveat, a starting point drawn from the athlete's
+  logs, how to load it — flag it in one short coaching-domain line, e.g. `note_flag: staged
+  knee return, shallow + pain-guided depth` or `note_flag: log shows no confirmed RPE at
+  40 kg, start from the confirmed 35 kg`. That's the whole job here: name the exercise + the
+  reason. **Don't draft the athlete-facing sentence** — /program-engage PART 3 writes the
+  actual "Coach's Note" copy from this flag + the full athlete picture, and /program-assemble
+  places it on the exercise. This is the ONLY athlete-facing place a weight number may ever
+  appear (in engage's copy, never in a chip). Program-wide guidance goes to engage's notes
+  cards instead — see COACHING-PRINCIPLES.md → "Communication & in-app text".
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 
