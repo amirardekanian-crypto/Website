@@ -89,6 +89,10 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
   `×`-prefixed or bare rep chip (`×8–10`, `8-10 Reps`) and collapse any hit to a single number
   (the top of the range) per COACHING-PRINCIPLES.md → "Progression (coach-driven)". The app has
   no rep-range field; this is a hard reject, not a style preference.
+- **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
+  `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
+  and SCHEMA "notes". A body that is one plain-text paragraph is a hard reject: rewrite it
+  before shipping.
 - Report any structural violation and fix before finishing. (Exercise-name normalization is
   the next step — a required pass, not optional.)
 
