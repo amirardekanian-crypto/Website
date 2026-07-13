@@ -112,6 +112,18 @@ cycle's log entry).
 - **ROADMAP CHECK** — confirm the locked plan fits, or name the data point forcing a
   deviation + the adjustment.
 
+**Check the rotation rate before finalizing REPLACE** (see COACHING-PRINCIPLES.md →
+Exercise selection). Roughly tally how many non-primary, non-warm-up exercises from the
+prior cycle would carry over unchanged into this one. North of ~70% is a signal, not a
+detail — it happened for Mehrnaz C2 (83%, caught only on review, not at design time). The
+"keep best-in-class" exception is for rehab/corrective work only; don't stretch it to
+accessories just because their load is progressing well on paper — that kind of progress
+is invisible to the athlete, new movements are what read as forward motion, and she pays
+monthly expecting to feel it. Anything genuinely kept (equipment constraint, a real
+rehab/corrective reason) must still carry a visible dose progression — more sets, more
+rounds, more load, or a harder variant. Never re-ship an identical prescription cycle to
+cycle on a power or conditioning item just because the exercise name stayed the same.
+
 Close with three **LOCKED LISTS** (Step 3 executes exactly), then classify retained items
 (primary / accessory / activation-corrective):
 ```
