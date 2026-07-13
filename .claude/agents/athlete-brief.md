@@ -50,7 +50,7 @@ MCP `execute_sql` tool and the Gmail MCP `search_threads` / `get_thread` tools.
 - **LOADS & RPE** *(returning)* — compact table: primary-lift load progression + RPE trend + **estimated 1RM** per key lift (Epley from the heaviest logged set, adjusted for reps-in-reserve at the logged RPE)
 - **READINESS** *(returning)* — sleep/energy/soreness/stress/overall trend; any decline
 - **RECOVERY & LIFE** — subjective picture (chat/intake): sleep, stress, nutrition, age, weekly life-load; separate training fatigue from life load
-- **INJURY / MOVEMENT** — history (past injuries / surgeries / recurring pain) + each current item with stage (active / resolving / resolved); flag any red flag needing referral
+- **INJURY / MOVEMENT** — history (past injuries / surgeries / recurring pain) + each current item with stage (active / resolving / resolved); flag any red flag needing referral. **Also flag, by exercise name,** anything from session notes/chat reading as a dislike, a mid-session swap, or a pain complaint tied to a SPECIFIC exercise — not just formal injury (e.g. "hated burpees," "swapped out lunges — knee complaint," even informal/minor). This feeds the coaching log's Exercise Ledger at design time; don't drop it for being informal
 - **DATA COVERAGE** — sessions found, gaps imported *(returning)* / OPEN QUESTIONS *(new)*
 
 Privacy: never write athlete chat/health detail to disk — this repo is published via

@@ -141,20 +141,30 @@ console.log('done');
 
 `GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
 
-## Step 5 — Archive the cycle rationale (coach-only, append-only)
+## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the Exercise Ledger
 Persist the **COACHING LOG ENTRY** from /program-design to `.claude/coaching-log/<id>.md` — the
 coach-only record of WHY this cycle looks the way it does (the read, decisions, volume,
 progression levers, e1RM). This file is git-tracked but **unpublished** (inside `.claude/`, so
 GitHub Pages never serves it) and the athlete app never reads it — it is the one place the design
 reasoning is allowed to live. See `.claude/coaching-log/README.md` for the convention + template.
 - **File missing (new athlete):** create it with the README's header
-  (`# Coaching Log — <First Last> (<id>)` + the coach-only note), then add the entry.
+  (`# Coaching Log — <First Last> (<id>)` + the coach-only note), an empty **Exercise Ledger**
+  table (header row only — see README "Exercise Ledger"), then the entry.
 - **File exists (returning):** **append** the new `## Cycle NN — …` section to the end.
   **Never edit, reorder, or delete any existing cycle section** — this archive is append-only, so
   a cycle's original reasoning survives even after the program is later changed. (It grows in
   lockstep with `programHistory` / `currentCycleIndex`.)
 - Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
 - Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
+- **Exercise Ledger — apply design's "Exercise Ledger Updates" deltas.** Unlike the cycle
+  sections, this table (sitting right after the file header, before the first `## Cycle`
+  section) is mutated in place every cycle — it's a current-state index, not a historical
+  narrative, so there's nothing to preserve by appending. Add a row for any exercise seen for
+  the first time; update `Status`/`Last cycle`/`Note` for every exercise design flagged as
+  changed. If the file predates the ledger (an athlete whose log started before this existed),
+  backfill it from this cycle's exercise list only — don't reconstruct earlier cycles from
+  memory, just start the table clean from here. See `.claude/coaching-log/README.md` →
+  "Exercise Ledger" for the exact format and status values.
 
 ## Step 6 — Ship
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm the coaching-log entry was appended.
