@@ -314,7 +314,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dumbbell Lateral Raise",
+                "name": "Bent-Over Dumbbell Rear Delt Raise",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -338,11 +338,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Arms lift in a smooth arc to shoulder height with a slight elbow bend",
-                    "Feel the side delts doing the lifting, not the traps"
+                    "Hinge forward from the hips, arms hang long, sweep them out and back to shoulder height",
+                    "Feel the rear delts and upper back pulling, not the traps shrugging"
                   ],
                   "bad": [
-                    "Shrugging or swinging the weights up"
+                    "Using momentum or swinging the torso to lift the weight"
                   ]
                 }
               }
@@ -354,9 +354,9 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Plank with Shoulder Taps",
+                "name": "Side Plank",
                 "videoUrl": null,
-                "restSec": 60,
+                "restSec": 45,
                 "chips": [
                   {
                     "label": "superset",
@@ -367,7 +367,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Each Side"
+                    "label": "×20s Each Side"
                   },
                   {
                     "label": "RPE 6"
@@ -375,11 +375,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Body stays rigid — the only thing moving is the tapping arm",
-                    "Feel the obliques firing to stop the hips rotating"
+                    "Stack the hips and feet, prop up on the forearm, lift the hips to a straight line",
+                    "Feel the obliques on the bottom side holding the entire body's weight"
                   ],
                   "bad": [
-                    "Hips twisting or shifting toward the raised arm"
+                    "Hips sagging toward the floor or rolling forward out of line"
                   ]
                 }
               }
@@ -687,7 +687,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Lying Leg Curl",
+                "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -711,11 +711,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Hips stay pressed into the pad — only the lower leg moves",
-                    "Feel the hamstrings curling the weight, not the glutes compensating"
+                    "Back flat against the pad, curl the lower legs down and back under the thigh pad",
+                    "Feel the hamstrings doing all the pulling, glutes staying relaxed"
                   ],
                   "bad": [
-                    "Letting the hips rise off the pad to finish the rep"
+                    "Lifting the hips off the seat or using a jerky first pull"
                   ]
                 }
               },
@@ -821,28 +821,31 @@
               },
               {
                 "type": "standard",
-                "name": "Hollow Hold",
+                "name": "Heel Touch",
                 "videoUrl": null,
-                "restSec": 30,
+                "restSec": 45,
                 "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×20s"
+                    "label": "×12 Each Side"
                   },
                   {
-                    "label": "RPE 5"
+                    "label": "Tempo 2-0-2-0"
+                  },
+                  {
+                    "label": "RPE 6"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Lower back pressed flat, arms overhead, legs long",
-                    "Feel the whole anterior core holding the shape"
+                    "Lie on your back, knees bent, feet flat — reach one hand down to tap the same-side heel, alternate sides",
+                    "Feel the obliques crunching to lift the shoulder blades off the floor each reach"
                   ],
                   "bad": [
-                    "The lower back lifting away from the floor — bend the knees to regress"
+                    "Yanking with the neck or letting the lower back arch off the floor"
                   ]
                 }
               }

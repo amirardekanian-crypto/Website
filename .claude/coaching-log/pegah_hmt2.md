@@ -41,6 +41,23 @@ chose one finisher on Day 1 only, protecting session length on Day 3).
 FORK: cycle boundary — Amir chose to start Cycle 3 now (fresh-cycle reset after the gap)
 rather than extend Cycle 2 two weeks.
 
+**Post-ship revision (2026-07-13):** Amir flagged that Stability Ball Rollout / Ab Wheel
+Rollout is a whole movement-family problem for Pegah, not a one-exercise fix — she's twice
+self-reported rollout-pattern anti-extension work as too hard. New standing principle for her:
+**no rollout-pattern core work, ever** (already moot for C3 — the whole Day 2 core finisher
+that held it was cut). He then asked to rotate the four accessory/core pieces that carried
+over unchanged from Cycle 2 (kept in the original design because they only had 1–2 exposures
+since her return) — decided to rotate now anyway, prioritising variety over exposure count:
+- Dumbbell Lateral Raise → **Bent-Over Dumbbell Rear Delt Raise** (not Cable — she already
+  flagged that machine as unworkable; different plane, complements posture)
+- Plank with Shoulder Taps → **Side Plank** (first pick, Cable Pallof Press, was rejected —
+  Amir: she can't do that one either; she also already had it before, so it wasn't fresh
+  anyway. Side Plank is a genuinely new-to-this-program-cycle pick.)
+- Machine Lying Leg Curl → **Machine Seated Leg Curl** (same hamstring pattern/SFR, fresh angle)
+- Hollow Hold → **Heel Touch** (first pick, Farmer's Carry, was rejected — Amir: she'd already
+  had that one before too. Heel Touch is a simple lying oblique reach, genuinely new to her,
+  not in `exercise_library.json` yet — flag for Notion when a video's added.)
+
 **Volume & Dose** (sets/week)
 | Muscle | Programmed | Goal | Verdict |
 |---|---|---|---|
