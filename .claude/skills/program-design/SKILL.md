@@ -75,6 +75,13 @@ change before I build?"* before writing exercises.
    back-fill, no separate seeding step: just design from the info you have (brief, roadmap,
    current program), and the entry written for THIS cycle becomes the baseline the next cycle
    continues. The logic is captured the first time you design their next cycle.
+   Also check the **Exercise Ledger** table at the top of the file, right after the header
+   (if present) — a fast lookup of every exercise this athlete has ever been given and its
+   status (Active / Available / Disliked / Pain-flagged / Banned), so you don't have to
+   reconstruct exposure history by reading every prior cycle's prose. Cross-check it against
+   the brief's exercise-specific signals (athlete-brief flags dislikes/pain tied to a named
+   exercise, not just general injury) before finalizing REPLACE — see COACHING-PRINCIPLES.md
+   → "Exercise selection" and `.claude/coaching-log/README.md` → "Exercise Ledger".
 6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
    state the data point + reason.
@@ -128,8 +135,10 @@ cycle on a power or conditioning item just because the exercise name stayed the 
 just the immediately-prior cycle.** Diffing only against the last cycle can pass something
 that isn't actually new — it happened for Pegah C3: two first-pass rotation picks (Cable
 Pallof Press, Farmer's Carry) had to be rejected because she'd already done both, just not
-in Cycle 2. Scan the coaching log / prior `programHistory` entries further back, not only
-the most recent one, before calling a swap genuinely fresh.
+in Cycle 2. The **Exercise Ledger** (read at STEP 0) is the fast way to check this — any
+exercise already listed `Available`/`Disliked`/`Pain-flagged`/`Banned` has been used
+before, whichever cycle it was. If the ledger predates this athlete (not yet backfilled),
+fall back to scanning prior `programHistory` entries further back than just the last one.
 
 Close with three **LOCKED LISTS** (Step 3 executes exactly), then classify retained items
 (primary / accessory / activation-corrective):
@@ -325,6 +334,13 @@ reasoning ("how we were thinking"); drop the throat-clearing.
 **Decisions** — the LOCKED LISTS verbatim (PROGRESS / REPLACE / ADD, or PRIMARY LIFT
 SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made ("why we
 changed something").
+
+**Exercise Ledger Updates** — deltas only, not the whole table (/program-assemble applies
+these to the persisted ledger): every REPLACE'd-out exercise → `Available` (rotated for
+freshness, safe to reuse later) unless the brief/Amir flagged it as `Disliked`,
+`Pain-flagged`, or `Banned` instead (name the reason in one clause); every PROGRESS/ADD
+exercise → `Active`. If nothing changed status this cycle beyond the normal rotate/keep,
+say so in one line rather than omitting the section.
 
 **Volume & Dose** — table: priority muscle → programmed sets/week → goal range → verdict
 (developing / maintaining / under-dosed / by-design). Frame a time-limited under-dose as

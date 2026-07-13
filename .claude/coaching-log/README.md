@@ -4,7 +4,9 @@ One file per athlete: `.claude/coaching-log/<id>.md` (the coach-side analog of
 `data/<id>.json`). It captures **why** each training cycle looks the way it does — the
 Step 1 read, the locked decisions, and the coach reports (volume, progression levers, e1RM) —
 so months later you can open it and see exactly how you were thinking and why you changed
-something.
+something. It also carries a running **Exercise Ledger** (see below) so a future cycle can
+check in one glance what this athlete has already done, disliked, or been in pain from,
+instead of re-deriving it from raw session data every time.
 
 **Coach-only & private.** It lives inside `.claude/`, so GitHub Pages never publishes it and
 the athlete app never reads it (the app only fetches `data/<id>.json`). It is git-tracked, so
@@ -41,6 +43,35 @@ cycle continues. From then on it's normal read-back + append.
   Capture the standing logic in your own words as you design the cycle. **Never invent a
   rationale** — a fabricated "why" poisons every future cycle that reads it.
 
+## Exercise Ledger (mutable — the one exception to append-only)
+
+Right after the file header, before any `## Cycle` section, every athlete's log carries one
+table tracking every exercise ever programmed for them — so a later design pass can check an
+athlete's whole exposure history with a glance instead of reading every prior cycle's prose:
+
+    | Exercise | Status | Last cycle | Note |
+    |---|---|---|---|
+    | Ab Wheel Rollout | Banned | C2 | Self-reported too hard twice — don't reintroduce without a stated reason |
+    | Cable Pallof Press | Available | C1 | rotated out C1→C2, safe to reuse |
+    | Barbell Back Squat | Active | C3 | primary — doesn't rotate |
+
+**Status values:** `Active` (in the current cycle) · `Available` (rotated out, genuinely
+safe to bring back — this is the default when something rotates out for plain freshness,
+no complaint attached) · `Disliked` (soft signal — avoid unless nothing better fits) ·
+`Pain-flagged` (needs a check-in before reuse, not necessarily permanent) · `Banned` (never
+reintroduce without a new, stated reason — see COACHING-PRINCIPLES.md → "A removed exercise
+stays removed unless re-earned").
+
+**Unlike the cycle sections below, this table IS mutated in place every cycle** — it's a
+current-state index, not a historical narrative, so there's nothing to preserve by
+appending. `/program-design` reads it at STEP 0 and hands `/program-assemble` this cycle's
+deltas (the "Exercise Ledger Updates" component of the COACHING LOG ENTRY); `/program-assemble`
+applies them as part of Step 5, before appending the immutable cycle section below it.
+
+New athletes get an empty ledger (header row only) from cycle 1. An athlete whose log
+predates the ledger gets one backfilled from whatever cycle is being designed now, not
+reconstructed from earlier cycles' prose — same "no back-fill" logic as the cycle sections.
+
 ## File template
 
 When an athlete's log is first created, it starts with this header:
@@ -49,8 +80,8 @@ When an athlete's log is first created, it starts with this header:
     Coach-only design record. Append-only — one section per cycle, newest last.
     Why each cycle looks the way it does. Never published; never read by the athlete app.
 
-Then one section is appended per cycle (the **COACHING LOG ENTRY** emitted by
-`/program-design`):
+Then the Exercise Ledger table (see above), then one section per cycle (the **COACHING LOG
+ENTRY** emitted by `/program-design`):
 
     ## Cycle <NN> — <Cycle Name> · <YYYY-MM-DD> · <NEW|RETURNING>
 
@@ -61,6 +92,9 @@ Then one section is appended per cycle (the **COACHING LOG ENTRY** emitted by
     **Decisions** — the locked lists verbatim (PROGRESS / REPLACE / ADD, or PRIMARY LIFT
     SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made (the
     "why we changed something").
+
+    **Exercise Ledger Updates** — deltas this cycle applies to the ledger table above
+    (rotated-out → Available/Disliked/Pain-flagged/Banned, PROGRESS/ADD → Active).
 
     **Volume & Dose** — priority muscle → programmed sets/week → goal range → verdict.
 
