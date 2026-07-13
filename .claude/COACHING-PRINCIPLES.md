@@ -70,7 +70,14 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Hypertrophy-accumulation blocks: machine/SFR primaries are acceptable even for sport
   athletes** — transfer isn't lost, it's deferred to the later power/translation cycle
   (e.g. Leg Press over Back Squat for a tennis player in a mass block). *(2026-07-12)*
-- **Accessories rotate every cycle** for variety — always to a *safe* alternative. *(2026-06-15)*
+- **Accessories rotate every cycle** for variety — always to a *safe* alternative. **The goal is
+  perceived novelty, not physiological necessity** — the athlete should feel the program changed,
+  even when a new superset/format pairing is the bigger stimulus change that cycle. Don't skip
+  rotation "because the format already changed enough"; that reasoning has to be an explicit,
+  stated exception if used, never a silent default. Exception: an isolation slot with no genuine
+  SFR-equivalent alternative in the library (e.g. Leg Extension for direct knee extension) can
+  stay — say so, don't force a worse substitute just to rotate. *(2026-06-15, clarified 2026-07-13
+  — Pooya C3 shipped with ~half its accessories unrotated by oversight, not by stated exception)*
 - **Rehab/corrective:** keep the best-in-class pieces; rotate the rest for freshness.
   (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
 - **Knee-history clients:** reverse lunge over forward lunge; reintroduce plyometrics

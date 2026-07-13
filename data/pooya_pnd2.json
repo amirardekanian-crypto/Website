@@ -246,7 +246,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Incline Chest Press",
+                "name": "Cable Chest Press",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
@@ -270,17 +270,17 @@
                 ],
                 "cues": {
                   "good": [
-                    "Press the handles up and slightly together, following the machine's path",
-                    "Feel the upper chest lengthen at the bottom, then contract to drive up"
+                    "Press the handles forward in a smooth arc until the arms are extended, chest tall",
+                    "Feel the chest drive the press through the full range, not the shoulders"
                   ],
                   "bad": [
-                    "Letting the shoulders roll forward off the pad at the bottom"
+                    "Letting the shoulders roll forward at the top of the press"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Machine Reverse Fly",
+                "name": "Prone Dumbbell Reverse Fly",
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
@@ -304,17 +304,17 @@
                 ],
                 "cues": {
                   "good": [
-                    "Open the arms wide in a smooth arc and lightly draw the shoulder blades together",
-                    "Feel the rear delts drive the movement, not the upper traps"
+                    "Lying face-down on the incline bench, sweep the arms out wide in an arc to shoulder height",
+                    "Feel the rear delts and mid-back lift the dumbbells, not the arms swinging"
                   ],
                   "bad": [
-                    "Bending the elbows through the rep and turning it into a row"
+                    "Using momentum or bending the elbows to turn it into a row"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Dumbbell Lateral Raise",
+                "name": "Cable Lateral Raise",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
@@ -334,11 +334,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Arms rise to shoulder height, slight forward lean of the torso",
-                    "Feel the middle deltoid lift the weight, not the traps"
+                    "Raise the handle out to the side to shoulder height in a smooth arc",
+                    "Feel the middle deltoid lift the handle the whole way — constant tension throughout"
                   ],
                   "bad": [
-                    "Shrugging the shoulders or swinging the dumbbells"
+                    "Shrugging the shoulder or leaning away from the cable to cheat the weight up"
                   ]
                 }
               }
@@ -375,6 +375,36 @@
                   ],
                   "bad": [
                     "Pulling with the arms or hinging at the hips"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Press",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-2-2-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the handle straight out from the chest and hold — hips and shoulders square to the anchor",
+                    "Feel the obliques resist the cable trying to twist you toward the stack"
+                  ],
+                  "bad": [
+                    "Letting the hips or shoulders rotate toward the cable"
                   ]
                 }
               }
@@ -539,7 +569,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Seated Leg Curl",
+                "name": "Stability Ball Leg Curl",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
@@ -552,7 +582,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×15 Reps"
+                    "label": "×12 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -563,11 +593,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Pad pulls toward the glutes, thighs stay pressed into the seat",
-                    "Feel the hamstrings contract from behind the knee upward"
+                    "Heels dig into the ball and curl it toward the glutes, hips stay lifted",
+                    "Feel the hamstrings do all the pulling while the core holds the hips up"
                   ],
                   "bad": [
-                    "Lifting the hips off the seat to generate momentum"
+                    "Letting the hips sag toward the floor as the ball rolls in"
                   ]
                 }
               },
@@ -638,6 +668,36 @@
                   ],
                   "bad": [
                     "Letting the hips sag or pike as you slide"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Reverse Crunch",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl the hips up off the floor toward the ribcage, knees stay bent throughout",
+                    "Feel the lower abs shorten and lift the pelvis, not the legs swinging"
+                  ],
+                  "bad": [
+                    "Using momentum to swing the legs instead of curling the pelvis"
                   ]
                 }
               }
@@ -800,7 +860,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Standing Cable Chest Fly",
+                "name": "Cable Chest Fly",
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
@@ -824,8 +884,8 @@
                 ],
                 "cues": {
                   "good": [
-                    "Hands meet at chest height with a slight bend in the elbows throughout",
-                    "Feel the pec fibres shorten as the arms come together"
+                    "Hands sweep together in a wide arc at chest height, slight bend in the elbows throughout",
+                    "Feel the chest stretch at the sides and squeeze together at the finish"
                   ],
                   "bad": [
                     "Bending the elbows more as the weight gets heavy"
