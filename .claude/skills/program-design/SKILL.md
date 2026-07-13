@@ -49,6 +49,11 @@ change before I build?"* before writing exercises.
   Amir curates what's learned.
 
 ## STEP 0 — Setup
+0. **Sync first — `git pull --rebase` before reading anything.** COACHING-PRINCIPLES,
+   SCHEMA, and the pipeline skills are edited from Amir's other sessions/machines;
+   designing against a stale working copy silently drops his newest rules (it happened:
+   a cycle shipped with rep ranges + plain-text notes because the rules landed in git
+   mid-design). If the pull fails (conflicts/WIP), say so and continue with a warning.
 1. Read **`.claude/COACHING-PRINCIPLES.md`** (apply throughout).
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
 3. **Detect mode:** `data/<id>.json` exists with prior `session_history` → **RETURNING**;
