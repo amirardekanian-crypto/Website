@@ -124,6 +124,13 @@ rehab/corrective reason) must still carry a visible dose progression — more se
 rounds, more load, or a harder variant. Never re-ship an identical prescription cycle to
 cycle on a power or conditioning item just because the exercise name stayed the same.
 
+**A "fresh" REPLACE pick must be checked against the athlete's whole exposure history, not
+just the immediately-prior cycle.** Diffing only against the last cycle can pass something
+that isn't actually new — it happened for Pegah C3: two first-pass rotation picks (Cable
+Pallof Press, Farmer's Carry) had to be rejected because she'd already done both, just not
+in Cycle 2. Scan the coaching log / prior `programHistory` entries further back, not only
+the most recent one, before calling a swap genuinely fresh.
+
 Close with three **LOCKED LISTS** (Step 3 executes exactly), then classify retained items
 (primary / accessory / activation-corrective):
 ```
