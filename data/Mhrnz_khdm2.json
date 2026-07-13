@@ -1178,39 +1178,44 @@
     "greeting": "For You, Mehrnaz",
     "cards": [
       {
-        "icon": "🎯",
-        "title": "Three Days Is the Whole Assignment",
-        "body": "Last cycle prescribed four days and got about sixty percent — including one stretch of ten days with nothing logged. So we redesigned around reality: three days, nothing wasted, conditioning folded in. That means the maths changed too — three of three is 100 percent, and there is no \"optional\" session anymore. Miss one and you've missed a third of the week. Put the three days in your calendar next to your padel sessions every Saturday, and treat them with the same respect you give a booked court."
+        "icon": "🩸",
+        "title": "Period Week: The Fallback Menu",
+        "body": "<p>For the days your cycle makes lifting heavy the wrong call, the plan is already made — don't negotiate with yourself from scratch.</p><ul><li><strong>Keep in full:</strong> every warm-up (the bike, the row, the prep circuit), plus banded lateral walks, glute bridges and dead bugs — light movement genuinely eases cramping.</li><li><strong>Cut to 2 lighter sets:</strong> squat, deadlift, hip thrust, bench press, push press, lateral lunge, leg curl, pulldown and rows — move the pattern, don't grind it.</li><li><strong>Skip outright:</strong> hanging knee raise, suitcase carry, wood chop and the rotational slam — anything that squeezes your abs hard or loads them under impact.</li></ul><p>The goal that week is protecting the training habit, not chasing a number — pick it back up at full intent next session.</p>"
       },
       {
         "icon": "📈",
-        "title": "The Bar Goes Up on Schedule",
-        "body": "Your squat sat at 20 kg for a month — and your last squat session was RPE 6, which tells me the plateau was the loading, not you. So this cycle the guesswork is gone: every primary lift has a written weekly target (squat +2.5 kg per week, hip thrust +5). When the session says add weight, add it — don't wait to \"feel ready\", because your logs prove you underestimate yourself. If a jump is genuinely above RPE 8, hold once and tell me in the report. That's the only exception."
+        "title": "Reading Your Own RPE, Every Set",
+        "body": "<p>Your squat sat at 20&nbsp;kg for a month, and your last squat session was RPE 6 — three reps left in the tank. That plateau was the loading, not your legs, and the fix isn't a number I hand you. It's you reading the target properly, every set.</p><p><strong>New movement — like this cycle's Push Press:</strong> start conservative on set one and let the RPE target tell you where to go next set.</p><p><strong>Same lift, next week:</strong> hit the prescribed reps at or under the RPE target → add a small jump, enough to feel it. RPE right at the ceiling, or reps missed → hold that weight and repeat before adding more.</p><p><strong>Rough day?</strong> Dropping the weight when a set is grinding harder than the target RPE says it should isn't failure — it's the system working. Chase the RPE number, not a fixed kg jump, and the plateau doesn't come back.</p>"
+      },
+      {
+        "icon": "🎯",
+        "title": "Three Days Is the Whole Assignment",
+        "body": "<p>Last cycle prescribed four days and landed at about sixty percent — including one stretch of ten days with nothing logged. So this cycle was redesigned around reality: <strong>three days, nothing wasted</strong>, conditioning folded straight into Day 3.</p><p>That changes the maths too. Three of three is 100 percent, and there's no \"optional\" session left in the week — miss one and you've missed a third of it.</p><p>Put the three days in your calendar next to your padel sessions, and treat them with the same respect you give a booked court.</p>"
       },
       {
         "icon": "🤔",
         "title": "One Question From Your Logs",
-        "body": "On June 3rd you logged a 30 kg deadlift — then every session after went back to 20 and never returned. Either that was a real lift (in which case you're stronger than this programme assumed and we'll raise the targets), or it was a logging slip. Tell me in your next session report which one it was — one sentence is enough. Your logs are how I coach you between sessions, so this one number actually matters."
+        "body": "<p>On June 3rd you logged a 30&nbsp;kg deadlift — then every session after went back to 20 and never returned.</p><p>Either that was a real lift (in which case you're stronger than this programme assumed, and the targets get raised), or it was a logging slip. <strong>Tell me in your next session report which one it was</strong> — one sentence is enough.</p><p>Your logs are how I coach you between sessions, so this one number actually matters.</p>"
       },
       {
         "icon": "⚡",
         "title": "Fast Is a Skill, Not an Effort",
-        "body": "This cycle adds jumps with fewer reps, continuous bounds, rotational slams, and push presses — and every one of them is graded on speed, not sweat. A slow throw is a wasted rep even if it's heavy; a crisp one at max intent is the whole point. If bar speed dies mid-set on the deadlift, stop the set — that's not quitting, that's power training done correctly. Your body learns whatever you repeat: repeat fast."
+        "body": "<p>This cycle adds jumps with fewer reps, continuous bounds, rotational slams and push presses — and every one of them is graded on <strong>speed, not sweat</strong>.</p><p>A slow throw is a wasted rep even if it's heavy; a crisp one at max intent is the whole point. If bar speed dies mid-set on the deadlift, stop the set — that's not quitting, that's power training done correctly.</p><p>Your body learns whatever you repeat: repeat fast.</p>"
       },
       {
         "icon": "🍽️",
         "title": "The Six-Pack Is Still in the Kitchen",
-        "body": "Nothing about the abs goal changed: a small daily calorie deficit plus around 130 g of protein, every day, is what makes the core work visible. The training side is covered — wood chops, hanging knee raises, carries, and the highest-intent conditioning yet. What I can't program is the plate. If the last cycle's nutrition drifted with the missed sessions, this is the reset: three trained days, seven fed-right days."
+        "body": "<p>Nothing about the abs goal changed: a small daily calorie deficit plus <strong>around 130&nbsp;g of protein, every day</strong>, is what makes the core work visible.</p><p>The training side is covered — wood chops, hanging knee raises, carries, and the highest-intent conditioning yet. What I can't program is the plate.</p><p>If last cycle's nutrition drifted along with the missed sessions, this is the reset: three trained days, seven fed-right days.</p>"
       },
       {
         "icon": "🎾",
         "title": "Space the Heavy Days",
-        "body": "Day 1 and Day 3 are both heavy lower-body days — squat on one, deadlift and hip thrust on the other. One rule for arranging your week: never put them back-to-back. Slot padel or Day 2 between them, and your legs will be fresh enough to actually hit the weekly load targets. If a week goes sideways and only one session fits, do Day 1 — and remember the minimum that still counts: the first power move plus the first primary lift."
+        "body": "<p>Day 1 and Day 3 are both heavy lower-body days — squat on one, deadlift and hip thrust on the other.</p><p><strong>One rule for arranging your week: never put them back-to-back.</strong> Slot padel or Day 2 between them, and your legs will actually be fresh enough to push those RPE targets each session.</p><p>If a week goes sideways and only one session fits, do Day 1 — and remember the minimum that still counts: the first power move plus the first primary lift.</p>"
       },
       {
         "icon": "💥",
         "title": "The Finisher Is Your Third Set",
-        "body": "The old conditioning day didn't survive contact with your calendar — you did it once — so its best weapon moved into Day 3: eight rounds of 20 seconds on, 40 off, at full intent. This is the exact energy demand of a long padel rally: explode, recover fast, explode again. Don't pace the early rounds to survive the late ones. It's eight minutes; empty the tank."
+        "body": "<p>The old conditioning day didn't survive contact with your calendar — you did it once — so its best weapon moved into Day 3: <strong>eight rounds of 20 seconds on, 40 off, at full intent.</strong></p><p>This is the exact energy demand of a long padel rally: explode, recover fast, explode again.</p><p>Don't pace the early rounds to survive the late ones. It's eight minutes; empty the tank.</p>"
       }
     ]
   }
