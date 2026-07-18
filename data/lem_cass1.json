@@ -220,72 +220,39 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Dumbbell Reverse Lunge",
+                "type": "circuit",
+                "name": "Quad-Hamstring Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 90,
-                "chips": [
+                "items": [
                   {
-                    "label": "left leads",
-                    "style": "dark"
+                    "name": "Dumbbell Reverse Lunge",
+                    "detail": "left leads · ×10 Each Leg · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Step back long, drop the back knee straight down",
+                        "Front-leg glute and quad drive you up"
+                      ],
+                      "bad": [
+                        "Leading with the right — the left side sets the ceiling"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×10 Each Leg"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
+                    "name": "Machine Seated Leg Curl",
+                    "detail": "×12 · RPE 8",
+                    "cues": {
+                      "good": [
+                        "Curl the pad through the full range, controlled back",
+                        "Pure hamstring tension bunching behind the knee"
+                      ],
+                      "bad": [
+                        "Throwing the pad down with momentum"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Step back long, drop the back knee straight down",
-                    "Front-leg glute and quad drive you up"
-                  ],
-                  "bad": [
-                    "Leading with the right — the left side sets the ceiling"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Machine Seated Leg Curl",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 8"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Curl the pad through the full range, controlled back",
-                    "Pure hamstring tension bunching behind the knee"
-                  ],
-                  "bad": [
-                    "Throwing the pad down with momentum"
-                  ]
-                }
+                ]
               }
             ]
           },
@@ -659,10 +626,6 @@
                 "chips": [
                   {
                     "label": "left leads",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "superset",
                     "style": "dark"
                   },
                   {
