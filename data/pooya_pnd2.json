@@ -170,73 +170,40 @@
             "icon": "🎯",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Dumbbell Bench Press",
-                "note": "Start with the 20 kg dumbbells you finished Cycle 2 on. At 60-second rests they'll feel heavier than you remember — if the RPE creeps past 8, step down a pair instead of stretching the rest.",
+                "type": "circuit",
+                "name": "Push-Pull Superset",
                 "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "4 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×10 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7-8"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Press the dumbbells up and slightly toward each other at the top",
-                    "Feel the stretch across the chest at the bottom, then squeeze the pecs to drive the bells up"
-                  ],
-                  "bad": [
-                    "Flaring the elbows to 90 degrees — keep them at roughly 45 degrees to the torso"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Chest-Supported Dumbbell Row",
-                "videoUrl": null,
+                "rounds": "×4 Rounds",
                 "restSec": 90,
-                "chips": [
+                "note": "Start the dumbbell bench press with the 20 kg pair you finished Cycle 2 on — if RPE creeps past 8, step down a pair rather than stretching the rest.",
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Dumbbell Bench Press",
+                    "detail": "×10 · RPE 7-8",
+                    "cues": {
+                      "good": [
+                        "Press the dumbbells up and slightly toward each other at the top",
+                        "Feel the stretch across the chest at the bottom, then squeeze the pecs to drive the bells up"
+                      ],
+                      "bad": [
+                        "Flaring the elbows to 90 degrees — keep them at roughly 45 degrees to the torso"
+                      ]
+                    }
                   },
                   {
-                    "label": "4 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7-8"
+                    "name": "Chest-Supported Dumbbell Row",
+                    "detail": "×12 · RPE 7-8",
+                    "cues": {
+                      "good": [
+                        "Elbows drive past the ribcage, dumbbells finish beside the hip",
+                        "Feel the mid-back muscles contract hard at the top"
+                      ],
+                      "bad": [
+                        "Jerking the weight up with momentum or shrugging"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Elbows drive past the ribcage, dumbbells finish beside the hip",
-                    "Feel the mid-back muscles contract hard at the top"
-                  ],
-                  "bad": [
-                    "Jerking the weight up with momentum or shrugging"
-                  ]
-                }
+                ]
               }
             ]
           },
@@ -245,72 +212,39 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Cable Chest Press",
+                "type": "circuit",
+                "name": "Chest-Rear Delt Superset",
                 "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Press the handles forward in a smooth arc until the arms are extended, chest tall",
-                    "Feel the chest drive the press through the full range, not the shoulders"
-                  ],
-                  "bad": [
-                    "Letting the shoulders roll forward at the top of the press"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Prone Dumbbell Reverse Fly",
-                "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Cable Chest Press",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Press the handles forward in a smooth arc until the arms are extended, chest tall",
+                        "Feel the chest drive the press through the full range, not the shoulders"
+                      ],
+                      "bad": [
+                        "Letting the shoulders roll forward at the top of the press"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
+                    "name": "Prone Dumbbell Reverse Fly",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Lying face-down on the incline bench, sweep the arms out wide in an arc to shoulder height",
+                        "Feel the rear delts and mid-back lift the dumbbells, not the arms swinging"
+                      ],
+                      "bad": [
+                        "Using momentum or bending the elbows to turn it into a row"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Lying face-down on the incline bench, sweep the arms out wide in an arc to shoulder height",
-                    "Feel the rear delts and mid-back lift the dumbbells, not the arms swinging"
-                  ],
-                  "bad": [
-                    "Using momentum or bending the elbows to turn it into a row"
-                  ]
-                }
+                ]
               },
               {
                 "type": "standard",
@@ -568,72 +502,39 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Stability Ball Leg Curl",
+                "type": "circuit",
+                "name": "Hamstring-Calf Superset",
                 "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Heels dig into the ball and curl it toward the glutes, hips stay lifted",
-                    "Feel the hamstrings do all the pulling while the core holds the hips up"
-                  ],
-                  "bad": [
-                    "Letting the hips sag toward the floor as the ball rolls in"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Seated Machine Calf Raise",
-                "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Stability Ball Leg Curl",
+                    "detail": "×12 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Heels dig into the ball and curl it toward the glutes, hips stay lifted",
+                        "Feel the hamstrings do all the pulling while the core holds the hips up"
+                      ],
+                      "bad": [
+                        "Letting the hips sag toward the floor as the ball rolls in"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-2-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
+                    "name": "Seated Machine Calf Raise",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Heels drop below the platform, then rise as high as possible",
+                        "Feel the soleus load under the knee as the heel lifts"
+                      ],
+                      "bad": [
+                        "Bouncing at the bottom without pausing"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Heels drop below the platform, then rise as high as possible",
-                    "Feel the soleus load under the knee as the heel lifts"
-                  ],
-                  "bad": [
-                    "Bouncing at the bottom without pausing"
-                  ]
-                }
+                ]
               }
             ]
           },
@@ -859,140 +760,74 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Cable Chest Fly",
+                "type": "circuit",
+                "name": "Chest-Back Superset",
                 "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Hands sweep together in a wide arc at chest height, slight bend in the elbows throughout",
-                    "Feel the chest stretch at the sides and squeeze together at the finish"
-                  ],
-                  "bad": [
-                    "Bending the elbows more as the weight gets heavy"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Single-Arm Cable Row",
-                "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Cable Chest Fly",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Hands sweep together in a wide arc at chest height, slight bend in the elbows throughout",
+                        "Feel the chest stretch at the sides and squeeze together at the finish"
+                      ],
+                      "bad": [
+                        "Bending the elbows more as the weight gets heavy"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Each Arm"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
+                    "name": "Single-Arm Cable Row",
+                    "detail": "×12 Each Arm · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Drive the elbow back past the ribs, hips square to the stack",
+                        "Feel one side of the mid-back contract fully on every rep"
+                      ],
+                      "bad": [
+                        "Rotating the torso to yank the weight back"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Drive the elbow back past the ribs, hips square to the stack",
-                    "Feel one side of the mid-back contract fully on every rep"
-                  ],
-                  "bad": [
-                    "Rotating the torso to yank the weight back"
-                  ]
-                }
+                ]
               },
               {
-                "type": "standard",
-                "name": "Dumbbell Hammer Curl",
+                "type": "circuit",
+                "name": "Arm Superset",
                 "videoUrl": null,
-                "restSec": 30,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-2-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Palms face each other, curl to shoulder height with the elbows pinned",
-                    "Feel the outer bicep and forearm take the load"
-                  ],
-                  "bad": [
-                    "Swinging the elbows forward to lift the weight"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Tricep Pushdown",
-                "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Dumbbell Hammer Curl",
+                    "detail": "×12 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Palms face each other, curl to shoulder height with the elbows pinned",
+                        "Feel the outer bicep and forearm take the load"
+                      ],
+                      "bad": [
+                        "Swinging the elbows forward to lift the weight"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
+                    "name": "Cable Tricep Pushdown",
+                    "detail": "×12 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Press the bar to full lockout with the elbows glued to the sides",
+                        "Feel the back of the arm squeeze hard at the bottom"
+                      ],
+                      "bad": [
+                        "Leaning over the cable and pressing with bodyweight"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Press the bar to full lockout with the elbows glued to the sides",
-                    "Feel the back of the arm squeeze hard at the bottom"
-                  ],
-                  "bad": [
-                    "Leaning over the cable and pressing with bodyweight"
-                  ]
-                }
+                ]
               }
             ]
           },
@@ -1190,72 +1025,39 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Machine Leg Extension",
+                "type": "circuit",
+                "name": "Quad-Hamstring Superset",
                 "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-2-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Shin pad reaches full knee extension at the top",
-                    "Feel the quad — especially just above the kneecap — contract hard"
-                  ],
-                  "bad": [
-                    "Using momentum to swing the weight up"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Machine Lying Leg Curl",
-                "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Machine Leg Extension",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Shin pad reaches full knee extension at the top",
+                        "Feel the quad — especially just above the kneecap — contract hard"
+                      ],
+                      "bad": [
+                        "Using momentum to swing the weight up"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
+                    "name": "Machine Lying Leg Curl",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Heels curl toward the glutes while the hips stay pressed into the pad",
+                        "Feel the hamstrings do the pulling from behind the knee"
+                      ],
+                      "bad": [
+                        "Lifting the hips off the pad to cheat the weight up"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Heels curl toward the glutes while the hips stay pressed into the pad",
-                    "Feel the hamstrings do the pulling from behind the knee"
-                  ],
-                  "bad": [
-                    "Lifting the hips off the pad to cheat the weight up"
-                  ]
-                }
+                ]
               }
             ]
           },
