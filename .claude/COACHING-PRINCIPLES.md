@@ -196,6 +196,19 @@ publish it. No athlete health/chat detail goes here — principles only.
   exactly when you need clean baseline data — run straight sets with independent rest until
   each movement has at least one cycle of logged working weights, then superset from there.
   *(2026-07-05, Bardia C1)*
+- **A superset pair is authored as ONE `type: circuit` entry — never two `"standard"`
+  exercises each carrying a `"superset"` chip.** The chip-based version breaks the entire
+  point of a superset: each `"standard"` exercise gets its own independent rest timer, so the
+  athlete does all of exercise A's sets first (resting between each), then starts exercise B —
+  not alternating with one shared rest — and there's no card grouping to show the two
+  exercises are even paired. Name the circuit descriptively (`"Push-Pull Superset"`, `"Arm
+  Superset"`), never a generic `"Superset A/B"` — the block's name is what communicates the
+  pairing. See SCHEMA.md → `"circuit"` type ("Common mistake") and `/program-assemble`
+  SKILL.md → "Set type from the design category." *(2026-07-18, Pooya C3 — shipped across all
+  4 days with every superset pair built this wrong way; caught only when Amir asked why the
+  pairing wasn't labeled and why the first exercise still had its own rest. Root cause: the
+  design SPEC template and this file's own "Chips & modifiers" section both listed `superset`
+  as a valid chip/intent value — both fixed alongside this entry.)*
 - **Round-format circuits log load by default** — any superset / complex / conditioning
   circuit gets an inline weight field *per exercise* + one RPE *per round* (each exercise
   its own weight; the RPE rates the whole round). Only **warm-up / prep** circuits opt out
@@ -327,13 +340,19 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Chips & modifiers
 - **A modifier (`intent`) chip must be something the athlete actively does or holds in mind
   that set** — a tempo/pause emphasis (`3s eccentric`, `2s top hold`), a sequencing order
-  (`right leg first`), an effort cue (`max intent`), or a structural pairing (`superset`).
-  It is never a restatement of the target muscle or exercise category — if it just re-labels
-  what the exercise already trains, especially when that's already said in the internal cue
-  right next to it, drop it; it's a label, not an instruction. Test before adding one: could
-  the athlete act on this mid-set, or would removing it lose nothing? *(2026-07-05, Bardia
-  C1 — dropped "knee control," "adductor focus," "anti-rotation," "no push-off," "dysplasia
-  stability" as redundant with cues/rationale already stated elsewhere on the card.)*
+  (`right leg first`), or an effort cue (`max intent`). **A superset/complex pairing is never
+  a chip** — it's a structural decision (see "Session structure & time" below): the paired
+  exercises become one `type: circuit` block with a shared name + rest, not a `"superset"`
+  chip on a standalone standard exercise. A modifier chip is also never a restatement of the
+  target muscle or exercise category — if it just re-labels what the exercise already trains,
+  especially when that's already said in the internal cue right next to it, drop it; it's a
+  label, not an instruction. Test before adding one: could the athlete act on this mid-set, or
+  would removing it lose nothing? *(2026-07-05, Bardia C1 — dropped "knee control," "adductor
+  focus," "anti-rotation," "no push-off," "dysplasia stability" as redundant with cues/
+  rationale already stated elsewhere on the card. 2026-07-18, Pooya C3 — this file itself was
+  found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's
+  chip tables and the design SPEC template; all three fixed the same day, see "Session
+  structure & time.")*
 
 ## Naming
 - **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,

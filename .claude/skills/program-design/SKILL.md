@@ -210,7 +210,12 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
 - **Superset** non-competing pairs to fit the time ceiling — **except** an athlete's first
   cycle, or any exercise new to that client: straight sets until each has a cycle of logged
-  working weights (see COACHING-PRINCIPLES.md → "Session structure & time").
+  working weights (see COACHING-PRINCIPLES.md → "Session structure & time"). **A superset is
+  a structural decision, not a per-exercise tag** — spec the whole pair as ONE circuit-role
+  entry (see the STEP 3 template below), never as two accessory-role entries each carrying
+  `intent: superset`. That exact mistake shipped once (Pooya C3, all 4 days): two independent
+  standard exercises with a decorative chip, no visible pairing, and a stray rest after the
+  first lift instead of one shared rest per round.
 - **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
   squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
   /program-assemble** (it owns the keyword→image matching per SCHEMA) — don't do
@@ -246,13 +251,18 @@ numbers + the coaching intent:
 - standard grinding lift → sets · reps/duration · tempo · RPE · rest · intent (e.g. `3s eccentric`, or none)
 - ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
 - loaded carry → sets · distance/duration · RPE · rest — **no tempo**
-- circuit (working) → rounds + rest + per-item reps + one overall RPE — **no per-item tempo**
+- circuit (working) → rounds + rest + per-item reps + one overall RPE — **no per-item tempo**.
+  **This is also how a superset/complex is spec'd — one circuit block, each paired exercise
+  is one `items[]` entry.** Never spec a superset pair as two separate standard-role entries
+  each with its own `rest:` and an `intent: superset` tag — see the "Superset" bullet in STEP 2.
 - **warm-up / prep (simple or circuit)** → dose only (reps/duration); **no RPE, logs nothing**
   (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
-- `intent` is the coaching intention in plain words (`3s eccentric`, `glute focus`, `superset`,
+- `intent` is the coaching intention in plain words (`3s eccentric`, `glute focus`,
   `max intent`, `2s hold`) — assemble renders it as the green modifier chip. Leave blank if none.
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
+  **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
+  decision (see above), not a chip on a standard exercise.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 - `note_flag` (optional, NOT athlete-facing wording): when an exercise carries guidance that
   belongs on the card itself — an injury caveat, a starting point drawn from the athlete's
@@ -303,8 +313,14 @@ avoid: [cue]
 
 SECTION: Accessory
 [Movement] | role: accessory
-sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [none / superset / …]
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [e.g. 3s eccentric / none]
 ext / int / avoid
+
+SECTION: Accessory (superset pair — role: circuit, NOT two accessory entries)
+[Movement A] + [Movement B] | role: circuit (superset) | rounds: X | rest: Xs (shared — once
+per round, after BOTH exercises, not per exercise)
+  [Movement A] — reps: X | RPE: X | ext / int / avoid
+  [Movement B] — reps: X | RPE: X | ext / int / avoid
 
 SECTION: Core
 [Movement or circuit] | dose | ext / int / avoid
