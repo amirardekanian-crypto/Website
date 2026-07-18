@@ -1307,41 +1307,41 @@
                 "restSec": 75,
                 "items": [
                   {
-                    "name": "Kettlebell Swing",
-                    "detail": "×15 · RPE 8",
+                    "name": "Battle Ropes",
+                    "detail": "30s · RPE 7",
                     "cues": {
                       "good": [
-                        "Bell reaches chest height, hips snap forward",
-                        "Feel the glutes and hamstrings drive the bell"
+                        "Whip the ropes in fast alternating waves from a low, athletic stance",
+                        "Feel the shoulders and upper back driving the wave, not just the wrists"
                       ],
                       "bad": [
-                        "Squatting the swing or pulling with the shoulders"
+                        "Standing tall and only flicking the wrists — bend the knees and stay low"
                       ]
                     }
                   },
                   {
-                    "name": "Medicine Ball Slam",
-                    "detail": "×10 · RPE 8-9",
+                    "name": "Renegade Row",
+                    "detail": "×8 Each Arm · RPE 7",
                     "cues": {
                       "good": [
-                        "Ball reaches full overhead, slams into the floor with maximum force",
-                        "Feel the core contract violently as the ball accelerates down"
+                        "Row one dumbbell to the hip while the other hand presses hard into the floor",
+                        "Feel the core locking the hips still as the row happens"
                       ],
                       "bad": [
-                        "Bending only at the waist — use the whole body"
+                        "Letting the hips rotate open toward the rowing arm"
                       ]
                     }
                   },
                   {
-                    "name": "Farmer's Walk",
-                    "detail": "30m · RPE 8",
+                    "name": "Suitcase Carry",
+                    "detail": "30m · RPE 7",
                     "cues": {
                       "good": [
-                        "Tall posture, shoulders packed down, no leaning to either side",
-                        "Feel the grip, core, and upper back working to stabilise the load"
+                        "Carry tall on one side only, ribs stacked directly over the hips",
+                        "Feel the obliques on the loaded side working hard to keep the spine upright"
                       ],
                       "bad": [
-                        "Letting the shoulders round forward or the head drop"
+                        "Leaning away from the weight to compensate — stay vertical for the whole walk"
                       ]
                     }
                   }
