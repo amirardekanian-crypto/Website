@@ -14,6 +14,13 @@
 - Every `days[]` entry must have a **unique numeric** `id` (1, 2, 3…).
 - Every day must contain at least one `block`; every block must contain at least one `exercise`.
 - `type` on every exercise must be exactly one of: `"simple"`, `"standard"`, `"circuit"`.
+- **A superset/complex (2+ exercises done back-to-back sharing one rest) is ALWAYS
+  `type: "circuit"`, with every paired exercise as its own entry in `items[]`.** It is
+  **never** two separate `"standard"` exercises each carrying a `"superset"` chip — that
+  anti-pattern breaks the whole point of a superset (each exercise gets its own independent
+  rest timer instead of alternating into one shared rest) and leaves no visual grouping to
+  show which exercises are paired. It shipped once (see COACHING-PRINCIPLES.md → "Session
+  structure & time," 2026-07-18) — see "Common mistake" under `type: "circuit"` below.
 - Chip `style`, if used, must be exactly `"yellow"` or `"dark"` (or omitted).
 - The `type` field decides what tools an exercise gets — no separate flags needed:
   - `"simple"` → just the row. No rest, no weight, no RPE, no note.
@@ -471,6 +478,33 @@ Every circuit gets, automatically:
 - **Superset / conditioning / complex** → no flags needed: each item gets its own inline weight box + one RPE per round. Syncs to the coach as two lines — `Incline Dumbbell Press 30 · Chest-Supported Dumbbell Row 25` then `RPE: R1 8 · R2 8 · R3 9`.
 - **Warm-up / prep** → `"warmup": true`: logs nothing.
 
+##### Common mistake — a superset is NOT a chip
+
+**Do not** author a superset as two `"standard"` exercises each carrying a `{"label":
+"superset", "style": "dark"}` chip. That looks plausible (it *does* mark them as related)
+but it's wrong: each `"standard"` exercise still gets its **own independent rest timer**, so
+instead of alternating A→B→shared rest, the athlete does all of A's sets (resting between
+each), THEN starts B — the opposite of a superset, and there's no card grouping to show the
+pairing at all. The correct shape is ONE `"circuit"` entry per pair:
+
+```json
+{
+  "type": "circuit",
+  "name": "Push-Pull Superset",
+  "rounds": "×4 Rounds",
+  "restSec": 90,
+  "items": [
+    { "name": "Dumbbell Bench Press", "detail": "×10 · RPE 8", "cues": { "good": ["..."], "bad": ["..."] } },
+    { "name": "Chest-Supported Dumbbell Row", "detail": "×12 · RPE 8", "cues": { "good": ["..."], "bad": ["..."] } }
+  ]
+}
+```
+
+Name the circuit descriptively so the name itself communicates the pairing (`"Push-Pull
+Superset"`, `"Arm Superset"`, `"Delt Superset"` — see `amir_ardekani.json` /
+`Mhrnz_khdm2.json` for live examples) — never a generic `"Superset A/B"`. Note there is no
+per-item `tempo` field; circuit items carry reps + RPE only (`"×N · RPE N"`).
+
 #### `type: "standard"` — Loaded exercise with rest, weight, RPE
 Best for: all loaded exercises (strength, plyos, accessories) — and any single-exercise row that should be logged.
 
@@ -527,7 +561,7 @@ Chips route to the stats grid by their **label pattern** (next section), not the
 |-------|-----------|---------|
 | *(none)* | Grey stat cell / pill | Reps, RPE, tempo — the parsed stats |
 | `"yellow"` | Yellow pill | The set count (`"N Sets"`), one per `standard` exercise |
-| `"dark"` | **Green** modifier pill, anchored by the name | Technique cues only: `"3s eccentric"`, `"1s squeeze"`, `"glute focus"`, `"superset"`, `"max intent"` |
+| `"dark"` | **Green** modifier pill, anchored by the name | Technique cues only: `"3s eccentric"`, `"1s squeeze"`, `"glute focus"`, `"max intent"` — **never** a structural pairing like `"superset"` (that's a `type: "circuit"` decision, not a chip — see "Common mistake" above) |
 
 ### Chip parsing — how every label becomes a stat or a modifier pill
 
@@ -543,11 +577,12 @@ Chips route to the stats grid by their **label pattern** (next section), not the
 | Pure duration / distance | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"5 min"`, `"1:30"` |
 | `"Tempo a-b-c-d"` | TEMPO cell | `"Tempo 3-0-1-0"` |
 | `"RPE N"` | RPE cell | `"RPE 8"` |
-| **Anything else** | **Green modifier pill** (by the name) | `"3s eccentric"`, `"max intent"`, `"superset"` |
+| **Anything else** | **Green modifier pill** (by the name) | `"3s eccentric"`, `"max intent"` |
 
 **Authoring rules — so chips land where you intend:**
 - **Reps → one `×`-prefixed chip:** `"×10 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"`. Embed side/leg/arm info in that *same* chip — never a separate `"Each Side"` chip. (Bare `"4 Each Side"` and bare numbers still route to REPS as a fallback, but `×` is the rule.)
 - **Modifier (green) chips are technique cues ONLY** — `"3s eccentric"`, `"glute focus"`, `"max intent"`, a `"2s hold"` pause-emphasis. **Never put a rep count, dose, or duration in a bare modifier chip**, or it shows as a green pill with an empty REPS cell (the `"4 Each Side"`-as-green-pill bug).
+- **Never put a `"superset"` (or any structural-pairing) chip on a `"standard"` exercise.** A superset is a `type: "circuit"` decision, not a chip — see "Common mistake" above.
 - **One set count per `standard`** — `"N Sets"`, yellow.
 
 ### `simple` exercise chip convention
