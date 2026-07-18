@@ -493,7 +493,6 @@
                 "videoUrl": null,
                 "restSec": 75,
                 "chips": [
-                  { "label": "superset", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×12 Reps" },
                   { "label": "Tempo 2-0-1-0" },
@@ -505,38 +504,29 @@
                 }
               },
               {
-                "type": "standard",
-                "name": "Single-Leg Glute Bridge",
+                "type": "circuit",
+                "name": "Glute-Row Superset",
                 "videoUrl": null,
+                "rounds": "×2 Rounds",
                 "restSec": 60,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×10 Each Side" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Drive through the working heel to level the hips", "The single glute holds you up"],
-                  "bad": ["Don't let the hips tilt or the back arch"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Seated Band Row",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  { "label": "squeeze", "style": "dark" },
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Elbows back, chest proud", "Mid-back squeeze at the end"],
-                  "bad": ["No leaning — tall spine"]
-                }
+                "items": [
+                  {
+                    "name": "Single-Leg Glute Bridge",
+                    "detail": "×10 Each Side · RPE 6",
+                    "cues": {
+                      "good": ["Drive through the working heel to level the hips", "The single glute holds you up"],
+                      "bad": ["Don't let the hips tilt or the back arch"]
+                    }
+                  },
+                  {
+                    "name": "Seated Band Row",
+                    "detail": "×15 · RPE 6",
+                    "cues": {
+                      "good": ["Elbows back, chest proud", "Mid-back squeeze at the end"],
+                      "bad": ["No leaning — tall spine"]
+                    }
+                  }
+                ]
               }
             ]
           },
