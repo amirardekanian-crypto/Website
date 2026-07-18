@@ -81,6 +81,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   same failure mode hit Mehrnaz C2 the same day, at an 83% overlap with Cycle 1, caught on review
   not at design time — two independent hits in one day means this is a recurring gap, not a
   one-off)*
+- **Conditioning-circuit/finisher exercises rotate for real variety too — not just accessories.**
+  Kettlebell Swing, Medicine Ball Slam, and Farmer's Walk had become the default finisher on
+  cycle after cycle, across different athletes — read back to back, every program sounded like
+  it only knew three exercises. Circuit/finisher slots get the same rotation discipline as
+  accessories: genuinely different equipment and movement patterns each time (loaded carries,
+  battle ropes, rowing, sled work, renegade rows, overhead carries — not just a new rep scheme
+  on the same three moves), picked for what the athlete's equipment/goals/injury history
+  actually support. *(2026-07-18, Amir: Pooya's and Pegah's circuits had converged on identical
+  exercises)*
 - **Rehab/corrective:** keep the best-in-class pieces; rotate the rest for freshness.
   (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
 - **The "keep best-in-class" exception above is for rehab/corrective work only.** Don't stretch
