@@ -216,6 +216,13 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   `intent: superset`. That exact mistake shipped once (Pooya C3, all 4 days): two independent
   standard exercises with a decorative chip, no visible pairing, and a stray rest after the
   first lift instead of one shared rest per round.
+- **Never superset a unilateral Primary lift** (Split Squat, Single-Leg Hip Thrust, Single-Leg
+  RDL — any main lift dosed Each Side/Each Leg). It already costs double the per-set time/
+  fatigue of a bilateral Primary, and it's the exact lift the progression sheet tracks e1RM/RPE
+  on cycle-over-cycle — pairing it dilutes that read and rushes the side that most needs full
+  rest. Straight sets, independent rest, same as any other Primary. Unilateral **Accessory**
+  work is unaffected — it can still superset per the rule above (see COACHING-PRINCIPLES.md →
+  "Session structure & time").
 - **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
   squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
   /program-assemble** (it owns the keyword→image matching per SCHEMA) — don't do
