@@ -191,6 +191,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   list with order + holds + icons lives in **SCHEMA.md → "Standard section names"** (single
   source — don't re-enumerate it here). *(2026-06-17)*
 - **Superset non-competing pairs** to save time. *(2026-06-15)*
+- **Never superset a unilateral (two-sided) Primary lift with anything else** (Split Squat,
+  Single-Leg Hip Thrust, Single-Leg RDL, and similar main lifts done Each Side/Each Leg). A
+  unilateral Primary already costs roughly double the per-set time and fatigue of a bilateral
+  one (both sides land inside the same set) — before adding a second exercise. Primaries are
+  also the exact lifts Amir tracks e1RM/RPE progression on cycle-over-cycle, so pairing one
+  dilutes that read and rushes the side that most needs full attention and full rest. Keep
+  every unilateral Primary on independent straight sets, same as a bilateral one. This is
+  scoped to the **Primary** block specifically — a unilateral **Accessory** exercise (e.g.
+  Single-Arm Dumbbell Row, Single-Leg Glute Bridge) can still superset per the normal
+  non-competing-pair rule above; accessories aren't progression-tracked with the same rigor
+  and the time-saving trade-off is the whole point there. *(2026-07-18, lem_cass1 C2 —
+  Single-Leg Dumbbell Hip Thrust had been mistakenly tagged as a superset partner for
+  Front-Foot-Elevated Split Squat, the only such instance across every multi-primary day in
+  this athlete's entire file; tag removed.)*
 - **No supersets in an athlete's first cycle, or on any exercise new to that client** (even in
   a later cycle). Pairing two not-yet-calibrated loads/movements adds logistics friction
   exactly when you need clean baseline data — run straight sets with independent rest until
