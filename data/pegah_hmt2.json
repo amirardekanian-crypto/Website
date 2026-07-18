@@ -397,28 +397,28 @@
                 "restSec": 60,
                 "items": [
                   {
-                    "name": "Kettlebell Swing",
-                    "detail": "×12 · Explosive · RPE 7",
+                    "name": "Rowing",
+                    "detail": "250m · RPE 7",
                     "cues": {
                       "good": [
-                        "A sharp hip snap floats the bell to shoulder height — arms are just ropes",
-                        "Feel the glutes loading on the backswing and firing at the top"
+                        "Drive with the legs first, then swing the hips, then pull the arms in — legs, hips, arms",
+                        "Feel the whole posterior chain finishing the pull, not just the arms"
                       ],
                       "bad": [
-                        "Squatting the movement — the knees must not travel forward"
+                        "Yanking with the arms before the legs finish driving"
                       ]
                     }
                   },
                   {
-                    "name": "Wall Ball",
-                    "detail": "×10 · RPE 7",
+                    "name": "Overhead Carry",
+                    "detail": "30m · RPE 7",
                     "cues": {
                       "good": [
-                        "Squat deep, drive up, and release the ball to the wall target",
-                        "Feel the legs and hips generating the throw — the arms only guide"
+                        "Press the dumbbells fully overhead, biceps by the ears, ribs pulled down",
+                        "Feel the shoulders and core locking the weight directly overhead with every step"
                       ],
                       "bad": [
-                        "Throwing with the arms only — if the legs are not driving, the pattern is wrong"
+                        "Letting the ribs flare and the lower back arch under the overhead load"
                       ]
                     }
                   }

@@ -58,6 +58,15 @@ since her return) — decided to rotate now anyway, prioritising variety over ex
   had that one before too. Heel Touch is a simple lying oblique reach, genuinely new to her,
   not in `exercise_library.json` yet — flag for Notion when a video's added.)
 
+**In-cycle edit (2026-07-18)** — Amir flagged that conditioning-circuit exercise selection had
+gone stale across athletes (Kettlebell Swing / Medicine Ball Slam / Farmer's Walk / Wall Ball on
+repeat, cycle after cycle). Day 1 "Metabolic Finisher" rotated: Kettlebell Swing → Rowing, Wall
+Ball → Overhead Carry — same ×3 rounds, 60s rest, RPE unchanged at 7. Both picks are lower-leg-
+impact-friendly ahead of Day 2's Zone 2 run, and deliberately distinct from Pooya's rotation
+(Battle Ropes / Renegade Row / Suitcase Carry) so the two athletes' finishers no longer overlap.
+Variety fix only — no change to weekly volume or day structure. New standing principle logged in
+COACHING-PRINCIPLES.md → Exercise selection.
+
 **Volume & Dose** (sets/week)
 | Muscle | Programmed | Goal | Verdict |
 |---|---|---|---|
