@@ -174,38 +174,29 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Floor Press",
+                "type": "circuit",
+                "name": "Press-Row Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 75,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Press the dumbbells toward the ceiling", "Feel the chest do the work"],
-                  "bad": ["Don't crash the elbows to the floor — let them rest a beat"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Seated Band Row",
-                "videoUrl": null,
-                "restSec": 75,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Drive the elbows back past your ribs", "Squeeze the mid-back at the end"],
-                  "bad": ["Don't lean back or yank — tall spine, arms do the work"]
-                }
+                "items": [
+                  {
+                    "name": "Floor Press",
+                    "detail": "×10 · RPE 6",
+                    "cues": {
+                      "good": ["Press the dumbbells toward the ceiling", "Feel the chest do the work"],
+                      "bad": ["Don't crash the elbows to the floor — let them rest a beat"]
+                    }
+                  },
+                  {
+                    "name": "Seated Band Row",
+                    "detail": "×12 · RPE 6",
+                    "cues": {
+                      "good": ["Drive the elbows back past your ribs", "Squeeze the mid-back at the end"],
+                      "bad": ["Don't lean back or yank — tall spine, arms do the work"]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -341,38 +332,29 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Standing Dumbbell Overhead Press",
+                "type": "circuit",
+                "name": "Press-Row Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 75,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Press straight up, stack the weights over the shoulders", "Feel the shoulders drive"],
-                  "bad": ["Don't arch backwards to press — squeeze the glutes, ribs down"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Single-Arm Dumbbell Row",
-                "videoUrl": null,
-                "restSec": 75,
-                "chips": [
-                  { "label": "superset", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Each Side" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Brace the free hand on a knee or bench and row the dumbbell to your hip", "Feel the lat and mid-back pull"],
-                  "bad": ["Don't twist the trunk — stay square"]
-                }
+                "items": [
+                  {
+                    "name": "Standing Dumbbell Overhead Press",
+                    "detail": "×10 · RPE 6",
+                    "cues": {
+                      "good": ["Press straight up, stack the weights over the shoulders", "Feel the shoulders drive"],
+                      "bad": ["Don't arch backwards to press — squeeze the glutes, ribs down"]
+                    }
+                  },
+                  {
+                    "name": "Single-Arm Dumbbell Row",
+                    "detail": "×10 Each Side · RPE 6",
+                    "cues": {
+                      "good": ["Brace the free hand on a knee or bench and row the dumbbell to your hip", "Feel the lat and mid-back pull"],
+                      "bad": ["Don't twist the trunk — stay square"]
+                    }
+                  }
+                ]
               }
             ]
           },

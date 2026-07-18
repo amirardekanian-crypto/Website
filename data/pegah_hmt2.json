@@ -319,10 +319,6 @@
                 "restSec": 60,
                 "chips": [
                   {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
@@ -358,10 +354,6 @@
                 "videoUrl": null,
                 "restSec": 45,
                 "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -686,72 +678,39 @@
             "icon": "💪",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Machine Seated Leg Curl",
+                "type": "circuit",
+                "name": "Hamstring-Calf Superset",
                 "videoUrl": null,
+                "rounds": "×3 Rounds",
                 "restSec": 60,
-                "chips": [
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Machine Seated Leg Curl",
+                    "detail": "×12 · RPE 6",
+                    "cues": {
+                      "good": [
+                        "Back flat against the pad, curl the lower legs down and back under the thigh pad",
+                        "Feel the hamstrings doing all the pulling, glutes staying relaxed"
+                      ],
+                      "bad": [
+                        "Lifting the hips off the seat or using a jerky first pull"
+                      ]
+                    }
                   },
                   {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 3-1-1-0"
-                  },
-                  {
-                    "label": "RPE 6"
+                    "name": "Standing Machine Calf Raise",
+                    "detail": "×15 · RPE 7",
+                    "cues": {
+                      "good": [
+                        "Rise all the way onto the balls of the feet, pause, then lower slowly to a full stretch",
+                        "Feel the calves stretch fully at the bottom and squeeze hard at the top"
+                      ],
+                      "bad": [
+                        "Bouncing out of the bottom — the slow lowering is the entire point"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Back flat against the pad, curl the lower legs down and back under the thigh pad",
-                    "Feel the hamstrings doing all the pulling, glutes staying relaxed"
-                  ],
-                  "bad": [
-                    "Lifting the hips off the seat or using a jerky first pull"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Standing Machine Calf Raise",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 3-1-1-1"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Rise all the way onto the balls of the feet, pause, then lower slowly to a full stretch",
-                    "Feel the calves stretch fully at the bottom and squeeze hard at the top"
-                  ],
-                  "bad": [
-                    "Bouncing out of the bottom — the slow lowering is the entire point"
-                  ]
-                }
+                ]
               },
               {
                 "type": "standard",

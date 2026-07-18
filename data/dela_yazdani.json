@@ -540,69 +540,40 @@
                 "videoUrl": "https://www.youtube.com/watch?v=lJoozxC0Rns"
               },
               {
-                "type": "standard",
-                "name": "Cable Tricep Pushdown",
-                "hasRest": true,
-                "chips": [
+                "type": "circuit",
+                "name": "Arm Superset",
+                "videoUrl": null,
+                "rounds": "×3 Rounds",
+                "restSec": 120,
+                "items": [
                   {
-                    "label": "superset",
-                    "style": "dark"
+                    "name": "Cable Tricep Pushdown",
+                    "detail": "×15 · RPE 5",
+                    "cues": {
+                      "good": [
+                        "Keep elbows pinned to your sides like your arms are in a cast",
+                        "Feel the back of your upper arm fully contract at the bottom"
+                      ],
+                      "bad": [
+                        "Elbows drifting forward or using bodyweight to push down"
+                      ]
+                    },
+                    "videoUrl": "https://www.youtube.com/watch?v=LXkCrxn3caQ"
                   },
                   {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 3-0-1-0"
-                  },
-                  {
-                    "label": "RPE 5"
+                    "name": "Dumbbell Bicep Curl",
+                    "detail": "×15 · RPE 5",
+                    "cues": {
+                      "good": [
+                        "Curl the weight up in a smooth arc — upper arms stay still",
+                        "Squeeze the bicep hard at the top before lowering slowly"
+                      ],
+                      "bad": [
+                        "Swinging the body — the movement comes only from the elbow"
+                      ]
+                    }
                   }
-                ],
-                "cues": {
-                  "good": [
-                    "Keep elbows pinned to your sides like your arms are in a cast",
-                    "Feel the back of your upper arm fully contract at the bottom"
-                  ],
-                  "bad": [
-                    "Elbows drifting forward or using bodyweight to push down"
-                  ]
-                },
-                "videoUrl": "https://www.youtube.com/watch?v=LXkCrxn3caQ"
-              },
-              {
-                "type": "standard",
-                "name": "Dumbbell Bicep Curl",
-                "hasRest": true,
-                "chips": [
-                  {
-                    "label": "superset",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 3-0-1-1"
-                  },
-                  {
-                    "label": "RPE 5"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Curl the weight up in a smooth arc — upper arms stay still",
-                    "Squeeze the bicep hard at the top before lowering slowly"
-                  ],
-                  "bad": [
-                    "Swinging the body — the movement comes only from the elbow"
-                  ]
-                }
+                ]
               }
             ]
           }
