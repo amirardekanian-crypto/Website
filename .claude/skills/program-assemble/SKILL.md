@@ -27,6 +27,15 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
+  **A superset/complex is always `"circuit"`** — if the spec pairs two (or more) exercises as
+  a superset, the whole pair becomes ONE circuit block: shared `name` + `rounds` + `restSec`,
+  each paired exercise its own `items[]` entry (`detail: "×N · RPE N"` — no per-item tempo).
+  **Never** render a superset pair as two separate `"standard"` exercises each carrying a
+  `superset` chip — that shipped once (Pooya C3, all 4 days): it broke the shared rest (each
+  exercise got its own independent rest timer instead of alternating) and left no visual
+  grouping showing which exercises were paired. Name the circuit descriptively
+  (`"Push-Pull Superset"`, `"Arm Superset"` — see `amir_ardekani.json` / `Mhrnz_khdm2.json`
+  for precedent), never a generic `"Superset A/B"` — the name itself carries the pairing.
 - **Place engage's exercise Coach's Notes**, matched by exercise name, into that exercise's
   `note` field (any type) — the app renders it as the clay "Coach's Note" (per SCHEMA
   "Exercise coach's note"). The text comes from /program-engage (which wrote it from
@@ -45,7 +54,9 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
   rep-range field, so every chip that reaches it must already be a single number.
 - tempo → `"Tempo 3-0-1-0"`; RPE → `"RPE N"` (grey)
 - `intent` → a green modifier chip `{style:"dark"}` (`3s eccentric`, `glute focus`,
-  `superset`, `max intent`, `2s hold`); ≤4 words, lowercase; **never a rep/dose count here**
+  `max intent`, `2s hold`); ≤4 words, lowercase; **never a rep/dose count here, and never a
+  structural pairing like `superset`** — a superset pair is a `"circuit"` block (see 2a
+  above), not a chip on a `"standard"` exercise
 - Chip order: green modifier(s) → yellow set count → grey stats. Carve-outs: ballistic/carry
   omit tempo; warm-up/prep omit RPE (see 2e).
 - **Working (non-warm-up) circuits:** build each item's `detail` from the spec's per-item
@@ -96,6 +107,12 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
   collapse any hit to a single number (the top of the range) per COACHING-PRINCIPLES.md →
   "Progression (coach-driven)". The app has no rep-range field; this is a hard reject, not a
   style preference.
+- **No superset shipped as a chip.** Grep every `"standard"` exercise's `chips[]` for a label
+  of `"superset"` (or any structural-pairing wording) — if found, that pair was never
+  converted to the required `"circuit"` block per 2a. Hard reject: rebuild it as one circuit
+  entry (shared `name`/`rounds`/`restSec`, both exercises as `items[]`) before shipping — see
+  SCHEMA.md → `"circuit"` type, "Common mistake." (Shipped once, Pooya C3 — this check exists
+  because of it.)
 - **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
   `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
   and SCHEMA "notes". A body that is one plain-text paragraph is a hard reject: rewrite it
