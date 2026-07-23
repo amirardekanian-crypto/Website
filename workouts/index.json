@@ -82,6 +82,13 @@
           "duration": "15 min",
           "equipment": "Bodyweight",
           "file": "workouts/mobility/daily-flow.json"
+        },
+        {
+          "id": "front-rack-rescue",
+          "title": "Front-Rack Rescue",
+          "duration": "15 min",
+          "equipment": "Foam Roller",
+          "file": "workouts/mobility/front-rack-rescue.json"
         }
       ]
     },
