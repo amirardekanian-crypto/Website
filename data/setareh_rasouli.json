@@ -110,10 +110,19 @@
                 "type": "simple",
                 "name": "Stationary Bike",
                 "videoUrl": null,
-                "chips": [{ "label": "5 min" }],
+                "chips": [
+                  {
+                    "label": "5 min"
+                  }
+                ],
                 "cues": {
-                  "good": ["Smooth circles, light gear", "Legs warming, breath easy"],
-                  "bad": ["Don't race it — this is a warm-up"]
+                  "good": [
+                    "Smooth circles, light gear",
+                    "Legs warming, breath easy"
+                  ],
+                  "bad": [
+                    "Don't race it — this is a warm-up"
+                  ]
                 }
               },
               {
@@ -128,24 +137,39 @@
                     "name": "Leg Swings",
                     "detail": "×10 Each Way",
                     "cues": {
-                      "good": ["Swing tall from the hip, hand on support", "Hips loosening through free range"],
-                      "bad": ["Don't force height — momentum stays easy"]
+                      "good": [
+                        "Swing tall from the hip, hand on support",
+                        "Hips loosening through free range"
+                      ],
+                      "bad": [
+                        "Don't force height — momentum stays easy"
+                      ]
                     }
                   },
                   {
                     "name": "Glute Bridge",
                     "detail": "×12",
                     "cues": {
-                      "good": ["Drive hips to the ceiling", "Glutes squeezing, not lower back"],
-                      "bad": ["Don't hyperextend at the top"]
+                      "good": [
+                        "Drive hips to the ceiling",
+                        "Glutes squeezing, not lower back"
+                      ],
+                      "bad": [
+                        "Don't hyperextend at the top"
+                      ]
                     }
                   },
                   {
                     "name": "Banded Lateral Walk",
                     "detail": "×10 Each Side",
                     "cues": {
-                      "good": ["Step wide against the band, stay low", "Outer hips burning"],
-                      "bad": ["Don't let knees collapse inward"]
+                      "good": [
+                        "Step wide against the band, stay low",
+                        "Outer hips burning"
+                      ],
+                      "bad": [
+                        "Don't let knees collapse inward"
+                      ]
                     }
                   }
                 ]
@@ -163,14 +187,28 @@
                 "restSec": 120,
                 "note": "Set the machine's range stop so your knees never bend past 90° — that's the ceiling this cycle. Start week 1 lighter than feels necessary; the first set's RPE tells you where to go.",
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 6" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Push the platform away through mid-foot", "Quads loading evenly, knees tracking over toes"],
-                  "bad": ["Don't chase depth — 90° is the ceiling this cycle"]
+                  "good": [
+                    "Push the platform away through mid-foot",
+                    "Quads loading evenly, knees tracking over toes"
+                  ],
+                  "bad": [
+                    "Don't chase depth — 90° is the ceiling this cycle"
+                  ]
                 }
               },
               {
@@ -180,14 +218,28 @@
                 "restSec": 120,
                 "note": "Start light and treat this as pattern practice — a crisp hinge, no grinding. Next cycle loads this properly; this month earns it.",
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 3-0-1-0" },
-                  { "label": "RPE 6" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Push your hips back to the wall behind you", "Hamstrings stretch-loading as you hinge"],
-                  "bad": ["Don't round the lower back or bend it into a squat"]
+                  "good": [
+                    "Push your hips back to the wall behind you",
+                    "Hamstrings stretch-loading as you hinge"
+                  ],
+                  "bad": [
+                    "Don't round the lower back or bend it into a squat"
+                  ]
                 }
               }
             ]
@@ -203,15 +255,32 @@
                 "restSec": 90,
                 "note": "Machine version on purpose this cycle — quick setup, clean calibration. The barbell arrives next cycle once your working weights exist.",
                 "chips": [
-                  { "label": "1s top squeeze", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "1s top squeeze",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Drive hips straight to the ceiling", "Glutes doing the lift, ribs stacked down"],
-                  "bad": ["Don't hyperextend the lower back at the top"]
+                  "good": [
+                    "Drive hips straight to the ceiling",
+                    "Glutes doing the lift, ribs stacked down"
+                  ],
+                  "bad": [
+                    "Don't hyperextend the lower back at the top"
+                  ]
                 }
               },
               {
@@ -221,14 +290,29 @@
                 "restSec": 90,
                 "note": "Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
                 "chips": [
-                  { "label": "mid-range hold", "style": "dark" },
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×30s" },
-                  { "label": "RPE 6" }
+                  {
+                    "label": "mid-range hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30s"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Press up into the pad and hold dead still", "Quads humming, kneecap pulled up tight"],
-                  "bad": ["Don't grind into pain — mild effort-burn only"]
+                  "good": [
+                    "Press up into the pad and hold dead still",
+                    "Quads humming, kneecap pulled up tight"
+                  ],
+                  "bad": [
+                    "Don't grind into pain — mild effort-burn only"
+                  ]
                 }
               },
               {
@@ -237,14 +321,28 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12 Reps" },
-                  { "label": "Tempo 2-1-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Push the floor away to full tiptoe", "Full calf stretch at the bottom, squeeze at the top"],
-                  "bad": ["Don't bounce out of the bottom"]
+                  "good": [
+                    "Push the floor away to full tiptoe",
+                    "Full calf stretch at the bottom, squeeze at the top"
+                  ],
+                  "bad": [
+                    "Don't bounce out of the bottom"
+                  ]
                 }
               }
             ]
@@ -259,13 +357,25 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Each Side" },
-                  { "label": "RPE 6" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Press the band straight out, dead level", "Obliques holding you perfectly square"],
-                  "bad": ["Don't let hips or shoulders rotate with the press"]
+                  "good": [
+                    "Press the band straight out, dead level",
+                    "Obliques holding you perfectly square"
+                  ],
+                  "bad": [
+                    "Don't let hips or shoulders rotate with the press"
+                  ]
                 }
               }
             ]
@@ -286,10 +396,19 @@
                 "type": "simple",
                 "name": "Rowing",
                 "videoUrl": null,
-                "chips": [{ "label": "4 min" }],
+                "chips": [
+                  {
+                    "label": "4 min"
+                  }
+                ],
                 "cues": {
-                  "good": ["Legs push, arms follow, smooth strokes", "Back and shoulders waking up"],
-                  "bad": ["Shorten the slide — stop before full knee bend"]
+                  "good": [
+                    "Legs push, arms follow, smooth strokes",
+                    "Back and shoulders waking up"
+                  ],
+                  "bad": [
+                    "Shorten the slide — stop before full knee bend"
+                  ]
                 }
               },
               {
@@ -304,24 +423,39 @@
                     "name": "Spiderman Lunge with Reach",
                     "detail": "×5 Each Side",
                     "cues": {
-                      "good": ["Reach tall to the ceiling, follow the hand", "Upper back rotating open"],
-                      "bad": ["Don't let the back knee crash down"]
+                      "good": [
+                        "Reach tall to the ceiling, follow the hand",
+                        "Upper back rotating open"
+                      ],
+                      "bad": [
+                        "Don't let the back knee crash down"
+                      ]
                     }
                   },
                   {
                     "name": "Band Pull-Apart",
                     "detail": "×15",
                     "cues": {
-                      "good": ["Tear the band apart to your chest", "Shoulder blades squeezing together"],
-                      "bad": ["Don't shrug up into your neck"]
+                      "good": [
+                        "Tear the band apart to your chest",
+                        "Shoulder blades squeezing together"
+                      ],
+                      "bad": [
+                        "Don't shrug up into your neck"
+                      ]
                     }
                   },
                   {
                     "name": "Band External Rotation",
                     "detail": "×12 Each Side",
                     "cues": {
-                      "good": ["Rotate the band out, elbow pinned", "Back of the shoulder working"],
-                      "bad": ["Don't let the elbow drift off your side"]
+                      "good": [
+                        "Rotate the band out, elbow pinned",
+                        "Back of the shoulder working"
+                      ],
+                      "bad": [
+                        "Don't let the elbow drift off your side"
+                      ]
                     }
                   }
                 ]
@@ -338,14 +472,28 @@
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Pull the bar to your collarbone", "Lats driving the elbows down"],
-                  "bad": ["Don't lean back and heave the weight"]
+                  "good": [
+                    "Pull the bar to your collarbone",
+                    "Lats driving the elbows down"
+                  ],
+                  "bad": [
+                    "Don't lean back and heave the weight"
+                  ]
                 }
               },
               {
@@ -354,14 +502,28 @@
                 "videoUrl": null,
                 "restSec": 120,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Row the dumbbells to your hips", "Shoulder blades squeezing at the top"],
-                  "bad": ["Don't shrug into your neck"]
+                  "good": [
+                    "Row the dumbbells to your hips",
+                    "Shoulder blades squeezing at the top"
+                  ],
+                  "bad": [
+                    "Don't shrug into your neck"
+                  ]
                 }
               }
             ]
@@ -377,14 +539,58 @@
                 "restSec": 90,
                 "note": "Two sets is the plan, not a typo — your serve already presses overhead every day. This slot stays small on purpose.",
                 "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×10 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 6" }
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Press straight to the ceiling", "Shoulders working, ribs stacked"],
-                  "bad": ["Don't arch the lower back to press"]
+                  "good": [
+                    "Press straight to the ceiling",
+                    "Shoulders working, ribs stacked"
+                  ],
+                  "bad": [
+                    "Don't arch the lower back to press"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Chest Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the handles away in a smooth line",
+                    "Chest doing the push, shoulder blades resting back on the pad"
+                  ],
+                  "bad": [
+                    "Don't shrug the shoulders up as you press"
+                  ]
                 }
               },
               {
@@ -393,14 +599,58 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 6" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
                 ],
                 "cues": {
-                  "good": ["Pull the rope to your eyebrows, elbows high", "Rear delts and mid-back squeezing"],
-                  "bad": ["Don't turn it into a row — elbows stay high"]
+                  "good": [
+                    "Pull the rope to your eyebrows, elbows high",
+                    "Rear delts and mid-back squeezing"
+                  ],
+                  "bad": [
+                    "Don't turn it into a row — elbows stay high"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Lateral Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Raise the dumbbells out to the sides, leading with the elbows",
+                    "Side delts lifting — nothing else helping"
+                  ],
+                  "bad": [
+                    "Don't swing or lean back to get the weight up"
+                  ]
                 }
               },
               {
@@ -409,35 +659,28 @@
                 "videoUrl": null,
                 "restSec": 60,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×15 Reps" },
-                  { "label": "Tempo 2-1-1-0" },
-                  { "label": "RPE 7" }
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
                 ],
                 "cues": {
-                  "good": ["Press through the balls of your feet", "Deep calf (soleus) burning under the knee"],
-                  "bad": ["Don't cut the bottom stretch short"]
-                }
-              }
-            ]
-          },
-          {
-            "title": "Core",
-            "icon": "🧱",
-            "exercises": [
-              {
-                "type": "standard",
-                "name": "Suitcase Carry",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×30m Each Side" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Walk tall, shoulders dead level", "Side abs holding you upright"],
-                  "bad": ["Don't lean away from the weight"]
+                  "good": [
+                    "Press through the balls of your feet",
+                    "Deep calf (soleus) burning under the knee"
+                  ],
+                  "bad": [
+                    "Don't cut the bottom stretch short"
+                  ]
                 }
               }
             ]
@@ -446,171 +689,6 @@
       },
       {
         "id": 3,
-        "focusTag": "Quiet Feet, Iron Trunk",
-        "completionTitle": "Control In The Bank",
-        "completionMessage": "Slow, precise, unglamorous — exactly right. Today's step-downs are the audition for the jumping that comes later in this program.",
-        "blocks": [
-          {
-            "title": "Activation & Prep",
-            "icon": "🔥",
-            "exercises": [
-              {
-                "type": "simple",
-                "name": "Stationary Bike",
-                "videoUrl": null,
-                "chips": [{ "label": "4 min" }],
-                "cues": {
-                  "good": ["Light gear, smooth circles", "Knees warming through easy range"],
-                  "bad": ["Don't load resistance"]
-                }
-              },
-              {
-                "type": "circuit",
-                "name": "Glute & Trunk Primer",
-                "videoUrl": null,
-                "rounds": "×2 Rounds",
-                "restSec": 45,
-                "warmup": true,
-                "items": [
-                  {
-                    "name": "Glute Bridge",
-                    "detail": "×12",
-                    "cues": {
-                      "good": ["Hips to ceiling", "Glutes not lower back"],
-                      "bad": ["Don't hyperextend"]
-                    }
-                  },
-                  {
-                    "name": "Banded Side-Lying Hip Abduction",
-                    "detail": "×10 Each Side",
-                    "cues": {
-                      "good": ["Lift the top leg against the band, heel leading", "Outer hip working"],
-                      "bad": ["Don't roll the hips backward"]
-                    }
-                  },
-                  {
-                    "name": "Bird Dog",
-                    "detail": "×6 Each Side",
-                    "cues": {
-                      "good": ["Reach hand and heel to opposite walls", "Trunk still as a table"],
-                      "bad": ["Don't let the hips tilt"]
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "title": "Accessory",
-            "icon": "💪",
-            "exercises": [
-              {
-                "type": "standard",
-                "name": "Box Step-Up",
-                "videoUrl": null,
-                "restSec": 60,
-                "note": "Start on a 15–20cm box. Height only rises after a green week of morning knee checks — this is landing prep, quality over load.",
-                "chips": [
-                  { "label": "slow lowering", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×8 Each Side" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Drive through the whole foot on the box", "Working-leg glute and quad only"],
-                  "bad": ["Don't push off the bottom foot"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Lateral Step-Down",
-                "videoUrl": null,
-                "restSec": 60,
-                "note": "Use a ~10cm step to start and watch your knee line in a mirror. Any catching at all: stop the set and message me.",
-                "chips": [
-                  { "label": "3s lowering", "style": "dark" },
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×6 Each Side" },
-                  { "label": "RPE 5" }
-                ],
-                "cues": {
-                  "good": ["Reach the free heel slowly toward the floor", "Standing-leg glute controlling the knee line"],
-                  "bad": ["Don't let the knee dive inward"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Machine Leg Extension",
-                "videoUrl": null,
-                "restSec": 90,
-                "note": "Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
-                "chips": [
-                  { "label": "mid-range hold", "style": "dark" },
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×30s" },
-                  { "label": "RPE 6" }
-                ],
-                "cues": {
-                  "good": ["Press up into the pad and hold dead still", "Quads humming, kneecap pulled up tight"],
-                  "bad": ["Don't grind into pain — mild effort-burn only"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Machine Seated Leg Curl",
-                "videoUrl": null,
-                "restSec": 75,
-                "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×12 Reps" },
-                  { "label": "Tempo 2-0-1-0" },
-                  { "label": "RPE 7" }
-                ],
-                "cues": {
-                  "good": ["Curl the pad down and under the seat", "Hamstrings only doing the work"],
-                  "bad": ["Stop a touch shy of full bend if you feel any pinch behind the knee"]
-                }
-              }
-            ]
-          },
-          {
-            "title": "Core",
-            "icon": "🧱",
-            "exercises": [
-              {
-                "type": "standard",
-                "name": "Dead Bug",
-                "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
-                  { "label": "×8 Each Side" }
-                ],
-                "cues": {
-                  "good": ["Reach heel and hand to opposite walls", "Deep abs pinning the low back flat"],
-                  "bad": ["Don't let the low back arch off the floor"]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Side Plank",
-                "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
-                  { "label": "×30s Each Side" }
-                ],
-                "cues": {
-                  "good": ["Push the floor away, one long straight line", "Bottom-side obliques holding"],
-                  "bad": ["Don't let the hips sag"]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 4,
         "focusTag": "Endurance, Re-Earned",
         "completionTitle": "You're A Runner Again",
         "completionMessage": "First rung of the ladder, done — that's a bigger deal than the minutes suggest. Check the knee tomorrow morning; a green check is what unlocks the next rung.",
@@ -623,50 +701,95 @@
                 "type": "simple",
                 "name": "Brisk Walk",
                 "videoUrl": null,
-                "chips": [{ "label": "5 min" }],
+                "chips": [
+                  {
+                    "label": "5 min"
+                  }
+                ],
                 "cues": {
-                  "good": ["Tall posture, quick light steps", "Legs and breath warming"],
-                  "bad": ["Don't start jogging yet"]
+                  "good": [
+                    "Tall posture, quick light steps",
+                    "Legs and breath warming"
+                  ],
+                  "bad": [
+                    "Don't start jogging yet"
+                  ]
                 }
               },
               {
                 "type": "simple",
                 "name": "Leg Swings",
                 "videoUrl": null,
-                "chips": [{ "label": "×10 Each Way" }],
+                "chips": [
+                  {
+                    "label": "×10 Each Way"
+                  }
+                ],
                 "cues": {
-                  "good": ["Swing tall from the hip, hand on support", "Hips loosening"],
-                  "bad": ["Don't force the range"]
+                  "good": [
+                    "Swing tall from the hip, hand on support",
+                    "Hips loosening"
+                  ],
+                  "bad": [
+                    "Don't force the range"
+                  ]
                 }
               },
               {
                 "type": "simple",
                 "name": "Glute Bridge",
                 "videoUrl": null,
-                "chips": [{ "label": "×10" }],
+                "chips": [
+                  {
+                    "label": "×10"
+                  }
+                ],
                 "cues": {
-                  "good": ["Hips to the ceiling", "Glutes switching on"],
-                  "bad": ["Don't arch the low back"]
+                  "good": [
+                    "Hips to the ceiling",
+                    "Glutes switching on"
+                  ],
+                  "bad": [
+                    "Don't arch the low back"
+                  ]
                 }
               },
               {
                 "type": "simple",
                 "name": "Banded Lateral Walk",
                 "videoUrl": null,
-                "chips": [{ "label": "×8 Each Side" }],
+                "chips": [
+                  {
+                    "label": "×8 Each Side"
+                  }
+                ],
                 "cues": {
-                  "good": ["Wide steps against the band", "Outer hips awake"],
-                  "bad": ["Don't stand up tall mid-step"]
+                  "good": [
+                    "Wide steps against the band",
+                    "Outer hips awake"
+                  ],
+                  "bad": [
+                    "Don't stand up tall mid-step"
+                  ]
                 }
               },
               {
                 "type": "simple",
                 "name": "Walking High-Knee March",
                 "videoUrl": null,
-                "chips": [{ "label": "×40m" }],
+                "chips": [
+                  {
+                    "label": "×40m"
+                  }
+                ],
                 "cues": {
-                  "good": ["Tall, knee to hip height, roll through the foot", "Rhythm and posture of running, zero impact"],
-                  "bad": ["Don't skip or bounce — march, not plyo"]
+                  "good": [
+                    "Tall, knee to hip height, roll through the foot",
+                    "Rhythm and posture of running, zero impact"
+                  ],
+                  "bad": [
+                    "Don't skip or bounce — march, not plyo"
+                  ]
                 }
               }
             ]
@@ -687,16 +810,25 @@
                     "name": "Easy Run",
                     "detail": "2 min · RPE 5",
                     "cues": {
-                      "good": ["Short light steps, land under your hips", "Easy rhythm — you could hold a conversation"],
-                      "bad": ["Don't chase pace — this cycle buys the knee back, not fitness"]
+                      "good": [
+                        "Short light steps, land under your hips",
+                        "Easy rhythm — you could hold a conversation"
+                      ],
+                      "bad": [
+                        "Don't chase pace — this cycle buys the knee back, not fitness"
+                      ]
                     }
                   },
                   {
                     "name": "Recovery Walk",
                     "detail": "1.5 min",
                     "cues": {
-                      "good": ["Keep moving, breathe down to easy"],
-                      "bad": ["Don't stop dead"]
+                      "good": [
+                        "Keep moving, breathe down to easy"
+                      ],
+                      "bad": [
+                        "Don't stop dead"
+                      ]
                     }
                   }
                 ]
@@ -705,10 +837,314 @@
                 "type": "simple",
                 "name": "Cool-Down Walk",
                 "videoUrl": null,
-                "chips": [{ "label": "5 min" }],
+                "chips": [
+                  {
+                    "label": "5 min"
+                  }
+                ],
                 "cues": {
-                  "good": ["Easy tall walking", "Breath settling"],
-                  "bad": ["Don't sit down straight after"]
+                  "good": [
+                    "Easy tall walking",
+                    "Breath settling"
+                  ],
+                  "bad": [
+                    "Don't sit down straight after"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Quiet Feet, Iron Trunk",
+        "completionTitle": "Control In The Bank",
+        "completionMessage": "Slow, precise, unglamorous — exactly right. Today's step-downs are the audition for the jumping that comes later in this program.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "4 min"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Light gear, smooth circles",
+                    "Knees warming through easy range"
+                  ],
+                  "bad": [
+                    "Don't load resistance"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Glute & Trunk Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Hips to ceiling",
+                        "Glutes not lower back"
+                      ],
+                      "bad": [
+                        "Don't hyperextend"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Banded Side-Lying Hip Abduction",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": [
+                        "Lift the top leg against the band, heel leading",
+                        "Outer hip working"
+                      ],
+                      "bad": [
+                        "Don't roll the hips backward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Bird Dog",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach hand and heel to opposite walls",
+                        "Trunk still as a table"
+                      ],
+                      "bad": [
+                        "Don't let the hips tilt"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Box Step-Up",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Start on a 15–20cm box. Height only rises after a green week of morning knee checks — this is landing prep, quality over load.",
+                "chips": [
+                  {
+                    "label": "slow lowering",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Each Side"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive through the whole foot on the box",
+                    "Working-leg glute and quad only"
+                  ],
+                  "bad": [
+                    "Don't push off the bottom foot"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Step-Down",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Use a ~10cm step to start and watch your knee line in a mirror. Any catching at all: stop the set and message me.",
+                "chips": [
+                  {
+                    "label": "3s lowering",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6 Each Side"
+                  },
+                  {
+                    "label": "RPE 5"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Reach the free heel slowly toward the floor",
+                    "Standing-leg glute controlling the knee line"
+                  ],
+                  "bad": [
+                    "Don't let the knee dive inward"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
+                "chips": [
+                  {
+                    "label": "mid-range hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30s"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Press up into the pad and hold dead still",
+                    "Quads humming, kneecap pulled up tight"
+                  ],
+                  "bad": [
+                    "Don't grind into pain — mild effort-burn only"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl the pad down and under the seat",
+                    "Hamstrings only doing the work"
+                  ],
+                  "bad": [
+                    "Stop a touch shy of full bend if you feel any pinch behind the knee"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Each Side"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Reach heel and hand to opposite walls",
+                    "Deep abs pinning the low back flat"
+                  ],
+                  "bad": [
+                    "Don't let the low back arch off the floor"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30s Each Side"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor away, one long straight line",
+                    "Bottom-side obliques holding"
+                  ],
+                  "bad": [
+                    "Don't let the hips sag"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30m Each Side"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Walk tall, shoulders dead level",
+                    "Side abs holding you upright"
+                  ],
+                  "bad": [
+                    "Don't lean away from the weight"
+                  ]
                 }
               }
             ]
@@ -731,12 +1167,21 @@
                 "videoUrl": null,
                 "note": "This stays a walk all cycle on purpose — it's recovery volume, and the first thing to drop on a heavy week. Guilt-free either way.",
                 "chips": [
-                  { "label": "30 min" },
-                  { "label": "RPE 4" }
+                  {
+                    "label": "30 min"
+                  },
+                  {
+                    "label": "RPE 4"
+                  }
                 ],
                 "cues": {
-                  "good": ["Purposeful pace, tall posture — first 5 minutes easy build-in", "Steady easy effort, nose-breathable"],
-                  "bad": ["Don't turn it into a workout — recovery volume only"]
+                  "good": [
+                    "Purposeful pace, tall posture — first 5 minutes easy build-in",
+                    "Steady easy effort, nose-breathable"
+                  ],
+                  "bad": [
+                    "Don't turn it into a workout — recovery volume only"
+                  ]
                 }
               }
             ]
@@ -781,7 +1226,7 @@
       {
         "icon": "🗓️",
         "title": "Your Week, Mapped",
-        "body": "<p>The default shape: <strong>Mon</strong> Lower · <strong>Tue</strong> Upper · <strong>Wed</strong> court only · <strong>Thu</strong> Walk-Run · <strong>Fri</strong> Control · <strong>Sat</strong> Easy Walk (optional) · <strong>Sun</strong> fully off.</p><p>Shuffle around your court schedule freely — <strong>two rules never bend:</strong></p><ul><li>Never put Friday's Control day right after the Lower day — the knee needs the honest 24h read between them.</li><li>The Walk-Run stays 48h+ after the Lower day.</li></ul><p>Brutal week? Drop in this order: <strong>Saturday walk first, then the Control day.</strong> Lower, Upper and the Walk-Run are the core — protect those three and the week counts.</p>"
+        "body": "<p>Your days are listed <strong>in the order that works best</strong>: <strong>Day 1</strong> legs · <strong>Day 2</strong> upper body · <strong>Day 3</strong> the walk-run · <strong>Day 4</strong> knee control &amp; trunk · <strong>Day 5</strong> easy walk. Default week: <strong>Mon</strong> Day 1 · <strong>Tue</strong> Day 2 · <strong>Wed</strong> court only · <strong>Thu</strong> Day 3 · <strong>Fri</strong> Day 4 · <strong>Sat</strong> Day 5 (optional) · <strong>Sun</strong> fully off.</p><p>Shuffle freely around your court schedule — <strong>two rules never bend:</strong></p><ul><li>Day 4 never lands the day straight after Day 1 — the knee needs the honest 24-hour read between them.</li><li>Day 3 stays 48h+ after Day 1.</li></ul><p>Wrecked day — bad sleep, brutal court hours? <strong>Drop every effort target by 1</strong>, and if time is short, the first main lift of the day is the minimum that still counts. Brutal week? Drop in this order: <strong>Day 5 first, then Day 4.</strong> Days 1, 2 and 3 are the core — protect those and the week counts.</p>"
       },
       {
         "icon": "🎯",
