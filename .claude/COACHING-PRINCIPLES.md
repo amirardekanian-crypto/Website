@@ -145,6 +145,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19)*
 - **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
   `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
+- **An isometric/hold variant is NAMED as one — never shipped under the library's dynamic
+  name.** When a dynamic library exercise is prescribed as a hold (e.g. leg-extension
+  isometrics for a tendon protocol), the card's name must say so ("Machine Leg Extension
+  Hold") even though that breaks the video join — **videoless beats a video that actively
+  misteaches the execution** (the dynamic clip shows reps; the athlete copies what she
+  watches, not the chip). The Coach's Note opens by stating "one continuous hold, not
+  reps." Longer-term fix: add the dedicated isometric (Wall Sit, Spanish Squat…) to the
+  Notion library with its own video and rotate it in. *(2026-07-24, Setareh C1 — Amir
+  reviewed the app and couldn't find the isometrics at all; they were hiding under the
+  dynamic name.)*
 - **`exercise_library.json` (generated from Notion) is the source of truth for names —
   it is the video join key.** Author each exercise to the library's canonical spelling
   exactly; `/program-assemble` validates and normalizes misses. *(2026-06-15)*

@@ -7,7 +7,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Machine Leg Press | Active | C1 | primary — depth-capped ~90° (knee ruling) |
 | Dumbbell Romanian Deadlift | Active | C1 | primary — patterning dose; C2 loads it |
 | Machine Hip Thrust | Active | C1 | machine deliberately (setup tax); Barbell Hip Thrust planned C2 |
-| Machine Leg Extension (isometric holds) | Active | C1 | THE knee-tendon protocol — 60–90°, 30s→45s, 2×/wk |
+| Machine Leg Extension Hold | Active | C1 | THE knee-tendon isometric — 60–90°, 30s→45s, 2×/wk; renamed from dynamic library name 2026-07-24, ships videoless on purpose |
 | Standing Machine Calf Raise | Active | C1 | run prep |
 | Half-Kneeling Pallof Press | Active | C1 | — |
 | Lat Pulldown | Active | C1 | primary |
@@ -57,3 +57,7 @@ Three changes applied to the shipped C1 file before the athlete's start date (no
 1. **Day order now = best execution order** — Day 3 and Day 4 swapped so the app lists days as they're ideally run (D1 Lower · D2 Upper · D3 Walk-Run · D4 Control · D5 Walk, matching the Mon/Tue/—/Thu/Fri/Sat template). Notes card "Your Week, Mapped" rewritten to speak in app day numbers (Amir: the "Control day" shorthand was unintelligible to the athlete) and now also carries the autoregulation rules explicitly (drop every RPE by 1 on a wrecked day; first main lift = minimum effective dose).
 2. **Added by Amir's direct request:** Machine Chest Press (D2, 2×10 @RPE 6, 90s) — revises design's deliberate chest-zero stance to a starter dose; Dumbbell Lateral Raise (D2, 3×15 @RPE 7, 60s).
 3. **Suitcase Carry moved D2 → D4 core** to keep D2 inside the 60′ cap after the additions (D2 now 7 working exercises ≈ 54′; D4 ≈ 53′, still the low day). Period-week skip-list unaffected (carry still listed).
+
+### Pre-start edit 2 · 2026-07-24 (Amir, before week 1)
+
+Amir reviewed the app and couldn't find the isometrics — proof the authoring failed: the knee-tendon holds were shipped under the library's dynamic name "Machine Leg Extension", so the card (and its video) read as normal reps with the hold intent buried in a chip + note. Renamed on both days to **"Machine Leg Extension Hold"** (no library match → deliberately videoless; the dynamic video would misteach the execution) and each Coach's Note now opens with "This is an isometric — one continuous 30-second HOLD per set, not reps." Follow-up option for C2: add a dedicated isometric (Wall Sit / Spanish Squat) with video to the Notion library and rotate it in.
