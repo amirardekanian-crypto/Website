@@ -232,6 +232,17 @@ Day count + type of each day; one line of rationale per day citing Step 1.
 
 ## STEP 3 — FULL PROGRAM
 
+**ADVERSARIAL VERIFICATION PANEL — MANDATORY after drafting, before showing Amir
+(his standing order, 2026-07-24).** Draft the full spec, then run the panel via the
+Workflow tool per `.claude/COACHING-PRINCIPLES.md` → Process → "Every design pass runs
+a multi-lens panel": three parallel auditors — clinical/injury lens · house-rules
+compliance lint (against COACHING-PRINCIPLES + `exercise_library.json`) · dose/
+time-budget audit (real per-day minutes vs the cap, volume vs targets, week
+schedulability) — then apply every surviving must-fix/should-fix and present the
+corrected spec. On its first run this caught a deep-flexion warm-up leak on a
+knee-history athlete, a 60-min cap breach, and an unwritten run progression. Never
+skip it; never show Amir an unaudited spec.
+
 **CLASSIFICATION:** every exercise gets a role, and the role IS its section block:
 primary (stable, progress via load — use Step 1 selections) → **Primary** block ·
 accessory (rotate between cycles) → **Accessory** block · activation/corrective →

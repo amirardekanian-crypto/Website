@@ -166,6 +166,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   (Mehraneh ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)*
 
 ## Session structure & time
+- **`workouts.days[]` is authored in the best execution order.** The order days appear in
+  the app IS the recommended weekly sequence (e.g. Lower → Upper → Walk-Run → Control →
+  Recovery) — the athlete reads the week top-to-bottom, then the notes tell her she may
+  shuffle around her schedule (within the stated invariants). Never list days in
+  design-convenience order and rely on a notes card to re-map them. *(2026-07-24, Setareh C1
+  — shipped with the run day after the control day; Amir had the order corrected to the
+  ideal week and the days renumbered.)*
 - **Warm-up + preparation is always 10–15 minutes** — never a token 5-min cardio bookend.
   The full prep (cardio raise + mobilisation/activation circuit) should occupy 10 min
   minimum, up to 15. This is programmed time, not filler: it primes the patterns trained
@@ -312,6 +319,12 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Communication & in-app text
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
+- **Notes speak in the athlete's app language — day numbers + on-screen names, never
+  design-side shorthand.** The athlete sees "Day 4 — Quiet Feet, Iron Trunk", not "the
+  Control day"; a notes card that references days by the coach's internal labels
+  (Lower/Upper/Control) is unintelligible to her. Anchor every day reference to **Day N**,
+  optionally + its visible focusTag, and describe it in plain words ("Day 4 — knee control &
+  trunk"). *(2026-07-24, Setareh C1 — Amir couldn't map "Control day" to anything in the app.)*
 - **Exercise-scoped guidance goes ON the exercise — the `note` field.** Anything about one
   specific exercise (an injury caveat like "start slower", a starting-weight suggestion from
   the athlete's past logs, how to load it) is authored as that exercise's `note`, which the
@@ -367,6 +380,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's
   chip tables and the design SPEC template; all three fixed the same day, see "Session
   structure & time.")*
+- **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.** Any
+  sub-6 intent (easy run, recovery walk, low-effort control drill) is authored as **RPE 6**
+  (the scale's floor = easy/conversational), or the RPE chip is omitted entirely on a
+  `simple` item that doesn't need grading. A prescribed RPE the athlete literally cannot
+  select in the logger is a mismatch, not a nuance. *(2026-07-24, Setareh C1 — shipped with
+  RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
+  mismatch and all three were raised to 6.)*
 
 ## Naming
 - **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
@@ -378,6 +398,22 @@ publish it. No athlete health/chat detail goes here — principles only.
   cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
 
 ## Process
+- **Every design pass runs a multi-lens panel — Amir's standing order, not an option.**
+  *(Amir, 2026-07-24, verbatim intent: "it should happen for every single program you want
+  to write for me.")* Two shapes, both via the Workflow tool:
+  **(1) Roadmaps** (/program-roadmap): 3+ independent specialist proposals from genuinely
+  different lenses (e.g. sport-transfer periodization · durability/return-to-play ·
+  recovery-constrained pragmatist — pick lenses that fit the athlete), then a head-coach
+  judge scores them against the brief + this file and issues synthesis directives; Claude
+  synthesizes the final roadmap from the winner + best grafts.
+  **(2) Cycle designs** (/program-design): Claude drafts the spec with full conversation
+  context (STEP 1 checkpoint with Amir still happens first), then an adversarial
+  verification panel audits the draft in parallel — clinical/injury lens · house-rules
+  compliance lint (against this file + the exercise library) · dose/time-budget audit —
+  and every surviving must-fix/should-fix is applied before the spec is shown to Amir.
+  This caught real issues on its first run (Setareh C1: a deep-flexion warm-up leak on a
+  locking-history knee, a 60-min cap breach, an unwritten run ladder) — the panel is the
+  quality gate, not ceremony. *(2026-07-24)*
 - **Reassessment is scheduled, not only reactive.** You adjust day-to-day on what you observe
   (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
   trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
