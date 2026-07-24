@@ -285,10 +285,10 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Leg Extension",
+                "name": "Machine Leg Extension Hold",
                 "videoUrl": null,
                 "restSec": 90,
-                "note": "Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
+                "note": "This is an isometric — one continuous 30-second HOLD per set, not reps. Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
                 "chips": [
                   {
                     "label": "mid-range hold",
@@ -1006,10 +1006,10 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Leg Extension",
+                "name": "Machine Leg Extension Hold",
                 "videoUrl": null,
                 "restSec": 90,
-                "note": "Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
+                "note": "This is an isometric — one continuous 30-second HOLD per set, not reps. Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
                 "chips": [
                   {
                     "label": "mid-range hold",
