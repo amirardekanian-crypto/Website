@@ -22,6 +22,8 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Dead Bug | Active | C1 | — |
 | Side Plank | Active | C1 | — |
 | Walk-Run Intervals | Active | C1 | 4-week ladder, check-in-gated, "ladder IS the run budget" |
+| Machine Chest Press | Active | C1 | added pre-start by Amir (2026-07-24); starter 2-set dose — C1 chest-zero stance revised |
+| Dumbbell Lateral Raise | Active | C1 | added pre-start by Amir (2026-07-24) |
 
 ## Cycle 01 — Groundwork · 2026-07-24 · NEW
 
@@ -47,3 +49,11 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 **Progression levers** — Leg Press: load, +5% when all reps clean ≤RPE7 two sessions running; W4 hold. DB RDL: +2.5kg/hand on quality ≤RPE6. Machine Hip Thrust: +5–10% at ≤RPE7. Pulldown/Row: +2.5–5% at ≤RPE7. Leg Ext iso: duration 30→45s first, RPE 6→7 from wk3, load only after 4×45s@≤7 + passing checklist. Run ladder (wk1 12 run-min · wk2 15 · wk3 18 · wk4 18 continuity-up) + step heights: progress only via weekly check-in off the quiet-knee checklist. W4 = consolidation — hold wk3 loads; Force Foundry starts only off a passing checklist.
 
 **e1RM** — none yet; first e1RMs land from this cycle's heaviest logged sets at C1 review.
+
+### Pre-start edit · 2026-07-24 (Amir, before week 1)
+
+Three changes applied to the shipped C1 file before the athlete's start date (no logged data existed, so day renumbering was safe):
+
+1. **Day order now = best execution order** — Day 3 and Day 4 swapped so the app lists days as they're ideally run (D1 Lower · D2 Upper · D3 Walk-Run · D4 Control · D5 Walk, matching the Mon/Tue/—/Thu/Fri/Sat template). Notes card "Your Week, Mapped" rewritten to speak in app day numbers (Amir: the "Control day" shorthand was unintelligible to the athlete) and now also carries the autoregulation rules explicitly (drop every RPE by 1 on a wrecked day; first main lift = minimum effective dose).
+2. **Added by Amir's direct request:** Machine Chest Press (D2, 2×10 @RPE 6, 90s) — revises design's deliberate chest-zero stance to a starter dose; Dumbbell Lateral Raise (D2, 3×15 @RPE 7, 60s).
+3. **Suitcase Carry moved D2 → D4 core** to keep D2 inside the 60′ cap after the additions (D2 now 7 working exercises ≈ 54′; D4 ≈ 53′, still the low day). Period-week skip-list unaffected (carry still listed).
