@@ -576,6 +576,7 @@ Chips route to the stats grid by their **label pattern** (next section), not the
 | Bare number or range | REPS cell | `"8"`, `"10-12"` |
 | Pure duration / distance | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"5 min"`, `"1:30"` |
 | `"Tempo a-b-c-d"` | TEMPO cell | `"Tempo 3-0-1-0"` |
+| `"Tempo Iso"` | TEMPO cell (any `Tempo <text>` routes there) | hold/isometric exercises — **rule:** every hold (iso machine holds, planks, wall sits) carries `"Tempo Iso"` instead of a numeric tempo |
 | `"RPE N"` | RPE cell | `"RPE 8"` |
 | **Anything else** | **Green modifier pill** (by the name) | `"3s eccentric"`, `"max intent"` |
 
