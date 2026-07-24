@@ -302,6 +302,9 @@
                     "label": "×30s"
                   },
                   {
+                    "label": "Tempo Iso"
+                  },
+                  {
                     "label": "RPE 6"
                   }
                 ],
@@ -1023,6 +1026,9 @@
                     "label": "×30s"
                   },
                   {
+                    "label": "Tempo Iso"
+                  },
+                  {
                     "label": "RPE 6"
                   }
                 ],
@@ -1108,6 +1114,9 @@
                   },
                   {
                     "label": "×30s Each Side"
+                  },
+                  {
+                    "label": "Tempo Iso"
                   }
                 ],
                 "cues": {

@@ -65,3 +65,7 @@ Amir reviewed the app and couldn't find the isometrics — proof the authoring f
 ### Pre-start edit 3 · 2026-07-24 (Amir, before week 1)
 
 Amir reverted pre-start edit 2: the "Machine Leg Extension Hold" rename goes back to the canonical **"Machine Leg Extension"** — his ruling is that the setup video is worth keeping, and the isometric execution is carried by the `×30s` duration chip, the `mid-range hold` modifier, and the Coach's Note (unchanged from original). Ruling generalized in COACHING-PRINCIPLES → Exercise naming.
+
+### Pre-start edit 4 · 2026-07-24 (Amir, before week 1)
+
+New standing rule from Amir, verbatim: "if it's a hold exercise, in the Tempo write Iso." Applied `Tempo Iso` chips to all three hold prescriptions (Machine Leg Extension holds on Days 1 + 4, Side Plank on Day 4) — the TEMPO cell now reads **Iso**. Rule codified in COACHING-PRINCIPLES → Chips & modifiers and SCHEMA → Chip parsing.

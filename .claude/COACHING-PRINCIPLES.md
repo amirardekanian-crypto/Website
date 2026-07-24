@@ -149,8 +149,9 @@ publish it. No athlete health/chat detail goes here — principles only.
   the video stays; the chip + Coach's Note carry the hold.** Amir's ruling (2026-07-24,
   Setareh C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
   it — the machine-setup video is still worth having, and the execution change is
-  communicated by the duration chip (`×30s`), the `mid-range hold` modifier chip, and a
-  Coach's Note that states it's one continuous hold, not reps. When telling Amir about a
+  communicated by the duration chip (`×30s`), the **`Tempo Iso` chip** (see "Chips &
+  modifiers" — Amir's rule), the `mid-range hold` modifier chip, and a Coach's Note
+  that states it's one continuous hold, not reps. When telling Amir about a
   program, point at where the isometric lives (exercise + day) rather than assuming the
   card reads as one. Longer-term option stands: add a dedicated isometric (Wall Sit,
   Spanish Squat…) with its own video to the Notion library and rotate it in.
@@ -389,6 +390,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's
   chip tables and the design SPEC template; all three fixed the same day, see "Session
   structure & time.")*
+- **Hold exercises write `Iso` in the Tempo — Amir's rule, verbatim (2026-07-24): "if
+  it's a hold exercise, in the Tempo write Iso."** Every isometric/hold prescription
+  (iso holds on a machine, planks, wall sits…) carries a `"Tempo Iso"` chip in place of
+  a numeric tempo, so the card's TEMPO cell reads **Iso** and the athlete knows it's one
+  continuous hold, not reps. The parser routes any `Tempo <text>` label to the TEMPO
+  cell (`program.html` chip parsing), so this renders correctly today. Pairs with the
+  canonical-name ruling in "Exercise naming" — name stays library-canonical, the Tempo
+  cell + note carry the execution. *(2026-07-24, Setareh C1 — applied to the leg-extension holds
+  and Side Plank.)*
 - **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.** Any
   sub-6 intent (easy run, recovery walk, low-effort control drill) is authored as **RPE 6**
   (the scale's floor = easy/conversational), or the RPE chip is omitted entirely on a
