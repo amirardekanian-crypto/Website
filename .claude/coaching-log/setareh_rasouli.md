@@ -7,7 +7,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Machine Leg Press | Active | C1 | primary — depth-capped ~90° (knee ruling) |
 | Dumbbell Romanian Deadlift | Active | C1 | primary — patterning dose; C2 loads it |
 | Machine Hip Thrust | Active | C1 | machine deliberately (setup tax); Barbell Hip Thrust planned C2 |
-| Machine Leg Extension Hold | Active | C1 | THE knee-tendon isometric — 60–90°, 30s→45s, 2×/wk; renamed from dynamic library name 2026-07-24, ships videoless on purpose |
+| Machine Leg Extension (isometric holds) | Active | C1 | THE knee-tendon isometric — 60–90°, 30s→45s, 2×/wk; ships under the canonical library name per Amir's ruling (video stays; chip + note carry the hold) |
 | Standing Machine Calf Raise | Active | C1 | run prep |
 | Half-Kneeling Pallof Press | Active | C1 | — |
 | Lat Pulldown | Active | C1 | primary |
@@ -61,3 +61,7 @@ Three changes applied to the shipped C1 file before the athlete's start date (no
 ### Pre-start edit 2 · 2026-07-24 (Amir, before week 1)
 
 Amir reviewed the app and couldn't find the isometrics — proof the authoring failed: the knee-tendon holds were shipped under the library's dynamic name "Machine Leg Extension", so the card (and its video) read as normal reps with the hold intent buried in a chip + note. Renamed on both days to **"Machine Leg Extension Hold"** (no library match → deliberately videoless; the dynamic video would misteach the execution) and each Coach's Note now opens with "This is an isometric — one continuous 30-second HOLD per set, not reps." Follow-up option for C2: add a dedicated isometric (Wall Sit / Spanish Squat) with video to the Notion library and rotate it in.
+
+### Pre-start edit 3 · 2026-07-24 (Amir, before week 1)
+
+Amir reverted pre-start edit 2: the "Machine Leg Extension Hold" rename goes back to the canonical **"Machine Leg Extension"** — his ruling is that the setup video is worth keeping, and the isometric execution is carried by the `×30s` duration chip, the `mid-range hold` modifier, and the Coach's Note (unchanged from original). Ruling generalized in COACHING-PRINCIPLES → Exercise naming.
