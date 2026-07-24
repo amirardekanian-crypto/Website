@@ -17,6 +17,12 @@ never drift from the plan.
 - **PROGRAM_START_DATE** (`YYYY-MM-DD`). If unknown, ask once.
 
 ## Rules
+- **Multi-lens panel is MANDATORY (Amir's standing order, 2026-07-24).** Read
+  `.claude/COACHING-PRINCIPLES.md` → Process → "Every design pass runs a multi-lens
+  panel" and run that shape via the Workflow tool: 3+ independent specialist proposals
+  (lenses picked to fit the athlete) → a head-coach judge scoring against the brief +
+  principles → Claude synthesizes the final roadmap from the winner + best grafts.
+  Never skip it to save time; Amir asked for it on every program.
 - Each cycle **4–6 weeks**. Cycle 1's length must match the first program
   /program-design will build.
 - **Cycle count is dictated by the goal and the science** — not a fixed number. A

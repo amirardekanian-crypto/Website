@@ -590,7 +590,7 @@ Chips route to the stats grid by their **label pattern** (next section), not the
 A `simple` exercise (warm-up / activation / cool-down) takes a **dose chip**, parsed into the stats just like a `standard` one:
 
 1. **Reps / duration** *(required)* — a `×`-prefixed count (`"×6 Each Side"`, `"×8"`) or a bare duration/distance (`"5 min"`, `"30s"`) → REPS cell.
-2. **RPE** *(optional — omit for warm-up / prep)* — `"RPE 4"` → RPE cell. **Warm-up and prep items carry NO RPE chip** (an RPE on a warm-up is noise; the pre-session readiness check covers feel). Add an RPE chip only on a genuinely effort-graded `simple` — a cool-down jog or a conditioning finisher.
+2. **RPE** *(optional — omit for warm-up / prep)* — `"RPE 6"` → RPE cell. **Warm-up and prep items carry NO RPE chip** (an RPE on a warm-up is noise; the pre-session readiness check covers feel). Add an RPE chip only on a genuinely effort-graded `simple` — a cool-down jog or a conditioning finisher. **The app's RPE selector runs 6–10 — never author an RPE chip below 6 on any exercise type**; RPE 6 is the scale's floor and means easy/conversational (see COACHING-PRINCIPLES → "Chips & modifiers").
 
 No sets, tempo, or rest chip. Don't add a separate chip for the rep count (it *is* the reps chip above), and only add a modifier chip if there's a genuine technique cue — it renders green.
 
@@ -602,7 +602,7 @@ No sets, tempo, or rest chip. Don't add a separate chip for the rep count (it *i
   "chips": [{ "label": "5 min" }] }
 
 { "type": "simple", "name": "Cool-Down Jog",
-  "chips": [{ "label": "5 min" }, { "label": "RPE 4" }] }
+  "chips": [{ "label": "5 min" }, { "label": "RPE 6" }] }
 ```
 
 ### Coaching Cues

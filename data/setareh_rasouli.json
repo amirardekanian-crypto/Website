@@ -808,7 +808,7 @@
                 "items": [
                   {
                     "name": "Easy Run",
-                    "detail": "2 min · RPE 5",
+                    "detail": "2 min · RPE 6",
                     "cues": {
                       "good": [
                         "Short light steps, land under your hips",
@@ -991,7 +991,7 @@
                     "label": "×6 Each Side"
                   },
                   {
-                    "label": "RPE 5"
+                    "label": "RPE 6"
                   }
                 ],
                 "cues": {
@@ -1171,7 +1171,7 @@
                     "label": "30 min"
                   },
                   {
-                    "label": "RPE 4"
+                    "label": "RPE 6"
                   }
                 ],
                 "cues": {
