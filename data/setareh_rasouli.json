@@ -285,10 +285,10 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Leg Extension Hold",
+                "name": "Machine Leg Extension",
                 "videoUrl": null,
                 "restSec": 90,
-                "note": "This is an isometric — one continuous 30-second HOLD per set, not reps. Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
+                "note": "Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
                 "chips": [
                   {
                     "label": "mid-range hold",
@@ -300,6 +300,9 @@
                   },
                   {
                     "label": "×30s"
+                  },
+                  {
+                    "label": "Tempo Iso"
                   },
                   {
                     "label": "RPE 6"
@@ -1006,10 +1009,10 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Leg Extension Hold",
+                "name": "Machine Leg Extension",
                 "videoUrl": null,
                 "restSec": 90,
-                "note": "This is an isometric — one continuous 30-second HOLD per set, not reps. Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
+                "note": "Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
                 "chips": [
                   {
                     "label": "mid-range hold",
@@ -1021,6 +1024,9 @@
                   },
                   {
                     "label": "×30s"
+                  },
+                  {
+                    "label": "Tempo Iso"
                   },
                   {
                     "label": "RPE 6"
@@ -1108,6 +1114,9 @@
                   },
                   {
                     "label": "×30s Each Side"
+                  },
+                  {
+                    "label": "Tempo Iso"
                   }
                 ],
                 "cues": {
