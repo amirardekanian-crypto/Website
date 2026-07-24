@@ -1,0 +1,793 @@
+{
+  "athlete": {
+    "id": "setareh_rasouli",
+    "key": "6df965c1d52c47b491f68d88e87a3a42",
+    "firstName": "Setareh",
+    "lastName": "Rasouli"
+  },
+  "sport": {
+    "badge": "🎾 Tennis Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Groundwork",
+      "tagline": "Quiet knee, honest base.",
+      "weeks": "Weeks 1–4",
+      "startDate": "2026-07-28",
+      "endDate": "2026-08-24",
+      "focuses": [
+        "Rebuild knee-tendon capacity with isometric-led, carefully-gated loading.",
+        "Calibrate honest working weights on every lift and return to running on a 4-week ladder."
+      ],
+      "message": {
+        "paragraphs": [
+          "Groundwork is the cycle that buys everything after it. You're on court every day — the court already trains your speed and reactions; what it can't give you is a bulletproof knee and a strength base with real numbers on it. That's this month: tendon work that rebuilds the knee's capacity, honest baselines on every lift, and your first structured steps back to running.",
+          "The mental focus is patience at effort 6–7. Nothing this month is meant to feel heroic — it's meant to be repeatable, precise, and pass the morning knee check four weeks straight.",
+          "By August 24: working weights on the board, eighteen minutes of near-continuous running on a quiet knee, and a body ready for what comes next — where it gets heavy."
+        ],
+        "outcomes": [
+          "Working weights calibrated on all five lifts",
+          "18 min of near-continuous running, knee quiet",
+          "Four straight weeks of passing morning knee checks",
+          "Iso holds built from 30s to 45s at real effort",
+          "The 5-touch week locked in around daily court time"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Force Foundry",
+      "tagline": "Heavy, slow, deliberate.",
+      "weeks": "Weeks 5–10",
+      "startDate": "2026-08-25",
+      "endDate": "2026-10-05",
+      "focuses": [
+        "Heavy-slow-resistance lower-body strength — tendon remodeling and maximal-force foundation in one stimulus.",
+        "Walk-run becomes continuous easy running; deload closes the cycle."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Groundwork hands over your baselines — Force Foundry spends them.",
+          "Six weeks where the polite introductions end and the bar gets to know you. The same knee work that protected you this month becomes the engine of the whole program.",
+          "Every honest rep you log now decides exactly where the loading starts.",
+          "Heavy, slow, deliberate — earn the quiet knee, then we forge."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Hold Fast",
+      "tagline": "Absorb, don't add.",
+      "weeks": "Weeks 11–14",
+      "startDate": "2026-10-06",
+      "endDate": "2026-11-02",
+      "focuses": [
+        "Deliberate consolidation — strength held at maintenance while court and run fatigue is paid down.",
+        "First plyometric exposure as pure absorption: stick landings, step-downs, low pogos."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "High Steel",
+      "tagline": "Heavier, not longer.",
+      "weeks": "Weeks 15–19",
+      "startDate": "2026-11-03",
+      "endDate": "2026-12-07",
+      "focuses": [
+        "Intensification on the primary lifts — fewer, heavier sets with full rest.",
+        "First jump production: single-response hops and snap-downs; strides return to the runs."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Spring Steel",
+      "tagline": "Reactive, elastic, court-fast.",
+      "weeks": "Weeks 20–24",
+      "startDate": "2026-12-08",
+      "endDate": "2027-01-11",
+      "focuses": [
+        "Elastic conversion — repeated hops to bounds, lateral bounds last and fully gated.",
+        "Installs the permanent weekly template: the sustainable season standard."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Groundwork",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "The Quiet Knee Project",
+        "completionTitle": "Base Layer Poured",
+        "completionMessage": "The week's biggest lift, banked — quads, hinge and glutes each calibrated one notch sharper. Eat properly tonight; the knee work you just did pays out while you sleep.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Smooth circles, light gear", "Legs warming, breath easy"],
+                  "bad": ["Don't race it — this is a warm-up"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Hip & Glute Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Leg Swings",
+                    "detail": "×10 Each Way",
+                    "cues": {
+                      "good": ["Swing tall from the hip, hand on support", "Hips loosening through free range"],
+                      "bad": ["Don't force height — momentum stays easy"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Drive hips to the ceiling", "Glutes squeezing, not lower back"],
+                      "bad": ["Don't hyperextend at the top"]
+                    }
+                  },
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Step wide against the band, stay low", "Outer hips burning"],
+                      "bad": ["Don't let knees collapse inward"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "note": "Set the machine's range stop so your knees never bend past 90° — that's the ceiling this cycle. Start week 1 lighter than feels necessary; the first set's RPE tells you where to go.",
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Push the platform away through mid-foot", "Quads loading evenly, knees tracking over toes"],
+                  "bad": ["Don't chase depth — 90° is the ceiling this cycle"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Romanian Deadlift",
+                "videoUrl": null,
+                "restSec": 120,
+                "note": "Start light and treat this as pattern practice — a crisp hinge, no grinding. Next cycle loads this properly; this month earns it.",
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Push your hips back to the wall behind you", "Hamstrings stretch-loading as you hinge"],
+                  "bad": ["Don't round the lower back or bend it into a squat"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Hip Thrust",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Machine version on purpose this cycle — quick setup, clean calibration. The barbell arrives next cycle once your working weights exist.",
+                "chips": [
+                  { "label": "1s top squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive hips straight to the ceiling", "Glutes doing the lift, ribs stacked down"],
+                  "bad": ["Don't hyperextend the lower back at the top"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
+                "chips": [
+                  { "label": "mid-range hold", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×30s" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press up into the pad and hold dead still", "Quads humming, kneecap pulled up tight"],
+                  "bad": ["Don't grind into pain — mild effort-burn only"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Machine Calf Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the floor away to full tiptoe", "Full calf stretch at the bottom, squeeze at the top"],
+                  "bad": ["Don't bounce out of the bottom"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Press",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press the band straight out, dead level", "Obliques holding you perfectly square"],
+                  "bad": ["Don't let hips or shoulders rotate with the press"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Pull Yourself Bulletproof",
+        "completionTitle": "Armour Behind The Serve",
+        "completionMessage": "Every row and face pull today is insurance on a shoulder that serves every single day. Log honest numbers — they become next cycle's starting line.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rowing",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min" }],
+                "cues": {
+                  "good": ["Legs push, arms follow, smooth strokes", "Back and shoulders waking up"],
+                  "bad": ["Shorten the slide — stop before full knee bend"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Shoulder & Scap Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Spiderman Lunge with Reach",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": ["Reach tall to the ceiling, follow the hand", "Upper back rotating open"],
+                      "bad": ["Don't let the back knee crash down"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Tear the band apart to your chest", "Shoulder blades squeezing together"],
+                      "bad": ["Don't shrug up into your neck"]
+                    }
+                  },
+                  {
+                    "name": "Band External Rotation",
+                    "detail": "×12 Each Side",
+                    "cues": {
+                      "good": ["Rotate the band out, elbow pinned", "Back of the shoulder working"],
+                      "bad": ["Don't let the elbow drift off your side"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the bar to your collarbone", "Lats driving the elbows down"],
+                  "bad": ["Don't lean back and heave the weight"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Row the dumbbells to your hips", "Shoulder blades squeezing at the top"],
+                  "bad": ["Don't shrug into your neck"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Shoulder Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Two sets is the plan, not a typo — your serve already presses overhead every day. This slot stays small on purpose.",
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press straight to the ceiling", "Shoulders working, ribs stacked"],
+                  "bad": ["Don't arch the lower back to press"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Pull the rope to your eyebrows, elbows high", "Rear delts and mid-back squeezing"],
+                  "bad": ["Don't turn it into a row — elbows stay high"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Machine Calf Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press through the balls of your feet", "Deep calf (soleus) burning under the knee"],
+                  "bad": ["Don't cut the bottom stretch short"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30m Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Walk tall, shoulders dead level", "Side abs holding you upright"],
+                  "bad": ["Don't lean away from the weight"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Quiet Feet, Iron Trunk",
+        "completionTitle": "Control In The Bank",
+        "completionMessage": "Slow, precise, unglamorous — exactly right. Today's step-downs are the audition for the jumping that comes later in this program.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min" }],
+                "cues": {
+                  "good": ["Light gear, smooth circles", "Knees warming through easy range"],
+                  "bad": ["Don't load resistance"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Glute & Trunk Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Hips to ceiling", "Glutes not lower back"],
+                      "bad": ["Don't hyperextend"]
+                    }
+                  },
+                  {
+                    "name": "Banded Side-Lying Hip Abduction",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Lift the top leg against the band, heel leading", "Outer hip working"],
+                      "bad": ["Don't roll the hips backward"]
+                    }
+                  },
+                  {
+                    "name": "Bird Dog",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Reach hand and heel to opposite walls", "Trunk still as a table"],
+                      "bad": ["Don't let the hips tilt"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Box Step-Up",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Start on a 15–20cm box. Height only rises after a green week of morning knee checks — this is landing prep, quality over load.",
+                "chips": [
+                  { "label": "slow lowering", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Drive through the whole foot on the box", "Working-leg glute and quad only"],
+                  "bad": ["Don't push off the bottom foot"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Step-Down",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Use a ~10cm step to start and watch your knee line in a mirror. Any catching at all: stop the set and message me.",
+                "chips": [
+                  { "label": "3s lowering", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×6 Each Side" },
+                  { "label": "RPE 5" }
+                ],
+                "cues": {
+                  "good": ["Reach the free heel slowly toward the floor", "Standing-leg glute controlling the knee line"],
+                  "bad": ["Don't let the knee dive inward"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
+                "chips": [
+                  { "label": "mid-range hold", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×30s" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press up into the pad and hold dead still", "Quads humming, kneecap pulled up tight"],
+                  "bad": ["Don't grind into pain — mild effort-burn only"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Curl the pad down and under the seat", "Hamstrings only doing the work"],
+                  "bad": ["Stop a touch shy of full bend if you feel any pinch behind the knee"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" }
+                ],
+                "cues": {
+                  "good": ["Reach heel and hand to opposite walls", "Deep abs pinning the low back flat"],
+                  "bad": ["Don't let the low back arch off the floor"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30s Each Side" }
+                ],
+                "cues": {
+                  "good": ["Push the floor away, one long straight line", "Bottom-side obliques holding"],
+                  "bad": ["Don't let the hips sag"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Endurance, Re-Earned",
+        "completionTitle": "You're A Runner Again",
+        "completionMessage": "First rung of the ladder, done — that's a bigger deal than the minutes suggest. Check the knee tomorrow morning; a green check is what unlocks the next rung.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Brisk Walk",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Tall posture, quick light steps", "Legs and breath warming"],
+                  "bad": ["Don't start jogging yet"]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Leg Swings",
+                "videoUrl": null,
+                "chips": [{ "label": "×10 Each Way" }],
+                "cues": {
+                  "good": ["Swing tall from the hip, hand on support", "Hips loosening"],
+                  "bad": ["Don't force the range"]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Glute Bridge",
+                "videoUrl": null,
+                "chips": [{ "label": "×10" }],
+                "cues": {
+                  "good": ["Hips to the ceiling", "Glutes switching on"],
+                  "bad": ["Don't arch the low back"]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Banded Lateral Walk",
+                "videoUrl": null,
+                "chips": [{ "label": "×8 Each Side" }],
+                "cues": {
+                  "good": ["Wide steps against the band", "Outer hips awake"],
+                  "bad": ["Don't stand up tall mid-step"]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Walking High-Knee March",
+                "videoUrl": null,
+                "chips": [{ "label": "×40m" }],
+                "cues": {
+                  "good": ["Tall, knee to hip height, roll through the foot", "Rhythm and posture of running, zero impact"],
+                  "bad": ["Don't skip or bounce — march, not plyo"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Walk-Run Ladder",
+            "icon": "🫀",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Walk-Run Intervals",
+                "videoUrl": null,
+                "rounds": "×6 Rounds",
+                "logWeight": false,
+                "note": "Week 1: six rounds of 2 minutes easy running, 90 seconds walking, flat route. We climb the ladder together at each check-in — never solo.",
+                "items": [
+                  {
+                    "name": "Easy Run",
+                    "detail": "2 min · RPE 5",
+                    "cues": {
+                      "good": ["Short light steps, land under your hips", "Easy rhythm — you could hold a conversation"],
+                      "bad": ["Don't chase pace — this cycle buys the knee back, not fitness"]
+                    }
+                  },
+                  {
+                    "name": "Recovery Walk",
+                    "detail": "1.5 min",
+                    "cues": {
+                      "good": ["Keep moving, breathe down to easy"],
+                      "bad": ["Don't stop dead"]
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "simple",
+                "name": "Cool-Down Walk",
+                "videoUrl": null,
+                "chips": [{ "label": "5 min" }],
+                "cues": {
+                  "good": ["Easy tall walking", "Breath settling"],
+                  "bad": ["Don't sit down straight after"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "focusTag": "Recovery That Counts",
+        "completionTitle": "Recovery, Counted",
+        "completionMessage": "Thirty easy minutes that count as training because they are training. This is the day that keeps every other day honest.",
+        "blocks": [
+          {
+            "title": "Easy Aerobic",
+            "icon": "🫀",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Brisk Walk",
+                "videoUrl": null,
+                "note": "This stays a walk all cycle on purpose — it's recovery volume, and the first thing to drop on a heavy week. Guilt-free either way.",
+                "chips": [
+                  { "label": "30 min" },
+                  { "label": "RPE 4" }
+                ],
+                "cues": {
+                  "good": ["Purposeful pace, tall posture — first 5 minutes easy build-in", "Steady easy effort, nose-breathable"],
+                  "bad": ["Don't turn it into a workout — recovery volume only"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Setareh",
+    "cards": [
+      {
+        "icon": "🛡️",
+        "title": "Your Knee: The Ground Rules",
+        "body": "<p>After the 16k, your knee locked for two days. It's been quiet for a month — good — but quiet is something we <strong>verify, not assume</strong>. This cycle is built to load it carefully and prove it.</p><p><strong>Normal and fine:</strong> muscle burn, effort, next-day stiffness that fades. Train through it.</p><p><strong>Not fine:</strong> sharp pain, anything that radiates, numbness or tingling, pain that builds through a set — and above all, <strong>any catching, clicking or locking, or a knee that won't straighten fully</strong>.</p><ul><li>Mild and fading → finish the set, note it in your log.</li><li>Building, or changing how you move → stop that exercise, use the fallback, message me.</li><li>Sharp / radiating / numb / any locking → stop the session, message me before the next one.</li></ul><p>One more thing, on record: <strong>a physio baseline check now, while the knee is quiet, is the smart play.</strong> We train either way — but a locked knee that was never imaged deserves one professional look. Your call; my recommendation stands.</p>"
+      },
+      {
+        "icon": "✅",
+        "title": "The Morning Knee Check",
+        "body": "<p>The morning after any leg session or run, run this <strong>30-second check</strong>:</p><ul><li>No new swelling compared to the other knee</li><li>Knee straightens fully flat, same as the other side</li><li>Zero catching or clicking overnight or on stairs</li><li>Any soreness ≤2/10 and gone within the day</li></ul><p><strong>All four pass = green.</strong> That's what unlocks every progression this cycle — run ladder, box height, iso load. Any fail = we repeat last week's dose, no drama.</p><p>A fail on straightening or catching isn't a repeat — <strong>that's a message to me, same day.</strong></p>"
+      },
+      {
+        "icon": "🏃‍♀️",
+        "title": "The Run Ladder",
+        "body": "<p>You're running again — on a ladder we climb together. Each week's rung only unlocks at our check-in, off a green morning check:</p><ul><li><strong>Week 1:</strong> 6 × (2 min run / 1.5 min walk)</li><li><strong>Week 2:</strong> 5 × (3 min / 1.5 min)</li><li><strong>Week 3:</strong> 4 × (4.5 min / 1.5 min)</li><li><strong>Week 4:</strong> 3 × (6 min / 1.5 min)</li></ul><p>Flat route, conversational pace — if you can't talk, you're too fast.</p><p><strong>The ladder IS the run budget.</strong> No extra runs outside it this cycle — a spontaneous long run is exactly the move that cost you two days of a locked knee. Next cycle buys continuous running; this one buys the knee.</p>"
+      },
+      {
+        "icon": "📈",
+        "title": "How To Pick Your Weights",
+        "body": "<p>The app never gives you a weight — <strong>you find it, the RPE target is the compass.</strong> RPE 6 means four clean reps left in the tank; RPE 7 means three.</p><ul><li><strong>New movement:</strong> start clearly lighter than you think. The first set's RPE tells you — too easy, nudge up next set; spot on, stay.</li><li><strong>Week to week:</strong> hit the reps at or under the target RPE → small jump next time. At the ceiling, or reps missed → same weight again. That's progress too.</li><li><strong>Rough day:</strong> readiness low, bar grinding harder than the number says it should → drop the weight. <strong>Regression is steering, not failure.</strong></li></ul><p>This month is calibration — every honest log builds the baseline the whole program stands on. Lighter and honest beats heavier and guessed, every single time.</p>"
+      },
+      {
+        "icon": "🌙",
+        "title": "Period-Week Fallback",
+        "body": "<p>For the rough days, there's a pre-agreed fallback — <strong>so you never have to negotiate with yourself mid-cramp:</strong></p><ul><li><strong>Full sets:</strong> the walks, all warm-up mobility, Glute Bridge work — easy movement genuinely helps.</li><li><strong>Cut to ~2 lighter sets:</strong> Leg Press, Romanian Deadlift, Lat Pulldown, the Row — move the pattern, don't grind it.</li><li><strong>Skip outright:</strong> Pallof Press, Dead Bug, Side Plank, Suitcase Carry — direct ab pressure waits a day or two.</li></ul><p>Showing up for the fallback version <strong>counts as full adherence.</strong> It's in the plan because it is the plan.</p>"
+      },
+      {
+        "icon": "😴",
+        "title": "The Knee Heals At Night",
+        "body": "<p>Honest truth: <strong>5–6 hours of sleep is the tightest limit in this whole program</strong> — tighter than any exercise choice. Tendon rebuilds on sleep; so does everything else we're asking your body to do while you coach and play daily.</p><p>Not asking for a life overhaul — <strong>aim for 7+ on the nights the week allows</strong>, and guard the ones before leg and run days first.</p><p><strong>Sunday stays a genuine off day.</strong> No gym, no run, court only if you must coach. That's programmed, not optional.</p>"
+      },
+      {
+        "icon": "🗓️",
+        "title": "Your Week, Mapped",
+        "body": "<p>The default shape: <strong>Mon</strong> Lower · <strong>Tue</strong> Upper · <strong>Wed</strong> court only · <strong>Thu</strong> Walk-Run · <strong>Fri</strong> Control · <strong>Sat</strong> Easy Walk (optional) · <strong>Sun</strong> fully off.</p><p>Shuffle around your court schedule freely — <strong>two rules never bend:</strong></p><ul><li>Never put Friday's Control day right after the Lower day — the knee needs the honest 24h read between them.</li><li>The Walk-Run stays 48h+ after the Lower day.</li></ul><p>Brutal week? Drop in this order: <strong>Saturday walk first, then the Control day.</strong> Lower, Upper and the Walk-Run are the core — protect those three and the week counts.</p>"
+      },
+      {
+        "icon": "🎯",
+        "title": "Why Groundwork Looks Easy",
+        "body": "<p>You asked for 5+ gym days. You're getting three, capped at effort 7 — <strong>on purpose.</strong> You already train daily: every session on court is load. The gym's job is to add the one thing the court can't — <strong>maximal strength and a knee rebuilt to take it</strong> — not to compete with your sport for recovery.</p><p>So when a session feels like it ended with fuel in the tank: <strong>that's the design working.</strong> Don't add sets, don't add days, don't test the knee on the side.</p><p>This is a 24-week build and Groundwork is its foundation pour. <strong>Boring now is what brutal later is built on.</strong></p>"
+      }
+    ]
+  }
+}
