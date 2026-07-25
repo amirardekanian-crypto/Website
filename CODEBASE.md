@@ -45,6 +45,13 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
 - **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, `content/`, and `workouts/`, not here. Ask an AI assistant to guide you before structural edits.
 
+#### `habits.html` — Daily habit tracker (private)
+- **What it does:** A standalone daily habit tracker for coaching clients. Ten default health/fitness habits in five groups — **Train** (session done, mobility), **Recover** (sleep, wind-down), **Fuel** (protein, water), **Move** (steps), **The Stack** (vitamin D, creatine, omega-3) — plus custom habits. Tracks per-habit streaks, an 80%-day streak, weekly ring strip and a 4-week heatmap. Athletes open it with the **same link pattern as the program**: `habits.html?client=<id>&key=<key>`. Demo mode: `?client=demo` (local-only, no cloud).
+- **If deleted:** Athletes lose the habit tracker. The program app and dashboard are unaffected.
+- **Depends on:** `data/<id>.json` (athlete name + key fallback) and **Supabase** — but only the *existing* `save_progress` / `get_progress` functions; it stores its data under the localStorage keys `<id>_hab_cfg` and `<id>_hab_log`, which merge into the same `athlete_progress` row the program app uses. No new tables or functions.
+- **Edit this when:** Changing the default habit list (the `DEFAULT_HABITS` array), groups, streak rules, or styling.
+- **Don't touch:** The Supabase URL/key and the key-resolution block. `noindex` on purpose.
+
 #### `coach.html` — Coach dashboard (private)
 - **What it does:** Your private admin view. You sign in with Google (locked to your coach email) and see every athlete's progress synced from `program.html`: who finished sessions, when they were last active, their notes, plus charts. It's also where you **create a secure link** for a new athlete (a per-athlete secret key) and where you **send messages** to athletes.
 - **If deleted:** You lose the dashboard. Athletes are unaffected — their app keeps working — but you can no longer view progress, mint new athlete links, or message anyone from one place.
