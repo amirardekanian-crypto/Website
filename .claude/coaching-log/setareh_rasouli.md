@@ -69,3 +69,22 @@ Amir reverted pre-start edit 2: the "Machine Leg Extension Hold" rename goes bac
 ### Pre-start edit 4 · 2026-07-24 (Amir, before week 1)
 
 New standing rule from Amir, verbatim: "if it's a hold exercise, in the Tempo write Iso." Applied `Tempo Iso` chips to all three hold prescriptions (Machine Leg Extension holds on Days 1 + 4, Side Plank on Day 4) — the TEMPO cell now reads **Iso**. Rule codified in COACHING-PRINCIPLES → Chips & modifiers and SCHEMA → Chip parsing.
+
+---
+
+## Assessment & Monitoring Plan · set 2026-07-25 (case study + content)
+
+**Context / constraint.** Athlete is in another city — **no coach-administered, in-person testing available.** No baseline was captured at onboarding (by design: calibration cycle, "trust the bar"). Case study intended for UKSCA submission + a social-media success story; testing must therefore be **remote (self-administered or filmed) and ruthlessly standardized**, and staged to the knee's tolerance (never test what the program hasn't cleared her to train).
+
+**Key methodological ruling (Amir's core question).** RPE-7 week-1 vs week-6 logs are valid **internal** progression tracking but **weak external proof** of a strength adaptation — the early-weeks e1RM delta is confounded by motor learning on new machines + novice RPE mis-calibration (her wk-1 "RPE 7" is likely a true 4–5), so it overstates the gain. Therefore: **the clean baseline is captured at END of Week 2** (after the motor-learning spike settles), not day 1. Cleanest maximal-strength proof that respects the knee = **isometric peak force** — deferred here only because no load cell is reachable remotely; revisit if she acquires a portable dynamometer / hand dynamometer.
+
+**Testing timeline (locked with Amir):**
+- **Week 2 (end) — remote baseline battery.** e1RM from app logs (flagship, zero extra burden) · **filmed Lateral Step-Down → coach scores QASLS** (flagship movement-quality marker + before/after content) · 30-sec sit-to-stand · single-leg calf-raise reps to failure L/R · wall-sit hold @~90° · single-leg balance eyes-open→closed L/R · SEBT anterior reach L/R (taped, filmed) · body mass + thigh girth L/R + knee circumference L/R (effusion baseline) · walk-run ladder position. Standardization is the main validity risk when self-administered — fix camera spot, footwear, machine settings, time of day, warm-up, 48h from a hard session.
+- **After Cycle 2 / Force Foundry (~Wk 10) — first dynamic 3–5RM** (Leg Press), knee-gated, technique calibrated. Earliest defensible maximal dynamic strength number.
+- **End C4 / High Steel (~Wk 19):** first CMJ (jump-test window opens). **End C5 / Spring Steel (~Wk 24):** exit battery — single-leg hop battery (LSI ≥ 90%), CMJ, SEBT, KOOS + TSK-11 final, e1RM deltas, continuous-run capacity, return-to-sport checklist.
+
+**PROMs.** KOOS (function — primary) + TSK-11 (fear of movement — HER differentiator; she was afraid to run). Print the official instruments from source (koos.nu; published TSK-11) for formal data — do not use a from-memory reproduction as submission-grade (the item-fidelity check is itself the methodological rigour a reviewer rewards).
+
+**Duty-of-care thread (standing).** Unimaged 2-day mechanical-locking knee. Physio baseline assessment recommended on record (her call; training proceeds in parallel). **Race question (2026-07-24):** she asked to run a race ~Tuesday feeling "ok"; Amir prescribed an easy 2–3 km knee-check run → pain = physio, fine = "may race but I advise against." Coaching read logged for the record: process good (graded test + hard escalation + stated advice), but a small asymptomatic run cannot clear a 16 km race — the recommendation is to decouple the check from race permission and keep the race off the table this cycle (harm-reduction: run/walk easy, assess first), consistent with the roadmap's return-to-run-not-race-prep stance and the "ladder IS the run budget" rule.
+
+**Deliverables produced (2026-07-24/25, kept OUT of the repo — private health data, in the coaching conversation/scratchpad only):** athlete self-report pack (confidence scales + TSK-11 + daily knee-check diary) and coach battery (master data sheet + QASLS + SEBT/Y-balance recording sheet + 24-week testing calendar), as print-ready PDFs.
