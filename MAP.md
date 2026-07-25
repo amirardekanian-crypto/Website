@@ -58,6 +58,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | File | What it is | Manual |
 |---|---|---|
 | [`program.html`](program.html) | The athlete PWA — Home · My Plan · Coach · Library [Read \| Train]. Loads `data/<id>.json`. Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
+| [`habits.html`](habits.html) | Daily habit tracker — Train/Recover/Fuel/Move/Stack defaults + custom habits, streaks, 4-week heatmap. Same `?client=<id>&key=<key>` link as the program; syncs via the existing `save_progress`/`get_progress` RPCs (keys `<id>_hab_cfg` / `<id>_hab_log`). Demo: `?client=demo` | — |
 | [`coach.html`](coach.html) | Coach dashboard — progress, charts, mint athlete links, messaging (Google sign-in) | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
 
