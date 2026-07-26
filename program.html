@@ -13,7 +13,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AA Performance</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#FAF7F2">
@@ -2638,6 +2638,42 @@
     color: var(--on-accent);
   }
   .a2hs-toast-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     APP FRAME — phone-width column (same setting as habits.html)
+     ───────────────────────────────────────────────────────────────────────
+     The app is designed for an iPhone, so it never grows past --app-w: on a
+     desktop browser you get the identical layout, centred, with the page
+     background bleeding out to the sides. Below 520px nothing changes.
+
+     .screen is the only flowing child of <body>; every position:fixed piece
+     of chrome (tab bar, demo banner, overlays, floating toggles) is pinned
+     to the viewport, so each one gets the same gutter to stay glued to the
+     column instead of the window edge. max() keeps that gutter at 0 on
+     phones, where 50% − 260px would go negative.
+     ═══════════════════════════════════════════════════════════════════════ */
+  :root {
+    --app-w: 520px;
+    --app-gutter: max(0px, calc(50% - var(--app-w) / 2));
+  }
+
+  .screen { width: 100%; max-width: var(--app-w); margin-inline: auto; }
+
+  .demo-banner, .loading-screen, .error-screen, .global-tabs,
+  .timer-overlay, .readiness-overlay, .video-modal {
+    left: var(--app-gutter); right: var(--app-gutter);
+  }
+  .global-dark-toggle { right: calc(var(--app-gutter) + 14px); }
+  .v-progress { right: var(--app-gutter); }
+  /* .a2hs-toast already centres itself on the viewport at max-width 380px,
+     so it lands inside the column without help. */
+
+  /* Wider than the column: draw its edges so the app reads as a deliberate
+     device-width app, not a layout that failed to stretch. */
+  @media (min-width: 560px) {
+    .screen.active { box-shadow: 0 0 0 1px var(--grey-mid), 0 24px 60px rgba(0,0,0,0.06); }
+    .global-tabs { border-left: 1px solid var(--grey-mid); border-right: 1px solid var(--grey-mid); }
+  }
 </style>
 </head>
 <body>
