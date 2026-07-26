@@ -496,6 +496,39 @@
     margin-top: 14px;
   }
 
+  /* ── VALIDATION ERROR STATE ── */
+  .f-field.has-error > label { color: var(--red-soft); }
+  .f-field.has-error input[type="text"],
+  .f-field.has-error input[type="email"],
+  .f-field.has-error input[type="number"],
+  .f-field.has-error select,
+  .f-field.has-error textarea {
+    border-color: var(--red-soft);
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.10);
+  }
+  .f-field.has-error .radio-card label,
+  .f-field.has-error .pill span { border-color: var(--red-soft); }
+  .field-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 9px;
+    color: var(--red-soft);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* ── SLIDER: untouched state (sends nothing until the athlete answers) ── */
+  .slider-wrap.is-unset input[type="range"]::-webkit-slider-thumb {
+    background: var(--text-muted);
+    box-shadow: 0 0 0 2px var(--text-muted);
+  }
+  .slider-wrap.is-unset input[type="range"]::-moz-range-thumb {
+    background: var(--text-muted);
+    box-shadow: 0 0 0 2px var(--text-muted);
+  }
+  .slider-wrap.is-unset .slider-val { color: var(--text-muted); }
+
   @media (max-width: 560px) {
     .fsection { padding: 28px 20px; }
     .radio-cards { grid-template-columns: 1fr 1fr; }
@@ -599,6 +632,13 @@
     <div class="f-field">
       <label for="email">Email</label>
       <input type="email" id="email" name="Email" required autocomplete="email" placeholder="you@email.com">
+    </div>
+
+    <div class="f-field">
+      <label for="contact">Instagram / WhatsApp
+        <span class="hint">A second way to reach you if email bounces</span>
+      </label>
+      <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required placeholder="@yourhandle or +44 7…">
     </div>
 
     <div class="row-3">
@@ -897,12 +937,13 @@
 
     <div class="f-field">
       <label for="sleepSlider">How would you rate your typical sleep quality?</label>
-      <div class="slider-wrap">
+      <div class="slider-wrap is-unset" id="sleepWrap">
         <span class="slider-edge">Poor</span>
-        <input type="range" id="sleepSlider" name="Sleep Quality (1-10)" min="1" max="10" value="7">
+        <input type="range" id="sleepSlider" min="1" max="10" value="7">
         <span class="slider-edge">Excellent</span>
-        <span class="slider-val" id="sleepVal" aria-live="polite">7</span>
+        <span class="slider-val" id="sleepVal" aria-live="polite">—</span>
       </div>
+      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value="" data-count-progress required>
     </div>
 
     <div class="f-field">
@@ -918,12 +959,13 @@
 
     <div class="f-field">
       <label for="stressSlider">Current stress level</label>
-      <div class="slider-wrap">
+      <div class="slider-wrap is-unset" id="stressWrap">
         <span class="slider-edge">Low</span>
-        <input type="range" id="stressSlider" name="Stress Level (1-10)" min="1" max="10" value="5">
+        <input type="range" id="stressSlider" min="1" max="10" value="5">
         <span class="slider-edge">High</span>
-        <span class="slider-val" id="stressVal" aria-live="polite">5</span>
+        <span class="slider-val" id="stressVal" aria-live="polite">—</span>
       </div>
+      <input type="hidden" id="stressValue" name="Stress Level (1-10)" value="" data-count-progress required>
     </div>
 
     <div class="f-field">
@@ -1113,15 +1155,79 @@
     discountInput.addEventListener('input', function () { checkDiscount(false); });
     discountInput.addEventListener('blur',  function () { checkDiscount(true); });
 
-    // ── Slider live value ────────────────────────────────────────────────
-    function wireSlider(sliderId, valId) {
+    // ── Sliders ──────────────────────────────────────────────────────────
+    // The range input carries no name. Its value is copied into a hidden
+    // field only once the athlete actually touches it, so an untouched
+    // slider submits nothing instead of silently sending the default.
+    function wireSlider(sliderId, valId, wrapId, hiddenId) {
       const s = document.getElementById(sliderId);
       const v = document.getElementById(valId);
-      if (!s || !v) return;
-      s.addEventListener('input', () => { v.textContent = s.value; });
+      const wrap = document.getElementById(wrapId);
+      const hidden = document.getElementById(hiddenId);
+      if (!s || !v || !wrap || !hidden) return;
+
+      function commit() {
+        hidden.value = s.value;
+        v.textContent = s.value;
+        wrap.classList.remove('is-unset');
+        clearError(hidden);
+        updateProgress();
+      }
+      // pointerdown/keydown so picking the value it already sits on still counts
+      s.addEventListener('input', commit);
+      s.addEventListener('pointerdown', commit);
+      s.addEventListener('keydown', commit);
     }
-    wireSlider('sleepSlider', 'sleepVal');
-    wireSlider('stressSlider', 'stressVal');
+    wireSlider('sleepSlider', 'sleepVal', 'sleepWrap', 'sleepValue');
+    wireSlider('stressSlider', 'stressVal', 'stressWrap', 'stressValue');
+
+    // ── Validation ───────────────────────────────────────────────────────
+    // The form is novalidate (so the browser's own bubbles stay out of the
+    // way), which means nothing is enforced unless we do it here.
+    function isAnswered(el) {
+      if (el.type === 'radio' || el.type === 'checkbox') {
+        return !!form.querySelector(`[name="${CSS.escape(el.name)}"]:checked`);
+      }
+      // hidden inputs are barred from constraint validation — check by hand
+      if (el.type === 'hidden') return (el.value || '').trim().length > 0;
+      return el.checkValidity();
+    }
+
+    function fieldOf(el) { return el.closest('.f-field') || el.closest('.fsection'); }
+
+    function clearError(el) {
+      const field = fieldOf(el);
+      if (!field) return;
+      field.classList.remove('has-error');
+      const msg = field.querySelector('.field-error');
+      if (msg) msg.remove();
+    }
+
+    function showError(el, text) {
+      const field = fieldOf(el);
+      if (!field) return;
+      field.classList.add('has-error');
+      if (!field.querySelector('.field-error')) {
+        const msg = document.createElement('p');
+        msg.className = 'field-error';
+        msg.setAttribute('role', 'alert');
+        msg.textContent = text;
+        field.appendChild(msg);
+      }
+    }
+
+    function firstUnanswered() {
+      const seen = new Set();
+      const required = form.querySelectorAll('[required]');
+      for (const el of required) {
+        if (!el.name || seen.has(el.name)) continue;
+        seen.add(el.name);
+        const cond = el.closest('.conditional');
+        if (cond && !cond.classList.contains('visible')) continue;   // not being asked
+        if (!isAnswered(el)) return el;
+      }
+      return null;
+    }
 
     // ── Dynamic subject line ─────────────────────────────────────────────
     function updateSubject() {
@@ -1155,7 +1261,7 @@
       const seen = new Set();
       const questions = [];
       form.querySelectorAll('input, select, textarea').forEach(el => {
-        if (el.type === 'hidden') return;
+        if (el.type === 'hidden' && !el.hasAttribute('data-count-progress')) return;
         if (el.name === 'botcheck') return;
         if (!el.name) return;
         if (el.hasAttribute('data-skip-progress')) return;
@@ -1182,11 +1288,30 @@
     form.addEventListener('change', updateProgress);
     updateProgress();
 
+    // Clear a field's error as soon as it gets answered
+    function clearOnAnswer(e) { if (e.target && e.target.name) clearError(e.target); }
+    form.addEventListener('input', clearOnAnswer);
+    form.addEventListener('change', clearOnAnswer);
+
     // ── Submit via fetch → show success overlay ──────────────────────────
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
       if (form.querySelector('[name="botcheck"]').checked) return;
+
+      const missing = firstUnanswered();
+      if (missing) {
+        const isBadEmail = missing.type === 'email' && (missing.value || '').trim();
+        showError(missing, isBadEmail
+          ? 'Please enter a valid email address.'
+          : 'Please answer this question.');
+        const field = fieldOf(missing);
+        if (field) field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (missing.offsetParent !== null) {
+          try { missing.focus({ preventScroll: true }); } catch (err) { /* not focusable */ }
+        }
+        return;
+      }
 
       const btn = document.getElementById('submitBtn');
       const originalHTML = btn.innerHTML;
