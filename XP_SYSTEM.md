@@ -205,7 +205,62 @@ to be kinder. This also drives the "days on target" figure in the weekly recap.
 
 ---
 
-## 7. What happens when you change any of this
+## 7. The leaderboard scores on the server — so XP lives in TWO places
+
+> **⚠️ The one thing that can get out of sync.** The leaderboard recalculates XP
+> **in the database** rather than trusting the number a phone sends, so nobody can
+> reach the top by editing their own storage. The price is that the scoring rules
+> exist twice:
+>
+> | Where | What | When to change it |
+> |---|---|---|
+> | `XP_RULES` in `habits.html` | What each athlete sees in their own app | Always |
+> | the `xp_rules` table row in Supabase | What the leaderboard ranks people by | Always, at the same time |
+>
+> If you change one and not the other, athletes' own screens and the leaderboard
+> will quietly disagree.
+
+To update the database copy, run this in the Supabase SQL editor (adjust the
+numbers to match whatever you just put in `XP_RULES`):
+
+```sql
+update public.xp_rules set rules = jsonb_build_object(
+  'base', 300,
+  'growth', 0.55,
+  'completionBonus', 1.2,
+  'customXp', 25,
+  'weights', '{"strength":100,"steps":60,"sleep":50,"fuel":40,
+               "water":30,"mobility":30,"breathe":20,"supps":20}'::jsonb,
+  'targets', '{"strength":1,"steps":10000,"sleep":7.5,"fuel":3,
+               "water":8,"mobility":1,"breathe":1,"supps":1}'::jsonb
+), updated_at = now() where id = 1;
+```
+
+Note `targets` as well as `weights` — the server needs targets to score partial
+progress on counter habits the same way the app does. Custom habits an athlete
+invents are scored at `customXp`, since the server has no target for them.
+
+### How the board works
+
+- **Opt-in only.** No row in `leaderboard_optin` means invisible. Athletes join
+  from the Leaderboard tab and pick their own display name (defaults to first
+  name + last initial). They can rename or leave at any time.
+- **Two boards.** *This week* (Monday to today) is the default so a new client can
+  win in week one; *all time* is the second tab.
+- **Reading it is key-checked**, so client display names are not exposed to the
+  open internet — only real athletes see the board.
+- **No athlete IDs are ever returned.** An ID alone is enough to fetch
+  `/data/<id>.json`, which is someone's whole programme. The function returns
+  display names, points, level and rank only, plus an `is_me` flag.
+- Rank names and the level curve are mirrored in SQL too (`hab_rank_label`,
+  `hab_level`), so renaming a rank means updating `RANKS` in `habits.html` **and**
+  the `names` array in that function.
+
+The SQL lives in `supabase/stage9_leaderboard.sql`.
+
+---
+
+## 8. What happens when you change any of this
 
 1. Edit `XP_RULES` (or `CONSISTENCY_TIERS`, or a habit's `target`) and ship.
 2. Next time each athlete opens the app, every day they have ever logged is rescored
@@ -223,7 +278,7 @@ new work over devaluing old work.
 
 ---
 
-## 8. Never losing progress
+## 9. Never losing progress
 
 Worth knowing, since it underpins all of the above.
 
