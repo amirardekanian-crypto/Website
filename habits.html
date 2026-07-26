@@ -216,7 +216,11 @@
     display: flex; flex-direction: column; gap: 12px; animation: riseIn .3s ease;
   }
   .coachcard .eyebrow { color: rgba(250,247,242,.8); }
-  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px; line-height: 1.05; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; }
+  /* The nudge changes copy as the day goes, and the lines are not all the same
+     length. Without a floor the card resizes on a tick and shoves the habit list
+     under the athlete's finger — a smaller version of the scroll bug the renderer
+     was rewritten to kill. Four lines holds almost every nudge in the library. */
+  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px; line-height: 1.05; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 4.2em; }
   .coachcard .cta {
     align-self: flex-start; background: #FAF7F2; color: #1A1A1A; padding: 10px 14px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
@@ -264,8 +268,12 @@
   /* The active-tab block used to be a background on the button, so it teleported.
      It is now one slab that SLIDES between cells, with the labels inverting under
      it — same modernist look, but the bar shows you where you went. */
+  /* minmax(0,1fr) — NOT plain 1fr. `1fr` is minmax(auto,1fr), so the longest
+     label forced its own column wider than the rest: the cells were 91/91/91/116
+     at 390px and the whole bar overflowed the viewport at 320px. Equal columns
+     are also what lets the sliding slab line up with a cell at all. */
   .tabs {
-    display: grid; grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
     border-top: 2px solid var(--divider); background: var(--bg);
     padding-bottom: env(safe-area-inset-bottom);
     position: relative;
@@ -276,14 +284,14 @@
     transition: transform .32s cubic-bezier(.16,1,.3,1);
   }
   .tabs button {
-    padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
+    padding: 12px 8px; display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
     border-right: 1px solid var(--rule); position: relative; z-index: 1;
-    transition: color .2s ease;
+    transition: color .2s ease; overflow: hidden;
   }
   .tabs button:last-child { border-right: 0; }
   .tabs button.on { color: var(--bg); }
   .tabs .num { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .06em; opacity: .6; }
-  .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; }
+  .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 11px; letter-spacing: .01em; text-transform: uppercase; white-space: nowrap; }
 
   /* ── Grid (35-day history) ── */
   /* Thirty-five squares appearing at once reads as a static block; cascading them
@@ -536,6 +544,32 @@
   /* Leaderboard rows arrive in order, each with its share of the leader's score. */
   .brow { animation: riseIn .34s cubic-bezier(.16,1,.3,1) both; }
 
+  /* ── Rank insignia ── */
+  .rankart { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: square; stroke-linejoin: miter; }
+  /* The rank label on a level hero is a door to the ladder, so it looks like one. */
+  .ranklink { display: flex; align-items: center; gap: 8px; text-align: left; color: inherit; }
+  .ranklink .go { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px; color: var(--clay-deep); }
+  /* One row per rank on the ladder screen. */
+  .rankrow { display: flex; gap: 14px; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--rule); }
+  .rankrow .badge {
+    width: 46px; height: 46px; flex: none; display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--rule); color: var(--muted-soft);
+  }
+  .rankrow.passed .badge { border-color: var(--accent); color: var(--accent); }
+  .rankrow.here { background: var(--accent); color: var(--bg); }
+  .rankrow.here .badge { border-color: var(--bg); color: var(--bg); }
+  .rankrow.locked { opacity: .5; }
+  .rankrow .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; line-height: 1; text-transform: uppercase; }
+  .rankrow .meta { font-size: 11px; line-height: 1.3; color: var(--muted); }
+  .rankrow.here .meta { color: rgba(250,247,242,.8); }
+  .rankrow .tag { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .1em; white-space: nowrap; }
+  /* Five sub-level ticks per rank. */
+  .subs { display: flex; gap: 3px; }
+  .subs i { width: 8px; height: 8px; border: 1.5px solid var(--box); display: block; }
+  .subs i.on { background: var(--accent); border-color: var(--accent); }
+  .rankrow.here .subs i { border-color: rgba(250,247,242,.7); }
+  .rankrow.here .subs i.on { background: var(--bg); border-color: var(--bg); }
+
   /* Consistency pip ladder */
   .pips { display: flex; gap: 4px; }
   .pips i { width: 13px; height: 13px; border: 1.5px solid var(--box); display: block; }
@@ -604,6 +638,140 @@ const HABITS = [
   { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',               source:'Manual' },
   { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
+// ── The nudge library ─────────────────────────────────────────────────────
+// One nudge a day, picked from a big pile so nobody hears the same line twice in
+// a week. Tokens: {n} = how many are left · {unit} · {name} · {st} = streak days.
+// Voice: dry, blunt, a little rude. Never chirpy, never therapeutic — a coach who
+// noticed, not an app that is proud of you for existing.
+const NUDGES = {
+  water: [
+    'You have out-hydrated exactly zero houseplants today. {n} more and I stop bringing it up.',
+    'You are 60% water and 40% intending to drink water. {n} to go.',
+    'Your kidneys have begun leaving passive-aggressive notes. {n} glasses.',
+    'Coffee is not water. I checked with a scientist. {n} more.',
+    '{n} glasses between you and me shutting up about water.',
+    'Somewhere a camel is judging you. {n} glasses left.',
+    'Thirst is not a personality. {n} more.',
+    '{n} glasses left and roughly sixteen hours to do it in. I believe in you, mathematically.',
+    'Drink the water. It is free, it is right there, and it is the easiest thing you will do today.',
+    'Every glass is one your body did not have to negotiate for. {n} to go.'
+  ],
+  steps: [
+    'Your step count suggests you have been guarding a chair. {n} to go.',
+    '{n} steps left. That is a walk, not an expedition.',
+    'The floor is not lava. You are allowed to move around on it. {n} steps.',
+    'Every one of these was a decision not to sit down. {n} left.',
+    '{n} steps. Your future knees are watching this closely.',
+    'You could do {n} steps just pacing while overthinking something. Play to your strengths.',
+    '{n} short. The lift is a trap and you have always known it.',
+    'Nobody in recorded history has regretted going for a walk. {n} steps.',
+    '{n} steps stand between you and smugly closing this app.'
+  ],
+  sleep: [
+    'Nothing logged about sleep, which is exactly what someone who did not sleep would do.',
+    'Sleep is the most underrated session in the whole programme and you have not logged it.',
+    'Log the sleep. Even a bad number is data.',
+    'Your recovery happened whether you wrote it down or not, but I would like to know.',
+    'Seven and a half hours is not laziness, it is unpaid labour by your nervous system. Log it.',
+    'How long were you unconscious? A ballpark is fine.',
+    'Tell me you slept. Lie convincingly if you must, but tell me.',
+    'The gym is where you ask for the adaptation. Sleep is where you get it. Log it.'
+  ],
+  fuel: [
+    '{n} meals unlogged. Food is data too — log it and stop guessing.',
+    'You have eaten. There is crumb-based evidence. Log {n} more.',
+    'Guessing at your food is how people end up confused and hungry. {n} to log.',
+    '{n} to go. Things assembled while standing at the fridge count, if you are honest about them.',
+    'Log the food. All of it. Especially that.',
+    '{n} meals left to log. I am not going to comment on any of them. Probably.'
+  ],
+  mobility: [
+    'Ten minutes now, or your hamstrings file a complaint with HR.',
+    'Your hips currently have the range of motion of a filing cabinet. Ten minutes.',
+    'Mobility is boring and it works. Those two things are usually related.',
+    'You will stretch eventually. The only question is whether it is voluntary.',
+    'Ten minutes of feeling ridiculous buys you a decade of moving properly.',
+    'Nobody has ever looked cool doing mobility. Do it anyway.',
+    'Ten minutes. You have lost longer than that to a single scroll.'
+  ],
+  breathe: [
+    'Sitting still on purpose. Harder than the squats and you know it.',
+    'Ten minutes of doing nothing, deliberately. You have wasted longer accidentally.',
+    'Your nervous system has been running at the redline all day. Ten minutes.',
+    'Breathing happens anyway. Doing it on purpose is the whole trick.',
+    'Ten quiet minutes. No, scrolling in bed does not count as rest.',
+    'The hardest ten minutes on the list, and it involves lying down.'
+  ],
+  supps: [
+    'The one habit that should never need negotiating. Take them.',
+    'They are in a jar. Approximately three feet away. Go.',
+    'Vitamin D, creatine, omega-3. Twelve seconds of effort, all of it useful.',
+    'The supplements are not going to take themselves, which frankly feels like a design flaw.',
+    'Easiest points in the app and you are leaving them on the table.',
+    'Twelve seconds. You have spent longer reading this nudge.'
+  ],
+  strength: [
+    'No session logged. Your programme is open in the other app, sulking.',
+    'Picking heavy things up and putting them down. Sisyphus with better shoulders. Go.',
+    'The session is worth more than everything else here combined. That is not an accident.',
+    'Your programme is one tap away and it already has a plan for you.',
+    'Nothing in this app pays like training does. Go and take it.',
+    'Show up and do the thing. Partial credit is still credit.'
+  ],
+  // ── Situational ──
+  empty: [
+    'Nothing logged yet. The day is a blank page and I am watching you not write on it.',
+    'An entirely empty day so far. Bold. Let us fix it with the easiest thing on the list.',
+    'Zero of everything. To be fair, every good day has started exactly here.',
+    'You have logged nothing. I will assume you are busy rather than hiding.',
+    'Blank slate. Pick literally anything and the day stops being a write-off.'
+  ],
+  lastOne: [
+    'One habit left. One. You have come much too far to leave it there.',
+    'Everything except {name}. That is a suspiciously specific kind of avoidance.',
+    'One left, and it is {name}. We both know exactly what is going on here.',
+    '{name} is the only thing standing between you and a clean day.',
+    'You are one habit from perfect. Do not make this a story about {name}.'
+  ],
+  allDone: [
+    'Everything is checked. I have nothing to nag about, which is deeply unsettling for me.',
+    'Clean sweep. I would like it on record that I barely had to say anything.',
+    'All of it, done. Suspicious. Impressive. Both.',
+    'Nothing left to chase. Go and be insufferable about it.',
+    'Perfect day logged. Do it again tomorrow and we will call it a pattern.',
+    'You have run out of things for me to complain about. Enjoy it, it will not last.'
+  ],
+  risk: [
+    '{st} days on the board, and tonight is where it breaks. {n} more habits and it stands.',
+    '{st} days. You are about to throw it away over {n} habits and one evening.',
+    'That {st}-day streak dies at midnight unless you move. {n} habits.',
+    '{n} habits between you and losing {st} days of work. Your call entirely.',
+    '{st} days built, {n} habits from losing it. This is the bit that decides people.'
+  ],
+  rolling: [
+    '{st} days deep and today is already handled. This is what it looks like when it works.',
+    'Day {st} of the streak and you are ahead of it. Keep it boring.',
+    '{st} days. At this point the habit has you, not the other way round.',
+    '{st} straight days. I am running out of ways to be rude about this.'
+  ]
+};
+// Stable within a day, different the next: the same situation gives the same line
+// all day (so it does not reshuffle under the athlete, or retype every render),
+// but tomorrow it rotates.
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 2147483647;
+  return h;
+}
+function pickLine(bucket, seedKey, tokens) {
+  const arr = NUDGES[bucket] || NUDGES.empty;
+  let line = arr[hashStr(TKEY() + '|' + seedKey) % arr.length];
+  Object.keys(tokens || {}).forEach(k => {
+    line = line.split('{' + k + '}').join(String(tokens[k]));
+  });
+  return line;
+}
+
 const QUIPS = {
   strength: 'Picking heavy things up and putting them down. Sisyphus with better shoulders.',
   steps:    'Every one of these was a decision not to sit down.',
@@ -620,6 +788,45 @@ const QUIPS = {
 // prestiges: the ladder restarts carrying a star (★1 ROOKIE 1, ★2 ROOKIE 1 …),
 // so there is no ceiling — the star is the real flex.
 const RANKS = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','ENFORCER','PREDATOR','MACHINE','RELENTLESS','UNTOUCHABLE','IMMORTAL'];
+
+// ── Rank insignia ─────────────────────────────────────────────────────────
+// Drawn, not imported: straight lines, hard corners, square caps, miter joins,
+// one colour inherited from the text. The set escalates on purpose so the ladder
+// reads at a glance — blocks being laid, then force, then machinery, then a
+// burst. Anything with a curve or a rounded cap belongs to a different app.
+const RANK_ART = {
+  ROOKIE:      'M9 9h6v6H9z',
+  CONTENDER:   'M3 14h6v6H3zM15 8h6v6h-6z',
+  GRINDER:     'M4 20V15M12 20V10M20 20V5',
+  OPERATOR:    'M12 2v6M12 16v6M2 12h6M16 12h6M8 8h8v8H8z',
+  ENFORCER:    'M12 2 21 6v7l-9 9-9-9V6z',
+  PREDATOR:    'M4 3 8 21M11 2 15 20M18 4 22 20',
+  MACHINE:     'M7 7h10v10H7zM12 2v5M12 17v5M2 12h5M17 12h5',
+  RELENTLESS:  'M3 13 12 4l9 9M3 21l9-9 9 9',
+  UNTOUCHABLE: 'M12 2 22 12 12 22 2 12zM12 8l4 4-4 4-4-4z',
+  IMMORTAL:    'M12 1v6M12 17v6M1 12h6M17 12h6M4 4l4.5 4.5M15.5 15.5 20 20M20 4l-4.5 4.5M8.5 15.5 4 20M10 10h4v4h-4z'
+};
+// `rank` is a rankFor() result, or a bare rank name.
+function rankIcon(rank, size, extra) {
+  const name = (rank && rank.name) || rank || RANKS[0];
+  const d = RANK_ART[name] || RANK_ART.ROOKIE;
+  const px = size || 20;
+  return '<svg class="rankart" viewBox="0 0 24 24" aria-hidden="true" '
+       + 'style="width:' + px + 'px;height:' + px + 'px' + (extra ? ';' + extra : '') + '">'
+       + '<path d="' + d + '"/></svg>';
+}
+// The leaderboard hands back a rendered label ("GRINDER 2", "★1 ROOKIE 1"), so
+// pull the rank name back out of it to pick the insignia.
+function rankNameOf(label) {
+  const s = String(label || '').toUpperCase();
+  return RANKS.find(n => s.indexOf(n) !== -1) || RANKS[0];
+}
+// Total XP needed to arrive at a given overall level.
+function cumXpTo(level) {
+  let s = 0;
+  for (let n = 1; n < level; n++) s += levelCost(XP_RULES.base, n);
+  return s;
+}
 const SUBS_PER_RANK = 5;
 const LEVELS_PER_CYCLE = RANKS.length * SUBS_PER_RANK;   // 50
 const MAX_LEVEL_SCAN = 5000;                             // loop guard
@@ -1171,32 +1378,63 @@ function shortOfQualifying() {
   return Math.max(1, need - hs.filter(h => isDone(h)).length);
 }
 
-// ── The nudge (one per day, driven by what is actually missing) ───────────
+// ── The nudge (one a day, driven by what is actually missing) ─────────────
+// Every nudge carries a `key` describing the SITUATION rather than the sentence.
+// The typing card keys off that, so logging another glass of water updates the
+// number in place instead of retyping the whole line from scratch.
 function nudge() {
-  // Loss beats gain: if a real streak is on the line tonight, that is the nudge.
+  const hs = live(), missing = hs.filter(h => !isDone(h));
+
+  // Loss beats gain: a real streak on the line tonight outranks everything.
   if (atRisk()) {
     const st = currentDayStreak(), short = shortOfQualifying();
-    const target = live().filter(h => !isDone(h) && !h.locked)
-                         .sort((a, b) => baseXp(b) - baseXp(a))[0];
-    return { risk: true,
-             line: st + ' day' + (st === 1 ? '' : 's') + ' on the board, and tonight is where it breaks. '
-                 + short + ' more habit' + (short === 1 ? '' : 's') + ' and it stands.',
-             cta: target ? 'SAVE IT · ' + target.name : 'SEE THE RECAP',
-             target: target ? target.id : null };
+    const t = missing.filter(h => !h.locked).sort((a, b) => baseXp(b) - baseXp(a))[0];
+    return { risk: true, key: 'risk',
+             line: pickLine('risk', 'risk', { st: st, n: short }),
+             cta: t ? 'SAVE IT · ' + t.name : 'SEE THE RECAP',
+             target: t ? t.id : null };
   }
-  const missing = live().filter(h => !isDone(h));
-  const water = live().find(h => h.id === 'water');
-  if (water && !isDone(water)) {
-    const left = Math.max(1, Math.ceil(water.target - valOf(TKEY(), 'water')));
-    return { line: 'You have out-hydrated exactly zero houseplants today. ' + left + ' more glass' + (left === 1 ? '' : 'es') + ' and I stop bringing it up.',
-             cta: 'SORT THE WATER', target: water.id };
+
+  // Everything done — the only nudge with nothing to ask for.
+  if (!missing.length) {
+    return { key: 'done', line: pickLine('allDone', 'done'), cta: 'SEE THE RECAP', target: null };
   }
-  if (missing.length) {
-    return { line: missing.length + ' habit' + (missing.length === 1 ? '' : 's') + ' left, and ' + missing[0].name.toLowerCase() + ' is the one you are avoiding. I can tell.',
-             cta: 'OPEN ' + missing[0].name, target: missing[0].id };
+
+  // Nothing logged at all yet: point at the cheapest win rather than the biggest.
+  const doneCount = hs.length - missing.length;
+  if (doneCount === 0) {
+    const easy = missing.filter(h => !h.locked).sort((a, b) => baseXp(a) - baseXp(b))[0] || missing[0];
+    return { key: 'empty', line: pickLine('empty', 'empty'),
+             cta: 'START WITH ' + easy.name, target: easy.id };
   }
-  return { line: 'Everything is checked. I have nothing to nag about, which is deeply unsettling for me.',
-           cta: 'SEE THE RECAP', target: null };
+
+  // Down to one. Name it — being specific is what makes it land.
+  if (missing.length === 1) {
+    const only = missing[0];
+    return { key: 'last:' + only.id,
+             line: pickLine('lastOne', 'last:' + only.id, { name: only.name.toLowerCase() }),
+             cta: only.locked ? 'OPEN YOUR PROGRAMME' : 'FINISH ' + only.name,
+             target: only.locked ? null : only.id };
+  }
+
+  // A run going well and today already qualifies: say so instead of inventing a
+  // complaint. The coach notices both directions.
+  const st = currentDayStreak();
+  if (st >= 5 && dayQualifies(TKEY())) {
+    return { key: 'rolling', line: pickLine('rolling', 'rolling', { st: st }),
+             cta: 'SEE THE RECAP', target: null };
+  }
+
+  // Otherwise: the most valuable thing they can still action, in its own words.
+  const t = missing.filter(h => !h.locked).sort((a, b) => baseXp(b) - baseXp(a))[0] || missing[0];
+  const left = t.kind === 'count'
+    ? Math.max(1, Math.ceil(t.target - valOf(TKEY(), t.id)))
+    : 1;
+  return { key: 'h:' + t.id,
+           line: pickLine(NUDGES[t.id] ? t.id : 'empty', 'h:' + t.id,
+                          { n: fmtVal(t, left), name: t.name.toLowerCase(), unit: t.unit }),
+           cta: t.locked ? 'OPEN YOUR PROGRAMME' : 'SORT ' + t.name,
+           target: t.locked ? null : t.id };
 }
 
 // ── Level-up detection ────────────────────────────────────────────────────
@@ -1376,8 +1614,8 @@ function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); rend
 // is what "deeper" and "back" feel like.
 const TAB_ORDER = ['today', 'progress', 'settings', 'board'];
 function navDir(from, to) {
-  if (to === 'detail' || to === 'manual') return 1;
-  if (from === 'detail' || from === 'manual') return -1;
+  if (to === 'detail' || to === 'manual' || to === 'ranks') return 1;
+  if (from === 'detail' || from === 'manual' || from === 'ranks') return -1;
   const a = TAB_ORDER.indexOf(from), b = TAB_ORDER.indexOf(to);
   if (a < 0 || b < 0 || a === b) return 0;
   return b > a ? 1 : -1;
@@ -1631,23 +1869,29 @@ function countTo(el, key, from, to, dec) {
 // and keyed by the LINE, so a new nudge replaces the node and retypes while an
 // unchanged one is left alone. The caret is a child element rather than a class,
 // because attributes on a static node are still patched from the template.
-function lineKey(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 2147483647;
-  return 'l' + h.toString(36);
-}
-const _typed = new WeakSet();
+const _typeState = new WeakMap();
 function typeLines(root) {
   root.querySelectorAll('[data-type]').forEach(el => {
-    if (_typed.has(el)) return;
-    _typed.add(el);
-    const full = el.textContent;
+    // The template puts the target text in an ATTRIBUTE as well as the content,
+    // because attributes are still patched on a data-static node while its
+    // children are not. So a line whose only change is a counter ("3 more
+    // glasses" → "2 more glasses") is retargeted in place; the typer is only
+    // restarted when the situation itself changes and the key replaces the node.
+    const full = el.getAttribute('data-full') || el.textContent;
+    const prev = _typeState.get(el);
+    if (prev) {
+      prev.full = full;
+      if (prev.done) el.textContent = full;
+      return;
+    }
     // Long lines would keep an athlete waiting to read their own nudge.
-    if (reduced() || full.length > 150) return;
+    if (reduced() || full.length > 150) { el.textContent = full; return; }
     // The untyped remainder stays in the DOM, just invisible, and the caret is
     // zero-width — so the card occupies its FINAL height from the first frame.
     // Typing into an emptied element instead grows the card as it goes, which
     // shoves everything below it and drags the scroll position with it.
+    const st = { full: full, i: 0, done: false };
+    _typeState.set(el, st);
     el.textContent = '';
     const shown = document.createTextNode('');
     const caret = document.createElement('i');
@@ -1656,16 +1900,19 @@ function typeLines(root) {
     rest.style.visibility = 'hidden';
     rest.textContent = full;
     el.append(shown, caret, rest);
-    let i = 0;
     const step = () => {
-      if (!el.isConnected) return;
-      i++;
-      shown.nodeValue = full.slice(0, i);
-      rest.textContent = full.slice(i);
-      if (i < full.length) { setTimeout(step, 13); return; }
+      if (!el.isConnected) { st.done = true; return; }
+      st.i++;
+      // Re-read st.full every frame, so a retarget mid-flight simply lands on
+      // the new text instead of finishing the old one and then jumping.
+      const f = st.full;
+      shown.nodeValue = f.slice(0, st.i);
+      rest.textContent = f.slice(st.i);
+      if (st.i < f.length) { setTimeout(step, 13); return; }
+      st.done = true;
       caret.remove();
       rest.remove();
-      el.textContent = full;
+      el.textContent = f;
     };
     setTimeout(step, 140);
   });
@@ -1789,12 +2036,14 @@ function renderApp() {
     detail:   [openH.source, openH.name],
     board:    [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
     manual:   ['Everything, explained', 'How this works'],
+    ranks:    ['Ten ranks, fifty levels', 'The ladder'],
     settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
     today: pct + '% DONE', progress: earned + ' OF ' + totalAch,
     detail: 'LV ' + habitLevel(openH).lv,
     board: LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '',
+    ranks: 'LV ' + overallLevel().lv,
     settings: ''
   };
   const head = heads[UI.screen] || heads.today;
@@ -1805,13 +2054,17 @@ function renderApp() {
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
   else if (UI.screen === 'board') screenHtml = renderBoard();
   else if (UI.screen === 'manual') screenHtml = renderManual();
+  else if (UI.screen === 'ranks') screenHtml = renderRanks();
   else screenHtml = renderSettings();
 
   // Four tabs, leaderboard last. Habits and achievements are one "Progress"
   // tab — they were two views of the same question.
-  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['SETTINGS','settings','03'],['LEADERBOARD','board','04']];
+  // "BOARD", not "LEADERBOARD": eleven characters cannot fit a quarter of a phone
+  // without either overflowing its cell or shrinking the type below the others.
+  // The screen's own title still reads "Leaderboard".
+  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['SETTINGS','settings','03'],['BOARD','board','04']];
   const activeTab = UI.screen === 'detail' ? 'progress'
-                  : UI.screen === 'manual' ? 'settings' : UI.screen;
+                  : (UI.screen === 'manual' || UI.screen === 'ranks') ? 'settings' : UI.screen;
 
   // Every child of the shell carries a data-k, so when an overlay opens or
   // closes the renderer swaps whole nodes instead of quietly patching a toast
@@ -1862,7 +2115,7 @@ function renderCelebration(ev) {
         <div class="lvrays"></div>
         <div class="lvshock"></div>
         <div class="lvshards">${shardHtml()}</div>
-        <div class="lvbadge"><span class="n">${ev.to}</span><span class="l">LEVEL</span></div>
+        <div class="lvbadge">${promoted ? rankIcon(r, 54, 'stroke-width:1.9') : `<span class="n">${ev.to}</span><span class="l">LEVEL</span>`}</div>
       </div>
       <div class="lvkicker">${prestiged ? 'Prestige' : (promoted ? 'Rank up' : 'Level up')}</div>
       <div class="lvrank">${esc(isHabit ? h.name : r.label)}</div>
@@ -1971,8 +2224,12 @@ function renderToday(LI, doneCount, pct) {
       <div class="block" style="display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:64px;line-height:.85">${LI.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
-            <div class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px;min-width:0">
+            <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
+              ${rankIcon(LI.rank, 17)}
+              <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
+              <span class="go">→</span>
+            </button>
             <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${esc(LI.nextLabel)}</div>
           </div>
         </div>
@@ -1985,7 +2242,7 @@ function renderToday(LI, doneCount, pct) {
 
       <div class="coachcard ${n.risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${n.risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
-        <div class="say" data-k="say:${lineKey(n.line)}" data-static data-type>${esc(n.line)}</div>
+        <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
         <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
       </div>
 
@@ -2040,8 +2297,12 @@ function renderProgress(LI, earned, totalAch) {
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:76px;line-height:.8">${LI.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
-            <div class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</div>
+          <div style="display:flex;flex-direction:column;gap:5px;padding-bottom:6px;min-width:0">
+            <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
+              ${rankIcon(LI.rank, 18)}
+              <span class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</span>
+              <span class="go">→</span>
+            </button>
             <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
           </div>
         </div>
@@ -2276,7 +2537,9 @@ function boardRow(r, lead, i) {
         <span class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</span>
         <span class="mono" style="flex:none;font-size:13px;font-weight:700">${Number(r.xp || 0).toLocaleString()}<span style="font-size:9px;color:var(--muted-soft)"> XP</span></span>
       </div>
-      <div style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(r.rank_label)}</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.2;color:var(--muted)">
+        ${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span>${esc(r.rank_label)}</span>
+      </div>
       <div class="bar" style="height:3px;width:100%"><span data-fill style="width:${pct}%"></span></div>
     </div>
   </div>`;
@@ -2358,9 +2621,11 @@ function renderManual() {
 
       ${block(h2('Levels and ranks') +
         p(`Every level costs more than the one before it — ${levelCost(XP_RULES.base, 1).toLocaleString()} XP for level 2, ${levelCost(XP_RULES.base, 10).toLocaleString()} for level 11. One full day gets you to level 2. Level 20 is about two months of solid work (${cum(20).toLocaleString()} XP).`) +
-        p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}.`) +
-        `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-          ${RANKS.map((r, i) => `<span class="mono" style="font-size:10px;letter-spacing:.06em;padding:4px 8px;border:1px solid var(--rule);color:var(--muted)">${esc(r)}</span>`).join('')}
+        p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}. Every rank has its own insignia — <strong style="color:var(--ink)">tap your rank anywhere in the app</strong> to see the whole ladder and what each one costs.`) +
+        `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+          ${RANKS.map(r => `<span style="display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--rule);color:var(--muted)">
+            ${rankIcon(r, 14, 'stroke-width:2.4')}<span class="mono" style="font-size:9px;letter-spacing:.06em">${esc(r)}</span>
+          </span>`).join('')}
         </div>` +
         p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star — ${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)} — and there is no ceiling after that.`) +
         p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water rank will leave your workout rank behind. That is the point.`))}
@@ -2401,6 +2666,88 @@ function renderManual() {
     </div>`;
 }
 
+// ── The rank ladder ───────────────────────────────────────────────────────
+// Every rank, its insignia, what it costs and where the athlete stands in it.
+// Games always show you the road ahead; before this, Proof's road existed only
+// inside a paragraph of the manual.
+function renderRanks() {
+  const LI = overallLevel(), cur = LI.rank;
+  const curIdx = RANKS.indexOf(cur.name);
+  // The last level of the current rank, and what it takes to clear the whole rank.
+  const rankTop = (curIdx + 1) * SUBS_PER_RANK + cur.star * LEVELS_PER_CYCLE;
+  const toRankUp = Math.max(0, cumXpTo(rankTop + 1) - LI.xp);
+  const nextName = RANKS[(curIdx + 1) % RANKS.length];
+
+  return `
+    <div data-k="screen:ranks" style="${screenAnim()}">
+      <div class="block" style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:74px;height:74px;flex:none;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center">
+            ${rankIcon(cur, 42)}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+            <div class="eyebrow" style="letter-spacing:.14em">You are</div>
+            <div class="hd" style="font-size:26px;line-height:1;letter-spacing:-.01em">${esc(cur.label)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">Level ${LI.lv} · ${LI.xp.toLocaleString()} XP</div>
+          </div>
+        </div>
+        <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
+        <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+          ${toRankUp > 0
+            ? `<strong style="color:var(--ink)">${toRankUp.toLocaleString()} XP</strong> and you are ${esc(nextName)}. That is about ${Math.max(1, Math.round(toRankUp / Math.max(1, perfectDayXp())))} good day${Math.max(1, Math.round(toRankUp / Math.max(1, perfectDayXp()))) === 1 ? '' : 's'}.`
+            : `You have cleared every rank in this cycle. Level ${rankTop + 1} starts the ladder again with a star.`}
+        </div>
+      </div>
+
+      <div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between">
+        <span>The ladder</span><span>${RANKS.length} ranks · ${SUBS_PER_RANK} levels each</span>
+      </div>
+
+      ${RANKS.map((name, i) => {
+        const first = i * SUBS_PER_RANK + 1, last = (i + 1) * SUBS_PER_RANK;
+        const here = curIdx === i;
+        const passed = cur.star > 0 || curIdx > i;
+        const cls = here ? 'here' : (passed ? 'passed' : 'locked');
+        // Within the current rank, how many sub-levels are cleared.
+        const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
+        const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
+        return `<div class="rankrow ${cls}">
+          <div class="badge">${rankIcon(name, 26)}</div>
+          <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+              <span class="nm">${esc(name)}</span>
+              <span class="tag">${here ? 'YOU ARE HERE' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
+            </div>
+            <div class="meta">Levels ${first}–${last}${here ? ' · you are on ' + cur.sub + ' of ' + SUBS_PER_RANK : ''}</div>
+            <div class="subs">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}"></i>`).join('')}</div>
+          </div>
+        </div>`;
+      }).join('')}
+
+      <div class="block" style="display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--divider)">
+        <div class="hd" style="font-size:20px;line-height:1">Past ${RANKS.length * SUBS_PER_RANK}: the star</div>
+        <div style="font-size:13px;line-height:1.55;color:var(--muted)">
+          Clear ${esc(RANKS[RANKS.length - 1])} ${SUBS_PER_RANK} and the ladder starts again carrying a star —
+          <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE + 1).label)}</strong>, then
+          <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE * 2 + 1).label)}</strong>, and on forever.
+          There is no ceiling. The star is the real flex.
+        </div>
+      </div>
+
+      <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
+          Ranks come from your overall level, which is every point you have earned this season —
+          habits, consistency tiers and milestones together. Each habit also carries its own rank on the same ladder.
+        </div>
+        <button class="btn btn-secondary btn-block" ${on(() => go('manual'))}>How the points work</button>
+      </div>
+    </div>`;
+}
+// A perfect day at the current weights — used to translate XP into days.
+function perfectDayXp() {
+  return live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
+}
+
 // ── Settings ──────────────────────────────────────────────────────────────
 function renderSettings() {
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -2416,6 +2763,16 @@ function renderSettings() {
       </div>
 
       ${sectionLabel('How this works')}
+      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('ranks'))}>
+        <span style="display:flex;align-items:center;gap:12px;min-width:0;text-align:left">
+          ${rankIcon(overallLevel().rank, 24)}
+          <span style="display:flex;flex-direction:column;gap:4px;min-width:0">
+            <span class="lbl" style="font-size:15px">The ranks</span>
+            <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">All ${RANKS.length} ranks, what each one costs, and where you stand</span>
+          </span>
+        </span>
+        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+      </button>
       <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('manual'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">Read the manual</span>

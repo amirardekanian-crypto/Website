@@ -57,9 +57,12 @@ The screen they actually live on.
 
 - **Level hero** — overall level, rank label, XP, and progress to the next level.
 - **Today's progress bar** — how many of their tracked habits are done.
-- **The nudge** — one clay card whose copy reacts to what is actually missing (water
-  first, then whichever habit they're avoiding, then a "nothing to nag about" line).
-  Its button opens the habit in question. This is the "nudge" half of *nudge and recap*.
+- **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
+  random from a library of **83 lines across 13 situations** (`NUDGES`): one bucket per
+  habit, plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and
+  streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
+  tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
+  repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
 - **The habit list** — tap the box to tick, tap the name for that habit's history, tap
   `+` on counter habits. Each row shows that habit's own level and current streak.
 - **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
@@ -78,14 +81,26 @@ progress, a log button, its consistency ladder, this-week / best-streak / 35-day
 stats, a 35-day grid, and the last five days with the XP each earned.
 
 ### 03 · SETTINGS
-Profile · **Read the manual** · link to the programme · sync status and a *Sync now*
-button · leaderboard status · dark mode · which habits are tracked (plus adding custom
-ones) · reset today's log.
+Profile · **The ranks** (the ladder, below) · **Read the manual** · link to the
+programme · sync status and a *Sync now* button · leaderboard status · dark mode ·
+which habits are tracked (plus adding custom ones) · reset today's log.
 
 Deliberately *not* here: coach volume, motivation display, replay onboarding. The app
 has one mode — XP and levels, nudge and recap — and doesn't ask athletes to configure it.
 
-### 04 · LEADERBOARD
+### The rank ladder
+Reachable by **tapping your rank** on Today or Progress, and from a Settings row.
+Shows all 10 ranks with their own insignia, what each one costs in XP, which are
+cleared, which one you are standing in (and how far through it), and what the star
+means past level 50. Games always show you the road ahead; before this, Proof's road
+existed only inside a paragraph of the manual.
+
+Insignia are **drawn, not imported** — straight lines, hard corners, square caps,
+one inherited colour, in `RANK_ART`. They escalate on purpose so the ladder reads at
+a glance: blocks being laid, then force, then machinery, then a burst. Anything with
+a curve or a rounded cap belongs to a different app.
+
+### 04 · BOARD
 Opt-in only. Two boards: **this season** (the default) and **past week** (a rolling
 seven days, not a calendar week). See below.
 
@@ -318,7 +333,10 @@ these keys when it syncs.
 ## Voice
 
 Dry, blunt, a little rude — the same coach who says *"your hamstrings have filed a
-complaint with HR"*. Never chirpy, never therapeutic. It notices what you skipped and
+complaint with HR"*. The whole nudge library (`NUDGES`, 83 lines) is written in it, and
+anything added to it has to be: never chirpy, never therapeutic, funny because it is
+true. Tokens available in a line are `{n}` (how many are left), `{name}`, `{unit}` and
+`{st}` (streak days). Never chirpy, never therapeutic. It notices what you skipped and
 says so. Uppercase Barlow Condensed for anything structural; sentence case for the
 lines that talk to you.
 
