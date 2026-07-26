@@ -31,6 +31,13 @@
 --    together. See XP_SYSTEM.md §8.
 --
 -- Safe to re-run.
+--
+-- ⚠️ SUPERSEDED IN PART. `hab_bonus_xp` was replaced twice after this file:
+--    12b gave it a p_season_start argument (badge runs are measured from the
+--    season start), and stage 13b added weekly-quest scoring. The CURRENT
+--    definition lives in `stage13_weekly_quests.sql`. Everything else here —
+--    the rules seed, hab_cfg_of, and the rolling-week leaderboard_top — is
+--    still current.
 
 begin;
 

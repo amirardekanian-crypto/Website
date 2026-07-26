@@ -45,8 +45,14 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–12 are applied and live** (leaderboard, workout-days feed, seasons,
-bonus XP for consistency tiers + milestones).
+**Supabase stages 9–13 are applied and live** (leaderboard, workout-days feed, seasons,
+bonus XP for consistency tiers + milestones, weekly quests).
+
+**Weekly quests** are the coach-facing lever: three a week, Monday→Sunday, worth real XP.
+Amir prescribes a week with `select public.set_quests('2026-07-27', array['w_water5', …]);`
+in the Supabase SQL editor — otherwise they are picked deterministically from the pool.
+The pool lives on the `xp_rules` row **and** as `QUEST_POOL` in `habits.html` (offline
+fallback) — change both together. Full detail in `XP_SYSTEM.md` §8.5.
 
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a

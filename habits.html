@@ -176,10 +176,17 @@
      between "the state changed" and "you just did that". Scoped to .tick on
      purpose: the same cell also holds the lock glyph on a locked habit, and
      these rules would otherwise dash and redraw its shackle. */
-  .boxmark svg.tick { width: 20px; height: 20px; display: block; }
-  .boxmark svg.tick path {
+  /* The stroke rules are GLOBAL, because the tick is reused outside a checkbox
+     (a cleared quest, for one) and a path with no fill rule renders as a solid
+     blob rather than a drawn line. Only the size and the draw animation belong
+     to the habit checkbox. */
+  svg.tick { display: block; width: 100%; height: 100%; }
+  svg.tick path {
     fill: none; stroke: currentColor; stroke-width: 3.4;
     stroke-linecap: square; stroke-linejoin: miter;
+  }
+  .boxmark svg.tick { width: 20px; height: 20px; }
+  .boxmark svg.tick path {
     stroke-dasharray: 24; stroke-dashoffset: 24;
     animation: drawTick .3s cubic-bezier(.5,0,.3,1) .04s forwards;
   }
@@ -543,6 +550,17 @@
 
   /* Leaderboard rows arrive in order, each with its share of the leader's score. */
   .brow { animation: riseIn .34s cubic-bezier(.16,1,.3,1) both; }
+  /* Movement, not just standing. Green for climbing, muted for slipping — a drop
+     is information, not a punishment, so it never gets the accent. */
+  .delta { font-size: 9px; font-weight: 700; letter-spacing: .04em; line-height: 1; }
+  .delta.up { color: var(--accent); }
+  .delta.down { color: var(--muted-soft); }
+  .passline {
+    background: var(--accent); color: var(--bg); padding: 11px 20px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px;
+    line-height: 1.2; text-transform: uppercase; letter-spacing: .01em;
+    animation: riseIn .3s cubic-bezier(.16,1,.3,1);
+  }
 
   /* ── Rank insignia ── */
   .rankart { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: square; stroke-linejoin: miter; }
@@ -638,6 +656,114 @@ const HABITS = [
   { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',               source:'Manual' },
   { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
+// ── Weekly quests ─────────────────────────────────────────────────────────
+// Three every week, Monday to Sunday, worth real XP. They give the week a shape
+// instead of it being seven identical days, and they are the one part of the
+// system Amir sets rather than the athlete earning it passively.
+//
+// A quest's `need` is measured ONLY from the log, so nothing new is stored and
+// both scorers can agree. Four kinds:
+//   daysHit:<habit>  — completed the habit on N separate days that week
+//   total:<habit>    — accumulated N units that week (steps, glasses, hours)
+//   qualify          — N days at streakQualifyPct or better
+//   perfect          — N days with every tracked habit done
+//
+// PRESCRIBING THEM: this pool is the offline fallback. The live one is the
+// `quests` array on the Supabase `xp_rules` row, and a specific week can be
+// pinned with `select public.set_quests('2026-07-27', array['w_water5', …]);`
+// See XP_SYSTEM.md §11.
+const QUEST_POOL = [
+  { id:'w_water5',   title:'THE WELL RUNS DEEP',  note:'Full water on 5 days',        kind:'daysHit:water',    need:5,     xp:150 },
+  { id:'w_water7',   title:'SEVEN FOR SEVEN',     note:'Full water every single day', kind:'daysHit:water',    need:7,     xp:220 },
+  { id:'w_steps50k', title:'FIFTY THOUSAND',      note:'50,000 steps across the week', kind:'total:steps',     need:50000, xp:200 },
+  { id:'w_steps70k', title:'THE LONG WAY ROUND',  note:'70,000 steps across the week', kind:'total:steps',     need:70000, xp:280 },
+  { id:'w_sleep5',   title:'LIGHTS OUT',          note:'Hit your sleep target 5 nights', kind:'daysHit:sleep', need:5,     xp:180 },
+  { id:'w_mob4',     title:'OILED HINGES',        note:'Mobility on 4 days',          kind:'daysHit:mobility', need:4,     xp:120 },
+  { id:'w_breathe4', title:'DEAD CALM',           note:'Breathe on 4 days',           kind:'daysHit:breathe',  need:4,     xp:100 },
+  { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',       kind:'daysHit:supps',    need:7,     xp:140 },
+  { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',    kind:'daysHit:fuel',     need:5,     xp:140 },
+  { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions in the week',  kind:'daysHit:strength', need:3,     xp:250 },
+  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 80% or better',     kind:'qualify',          need:5,     xp:220 },
+  { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',            kind:'perfect',          need:2,     xp:300 }
+];
+const QUESTS_PER_WEEK = 3;
+
+// The server is the authority once it has answered; the pool above is the fallback.
+function questPool() {
+  const s = CFG.questPool;
+  return (Array.isArray(s) && s.length) ? s : QUEST_POOL;
+}
+function questOverrides() { return (CFG.questWeeks && typeof CFG.questWeeks === 'object') ? CFG.questWeeks : {}; }
+
+// Monday of the week a date falls in. ISO weeks, so a "week" is the same seven
+// days for everybody and a quest cannot be farmed by timezone.
+function weekStartOf(dayKey) {
+  const d = parseKey(dayKey), wd = (d.getDay() + 6) % 7;   // Mon = 0
+  return fmtKey(addDays(d, -wd));
+}
+function thisWeekStart() { return weekStartOf(TKEY()); }
+// Which quests are live for a given week: an explicit prescription if Amir set
+// one, otherwise a deterministic pick from the pool seeded on the week itself —
+// so every device and the server agree without storing a thing.
+function questsForWeek(weekKey) {
+  const pool = questPool();
+  const pinned = questOverrides()[weekKey];
+  if (Array.isArray(pinned) && pinned.length) {
+    return pinned.map(id => pool.find(q => q.id === id)).filter(Boolean);
+  }
+  if (pool.length <= QUESTS_PER_WEEK) return pool.slice();
+  const out = [], used = {};
+  let h = hashStr(weekKey);
+  for (let i = 0; out.length < QUESTS_PER_WEEK && i < pool.length * 4; i++) {
+    h = (h * 31 + 17) % 2147483647;
+    const pick = h % pool.length;
+    if (used[pick]) continue;
+    used[pick] = 1;
+    out.push(pool[pick]);
+  }
+  return out;
+}
+// Progress through a quest, and the day it was completed if it was. Everything
+// is derived from the log inside that week.
+function questProgress(q, weekKey) {
+  const start = parseKey(weekKey);
+  const parts = String(q.kind || '').split(':');
+  const kind = parts[0], hid = parts[1];
+  const h = hid ? habitById(hid) : null;
+  let have = 0, doneDay = null;
+  for (let i = 0; i < 7; i++) {
+    const k = fmtKey(addDays(start, i));
+    if (k > TKEY()) break;                       // the future has not happened
+    // Season-bounded like everything else that pays: a week straddling the
+    // season opening must not count the days before it, or the server (which
+    // never sees them) would score the same quest differently.
+    if (!inSeason(k)) continue;
+    if (kind === 'daysHit') { if (h && isDone(h, k)) have++; }
+    else if (kind === 'total') { have += valOf(k, hid); }
+    else if (kind === 'qualify') { if (dayQualifies(k)) have++; }
+    else if (kind === 'perfect') { if (isPerfect(k)) have++; }
+    if (!doneDay && have >= q.need) doneDay = k;
+  }
+  return { have, need: q.need, done: have >= q.need, doneDay,
+           pct: Math.max(0, Math.min(100, Math.round(have / q.need * 100))) };
+}
+// Every quest completion in the athlete's history, as dated events — the same
+// shape tiers and milestones use, so seasons and both board windows filter them
+// with no special cases.
+function questEvents() {
+  const days = seasonDays();
+  if (!days.length) return [];
+  const weeks = {}, out = [];
+  days.forEach(k => { weeks[weekStartOf(k)] = 1; });
+  Object.keys(weeks).sort().forEach(wk => {
+    questsForWeek(wk).forEach(q => {
+      const p = questProgress(q, wk);
+      if (p.done && p.doneDay) out.push({ day: p.doneDay, xp: q.xp, kind: 'quest', id: wk + ':' + q.id });
+    });
+  });
+  return out;
+}
+
 // ── The nudge library ─────────────────────────────────────────────────────
 // One nudge a day, picked from a big pile so nobody hears the same line twice in
 // a week. Tokens: {n} = how many are left · {unit} · {name} · {st} = streak days.
@@ -871,7 +997,8 @@ let _toastTimer = null, _flashTimer = null;
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
   return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null,
-           seenTiers:null, seenAch:null, seenPerfect:null,
+           seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
+           questPool:null, questWeeks:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, updatedAt:0 };
 }
 
@@ -1094,6 +1221,7 @@ async function syncFromCloud() {
       if (cloudCfg && !SYNC.dirty && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
         const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
         const keepTiers = CFG.seenTiers, keepAch = CFG.seenAch, keepPerfect = CFG.seenPerfect;
+        const keepQuests = CFG.seenQuests;
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
         if (!CFG.seen) CFG.seen = keepSeen;
@@ -1104,6 +1232,7 @@ async function syncFromCloud() {
         if (!CFG.seenTiers) CFG.seenTiers = keepTiers;
         if (!Array.isArray(CFG.seenAch)) CFG.seenAch = keepAch;
         if (!CFG.seenPerfect) CFG.seenPerfect = keepPerfect;
+        if (!Array.isArray(CFG.seenQuests)) CFG.seenQuests = keepQuests;
         localStorage.setItem(K_CFG(), JSON.stringify(CFG));
       }
     } catch (e) {}
@@ -1183,6 +1312,25 @@ async function fetchSeason() {
   } catch (e) { /* keep whatever we last cached */ }
 }
 
+// The quest pool lives on the server so the board and the app score the same
+// week. Cached in CFG, exactly like the season, so a phone with no signal keeps
+// working off whatever it last saw (and the built-in pool before that).
+async function fetchQuests() {
+  if (window.IS_DEMO || !ATHLETE_ID) return;
+  try {
+    const sb = _sb();
+    if (!sb) return;
+    const { data, error } = await sb.rpc('get_quests', { p_athlete_id: ATHLETE_ID, p_key: KEY });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (error || !row) return;                   // offline / not deployed → keep the cache
+    const pool = row.pool, weeks = row.weeks;
+    let changed = false;
+    if (Array.isArray(pool) && JSON.stringify(pool) !== JSON.stringify(CFG.questPool)) { CFG.questPool = pool; changed = true; }
+    if (weeks && JSON.stringify(weeks) !== JSON.stringify(CFG.questWeeks)) { CFG.questWeeks = weeks; changed = true; }
+    if (changed) { invalidateBonus(); saveCfg(); }
+  } catch (e) { /* keep whatever we last cached */ }
+}
+
 // A habit's own XP pool for the CURRENT SEASON. Counted even when the habit is
 // currently switched off — XP you earned is never taken back mid-season.
 function habitXp(h) { return seasonDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
@@ -1259,6 +1407,9 @@ function bonusEvents() {
       out.push({ day: k, xp: a.xp, kind: 'milestone', id: a.code });
     });
   });
+
+  // Weekly quests pay the same way: dated, so windows filter them for free.
+  questEvents().forEach(e => out.push(e));
 
   _bonusCache = out;
   return out;
@@ -1517,13 +1668,15 @@ function currentTiers() {
   return out;
 }
 function currentAch() { return ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).map(a => a.code); }
+function currentQuests() { return questEvents().map(e => e.id); }
 function seedUnlocks() {
   CFG.seenTiers = currentTiers();
   CFG.seenAch = currentAch();
   CFG.seenPerfect = isPerfect(TKEY()) ? TKEY() : null;
+  CFG.seenQuests = currentQuests();
 }
 function checkUnlocks() {
-  if (!CFG.seenTiers || !Array.isArray(CFG.seenAch)) { seedUnlocks(); saveCfg(); return; }
+  if (!CFG.seenTiers || !Array.isArray(CFG.seenAch) || !Array.isArray(CFG.seenQuests)) { seedUnlocks(); saveCfg(); return; }
   const tiers = currentTiers(), ach = currentAch(), events = [];
 
   // Tiers are COALESCED BY TIER, not reported per habit. An athlete who has been
@@ -1554,8 +1707,19 @@ function checkUnlocks() {
   // behind them would retroactively become perfect.
   if (isPerfect(TKEY()) && CFG.seenPerfect !== TKEY()) events.push({ kind:'perfect', id:TKEY() });
 
+  // Quests. Only this week's get a takeover — an older week completing is
+  // history arriving late (a cloud sync, a backfilled session), not a moment.
+  const quests = currentQuests(), wk = thisWeekStart();
+  quests.forEach(qid => {
+    if (CFG.seenQuests.indexOf(qid) !== -1) return;
+    if (qid.indexOf(wk + ':') !== 0) return;
+    const q = questPool().find(x => x.id === qid.slice(wk.length + 1));
+    if (q) events.push({ kind:'quest', id:qid, quest:q });
+  });
+
   CFG.seenTiers = tiers;
   CFG.seenAch = ach;
+  CFG.seenQuests = quests;
   if (isPerfect(TKEY())) CFG.seenPerfect = TKEY();
   saveCfg();
   if (!events.length) return;
@@ -1645,7 +1809,35 @@ function go(screen) {
 // That means a tampered localStorage cannot buy a place on the board. The RPC
 // deliberately returns no athlete ids — an id alone would let one client fetch
 // /data/<id>.json and read another athlete's whole programme.
-const LB = { scope:'season', rows:[], joined:false, loading:false, error:null, loaded:false, nameDraft:'' };
+const LB = { scope:'season', rows:[], joined:false, loading:false, error:null, loaded:false, nameDraft:'',
+             deltas:{}, passed:[] };
+// ── Position deltas ───────────────────────────────────────────────────────
+// The board only ever showed a standing. What actually lands is MOVEMENT — that
+// you climbed two places, and whose name you went past. The server returns no
+// history, so the last standing is remembered per scope on the device and the
+// next fetch is diffed against it.
+function applyBoardDeltas() {
+  const seen = (CFG.lbSeen && CFG.lbSeen[LB.scope]) || null;
+  LB.deltas = {}; LB.passed = [];
+  if (seen) {
+    LB.rows.forEach(r => {
+      const was = seen[r.display_name];
+      if (typeof was === 'number' && was !== r.pos) LB.deltas[r.display_name] = was - r.pos;
+    });
+    const me = LB.rows.find(r => r.is_me), myWas = me && seen[me.display_name];
+    if (me && typeof myWas === 'number' && myWas > me.pos) {
+      // Anyone who was above me then and is below me now — that is who I passed.
+      LB.passed = LB.rows
+        .filter(r => !r.is_me && r.pos > me.pos
+                  && typeof seen[r.display_name] === 'number' && seen[r.display_name] < myWas)
+        .map(r => r.display_name);
+    }
+  }
+  const snap = {};
+  LB.rows.forEach(r => { snap[r.display_name] = r.pos; });
+  CFG.lbSeen = Object.assign({}, CFG.lbSeen || {}, { [LB.scope]: snap });
+  saveCfg();
+}
 async function fetchBoard() {
   if (window.IS_DEMO) { LB.error = 'demo'; LB.loaded = true; render(); return; }
   if (LB.loading) return;
@@ -1659,6 +1851,7 @@ async function fetchBoard() {
     if (error) throw error;
     LB.rows = data || [];
     LB.joined = !!(LB.rows.length && LB.rows[0].joined);
+    applyBoardDeltas();
     // `joined` comes back on every row; when the board is empty ask separately.
     if (!LB.rows.length) LB.joined = false;
     LB.error = null;
@@ -1821,6 +2014,7 @@ function render() {
   syncNumbers(app);
   fillBars(app);
   typeLines(app);
+  bindGestures(app);
   document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
 }
 
@@ -1942,6 +2136,87 @@ function fillBars(root) {
 const HAPTIC = { tick:[12], done:[10,40,24], level:[0,26,70,26,70,60], rank:[0,30,60,30,60,30,60,90], tab:[8] };
 function haptic(kind) {
   try { if (navigator.vibrate) navigator.vibrate(HAPTIC[kind] || HAPTIC.tick); } catch (e) {}
+  blip(kind);
+}
+
+// ── Sound ─────────────────────────────────────────────────────────────────
+// Off unless the athlete turns it on, and synthesised rather than loaded — a
+// short square blip costs no bytes and cannot fail to download. This is also the
+// only feedback an iPhone actually gets, since Safari has no vibration API.
+let _actx = null;
+const BLIP = { tick:[660,0.055,0.05], done:[880,0.14,0.07], level:[1046,0.2,0.075],
+               rank:[1318,0.26,0.08], tab:[520,0.035,0.035] };
+function blip(kind) {
+  if (!CFG || !CFG.sound) return;
+  const spec = BLIP[kind] || BLIP.tick;
+  try {
+    _actx = _actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (_actx.state === 'suspended') _actx.resume();
+    const t = _actx.currentTime;
+    const osc = _actx.createOscillator(), gain = _actx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(spec[0], t);
+    if (kind !== 'tick' && kind !== 'tab') osc.frequency.exponentialRampToValueAtTime(spec[0] * 1.5, t + spec[1] * 0.7);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(spec[2], t + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + spec[1]);
+    osc.connect(gain); gain.connect(_actx.destination);
+    osc.start(t); osc.stop(t + spec[1] + 0.05);
+  } catch (e) { /* no audio on this device — never a reason to break a tick */ }
+}
+
+// ── Gestures ──────────────────────────────────────────────────────────────
+// Bound once per node (the renderer keeps nodes alive, so binding per render
+// would stack listeners). Two things a sheet on a phone should always do: come
+// away under your thumb, and let you hold a stepper instead of tapping it forty
+// times to log ten thousand steps.
+const _bound = new WeakSet();
+function bindGestures(root) {
+  const sheet = root.querySelector('.sheet');
+  if (sheet && !_bound.has(sheet)) {
+    _bound.add(sheet);
+    let y0 = null, dy = 0, h = 0;
+    sheet.addEventListener('pointerdown', ev => {
+      // Only drag from the sheet's own chrome, never from a control inside it.
+      if (ev.target.closest('button, input, .stepper')) return;
+      y0 = ev.clientY; dy = 0; h = sheet.getBoundingClientRect().height;
+      sheet.style.transition = 'none';
+      sheet.setPointerCapture(ev.pointerId);
+    });
+    sheet.addEventListener('pointermove', ev => {
+      if (y0 === null) return;
+      dy = Math.max(0, ev.clientY - y0);
+      sheet.style.transform = 'translateY(' + dy + 'px)';
+    });
+    const release = () => {
+      if (y0 === null) return;
+      const far = dy > Math.min(120, h * 0.3);
+      y0 = null;
+      sheet.style.transition = 'transform .24s cubic-bezier(.16,1,.3,1)';
+      if (far) {
+        sheet.style.transform = 'translateY(100%)';
+        haptic('tab');
+        setTimeout(() => { UI.sheet = null; render(); }, 180);
+      } else {
+        sheet.style.transform = '';
+      }
+    };
+    sheet.addEventListener('pointerup', release);
+    sheet.addEventListener('pointercancel', release);
+  }
+
+  root.querySelectorAll('.stepper button').forEach(btn => {
+    if (_bound.has(btn)) return;
+    _bound.add(btn);
+    let hold = null, rep = null;
+    const stop = () => { clearTimeout(hold); clearInterval(rep); hold = rep = null; };
+    btn.addEventListener('pointerdown', () => {
+      // 420ms before it starts repeating, then ~9/sec — fast enough for 10,000
+      // steps, slow enough that a normal tap is never mistaken for a hold.
+      hold = setTimeout(() => { rep = setInterval(() => btn.click(), 110); }, 420);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(e => btn.addEventListener(e, stop));
+  });
 }
 
 // ── The XP flight ─────────────────────────────────────────────────────────
@@ -2145,6 +2420,11 @@ function renderBadgeCelebration(ev) {
     title = ev.tier.name;
     sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. +' + paid.toLocaleString()
         + ' XP, and the badge is yours for good.';
+  } else if (ev.kind === 'quest') {
+    badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
+    kicker = 'Quest complete';
+    title = ev.quest.title;
+    sub = ev.quest.note + '. +' + ev.quest.xp.toLocaleString() + ' XP.';
   } else if (ev.kind === 'milestone') {
     badge = ev.ach.code; badgeLabel = 'MILESTONE'; codeClass = ' code';
     kicker = 'Unlocked';
@@ -2246,6 +2526,8 @@ function renderToday(LI, doneCount, pct) {
         <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
       </div>
 
+      ${renderQuestBlock()}
+
       ${hs.map(h => habitRow(h, 'today')).join('')}
 
       <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
@@ -2279,6 +2561,55 @@ function renderToday(LI, doneCount, pct) {
         Tap a habit's name for its history and rank. Steps, sleep, water and meals take a number — tap the +, or open the habit to log it.
       </div>
     </div>`;
+}
+
+// ── This week's quests ────────────────────────────────────────────────────
+// Three targets that give the week a shape. Shown on Today under the nudge,
+// because a quest only means anything while there is still week left to do it in.
+function renderQuestBlock() {
+  const wk = thisWeekStart(), qs = questsForWeek(wk);
+  if (!qs.length) return '';
+  const prog = qs.map(q => ({ q, p: questProgress(q, wk) }));
+  const doneN = prog.filter(x => x.p.done).length;
+  const left = 7 - Math.min(7, Math.round((today() - parseKey(wk)) / 86400000) + 1);
+  const earned = prog.filter(x => x.p.done).reduce((s, x) => s + x.q.xp, 0);
+  const onOffer = qs.reduce((s, q) => s + q.xp, 0);
+
+  return `
+    <div class="block" data-k="quests" style="display:flex;flex-direction:column;gap:12px;border-bottom:2px solid var(--divider)">
+      <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+        <span>This week</span>
+        <span>${doneN} of ${qs.length} · ${left > 0 ? left + ' day' + (left === 1 ? '' : 's') + ' left' : 'last day'}</span>
+      </div>
+      ${prog.map(({ q, p }) => `
+        <div data-k="q:${esc(q.id)}" style="display:flex;gap:12px;align-items:center;${p.done ? '' : 'opacity:.92'}">
+          <div class="hd" style="width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;
+            ${p.done ? 'background:var(--accent);color:var(--bg);border:2px solid var(--accent)' : 'border:2px solid var(--box);color:var(--muted-soft)'}">
+            ${p.done ? '<span style="width:17px;height:17px;display:block">' + TICK + '</span>' : 'Q'}
+          </div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+              <span class="hd" style="font-size:15px;line-height:1">${esc(q.title)}</span>
+              <span class="mono" style="flex:none;font-size:10px;font-weight:700;color:${p.done ? 'var(--clay-deep)' : 'var(--muted-soft)'}">+${q.xp}</span>
+            </div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">
+              ${esc(q.note)} · <strong style="color:var(--ink)">${fmtQuestVal(q, p.have)} / ${fmtQuestVal(q, p.need)}</strong>
+            </div>
+            <div class="bar" style="height:4px;width:100%"><span data-fill style="width:${p.pct}%"></span></div>
+          </div>
+        </div>`).join('')}
+      <div style="font-size:11px;line-height:1.4;color:var(--muted-soft)">
+        ${doneN === qs.length
+          ? 'Every quest cleared — ' + earned.toLocaleString() + ' XP banked. New ones on Monday.'
+          : earned > 0
+            ? earned.toLocaleString() + ' XP banked, ' + (onOffer - earned).toLocaleString() + ' still on the table. Quests reset Monday.'
+            : onOffer.toLocaleString() + ' XP on the table this week. They reset Monday, finished or not.'}
+      </div>
+    </div>`;
+}
+// Big counter totals read better rounded; day counts are just numbers.
+function fmtQuestVal(q, v) {
+  return String(q.kind || '').indexOf('total:') === 0 ? Math.round(v).toLocaleString() : Math.round(v);
 }
 
 // ── Progress — habits and achievements in one tab ─────────────────────────
@@ -2498,6 +2829,9 @@ function renderBoard() {
     // rather than arithmetic.
     const lead = Math.max(1, ...LB.rows.map(r => Number(r.xp) || 0));
     body = `
+      ${LB.passed.length ? `<div class="passline" data-k="passed">
+        You passed ${esc(LB.passed.slice(0, 2).join(' and '))}${LB.passed.length > 2 ? ' and ' + (LB.passed.length - 2) + ' more' : ''} since you last looked.
+      </div>` : ''}
       <div>
         ${top.map((r, i) => boardRow(r, lead, i)).join('')}
       </div>
@@ -2531,7 +2865,12 @@ function boardRow(r, lead, i) {
   const pct = Math.max(2, Math.round((Number(r.xp) || 0) / (lead || 1) * 100));
   return `<div class="row-rule brow" data-k="brow:${esc(String(r.display_name || r.pos))}"
     style="display:flex;gap:14px;align-items:center;padding:14px 20px;animation-delay:${((i || 0) * 0.05).toFixed(2)}s;${r.is_me ? 'background:var(--accent-100);' : ''}">
-    <div class="hd" style="width:38px;flex:none;font-size:22px;line-height:1;text-align:right;color:${medal ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${r.pos}</div>
+    <div style="width:38px;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+      <span class="hd" style="font-size:22px;line-height:1;color:${medal ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${r.pos}</span>
+      ${(() => { const d = LB.deltas[r.display_name];
+                 if (!d) return '';
+                 return '<span class="mono delta ' + (d > 0 ? 'up' : 'down') + '">' + (d > 0 ? '▲' : '▼') + Math.abs(d) + '</span>'; })()}
+    </div>
     <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
         <span class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</span>
@@ -2629,6 +2968,20 @@ function renderManual() {
         </div>` +
         p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star — ${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)} — and there is no ceiling after that.`) +
         p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water rank will leave your workout rank behind. That is the point.`))}
+
+      ${block(h2('Weekly quests') +
+        p(`Every Monday you get <strong style="color:var(--ink)">${QUESTS_PER_WEEK} quests</strong> — targets for the week rather than the day. They sit on your Today screen, they are worth real points, and they expire on Sunday night whether you finish them or not.`) +
+        `<div style="display:flex;flex-direction:column;gap:0">
+          ${questsForWeek(thisWeekStart()).map(q => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
+            <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <span class="hd" style="font-size:14px;line-height:1">${esc(q.title)}</span>
+              <span style="font-size:11px;color:var(--muted)">${esc(q.note)}</span>
+            </span>
+            <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">+${q.xp}</span>
+          </div>`).join('')}
+        </div>` +
+        `<div style="height:12px"></div>` +
+        p(`Your coach sets these. Some weeks they are picked for you, some weeks Amir picks them himself — either way everybody on the app gets the same three, so the leaderboard stays fair.`))}
 
       ${block(h2('Consistency') +
         p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a streak never takes a badge back.`) +
@@ -2735,14 +3088,140 @@ function renderRanks() {
       </div>
 
       <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:12px">
+        <button class="btn btn-primary btn-block" ${on(shareRankCard)}>Share your rank</button>
         <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
           Ranks come from your overall level, which is every point you have earned this season —
-          habits, consistency tiers and milestones together. Each habit also carries its own rank on the same ladder.
+          habits, quests, consistency tiers and milestones together. Each habit also carries its
+          own rank on the same ladder.
         </div>
         <button class="btn btn-secondary btn-block" ${on(() => go('manual'))}>How the points work</button>
       </div>
     </div>`;
 }
+// ── The shareable rank card ───────────────────────────────────────────────
+// 1080×1080, drawn on a canvas so it can be shared straight out of the app. The
+// insignia is the SAME path data the app draws, run through Path2D — one source
+// of truth, so a rank can never look different on the card than it does in here.
+// Brand rules apply: green ground, paper type, clay-2 as the only accent, hard
+// edges, Barlow Condensed uppercase.
+const CARD = { green:'#0E4A36', paper:'#FAF7F2', clay2:'#E06B43', ink:'#1A1A1A' };
+async function buildRankCard() {
+  const S = 1080, LI = overallLevel(), r = LI.rank;
+  const c = document.createElement('canvas');
+  c.width = S; c.height = S;
+  const x = c.getContext('2d');
+  // `fonts.ready` alone is not enough: a face the page has never painted at that
+  // weight may not be downloaded yet, and canvas silently falls back to a system
+  // sans — which is exactly how a brand card stops looking like the brand. Ask
+  // for each face explicitly and wait for it.
+  try {
+    if (document.fonts && document.fonts.load) {
+      await Promise.all([
+        document.fonts.load('900 132px "Barlow Condensed"'),
+        document.fonts.load('900 86px "Barlow Condensed"'),
+        document.fonts.load('900 32px "Barlow Condensed"'),
+        document.fonts.load('700 26px "Space Mono"'),
+        document.fonts.load('700 20px "Space Mono"'),
+        document.fonts.load('500 34px "Barlow"'),
+        document.fonts.load('400 26px "Barlow"')
+      ]);
+    }
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  } catch (e) { /* fall back to system type rather than no card at all */ }
+
+  x.fillStyle = CARD.green; x.fillRect(0, 0, S, S);
+  // A quiet grid of hairlines — texture without a gradient or a glow.
+  x.strokeStyle = 'rgba(250,247,242,0.055)'; x.lineWidth = 2;
+  for (let i = 1; i < 9; i++) {
+    x.beginPath(); x.moveTo(i * S / 9, 0); x.lineTo(i * S / 9, S); x.stroke();
+    x.beginPath(); x.moveTo(0, i * S / 9); x.lineTo(S, i * S / 9); x.stroke();
+  }
+  const PAD = 88;
+  // Eyebrow
+  x.fillStyle = CARD.clay2;
+  x.font = '700 26px "Space Mono", monospace';
+  x.letterSpacing = '6px';
+  x.fillText('PROOF · AA PERFORMANCE', PAD, PAD + 26);
+  x.letterSpacing = '0px';
+
+  // Insignia in a paper square, drawn from RANK_ART via Path2D.
+  const box = 260, bx = PAD, by = 210;
+  x.fillStyle = CARD.paper; x.fillRect(bx, by, box, box);
+  x.save();
+  const g = 150;                                   // glyph size inside the square
+  x.translate(bx + (box - g) / 2, by + (box - g) / 2);
+  x.scale(g / 24, g / 24);
+  x.strokeStyle = CARD.green; x.lineWidth = 2; x.lineCap = 'square'; x.lineJoin = 'miter';
+  x.stroke(new Path2D(RANK_ART[r.name] || RANK_ART.ROOKIE));
+  x.restore();
+
+  // Rank, big.
+  x.fillStyle = CARD.paper;
+  x.font = '900 132px "Barlow Condensed", sans-serif';
+  x.fillText(r.label.toUpperCase(), PAD, by + box + 148);
+  x.fillStyle = 'rgba(250,247,242,0.72)';
+  x.font = '500 34px "Barlow", sans-serif';
+  x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', PAD, by + box + 200);
+
+  // Three facts, on a rule.
+  // Three facts that are always worth showing. Deliberately not "today's %" —
+  // that reads as 12% for most of the day and this card gets shared.
+  const stats = [
+    [String(currentDayStreak()), 'DAY STREAK'],
+    [String(allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0)), 'BADGES'],
+    [String(seasonDays().filter(isPerfect).length), 'PERFECT DAYS']
+  ];
+  const ry = S - PAD - 210;
+  x.strokeStyle = 'rgba(250,247,242,0.3)'; x.lineWidth = 3;
+  x.beginPath(); x.moveTo(PAD, ry); x.lineTo(S - PAD, ry); x.stroke();
+  stats.forEach((st, i) => {
+    const sx = PAD + i * ((S - PAD * 2) / 3);
+    x.fillStyle = CARD.paper;
+    x.font = '900 86px "Barlow Condensed", sans-serif';
+    x.fillText(st[0], sx, ry + 92);
+    x.fillStyle = CARD.clay2;
+    x.font = '700 20px "Space Mono", monospace';
+    x.letterSpacing = '3px';
+    x.fillText(st[1], sx, ry + 128);
+    x.letterSpacing = '0px';
+  });
+
+  // Sign-off.
+  x.fillStyle = CARD.paper;
+  x.font = '900 32px "Barlow Condensed", sans-serif';
+  x.fillText('@AMIRARDEKANIAN', PAD, S - PAD);
+  x.fillStyle = 'rgba(250,247,242,0.55)';
+  x.font = '400 26px "Barlow", sans-serif';
+  const site = 'AMIRARDEKANI.COM';
+  x.fillText(site, S - PAD - x.measureText(site).width, S - PAD);
+
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+async function shareRankCard() {
+  const LI = overallLevel();
+  try {
+    const blob = await buildRankCard();
+    if (!blob) { toast('Could not build the card on this phone.'); return; }
+    const file = new File([blob], 'proof-rank.png', { type: 'image/png' });
+    const text = LI.rank.label + ' · level ' + LI.lv + ' on Proof.';
+    // Share sheet where it exists (iOS and Android both do), download otherwise.
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      await navigator.share({ files: [file], text: text });
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'proof-rank.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast('Card saved to your downloads.');
+  } catch (e) {
+    // A cancelled share sheet throws AbortError — that is not a failure.
+    if (e && e.name === 'AbortError') return;
+    toast('Could not share the card just now.');
+  }
+}
+
 // A perfect day at the current weights — used to translate XP into days.
 function perfectDayXp() {
   return live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
@@ -2819,6 +3298,13 @@ function renderSettings() {
       <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
         <span class="lbl" style="font-size:15px">Dark mode</span>
         <span class="sw ${CFG.dark ? 'on' : ''}"><i></i></span>
+      </button>
+      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.sound = !CFG.sound; saveCfg(); render(); if (CFG.sound) haptic('done'); })}>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">Sound</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">A short blip when you tick something. Off by default.</span>
+        </span>
+        <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
       </button>
 
       ${sectionLabel('Tracked habits')}
@@ -2929,6 +3415,7 @@ function showError(msg) {
   // Which season we are in decides what scores, so settle that before anything
   // reads XP — including the workout import, which must not reach back further.
   await fetchSeason();
+  await fetchQuests();
   // Sessions finished in the training app tick the WORKOUT habit here. The
   // dates come from the server, not from the other app's storage.
   importWorkoutDays(await fetchWorkoutDays());
