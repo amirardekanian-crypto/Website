@@ -17,6 +17,24 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - `CODEBASE.md` — technical map of the repo.
 - `Content/PRODUCT.md` — what the product/business actually is (internal brief; pricing, voice, backend).
 - `Content/HOW-IT-WORKS.md` — customer-facing explainer of the coaching process.
+- `HABITS.md` — **the habit app (`habits.html`, "Proof") brief.** Start here for anything
+  habit-tracker related: the four tabs, the eight habits, how progression works, the
+  leaderboard, and how it links both ways with `program.html`.
+- `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
+
+## Working on the habit app (`habits.html`) — keep four things in sync
+Whenever you change how Proof behaves, update **all** of these in the same PR, or the
+next chat will be working from a lie:
+1. **`HABITS.md`** — the brief (what it is, what each tab does).
+2. **`XP_SYSTEM.md`** — if you touched XP, levels, ranks, consistency or pacing.
+3. **The in-app manual** — `renderManual()` in `habits.html`, which athletes open from
+   Settings → *Read the manual*. Its **numbers** read from the live constants and update
+   themselves; its **prose** does not — fix that by hand when behaviour changes.
+4. **`privacy.html`** — if you changed what data is stored or shared.
+
+Also: XP is scored **twice** — `XP_RULES` in `habits.html` and the `xp_rules` row in
+Supabase (the leaderboard scores server-side). Change both together or the board and the
+athletes' own screens will disagree.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). `.claude/coaching-log/` is the coach-only per-athlete rationale log.
 

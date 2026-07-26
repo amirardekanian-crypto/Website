@@ -369,6 +369,31 @@
   }
   .hlv { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
 
+  /* Cross-link back to the training programme — the other half of the pair.
+     Mirrors the Daily Habits card in program.html so the two apps read as one
+     product rather than two separate tools. */
+  .crosslink-wrap { padding: 4px 20px 22px; }
+  .crosslink {
+    width: 100%; display: flex; align-items: center; gap: 13px; text-align: left;
+    padding: 14px 15px; background: var(--surface); border: 1px solid var(--divider);
+  }
+  .crosslink:active { transform: scale(0.99); }
+  .crosslink-mark {
+    flex: none; width: 42px; height: 42px; background: var(--accent); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .crosslink-mark svg { width: 21px; height: 21px; }
+  .crosslink-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .crosslink-title {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
+    line-height: 1; text-transform: uppercase; letter-spacing: .02em;
+  }
+  .crosslink-sub { font-size: 11px; line-height: 1.3; color: var(--muted); }
+  .crosslink-go {
+    flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 19px; color: var(--clay-deep);
+  }
+
   /* Scope chips (leaderboard: this week / all time) */
   .chips { display: flex; gap: 8px; }
   .chip {
@@ -427,7 +452,9 @@ const XP_RULES = {
 };
 
 const HABITS = [
-  { id:'strength', name:'STRENGTH', code:'ST', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'Manual' },
+  // The id stays 'strength' so nobody's history or XP is orphaned by the
+  // rename. It is fed by program.html: finishing a session there ticks it here.
+  { id:'strength', name:'WORKOUT',  code:'WO', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'From your programme' },
   { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
   { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
   { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                 source:'Manual' },
@@ -562,6 +589,46 @@ function saveLog() {
   try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {}
   markDirty();
 }
+// ── The WORKOUT habit is fed by the training app, via the server ───────────
+// These are two separate apps and neither writes into the other's storage. The
+// one shared fact — "did they train that day" — comes from the server:
+// program.html records every finished session to session_history, and this
+// read-only RPC hands back the dates.
+async function fetchWorkoutDays() {
+  if (window.IS_DEMO || !ATHLETE_ID) return [];
+  try {
+    const sb = _sb();
+    if (!sb) return [];
+    // Only ever look back far enough to matter; keeps the payload tiny.
+    const since = fmtKey(addDays(today(), -120));
+    const { data, error } = await sb.rpc('get_workout_days', {
+      p_athlete_id: ATHLETE_ID, p_key: KEY, p_since: since
+    });
+    if (error || !Array.isArray(data)) return [];
+    return data.map(d => String(d).slice(0, 10));
+  } catch (e) { return []; }   // offline, or the migration is not applied yet
+}
+// Import each date once: after that the athlete is in charge, so unticking a
+// day makes it stay unticked rather than reappearing on the next load.
+function importWorkoutDays(src) {
+  if (!Array.isArray(src) || !src.length) return false;
+  const seen = Array.isArray(CFG.wkImported) ? CFG.wkImported : [];
+  const h = habitById('strength');
+  let changed = false, added = false;
+  src.forEach(d => {
+    if (typeof d !== 'string' || seen.indexOf(d) !== -1) return;
+    seen.push(d);
+    added = true;
+    if (!LOG[d]) LOG[d] = {};
+    if ((Number(LOG[d].strength) || 0) < h.target) { LOG[d].strength = h.target; changed = true; }
+  });
+  if (!added) return false;
+  CFG.wkImported = seen.slice(-400);
+  if (changed) saveLog();
+  saveCfg();
+  return changed;
+}
+
 function saveMeta() {
   try { localStorage.setItem(K_META(), JSON.stringify({ dirty: SYNC.dirty, lastOk: SYNC.lastOk })); } catch (e) {}
 }
@@ -945,6 +1012,15 @@ async function joinBoard(name, joining) {
     toast('Could not reach the leaderboard. Try again when you have signal.');
   }
 }
+// The other half of the pair. Hand the id and key across exactly as this app
+// resolved them — an installed PWA often opens without ?key= in the URL.
+function programUrl() {
+  let url = 'program.html?client=' + encodeURIComponent(ATHLETE_ID);
+  if (KEY) url += '&key=' + encodeURIComponent(KEY);
+  return url;
+}
+function goProgram() { window.location.href = programUrl(); }
+
 function defaultDisplayName() {
   const f = (ATHLETE.firstName || 'Athlete').trim();
   const l = (ATHLETE.lastName || '').trim();
@@ -1019,6 +1095,7 @@ function renderApp() {
     progress: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Progress'],
     detail:   [openH.source, openH.name],
     board:    [LB.scope === 'week' ? 'This week · resets Monday' : 'All time', 'Leaderboard'],
+    manual:   ['Everything, explained', 'How this works'],
     settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
@@ -1034,12 +1111,14 @@ function renderApp() {
   else if (UI.screen === 'progress') screenHtml = renderProgress(LI, earned, totalAch);
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
   else if (UI.screen === 'board') screenHtml = renderBoard();
+  else if (UI.screen === 'manual') screenHtml = renderManual();
   else screenHtml = renderSettings();
 
   // Four tabs, leaderboard last. Habits and achievements are one "Progress"
   // tab — they were two views of the same question.
   const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['SETTINGS','settings','03'],['LEADERBOARD','board','04']];
-  const activeTab = UI.screen === 'detail' ? 'progress' : UI.screen;
+  const activeTab = UI.screen === 'detail' ? 'progress'
+                  : UI.screen === 'manual' ? 'settings' : UI.screen;
 
   return `
     ${window.IS_DEMO ? '<div class="demo-banner">Demo mode — nothing is saved to the cloud</div>' : ''}
@@ -1167,6 +1246,19 @@ function renderToday(LI, doneCount, pct) {
           Strongest: <strong style="color:var(--ink)">${esc(strongest.h.name)}</strong> ${strongest.w}/7 ·
           weakest: <strong style="color:var(--ink)">${esc(weakest.h.name)}</strong> ${weakest.w}/7.
         </div>` : ''}
+      </div>
+
+      <div class="crosslink-wrap">
+        <button class="crosslink" ${on(goProgram)}>
+          <span class="crosslink-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6M6 5v14M18 5v14M21 9v6M6 12h12"/></svg>
+          </span>
+          <span class="crosslink-body">
+            <span class="crosslink-title">Your training programme</span>
+            <span class="crosslink-sub">Today's session, your plan and the library</span>
+          </span>
+          <span class="crosslink-go">→</span>
+        </button>
       </div>
 
       <div style="padding:0 20px 30px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
@@ -1442,6 +1534,83 @@ function renderBoardJoin() {
     </div>`;
 }
 
+// ── The manual ────────────────────────────────────────────────────────────
+// Every number here is READ FROM THE LIVE CONSTANTS rather than typed out, so
+// retuning XP_RULES, RANKS or CONSISTENCY_TIERS updates this page by itself and
+// it can never quietly go out of date. If you change how something *works*
+// (not just its number), update the prose here too — see HABITS.md.
+function renderManual() {
+  const hs = allHabits();
+  const perfectDay = live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
+  const cum = (L) => { let s = 0; for (let n = 1; n < L; n++) s += levelCost(XP_RULES.base, n); return s; };
+  const water = habitById('water');
+  const h2 = (t) => `<div class="hd" style="font-size:22px;line-height:1;margin-bottom:10px">${t}</div>`;
+  const p = (t) => `<p style="font-size:13.5px;line-height:1.6;color:var(--muted);margin-bottom:12px">${t}</p>`;
+  const block = (inner) => `<div class="block" style="display:flex;flex-direction:column">${inner}</div>`;
+
+  return `
+    <div style="animation:fadeIn .25s ease">
+      ${block(h2('The daily loop') +
+        p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
+        p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`))}
+
+      ${block(h2('What each habit is worth') +
+        p(`Points are weighted by how much the habit actually moves your health. Your training session pays the most, then daily steps.`) +
+        `<div style="display:flex;flex-direction:column;gap:0">
+          ${hs.map(h => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
+            <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
+              <span style="font-size:11px;color:var(--muted)">${esc(h.goal || h.source)}</span>
+            </span>
+            <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">${baseXp(h)} <span style="font-size:9px;color:var(--muted-soft)">XP</span></span>
+          </div>`).join('')}
+        </div>` +
+        `<div style="height:12px"></div>` +
+        p(`<strong style="color:var(--ink)">Finishing pays more than nearly finishing.</strong> Habits you count — water, steps, sleep, meals — pay as you go, then add a bonus once you hit the target. ${water ? `${water.target / 2} of ${water.target} glasses earns ${xpFor(water, water.target / 2)} XP; all ${water.target} earns ${xpFor(water, water.target)} XP.` : ''}`) +
+        p(`A perfect day is currently <strong style="color:var(--ink)">${perfectDay.toLocaleString()} XP</strong>.`))}
+
+      ${block(h2('How to earn more') +
+        `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted)">
+          <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list, and it ticks itself when you finish a session in your programme.</div>
+          <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
+          <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
+          <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points, and they only come from unbroken runs.</div>
+        </div>`)}
+
+      ${block(h2('Levels and ranks') +
+        p(`Every level costs more than the one before it — ${levelCost(XP_RULES.base, 1).toLocaleString()} XP for level 2, ${levelCost(XP_RULES.base, 10).toLocaleString()} for level 11. One full day gets you to level 2. Level 20 is about two months of solid work (${cum(20).toLocaleString()} XP).`) +
+        p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}.`) +
+        `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+          ${RANKS.map((r, i) => `<span class="mono" style="font-size:10px;letter-spacing:.06em;padding:4px 8px;border:1px solid var(--rule);color:var(--muted)">${esc(r)}</span>`).join('')}
+        </div>` +
+        p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star — ${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)} — and there is no ceiling after that.`) +
+        p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water rank will leave your workout rank behind. That is the point.`))}
+
+      ${block(h2('Consistency') +
+        p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a streak never takes a badge back.`) +
+        `<div style="display:flex;flex-direction:column;gap:0">
+          ${CONSISTENCY_TIERS.map(t => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
+            <span class="hd" style="font-size:14px">${esc(t.name)}</span>
+            <span class="mono" style="font-size:11px;color:var(--muted)">${t.days} DAYS IN A ROW</span>
+          </div>`).join('')}
+        </div>`)}
+
+      ${block(h2('The leaderboard') +
+        p(`It is <strong style="color:var(--ink)">off until you join</strong>. Nobody sees you before that.`) +
+        p(`When you join you pick your own name — it does not have to be your real one. Other athletes see <strong style="color:var(--ink)">that name and your points</strong>. They never see your habits, your logs, your programme or anything else. You can rename yourself or leave whenever you like.`) +
+        p(`There are two boards. <strong style="color:var(--ink)">This week</strong> resets every Monday, so a good week beats a long history and anyone can win it. <strong style="color:var(--ink)">All time</strong> is every point you have ever earned.`) +
+        p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
+
+      ${block(h2('Your data') +
+        p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
+        p(`Your coach can see your habits as part of coaching you. Other athletes cannot — unless you join the leaderboard, and even then only your chosen name and points.`))}
+
+      <div style="padding:4px 20px 34px">
+        <button class="btn btn-secondary btn-block" ${on(() => go('settings'))}>Back to settings</button>
+      </div>
+    </div>`;
+}
+
 // ── Settings ──────────────────────────────────────────────────────────────
 function renderSettings() {
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -1455,6 +1624,24 @@ function renderSettings() {
           <div style="font-size:11px;line-height:1;color:var(--muted)">Coached by Amir · day ${dayNumber()}</div>
         </div>
       </div>
+
+      ${sectionLabel('How this works')}
+      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('manual'))}>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">Read the manual</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Points, levels, ranks, consistency and the leaderboard — explained</span>
+        </span>
+        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+      </button>
+
+      ${sectionLabel('Your training')}
+      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(goProgram)}>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">Open your programme</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Today's session, your plan and the library</span>
+        </span>
+        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+      </button>
 
       ${sectionLabel('Your data')}
       <div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px">
@@ -1589,6 +1776,9 @@ function showError(msg) {
 
   loadLocal();
   await syncFromCloud();
+  // Sessions finished in the training app tick the WORKOUT habit here. The
+  // dates come from the server, not from the other app's storage.
+  importWorkoutDays(await fetchWorkoutDays());
   // Levels that arrived with a sync still get their moment; a first run (or a
   // changed XP system) only re-baselines, so nobody is ambushed by a queue.
   checkLevelUps();
