@@ -1,0 +1,43 @@
+carousel-kit-express-review.html — build notes
+
+23 template slides, in order placed:
+1. tpl-cover
+2. tpl-myth
+3. tpl-big
+4. tpl-heatmap
+5. tpl-rules light
+6. tpl-stat
+7. tpl-quote
+8. tpl-compare
+9. tpl-list
+10. tpl-cta
+11. tpl-feature
+12. tpl-journey
+13. tpl-result
+14. tpl-checklist light
+15. tpl-index
+16. tpl-step
+17. tpl-split
+18. tpl-define light
+19. tpl-qa
+20. tpl-diagram
+21. tpl-formula
+22. tpl-schedule
+23. tpl-bio
+
+Image placeholder fallbacks (.img-ph):
+- tpl-feature (.feat-img) — the source kit already used .img-ph here (no real <img> tag existed to replace), copied verbatim: "CYCLE / PHASE PHOTO · 1080×1350"
+- tpl-diagram (.stage-img) — same situation, already .img-ph in source: "APP SCREEN / EXERCISE CARD"
+- tpl-split (.pair .ba) — also already .img-ph x2 in source (BEFORE PHOTO / AFTER PHOTO)
+No manual <img>-to-placeholder substitution was needed; the kit never used real <img> tags in these templates in the first place.
+
+data-bg patterns: NONE of the 23 templates in the template-library section actually carry a data-bg="..." attribute (checked via grep across the source file — data-bg only appears inside CSS attribute-selectors, never as a live HTML attribute on any post-canvas/slide div). So the entire "BACKGROUND PATTERNS" CSS block (grid/dots/scanlines/diagonal/glow/frame/corner) was dropped as unused, including the data-bg="glow" color-mix() rule mentioned as a risk in the spec — moot since it's never referenced.
+
+Other notes:
+- Real base64 image data pulled from the ORIGINAL Content/Carousel-Kit.html lines 46 (--og) and 47 (--coach) — confirmed which was which by inspecting each line's opening "--og:"/"--coach:" prefix before extracting.
+- .slide background uses a base64 data URI of C:\...\Website\court-sessions.jpg (34KB JPEG) in place of the relative url('../court-sessions.jpg'), placed once in the shared base .slide rule (not duplicated per-slide).
+- Pagination dots (.progress-bar span) converted from JS/SVG-driven tennis-ball glyphs to static plain circles: default rgba(244,244,240,0.25), .on = solid var(--clay) + scale(1.14), no filter/drop-shadow chain.
+- Dropped: the empty <svg width="0" height="0"> defs block and the closing <script> block (both were JS-only, dead in a static export).
+- Dropped: .shell, .page-head, .section-title, .system-grid, .tile, .swatch, .typeSpec, .span-*, .post-row, .post-info, .post-stage, all .fa/RTL rules, .hide-header/.hide-footer — kit-page chrome not part of any exported slide.
+- Fonts: --display/--mono → "barlow-condensed", sans-serif; --latin → "roboto", sans-serif; <link> left as <!-- FONT_EMBED_PLACEHOLDER --> right after <meta charset> for Amir to substitute the real Adobe Fonts embed.
+- Nothing needed flagging as "hard to isolate" — the TEMPLATES CSS block was contiguous and copied whole; no template required special-casing beyond the img-ph substitutions already present in source.
