@@ -201,8 +201,11 @@
   .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); }
   .hrow .body .track { display: block; width: 100%; height: 4px; background: var(--track); margin-top: 2px; }
   .hrow .body .track > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
+  /* No border-left. It only existed on rows that HAVE a plus, so the vertical
+     rule appeared on the counter habits and vanished on the check-off ones,
+     making the right edge of the list look broken halfway down. */
   .hrow .pluscell {
-    flex: none; width: 54px; border-left: 1px solid var(--rule);
+    flex: none; width: 54px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; color: var(--accent);
   }
   .hrow .pluscell:hover { background: var(--accent-100); }
@@ -227,7 +230,70 @@
      length. Without a floor the card resizes on a tick and shoves the habit list
      under the athlete's finger — a smaller version of the scroll bug the renderer
      was rewritten to kill. Four lines holds almost every nudge in the library. */
-  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px; line-height: 1.05; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 4.2em; }
+  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 3.3em; }
+
+  /* The level hero. One bar, not two — see the comment in renderToday(). */
+  .hero-lv { display: flex; flex-direction: column; gap: 12px; }
+
+  /* Progress's slim level strip — the same information as Today's hero at a
+     fifth of the height, so the tab can lead with something of its own. */
+  .lvstrip {
+    width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 12px 20px; background: none; border-bottom: 2px solid var(--divider);
+  }
+  .lvstrip-num { font-size: 20px; line-height: 1; color: var(--accent); flex: none; }
+  .lvstrip-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .lvstrip-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .lvstrip-top .hd { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lvstrip-top .go { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; color: var(--clay-deep); }
+  .lvstrip-next { flex: none; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .lvstrip-next span { font-size: 8px; letter-spacing: .08em; color: var(--muted-soft); display: block; }
+
+  /* Four season facts, equal weight. The old two-up made the day streak the
+     biggest number on the tab, so a rebuilding athlete opened Progress to a
+     giant zero. */
+  .statgrid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-bottom: 2px solid var(--divider);
+  }
+  .statgrid > div {
+    padding: 13px 20px; display: flex; flex-direction: column; gap: 3px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .statgrid > div:nth-child(odd) { border-right: 1px solid var(--rule); }
+  .statgrid > div:nth-last-child(-n+2) { border-bottom: 0; }
+  .statgrid .figure, .statgrid .statfrac { font-size: 27px; line-height: .95; letter-spacing: -.02em; }
+  .statgrid .statfrac { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; color: var(--accent); }
+  .statgrid .statfrac .of { font-size: 15px; color: var(--muted-soft); }
+  .statgrid .eyebrow { letter-spacing: .1em; }
+
+  /* The pips had no legend anywhere in the app and are empty for the first
+     five days, so they read as decoration. Said once, above the list. */
+  .pipkey {
+    display: flex; align-items: center; gap: 9px; padding: 0 20px 12px;
+    font-size: 11px; line-height: 1.4; color: var(--muted-soft);
+  }
+  .pipkey .pips { flex: none; }
+
+  /* Board chrome, compressed. */
+  .boardbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 13px 20px; border-bottom: 2px solid var(--divider);
+  }
+  .boardbar.sub { padding: 11px 20px; border-bottom-width: 1px; border-color: var(--rule); }
+  .boardbar .chips { flex: 1; min-width: 0; }
+  .boardbar .chip { flex: 1; text-align: center; }
+  .boardday { flex: none; font-size: 10px; letter-spacing: .08em; color: var(--clay-deep); font-weight: 700; }
+  .boardnote { padding: 10px 20px 12px; font-size: 11.5px; line-height: 1.45; color: var(--muted-soft); }
+
+  /* At-risk used to be said three ways at once: a clay card, a clay day-bar and
+     a header flag. Now the day bar is gone it gets one unmissable strip, sitting
+     directly above the list of things that would fix it. */
+  .riskbar {
+    background: var(--clay-deep); color: #fff; padding: 9px 20px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 13px; letter-spacing: .05em; text-transform: uppercase;
+  }
   .coachcard .cta {
     align-self: flex-start; background: #FAF7F2; color: #1A1A1A; padding: 10px 14px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
@@ -462,6 +528,10 @@
     animation: lvPop .45s cubic-bezier(.2,.8,.25,1) both;
   }
   .hlv { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
+  /* The streak was the smallest type in the row and the most motivating number
+     in it. It now reads as a figure with a unit rather than "9D". */
+  .hlv .ember { font-size: 11px; }
+  .hlv .ember .u { font-size: 8px; opacity: .75; margin-left: 1px; }
 
   /* Cross-link back to the training programme — the other half of the pair.
      Mirrors the Daily Habits card in program.html so the two apps read as one
@@ -2593,7 +2663,8 @@ function renderApp() {
                 ? [parseKey(AKEY()).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · FILLING IN',
                    dayLong(AKEY()).replace(/^./, c => c.toUpperCase())]
                 : [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
-    progress: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Progress'],
+    // Not the level — the strip immediately below the header already says it.
+    progress: [seasonName() + ' · day ' + dayNumber(), 'Progress'],
     detail:   [openH.source, openH.name],
     board:    LB.view === 'roll'
                 ? ['One sentence each, past 7 days', 'Roll call']
@@ -2603,7 +2674,7 @@ function renderApp() {
     settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
-    today: pct + '% DONE', progress: earned + ' OF ' + totalAch,
+    today: pct + '% DONE', progress: '',   // the stat grid states the badge count
     detail: 'LV ' + habitLevel(openH).lv,
     board: LB.view === 'roll'
              ? (RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length || '') && RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length + ' IN TODAY'
@@ -2779,10 +2850,12 @@ function habitRow(h, from) {
       <span class="line1">
         <span class="nm">${esc(h.name)}</span>
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
-                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}${st > 0 ? `<span class="ember" data-lvl="${emberLevel(st)}">${st}D</span>` : ''}</span>`}
+                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}${st > 0 ? `<span class="ember" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span>` : ''}</span>`}
       </span>
       <span class="status">${esc(status)}</span>
-      <span class="track"><span data-fill style="width:${pc}%"></span></span>
+      ${h.kind === 'count'
+        ? `<span class="track"><span data-fill style="width:${pc}%"></span></span>`
+        : ''}
     </button>
     ${h.kind === 'count' && !h.locked ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
     ${locked ? `<button class="pluscell" ${on(goProgram)} aria-label="Open your programme">→</button>` : ''}
@@ -2870,10 +2943,14 @@ function renderToday(LI, doneCount, pct) {
 
   return `
     <div data-k="screen:today" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:14px">
+      <!-- The hero carries the LEVEL only. The day's own progress used to sit
+           directly beneath it as a second green bar of identical shape, which
+           read as one broken double-bar and stated a number the header and the
+           day strip were both already showing. -->
+      <div class="block hero-lv">
         <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:64px;line-height:.85">${LI.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px;min-width:0">
+          <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:56px;line-height:.85">${LI.lv}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:5px;min-width:0">
             <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
               ${rankIcon(LI.rank, 17)}
               <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
@@ -2883,20 +2960,11 @@ function renderToday(LI, doneCount, pct) {
           </div>
         </div>
         <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <div class="eyebrow" style="display:flex;justify-content:space-between"><span>${past ? esc(dayLong(AKEY())) : 'Today'}</span><span>${risk ? 'STREAK AT RISK' : doneCount + ' of ' + hs.length + ' habits'}</span></div>
-          <div class="bar ${risk ? 'risk' : ''}"><span data-fill style="width:${pct}%"></span></div>
-        </div>
       </div>
 
-      ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
-        <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
-        <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
-        <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
-      </div>`}
-
-      ${renderQuestBlock()}
-
+      <!-- Day strip then habits, directly under the hero. The list is what the
+           screen is FOR; it used to start ~1,400px down, behind the nudge and
+           the quest block, so opening the app to log meant scrolling to log. -->
       ${dayStrip()}
       ${past ? `<div class="backfill" data-k="backfill">
         <div>
@@ -2905,8 +2973,17 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <button ${on(() => setDay(TKEY()))}>Back to today</button>
       </div>` : ''}
+      ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${hs.length - doneCount} to go before midnight</div>` : ''}
 
       ${hs.map(h => habitRow(h, 'today')).join('')}
+
+      ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
+        <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
+        <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
+        <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
+      </div>`}
+
+      ${renderQuestBlock()}
 
       ${past ? '' : renderNoteBox()}
 
@@ -3002,6 +3079,9 @@ function fmtQuestVal(q, v) {
 // one screen: overall level, then every habit's own rank, then the milestones.
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
+  const dayStreakNow = currentDayStreak(), bestStreak = bestDayStreak();
+  const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
+  const perfectDays = seasonDays().filter(isPerfect).length;
   const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
   const statusOf = (h) => {
     const v = valOf(TKEY(), h.id);
@@ -3010,32 +3090,43 @@ function renderProgress(LI, earned, totalAch) {
   };
   return `
     <div data-k="screen:progress" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:76px;line-height:.8">${LI.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:5px;padding-bottom:6px;min-width:0">
-            <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
-              ${rankIcon(LI.rank, 18)}
-              <span class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</span>
-              <span class="go">→</span>
-            </button>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
-          </div>
-        </div>
-        <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--divider)">
-        <div style="padding:14px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px">
-          <div class="figure" data-static data-num="streak" data-to="${currentDayStreak()}" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
-          <div class="eyebrow" style="letter-spacing:.12em">Day streak · best ${bestDayStreak()}</div>
-        </div>
-        <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
-          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span> / ${totalAch}</div>
-          <div class="eyebrow" style="letter-spacing:.12em">Unlocked</div>
-        </div>
+      <!-- Progress used to open with the SAME 76px level hero as Today, so two
+           of the four tabs began with an identical block. The level still
+           belongs here as context, but not as the headline — the headline is
+           the season, which is the question this tab answers. -->
+      <button class="lvstrip" data-k="lvstrip" ${on(() => go('ranks'))} aria-label="See the rank ladder">
+        <span class="lvstrip-num hd">LV ${LI.lv}</span>
+        <span class="lvstrip-mid">
+          <span class="lvstrip-top">
+            ${rankIcon(LI.rank, 14)}
+            <span class="hd" style="font-size:14px;line-height:1">${esc(LI.label)}</span>
+            <span class="go">→</span>
+          </span>
+          <span class="bar thin"><span data-fill style="width:${LI.pct}%"></span></span>
+        </span>
+        <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
+      </button>
+
+      <!-- Days-logged leads on purpose. Streak and perfect-days are both zero
+           for anyone rebuilding, and opening your progress on a pair of zeros
+           is a punishment for having had a bad week. Showing up is the stat
+           that is almost always positive, and it is the one that earns the rest. -->
+      <div class="statgrid">
+        <div><div class="figure" data-static data-num="logged" data-to="${daysLogged}">${daysLogged}</div>
+          <div class="eyebrow">Days logged</div></div>
+        <div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
+          <div class="eyebrow">Badges</div></div>
+        <div><div class="figure" data-static data-num="streak" data-to="${dayStreakNow}">${dayStreakNow}</div>
+          <div class="eyebrow">Day streak${bestStreak > dayStreakNow ? ' · best ' + bestStreak : ''}</div></div>
+        <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
+          <div class="eyebrow">Perfect days</div></div>
       </div>
 
       ${sectionLabel('Your habits', 'Tap for history')}
+      <div class="pipkey">
+        <span class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>
+        <span>One square per consistency tier — ${CONSISTENCY_TIERS.map(t => t.days).join(', ')} days in a row on that habit.</span>
+      </div>
       ${hs.length ? hs.map(h => {
         const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
         return `<button class="row-rule" data-k="prow:${h.id}" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
@@ -3044,9 +3135,11 @@ function renderProgress(LI, earned, totalAch) {
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span class="hlv">${st > 0 ? st + 'D' : '—'}</span>
+              <span class="hlv">${st > 0 ? `<span class="ember" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span>` : '—'}</span>
             </div>
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP · ${esc(statusOf(h))}</div>
+            <!-- Was rank · XP · today's status, which wrapped to two lines and
+                 restated what Today already says. Progress is about standing. -->
+            <div style="font-size:11px;line-height:1.3;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP</div>
             <div class="bar" style="height:4px;width:100%"><span data-fill style="width:${hl.pct}%"></span></div>
           </div>
           <div class="pips" style="flex:none">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
@@ -3229,23 +3322,21 @@ function renderBoard() {
 
   return `
     <div data-k="screen:board" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
-          <div class="hd" style="font-size:20px;line-height:1">${esc(seasonName())}</div>
-          <div class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--clay-deep)">DAY ${dayOfSeason}</div>
-        </div>
+      <!-- The season name was printed twice within 200px (header eyebrow, then
+           a heading) and the scope explainer took three permanent lines, so the
+           board itself started ~470px down. Both switches now sit on one row
+           and the explanation is one line under them. -->
+      <div class="boardbar">
         <div class="chips">${viewBtn('board', 'Leaderboard')}${viewBtn('roll', 'Roll call')}</div>
+        <div class="mono boardday">DAY ${dayOfSeason}</div>
       </div>
       ${LB.view === 'roll' ? renderRollCall() : `
-        <div class="block" style="display:flex;flex-direction:column;gap:12px;padding-top:0;border-top:0">
+        <div class="boardbar sub">
           <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
-          <div style="font-size:12px;line-height:1.5;color:var(--muted)">
-            ${LB.scope === 'week'
-              ? 'A rolling seven days — today and the six before it. Nothing to wait for on a Monday; a strong week always shows.'
-              : 'Every point earned since ' + esc(started) + ', when ' + esc(seasonName().toLowerCase()) + ' opened. Nothing from before it counts.'}
-            Scored on the server from what you have actually logged.
-          </div>
         </div>
+        <div class="boardnote">${LB.scope === 'week'
+          ? 'Today and the six days before it. Server-scored from what you logged.'
+          : 'Everything since ' + esc(started) + '. Server-scored from what you logged.'}</div>
         ${body}
         ${renderBoardJoin()}`}
     </div>`;
@@ -3714,13 +3805,13 @@ function renderSettings() {
       </div>
 
       ${sectionLabel('How this works')}
+      <!-- No leading icon here. It was the only row in Settings that had one,
+           which pushed its label 70px right of every other row's and left the
+           whole list with a ragged left edge. -->
       <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('ranks'))}>
-        <span style="display:flex;align-items:center;gap:12px;min-width:0;text-align:left">
-          ${rankIcon(overallLevel().rank, 24)}
-          <span style="display:flex;flex-direction:column;gap:4px;min-width:0">
-            <span class="lbl" style="font-size:15px">The ranks</span>
-            <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">All ${RANKS.length} ranks, what each one costs, and where you stand</span>
-          </span>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">The ranks</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">All ${RANKS.length} ranks, what each one costs, and where you stand</span>
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
