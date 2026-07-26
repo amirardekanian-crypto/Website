@@ -498,22 +498,13 @@ the coach out of his own command.
 
 ### The quest pool
 
-Twelve to choose from, on the `xp_rules` row under `quests`:
+**[`QUESTS.md`](QUESTS.md) is the catalogue** — the twelve built quests with their ids
+and XP, ready-made themed weeks you can copy-paste, an idea bank for new ones, and
+guidance on choosing. Look there when you want to *pick* quests; this section is the
+mechanics.
 
-| id | Title | What it takes | XP |
-|---|---|---|---|
-| `w_perfect2` | TWICE PERFECT | Two clean sweeps | 300 |
-| `w_steps70k` | THE LONG WAY ROUND | 70,000 steps | 280 |
-| `w_train3` | THREE HARD DAYS | Three sessions | 250 |
-| `w_water7` | SEVEN FOR SEVEN | Full water every day | 220 |
-| `w_qualify5` | FIVE ON TARGET | 5 days at 80%+ | 220 |
-| `w_steps50k` | FIFTY THOUSAND | 50,000 steps | 200 |
-| `w_sleep5` | LIGHTS OUT | Sleep target 5 nights | 180 |
-| `w_water5` | THE WELL RUNS DEEP | Full water on 5 days | 150 |
-| `w_fuel5` | ON THE RECORD | Log meals on 5 days | 140 |
-| `w_supps7` | NO NEGOTIATION | Supplements every day | 140 |
-| `w_mob4` | OILED HINGES | Mobility on 4 days | 120 |
-| `w_breathe4` | DEAD CALM | Breathe on 4 days | 100 |
+Keeping the list in one place is deliberate: a pool table copied into two documents goes
+stale the first time one is edited.
 
 ### The shape of a quest
 

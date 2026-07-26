@@ -59,7 +59,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | File | What it is | Manual |
 |---|---|---|
 | [`program.html`](program.html) | The athlete PWA — Home · My Plan · Coach · Library [Read \| Train] · Habits (→ `habits.html`). Loads `data/<id>.json`. Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
-| [`habits.html`](habits.html) | **Proof** — habit tracker. Today · Progress · Settings · Leaderboard (no chat). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), full-screen level-up celebration, 5-tier consistency ladders, opt-in server-scored **leaderboard**, offline-durable saving. Reached from `program.html` (Home card + Habits tab). Same `?client=<id>&key=<key>` link as the program. Demo: `?client=demo` | [`XP_SYSTEM.md`](XP_SYSTEM.md) |
+| [`habits.html`](habits.html) | **Proof** — habit tracker. Today · Progress · Settings · Leaderboard (no chat). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), full-screen level-up celebration, 5-tier consistency ladders, opt-in server-scored **leaderboard**, offline-durable saving. Reached from `program.html` (Home card + Habits tab). Same `?client=<id>&key=<key>` link as the program. Demo: `?client=demo` | [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
 | [`coach.html`](coach.html) | Coach dashboard — progress, charts, mint athlete links, messaging (Google sign-in) | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
 
@@ -200,6 +200,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
 | [`NOTION_SYNC.md`](NOTION_SYNC.md) · [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Sync / import how-tos |
+| [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |
 | [`CLAUDE.md`](CLAUDE.md) | Working notes / preferences for AI assistants |
 
 ---

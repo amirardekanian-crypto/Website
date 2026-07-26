@@ -53,8 +53,9 @@ starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). St
 `select public.set_quests('2026-07-29', array['w_water5','w_steps50k']);` and cancel with
 `select public.clear_quests('2026-07-29');` in the Supabase SQL editor. Past runs are kept
 so their XP keeps counting. The 12-quest pool lives on the `xp_rules` row **and** as
-`QUEST_POOL` in `habits.html` (offline fallback) — change both together. Full detail,
-including the pool table, in `XP_SYSTEM.md` §8.5.
+`QUEST_POOL` in `habits.html` (offline fallback) — change both together.
+**`QUESTS.md` is the catalogue** — what's running, the built quests, ready-made themed
+weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a
