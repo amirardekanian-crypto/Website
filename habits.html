@@ -497,6 +497,68 @@
   }
   .chip.chip-on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
+  /* ── Roll call ───────────────────────────────────────────────────────────
+     The compose box, and the wall it posts to. Flat, square, no bubbles: this
+     is a noticeboard, not a chat app. */
+  .notebox { display: flex; flex-direction: column; gap: 10px; }
+  .noteq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+           font-size: 20px; line-height: 1.05; letter-spacing: .005em; }
+  .noterow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .noterow .mono { font-size: 11px; font-weight: 700; color: var(--muted-soft); }
+  .noterow .mono.tight { color: var(--clay-deep); }
+  .notebox .btn[disabled] { opacity: .4; }
+
+  .rcday { display: flex; align-items: baseline; justify-content: space-between;
+           padding: 16px 20px 8px; font-family: 'Barlow Condensed', sans-serif;
+           font-weight: 900; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
+  .rcday .mono { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted-soft); }
+  .rcline { padding: 12px 20px; border-bottom: 1px solid var(--rule);
+            display: flex; flex-direction: column; gap: 5px;
+            animation: riseIn .34s cubic-bezier(.16,1,.3,1) both; }
+  .rcline.me { background: var(--accent-100); }
+  .rcline.coach { border-left: 4px solid var(--clay-deep); }
+  .rc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .rc-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+             font-size: 16px; line-height: 1; }
+  .rc-meta { flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+             font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--muted-soft); }
+  .rcline.coach .rc-meta { color: var(--clay-deep); }
+  .rc-say { font-size: 14px; line-height: 1.45; color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .rcline { animation: none; } }
+
+  /* ── The backfill day strip ──────────────────────────────────────────────
+     Four days, today first. Each carries its own completion so you can see at
+     a glance which one you forgot — the whole reason the strip exists. */
+  .daystrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+              gap: 6px; padding: 14px 20px 0; }
+  .daychip { display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+             border: 2px solid var(--divider); padding: 8px 8px 7px; background: none;
+             color: var(--ink); text-align: left; min-width: 0; }
+  .daychip .dl { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+                 font-size: 12px; letter-spacing: .05em; line-height: 1;
+                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .daychip .dp { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                 font-size: 9px; font-weight: 700; color: var(--muted-soft); line-height: 1; }
+  .daychip .dbar { display: block; width: 100%; height: 3px; background: var(--divider); }
+  .daychip .dbar > span { display: block; height: 100%; background: var(--muted-soft); }
+  .daychip.on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .daychip.on .dp { color: rgba(255,255,255,.7); }
+  .daychip.on .dbar { background: rgba(255,255,255,.25); }
+  .daychip.on .dbar > span { background: var(--bg); }
+  .daychip.full .dbar > span { background: var(--accent); }
+  .daychip.on.full .dbar > span { background: var(--bg); }
+
+  /* Editing a day that is not today is a state you must never be in by
+     accident, so it is announced in clay rather than implied by a highlight. */
+  .backfill { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+              margin: 12px 20px 0; padding: 12px 14px; background: var(--clay-deep); color: #fff; }
+  .backfill .eyebrow { color: rgba(255,255,255,.72); }
+  .backfill .bf-day { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+                      font-size: 19px; line-height: 1; text-transform: capitalize; }
+  .backfill button { flex: none; border: 2px solid rgba(255,255,255,.55); background: none;
+                     color: #fff; padding: 7px 11px; font-family: 'Barlow Condensed', sans-serif;
+                     font-weight: 900; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+
   /* ── The streak ember ────────────────────────────────────────────────────
      A streak was 9px of grey mono. It is now an object that gets hotter as the
      run gets longer — a slow breath at 5 days, a real flicker past 30 — so the
@@ -865,6 +927,31 @@ const NUDGES = {
     'Day {st} of the streak and you are ahead of it. Keep it boring.',
     '{st} days. At this point the habit has you, not the other way round.',
     '{st} straight days. I am running out of ways to be rude about this.'
+  ],
+  // Roll call. A blank box gets you nothing, so the box asks a question — and
+  // it is a different question tomorrow. Same daily seed as every other line
+  // here, so it holds still all day instead of reshuffling under them.
+  prompt: [
+    'What broke you today?',
+    'One thing you would do differently.',
+    'What was heavier than it should have been?',
+    'Say something true about today.',
+    'Who would have beaten you today?',
+    'What did you talk yourself out of?',
+    'Best thing that happened. Go.',
+    'What are you dreading tomorrow?',
+    'The bit nobody saw — what was it?',
+    'Rate today out of ten, then justify it.',
+    'What did today cost you?',
+    'One sentence. Make it honest.',
+    'What would yesterday-you think of today?',
+    'Where did it nearly fall apart?',
+    'What are you quietly proud of?',
+    'Excuse you nearly used today?',
+    'Hardest ten minutes of the day.',
+    'What would you tell someone starting this week?',
+    'Anything hurt? Anything work?',
+    'If today had a title, what is it?'
   ]
 };
 // Stable within a day, different the next: the same situation gives the same line
@@ -881,7 +968,11 @@ function pickLine(bucket, seedKey, tokens) {
   Object.keys(tokens || {}).forEach(k => {
     line = line.split('{' + k + '}').join(String(tokens[k]));
   });
-  return line;
+  // Counts are substituted into fixed prose, so a streak of one produced
+  // "1 days on the board". Fixed once here rather than in forty separate lines.
+  return line.replace(/\b1 (days|habits|glasses|sessions|nights|more)\b/g,
+    (m, w) => '1 ' + ({ days:'day', habits:'habit', glasses:'glass',
+                        sessions:'session', nights:'night', more:'more' })[w]);
 }
 
 const QUIPS = {
@@ -977,7 +1068,8 @@ const K_LOG  = () => ATHLETE_ID + '_hab_log';
 const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
-             celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null };
+             celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
+             day:null, note:null, noteBusy:false };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
@@ -985,7 +1077,7 @@ function defaultCfg() {
   return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null,
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
-           onBoard:false, boardName:null, updatedAt:0 };
+           onBoard:false, boardName:null, notes:null, updatedAt:0 };
 }
 
 // ── Dates ─────────────────────────────────────────────────────────────────
@@ -994,6 +1086,44 @@ function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); retu
 function fmtKey(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 const TKEY = () => fmtKey(today());
 function parseKey(k) { return new Date(k + 'T00:00:00'); }
+
+// ── The backfill window ───────────────────────────────────────────────────
+// Nobody remembers to log on the day, every day. You can fill in or correct
+// the last few days; past that the log closes. The limit is the point — a
+// record you can rewrite whenever you like is a diary, not evidence.
+//
+// UI.day is the day being EDITED (null = today). Everything else in the app —
+// streaks, nudges, the perfect-day celebration — stays anchored to the real
+// today, because those are statements about now, not about the day you happen
+// to be filling in. AKEY() self-heals: leave the app open past midnight on
+// "3 days ago" and the window slides out from under it, so it falls back to
+// today rather than writing to a day that has since closed.
+const BACKFILL_DAYS = 3;                                 // today plus this many days back
+function oldestLoggable() { return fmtKey(addDays(today(), -BACKFILL_DAYS)); }
+function canLog(dayKey) { return !!dayKey && dayKey <= TKEY() && dayKey >= oldestLoggable(); }
+const AKEY = () => (canLog(UI.day) ? UI.day : TKEY());   // the day being edited
+function editingPast() { return AKEY() !== TKEY(); }
+function editableDays() {
+  const out = [];
+  for (let i = 0; i <= BACKFILL_DAYS; i++) out.push(fmtKey(addDays(today(), -i)));
+  return out;
+}
+function dayShort(k) {
+  return k === TKEY() ? 'TODAY' : parseKey(k).toLocaleDateString('en-GB', { weekday:'short' }).toUpperCase();
+}
+function dayLong(k) {
+  if (k === TKEY()) return 'today';
+  if (k === fmtKey(addDays(today(), -1))) return 'yesterday';
+  return parseKey(k).toLocaleDateString('en-GB', { weekday:'long' });
+}
+// Appended to the toast when the tap did not land on today, so a mis-tap on the
+// day strip announces itself instead of quietly filing Tuesday under Saturday.
+function dayTag() { return editingPast() ? ' for ' + dayLong(AKEY()) : ''; }
+function setDay(k) {
+  UI.day = (k === TKEY() ? null : k);
+  haptic('tick');
+  render();
+}
 
 // ── Habit helpers ─────────────────────────────────────────────────────────
 function allHabits() {
@@ -1060,6 +1190,7 @@ function saveLog() {
   invalidateBonus();
   try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {}
   markDirty();
+  refreshNotePct();
 }
 // ── The WORKOUT habit is fed by the training app, via the server ───────────
 // These are two separate apps and neither writes into the other's storage. The
@@ -1724,7 +1855,8 @@ function toast(text) {
   _toastTimer = setTimeout(() => { UI.toast = null; render(); }, 2200);
 }
 function setVal(id, v) {
-  const k = TKEY();
+  const k = AKEY();
+  if (!canLog(k)) return;                  // the window has closed — write nothing
   if (!LOG[k]) LOG[k] = {};
   LOG[k][id] = Math.max(0, v);
   saveLog();
@@ -1734,25 +1866,26 @@ function toggleHabit(h) {
   // hand, so explain what does earn it instead of silently doing nothing. No
   // haptic and no XP flight either: nothing was earned to celebrate.
   if (h.locked) { toast(h.lockedHint || 'This one is earned elsewhere.'); return; }
-  const done = isDone(h), before = habitXp(h), rect = UI._tapRect;
+  const done = isDone(h, AKEY()), before = habitXp(h), rect = UI._tapRect;
   setVal(h.id, done ? 0 : h.target);
   checkLevelUps();
   render();
   if (done) { haptic('tick'); return; }        // unticking earns nothing to fly
   const gained = habitXp(h) - before;
   haptic('done');
-  toast('+' + gained + ' XP · ' + h.name + ' logged. Look at you.');
+  toast('+' + gained + ' XP · ' + h.name + ' logged' + (editingPast() ? dayTag() + '.' : '. Look at you.'));
   flyXp(gained, rect);
 }
 function bump(h) {
   const before = habitXp(h), rect = UI._tapRect;
-  const v = Math.min(h.target, valOf(TKEY(), h.id) + (h.step || 1));
+  const v = Math.min(h.target, valOf(AKEY(), h.id) + (h.step || 1));
   setVal(h.id, v);
   checkLevelUps();
   render();
   const gained = habitXp(h) - before, complete = v >= h.target;
   haptic(complete ? 'done' : 'tick');
-  toast(complete ? '+' + gained + ' XP · ' + h.name + ' complete.' : '+' + gained + ' XP. Keep them coming.');
+  toast(complete ? '+' + gained + ' XP · ' + h.name + ' complete' + dayTag() + '.'
+                 : '+' + gained + ' XP' + dayTag() + '. Keep them coming.');
   flyXp(gained, rect);
 }
 // Navigating to a screen starts at its top; ticking a habit does not move you at
@@ -1761,7 +1894,7 @@ function resetScroll() {
   const sc = document.getElementById('scroll');
   if (sc) sc.scrollTop = 0;
 }
-function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
+function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(AKEY(), h.id); render(); }
 // Which way a screen should travel. Tabs move along their own order; a detail or
 // the manual always pushes in from the right and pops back out to the left, which
 // is what "deeper" and "back" feel like.
@@ -1785,11 +1918,14 @@ function openHabit(id, from) {
 }
 function go(screen) {
   UI._navDir = navDir(UI.screen, screen);
+  // Leaving Today drops the backfill day — except into a habit's detail, which
+  // is a round trip you take mid-edit to check the history you are filling in.
+  if (screen !== 'detail' && screen !== 'today') UI.day = null;
   UI.screen = screen; UI.open = null;
   haptic('tab');
   render();
   resetScroll();
-  if (screen === 'board') fetchBoard();
+  if (screen === 'board') { fetchBoard(); if (LB.view === 'roll' && !RC.loaded) fetchRollCall(); }
 }
 
 // ── Leaderboard ───────────────────────────────────────────────────────────
@@ -1798,8 +1934,8 @@ function go(screen) {
 // That means a tampered localStorage cannot buy a place on the board. The RPC
 // deliberately returns no athlete ids — an id alone would let one client fetch
 // /data/<id>.json and read another athlete's whole programme.
-const LB = { scope:'season', rows:[], joined:false, loading:false, error:null, loaded:false, nameDraft:'',
-             deltas:{}, passed:[] };
+const LB = { scope:'season', view:'board', rows:[], joined:false, loading:false, error:null, loaded:false,
+             nameDraft:'', deltas:{}, passed:[] };
 // ── Position deltas ───────────────────────────────────────────────────────
 // The board only ever showed a standing. What actually lands is MOVEMENT — that
 // you climbed two places, and whose name you went past. The server returns no
@@ -1872,6 +2008,93 @@ async function joinBoard(name, joining) {
     toast('Could not reach the leaderboard. Try again when you have signal.');
   }
 }
+// ── Roll call ─────────────────────────────────────────────────────────────
+// One sentence a day, visible to everyone else on the board. Deliberately not
+// a chat: the primary key on the server is (athlete, day), so the shape of the
+// data is the rate limit — there is nothing to moderate into a thread, and a
+// quiet day reads as "nobody has answered yet" rather than "this is dead".
+//
+// It pays NO XP, on purpose. The moment a sentence earns points you get one
+// character of gibberish every night at 23:58.
+//
+// TODAY ONLY, even though the habit log itself can be filled in for
+// BACKFILL_DAYS. Fixing Saturday's steps is admin; rewriting what you said
+// about Saturday, now that you know how the week went, is not.
+const NOTE_MAX = 200;
+const RC = { rows:[], loading:false, error:null, loaded:false };
+let _notePctTimer = null;
+
+function myNote(k) { return (CFG.notes && CFG.notes[k]) || ''; }
+// A local mirror of what is on the wall, so your own line survives a reload and
+// shows up offline. Pruned to the fortnight — it is a cache, not an archive.
+function setMyNote(k, body) {
+  const next = Object.assign({}, CFG.notes || {});
+  if (body) next[k] = body; else delete next[k];
+  const floor = fmtKey(addDays(today(), -14));
+  Object.keys(next).forEach(d => { if (d < floor) delete next[d]; });
+  CFG.notes = next;
+  saveCfg();
+}
+async function postNote(body) {
+  const k = TKEY(), clean = String(body || '').replace(/\s+/g, ' ').trim().slice(0, NOTE_MAX);
+  if (window.IS_DEMO) { toast('Demo mode — the wall is live only for real athletes.'); return; }
+  if (!CFG.onBoard) { toast('Join the board first — that is where your name comes from.'); return; }
+  UI.noteBusy = true; render();
+  try {
+    const sb = _sb();
+    if (!sb) throw new Error('offline');
+    const { error } = await sb.rpc('set_day_note', {
+      p_athlete_id: ATHLETE_ID, p_key: KEY, p_day: k, p_body: clean, p_pct: dayPct(k)
+    });
+    if (error) throw error;
+    setMyNote(k, clean);
+    UI.note = null;
+    haptic(clean ? 'done' : 'tick');
+    toast(clean ? 'Said and done. It stands until midnight.' : 'Line withdrawn.');
+    RC.loaded = false;
+    if (UI.screen === 'board') fetchRollCall();
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    toast(/join the leaderboard/i.test(msg) ? 'Join the board first — that is where your name comes from.'
+        : navigator.onLine === false ? 'No signal. The wall needs a connection.'
+        : 'Could not post that. Try again in a moment.');
+  }
+  UI.noteBusy = false; render();
+}
+// The percentage beside your line is where the day stood when you wrote it. If
+// you keep logging afterwards, quietly bring it up to date rather than leaving
+// "38%" under a sentence written at lunchtime on a day you went on to finish.
+function refreshNotePct() {
+  if (!myNote(TKEY()) || !CFG.onBoard || window.IS_DEMO) return;
+  clearTimeout(_notePctTimer);
+  _notePctTimer = setTimeout(() => {
+    const sb = _sb();
+    if (!sb) return;
+    sb.rpc('set_day_note', { p_athlete_id: ATHLETE_ID, p_key: KEY, p_day: TKEY(),
+                             p_body: myNote(TKEY()), p_pct: dayPct(TKEY()) }).then(() => {}, () => {});
+  }, 4000);
+}
+async function fetchRollCall() {
+  if (window.IS_DEMO) { RC.error = 'demo'; RC.loaded = true; render(); return; }
+  if (RC.loading) return;
+  RC.loading = true; RC.error = null; render();
+  try {
+    const sb = _sb();
+    if (!sb) throw new Error('offline');
+    const { data, error } = await sb.rpc('roll_call', {
+      p_athlete_id: ATHLETE_ID, p_key: KEY, p_days: 7
+    });
+    if (error) throw error;
+    RC.rows = data || [];
+    RC.error = null;
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    RC.error = /function|does not exist|schema/i.test(msg) ? 'notdeployed'
+             : (navigator.onLine === false ? 'offline' : 'failed');
+  }
+  RC.loading = false; RC.loaded = true; render();
+}
+
 // The other half of the pair. Hand the id and key across exactly as this app
 // resolved them — an installed PWA often opens without ?key= in the URL.
 function programUrl() {
@@ -1982,6 +2205,10 @@ function installDelegates(app) {
     if (!t || !t.id) return;
     if (t.id === 'newhabit') UI._newName = t.value;
     else if (t.id === 'boardname') LB.nameDraft = t.value;
+    // Re-rendered per keystroke so the counter and the button state stay true.
+    // Safe: morphAttrs never writes `value` onto a live field, so the caret and
+    // any selection belong to whoever is typing, not to the last render.
+    else if (t.id === 'dayline') { UI.note = t.value; render(); }
   });
 }
 
@@ -2287,7 +2514,7 @@ function renderOnboarding() {
 // ── App shell ─────────────────────────────────────────────────────────────
 function renderApp() {
   const LI = overallLevel();
-  const hs = live(), doneCount = hs.filter(h => isDone(h)).length, pct = dayPct(TKEY());
+  const hs = live(), doneCount = hs.filter(h => isDone(h, AKEY())).length, pct = dayPct(AKEY());
   const openH = habitById(UI.open || (hs[0] || HABITS[0]).id);
   const earnedMilestones = ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).length;
   const earnedTiers = allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0);
@@ -2295,10 +2522,15 @@ function renderApp() {
   const earned = earnedMilestones + earnedTiers, totalAch = ACHIEVEMENTS.length + totalTiers;
 
   const heads = {
-    today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
+    today:    editingPast()
+                ? [parseKey(AKEY()).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · FILLING IN',
+                   dayLong(AKEY()).replace(/^./, c => c.toUpperCase())]
+                : [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
     progress: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Progress'],
     detail:   [openH.source, openH.name],
-    board:    [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
+    board:    LB.view === 'roll'
+                ? ['One sentence each, past 7 days', 'Roll call']
+                : [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
     manual:   ['Everything, explained', 'How this works'],
     ranks:    ['Ten ranks, fifty levels', 'The ladder'],
     settings: ['Profile & tracking', 'Settings']
@@ -2306,7 +2538,9 @@ function renderApp() {
   const rights = {
     today: pct + '% DONE', progress: earned + ' OF ' + totalAch,
     detail: 'LV ' + habitLevel(openH).lv,
-    board: LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '',
+    board: LB.view === 'roll'
+             ? (RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length || '') && RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length + ' IN TODAY'
+             : (LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : ''),
     ranks: 'LV ' + overallLevel().lv,
     settings: ''
   };
@@ -2444,7 +2678,7 @@ function renderBadgeCelebration(ev) {
 
 // ── Habit row, shared by Today and Habits ─────────────────────────────────
 function habitRow(h, from) {
-  const v = valOf(TKEY(), h.id), done = isDone(h), st = habitStreak(h);
+  const v = valOf(AKEY(), h.id), done = isDone(h, AKEY()), st = habitStreak(h);
   const hl = habitLevel(h), flashed = UI.flash[h.id];
   const locked = !!h.locked && !done;
   const status = locked
@@ -2477,9 +2711,76 @@ function habitRow(h, from) {
 }
 
 // ── Today ─────────────────────────────────────────────────────────────────
+// Four days, today first. The nudge and the at-risk warning are statements
+// about now, so they stand down while you are filling in an earlier day —
+// "drink three more glasses" is nonsense advice about last Saturday.
+function dayStrip() {
+  const active = AKEY();
+  return `<div class="daystrip" data-k="daystrip">
+    ${editableDays().map(k => {
+      const p = dayPct(k), sel = k === active;
+      return `<button class="daychip ${sel ? 'on' : ''} ${p >= 100 ? 'full' : ''}" data-k="dc:${k}"
+        ${on(() => setDay(k))} aria-pressed="${sel}"
+        aria-label="Log ${esc(dayLong(k))}, ${p}% done">
+        <span class="dl">${dayShort(k)}</span>
+        <span class="dp">${p}%</span>
+        <span class="dbar"><span data-fill style="width:${p}%"></span></span>
+      </button>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── Roll call: writing today's line ───────────────────────────────────────
+// Lives at the bottom of Today, under the habits, because the moment you are
+// most likely to have something to say is the moment you have just logged.
+function renderNoteBox() {
+  if (window.IS_DEMO) return '';
+  if (!CFG.onBoard) {
+    return `<div class="block notebox" data-k="notejoin" style="border-top:2px solid var(--divider)">
+      <div class="eyebrow" style="letter-spacing:.12em">Roll call</div>
+      <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+        Every athlete gets one sentence a day, and everyone else sees it. Join the
+        board and you can leave yours — it uses the same name and nothing more.
+      </div>
+      <button class="btn btn-secondary btn-block" ${on(() => go('board'))}>Take a look at the board</button>
+    </div>`;
+  }
+  const posted = myNote(TKEY());
+  // null means "no draft yet, show what is posted". Plain '' is a real draft —
+  // the athlete clearing the box on purpose — and must not snap back.
+  const draft = UI.note === null ? posted : UI.note;
+  const left = NOTE_MAX - draft.length;
+  const changed = draft.trim() !== posted;
+  return `<div class="block notebox" data-k="notebox" style="border-top:2px solid var(--divider)">
+    <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+      <span>Roll call</span><span>${posted ? 'ANSWERED' : 'ONE SENTENCE'}</span>
+    </div>
+    <div class="noteq" data-k="noteq">${esc(pickLine('prompt', 'rollcall'))}</div>
+    <input class="input" id="dayline" maxlength="${NOTE_MAX}" data-k="dayline"
+           placeholder="Say something about today…" value="${esc(draft)}"
+           aria-label="Your line for today">
+    <div class="noterow">
+      <span class="mono ${left <= 20 ? 'tight' : ''}">${left}</span>
+      <div style="display:flex;gap:8px">
+        ${posted ? `<button class="btn btn-secondary" style="padding:0 12px"
+          ${on(() => postNote(''))}>Delete</button>` : ''}
+        <button class="btn btn-primary" style="padding:0 16px"
+          ${UI.noteBusy || !changed ? 'disabled' : ''}
+          ${on(() => postNote(draft))}>${posted ? 'Change it' : 'Post'}</button>
+      </div>
+    </div>
+    <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
+      Everyone on the board sees this next to your name and today's percentage.
+      Change it as often as you like until midnight — after that it stands.
+    </div>
+  </div>`;
+}
+
 function renderToday(LI, doneCount, pct) {
   const hs = live();
   const n = nudge();
+  const past = editingPast();
+  const risk = !past && n.risk;
   // The recap half of "nudge and recap": last seven days at a glance.
   const weekStart = addDays(today(), -6);
   const weekXp = xpBetween(weekStart, today());
@@ -2504,20 +2805,31 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
         <div style="display:flex;flex-direction:column;gap:6px">
-          <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Today</span><span>${n.risk ? 'STREAK AT RISK' : doneCount + ' of ' + hs.length + ' habits'}</span></div>
-          <div class="bar ${n.risk ? 'risk' : ''}"><span data-fill style="width:${pct}%"></span></div>
+          <div class="eyebrow" style="display:flex;justify-content:space-between"><span>${past ? esc(dayLong(AKEY())) : 'Today'}</span><span>${risk ? 'STREAK AT RISK' : doneCount + ' of ' + hs.length + ' habits'}</span></div>
+          <div class="bar ${risk ? 'risk' : ''}"><span data-fill style="width:${pct}%"></span></div>
         </div>
       </div>
 
-      <div class="coachcard ${n.risk ? 'risk' : ''}" data-k="nudge">
-        <div class="eyebrow">${n.risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
+      ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
+        <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
         <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
         <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
-      </div>
+      </div>`}
 
       ${renderQuestBlock()}
 
+      ${dayStrip()}
+      ${past ? `<div class="backfill" data-k="backfill">
+        <div>
+          <div class="eyebrow">Filling in</div>
+          <div class="bf-day">${esc(dayLong(AKEY()))}</div>
+        </div>
+        <button ${on(() => setDay(TKEY()))}>Back to today</button>
+      </div>` : ''}
+
       ${hs.map(h => habitRow(h, 'today')).join('')}
+
+      ${past ? '' : renderNoteBox()}
 
       <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
         <div class="eyebrow" style="letter-spacing:.12em">The last seven days</div>
@@ -2715,8 +3027,8 @@ function renderDetail(h) {
     { v: habitBest(h) + 'd',        k: 'Best streak' },
     { v: habitRate35(h) + '%',      k: '35-day rate' }
   ];
-  const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h);
-  const v = valOf(TKEY(), h.id);
+  const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h, AKEY());
+  const v = valOf(AKEY(), h.id);
   return `
     <div data-k="screen:detail:${h.id}" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
@@ -2733,7 +3045,7 @@ function renderDetail(h) {
 
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
         <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
-          <span>Today</span><span>${done ? 'DONE' : fmtVal(h, v) + ' / ' + fmtVal(h, h.target) + ' ' + h.unit.toUpperCase()}</span>
+          <span>${editingPast() ? esc(dayLong(AKEY())) : 'Today'}</span><span>${done ? 'DONE' : fmtVal(h, v) + ' / ' + fmtVal(h, h.target) + ' ' + h.unit.toUpperCase()}</span>
         </div>
         ${h.locked
           ? `<div style="display:flex;flex-direction:column;gap:10px">
@@ -2832,6 +3144,10 @@ function renderBoard() {
       ${outside ? `<div class="eyebrow" style="padding:16px 20px 6px;letter-spacing:.12em">Your position</div>${boardRow(me, lead, top.length)}` : ''}`;
   }
 
+  const viewBtn = (key, label) => `<button class="chip ${LB.view === key ? 'chip-on' : ''}"
+    ${on(() => { if (LB.view !== key) { LB.view = key; render(); resetScroll();
+                                       if (key === 'roll' && !RC.loaded) fetchRollCall(); } })}>${label}</button>`;
+
   return `
     <div data-k="screen:board" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
@@ -2839,17 +3155,80 @@ function renderBoard() {
           <div class="hd" style="font-size:20px;line-height:1">${esc(seasonName())}</div>
           <div class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--clay-deep)">DAY ${dayOfSeason}</div>
         </div>
-        <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
-        <div style="font-size:12px;line-height:1.5;color:var(--muted)">
-          ${LB.scope === 'week'
-            ? 'A rolling seven days — today and the six before it. Nothing to wait for on a Monday; a strong week always shows.'
-            : 'Every point earned since ' + esc(started) + ', when ' + esc(seasonName().toLowerCase()) + ' opened. Nothing from before it counts.'}
-          Scored on the server from what you have actually logged.
-        </div>
+        <div class="chips">${viewBtn('board', 'Leaderboard')}${viewBtn('roll', 'Roll call')}</div>
       </div>
-      ${body}
-      ${renderBoardJoin()}
+      ${LB.view === 'roll' ? renderRollCall() : `
+        <div class="block" style="display:flex;flex-direction:column;gap:12px;padding-top:0;border-top:0">
+          <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
+          <div style="font-size:12px;line-height:1.5;color:var(--muted)">
+            ${LB.scope === 'week'
+              ? 'A rolling seven days — today and the six before it. Nothing to wait for on a Monday; a strong week always shows.'
+              : 'Every point earned since ' + esc(started) + ', when ' + esc(seasonName().toLowerCase()) + ' opened. Nothing from before it counts.'}
+            Scored on the server from what you have actually logged.
+          </div>
+        </div>
+        ${body}
+        ${renderBoardJoin()}`}
     </div>`;
+}
+
+// ── Roll call: reading the wall ───────────────────────────────────────────
+// Grouped by day, newest first, the coach's line leading its day. A day reads
+// top-down as "here is the brief, here is who answered it".
+function renderRollCall() {
+  if (RC.loading && !RC.rows.length) {
+    return `<div style="padding:26px 20px;display:flex;align-items:center;gap:12px">
+      <span class="spinner" style="width:22px;height:22px;border-width:2px"></span>
+      <span style="font-size:13px;color:var(--muted)">Reading the wall…</span></div>`;
+  }
+  if (RC.error === 'demo')        return boardNote('The wall is live for real athletes only — the demo has nobody to talk to.');
+  if (RC.error === 'notdeployed') return boardNote('Roll call is not switched on yet. Your coach needs to run the migration — nothing is wrong with your app.');
+  if (RC.error === 'offline')     return boardNote('No connection. The wall needs signal — everything else in the app works offline.');
+  if (RC.error) {
+    return boardNote('Could not load the wall just now.') +
+      `<div style="padding:0 20px 20px"><button class="btn btn-secondary" ${on(() => { RC.loaded = false; fetchRollCall(); })}>Try again</button></div>`;
+  }
+  if (!RC.rows.length) {
+    return boardNote(CFG.onBoard
+      ? 'Nobody has said anything yet. One sentence on Today and you are the first voice on here.'
+      : 'Nothing on the wall yet. Join the board and you can leave a line of your own.');
+  }
+
+  // The server already ordered this: day desc, coach first, then most recent.
+  const days = [];
+  RC.rows.forEach(r => {
+    const d = days.length && days[days.length - 1].day === r.day ? days[days.length - 1] : null;
+    if (d) d.rows.push(r); else days.push({ day: r.day, rows: [r] });
+  });
+
+  return days.map((g, gi) => `
+    <div data-k="rcday:${esc(g.day)}">
+      <div class="rcday">
+        <span>${esc(rcDayLabel(g.day))}</span>
+        <span class="mono">${g.rows.filter(r => !r.is_coach).length} IN</span>
+      </div>
+      ${g.rows.map((r, i) => rollLine(r, gi * 8 + i)).join('')}
+    </div>`).join('');
+}
+function rcDayLabel(day) {
+  if (day === TKEY()) return 'Today';
+  if (day === fmtKey(addDays(today(), -1))) return 'Yesterday';
+  return parseKey(day).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+}
+function rollLine(r, i) {
+  const pct = (r.pct === null || r.pct === undefined) ? null : Number(r.pct);
+  const meta = r.is_coach ? 'YOUR COACH'
+             : [r.rank_label ? String(r.rank_label).toUpperCase() : '', pct === null ? '' : pct + '%']
+                 .filter(Boolean).join(' · ');
+  return `<div class="rcline ${r.is_coach ? 'coach' : ''} ${r.is_me ? 'me' : ''}"
+      data-k="rc:${esc(r.day)}:${esc(String(r.display_name))}"
+      style="animation-delay:${(Math.min(i, 12) * 0.04).toFixed(2)}s">
+    <div class="rc-top">
+      <span class="rc-name">${esc(r.is_me ? 'You' : r.display_name)}</span>
+      <span class="rc-meta">${esc(meta)}</span>
+    </div>
+    <div class="rc-say">${esc(r.body)}</div>
+  </div>`;
 }
 function boardNote(text) {
   return `<div style="padding:24px 20px;font-size:13px;line-height:1.55;color:var(--muted)">${esc(text)}</div>`;
@@ -2927,6 +3306,17 @@ function renderManual() {
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`))}
+
+      ${block(h2('Forgot to log a day?') +
+        p(`Use the row of days at the top of Today. You can go back <strong style="color:var(--ink)">${BACKFILL_DAYS} days</strong> and fill in or correct anything you missed — each day shows how much of it you completed, so it is easy to spot the one you forgot.`) +
+        p(`While you are on an earlier day the screen turns clay and says so, and everything you tap lands on <em>that</em> day. Tap <strong style="color:var(--ink)">Back to today</strong> when you're done.`) +
+        p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything — points, streaks, badges, quests.`))}
+
+      ${block(h2('Roll call') +
+        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>, at the bottom of Today. Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
+        p(`Change it as many times as you like until midnight. After that it stands — you can fix an old day's <em>log</em>, but not what you said about it.`) +
+        p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Read everyone else's on the Board tab.`) +
+        p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach. Use Settings to message me privately.`))}
 
       ${block(h2('What each habit is worth') +
         p(`Points are weighted by how much the habit actually moves your health. Your training session pays the most, then daily steps.`) +
@@ -3352,7 +3742,7 @@ function renderSheet() {
     <div class="scrim" data-k="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
     <div class="sheet" data-k="sheet:${h.id}">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <div class="hd" style="font-size:21px;line-height:1">Log ${esc(h.name)}</div>
+        <div class="hd" style="font-size:21px;line-height:1">Log ${esc(h.name)}${editingPast() ? ' · ' + esc(dayLong(AKEY())) : ''}</div>
         <button class="hd" style="font-size:13px;color:var(--clay-deep)" ${on(() => { UI.sheet = null; render(); })}>Close</button>
       </div>
       <div style="font-size:13px;line-height:1.4;color:var(--muted)">Target is ${fmtVal(h, h.target)} ${esc(h.unit)} a day. Round up generously, I will never know.</div>
@@ -3436,7 +3826,12 @@ function showError(msg) {
 
   window.addEventListener('online', () => { SYNC.attempts = 0; pushNow(); refreshSyncBadge(); });
   window.addEventListener('offline', refreshSyncBadge);
-  window.addEventListener('visibilitychange', () => { if (document.hidden) pushNow(); else refreshSyncBadge(); });
+  // Coming back to the app is a fresh start: never resume pointed at an
+  // earlier day, or the first tap after lunch quietly lands on Saturday.
+  window.addEventListener('visibilitychange', () => {
+    if (document.hidden) pushNow();
+    else { if (UI.day) { UI.day = null; render(); } refreshSyncBadge(); }
+  });
   // Last-ditch attempt on the way out; keepalive is not available through the
   // client library, so this is best effort on top of the durable dirty flag.
   window.addEventListener('pagehide', () => { if (SYNC.dirty) pushNow(); });
