@@ -65,7 +65,13 @@ create or replace function public.set_quests(p_start date, p_ids text[])
 returns jsonb language plpgsql security definer set search_path = public as $fn$
 declare v_key text; v_runs jsonb; v_kept jsonb := '[]'::jsonb; r jsonb;
 begin
-  if (auth.jwt() ->> 'email') is distinct from 'amirardekanian@gmail.com' then
+  -- Reject only a signed-in SOMEBODY ELSE. A NULL jwt means a privileged database
+  -- session — the Supabase SQL editor, which is where the coach actually runs
+  -- this. Guarding on `is distinct from` alone locked him out of his own command,
+  -- because auth.jwt() is NULL there. Nothing is loosened: execute is granted to
+  -- `authenticated` only, and a service-role caller can already UPDATE the table.
+  if auth.jwt() is not null
+     and (auth.jwt() ->> 'email') is distinct from 'amirardekanian@gmail.com' then
     raise exception 'coach only';
   end if;
   if p_ids is null or array_length(p_ids, 1) is null then
@@ -90,7 +96,13 @@ create or replace function public.clear_quests(p_start date)
 returns jsonb language plpgsql security definer set search_path = public as $fn$
 declare v_key text; v_runs jsonb; v_kept jsonb := '[]'::jsonb; r jsonb;
 begin
-  if (auth.jwt() ->> 'email') is distinct from 'amirardekanian@gmail.com' then
+  -- Reject only a signed-in SOMEBODY ELSE. A NULL jwt means a privileged database
+  -- session — the Supabase SQL editor, which is where the coach actually runs
+  -- this. Guarding on `is distinct from` alone locked him out of his own command,
+  -- because auth.jwt() is NULL there. Nothing is loosened: execute is granted to
+  -- `authenticated` only, and a service-role caller can already UPDATE the table.
+  if auth.jwt() is not null
+     and (auth.jwt() ->> 'email') is distinct from 'amirardekanian@gmail.com' then
     raise exception 'coach only';
   end if;
   v_key := to_char(p_start, 'YYYY-MM-DD');
