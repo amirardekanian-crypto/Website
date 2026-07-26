@@ -250,7 +250,6 @@
   .tabs button.on { background: var(--ink); color: var(--bg); }
   .tabs .num { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .06em; opacity: .6; }
   .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; }
-  .tabs .dot { position: absolute; top: 9px; right: 9px; width: 7px; height: 7px; background: var(--clay); }
 
   /* ── Grid (35-day history) ── */
   .grid35 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
@@ -258,20 +257,6 @@
   .grid35 .c.hit { background: var(--accent); border-color: var(--accent); }
   .grid35 .c.part { background: var(--accent-100); border-color: var(--accent); }
   .grid35 .c.future { opacity: .25; }
-
-  /* ── Chat ── */
-  .chat { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; }
-  .bub { max-width: 82%; padding: 12px 14px; font-size: 13px; line-height: 1.4; animation: riseIn .25s ease; white-space: pre-wrap; }
-  .bub.coach { align-self: flex-start; background: var(--surface); border: 2px solid var(--divider); }
-  .bub.me { align-self: flex-end; background: var(--accent); color: var(--bg); }
-  .bub .tag { display: block; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; opacity: .6; margin-bottom: 5px; text-transform: uppercase; }
-  .composer { border-top: 2px solid var(--divider); padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: var(--surface); display: flex; flex-direction: column; gap: 10px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    border: 2px solid var(--divider); padding: 7px 10px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; text-transform: uppercase;
-  }
-  .chip:hover { border-color: var(--accent); color: var(--accent-700); }
 
   /* ── Sheet & toast ── */
   .scrim { position: absolute; inset: 0; z-index: 80; background: var(--scrim); animation: fadeIn .2s ease; }
@@ -399,33 +384,49 @@
 
 <script>
 // ════════════════════════════════════════════════════════════════════════
-//  PROOF — health habit coach & tracker.
-//  Implements the PROOF design handoff on the AA Performance palette.
+//  PROOF — health habit tracker with XP, levels and ranks.
 //  Identity is the same link as the program app: habits.html?client=<id>&key=<key>.
-//  localStorage is the source of truth; the cloud mirror reuses the existing
-//  save_progress / get_progress RPCs, and the COACH tab talks to the real
-//  messages table (get_messages / send_athlete_message / mark_athlete_read).
+//  localStorage is the source of truth and the durable record; an outbox with
+//  backoff mirrors it to Supabase via the existing save_progress/get_progress
+//  RPCs, so nothing is ever lost while offline.
+//  Levels are ALWAYS derived from the log and never stored — retune XP_RULES
+//  (documented in XP_SYSTEM.md) and every level recomputes from history.
 // ════════════════════════════════════════════════════════════════════════
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 
-// Steps and sleep are numeric entries rather than HealthKit syncs — a web app
-// can't read phone health data, so the athlete logs them via the sheet.
-// `xp` is the base value of one completion, ranked by health impact: the
-// training session pays most, then daily steps, then sleep. Partial progress on
-// a counter habit pays pro-rata; finishing pays COMPLETION_BONUS × base.
+// ── THE XP SYSTEM — every tunable lives here ─────────────────────────────
+// Read XP_SYSTEM.md before changing these. Nothing about XP is persisted, so
+// editing this object retroactively rescores every day the athlete has logged.
+const XP_RULES = {
+  base: 300,              // XP for level 1 → 2 (one full day of habits)
+  growth: 0.55,           // cost(n) = base × n^growth — higher = steeper climb
+  completionBonus: 1.2,   // multiplier once a habit's target is met
+  customXp: 25,           // per-completion value of an athlete-added habit
+  streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  // Per-completion value, ranked by health impact.
+  weights: {
+    strength: 100,
+    steps:     60,
+    sleep:     50,
+    fuel:      40,
+    water:     30,
+    mobility:  30,
+    breathe:   20,
+    supps:     20
+  }
+};
+
 const HABITS = [
-  { id:'strength', name:'STRENGTH', code:'ST', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',            source:'Manual',      xp:100 },
-  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                  source:'Enter daily', xp:60, step:500 },
-  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                     source:'Enter daily', xp:50, step:0.5, dec:1 },
-  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                source:'Manual',      xp:40 },
-  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                     source:'Manual',      xp:30 },
-  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                source:'Manual',      xp:30 },
-  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',              source:'Manual',      xp:20 },
-  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3', source:'Manual',      xp:20 }
+  { id:'strength', name:'STRENGTH', code:'ST', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'Manual' },
+  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
+  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
+  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                 source:'Manual' },
+  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
+  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                 source:'Manual' },
+  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',               source:'Manual' },
+  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
-const CUSTOM_XP = 25;
-const COMPLETION_BONUS = 1.2;
 const QUIPS = {
   strength: 'Picking heavy things up and putting them down. Sisyphus with better shoulders.',
   steps:    'Every one of these was a decision not to sit down.',
@@ -436,26 +437,15 @@ const QUIPS = {
   mobility: 'Ten minutes now, or your hamstrings file a complaint with HR.',
   supps:    'The one habit that should never need negotiating.'
 };
-const COACH_STYLES = [
-  { key:'silent', label:'SILENT TRACKER', desc:"No pep talks. Just boxes and streaks. Respect." },
-  { key:'nudge',  label:'NUDGE & RECAP',  desc:'One nudge when you drift, one recap on Sundays.' },
-  { key:'active', label:'FULL COACH',     desc:'I chat, I adapt the plan, I notice things. Sorry in advance.' }
-];
-const MOTIV = [ {key:'streak',label:'BIG STREAK NUMBER'}, {key:'rings',label:'DAILY BAR SET'}, {key:'points',label:'XP & LEVELS'} ];
+
 // ── Ranks ────────────────────────────────────────────────────────────────
-// Ten names × five sub-levels = 50 levels a cycle. Past 50 you prestige: the
-// ladder restarts at ROOKIE 1 carrying a star (★1 ROOKIE 1, ★2 ROOKIE 1 …), so
-// there is no ceiling — the star is the real flex.
+// Ten names × five sub-levels = 50 levels a cycle. Past 50 the athlete
+// prestiges: the ladder restarts carrying a star (★1 ROOKIE 1, ★2 ROOKIE 1 …),
+// so there is no ceiling — the star is the real flex.
 const RANKS = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','ENFORCER','PREDATOR','MACHINE','RELENTLESS','UNTOUCHABLE','IMMORTAL'];
 const SUBS_PER_RANK = 5;
 const LEVELS_PER_CYCLE = RANKS.length * SUBS_PER_RANK;   // 50
-
-// Cost of level n → n+1 is BASE × n^GROWTH, so every level costs more than the
-// last. Tuned against two anchors: one full day of habits reaches level 2, and
-// a solid (~80%) two months reaches level 20. Level 19→20 costs 4.4× level 1→2.
-const XP_BASE = 300;
-const XP_GROWTH = 0.55;
-const MAX_LEVEL_SCAN = 5000;   // loop guard, far above any reachable level
+const MAX_LEVEL_SCAN = 5000;                             // loop guard
 
 // Consecutive-day ladders, one per habit, five tiers each — 5 days up to two months.
 const CONSISTENCY_TIERS = [
@@ -465,36 +455,34 @@ const CONSISTENCY_TIERS = [
   { days: 30, name: 'IRONCLAD',    xp: 350 },
   { days: 60, name: 'UNBREAKABLE', xp: 750 }
 ];
-const GOALS = ['FEEL LESS TIRED AT 3PM','GET GENUINELY STRONGER','SLEEP LIKE A ROCK','EAT LIKE AN ADULT','STOP DOOMSCROLLING AT 1AM'];
-const QUICKS = ["I'M WRECKED TODAY",'GIVE ME ONE THING','HIT A PR TODAY','TRAVELLING TOMORROW'];
 
-// Achievements are measured against the athlete's real log — nothing is seeded.
+// One-off milestones, measured against real history — nothing is seeded.
 const ACHIEVEMENTS = [
-  { code:'RR', name:'ROAD RUNNER',      note:'30 days over your step target',        xp:200, need:30,  measure:'daysHit:steps' },
-  { code:'IM', name:'IRON MONK',        note:'16-day supplement streak',             xp:150, need:16,  measure:'streak:supps' },
-  { code:'HM', name:'HEAVY METAL',      note:'12 straight days with a session',      xp:150, need:12,  measure:'streak:strength' },
-  { code:'HS', name:'HUMAN SPRINKLER',  note:'5 days running on full water',         xp:100, need:5,   measure:'streak:water' },
-  { code:'DP', name:'DAWN PATROL',      note:'10 days with 3+ habits logged',        xp:75,  need:10,  measure:'daysWith3' },
-  { code:'ZM', name:'ZEN MACHINE',      note:'10 breathing sessions in a row',       xp:100, need:10,  measure:'streak:breathe' },
-  { code:'BA', name:'BLACKOUT ARTIST',  note:'10 nights at 7.5h or more',            xp:150, need:10,  measure:'streak:sleep' },
-  { code:'RB', name:'RUBBER BAND',      note:'14-day mobility streak',               xp:150, need:14,  measure:'streak:mobility' },
-  { code:'CN', name:'THE CENTURION',    note:'100 perfect days. Nobody has done this.', xp:500, need:100, measure:'perfectDays' }
+  { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps' },
+  { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps' },
+  { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength' },
+  { code:'HS', name:'HUMAN SPRINKLER', note:'5 days running on full water',             xp:100, need:5,   measure:'streak:water' },
+  { code:'DP', name:'DAWN PATROL',     note:'10 days with 3+ habits logged',            xp:75,  need:10,  measure:'daysWith3' },
+  { code:'ZM', name:'ZEN MACHINE',     note:'10 breathing sessions in a row',           xp:100, need:10,  measure:'streak:breathe' },
+  { code:'BA', name:'BLACKOUT ARTIST', note:'10 nights at 7.5h or more',                xp:150, need:10,  measure:'streak:sleep' },
+  { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility' },
+  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays' }
 ];
 
 // ── Identity & storage ────────────────────────────────────────────────────
 let ATHLETE_ID = '', ATHLETE_NAME = '', KEY = null, ATHLETE = {};
 let CFG = null, LOG = {};
-let MSGS = [];
-const K_CFG = () => ATHLETE_ID + '_hab_cfg';
-const K_LOG = () => ATHLETE_ID + '_hab_log';
+const K_CFG  = () => ATHLETE_ID + '_hab_cfg';
+const K_LOG  = () => ATHLETE_ID + '_hab_log';
+const K_META = () => ATHLETE_ID + '_hab_meta';
 
-const UI = { screen:'today', ob:0, open:null, sheet:null, sheetVal:0, draft:'', toast:null, adding:false,
-             celebrate: [], flash: {} };   // celebrate = queued full-screen level-ups; flash = inline habit-row pops
+const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
+             celebrate: [], flash: {}, _newName:'' };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
-  return { v:2, on, custom:[], goals:{}, coach:'active', motiv:'points', onboarded:false, dark:false, updatedAt:0 };
+  return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null, updatedAt:0 };
 }
 
 // ── Dates ─────────────────────────────────────────────────────────────────
@@ -502,6 +490,7 @@ function today() { const d = new Date(); d.setHours(0,0,0,0); return d; }
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
 function fmtKey(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 const TKEY = () => fmtKey(today());
+function parseKey(k) { return new Date(k + 'T00:00:00'); }
 
 // ── Habit helpers ─────────────────────────────────────────────────────────
 function allHabits() {
@@ -511,6 +500,7 @@ function allHabits() {
 }
 function habitById(id) { return allHabits().find(h => h.id === id) || HABITS[0]; }
 function live() { return allHabits().filter(h => CFG.on[h.id] !== false); }
+function offHabits() { return allHabits().filter(h => CFG.on[h.id] === false); }
 function valOf(dayKey, id) { const d = LOG[dayKey]; return (d && typeof d[id] === 'number') ? d[id] : 0; }
 function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
 function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
@@ -524,12 +514,17 @@ function loadLocal() {
     CFG.on = Object.assign(defaultCfg().on, raw.on || {});
   } catch (e) {}
   try { LOG = JSON.parse(localStorage.getItem(K_LOG()) || '{}') || {}; } catch (e) {}
-  migrateV1();
+  try {
+    const m = JSON.parse(localStorage.getItem(K_META()) || '{}');
+    SYNC.dirty = !!m.dirty; SYNC.lastOk = m.lastOk || null;
+  } catch (e) {}
+  migrateOld();
 }
-// The first shipped version stored 0/1 flags under a different habit set.
-// Fold that into the numeric model once, so nobody loses their first days.
-function migrateV1() {
-  if (CFG.v === 2 && CFG.migrated) return;
+// Fold forward the two earlier shipped shapes: v1 stored 0/1 flags under a
+// different habit set, and v2 carried coach/motivation settings this build no
+// longer has. Runs once, then never again.
+function migrateOld() {
+  if (CFG.v === 3 && CFG.migrated3) return;
   const MAP = { train:'strength', mobility:'mobility', sleep:'sleep', unwind:'breathe',
                 protein:'fuel', water:'water', steps:'steps', vitd:'supps', creatine:'supps', omega3:'supps' };
   let touched = false;
@@ -543,45 +538,112 @@ function migrateV1() {
     });
     LOG[day] = out;
   });
-  CFG.v = 2; CFG.migrated = true;
+  delete CFG.coach; delete CFG.motiv; delete CFG.goals;   // retired settings
+  CFG.v = 3; CFG.migrated3 = true;
   if (touched) saveLog();
   saveCfg();
 }
-function saveCfg() { CFG.updatedAt = Date.now(); try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {} schedulePush(); }
-function saveLog() { try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {} schedulePush(); }
+function saveCfg() {
+  CFG.updatedAt = Date.now();
+  try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
+  markDirty();
+}
+function saveLog() {
+  try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {}
+  markDirty();
+}
+function saveMeta() {
+  try { localStorage.setItem(K_META(), JSON.stringify({ dirty: SYNC.dirty, lastOk: SYNC.lastOk })); } catch (e) {}
+}
 
-let _sbClient = null, _pushTimer = null, _synced = false;
+// ── Durable sync ──────────────────────────────────────────────────────────
+// Contract: the athlete's phone is the record. Every change is written to
+// localStorage FIRST and flagged dirty; the flag itself is persisted, so an
+// app killed while offline still knows there is unsent work next launch. We
+// always push the complete current snapshot, so a newer push simply supersedes
+// an older one and no intermediate state can be lost or applied out of order.
+// Retries run with exponential backoff and fire again on reconnect, on
+// foreground, and at boot — nothing is dropped silently.
+const SYNC = { dirty:false, syncing:false, lastOk:null, lastErr:null, attempts:0 };
+const RETRY_MS = [5000, 15000, 45000, 120000, 300000];
+let _sbClient = null, _pushTimer = null, _retryTimer = null;
+
 function _sb() {
   if (_sbClient) return _sbClient;
   if (!window.supabase || !window.supabase.createClient) return null;
   _sbClient = window.supabase.createClient(SB_URL, SB_KEY);
   return _sbClient;
 }
-function schedulePush() {
-  if (window.IS_DEMO || !ATHLETE_ID) return;
+function markDirty() {
+  if (window.IS_DEMO) return;
+  SYNC.dirty = true; saveMeta();
   clearTimeout(_pushTimer);
-  _pushTimer = setTimeout(async () => {
-    try {
-      const sb = _sb(); if (!sb) return;
-      const payload = {};
-      payload[K_CFG()] = localStorage.getItem(K_CFG()) || '{}';
-      payload[K_LOG()] = localStorage.getItem(K_LOG()) || '{}';
-      const { error } = await sb.rpc('save_progress', {
-        p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME, p_data: payload, p_key: KEY
-      });
-      _synced = !error;
-    } catch (e) { _synced = false; }
-  }, 1200);
+  _pushTimer = setTimeout(pushNow, 1200);
 }
+async function pushNow() {
+  if (window.IS_DEMO || !ATHLETE_ID || SYNC.syncing || !SYNC.dirty) return SYNC.dirty === false;
+  if (navigator.onLine === false) { scheduleRetry(); return false; }
+  SYNC.syncing = true; refreshSyncBadge();
+  let okay = false;
+  try {
+    const sb = _sb();
+    if (!sb) throw new Error('Supabase not loaded');
+    const payload = {};
+    payload[K_CFG()] = localStorage.getItem(K_CFG()) || '{}';
+    payload[K_LOG()] = localStorage.getItem(K_LOG()) || '{}';
+    const { error } = await sb.rpc('save_progress', {
+      p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME, p_data: payload, p_key: KEY
+    });
+    if (error) throw new Error(error.message || 'save rejected');
+    SYNC.dirty = false; SYNC.attempts = 0; SYNC.lastErr = null; SYNC.lastOk = Date.now();
+    clearTimeout(_retryTimer);
+    okay = true;
+  } catch (e) {
+    SYNC.lastErr = String((e && e.message) || e);
+    SYNC.attempts++;
+    scheduleRetry();
+  }
+  SYNC.syncing = false;
+  saveMeta();
+  refreshSyncBadge();
+  return okay;
+}
+function scheduleRetry() {
+  clearTimeout(_retryTimer);
+  if (!SYNC.dirty || window.IS_DEMO) return;
+  const delay = RETRY_MS[Math.min(SYNC.attempts, RETRY_MS.length - 1)];
+  _retryTimer = setTimeout(pushNow, delay);
+}
+function syncLabel() {
+  if (window.IS_DEMO) return 'DEMO — THIS DEVICE ONLY';
+  if (SYNC.syncing) return 'SAVING…';
+  if (SYNC.dirty) return navigator.onLine === false ? 'OFFLINE — SAVED ON THIS PHONE' : 'WAITING TO SYNC';
+  return SYNC.lastOk ? 'SYNCED ' + agoLabel(SYNC.lastOk) : 'SAVED ON THIS PHONE';
+}
+function agoLabel(ts) {
+  const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (s < 60) return 'JUST NOW';
+  const m = Math.round(s / 60);
+  if (m < 60) return m + ' MIN AGO';
+  const h = Math.round(m / 60);
+  return h < 24 ? h + 'H AGO' : Math.round(h / 24) + 'D AGO';
+}
+// Patch the badge in place rather than re-rendering: a full render would steal
+// focus from the add-habit field mid-typing.
+function refreshSyncBadge() {
+  document.querySelectorAll('[data-sync]').forEach(el => { el.textContent = syncLabel(); });
+}
+
 async function syncFromCloud() {
   if (window.IS_DEMO || !ATHLETE_ID) return;
   for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) await new Promise(r => setTimeout(r, 100));
   try {
-    const sb = _sb(); if (!sb) return;
+    const sb = _sb();
+    if (!sb) return;
     const { data, error } = await sb.rpc('get_progress', { p_athlete_id: ATHLETE_ID, p_key: KEY });
     if (error || !data || typeof data !== 'object') return;
-    // Log: union of days, per-habit the larger logged value wins — an uncheck on
-    // a stale device must never erase a real number from another one.
+    // Log merge: union of days, and per habit the LARGER logged value wins —
+    // so a stale device can never erase a real number recorded elsewhere.
     try {
       const cloudLog = JSON.parse(data[K_LOG()] || '{}') || {};
       Object.keys(cloudLog).forEach(day => {
@@ -589,45 +651,22 @@ async function syncFromCloud() {
         Object.keys(theirs).forEach(id => { out[id] = Math.max(Number(theirs[id]) || 0, Number(mine[id]) || 0); });
         LOG[day] = out;
       });
+      localStorage.setItem(K_LOG(), JSON.stringify(LOG));
     } catch (e) {}
-    // Config: newest wins wholesale (it's a settings blob, not a merge target).
+    // Config: newest wins wholesale, but never clobber unsent local settings.
     try {
       const cloudCfg = JSON.parse(data[K_CFG()] || '{}');
-      if (cloudCfg && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
+      if (cloudCfg && !SYNC.dirty && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
+        const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
+        if (!CFG.seen) CFG.seen = keepSeen;
+        if (!CFG.rulesSig) CFG.rulesSig = keepSig;
+        localStorage.setItem(K_CFG(), JSON.stringify(CFG));
       }
     } catch (e) {}
-    migrateV1();
-    try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
-    _synced = true;
-  } catch (e) {}
-}
-async function fetchMessages() {
-  if (window.IS_DEMO || !ATHLETE_ID) return;
-  try {
-    const sb = _sb(); if (!sb) return;
-    const { data, error } = await sb.rpc('get_messages', { p_athlete_id: ATHLETE_ID, p_key: KEY });
-    if (error) return;
-    MSGS = data || [];
-    render();
-  } catch (e) {}
-}
-function unreadFromCoach() { return MSGS.filter(m => m.sender === 'coach' && !m.read_by_athlete).length; }
-async function markCoachRead() {
-  if (!unreadFromCoach()) return;
-  MSGS.forEach(m => { if (m.sender === 'coach') m.read_by_athlete = true; });
-  try { const sb = _sb(); if (sb) await sb.rpc('mark_athlete_read', { p_athlete_id: ATHLETE_ID, p_key: KEY }); } catch (e) {}
-}
-async function sendMessage(body) {
-  body = String(body || '').trim();
-  if (!body) return;
-  const lastCtx = MSGS.length ? MSGS[MSGS.length - 1].context : null;
-  MSGS.push({ sender:'athlete', body, context:lastCtx, read_by_athlete:true, read_by_coach:false });
-  UI.draft = '';
-  render();
-  if (window.IS_DEMO) return;
-  try { const sb = _sb(); if (sb) await sb.rpc('send_athlete_message', { p_athlete_id: ATHLETE_ID, p_body: body, p_context: lastCtx, p_key: KEY }); } catch (e) {}
+    migrateOld();
+  } catch (e) { /* offline — the phone still holds everything */ }
 }
 
 // ── Derived stats, all from real history ──────────────────────────────────
@@ -637,61 +676,52 @@ function dayPct(dayKey) {
   return Math.round(hs.filter(h => isDone(h, dayKey)).length / hs.length * 100);
 }
 function isPerfect(dayKey) { const hs = live(); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
-// A day counts toward the streak at 80% or better — the same bar the coach uses.
-function dayQualifies(dayKey) { return dayPct(dayKey) >= 80; }
+function dayQualifies(dayKey) { return dayPct(dayKey) >= XP_RULES.streakQualifyPct; }
 function currentDayStreak() {
   let d = dayQualifies(TKEY()) ? today() : addDays(today(), -1), n = 0;
   while (dayQualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
   return n;
 }
-function bestDayStreak() {
-  const days = loggedDays().filter(dayQualifies);
+function runLength(days) {
   let best = 0, run = 0, prev = null;
   days.forEach(k => {
-    run = (prev && fmtKey(addDays(new Date(prev + 'T00:00:00'), 1)) === k) ? run + 1 : 1;
+    run = (prev && fmtKey(addDays(parseKey(prev), 1)) === k) ? run + 1 : 1;
     best = Math.max(best, run); prev = k;
   });
-  return Math.max(best, currentDayStreak());
+  return best;
 }
+function bestDayStreak() { return Math.max(runLength(loggedDays().filter(dayQualifies)), currentDayStreak()); }
 function habitStreak(h) {
   let d = isDone(h, TKEY()) ? today() : addDays(today(), -1), n = 0;
   while (isDone(h, fmtKey(d))) { n++; d = addDays(d, -1); }
   return n;
 }
-function habitBest(h) {
-  const days = loggedDays().filter(k => isDone(h, k));
-  let best = 0, run = 0, prev = null;
-  days.forEach(k => {
-    run = (prev && fmtKey(addDays(new Date(prev + 'T00:00:00'), 1)) === k) ? run + 1 : 1;
-    best = Math.max(best, run); prev = k;
-  });
-  return Math.max(best, habitStreak(h));
-}
+function habitBest(h) { return Math.max(runLength(loggedDays().filter(k => isDone(h, k))), habitStreak(h)); }
 function habitWeek(h) { let n = 0; for (let i = 0; i < 7; i++) if (isDone(h, fmtKey(addDays(today(), -i)))) n++; return n; }
 function habitRate35(h) { let n = 0; for (let i = 0; i < 35; i++) if (isDone(h, fmtKey(addDays(today(), -i)))) n++; return Math.round(n / 35 * 100); }
-function totalCompletions() { return loggedDays().reduce((s, k) => s + live().filter(h => isDone(h, k)).length, 0); }
 
 // ── XP ────────────────────────────────────────────────────────────────────
-function baseXp(h) { return typeof h.xp === 'number' ? h.xp : CUSTOM_XP; }
-// One day's worth of one habit: pro-rata while you're part way, with a bonus
-// once you actually finish — so a near-miss still pays, but finishing pays more.
+function baseXp(h) {
+  const w = XP_RULES.weights[h.id];
+  return typeof w === 'number' ? w : XP_RULES.customXp;
+}
+// Pro-rata while part way, with a bonus once the target is actually met — so a
+// near-miss still pays, but finishing pays more.
 function xpFor(h, v) {
   if (v <= 0) return 0;
   const base = baseXp(h);
-  return Math.round(v >= h.target ? base * COMPLETION_BONUS : base * (v / h.target));
+  return Math.round(v >= h.target ? base * XP_RULES.completionBonus : base * (v / h.target));
 }
-// A habit's own XP pool, across all history. Counted even if the habit is
-// currently switched off — XP you earned is not taken back.
+// A habit's own XP pool across all history. Counted even when the habit is
+// currently switched off — XP you earned is never taken back.
 function habitXp(h) { return loggedDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
 function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0); }
-// Per-habit ladders use the same curve, scaled to that habit's daily value, so
-// every habit levels at the same *rate* — which means your level in a habit
-// tracks how often you actually do it. Train less than you drink water and your
-// water level climbs past your strength level, exactly as it should.
-function baseFor(h) { return h ? Math.max(10, Math.round(baseXp(h) * COMPLETION_BONUS)) : XP_BASE; }
-function levelCost(base, n) { return Math.max(10, Math.round(base * Math.pow(n, XP_GROWTH) / 10) * 10); }
+// Habit ladders reuse the curve, scaled to that habit's daily value, so every
+// habit levels at the same RATE — which is what makes your level in a habit
+// track how often you actually do it.
+function baseFor(h) { return h ? Math.max(10, Math.round(baseXp(h) * XP_RULES.completionBonus)) : XP_RULES.base; }
+function levelCost(base, n) { return Math.max(10, Math.round(base * Math.pow(n, XP_RULES.growth) / 10) * 10); }
 
-// Rank label for any level, including the prestige star past level 50.
 function rankFor(level) {
   const i = Math.max(0, level - 1);
   const star = Math.floor(i / LEVELS_PER_CYCLE);
@@ -700,9 +730,8 @@ function rankFor(level) {
   const sub = (within % SUBS_PER_RANK) + 1;
   return { star, name, sub, label: (star ? '★' + star + ' ' : '') + name + ' ' + sub };
 }
-// Walk the cumulative curve to turn an XP total into a level plus its progress.
 function levelInfo(xp, base) {
-  base = base || XP_BASE;
+  base = base || XP_RULES.base;
   let lv = 1, spent = 0, cost = levelCost(base, 1);
   while (lv < MAX_LEVEL_SCAN && xp - spent >= cost) { spent += cost; lv++; cost = levelCost(base, lv); }
   const into = xp - spent, r = rankFor(lv);
@@ -713,8 +742,19 @@ function levelInfo(xp, base) {
     nextLabel: (cost - into) + ' XP to level ' + (lv + 1)
   };
 }
-function overallLevel() { return levelInfo(overallXp(), XP_BASE); }
+function overallLevel() { return levelInfo(overallXp(), XP_RULES.base); }
 function habitLevel(h) { return levelInfo(habitXp(h), baseFor(h)); }
+
+// XP earned inside a date window — powers the weekly recap.
+function xpBetween(fromDate, toDate) {
+  let sum = 0;
+  loggedDays().forEach(k => {
+    const d = parseKey(k);
+    if (d < fromDate || d > toDate) return;
+    allHabits().forEach(h => { sum += xpFor(h, valOf(k, h.id)); });
+  });
+  return sum;
+}
 
 // ── Consistency ladders ───────────────────────────────────────────────────
 // Tier is earned on the BEST run ever, so a broken streak never revokes a badge.
@@ -722,20 +762,12 @@ function consistencyFor(h) {
   const best = habitBest(h), cur = habitStreak(h);
   let tier = 0;
   CONSISTENCY_TIERS.forEach((t, i) => { if (best >= t.days) tier = i + 1; });
-  const next = CONSISTENCY_TIERS[tier] || null;
-  return { best, cur, tier, next, total: CONSISTENCY_TIERS.length };
-}
-function consistencyXp() {
-  return allHabits().reduce((s, h) => {
-    const c = consistencyFor(h);
-    return s + CONSISTENCY_TIERS.slice(0, c.tier).reduce((a, t) => a + t.xp, 0);
-  }, 0);
+  return { best, cur, tier, next: CONSISTENCY_TIERS[tier] || null, total: CONSISTENCY_TIERS.length };
 }
 function measureAch(a) {
   if (a.measure === 'perfectDays') return loggedDays().filter(isPerfect).length;
   if (a.measure === 'daysWith3') return loggedDays().filter(k => live().filter(h => isDone(h, k)).length >= 3).length;
-  const [kind, id] = a.measure.split(':');
-  const h = habitById(id);
+  const parts = a.measure.split(':'), kind = parts[0], h = habitById(parts[1]);
   if (kind === 'streak') return habitStreak(h);
   if (kind === 'daysHit') return loggedDays().filter(k => isDone(h, k)).length;
   return 0;
@@ -743,73 +775,78 @@ function measureAch(a) {
 function dayNumber() {
   const days = loggedDays();
   if (!days.length) return 1;
-  const first = new Date(days[0] + 'T00:00:00');
-  return Math.max(1, Math.round((today() - first) / 86400000) + 1);
+  return Math.max(1, Math.round((today() - parseKey(days[0])) / 86400000) + 1);
 }
 
-// ── Coach copy, reactive to what's actually missing ───────────────────────
-function coachCopy() {
+// ── The nudge (one per day, driven by what is actually missing) ───────────
+function nudge() {
   const missing = live().filter(h => !isDone(h));
   const water = live().find(h => h.id === 'water');
-  let line, cta;
   if (water && !isDone(water)) {
     const left = Math.max(1, Math.ceil(water.target - valOf(TKEY(), 'water')));
-    line = 'You have out-hydrated exactly zero houseplants today. ' + left + ' more glass' + (left === 1 ? '' : 'es') + ' and I stop bringing it up.';
-    cta = 'FINE, TALK TO ME';
-  } else if (missing.length) {
-    line = missing.length + ' habit' + (missing.length === 1 ? '' : 's') + ' left, and ' + missing[0].name.toLowerCase() + ' is the one you are avoiding. I can tell.';
-    cta = 'DEFEND YOURSELF';
-  } else {
-    line = 'Everything is checked. I have nothing to nag about, which is deeply unsettling for me.';
-    cta = 'SAY SOMETHING NICE';
+    return { line: 'You have out-hydrated exactly zero houseplants today. ' + left + ' more glass' + (left === 1 ? '' : 'es') + ' and I stop bringing it up.',
+             cta: 'SORT THE WATER', target: water.id };
   }
-  if (CFG.coach === 'nudge') cta = 'SEE THE RECAP';
-  return { line, cta };
+  if (missing.length) {
+    return { line: missing.length + ' habit' + (missing.length === 1 ? '' : 's') + ' left, and ' + missing[0].name.toLowerCase() + ' is the one you are avoiding. I can tell.',
+             cta: 'OPEN ' + missing[0].name, target: missing[0].id };
+  }
+  return { line: 'Everything is checked. I have nothing to nag about, which is deeply unsettling for me.',
+           cta: 'SEE THE RECAP', target: null };
 }
 
 // ── Level-up detection ────────────────────────────────────────────────────
-// Levels are always derived from the log, never stored — so instead of trying
-// to catch every mutation we keep the last level the athlete has actually been
-// SHOWN (CFG.seen) and diff against it. That covers local check-offs, a cloud
-// sync that arrives with new XP, and the first-run migration alike.
+// Levels are derived, never stored, so instead of catching every mutation we
+// keep the last level the athlete has actually been SHOWN (CFG.seen) and diff
+// against it. That covers local check-offs, a cloud sync arriving with new XP,
+// and migrations alike.
 function currentLevels() {
   const out = { _overall: overallLevel().lv };
   allHabits().forEach(h => { out[h.id] = habitLevel(h).lv; });
   return out;
 }
-// Seed silently: an athlete arriving with history must not be ambushed by
-// twenty queued celebrations for levels they never saw themselves earn.
-function seedSeenLevels() { CFG.seen = currentLevels(); saveCfg(); }
+// Signature of everything that affects scoring. When XP_RULES or a target
+// changes, levels legitimately move — we re-baseline silently instead of
+// firing a hundred celebrations the athlete did not earn today.
+function rulesSignature() {
+  const src = JSON.stringify([
+    XP_RULES.base, XP_RULES.growth, XP_RULES.completionBonus, XP_RULES.customXp,
+    XP_RULES.weights, CONSISTENCY_TIERS.map(t => t.days), HABITS.map(h => [h.id, h.target])
+  ]);
+  let hash = 0;
+  for (let i = 0; i < src.length; i++) hash = (hash * 31 + src.charCodeAt(i)) % 2147483647;
+  return 'r' + hash.toString(36);
+}
+function seedSeenLevels() { CFG.seen = currentLevels(); CFG.rulesSig = rulesSignature(); saveCfg(); }
 function checkLevelUps() {
-  if (!CFG.seen) { seedSeenLevels(); return; }
+  const sig = rulesSignature();
+  if (!CFG.seen || CFG.rulesSig !== sig) {
+    const rescored = !!CFG.seen && CFG.rulesSig !== sig;
+    seedSeenLevels();
+    if (rescored) toast('XP system updated — your levels were rescored.');
+    return;
+  }
   const now = currentLevels(), seen = CFG.seen, events = [];
   Object.keys(now).forEach(id => {
     const from = typeof seen[id] === 'number' ? seen[id] : now[id];
     if (now[id] <= from) return;
     const overall = id === '_overall';
-    const rankChanged = rankFor(now[id]).name !== rankFor(from).name || rankFor(now[id]).star !== rankFor(from).star;
-    events.push({
-      id, overall, from, to: now[id], rankChanged,
-      name: overall ? 'OVERALL' : habitById(id).name,
-      // Full-screen takeover for an overall level or a genuine rank promotion.
-      // Routine habit levels flash in their row instead, so day one doesn't
-      // become nine consecutive takeovers.
-      big: overall || rankChanged
-    });
+    const a = rankFor(now[id]), b = rankFor(from);
+    const rankChanged = a.name !== b.name || a.star !== b.star;
+    // Full-screen takeover for an overall level or a real rank promotion.
+    // Routine habit levels flash in their row, so day one is not nine takeovers.
+    events.push({ id, overall, from, to: now[id], rankChanged,
+                  name: overall ? 'OVERALL' : habitById(id).name,
+                  big: overall || rankChanged });
   });
   CFG.seen = now;
-  if (!events.length) { saveCfg(); return; }
-  events.filter(e => e.big).forEach(e => UI.celebrate.push(e));
-  events.filter(e => !e.big).forEach(e => { UI.flash[e.id] = e.to; });
   saveCfg();
-  // Clear the inline flashes once their animation has played out.
+  if (!events.length) return;
+  events.forEach(e => { if (e.big) UI.celebrate.push(e); else UI.flash[e.id] = e.to; });
   clearTimeout(_flashTimer);
   _flashTimer = setTimeout(() => { UI.flash = {}; render(); }, 1600);
 }
-function dismissCelebration() {
-  UI.celebrate.shift();
-  render();
-}
+function dismissCelebration() { UI.celebrate.shift(); render(); }
 
 // ── Actions ───────────────────────────────────────────────────────────────
 function toast(text) {
@@ -824,17 +861,15 @@ function setVal(id, v) {
   saveLog();
 }
 function toggleHabit(h) {
-  const done = isDone(h);
-  const before = habitXp(h) + 0;
+  const done = isDone(h), before = habitXp(h);
   setVal(h.id, done ? 0 : h.target);
   checkLevelUps();
   render();
   if (!done) toast('+' + (habitXp(h) - before) + ' XP · ' + h.name + ' logged. Look at you.');
 }
 function bump(h) {
-  const stepBy = h.step || 1;
   const before = habitXp(h);
-  const v = Math.min(h.target, valOf(TKEY(), h.id) + stepBy);
+  const v = Math.min(h.target, valOf(TKEY(), h.id) + (h.step || 1));
   setVal(h.id, v);
   checkLevelUps();
   render();
@@ -842,11 +877,11 @@ function bump(h) {
   toast(v >= h.target ? '+' + gained + ' XP · ' + h.name + ' complete.' : '+' + gained + ' XP. Keep them coming.');
 }
 function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
-function go(screen) { UI.screen = screen; UI.open = null; if (screen === 'coach') markCoachRead(); render(); }
+function openHabit(id, from) { UI.open = id; UI.from = from || UI.screen; UI.screen = 'detail'; render(); }
+function go(screen) { UI.screen = screen; UI.open = null; render(); }
 
 // ── Render helpers ────────────────────────────────────────────────────────
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-const H = (s) => s;
 let _handlers = {};
 function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _handlers[id] = fn; return 'data-h="' + id + '"'; }
 
@@ -859,115 +894,75 @@ function render() {
     const fn = _handlers[el.getAttribute('data-h')];
     if (fn) el.addEventListener('click', ev => { ev.stopPropagation(); fn(ev); });
   });
-  const ta = app.querySelector('#draft');
-  if (ta) {
-    ta.addEventListener('input', e => { UI.draft = e.target.value; });
-    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(UI.draft); } });
-  }
   const nh = app.querySelector('#newhabit');
   if (nh) nh.addEventListener('input', e => { UI._newName = e.target.value; });
-  const sc = app.querySelector('#scroll');
-  if (sc && UI.screen === 'coach') sc.scrollTop = sc.scrollHeight;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
 }
 
-// ── Onboarding ────────────────────────────────────────────────────────────
+// ── Onboarding — one screen: the suggested habit set, all editable ─────────
 function renderOnboarding() {
-  const step = UI.ob;
-  let bodyHtml = '';
-  if (step === 0) {
-    bodyHtml = `
-      <div style="flex:1;display:flex;flex-direction:column;padding-top:28px;animation:riseIn .3s ease;overflow:hidden">
-        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">What are we<br>fixing first?</div>
-        <p style="margin:14px 0 22px;font-size:14px;color:var(--muted)">Pick as many as you like. Nobody's reading this but me, and I'm a program.</p>
-        <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
-          ${GOALS.map((g, i) => `<button class="selrow ${CFG.goals[i] ? 'on' : ''}" ${on(() => { CFG.goals[i] = !CFG.goals[i]; saveCfg(); render(); })}>
-            <span class="lbl">${esc(g)}</span><span class="mark">${CFG.goals[i] ? 'PICKED' : '+'}</span>
-          </button>`).join('')}
-        </div>
-      </div>`;
-  } else if (step === 1) {
-    bodyHtml = `
-      <div style="flex:1;display:flex;flex-direction:column;padding-top:28px;overflow:hidden;animation:riseIn .3s ease">
-        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">Your eight<br>daily habits</div>
-        <p style="margin:14px 0 18px;font-size:14px;color:var(--muted)">Switch off anything you'd only lie about later.</p>
+  const nOn = live().length;
+  return `
+    <div style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
+        <div class="hd" style="font-size:16px;line-height:1;letter-spacing:.02em">Proof</div>
+        <div class="eyebrow">${nOn} tracked</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;padding-top:26px;overflow:hidden;animation:riseIn .3s ease">
+        <div class="hd" style="font-size:38px;line-height:.98;letter-spacing:-.03em">Here's what<br>I'd track</div>
+        <p style="margin:14px 0 16px;font-size:14px;color:var(--muted)">
+          These are my suggestions. Switch off anything you'd only lie about later — you can change all of it whenever you like.
+        </p>
         <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
           ${allHabits().map(h => `<button style="width:100%;text-align:left;padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px" class="row-rule"
             ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}>
             <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(h.goal || h.source)}</span>
+              <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
             </span>
             <span class="sw ${CFG.on[h.id] !== false ? 'on' : ''}"><i></i></span>
           </button>`).join('')}
         </div>
-      </div>`;
-  } else {
-    bodyHtml = `
-      <div style="flex:1;display:flex;flex-direction:column;padding-top:28px;animation:riseIn .3s ease;overflow:hidden">
-        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">How loud<br>should I be?</div>
-        <p style="margin:14px 0 20px;font-size:14px;color:var(--muted)">You can change your mind at 6am like everyone else.</p>
-        <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
-          ${COACH_STYLES.map(c => `<button class="selrow ${CFG.coach === c.key ? 'on' : ''}" style="flex-direction:column;align-items:flex-start"
-            ${on(() => { CFG.coach = c.key; saveCfg(); render(); })}>
-            <span class="lbl">${esc(c.label)}</span><span class="desc">${esc(c.desc)}</span>
-          </button>`).join('')}
-        </div>
-      </div>`;
-  }
-  return `
-    <div style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
-        <div class="hd" style="font-size:16px;line-height:1;letter-spacing:.02em">Proof</div>
-        <div class="eyebrow">Step ${step + 1} of 3</div>
       </div>
-      ${bodyHtml}
-      <div style="display:flex;gap:10px;padding-top:18px">
-        <button class="btn btn-secondary" ${on(() => { if (UI.ob === 0) { CFG.onboarded = true; saveCfg(); } else UI.ob--; render(); })}>Back</button>
-        <button class="btn btn-primary" style="flex:1" ${on(() => {
-          if (UI.ob === 2) { CFG.onboarded = true; saveCfg(); UI.screen = 'today'; }
-          else UI.ob++;
-          render();
-        })}>${step === 2 ? 'Start day 1' : 'Next'}</button>
-      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:18px" ${on(() => {
+        if (!live().length) { toast('Pick at least one habit.'); return; }
+        CFG.onboarded = true; saveCfg(); seedSeenLevels(); UI.screen = 'today'; render();
+      })}>Start tracking</button>
     </div>`;
 }
 
 // ── App shell ─────────────────────────────────────────────────────────────
 function renderApp() {
-  const LI = overallLevel(), xp = LI.xp, lv = LI.lv;
+  const LI = overallLevel();
   const hs = live(), doneCount = hs.filter(h => isDone(h)).length, pct = dayPct(TKEY());
-  const openH = habitById(UI.open || 'strength');
+  const openH = habitById(UI.open || (hs[0] || HABITS[0]).id);
   const earnedMilestones = ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).length;
   const earnedTiers = allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0);
   const totalTiers = allHabits().length * CONSISTENCY_TIERS.length;
-  const earned = earnedMilestones + earnedTiers;
-  const totalAch = ACHIEVEMENTS.length + totalTiers;
+  const earned = earnedMilestones + earnedTiers, totalAch = ACHIEVEMENTS.length + totalTiers;
 
   const heads = {
     today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
+    habits:   [hs.length + ' tracked · tap for detail', 'Habits'],
     detail:   [openH.source, openH.name],
-    insights: ['LV ' + lv + ' ' + LI.label + ' · ' + xp + ' XP', 'Achievements'],
-    coach:    [CFG.coach === 'silent' ? 'Coach muted in settings' : 'Amir · replies within a day', 'Your coach'],
-    settings: ['Profile & programme', 'Settings']
+    insights: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Achievements'],
+    settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
-    today: pct + '% DONE', detail: 'LV ' + habitLevel(openH).lv,
-    insights: earned + ' OF ' + totalAch,
-    coach: (CFG.coach || 'active').toUpperCase(), settings: _synced ? 'SYNCED' : 'LOCAL'
+    today: pct + '% DONE', habits: 'LV ' + LI.lv, detail: 'LV ' + habitLevel(openH).lv,
+    insights: earned + ' OF ' + totalAch, settings: ''
   };
   const head = heads[UI.screen] || heads.today;
 
   let screenHtml = '';
   if (UI.screen === 'today') screenHtml = renderToday(LI, doneCount, pct);
+  else if (UI.screen === 'habits') screenHtml = renderHabits();
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
-  else if (UI.screen === 'insights') screenHtml = renderAwards(LI, earned, totalAch);
-  else if (UI.screen === 'coach') screenHtml = renderCoach();
+  else if (UI.screen === 'insights') screenHtml = renderAchievements(LI, earned, totalAch);
   else screenHtml = renderSettings();
 
-  const tabDefs = [['TODAY','today','01'],['AWARDS','insights','02'],['COACH','coach','03'],['YOU','settings','04']];
-  const activeTab = UI.screen === 'detail' ? 'today' : UI.screen;
-  const unread = unreadFromCoach();
+  const tabDefs = [['TODAY','today','01'],['ACHIEVEMENTS','insights','02'],['HABITS','habits','03'],['SETTINGS','settings','04']];
+  const activeTab = UI.screen === 'detail' ? 'habits' : UI.screen;
 
   return `
     ${window.IS_DEMO ? '<div class="demo-banner">Demo mode — nothing is saved to the cloud</div>' : ''}
@@ -982,12 +977,15 @@ function renderApp() {
     <div class="tabs">
       ${tabDefs.map(t => `<button class="${activeTab === t[1] ? 'on' : ''}" ${on(() => go(t[1]))}>
         <span class="num">${t[2]}</span><span class="nm">${t[0]}</span>
-        ${t[1] === 'coach' && unread && activeTab !== 'coach' ? '<span class="dot"></span>' : ''}
       </button>`).join('')}
     </div>
     ${UI.sheet ? renderSheet() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast">${esc(UI.toast)}</div>` : ''}
     ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
+}
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
 // ── Level-up takeover ─────────────────────────────────────────────────────
@@ -995,10 +993,8 @@ function renderCelebration(ev) {
   const isHabit = !ev.overall;
   const h = isHabit ? habitById(ev.id) : null;
   const info = isHabit ? habitLevel(h) : overallLevel();
-  const r = rankFor(ev.to);
-  const promoted = ev.rankChanged;
-  // Shards fly out on eight fixed vectors — deterministic, so the burst reads
-  // the same every time instead of looking like noise.
+  const r = rankFor(ev.to), promoted = ev.rankChanged;
+  const prestiged = promoted && r.star > 0 && r.name === RANKS[0] && r.sub === 1;
   const shards = [[0,-118],[84,-84],[118,0],[84,84],[0,118],[-84,84],[-118,0],[-84,-84],[52,-132],[-52,132],[132,52],[-132,-52]];
   return `
     <div class="lvwrap ${promoted ? 'rank' : ''}" ${on(dismissCelebration)}>
@@ -1008,12 +1004,9 @@ function renderCelebration(ev) {
         <div class="lvshards">
           ${shards.map((s, i) => `<i style="--dx:${s[0]}px;--dy:${s[1]}px;animation-delay:${(0.22 + i * 0.025).toFixed(3)}s"></i>`).join('')}
         </div>
-        <div class="lvbadge">
-          <span class="n">${ev.to}</span>
-          <span class="l">LEVEL</span>
-        </div>
+        <div class="lvbadge"><span class="n">${ev.to}</span><span class="l">LEVEL</span></div>
       </div>
-      <div class="lvkicker">${promoted ? (r.star && r.sub === 1 && r.name === RANKS[0] ? 'Prestige' : 'Rank up') : 'Level up'}</div>
+      <div class="lvkicker">${prestiged ? 'Prestige' : (promoted ? 'Rank up' : 'Level up')}</div>
       <div class="lvrank">${esc(isHabit ? h.name : r.label)}</div>
       ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
                 : `<div class="lvsub">Overall level ${ev.to} · ${info.into} / ${info.need} XP</div>`}
@@ -1022,94 +1015,132 @@ function renderCelebration(ev) {
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
 }
-function greeting() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+
+// ── Habit row, shared by Today and Habits ─────────────────────────────────
+function habitRow(h, from) {
+  const v = valOf(TKEY(), h.id), done = isDone(h), st = habitStreak(h);
+  const hl = habitLevel(h), flashed = UI.flash[h.id];
+  const status = h.kind === 'count'
+    ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
+    : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source));
+  const pc = Math.min(100, Math.round(v / h.target * 100));
+  return `<div class="hrow ${done ? 'done' : ''}">
+    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="Toggle ${esc(h.name)}">
+      <span class="boxmark ${done ? 'on' : ''}">${done ? '✓' : ''}</span>
+    </button>
+    <button class="body" ${on(() => openHabit(h.id, from))}>
+      <span class="line1">
+        <span class="nm">${esc(h.name)}</span>
+        ${flashed ? `<span class="lvchip">LV ${flashed} ↑</span>`
+                  : `<span class="hlv">LV ${hl.lv}${st > 0 ? ' · ' + st + 'D' : ''}</span>`}
+      </span>
+      <span class="status">${esc(status)}</span>
+      <span class="track"><span style="width:${pc}%"></span></span>
+    </button>
+    ${h.kind === 'count' ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
+  </div>`;
 }
 
 // ── Today ─────────────────────────────────────────────────────────────────
 function renderToday(LI, doneCount, pct) {
   const hs = live();
-  const xp = LI.xp, lv = LI.lv;
-  const streak = currentDayStreak();
+  const n = nudge();
+  // The recap half of "nudge and recap": last seven days at a glance.
+  const weekStart = addDays(today(), -6);
+  const weekXp = xpBetween(weekStart, today());
+  let goodDays = 0;
+  for (let i = 0; i < 7; i++) if (dayQualifies(fmtKey(addDays(today(), -i)))) goodDays++;
+  const ranked = hs.map(h => ({ h, w: habitWeek(h) })).sort((a, b) => b.w - a.w);
+  const strongest = ranked[0], weakest = ranked[ranked.length - 1];
 
-  let hero = '';
-  if (CFG.motiv === 'streak') {
-    hero = `<div style="display:flex;align-items:flex-end;gap:14px">
-      <div class="figure" style="font-size:92px;line-height:.8">${streak}</div>
-      <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
-        <div class="hd" style="font-size:15px;line-height:1">Day streak</div>
-        <div style="font-size:12px;line-height:1.3;color:var(--muted)">Longest ever: ${bestDayStreak()} days</div>
-      </div></div>`;
-  } else if (CFG.motiv === 'rings') {
-    hero = `<div style="display:flex;gap:8px;align-items:flex-end">
-      ${hs.map(h => {
-        const v = valOf(TKEY(), h.id);
-        const pc = Math.max(4, Math.min(100, Math.round(v / h.target * 100)));
-        return `<div style="flex:1;display:flex;flex-direction:column;gap:6px">
-          <div style="height:78px;display:flex;align-items:flex-end;background:var(--track)">
-            <div style="width:100%;height:${pc}%;background:${isDone(h) ? 'var(--accent)' : 'var(--muted)'};transition:height .35s cubic-bezier(.2,.8,.2,1)"></div>
-          </div>
-          <div class="mono" style="font-size:8px;letter-spacing:.04em;color:var(--muted)">${esc(h.code)}</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  } else {
-    hero = `<div style="display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;align-items:flex-end;gap:14px">
-        <div class="figure" style="font-size:64px;line-height:.85">${lv}</div>
-        <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
-          <div class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</div>
-          <div style="font-size:12px;line-height:1.3;color:var(--muted)">${xp.toLocaleString()} XP · ${esc(LI.nextLabel)}</div>
-        </div>
-      </div>
-      <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
-    </div>`;
-  }
-
-  const cc = coachCopy();
   return `
     <div style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:14px">
-        ${hero}
+        <div style="display:flex;align-items:flex-end;gap:14px">
+          <div class="figure" style="font-size:64px;line-height:.85">${LI.lv}</div>
+          <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
+            <div class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${LI.xp.toLocaleString()} XP · ${esc(LI.nextLabel)}</div>
+          </div>
+        </div>
+        <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
         <div style="display:flex;flex-direction:column;gap:6px">
           <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Today</span><span>${doneCount} of ${hs.length} habits</span></div>
           <div class="bar"><span style="width:${pct}%"></span></div>
         </div>
       </div>
 
-      ${CFG.coach !== 'silent' ? `<div class="coachcard">
-        <div class="eyebrow">${CFG.coach === 'nudge' ? 'One nudge, as agreed' : 'Amir, your coach'}</div>
-        <div class="say">${esc(cc.line)}</div>
-        <button class="cta" ${on(() => go('coach'))}>${esc(cc.cta)}</button>
-      </div>` : ''}
+      <div class="coachcard">
+        <div class="eyebrow">One nudge, as agreed</div>
+        <div class="say">${esc(n.line)}</div>
+        <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('insights')))}>${esc(n.cta)}</button>
+      </div>
 
-      ${hs.map(h => {
-        const v = valOf(TKEY(), h.id), done = isDone(h), st = habitStreak(h);
-        const hl = habitLevel(h), flashed = UI.flash[h.id];
-        let status;
-        if (h.kind === 'count') status = fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit;
-        else status = done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source);
-        const pc = Math.min(100, Math.round(v / h.target * 100));
-        return `<div class="hrow ${done ? 'done' : ''}">
-          <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="Toggle ${esc(h.name)}">
-            <span class="boxmark ${done ? 'on' : ''}">${done ? '✓' : ''}</span>
-          </button>
-          <button class="body" ${on(() => { UI.open = h.id; UI.screen = 'detail'; render(); })}>
-            <span class="line1">
-              <span class="nm">${esc(h.name)}</span>
-              ${flashed ? `<span class="lvchip">LV ${flashed} ↑</span>`
-                        : `<span class="hlv">LV ${hl.lv}${st > 0 ? ' · ' + st + 'D' : ''}</span>`}
-            </span>
-            <span class="status">${esc(status)}</span>
-            <span class="track"><span style="width:${pc}%"></span></span>
-          </button>
-          ${h.kind === 'count' ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
-        </div>`;
-      }).join('')}
+      ${hs.map(h => habitRow(h, 'today')).join('')}
 
-      <div style="padding:18px 20px 30px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        Tap a habit's name to see its history. Steps and sleep take a number — tap the +, or open the habit and log it. Everything else is on you, champ.
+      <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
+        <div class="eyebrow" style="letter-spacing:.12em">The last seven days</div>
+        <div style="display:flex;gap:22px">
+          <div><div class="figure" style="font-size:34px;line-height:.95">${goodDays}<span style="font-size:16px;color:var(--muted)">/7</span></div>
+            <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">Days on target</div></div>
+          <div><div class="figure" style="font-size:34px;line-height:.95">${weekXp.toLocaleString()}</div>
+            <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">XP earned</div></div>
+        </div>
+        ${ranked.length > 1 ? `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
+          Strongest: <strong style="color:var(--ink)">${esc(strongest.h.name)}</strong> ${strongest.w}/7 ·
+          weakest: <strong style="color:var(--ink)">${esc(weakest.h.name)}</strong> ${weakest.w}/7.
+        </div>` : ''}
+      </div>
+
+      <div style="padding:0 20px 30px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+        Tap a habit's name for its history and rank. Steps, sleep, water and meals take a number — tap the +, or open the habit to log it.
+      </div>
+    </div>`;
+}
+
+// ── Habits tab ────────────────────────────────────────────────────────────
+// Today is for ticking things off; this is for seeing where you stand. One row
+// per habit — rank, level progress, today's state and the consistency ladder —
+// so nothing here repeats the Today list.
+function renderHabits() {
+  const hs = live(), off = offHabits();
+  const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
+  const statusOf = (h) => {
+    const v = valOf(TKEY(), h.id);
+    if (isDone(h)) return 'Done today';
+    return h.kind === 'count' ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + ' today' : 'Not done today';
+  };
+  return `
+    <div style="animation:fadeIn .25s ease">
+      ${sectionLabel('Tracked', 'Tap for history')}
+      ${hs.length ? hs.map(h => {
+        const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
+        return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
+          ${on(() => openHabit(h.id, 'habits'))}>
+          <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
+          <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+              <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
+              <span class="hlv">${st > 0 ? st + 'D' : '—'}</span>
+            </div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP · ${esc(statusOf(h))}</div>
+            <div class="bar" style="height:4px;width:100%"><span style="width:${hl.pct}%"></span></div>
+          </div>
+          <div class="pips" style="flex:none">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
+        </button>`;
+      }).join('') : `<div style="padding:18px 20px;font-size:13px;color:var(--muted)">Nothing tracked yet. Switch habits on in Settings.</div>`}
+
+      ${off.length ? sectionLabel('Paused', 'Turn on in Settings') +
+        off.map(h => `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:13px 20px;opacity:.45">
+          <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--box)">${habitLevel(h).lv}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
+            <div class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">Paused · ${habitLevel(h).xp.toLocaleString()} XP banked</div>
+          </div>
+        </div>`).join('') : ''}
+
+      <div style="padding:18px 20px 34px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+        The number is your level in that habit — it climbs with how often you do it, not how hard it is. The five squares are your consistency tiers, from a 5-day run up to two months.
       </div>
     </div>`;
 }
@@ -1122,20 +1153,21 @@ function renderDetail(h) {
     cells.push(v >= h.target ? 'hit' : (v > 0 ? 'part' : ''));
   }
   const logRows = [];
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 5; i++) {
     const d = addDays(today(), -i), k = fmtKey(d), v = valOf(k, h.id), hit = v >= h.target;
     logRows.push({
-      day: i === 1 ? 'YESTERDAY' : d.toLocaleDateString('en-GB', { weekday:'short' }).toUpperCase(),
+      day: i === 1 ? 'YESTERDAY' : d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric' }).toUpperCase(),
       note: h.kind === 'count' ? fmtVal(h, v) + ' ' + h.unit + ' logged' : (hit ? 'Logged in the app' : 'Nothing logged'),
-      val: hit ? 'HIT' : 'MISS', hit
+      val: hit ? 'HIT' : 'MISS', hit, xp: xpFor(h, v)
     });
   }
   const stats = [
-    { v: habitWeek(h) + '/7', k: 'This week' },
-    { v: habitBest(h) + 'd',  k: 'Best streak' },
-    { v: habitRate35(h) + '%', k: '35-day rate' }
+    { v: habitWeek(h) + '/7',       k: 'This week' },
+    { v: habitBest(h) + 'd',        k: 'Best streak' },
+    { v: habitRate35(h) + '%',      k: '35-day rate' }
   ];
-  const hl = habitLevel(h), con = consistencyFor(h);
+  const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h);
+  const v = valOf(TKEY(), h.id);
   return `
     <div style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
@@ -1143,12 +1175,25 @@ function renderDetail(h) {
           <div class="figure" style="font-size:76px;line-height:.8">${hl.lv}</div>
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
             <div class="hd" style="font-size:16px;line-height:1">${esc(hl.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${hl.xp.toLocaleString()} XP in ${esc(h.name.toLowerCase())} · ${hl.toNext} to LV ${hl.lv + 1}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${hl.xp.toLocaleString()} XP banked · ${hl.toNext} to LV ${hl.lv + 1}</div>
           </div>
         </div>
         <div class="bar thin"><span style="width:${hl.pct}%"></span></div>
         <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</p>
       </div>
+
+      <div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Today</span><span>${done ? 'DONE' : fmtVal(h, v) + ' / ' + fmtVal(h, h.target) + ' ' + h.unit.toUpperCase()}</span>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn ${done ? 'btn-secondary' : 'btn-primary'}" style="flex:1"
+            ${on(() => (h.kind === 'count' ? openSheet(h) : toggleHabit(h)))}>${h.kind === 'count' ? 'Log a number' : (done ? 'Undo today' : 'Mark done')}</button>
+          ${h.kind === 'count' && !done ? `<button class="btn btn-secondary" ${on(() => bump(h))}>+${h.step || 1}</button>` : ''}
+        </div>
+        <div style="font-size:11px;color:var(--muted-soft)">Worth ${baseXp(h)} XP a day · ${Math.round(baseXp(h) * XP_RULES.completionBonus)} XP when you finish it</div>
+      </div>
+
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
         <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
           <span>Consistency</span><span>${con.tier} of ${con.total}</span>
@@ -1156,49 +1201,54 @@ function renderDetail(h) {
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
           <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
           <div style="font-size:12px;color:var(--muted);text-align:right">
-            ${con.next ? esc(con.next.name) + ' at ' + con.next.days + ' days · best run ' + con.best
+            ${con.next ? esc(con.next.name) + ' at ' + con.next.days + ' days · best run ' + con.best + 'd'
                        : 'UNBREAKABLE — every tier cleared'}
           </div>
         </div>
       </div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
         ${stats.map((s, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
           <div class="hd" style="font-size:24px;line-height:1">${esc(s.v)}</div>
           <div class="eyebrow" style="letter-spacing:.1em">${esc(s.k)}</div>
         </div>`).join('')}
       </div>
+
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
         <div class="eyebrow" style="letter-spacing:.12em">Last 35 days</div>
         <div class="grid35">${cells.map(c => `<div class="c ${c}"></div>`).join('')}</div>
       </div>
+
       <div>
         ${logRows.map(l => `<div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px">
           <span style="display:flex;flex-direction:column;gap:3px">
             <span class="hd" style="font-size:14px;line-height:1">${esc(l.day)}</span>
             <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(l.note)}</span>
           </span>
-          <span class="mono" style="font-size:10px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
+          <span style="text-align:right">
+            <span class="mono" style="display:block;font-size:10px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
+            <span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">+${l.xp} XP</span>
+          </span>
         </div>`).join('')}
       </div>
-      <div style="padding:18px 20px 34px;display:flex;gap:10px">
-        <button class="btn btn-primary" style="flex:1" ${on(() => (h.kind === 'count' ? openSheet(h) : toggleHabit(h)))}>Log today</button>
-        <button class="btn btn-secondary" ${on(() => go('today'))}>Back</button>
+
+      <div style="padding:18px 20px 34px">
+        <button class="btn btn-secondary btn-block" ${on(() => go(UI.from === 'today' ? 'today' : 'habits'))}>Back to ${UI.from === 'today' ? 'today' : 'habits'}</button>
       </div>
     </div>`;
 }
 
-// ── Awards ────────────────────────────────────────────────────────────────
-function renderAwards(LI, earned, totalAch) {
-  const xp = LI.xp, lv = LI.lv;
+// ── Achievements ──────────────────────────────────────────────────────────
+function renderAchievements(LI, earned, totalAch) {
   const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
   return `
     <div style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" style="font-size:76px;line-height:.8">${lv}</div>
+          <div class="figure" style="font-size:76px;line-height:.8">${LI.lv}</div>
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
             <div class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${xp.toLocaleString()} XP · ${LI.toNext} to LV ${lv + 1}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${LI.xp.toLocaleString()} XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
           </div>
         </div>
         <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
@@ -1206,41 +1256,28 @@ function renderAwards(LI, earned, totalAch) {
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--divider)">
         <div style="padding:14px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px">
           <div class="figure" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
-          <div class="eyebrow" style="letter-spacing:.12em">Day streak</div>
+          <div class="eyebrow" style="letter-spacing:.12em">Day streak · best ${bestDayStreak()}</div>
         </div>
         <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
           <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${totalAch}</div>
-          <div class="eyebrow" style="letter-spacing:.12em">Achievements unlocked</div>
+          <div class="eyebrow" style="letter-spacing:.12em">Unlocked</div>
         </div>
       </div>
-
-      ${sectionLabel('Habit ranks', 'Tap to open')}
-      ${allHabits().map(h => {
-        const hl = habitLevel(h);
-        return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:13px 20px"
-          ${on(() => { UI.open = h.id; UI.screen = 'detail'; render(); })}>
-          <div class="hd" style="width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
-            <div class="hd" style="font-size:15px;line-height:1">${esc(h.name)}</div>
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP</div>
-          </div>
-          <div style="flex:none;width:74px"><div class="bar" style="height:5px"><span style="width:${hl.pct}%"></span></div></div>
-        </button>`;
-      }).join('')}
 
       ${sectionLabel('Consistency', '5 tiers each')}
       ${allHabits().map(h => {
         const c = consistencyFor(h);
-        return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:13px 20px">
+        return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:13px 20px"
+          ${on(() => openHabit(h.id, 'insights'))}>
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</div>
             <div style="font-size:11px;line-height:1.3;color:var(--muted)">
-              ${c.next ? esc(c.next.name) + ' at ' + c.next.days + ' days' : esc(CONSISTENCY_TIERS[4].name) + ' — all cleared'}
+              ${c.next ? esc(c.next.name) + ' at ' + c.next.days + ' days' : esc(CONSISTENCY_TIERS[CONSISTENCY_TIERS.length-1].name) + ' — all cleared'}
               · best ${c.best}d${c.cur ? ' · now ' + c.cur + 'd' : ''}
             </div>
           </div>
           <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
-        </div>`;
+        </button>`;
       }).join('')}
 
       ${sectionLabel('Milestones')}
@@ -1263,27 +1300,6 @@ function renderAwards(LI, earned, totalAch) {
     </div>`;
 }
 
-// ── Coach chat (real messages) ────────────────────────────────────────────
-function renderCoach() {
-  const ctxLabel = (c) => { const m = String(c || '').match(/^session:(\d+):/); return m ? 'Day ' + m[1] : ''; };
-  const bubbles = MSGS.length
-    ? MSGS.map(m => `<div class="bub ${m.sender === 'athlete' ? 'me' : 'coach'}">${ctxLabel(m.context) ? '<span class="tag">' + esc(ctxLabel(m.context)) + '</span>' : ''}${esc(m.body)}</div>`).join('')
-    : `<div style="padding:8px 0;font-size:13px;color:var(--muted)">No messages yet. Send Amir a note — he reads every one.</div>`;
-  return `
-    <div style="min-height:100%;display:flex;flex-direction:column;animation:fadeIn .25s ease">
-      <div class="chat">${bubbles}</div>
-      <div class="composer">
-        <div class="chips">
-          ${QUICKS.map(q => `<button class="chip" ${on(() => sendMessage(q))}>${esc(q)}</button>`).join('')}
-        </div>
-        <div style="display:flex;gap:8px">
-          <textarea class="input" id="draft" rows="1" placeholder="Tell your coach something…" style="flex:1;resize:none">${esc(UI.draft)}</textarea>
-          <button class="btn btn-primary" style="padding:0 16px" ${on(() => sendMessage(UI.draft))}>Send</button>
-        </div>
-      </div>
-    </div>`;
-}
-
 // ── Settings ──────────────────────────────────────────────────────────────
 function renderSettings() {
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -1298,17 +1314,18 @@ function renderSettings() {
         </div>
       </div>
 
-      ${sectionLabel('Coach volume')}
-      ${COACH_STYLES.map(c => `<button class="selrow ${CFG.coach === c.key ? 'on' : ''}" style="flex-direction:column;align-items:flex-start;border-bottom:1px solid var(--rule)"
-        ${on(() => { CFG.coach = c.key; saveCfg(); render(); })}>
-        <span class="lbl" style="font-size:15px">${esc(c.label)}</span><span class="desc">${esc(c.desc)}</span>
-      </button>`).join('')}
-
-      ${sectionLabel('Motivation display')}
-      ${MOTIV.map(m => `<button class="selrow ${CFG.motiv === m.key ? 'on' : ''}" style="border-bottom:1px solid var(--rule)"
-        ${on(() => { CFG.motiv = m.key; saveCfg(); render(); })}>
-        <span class="lbl" style="font-size:15px">${esc(m.label)}</span>
-      </button>`).join('')}
+      ${sectionLabel('Your data')}
+      <div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0">
+          <span class="hd" style="font-size:14px;line-height:1">Sync</span>
+          <span class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--muted)" data-sync>${syncLabel()}</span>
+        </span>
+        <button class="btn btn-secondary" style="padding:10px 14px;font-size:13px"
+          ${on(async () => { if (window.IS_DEMO) { toast('Demo mode — nothing is sent.'); return; } markDirty(); await pushNow(); toast(SYNC.dirty ? 'Still offline — it is saved here and will go up on its own.' : 'Everything is up to date.'); })}>Sync now</button>
+      </div>
+      <div style="padding:10px 20px 4px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+        Every tick is written to this phone the moment you make it, then sent up when there's a connection. Close the app, lose signal, fly somewhere — nothing is lost.
+      </div>
 
       ${sectionLabel('Appearance')}
       <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
@@ -1322,7 +1339,7 @@ function renderSettings() {
         return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
           <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
             <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
-            <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(h.source)}${custom ? '' : ' · ' + esc(h.goal)}</span>
+            <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
           </span>
           <span style="display:flex;gap:10px;align-items:center">
             ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
@@ -1331,8 +1348,7 @@ function renderSettings() {
           </span>
         </div>`;
       }).join('')}
-
-      <div style="padding:14px 20px 6px;display:flex;gap:8px">
+      <div style="padding:14px 20px 4px;display:flex;gap:8px">
         <input class="input" id="newhabit" maxlength="40" placeholder="Add a habit — e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
         <button class="btn btn-primary" style="padding:0 16px" ${on(() => {
           const name = String(UI._newName || '').trim();
@@ -1340,12 +1356,13 @@ function renderSettings() {
           const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20) + '_' + Date.now().toString(36);
           CFG.custom = (CFG.custom || []).concat([{ id, name: name.toUpperCase(), goal: name }]);
           CFG.on[id] = true; UI._newName = '';
-          saveCfg(); render(); toast(name.toUpperCase() + ' added.');
+          if (CFG.seen) CFG.seen[id] = 1;
+          saveCfg(); render(); toast(name.toUpperCase() + ' added · ' + XP_RULES.customXp + ' XP a day.');
         })}>Add</button>
       </div>
+      <div style="padding:6px 20px 0;font-size:11px;color:var(--muted-soft)">Custom habits are worth ${XP_RULES.customXp} XP a day.</div>
 
-      <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:10px">
-        <button class="btn btn-secondary btn-block" ${on(() => { CFG.onboarded = false; UI.ob = 0; saveCfg(); render(); })}>Replay onboarding</button>
+      <div style="padding:22px 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => { LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.'); })}>Reset today's log</button>
       </div>
     </div>`;
@@ -1372,7 +1389,12 @@ function renderSheet() {
         <button class="plus" ${on(() => { UI.sheetVal = UI.sheetVal + stepBy; render(); })}>+</button>
       </div>
       <button class="btn btn-primary btn-block" ${on(() => {
-        setVal(h.id, UI.sheetVal); UI.sheet = null; render(); toast(h.name + ' updated.');
+        const before = habitXp(h);
+        setVal(h.id, UI.sheetVal);
+        UI.sheet = null;
+        checkLevelUps();
+        render();
+        toast(h.name + ' updated · +' + Math.max(0, habitXp(h) - before) + ' XP.');
       })}>Save it</button>
     </div>`;
 }
@@ -1413,8 +1435,8 @@ function showError(msg) {
 
   loadLocal();
   await syncFromCloud();
-  // Levels that arrived with a cloud sync still deserve their moment; the very
-  // first run only seeds the baseline, so nobody is ambushed by a queue.
+  // Levels that arrived with a sync still get their moment; a first run (or a
+  // changed XP system) only re-baselines, so nobody is ambushed by a queue.
   checkLevelUps();
   if (CFG.dark) document.body.setAttribute('data-dark', '');
   document.title = 'Proof — ' + (ATHLETE.firstName || 'AA Performance');
@@ -1422,8 +1444,15 @@ function showError(msg) {
   render();
   document.getElementById('loading').classList.add('hidden');
 
-  fetchMessages();
-  window.addEventListener('visibilitychange', () => { if (document.hidden) schedulePush(); });
+  // Anything still unsent from a previous session goes up now.
+  if (SYNC.dirty) pushNow();
+
+  window.addEventListener('online', () => { SYNC.attempts = 0; pushNow(); refreshSyncBadge(); });
+  window.addEventListener('offline', refreshSyncBadge);
+  window.addEventListener('visibilitychange', () => { if (document.hidden) pushNow(); else refreshSyncBadge(); });
+  // Last-ditch attempt on the way out; keepalive is not available through the
+  // client library, so this is best effort on top of the durable dirty flag.
+  window.addEventListener('pagehide', () => { if (SYNC.dirty) pushNow(); });
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();
 </script>
