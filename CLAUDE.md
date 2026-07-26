@@ -21,6 +21,8 @@ Durable context for working in this repo. Read the linked docs before diving in.
   habit-tracker related: the four tabs, the eight habits, how progression works, the
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
+- `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
+- `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). `.claude/coaching-log/` is the coach-only per-athlete rationale log.
 
 ## Working on the habit app (`habits.html`) — keep four things in sync
 Whenever you change how Proof behaves, update **all** of these in the same PR, or the
@@ -35,8 +37,15 @@ next chat will be working from a lie:
 Also: XP is scored **twice** — `XP_RULES` in `habits.html` and the `xp_rules` row in
 Supabase (the leaderboard scores server-side). Change both together or the board and the
 athletes' own screens will disagree.
-- `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
-- `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). `.claude/coaching-log/` is the coach-only per-athlete rationale log.
+
+**Seasons.** Scoring runs in seasons; only days from the current season's start earn XP,
+for personal levels *and* the boards. Currently **Pre-Season (opened 26 July 2026)** —
+Amir launches the real one on command with `select public.start_season('Season 1');` in
+the Supabase SQL editor. That resets every score to zero and deletes nothing; streaks and
+consistency badges survive. The server (`public.seasons`) is the authority; the app
+fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
+
+**Supabase stages 9–11 are applied and live** (leaderboard, workout-days feed, seasons).
 
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a

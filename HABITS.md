@@ -86,7 +86,7 @@ Deliberately *not* here: coach volume, motivation display, replay onboarding. Th
 has one mode — XP and levels, nudge and recap — and doesn't ask athletes to configure it.
 
 ### 04 · LEADERBOARD
-Opt-in only. Two boards (this week / all time). See below.
+Opt-in only. Two boards: **this season** (the default) and **this week**. See below.
 
 ---
 
@@ -138,8 +138,9 @@ Why it's built this way:
 The habit's id is still `strength` internally so that renaming it to WORKOUT didn't
 orphan anyone's history or XP.
 
-SQL: `supabase/stage10_workout_days.sql` — **must be run once**. Until it is, the
-WORKOUT habit simply stays manual, which is a fine fallback.
+Only sessions from the current season's start are ever imported — see Seasons below.
+
+SQL: `supabase/stage10_workout_days.sql` — **applied and live**.
 
 ---
 
@@ -165,22 +166,48 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
 
 ---
 
+## Seasons — scoring resets on command
+
+Scoring runs in **seasons**, like ranked play. Only days on or after the current
+season's start earn XP — for the athlete's own level *and* for the boards. Earlier days
+stay in their history and still count toward streaks and consistency badges; they just
+don't score.
+
+**Currently `Pre-Season`, opened 26 July 2026.** Amir launches the real thing with one
+SQL command:
+
+```sql
+select public.start_season('Season 1');                -- starts today
+select public.start_season('Season 1', '2026-08-01');  -- or a chosen date
+```
+
+Nothing is deleted — it inserts a row in `public.seasons` and every score is recomputed
+from that date. Athletes' apps pick it up on next open with a toast. XP, levels and both
+boards reset; logged history, streaks and consistency badges do not.
+
+This also gates the workout backfill: without it, one athlete's 41 days of past sessions
+would have landed as an instant head start. Full detail in
+[`XP_SYSTEM.md`](XP_SYSTEM.md) §7. SQL: `supabase/stage11_seasons.sql`.
+
+---
+
 ## The leaderboard
 
 - **Opt-in.** No row in `leaderboard_optin` means invisible.
 - Athletes pick their **own display name** (defaults to first name + last initial) and
   can rename or leave at any time.
 - Others see **that name, their points, level and rank** — nothing else.
-- **Two boards**: *this week* (resets Monday, so a new client can win in week one) and
-  *all time*.
+- **Two boards**: *this season* (the default — every point since the season opened) and
+  *this week* (resets Monday, so a new client can win in week one). Neither ever counts a
+  day from before the season started.
 - **Scored in Postgres** from the log already stored server-side. The app submits no
   number, so editing local storage cannot buy a place.
 - **No athlete ids are ever returned** — an id alone would let one client fetch
   `/data/<id>.json` and read another athlete's whole programme.
 - **Reading the board is key-checked**, so client names never reach the open internet.
 
-SQL: `supabase/stage9_leaderboard.sql`. **It must be run once** — until then the tab
-explains itself rather than erroring.
+SQL: `supabase/stage9_leaderboard.sql`. **Applied and live** (26 July 2026), along with
+`stage10_workout_days.sql` and `stage11_seasons.sql`.
 
 > Because scoring happens on the server, the XP rules exist in **two places**:
 > `XP_RULES` in `habits.html` and the `xp_rules` row in Supabase. Change both together.

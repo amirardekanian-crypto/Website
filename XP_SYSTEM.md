@@ -24,6 +24,8 @@ const XP_RULES = {
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
   streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  seasonStart: '2026-07-26',   // fallback only — the server is the authority
+  seasonName: 'Pre-Season',    // see section 7
   weights: {              // per-completion value, by health impact
     strength: 100,
     steps:     60,
@@ -38,7 +40,9 @@ const XP_RULES = {
 ```
 
 Two supporting lists sit just below it: `RANKS` (the rank names) and
-`CONSISTENCY_TIERS` (the consecutive-day ladders).
+`CONSISTENCY_TIERS` (the consecutive-day ladders). Note `weights` is still keyed by
+`strength` — that is the WORKOUT habit's internal id, kept so the rename didn't orphan
+anyone's history.
 
 ---
 
@@ -49,7 +53,7 @@ actually moves someone's health. Training pays most, then daily steps.
 
 | Habit | Target | XP | Why it sits here |
 |---|---|---|---|
-| STRENGTH | 1 session | **100** | The session is the point. Nothing else comes close. |
+| WORKOUT | 1 session | **100** | The session is the point. Ticked automatically when they finish one in `program.html`. |
 | STEPS | 10,000 | **60** | Daily movement — the biggest lever outside training. |
 | SLEEP | 7.5 h | **50** | The most underrated recovery input. |
 | FUEL | 3 meals | **40** | Logged eating drives every other adaptation. |
@@ -67,7 +71,7 @@ you're part way there, and get the `completionBonus` once you finish:
 - 8 of 8 glasses → `30 × 1.2` = **36 XP**
 
 So a near-miss day still pays, but finishing is clearly worth more. Check-off habits
-are all-or-nothing and always get the bonus (100 XP strength pays 120).
+are all-or-nothing and always get the bonus (a 100 XP workout pays 120).
 
 **A perfect day is 420 XP** with the current numbers. That figure is the anchor for
 everything below — if you change `weights`, recompute it.
@@ -111,7 +115,7 @@ This was tuned to two deliberate anchors:
 value (`weight × completionBonus`). That's deliberate: it means every habit levels at
 the same *rate*, so an athlete's level in a habit reflects **how often they actually do
 it**, not how much it's worth. Someone who drinks water daily but trains twice a week
-ends up GRINDER on water and ROOKIE on strength — which is the honest picture.
+ends up GRINDER on water and ROOKIE on their workout — which is the honest picture.
 
 > **A consequence worth knowing.** Because a habit's XP *and* its level cost both scale
 > from the same weight, changing a habit's weight does **not** move that habit's own
@@ -205,7 +209,67 @@ to be kinder. This also drives the "days on target" figure in the weekly recap.
 
 ---
 
-## 7. The leaderboard scores on the server — so XP lives in TWO places
+## 7. Seasons — how scoring resets
+
+Scoring runs in **seasons**, like ranked play in a game. Only days on or after the
+current season's start date earn XP — for the athlete's own level *and* for both
+leaderboards. Days before it stay in their history (visible in the 35-day grid, still
+counting toward streaks and consistency badges) but score nothing.
+
+**Right now it is `Pre-Season`, opened 26 July 2026.** Athletes are trying the app and
+building a score from that date.
+
+### Starting a season — the command
+
+One line in the Supabase SQL editor:
+
+```sql
+select public.start_season('Season 1');                -- starts today
+select public.start_season('Season 1', '2026-08-01');  -- or a chosen date
+```
+
+That is the whole reset. It **deletes nothing** — it inserts a new row in
+`public.seasons`, and from that date every score is computed from zero. Athletes see
+their app pick it up on next open, with a toast: *"SEASON 1 has begun — scores start
+from zero."*
+
+To check what's live: `select * from public.current_season();`
+To see the history: `select * from public.seasons order by starts_on;`
+
+### What resets and what doesn't
+
+| | Resets on a new season |
+|---|---|
+| Overall XP and level | **Yes** — back to zero / ROOKIE 1 |
+| Each habit's XP and level | **Yes** |
+| Both leaderboards | **Yes** |
+| Logged history (the grid, the log) | No — nothing is deleted |
+| Streaks and consistency badges | No — those measure behaviour, not score |
+
+That split is deliberate and matches how games work: ranked resets each season,
+account-level unlocks persist. It also means a season change never punishes someone for
+a 30-day streak they legitimately built.
+
+**No celebrations fire on a season change.** Levels drop, which would otherwise be
+noise; `rulesSignature()` includes the season start, so the app re-baselines silently.
+
+### It also gates the workout backfill
+
+The WORKOUT habit is ticked from finished sessions on the server. Without a season it
+would import *every* past session — one athlete had 41 days of history that would have
+landed as an instant head start. The app only ever asks for dates from the season start.
+
+### Two places again
+
+Like the XP rules, the season lives server-side (`public.seasons`, the authority) with a
+fallback baked into `XP_RULES.seasonStart` / `seasonName` in `habits.html` for offline and
+first load. The app fetches the real one on every open and caches it. **You only need to
+run the SQL command** — the fallback matters only if someone opens the app offline having
+never synced.
+
+---
+
+## 8. The leaderboard scores on the server — so XP lives in TWO places
 
 > **⚠️ The one thing that can get out of sync.** The leaderboard recalculates XP
 > **in the database** rather than trusting the number a phone sends, so nobody can
@@ -260,7 +324,7 @@ The SQL lives in `supabase/stage9_leaderboard.sql`.
 
 ---
 
-## 8. What happens when you change any of this
+## 9. What happens when you change any of this
 
 1. Edit `XP_RULES` (or `CONSISTENCY_TIERS`, or a habit's `target`) and ship.
 2. Next time each athlete opens the app, every day they have ever logged is rescored
@@ -278,7 +342,7 @@ new work over devaluing old work.
 
 ---
 
-## 9. Never losing progress
+## 10. Never losing progress
 
 Worth knowing, since it underpins all of the above.
 
