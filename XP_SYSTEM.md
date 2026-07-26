@@ -448,16 +448,67 @@ perfect day and as a three-habit day.
   the `names` array in that function.
 
 The SQL lives in `supabase/stage9_leaderboard.sql`, with seasons in
-`stage11_seasons.sql`, bonus XP in `stage12_bonus_xp.sql` and weekly quests in
-`stage13_weekly_quests.sql` — **all applied and live**.
+`stage11_seasons.sql`, bonus XP in `stage12_bonus_xp.sql` and quest runs in
+`stage14_quest_runs.sql` (which holds the current `hab_bonus_xp`) — **all applied
+and live**.
 
 ---
 
-## 8.5 Weekly quests — and how Amir prescribes them
+## 8.5 Quests — a run you start, not a standing feature
 
-Three quests a week, **Monday to Sunday**, worth real XP. They give the week a shape
-instead of it being seven identical days, and they are the one part of the system the
-coach sets rather than the athlete earning passively.
+Quests are a **lever**, not a background system. There are **none** unless you start a
+run, and a run lasts **seven days from the day it starts** — not Monday to Sunday. When
+it ends the block disappears from Today until you start another.
+
+That is deliberate: an athlete seeing quests means *something is on this week*. If they
+were always there they would be wallpaper.
+
+### 🎯 Starting a run
+
+```sql
+select public.set_quests('2026-07-29', array['w_water5','w_steps50k','w_perfect2']);
+```
+
+Runs 29 July → 4 August inclusive. Pass however many ids you like — one, three, five.
+Re-running it with the same start date **replaces** that run.
+
+**Cancelling one:**
+
+```sql
+select public.clear_quests('2026-07-29');
+```
+
+**Seeing what is set:**
+
+```sql
+select rules -> 'questRuns' from public.xp_rules where id = 1;
+```
+
+Past runs are kept on purpose — the XP athletes earned in them keeps counting. Clearing
+a *finished* run would retroactively take those points away.
+
+> The log stores **days**, not timestamps, so a run starts at the beginning of its start
+> date rather than at the hour you ran the command. "Live from Wednesday" means all of
+> Wednesday.
+
+### The quest pool
+
+Twelve to choose from, on the `xp_rules` row under `quests`:
+
+| id | Title | What it takes | XP |
+|---|---|---|---|
+| `w_perfect2` | TWICE PERFECT | Two clean sweeps | 300 |
+| `w_steps70k` | THE LONG WAY ROUND | 70,000 steps | 280 |
+| `w_train3` | THREE HARD DAYS | Three sessions | 250 |
+| `w_water7` | SEVEN FOR SEVEN | Full water every day | 220 |
+| `w_qualify5` | FIVE ON TARGET | 5 days at 80%+ | 220 |
+| `w_steps50k` | FIFTY THOUSAND | 50,000 steps | 200 |
+| `w_sleep5` | LIGHTS OUT | Sleep target 5 nights | 180 |
+| `w_water5` | THE WELL RUNS DEEP | Full water on 5 days | 150 |
+| `w_fuel5` | ON THE RECORD | Log meals on 5 days | 140 |
+| `w_supps7` | NO NEGOTIATION | Supplements every day | 140 |
+| `w_mob4` | OILED HINGES | Mobility on 4 days | 120 |
+| `w_breathe4` | DEAD CALM | Breathe on 4 days | 100 |
 
 ### The shape of a quest
 
@@ -466,53 +517,22 @@ coach sets rather than the athlete earning passively.
   "kind":"daysHit:water", "need":5, "xp":150 }
 ```
 
-| `kind` | Means | Example |
-|---|---|---|
-| `daysHit:<habit>` | Completed that habit on N separate days in the week | `daysHit:sleep`, need 5 |
-| `total:<habit>` | Accumulated N units in the week (target or not) | `total:steps`, need 50000 |
-| `qualify` | N days at `streakQualifyPct` or better | need 5 |
-| `perfect` | N days with every tracked habit done | need 2 |
+| `kind` | Means |
+|---|---|
+| `daysHit:<habit>` | Completed that habit on N separate days of the run |
+| `total:<habit>` | Accumulated N units across the run (target or not) |
+| `qualify` | N days at `streakQualifyPct` or better |
+| `perfect` | N days with every tracked habit done |
 
-Everything is measured **from the log alone**, so nothing new is stored and both
-scorers can agree. Quests are paid **on the day they complete**, exactly like tiers
-and milestones, and are **season-bounded** — a week straddling a season opening does
-not count the days before it.
+Everything is measured **from the log alone**, so nothing new is stored and both scorers
+agree. Each quest pays **once**, on the day it completes, and is **season-bounded** — a
+run straddling a season opening does not count the days before it.
 
-### Which three are live
+Quests are **the same for everybody**, which is what keeps the leaderboard fair, and
+they are distinct from milestones: a milestone is a permanent one-off achievement, a
+quest is a limited-time target that expires.
 
-Derived, never stored:
-
-1. If Amir has **prescribed** that week, those are the quests, in his order.
-2. Otherwise a deterministic pick from the pool, **seeded on the week's Monday**.
-
-Both the app and Postgres run the identical rule (`questsForWeek()` /
-`public.hab_week_quests`), including the same string hash, so they always land on the
-same three without a lookup table.
-
-### 🎯 Prescribing a week
-
-One command in the Supabase SQL editor — same shape as starting a season:
-
-```sql
-select public.set_quests('2026-07-27', array['w_water5','w_steps50k','w_perfect2']);
-```
-
-The date is any day in the target week (it is normalised to the Monday). Pass as many
-ids as you like — two, three, five — that is exactly what the athletes get. To go back
-to automatic picks for a week, remove its key:
-
-```sql
-update public.xp_rules
-set rules = jsonb_set(rules, '{questWeeks}', (rules -> 'questWeeks') - '2026-07-27')
-where id = 1;
-```
-
-### Editing the pool itself
-
-The pool lives on the `xp_rules` row under `quests`, with `questsPerWeek` controlling
-how many are drawn. **`QUEST_POOL` in `habits.html` is the offline fallback and must
-be kept in step** — an athlete with no signal scores off it, and if the two disagree
-their screen and the board will too. Same rule as everything else in §8.
+### Editing the pool
 
 ```sql
 update public.xp_rules
@@ -520,12 +540,13 @@ set rules = jsonb_set(rules, '{quests}', '[ … the whole array … ]'::jsonb)
 where id = 1;
 ```
 
-Quest names follow the house rule: **cool, not literal**. "THE WELL RUNS DEEP", with
-the literal description in `note`.
+**`QUEST_POOL` in `habits.html` is the offline fallback and must be kept in step** — an
+athlete with no signal scores off it. Same rule as everything else in §8. Quest names
+follow the house rule: cool, not literal, with the plain description in `note`.
 
-> **Careful with `xp`.** Three quests at 150–300 XP is 450–750 a week, on top of ~2,900
-> from a perfect week of habits — roughly a 15–25% top-up, which is the intent. Push
-> quest XP much past that and quests stop being a bonus and start being the game.
+> **Careful with `xp`.** Three quests at 150–300 is 450–750 for the run, against ~2,900
+> from a perfect week of habits — a 15–25% top-up, which is the intent. Push much past
+> that and quests stop being a bonus and start being the game.
 
 ---
 
