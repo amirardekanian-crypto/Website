@@ -25,6 +25,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | Amir's coaching philosophy (the *why* behind sets/reps) | [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) |
 | File-by-file plain-English guide | [`CODEBASE.md`](CODEBASE.md) |
 | What fields a program / article / workout JSON can have | [`SCHEMA.md`](SCHEMA.md) |
+| **How XP, levels and ranks work** (and how to retune them) | [`XP_SYSTEM.md`](XP_SYSTEM.md) |
 | How to run the coaching skills (intake → ship) | [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md) |
 | The home page / hero | [`index.html`](index.html) (EN) · [`index-fa.html`](index-fa.html) (FA) |
 | The athlete training app | [`program.html`](program.html) |
@@ -58,7 +59,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | File | What it is | Manual |
 |---|---|---|
 | [`program.html`](program.html) | The athlete PWA — Home · My Plan · Coach · Library [Read \| Train]. Loads `data/<id>.json`. Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
-| [`habits.html`](habits.html) | **Proof** — daily habit coach & tracker. Onboarding → Today · Awards · Coach · You. 8 default habits + custom. **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), full-screen level-up celebration, 5-tier consistency ladders, real coach chat. Same `?client=<id>&key=<key>` link as the program; syncs via the existing `save_progress`/`get_progress` RPCs (keys `<id>_hab_cfg` / `<id>_hab_log`). Demo: `?client=demo` | — |
+| [`habits.html`](habits.html) | **Proof** — habit tracker. Today · Achievements · Habits · Settings (no chat). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), full-screen level-up celebration, 5-tier consistency ladders, offline-durable saving. Same `?client=<id>&key=<key>` link as the program. Demo: `?client=demo` | [`XP_SYSTEM.md`](XP_SYSTEM.md) |
 | [`coach.html`](coach.html) | Coach dashboard — progress, charts, mint athlete links, messaging (Google sign-in) | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
 
