@@ -53,7 +53,7 @@ actually moves someone's health. Training pays most, then daily steps.
 
 | Habit | Target | XP | Why it sits here |
 |---|---|---|---|
-| WORKOUT | 1 session | **100** | The session is the point. Ticked automatically when they finish one in `program.html`. |
+| WORKOUT | 1 session | **100** | The session is the point. **Locked** — cannot be ticked by hand; only a finished session in `program.html` earns it. |
 | STEPS | 10,000 | **60** | Daily movement — the biggest lever outside training. |
 | SLEEP | 7.5 h | **50** | The most underrated recovery input. |
 | FUEL | 3 meals | **40** | Logged eating drives every other adaptation. |
