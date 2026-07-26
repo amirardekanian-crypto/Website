@@ -111,6 +111,10 @@
   @keyframes sheetUp { from { transform: translateY(100%) } to { transform: none } }
   @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
   @keyframes spin { to { transform: rotate(360deg) } }
+  /* Screens travel in the direction you navigated, so the tab bar and the
+     content agree about which way you just moved. House ease throughout. */
+  @keyframes slideFromRight { from { opacity: 0; transform: translateX(24px) } to { opacity: 1; transform: none } }
+  @keyframes slideFromLeft  { from { opacity: 0; transform: translateX(-24px) } to { opacity: 1; transform: none } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
   /* ── Shell ── */
@@ -257,23 +261,39 @@
   .selrow .mark { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 
   /* ── Tab bar ── */
+  /* The active-tab block used to be a background on the button, so it teleported.
+     It is now one slab that SLIDES between cells, with the labels inverting under
+     it — same modernist look, but the bar shows you where you went. */
   .tabs {
     display: grid; grid-template-columns: repeat(4, 1fr);
     border-top: 2px solid var(--divider); background: var(--bg);
     padding-bottom: env(safe-area-inset-bottom);
+    position: relative;
+  }
+  .tabslab {
+    position: absolute; top: 0; bottom: env(safe-area-inset-bottom); left: 0;
+    background: var(--ink); z-index: 0;
+    transition: transform .32s cubic-bezier(.16,1,.3,1);
   }
   .tabs button {
     padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
-    border-right: 1px solid var(--rule); position: relative;
+    border-right: 1px solid var(--rule); position: relative; z-index: 1;
+    transition: color .2s ease;
   }
   .tabs button:last-child { border-right: 0; }
-  .tabs button.on { background: var(--ink); color: var(--bg); }
+  .tabs button.on { color: var(--bg); }
   .tabs .num { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .06em; opacity: .6; }
   .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; }
 
   /* ── Grid (35-day history) ── */
+  /* Thirty-five squares appearing at once reads as a static block; cascading them
+     reads as five weeks of data arriving. */
+  @keyframes cellIn { from { opacity: 0; transform: scale(.7) } to { opacity: 1; transform: none } }
   .grid35 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-  .grid35 .c { aspect-ratio: 1; border: 1px solid rgba(128,128,128,.35); }
+  .grid35 .c {
+    aspect-ratio: 1; border: 1px solid rgba(128,128,128,.35);
+    animation: cellIn .28s cubic-bezier(.16,1,.3,1) both;
+  }
   .grid35 .c.hit { background: var(--accent); border-color: var(--accent); }
   .grid35 .c.part { background: var(--accent-100); border-color: var(--accent); }
   .grid35 .c.future { opacity: .25; }
@@ -462,6 +482,60 @@
   }
   .chip.chip-on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
+  /* ── The streak ember ────────────────────────────────────────────────────
+     A streak was 9px of grey mono. It is now an object that gets hotter as the
+     run gets longer — a slow breath at 5 days, a real flicker past 30 — so the
+     number stops being a fact and starts being something you don't want to lose.
+     Squares and opacity only; no glow, no radius. */
+  @keyframes emberPulse {
+    0%, 100% { opacity: .5;  transform: scale(1) }
+    50%      { opacity: 1;   transform: scale(1.35) }
+  }
+  @keyframes emberFlicker {
+    0%, 100% { opacity: 1;  transform: scale(1.25) }
+    18%      { opacity: .45; transform: scale(.85) }
+    34%      { opacity: 1;  transform: scale(1.4) }
+    52%      { opacity: .7; transform: scale(1.05) }
+    68%      { opacity: 1;  transform: scale(1.32) }
+    84%      { opacity: .6; transform: scale(.95) }
+  }
+  .ember { position: relative; padding-left: 9px; margin-left: 7px; }
+  .ember::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    width: 5px; height: 5px; margin-top: -2.5px;
+    background: var(--muted-soft);
+  }
+  .ember[data-lvl="1"], .ember[data-lvl="2"], .ember[data-lvl="3"] { color: var(--clay-deep); }
+  .ember[data-lvl="1"]::before { background: var(--clay); animation: emberPulse 2.8s ease-in-out infinite; }
+  .ember[data-lvl="2"]::before { background: var(--clay); animation: emberPulse 1.5s ease-in-out infinite; }
+  .ember[data-lvl="3"] { font-weight: 700; }
+  .ember[data-lvl="3"]::before { background: var(--clay); animation: emberFlicker 1.9s ease-in-out infinite; }
+
+  /* The app noticing you have stalled. Breathes the box of the most valuable
+     habit still undone, ~20s after you last touched anything. */
+  @keyframes idleBreathe {
+    0%, 100% { transform: scale(1);    border-color: var(--box) }
+    50%      { transform: scale(1.14); border-color: var(--clay) }
+  }
+  .boxmark.nudge { animation: idleBreathe 2.6s ease-in-out infinite; }
+
+  /* A day that is about to break a real streak. The coach's card goes darker,
+     and the day bar stops being green about it. */
+  .coachcard.risk { background: var(--clay-deep); }
+  .bar.risk > span { background: var(--clay); }
+  /* The nudge types itself on first paint — it is the coach talking, not a label. */
+  /* Zero-width on purpose: the caret is drawn by a positioned ::before so it
+     takes no space in the line, and the text never reflows as it types. */
+  .caret { display: inline-block; width: 0; height: .92em; vertical-align: -.1em; position: relative; }
+  .caret::before {
+    content: ''; position: absolute; left: 1px; top: 0; width: .46em; height: 100%;
+    background: #FAF7F2; animation: caretBlink .7s steps(1) infinite;
+  }
+  @keyframes caretBlink { 0%, 50% { opacity: 1 } 51%, 100% { opacity: 0 } }
+
+  /* Leaderboard rows arrive in order, each with its share of the leader's score. */
+  .brow { animation: riseIn .34s cubic-bezier(.16,1,.3,1) both; }
+
   /* Consistency pip ladder */
   .pips { display: flex; gap: 4px; }
   .pips i { width: 13px; height: 13px; border: 1.5px solid var(--box); display: block; }
@@ -584,7 +658,7 @@ const K_LOG  = () => ATHLETE_ID + '_hab_log';
 const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
-             celebrate: [], flash: {}, _newName:'', _tapRect:null };
+             celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
@@ -1062,8 +1136,54 @@ function dayNumber() {
   return Math.max(1, Math.round((today() - parseKey(days[0])) / 86400000) + 1);
 }
 
+// How hot a streak reads: 0 none · 1 warm from 5 days · 2 burning from 15 · 3 from 30.
+function emberLevel(st) { return st >= 30 ? 3 : st >= 15 ? 2 : st >= 5 ? 1 : 0; }
+
+// ── The app noticing you have stalled ─────────────────────────────────────
+// Twenty seconds after the last tap, the most valuable habit still undone starts
+// breathing. Only on Today, never over a sheet or a celebration, and never for a
+// locked habit the athlete cannot action from here.
+let _idleTimer = null;
+function armIdle() {
+  clearTimeout(_idleTimer);
+  UI.idle = null;
+  _idleTimer = setTimeout(() => {
+    if (UI.screen !== 'today' || UI.celebrate.length || UI.sheet || reduced()) return;
+    const cand = live().filter(h => !isDone(h) && !h.locked)
+                       .sort((a, b) => baseXp(b) - baseXp(a))[0];
+    if (!cand) return;
+    UI.idle = cand.id;
+    render();
+  }, 20000);
+}
+
+// A day that is about to break a streak the athlete actually has. Late enough to
+// be true, and gated on `currentDayStreak() > 0` so it threatens something real
+// rather than nagging someone who has nothing on the line yet.
+function atRisk() {
+  return new Date().getHours() >= 20 && !dayQualifies(TKEY()) && currentDayStreak() > 0;
+}
+// How many more habits would rescue the day.
+function shortOfQualifying() {
+  const hs = live();
+  if (!hs.length) return 0;
+  const need = Math.ceil(hs.length * XP_RULES.streakQualifyPct / 100);
+  return Math.max(1, need - hs.filter(h => isDone(h)).length);
+}
+
 // ── The nudge (one per day, driven by what is actually missing) ───────────
 function nudge() {
+  // Loss beats gain: if a real streak is on the line tonight, that is the nudge.
+  if (atRisk()) {
+    const st = currentDayStreak(), short = shortOfQualifying();
+    const target = live().filter(h => !isDone(h) && !h.locked)
+                         .sort((a, b) => baseXp(b) - baseXp(a))[0];
+    return { risk: true,
+             line: st + ' day' + (st === 1 ? '' : 's') + ' on the board, and tonight is where it breaks. '
+                 + short + ' more habit' + (short === 1 ? '' : 's') + ' and it stands.',
+             cta: target ? 'SAVE IT · ' + target.name : 'SEE THE RECAP',
+             target: target ? target.id : null };
+  }
   const missing = live().filter(h => !isDone(h));
   const water = live().find(h => h.id === 'water');
   if (water && !isDone(water)) {
@@ -1251,11 +1371,29 @@ function resetScroll() {
   if (sc) sc.scrollTop = 0;
 }
 function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
+// Which way a screen should travel. Tabs move along their own order; a detail or
+// the manual always pushes in from the right and pops back out to the left, which
+// is what "deeper" and "back" feel like.
+const TAB_ORDER = ['today', 'progress', 'settings', 'board'];
+function navDir(from, to) {
+  if (to === 'detail' || to === 'manual') return 1;
+  if (from === 'detail' || from === 'manual') return -1;
+  const a = TAB_ORDER.indexOf(from), b = TAB_ORDER.indexOf(to);
+  if (a < 0 || b < 0 || a === b) return 0;
+  return b > a ? 1 : -1;
+}
+function screenAnim() {
+  if (!UI._navDir) return 'animation:fadeIn .25s ease';
+  return 'animation:' + (UI._navDir > 0 ? 'slideFromRight' : 'slideFromLeft')
+       + ' .32s cubic-bezier(.16,1,.3,1)';
+}
 function openHabit(id, from) {
+  UI._navDir = navDir(UI.screen, 'detail');
   UI.open = id; UI.from = from || UI.screen; UI.screen = 'detail';
   haptic('tab'); render(); resetScroll();
 }
 function go(screen) {
+  UI._navDir = navDir(UI.screen, screen);
   UI.screen = screen; UI.open = null;
   haptic('tab');
   render();
@@ -1416,6 +1554,7 @@ function installDelegates(app) {
     // Measured now, before the handler renders: a flying XP chip needs to know
     // where the tap happened, and layout may move underneath it.
     UI._tapRect = el.getBoundingClientRect();
+    armIdle();                                  // they are here; stop nudging
     fn(ev);
   });
   app.addEventListener('input', ev => {
@@ -1443,6 +1582,7 @@ function render() {
   }
   syncNumbers(app);
   fillBars(app);
+  typeLines(app);
   document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
 }
 
@@ -1483,6 +1623,52 @@ function countTo(el, key, from, to, dec) {
     el.textContent = fmtNum(to, dec);
   };
   _numAnim[key] = requestAnimationFrame(step);
+}
+
+// ── The nudge types itself ────────────────────────────────────────────────
+// The clay card is the coach talking, so it arrives one character at a time. The
+// element is `data-static` (the renderer must not fight the typer for its text)
+// and keyed by the LINE, so a new nudge replaces the node and retypes while an
+// unchanged one is left alone. The caret is a child element rather than a class,
+// because attributes on a static node are still patched from the template.
+function lineKey(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 2147483647;
+  return 'l' + h.toString(36);
+}
+const _typed = new WeakSet();
+function typeLines(root) {
+  root.querySelectorAll('[data-type]').forEach(el => {
+    if (_typed.has(el)) return;
+    _typed.add(el);
+    const full = el.textContent;
+    // Long lines would keep an athlete waiting to read their own nudge.
+    if (reduced() || full.length > 150) return;
+    // The untyped remainder stays in the DOM, just invisible, and the caret is
+    // zero-width — so the card occupies its FINAL height from the first frame.
+    // Typing into an emptied element instead grows the card as it goes, which
+    // shoves everything below it and drags the scroll position with it.
+    el.textContent = '';
+    const shown = document.createTextNode('');
+    const caret = document.createElement('i');
+    caret.className = 'caret';
+    const rest = document.createElement('span');
+    rest.style.visibility = 'hidden';
+    rest.textContent = full;
+    el.append(shown, caret, rest);
+    let i = 0;
+    const step = () => {
+      if (!el.isConnected) return;
+      i++;
+      shown.nodeValue = full.slice(0, i);
+      rest.textContent = full.slice(i);
+      if (i < full.length) { setTimeout(step, 13); return; }
+      caret.remove();
+      rest.remove();
+      el.textContent = full;
+    };
+    setTimeout(step, 140);
+  });
 }
 
 // A bar that survives a render animates itself, because its width transition is
@@ -1641,6 +1827,7 @@ function renderApp() {
     </div>
     <div class="scroll" id="scroll" data-k="scroll">${screenHtml}</div>
     <div class="tabs" data-k="tabs">
+      <div class="tabslab" data-k="tabslab" style="width:calc(100% / ${tabDefs.length});transform:translateX(${Math.max(0, tabDefs.findIndex(t => t[1] === activeTab)) * 100}%)"></div>
       ${tabDefs.map(t => `<button class="${activeTab === t[1] ? 'on' : ''}" data-k="tab:${t[1]}" ${on(() => go(t[1]))}>
         <span class="num">${t[2]}</span><span class="nm">${t[0]}</span>
       </button>`).join('')}
@@ -1744,19 +1931,20 @@ function habitRow(h, from) {
         ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
         : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)));
   const pc = Math.min(100, Math.round(v / h.target * 100));
+  const nudged = UI.idle === h.id && !done && !locked;
   return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''}" data-k="row:${h.id}">
     <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(h.name) + ' is earned in your programme' : 'Toggle ' + esc(h.name)}">
       ${locked
         ? `<span class="boxmark lock" aria-hidden="true">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
            </span>`
-        : `<span class="boxmark ${done ? 'on' : ''}">${done ? TICK : ''}</span>`}
+        : `<span class="boxmark ${done ? 'on' : ''}${nudged ? ' nudge' : ''}">${done ? TICK : ''}</span>`}
     </button>
     <button class="body" ${on(() => openHabit(h.id, from))}>
       <span class="line1">
         <span class="nm">${esc(h.name)}</span>
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
-                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}${st > 0 ? ' · ' + st + 'D' : ''}</span>`}
+                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}${st > 0 ? `<span class="ember" data-lvl="${emberLevel(st)}">${st}D</span>` : ''}</span>`}
       </span>
       <span class="status">${esc(status)}</span>
       <span class="track"><span data-fill style="width:${pc}%"></span></span>
@@ -1779,7 +1967,7 @@ function renderToday(LI, doneCount, pct) {
   const strongest = ranked[0], weakest = ranked[ranked.length - 1];
 
   return `
-    <div data-k="screen:today" style="animation:fadeIn .25s ease">
+    <div data-k="screen:today" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:64px;line-height:.85">${LI.lv}</div>
@@ -1790,14 +1978,14 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
         <div style="display:flex;flex-direction:column;gap:6px">
-          <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Today</span><span>${doneCount} of ${hs.length} habits</span></div>
-          <div class="bar"><span data-fill style="width:${pct}%"></span></div>
+          <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Today</span><span>${n.risk ? 'STREAK AT RISK' : doneCount + ' of ' + hs.length + ' habits'}</span></div>
+          <div class="bar ${n.risk ? 'risk' : ''}"><span data-fill style="width:${pct}%"></span></div>
         </div>
       </div>
 
-      <div class="coachcard" data-k="nudge">
-        <div class="eyebrow">One nudge, as agreed</div>
-        <div class="say">${esc(n.line)}</div>
+      <div class="coachcard ${n.risk ? 'risk' : ''}" data-k="nudge">
+        <div class="eyebrow">${n.risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
+        <div class="say" data-k="say:${lineKey(n.line)}" data-static data-type>${esc(n.line)}</div>
         <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
       </div>
 
@@ -1848,7 +2036,7 @@ function renderProgress(LI, earned, totalAch) {
     return h.kind === 'count' ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + ' today' : 'Not done today';
   };
   return `
-    <div data-k="screen:progress" style="animation:fadeIn .25s ease">
+    <div data-k="screen:progress" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:76px;line-height:.8">${LI.lv}</div>
@@ -1944,7 +2132,7 @@ function renderDetail(h) {
   const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h);
   const v = valOf(TKEY(), h.id);
   return `
-    <div data-k="screen:detail:${h.id}" style="animation:fadeIn .25s ease">
+    <div data-k="screen:detail:${h.id}" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="hlv:${h.id}" data-to="${hl.lv}" style="font-size:76px;line-height:.8">${hl.lv}</div>
@@ -1996,7 +2184,7 @@ function renderDetail(h) {
 
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
         <div class="eyebrow" style="letter-spacing:.12em">Last 35 days</div>
-        <div class="grid35">${cells.map(c => `<div class="c ${c}"></div>`).join('')}</div>
+        <div class="grid35">${cells.map((c, i) => `<div class="c ${c}" style="animation-delay:${(i * 0.011).toFixed(3)}s"></div>`).join('')}</div>
       </div>
 
       <div>
@@ -2045,15 +2233,18 @@ function renderBoard() {
     const top = LB.rows.filter(r => r.pos <= 10);
     const me = LB.rows.find(r => r.is_me);
     const outside = me && me.pos > 10;
+    // Everyone's bar is drawn against the leader's score, so the gap is visible
+    // rather than arithmetic.
+    const lead = Math.max(1, ...LB.rows.map(r => Number(r.xp) || 0));
     body = `
       <div>
-        ${top.map(r => boardRow(r)).join('')}
+        ${top.map((r, i) => boardRow(r, lead, i)).join('')}
       </div>
-      ${outside ? `<div class="eyebrow" style="padding:16px 20px 6px;letter-spacing:.12em">Your position</div>${boardRow(me)}` : ''}`;
+      ${outside ? `<div class="eyebrow" style="padding:16px 20px 6px;letter-spacing:.12em">Your position</div>${boardRow(me, lead, top.length)}` : ''}`;
   }
 
   return `
-    <div data-k="screen:board" style="animation:fadeIn .25s ease">
+    <div data-k="screen:board" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
           <div class="hd" style="font-size:20px;line-height:1">${esc(seasonName())}</div>
@@ -2074,15 +2265,20 @@ function renderBoard() {
 function boardNote(text) {
   return `<div style="padding:24px 20px;font-size:13px;line-height:1.55;color:var(--muted)">${esc(text)}</div>`;
 }
-function boardRow(r) {
+function boardRow(r, lead, i) {
   const medal = r.pos <= 3;
-  return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:14px 20px;${r.is_me ? 'background:var(--accent-100);' : ''}">
+  const pct = Math.max(2, Math.round((Number(r.xp) || 0) / (lead || 1) * 100));
+  return `<div class="row-rule brow" data-k="brow:${esc(String(r.display_name || r.pos))}"
+    style="display:flex;gap:14px;align-items:center;padding:14px 20px;animation-delay:${((i || 0) * 0.05).toFixed(2)}s;${r.is_me ? 'background:var(--accent-100);' : ''}">
     <div class="hd" style="width:38px;flex:none;font-size:22px;line-height:1;text-align:right;color:${medal ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${r.pos}</div>
-    <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
-      <div class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</div>
+    <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+        <span class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</span>
+        <span class="mono" style="flex:none;font-size:13px;font-weight:700">${Number(r.xp || 0).toLocaleString()}<span style="font-size:9px;color:var(--muted-soft)"> XP</span></span>
+      </div>
       <div style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(r.rank_label)}</div>
+      <div class="bar" style="height:3px;width:100%"><span data-fill style="width:${pct}%"></span></div>
     </div>
-    <div class="mono" style="flex:none;font-size:13px;font-weight:700;text-align:right">${Number(r.xp || 0).toLocaleString()}<span style="font-size:9px;color:var(--muted-soft)"> XP</span></div>
   </div>`;
 }
 // Joining is explicit and reversible, and the handle is theirs to choose —
@@ -2130,7 +2326,7 @@ function renderManual() {
   const block = (inner) => `<div class="block" style="display:flex;flex-direction:column">${inner}</div>`;
 
   return `
-    <div data-k="screen:manual" style="animation:fadeIn .25s ease">
+    <div data-k="screen:manual" style="${screenAnim()}">
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
@@ -2210,7 +2406,7 @@ function renderSettings() {
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   const sectionLabel = (t) => `<div class="eyebrow" style="padding:18px 20px 6px;letter-spacing:.12em">${t}</div>`;
   return `
-    <div data-k="screen:settings" style="animation:fadeIn .25s ease">
+    <div data-k="screen:settings" style="${screenAnim()}">
       <div class="block" style="display:flex;gap:14px;align-items:center;padding:18px 20px">
         <div class="hd" style="width:52px;height:52px;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:21px">${esc(initials)}</div>
         <div style="display:flex;flex-direction:column;gap:4px">
@@ -2386,6 +2582,7 @@ function showError(msg) {
   document.title = 'Proof — ' + (ATHLETE.firstName || 'AA Performance');
 
   render();
+  armIdle();
   document.getElementById('loading').classList.add('hidden');
 
   // Anything still unsent from a previous session goes up now.

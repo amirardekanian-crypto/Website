@@ -207,13 +207,39 @@ tap. Two attributes steer the patch:
 | `data-k` | Identity. A different key in the same slot is replaced outright, not patched — that's how a screen change still fades while a check-off doesn't. Screens, habit rows, overlays and each queued celebration all carry one. |
 | `data-static` | "This subtree is mine, not the template's." The `#fx` layer where XP chips are mid-flight, and any figure the counter engine owns. |
 
-The rest of the layer: figures marked `data-num` are animated by `syncNumbers()`
-rather than printed (the template only says where the number should *end up*, via
-`data-to`); bars marked `data-fill` grow from zero on first paint; ticking a habit
-sends a clay `+XP` chip arcing from the row to the level hero, which then takes the
-hit; the checkmark is a stroked SVG that draws rather than a glyph that appears; and
-`haptic()` fires on tick, completion, level and rank — a no-op on iPhone, since
-Safari still exposes no vibration at all.
+**The tick.** Figures marked `data-num` are animated by `syncNumbers()` rather than
+printed (the template only says where the number should *end up*, via `data-to`);
+bars marked `data-fill` grow from zero on first paint and tween on every change
+after; ticking a habit sends a clay `+XP` chip arcing from the row to the level hero
+via `flyXp()`, which then takes the hit; the checkmark is a stroked SVG that draws
+rather than a glyph that appears; and `haptic()` fires on tick, completion, level and
+rank — a no-op on iPhone, since Safari still exposes no vibration at all.
+
+**Navigation has a direction.** `navDir()` compares the two screens against
+`TAB_ORDER` and `screenAnim()` slides the new screen in from that side; a detail or
+the manual always pushes in from the right and pops back out to the left. The active
+tab is one `.tabslab` that *slides* between cells with the labels inverting under it,
+rather than a background that teleports between buttons.
+
+**The screen is never quite still.**
+
+| Thing | What it does |
+|---|---|
+| **Streak ember** | `emberLevel()` — a clay square that breathes from 5 days, faster from 15, and genuinely flickers past 30. The streak stops being a fact and starts being something you don't want to lose. |
+| **Idle attention** | `armIdle()` — 20s after the last tap, the box of the most valuable *unlocked* habit still undone starts breathing. Only on Today, never over a sheet or a celebration. |
+| **Streak at risk** | `atRisk()` — after 20:00, if the day doesn't qualify **and there is a real streak on the line**, the day bar goes clay and the nudge changes tone and copy. Gated on `currentDayStreak() > 0` so it threatens something real instead of nagging. |
+| **Typing nudge** | `typeLines()` — the clay card types itself out. |
+| **Grid cascade** | The 35-day grid arrives row by row on an 11ms stagger. |
+| **Board race** | Leaderboard rows stagger in, each with a bar drawn against the leader's score, so the gap is visible rather than arithmetic. |
+
+> ⚠️ **The typing nudge is a layout trap.** It keeps the untyped remainder in the DOM
+> (invisible) and uses a **zero-width caret**, so the card occupies its final height
+> from the first frame. Typing into an emptied element grows the card as it goes,
+> which shoves everything below it and drags the scroll position with it — that
+> regression cost 25px of scroll drift per tick before it was caught. The element is
+> `data-static` (the renderer must not fight the typer for its text) and keyed by the
+> *line*, so a new nudge replaces the node and retypes while an unchanged one is left
+> alone.
 
 All of it is off under `prefers-reduced-motion`, which `reduced()` checks live.
 
