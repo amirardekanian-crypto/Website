@@ -685,6 +685,13 @@ const XP_RULES = {
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
   streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  // The most a counter habit will accept in one day, as a multiple of its target
+  // (steps 30,000 · water 24 · sleep 22.5h). Daily XP was always capped by
+  // xpFor(), but a `total:` quest counts RAW UNITS — so without a ceiling one
+  // tap-and-hold on the stepper logged 9,999,999 steps and cleared "50,000 steps
+  // across the run" on the spot, on the board as well as on the phone. Raising
+  // this above 5 makes the two steps quests one-day work again.
+  dailyCap: 3,
   // Scoring runs in SEASONS. Only days on or after this date earn XP — for the
   // athlete's own level and for the leaderboards alike. The server is the
   // authority (public.seasons); this is the fallback used offline or before the
@@ -1534,6 +1541,18 @@ function bonusEvents() {
 // Every event is already inside the season by construction, so these only have
 // to window it.
 function bonusXp() { return bonusEvents().reduce((s, e) => s + e.xp, 0); }
+// What a specific badge ACTUALLY paid, read off the same ledger everything else
+// is scored from. A badge is judged on the athlete's best run ever, but it is
+// only PAID when that run falls inside the season (XP_SYSTEM.md §4.5) — so the
+// two legitimately disagree, and anything quoting a payout has to ask the ledger
+// rather than read the figure off CONSISTENCY_TIERS or ACHIEVEMENTS.
+function tierPaid(h, tierIndex) {
+  return bonusEvents().reduce((s, e) =>
+    (e.kind === 'tier' && e.id === h.id && e.tier === tierIndex) ? s + e.xp : s, 0);
+}
+function milestonePaid(code) {
+  return bonusEvents().reduce((s, e) => (e.kind === 'milestone' && e.id === code) ? s + e.xp : s, 0);
+}
 function bonusXpBetween(fromDate, toDate) {
   return bonusEvents().reduce((s, e) => {
     const d = parseKey(e.day);
@@ -1854,11 +1873,14 @@ function toast(text) {
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => { UI.toast = null; render(); }, 2200);
 }
+// The one door into the log, so the ceiling belongs here rather than on each
+// control that writes through it.
+function capFor(h) { return (h.target || 1) * XP_RULES.dailyCap; }
 function setVal(id, v) {
   const k = AKEY();
   if (!canLog(k)) return;                  // the window has closed — write nothing
   if (!LOG[k]) LOG[k] = {};
-  LOG[k][id] = Math.max(0, v);
+  LOG[k][id] = Math.max(0, Math.min(v, capFor(habitById(id))));
   saveLog();
 }
 function toggleHabit(h) {
@@ -1887,6 +1909,24 @@ function bump(h) {
   toast(complete ? '+' + gained + ' XP · ' + h.name + ' complete' + dayTag() + '.'
                  : '+' + gained + ' XP' + dayTag() + '. Keep them coming.');
   flyXp(gained, rect);
+}
+// Removing a custom habit takes its logged values with it. The app stops
+// counting a removed habit the moment it leaves CFG.custom — allHabits() no
+// longer lists it — but the SERVER's hab_xp() walks every key in a day and pays
+// customXp for anything it does not recognise, so a left-behind key kept scoring
+// on the leaderboard and nowhere else, and the two could never reconcile. The
+// toggle beside it is still the non-destructive door: switching a habit off
+// pauses it and keeps every point.
+function removeCustom(h) {
+  CFG.custom = (CFG.custom || []).filter(c => c.id !== h.id);
+  delete CFG.on[h.id];
+  Object.keys(LOG).forEach(day => {
+    if (LOG[day] && typeof LOG[day] === 'object') delete LOG[day][h.id];
+  });
+  saveLog();                 // both of these invalidate the bonus cache
+  saveCfg();
+  render();
+  toast(h.name + ' removed. Its points went with it.');
 }
 // Navigating to a screen starts at its top; ticking a habit does not move you at
 // all. Before the renderer kept nodes alive, every render did both.
@@ -2424,15 +2464,42 @@ function bindGestures(root) {
   root.querySelectorAll('.stepper button').forEach(btn => {
     if (_bound.has(btn)) return;
     _bound.add(btn);
-    let hold = null, rep = null;
-    const stop = () => { clearTimeout(hold); clearInterval(rep); hold = rep = null; };
-    btn.addEventListener('pointerdown', () => {
-      // 420ms before it starts repeating, then ~9/sec — fast enough for 10,000
-      // steps, slow enough that a normal tap is never mistaken for a hold.
-      hold = setTimeout(() => { rep = setInterval(() => btn.click(), 110); }, 420);
-    });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(e => btn.addEventListener(e, stop));
+    btn.addEventListener('pointerdown', () => startRepeat(btn));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(e => btn.addEventListener(e, stopRepeat));
   });
+  // A finger does not always come back up over the button it went down on, and
+  // the sheet can be dragged away mid-hold — so the release is also watched at
+  // the window, once, for every stepper there will ever be.
+  if (!_repeatWatched) {
+    _repeatWatched = true;
+    window.addEventListener('pointerup', stopRepeat);
+    window.addEventListener('pointercancel', stopRepeat);
+    window.addEventListener('blur', stopRepeat);
+  }
+}
+// ── The stepper's hold-to-repeat ──────────────────────────────────────────
+// One repeat at a time, held at module level so it can always be found and
+// killed. It used to be a closure per button whose only exits were pointerup,
+// pointercancel and pointerleave ON THAT BUTTON — miss all three (the sheet is
+// dismissed under the thumb, the pointer is captured elsewhere, the app goes to
+// the background) and the interval ran forever, clicking a control nobody was
+// touching. Reproduced: the number drained 500 at a time while the athlete
+// watched it. Two independent exits now, either of which is enough on its own.
+let _repHold = null, _repTimer = null, _repeatWatched = false;
+function stopRepeat() {
+  clearTimeout(_repHold); clearInterval(_repTimer);
+  _repHold = _repTimer = null;
+}
+function startRepeat(btn) {
+  stopRepeat();
+  // 420ms before it starts repeating, then ~9/sec — fast enough for 10,000
+  // steps, slow enough that a normal tap is never mistaken for a hold.
+  _repHold = setTimeout(() => {
+    _repTimer = setInterval(() => {
+      if (!btn.isConnected) { stopRepeat(); return; }   // the sheet went away
+      btn.click();
+    }, 110);
+  }, 420);
 }
 
 // ── The XP flight ─────────────────────────────────────────────────────────
@@ -2637,22 +2704,34 @@ function nameList(hs) {
 function renderBadgeCelebration(ev) {
   let badge, badgeLabel, kicker, title, sub, codeClass = '';
   if (ev.kind === 'tier') {
-    const paid = ev.habits.reduce((s, h) => s + tierXp(h, ev.tierIndex), 0);
+    // The LEDGER, not the tier table. A run that began before the season opened
+    // still earns the badge but banks nothing (XP_SYSTEM.md §4.5), and reading
+    // the figure off CONSISTENCY_TIERS promised XP that never arrived.
+    const paid = ev.habits.reduce((s, h) => s + tierPaid(h, ev.tierIndex), 0);
     badge = String(ev.tier.days); badgeLabel = 'DAYS';
     kicker = 'Consistency';
     title = ev.tier.name;
-    sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. +' + paid.toLocaleString()
-        + ' XP, and the badge is yours for good.';
+    sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. '
+        + (paid > 0
+            ? '+' + paid.toLocaleString() + ' XP, and the badge is yours for good.'
+            : 'The badge is yours for good. The run started before ' + seasonName()
+              + ', so it pays nothing this season.');
   } else if (ev.kind === 'quest') {
     badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
     kicker = 'Quest complete';
     title = ev.quest.title;
     sub = ev.quest.note + '. +' + ev.quest.xp.toLocaleString() + ' XP.';
   } else if (ev.kind === 'milestone') {
+    // Same rule as tiers: measureAch() counts all of history, bonusEvents() only
+    // pays what was crossed inside the season, so ask the ledger what landed.
+    const paid = milestonePaid(ev.ach.code);
     badge = ev.ach.code; badgeLabel = 'MILESTONE'; codeClass = ' code';
     kicker = 'Unlocked';
     title = ev.ach.name;
-    sub = ev.ach.note + '. +' + ev.ach.xp.toLocaleString() + ' XP.';
+    sub = ev.ach.note + '. ' + (paid > 0
+        ? '+' + paid.toLocaleString() + ' XP.'
+        : 'Yours on your all-time record. The ' + ev.ach.xp.toLocaleString()
+          + ' XP lands when you do it again inside ' + seasonName() + '.');
   } else {
     const n = live().length;
     badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
@@ -3295,7 +3374,7 @@ function renderManual() {
   const hs = allHabits();
   const perfectDay = live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
   const cum = (L) => { let s = 0; for (let n = 1; n < L; n++) s += levelCost(XP_RULES.base, n); return s; };
-  const water = habitById('water');
+  const water = habitById('water'), steps = habitById('steps');
   const h2 = (t) => `<div class="hd" style="font-size:22px;line-height:1;margin-bottom:10px">${t}</div>`;
   const p = (t) => `<p style="font-size:13.5px;line-height:1.6;color:var(--muted);margin-bottom:12px">${t}</p>`;
   const block = (inner) => `<div class="block" style="display:flex;flex-direction:column">${inner}</div>`;
@@ -3331,7 +3410,8 @@ function renderManual() {
         </div>` +
         `<div style="height:12px"></div>` +
         p(`<strong style="color:var(--ink)">Finishing pays more than nearly finishing.</strong> Habits you count — water, steps, sleep, meals — pay as you go, then add a bonus once you hit the target. ${water ? `${water.target / 2} of ${water.target} glasses earns ${xpFor(water, water.target / 2)} XP; all ${water.target} earns ${xpFor(water, water.target)} XP.` : ''}`) +
-        p(`A perfect day is currently <strong style="color:var(--ink)">${perfectDay.toLocaleString()} XP</strong>.`))}
+        p(`A perfect day is currently <strong style="color:var(--ink)">${perfectDay.toLocaleString()} XP</strong>.`) +
+        p(`There is a ceiling on what a counter will take in one day — <strong style="color:var(--ink)">${XP_RULES.dailyCap}× the target</strong>${steps ? `, so ${fmtVal(steps, steps.target * XP_RULES.dailyCap)} steps` : ''}. Going past your target never paid extra anyway; the ceiling is there so a stuck thumb on the + button cannot hand you a quest you did not walk.`))}
 
       ${block(h2('How to earn more') +
         `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted)">
@@ -3709,7 +3789,7 @@ function renderSettings() {
           </span>
           <span style="display:flex;gap:10px;align-items:center">
             ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
-              ${on(() => { CFG.custom = CFG.custom.filter(c => c.id !== h.id); saveCfg(); render(); })} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
+              ${on(() => removeCustom(h))} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
             <button class="sw ${CFG.on[h.id] !== false ? 'on' : ''}" ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
           </span>
         </div>`;
@@ -3726,7 +3806,7 @@ function renderSettings() {
           saveCfg(); render(); toast(name.toUpperCase() + ' added · ' + XP_RULES.customXp + ' XP a day.');
         })}>Add</button>
       </div>
-      <div style="padding:6px 20px 0;font-size:11px;color:var(--muted-soft)">Custom habits are worth ${XP_RULES.customXp} XP a day.</div>
+      <div style="padding:6px 20px 0;font-size:11px;color:var(--muted-soft)">Custom habits are worth ${XP_RULES.customXp} XP a day. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
 
       <div style="padding:22px 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => { LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.'); })}>Reset today's log</button>
@@ -3738,6 +3818,7 @@ function renderSettings() {
 function renderSheet() {
   const h = habitById(UI.sheet);
   const stepBy = h.step || 1;
+  const cap = capFor(h), atCap = UI.sheetVal >= cap;
   return `
     <div class="scrim" data-k="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
     <div class="sheet" data-k="sheet:${h.id}">
@@ -3745,14 +3826,16 @@ function renderSheet() {
         <div class="hd" style="font-size:21px;line-height:1">Log ${esc(h.name)}${editingPast() ? ' · ' + esc(dayLong(AKEY())) : ''}</div>
         <button class="hd" style="font-size:13px;color:var(--clay-deep)" ${on(() => { UI.sheet = null; render(); })}>Close</button>
       </div>
-      <div style="font-size:13px;line-height:1.4;color:var(--muted)">Target is ${fmtVal(h, h.target)} ${esc(h.unit)} a day. Round up generously, I will never know.</div>
+      <div style="font-size:13px;line-height:1.4;color:var(--muted)">${atCap
+        ? fmtVal(h, cap) + ' ' + esc(h.unit) + ' is the most this will take in a day. Anything past that is not a number, it is a typo.'
+        : 'Target is ' + fmtVal(h, h.target) + ' ' + esc(h.unit) + ' a day. Round up generously, I will never know.'}</div>
       <div class="stepper">
         <button class="minus" ${on(() => { UI.sheetVal = Math.max(0, UI.sheetVal - stepBy); render(); })}>–</button>
         <div class="val">
           <span class="figure" style="font-size:36px;line-height:1">${fmtVal(h, UI.sheetVal)}</span>
           <span class="eyebrow">${esc(h.unit)}</span>
         </div>
-        <button class="plus" ${on(() => { UI.sheetVal = UI.sheetVal + stepBy; render(); })}>+</button>
+        <button class="plus" ${on(() => { UI.sheetVal = Math.min(cap, UI.sheetVal + stepBy); render(); })}>+</button>
       </div>
       <button class="btn btn-primary btn-block" ${on(() => {
         const before = habitXp(h), rect = UI._tapRect, logged = UI.sheetVal;
@@ -3762,7 +3845,7 @@ function renderSheet() {
         render();
         const gained = Math.max(0, habitXp(h) - before);
         haptic(logged >= h.target ? 'done' : 'tick');
-        toast(h.name + ' updated · +' + gained + ' XP.');
+        toast(h.name + ' updated' + dayTag() + ' · +' + gained + ' XP.');
         flyXp(gained, rect);
       })}>Save it</button>
     </div>`;

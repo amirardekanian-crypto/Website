@@ -209,6 +209,21 @@ Athletes can switch any of them off and add their own (worth `customXp`, 25).
 **Onboarding** is one screen that *suggests* this set with every item as a toggle —
 it decides nothing for them, and everything stays editable in Settings afterwards.
 
+**A counter takes at most `dailyCap` × its target in a day** (3×, so 30,000 steps).
+Daily XP never needed a ceiling — `xpFor()` stops at the target — but a `total:`
+quest counts raw units, and the server scores whatever the log holds. See
+[`XP_SYSTEM.md`](XP_SYSTEM.md) §1.
+
+**Off and removed are different things, deliberately.** The toggle beside a habit
+*pauses* it: it leaves the daily list, keeps every point it has banked, and can come
+back. The ✕ beside a custom habit *removes* it — and takes its logged values out of
+the log with it. That second half is not tidiness. The app stops counting a habit
+the moment it leaves `CFG.custom`, but the server's `hab_xp()` walks every key in a
+day and pays `customXp` for anything it does not recognise, so a left-behind key
+went on scoring on the leaderboard and nowhere else, and the two could never
+reconcile. `removeCustom()` in `habits.html` owns this; anything else that drops a
+habit has to do the same.
+
 > **STEPS and SLEEP are entered by hand**, not synced from a phone's health app. A
 > website cannot read Apple Health or Health Connect — there is no browser API for it,
 > and Google shut its Fit REST API down on 30 June 2026. Reading steps automatically
@@ -348,6 +363,15 @@ your thumb** — past 30% of its height or 120px it dismisses — and a stepper 
 is not forty taps. Dragging is ignored when the gesture starts on a control inside the
 sheet.
 
+> ⚠️ **The repeat must have an exit that does not depend on the button.** It is held
+> in `_repHold` / `_repTimer` at module level, not in a closure, and it is killed by
+> a `pointerup`/`pointercancel`/`blur` **on the window** as well as on the button —
+> plus an `isConnected` check inside the tick. As a per-button closure whose only
+> exits were events on that button, missing all three (sheet dismissed under the
+> thumb, pointer captured elsewhere, app backgrounded) left the interval running
+> forever, clicking a control nobody was touching: the number drained 500 at a time
+> while the athlete watched it.
+
 **Sound** is off unless the athlete turns it on (Settings → Sound). It is *synthesised*,
 not loaded — a short square blip through WebAudio, so it costs no bytes and cannot fail
 to download. It rides inside `haptic()`, so every existing call site gets it for free.
@@ -400,10 +424,22 @@ would have landed as an instant head start. Full detail in
 - **Reading the board is key-checked**, so client names never reach the open internet.
 
 SQL: `supabase/stage9_leaderboard.sql`. **Applied and live** (26 July 2026), along with
-`stage10_workout_days.sql`, `stage11_seasons.sql` and `stage12_bonus_xp.sql`.
+`stage10_workout_days.sql`, `stage11_seasons.sql`, `stage12_bonus_xp.sql`,
+`stage14_quest_runs.sql` and `stage15_roll_call.sql`.
 
 > Because scoring happens on the server, the XP rules exist in **two places**:
 > `XP_RULES` in `habits.html` and the `xp_rules` row in Supabase. Change both together.
+
+> ⛔ **The `supabase/` folder is a changelog, not a schema.** Later stages redefine
+> functions from earlier ones and the earlier file keeps its stale copy, so a
+> "safe to re-run" banner is only true if nothing after it touched the same
+> function. `stage12_bonus_xp.sql` is the live example: its `leaderboard_top` calls
+> a `hab_bonus_xp` overload that no longer exists, and re-running it would point
+> the board at rules the athletes' own screens do not use — silently, with no
+> error. The current `hab_bonus_xp` **and** `leaderboard_top` both live at the foot
+> of `stage14_quest_runs.sql`. Before running or trusting any of these files, read
+> the live definition first:
+> `select pg_get_functiondef(oid) from pg_proc where proname = '…' and pronamespace = 'public'::regnamespace;`
 
 ---
 
