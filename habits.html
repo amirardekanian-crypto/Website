@@ -295,6 +295,99 @@
   }
 
   .demo-banner { background: var(--clay); color: #FAF7F2; padding: 8px 20px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+
+  /* ── Level-up takeover ──────────────────────────────────────────────────
+     The game moment. Square badge and hard edges keep it inside the modernist
+     system — the drama comes from the ray burst, the scale-punch and the
+     shards, not from rounded corners or glows. */
+  @keyframes lvScrim  { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes lvRays   { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+  @keyframes lvRaysIn { from { opacity: 0; transform: scale(.3) } to { opacity: .55; transform: scale(1) } }
+  @keyframes lvBadge  {
+    0%   { transform: scale(0) rotate(-25deg); opacity: 0 }
+    55%  { transform: scale(1.25) rotate(6deg); opacity: 1 }
+    75%  { transform: scale(.94) rotate(-2deg) }
+    100% { transform: scale(1) rotate(0deg); opacity: 1 }
+  }
+  @keyframes lvShock  { 0% { transform: scale(.2); opacity: .9 } 100% { transform: scale(2.6); opacity: 0 } }
+  @keyframes lvUp     { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
+  @keyframes lvShard  { 0% { transform: translate(0,0) scale(1); opacity: 1 } 100% { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0 } }
+  @keyframes lvFill   { from { width: 0 } to { width: var(--w) } }
+
+  /* Two opaque variants so the moment never fights the screen behind it:
+     a routine level lands on near-black with clay rays; a rank promotion goes
+     full clay. Both are dark grounds, so all type is paper in both. */
+  .lvwrap {
+    position: absolute; inset: 0; z-index: 200;
+    background: #14120F;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 32px 26px; text-align: center; overflow: hidden;
+    color: #FAF7F2;
+    animation: lvScrim .22s ease;
+  }
+  .lvwrap.rank { background: var(--clay); }
+  .lvstage { position: relative; display: flex; align-items: center; justify-content: center; width: 200px; height: 200px; margin-bottom: 30px; }
+  /* The burst is masked to a soft disc so it never collides with the type below. */
+  .lvrays {
+    position: absolute; width: 460px; height: 460px; opacity: .5;
+    background: repeating-conic-gradient(var(--clay) 0deg 7deg, transparent 7deg 22deg);
+    -webkit-mask-image: radial-gradient(circle, #000 18%, rgba(0,0,0,.35) 42%, transparent 66%);
+            mask-image: radial-gradient(circle, #000 18%, rgba(0,0,0,.35) 42%, transparent 66%);
+    animation: lvRaysIn .5s ease both, lvRays 16s linear .5s infinite;
+  }
+  .lvwrap.rank .lvrays { background: repeating-conic-gradient(#FAF7F2 0deg 6deg, transparent 6deg 20deg); opacity: .38; }
+  .lvshock { position: absolute; width: 150px; height: 150px; border: 3px solid var(--clay); animation: lvShock .7s cubic-bezier(.2,.7,.3,1) .18s both; }
+  .lvwrap.rank .lvshock { border-color: #FAF7F2; }
+  .lvbadge {
+    position: relative; width: 128px; height: 128px;
+    background: #FAF7F2; color: var(--clay);
+    border: 4px solid var(--clay);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    animation: lvBadge .72s cubic-bezier(.2,.8,.25,1) .1s both;
+  }
+  .lvwrap.rank .lvbadge { border-color: #FAF7F2; color: var(--clay); }
+  .lvbadge .n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: .85; letter-spacing: -.04em; }
+  .lvbadge .l { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .18em; color: rgba(26,26,26,.55); }
+  .lvshards { position: absolute; inset: 0; pointer-events: none; }
+  .lvshards i {
+    position: absolute; top: 50%; left: 50%; width: 9px; height: 9px; background: var(--clay);
+    animation: lvShard .95s cubic-bezier(.15,.75,.3,1) .22s both;
+  }
+  .lvwrap.rank .lvshards i { background: #FAF7F2; }
+  .lvkicker {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .34em;
+    text-transform: uppercase; color: var(--clay-2, #E06B43); animation: lvUp .4s ease .5s both;
+  }
+  .lvwrap.rank .lvkicker { color: rgba(250,247,242,.9); }
+  .lvrank {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase;
+    font-size: 46px; line-height: .95; letter-spacing: -.02em; margin-top: 10px;
+    color: #FAF7F2; animation: lvUp .45s ease .6s both;
+  }
+  .lvsub { font-size: 13px; color: rgba(250,247,242,.72); margin-top: 10px; animation: lvUp .45s ease .72s both; }
+  .lvbar { width: 200px; height: 8px; background: rgba(250,247,242,.22); margin-top: 18px; animation: lvUp .45s ease .8s both; }
+  .lvbar > span { display: block; height: 100%; background: #FAF7F2; animation: lvFill .8s cubic-bezier(.2,.8,.2,1) .95s both; }
+  .lvgo {
+    margin-top: 28px; background: #FAF7F2; color: #14120F; padding: 14px 26px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px;
+    letter-spacing: .1em; text-transform: uppercase; animation: lvUp .45s ease .9s both;
+  }
+  .lvwrap.rank .lvgo { color: var(--clay); }
+  .lvqueue { position: absolute; bottom: 22px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .16em; color: rgba(250,247,242,.6); }
+
+  /* Inline flash for routine habit level-ups (no takeover) */
+  @keyframes lvPop { 0% { transform: scale(.4); opacity: 0 } 55% { transform: scale(1.22) } 100% { transform: scale(1); opacity: 1 } }
+  .lvchip {
+    background: var(--clay); color: #FAF7F2; padding: 3px 7px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em;
+    animation: lvPop .45s cubic-bezier(.2,.8,.25,1) both;
+  }
+  .hlv { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
+
+  /* Consistency pip ladder */
+  .pips { display: flex; gap: 4px; }
+  .pips i { width: 13px; height: 13px; border: 1.5px solid var(--box); display: block; }
+  .pips i.on { background: var(--accent); border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -318,16 +411,21 @@ const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 
 // Steps and sleep are numeric entries rather than HealthKit syncs — a web app
 // can't read phone health data, so the athlete logs them via the sheet.
+// `xp` is the base value of one completion, ranked by health impact: the
+// training session pays most, then daily steps, then sleep. Partial progress on
+// a counter habit pays pro-rata; finishing pays COMPLETION_BONUS × base.
 const HABITS = [
-  { id:'strength', name:'STRENGTH', code:'ST', kind:'check', target:1,    unit:'session', goal:'1 session · 45 min',            source:'Manual' },
-  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:8000,  unit:'steps',   goal:'8,000 steps',                   source:'Enter daily', step:500 },
-  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                     source:'Enter daily', step:0.5, dec:1 },
-  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                     source:'Manual' },
-  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                source:'Manual' },
-  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',              source:'Manual' },
-  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                source:'Manual' },
-  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3', source:'Manual' }
+  { id:'strength', name:'STRENGTH', code:'ST', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',            source:'Manual',      xp:100 },
+  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                  source:'Enter daily', xp:60, step:500 },
+  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                     source:'Enter daily', xp:50, step:0.5, dec:1 },
+  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                source:'Manual',      xp:40 },
+  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                     source:'Manual',      xp:30 },
+  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                source:'Manual',      xp:30 },
+  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',              source:'Manual',      xp:20 },
+  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3', source:'Manual',      xp:20 }
 ];
+const CUSTOM_XP = 25;
+const COMPLETION_BONUS = 1.2;
 const QUIPS = {
   strength: 'Picking heavy things up and putting them down. Sisyphus with better shoulders.',
   steps:    'Every one of these was a decision not to sit down.',
@@ -344,11 +442,29 @@ const COACH_STYLES = [
   { key:'active', label:'FULL COACH',     desc:'I chat, I adapt the plan, I notice things. Sorry in advance.' }
 ];
 const MOTIV = [ {key:'streak',label:'BIG STREAK NUMBER'}, {key:'rings',label:'DAILY BAR SET'}, {key:'points',label:'XP & LEVELS'} ];
-const LEVEL_NAMES = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','MACHINE','RELENTLESS','LEGEND'];
-// Progressive, not linear: at ~5 completions a day a flat 400/level would hand
-// out LEGEND inside a month. These thresholds make level 7 roughly a season's
-// work, so the number still means something in month six.
-const LEVEL_AT = [0, 500, 1500, 3500, 7000, 12500, 21000];
+// ── Ranks ────────────────────────────────────────────────────────────────
+// Ten names × five sub-levels = 50 levels a cycle. Past 50 you prestige: the
+// ladder restarts at ROOKIE 1 carrying a star (★1 ROOKIE 1, ★2 ROOKIE 1 …), so
+// there is no ceiling — the star is the real flex.
+const RANKS = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','ENFORCER','PREDATOR','MACHINE','RELENTLESS','UNTOUCHABLE','IMMORTAL'];
+const SUBS_PER_RANK = 5;
+const LEVELS_PER_CYCLE = RANKS.length * SUBS_PER_RANK;   // 50
+
+// Cost of level n → n+1 is BASE × n^GROWTH, so every level costs more than the
+// last. Tuned against two anchors: one full day of habits reaches level 2, and
+// a solid (~80%) two months reaches level 20. Level 19→20 costs 4.4× level 1→2.
+const XP_BASE = 300;
+const XP_GROWTH = 0.55;
+const MAX_LEVEL_SCAN = 5000;   // loop guard, far above any reachable level
+
+// Consecutive-day ladders, one per habit, five tiers each — 5 days up to two months.
+const CONSISTENCY_TIERS = [
+  { days: 5,  name: 'KINDLED',     xp: 50 },
+  { days: 10, name: 'STEADY',      xp: 100 },
+  { days: 20, name: 'LOCKED IN',   xp: 200 },
+  { days: 30, name: 'IRONCLAD',    xp: 350 },
+  { days: 60, name: 'UNBREAKABLE', xp: 750 }
+];
 const GOALS = ['FEEL LESS TIRED AT 3PM','GET GENUINELY STRONGER','SLEEP LIKE A ROCK','EAT LIKE AN ADULT','STOP DOOMSCROLLING AT 1AM'];
 const QUICKS = ["I'M WRECKED TODAY",'GIVE ME ONE THING','HIT A PR TODAY','TRAVELLING TOMORROW'];
 
@@ -372,8 +488,9 @@ let MSGS = [];
 const K_CFG = () => ATHLETE_ID + '_hab_cfg';
 const K_LOG = () => ATHLETE_ID + '_hab_log';
 
-const UI = { screen:'today', ob:0, open:null, sheet:null, sheetVal:0, draft:'', toast:null, adding:false };
-let _toastTimer = null;
+const UI = { screen:'today', ob:0, open:null, sheet:null, sheetVal:0, draft:'', toast:null, adding:false,
+             celebrate: [], flash: {} };   // celebrate = queued full-screen level-ups; flash = inline habit-row pops
+let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
@@ -553,23 +670,66 @@ function habitBest(h) {
 function habitWeek(h) { let n = 0; for (let i = 0; i < 7; i++) if (isDone(h, fmtKey(addDays(today(), -i)))) n++; return n; }
 function habitRate35(h) { let n = 0; for (let i = 0; i < 35; i++) if (isDone(h, fmtKey(addDays(today(), -i)))) n++; return Math.round(n / 35 * 100); }
 function totalCompletions() { return loggedDays().reduce((s, k) => s + live().filter(h => isDone(h, k)).length, 0); }
-function totalXp() { return totalCompletions() * 30 + loggedDays().filter(isPerfect).length * 10; }
-function levelOf(xp) {
-  let lv = 1;
-  for (let i = 0; i < LEVEL_AT.length; i++) if (xp >= LEVEL_AT[i]) lv = i + 1;
-  return lv;
+
+// ── XP ────────────────────────────────────────────────────────────────────
+function baseXp(h) { return typeof h.xp === 'number' ? h.xp : CUSTOM_XP; }
+// One day's worth of one habit: pro-rata while you're part way, with a bonus
+// once you actually finish — so a near-miss still pays, but finishing pays more.
+function xpFor(h, v) {
+  if (v <= 0) return 0;
+  const base = baseXp(h);
+  return Math.round(v >= h.target ? base * COMPLETION_BONUS : base * (v / h.target));
 }
-// Everything the level UI needs, with the max-level case handled once so no
-// screen can render a negative "XP to next".
-function levelInfo(xp) {
-  const lv = levelOf(xp), max = lv >= LEVEL_AT.length;
-  const floor = LEVEL_AT[lv - 1], next = max ? null : LEVEL_AT[lv];
+// A habit's own XP pool, across all history. Counted even if the habit is
+// currently switched off — XP you earned is not taken back.
+function habitXp(h) { return loggedDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
+function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0); }
+// Per-habit ladders use the same curve, scaled to that habit's daily value, so
+// every habit levels at the same *rate* — which means your level in a habit
+// tracks how often you actually do it. Train less than you drink water and your
+// water level climbs past your strength level, exactly as it should.
+function baseFor(h) { return h ? Math.max(10, Math.round(baseXp(h) * COMPLETION_BONUS)) : XP_BASE; }
+function levelCost(base, n) { return Math.max(10, Math.round(base * Math.pow(n, XP_GROWTH) / 10) * 10); }
+
+// Rank label for any level, including the prestige star past level 50.
+function rankFor(level) {
+  const i = Math.max(0, level - 1);
+  const star = Math.floor(i / LEVELS_PER_CYCLE);
+  const within = i % LEVELS_PER_CYCLE;
+  const name = RANKS[Math.floor(within / SUBS_PER_RANK)];
+  const sub = (within % SUBS_PER_RANK) + 1;
+  return { star, name, sub, label: (star ? '★' + star + ' ' : '') + name + ' ' + sub };
+}
+// Walk the cumulative curve to turn an XP total into a level plus its progress.
+function levelInfo(xp, base) {
+  base = base || XP_BASE;
+  let lv = 1, spent = 0, cost = levelCost(base, 1);
+  while (lv < MAX_LEVEL_SCAN && xp - spent >= cost) { spent += cost; lv++; cost = levelCost(base, lv); }
+  const into = xp - spent, r = rankFor(lv);
   return {
-    lv, max, name: LEVEL_NAMES[lv - 1], next,
-    toNext: max ? 0 : next - xp,
-    pct: max ? 100 : Math.max(0, Math.min(100, Math.round((xp - floor) / (next - floor) * 100))),
-    nextLabel: max ? 'Max level reached' : (next - xp) + ' XP to level ' + (lv + 1)
+    lv, xp, into, need: cost, toNext: cost - into,
+    pct: Math.max(0, Math.min(100, Math.round(into / cost * 100))),
+    rank: r, label: r.label,
+    nextLabel: (cost - into) + ' XP to level ' + (lv + 1)
   };
+}
+function overallLevel() { return levelInfo(overallXp(), XP_BASE); }
+function habitLevel(h) { return levelInfo(habitXp(h), baseFor(h)); }
+
+// ── Consistency ladders ───────────────────────────────────────────────────
+// Tier is earned on the BEST run ever, so a broken streak never revokes a badge.
+function consistencyFor(h) {
+  const best = habitBest(h), cur = habitStreak(h);
+  let tier = 0;
+  CONSISTENCY_TIERS.forEach((t, i) => { if (best >= t.days) tier = i + 1; });
+  const next = CONSISTENCY_TIERS[tier] || null;
+  return { best, cur, tier, next, total: CONSISTENCY_TIERS.length };
+}
+function consistencyXp() {
+  return allHabits().reduce((s, h) => {
+    const c = consistencyFor(h);
+    return s + CONSISTENCY_TIERS.slice(0, c.tier).reduce((a, t) => a + t.xp, 0);
+  }, 0);
 }
 function measureAch(a) {
   if (a.measure === 'perfectDays') return loggedDays().filter(isPerfect).length;
@@ -607,6 +767,50 @@ function coachCopy() {
   return { line, cta };
 }
 
+// ── Level-up detection ────────────────────────────────────────────────────
+// Levels are always derived from the log, never stored — so instead of trying
+// to catch every mutation we keep the last level the athlete has actually been
+// SHOWN (CFG.seen) and diff against it. That covers local check-offs, a cloud
+// sync that arrives with new XP, and the first-run migration alike.
+function currentLevels() {
+  const out = { _overall: overallLevel().lv };
+  allHabits().forEach(h => { out[h.id] = habitLevel(h).lv; });
+  return out;
+}
+// Seed silently: an athlete arriving with history must not be ambushed by
+// twenty queued celebrations for levels they never saw themselves earn.
+function seedSeenLevels() { CFG.seen = currentLevels(); saveCfg(); }
+function checkLevelUps() {
+  if (!CFG.seen) { seedSeenLevels(); return; }
+  const now = currentLevels(), seen = CFG.seen, events = [];
+  Object.keys(now).forEach(id => {
+    const from = typeof seen[id] === 'number' ? seen[id] : now[id];
+    if (now[id] <= from) return;
+    const overall = id === '_overall';
+    const rankChanged = rankFor(now[id]).name !== rankFor(from).name || rankFor(now[id]).star !== rankFor(from).star;
+    events.push({
+      id, overall, from, to: now[id], rankChanged,
+      name: overall ? 'OVERALL' : habitById(id).name,
+      // Full-screen takeover for an overall level or a genuine rank promotion.
+      // Routine habit levels flash in their row instead, so day one doesn't
+      // become nine consecutive takeovers.
+      big: overall || rankChanged
+    });
+  });
+  CFG.seen = now;
+  if (!events.length) { saveCfg(); return; }
+  events.filter(e => e.big).forEach(e => UI.celebrate.push(e));
+  events.filter(e => !e.big).forEach(e => { UI.flash[e.id] = e.to; });
+  saveCfg();
+  // Clear the inline flashes once their animation has played out.
+  clearTimeout(_flashTimer);
+  _flashTimer = setTimeout(() => { UI.flash = {}; render(); }, 1600);
+}
+function dismissCelebration() {
+  UI.celebrate.shift();
+  render();
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────
 function toast(text) {
   UI.toast = text; render();
@@ -621,15 +825,21 @@ function setVal(id, v) {
 }
 function toggleHabit(h) {
   const done = isDone(h);
+  const before = habitXp(h) + 0;
   setVal(h.id, done ? 0 : h.target);
+  checkLevelUps();
   render();
-  if (!done) toast('+30 XP · ' + h.name + ' logged. Look at you.');
+  if (!done) toast('+' + (habitXp(h) - before) + ' XP · ' + h.name + ' logged. Look at you.');
 }
 function bump(h) {
   const stepBy = h.step || 1;
+  const before = habitXp(h);
   const v = Math.min(h.target, valOf(TKEY(), h.id) + stepBy);
-  setVal(h.id, v); render();
-  toast(v >= h.target ? '+30 XP · ' + h.name + ' complete.' : '+5 XP. Keep them coming.');
+  setVal(h.id, v);
+  checkLevelUps();
+  render();
+  const gained = habitXp(h) - before;
+  toast(v >= h.target ? '+' + gained + ' XP · ' + h.name + ' complete.' : '+' + gained + ' XP. Keep them coming.');
 }
 function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
 function go(screen) { UI.screen = screen; UI.open = null; if (screen === 'coach') markCoachRead(); render(); }
@@ -725,29 +935,33 @@ function renderOnboarding() {
 
 // ── App shell ─────────────────────────────────────────────────────────────
 function renderApp() {
-  const xp = totalXp(), LI = levelInfo(xp), lv = LI.lv, lvName = LI.name;
+  const LI = overallLevel(), xp = LI.xp, lv = LI.lv;
   const hs = live(), doneCount = hs.filter(h => isDone(h)).length, pct = dayPct(TKEY());
   const openH = habitById(UI.open || 'strength');
-  const earned = ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).length;
+  const earnedMilestones = ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).length;
+  const earnedTiers = allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0);
+  const totalTiers = allHabits().length * CONSISTENCY_TIERS.length;
+  const earned = earnedMilestones + earnedTiers;
+  const totalAch = ACHIEVEMENTS.length + totalTiers;
 
   const heads = {
     today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
     detail:   [openH.source, openH.name],
-    insights: ['LV ' + lv + ' ' + lvName + ' · ' + xp + ' XP', 'Achievements'],
+    insights: ['LV ' + lv + ' ' + LI.label + ' · ' + xp + ' XP', 'Achievements'],
     coach:    [CFG.coach === 'silent' ? 'Coach muted in settings' : 'Amir · replies within a day', 'Your coach'],
     settings: ['Profile & programme', 'Settings']
   };
   const rights = {
-    today: pct + '% DONE', detail: habitBest(openH) + 'D BEST',
-    insights: earned + ' OF ' + ACHIEVEMENTS.length,
+    today: pct + '% DONE', detail: 'LV ' + habitLevel(openH).lv,
+    insights: earned + ' OF ' + totalAch,
     coach: (CFG.coach || 'active').toUpperCase(), settings: _synced ? 'SYNCED' : 'LOCAL'
   };
   const head = heads[UI.screen] || heads.today;
 
   let screenHtml = '';
-  if (UI.screen === 'today') screenHtml = renderToday(xp, lv, lvName, doneCount, pct);
+  if (UI.screen === 'today') screenHtml = renderToday(LI, doneCount, pct);
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
-  else if (UI.screen === 'insights') screenHtml = renderAwards(xp, lv, lvName, earned);
+  else if (UI.screen === 'insights') screenHtml = renderAwards(LI, earned, totalAch);
   else if (UI.screen === 'coach') screenHtml = renderCoach();
   else screenHtml = renderSettings();
 
@@ -772,7 +986,41 @@ function renderApp() {
       </button>`).join('')}
     </div>
     ${UI.sheet ? renderSheet() : ''}
-    ${UI.toast ? `<div class="toast">${esc(UI.toast)}</div>` : ''}`;
+    ${UI.toast && !UI.celebrate.length ? `<div class="toast">${esc(UI.toast)}</div>` : ''}
+    ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
+}
+
+// ── Level-up takeover ─────────────────────────────────────────────────────
+function renderCelebration(ev) {
+  const isHabit = !ev.overall;
+  const h = isHabit ? habitById(ev.id) : null;
+  const info = isHabit ? habitLevel(h) : overallLevel();
+  const r = rankFor(ev.to);
+  const promoted = ev.rankChanged;
+  // Shards fly out on eight fixed vectors — deterministic, so the burst reads
+  // the same every time instead of looking like noise.
+  const shards = [[0,-118],[84,-84],[118,0],[84,84],[0,118],[-84,84],[-118,0],[-84,-84],[52,-132],[-52,132],[132,52],[-132,-52]];
+  return `
+    <div class="lvwrap ${promoted ? 'rank' : ''}" ${on(dismissCelebration)}>
+      <div class="lvstage">
+        <div class="lvrays"></div>
+        <div class="lvshock"></div>
+        <div class="lvshards">
+          ${shards.map((s, i) => `<i style="--dx:${s[0]}px;--dy:${s[1]}px;animation-delay:${(0.22 + i * 0.025).toFixed(3)}s"></i>`).join('')}
+        </div>
+        <div class="lvbadge">
+          <span class="n">${ev.to}</span>
+          <span class="l">LEVEL</span>
+        </div>
+      </div>
+      <div class="lvkicker">${promoted ? (r.star && r.sub === 1 && r.name === RANKS[0] ? 'Prestige' : 'Rank up') : 'Level up'}</div>
+      <div class="lvrank">${esc(isHabit ? h.name : r.label)}</div>
+      ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
+                : `<div class="lvsub">Overall level ${ev.to} · ${info.into} / ${info.need} XP</div>`}
+      <div class="lvbar"><span style="--w:${info.pct}%"></span></div>
+      <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
+      ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
+    </div>`;
 }
 function greeting() {
   const h = new Date().getHours();
@@ -780,9 +1028,9 @@ function greeting() {
 }
 
 // ── Today ─────────────────────────────────────────────────────────────────
-function renderToday(xp, lv, lvName, doneCount, pct) {
+function renderToday(LI, doneCount, pct) {
   const hs = live();
-  const LI = levelInfo(xp);
+  const xp = LI.xp, lv = LI.lv;
   const streak = currentDayStreak();
 
   let hero = '';
@@ -809,10 +1057,10 @@ function renderToday(xp, lv, lvName, doneCount, pct) {
   } else {
     hero = `<div style="display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;align-items:flex-end;gap:14px">
-        <div class="figure" style="font-size:64px;line-height:.85">${xp}</div>
+        <div class="figure" style="font-size:64px;line-height:.85">${lv}</div>
         <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
-          <div class="hd" style="font-size:15px;line-height:1">XP · LV ${lv} ${esc(lvName)}</div>
-          <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(LI.nextLabel)}</div>
+          <div class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</div>
+          <div style="font-size:12px;line-height:1.3;color:var(--muted)">${xp.toLocaleString()} XP · ${esc(LI.nextLabel)}</div>
         </div>
       </div>
       <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
@@ -838,6 +1086,7 @@ function renderToday(xp, lv, lvName, doneCount, pct) {
 
       ${hs.map(h => {
         const v = valOf(TKEY(), h.id), done = isDone(h), st = habitStreak(h);
+        const hl = habitLevel(h), flashed = UI.flash[h.id];
         let status;
         if (h.kind === 'count') status = fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit;
         else status = done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source);
@@ -849,7 +1098,8 @@ function renderToday(xp, lv, lvName, doneCount, pct) {
           <button class="body" ${on(() => { UI.open = h.id; UI.screen = 'detail'; render(); })}>
             <span class="line1">
               <span class="nm">${esc(h.name)}</span>
-              <span class="stk mono">${st > 0 ? st + 'D' : '—'}</span>
+              ${flashed ? `<span class="lvchip">LV ${flashed} ↑</span>`
+                        : `<span class="hlv">LV ${hl.lv}${st > 0 ? ' · ' + st + 'D' : ''}</span>`}
             </span>
             <span class="status">${esc(status)}</span>
             <span class="track"><span style="width:${pc}%"></span></span>
@@ -885,14 +1135,31 @@ function renderDetail(h) {
     { v: habitBest(h) + 'd',  k: 'Best streak' },
     { v: habitRate35(h) + '%', k: '35-day rate' }
   ];
+  const hl = habitLevel(h), con = consistencyFor(h);
   return `
     <div style="animation:fadeIn .25s ease">
-      <div class="block">
-        <div style="display:flex;align-items:flex-end;gap:12px">
-          <div class="figure" style="font-size:76px;line-height:.8">${habitStreak(h)}</div>
-          <div class="hd" style="font-size:14px;line-height:1.15;padding-bottom:6px">Day<br>streak</div>
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:flex-end;gap:14px">
+          <div class="figure" style="font-size:76px;line-height:.8">${hl.lv}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
+            <div class="hd" style="font-size:16px;line-height:1">${esc(hl.label)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${hl.xp.toLocaleString()} XP in ${esc(h.name.toLowerCase())} · ${hl.toNext} to LV ${hl.lv + 1}</div>
+          </div>
         </div>
-        <p style="margin:12px 0 0;font-size:13px;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</p>
+        <div class="bar thin"><span style="width:${hl.pct}%"></span></div>
+        <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</p>
+      </div>
+      <div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Consistency</span><span>${con.tier} of ${con.total}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
+          <div style="font-size:12px;color:var(--muted);text-align:right">
+            ${con.next ? esc(con.next.name) + ' at ' + con.next.days + ' days · best run ' + con.best
+                       : 'UNBREAKABLE — every tier cleared'}
+          </div>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
         ${stats.map((s, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
@@ -921,16 +1188,17 @@ function renderDetail(h) {
 }
 
 // ── Awards ────────────────────────────────────────────────────────────────
-function renderAwards(xp, lv, lvName, earned) {
-  const LI = levelInfo(xp);
+function renderAwards(LI, earned, totalAch) {
+  const xp = LI.xp, lv = LI.lv;
+  const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
   return `
     <div style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" style="font-size:76px;line-height:.8">${lv}</div>
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
-            <div class="hd" style="font-size:16px;line-height:1">Level · ${esc(lvName)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${xp} XP · ${LI.max ? 'max level reached' : LI.toNext + ' to LV ' + (lv + 1)}</div>
+            <div class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${xp.toLocaleString()} XP · ${LI.toNext} to LV ${lv + 1}</div>
           </div>
         </div>
         <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
@@ -941,10 +1209,41 @@ function renderAwards(xp, lv, lvName, earned) {
           <div class="eyebrow" style="letter-spacing:.12em">Day streak</div>
         </div>
         <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
-          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${ACHIEVEMENTS.length}</div>
+          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${totalAch}</div>
           <div class="eyebrow" style="letter-spacing:.12em">Achievements unlocked</div>
         </div>
       </div>
+
+      ${sectionLabel('Habit ranks', 'Tap to open')}
+      ${allHabits().map(h => {
+        const hl = habitLevel(h);
+        return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:13px 20px"
+          ${on(() => { UI.open = h.id; UI.screen = 'detail'; render(); })}>
+          <div class="hd" style="width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
+            <div class="hd" style="font-size:15px;line-height:1">${esc(h.name)}</div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP</div>
+          </div>
+          <div style="flex:none;width:74px"><div class="bar" style="height:5px"><span style="width:${hl.pct}%"></span></div></div>
+        </button>`;
+      }).join('')}
+
+      ${sectionLabel('Consistency', '5 tiers each')}
+      ${allHabits().map(h => {
+        const c = consistencyFor(h);
+        return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:13px 20px">
+          <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+            <div class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">
+              ${c.next ? esc(c.next.name) + ' at ' + c.next.days + ' days' : esc(CONSISTENCY_TIERS[4].name) + ' — all cleared'}
+              · best ${c.best}d${c.cur ? ' · now ' + c.cur + 'd' : ''}
+            </div>
+          </div>
+          <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
+        </div>`;
+      }).join('')}
+
+      ${sectionLabel('Milestones')}
       ${ACHIEVEMENTS.map(a => {
         const have = measureAch(a), got = have >= a.need;
         return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:15px 20px;opacity:${got ? '1' : '.45'}">
@@ -1114,6 +1413,9 @@ function showError(msg) {
 
   loadLocal();
   await syncFromCloud();
+  // Levels that arrived with a cloud sync still deserve their moment; the very
+  // first run only seeds the baseline, so nobody is ambushed by a queue.
+  checkLevelUps();
   if (CFG.dark) document.body.setAttribute('data-dark', '');
   document.title = 'Proof — ' + (ATHLETE.firstName || 'AA Performance');
 
