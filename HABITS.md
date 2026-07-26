@@ -7,8 +7,9 @@ move it) and **[`CODEBASE.md`](CODEBASE.md)** (the technical file-by-file map).
 
 Start here if you're picking this up in a fresh chat.
 
-> **⚠️ Keeping this honest.** When you change how the app works, three things must
-> move together: **this file**, **`XP_SYSTEM.md`**, and the **in-app manual**
+> **⚠️ Keeping this honest.** When you change how the app works, these must move
+> together: **this file**, **`XP_SYSTEM.md`**, **`QUESTS.md`** (if you touched a quest),
+> and the **in-app manual**
 > (`renderManual()` in `habits.html`, which athletes read from Settings → *Read the
 > manual*). The manual reads its numbers straight from the live constants, so
 > retuning XP never breaks it — but if you change *behaviour*, its prose needs
@@ -63,7 +64,7 @@ The screen they actually live on.
   streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
   tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
   repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
-- **Quests, when a run is on** — targets for the *week* rather than the day, worth real
+- **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
   XP, with live progress and a countdown. **There are usually none**: quests only exist
   while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
   the point — seeing them means something is on.
