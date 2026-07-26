@@ -487,6 +487,11 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 Past runs are kept on purpose — the XP athletes earned in them keeps counting. Clearing
 a *finished* run would retroactively take those points away.
 
+Both commands are **coach-only**: they reject any signed-in user who is not Amir, and
+are not callable by athletes at all. They deliberately *do* work from the Supabase SQL
+editor, which carries no JWT — an earlier version guarded on the email alone and locked
+the coach out of his own command.
+
 > The log stores **days**, not timestamps, so a run starts at the beginning of its start
 > date rather than at the hour you ran the command. "Live from Wednesday" means all of
 > Wednesday.
