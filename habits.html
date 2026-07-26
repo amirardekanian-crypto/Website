@@ -162,13 +162,24 @@
     flex: none; width: 64px; border-right: 1px solid var(--rule);
     display: flex; align-items: center; justify-content: center;
   }
-  .boxmark { width: 28px; height: 28px; border: 2px solid var(--box); display: block; }
+  .boxmark { width: 28px; height: 28px; border: 2px solid var(--box); display: block; transition: border-color .18s ease, background-color .18s ease; }
   .boxmark.on {
     border-color: var(--accent); background: var(--accent); color: var(--bg);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
     animation: pop .28s ease;
   }
+  /* The tick DRAWS rather than appearing — 300ms of stroke is the difference
+     between "the state changed" and "you just did that". Scoped to .tick on
+     purpose: the same cell also holds the lock glyph on a locked habit, and
+     these rules would otherwise dash and redraw its shackle. */
+  .boxmark svg.tick { width: 20px; height: 20px; display: block; }
+  .boxmark svg.tick path {
+    fill: none; stroke: currentColor; stroke-width: 3.4;
+    stroke-linecap: square; stroke-linejoin: miter;
+    stroke-dasharray: 24; stroke-dashoffset: 24;
+    animation: drawTick .3s cubic-bezier(.5,0,.3,1) .04s forwards;
+  }
+  @keyframes drawTick { to { stroke-dashoffset: 0 } }
   .hrow .body {
     flex: 1; min-width: 0; text-align: left; padding: 13px 12px;
     display: flex; flex-direction: column; gap: 5px;
@@ -290,6 +301,32 @@
 
   .demo-banner { background: var(--clay); color: #FAF7F2; padding: 8px 20px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
 
+  /* ── The XP flight ──────────────────────────────────────────────────────
+     Points you just earned leave the habit that earned them and land in the
+     level that owns them. Two nested elements so the path is an ARC, not a
+     straight line: the outer carries X on an ease-out, the inner carries Y on
+     an ease-in with a small hop first. `#fx` is a `data-static` island, so the
+     renderer leaves whatever is mid-flight alone. */
+  #fx { position: absolute; inset: 0; z-index: 120; pointer-events: none; overflow: hidden; }
+  .xpfly {
+    position: absolute; will-change: transform;
+    transform: translate(-50%, -50%);
+    animation: xpFlyX .74s cubic-bezier(.35,.75,.25,1) both;
+  }
+  .xpfly > i {
+    display: block; white-space: nowrap;
+    background: var(--clay); color: #FAF7F2; padding: 4px 8px;
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    animation: xpFlyY .74s cubic-bezier(.6,.04,.75,.6) both;
+  }
+  @keyframes xpFlyX { to { transform: translate(calc(-50% + var(--dx)), -50%) } }
+  @keyframes xpFlyY {
+    0%   { transform: translateY(0) scale(.7); opacity: 0 }
+    16%  { transform: translateY(-15px) scale(1.06); opacity: 1 }
+    78%  { opacity: 1 }
+    100% { transform: translateY(var(--dy)) scale(.55); opacity: 0 }
+  }
+
   /* ── Level-up takeover ──────────────────────────────────────────────────
      The game moment. Square badge and hard edges keep it inside the modernist
      system — the drama comes from the ray burst, the scale-punch and the
@@ -368,6 +405,19 @@
   }
   .lvwrap.rank .lvgo { color: var(--clay); }
   .lvqueue { position: absolute; bottom: 22px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .16em; color: rgba(250,247,242,.6); }
+
+  /* A third ground for the things that are NOT a level: consistency tiers,
+     milestones and a perfect day. Deep green with clay-2 rays, so an athlete
+     can tell what kind of win landed before they read a word of it. */
+  .lvwrap.badge { background: #0B3B2B; }
+  .lvwrap.badge .lvrays { background: repeating-conic-gradient(#E06B43 0deg 7deg, transparent 7deg 22deg); opacity: .42; }
+  .lvwrap.badge .lvshock { border-color: #E06B43; }
+  .lvwrap.badge .lvbadge { background: #FAF7F2; color: #0B3B2B; border-color: #E06B43; }
+  .lvwrap.badge .lvshards i { background: #E06B43; }
+  .lvwrap.badge .lvkicker { color: #E9A183; }
+  .lvwrap.badge .lvgo { color: #0B3B2B; }
+  /* Milestone codes are two letters, not a two-digit number — same box, smaller type. */
+  .lvbadge .n.code { font-size: 44px; letter-spacing: -.02em; }
 
   /* Inline flash for routine habit level-ups (no takeover) */
   @keyframes lvPop { 0% { transform: scale(.4); opacity: 0 } 55% { transform: scale(1.22) } 100% { transform: scale(1); opacity: 1 } }
@@ -530,12 +580,13 @@ const K_LOG  = () => ATHLETE_ID + '_hab_log';
 const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
-             celebrate: [], flash: {}, _newName:'' };
+             celebrate: [], flash: {}, _newName:'', _tapRect:null };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
   return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null,
+           seenTiers:null, seenAch:null, seenPerfect:null,
            onBoard:false, boardName:null, updatedAt:0 };
 }
 
@@ -748,10 +799,17 @@ async function syncFromCloud() {
       const cloudCfg = JSON.parse(data[K_CFG()] || '{}');
       if (cloudCfg && !SYNC.dirty && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
         const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
+        const keepTiers = CFG.seenTiers, keepAch = CFG.seenAch, keepPerfect = CFG.seenPerfect;
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
         if (!CFG.seen) CFG.seen = keepSeen;
         if (!CFG.rulesSig) CFG.rulesSig = keepSig;
+        // Same reasoning as `seen`: a cloud row written before this build has no
+        // unlock baseline, and inheriting nothing would replay every badge the
+        // athlete already owns as a fresh takeover.
+        if (!CFG.seenTiers) CFG.seenTiers = keepTiers;
+        if (!Array.isArray(CFG.seenAch)) CFG.seenAch = keepAch;
+        if (!CFG.seenPerfect) CFG.seenPerfect = keepPerfect;
         localStorage.setItem(K_CFG(), JSON.stringify(CFG));
       }
     } catch (e) {}
@@ -832,6 +890,11 @@ async function fetchSeason() {
 // currently switched off — XP you earned is never taken back mid-season.
 function habitXp(h) { return seasonDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
 function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0); }
+// What a single day actually paid — the perfect-day takeover quotes it.
+function dayXp(dayKey) {
+  if (!inSeason(dayKey)) return 0;
+  return allHabits().reduce((s, h) => s + xpFor(h, valOf(dayKey, h.id)), 0);
+}
 // Habit ladders reuse the curve, scaled to that habit's daily value, so every
 // habit levels at the same RATE — which is what makes your level in a habit
 // track how often you actually do it.
@@ -935,7 +998,7 @@ function rulesSignature() {
   for (let i = 0; i < src.length; i++) hash = (hash * 31 + src.charCodeAt(i)) % 2147483647;
   return 'r' + hash.toString(36);
 }
-function seedSeenLevels() { CFG.seen = currentLevels(); CFG.rulesSig = rulesSignature(); saveCfg(); }
+function seedSeenLevels() { CFG.seen = currentLevels(); CFG.rulesSig = rulesSignature(); seedUnlocks(); saveCfg(); }
 function checkLevelUps() {
   const sig = rulesSignature();
   if (!CFG.seen || CFG.rulesSig !== sig) {
@@ -962,12 +1025,77 @@ function checkLevelUps() {
   });
   CFG.seen = now;
   saveCfg();
-  if (!events.length) return;
-  events.forEach(e => { if (e.big) UI.celebrate.push(e); else UI.flash[e.id] = e.to; });
-  clearTimeout(_flashTimer);
-  _flashTimer = setTimeout(() => { UI.flash = {}; render(); }, 1600);
+  events.forEach(e => {
+    if (e.big) { UI.celebrate.push(e); haptic(e.rankChanged ? 'rank' : 'level'); }
+    else UI.flash[e.id] = e.to;
+  });
+  if (events.length) {
+    clearTimeout(_flashTimer);
+    _flashTimer = setTimeout(() => { UI.flash = {}; render(); }, 1600);
+  }
+  checkUnlocks();
 }
-function dismissCelebration() { UI.celebrate.shift(); render(); }
+
+// ── Unlock detection ──────────────────────────────────────────────────────
+// Levels were the only thing this app ever noticed. Consistency tiers,
+// milestones and a perfect day all landed in total silence — a pip quietly
+// filling on a tab the athlete might not open that day. They are the biggest
+// moments the system has, so now they get seen.
+//
+// Baselined exactly like levels: an athlete arriving with history already behind
+// them gets it recorded, not replayed at them.
+function currentTiers() {
+  const out = {};
+  allHabits().forEach(h => { out[h.id] = consistencyFor(h).tier; });
+  return out;
+}
+function currentAch() { return ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).map(a => a.code); }
+function seedUnlocks() {
+  CFG.seenTiers = currentTiers();
+  CFG.seenAch = currentAch();
+  CFG.seenPerfect = isPerfect(TKEY()) ? TKEY() : null;
+}
+function checkUnlocks() {
+  if (!CFG.seenTiers || !Array.isArray(CFG.seenAch)) { seedUnlocks(); saveCfg(); return; }
+  const tiers = currentTiers(), ach = currentAch(), events = [];
+
+  // Tiers are COALESCED BY TIER, not reported per habit. An athlete who has been
+  // solid since day one crosses the 20-day tier on all eight habits on the same
+  // day, and eight identical takeovers in a row is a punishment, not a reward —
+  // the same reasoning that keeps routine habit levels down to an inline chip.
+  const byTier = {};
+  allHabits().forEach(h => {
+    const was = typeof CFG.seenTiers[h.id] === 'number' ? CFG.seenTiers[h.id] : tiers[h.id];
+    if (tiers[h.id] <= was) return;
+    // Crossing several tiers at once (a long run imported at once) reports only
+    // the highest reached — the lower ones are implied by it.
+    const t = CONSISTENCY_TIERS[tiers[h.id] - 1];
+    if (!t) return;
+    (byTier[t.days] = byTier[t.days] || { tier: t, habits: [] }).habits.push(h);
+  });
+  Object.keys(byTier).sort((a, b) => a - b).forEach(days => {
+    const g = byTier[days];
+    events.push({ kind:'tier', id:'t' + days, tier:g.tier, habits:g.habits });
+  });
+  ach.forEach(code => {
+    if (CFG.seenAch.indexOf(code) !== -1) return;
+    const a = ACHIEVEMENTS.find(x => x.code === code);
+    if (a) events.push({ kind:'milestone', id:code, ach:a });
+  });
+  // A perfect day is judged on TODAY alone. Judging it across history would fire
+  // a burst the moment somebody switched a habit off, because every thin day
+  // behind them would retroactively become perfect.
+  if (isPerfect(TKEY()) && CFG.seenPerfect !== TKEY()) events.push({ kind:'perfect', id:TKEY() });
+
+  CFG.seenTiers = tiers;
+  CFG.seenAch = ach;
+  if (isPerfect(TKEY())) CFG.seenPerfect = TKEY();
+  saveCfg();
+  if (!events.length) return;
+  events.forEach(e => UI.celebrate.push(e));
+  haptic('rank');
+}
+function dismissCelebration() { UI.celebrate.shift(); haptic('tick'); render(); }
 
 // ── Actions ───────────────────────────────────────────────────────────────
 function toast(text) {
@@ -983,28 +1111,46 @@ function setVal(id, v) {
 }
 function toggleHabit(h) {
   // A locked habit is owned by another system — the athlete cannot claim it by
-  // hand, so explain what does earn it instead of silently doing nothing.
+  // hand, so explain what does earn it instead of silently doing nothing. No
+  // haptic and no XP flight either: nothing was earned to celebrate.
   if (h.locked) { toast(h.lockedHint || 'This one is earned elsewhere.'); return; }
-  const done = isDone(h), before = habitXp(h);
+  const done = isDone(h), before = habitXp(h), rect = UI._tapRect;
   setVal(h.id, done ? 0 : h.target);
   checkLevelUps();
   render();
-  if (!done) toast('+' + (habitXp(h) - before) + ' XP · ' + h.name + ' logged. Look at you.');
+  if (done) { haptic('tick'); return; }        // unticking earns nothing to fly
+  const gained = habitXp(h) - before;
+  haptic('done');
+  toast('+' + gained + ' XP · ' + h.name + ' logged. Look at you.');
+  flyXp(gained, rect);
 }
 function bump(h) {
-  const before = habitXp(h);
+  const before = habitXp(h), rect = UI._tapRect;
   const v = Math.min(h.target, valOf(TKEY(), h.id) + (h.step || 1));
   setVal(h.id, v);
   checkLevelUps();
   render();
-  const gained = habitXp(h) - before;
-  toast(v >= h.target ? '+' + gained + ' XP · ' + h.name + ' complete.' : '+' + gained + ' XP. Keep them coming.');
+  const gained = habitXp(h) - before, complete = v >= h.target;
+  haptic(complete ? 'done' : 'tick');
+  toast(complete ? '+' + gained + ' XP · ' + h.name + ' complete.' : '+' + gained + ' XP. Keep them coming.');
+  flyXp(gained, rect);
+}
+// Navigating to a screen starts at its top; ticking a habit does not move you at
+// all. Before the renderer kept nodes alive, every render did both.
+function resetScroll() {
+  const sc = document.getElementById('scroll');
+  if (sc) sc.scrollTop = 0;
 }
 function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
-function openHabit(id, from) { UI.open = id; UI.from = from || UI.screen; UI.screen = 'detail'; render(); }
+function openHabit(id, from) {
+  UI.open = id; UI.from = from || UI.screen; UI.screen = 'detail';
+  haptic('tab'); render(); resetScroll();
+}
 function go(screen) {
   UI.screen = screen; UI.open = null;
+  haptic('tab');
   render();
+  resetScroll();
   if (screen === 'board') fetchBoard();
 }
 
@@ -1079,27 +1225,232 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'
 let _handlers = {};
 function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _handlers[id] = fn; return 'data-h="' + id + '"'; }
 
+// A stroked tick rather than a ✓ glyph, so it can be drawn on. Hard corners and
+// a square cap keep it inside the modernist system — no rounded checkmark.
+const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg>';
+
+function reduced() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+// ── The renderer ──────────────────────────────────────────────────────────
+// This used to be `app.innerHTML = renderApp()`, which threw the entire DOM away
+// on all two dozen render paths. Three things follow from that, and all three
+// read as "the app is dead":
+//   · the scroll container was a new node every time, so ticking a habit near
+//     the bottom of Today threw the athlete back up to the level hero;
+//   · every `transition: width` was dead code, because the bar it animated was
+//     a brand new element born at its final width — bars snapped, always;
+//   · the screen's entrance fade replayed on every tap, and again 2.2s later
+//     when the toast cleared, which reads as a flicker rather than a reaction.
+// So we build the same HTML string and MORPH it into the live DOM instead.
+// Surviving nodes keep their identity, their scroll offset and their animations.
+//
+// Two attributes steer it:
+//   data-k       identity. Different key in the same slot means replace outright
+//                rather than patch — which is how a screen change still gets its
+//                fade while a check-off no longer does.
+//   data-static  "this subtree is mine, not the template's". The FX layer, where
+//                XP chips are mid-flight, and any figure the counter engine owns.
+function morphAttrs(a, b) {
+  const src = b.attributes;
+  for (let i = 0; i < src.length; i++) {
+    const at = src[i];
+    // A live field's value belongs to whoever is typing in it, not to a template.
+    if (at.name === 'value' && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) continue;
+    if (a.getAttribute(at.name) !== at.value) a.setAttribute(at.name, at.value);
+  }
+  for (let i = a.attributes.length - 1; i >= 0; i--) {
+    const n = a.attributes[i].name;
+    if (!b.hasAttribute(n)) a.removeAttribute(n);
+  }
+}
+function sameSlot(a, b) {
+  if (a.nodeType !== b.nodeType) return false;
+  if (a.nodeType !== 1) return true;
+  if (a.tagName !== b.tagName) return false;
+  return (a.getAttribute('data-k') || '') === (b.getAttribute('data-k') || '');
+}
+function morphNode(a, b) {
+  if (a.nodeType !== 1) { if (a.nodeValue !== b.nodeValue) a.nodeValue = b.nodeValue; return; }
+  morphAttrs(a, b);
+  if (a.hasAttribute('data-static')) return;
+  morphChildren(a, b);
+}
+function morphChildren(a, b) {
+  let x = a.firstChild, y = b.firstChild;
+  while (y) {
+    const yNext = y.nextSibling;              // captured first: moving y detaches it
+    if (!x) { a.appendChild(y); y = yNext; continue; }
+    const xNext = x.nextSibling;
+    if (sameSlot(x, y)) morphNode(x, y);
+    else a.replaceChild(y, x);
+    x = xNext; y = yNext;
+  }
+  while (x) { const n = x.nextSibling; a.removeChild(x); x = n; }
+}
+
+// Handlers are re-registered every render under fresh ids, and morph copies the
+// new id onto the surviving node — so a single delegated listener stays correct
+// for the life of the page. Binding per node per render, as before, would attach
+// a second listener to every element that survived.
+let _delegated = false;
+function installDelegates(app) {
+  if (_delegated) return;
+  _delegated = true;
+  app.addEventListener('click', ev => {
+    const el = ev.target && ev.target.closest ? ev.target.closest('[data-h]') : null;
+    if (!el) return;
+    const fn = _handlers[el.getAttribute('data-h')];
+    if (!fn) return;
+    ev.stopPropagation();
+    // Measured now, before the handler renders: a flying XP chip needs to know
+    // where the tap happened, and layout may move underneath it.
+    UI._tapRect = el.getBoundingClientRect();
+    fn(ev);
+  });
+  app.addEventListener('input', ev => {
+    const t = ev.target;
+    if (!t || !t.id) return;
+    if (t.id === 'newhabit') UI._newName = t.value;
+    else if (t.id === 'boardname') LB.nameDraft = t.value;
+  });
+}
+
+let _mounted = false;
 function render() {
   _handlers = {};
   const app = document.getElementById('app');
   app.className = 'app on';
-  app.innerHTML = CFG.onboarded ? renderApp() : renderOnboarding();
-  app.querySelectorAll('[data-h]').forEach(el => {
-    const fn = _handlers[el.getAttribute('data-h')];
-    if (fn) el.addEventListener('click', ev => { ev.stopPropagation(); fn(ev); });
-  });
-  const nh = app.querySelector('#newhabit');
-  if (nh) nh.addEventListener('input', e => { UI._newName = e.target.value; });
-  const bn = app.querySelector('#boardname');
-  if (bn) bn.addEventListener('input', e => { LB.nameDraft = e.target.value; });
+  const html = CFG.onboarded ? renderApp() : renderOnboarding();
+  if (!_mounted) {
+    app.innerHTML = html;
+    _mounted = true;
+    installDelegates(app);
+  } else {
+    const next = document.createElement('div');
+    next.innerHTML = html;
+    morphChildren(app, next);
+  }
+  syncNumbers(app);
+  fillBars(app);
   document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
+}
+
+// ── Numbers that count ────────────────────────────────────────────────────
+// Any element marked `data-num` is owned by this engine rather than by the
+// template: the template only says where the figure should END UP (`data-to`),
+// and the engine walks it there. XP you watch climb is worth more than XP that
+// was simply already correct when the screen repainted.
+const _numShown = {}, _numAnim = {};
+function fmtNum(v, dec) { return dec ? Number(v).toFixed(dec) : Math.round(v).toLocaleString(); }
+function syncNumbers(root) {
+  root.querySelectorAll('[data-num]').forEach(el => {
+    const key = el.getAttribute('data-num');
+    const to = Number(el.getAttribute('data-to') || 0);
+    const dec = Number(el.getAttribute('data-dec') || 0);
+    const from = typeof _numShown[key] === 'number' ? _numShown[key] : to;
+    if (from === to || reduced()) {
+      cancelAnimationFrame(_numAnim[key] || 0);
+      _numAnim[key] = 0; _numShown[key] = to;
+      el.textContent = fmtNum(to, dec);
+      return;
+    }
+    countTo(el, key, from, to, dec);
+  });
+}
+function countTo(el, key, from, to, dec) {
+  cancelAnimationFrame(_numAnim[key] || 0);
+  const dur = Math.min(950, 280 + Math.abs(to - from) * 1.4);
+  const t0 = performance.now();
+  const step = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    const e = 1 - Math.pow(1 - p, 3);
+    const v = from + (to - from) * e;
+    _numShown[key] = v;
+    el.textContent = fmtNum(v, dec);
+    if (p < 1) { _numAnim[key] = requestAnimationFrame(step); return; }
+    _numAnim[key] = 0; _numShown[key] = to;
+    el.textContent = fmtNum(to, dec);
+  };
+  _numAnim[key] = requestAnimationFrame(step);
+}
+
+// A bar that survives a render animates itself, because its width transition is
+// finally attached to a node that still exists. A bar seeing its first paint has
+// nothing to travel from, so we give it one.
+const _seenBars = new WeakSet();
+function fillBars(root) {
+  root.querySelectorAll('[data-fill]').forEach(el => {
+    if (_seenBars.has(el)) return;
+    _seenBars.add(el);
+    if (reduced()) return;
+    const target = el.style.width;
+    el.style.width = '0%';
+    void el.offsetWidth;                       // commit the zero before asking for the target
+    requestAnimationFrame(() => { el.style.width = target; });
+  });
+}
+
+// ── Haptics ───────────────────────────────────────────────────────────────
+// A tick you can feel in your hand is most of what separates an app from a
+// web page. Silent no-op wherever the API is missing — notably every iPhone,
+// since Safari still exposes no vibration at all — so it can never be the thing
+// that breaks a check-off.
+const HAPTIC = { tick:[12], done:[10,40,24], level:[0,26,70,26,70,60], rank:[0,30,60,30,60,30,60,90], tab:[8] };
+function haptic(kind) {
+  try { if (navigator.vibrate) navigator.vibrate(HAPTIC[kind] || HAPTIC.tick); } catch (e) {}
+}
+
+// ── The XP flight ─────────────────────────────────────────────────────────
+// The most important 700ms in the app: the points you just earned visibly leave
+// the habit that earned them and land on the level that owns them, which then
+// takes the hit. Without this the hero is a label; with it, it is a destination.
+function flyXp(amount, rect) {
+  if (reduced() || !amount || amount <= 0 || !rect) return;
+  const app = document.getElementById('app');
+  const fx = document.getElementById('fx');
+  const hero = app && app.querySelector('[data-hero]');
+  if (!app || !fx || !hero) return;
+  const box = app.getBoundingClientRect(), dest = hero.getBoundingClientRect();
+  const x0 = rect.left - box.left + rect.width / 2, y0 = rect.top - box.top + rect.height / 2;
+  const x1 = dest.left - box.left + dest.width / 2;
+  // The hero is often scrolled out of sight when a habit low on the list is
+  // ticked. Aiming at its real position would send the chip up over the sticky
+  // header, so the landing point is clamped to the top of the scroll viewport —
+  // it still reads as "these went up to your level", without crossing the chrome.
+  const sc = document.getElementById('scroll');
+  const lid = sc ? sc.getBoundingClientRect().top - box.top + 12 : 0;
+  const y1 = Math.max(lid, dest.top - box.top + dest.height / 2);
+  const chip = document.createElement('div');
+  chip.className = 'xpfly';
+  chip.style.left = x0 + 'px';
+  chip.style.top = y0 + 'px';
+  chip.style.setProperty('--dx', Math.round(x1 - x0) + 'px');
+  const inner = document.createElement('i');
+  inner.textContent = '+' + amount + ' XP';
+  inner.style.setProperty('--dy', Math.round(y1 - y0) + 'px');
+  chip.appendChild(inner);
+  fx.appendChild(chip);
+  // The pulse runs through the animation API rather than a class, so the next
+  // render cannot strip it mid-flight.
+  inner.addEventListener('animationend', () => {
+    chip.remove();
+    const target = document.querySelector('[data-hero]');
+    if (target && target.animate) {
+      target.animate(
+        [{ transform: 'scale(1)' }, { transform: 'scale(1.13)' }, { transform: 'scale(1)' }],
+        { duration: 420, easing: 'cubic-bezier(.2,.8,.25,1)' }
+      );
+    }
+  }, { once: true });
 }
 
 // ── Onboarding — one screen: the suggested habit set, all editable ─────────
 function renderOnboarding() {
   const nOn = live().length;
   return `
-    <div style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
+    <div data-k="onboarding" style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
       <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
         <div class="hd" style="font-size:16px;line-height:1;letter-spacing:.02em">Proof</div>
         <div class="eyebrow">${nOn} tracked</div>
@@ -1167,23 +1518,27 @@ function renderApp() {
   const activeTab = UI.screen === 'detail' ? 'progress'
                   : UI.screen === 'manual' ? 'settings' : UI.screen;
 
+  // Every child of the shell carries a data-k, so when an overlay opens or
+  // closes the renderer swaps whole nodes instead of quietly patching a toast
+  // into a celebration and stealing its entrance.
   return `
-    ${window.IS_DEMO ? '<div class="demo-banner">Demo mode — nothing is saved to the cloud</div>' : ''}
-    <div class="apphd">
+    ${window.IS_DEMO ? '<div class="demo-banner" data-k="banner">Demo mode — nothing is saved to the cloud</div>' : ''}
+    <div class="apphd" data-k="apphd">
       <div style="min-width:0">
         <div class="eyebrow">${esc(head[0])}</div>
         <div class="title hd">${esc(head[1])}</div>
       </div>
       <div class="right mono">${esc(rights[UI.screen] || '')}</div>
     </div>
-    <div class="scroll" id="scroll">${screenHtml}</div>
-    <div class="tabs">
-      ${tabDefs.map(t => `<button class="${activeTab === t[1] ? 'on' : ''}" ${on(() => go(t[1]))}>
+    <div class="scroll" id="scroll" data-k="scroll">${screenHtml}</div>
+    <div class="tabs" data-k="tabs">
+      ${tabDefs.map(t => `<button class="${activeTab === t[1] ? 'on' : ''}" data-k="tab:${t[1]}" ${on(() => go(t[1]))}>
         <span class="num">${t[2]}</span><span class="nm">${t[0]}</span>
       </button>`).join('')}
     </div>
+    <div id="fx" data-k="fx" data-static></div>
     ${UI.sheet ? renderSheet() : ''}
-    ${UI.toast && !UI.celebrate.length ? `<div class="toast">${esc(UI.toast)}</div>` : ''}
+    ${UI.toast && !UI.celebrate.length ? `<div class="toast" data-k="toast">${esc(UI.toast)}</div>` : ''}
     ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
 }
 function greeting() {
@@ -1192,21 +1547,25 @@ function greeting() {
 }
 
 // ── Level-up takeover ─────────────────────────────────────────────────────
+const SHARDS = [[0,-118],[84,-84],[118,0],[84,84],[0,118],[-84,84],[-118,0],[-84,-84],[52,-132],[-52,132],[132,52],[-132,-52]];
+function shardHtml() {
+  return SHARDS.map((s, i) => `<i style="--dx:${s[0]}px;--dy:${s[1]}px;animation-delay:${(0.22 + i * 0.025).toFixed(3)}s"></i>`).join('');
+}
 function renderCelebration(ev) {
+  if (ev.kind) return renderBadgeCelebration(ev);
   const isHabit = !ev.overall;
   const h = isHabit ? habitById(ev.id) : null;
   const info = isHabit ? habitLevel(h) : overallLevel();
   const r = rankFor(ev.to), promoted = ev.rankChanged;
   const prestiged = promoted && r.star > 0 && r.name === RANKS[0] && r.sub === 1;
-  const shards = [[0,-118],[84,-84],[118,0],[84,84],[0,118],[-84,84],[-118,0],[-84,-84],[52,-132],[-52,132],[132,52],[-132,-52]];
+  // Keyed per event, so advancing the queue swaps the whole takeover and the
+  // next one bursts properly instead of inheriting a spent animation.
   return `
-    <div class="lvwrap ${promoted ? 'rank' : ''}" ${on(dismissCelebration)}>
+    <div class="lvwrap ${promoted ? 'rank' : ''}" data-k="cel:lv:${esc(ev.id)}:${ev.to}" ${on(dismissCelebration)}>
       <div class="lvstage">
         <div class="lvrays"></div>
         <div class="lvshock"></div>
-        <div class="lvshards">
-          ${shards.map((s, i) => `<i style="--dx:${s[0]}px;--dy:${s[1]}px;animation-delay:${(0.22 + i * 0.025).toFixed(3)}s"></i>`).join('')}
-        </div>
+        <div class="lvshards">${shardHtml()}</div>
         <div class="lvbadge"><span class="n">${ev.to}</span><span class="l">LEVEL</span></div>
       </div>
       <div class="lvkicker">${prestiged ? 'Prestige' : (promoted ? 'Rank up' : 'Level up')}</div>
@@ -1214,6 +1573,50 @@ function renderCelebration(ev) {
       ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
                 : `<div class="lvsub">Overall level ${ev.to} · ${info.into} / ${info.need} XP</div>`}
       <div class="lvbar"><span style="--w:${info.pct}%"></span></div>
+      <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
+      ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
+    </div>`;
+}
+// "steps, sleep and water" — and past four, it stops listing and starts counting,
+// because a takeover is not the place to read eight habit names.
+function nameList(hs) {
+  const n = hs.map(h => h.name.toLowerCase());
+  if (n.length === 1) return n[0];
+  if (n.length > 4) return n.slice(0, 3).join(', ') + ' and ' + (n.length - 3) + ' more';
+  return n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
+}
+// Tiers, milestones and perfect days borrow the same machinery but land on the
+// green ground, so the KIND of win is readable before a word of it is.
+function renderBadgeCelebration(ev) {
+  let badge, badgeLabel, kicker, title, sub, codeClass = '';
+  if (ev.kind === 'tier') {
+    badge = String(ev.tier.days); badgeLabel = 'DAYS';
+    kicker = 'Consistency';
+    title = ev.tier.name;
+    sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. Your longest run yet, and it is yours for good.';
+  } else if (ev.kind === 'milestone') {
+    badge = ev.ach.code; badgeLabel = 'MILESTONE'; codeClass = ' code';
+    kicker = 'Unlocked';
+    title = ev.ach.name;
+    sub = ev.ach.note + '.';
+  } else {
+    const n = live().length;
+    badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
+    kicker = 'Clean sweep';
+    title = 'Perfect day';
+    sub = 'Every habit you track, done. ' + dayXp(ev.id).toLocaleString() + ' XP today.';
+  }
+  return `
+    <div class="lvwrap badge" data-k="cel:${esc(ev.kind)}:${esc(String(ev.id))}" ${on(dismissCelebration)}>
+      <div class="lvstage">
+        <div class="lvrays"></div>
+        <div class="lvshock"></div>
+        <div class="lvshards">${shardHtml()}</div>
+        <div class="lvbadge"><span class="n${codeClass}">${esc(badge)}</span><span class="l">${esc(badgeLabel)}</span></div>
+      </div>
+      <div class="lvkicker">${esc(kicker)}</div>
+      <div class="lvrank">${esc(title)}</div>
+      <div class="lvsub">${esc(sub)}</div>
       <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
@@ -1230,22 +1633,22 @@ function habitRow(h, from) {
         ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
         : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)));
   const pc = Math.min(100, Math.round(v / h.target * 100));
-  return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''}">
+  return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''}" data-k="row:${h.id}">
     <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(h.name) + ' is earned in your programme' : 'Toggle ' + esc(h.name)}">
       ${locked
         ? `<span class="boxmark lock" aria-hidden="true">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
            </span>`
-        : `<span class="boxmark ${done ? 'on' : ''}">${done ? '✓' : ''}</span>`}
+        : `<span class="boxmark ${done ? 'on' : ''}">${done ? TICK : ''}</span>`}
     </button>
     <button class="body" ${on(() => openHabit(h.id, from))}>
       <span class="line1">
         <span class="nm">${esc(h.name)}</span>
-        ${flashed ? `<span class="lvchip">LV ${flashed} ↑</span>`
-                  : `<span class="hlv">LV ${hl.lv}${st > 0 ? ' · ' + st + 'D' : ''}</span>`}
+        ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
+                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}${st > 0 ? ' · ' + st + 'D' : ''}</span>`}
       </span>
       <span class="status">${esc(status)}</span>
-      <span class="track"><span style="width:${pc}%"></span></span>
+      <span class="track"><span data-fill style="width:${pc}%"></span></span>
     </button>
     ${h.kind === 'count' && !h.locked ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
     ${locked ? `<button class="pluscell" ${on(goProgram)} aria-label="Open your programme">→</button>` : ''}
@@ -1265,23 +1668,23 @@ function renderToday(LI, doneCount, pct) {
   const strongest = ranked[0], weakest = ranked[ranked.length - 1];
 
   return `
-    <div style="animation:fadeIn .25s ease">
+    <div data-k="screen:today" style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" style="font-size:64px;line-height:.85">${LI.lv}</div>
+          <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:64px;line-height:.85">${LI.lv}</div>
           <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
             <div class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${LI.xp.toLocaleString()} XP · ${esc(LI.nextLabel)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${esc(LI.nextLabel)}</div>
           </div>
         </div>
-        <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
+        <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
         <div style="display:flex;flex-direction:column;gap:6px">
           <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Today</span><span>${doneCount} of ${hs.length} habits</span></div>
-          <div class="bar"><span style="width:${pct}%"></span></div>
+          <div class="bar"><span data-fill style="width:${pct}%"></span></div>
         </div>
       </div>
 
-      <div class="coachcard">
+      <div class="coachcard" data-k="nudge">
         <div class="eyebrow">One nudge, as agreed</div>
         <div class="say">${esc(n.line)}</div>
         <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
@@ -1292,9 +1695,9 @@ function renderToday(LI, doneCount, pct) {
       <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
         <div class="eyebrow" style="letter-spacing:.12em">The last seven days</div>
         <div style="display:flex;gap:22px">
-          <div><div class="figure" style="font-size:34px;line-height:.95">${goodDays}<span style="font-size:16px;color:var(--muted)">/7</span></div>
+          <div><div class="figure" style="font-size:34px;line-height:.95"><span data-static data-num="goodDays" data-to="${goodDays}">${goodDays}</span><span style="font-size:16px;color:var(--muted)">/7</span></div>
             <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">Days on target</div></div>
-          <div><div class="figure" style="font-size:34px;line-height:.95">${weekXp.toLocaleString()}</div>
+          <div><div class="figure" data-static data-num="weekXp" data-to="${weekXp}" style="font-size:34px;line-height:.95">${weekXp.toLocaleString()}</div>
             <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">XP earned</div></div>
         </div>
         ${ranked.length > 1 ? `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
@@ -1334,24 +1737,24 @@ function renderProgress(LI, earned, totalAch) {
     return h.kind === 'count' ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + ' today' : 'Not done today';
   };
   return `
-    <div style="animation:fadeIn .25s ease">
+    <div data-k="screen:progress" style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" style="font-size:76px;line-height:.8">${LI.lv}</div>
+          <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:76px;line-height:.8">${LI.lv}</div>
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
             <div class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${LI.xp.toLocaleString()} XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
           </div>
         </div>
-        <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
+        <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--divider)">
         <div style="padding:14px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px">
-          <div class="figure" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
+          <div class="figure" data-static data-num="streak" data-to="${currentDayStreak()}" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
           <div class="eyebrow" style="letter-spacing:.12em">Day streak · best ${bestDayStreak()}</div>
         </div>
         <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
-          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${totalAch}</div>
+          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span> / ${totalAch}</div>
           <div class="eyebrow" style="letter-spacing:.12em">Unlocked</div>
         </div>
       </div>
@@ -1359,7 +1762,7 @@ function renderProgress(LI, earned, totalAch) {
       ${sectionLabel('Your habits', 'Tap for history')}
       ${hs.length ? hs.map(h => {
         const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
-        return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
+        return `<button class="row-rule" data-k="prow:${h.id}" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
           ${on(() => openHabit(h.id, 'progress'))}>
           <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
@@ -1368,7 +1771,7 @@ function renderProgress(LI, earned, totalAch) {
               <span class="hlv">${st > 0 ? st + 'D' : '—'}</span>
             </div>
             <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP · ${esc(statusOf(h))}</div>
-            <div class="bar" style="height:4px;width:100%"><span style="width:${hl.pct}%"></span></div>
+            <div class="bar" style="height:4px;width:100%"><span data-fill style="width:${hl.pct}%"></span></div>
           </div>
           <div class="pips" style="flex:none">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
         </button>`;
@@ -1430,16 +1833,16 @@ function renderDetail(h) {
   const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h);
   const v = valOf(TKEY(), h.id);
   return `
-    <div style="animation:fadeIn .25s ease">
+    <div data-k="screen:detail:${h.id}" style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" style="font-size:76px;line-height:.8">${hl.lv}</div>
+          <div class="figure" data-hero data-static data-num="hlv:${h.id}" data-to="${hl.lv}" style="font-size:76px;line-height:.8">${hl.lv}</div>
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
             <div class="hd" style="font-size:16px;line-height:1">${esc(hl.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${hl.xp.toLocaleString()} XP banked · ${hl.toNext} to LV ${hl.lv + 1}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="hxp:${h.id}" data-to="${hl.xp}">${hl.xp.toLocaleString()}</span> XP banked · ${hl.toNext} to LV ${hl.lv + 1}</div>
           </div>
         </div>
-        <div class="bar thin"><span style="width:${hl.pct}%"></span></div>
+        <div class="bar thin"><span data-fill style="width:${hl.pct}%"></span></div>
         <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</p>
       </div>
 
@@ -1539,7 +1942,7 @@ function renderBoard() {
   }
 
   return `
-    <div style="animation:fadeIn .25s ease">
+    <div data-k="screen:board" style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
           <div class="hd" style="font-size:20px;line-height:1">${esc(seasonName())}</div>
@@ -1616,9 +2019,10 @@ function renderManual() {
   const block = (inner) => `<div class="block" style="display:flex;flex-direction:column">${inner}</div>`;
 
   return `
-    <div style="animation:fadeIn .25s ease">
+    <div data-k="screen:manual" style="animation:fadeIn .25s ease">
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
+        p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`))}
 
       ${block(h2('What each habit is worth') +
@@ -1688,7 +2092,7 @@ function renderSettings() {
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   const sectionLabel = (t) => `<div class="eyebrow" style="padding:18px 20px 6px;letter-spacing:.12em">${t}</div>`;
   return `
-    <div style="animation:fadeIn .25s ease">
+    <div data-k="screen:settings" style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;gap:14px;align-items:center;padding:18px 20px">
         <div class="hd" style="width:52px;height:52px;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:21px">${esc(initials)}</div>
         <div style="display:flex;flex-direction:column;gap:4px">
@@ -1786,8 +2190,8 @@ function renderSheet() {
   const h = habitById(UI.sheet);
   const stepBy = h.step || 1;
   return `
-    <div class="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
-    <div class="sheet">
+    <div class="scrim" data-k="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
+    <div class="sheet" data-k="sheet:${h.id}">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <div class="hd" style="font-size:21px;line-height:1">Log ${esc(h.name)}</div>
         <button class="hd" style="font-size:13px;color:var(--clay-deep)" ${on(() => { UI.sheet = null; render(); })}>Close</button>
@@ -1802,12 +2206,15 @@ function renderSheet() {
         <button class="plus" ${on(() => { UI.sheetVal = UI.sheetVal + stepBy; render(); })}>+</button>
       </div>
       <button class="btn btn-primary btn-block" ${on(() => {
-        const before = habitXp(h);
-        setVal(h.id, UI.sheetVal);
+        const before = habitXp(h), rect = UI._tapRect, logged = UI.sheetVal;
+        setVal(h.id, logged);
         UI.sheet = null;
         checkLevelUps();
         render();
-        toast(h.name + ' updated · +' + Math.max(0, habitXp(h) - before) + ' XP.');
+        const gained = Math.max(0, habitXp(h) - before);
+        haptic(logged >= h.target ? 'done' : 'tick');
+        toast(h.name + ' updated · +' + gained + ' XP.');
+        flyXp(gained, rect);
       })}>Save it</button>
     </div>`;
 }
