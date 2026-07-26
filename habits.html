@@ -169,9 +169,11 @@
     animation: pop .28s ease;
   }
   /* The tick DRAWS rather than appearing — 300ms of stroke is the difference
-     between "the state changed" and "you just did that". */
-  .boxmark svg { width: 20px; height: 20px; display: block; }
-  .boxmark svg path {
+     between "the state changed" and "you just did that". Scoped to .tick on
+     purpose: the same cell also holds the lock glyph on a locked habit, and
+     these rules would otherwise dash and redraw its shackle. */
+  .boxmark svg.tick { width: 20px; height: 20px; display: block; }
+  .boxmark svg.tick path {
     fill: none; stroke: currentColor; stroke-width: 3.4;
     stroke-linecap: square; stroke-linejoin: miter;
     stroke-dasharray: 24; stroke-dashoffset: 24;
@@ -193,6 +195,15 @@
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; color: var(--accent);
   }
   .hrow .pluscell:hover { background: var(--accent-100); }
+  /* A locked habit is owned by another system — it reads as unavailable rather
+     than merely unticked, so nobody taps it expecting a tick. */
+  .hrow.locked .checkcell { cursor: default; }
+  .boxmark.lock {
+    border-style: dashed; border-color: var(--muted-soft); color: var(--muted-soft);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .boxmark.lock svg { width: 15px; height: 15px; }
+  .hrow.locked .nm, .hrow.locked .status { color: var(--muted); }
 
   /* ── Coach card ── */
   .coachcard {
@@ -507,8 +518,10 @@ const XP_RULES = {
 
 const HABITS = [
   // The id stays 'strength' so nobody's history or XP is orphaned by the
-  // rename. It is fed by program.html: finishing a session there ticks it here.
-  { id:'strength', name:'WORKOUT',  code:'WO', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'From your programme' },
+  // rename. LOCKED: it cannot be ticked by hand — finishing a session in
+  // program.html is the only thing that earns it. See lockedHint below.
+  { id:'strength', name:'WORKOUT',  code:'WO', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'From your programme', locked:true,
+    lockedHint:'Complete any day of your Workout in your Program to gain XP for this.' },
   { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
   { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
   { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                 source:'Manual' },
@@ -664,24 +677,19 @@ async function fetchWorkoutDays() {
     return data.map(d => String(d).slice(0, 10));
   } catch (e) { return []; }   // offline, or the migration is not applied yet
 }
-// Import each date once: after that the athlete is in charge, so unticking a
-// day makes it stay unticked rather than reappearing on the next load.
+// The habit is locked, so the server is simply the truth: every date it reports
+// is ticked. Idempotent — no bookkeeping needed, because the athlete cannot
+// untick it and disagree.
 function importWorkoutDays(src) {
   if (!Array.isArray(src) || !src.length) return false;
-  const seen = Array.isArray(CFG.wkImported) ? CFG.wkImported : [];
   const h = habitById('strength');
-  let changed = false, added = false;
+  let changed = false;
   src.forEach(d => {
-    if (typeof d !== 'string' || seen.indexOf(d) !== -1) return;
-    seen.push(d);
-    added = true;
+    if (typeof d !== 'string') return;
     if (!LOG[d]) LOG[d] = {};
     if ((Number(LOG[d].strength) || 0) < h.target) { LOG[d].strength = h.target; changed = true; }
   });
-  if (!added) return false;
-  CFG.wkImported = seen.slice(-400);
   if (changed) saveLog();
-  saveCfg();
   return changed;
 }
 
@@ -1102,6 +1110,10 @@ function setVal(id, v) {
   saveLog();
 }
 function toggleHabit(h) {
+  // A locked habit is owned by another system — the athlete cannot claim it by
+  // hand, so explain what does earn it instead of silently doing nothing. No
+  // haptic and no XP flight either: nothing was earned to celebrate.
+  if (h.locked) { toast(h.lockedHint || 'This one is earned elsewhere.'); return; }
   const done = isDone(h), before = habitXp(h), rect = UI._tapRect;
   setVal(h.id, done ? 0 : h.target);
   checkLevelUps();
@@ -1215,7 +1227,7 @@ function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _ha
 
 // A stroked tick rather than a ✓ glyph, so it can be drawn on. Hard corners and
 // a square cap keep it inside the modernist system — no rounded checkmark.
-const TICK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg>';
+const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg>';
 
 function reduced() {
   return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -1480,7 +1492,7 @@ function renderApp() {
     today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
     progress: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Progress'],
     detail:   [openH.source, openH.name],
-    board:    [LB.scope === 'week' ? 'This week · resets Monday' : seasonName(), 'Leaderboard'],
+    board:    [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
     manual:   ['Everything, explained', 'How this works'],
     settings: ['Profile & tracking', 'Settings']
   };
@@ -1614,13 +1626,20 @@ function renderBadgeCelebration(ev) {
 function habitRow(h, from) {
   const v = valOf(TKEY(), h.id), done = isDone(h), st = habitStreak(h);
   const hl = habitLevel(h), flashed = UI.flash[h.id];
-  const status = h.kind === 'count'
-    ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
-    : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source));
+  const locked = !!h.locked && !done;
+  const status = locked
+    ? (h.lockedHint || 'Earned elsewhere.')
+    : (h.kind === 'count'
+        ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
+        : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)));
   const pc = Math.min(100, Math.round(v / h.target * 100));
-  return `<div class="hrow ${done ? 'done' : ''}" data-k="row:${h.id}">
-    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="Toggle ${esc(h.name)}">
-      <span class="boxmark ${done ? 'on' : ''}">${done ? TICK : ''}</span>
+  return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''}" data-k="row:${h.id}">
+    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(h.name) + ' is earned in your programme' : 'Toggle ' + esc(h.name)}">
+      ${locked
+        ? `<span class="boxmark lock" aria-hidden="true">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+           </span>`
+        : `<span class="boxmark ${done ? 'on' : ''}">${done ? TICK : ''}</span>`}
     </button>
     <button class="body" ${on(() => openHabit(h.id, from))}>
       <span class="line1">
@@ -1631,7 +1650,8 @@ function habitRow(h, from) {
       <span class="status">${esc(status)}</span>
       <span class="track"><span data-fill style="width:${pc}%"></span></span>
     </button>
-    ${h.kind === 'count' ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
+    ${h.kind === 'count' && !h.locked ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
+    ${locked ? `<button class="pluscell" ${on(goProgram)} aria-label="Open your programme">→</button>` : ''}
   </div>`;
 }
 
@@ -1806,7 +1826,7 @@ function renderDetail(h) {
     });
   }
   const stats = [
-    { v: habitWeek(h) + '/7',       k: 'This week' },
+    { v: habitWeek(h) + '/7',       k: 'Past 7 days' },
     { v: habitBest(h) + 'd',        k: 'Best streak' },
     { v: habitRate35(h) + '%',      k: '35-day rate' }
   ];
@@ -1830,11 +1850,16 @@ function renderDetail(h) {
         <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
           <span>Today</span><span>${done ? 'DONE' : fmtVal(h, v) + ' / ' + fmtVal(h, h.target) + ' ' + h.unit.toUpperCase()}</span>
         </div>
-        <div style="display:flex;gap:10px">
+        ${h.locked
+          ? `<div style="display:flex;flex-direction:column;gap:10px">
+               <div style="font-size:13px;line-height:1.5;color:var(--muted)">${esc(h.lockedHint || '')}</div>
+               <button class="btn btn-primary btn-block" ${on(goProgram)}>Open your programme</button>
+             </div>`
+          : `<div style="display:flex;gap:10px">
           <button class="btn ${done ? 'btn-secondary' : 'btn-primary'}" style="flex:1"
             ${on(() => (h.kind === 'count' ? openSheet(h) : toggleHabit(h)))}>${h.kind === 'count' ? 'Log a number' : (done ? 'Undo today' : 'Mark done')}</button>
           ${h.kind === 'count' && !done ? `<button class="btn btn-secondary" ${on(() => bump(h))}>+${h.step || 1}</button>` : ''}
-        </div>
+        </div>`}
         <div style="font-size:11px;color:var(--muted-soft)">Worth ${baseXp(h)} XP a day · ${Math.round(baseXp(h) * XP_RULES.completionBonus)} XP when you finish it</div>
       </div>
 
@@ -1923,10 +1948,10 @@ function renderBoard() {
           <div class="hd" style="font-size:20px;line-height:1">${esc(seasonName())}</div>
           <div class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--clay-deep)">DAY ${dayOfSeason}</div>
         </div>
-        <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'This week')}</div>
+        <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
         <div style="font-size:12px;line-height:1.5;color:var(--muted)">
           ${LB.scope === 'week'
-            ? 'Everyone starts level again on Monday, so one good week beats a long history.'
+            ? 'A rolling seven days — today and the six before it. Nothing to wait for on a Monday; a strong week always shows.'
             : 'Every point earned since ' + esc(started) + ', when ' + esc(seasonName().toLowerCase()) + ' opened. Nothing from before it counts.'}
           Scored on the server from what you have actually logged.
         </div>
@@ -2017,7 +2042,7 @@ function renderManual() {
 
       ${block(h2('How to earn more') +
         `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted)">
-          <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list, and it ticks itself when you finish a session in your programme.</div>
+          <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here — finish a session in your programme and it ticks itself, whether you got through all of it or not.</div>
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points, and they only come from unbroken runs.</div>
@@ -2049,7 +2074,7 @@ function renderManual() {
       ${block(h2('The leaderboard') +
         p(`It is <strong style="color:var(--ink)">off until you join</strong>. Nobody sees you before that.`) +
         p(`When you join you pick your own name — it does not have to be your real one. Other athletes see <strong style="color:var(--ink)">that name and your points</strong>. They never see your habits, your logs, your programme or anything else. You can rename yourself or leave whenever you like.`) +
-        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">This week</strong> resets every Monday, so one good week beats a long history and anyone can win it.`) +
+        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.`) +
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
       ${block(h2('Your data') +
