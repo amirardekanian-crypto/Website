@@ -179,11 +179,14 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   nine takeovers, and same-day tier clears across several habits coalesce into one.
   Full rules in [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
 
-> ⚠️ **The `xp` on consistency tiers and milestones is displayed but never awarded** —
-> `overallXp()` sums `habitXp` and nothing else, so the "+750 XP" on UNBREAKABLE buys
-> nothing today. The takeovers deliberately quote days and names, never an XP figure.
-> Making the badges pay means moving `XP_RULES` **and** Supabase's `xp_rules`/`hab_xp`
-> together, so it is its own change — see `XP_SYSTEM.md` §5 and §8.
+- **The badges pay** (since stage 12). Clearing a consistency tier or unlocking a
+  milestone is worth real XP, on the **overall** ladder only — never on a habit's own,
+  which has to stay a pure count of how often it was done. Two rules make it safe:
+  each bonus is paid **on the day it was crossed**, so windows filter it like any other
+  amount and nothing has to be stored; and **runs are measured from the season start**,
+  so every season everyone can earn them again. Tier values are a multiplier on *that
+  habit's* daily value, so a workout streak outpays a supplements streak. Detail in
+  [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.5.
 
 ---
 
@@ -258,7 +261,7 @@ would have landed as an instant head start. Full detail in
 - **Reading the board is key-checked**, so client names never reach the open internet.
 
 SQL: `supabase/stage9_leaderboard.sql`. **Applied and live** (26 July 2026), along with
-`stage10_workout_days.sql` and `stage11_seasons.sql`.
+`stage10_workout_days.sql`, `stage11_seasons.sql` and `stage12_bonus_xp.sql`.
 
 > Because scoring happens on the server, the XP rules exist in **two places**:
 > `XP_RULES` in `habits.html` and the `xp_rules` row in Supabase. Change both together.
