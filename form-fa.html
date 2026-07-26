@@ -13,6 +13,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+
+<!-- Plausible (privacy-friendly, cookieless) -->
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <style>
   :root{
     --green:#0E4A36; --clay:#C7552F; --clay-2:#E06B43; --paper:#FAF7F2; --paper-2:#F1ECE3;
@@ -100,6 +103,18 @@
 
   /* conditional */
   .cond{display:none;}.cond.on{display:block;margin-top:14px;}
+
+  /* validation error state */
+  .f.has-error>label{color:var(--bad);}
+  .f.has-error input[type=text],.f.has-error input[type=email],.f.has-error input[type=number],
+  .f.has-error select,.f.has-error textarea{border-color:var(--bad);box-shadow:0 0 0 3px rgba(192,57,43,.10);}
+  .f.has-error .rcard label,.f.has-error .pill span{border-color:var(--bad);}
+  .ferr{display:flex;align-items:center;gap:6px;margin-top:9px;color:var(--bad);font-size:13px;font-weight:600;}
+
+  /* slider: untouched state (چیزی ارسال نمی‌شه تا وقتی جواب بده) */
+  .slider.is-unset input[type=range]::-webkit-slider-thumb{background:var(--muted);box-shadow:0 0 0 2px var(--muted);}
+  .slider.is-unset input[type=range]::-moz-range-thumb{background:var(--muted);box-shadow:0 0 0 2px var(--muted);}
+  .slider.is-unset .sval{color:var(--muted);}
 
   /* discount code feedback (own class names — avoid the .ok/.on overlay classes) */
   .dmsg{display:none;align-items:center;gap:7px;margin-top:10px;padding:11px 15px;border-radius:var(--r);font-size:14px;font-weight:600;line-height:1.5;}
@@ -366,12 +381,14 @@
           <option value="~30 min">حدودِ ۳۰ دقیقه</option><option value="~45 min">حدودِ ۴۵ دقیقه</option><option value="~60 min">حدودِ ۶۰ دقیقه</option><option value="75+ min">۷۵+ دقیقه</option></select></div>
     </div>
     <div class="f"><label for="sleepS">کیفیتِ خوابت معمولاً چطوره؟</label>
-      <div class="slider"><span class="sedge">ضعیف</span><input type="range" id="sleepS" name="Sleep Quality (1-10)" min="1" max="10" value="7"><span class="sedge">عالی</span><span class="sval" id="sleepV">۷</span></div></div>
+      <div class="slider is-unset" id="sleepWrap"><span class="sedge">ضعیف</span><input type="range" id="sleepS" min="1" max="10" value="7"><span class="sedge">عالی</span><span class="sval" id="sleepV">—</span></div>
+      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value="" data-count-progress required></div>
     <div class="f"><label for="sleepH">میانگینِ ساعتِ خواب در شب</label>
       <select id="sleepH" name="Sleep Hours"><option value="" disabled selected>انتخاب</option>
         <option value="Under 5 hours">زیرِ ۵ ساعت</option><option value="5-6 hours">۵–۶ ساعت</option><option value="7-8 hours">۷–۸ ساعت</option><option value="9+ hours">۹+ ساعت</option></select></div>
     <div class="f"><label for="stressS">سطحِ استرسِ فعلی</label>
-      <div class="slider"><span class="sedge">کم</span><input type="range" id="stressS" name="Stress Level (1-10)" min="1" max="10" value="5"><span class="sedge">زیاد</span><span class="sval" id="stressV">۵</span></div></div>
+      <div class="slider is-unset" id="stressWrap"><span class="sedge">کم</span><input type="range" id="stressS" min="1" max="10" value="5"><span class="sedge">زیاد</span><span class="sval" id="stressV">—</span></div>
+      <input type="hidden" id="stressValue" name="Stress Level (1-10)" value="" data-count-progress required></div>
     <div class="f"><label for="nutrition">تغذیه‌ی فعلیت رو چطور توصیف می‌کنی؟</label>
       <select id="nutrition" name="Nutrition" required><option value="" disabled selected>انتخاب</option>
         <option value="Dialed in — consistent & intentional">منظم — ثابت و هدفمند</option><option value="Pretty good — mostly on track">خوب — بیشترِ مواقع روی روال</option><option value="Average — inconsistent">متوسط — بی‌نظم</option><option value="Needs work — little structure">نیاز به کار داره — بدونِ ساختار</option></select></div>
@@ -456,11 +473,41 @@
     goals.querySelectorAll('input').forEach(function(cb){cb.disabled=n>=3&&!cb.checked;});
     upd();
   });
-  // sliders
-  [['sleepS','sleepV'],['stressS','stressV']].forEach(function(p){
-    var s=document.getElementById(p[0]),v=document.getElementById(p[1]);
-    s.addEventListener('input',function(){v.textContent=fa(s.value);});
+  // ── اسلایدرها ──
+  // رنج اسمی نداره؛ مقدارش فقط وقتی که کاربر واقعاً دست بهش زد توی فیلدِ
+  // مخفی کپی می‌شه — پس اسلایدرِ دست‌نخورده هیچی نمی‌فرسته (نه مقدارِ پیش‌فرض).
+  [['sleepS','sleepV','sleepWrap','sleepValue'],['stressS','stressV','stressWrap','stressValue']].forEach(function(p){
+    var s=document.getElementById(p[0]),v=document.getElementById(p[1]),
+        wrap=document.getElementById(p[2]),hid=document.getElementById(p[3]);
+    if(!s||!v||!wrap||!hid)return;
+    function commit(){hid.value=s.value;v.textContent=fa(s.value);wrap.classList.remove('is-unset');clearErr(hid);upd();}
+    // pointerdown/keydown تا انتخابِ همون عددی که روش هست هم حساب بشه
+    s.addEventListener('input',commit);
+    s.addEventListener('pointerdown',commit);
+    s.addEventListener('keydown',commit);
   });
+
+  // ── اعتبارسنجی ──
+  // فرم novalidate هست، پس هیچ فیلدِ اجباری‌ای اعمال نمی‌شه مگه اینجا چکش کنیم.
+  function answered(el){
+    if(el.type==='radio'||el.type==='checkbox')return !!form.querySelector('[name="'+CSS.escape(el.name)+'"]:checked');
+    if(el.type==='hidden')return (el.value||'').trim().length>0; // hidden از اعتبارسنجیِ مرورگر مستثناست
+    return el.checkValidity();
+  }
+  function fieldOf(el){return el.closest('.f')||el.closest('.fsec');}
+  function clearErr(el){var f=fieldOf(el);if(!f)return;f.classList.remove('has-error');
+    var m=f.querySelector('.ferr');if(m)m.remove();}
+  function showErr(el,txt){var f=fieldOf(el);if(!f)return;f.classList.add('has-error');
+    if(!f.querySelector('.ferr')){var m=document.createElement('p');m.className='ferr';
+      m.setAttribute('role','alert');m.textContent=txt;f.appendChild(m);}}
+  function firstMissing(){
+    var seen={},req=form.querySelectorAll('[required]');
+    for(var i=0;i<req.length;i++){var el=req[i];
+      if(!el.name||seen[el.name])continue;seen[el.name]=1;
+      var c=el.closest('.cond');if(c&&!c.classList.contains('on'))continue; // ازش پرسیده نشده
+      if(!answered(el))return el;}
+    return null;
+  }
   // ═══════════════════════════════════════════════════════════════════
   // DISCOUNT CODES — edit this list to add, change, or remove codes.
   //   'CODE': percent   (matched case-insensitively → 'MHRN10' also
@@ -500,7 +547,8 @@
     if(t==='radio'||t==='checkbox')return !!form.querySelector('[name="'+CSS.escape(el.name)+'"]:checked');
     if(el.tagName==='SELECT')return el.value&&el.value!=='';return (el.value||'').trim().length>0;}
   function collect(){var seen={},q=[];form.querySelectorAll('input,select,textarea').forEach(function(el){
-    if(el.type==='hidden'||el.name==='botcheck'||!el.name)return;
+    if(el.type==='hidden'&&!el.hasAttribute('data-count-progress'))return;
+    if(el.name==='botcheck'||!el.name)return;
     if(el.hasAttribute('data-skip-progress'))return;
     var c=el.closest('.cond');if(c&&!c.classList.contains('on'))return;
     if(seen[el.name])return;seen[el.name]=1;q.push(el);});return q;}
@@ -508,10 +556,25 @@
     pPct.textContent=fa(p)+'٪';pFill.style.width=p+'%';pCount.textContent=fa(fl)+' / '+fa(tot);}
   form.addEventListener('input',upd);form.addEventListener('change',upd);upd();
 
+  // به‌محضِ جواب‌دادن، خطای اون فیلد پاک می‌شه
+  function clearOnAnswer(e){if(e.target&&e.target.name)clearErr(e.target);}
+  form.addEventListener('input',clearOnAnswer);form.addEventListener('change',clearOnAnswer);
+
   // submit
   form.addEventListener('submit',async function(e){
     e.preventDefault();
     if(form.querySelector('[name="botcheck"]').checked)return;
+
+    var miss=firstMissing();
+    if(miss){
+      var badEmail=miss.type==='email'&&(miss.value||'').trim();
+      showErr(miss,badEmail?'ایمیلِ معتبر وارد کن.':'این سؤال رو جواب بده.');
+      var f=fieldOf(miss);
+      if(f)f.scrollIntoView({behavior:'smooth',block:'center'});
+      if(miss.offsetParent!==null){try{miss.focus({preventScroll:true});}catch(err){}}
+      return;
+    }
+
     var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
     try{
       var r=await fetch(this.action,{method:'POST',body:new FormData(this)});
