@@ -34,8 +34,8 @@
 --
 -- ⚠️ SUPERSEDED IN PART. `hab_bonus_xp` was replaced twice after this file:
 --    12b gave it a p_season_start argument (badge runs are measured from the
---    season start), and stage 13b added weekly-quest scoring. The CURRENT
---    definition lives in `stage13_weekly_quests.sql`. Everything else here —
+--    season start), and stages 13/14 added quest-run scoring. The CURRENT
+--    definition lives in `stage14_quest_runs.sql`. Everything else here —
 --    the rules seed, hab_cfg_of, and the rolling-week leaderboard_top — is
 --    still current.
 

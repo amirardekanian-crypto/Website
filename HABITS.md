@@ -63,9 +63,10 @@ The screen they actually live on.
   streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
   tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
   repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
-- **This week's quests** — three targets for the *week* rather than the day, worth real
-  XP, with live progress. They sit under the nudge because a quest only means anything
-  while there is week left to do it in. Amir sets them — see below.
+- **Quests, when a run is on** — targets for the *week* rather than the day, worth real
+  XP, with live progress and a countdown. **There are usually none**: quests only exist
+  while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
+  the point — seeing them means something is on.
 - **The habit list** — tap the box to tick, tap the name for that habit's history, tap
   `+` on counter habits. Each row shows that habit's own level and current streak.
 - **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
