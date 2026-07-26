@@ -657,86 +657,75 @@ const HABITS = [
   { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
 // ── Weekly quests ─────────────────────────────────────────────────────────
-// Three every week, Monday to Sunday, worth real XP. They give the week a shape
-// instead of it being seven identical days, and they are the one part of the
-// system Amir sets rather than the athlete earning it passively.
+// A RUN of quests, not a permanent feature. There are none unless the coach
+// starts a run, and a run lasts seven days from the day it starts — not
+// Monday-to-Sunday. That is the point: quests are a lever Amir pulls ("this week
+// we are going after your water"), so an athlete seeing them means something is
+// on. When a run ends the block simply disappears until the next one.
 //
 // A quest's `need` is measured ONLY from the log, so nothing new is stored and
 // both scorers can agree. Four kinds:
-//   daysHit:<habit>  — completed the habit on N separate days that week
-//   total:<habit>    — accumulated N units that week (steps, glasses, hours)
+//   daysHit:<habit>  — completed the habit on N separate days in the run
+//   total:<habit>    — accumulated N units in the run (steps, glasses, hours)
 //   qualify          — N days at streakQualifyPct or better
 //   perfect          — N days with every tracked habit done
 //
-// PRESCRIBING THEM: this pool is the offline fallback. The live one is the
-// `quests` array on the Supabase `xp_rules` row, and a specific week can be
-// pinned with `select public.set_quests('2026-07-27', array['w_water5', …]);`
-// See XP_SYSTEM.md §11.
+// STARTING A RUN: `select public.set_quests('2026-07-29', array['w_water5', …]);`
+// The pool below is the offline fallback; the live one is the `quests` array on
+// the Supabase `xp_rules` row, and the runs live in `questRuns`. See XP_SYSTEM.md §8.5.
 const QUEST_POOL = [
-  { id:'w_water5',   title:'THE WELL RUNS DEEP',  note:'Full water on 5 days',        kind:'daysHit:water',    need:5,     xp:150 },
-  { id:'w_water7',   title:'SEVEN FOR SEVEN',     note:'Full water every single day', kind:'daysHit:water',    need:7,     xp:220 },
-  { id:'w_steps50k', title:'FIFTY THOUSAND',      note:'50,000 steps across the week', kind:'total:steps',     need:50000, xp:200 },
-  { id:'w_steps70k', title:'THE LONG WAY ROUND',  note:'70,000 steps across the week', kind:'total:steps',     need:70000, xp:280 },
-  { id:'w_sleep5',   title:'LIGHTS OUT',          note:'Hit your sleep target 5 nights', kind:'daysHit:sleep', need:5,     xp:180 },
-  { id:'w_mob4',     title:'OILED HINGES',        note:'Mobility on 4 days',          kind:'daysHit:mobility', need:4,     xp:120 },
-  { id:'w_breathe4', title:'DEAD CALM',           note:'Breathe on 4 days',           kind:'daysHit:breathe',  need:4,     xp:100 },
-  { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',       kind:'daysHit:supps',    need:7,     xp:140 },
-  { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',    kind:'daysHit:fuel',     need:5,     xp:140 },
-  { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions in the week',  kind:'daysHit:strength', need:3,     xp:250 },
-  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 80% or better',     kind:'qualify',          need:5,     xp:220 },
-  { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',            kind:'perfect',          need:2,     xp:300 }
+  { id:'w_water5',   title:'THE WELL RUNS DEEP',  note:'Full water on 5 days',           kind:'daysHit:water',    need:5,     xp:150 },
+  { id:'w_water7',   title:'SEVEN FOR SEVEN',     note:'Full water every single day',    kind:'daysHit:water',    need:7,     xp:220 },
+  { id:'w_steps50k', title:'FIFTY THOUSAND',      note:'50,000 steps across the run',    kind:'total:steps',      need:50000, xp:200 },
+  { id:'w_steps70k', title:'THE LONG WAY ROUND',  note:'70,000 steps across the run',    kind:'total:steps',      need:70000, xp:280 },
+  { id:'w_sleep5',   title:'LIGHTS OUT',          note:'Hit your sleep target 5 nights', kind:'daysHit:sleep',    need:5,     xp:180 },
+  { id:'w_mob4',     title:'OILED HINGES',        note:'Mobility on 4 days',             kind:'daysHit:mobility', need:4,     xp:120 },
+  { id:'w_breathe4', title:'DEAD CALM',           note:'Breathe on 4 days',              kind:'daysHit:breathe',  need:4,     xp:100 },
+  { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',          kind:'daysHit:supps',    need:7,     xp:140 },
+  { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',       kind:'daysHit:fuel',     need:5,     xp:140 },
+  { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions in the run',      kind:'daysHit:strength', need:3,     xp:250 },
+  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 80% or better',        kind:'qualify',          need:5,     xp:220 },
+  { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',               kind:'perfect',          need:2,     xp:300 }
 ];
-const QUESTS_PER_WEEK = 3;
+const QUEST_RUN_DAYS = 7;
 
-// The server is the authority once it has answered; the pool above is the fallback.
+// The server is the authority once it has answered; these are the fallbacks.
 function questPool() {
   const s = CFG.questPool;
   return (Array.isArray(s) && s.length) ? s : QUEST_POOL;
 }
-function questOverrides() { return (CFG.questWeeks && typeof CFG.questWeeks === 'object') ? CFG.questWeeks : {}; }
-
-// Monday of the week a date falls in. ISO weeks, so a "week" is the same seven
-// days for everybody and a quest cannot be farmed by timezone.
-function weekStartOf(dayKey) {
-  const d = parseKey(dayKey), wd = (d.getDay() + 6) % 7;   // Mon = 0
-  return fmtKey(addDays(d, -wd));
+// [{ start:'2026-07-29', ids:['w_water5', …] }] — empty by default, on purpose.
+function questRuns() {
+  const r = CFG.questRuns;
+  return Array.isArray(r) ? r.filter(x => x && typeof x.start === 'string' && Array.isArray(x.ids)) : [];
 }
-function thisWeekStart() { return weekStartOf(TKEY()); }
-// Which quests are live for a given week: an explicit prescription if Amir set
-// one, otherwise a deterministic pick from the pool seeded on the week itself —
-// so every device and the server agree without storing a thing.
-function questsForWeek(weekKey) {
+function runEndKey(run) { return fmtKey(addDays(parseKey(run.start), QUEST_RUN_DAYS - 1)); }
+function runQuests(run) {
   const pool = questPool();
-  const pinned = questOverrides()[weekKey];
-  if (Array.isArray(pinned) && pinned.length) {
-    return pinned.map(id => pool.find(q => q.id === id)).filter(Boolean);
-  }
-  if (pool.length <= QUESTS_PER_WEEK) return pool.slice();
-  const out = [], used = {};
-  let h = hashStr(weekKey);
-  for (let i = 0; out.length < QUESTS_PER_WEEK && i < pool.length * 4; i++) {
-    h = (h * 31 + 17) % 2147483647;
-    const pick = h % pool.length;
-    if (used[pick]) continue;
-    used[pick] = 1;
-    out.push(pool[pick]);
-  }
-  return out;
+  return run.ids.map(id => pool.find(q => q.id === id)).filter(Boolean);
 }
-// Progress through a quest, and the day it was completed if it was. Everything
-// is derived from the log inside that week.
-function questProgress(q, weekKey) {
-  const start = parseKey(weekKey);
+// The run covering today, if any. There is usually none, and that is fine.
+function activeQuestRun() {
+  const t = TKEY();
+  return questRuns().find(r => t >= r.start && t <= runEndKey(r)) || null;
+}
+// Whole days left in a run, counting today.
+function runDaysLeft(run) {
+  return Math.max(0, Math.round((parseKey(runEndKey(run)) - today()) / 86400000) + 1);
+}
+// Progress through a quest inside its run, and the day it completed if it did.
+function questProgress(q, run) {
+  const start = parseKey(run.start);
   const parts = String(q.kind || '').split(':');
   const kind = parts[0], hid = parts[1];
   const h = hid ? habitById(hid) : null;
   let have = 0, doneDay = null;
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < QUEST_RUN_DAYS; i++) {
     const k = fmtKey(addDays(start, i));
     if (k > TKEY()) break;                       // the future has not happened
-    // Season-bounded like everything else that pays: a week straddling the
-    // season opening must not count the days before it, or the server (which
-    // never sees them) would score the same quest differently.
+    // Season-bounded like everything else that pays: a run straddling the season
+    // opening must not count the days before it, or the server (which never sees
+    // them) would score the same quest differently.
     if (!inSeason(k)) continue;
     if (kind === 'daysHit') { if (h && isDone(h, k)) have++; }
     else if (kind === 'total') { have += valOf(k, hid); }
@@ -747,18 +736,15 @@ function questProgress(q, weekKey) {
   return { have, need: q.need, done: have >= q.need, doneDay,
            pct: Math.max(0, Math.min(100, Math.round(have / q.need * 100))) };
 }
-// Every quest completion in the athlete's history, as dated events — the same
-// shape tiers and milestones use, so seasons and both board windows filter them
-// with no special cases.
+// Every quest completed across every run, as dated events — the same shape tiers
+// and milestones use, so seasons and both board windows filter them for free.
+// Past runs keep paying: XP already earned is never taken back.
 function questEvents() {
-  const days = seasonDays();
-  if (!days.length) return [];
-  const weeks = {}, out = [];
-  days.forEach(k => { weeks[weekStartOf(k)] = 1; });
-  Object.keys(weeks).sort().forEach(wk => {
-    questsForWeek(wk).forEach(q => {
-      const p = questProgress(q, wk);
-      if (p.done && p.doneDay) out.push({ day: p.doneDay, xp: q.xp, kind: 'quest', id: wk + ':' + q.id });
+  const out = [];
+  questRuns().forEach(run => {
+    runQuests(run).forEach(q => {
+      const p = questProgress(q, run);
+      if (p.done && p.doneDay) out.push({ day: p.doneDay, xp: q.xp, kind: 'quest', id: run.start + ':' + q.id });
     });
   });
   return out;
@@ -998,7 +984,7 @@ function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
   return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null,
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
-           questPool:null, questWeeks:null, sound:false, lbSeen:null,
+           questPool:null, questRuns:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, updatedAt:0 };
 }
 
@@ -1323,10 +1309,10 @@ async function fetchQuests() {
     const { data, error } = await sb.rpc('get_quests', { p_athlete_id: ATHLETE_ID, p_key: KEY });
     const row = Array.isArray(data) ? data[0] : data;
     if (error || !row) return;                   // offline / not deployed → keep the cache
-    const pool = row.pool, weeks = row.weeks;
+    const pool = row.pool, runs = row.runs;
     let changed = false;
     if (Array.isArray(pool) && JSON.stringify(pool) !== JSON.stringify(CFG.questPool)) { CFG.questPool = pool; changed = true; }
-    if (weeks && JSON.stringify(weeks) !== JSON.stringify(CFG.questWeeks)) { CFG.questWeeks = weeks; changed = true; }
+    if (Array.isArray(runs) && JSON.stringify(runs) !== JSON.stringify(CFG.questRuns)) { CFG.questRuns = runs; changed = true; }
     if (changed) { invalidateBonus(); saveCfg(); }
   } catch (e) { /* keep whatever we last cached */ }
 }
@@ -1709,11 +1695,14 @@ function checkUnlocks() {
 
   // Quests. Only this week's get a takeover — an older week completing is
   // history arriving late (a cloud sync, a backfilled session), not a moment.
-  const quests = currentQuests(), wk = thisWeekStart();
+  const quests = currentQuests(), run = activeQuestRun();
   quests.forEach(qid => {
     if (CFG.seenQuests.indexOf(qid) !== -1) return;
-    if (qid.indexOf(wk + ':') !== 0) return;
-    const q = questPool().find(x => x.id === qid.slice(wk.length + 1));
+    // Only the run that is live right now gets a takeover. An older run
+    // completing is history arriving late (a cloud sync, a backfilled session),
+    // not a moment.
+    if (!run || qid.indexOf(run.start + ':') !== 0) return;
+    const q = questPool().find(x => x.id === qid.slice(run.start.length + 1));
     if (q) events.push({ kind:'quest', id:qid, quest:q });
   });
 
@@ -2567,19 +2556,21 @@ function renderToday(LI, doneCount, pct) {
 // Three targets that give the week a shape. Shown on Today under the nudge,
 // because a quest only means anything while there is still week left to do it in.
 function renderQuestBlock() {
-  const wk = thisWeekStart(), qs = questsForWeek(wk);
+  const run = activeQuestRun();
+  if (!run) return '';                     // no run on — the block does not exist
+  const qs = runQuests(run);
   if (!qs.length) return '';
-  const prog = qs.map(q => ({ q, p: questProgress(q, wk) }));
+  const prog = qs.map(q => ({ q, p: questProgress(q, run) }));
   const doneN = prog.filter(x => x.p.done).length;
-  const left = 7 - Math.min(7, Math.round((today() - parseKey(wk)) / 86400000) + 1);
+  const left = runDaysLeft(run);
   const earned = prog.filter(x => x.p.done).reduce((s, x) => s + x.q.xp, 0);
   const onOffer = qs.reduce((s, q) => s + q.xp, 0);
 
   return `
-    <div class="block" data-k="quests" style="display:flex;flex-direction:column;gap:12px;border-bottom:2px solid var(--divider)">
+    <div class="block" data-k="quests:${esc(run.start)}" style="display:flex;flex-direction:column;gap:12px;border-bottom:2px solid var(--divider)">
       <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
-        <span>This week</span>
-        <span>${doneN} of ${qs.length} · ${left > 0 ? left + ' day' + (left === 1 ? '' : 's') + ' left' : 'last day'}</span>
+        <span>Quests</span>
+        <span>${doneN} of ${qs.length} · ${left > 1 ? left + ' days left' : 'last day'}</span>
       </div>
       ${prog.map(({ q, p }) => `
         <div data-k="q:${esc(q.id)}" style="display:flex;gap:12px;align-items:center;${p.done ? '' : 'opacity:.92'}">
@@ -2600,12 +2591,15 @@ function renderQuestBlock() {
         </div>`).join('')}
       <div style="font-size:11px;line-height:1.4;color:var(--muted-soft)">
         ${doneN === qs.length
-          ? 'Every quest cleared — ' + earned.toLocaleString() + ' XP banked. New ones on Monday.'
+          ? 'Every quest cleared — ' + earned.toLocaleString() + ' XP banked.'
           : earned > 0
-            ? earned.toLocaleString() + ' XP banked, ' + (onOffer - earned).toLocaleString() + ' still on the table. Quests reset Monday.'
-            : onOffer.toLocaleString() + ' XP on the table this week. They reset Monday, finished or not.'}
+            ? earned.toLocaleString() + ' XP banked, ' + (onOffer - earned).toLocaleString() + ' still on the table. This run ends ' + esc(runEndLabel(run)) + '.'
+            : onOffer.toLocaleString() + ' XP on the table. This run ends ' + esc(runEndLabel(run)) + ', finished or not.'}
       </div>
     </div>`;
+}
+function runEndLabel(run) {
+  return parseKey(runEndKey(run)).toLocaleDateString('en-GB', { weekday: 'long' });
 }
 // Big counter totals read better rounded; day counts are just numbers.
 function fmtQuestVal(q, v) {
@@ -2969,19 +2963,27 @@ function renderManual() {
         p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star — ${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)} — and there is no ceiling after that.`) +
         p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water rank will leave your workout rank behind. That is the point.`))}
 
-      ${block(h2('Weekly quests') +
-        p(`Every Monday you get <strong style="color:var(--ink)">${QUESTS_PER_WEEK} quests</strong> — targets for the week rather than the day. They sit on your Today screen, they are worth real points, and they expire on Sunday night whether you finish them or not.`) +
-        `<div style="display:flex;flex-direction:column;gap:0">
-          ${questsForWeek(thisWeekStart()).map(q => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
-            <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
-              <span class="hd" style="font-size:14px;line-height:1">${esc(q.title)}</span>
-              <span style="font-size:11px;color:var(--muted)">${esc(q.note)}</span>
-            </span>
-            <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">+${q.xp}</span>
-          </div>`).join('')}
-        </div>` +
-        `<div style="height:12px"></div>` +
-        p(`Your coach sets these. Some weeks they are picked for you, some weeks Amir picks them himself — either way everybody on the app gets the same three, so the leaderboard stays fair.`))}
+      ${(() => {
+        const run = activeQuestRun(), qs = run ? runQuests(run) : [];
+        if (!run || !qs.length) {
+          return block(h2('Quests') +
+            p(`From time to time your coach sets a <strong style="color:var(--ink)">run of quests</strong> — targets for the week rather than the day, worth real points on top of your habits.`) +
+            p(`There are none running right now. When there are, they appear at the top of your Today screen with a countdown, and everybody on the app gets the same ones.`));
+        }
+        return block(h2('Quests') +
+          p(`Your coach has a run going: <strong style="color:var(--ink)">${qs.length} quest${qs.length === 1 ? '' : 's'}</strong>, ending ${esc(runEndLabel(run))}. They are targets for the week rather than the day, and they expire when the run does, finished or not.`) +
+          `<div style="display:flex;flex-direction:column;gap:0">
+            ${qs.map(q => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <span class="hd" style="font-size:14px;line-height:1">${esc(q.title)}</span>
+                <span style="font-size:11px;color:var(--muted)">${esc(q.note)}</span>
+              </span>
+              <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">+${q.xp}</span>
+            </div>`).join('')}
+          </div>` +
+          `<div style="height:12px"></div>` +
+          p(`Everybody gets the same quests, so the leaderboard stays fair. Each one pays once.`));
+      })()}
 
       ${block(h2('Consistency') +
         p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a streak never takes a badge back.`) +
