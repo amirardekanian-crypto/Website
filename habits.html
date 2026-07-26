@@ -438,6 +438,12 @@ const XP_RULES = {
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
   streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  // Scoring runs in SEASONS. Only days on or after this date earn XP — for the
+  // athlete's own level and for the leaderboards alike. The server is the
+  // authority (public.seasons); this is the fallback used offline or before the
+  // first fetch. Amir starts a new season with one SQL command — see XP_SYSTEM.md.
+  seasonStart: '2026-07-26',
+  seasonName: 'Pre-Season',
   // Per-completion value, ranked by health impact.
   weights: {
     strength: 100,
@@ -599,8 +605,9 @@ async function fetchWorkoutDays() {
   try {
     const sb = _sb();
     if (!sb) return [];
-    // Only ever look back far enough to matter; keeps the payload tiny.
-    const since = fmtKey(addDays(today(), -120));
+    // Never reach back before the season started — a new athlete (or a new
+    // season) must not have months of past sessions backfilled into their score.
+    const since = seasonStart();
     const { data, error } = await sb.rpc('get_workout_days', {
       p_athlete_id: ATHLETE_ID, p_key: KEY, p_since: since
     });
@@ -789,9 +796,35 @@ function xpFor(h, v) {
   const base = baseXp(h);
   return Math.round(v >= h.target ? base * XP_RULES.completionBonus : base * (v / h.target));
 }
-// A habit's own XP pool across all history. Counted even when the habit is
-// currently switched off — XP you earned is never taken back.
-function habitXp(h) { return loggedDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
+// ── Seasons ───────────────────────────────────────────────────────────────
+// Scores run in seasons, like ranked play. Days before the season started stay
+// in the athlete's history — visible in the grid, still counting toward streaks
+// and consistency badges — but they earn no XP. Starting a new season is
+// therefore a clean scoreboard reset that deletes nothing.
+function seasonStart() { return (CFG.season && CFG.season.startsOn) || XP_RULES.seasonStart; }
+function seasonName()  { return (CFG.season && CFG.season.name)     || XP_RULES.seasonName; }
+function inSeason(dayKey) { return dayKey >= seasonStart(); }   // ISO dates compare as strings
+function seasonDays() { return loggedDays().filter(inSeason); }
+async function fetchSeason() {
+  if (window.IS_DEMO || !ATHLETE_ID) return;
+  try {
+    const sb = _sb();
+    if (!sb) return;
+    const { data, error } = await sb.rpc('get_season', { p_athlete_id: ATHLETE_ID, p_key: KEY });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (error || !row || !row.starts_on) return;   // offline / not deployed → keep the cached one
+    const next = { name: row.name || 'Season', startsOn: String(row.starts_on).slice(0, 10) };
+    const cur = CFG.season || {};
+    if (cur.startsOn !== next.startsOn || cur.name !== next.name) {
+      CFG.season = next;
+      saveCfg();
+    }
+  } catch (e) { /* keep whatever we last cached */ }
+}
+
+// A habit's own XP pool for the CURRENT SEASON. Counted even when the habit is
+// currently switched off — XP you earned is never taken back mid-season.
+function habitXp(h) { return seasonDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
 function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0); }
 // Habit ladders reuse the curve, scaled to that habit's daily value, so every
 // habit levels at the same RATE — which is what makes your level in a habit
@@ -822,10 +855,11 @@ function levelInfo(xp, base) {
 function overallLevel() { return levelInfo(overallXp(), XP_RULES.base); }
 function habitLevel(h) { return levelInfo(habitXp(h), baseFor(h)); }
 
-// XP earned inside a date window — powers the weekly recap.
+// XP earned inside a date window — powers the weekly recap. Season-gated too,
+// so the first week of a season never shows points carried in from before it.
 function xpBetween(fromDate, toDate) {
   let sum = 0;
-  loggedDays().forEach(k => {
+  seasonDays().forEach(k => {
     const d = parseKey(k);
     if (d < fromDate || d > toDate) return;
     allHabits().forEach(h => { sum += xpFor(h, valOf(k, h.id)); });
@@ -888,7 +922,8 @@ function currentLevels() {
 function rulesSignature() {
   const src = JSON.stringify([
     XP_RULES.base, XP_RULES.growth, XP_RULES.completionBonus, XP_RULES.customXp,
-    XP_RULES.weights, CONSISTENCY_TIERS.map(t => t.days), HABITS.map(h => [h.id, h.target])
+    XP_RULES.weights, CONSISTENCY_TIERS.map(t => t.days), HABITS.map(h => [h.id, h.target]),
+    seasonStart()   // a new season resets every score, so re-baseline instead of celebrating
   ]);
   let hash = 0;
   for (let i = 0; i < src.length; i++) hash = (hash * 31 + src.charCodeAt(i)) % 2147483647;
@@ -899,8 +934,11 @@ function checkLevelUps() {
   const sig = rulesSignature();
   if (!CFG.seen || CFG.rulesSig !== sig) {
     const rescored = !!CFG.seen && CFG.rulesSig !== sig;
+    const wasSeason = CFG.seenSeason && CFG.seenSeason !== seasonStart();
+    CFG.seenSeason = seasonStart();
     seedSeenLevels();
-    if (rescored) toast('XP system updated — your levels were rescored.');
+    if (rescored) toast(wasSeason ? seasonName().toUpperCase() + ' has begun — scores start from zero.'
+                                  : 'XP system updated — your levels were rescored.');
     return;
   }
   const now = currentLevels(), seen = CFG.seen, events = [];
@@ -967,7 +1005,7 @@ function go(screen) {
 // That means a tampered localStorage cannot buy a place on the board. The RPC
 // deliberately returns no athlete ids — an id alone would let one client fetch
 // /data/<id>.json and read another athlete's whole programme.
-const LB = { scope:'week', rows:[], joined:false, loading:false, error:null, loaded:false, nameDraft:'' };
+const LB = { scope:'season', rows:[], joined:false, loading:false, error:null, loaded:false, nameDraft:'' };
 async function fetchBoard() {
   if (window.IS_DEMO) { LB.error = 'demo'; LB.loaded = true; render(); return; }
   if (LB.loading) return;
@@ -1094,7 +1132,7 @@ function renderApp() {
     today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
     progress: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Progress'],
     detail:   [openH.source, openH.name],
-    board:    [LB.scope === 'week' ? 'This week · resets Monday' : 'All time', 'Leaderboard'],
+    board:    [LB.scope === 'week' ? 'This week · resets Monday' : seasonName(), 'Leaderboard'],
     manual:   ['Everything, explained', 'How this works'],
     settings: ['Profile & tracking', 'Settings']
   };
@@ -1448,6 +1486,8 @@ function renderDetail(h) {
 function renderBoard() {
   const scopeBtn = (key, label) => `<button class="chip ${LB.scope === key ? 'chip-on' : ''}"
     ${on(() => { if (LB.scope !== key) { LB.scope = key; LB.loaded = false; fetchBoard(); } })}>${label}</button>`;
+  const started = parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long' });
+  const dayOfSeason = Math.max(1, Math.round((today() - parseKey(seasonStart())) / 86400000) + 1);
 
   let body = '';
   if (LB.loading && !LB.rows.length) {
@@ -1464,7 +1504,7 @@ function renderBoard() {
     body = boardNote('Could not load the board just now.') +
       `<div style="padding:0 20px 20px"><button class="btn btn-secondary" ${on(() => { LB.loaded = false; fetchBoard(); })}>Try again</button></div>`;
   } else if (!LB.rows.length) {
-    body = boardNote('Nobody has joined yet. Be first — and set the pace.');
+    body = boardNote('Nobody has joined yet. ' + seasonName() + ' is wide open — be first and set the pace.');
   } else {
     const top = LB.rows.filter(r => r.pos <= 10);
     const me = LB.rows.find(r => r.is_me);
@@ -1479,11 +1519,16 @@ function renderBoard() {
   return `
     <div style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
-        <div class="chips">${scopeBtn('week', 'This week')}${scopeBtn('all', 'All time')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <div class="hd" style="font-size:20px;line-height:1">${esc(seasonName())}</div>
+          <div class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--clay-deep)">DAY ${dayOfSeason}</div>
+        </div>
+        <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'This week')}</div>
         <div style="font-size:12px;line-height:1.5;color:var(--muted)">
           ${LB.scope === 'week'
-            ? 'Everyone starts level on Monday, so a good week beats a long history. Scored on the server from what you have actually logged.'
-            : 'Every point you have ever earned. Scored on the server from what you have actually logged.'}
+            ? 'Everyone starts level again on Monday, so one good week beats a long history.'
+            : 'Every point earned since ' + esc(started) + ', when ' + esc(seasonName().toLowerCase()) + ' opened. Nothing from before it counts.'}
+          Scored on the server from what you have actually logged.
         </div>
       </div>
       ${body}
@@ -1595,10 +1640,15 @@ function renderManual() {
           </div>`).join('')}
         </div>`)}
 
+      ${block(h2('Seasons') +
+        p(`Scoring runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
+        p(`Only days from the start of the season earn points. Anything you logged before it still sits in your history and still counts toward your streaks and consistency badges — it just does not score.`) +
+        p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency badges stay yours.`))}
+
       ${block(h2('The leaderboard') +
         p(`It is <strong style="color:var(--ink)">off until you join</strong>. Nobody sees you before that.`) +
         p(`When you join you pick your own name — it does not have to be your real one. Other athletes see <strong style="color:var(--ink)">that name and your points</strong>. They never see your habits, your logs, your programme or anything else. You can rename yourself or leave whenever you like.`) +
-        p(`There are two boards. <strong style="color:var(--ink)">This week</strong> resets every Monday, so a good week beats a long history and anyone can win it. <strong style="color:var(--ink)">All time</strong> is every point you have ever earned.`) +
+        p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">This week</strong> resets every Monday, so one good week beats a long history and anyone can win it.`) +
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
       ${block(h2('Your data') +
@@ -1776,6 +1826,9 @@ function showError(msg) {
 
   loadLocal();
   await syncFromCloud();
+  // Which season we are in decides what scores, so settle that before anything
+  // reads XP — including the workout import, which must not reach back further.
+  await fetchSeason();
   // Sessions finished in the training app tick the WORKOUT habit here. The
   // dates come from the server, not from the other app's storage.
   importWorkoutDays(await fetchWorkoutDays());
