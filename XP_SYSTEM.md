@@ -183,21 +183,57 @@ display adapts to however many there are.
 
 ## 5. Celebrations
 
-A full-screen, game-style takeover fires for:
+A full-screen, game-style takeover fires for five things:
 
-- **any overall level**, and
-- **a rank promotion** on any habit (e.g. water crossing from GRINDER 5 to OPERATOR 1).
+| Trigger | Detected in | Ground |
+|---|---|---|
+| **Any overall level** | `checkLevelUps()` | near-black, clay rays |
+| **A rank promotion** on any habit (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | full clay |
+| **A consistency tier** cleared on any habit | `checkUnlocks()` | deep green, clay-2 rays |
+| **A milestone** unlocked | `checkUnlocks()` | deep green, clay-2 rays |
+| **A perfect day** — every tracked habit done | `checkUnlocks()` | deep green, clay-2 rays |
 
 Routine habit levels flash a small chip in that habit's row instead. This split is
 deliberate: an athlete completing eight habits on day one would otherwise get nine
 full-screen takeovers back to back. If several big ones land together they queue and
 show a "2 more to go" counter.
 
-Two looks: near-black with clay rays for a level, full clay for a rank promotion.
+The three grounds are the point — an athlete can tell which *kind* of win landed
+before reading a word of it. Green is never a level and never a rank.
+
+### What `checkUnlocks()` guarantees
+
+Tiers, milestones and perfect days were detected by nothing at all until this was
+added: a pip quietly filled on a tab the athlete might not open that day. Three
+rules keep it from becoming noise:
+
+- **Tiers are coalesced by tier, not reported per habit.** An athlete solid since
+  day one crosses the 20-day tier on all eight habits *on the same day*; eight
+  identical takeovers is a punishment. One takeover names the tier and lists the
+  habits ("20 days of workout, steps, sleep and 5 more in a row"), and past four
+  it counts instead of listing. Crossing several tiers at once reports only the
+  highest — the lower ones are implied.
+- **A perfect day is judged on TODAY only**, never across history. Judging history
+  would fire a burst the moment somebody switched a habit off, because every thin
+  day behind them would retroactively become perfect. It also can't be farmed:
+  `CFG.seenPerfect` holds the date, so unticking and re-ticking pays once.
+- **It baselines like levels do.** `CFG.seenTiers` / `CFG.seenAch` / `CFG.seenPerfect`
+  are seeded silently on a first run, on a rules change, and on a cloud row that
+  predates this build — so an athlete arriving with history already behind them
+  gets it recorded, not replayed at them. `seedUnlocks()` is called from
+  `seedSeenLevels()`, so the two baselines can never drift apart.
+
+> ⚠️ **The `xp` on `CONSISTENCY_TIERS` and `ACHIEVEMENTS` is still not awarded.**
+> `overallXp()` is the sum of `habitXp` and nothing else, so the "+750 XP" the
+> Progress tab shows against UNBREAKABLE buys nothing. That is why the takeovers
+> above quote days and names but never an XP figure. Fixing it means changing the
+> client **and** the `xp_rules`/`hab_xp` scorer in Supabase in the same breath —
+> see §8 and the warning at the top of this file.
 
 **If it feels like too much,** the cheapest change is in `checkLevelUps()` — set
 `big: overall` instead of `big: overall || rankChanged` and only the overall level
-takes over the screen.
+takes over the screen. To silence the new ones, return early from `checkUnlocks()`
+after its baseline block.
 
 ---
 

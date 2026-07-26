@@ -161,8 +161,47 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   habit's level measures *how often they do it*, not how hard it is.
 - **Consistency ladders**: five tiers per habit (5/10/20/30/60 consecutive days),
   earned on the best run ever so breaking a streak never revokes a badge.
-- **Celebrations**: full-screen takeover for an overall level or a rank promotion;
-  routine habit levels flash inline, so day one isn't nine takeovers.
+- **Celebrations**: full-screen takeover for an overall level, a rank promotion, a
+  consistency tier, a milestone, or a perfect day. Three grounds — near-black for a
+  level, clay for a rank, deep green for the rest — so the *kind* of win is legible
+  before the words are. Routine habit levels flash inline instead, so day one isn't
+  nine takeovers, and same-day tier clears across several habits coalesce into one.
+  Full rules in [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
+
+> ⚠️ **The `xp` on consistency tiers and milestones is displayed but never awarded** —
+> `overallXp()` sums `habitXp` and nothing else, so the "+750 XP" on UNBREAKABLE buys
+> nothing today. The takeovers deliberately quote days and names, never an XP figure.
+> Making the badges pay means moving `XP_RULES` **and** Supabase's `xp_rules`/`hab_xp`
+> together, so it is its own change — see `XP_SYSTEM.md` §5 and §8.
+
+---
+
+## How it feels — the motion layer
+
+Proof is meant to read as a game, not a form. The mechanics of that live in a few
+places, and one of them is load-bearing:
+
+**The renderer morphs; it does not replace.** `render()` builds the same HTML string
+it always did, then patches it into the live DOM node by node. **Do not reintroduce
+`app.innerHTML = …`** — it silently breaks three things at once: scroll jumps to the
+top on every tick, every `transition: width` becomes dead code (the bar it animates is
+a new node born at its final width), and each screen's entrance fade replays on every
+tap. Two attributes steer the patch:
+
+| Attribute | Means |
+|---|---|
+| `data-k` | Identity. A different key in the same slot is replaced outright, not patched — that's how a screen change still fades while a check-off doesn't. Screens, habit rows, overlays and each queued celebration all carry one. |
+| `data-static` | "This subtree is mine, not the template's." The `#fx` layer where XP chips are mid-flight, and any figure the counter engine owns. |
+
+The rest of the layer: figures marked `data-num` are animated by `syncNumbers()`
+rather than printed (the template only says where the number should *end up*, via
+`data-to`); bars marked `data-fill` grow from zero on first paint; ticking a habit
+sends a clay `+XP` chip arcing from the row to the level hero, which then takes the
+hit; the checkmark is a stroked SVG that draws rather than a glyph that appears; and
+`haptic()` fires on tick, completion, level and rank — a no-op on iPhone, since
+Safari still exposes no vibration at all.
+
+All of it is off under `prefers-reduced-motion`, which `reduced()` checks live.
 
 ---
 
