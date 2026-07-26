@@ -54,28 +54,43 @@ without `&key=` in the URL.
 ## The four tabs
 
 ### 01 · TODAY — the daily loop
-The screen they actually live on.
+The screen they actually live on. **In this order, and the order is the point:**
 
-- **Level hero** — overall level, rank label, XP, and progress to the next level.
-- **Today's progress bar** — how many of their tracked habits are done.
-- **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
-  random from a library of **83 lines across 13 situations** (`NUDGES`): one bucket per
-  habit, plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and
-  streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
-  tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
-  repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
-- **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
-  XP, with live progress and a countdown. **There are usually none**: quests only exist
-  while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
-  the point — seeing them means something is on.
-- **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
-  completion, that choose **which day you are logging**. See *The backfill window* below.
-- **The habit list** — tap the box to tick, tap the name for that habit's history, tap
-  `+` on counter habits. Each row shows that habit's own level and current streak.
-- **Roll call** — the compose box for the day's one sentence. See *Roll call* below.
-- **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
-  weakest habit. The "recap" half.
-- **The cross-link** back to the training programme.
+1. **Level hero** — overall level, rank label, XP, and one bar: progress to the next
+   level. Today's own completion is *not* repeated here; the header and the day strip
+   both already carry it, and a second green bar of the same shape directly beneath the
+   first read as one broken double-bar.
+2. **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
+   completion, that choose **which day you are logging**. See *The backfill window* below.
+3. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
+   `+` on counter habits. Each row shows that habit's own level and current streak.
+   Only counter habits carry a progress track; on a check-off habit it could only ever
+   read 0% or 100%, which was noise on half the list.
+4. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
+   random from a library of **83 lines across 13 situations** (`NUDGES`): one bucket per
+   habit, plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and
+   streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
+   tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
+   repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
+5. **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
+   XP, with live progress and a countdown. **There are usually none**: quests only exist
+   while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
+   the point — seeing them means something is on.
+6. **Roll call** — the compose box for the day's one sentence. See *Roll call* below.
+7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
+   weakest habit. The "recap" half.
+8. **The cross-link** back to the training programme.
+
+> **Why the list sits above the commentary.** It used to be hero → nudge → quests →
+> habits, which put the first tickable row about **1,400px down**: you opened the app to
+> log and had to scroll before you could log. The nudge alone was over half a phone
+> screen. Now **six of the eight habits are tickable without scrolling at 390px, five at
+> 320px**, and the nudge keeps every word of its voice — it just reads as a reply to the
+> list rather than a wall in front of it. If you add anything to this screen, it goes
+> *below* the habit list unless it is something the athlete must act on first.
+
+**Streak at risk** gets one clay strip immediately above the list, rather than being
+said three ways at once (card, day-bar and header flag) as it was before.
 
 #### The backfill window
 Nobody logs perfectly on the day, every day, so **the last `BACKFILL_DAYS` (3) days plus
@@ -122,9 +137,21 @@ Read it on the **BOARD** tab, second view.
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
 
-Overall level → day streak and achievements unlocked → **one row per habit** (its level,
-rank, XP, progress bar and five consistency pips, tapping through to full history) →
+**A slim level strip** (not a repeat of Today's hero — two of the four tabs used to open
+with the identical 76px level block) → **four season stats**: days logged, badges, day
+streak, perfect days → a one-line **key explaining the consistency pips**, which had no
+legend anywhere in the app and are empty for the first five days → **one row per habit**
+(its level, rank, XP, progress bar and five pips, tapping through to full history) →
 paused habits with their banked XP → the nine one-off **milestones**.
+
+Days-logged leads the stat grid deliberately. Streak and perfect-days are both zero for
+anyone rebuilding after a bad week, and opening your own progress on a pair of zeros
+punishes exactly the athlete who most needs to keep going. Showing up is the stat that is
+almost always positive, and it is the one that earns the others.
+
+A habit row's meta line is **rank · XP** only. It used to append today's status too,
+which wrapped every row to two lines and restated what Today already says — Progress is
+about standing, not about today.
 
 **Habit detail** (reached from here or from Today) shows that habit's rank and level
 progress, a log button, its consistency ladder, this-week / best-streak / 35-day-rate
