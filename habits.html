@@ -369,6 +369,15 @@
   }
   .hlv { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
 
+  /* Scope chips (leaderboard: this week / all time) */
+  .chips { display: flex; gap: 8px; }
+  .chip {
+    border: 2px solid var(--divider); padding: 8px 12px; color: var(--ink);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  .chip.chip-on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
   /* Consistency pip ladder */
   .pips { display: flex; gap: 4px; }
   .pips i { width: 13px; height: 13px; border: 1.5px solid var(--box); display: block; }
@@ -482,7 +491,8 @@ let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
-  return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null, updatedAt:0 };
+  return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null,
+           onBoard:false, boardName:null, updatedAt:0 };
 }
 
 // ── Dates ─────────────────────────────────────────────────────────────────
@@ -878,7 +888,68 @@ function bump(h) {
 }
 function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
 function openHabit(id, from) { UI.open = id; UI.from = from || UI.screen; UI.screen = 'detail'; render(); }
-function go(screen) { UI.screen = screen; UI.open = null; render(); }
+function go(screen) {
+  UI.screen = screen; UI.open = null;
+  render();
+  if (screen === 'board') fetchBoard();
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────
+// Opt-in only, and scored entirely server-side: the app submits no number at
+// all, the RPC recomputes XP from the log already stored in athlete_progress.
+// That means a tampered localStorage cannot buy a place on the board. The RPC
+// deliberately returns no athlete ids — an id alone would let one client fetch
+// /data/<id>.json and read another athlete's whole programme.
+const LB = { scope:'week', rows:[], joined:false, loading:false, error:null, loaded:false, nameDraft:'' };
+async function fetchBoard() {
+  if (window.IS_DEMO) { LB.error = 'demo'; LB.loaded = true; render(); return; }
+  if (LB.loading) return;
+  LB.loading = true; LB.error = null; render();
+  try {
+    const sb = _sb();
+    if (!sb) throw new Error('offline');
+    const { data, error } = await sb.rpc('leaderboard_top', {
+      p_athlete_id: ATHLETE_ID, p_key: KEY, p_scope: LB.scope, p_limit: 10
+    });
+    if (error) throw error;
+    LB.rows = data || [];
+    LB.joined = !!(LB.rows.length && LB.rows[0].joined);
+    // `joined` comes back on every row; when the board is empty ask separately.
+    if (!LB.rows.length) LB.joined = false;
+    LB.error = null;
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    // The migration may not be applied yet — say so plainly instead of failing.
+    LB.error = /function|does not exist|schema/i.test(msg) ? 'notdeployed'
+             : (navigator.onLine === false ? 'offline' : 'failed');
+  }
+  LB.loading = false; LB.loaded = true; render();
+}
+async function joinBoard(name, joining) {
+  if (window.IS_DEMO) { toast('Demo mode — the board is live only for real athletes.'); return; }
+  try {
+    const sb = _sb();
+    if (!sb) throw new Error('offline');
+    const { error } = await sb.rpc('set_leaderboard_optin', {
+      p_athlete_id: ATHLETE_ID, p_display_name: name || defaultDisplayName(),
+      p_opt_in: !!joining, p_key: KEY
+    });
+    if (error) throw error;
+    CFG.boardName = joining ? (name || defaultDisplayName()) : null;
+    CFG.onBoard = !!joining;
+    saveCfg();
+    toast(joining ? 'You are on the board. Go and be insufferable.' : 'Left the leaderboard.');
+    LB.loaded = false;
+    await fetchBoard();
+  } catch (e) {
+    toast('Could not reach the leaderboard. Try again when you have signal.');
+  }
+}
+function defaultDisplayName() {
+  const f = (ATHLETE.firstName || 'Athlete').trim();
+  const l = (ATHLETE.lastName || '').trim();
+  return (l ? f + ' ' + l[0].toUpperCase() + '.' : f).slice(0, 24);
+}
 
 // ── Render helpers ────────────────────────────────────────────────────────
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -896,6 +967,8 @@ function render() {
   });
   const nh = app.querySelector('#newhabit');
   if (nh) nh.addEventListener('input', e => { UI._newName = e.target.value; });
+  const bn = app.querySelector('#boardname');
+  if (bn) bn.addEventListener('input', e => { LB.nameDraft = e.target.value; });
   document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
 }
 
@@ -943,26 +1016,30 @@ function renderApp() {
 
   const heads = {
     today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
-    habits:   [hs.length + ' tracked · tap for detail', 'Habits'],
+    progress: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Progress'],
     detail:   [openH.source, openH.name],
-    insights: ['LV ' + LI.lv + ' ' + LI.label + ' · ' + LI.xp.toLocaleString() + ' XP', 'Achievements'],
+    board:    [LB.scope === 'week' ? 'This week · resets Monday' : 'All time', 'Leaderboard'],
     settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
-    today: pct + '% DONE', habits: 'LV ' + LI.lv, detail: 'LV ' + habitLevel(openH).lv,
-    insights: earned + ' OF ' + totalAch, settings: ''
+    today: pct + '% DONE', progress: earned + ' OF ' + totalAch,
+    detail: 'LV ' + habitLevel(openH).lv,
+    board: LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '',
+    settings: ''
   };
   const head = heads[UI.screen] || heads.today;
 
   let screenHtml = '';
   if (UI.screen === 'today') screenHtml = renderToday(LI, doneCount, pct);
-  else if (UI.screen === 'habits') screenHtml = renderHabits();
+  else if (UI.screen === 'progress') screenHtml = renderProgress(LI, earned, totalAch);
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
-  else if (UI.screen === 'insights') screenHtml = renderAchievements(LI, earned, totalAch);
+  else if (UI.screen === 'board') screenHtml = renderBoard();
   else screenHtml = renderSettings();
 
-  const tabDefs = [['TODAY','today','01'],['ACHIEVEMENTS','insights','02'],['HABITS','habits','03'],['SETTINGS','settings','04']];
-  const activeTab = UI.screen === 'detail' ? 'habits' : UI.screen;
+  // Four tabs, leaderboard last. Habits and achievements are one "Progress"
+  // tab — they were two views of the same question.
+  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['SETTINGS','settings','03'],['LEADERBOARD','board','04']];
+  const activeTab = UI.screen === 'detail' ? 'progress' : UI.screen;
 
   return `
     ${window.IS_DEMO ? '<div class="demo-banner">Demo mode — nothing is saved to the cloud</div>' : ''}
@@ -1073,7 +1150,7 @@ function renderToday(LI, doneCount, pct) {
       <div class="coachcard">
         <div class="eyebrow">One nudge, as agreed</div>
         <div class="say">${esc(n.line)}</div>
-        <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('insights')))}>${esc(n.cta)}</button>
+        <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
       </div>
 
       ${hs.map(h => habitRow(h, 'today')).join('')}
@@ -1098,11 +1175,10 @@ function renderToday(LI, doneCount, pct) {
     </div>`;
 }
 
-// ── Habits tab ────────────────────────────────────────────────────────────
-// Today is for ticking things off; this is for seeing where you stand. One row
-// per habit — rank, level progress, today's state and the consistency ladder —
-// so nothing here repeats the Today list.
-function renderHabits() {
+// ── Progress — habits and achievements in one tab ─────────────────────────
+// These were two views of the same question ("how am I doing"), so they are
+// one screen: overall level, then every habit's own rank, then the milestones.
+function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
   const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
   const statusOf = (h) => {
@@ -1112,11 +1188,32 @@ function renderHabits() {
   };
   return `
     <div style="animation:fadeIn .25s ease">
-      ${sectionLabel('Tracked', 'Tap for history')}
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:flex-end;gap:14px">
+          <div class="figure" style="font-size:76px;line-height:.8">${LI.lv}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
+            <div class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${LI.xp.toLocaleString()} XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
+          </div>
+        </div>
+        <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--divider)">
+        <div style="padding:14px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px">
+          <div class="figure" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
+          <div class="eyebrow" style="letter-spacing:.12em">Day streak · best ${bestDayStreak()}</div>
+        </div>
+        <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
+          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${totalAch}</div>
+          <div class="eyebrow" style="letter-spacing:.12em">Unlocked</div>
+        </div>
+      </div>
+
+      ${sectionLabel('Your habits', 'Tap for history')}
       ${hs.length ? hs.map(h => {
         const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
         return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
-          ${on(() => openHabit(h.id, 'habits'))}>
+          ${on(() => openHabit(h.id, 'progress'))}>
           <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
@@ -1139,8 +1236,25 @@ function renderHabits() {
           </div>
         </div>`).join('') : ''}
 
+      ${sectionLabel('Milestones')}
+      ${ACHIEVEMENTS.map(a => {
+        const have = measureAch(a), got = have >= a.need;
+        return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:15px 20px;opacity:${got ? '1' : '.45'}">
+          <div class="hd" style="width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;
+            ${got ? 'background:var(--accent);color:var(--bg);border:2px solid var(--accent)' : 'border:2px solid rgba(128,128,128,.5)'}">${a.code}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
+            <div class="hd" style="font-size:15px;line-height:1">${esc(a.name)}</div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(a.note)}</div>
+          </div>
+          <div style="flex:none;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <div class="mono" style="font-size:11px;color:${got ? 'var(--clay-deep)' : 'var(--muted-soft)'}">+${a.xp} XP</div>
+            <div class="mono" style="font-size:8px;letter-spacing:.08em;color:var(--muted-soft)">${got ? 'UNLOCKED' : have + '/' + a.need}</div>
+          </div>
+        </div>`;
+      }).join('')}
+
       <div style="padding:18px 20px 34px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        The number is your level in that habit — it climbs with how often you do it, not how hard it is. The five squares are your consistency tiers, from a 5-day run up to two months.
+        The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is. The five squares are consistency tiers, from a 5-day run up to two months.
       </div>
     </div>`;
 }
@@ -1233,70 +1347,98 @@ function renderDetail(h) {
       </div>
 
       <div style="padding:18px 20px 34px">
-        <button class="btn btn-secondary btn-block" ${on(() => go(UI.from === 'today' ? 'today' : 'habits'))}>Back to ${UI.from === 'today' ? 'today' : 'habits'}</button>
+        <button class="btn btn-secondary btn-block" ${on(() => go(UI.from === 'today' ? 'today' : 'progress'))}>Back to ${UI.from === 'today' ? 'today' : 'progress'}</button>
       </div>
     </div>`;
 }
 
-// ── Achievements ──────────────────────────────────────────────────────────
-function renderAchievements(LI, earned, totalAch) {
-  const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
+// ── Leaderboard screen ────────────────────────────────────────────────────
+function renderBoard() {
+  const scopeBtn = (key, label) => `<button class="chip ${LB.scope === key ? 'chip-on' : ''}"
+    ${on(() => { if (LB.scope !== key) { LB.scope = key; LB.loaded = false; fetchBoard(); } })}>${label}</button>`;
+
+  let body = '';
+  if (LB.loading && !LB.rows.length) {
+    body = `<div style="padding:26px 20px;display:flex;align-items:center;gap:12px">
+      <span class="spinner" style="width:22px;height:22px;border-width:2px"></span>
+      <span style="font-size:13px;color:var(--muted)">Scoring everyone…</span></div>`;
+  } else if (LB.error === 'demo') {
+    body = boardNote('The leaderboard is live for real athletes only — the demo has nobody to compete with.');
+  } else if (LB.error === 'notdeployed') {
+    body = boardNote('The leaderboard is not switched on yet. Your coach needs to run the leaderboard migration — nothing is wrong with your app.');
+  } else if (LB.error === 'offline') {
+    body = boardNote('No connection. The board needs signal — everything else in the app works offline.');
+  } else if (LB.error) {
+    body = boardNote('Could not load the board just now.') +
+      `<div style="padding:0 20px 20px"><button class="btn btn-secondary" ${on(() => { LB.loaded = false; fetchBoard(); })}>Try again</button></div>`;
+  } else if (!LB.rows.length) {
+    body = boardNote('Nobody has joined yet. Be first — and set the pace.');
+  } else {
+    const top = LB.rows.filter(r => r.pos <= 10);
+    const me = LB.rows.find(r => r.is_me);
+    const outside = me && me.pos > 10;
+    body = `
+      <div>
+        ${top.map(r => boardRow(r)).join('')}
+      </div>
+      ${outside ? `<div class="eyebrow" style="padding:16px 20px 6px;letter-spacing:.12em">Your position</div>${boardRow(me)}` : ''}`;
+  }
+
   return `
     <div style="animation:fadeIn .25s ease">
       <div class="block" style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" style="font-size:76px;line-height:.8">${LI.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
-            <div class="hd" style="font-size:18px;line-height:1">${esc(LI.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${LI.xp.toLocaleString()} XP · ${LI.toNext} to LV ${LI.lv + 1}</div>
-          </div>
-        </div>
-        <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--divider)">
-        <div style="padding:14px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px">
-          <div class="figure" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
-          <div class="eyebrow" style="letter-spacing:.12em">Day streak · best ${bestDayStreak()}</div>
-        </div>
-        <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
-          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${totalAch}</div>
-          <div class="eyebrow" style="letter-spacing:.12em">Unlocked</div>
+        <div class="chips">${scopeBtn('week', 'This week')}${scopeBtn('all', 'All time')}</div>
+        <div style="font-size:12px;line-height:1.5;color:var(--muted)">
+          ${LB.scope === 'week'
+            ? 'Everyone starts level on Monday, so a good week beats a long history. Scored on the server from what you have actually logged.'
+            : 'Every point you have ever earned. Scored on the server from what you have actually logged.'}
         </div>
       </div>
-
-      ${sectionLabel('Consistency', '5 tiers each')}
-      ${allHabits().map(h => {
-        const c = consistencyFor(h);
-        return `<button class="row-rule" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:13px 20px"
-          ${on(() => openHabit(h.id, 'insights'))}>
-          <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
-            <div class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</div>
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">
-              ${c.next ? esc(c.next.name) + ' at ' + c.next.days + ' days' : esc(CONSISTENCY_TIERS[CONSISTENCY_TIERS.length-1].name) + ' — all cleared'}
-              · best ${c.best}d${c.cur ? ' · now ' + c.cur + 'd' : ''}
-            </div>
-          </div>
-          <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
-        </button>`;
-      }).join('')}
-
-      ${sectionLabel('Milestones')}
-      ${ACHIEVEMENTS.map(a => {
-        const have = measureAch(a), got = have >= a.need;
-        return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:15px 20px;opacity:${got ? '1' : '.45'}">
-          <div class="hd" style="width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;
-            ${got ? 'background:var(--accent);color:var(--bg);border:2px solid var(--accent)' : 'border:2px solid rgba(128,128,128,.5)'}">${a.code}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
-            <div class="hd" style="font-size:15px;line-height:1">${esc(a.name)}</div>
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(a.note)}</div>
-          </div>
-          <div style="flex:none;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-            <div class="mono" style="font-size:11px;color:${got ? 'var(--clay-deep)' : 'var(--muted-soft)'}">+${a.xp} XP</div>
-            <div class="mono" style="font-size:8px;letter-spacing:.08em;color:var(--muted-soft)">${got ? 'UNLOCKED' : have + '/' + a.need}</div>
-          </div>
-        </div>`;
-      }).join('')}
-      <div style="height:30px"></div>
+      ${body}
+      ${renderBoardJoin()}
+    </div>`;
+}
+function boardNote(text) {
+  return `<div style="padding:24px 20px;font-size:13px;line-height:1.55;color:var(--muted)">${esc(text)}</div>`;
+}
+function boardRow(r) {
+  const medal = r.pos <= 3;
+  return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:14px 20px;${r.is_me ? 'background:var(--accent-100);' : ''}">
+    <div class="hd" style="width:38px;flex:none;font-size:22px;line-height:1;text-align:right;color:${medal ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${r.pos}</div>
+    <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
+      <div class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</div>
+      <div style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(r.rank_label)}</div>
+    </div>
+    <div class="mono" style="flex:none;font-size:13px;font-weight:700;text-align:right">${Number(r.xp || 0).toLocaleString()}<span style="font-size:9px;color:var(--muted-soft)"> XP</span></div>
+  </div>`;
+}
+// Joining is explicit and reversible, and the handle is theirs to choose —
+// nobody's name is published to other clients without them asking for it.
+function renderBoardJoin() {
+  if (window.IS_DEMO) return '';
+  const joined = !!CFG.onBoard;
+  if (!joined) {
+    return `
+      <div class="block" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
+        <div class="hd" style="font-size:20px;line-height:1">Join the board</div>
+        <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+          Other athletes will see the name you pick here and your points — nothing else. No habits, no logs, no real name unless you use it. You can leave any time.
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="input" id="boardname" maxlength="24" placeholder="${esc(defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
+          <button class="btn btn-primary" style="padding:0 16px" ${on(() => joinBoard(LB.nameDraft.trim(), true))}>Join</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted-soft)">Leave it blank to appear as ${esc(defaultDisplayName())}.</div>
+      </div>`;
+  }
+  return `
+    <div class="block" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
+      <div class="eyebrow" style="letter-spacing:.12em">You appear as</div>
+      <div style="display:flex;gap:8px">
+        <input class="input" id="boardname" maxlength="24" placeholder="${esc(CFG.boardName || defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
+        <button class="btn btn-secondary" style="padding:0 14px" ${on(() => joinBoard(LB.nameDraft.trim() || CFG.boardName, true))}>Rename</button>
+      </div>
+      <button class="btn btn-secondary btn-block" ${on(() => joinBoard(null, false))}>Leave the leaderboard</button>
     </div>`;
 }
 
@@ -1326,6 +1468,18 @@ function renderSettings() {
       <div style="padding:10px 20px 4px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
         Every tick is written to this phone the moment you make it, then sent up when there's a connection. Close the app, lose signal, fly somewhere — nothing is lost.
       </div>
+
+      ${sectionLabel('Leaderboard')}
+      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('board'))}>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">${CFG.onBoard ? 'You are on the board' : 'Not on the board'}</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">
+            ${CFG.onBoard ? 'Appearing as ' + esc(CFG.boardName || defaultDisplayName()) + ' · tap to rename or leave'
+                          : 'Other athletes only see you if you join · tap to have a look'}
+          </span>
+        </span>
+        <span class="mono" style="font-size:11px;color:var(--clay-deep)">${CFG.onBoard ? 'ON' : 'OFF'}</span>
+      </button>
 
       ${sectionLabel('Appearance')}
       <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
