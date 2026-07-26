@@ -906,8 +906,8 @@
     flex: none; width: 46px; height: 46px; border-radius: 12px;
     background: #0E4A36; color: #FAF7F2;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px;
   }
+  .habit-card-lv svg { width: 22px; height: 22px; }
   .habit-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
   .habit-card-title {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px;
@@ -915,14 +915,26 @@
   }
   body[data-dark] .habit-card-title { color: #EDEAE4; }
   .habit-card-sub { font-size: 12px; line-height: 1.35; color: var(--grey-text); }
-  .habit-card-bar { height: 4px; background: var(--grey-card); margin-top: 3px; border-radius: 2px; overflow: hidden; }
-  body[data-dark] .habit-card-bar { background: #333; }
-  .habit-card-bar > span { display: block; height: 100%; background: #0E4A36; }
-  body[data-dark] .habit-card-bar > span { background: #2E8663; }
   .habit-card-go {
     flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 20px; color: #C7552F;
   }
+
+  /* "Ticked in your habits" confirmation inside the completion card */
+  .complete-habit {
+    display: flex; align-items: center; gap: 9px; margin: 14px auto 0;
+    padding: 9px 13px; cursor: pointer;
+    background: var(--yellow-dim); border: 1px solid var(--yellow-mid); border-radius: 10px;
+  }
+  .complete-habit-mark {
+    flex: none; width: 20px; height: 20px; border-radius: 5px;
+    background: #0E4A36; color: #FAF7F2;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .complete-habit-text { font-size: 12.5px; color: var(--grey-dark); }
+  body[data-dark] .complete-habit-text { color: #EDEAE4; }
+  .complete-habit-text b { color: #C7552F; }
 
   /* "View Plan" pill on the current-cycle card — brand green, tappable look */
   .cm-pill-view { background: #0E4A36; color: #fff; }
@@ -2676,6 +2688,9 @@
   <!-- All future cycles (next + upcoming), unified layout -->
   <div id="upcoming-wrap"></div>
 
+  <!-- Daily habits (Proof) — the companion tracker, opened from here too -->
+  <div id="plan-habits-wrap"></div>
+
 </div>
 
 <!-- ═══ LIBRARY ═══ shared, app-wide content. A "two doors" landing — Sessions
@@ -2845,13 +2860,6 @@
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></span>
     <span class="nav-label">My Plan</span>
   </button>
-  <!-- Habits lives in its own page (habits.html). Same origin and the same PWA
-       scope, so from an installed app this stays inside the app shell rather
-       than bouncing out to the browser. -->
-  <button class="nav-item" data-tab="habits" onclick="goHabits()">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l4 4L20 5"/><path d="M4 19h16"/></svg></span>
-    <span class="nav-label">Habits</span>
-  </button>
 </div>
 
 <!-- Global dark-mode toggle — floats top-right on every nav screen so the theme
@@ -3011,10 +3019,10 @@ function _snapshot() {
   const out = {}, prefix = _sbId + '_';
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    // The habit tracker (habits.html) owns its own keys and has its own
-    // conflict-safe merge. This app only ever READS them (for the Home card),
-    // so it must not push them back — a stale copy here would otherwise
-    // overwrite habit progress the athlete just logged on another device.
+    // The habit tracker (habits.html) is a separate app that happens to share
+    // this origin's storage. It owns "<id>_hab_*" and syncs those itself, so
+    // this app must never push them — a stale copy here would overwrite habit
+    // progress the athlete logged on another device.
     if (k && k.indexOf(prefix + 'hab_') === 0) continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
@@ -3766,6 +3774,11 @@ function renderPlan() {
     });
     document.getElementById('upcoming-wrap').innerHTML = html;
   }
+
+  // The habit tracker sits at the end of My Plan too — the programme and the
+  // daily habits are the two halves of the plan, so both are reachable here.
+  const planHab = document.getElementById('plan-habits-wrap');
+  if (planHab) planHab.innerHTML = habitCardHtml();
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -3823,25 +3836,7 @@ function renderHome() {
   // Daily habits card — shows their real level when they've used the tracker,
   // and an invitation when they haven't. Tapping it opens habits.html.
   const habWrap = document.getElementById('home-habits-wrap');
-  if (habWrap) {
-    const hs = habitSnapshot();
-    habWrap.innerHTML = `
-      <div class="home-section-head">
-        <div class="home-section-title">Daily Habits</div>
-        <div class="home-week-chip">${hs ? esc(hs.label) : 'New'}</div>
-      </div>
-      <button type="button" class="habit-card" onclick="goHabits()">
-        <div class="habit-card-lv">${hs ? hs.lv : '1'}</div>
-        <div class="habit-card-body">
-          <div class="habit-card-title">${hs ? 'Level ' + hs.lv + ' · ' + esc(hs.label) : 'Start tracking'}</div>
-          <div class="habit-card-sub">${hs
-            ? hs.done + ' of ' + hs.total + ' habits done today · ' + hs.xp.toLocaleString() + ' XP'
-            : 'Sleep, steps, water, supplements — earn XP and climb the ranks.'}</div>
-          ${hs ? `<div class="habit-card-bar"><span style="width:${hs.pct}%"></span></div>` : ''}
-        </div>
-        <div class="habit-card-go">→</div>
-      </button>`;
-  }
+  if (habWrap) habWrap.innerHTML = habitCardHtml();
 
   const weekWrap = document.getElementById('home-week-wrap');
   if (weekWrap) {
@@ -3909,6 +3904,12 @@ function renderHome() {
       <div class="complete-emoji">✓</div>
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
+      <!-- Confirms the WORKOUT habit was ticked in Proof, so the athlete can
+           see the two apps agreed without leaving this screen. -->
+      <button type="button" class="complete-habit" id="habit-tick-${day.id}" hidden onclick="goHabits()">
+        <span class="complete-habit-mark">✓</span>
+        <span class="complete-habit-text">Counts as your Workout habit <b>·&nbsp;open tracker</b></span>
+      </button>
       <div class="complete-rpe">
         <div class="complete-rpe-label">How hard was this session?</div>
         <div class="complete-rpe-hint">1 = very easy · 10 = maximum effort</div>
@@ -4662,44 +4663,26 @@ function habitsUrl() {
 function goHabits() { window.location.href = habitsUrl(); }
 window.goHabits = goHabits;
 
-// Read the habit tracker's own stored state so the Home card can show a real
-// level without loading Proof. These keys arrive on this device automatically:
-// syncFromCloud() merges every "<id>_" key, habits included.
-function habitSnapshot() {
-  try {
-    const cfg = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || '{}');
-    const log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_log') || '{}');
-    const days = Object.keys(log);
-    if (!days.length) return null;
-    // Mirror of habits.html: weights x completion bonus, then the n^0.55 curve.
-    const W = { strength:100, steps:60, sleep:50, fuel:40, water:30, mobility:30, breathe:20, supps:20 };
-    const T = { strength:1, steps:10000, sleep:7.5, fuel:3, water:8, mobility:1, breathe:1, supps:1 };
-    const RANKS = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','ENFORCER','PREDATOR','MACHINE','RELENTLESS','UNTOUCHABLE','IMMORTAL'];
-    let xp = 0;
-    days.forEach(d => {
-      const day = log[d] || {};
-      Object.keys(day).forEach(id => {
-        const v = Number(day[id]) || 0;
-        if (v <= 0) return;
-        const w = (typeof W[id] === 'number') ? W[id] : 25;
-        const tgt = T[id] || 1;
-        xp += Math.round(v >= tgt ? w * 1.2 : w * (v / tgt));
-      });
-    });
-    let lv = 1, spent = 0, cost = Math.max(10, Math.round(300 * Math.pow(1, 0.55) / 10) * 10);
-    while (lv < 500 && xp - spent >= cost) { spent += cost; lv++; cost = Math.max(10, Math.round(300 * Math.pow(lv, 0.55) / 10) * 10); }
-    const i = lv - 1, star = Math.floor(i / 50), within = i % 50;
-    const label = (star ? '★' + star + ' ' : '') + RANKS[Math.floor(within / 5)] + ' ' + ((within % 5) + 1);
-    // Today's completion across whatever they have switched on.
-    const ids = Object.keys(W).concat((cfg.custom || []).map(c => c.id))
-      .filter(id => !cfg.on || cfg.on[id] !== false);
-    const t = new Date(); t.setHours(0, 0, 0, 0);
-    const key = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-    const todayLog = log[key] || {};
-    const done = ids.filter(id => (Number(todayLog[id]) || 0) >= (T[id] || 1)).length;
-    return { xp, lv, label, done, total: ids.length,
-             pct: ids.length ? Math.round(done / ids.length * 100) : 0 };
-  } catch (e) { return null; }
+
+// The one card, used on Home and at the end of My Plan. Deliberately a plain
+// shortcut: this app knows nothing about levels, XP or what is ticked. Proof
+// owns all of that, and duplicating the scoring here would be a third copy of
+// the formula to keep in sync — and weight this app does not need to carry.
+function habitCardHtml() {
+  return `
+    <div class="home-section-head">
+      <div class="home-section-title">Daily Habits</div>
+    </div>
+    <button type="button" class="habit-card" onclick="goHabits()">
+      <div class="habit-card-lv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l4 4L20 5"/><path d="M4 19h16"/></svg>
+      </div>
+      <div class="habit-card-body">
+        <div class="habit-card-title">Open your habit tracker</div>
+        <div class="habit-card-sub">Sleep, steps, water, supplements — earn XP and climb the ranks.</div>
+      </div>
+      <div class="habit-card-go">→</div>
+    </button>`;
 }
 
 function showLibPane(which) {
@@ -5549,6 +5532,13 @@ function confirmSession(day) {
   // finished (full OR partial) — no "send to coach" tap required. Send/email is
   // unchanged; this just also captures completions the athlete doesn't send.
   recordSessionToCloud(day);
+  // recordSessionToCloud() above already told the server this session happened.
+  // The habit tracker reads that record itself — this app writes nothing into
+  // Proof's space — so all we do here is say so.
+  if (!window.IS_DEMO) {
+    const tick = document.getElementById('habit-tick-' + day);
+    if (tick) tick.hidden = false;
+  }
   markSuggestedDay();
 }
 
