@@ -86,7 +86,8 @@ Deliberately *not* here: coach volume, motivation display, replay onboarding. Th
 has one mode — XP and levels, nudge and recap — and doesn't ask athletes to configure it.
 
 ### 04 · LEADERBOARD
-Opt-in only. Two boards: **this season** (the default) and **this week**. See below.
+Opt-in only. Two boards: **this season** (the default) and **past week** (a rolling
+seven days, not a calendar week). See below.
 
 ---
 
@@ -94,7 +95,7 @@ Opt-in only. Two boards: **this season** (the default) and **this week**. See be
 
 | Habit | Target | XP | Notes |
 |---|---|---|---|
-| **WORKOUT** | 1 session | 100 | **Ticked automatically** — see below |
+| **WORKOUT** | 1 session | 100 | **Locked** — only a finished session earns it. See below |
 | STEPS | 10,000 | 60 | Entered as a number |
 | SLEEP | 7.5 h | 50 | Entered as a number |
 | FUEL | 3 meals | 40 | Counter |
@@ -108,11 +109,20 @@ Athletes can switch any of them off and add their own (worth `customXp`, 25).
 **Onboarding** is one screen that *suggests* this set with every item as a toggle —
 it decides nothing for them, and everything stays editable in Settings afterwards.
 
-> **STEPS and SLEEP are entered by hand**, not synced from HealthKit. A web app cannot
-> read phone health data. This is the one place Proof departs from the original design
-> handoff, and it would need a native app to change.
+> **STEPS and SLEEP are entered by hand**, not synced from a phone's health app. A
+> website cannot read Apple Health or Health Connect — there is no browser API for it,
+> and Google shut its Fit REST API down on 30 June 2026. Reading steps automatically
+> needs one of: a native/Capacitor wrapper app, a per-athlete Apple Shortcut that POSTs
+> the number daily, or a paid aggregator (Terra/Vital) — see the open question at the
+> foot of this file. Until then, they are manual and unlocked.
 
-### The WORKOUT habit is fed by the training programme — through the server
+### The WORKOUT habit is LOCKED and fed by the training programme — through the server
+
+**Athletes cannot tick it by hand.** The row shows a padlock and the line *"Complete any
+day of your Workout in your Program to gain XP for this."*, with an arrow across to the
+programme; tapping the box explains rather than doing nothing. The habit-detail screen
+replaces its log button with *Open your programme*. Once earned, the padlock becomes a
+normal tick.
 
 **These are two separate apps.** Neither reaches into the other's storage, and
 neither carries the other's logic. The only thing they share is a fact that lives
@@ -132,8 +142,9 @@ Why it's built this way:
 - **`program.html` never syncs `<id>_hab_*`.** Those keys share an origin but belong to
   Proof, which merges them conflict-safely; a stale programme app would otherwise
   overwrite habit progress logged on another device.
-- **Each date imports once.** After that the athlete is in charge — unticking a day
-  makes it stay unticked instead of reappearing on the next load.
+- **The server is simply the truth.** Because the habit is locked, the import is
+  idempotent — no once-only bookkeeping is needed, since the athlete cannot untick it
+  and disagree.
 
 The habit's id is still `strength` internally so that renaming it to WORKOUT didn't
 orphan anyone's history or XP.
@@ -198,8 +209,9 @@ would have landed as an instant head start. Full detail in
   can rename or leave at any time.
 - Others see **that name, their points, level and rank** — nothing else.
 - **Two boards**: *this season* (the default — every point since the season opened) and
-  *this week* (resets Monday, so a new client can win in week one). Neither ever counts a
-  day from before the season started.
+  *past week* (a **rolling** seven days: today and the six before it, so a strong week
+  always shows instead of emptying every Monday). Neither ever counts a day from before
+  the season started.
 - **Scored in Postgres** from the log already stored server-side. The app submits no
   number, so editing local storage cannot buy a place.
 - **No athlete ids are ever returned** — an id alone would let one client fetch
@@ -245,3 +257,35 @@ lines that talk to you.
 Design language is the PROOF modernist system on AA's palette: zero border radius,
 2px section rules, 1px row rules, flush-left, typographic (no icon set), green as the
 accent with clay for the nudge card and mono meta.
+
+
+---
+
+## Open question — automatic steps
+
+Amir wants STEPS locked and filled from the athlete's health app, the way WORKOUT is
+locked and filled from the programme. **This cannot be done from a website.** There is
+no browser API for Apple Health or Android Health Connect, and Google's Fit REST API
+(the one route that used to work server-to-server) was shut down on **30 June 2026**.
+
+Three routes that would actually work, cheapest first:
+
+1. **Apple Shortcuts automation (iOS, free).** The athlete builds a Shortcut —
+   *Get Health Sample → Steps → Today → Get Contents of URL (POST)* — and a Personal
+   Automation that runs it daily. It posts to a Supabase edge function that writes the
+   number, and Proof reads it exactly like it reads workout days. No app store, no
+   native build. Costs: iOS only, ~2 minutes of one-time setup per athlete, and Apple
+   sometimes requires confirming the automation.
+2. **An aggregator (Terra, Vital, Rook).** One API covering Apple Health, Health
+   Connect, Fitbit, Garmin, Oura, Whoop. Real money monthly, and for Apple Health the
+   athlete still installs the aggregator's companion app or we embed their SDK in a
+   native app — so it does not remove the native requirement, it just outsources it.
+3. **Wrap Proof in Capacitor and ship a real app.** Reads HealthKit and Health Connect
+   natively and properly. Costs: Apple and Google developer accounts, review, builds,
+   and ongoing maintenance — and it contradicts the standing "don't make my apps heavy"
+   rule.
+
+**Recommendation: option 1** for the athletes who want it, keeping manual entry as the
+default for everyone else. It is free, needs no native app, and slots into the existing
+server-fed pattern. Do not lock STEPS until a source exists, or athletes simply cannot
+earn it.
