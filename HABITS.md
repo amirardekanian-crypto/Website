@@ -63,6 +63,9 @@ The screen they actually live on.
   streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
   tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
   repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
+- **This week's quests** — three targets for the *week* rather than the day, worth real
+  XP, with live progress. They sit under the nudge because a quest only means anything
+  while there is week left to do it in. Amir sets them — see below.
 - **The habit list** — tap the box to tick, tap the name for that habit's history, tap
   `+` on counter habits. Each row shows that habit's own level and current streak.
 - **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
@@ -95,6 +98,14 @@ cleared, which one you are standing in (and how far through it), and what the st
 means past level 50. Games always show you the road ahead; before this, Proof's road
 existed only inside a paragraph of the manual.
 
+**Share your rank** builds a 1080×1080 card on a canvas and hands it to the OS share
+sheet (or downloads it where there isn't one). The insignia is drawn from the *same*
+`RANK_ART` path data through `Path2D`, so a rank can never look different on the card
+than it does in the app. Green ground, paper type, clay-2 accent, Barlow Condensed —
+and it waits on `document.fonts.load()` for each face first, because canvas silently
+falls back to a system sans if the font has not downloaded yet, which is exactly how a
+brand card stops looking like the brand.
+
 Insignia are **drawn, not imported** — straight lines, hard corners, square caps,
 one inherited colour, in `RANK_ART`. They escalate on purpose so the ladder reads at
 a glance: blocks being laid, then force, then machinery, then a burst. Anything with
@@ -103,6 +114,11 @@ a curve or a rounded cap belongs to a different app.
 ### 04 · BOARD
 Opt-in only. Two boards: **this season** (the default) and **past week** (a rolling
 seven days, not a calendar week). See below.
+
+Rows show **movement, not just standing**: a ▲/▼ chip against each name, and a green
+banner when the athlete has overtaken someone — *"You passed Bo and Cy since you last
+looked."* The server returns no history, so the last standing is remembered per scope
+on the device (`CFG.lbSeen`) and the next fetch is diffed against it.
 
 ---
 
@@ -255,6 +271,19 @@ rather than a background that teleports between buttons.
 > `data-static` (the renderer must not fight the typer for its text) and keyed by the
 > *line*, so a new nudge replaces the node and retypes while an unchanged one is left
 > alone.
+
+**Phone manners.** `bindGestures()` binds once per node (the renderer keeps nodes
+alive, so binding per render would stack listeners): the log sheet **drags away under
+your thumb** — past 30% of its height or 120px it dismisses — and a stepper button
+**repeats when held**, 420ms before it starts and ~9/sec after, so logging 10,000 steps
+is not forty taps. Dragging is ignored when the gesture starts on a control inside the
+sheet.
+
+**Sound** is off unless the athlete turns it on (Settings → Sound). It is *synthesised*,
+not loaded — a short square blip through WebAudio, so it costs no bytes and cannot fail
+to download. It rides inside `haptic()`, so every existing call site gets it for free.
+This is also the only feedback an iPhone actually gets, since Safari exposes no
+vibration API at all.
 
 All of it is off under `prefers-reduced-motion`, which `reduced()` checks live.
 

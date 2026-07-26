@@ -230,7 +230,8 @@ level has to stay a pure count of how often it was done (§2), and paying its la
 for its own streak would quietly break that.
 
 Milestones keep flat values — they are one-off and genuinely hard — totalling
-**1,575 XP** across the nine.
+**1,575 XP** across the nine. **Weekly quests ride the same rail** (§8.5): dated on the
+day they complete, so they need no special handling in any window.
 
 `bonusEvents()` is cached and dropped by `invalidateBonus()`, which `saveLog()` and
 `saveCfg()` call. **Anything that mutates `LOG` or `CFG` without going through those
@@ -250,6 +251,7 @@ A full-screen, game-style takeover fires for five things:
 | **A consistency tier** cleared on any habit | `checkUnlocks()` | deep green, clay-2 rays |
 | **A milestone** unlocked | `checkUnlocks()` | deep green, clay-2 rays |
 | **A perfect day** — every tracked habit done | `checkUnlocks()` | deep green, clay-2 rays |
+| **A weekly quest** completed (this week only) | `checkUnlocks()` | deep green, clay-2 rays |
 
 Routine habit levels flash a small chip in that habit's row instead. This split is
 deliberate: an athlete completing eight habits on day one would otherwise get nine
@@ -371,7 +373,7 @@ never synced.
 >
 > | Where | What | When to change it |
 > |---|---|---|
-> | `XP_RULES`, `CONSISTENCY_TIERS`, `ACHIEVEMENTS` in `habits.html` | What each athlete sees in their own app | Always |
+> | `XP_RULES`, `CONSISTENCY_TIERS`, `ACHIEVEMENTS`, `QUEST_POOL` in `habits.html` | What each athlete sees in their own app | Always |
 > | the `xp_rules` table row in Supabase | What the leaderboard ranks people by | Always, at the same time |
 >
 > If you change one and not the other, athletes' own screens and the leaderboard
@@ -446,8 +448,84 @@ perfect day and as a three-habit day.
   the `names` array in that function.
 
 The SQL lives in `supabase/stage9_leaderboard.sql`, with seasons in
-`stage11_seasons.sql` and bonus XP in `stage12_bonus_xp.sql` — **all applied and
-live**.
+`stage11_seasons.sql`, bonus XP in `stage12_bonus_xp.sql` and weekly quests in
+`stage13_weekly_quests.sql` — **all applied and live**.
+
+---
+
+## 8.5 Weekly quests — and how Amir prescribes them
+
+Three quests a week, **Monday to Sunday**, worth real XP. They give the week a shape
+instead of it being seven identical days, and they are the one part of the system the
+coach sets rather than the athlete earning passively.
+
+### The shape of a quest
+
+```json
+{ "id":"w_water5", "title":"THE WELL RUNS DEEP", "note":"Full water on 5 days",
+  "kind":"daysHit:water", "need":5, "xp":150 }
+```
+
+| `kind` | Means | Example |
+|---|---|---|
+| `daysHit:<habit>` | Completed that habit on N separate days in the week | `daysHit:sleep`, need 5 |
+| `total:<habit>` | Accumulated N units in the week (target or not) | `total:steps`, need 50000 |
+| `qualify` | N days at `streakQualifyPct` or better | need 5 |
+| `perfect` | N days with every tracked habit done | need 2 |
+
+Everything is measured **from the log alone**, so nothing new is stored and both
+scorers can agree. Quests are paid **on the day they complete**, exactly like tiers
+and milestones, and are **season-bounded** — a week straddling a season opening does
+not count the days before it.
+
+### Which three are live
+
+Derived, never stored:
+
+1. If Amir has **prescribed** that week, those are the quests, in his order.
+2. Otherwise a deterministic pick from the pool, **seeded on the week's Monday**.
+
+Both the app and Postgres run the identical rule (`questsForWeek()` /
+`public.hab_week_quests`), including the same string hash, so they always land on the
+same three without a lookup table.
+
+### 🎯 Prescribing a week
+
+One command in the Supabase SQL editor — same shape as starting a season:
+
+```sql
+select public.set_quests('2026-07-27', array['w_water5','w_steps50k','w_perfect2']);
+```
+
+The date is any day in the target week (it is normalised to the Monday). Pass as many
+ids as you like — two, three, five — that is exactly what the athletes get. To go back
+to automatic picks for a week, remove its key:
+
+```sql
+update public.xp_rules
+set rules = jsonb_set(rules, '{questWeeks}', (rules -> 'questWeeks') - '2026-07-27')
+where id = 1;
+```
+
+### Editing the pool itself
+
+The pool lives on the `xp_rules` row under `quests`, with `questsPerWeek` controlling
+how many are drawn. **`QUEST_POOL` in `habits.html` is the offline fallback and must
+be kept in step** — an athlete with no signal scores off it, and if the two disagree
+their screen and the board will too. Same rule as everything else in §8.
+
+```sql
+update public.xp_rules
+set rules = jsonb_set(rules, '{quests}', '[ … the whole array … ]'::jsonb)
+where id = 1;
+```
+
+Quest names follow the house rule: **cool, not literal**. "THE WELL RUNS DEEP", with
+the literal description in `note`.
+
+> **Careful with `xp`.** Three quests at 150–300 XP is 450–750 a week, on top of ~2,900
+> from a perfect week of habits — roughly a 15–25% top-up, which is the intent. Push
+> quest XP much past that and quests stop being a bonus and start being the game.
 
 ---
 
