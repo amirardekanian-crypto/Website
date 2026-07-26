@@ -167,17 +167,75 @@ Every habit has the same five-tier consecutive-day ladder:
 
 ```js
 const CONSISTENCY_TIERS = [
-  { days: 5,  name: 'KINDLED',     xp: 50 },
-  { days: 10, name: 'STEADY',      xp: 100 },
-  { days: 20, name: 'LOCKED IN',   xp: 200 },
-  { days: 30, name: 'IRONCLAD',    xp: 350 },
-  { days: 60, name: 'UNBREAKABLE', xp: 750 }
+  { days: 5,  name: 'KINDLED',     mult: 0.5 },
+  { days: 10, name: 'STEADY',      mult: 1 },
+  { days: 20, name: 'LOCKED IN',   mult: 2 },
+  { days: 30, name: 'IRONCLAD',    mult: 3 },
+  { days: 60, name: 'UNBREAKABLE', mult: 6 }
 ];
 ```
 
 Tiers are judged on the athlete's **best run ever**, not their current streak — so
 breaking a streak never takes a badge back. Add or remove tiers freely; the pip
 display adapts to however many there are.
+
+**`mult` is a multiplier on that habit's own daily completion value, not a flat
+number.** This was changed in stage 12 and it matters: flat values inverted the
+weighting the rest of the system rests on — sixty straight days of SUPPS (20 XP a
+day) paid exactly the same 750 as sixty straight days of WORKOUT (100 a day), which
+is not true and an athlete can feel it.
+
+```
+tierXp(habit, i) = max(10, round(weight × completionBonus × mult / 10) × 10)
+```
+
+| Tier | ×    | WORKOUT | STEPS | SLEEP | WATER | SUPPS |
+|---|---|---|---|---|---|---|
+| KINDLED     | 0.5 | 60  | 40  | 30  | 20  | 10  |
+| STEADY      | 1   | 120 | 70  | 60  | 40  | 20  |
+| LOCKED IN   | 2   | 240 | 140 | 120 | 70  | 50  |
+| IRONCLAD    | 3   | 360 | 220 | 180 | 110 | 70  |
+| UNBREAKABLE | 6   | 720 | 430 | 360 | 220 | 140 |
+| **full ladder** | | **1,500** | **900** | **750** | **460** | **290** |
+
+Across all eight habits the whole ladder is about **5,300 XP**. The flat values it
+replaced totalled 11,600, which was +46% on top of sixty perfect days (25,200) and
+made daily logging feel like the side dish.
+
+---
+
+## 4.5 What the badges pay, and why it is safe
+
+Tiers and milestones were displayed with an XP value and awarded **nothing** until
+stage 12: `overallXp()` summed `habitXp` and stopped. They pay now, under three
+rules that keep the guarantee at the top of this file intact.
+
+**1. A bonus is paid on the day it was crossed.** `bonusEvents()` walks the log once
+and returns `{day, xp, kind, id}` for every tier and milestone crossing. Dating it is
+the whole trick: a bonus is then just an ordinary amount inside a window, so the
+season rule and both leaderboard windows filter it with no special cases — and
+nothing new is stored, so retuning still rescores everyone automatically.
+
+**2. Runs are measured from the season start.** `bonusEvents()` walks `seasonDays()`,
+not `loggedDays()`. This is a **fairness rule, not an implementation detail**: a tier
+crosses once, so scoring it against all-time runs would mean an athlete whose streak
+began before the season could never earn tier points again, while someone who joined
+yesterday could earn all 5,300. The season resets the run *for payment*; the badge
+itself is still judged on the best run ever and is never taken back. So the pip on
+the Progress tab can read "tier 5" while this season has only paid tier 2 — that is
+the same rule as pre-season days not scoring, applied to streaks.
+
+**3. Bonuses land on the overall ladder only**, never on a habit's own. A habit's
+level has to stay a pure count of how often it was done (§2), and paying its ladder
+for its own streak would quietly break that.
+
+Milestones keep flat values — they are one-off and genuinely hard — totalling
+**1,575 XP** across the nine.
+
+`bonusEvents()` is cached and dropped by `invalidateBonus()`, which `saveLog()` and
+`saveCfg()` call. **Anything that mutates `LOG` or `CFG` without going through those
+two must invalidate by hand** — `syncFromCloud()` and `importWorkoutDays()` do. The
+cold walk is ~7ms over 400 days of full logs.
 
 ---
 
@@ -223,12 +281,11 @@ rules keep it from becoming noise:
   gets it recorded, not replayed at them. `seedUnlocks()` is called from
   `seedSeenLevels()`, so the two baselines can never drift apart.
 
-> ⚠️ **The `xp` on `CONSISTENCY_TIERS` and `ACHIEVEMENTS` is still not awarded.**
-> `overallXp()` is the sum of `habitXp` and nothing else, so the "+750 XP" the
-> Progress tab shows against UNBREAKABLE buys nothing. That is why the takeovers
-> above quote days and names but never an XP figure. Fixing it means changing the
-> client **and** the `xp_rules`/`hab_xp` scorer in Supabase in the same breath —
-> see §8 and the warning at the top of this file.
+Since stage 12 the tier and milestone takeovers **quote the XP they actually pay**,
+because they actually pay it — a tier takeover sums the payout across every habit
+that cleared it in the same pass. A perfect-day takeover quotes `dayXp(today)`, which
+includes any bonus crossed that day, so the figure always matches what the athlete's
+total just moved by. See §4.5.
 
 **If it feels like too much,** the cheapest change is in `checkLevelUps()` — set
 `big: overall` instead of `big: overall || rankChanged` and only the overall level
@@ -314,14 +371,14 @@ never synced.
 >
 > | Where | What | When to change it |
 > |---|---|---|
-> | `XP_RULES` in `habits.html` | What each athlete sees in their own app | Always |
+> | `XP_RULES`, `CONSISTENCY_TIERS`, `ACHIEVEMENTS` in `habits.html` | What each athlete sees in their own app | Always |
 > | the `xp_rules` table row in Supabase | What the leaderboard ranks people by | Always, at the same time |
 >
 > If you change one and not the other, athletes' own screens and the leaderboard
 > will quietly disagree.
 
 To update the database copy, run this in the Supabase SQL editor (adjust the
-numbers to match whatever you just put in `XP_RULES`):
+numbers to match whatever you just put in the app):
 
 ```sql
 update public.xp_rules set rules = jsonb_build_object(
@@ -332,7 +389,20 @@ update public.xp_rules set rules = jsonb_build_object(
   'weights', '{"strength":100,"steps":60,"sleep":50,"fuel":40,
                "water":30,"mobility":30,"breathe":20,"supps":20}'::jsonb,
   'targets', '{"strength":1,"steps":10000,"sleep":7.5,"fuel":3,
-               "water":8,"mobility":1,"breathe":1,"supps":1}'::jsonb
+               "water":8,"mobility":1,"breathe":1,"supps":1}'::jsonb,
+  -- mirrors CONSISTENCY_TIERS
+  'tiers', '[{"days":5,"mult":0.5},{"days":10,"mult":1},{"days":20,"mult":2},
+             {"days":30,"mult":3},{"days":60,"mult":6}]'::jsonb,
+  -- mirrors ACHIEVEMENTS; `measure` strings are read exactly as the app reads them
+  'milestones', '[{"code":"RR","need":30,"xp":200,"measure":"daysHit:steps"},
+                  {"code":"IM","need":16,"xp":150,"measure":"streak:supps"},
+                  {"code":"HM","need":12,"xp":150,"measure":"streak:strength"},
+                  {"code":"HS","need":5,"xp":100,"measure":"streak:water"},
+                  {"code":"DP","need":10,"xp":75,"measure":"daysWith3"},
+                  {"code":"ZM","need":10,"xp":100,"measure":"streak:breathe"},
+                  {"code":"BA","need":10,"xp":150,"measure":"streak:sleep"},
+                  {"code":"RB","need":14,"xp":150,"measure":"streak:mobility"},
+                  {"code":"CN","need":100,"xp":500,"measure":"perfectDays"}]'::jsonb
 ), updated_at = now() where id = 1;
 ```
 
@@ -340,13 +410,32 @@ Note `targets` as well as `weights` — the server needs targets to score partia
 progress on counter habits the same way the app does. Custom habits an athlete
 invents are scored at `customXp`, since the server has no target for them.
 
+`tiers` and `milestones` feed `public.hab_bonus_xp`, which mirrors `bonusEvents()`
+in the app: it walks the log from the season start, dates every crossing, and pays
+the ones inside the window. It reads the athlete's **config** as well as their log
+(via `hab_cfg_of`), because which habits are switched on decides what counts as a
+perfect day and as a three-habit day.
+
+> **Verify parity after any change to these.** The two scorers are only worth having
+> if they agree. Build a log arithmetically so both sides can generate it identically
+> (`generate_series` + modulo in SQL, the same modulo in JS), then compare
+> `hab_bonus_xp` against `bonusEvents()` over several windows — all-time, a season
+> starting mid-log, a season starting today, and a rolling week. They must match
+> exactly, including the awkward cases: days missing from the log entirely, partial
+> counter values, and runs broken by a gap.
+
 ### How the board works
 
 - **Opt-in only.** No row in `leaderboard_optin` means invisible. Athletes join
   from the Leaderboard tab and pick their own display name (defaults to first
   name + last initial). They can rename or leave at any time.
-- **Two boards.** *This week* (Monday to today) is the default so a new client can
-  win in week one; *all time* is the second tab.
+- **Two boards.** *This season* is the default; *past week* is a **rolling seven
+  days** — today and the six before it, never reaching earlier than the season start.
+  (Stage 12 fixed a mismatch here: the app was changed to say "rolling seven days"
+  while the server still scored `date_trunc('week')`, i.e. Monday-to-today. The two
+  agreed only on a Sunday.)
+- **Badges score on the board too**, on the same day-of-crossing rule — so a tier
+  cleared inside those seven days pays on the weekly board. See §4.5.
 - **Reading it is key-checked**, so client display names are not exposed to the
   open internet — only real athletes see the board.
 - **No athlete IDs are ever returned.** An ID alone is enough to fetch
@@ -356,7 +445,9 @@ invents are scored at `customXp`, since the server has no target for them.
   `hab_level`), so renaming a rank means updating `RANKS` in `habits.html` **and**
   the `names` array in that function.
 
-The SQL lives in `supabase/stage9_leaderboard.sql`.
+The SQL lives in `supabase/stage9_leaderboard.sql`, with seasons in
+`stage11_seasons.sql` and bonus XP in `stage12_bonus_xp.sql` — **all applied and
+live**.
 
 ---
 

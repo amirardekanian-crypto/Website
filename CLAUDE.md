@@ -45,7 +45,8 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–11 are applied and live** (leaderboard, workout-days feed, seasons).
+**Supabase stages 9–12 are applied and live** (leaderboard, workout-days feed, seasons,
+bonus XP for consistency tiers + milestones).
 
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a
