@@ -551,12 +551,16 @@ const LEVELS_PER_CYCLE = RANKS.length * SUBS_PER_RANK;   // 50
 const MAX_LEVEL_SCAN = 5000;                             // loop guard
 
 // Consecutive-day ladders, one per habit, five tiers each — 5 days up to two months.
+// `mult` is a multiplier on THAT HABIT's daily completion value, not a flat number.
+// Flat values inverted the weighting the rest of the system rests on: sixty straight
+// days of SUPPS (20 XP a day) paid exactly as much as sixty straight days of
+// WORKOUT (100 a day), which is not true and the athlete can feel it.
 const CONSISTENCY_TIERS = [
-  { days: 5,  name: 'KINDLED',     xp: 50 },
-  { days: 10, name: 'STEADY',      xp: 100 },
-  { days: 20, name: 'LOCKED IN',   xp: 200 },
-  { days: 30, name: 'IRONCLAD',    xp: 350 },
-  { days: 60, name: 'UNBREAKABLE', xp: 750 }
+  { days: 5,  name: 'KINDLED',     mult: 0.5 },
+  { days: 10, name: 'STEADY',      mult: 1 },
+  { days: 20, name: 'LOCKED IN',   mult: 2 },
+  { days: 30, name: 'IRONCLAD',    mult: 3 },
+  { days: 60, name: 'UNBREAKABLE', mult: 6 }
 ];
 
 // One-off milestones, measured against real history — nothing is seeded.
@@ -648,12 +652,18 @@ function migrateOld() {
   if (touched) saveLog();
   saveCfg();
 }
+// Both of these drop the bonus cache: the log obviously moves it, and so does
+// the config, because which habits are TRACKED decides what counts as a perfect
+// day and as a three-habit day. Anything that mutates LOG or CFG without going
+// through these two has to invalidate by hand — see syncFromCloud.
 function saveCfg() {
   CFG.updatedAt = Date.now();
+  invalidateBonus();
   try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
   markDirty();
 }
 function saveLog() {
+  invalidateBonus();
   try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {}
   markDirty();
 }
@@ -683,6 +693,9 @@ async function fetchWorkoutDays() {
 function importWorkoutDays(src) {
   if (!Array.isArray(src) || !src.length) return false;
   const h = habitById('strength');
+  // Even a no-op import can add an empty day to LOG below, which moves the run
+  // lengths the badge walk depends on — so drop the cache regardless of `changed`.
+  invalidateBonus();
   let changed = false;
   src.forEach(d => {
     if (typeof d !== 'string') return;
@@ -813,6 +826,9 @@ async function syncFromCloud() {
         localStorage.setItem(K_CFG(), JSON.stringify(CFG));
       }
     } catch (e) {}
+    // Both merges above write straight to LOG/CFG and localStorage without going
+    // through saveLog/saveCfg, so the bonus cache has to be dropped by hand.
+    invalidateBonus();
     migrateOld();
   } catch (e) { /* offline — the phone still holds everything */ }
 }
@@ -889,11 +905,99 @@ async function fetchSeason() {
 // A habit's own XP pool for the CURRENT SEASON. Counted even when the habit is
 // currently switched off — XP you earned is never taken back mid-season.
 function habitXp(h) { return seasonDays().reduce((s, k) => s + xpFor(h, valOf(k, h.id)), 0); }
-function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0); }
-// What a single day actually paid — the perfect-day takeover quotes it.
+// ── What the badges pay ───────────────────────────────────────────────────
+// Consistency tiers and milestones are worth real points, and each is paid ON
+// THE DAY IT WAS CROSSED. Dating them is the whole trick: a bonus is then just
+// an ordinary dated amount, so the season window and both leaderboard windows
+// filter it with no special cases, and XP stays a pure function of the log —
+// nothing new is stored, exactly as before.
+//
+// Bonuses land on the OVERALL ladder only, never on a habit's own. A habit's
+// level has to stay a pure count of how often it was done (see XP_SYSTEM.md §2),
+// and paying its ladder for its own streak would quietly break that.
+function tierXp(h, i) {
+  const t = CONSISTENCY_TIERS[i];
+  if (!t) return 0;
+  return Math.max(10, Math.round(baseXp(h) * XP_RULES.completionBonus * t.mult / 10) * 10);
+}
+// Recomputing this on every level read would be thousands of operations per
+// render, so it is cached and dropped whenever the log or the tracked set moves.
+let _bonusCache = null;
+function invalidateBonus() { _bonusCache = null; }
+// Runs and counts are measured FROM THE SEASON START, not from all of history.
+// That is a fairness rule, not an implementation detail: a tier crosses once, so
+// scoring it against all-time runs would mean an athlete whose streak began
+// before the season could never earn tier points again, while someone who joined
+// yesterday could earn every one of them. The season resets the run for PAYMENT;
+// the badge itself is judged on the best run ever and is never given back.
+function bonusEvents() {
+  if (_bonusCache) return _bonusCache;
+  const days = seasonDays(), out = [];
+  if (!days.length) { _bonusCache = out; return out; }
+  const hs = allHabits();
+
+  // Tiers — one ordered pass per habit, watching the run length.
+  hs.forEach(h => {
+    let run = 0, prev = null, next = 0;
+    days.forEach(k => {
+      if (!isDone(h, k)) { run = 0; return; }
+      run = (prev && fmtKey(addDays(parseKey(prev), 1)) === k) ? run + 1 : 1;
+      prev = k;
+      while (next < CONSISTENCY_TIERS.length && run >= CONSISTENCY_TIERS[next].days) {
+        out.push({ day: k, xp: tierXp(h, next), kind: 'tier', id: h.id, tier: next });
+        next++;
+      }
+    });
+  });
+
+  // Milestones — one ordered pass maintaining every counter at once, recording
+  // the day each measure first reaches its target.
+  const streak = {}, lastDone = {}, hits = {}, claimed = {};
+  let with3 = 0, perfect = 0;
+  days.forEach(k => {
+    hs.forEach(h => {
+      if (!isDone(h, k)) { streak[h.id] = 0; return; }
+      streak[h.id] = (lastDone[h.id] && fmtKey(addDays(parseKey(lastDone[h.id]), 1)) === k) ? (streak[h.id] || 0) + 1 : 1;
+      lastDone[h.id] = k;
+      hits[h.id] = (hits[h.id] || 0) + 1;
+    });
+    if (live().filter(h => isDone(h, k)).length >= 3) with3++;
+    if (isPerfect(k)) perfect++;
+    ACHIEVEMENTS.forEach(a => {
+      if (claimed[a.code]) return;
+      let have = 0;
+      if (a.measure === 'perfectDays') have = perfect;
+      else if (a.measure === 'daysWith3') have = with3;
+      else {
+        const p = a.measure.split(':');
+        if (p[0] === 'streak') have = streak[p[1]] || 0;
+        else if (p[0] === 'daysHit') have = hits[p[1]] || 0;
+      }
+      if (have < a.need) return;
+      claimed[a.code] = true;
+      out.push({ day: k, xp: a.xp, kind: 'milestone', id: a.code });
+    });
+  });
+
+  _bonusCache = out;
+  return out;
+}
+// Every event is already inside the season by construction, so these only have
+// to window it.
+function bonusXp() { return bonusEvents().reduce((s, e) => s + e.xp, 0); }
+function bonusXpBetween(fromDate, toDate) {
+  return bonusEvents().reduce((s, e) => {
+    const d = parseKey(e.day);
+    return (d < fromDate || d > toDate) ? s : s + e.xp;
+  }, 0);
+}
+function overallXp() { return allHabits().reduce((s, h) => s + habitXp(h), 0) + bonusXp(); }
+// What a single day actually paid, badges included — the perfect-day takeover
+// quotes it, so it has to match what the athlete's total just moved by.
 function dayXp(dayKey) {
   if (!inSeason(dayKey)) return 0;
-  return allHabits().reduce((s, h) => s + xpFor(h, valOf(dayKey, h.id)), 0);
+  const d = parseKey(dayKey);
+  return allHabits().reduce((s, h) => s + xpFor(h, valOf(dayKey, h.id)), 0) + bonusXpBetween(d, d);
 }
 // Habit ladders reuse the curve, scaled to that habit's daily value, so every
 // habit levels at the same RATE — which is what makes your level in a habit
@@ -933,7 +1037,7 @@ function xpBetween(fromDate, toDate) {
     if (d < fromDate || d > toDate) return;
     allHabits().forEach(h => { sum += xpFor(h, valOf(k, h.id)); });
   });
-  return sum;
+  return sum + bonusXpBetween(fromDate, toDate);
 }
 
 // ── Consistency ladders ───────────────────────────────────────────────────
@@ -991,7 +1095,12 @@ function currentLevels() {
 function rulesSignature() {
   const src = JSON.stringify([
     XP_RULES.base, XP_RULES.growth, XP_RULES.completionBonus, XP_RULES.customXp,
-    XP_RULES.weights, CONSISTENCY_TIERS.map(t => t.days), HABITS.map(h => [h.id, h.target]),
+    XP_RULES.weights, HABITS.map(h => [h.id, h.target]),
+    // Tier days AND their multipliers, plus every milestone's cost and payout —
+    // all of these now move real XP, so retuning any of them has to re-baseline
+    // rather than fire a wall of celebrations nobody earned today.
+    CONSISTENCY_TIERS.map(t => [t.days, t.mult]),
+    ACHIEVEMENTS.map(a => [a.code, a.need, a.xp]),
     seasonStart()   // a new season resets every score, so re-baseline instead of celebrating
   ]);
   let hash = 0;
@@ -1069,13 +1178,13 @@ function checkUnlocks() {
     if (tiers[h.id] <= was) return;
     // Crossing several tiers at once (a long run imported at once) reports only
     // the highest reached — the lower ones are implied by it.
-    const t = CONSISTENCY_TIERS[tiers[h.id] - 1];
+    const idx = tiers[h.id] - 1, t = CONSISTENCY_TIERS[idx];
     if (!t) return;
-    (byTier[t.days] = byTier[t.days] || { tier: t, habits: [] }).habits.push(h);
+    (byTier[t.days] = byTier[t.days] || { tier: t, tierIndex: idx, habits: [] }).habits.push(h);
   });
   Object.keys(byTier).sort((a, b) => a - b).forEach(days => {
     const g = byTier[days];
-    events.push({ kind:'tier', id:'t' + days, tier:g.tier, habits:g.habits });
+    events.push({ kind:'tier', id:'t' + days, tier:g.tier, tierIndex:g.tierIndex, habits:g.habits });
   });
   ach.forEach(code => {
     if (CFG.seenAch.indexOf(code) !== -1) return;
@@ -1590,15 +1699,17 @@ function nameList(hs) {
 function renderBadgeCelebration(ev) {
   let badge, badgeLabel, kicker, title, sub, codeClass = '';
   if (ev.kind === 'tier') {
+    const paid = ev.habits.reduce((s, h) => s + tierXp(h, ev.tierIndex), 0);
     badge = String(ev.tier.days); badgeLabel = 'DAYS';
     kicker = 'Consistency';
     title = ev.tier.name;
-    sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. Your longest run yet, and it is yours for good.';
+    sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. +' + paid.toLocaleString()
+        + ' XP, and the badge is yours for good.';
   } else if (ev.kind === 'milestone') {
     badge = ev.ach.code; badgeLabel = 'MILESTONE'; codeClass = ' code';
     kicker = 'Unlocked';
     title = ev.ach.name;
-    sub = ev.ach.note + '.';
+    sub = ev.ach.note + '. +' + ev.ach.xp.toLocaleString() + ' XP.';
   } else {
     const n = live().length;
     badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
@@ -1868,9 +1979,9 @@ function renderDetail(h) {
           <span>Consistency</span><span>${con.tier} of ${con.total}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-          <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
+          <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
           <div style="font-size:12px;color:var(--muted);text-align:right">
-            ${con.next ? esc(con.next.name) + ' at ' + con.next.days + ' days · best run ' + con.best + 'd'
+            ${con.next ? esc(con.next.name) + ' at ' + con.next.days + ' days · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong><br>best run ' + con.best + 'd'
                        : 'UNBREAKABLE — every tier cleared'}
           </div>
         </div>
@@ -2045,7 +2156,8 @@ function renderManual() {
           <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here — finish a session in your programme and it ticks itself, whether you got through all of it or not.</div>
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
-          <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points, and they only come from unbroken runs.</div>
+          <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken runs.</div>
+          <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The nine on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
         </div>`)}
 
       ${block(h2('Levels and ranks') +
@@ -2059,12 +2171,18 @@ function renderManual() {
 
       ${block(h2('Consistency') +
         p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a streak never takes a badge back.`) +
+        p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`) +
         `<div style="display:flex;flex-direction:column;gap:0">
-          ${CONSISTENCY_TIERS.map(t => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
+          ${CONSISTENCY_TIERS.map((t, i) => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
             <span class="hd" style="font-size:14px">${esc(t.name)}</span>
-            <span class="mono" style="font-size:11px;color:var(--muted)">${t.days} DAYS IN A ROW</span>
+            <span style="display:flex;gap:10px;align-items:baseline;white-space:nowrap">
+              <span class="mono" style="font-size:11px;color:var(--muted)">${t.days} DAYS IN A ROW</span>
+              <span class="mono" style="font-size:12px;font-weight:700;color:var(--clay-deep)">+${tierXp(live()[0] || HABITS[0], i)}</span>
+            </span>
           </div>`).join('')}
-        </div>`)}
+        </div>` +
+        `<div style="height:12px"></div>` +
+        p(`Tier points are paid on the day you cross the tier, so they belong to the season you earned them in. A new season starts your points again — but the badges themselves stay yours.`))}
 
       ${block(h2('Seasons') +
         p(`Scoring runs in seasons, like ranked play in a game. You are in <strong style="color:var(--ink)">${esc(seasonName())}</strong>, which opened on ${esc(parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}.`) +
