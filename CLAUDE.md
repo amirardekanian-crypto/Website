@@ -34,6 +34,13 @@ next chat will be working from a lie:
    themselves; its **prose** does not — fix that by hand when behaviour changes.
 4. **`privacy.html`** — if you changed what data is stored or shared.
 
+**Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
+backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
+Roll call pays **no XP** on purpose and no scoring function reads `hab_notes`; keep it
+that way. Amir posts the day's coach line with
+`select public.set_coach_note('…');` and moderates with
+`select public.hide_note('<athlete_id>', '<date>');`.
+
 Also: XP is scored **twice** — `XP_RULES` in `habits.html` and the `xp_rules` row in
 Supabase (the leaderboard scores server-side). Change both together or the board and the
 athletes' own screens will disagree.
