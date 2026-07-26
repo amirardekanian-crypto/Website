@@ -24,6 +24,7 @@ const XP_RULES = {
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
   streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  dailyCap: 3,            // most a counter takes in a day, × its target — section 1
   seasonStart: '2026-07-26',   // fallback only — the server is the authority
   seasonName: 'Pre-Season',    // see section 7
   weights: {              // per-completion value, by health impact
@@ -79,6 +80,19 @@ you're part way there, and get the `completionBonus` once you finish:
 
 So a near-miss day still pays, but finishing is clearly worth more. Check-off habits
 are all-or-nothing and always get the bonus (a 100 XP workout pays 120).
+
+**The daily ceiling.** `dailyCap: 3` — a counter habit accepts at most **3× its
+target** in one day (steps 30,000 · water 24 · sleep 22.5h · meals 9), clamped in
+`setVal()`, which is the only door into the log. Daily XP never needed it, because
+`xpFor()` stops at the target — but a `total:` quest counts **raw units**, so
+without a ceiling one tap-and-hold on the stepper logged 9,999,999 steps and
+cleared *"50,000 steps across the run"* on the spot, on the leaderboard as well as
+on the phone. The server scores whatever the log holds, so capping at write time is
+what keeps both scorers honest; there is no server-side check.
+
+> Raising this is a quest-balance decision, not a logging one. At 3× the two steps
+> quests (50k and 70k) need two and three days respectively; at 5× or above they are
+> one-day work again.
 
 **A perfect day is 420 XP** with the current numbers. That figure is the anchor for
 everything below — if you change `weights`, recompute it.
@@ -295,6 +309,17 @@ because they actually pay it — a tier takeover sums the payout across every ha
 that cleared it in the same pass. A perfect-day takeover quotes `dayXp(today)`, which
 includes any bonus crossed that day, so the figure always matches what the athlete's
 total just moved by. See §4.5.
+
+> ⚠️ **Quote the ledger, never the table.** Those two takeovers read their figure
+> off `bonusEvents()` — via `tierPaid()` and `milestonePaid()` — and *not* off
+> `CONSISTENCY_TIERS` / `ACHIEVEMENTS`. They have to, because of §4.5 rule 2: a
+> badge is judged on the best run ever but only **paid** when that run falls inside
+> the season, so the two legitimately disagree. Reading the table instead is a bug
+> that hides for months and then lies to the athlete's face — an athlete with 25
+> pre-season step days who logs 5 in-season ones got a full-screen *"ROAD RUNNER ·
+> +200 XP"* while their total moved by nothing. When the ledger paid nothing, both
+> takeovers now say so plainly: the badge is still awarded, the points are named as
+> pending. Anything added here that mentions an XP figure must do the same.
 
 **If it feels like too much,** the cheapest change is in `checkLevelUps()` — set
 `big: overall` instead of `big: overall || rankChanged` and only the overall level

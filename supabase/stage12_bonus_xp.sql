@@ -32,12 +32,26 @@
 --
 -- Safe to re-run.
 --
--- ⚠️ SUPERSEDED IN PART. `hab_bonus_xp` was replaced twice after this file:
---    12b gave it a p_season_start argument (badge runs are measured from the
---    season start), and stages 13/14 added quest-run scoring. The CURRENT
---    definition lives in `stage14_quest_runs.sql`. Everything else here —
---    the rules seed, hab_cfg_of, and the rolling-week leaderboard_top — is
---    still current.
+-- ⛔ DO NOT RE-RUN THIS FILE. Two of its function definitions are stale, and
+--    running it would silently move the leaderboard off the rules every athlete's
+--    own screen uses. Nothing would error; the numbers would just stop agreeing.
+--
+--    · `hab_bonus_xp` was replaced twice after this file: 12b gave it a
+--      p_season_start argument (badge runs are measured from the season start),
+--      and stages 13/14 added quest-run scoring. The CURRENT definition — the
+--      6-arg one, and the only one that now exists in the database — lives in
+--      `stage14_quest_runs.sql`.
+--    · `leaderboard_top` below still calls the OLD 5-arg `hab_bonus_xp`, so
+--      re-running it would recreate that overload and point the board at it:
+--      badge runs measured from the window start instead of the season start.
+--      The CURRENT definition is at the foot of `stage14_quest_runs.sql`.
+--
+--    Still current here, and safe on their own: the rules seed and `hab_cfg_of`.
+--
+--    General rule for this folder — these files are a CHANGELOG, not a schema.
+--    Before trusting or re-running any of them, read the live definition:
+--      select pg_get_functiondef(oid) from pg_proc
+--       where proname = 'leaderboard_top' and pronamespace = 'public'::regnamespace;
 
 begin;
 
@@ -226,6 +240,9 @@ select (coalesce((select xp from tier_paid), 0)
 $fn$;
 
 -- ── The board scores daily points PLUS badges, over a real rolling week ────
+-- ⛔ STALE — kept only as the record of what stage 12 did. This calls the 5-arg
+--    `hab_bonus_xp`, which no longer exists in the database. The live definition
+--    is at the foot of `stage14_quest_runs.sql`; use that one.
 create or replace function public.leaderboard_top(
   p_athlete_id text, p_key text default null,
   p_scope text default 'season', p_limit int default 10)

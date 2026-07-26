@@ -307,3 +307,85 @@ select (coalesce((select xp from tier_paid), 0)
 $fn$;
 
 revoke all on function public.hab_bonus_xp(jsonb, jsonb, date, date, date, jsonb) from public;
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- The CURRENT leaderboard_top — the caller of the function above
+-- ═══════════════════════════════════════════════════════════════════════════
+-- This arrived with stage 13, which was deleted when 13 was superseded — so
+-- until now the live definition existed in the database and NOWHERE in the repo,
+-- while `stage12_bonus_xp.sql` still held a stale copy calling the old 5-arg
+-- `hab_bonus_xp`. Reproduced here verbatim from `pg_get_functiondef`, so the
+-- file that owns `hab_bonus_xp` also owns its only caller and the two can never
+-- drift apart again.
+--
+-- The one thing that matters: `v_season_start` is passed SEPARATELY from the
+-- scoring window. Badge and quest runs are measured from the season start even
+-- when the board is showing a rolling week, so a tier crossed inside those seven
+-- days pays here. Collapsing the two arguments back into one is exactly the bug
+-- the stage-12 copy would reintroduce.
+--
+-- Already applied and live. Re-running it is a no-op.
+create or replace function public.leaderboard_top(
+  p_athlete_id text, p_key text default null,
+  p_scope text default 'season', p_limit int default 10)
+returns table (
+  pos int, display_name text, xp bigint, level int, rank_label text,
+  is_me boolean, joined boolean
+) language plpgsql security definer set search_path = public as $fn$
+declare
+  v_expected text; v_rules jsonb; v_from date; v_to date; v_joined boolean;
+  v_season_start date;
+begin
+  select secret_key into v_expected from public.athlete_keys where athlete_id = p_athlete_id;
+  if v_expected is not null and (p_key is distinct from v_expected) then
+    raise exception 'invalid athlete key';
+  end if;
+
+  select rules into v_rules from public.xp_rules where id = 1;
+  if v_rules is null then return; end if;
+
+  select s.starts_on into v_season_start from public.current_season() s;
+  v_season_start := coalesce(v_season_start, '1970-01-01'::date);
+  v_to := current_date;
+
+  if p_scope = 'week' then
+    -- A ROLLING seven days: today and the six before it, never earlier than the
+    -- season start. Badge runs are still measured from the season start, so a
+    -- tier crossed inside these seven days pays here.
+    v_from := greatest(current_date - 6, v_season_start);
+  else
+    v_from := v_season_start;
+  end if;
+
+  select exists (select 1 from public.leaderboard_optin o where o.athlete_id = p_athlete_id)
+    into v_joined;
+
+  return query
+  with scored as (
+    select o.athlete_id as aid,
+           o.display_name as dname,
+           ( public.hab_xp(public.hab_log_of(ap.data, o.athlete_id), v_from, v_to, v_rules)
+           + public.hab_bonus_xp(public.hab_log_of(ap.data, o.athlete_id),
+                                 public.hab_cfg_of(ap.data, o.athlete_id),
+                                 v_season_start, v_from, v_to, v_rules) ) as x
+    from public.leaderboard_optin o
+    left join public.athlete_progress ap on ap.athlete_id = o.athlete_id
+  ),
+  ranked as (
+    select row_number() over (order by s.x desc, lower(s.dname) asc) as rn, s.*
+    from scored s
+  )
+  select r.rn::int,
+         r.dname,
+         r.x,
+         public.hab_level(r.x, v_rules),
+         public.hab_rank_label(public.hab_level(r.x, v_rules)),
+         (r.aid = p_athlete_id),
+         v_joined
+  from ranked r
+  where r.rn <= greatest(1, p_limit) or r.aid = p_athlete_id
+  order by r.rn;
+end; $fn$;
+
+revoke all on function public.leaderboard_top(text, text, text, int) from public;
+grant execute on function public.leaderboard_top(text, text, text, int) to anon, authenticated;
