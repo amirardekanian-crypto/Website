@@ -68,11 +68,56 @@ The screen they actually live on.
   XP, with live progress and a countdown. **There are usually none**: quests only exist
   while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
   the point — seeing them means something is on.
+- **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
+  completion, that choose **which day you are logging**. See *The backfill window* below.
 - **The habit list** — tap the box to tick, tap the name for that habit's history, tap
   `+` on counter habits. Each row shows that habit's own level and current streak.
+- **Roll call** — the compose box for the day's one sentence. See *Roll call* below.
 - **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
   weakest habit. The "recap" half.
 - **The cross-link** back to the training programme.
+
+#### The backfill window
+Nobody logs perfectly on the day, every day, so **the last `BACKFILL_DAYS` (3) days plus
+today are editable**. The day strip switches which day the taps land on; past that the
+log is closed. The limit is the feature — a record you can rewrite whenever you like is
+a diary, not evidence.
+
+While an earlier day is selected the screen says so unmistakably (clay banner, the header
+title becomes the weekday, `· FILLING IN` in the eyebrow), and **the nudge and the roll
+call box stand down** — both are statements about *now*, and "drink three more glasses"
+is nonsense advice about last Saturday. Streaks, at-risk warnings and the perfect-day
+celebration stay anchored to the real today for the same reason. `AKEY()` self-heals: if
+the app is left open past midnight the window slides and it falls back to today rather
+than writing to a day that has since closed.
+
+Backfilling **does** recompute XP, streaks, badges and quest progress — that is the point
+of allowing it. It does **not** reopen that day's roll call sentence.
+
+> The window is a **UI affordance, not a lock**. The app pushes its whole log blob to the
+> server, so devtools could always reach further back — true before this existed too.
+> Enforcing it server-side would mean diffing snapshots on every save; judged not worth
+> it for a board among one coach's own clients.
+
+#### Roll call
+**One sentence a day, visible to everyone else on the board.** Deliberately not a chat:
+the server's primary key is `(athlete, day)`, so the shape of the data *is* the rate
+limit — nothing to moderate into a thread, and a quiet day reads as "nobody has answered
+yet" rather than "this is dead".
+
+- **Posting requires being on the leaderboard.** That opt-in already means "I agree to
+  other athletes seeing me, under this handle", so there is no second consent to reason
+  about and no second display name. Not joined → the box becomes an invitation.
+- **Today only**, even though the log itself is editable for three days. Fixing
+  Saturday's steps is admin; rewriting what you *said* about Saturday is not.
+- **It pays no XP.** The moment a sentence earns points you get one character of
+  gibberish every night at 23:58. The reward is that your line sits next to your rank.
+- **The box asks a question** rather than showing a blank field — 20 prompts in the
+  `prompt` bucket of `NUDGES`, rotating daily on the same seed as every other line.
+- **Leaving the board hides your lines** immediately, without deleting them. Re-joining
+  brings them back.
+
+Read it on the **BOARD** tab, second view.
 
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
@@ -114,13 +159,35 @@ a glance: blocks being laid, then force, then machinery, then a burst. Anything 
 a curve or a rounded cap belongs to a different app.
 
 ### 04 · BOARD
-Opt-in only. Two boards: **this season** (the default) and **past week** (a rolling
+Opt-in only. Two views, switched at the top: **Leaderboard** and **Roll call**.
+
+**Leaderboard** has two scopes: **this season** (the default) and **past week** (a rolling
 seven days, not a calendar week). See below.
 
 Rows show **movement, not just standing**: a ▲/▼ chip against each name, and a green
 banner when the athlete has overtaken someone — *"You passed Bo and Cy since you last
 looked."* The server returns no history, so the last standing is remembered per scope
 on the device (`CFG.lbSeen`) and the next fetch is diffed against it.
+
+**Roll call** is the wall: the last seven days of one-sentence entries, grouped by day,
+newest first, each line carrying the writer's display name, season rank and that day's
+completion percentage. **Amir's own line leads its day** (clay left border, `YOUR COACH`)
+— set it with `select public.set_coach_note('…');`. A day reads top-down as *here is the
+brief, here is who answered*. Written on the TODAY tab; see *Roll call* above for the
+rules and the reasoning.
+
+**Moderation** is coach-only, in the Supabase SQL editor:
+
+```sql
+select public.set_coach_note('Everyone in. No excuses today.');  -- your line for today
+select public.hide_note('<athlete_id>', '2026-07-27');           -- take a line down
+select public.hide_note('<athlete_id>', '2026-07-27', false);    -- put it back
+select day, athlete_id, hidden, pct, body from public.hab_notes
+  order by day desc, updated_at desc limit 50;                   -- read everything
+```
+
+Hiding rather than deleting keeps the evidence, which is what you want if you ever have
+to explain the decision to the athlete.
 
 ---
 

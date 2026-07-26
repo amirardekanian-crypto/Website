@@ -44,6 +44,13 @@ Two supporting lists sit just below it: `RANKS` (the rank names) and
 `strength` — that is the WORKOUT habit's internal id, kept so the rename didn't orphan
 anyone's history.
 
+Two more constants live outside `XP_RULES` because neither is a scoring number:
+
+```js
+const BACKFILL_DAYS = 3;   // today + this many days back are editable — section 6.5
+const NOTE_MAX = 200;      // characters in a roll call sentence — section 11
+```
+
 ---
 
 ## 1. What each habit is worth
@@ -301,6 +308,35 @@ after its baseline block.
 `streakQualifyPct: 80` — a day counts toward the day-streak if at least 80% of the
 athlete's tracked habits are done. Set it to `100` to demand a perfect day, or `60`
 to be kinder. This also drives the "days on target" figure in the weekly recap.
+
+---
+
+## 6.5 The backfill window
+
+`BACKFILL_DAYS = 3` — **today plus the three days before it are editable.** The day strip
+at the top of TODAY picks which day the taps land on; `setVal()` refuses anything outside
+the window, so nothing can be written to a closed day even if the UI is confused.
+
+Move the number and the strip grows or shrinks with it — but check the CSS: the strip is
+`repeat(4, minmax(0, 1fr))` and is sized for four cells at 320px. Past five it needs to
+scroll or wrap.
+
+**What backfilling recomputes.** Everything derived from the log: habit and overall XP,
+streaks, consistency tiers, milestones, quest progress, and both leaderboard windows once
+the log syncs. That is the point of allowing it — someone who forgot to log Saturday
+should not lose Saturday's XP. Two things it deliberately does **not** do:
+
+| | Why |
+|---|---|
+| Fire the **perfect-day** celebration for a backfilled day | It is scoped to today. You do not get a fanfare for paperwork — badges and tiers still pop, because those are about the run, not the day. |
+| Reopen that day's **roll call** sentence | Section 11. Fixing Saturday's steps is admin; rewriting what you said about Saturday is not. |
+
+**It is an affordance, not a lock.** The app pushes its whole log blob to `save_progress`,
+so devtools could always write further back — that was true before the strip existed.
+Enforcing the window server-side means diffing the previous snapshot against the incoming
+one on every save, and rejecting or reverting changes to closed days. Buildable; judged
+not worth the complexity for a board among one coach's own clients. If the board ever
+opens up beyond that, revisit it.
 
 ---
 
@@ -582,3 +618,37 @@ Worth knowing, since it underpins all of the above.
   and a **Sync now** button.
 
 The athlete's phone is the record. The server is the mirror.
+
+---
+
+## 11. Roll call — the one thing here that pays nothing
+
+One sentence a day, visible to everyone else on the board. Catalogued in
+[`HABITS.md`](HABITS.md); the schema and every guard are in
+[`supabase/stage15_roll_call.sql`](supabase/stage15_roll_call.sql). It appears in this
+document only to say where it sits relative to scoring:
+
+**It pays no XP, and nothing about it feeds a level, badge, quest or board position.**
+That is a design decision, not an oversight — the moment a sentence earns points you get
+one character of gibberish every night at 23:58. The reward is that the line sits next to
+the writer's rank.
+
+Two consequences worth keeping straight:
+
+- **`NOTE_MAX = 200`** is enforced in *both* places, like everything else here: the input's
+  `maxlength` and `hab_clean_note()` on the server. The server is the one that matters.
+- **The percentage beside a line is self-reported.** The client sends the day's
+  completion it has already computed. That is fine *because it buys nothing* — it is
+  decoration on self-authored text. Mirroring `dayPct()` into plpgsql would add a third
+  place the scoring rules have to agree, which is precisely the class of bug section 8
+  exists to warn about. **Anything that pays stays server-scored. This does not pay.**
+
+If you ever make roll call pay — don't — it would have to move to the server-scored side
+of that line, and `hab_notes` would need the same treatment `hab_xp` gets.
+
+### The one place it touches the log
+
+`saveLog()` calls `refreshNotePct()`. If the athlete has already written today's line and
+then keeps logging, the percentage beside it is quietly brought up to date (debounced 4s)
+rather than leaving "38%" under a sentence written at lunchtime on a day they went on to
+finish. It re-posts the same body with a new `pct`; it never changes their words.
