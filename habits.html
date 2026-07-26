@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FAF7F2">
-<title>Habits — AA Performance</title>
+<title>Proof — AA Performance</title>
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 
@@ -25,16 +25,10 @@
         (clientKey ? '&key=' + encodeURIComponent(clientKey) : '')
       : 'habits.html';
     var manifest = {
-      name: "AA Habits",
-      short_name: "AA Habits",
-      description: "Daily health & fitness habit tracker.",
-      start_url: startUrl,
-      scope: "/",
-      display: "standalone",
-      orientation: "portrait",
-      background_color: "#FAF7F2",
-      theme_color: "#FAF7F2",
-      lang: "en-GB",
+      name: "Proof", short_name: "Proof",
+      description: "Daily health habits, tracked and coached.",
+      start_url: startUrl, scope: "/", display: "standalone", orientation: "portrait",
+      background_color: "#FAF7F2", theme_color: "#FAF7F2", lang: "en-GB",
       categories: ["fitness", "health", "sports"],
       icons: [
         { src: "/assets/img/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
@@ -43,366 +37,403 @@
     };
     var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
     var link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = URL.createObjectURL(blob);
+    link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
     document.head.appendChild(link);
   })();
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Barlow:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  /* ── Tokens ────────────────────────────────────────────────────────────
+     PROOF's modernist structure on the AA Performance palette (the "green
+     machine" mapping from the handoff's Color Options sheet): green is the
+     accent, clay carries the coach's voice and mono meta. Zero radius
+     anywhere, 2px section rules, 1px row rules, everything flush left. */
   :root {
-    --green: #0E4A36;
-    --green-dim: rgba(14,74,54,0.08);
-    --green-mid: rgba(14,74,54,0.22);
-    --clay: #C7552F;
-    --clay-dim: rgba(199,85,47,0.08);
-    --clay-mid: rgba(199,85,47,0.22);
-    --ochre: #A8741C;
-    --ochre-dim: rgba(168,116,28,0.08);
     --bg: #FAF7F2;
-    --card: #FFFFFF;
-    --card-alt: #EDE8E0;
-    --line: #D8D1C5;
+    --surface: #EDE8E0;
     --ink: #1A1A1A;
-    --muted: #5C5C5C;
-    --on-accent: #FFFFFF;
+    --accent: #0E4A36;
+    --accent-600: #0B3B2B;
+    --accent-700: #08301F;
+    --accent-100: rgba(14,74,54,0.08);
+    --clay: #C7552F;
+    --clay-deep: #8E3A1E;
+    --scrim: rgba(26,26,26,0.45);
+    --divider: rgba(26,26,26,0.40);
+    --rule: rgba(26,26,26,0.20);
+    --muted: rgba(26,26,26,0.58);
+    --muted-soft: rgba(26,26,26,0.50);
+    --track: rgba(26,26,26,0.12);
+    --box: rgba(26,26,26,0.45);
   }
   body[data-dark] {
-    --bg: #181818;
-    --card: #202020;
-    --card-alt: #262626;
-    --line: #3A3A3A;
-    --ink: #EDEAE4;
-    --muted: #9A9690;
-    --green: #2E8663;
-    --green-dim: rgba(46,134,99,0.14);
-    --green-mid: rgba(46,134,99,0.32);
+    --bg: #0F1A15;
+    --surface: #172219;
+    --ink: #F0EDE6;
+    --accent: #3E9C74;
+    --accent-600: #4FAF85;
+    --accent-700: #7FD0AC;
+    --accent-100: rgba(62,156,116,0.14);
     --clay: #E06B43;
-    --clay-dim: rgba(224,107,67,0.12);
-    --clay-mid: rgba(224,107,67,0.3);
-    --ochre: #C99435;
-    --ochre-dim: rgba(201,148,53,0.12);
+    --clay-deep: #F09068;
+    --scrim: rgba(0,0,0,0.55);
+    --divider: rgba(240,237,230,0.34);
+    --rule: rgba(240,237,230,0.18);
+    --muted: rgba(240,237,230,0.60);
+    --muted-soft: rgba(240,237,230,0.50);
+    --track: rgba(240,237,230,0.14);
+    --box: rgba(240,237,230,0.45);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
   body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
-    transition: background 0.25s ease, color 0.25s ease;
+    background: var(--bg); color: var(--ink);
+    font-family: 'Barlow', system-ui, sans-serif; font-size: 15px; line-height: 1.55;
+    overflow: hidden;
   }
-  .wrap { max-width: 560px; margin: 0 auto; padding: 20px 18px 80px; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { background: transparent; border: 0; cursor: pointer; }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  /* ── Loading / error ── */
-  .loading-screen {
+  .hd { font-family: 'Barlow Condensed', system-ui, sans-serif; font-weight: 900; text-transform: uppercase; }
+  .mono { font-family: 'Space Mono', ui-monospace, Menlo, monospace; }
+  .eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  @keyframes pop { 0% { transform: scale(.6) } 60% { transform: scale(1.12) } 100% { transform: scale(1) } }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+  @keyframes sheetUp { from { transform: translateY(100%) } to { transform: none } }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ── Shell ── */
+  .app {
+    height: 100%; max-width: 520px; margin: 0 auto;
+    display: none; flex-direction: column; position: relative; overflow: hidden;
+    background: var(--bg);
+  }
+  .app.on { display: flex; }
+  .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .scroll::-webkit-scrollbar { width: 0; }
+
+  .loading, .errscreen {
     position: fixed; inset: 0; z-index: 9999; background: var(--bg);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: opacity 0.4s ease;
+    padding: 32px; text-align: center; transition: opacity .4s ease;
   }
-  .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .loading-spinner {
-    width: 40px; height: 40px; border: 3px solid var(--line);
-    border-top-color: var(--green); border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text, .eyebrow {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
-  }
-  .loading-text { margin-top: 20px; }
-  .error-screen {
-    position: fixed; inset: 0; z-index: 9998; background: var(--bg);
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    padding: 32px; text-align: center;
-  }
-  .error-screen.show { display: flex; }
-  .error-screen h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 28px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-  .error-screen p { color: var(--muted); font-size: 14px; white-space: pre-line; line-height: 1.6; }
+  .loading.hidden { opacity: 0; pointer-events: none; }
+  .spinner { width: 38px; height: 38px; border: 3px solid var(--track); border-top-color: var(--accent); animation: spin .8s linear infinite; }
+  .errscreen { display: none; z-index: 9998; }
+  .errscreen.on { display: flex; }
+  .errscreen h2 { font-size: 30px; line-height: 1; letter-spacing: -.02em; margin-bottom: 12px; }
+  .errscreen p { font-size: 14px; color: var(--muted); white-space: pre-line; }
 
   /* ── Header ── */
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand img { width: 34px; height: 34px; border-radius: 9px; display: block; }
-  .brand .eyebrow { color: var(--muted); }
-  .brand h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; letter-spacing: 1.5px; text-transform: uppercase; line-height: 1; }
-  .hdr-btns { display: flex; gap: 8px; }
-  .icon-btn {
-    width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
-    background: var(--card); color: var(--muted); cursor: pointer;
+  .apphd {
+    padding: calc(20px + env(safe-area-inset-top)) 20px 12px;
+    border-bottom: 2px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;
+    background: var(--bg);
+  }
+  .apphd .title { font-size: 24px; line-height: 1; letter-spacing: -.02em; margin-top: 4px; }
+  .apphd .right { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--clay-deep); white-space: nowrap; }
+
+  /* ── Blocks & rules ── */
+  .block { padding: 20px; border-bottom: 2px solid var(--divider); }
+  .row-rule { border-bottom: 1px solid var(--rule); }
+
+  .bar { height: 10px; background: var(--track); }
+  .bar > span { display: block; height: 100%; background: var(--accent); transition: width .35s cubic-bezier(.2,.8,.2,1); }
+  .bar.thin { height: 8px; }
+
+  .figure { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; color: var(--accent); letter-spacing: -.04em; }
+
+  /* ── Habit rows ── */
+  .hrow { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); }
+  .hrow.done { background: var(--accent-100); }
+  .hrow .checkcell {
+    flex: none; width: 64px; border-right: 1px solid var(--rule);
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; transition: all 0.15s ease;
   }
-  .icon-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-  .icon-btn svg { width: 17px; height: 17px; }
+  .boxmark { width: 28px; height: 28px; border: 2px solid var(--box); display: block; }
+  .boxmark.on {
+    border-color: var(--accent); background: var(--accent); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
+    animation: pop .28s ease;
+  }
+  .hrow .body {
+    flex: 1; min-width: 0; text-align: left; padding: 13px 12px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .hrow .body .line1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .hrow .body .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1; letter-spacing: .01em; text-transform: uppercase; }
+  .hrow .body .stk { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
+  .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); }
+  .hrow .body .track { display: block; width: 100%; height: 4px; background: var(--track); margin-top: 2px; }
+  .hrow .body .track > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
+  .hrow .pluscell {
+    flex: none; width: 54px; border-left: 1px solid var(--rule);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; color: var(--accent);
+  }
+  .hrow .pluscell:hover { background: var(--accent-100); }
 
-  /* ── Greeting / stats ── */
-  .greet { margin-bottom: 16px; }
-  .greet .name {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 44px; text-transform: uppercase; letter-spacing: 1px; line-height: 1;
+  /* ── Coach card ── */
+  .coachcard {
+    background: var(--clay); color: #FAF7F2; padding: 20px;
+    border-bottom: 2px solid var(--divider);
+    display: flex; flex-direction: column; gap: 12px; animation: riseIn .3s ease;
   }
-  .greet .sub { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
-  .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-  .stat {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 12px 10px 10px; text-align: center; position: relative; overflow: hidden;
+  .coachcard .eyebrow { color: rgba(250,247,242,.8); }
+  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px; line-height: 1.05; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; }
+  .coachcard .cta {
+    align-self: flex-start; background: #FAF7F2; color: #1A1A1A; padding: 10px 14px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
   }
-  .stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--green); }
-  .stat:nth-child(2)::before { background: var(--clay); }
-  .stat:nth-child(3)::before { background: var(--ochre); }
-  .stat .v { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; }
-  .stat .l { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
 
-  /* ── Week strip ── */
-  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 20px; }
-  .wday { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; padding: 8px 0 9px; border-radius: 12px; border: 1px solid transparent; transition: all 0.15s ease; }
-  .wday.sel { border-color: var(--line); background: var(--card); }
-  .wday .dl { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
-  .wday .ring { width: 30px; height: 30px; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
-  .wday .ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p) * 1%), var(--line) 0); }
-  .wday .ring::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--bg); }
-  .wday.sel .ring::after { background: var(--card); }
-  .wday .dn { position: relative; z-index: 1; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; }
-  .wday.done .ring::before { background: var(--green); }
-  .wday.done .ring::after { display: none; }
-  .wday.done .dn { color: var(--on-accent); }
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px;
+    letter-spacing: .04em; text-transform: uppercase; line-height: 1.2;
+    padding: 14px 16px; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover { background: var(--accent-600); }
+  .btn-primary:active { background: var(--accent-700); }
+  .btn-secondary { border-color: var(--divider); }
+  .btn-secondary:hover { background: rgba(128,128,128,.10); }
+  .btn-block { width: 100%; }
 
-  /* ── Day heading ── */
-  .day-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .day-head h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
-  .day-head .pct { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; color: var(--muted); }
-  .not-today {
-    display: none; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--clay); margin: -6px 0 12px; cursor: pointer;
+  .input {
+    width: 100%; min-height: 42px; padding: 8px 10px; font-size: 14px;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--divider); caret-color: var(--accent);
   }
-  .not-today.show { display: block; }
+  .input:focus-visible { border-color: var(--accent); outline-offset: 0; }
 
-  /* ── Groups & habits ── */
-  .group { margin-bottom: 18px; }
-  .group-label {
-    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2.5px;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .group-label .dot { width: 7px; height: 7px; border-radius: 2px; }
-  .habit {
-    display: flex; align-items: center; gap: 13px;
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 13px 14px; margin-bottom: 8px; cursor: pointer; user-select: none;
-    position: relative; overflow: hidden; transition: transform 0.1s ease;
-  }
-  .habit:active { transform: scale(0.985); }
-  .habit::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gc, var(--green)); }
-  .hb-check {
-    width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
-    border: 2px solid var(--line); display: flex; align-items: center; justify-content: center;
-    transition: all 0.18s ease;
-  }
-  .hb-check svg { width: 13px; height: 13px; stroke: var(--on-accent); stroke-width: 3.2; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30; stroke-dashoffset: 30; transition: stroke-dashoffset 0.22s ease 0.05s; }
-  .habit.on .hb-check { background: var(--gc, var(--green)); border-color: var(--gc, var(--green)); }
-  .habit.on .hb-check svg { stroke-dashoffset: 0; }
-  .hb-name { flex: 1; font-size: 15px; font-weight: 500; line-height: 1.25; transition: color 0.18s ease; }
-  .habit.on .hb-name { color: var(--muted); }
-  .hb-streak {
-    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.5px;
-    color: var(--gc, var(--green)); background: var(--gcd, var(--green-dim));
-    padding: 3px 8px; border-radius: 999px; white-space: nowrap;
-  }
-  .hb-del {
-    display: none; width: 26px; height: 26px; min-width: 26px; border-radius: 8px;
-    border: 1px solid var(--line); background: none; color: var(--muted);
-    font-size: 14px; cursor: pointer; align-items: center; justify-content: center;
-  }
-  body.editing .hb-del { display: flex; }
-  body.editing .hb-streak { display: none; }
-  .habit.hidden-habit { opacity: 0.45; }
-  .habit.hidden-habit .hb-name { text-decoration: line-through; }
+  /* ── Toggle (square, 44×24) ── */
+  .sw { width: 44px; height: 24px; flex: none; border: 2px solid var(--ink); display: flex; align-items: center; padding: 2px; }
+  .sw > i { width: 16px; height: 16px; display: block; background: var(--ink); }
+  .sw.on { background: var(--accent); justify-content: flex-end; border-color: var(--accent); }
+  .sw.on > i { background: var(--bg); }
 
-  /* ── Add habit ── */
-  .add-card { display: none; background: var(--card-alt); border: 1px dashed var(--line); border-radius: 14px; padding: 14px; margin-bottom: 18px; }
-  body.editing .add-card { display: block; }
-  .add-card .row { display: flex; gap: 8px; }
-  .add-card input, .add-card select {
-    font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--ink);
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  /* ── Select rows (goals, coach volume, motivation) ── */
+  .selrow {
+    width: 100%; text-align: left; padding: 15px 14px;
+    border-bottom: 2px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
   }
-  .add-card input { flex: 1; min-width: 0; }
-  .add-card button {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px;
-    letter-spacing: 1.5px; text-transform: uppercase; color: var(--on-accent);
-    background: var(--green); border: none; border-radius: 10px; padding: 10px 16px; cursor: pointer;
-  }
-  .add-card .hint { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+  .selrow.on { background: var(--accent); color: var(--bg); }
+  .selrow .lbl { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1.15; text-transform: uppercase; }
+  .selrow .desc { font-size: 12px; line-height: 1.35; opacity: .75; margin-top: 5px; }
+  .selrow .mark { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 
-  /* ── Heatmap ── */
-  .heat-sec { margin-top: 26px; }
-  .heat-sec h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 18px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
-  .heat { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-  .heat .cell { aspect-ratio: 1; border-radius: 6px; background: var(--card-alt); position: relative; }
-  .heat .cell.lv1 { background: var(--green-dim); }
-  .heat .cell.lv2 { background: var(--green-mid); }
-  .heat .cell.lv3 { background: var(--green); opacity: 0.65; }
-  .heat .cell.lv4 { background: var(--green); }
-  .heat .cell.today-cell { outline: 2px solid var(--clay); outline-offset: 1px; }
-  .heat-legend { display: flex; align-items: center; gap: 5px; justify-content: flex-end; margin-top: 8px; }
-  .heat-legend span { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
-  .heat-legend .cell { width: 12px; height: 12px; border-radius: 3px; aspect-ratio: auto; }
-
-  .sync-note { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); text-align: center; margin-top: 30px; }
-  .sync-note .sdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--line); margin-right: 5px; vertical-align: 1px; }
-  .sync-note.ok .sdot { background: var(--green); }
-  .demo-banner {
-    display: none; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px;
-    text-transform: uppercase; text-align: center; color: var(--on-accent);
-    background: var(--clay); border-radius: 10px; padding: 8px; margin-bottom: 16px;
+  /* ── Tab bar ── */
+  .tabs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 2px solid var(--divider); background: var(--bg);
+    padding-bottom: env(safe-area-inset-bottom);
   }
-  body.is-demo .demo-banner { display: block; }
+  .tabs button {
+    padding: 12px 10px; display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
+    border-right: 1px solid var(--rule); position: relative;
+  }
+  .tabs button:last-child { border-right: 0; }
+  .tabs button.on { background: var(--ink); color: var(--bg); }
+  .tabs .num { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .06em; opacity: .6; }
+  .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; }
+  .tabs .dot { position: absolute; top: 9px; right: 9px; width: 7px; height: 7px; background: var(--clay); }
+
+  /* ── Grid (35-day history) ── */
+  .grid35 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .grid35 .c { aspect-ratio: 1; border: 1px solid rgba(128,128,128,.35); }
+  .grid35 .c.hit { background: var(--accent); border-color: var(--accent); }
+  .grid35 .c.part { background: var(--accent-100); border-color: var(--accent); }
+  .grid35 .c.future { opacity: .25; }
+
+  /* ── Chat ── */
+  .chat { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; }
+  .bub { max-width: 82%; padding: 12px 14px; font-size: 13px; line-height: 1.4; animation: riseIn .25s ease; white-space: pre-wrap; }
+  .bub.coach { align-self: flex-start; background: var(--surface); border: 2px solid var(--divider); }
+  .bub.me { align-self: flex-end; background: var(--accent); color: var(--bg); }
+  .bub .tag { display: block; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; opacity: .6; margin-bottom: 5px; text-transform: uppercase; }
+  .composer { border-top: 2px solid var(--divider); padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: var(--surface); display: flex; flex-direction: column; gap: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 2px solid var(--divider); padding: 7px 10px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; text-transform: uppercase;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent-700); }
+
+  /* ── Sheet & toast ── */
+  .scrim { position: absolute; inset: 0; z-index: 80; background: var(--scrim); animation: fadeIn .2s ease; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 90;
+    background: var(--bg); border-top: 2px solid var(--ink);
+    padding: 20px 20px calc(28px + env(safe-area-inset-bottom));
+    animation: sheetUp .3s cubic-bezier(.2,.8,.2,1);
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .stepper { display: flex; align-items: center; border: 2px solid var(--ink); }
+  .stepper button { width: 58px; height: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; }
+  .stepper .minus { border-right: 2px solid var(--ink); }
+  .stepper .plus { border-left: 2px solid var(--ink); }
+  .stepper .val { flex: 1; display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+  .toast {
+    position: absolute; left: 20px; right: 20px; bottom: calc(104px + env(safe-area-inset-bottom)); z-index: 70;
+    background: var(--ink); color: var(--bg); padding: 13px 15px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; line-height: 1.25;
+    text-transform: uppercase; animation: riseIn .25s ease;
+  }
+
+  .demo-banner { background: var(--clay); color: #FAF7F2; padding: 8px 20px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
 </style>
 </head>
 <body>
 
-<div class="loading-screen" id="loading"><div class="loading-spinner"></div><div class="loading-text">Loading habits</div></div>
-<div class="error-screen" id="error"><h2>Can't load</h2><p id="error-msg"></p></div>
+<div class="loading" id="loading"><div class="spinner"></div><div class="eyebrow" style="margin-top:20px">Loading proof</div></div>
+<div class="errscreen" id="error"><h2 class="hd">Can't load</h2><p id="error-msg"></p></div>
 
-<div class="wrap" id="app" style="display:none">
-  <header>
-    <div class="brand">
-      <img src="/assets/img/icon-192.png" alt="" width="34" height="34">
-      <div>
-        <div class="eyebrow">AA Performance</div>
-        <h1>Habits</h1>
-      </div>
-    </div>
-    <div class="hdr-btns">
-      <button class="icon-btn" id="btn-dark" aria-label="Toggle dark mode">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
-      <button class="icon-btn" id="btn-edit" aria-label="Edit habits">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-      </button>
-    </div>
-  </header>
-
-  <div class="demo-banner">Demo mode — nothing is saved to the cloud</div>
-
-  <div class="greet">
-    <div class="name" id="greet-name"></div>
-    <div class="sub" id="greet-date"></div>
-  </div>
-
-  <div class="stat-row">
-    <div class="stat"><div class="v" id="st-streak">0</div><div class="l">Day streak</div></div>
-    <div class="stat"><div class="v" id="st-today">0%</div><div class="l">Today</div></div>
-    <div class="stat"><div class="v" id="st-week">0%</div><div class="l">This week</div></div>
-  </div>
-
-  <div class="week" id="week"></div>
-
-  <div class="day-head">
-    <h2 id="day-title">Today</h2>
-    <div class="pct" id="day-pct"></div>
-  </div>
-  <div class="not-today" id="back-today">‹ Back to today</div>
-
-  <div id="groups"></div>
-
-  <div class="add-card">
-    <div class="row">
-      <input type="text" id="add-name" maxlength="60" placeholder="New habit — e.g. Stretch 10 min">
-      <select id="add-group"></select>
-      <button id="add-btn">Add</button>
-    </div>
-    <div class="hint">Tap ✕ to hide a default habit or remove a custom one. Tap a hidden habit's ↺ to bring it back.</div>
-  </div>
-
-  <div class="heat-sec">
-    <h3>Last 4 weeks</h3>
-    <div class="heat" id="heat"></div>
-    <div class="heat-legend">
-      <span>Less</span>
-      <div class="cell"></div><div class="cell lv1"></div><div class="cell lv2"></div><div class="cell lv3"></div><div class="cell lv4"></div>
-      <span>More</span>
-    </div>
-  </div>
-
-  <div class="sync-note" id="sync-note"><span class="sdot"></span><span id="sync-text">Saved on this device</span></div>
-</div>
+<div class="app" id="app"></div>
 
 <script>
-// ════════════════════════════════════════════════════════════════════
-//  AA HABITS — standalone daily habit tracker for coaching clients.
-//  Same identity model as program.html: habits.html?client=<id>&key=<key>.
-//  localStorage is the source of truth; the cloud mirror reuses the
-//  existing save_progress/get_progress RPCs (jsonb top-level merge), so
-//  no new backend objects are needed and program.html's own snapshot
-//  carries these keys too.
-// ════════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════════
+//  PROOF — health habit coach & tracker.
+//  Implements the PROOF design handoff on the AA Performance palette.
+//  Identity is the same link as the program app: habits.html?client=<id>&key=<key>.
+//  localStorage is the source of truth; the cloud mirror reuses the existing
+//  save_progress / get_progress RPCs, and the COACH tab talks to the real
+//  messages table (get_messages / send_athlete_message / mark_athlete_read).
+// ════════════════════════════════════════════════════════════════════════
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 
-const GROUPS = {
-  train:   { label: 'Train',     color: 'var(--clay)',  dim: 'var(--clay-dim)'  },
-  recover: { label: 'Recover',   color: 'var(--green)', dim: 'var(--green-dim)' },
-  fuel:    { label: 'Fuel',      color: 'var(--ochre)', dim: 'var(--ochre-dim)' },
-  move:    { label: 'Move',      color: 'var(--clay)',  dim: 'var(--clay-dim)'  },
-  stack:   { label: 'The Stack', color: 'var(--green)', dim: 'var(--green-dim)' }
+// Steps and sleep are numeric entries rather than HealthKit syncs — a web app
+// can't read phone health data, so the athlete logs them via the sheet.
+const HABITS = [
+  { id:'strength', name:'STRENGTH', code:'ST', kind:'check', target:1,    unit:'session', goal:'1 session · 45 min',            source:'Manual' },
+  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:8000,  unit:'steps',   goal:'8,000 steps',                   source:'Enter daily', step:500 },
+  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                     source:'Enter daily', step:0.5, dec:1 },
+  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                     source:'Manual' },
+  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                source:'Manual' },
+  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',              source:'Manual' },
+  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                source:'Manual' },
+  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3', source:'Manual' }
+];
+const QUIPS = {
+  strength: 'Picking heavy things up and putting them down. Sisyphus with better shoulders.',
+  steps:    'Every one of these was a decision not to sit down.',
+  sleep:    'The most underrated session in the whole programme.',
+  water:    'You are 60% water and 40% intending to drink water.',
+  fuel:     'Food is data too. Log it and stop guessing.',
+  breathe:  'Sitting still on purpose. Harder than the squats.',
+  mobility: 'Ten minutes now, or your hamstrings file a complaint with HR.',
+  supps:    'The one habit that should never need negotiating.'
 };
-const DEFAULT_HABITS = [
-  { id: 'train',    name: 'Training session done',      group: 'train'   },
-  { id: 'mobility', name: '10 min mobility / warm-up',  group: 'train'   },
-  { id: 'sleep',    name: 'Sleep 7+ hours',             group: 'recover' },
-  { id: 'unwind',   name: 'Wind down — no screens in bed', group: 'recover' },
-  { id: 'protein',  name: 'Hit protein target',         group: 'fuel'    },
-  { id: 'water',    name: '2L+ water',                  group: 'fuel'    },
-  { id: 'steps',    name: '8,000+ steps',               group: 'move'    },
-  { id: 'vitd',     name: 'Vitamin D',                  group: 'stack'   },
-  { id: 'creatine', name: 'Creatine',                   group: 'stack'   },
-  { id: 'omega3',   name: 'Omega-3',                    group: 'stack'   }
+const COACH_STYLES = [
+  { key:'silent', label:'SILENT TRACKER', desc:"No pep talks. Just boxes and streaks. Respect." },
+  { key:'nudge',  label:'NUDGE & RECAP',  desc:'One nudge when you drift, one recap on Sundays.' },
+  { key:'active', label:'FULL COACH',     desc:'I chat, I adapt the plan, I notice things. Sorry in advance.' }
+];
+const MOTIV = [ {key:'streak',label:'BIG STREAK NUMBER'}, {key:'rings',label:'DAILY BAR SET'}, {key:'points',label:'XP & LEVELS'} ];
+const LEVEL_NAMES = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','MACHINE','RELENTLESS','LEGEND'];
+// Progressive, not linear: at ~5 completions a day a flat 400/level would hand
+// out LEGEND inside a month. These thresholds make level 7 roughly a season's
+// work, so the number still means something in month six.
+const LEVEL_AT = [0, 500, 1500, 3500, 7000, 12500, 21000];
+const GOALS = ['FEEL LESS TIRED AT 3PM','GET GENUINELY STRONGER','SLEEP LIKE A ROCK','EAT LIKE AN ADULT','STOP DOOMSCROLLING AT 1AM'];
+const QUICKS = ["I'M WRECKED TODAY",'GIVE ME ONE THING','HIT A PR TODAY','TRAVELLING TOMORROW'];
+
+// Achievements are measured against the athlete's real log — nothing is seeded.
+const ACHIEVEMENTS = [
+  { code:'RR', name:'ROAD RUNNER',      note:'30 days over your step target',        xp:200, need:30,  measure:'daysHit:steps' },
+  { code:'IM', name:'IRON MONK',        note:'16-day supplement streak',             xp:150, need:16,  measure:'streak:supps' },
+  { code:'HM', name:'HEAVY METAL',      note:'12 straight days with a session',      xp:150, need:12,  measure:'streak:strength' },
+  { code:'HS', name:'HUMAN SPRINKLER',  note:'5 days running on full water',         xp:100, need:5,   measure:'streak:water' },
+  { code:'DP', name:'DAWN PATROL',      note:'10 days with 3+ habits logged',        xp:75,  need:10,  measure:'daysWith3' },
+  { code:'ZM', name:'ZEN MACHINE',      note:'10 breathing sessions in a row',       xp:100, need:10,  measure:'streak:breathe' },
+  { code:'BA', name:'BLACKOUT ARTIST',  note:'10 nights at 7.5h or more',            xp:150, need:10,  measure:'streak:sleep' },
+  { code:'RB', name:'RUBBER BAND',      note:'14-day mobility streak',               xp:150, need:14,  measure:'streak:mobility' },
+  { code:'CN', name:'THE CENTURION',    note:'100 perfect days. Nobody has done this.', xp:500, need:100, measure:'perfectDays' }
 ];
 
-let ATHLETE_ID = '', ATHLETE_NAME = '', KEY = null;
-let CFG = { custom: [], hidden: [], updatedAt: 0 };   // custom: [{id,name,group}]
-let LOG = {};                                          // { 'YYYY-MM-DD': { habitId: 1|0 } }
-let viewDate = null;                                   // Date being viewed/edited
-
+// ── Identity & storage ────────────────────────────────────────────────────
+let ATHLETE_ID = '', ATHLETE_NAME = '', KEY = null, ATHLETE = {};
+let CFG = null, LOG = {};
+let MSGS = [];
 const K_CFG = () => ATHLETE_ID + '_hab_cfg';
 const K_LOG = () => ATHLETE_ID + '_hab_log';
 
-function fmtKey(d) {
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const UI = { screen:'today', ob:0, open:null, sheet:null, sheetVal:0, draft:'', toast:null, adding:false };
+let _toastTimer = null;
+
+function defaultCfg() {
+  const on = {}; HABITS.forEach(h => on[h.id] = true);
+  return { v:2, on, custom:[], goals:{}, coach:'active', motiv:'points', onboarded:false, dark:false, updatedAt:0 };
 }
-function today() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+
+// ── Dates ─────────────────────────────────────────────────────────────────
+function today() { const d = new Date(); d.setHours(0,0,0,0); return d; }
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
-function allHabits() { return DEFAULT_HABITS.concat(CFG.custom || []); }
-function activeHabits() { return allHabits().filter(h => (CFG.hidden || []).indexOf(h.id) === -1); }
-function isChecked(dayKey, id) { return !!(LOG[dayKey] && LOG[dayKey][id] === 1); }
-function dayPct(dayKey) {
-  const hs = activeHabits();
-  if (!hs.length) return 0;
-  return Math.round(hs.filter(h => isChecked(dayKey, h.id)).length / hs.length * 100);
-}
+function fmtKey(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+const TKEY = () => fmtKey(today());
 
-// ── Persistence ──────────────────────────────────────────────────────
+// ── Habit helpers ─────────────────────────────────────────────────────────
+function allHabits() {
+  return HABITS.concat((CFG.custom || []).map(c => Object.assign({
+    kind:'check', target:1, unit:'session', source:'Custom', code:(c.name||'??').slice(0,2).toUpperCase()
+  }, c)));
+}
+function habitById(id) { return allHabits().find(h => h.id === id) || HABITS[0]; }
+function live() { return allHabits().filter(h => CFG.on[h.id] !== false); }
+function valOf(dayKey, id) { const d = LOG[dayKey]; return (d && typeof d[id] === 'number') ? d[id] : 0; }
+function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
+function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
+
+// ── Persistence ───────────────────────────────────────────────────────────
 function loadLocal() {
-  try { CFG = Object.assign({ custom: [], hidden: [], updatedAt: 0 }, JSON.parse(localStorage.getItem(K_CFG()) || '{}')); } catch (e) {}
+  CFG = defaultCfg();
+  try {
+    const raw = JSON.parse(localStorage.getItem(K_CFG()) || '{}');
+    CFG = Object.assign(CFG, raw);
+    CFG.on = Object.assign(defaultCfg().on, raw.on || {});
+  } catch (e) {}
   try { LOG = JSON.parse(localStorage.getItem(K_LOG()) || '{}') || {}; } catch (e) {}
+  migrateV1();
 }
-function saveCfg() {
-  CFG.updatedAt = Date.now();
-  try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
-  schedulePush();
+// The first shipped version stored 0/1 flags under a different habit set.
+// Fold that into the numeric model once, so nobody loses their first days.
+function migrateV1() {
+  if (CFG.v === 2 && CFG.migrated) return;
+  const MAP = { train:'strength', mobility:'mobility', sleep:'sleep', unwind:'breathe',
+                protein:'fuel', water:'water', steps:'steps', vitd:'supps', creatine:'supps', omega3:'supps' };
+  let touched = false;
+  Object.keys(LOG).forEach(day => {
+    const src = LOG[day] || {}, out = {};
+    Object.keys(src).forEach(k => {
+      const v = src[k];
+      if (HABITS.some(h => h.id === k) || (CFG.custom || []).some(c => c.id === k)) { out[k] = v; return; }
+      const to = MAP[k];
+      if (to && v === 1) { out[to] = habitById(to).target; touched = true; }
+    });
+    LOG[day] = out;
+  });
+  CFG.v = 2; CFG.migrated = true;
+  if (touched) saveLog();
+  saveCfg();
 }
-function saveLog() {
-  try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {}
-  schedulePush();
-}
+function saveCfg() { CFG.updatedAt = Date.now(); try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {} schedulePush(); }
+function saveLog() { try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {} schedulePush(); }
 
-// ── Cloud mirror (reuses program.html's RPC pair) ────────────────────
-let _sbClient = null, _pushTimer = null;
+let _sbClient = null, _pushTimer = null, _synced = false;
 function _sb() {
   if (_sbClient) return _sbClient;
   if (!window.supabase || !window.supabase.createClient) return null;
@@ -414,190 +445,645 @@ function schedulePush() {
   clearTimeout(_pushTimer);
   _pushTimer = setTimeout(async () => {
     try {
-      const sb = _sb();
-      if (!sb) return;
+      const sb = _sb(); if (!sb) return;
       const payload = {};
       payload[K_CFG()] = localStorage.getItem(K_CFG()) || '{}';
       payload[K_LOG()] = localStorage.getItem(K_LOG()) || '{}';
       const { error } = await sb.rpc('save_progress', {
-        p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME,
-        p_data: payload, p_key: KEY
+        p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME, p_data: payload, p_key: KEY
       });
-      setSyncState(!error);
-    } catch (e) { setSyncState(false); }
+      _synced = !error;
+    } catch (e) { _synced = false; }
   }, 1200);
 }
 async function syncFromCloud() {
   if (window.IS_DEMO || !ATHLETE_ID) return;
-  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
-    await new Promise(r => setTimeout(r, 100));
-  }
+  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) await new Promise(r => setTimeout(r, 100));
   try {
-    const sb = _sb();
-    if (!sb) return;
+    const sb = _sb(); if (!sb) return;
     const { data, error } = await sb.rpc('get_progress', { p_athlete_id: ATHLETE_ID, p_key: KEY });
     if (error || !data || typeof data !== 'object') return;
-    // Deep-merge the habit log: union of days; per habit, an explicit value
-    // (1 checked / 0 unchecked) wins over absence, cloud wins a true conflict.
+    // Log: union of days, per-habit the larger logged value wins — an uncheck on
+    // a stale device must never erase a real number from another one.
     try {
       const cloudLog = JSON.parse(data[K_LOG()] || '{}') || {};
       Object.keys(cloudLog).forEach(day => {
-        LOG[day] = Object.assign({}, LOG[day] || {}, cloudLog[day]);
+        const mine = LOG[day] || {}, theirs = cloudLog[day] || {}, out = Object.assign({}, mine);
+        Object.keys(theirs).forEach(id => { out[id] = Math.max(Number(theirs[id]) || 0, Number(mine[id]) || 0); });
+        LOG[day] = out;
       });
     } catch (e) {}
-    // Config: newest updatedAt wins wholesale.
+    // Config: newest wins wholesale (it's a settings blob, not a merge target).
     try {
       const cloudCfg = JSON.parse(data[K_CFG()] || '{}');
       if (cloudCfg && (cloudCfg.updatedAt || 0) > (CFG.updatedAt || 0)) {
-        CFG = Object.assign({ custom: [], hidden: [], updatedAt: 0 }, cloudCfg);
+        CFG = Object.assign(defaultCfg(), cloudCfg);
+        CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
       }
     } catch (e) {}
-    try {
-      localStorage.setItem(K_LOG(), JSON.stringify(LOG));
-      localStorage.setItem(K_CFG(), JSON.stringify(CFG));
-    } catch (e) {}
-    setSyncState(true);
-  } catch (e) { /* offline — local still works */ }
+    migrateV1();
+    try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
+    _synced = true;
+  } catch (e) {}
 }
-function setSyncState(ok) {
-  const n = document.getElementById('sync-note');
-  const t = document.getElementById('sync-text');
-  if (window.IS_DEMO) { t.textContent = 'Demo — saved on this device only'; return; }
-  n.classList.toggle('ok', !!ok);
-  t.textContent = ok ? 'Synced with your coach' : 'Saved on this device — will sync when online';
+async function fetchMessages() {
+  if (window.IS_DEMO || !ATHLETE_ID) return;
+  try {
+    const sb = _sb(); if (!sb) return;
+    const { data, error } = await sb.rpc('get_messages', { p_athlete_id: ATHLETE_ID, p_key: KEY });
+    if (error) return;
+    MSGS = data || [];
+    render();
+  } catch (e) {}
+}
+function unreadFromCoach() { return MSGS.filter(m => m.sender === 'coach' && !m.read_by_athlete).length; }
+async function markCoachRead() {
+  if (!unreadFromCoach()) return;
+  MSGS.forEach(m => { if (m.sender === 'coach') m.read_by_athlete = true; });
+  try { const sb = _sb(); if (sb) await sb.rpc('mark_athlete_read', { p_athlete_id: ATHLETE_ID, p_key: KEY }); } catch (e) {}
+}
+async function sendMessage(body) {
+  body = String(body || '').trim();
+  if (!body) return;
+  const lastCtx = MSGS.length ? MSGS[MSGS.length - 1].context : null;
+  MSGS.push({ sender:'athlete', body, context:lastCtx, read_by_athlete:true, read_by_coach:false });
+  UI.draft = '';
+  render();
+  if (window.IS_DEMO) return;
+  try { const sb = _sb(); if (sb) await sb.rpc('send_athlete_message', { p_athlete_id: ATHLETE_ID, p_body: body, p_context: lastCtx, p_key: KEY }); } catch (e) {}
 }
 
-// ── Streaks & stats ──────────────────────────────────────────────────
-function habitStreak(id) {
-  const tk = fmtKey(today());
-  let d = isChecked(tk, id) ? today() : addDays(today(), -1);
-  let n = 0;
-  while (isChecked(fmtKey(d), id)) { n++; d = addDays(d, -1); }
+// ── Derived stats, all from real history ──────────────────────────────────
+function loggedDays() { return Object.keys(LOG).sort(); }
+function dayPct(dayKey) {
+  const hs = live(); if (!hs.length) return 0;
+  return Math.round(hs.filter(h => isDone(h, dayKey)).length / hs.length * 100);
+}
+function isPerfect(dayKey) { const hs = live(); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
+// A day counts toward the streak at 80% or better — the same bar the coach uses.
+function dayQualifies(dayKey) { return dayPct(dayKey) >= 80; }
+function currentDayStreak() {
+  let d = dayQualifies(TKEY()) ? today() : addDays(today(), -1), n = 0;
+  while (dayQualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
   return n;
 }
-function dayStreak() {
-  // Consecutive days with at least 80% of habits done; today counts once it qualifies.
-  const qualifies = k => dayPct(k) >= 80;
-  let d = qualifies(fmtKey(today())) ? today() : addDays(today(), -1);
-  let n = 0;
-  while (qualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
-  return n;
-}
-function weekPct() {
-  let sum = 0;
-  for (let i = 0; i < 7; i++) sum += dayPct(fmtKey(addDays(today(), -i)));
-  return Math.round(sum / 7);
-}
-
-// ── Render ───────────────────────────────────────────────────────────
-const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-function render() {
-  const vk = fmtKey(viewDate);
-  const tk = fmtKey(today());
-  const isToday = vk === tk;
-
-  document.getElementById('st-streak').textContent = dayStreak();
-  document.getElementById('st-today').textContent = dayPct(tk) + '%';
-  document.getElementById('st-week').textContent = weekPct() + '%';
-
-  // Week strip: trailing 7 days ending today.
-  const week = document.getElementById('week');
-  week.innerHTML = '';
-  for (let i = 6; i >= 0; i--) {
-    const d = addDays(today(), -i);
-    const k = fmtKey(d);
-    const p = dayPct(k);
-    const el = document.createElement('div');
-    el.className = 'wday' + (k === vk ? ' sel' : '') + (p === 100 ? ' done' : '');
-    el.style.setProperty('--p', p);
-    el.innerHTML = '<span class="dl">' + DAY_LETTERS[d.getDay()] + '</span>' +
-      '<span class="ring"><span class="dn">' + d.getDate() + '</span></span>';
-    el.addEventListener('click', () => { viewDate = d; render(); });
-    week.appendChild(el);
-  }
-
-  document.getElementById('day-title').textContent = isToday ? 'Today'
-    : viewDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
-  document.getElementById('day-pct').textContent = dayPct(vk) + '% done';
-  document.getElementById('back-today').classList.toggle('show', !isToday);
-
-  // Habit groups.
-  const wrap = document.getElementById('groups');
-  wrap.innerHTML = '';
-  const hiddenIds = CFG.hidden || [];
-  const editing = document.body.classList.contains('editing');
-  Object.keys(GROUPS).forEach(gid => {
-    const g = GROUPS[gid];
-    let hs = allHabits().filter(h => h.group === gid);
-    if (!editing) hs = hs.filter(h => hiddenIds.indexOf(h.id) === -1);
-    if (!hs.length) return;
-    const sec = document.createElement('div');
-    sec.className = 'group';
-    const lbl = document.createElement('div');
-    lbl.className = 'group-label';
-    lbl.innerHTML = '<span class="dot" style="background:' + g.color + '"></span>' + g.label;
-    sec.appendChild(lbl);
-    hs.forEach(h => {
-      const hidden = hiddenIds.indexOf(h.id) !== -1;
-      const on = isChecked(vk, h.id);
-      const row = document.createElement('div');
-      row.className = 'habit' + (on ? ' on' : '') + (hidden ? ' hidden-habit' : '');
-      row.style.setProperty('--gc', g.color);
-      row.style.setProperty('--gcd', g.dim);
-      const streak = habitStreak(h.id);
-      row.innerHTML =
-        '<span class="hb-check"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span>' +
-        '<span class="hb-name">' + escapeHtml(h.name) + '</span>' +
-        (streak >= 2 ? '<span class="hb-streak">' + streak + '-day</span>' : '');
-      if (!hidden) row.addEventListener('click', () => toggleHabit(vk, h.id));
-      if (editing) {
-        const del = document.createElement('button');
-        del.className = 'hb-del';
-        const isCustom = DEFAULT_HABITS.every(d => d.id !== h.id);
-        del.textContent = hidden ? '↺' : '✕';
-        del.setAttribute('aria-label', hidden ? 'Restore habit' : (isCustom ? 'Remove habit' : 'Hide habit'));
-        del.addEventListener('click', ev => {
-          ev.stopPropagation();
-          if (hidden) CFG.hidden = hiddenIds.filter(x => x !== h.id);
-          else if (isCustom) CFG.custom = (CFG.custom || []).filter(c => c.id !== h.id);
-          else CFG.hidden = hiddenIds.concat([h.id]);
-          saveCfg(); render();
-        });
-        row.appendChild(del);
-      }
-      sec.appendChild(row);
-    });
-    wrap.appendChild(sec);
+function bestDayStreak() {
+  const days = loggedDays().filter(dayQualifies);
+  let best = 0, run = 0, prev = null;
+  days.forEach(k => {
+    run = (prev && fmtKey(addDays(new Date(prev + 'T00:00:00'), 1)) === k) ? run + 1 : 1;
+    best = Math.max(best, run); prev = k;
   });
+  return Math.max(best, currentDayStreak());
+}
+function habitStreak(h) {
+  let d = isDone(h, TKEY()) ? today() : addDays(today(), -1), n = 0;
+  while (isDone(h, fmtKey(d))) { n++; d = addDays(d, -1); }
+  return n;
+}
+function habitBest(h) {
+  const days = loggedDays().filter(k => isDone(h, k));
+  let best = 0, run = 0, prev = null;
+  days.forEach(k => {
+    run = (prev && fmtKey(addDays(new Date(prev + 'T00:00:00'), 1)) === k) ? run + 1 : 1;
+    best = Math.max(best, run); prev = k;
+  });
+  return Math.max(best, habitStreak(h));
+}
+function habitWeek(h) { let n = 0; for (let i = 0; i < 7; i++) if (isDone(h, fmtKey(addDays(today(), -i)))) n++; return n; }
+function habitRate35(h) { let n = 0; for (let i = 0; i < 35; i++) if (isDone(h, fmtKey(addDays(today(), -i)))) n++; return Math.round(n / 35 * 100); }
+function totalCompletions() { return loggedDays().reduce((s, k) => s + live().filter(h => isDone(h, k)).length, 0); }
+function totalXp() { return totalCompletions() * 30 + loggedDays().filter(isPerfect).length * 10; }
+function levelOf(xp) {
+  let lv = 1;
+  for (let i = 0; i < LEVEL_AT.length; i++) if (xp >= LEVEL_AT[i]) lv = i + 1;
+  return lv;
+}
+// Everything the level UI needs, with the max-level case handled once so no
+// screen can render a negative "XP to next".
+function levelInfo(xp) {
+  const lv = levelOf(xp), max = lv >= LEVEL_AT.length;
+  const floor = LEVEL_AT[lv - 1], next = max ? null : LEVEL_AT[lv];
+  return {
+    lv, max, name: LEVEL_NAMES[lv - 1], next,
+    toNext: max ? 0 : next - xp,
+    pct: max ? 100 : Math.max(0, Math.min(100, Math.round((xp - floor) / (next - floor) * 100))),
+    nextLabel: max ? 'Max level reached' : (next - xp) + ' XP to level ' + (lv + 1)
+  };
+}
+function measureAch(a) {
+  if (a.measure === 'perfectDays') return loggedDays().filter(isPerfect).length;
+  if (a.measure === 'daysWith3') return loggedDays().filter(k => live().filter(h => isDone(h, k)).length >= 3).length;
+  const [kind, id] = a.measure.split(':');
+  const h = habitById(id);
+  if (kind === 'streak') return habitStreak(h);
+  if (kind === 'daysHit') return loggedDays().filter(k => isDone(h, k)).length;
+  return 0;
+}
+function dayNumber() {
+  const days = loggedDays();
+  if (!days.length) return 1;
+  const first = new Date(days[0] + 'T00:00:00');
+  return Math.max(1, Math.round((today() - first) / 86400000) + 1);
+}
 
-  // Heatmap: 28 cells ending today, week rows aligned so today is last.
-  const heat = document.getElementById('heat');
-  heat.innerHTML = '';
-  for (let i = 27; i >= 0; i--) {
-    const k = fmtKey(addDays(today(), -i));
-    const p = dayPct(k);
-    const lv = p === 0 ? 0 : p <= 30 ? 1 : p <= 60 ? 2 : p < 100 ? 3 : 4;
-    const c = document.createElement('div');
-    c.className = 'cell' + (lv ? ' lv' + lv : '') + (i === 0 ? ' today-cell' : '');
-    c.title = k + ' — ' + p + '%';
-    heat.appendChild(c);
+// ── Coach copy, reactive to what's actually missing ───────────────────────
+function coachCopy() {
+  const missing = live().filter(h => !isDone(h));
+  const water = live().find(h => h.id === 'water');
+  let line, cta;
+  if (water && !isDone(water)) {
+    const left = Math.max(1, Math.ceil(water.target - valOf(TKEY(), 'water')));
+    line = 'You have out-hydrated exactly zero houseplants today. ' + left + ' more glass' + (left === 1 ? '' : 'es') + ' and I stop bringing it up.';
+    cta = 'FINE, TALK TO ME';
+  } else if (missing.length) {
+    line = missing.length + ' habit' + (missing.length === 1 ? '' : 's') + ' left, and ' + missing[0].name.toLowerCase() + ' is the one you are avoiding. I can tell.';
+    cta = 'DEFEND YOURSELF';
+  } else {
+    line = 'Everything is checked. I have nothing to nag about, which is deeply unsettling for me.';
+    cta = 'SAY SOMETHING NICE';
   }
+  if (CFG.coach === 'nudge') cta = 'SEE THE RECAP';
+  return { line, cta };
 }
-function toggleHabit(dayKey, id) {
-  if (!LOG[dayKey]) LOG[dayKey] = {};
-  LOG[dayKey][id] = isChecked(dayKey, id) ? 0 : 1;   // explicit 0 so an uncheck syncs too
-  saveLog(); render();
+
+// ── Actions ───────────────────────────────────────────────────────────────
+function toast(text) {
+  UI.toast = text; render();
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { UI.toast = null; render(); }, 2200);
 }
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function setVal(id, v) {
+  const k = TKEY();
+  if (!LOG[k]) LOG[k] = {};
+  LOG[k][id] = Math.max(0, v);
+  saveLog();
 }
+function toggleHabit(h) {
+  const done = isDone(h);
+  setVal(h.id, done ? 0 : h.target);
+  render();
+  if (!done) toast('+30 XP · ' + h.name + ' logged. Look at you.');
+}
+function bump(h) {
+  const stepBy = h.step || 1;
+  const v = Math.min(h.target, valOf(TKEY(), h.id) + stepBy);
+  setVal(h.id, v); render();
+  toast(v >= h.target ? '+30 XP · ' + h.name + ' complete.' : '+5 XP. Keep them coming.');
+}
+function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(TKEY(), h.id); render(); }
+function go(screen) { UI.screen = screen; UI.open = null; if (screen === 'coach') markCoachRead(); render(); }
+
+// ── Render helpers ────────────────────────────────────────────────────────
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const H = (s) => s;
+let _handlers = {};
+function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _handlers[id] = fn; return 'data-h="' + id + '"'; }
+
+function render() {
+  _handlers = {};
+  const app = document.getElementById('app');
+  app.className = 'app on';
+  app.innerHTML = CFG.onboarded ? renderApp() : renderOnboarding();
+  app.querySelectorAll('[data-h]').forEach(el => {
+    const fn = _handlers[el.getAttribute('data-h')];
+    if (fn) el.addEventListener('click', ev => { ev.stopPropagation(); fn(ev); });
+  });
+  const ta = app.querySelector('#draft');
+  if (ta) {
+    ta.addEventListener('input', e => { UI.draft = e.target.value; });
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(UI.draft); } });
+  }
+  const nh = app.querySelector('#newhabit');
+  if (nh) nh.addEventListener('input', e => { UI._newName = e.target.value; });
+  const sc = app.querySelector('#scroll');
+  if (sc && UI.screen === 'coach') sc.scrollTop = sc.scrollHeight;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
+}
+
+// ── Onboarding ────────────────────────────────────────────────────────────
+function renderOnboarding() {
+  const step = UI.ob;
+  let bodyHtml = '';
+  if (step === 0) {
+    bodyHtml = `
+      <div style="flex:1;display:flex;flex-direction:column;padding-top:28px;animation:riseIn .3s ease;overflow:hidden">
+        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">What are we<br>fixing first?</div>
+        <p style="margin:14px 0 22px;font-size:14px;color:var(--muted)">Pick as many as you like. Nobody's reading this but me, and I'm a program.</p>
+        <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
+          ${GOALS.map((g, i) => `<button class="selrow ${CFG.goals[i] ? 'on' : ''}" ${on(() => { CFG.goals[i] = !CFG.goals[i]; saveCfg(); render(); })}>
+            <span class="lbl">${esc(g)}</span><span class="mark">${CFG.goals[i] ? 'PICKED' : '+'}</span>
+          </button>`).join('')}
+        </div>
+      </div>`;
+  } else if (step === 1) {
+    bodyHtml = `
+      <div style="flex:1;display:flex;flex-direction:column;padding-top:28px;overflow:hidden;animation:riseIn .3s ease">
+        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">Your eight<br>daily habits</div>
+        <p style="margin:14px 0 18px;font-size:14px;color:var(--muted)">Switch off anything you'd only lie about later.</p>
+        <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
+          ${allHabits().map(h => `<button style="width:100%;text-align:left;padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px" class="row-rule"
+            ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}>
+            <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+              <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
+              <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(h.goal || h.source)}</span>
+            </span>
+            <span class="sw ${CFG.on[h.id] !== false ? 'on' : ''}"><i></i></span>
+          </button>`).join('')}
+        </div>
+      </div>`;
+  } else {
+    bodyHtml = `
+      <div style="flex:1;display:flex;flex-direction:column;padding-top:28px;animation:riseIn .3s ease;overflow:hidden">
+        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">How loud<br>should I be?</div>
+        <p style="margin:14px 0 20px;font-size:14px;color:var(--muted)">You can change your mind at 6am like everyone else.</p>
+        <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
+          ${COACH_STYLES.map(c => `<button class="selrow ${CFG.coach === c.key ? 'on' : ''}" style="flex-direction:column;align-items:flex-start"
+            ${on(() => { CFG.coach = c.key; saveCfg(); render(); })}>
+            <span class="lbl">${esc(c.label)}</span><span class="desc">${esc(c.desc)}</span>
+          </button>`).join('')}
+        </div>
+      </div>`;
+  }
+  return `
+    <div style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
+        <div class="hd" style="font-size:16px;line-height:1;letter-spacing:.02em">Proof</div>
+        <div class="eyebrow">Step ${step + 1} of 3</div>
+      </div>
+      ${bodyHtml}
+      <div style="display:flex;gap:10px;padding-top:18px">
+        <button class="btn btn-secondary" ${on(() => { if (UI.ob === 0) { CFG.onboarded = true; saveCfg(); } else UI.ob--; render(); })}>Back</button>
+        <button class="btn btn-primary" style="flex:1" ${on(() => {
+          if (UI.ob === 2) { CFG.onboarded = true; saveCfg(); UI.screen = 'today'; }
+          else UI.ob++;
+          render();
+        })}>${step === 2 ? 'Start day 1' : 'Next'}</button>
+      </div>
+    </div>`;
+}
+
+// ── App shell ─────────────────────────────────────────────────────────────
+function renderApp() {
+  const xp = totalXp(), LI = levelInfo(xp), lv = LI.lv, lvName = LI.name;
+  const hs = live(), doneCount = hs.filter(h => isDone(h)).length, pct = dayPct(TKEY());
+  const openH = habitById(UI.open || 'strength');
+  const earned = ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).length;
+
+  const heads = {
+    today:    [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
+    detail:   [openH.source, openH.name],
+    insights: ['LV ' + lv + ' ' + lvName + ' · ' + xp + ' XP', 'Achievements'],
+    coach:    [CFG.coach === 'silent' ? 'Coach muted in settings' : 'Amir · replies within a day', 'Your coach'],
+    settings: ['Profile & programme', 'Settings']
+  };
+  const rights = {
+    today: pct + '% DONE', detail: habitBest(openH) + 'D BEST',
+    insights: earned + ' OF ' + ACHIEVEMENTS.length,
+    coach: (CFG.coach || 'active').toUpperCase(), settings: _synced ? 'SYNCED' : 'LOCAL'
+  };
+  const head = heads[UI.screen] || heads.today;
+
+  let screenHtml = '';
+  if (UI.screen === 'today') screenHtml = renderToday(xp, lv, lvName, doneCount, pct);
+  else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
+  else if (UI.screen === 'insights') screenHtml = renderAwards(xp, lv, lvName, earned);
+  else if (UI.screen === 'coach') screenHtml = renderCoach();
+  else screenHtml = renderSettings();
+
+  const tabDefs = [['TODAY','today','01'],['AWARDS','insights','02'],['COACH','coach','03'],['YOU','settings','04']];
+  const activeTab = UI.screen === 'detail' ? 'today' : UI.screen;
+  const unread = unreadFromCoach();
+
+  return `
+    ${window.IS_DEMO ? '<div class="demo-banner">Demo mode — nothing is saved to the cloud</div>' : ''}
+    <div class="apphd">
+      <div style="min-width:0">
+        <div class="eyebrow">${esc(head[0])}</div>
+        <div class="title hd">${esc(head[1])}</div>
+      </div>
+      <div class="right mono">${esc(rights[UI.screen] || '')}</div>
+    </div>
+    <div class="scroll" id="scroll">${screenHtml}</div>
+    <div class="tabs">
+      ${tabDefs.map(t => `<button class="${activeTab === t[1] ? 'on' : ''}" ${on(() => go(t[1]))}>
+        <span class="num">${t[2]}</span><span class="nm">${t[0]}</span>
+        ${t[1] === 'coach' && unread && activeTab !== 'coach' ? '<span class="dot"></span>' : ''}
+      </button>`).join('')}
+    </div>
+    ${UI.sheet ? renderSheet() : ''}
+    ${UI.toast ? `<div class="toast">${esc(UI.toast)}</div>` : ''}`;
+}
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+}
+
+// ── Today ─────────────────────────────────────────────────────────────────
+function renderToday(xp, lv, lvName, doneCount, pct) {
+  const hs = live();
+  const LI = levelInfo(xp);
+  const streak = currentDayStreak();
+
+  let hero = '';
+  if (CFG.motiv === 'streak') {
+    hero = `<div style="display:flex;align-items:flex-end;gap:14px">
+      <div class="figure" style="font-size:92px;line-height:.8">${streak}</div>
+      <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
+        <div class="hd" style="font-size:15px;line-height:1">Day streak</div>
+        <div style="font-size:12px;line-height:1.3;color:var(--muted)">Longest ever: ${bestDayStreak()} days</div>
+      </div></div>`;
+  } else if (CFG.motiv === 'rings') {
+    hero = `<div style="display:flex;gap:8px;align-items:flex-end">
+      ${hs.map(h => {
+        const v = valOf(TKEY(), h.id);
+        const pc = Math.max(4, Math.min(100, Math.round(v / h.target * 100)));
+        return `<div style="flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="height:78px;display:flex;align-items:flex-end;background:var(--track)">
+            <div style="width:100%;height:${pc}%;background:${isDone(h) ? 'var(--accent)' : 'var(--muted)'};transition:height .35s cubic-bezier(.2,.8,.2,1)"></div>
+          </div>
+          <div class="mono" style="font-size:8px;letter-spacing:.04em;color:var(--muted)">${esc(h.code)}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } else {
+    hero = `<div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:flex-end;gap:14px">
+        <div class="figure" style="font-size:64px;line-height:.85">${xp}</div>
+        <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:6px">
+          <div class="hd" style="font-size:15px;line-height:1">XP · LV ${lv} ${esc(lvName)}</div>
+          <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(LI.nextLabel)}</div>
+        </div>
+      </div>
+      <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
+    </div>`;
+  }
+
+  const cc = coachCopy();
+  return `
+    <div style="animation:fadeIn .25s ease">
+      <div class="block" style="display:flex;flex-direction:column;gap:14px">
+        ${hero}
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="eyebrow" style="display:flex;justify-content:space-between"><span>Today</span><span>${doneCount} of ${hs.length} habits</span></div>
+          <div class="bar"><span style="width:${pct}%"></span></div>
+        </div>
+      </div>
+
+      ${CFG.coach !== 'silent' ? `<div class="coachcard">
+        <div class="eyebrow">${CFG.coach === 'nudge' ? 'One nudge, as agreed' : 'Amir, your coach'}</div>
+        <div class="say">${esc(cc.line)}</div>
+        <button class="cta" ${on(() => go('coach'))}>${esc(cc.cta)}</button>
+      </div>` : ''}
+
+      ${hs.map(h => {
+        const v = valOf(TKEY(), h.id), done = isDone(h), st = habitStreak(h);
+        let status;
+        if (h.kind === 'count') status = fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit;
+        else status = done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source);
+        const pc = Math.min(100, Math.round(v / h.target * 100));
+        return `<div class="hrow ${done ? 'done' : ''}">
+          <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="Toggle ${esc(h.name)}">
+            <span class="boxmark ${done ? 'on' : ''}">${done ? '✓' : ''}</span>
+          </button>
+          <button class="body" ${on(() => { UI.open = h.id; UI.screen = 'detail'; render(); })}>
+            <span class="line1">
+              <span class="nm">${esc(h.name)}</span>
+              <span class="stk mono">${st > 0 ? st + 'D' : '—'}</span>
+            </span>
+            <span class="status">${esc(status)}</span>
+            <span class="track"><span style="width:${pc}%"></span></span>
+          </button>
+          ${h.kind === 'count' ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
+        </div>`;
+      }).join('')}
+
+      <div style="padding:18px 20px 30px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+        Tap a habit's name to see its history. Steps and sleep take a number — tap the +, or open the habit and log it. Everything else is on you, champ.
+      </div>
+    </div>`;
+}
+
+// ── Habit detail ──────────────────────────────────────────────────────────
+function renderDetail(h) {
+  const cells = [];
+  for (let i = 34; i >= 0; i--) {
+    const k = fmtKey(addDays(today(), -i)), v = valOf(k, h.id);
+    cells.push(v >= h.target ? 'hit' : (v > 0 ? 'part' : ''));
+  }
+  const logRows = [];
+  for (let i = 1; i <= 4; i++) {
+    const d = addDays(today(), -i), k = fmtKey(d), v = valOf(k, h.id), hit = v >= h.target;
+    logRows.push({
+      day: i === 1 ? 'YESTERDAY' : d.toLocaleDateString('en-GB', { weekday:'short' }).toUpperCase(),
+      note: h.kind === 'count' ? fmtVal(h, v) + ' ' + h.unit + ' logged' : (hit ? 'Logged in the app' : 'Nothing logged'),
+      val: hit ? 'HIT' : 'MISS', hit
+    });
+  }
+  const stats = [
+    { v: habitWeek(h) + '/7', k: 'This week' },
+    { v: habitBest(h) + 'd',  k: 'Best streak' },
+    { v: habitRate35(h) + '%', k: '35-day rate' }
+  ];
+  return `
+    <div style="animation:fadeIn .25s ease">
+      <div class="block">
+        <div style="display:flex;align-items:flex-end;gap:12px">
+          <div class="figure" style="font-size:76px;line-height:.8">${habitStreak(h)}</div>
+          <div class="hd" style="font-size:14px;line-height:1.15;padding-bottom:6px">Day<br>streak</div>
+        </div>
+        <p style="margin:12px 0 0;font-size:13px;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
+        ${stats.map((s, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
+          <div class="hd" style="font-size:24px;line-height:1">${esc(s.v)}</div>
+          <div class="eyebrow" style="letter-spacing:.1em">${esc(s.k)}</div>
+        </div>`).join('')}
+      </div>
+      <div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="letter-spacing:.12em">Last 35 days</div>
+        <div class="grid35">${cells.map(c => `<div class="c ${c}"></div>`).join('')}</div>
+      </div>
+      <div>
+        ${logRows.map(l => `<div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <span style="display:flex;flex-direction:column;gap:3px">
+            <span class="hd" style="font-size:14px;line-height:1">${esc(l.day)}</span>
+            <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(l.note)}</span>
+          </span>
+          <span class="mono" style="font-size:10px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
+        </div>`).join('')}
+      </div>
+      <div style="padding:18px 20px 34px;display:flex;gap:10px">
+        <button class="btn btn-primary" style="flex:1" ${on(() => (h.kind === 'count' ? openSheet(h) : toggleHabit(h)))}>Log today</button>
+        <button class="btn btn-secondary" ${on(() => go('today'))}>Back</button>
+      </div>
+    </div>`;
+}
+
+// ── Awards ────────────────────────────────────────────────────────────────
+function renderAwards(xp, lv, lvName, earned) {
+  const LI = levelInfo(xp);
+  return `
+    <div style="animation:fadeIn .25s ease">
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:flex-end;gap:14px">
+          <div class="figure" style="font-size:76px;line-height:.8">${lv}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
+            <div class="hd" style="font-size:16px;line-height:1">Level · ${esc(lvName)}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${xp} XP · ${LI.max ? 'max level reached' : LI.toNext + ' to LV ' + (lv + 1)}</div>
+          </div>
+        </div>
+        <div class="bar thin"><span style="width:${LI.pct}%"></span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--divider)">
+        <div style="padding:14px 20px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px">
+          <div class="figure" style="font-size:32px;line-height:.95">${currentDayStreak()}</div>
+          <div class="eyebrow" style="letter-spacing:.12em">Day streak</div>
+        </div>
+        <div style="padding:14px 20px;display:flex;flex-direction:column;gap:4px">
+          <div class="hd" style="font-size:32px;line-height:.95;letter-spacing:-.03em">${earned} / ${ACHIEVEMENTS.length}</div>
+          <div class="eyebrow" style="letter-spacing:.12em">Achievements unlocked</div>
+        </div>
+      </div>
+      ${ACHIEVEMENTS.map(a => {
+        const have = measureAch(a), got = have >= a.need;
+        return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:15px 20px;opacity:${got ? '1' : '.45'}">
+          <div class="hd" style="width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;
+            ${got ? 'background:var(--accent);color:var(--bg);border:2px solid var(--accent)' : 'border:2px solid rgba(128,128,128,.5)'}">${a.code}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
+            <div class="hd" style="font-size:15px;line-height:1">${esc(a.name)}</div>
+            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(a.note)}</div>
+          </div>
+          <div style="flex:none;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <div class="mono" style="font-size:11px;color:${got ? 'var(--clay-deep)' : 'var(--muted-soft)'}">+${a.xp} XP</div>
+            <div class="mono" style="font-size:8px;letter-spacing:.08em;color:var(--muted-soft)">${got ? 'UNLOCKED' : have + '/' + a.need}</div>
+          </div>
+        </div>`;
+      }).join('')}
+      <div style="height:30px"></div>
+    </div>`;
+}
+
+// ── Coach chat (real messages) ────────────────────────────────────────────
+function renderCoach() {
+  const ctxLabel = (c) => { const m = String(c || '').match(/^session:(\d+):/); return m ? 'Day ' + m[1] : ''; };
+  const bubbles = MSGS.length
+    ? MSGS.map(m => `<div class="bub ${m.sender === 'athlete' ? 'me' : 'coach'}">${ctxLabel(m.context) ? '<span class="tag">' + esc(ctxLabel(m.context)) + '</span>' : ''}${esc(m.body)}</div>`).join('')
+    : `<div style="padding:8px 0;font-size:13px;color:var(--muted)">No messages yet. Send Amir a note — he reads every one.</div>`;
+  return `
+    <div style="min-height:100%;display:flex;flex-direction:column;animation:fadeIn .25s ease">
+      <div class="chat">${bubbles}</div>
+      <div class="composer">
+        <div class="chips">
+          ${QUICKS.map(q => `<button class="chip" ${on(() => sendMessage(q))}>${esc(q)}</button>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px">
+          <textarea class="input" id="draft" rows="1" placeholder="Tell your coach something…" style="flex:1;resize:none">${esc(UI.draft)}</textarea>
+          <button class="btn btn-primary" style="padding:0 16px" ${on(() => sendMessage(UI.draft))}>Send</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────
+function renderSettings() {
+  const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const sectionLabel = (t) => `<div class="eyebrow" style="padding:18px 20px 6px;letter-spacing:.12em">${t}</div>`;
+  return `
+    <div style="animation:fadeIn .25s ease">
+      <div class="block" style="display:flex;gap:14px;align-items:center;padding:18px 20px">
+        <div class="hd" style="width:52px;height:52px;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:21px">${esc(initials)}</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="hd" style="font-size:18px;line-height:1">${esc(ATHLETE_NAME || 'Athlete')}</div>
+          <div style="font-size:11px;line-height:1;color:var(--muted)">Coached by Amir · day ${dayNumber()}</div>
+        </div>
+      </div>
+
+      ${sectionLabel('Coach volume')}
+      ${COACH_STYLES.map(c => `<button class="selrow ${CFG.coach === c.key ? 'on' : ''}" style="flex-direction:column;align-items:flex-start;border-bottom:1px solid var(--rule)"
+        ${on(() => { CFG.coach = c.key; saveCfg(); render(); })}>
+        <span class="lbl" style="font-size:15px">${esc(c.label)}</span><span class="desc">${esc(c.desc)}</span>
+      </button>`).join('')}
+
+      ${sectionLabel('Motivation display')}
+      ${MOTIV.map(m => `<button class="selrow ${CFG.motiv === m.key ? 'on' : ''}" style="border-bottom:1px solid var(--rule)"
+        ${on(() => { CFG.motiv = m.key; saveCfg(); render(); })}>
+        <span class="lbl" style="font-size:15px">${esc(m.label)}</span>
+      </button>`).join('')}
+
+      ${sectionLabel('Appearance')}
+      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
+        <span class="lbl" style="font-size:15px">Dark mode</span>
+        <span class="sw ${CFG.dark ? 'on' : ''}"><i></i></span>
+      </button>
+
+      ${sectionLabel('Tracked habits')}
+      ${allHabits().map(h => {
+        const custom = (CFG.custom || []).some(c => c.id === h.id);
+        return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
+          <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+            <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
+            <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(h.source)}${custom ? '' : ' · ' + esc(h.goal)}</span>
+          </span>
+          <span style="display:flex;gap:10px;align-items:center">
+            ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
+              ${on(() => { CFG.custom = CFG.custom.filter(c => c.id !== h.id); saveCfg(); render(); })} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
+            <button class="sw ${CFG.on[h.id] !== false ? 'on' : ''}" ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
+          </span>
+        </div>`;
+      }).join('')}
+
+      <div style="padding:14px 20px 6px;display:flex;gap:8px">
+        <input class="input" id="newhabit" maxlength="40" placeholder="Add a habit — e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
+        <button class="btn btn-primary" style="padding:0 16px" ${on(() => {
+          const name = String(UI._newName || '').trim();
+          if (!name) return;
+          const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20) + '_' + Date.now().toString(36);
+          CFG.custom = (CFG.custom || []).concat([{ id, name: name.toUpperCase(), goal: name }]);
+          CFG.on[id] = true; UI._newName = '';
+          saveCfg(); render(); toast(name.toUpperCase() + ' added.');
+        })}>Add</button>
+      </div>
+
+      <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-secondary btn-block" ${on(() => { CFG.onboarded = false; UI.ob = 0; saveCfg(); render(); })}>Replay onboarding</button>
+        <button class="btn btn-secondary btn-block" ${on(() => { LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.'); })}>Reset today's log</button>
+      </div>
+    </div>`;
+}
+
+// ── Log sheet ─────────────────────────────────────────────────────────────
+function renderSheet() {
+  const h = habitById(UI.sheet);
+  const stepBy = h.step || 1;
+  return `
+    <div class="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
+    <div class="sheet">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="hd" style="font-size:21px;line-height:1">Log ${esc(h.name)}</div>
+        <button class="hd" style="font-size:13px;color:var(--clay-deep)" ${on(() => { UI.sheet = null; render(); })}>Close</button>
+      </div>
+      <div style="font-size:13px;line-height:1.4;color:var(--muted)">Target is ${fmtVal(h, h.target)} ${esc(h.unit)} a day. Round up generously, I will never know.</div>
+      <div class="stepper">
+        <button class="minus" ${on(() => { UI.sheetVal = Math.max(0, UI.sheetVal - stepBy); render(); })}>–</button>
+        <div class="val">
+          <span class="figure" style="font-size:36px;line-height:1">${fmtVal(h, UI.sheetVal)}</span>
+          <span class="eyebrow">${esc(h.unit)}</span>
+        </div>
+        <button class="plus" ${on(() => { UI.sheetVal = UI.sheetVal + stepBy; render(); })}>+</button>
+      </div>
+      <button class="btn btn-primary btn-block" ${on(() => {
+        setVal(h.id, UI.sheetVal); UI.sheet = null; render(); toast(h.name + ' updated.');
+      })}>Save it</button>
+    </div>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
 function showError(msg) {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('error-msg').textContent = msg;
-  document.getElementById('error').classList.add('show');
+  document.getElementById('error').classList.add('on');
 }
-
-// ── Boot ─────────────────────────────────────────────────────────────
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
   const clientId = params.get('client');
@@ -606,81 +1092,37 @@ function showError(msg) {
     showError('No client specified.\n\nOpen this page from your personal link:\nhabits.html?client=your_id');
     return;
   }
-  if (window.IS_DEMO) document.body.classList.add('is-demo');
-
-  let athlete = null;
   try {
     const res = await fetch('data/' + encodeURIComponent(clientId) + '.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    athlete = (await res.json()).athlete || {};
+    ATHLETE = (await res.json()).athlete || {};
   } catch (e) {
     showError('Could not load data for "' + clientId + '".\n\nCheck your link, or ask your coach for a fresh one.');
     return;
   }
-
-  ATHLETE_ID = athlete.id || clientId;
-  ATHLETE_NAME = [athlete.firstName, athlete.lastName].filter(Boolean).join(' ');
+  ATHLETE_ID = ATHLETE.id || clientId;
+  ATHLETE_NAME = [ATHLETE.firstName, ATHLETE.lastName].filter(Boolean).join(' ');
 
   // Same 3-tier key resolution as program.html: URL → device copy → program JSON.
   if (!window.IS_DEMO) {
     const ks = ATHLETE_ID + '_skey';
     try {
-      KEY = clientKey || localStorage.getItem(ks) || athlete.key || null;
+      KEY = clientKey || localStorage.getItem(ks) || ATHLETE.key || null;
       if (KEY) localStorage.setItem(ks, KEY);
-    } catch (e) { KEY = clientKey || athlete.key || null; }
+    } catch (e) { KEY = clientKey || ATHLETE.key || null; }
   }
 
   loadLocal();
   await syncFromCloud();
+  if (CFG.dark) document.body.setAttribute('data-dark', '');
+  document.title = 'Proof — ' + (ATHLETE.firstName || 'AA Performance');
 
-  if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
-  document.querySelector('meta[name="theme-color"]').setAttribute('content',
-    document.body.hasAttribute('data-dark') ? '#181818' : '#FAF7F2');
-
-  document.getElementById('greet-name').textContent = athlete.firstName || 'Athlete';
-  document.getElementById('greet-date').textContent =
-    today().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-
-  const sel = document.getElementById('add-group');
-  Object.keys(GROUPS).forEach(gid => {
-    const o = document.createElement('option');
-    o.value = gid; o.textContent = GROUPS[gid].label;
-    sel.appendChild(o);
-  });
-
-  document.getElementById('btn-dark').addEventListener('click', () => {
-    const dark = document.body.hasAttribute('data-dark');
-    if (dark) { document.body.removeAttribute('data-dark'); localStorage.removeItem('dark_mode'); }
-    else { document.body.setAttribute('data-dark', ''); localStorage.setItem('dark_mode', '1'); }
-    document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#FAF7F2' : '#181818');
-  });
-  document.getElementById('btn-edit').addEventListener('click', () => {
-    document.body.classList.toggle('editing');
-    document.getElementById('btn-edit').classList.toggle('active');
-    render();
-  });
-  document.getElementById('back-today').addEventListener('click', () => { viewDate = today(); render(); });
-  document.getElementById('add-btn').addEventListener('click', () => {
-    const inp = document.getElementById('add-name');
-    const name = inp.value.trim();
-    if (!name) return;
-    const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 24) + '_' + Date.now().toString(36);
-    CFG.custom = (CFG.custom || []).concat([{ id: id, name: name, group: sel.value }]);
-    inp.value = '';
-    saveCfg(); render();
-  });
-  window.addEventListener('visibilitychange', () => { if (document.hidden) schedulePush(); });
-
-  viewDate = today();
-  setSyncState(false);
   render();
-
-  document.getElementById('app').style.display = '';
   document.getElementById('loading').classList.add('hidden');
 
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
+  fetchMessages();
+  window.addEventListener('visibilitychange', () => { if (document.hidden) schedulePush(); });
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();
 </script>
 </body>
