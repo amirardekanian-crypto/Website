@@ -38,6 +38,17 @@ next chat will be working from a lie:
    constants and update
    themselves; its **prose** does not — fix that by hand when behaviour changes.
 4. **`privacy.html`** — if you changed what data is stored or shared.
+5. **`tourSteps()`** — the 15-step guided tour points a clay box at real controls and
+   says out loud what each one does. Move a button, rename a tab or change what a tap
+   does and the tour is actively lying, on the first screen a new athlete sees.
+
+**The tour is the first run.** *Start tracking* on the onboarding screen goes straight
+into it; it is replayable for ever from **Settings → How this works → Show me around**
+and from the manual's **Start here** section, and `CFG.toured` defaults to false for
+existing athletes so they get the offer once too. It lives in its own `<div id="tour">`
+**outside `#app`** — `render()` morphs `#app` against the template and would delete it —
+and its dimmer is four mask panes with a **real hole**, not a transparent lid, so a step
+marked `act` can be completed by actually doing the thing. Full detail in `HABITS.md`.
 
 **Navigation is three tabs: `TODAY · PROGRESS · CREW`.** Settings is **not** a tab — it
 lives behind the athlete's initials at the top-right of the header, and that same button

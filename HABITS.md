@@ -9,6 +9,7 @@ Start here if you're picking this up in a fresh chat.
 
 > **⚠️ Keeping this honest.** When you change how the app works, these must move
 > together: **this file**, **`XP_SYSTEM.md`**, **`QUESTS.md`** (if you touched a quest),
+> **`tourSteps()`** (the tour names controls out loud — move a button and it lies),
 > and the **in-app manual**
 > (`renderManual()` in `habits.html`, which athletes reach from the initials button
 > top-right → *The manual*). The manual reads its numbers straight from the live constants, so
@@ -233,7 +234,12 @@ yet" rather than "this is dead".
 
 - **Posting requires being on the leaderboard.** That opt-in already means "I agree to
   other athletes seeing me, under this handle", so there is no second consent to reason
-  about and no second display name. Not joined → the box becomes an invitation.
+  about and no second display name. Not joined → the box becomes an invitation, **with
+  the join form itself rendered underneath it**. It used to be an invitation over a
+  button reading *"Take a look at the crew"* whose handler was `go('crew')` — from the
+  crew screen, the only place that box renders. It scrolled to the top and did nothing
+  else, and the actual join form was on the *other* view of the tab, at the bottom, past
+  a board of strangers. That was the single dead end a brand-new athlete hit first.
 - **Today only**, even though the log itself is editable for three days. Fixing
   Saturday's steps is admin; rewriting what you *said* about Saturday is not.
 - **It pays no XP.** The moment a sentence earns points you get one character of
@@ -264,9 +270,23 @@ A habit row's meta line is **rank · XP** only. It used to append today's status
 which wrapped every row to two lines and restated what Today already says — Progress is
 about standing, not about today.
 
+**Nothing-logged-yet is taught, not reported.** On a log with no days in it the stat grid
+carries one line defining *badge*, *day streak* and *perfect day* — three of its four
+words were used nowhere else an athlete had been — and it disappears at the first logged
+day. Today's seven-day recap no longer names a "strongest" and "weakest" habit out of an
+eight-way tie at 0/7. The foot of Progress carries a second door to the manual.
+
 **Habit detail** (reached from here or from Today) shows that habit's rank and level
 progress, a log button, its consistency ladder, this-week / best-streak / 35-day-rate
 stats, a 35-day grid, and the last five days with the XP each earned.
+
+**Missed and not-yet-started are different, everywhere a day is drawn.** Days before
+`firstLoggedDay()` render as `.c.pre` in the 35-day grid (dotted, with its own key entry),
+are dropped from the last-five list, and read `—` rather than `0%` on Today's day strip.
+A day-one athlete was being shown three failed days on the day strip and five weeks of
+MISS on every habit, for a period during which they did not have the app. Note
+`firstLoggedDay() || TKEY()` at both call sites — it returns `null` until something is
+logged, which is precisely the case this exists for.
 
 Its header eyebrow is the habit's **goal**, not `h.source` — most habits are sourced
 `Manual`, so the screen used to announce itself as "MANUAL", which reads as *the manual*
@@ -298,12 +318,18 @@ once the athlete has written — a doorway, not a second composer.
 seven days, not a calendar week). Joining and renaming live with it.
 
 ### Settings — behind the initials button
-Profile · **The ladder** · **The manual** · link to the
+Profile · **Show me around** (the tour) · **The ladder** · **The manual** · link to the
 programme · sync status and a *Sync now* button · leaderboard status · dark mode ·
 which habits are tracked (plus adding custom ones) · reset today's log.
 
-Deliberately *not* here: coach volume, motivation display, replay onboarding. The app
-has one mode — XP and levels, nudge and recap — and doesn't ask athletes to configure it.
+Deliberately *not* here: coach volume, motivation display. The app has one mode — XP and
+levels, nudge and recap — and doesn't ask athletes to configure it.
+
+> **This used to say "replay onboarding" was deliberately absent too.** That ruling was
+> about the habit *picker*, which decides nothing and is fully editable in the list
+> further down this same screen. It is not about **the tour**, which is the only
+> explanation of what the app's controls do — and an explanation you can see exactly once
+> is worth very little. *Show me around* is the first row in *How this works*.
 
 ### The rank ladder
 Reachable by **tapping your rank** on Today or Progress, and from a Settings row.
@@ -347,6 +373,57 @@ select day, athlete_id, hidden, pct, body from public.hab_notes
 
 Hiding rather than deleting keeps the evidence, which is what you want if you ever have
 to explain the decision to the athlete.
+
+---
+
+## The tour — the game-style first run
+
+**One screen of onboarding said what to track and not one word about how any of it
+works.** The athlete was then handed a scoring system, three tabs, a header button
+labelled with their own initials, and a habit row with **three different tap targets and
+no signal that there was more than one** — and left to guess. The only real explanation,
+`renderManual()`, is excellent and sat three taps deep behind an unlabelled monogram with
+nothing anywhere pointing at it.
+
+The tour is a clay box drawn around the thing being named, a card beside it saying what
+that thing does, and everything else dimmed. **15 steps**, about a minute, across Today,
+Progress, Crew and Settings. It runs straight off *Start tracking*, and it is replayable
+for ever from **Settings → How this works → Show me around** and from the manual's new
+**Start here** section.
+
+`TOUR`, `tourSteps()`, `startTour()`, `tourShow()`, `tourTap()` and `paintTour()` in
+`habits.html`. Three things about it are load-bearing:
+
+- **It lives OUTSIDE `#app`,** in its own `<div id="tour">`. `render()` morphs `#app`
+  against the template and deletes anything the template does not know about, so a layer
+  inside it would be destroyed on the next tick. `paintTour()` owns that node
+  imperatively; `render()` calls it when `TOUR.on` so the ring re-measures after a tick,
+  a screen change or a celebration.
+- **The dimmer is four mask panes with a real hole, not one lid with a transparent
+  window.** A lid still swallows the tap. The hole is what lets a step marked `act` be
+  finished by *actually doing the thing* — tapping the real checkbox, opening real
+  Settings. A step you only read gets `.tourblock` dropped into the hole to seal it.
+- **Targets are resolved live and measured with `getBoundingClientRect()`,** never
+  hard-coded, so the ring cannot drift out of step with a retuned screen. Steps that
+  cannot apply (the `+` step when nothing counter-ish is tracked) are dropped when the
+  list is built rather than discovered missing halfway through.
+
+**Placement is solved for the ring and the card together**, because the card is up to
+56vh and a 320×568 phone has no arrangement where a naive "draw ring, then fit card"
+does not cover the thing being pointed at. `paintTour()` measures the card first, then
+either trims the ring's height to leave room below it, or puts the card above, or — for a
+tall block low on a short screen, like the join box at the foot of Crew — pins the card
+to an edge and trims the ring from the far side. Verified with no overlap and no
+off-viewport card across coached / free / dark / reduced-motion / 320px.
+
+⚠️ **The tour names controls, so it is now a fifth thing that goes out of date.** If you
+move a control, rename a tab, or change what a tap does, fix `tourSteps()` in the same
+pass — see the sync list at the top of this file.
+
+`CFG.toured` records that it has been offered. It defaults to **false for existing
+athletes too**, so everyone who has been using Proof since before this shipped gets the
+offer once — a one-line pointer below the habit list on Today, which deletes itself the
+moment the tour has run.
 
 ---
 
@@ -458,6 +535,13 @@ Athletes can switch any of them off and add their own (worth `customXp`, 25).
 
 **Onboarding** is one screen that *suggests* this set with every item as a toggle —
 it decides nothing for them, and everything stays editable in Settings afterwards.
+**The locked habit says so on that screen**, in clay, under its name: it used to be sold
+there as the highest-value habit on the list with its switch on and no mention of the
+padlock waiting on the very next screen. The free wording states the lock and stops —
+it does **not** suggest switching it off to reach 100%, because `proof.html` promises the
+opposite in public and in Amir's own first person.
+
+Pressing **Start tracking** goes straight into **the tour** (below).
 
 **A counter takes at most `dailyCap` × its target in a day** (3×, so 30,000 steps).
 Daily XP never needed a ceiling — `xpFor()` stops at the target — but a `total:`
