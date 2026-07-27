@@ -156,7 +156,21 @@
     background: var(--bg);
   }
   .apphd .title { font-size: 24px; line-height: 1; letter-spacing: -.02em; margin-top: 4px; }
+  /* One line, always. The header's right side now carries a value AND a button,
+     so an eyebrow long enough to wrap would push the title down and shift the
+     whole screen under the athlete's thumb. */
+  .apphd .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .apphd .right { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--clay-deep); white-space: nowrap; }
+  /* The contextual value and the way into Settings share the header's right
+     side, so the value never has the whole edge to itself and never collides
+     with the button. */
+  .hdright { display: flex; align-items: center; gap: 10px; flex: none; }
+  .hdme {
+    flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    background: var(--accent); color: var(--bg); border: 0;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .02em;
+  }
+  .hdme.closing { background: none; color: var(--ink); border: 2px solid var(--divider); font-size: 15px; }
 
   /* ── Blocks & rules ── */
   .block { padding: 20px; border-bottom: 2px solid var(--divider); }
@@ -397,8 +411,11 @@
      label forced its own column wider than the rest: the cells were 91/91/91/116
      at 390px and the whole bar overflowed the viewport at 320px. Equal columns
      are also what lets the sliding slab line up with a cell at all. */
+  /* Column count comes from the tab count, set inline — it was hard-coded to
+     four, so dropping Settings left a phantom fourth column and the sliding
+     indicator, sized as a fraction of the bar, landed off the last tab. */
   .tabs {
-    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
     border-top: 2px solid var(--divider); background: var(--bg);
     padding-bottom: env(safe-area-inset-bottom);
     position: relative;
@@ -632,6 +649,16 @@
      The compose box, and the wall it posts to. Flat, square, no bubbles: this
      is a noticeboard, not a chat app. */
   .notebox { display: flex; flex-direction: column; gap: 10px; }
+  /* Today's pointer to the conversation. Quiet on purpose — it is a doorway,
+     not a demand, and it disappears the moment the athlete has written. */
+  .rcprompt {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 20px; background: none; text-align: left;
+    border-bottom: 2px solid var(--divider);
+  }
+  .rcprompt > span:first-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .rcprompt .rcq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+                   font-size: 17px; line-height: 1.1; }
   .noteq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
            font-size: 20px; line-height: 1.05; letter-spacing: .005em; }
   .noterow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -1223,7 +1250,7 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
-             day:null, note:null, noteBusy:false };
+             day:null, note:null, noteBusy:false, backTo:'today' };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
@@ -2085,10 +2112,17 @@ function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(AKEY(), h.id); rend
 // Which way a screen should travel. Tabs move along their own order; a detail or
 // the manual always pushes in from the right and pops back out to the left, which
 // is what "deeper" and "back" feel like.
-const TAB_ORDER = ['today', 'progress', 'settings', 'board'];
+// Three tabs, not four. Settings held a quarter of the primary navigation for
+// a screen an athlete opens three or four times ever; it now lives behind the
+// initials button in the header. The slot it freed went to the social layer,
+// which is the thing that brings people back daily and which used to be a chip
+// inside another tab.
+const TAB_ORDER = ['today', 'progress', 'crew'];
 function navDir(from, to) {
-  if (to === 'detail' || to === 'manual' || to === 'ranks') return 1;
-  if (from === 'detail' || from === 'manual' || from === 'ranks') return -1;
+  // Settings joins the list of screens that push in from the right and pop
+  // back out to the left — it is no longer a tab you slide sideways into.
+  if (to === 'detail' || to === 'manual' || to === 'ranks' || to === 'settings') return 1;
+  if (from === 'detail' || from === 'manual' || from === 'ranks' || from === 'settings') return -1;
   const a = TAB_ORDER.indexOf(from), b = TAB_ORDER.indexOf(to);
   if (a < 0 || b < 0 || a === b) return 0;
   return b > a ? 1 : -1;
@@ -2112,7 +2146,7 @@ function go(screen) {
   haptic('tab');
   render();
   resetScroll();
-  if (screen === 'board') { fetchBoard(); if (LB.view === 'roll' && !RC.loaded) fetchRollCall(); }
+  if (screen === 'crew') { fetchBoard(); if (!RC.loaded) fetchRollCall(); }
 }
 
 // ── Leaderboard ───────────────────────────────────────────────────────────
@@ -2121,7 +2155,7 @@ function go(screen) {
 // That means a tampered localStorage cannot buy a place on the board. The RPC
 // deliberately returns no athlete ids — an id alone would let one client fetch
 // /data/<id>.json and read another athlete's whole programme.
-const LB = { scope:'season', view:'board', rows:[], joined:false, loading:false, error:null, loaded:false,
+const LB = { scope:'season', view:'roll', rows:[], joined:false, loading:false, error:null, loaded:false,
              nameDraft:'', deltas:{}, passed:[] };
 // ── Position deltas ───────────────────────────────────────────────────────
 // The board only ever showed a standing. What actually lands is MOVEMENT — that
@@ -2239,7 +2273,7 @@ async function postNote(body) {
     haptic(clean ? 'done' : 'tick');
     toast(clean ? 'Said and done. It stands until midnight.' : 'Line withdrawn.');
     RC.loaded = false;
-    if (UI.screen === 'board') fetchRollCall();
+    if (UI.screen === 'crew') fetchRollCall();
   } catch (e) {
     const msg = String((e && e.message) || e);
     toast(/join the leaderboard/i.test(msg) ? 'Join the board first — that is where your name comes from.'
@@ -2757,8 +2791,8 @@ function renderApp() {
     // "MANUAL" — which reads as the manual, the document in Settings. The goal
     // is what an athlete actually wants reminding of at the top of the screen.
     detail:   [openH.goal || openH.source, openH.name],
-    board:    LB.view === 'roll'
-                ? ['One sentence each, past 7 days', 'Roll call']
+    crew:     LB.view === 'roll'
+                ? ['Everyone, one line a day', 'Roll call']
                 : [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
     // Screen titles are the canonical names, and the Settings rows that lead
     // here now use exactly these words. Tapping "Read the manual" and arriving
@@ -2771,7 +2805,7 @@ function renderApp() {
     today: pct + '% DONE', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
                      return s > 0 ? s + ' DAY' + (s === 1 ? '' : 'S') + ' RUNNING' : ''; })(),
-    board: (() => {
+    crew: (() => {
       if (LB.view === 'roll') {
         const n = RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length;
         return n ? n + ' IN TODAY' : '';
@@ -2787,19 +2821,22 @@ function renderApp() {
   if (UI.screen === 'today') screenHtml = renderToday(LI, doneCount, pct);
   else if (UI.screen === 'progress') screenHtml = renderProgress(LI, earned, totalAch);
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
-  else if (UI.screen === 'board') screenHtml = renderBoard();
+  else if (UI.screen === 'crew') screenHtml = renderCrew();
   else if (UI.screen === 'manual') screenHtml = renderManual();
   else if (UI.screen === 'ranks') screenHtml = renderRanks();
   else screenHtml = renderSettings();
 
-  // Four tabs, leaderboard last. Habits and achievements are one "Progress"
-  // tab — they were two views of the same question.
-  // "BOARD", not "LEADERBOARD": eleven characters cannot fit a quarter of a phone
-  // without either overflowing its cell or shrinking the type below the others.
-  // The screen's own title still reads "Leaderboard".
-  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['SETTINGS','settings','03'],['BOARD','board','04']];
-  const activeTab = UI.screen === 'detail' ? 'progress'
-                  : (UI.screen === 'manual' || UI.screen === 'ranks') ? 'settings' : UI.screen;
+  // Three tabs: do it, see where you stand, see everyone else. Habits and
+  // achievements are one "Progress" tab — they were two views of one question —
+  // and CREW holds the whole social layer, which was previously a chip inside
+  // a tab named after only half of what it contained.
+  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['CREW','crew','03']];
+  // Settings, the manual and the ladder are not tabs. They sit "above" the tab
+  // bar, so no tab lights up while you are in them and the initials button
+  // becomes the way out.
+  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' || UI.screen === 'ranks');
+  const activeTab = UI.screen === 'detail' ? 'progress' : (OVERLAY ? '' : UI.screen);
+  const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
   // Every child of the shell carries a data-k, so when an overlay opens or
   // closes the renderer swaps whole nodes instead of quietly patching a toast
@@ -2811,7 +2848,18 @@ function renderApp() {
         <div class="eyebrow">${esc(head[0])}</div>
         <div class="title hd">${esc(head[1])}</div>
       </div>
-      <div class="right mono">${esc(rights[UI.screen] || '')}</div>
+      <div class="hdright">
+        <span class="right mono">${esc(rights[UI.screen] || '')}</span>
+        <!-- One control, two states, always in the same place: your initials
+             open Settings from anywhere, and become the way out of Settings,
+             the manual and the ladder — none of which is a tab any more, so
+             none of them has a tab to press to leave. -->
+        <button class="hdme ${OVERLAY ? 'closing' : ''}" data-k="hdme"
+          aria-label="${OVERLAY ? 'Close' : 'Settings'}"
+          ${on(() => (OVERLAY ? go(UI.backTo || 'today') : (UI.backTo = UI.screen, go('settings'))))}>
+          ${OVERLAY ? '&#10005;' : esc(initials)}
+        </button>
+      </div>
     </div>
     <div class="scroll" id="scroll" data-k="scroll">${screenHtml}</div>
     <div class="tabs" data-k="tabs">
@@ -2995,8 +3043,9 @@ function dayStrip() {
 }
 
 // ── Roll call: writing today's line ───────────────────────────────────────
-// Lives at the bottom of Today, under the habits, because the moment you are
-// most likely to have something to say is the moment you have just logged.
+// Lives at the top of the CREW tab, above the feed it posts to. It used to sit
+// at the bottom of Today, which put writing and reading on different screens
+// and left the feature without a home; Today keeps a one-line pointer instead.
 function renderNoteBox() {
   if (window.IS_DEMO) return '';
   if (!CFG.onBoard) {
@@ -3006,7 +3055,7 @@ function renderNoteBox() {
         Every athlete gets one sentence a day, and everyone else sees it. Join the
         board and you can leave yours — it uses the same name and nothing more.
       </div>
-      <button class="btn btn-secondary btn-block" ${on(() => go('board'))}>Take a look at the board</button>
+      <button class="btn btn-secondary btn-block" ${on(() => go('crew'))}>Take a look at the crew</button>
     </div>`;
   }
   const posted = myNote(TKEY());
@@ -3016,8 +3065,10 @@ function renderNoteBox() {
   const left = NOTE_MAX - draft.length;
   const changed = draft.trim() !== posted;
   return `<div class="block notebox" data-k="notebox" style="border-top:2px solid var(--divider)">
+    <!-- Not "Roll call" — the screen title and the view chip both already say
+         it, and three of the same words on one screen is noise. -->
     <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
-      <span>Roll call</span><span>${posted ? 'ANSWERED' : 'ONE SENTENCE'}</span>
+      <span>Your line today</span><span>${posted ? 'ANSWERED' : 'ONE SENTENCE'}</span>
     </div>
     <div class="noteq" data-k="noteq">${esc(pickLine('prompt', 'rollcall'))}</div>
     <input class="input" id="dayline" maxlength="${NOTE_MAX}" data-k="dayline"
@@ -3097,7 +3148,18 @@ function renderToday(LI, doneCount, pct) {
 
       ${renderQuestBlock()}
 
-      ${past ? '' : renderNoteBox()}
+      <!-- A pointer, not a second copy. The compose box itself lives in CREW
+           with the feed it posts to; this row exists so an athlete who only
+           ever opens Today still discovers there is a conversation. It shows
+           only while today's line is unwritten, so it disappears once done. -->
+      ${past || window.IS_DEMO || myNote(TKEY()) ? '' : `
+        <button class="rcprompt" data-k="rcprompt" ${on(() => go('crew'))}>
+          <span>
+            <span class="eyebrow">Roll call</span>
+            <span class="rcq">${esc(pickLine('prompt', 'rollcall'))}</span>
+          </span>
+          <span class="hd" style="font-size:19px;color:var(--clay-deep);flex:none">→</span>
+        </button>`}
 
       <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
         <div class="eyebrow" style="letter-spacing:.12em">The last seven days</div>
@@ -3402,7 +3464,7 @@ function renderDetail(h) {
 }
 
 // ── Leaderboard screen ────────────────────────────────────────────────────
-function renderBoard() {
+function renderCrew() {
   const scopeBtn = (key, label) => `<button class="chip ${LB.scope === key ? 'chip-on' : ''}"
     ${on(() => { if (LB.scope !== key) { LB.scope = key; LB.loaded = false; fetchBoard(); } })}>${label}</button>`;
   const started = parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long' });
@@ -3452,10 +3514,12 @@ function renderBoard() {
            board itself started ~470px down. Both switches now sit on one row
            and the explanation is one line under them. -->
       <div class="boardbar">
-        <div class="chips">${viewBtn('board', 'Leaderboard')}${viewBtn('roll', 'Roll call')}</div>
+        <!-- Roll call leads because it is the default and because conversation
+             rewards coming back; a ranking is a once-a-day glance. -->
+        <div class="chips">${viewBtn('roll', 'Roll call')}${viewBtn('board', 'Leaderboard')}</div>
         <div class="mono boardday">DAY ${dayOfSeason}</div>
       </div>
-      ${LB.view === 'roll' ? renderRollCall() : `
+      ${LB.view === 'roll' ? renderNoteBox() + renderRollCall() : `
         <div class="boardbar sub">
           <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
         </div>
@@ -3625,9 +3689,9 @@ function renderManual() {
         p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything — points, streaks, badges, quests.`))}
 
       ${block(h2('Roll call') +
-        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>, at the bottom of Today. Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
+        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it at the top of the <strong style="color:var(--ink)">CREW</strong> tab. Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
         p(`Change it as many times as you like until midnight. After that it stands — you can fix an old day's <em>log</em>, but not what you said about it.`) +
-        p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Read everyone else's on the Board tab.`) +
+        p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Everyone else's lines are right underneath yours.`) +
         p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach. Use Settings to message me privately.`))}
 
       ${block(h2('What each habit is worth') +
@@ -3671,7 +3735,7 @@ function renderManual() {
         if (!run || !qs.length) {
           return block(h2('Quests') +
             p(`From time to time your coach sets a <strong style="color:var(--ink)">run of quests</strong> — targets for the week rather than the day, worth real points on top of your habits.`) +
-            p(`There are none running right now. When there are, they appear at the top of your Today screen with a countdown, and everybody on the app gets the same ones.`));
+            p(`There are none running right now. When there are, they appear on your Today screen with a countdown, and everybody on the app gets the same ones.`));
         }
         return block(h2('Quests') +
           p(`Your coach has a run going: <strong style="color:var(--ink)">${qs.length} quest${qs.length === 1 ? '' : 's'}</strong>, ending ${esc(runEndLabel(run))}. They are targets for the week rather than the day, and they expire when the run does, finished or not.`) +
@@ -3987,7 +4051,7 @@ function renderSettings() {
       </div>
 
       ${sectionLabel('Leaderboard')}
-      <button class="selrow" ${on(() => go('board'))}>
+      <button class="selrow" ${on(() => go('crew'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">${CFG.onBoard ? 'You are on the board' : 'Not on the board'}</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">

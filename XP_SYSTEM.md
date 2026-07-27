@@ -648,7 +648,7 @@ The athlete's phone is the record. The server is the mirror.
 
 ## 11. Roll call — the one thing here that pays nothing
 
-One sentence a day, visible to everyone else on the board. Catalogued in
+One sentence a day, visible to everyone else on the board, written and read in the **Crew** tab. Catalogued in
 [`HABITS.md`](HABITS.md); the schema and every guard are in
 [`supabase/stage15_roll_call.sql`](supabase/stage15_roll_call.sql). It appears in this
 document only to say where it sits relative to scoring:

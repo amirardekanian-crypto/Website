@@ -18,7 +18,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - `Content/PRODUCT.md` — what the product/business actually is (internal brief; pricing, voice, backend).
 - `Content/HOW-IT-WORKS.md` — customer-facing explainer of the coaching process.
 - `HABITS.md` — **the habit app (`habits.html`, "Proof") brief.** Start here for anything
-  habit-tracker related: the four tabs, the eight habits, how progression works, the
+  habit-tracker related: the three tabs, the eight habits, how progression works, the
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
@@ -30,9 +30,17 @@ next chat will be working from a lie:
 1. **`HABITS.md`** — the brief (what it is, what each tab does).
 2. **`XP_SYSTEM.md`** — if you touched XP, levels, ranks, consistency or pacing.
 3. **The in-app manual** — `renderManual()` in `habits.html`, which athletes open from
-   Settings → *Read the manual*. Its **numbers** read from the live constants and update
+   the initials button (top-right) → *The manual*. Its **numbers** read from the live
+   constants and update
    themselves; its **prose** does not — fix that by hand when behaviour changes.
 4. **`privacy.html`** — if you changed what data is stored or shared.
+
+**Navigation is three tabs: `TODAY · PROGRESS · CREW`.** Settings is **not** a tab — it
+lives behind the athlete's initials at the top-right of the header, and that same button
+becomes the way out of Settings, the manual and the ladder. **CREW holds the entire
+social layer**: the roll-call composer, the wall, the leaderboard and joining/renaming.
+It opens on Roll Call, with the leaderboard as the second view. Today keeps a one-line
+*pointer* to Crew (not a second composer) that disappears once the athlete has written.
 
 **Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
 backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
