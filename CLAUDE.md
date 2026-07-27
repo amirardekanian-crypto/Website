@@ -59,8 +59,13 @@ thing in this app that is stored rather than derived** (`CFG.pass.owned`) and **
 may ever revoke one** — not a season reset, not a retune, not switching a habit off. That
 is what lets levels keep resetting each season. Everything on the track must stay **free
 to mint**: the moment a reward costs Amir an hour, forty consistent athletes become forty
-hours he owes. Titles are not on the leaderboard yet — that needs server-side validation
-via `xp_rules`, exactly like `QUEST_POOL`.
+hours he owes. **Titles now show on the leaderboard and the roll call wall** (stage17);
+cards deliberately do not, because a card is drawn on the athlete's own phone and nobody
+else reads it. The server keeps its own record of what was earned (`public.hab_titles`)
+and **mints rather than recomputes** — a level can fall, both at a season reset and
+mid-season when adding a habit deletes perfect days, so any check against the *current*
+level would revoke titles people already own. The track is a third thing scored twice:
+`PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
 
 **Two words, one job each — do not invent a third.** A **run** is consecutive days on
 *one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
@@ -86,8 +91,8 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–16 are applied and live** (leaderboard, workout-days feed, seasons,
-bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts).
+**Supabase stages 9–17 are applied and live** (leaderboard, workout-days feed, seasons,
+bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles).
 
 **Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
 the only test, and anything not `"free"` is coached, so no existing file needs editing.
