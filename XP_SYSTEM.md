@@ -60,14 +60,15 @@ reward you can lose is a rental. `claimRewards()` only ever **adds**. Nothing in
 document changes what a reward is worth, because a reward is worth no XP — see
 `HABITS.md` → *The long game*.
 
-It is stored **on the server too** (`public.hab_titles`, stage 17), for the same reason
-and with one extra one on top: level is not monotonic even *within* a season. The two
-milestones scored off `perday.ndone` — `daysWith3` and `perfectDays` — count only habits
-currently switched **on**, so an athlete who earns CN and then adds a ninth habit stops
-having perfect days and loses 500xp of history they already earned. Across log lengths
-100–365 days that drops the overall level in **67 of 266 cases**. Any check that recomputed
-a reward from the current level would revoke it. `hab_mint_titles()` records instead, at
-the level the athlete has *right now*, and never deletes.
+It is stored **on the server too** (`public.hab_titles`, stage 17), for the same reason:
+a season reset drops every level to 1, so any check that recomputed a reward from the
+current level would revoke it. `hab_mint_titles()` records instead, at the level the
+athlete has *right now*, and never deletes.
+
+Level used to move *within* a season as well — the two milestones scored off
+`perday.ndone` counted only habits currently switched on, which cost 500xp and a level in
+67 of 266 log lengths. Stage18 fixed that (see §4.5 and `HABITS.md` → *Days are settled
+units*), so the season reset is now the only way a level falls. It is reason enough.
 
 ⚠️ If you retune anything in this document, you change what level a given log produces —
 and therefore who qualifies for a title *from here on*. Everything already minted stays
@@ -280,14 +281,31 @@ the same rule as pre-season days not scoring, applied to streaks.
 level has to stay a pure count of how often it was done (§2), and paying its ladder
 for its own streak would quietly break that.
 
+**4. Each day is counted against the habits it actually had.** The two milestones
+measured per day — `daysWith3` (DP, 75xp) and `perfectDays` (CN, 500xp) — need a
+denominator, and they take it from `rosterOn(day)`: a dated timeline of the tracked
+set (`CFG.roster`), not `live()`. Until stage18 both used the current set for all of
+history, which meant adding a habit **deleted** perfect days already earned and
+switching one off **invented** perfect days that never happened — 500xp in either
+direction, and enough to cost a level in 67 of 266 log lengths. `hab_bonus_xp` was
+changed to match, so the board and the phone still agree. Tiers are unaffected: a run
+is per habit, so it never needed a denominator. Full design in `HABITS.md` →
+*Days are settled units*.
+
+⚠️ **`live()` is the present tense only.** Any function that takes a `dayKey` must use
+`rosterOn(dayKey)`, or it will quietly re-judge history again.
+
 Milestones keep flat values — they are one-off and genuinely hard — totalling
 **1,575 XP** across the nine. **Weekly quests ride the same rail** (§8.5): dated on the
 day they complete, so they need no special handling in any window.
 
 `bonusEvents()` is cached and dropped by `invalidateBonus()`, which `saveLog()` and
-`saveCfg()` call. **Anything that mutates `LOG` or `CFG` without going through those
-two must invalidate by hand** — `syncFromCloud()` and `importWorkoutDays()` do. The
-cold walk is ~7ms over 400 days of full logs.
+`saveCfg()` call — and which also drops the roster lookup cache, since the two are read
+together. **Anything that mutates `LOG` or `CFG` without going through those two must
+invalidate by hand** — `syncFromCloud()` and `importWorkoutDays()` do. `saveCfg()` also
+calls `stampRoster()`, which is why every path that changes the tracked set records
+itself without anyone having to remember. The cold walk is ~7ms over 400 days of full
+logs.
 
 ---
 
@@ -324,10 +342,13 @@ rules keep it from becoming noise:
   habits ("20 days of workout, steps, sleep and 5 more in a row"), and past four
   it counts instead of listing. Crossing several tiers at once reports only the
   highest — the lower ones are implied.
-- **A perfect day is judged on TODAY only**, never across history. Judging history
-  would fire a burst the moment somebody switched a habit off, because every thin
-  day behind them would retroactively become perfect. It also can't be farmed:
-  `CFG.seenPerfect` holds the date, so unticking and re-ticking pays once.
+- **A perfect day is judged on TODAY only**, never across history. That used to be
+  load-bearing: before stage18, switching a habit off turned every thin day behind
+  the athlete retroactively perfect, and judging history would have fired a burst of
+  takeovers for days they never had. Days are settled now, so the rule is kept for
+  the reason that still applies — a celebration is for something that happened just
+  now, and replaying an old one is noise. It also can't be farmed: `CFG.seenPerfect`
+  holds the date, so unticking and re-ticking pays once.
 - **It baselines like levels do.** `CFG.seenTiers` / `CFG.seenAch` / `CFG.seenPerfect`
   are seeded silently on a first run, on a rules change, and on a cloud row that
   predates this build — so an athlete arriving with history already behind them
@@ -506,8 +527,17 @@ invents are scored at `customXp`, since the server has no target for them.
 `tiers` and `milestones` feed `public.hab_bonus_xp`, which mirrors `bonusEvents()`
 in the app: it walks the log from the season start, dates every crossing, and pays
 the ones inside the window. It reads the athlete's **config** as well as their log
-(via `hab_cfg_of`), because which habits are switched on decides what counts as a
+(via `hab_cfg_of`), because which habits were switched on decides what counts as a
 perfect day and as a three-habit day.
+
+**Past tense, deliberately.** It reads `cfg.roster` — a dated timeline of the tracked
+set — and scores each day against the roster *that day* had, not the one the athlete has
+now (stage18; `rosterOn()` is the client half). Before that, both scorers used the current
+set for all of history, so adding a habit deleted perfect days already earned and switching
+one off invented perfect days that never happened — 500xp either way, since `CN` needs 100
+of them. An athlete with no timeline yet falls back to `cfg.on`, which is exactly the old
+behaviour, so nothing was rescored when this shipped. See `HABITS.md` → *Days are settled
+units*.
 
 > **Verify parity after any change to these.** The two scorers are only worth having
 > if they agree. Build a log arithmetically so both sides can generate it identically
