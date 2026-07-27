@@ -82,7 +82,10 @@ The screen they actually live on. **In this order, and the order is the point:**
 5. **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
    XP, with live progress and a countdown. **There are usually none**: quests only exist
    while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
-   the point — seeing them means something is on.
+   the point — seeing them means something is on. **Between runs it is one muted line**
+   rather than nothing: the block vanishing entirely kept that sentence true but made the
+   whole feature invisible, so an athlete who joined between runs never learned quests
+   existed and the next one read as random rather than as an event.
 6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
    sentence is unwritten. The composer itself lives in CREW with its feed.
 7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
@@ -99,6 +102,18 @@ The screen they actually live on. **In this order, and the order is the point:**
 
 **Streak at risk** gets one clay strip immediately above the list, rather than being
 said three ways at once (card, day-bar and header flag) as it was before.
+
+#### Run vs streak — two words, one job each
+A **run** is consecutive days on *one* habit ("a 24-day run on water"). A **streak** is
+consecutive days where the athlete cleared `streakQualifyPct` of everything they track
+("a 2-day streak"). They are different numbers moving at different speeds.
+
+The app used to say it five ways — *day streak*, *24 DAYS*, *Best streak*, *Best run so
+far*, *days in a row* — so `24 DAYS` on a habit row beside `2` for DAY STREAK on Progress
+read as one number disagreeing with itself. Habit rows and the detail header now read
+`24-DAY RUN`, the detail stat is `Longest run`, and the pip key and tier line both say
+*run*. **Do not introduce a third word for either idea.** The manual teaches both under
+*Consistency*.
 
 #### The backfill window
 Nobody logs perfectly on the day, every day, so **the last `BACKFILL_DAYS` (3) days plus
