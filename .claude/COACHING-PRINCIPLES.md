@@ -313,6 +313,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   Use this as the working ceiling when sizing weekly/per-day muscle volume, not just intuition.
   *(2026-07-08, sc-research brief — Schoenfeld 2017, Iversen 2022 umbrella review, Pelland 2025
   meta-regression, Barbalho 2019, Krause Neto 2025 for glute-specific)*
+- **Women's lower body: quads, hamstrings and glutes each clear ≥10 working sets/week — a hard
+  floor, not a target.** The 10–20 range above is a rule to satisfy, not a band to approach from
+  below. Never sign a major lower-body muscle off as "maintenance by design" just because it isn't
+  the athlete's headline goal — under 10 needs a stated, genuinely good reason, and "it's
+  secondary to her physique goal" is not one. Where the sets go: the day with the lowest
+  cost-weighted load and spare time (see the bullet below), and prefer movements the athlete
+  hasn't seen in the prior cycle so the added volume also reads as new. *(2026-07-27, Amir,
+  verbatim: "specially for women every major muscle in lower body should get at least 10, this is
+  a hard rule, unless you have a very good reason not to" — Elmira C2 first shipped with quads at
+  5.5 and hamstrings at 7.5 sets/wk, both wrongly justified as secondary-by-design.)*
 - **Check for unused session-time budget before calling a day "done."** Estimate the day's
   actual working time (sets × rest + set duration) against its time cap — if there's real
   headroom (15+ min) and the athlete's recovery capacity allows it, that's free volume, not a
