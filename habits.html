@@ -693,6 +693,11 @@
              font-size: 16px; line-height: 1; }
   .rc-meta { flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
              font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--muted-soft); }
+  /* Sits with the NAME, not with the rank — a title is part of who is talking.
+     Ellipsised because the name beside it is the thing that must never truncate. */
+  .rc-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+              margin-left: 7px; font-size: 11px; font-weight: 900; letter-spacing: .06em;
+              color: var(--clay-deep); }
   .rcline.coach .rc-meta { color: var(--clay-deep); }
   .rc-say { font-size: 14px; line-height: 1.45; color: var(--ink); }
   @media (prefers-reduced-motion: reduce) { .rcline { animation: none; } }
@@ -1327,6 +1332,10 @@ function passHas(id)  { return id === CARD_BASE.id || passOwned().indexOf(id) >=
 function passTitle()  { const t = CFG.pass && CFG.pass.title; return passHas(t) ? passItem(t) : null; }
 function passCard()   { const c = CFG.pass && CFG.pass.card;  return (passHas(c) && passItem(c)) || CARD_BASE; }
 function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p => p.lv > lv) || null; }
+// The board and the wall hand back a title's ID; its NAME lives here. An id
+// this build does not know shows nothing rather than a raw `t_iron` — a cached
+// page can be older than the track on the server.
+function titleName(id) { const p = id && passItem(id); return (p && p.kind === 'title') ? p.name : ''; }
 // Records anything the athlete's level has reached and returns only what is NEW,
 // so the caller can celebrate it. Silent on first run for someone who arrives
 // with history — the same baselining every other unlock does.
@@ -2440,6 +2449,9 @@ async function joinBoard(name, joining) {
     CFG.boardName = joining ? (name || defaultDisplayName()) : null;
     CFG.onBoard = !!joining;
     saveCfg();
+    // Joining creates the row with no title on it, so anything already equipped
+    // has to be published now or it would silently not appear.
+    if (joining && CFG.pass && CFG.pass.title) await pushTitle();
     toast(joining ? 'You are on the board. Go and be insufferable.' : 'Left the leaderboard.');
     LB.loaded = false;
     await fetchBoard();
@@ -2447,6 +2459,66 @@ async function joinBoard(name, joining) {
     toast('Could not reach the leaderboard. Try again when you have signal.');
   }
 }
+
+// ── Titles on the board ───────────────────────────────────────────────────
+// A card is drawn on the athlete's own phone, so it needs nobody's permission.
+// A TITLE goes next to their name on a board other people read, and
+// `CFG.pass.owned` is localStorage — devtools would hand anyone PROOF ITSELF.
+// So the server keeps its own record of what each athlete has earned and
+// refuses everything else (supabase/stage17_titles.sql).
+//
+// Reconciles that record back into `owned`. It only ever ADDS. The server's
+// copy is what survives a cleared browser; the client's is what survives being
+// offline; the union is the truth, and neither side is allowed to subtract.
+async function syncTitles() {
+  if (window.IS_DEMO) return;
+  const sb = _sb();
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.rpc('claim_titles', { p_athlete_id: ATHLETE_ID, p_key: KEY });
+    if (error) throw error;
+    if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+    const owned = CFG.pass.owned || (CFG.pass.owned = []);
+    let added = 0;
+    // An id this build has never heard of is ignored rather than stored — a
+    // cached page can be older than the track on the server.
+    (data || []).forEach(t => {
+      if (passItem(t.title) && owned.indexOf(t.title) < 0) { owned.push(t.title); added++; }
+    });
+    if (added) { saveCfg(); render(); }
+  } catch (e) { /* offline, or stage17 not applied yet — the local record stands */ }
+}
+
+// Publishes whichever title is equipped. Three rules, and they follow from the
+// two places a title is read:
+//   · equipping stays LOCAL and instant — it is their screen, and it must not
+//     wait on a round trip to feel like it worked;
+//   · the push only happens once they are ON the board, because that is the
+//     only place the title is published to anyone else;
+//   · a refusal takes the title OFF, and never out of `owned`. Wearing is
+//     revocable, owning is not — that is the whole promise of the track.
+async function pushTitle() {
+  if (window.IS_DEMO || !CFG.onBoard) return;
+  const sb = _sb();
+  if (!sb) return;
+  try {
+    const { error } = await sb.rpc('set_title', {
+      p_athlete_id: ATHLETE_ID, p_title: (CFG.pass && CFG.pass.title) || null, p_key: KEY
+    });
+    if (error) throw error;
+    LB.loaded = false;   // the board is now a version behind
+    RC.loaded = false;
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    if (/not earned|unknown title/i.test(msg)) {
+      CFG.pass.title = null; saveCfg(); render();
+      toast('The board has not seen that unlock yet. It will once your next day syncs.');
+    } else if (!/join the board|function|does not exist|schema/i.test(msg)) {
+      toast('Could not reach the board. Your title will show once you have signal.');
+    }
+  }
+}
+
 // ── Roll call ─────────────────────────────────────────────────────────────
 // One sentence a day, visible to everyone else on the board. Deliberately not
 // a chat: the primary key on the server is (athlete, day), so the shape of the
@@ -3861,7 +3933,11 @@ function rollLine(r, i) {
       data-k="rc:${esc(r.day)}:${esc(String(r.display_name))}"
       style="animation-delay:${(Math.min(i, 12) * 0.04).toFixed(2)}s">
     <div class="rc-top">
-      <span class="rc-name">${esc(r.is_me ? 'You' : r.display_name)}</span>
+      <span class="rc-name" style="min-width:0;display:flex;align-items:baseline">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.is_me ? 'You' : r.display_name)}</span>
+        ${(() => { const t = r.is_coach ? '' : titleName(r.title);
+                   return t ? `<span class="rc-title">${esc(t)}</span>` : ''; })()}
+      </span>
       <span class="rc-meta">${esc(meta)}</span>
     </div>
     <div class="rc-say">${esc(r.body)}</div>
@@ -3886,8 +3962,13 @@ function boardRow(r, lead, i) {
         <span class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</span>
         <span class="mono" style="flex:none;font-size:13px;font-weight:700">${Number(r.xp || 0).toLocaleString()}<span style="font-size:9px;color:var(--muted-soft)"> XP</span></span>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.2;color:var(--muted)">
-        ${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span>${esc(r.rank_label)}</span>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.2;color:var(--muted);min-width:0">
+        ${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="flex:none">${esc(r.rank_label)}</span>
+        ${(() => { const t = titleName(r.title);
+                   // Clay, so the earned thing is the one that catches the eye
+                   // on a line that is otherwise rank furniture.
+                   return t ? `<span style="flex:none;color:var(--muted-soft)">·</span>
+             <span class="hd" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;letter-spacing:.06em;color:var(--clay-deep)">${esc(t)}</span>` : ''; })()}
       </div>
       <div class="bar" style="height:3px;width:100%"><span data-fill style="width:${pct}%"></span></div>
     </div>
@@ -4015,8 +4096,8 @@ function renderManual() {
         const nx = nextReward(), got = passOwned().length, eq = passTitle();
         return block(h2('The long game') +
           p(`Levels pay out. There are <strong style="color:var(--ink)">${PASS_TRACK.length} rewards</strong> spread up the ladder, and reaching the level is all it takes — there is nothing to buy and nothing to claim.`) +
-          p(`Two kinds. <strong style="color:var(--ink)">Titles</strong> are a name you wear: it sits under your rank and it goes on the card you share. <strong style="color:var(--ink)">Cards</strong> change how that shared card looks. You choose which of the ones you own to use, and you can change your mind whenever.`) +
-          p(`<strong style="color:var(--ink)">They are kept.</strong> This is the one thing here a new season does not touch — your points go back to zero and every reward you have unlocked stays exactly where it is. Switching a habit off does not take them either.`) +
+          p(`Two kinds. <strong style="color:var(--ink)">Titles</strong> are a name you wear: it sits under your rank, it goes on the card you share, and if you are on the board it sits next to your name there and on the roll call wall. <strong style="color:var(--ink)">Cards</strong> change how that shared card looks — those are yours alone, nobody else sees them. You choose which of the ones you own to use, and you can change your mind whenever, including showing no title at all.`) +
+          p(`<strong style="color:var(--ink)">They are kept.</strong> This is the one thing here a new season does not touch — your points go back to zero and every reward you have unlocked stays exactly where it is. Switching a habit off does not take them either. That holds on the board too: what you have earned is recorded the day you earn it, and nothing later takes it back.`) +
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
@@ -4125,6 +4206,9 @@ function renderPass() {
         if (p.kind === 'title') CFG.pass.title = (CFG.pass.title === p.id) ? null : p.id;
         else CFG.pass.card = p.id;
         saveCfg(); haptic('done'); render();
+        // Not awaited: the row has already changed state, and the board catching
+        // up a second later is not something the athlete should have to watch.
+        if (p.kind === 'title') pushTitle();
       })}>
       ${p.kind === 'card'
         ? `<span class="swatch" style="${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
@@ -4673,6 +4757,10 @@ function showError(msg) {
   // defaultCfg(), so CFG.pass always exists and that guard never fired. It is
   // idempotent anyway — claimRewards only ever adds what is missing.
   claimRewards(true);
+  // And the other half of the same record. Minting on boot is what makes the
+  // server's copy keep up with a level that is about to reset: the peak is
+  // captured on the day it happens, while the level is still there to prove it.
+  syncTitles();
 
   render();
   armIdle();

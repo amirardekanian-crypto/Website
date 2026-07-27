@@ -60,6 +60,19 @@ reward you can lose is a rental. `claimRewards()` only ever **adds**. Nothing in
 document changes what a reward is worth, because a reward is worth no XP — see
 `HABITS.md` → *The long game*.
 
+It is stored **on the server too** (`public.hab_titles`, stage 17), for the same reason
+and with one extra one on top: level is not monotonic even *within* a season. The two
+milestones scored off `perday.ndone` — `daysWith3` and `perfectDays` — count only habits
+currently switched **on**, so an athlete who earns CN and then adds a ninth habit stops
+having perfect days and loses 500xp of history they already earned. Across log lengths
+100–365 days that drops the overall level in **67 of 266 cases**. Any check that recomputed
+a reward from the current level would revoke it. `hab_mint_titles()` records instead, at
+the level the athlete has *right now*, and never deletes.
+
+⚠️ If you retune anything in this document, you change what level a given log produces —
+and therefore who qualifies for a title *from here on*. Everything already minted stays
+minted, on both sides. That is the intended behaviour, not a rounding error to clean up.
+
 **Free users score on exactly these rules.** `"tier": "free"` in `data/<id>.json`
 (`isFree()` in the app) changes what the athlete can *reach* — WORKOUT stays locked and
 the programme links point at the apply form — and changes **nothing** about scoring.

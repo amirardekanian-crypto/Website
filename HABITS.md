@@ -390,11 +390,54 @@ go and switch it on is a step nobody asks for.
 Reached from **Progress → The long game**, which also states the next unlock and its
 distance in XP — the only forward-looking line on a screen that otherwise reports the past.
 
-⚠️ **Not yet on the leaderboard.** Titles show on Progress and on the exported card, both
-client-side. Putting one beside a name on the board means the server has to validate that
-the athlete actually earned it, which needs the track on the `xp_rules` row (the pattern
-`QUEST_POOL` already uses) — otherwise devtools could award anyone anything. That is the
-next step, and it is the step that gives titles their real audience.
+### Titles on the board (stage 17)
+
+A title now appears **beside the athlete's name on the leaderboard and on the roll-call
+wall** — the audience that makes a cosmetic worth having. Cards deliberately do not: a
+card is drawn on the athlete's own phone, so nobody else reads it and nobody needs to
+trust it.
+
+That difference is the whole design. `CFG.pass.owned` is localStorage, and devtools would
+hand anyone PROOF ITSELF, so the server keeps **its own record of what has been earned**
+(`public.hab_titles`) and refuses to publish anything else.
+
+**The record is minted, not recomputed** — and that is the part worth remembering, because
+checking the title against the athlete's *current* level is the obvious design and it is
+wrong twice over:
+
+1. **Levels reset every season.** The day Amir opens Season 1 every athlete drops to level
+   1, and a recomputing check would strip every title off the board at once while every
+   Progress screen still showed them. The track exists precisely so levels *can* reset.
+2. **Level is not even monotonic inside a season.** `hab_bonus_xp` scores `daysWith3` and
+   `perfectDays` off habits that are currently switched **on**, so adding a habit you are
+   not yet doing deletes perfect days you already earned. Swept across log lengths
+   100–365 days that drops the level in **67 of 266 cases** — the first at 105 days, level
+   21 falling to 20. Level 21 is IRONCLAD. A recomputing check would take IRONCLAD off the
+   board at the exact moment the athlete added a habit.
+
+So `hab_mint_titles()` records what the level has earned *at the moment it is called*, and
+that row is permanent. Minting runs on boot, which is what captures the peak on the day it
+happens; `set_title()` then only checks the record. **The threshold mirrors the client
+exactly — season-scoped, because that is what `overallLevel()` measures.** Scoring career
+XP server-side instead would mint titles the athlete's own app never awarded.
+
+Three rules follow on the client, all in `pushTitle()`:
+
+- equipping is **local and instant** — it is their screen, and it must not wait on a round
+  trip to feel like it worked;
+- the push only happens once they are **on the board**, the only place a title is
+  published. Off the board they can still wear one; it shows on their card;
+- a refusal takes the title **off**, never out of `owned`. Wearing is revocable, owning is
+  not.
+
+`syncTitles()` reconciles the server's record back into `owned` on boot and **only ever
+adds**: the server's copy survives a cleared browser, the client's survives being offline,
+and the union is the truth.
+
+⚠️ The track lives in **two places** — `PASS_TRACK` in `habits.html` and `passTrack` on the
+`xp_rules` row. Same rule as `QUEST_POOL`: change both together, or the server will refuse
+a title the app has already handed out. The server stores only `id → level`; names and
+notes are presentation and stay in the app.
 
 ---
 
