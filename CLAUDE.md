@@ -42,6 +42,12 @@ social layer**: the roll-call composer, the wall, the leaderboard and joining/re
 It opens on Roll Call, with the leaderboard as the second view. Today keeps a one-line
 *pointer* to Crew (not a second composer) that disappears once the athlete has written.
 
+**Two words, one job each — do not invent a third.** A **run** is consecutive days on
+*one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
+`streakQualifyPct` of everything they track ("2-day streak"). The app once used five
+phrasings for these two ideas, so a 24-day run beside a 2-day streak looked like the same
+number disagreeing with itself. The manual teaches both in *Consistency*.
+
 **Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
 backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
 Roll call pays **no XP** on purpose and no scoring function reads `hab_notes`; keep it

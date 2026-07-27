@@ -609,7 +609,7 @@
   .hlv .ember { font-size: 11px; }
   /* The ember used to sit after "LV 10" and carried a left margin for it. */
   .hlv .ember:first-child { margin-left: 0; }
-  .hlv .ember .u { font-size: 8px; opacity: .75; margin-left: 1px; }
+  .hlv .ember .u { font-size: 8px; opacity: .75; }
 
   /* Cross-link back to the training programme — the other half of the pair.
      Mirrors the Daily Habits card in program.html so the two apps read as one
@@ -659,6 +659,15 @@
   .rcprompt > span:first-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .rcprompt .rcq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
                    font-size: 17px; line-height: 1.1; }
+
+  /* Deliberately small. It exists to teach that quests are a thing, not to
+     compete with a live run. */
+  .questidle {
+    display: flex; align-items: baseline; gap: 10px; padding: 12px 20px;
+    border-bottom: 2px solid var(--divider);
+    font-size: 11.5px; line-height: 1.45; color: var(--muted-soft);
+  }
+  .questidle .eyebrow { flex: none; letter-spacing: .12em; }
   .noteq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
            font-size: 20px; line-height: 1.05; letter-spacing: .005em; }
   .noterow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -2804,7 +2813,7 @@ function renderApp() {
   const rights = {
     today: pct + '% DONE', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
-                     return s > 0 ? s + ' DAY' + (s === 1 ? '' : 'S') + ' RUNNING' : ''; })(),
+                     return s > 0 ? s + '-DAY RUN' : ''; })(),
     crew: (() => {
       if (LB.view === 'roll') {
         const n = RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length;
@@ -3009,7 +3018,7 @@ function habitRow(h, from, lead) {
              the level permanently. -->
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
                   : st > 0
-                    ? `<span class="hlv" data-k="hlv"><span class="ember${st === lead && st > 0 ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span></span>`
+                    ? `<span class="hlv" data-k="hlv"><span class="ember${st === lead && st > 0 ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY RUN</span></span></span>`
                     : `<span class="hlv" data-k="hlv">LV ${hl.lv}</span>`}
       </span>
       <span class="status">${esc(status)}</span>
@@ -3197,11 +3206,22 @@ function renderToday(LI, doneCount, pct) {
 // ── This week's quests ────────────────────────────────────────────────────
 // Three targets that give the week a shape. Shown on Today under the nudge,
 // because a quest only means anything while there is still week left to do it in.
+// Between runs the block used to vanish completely, which kept "seeing quests
+// means something is on" true but made the whole feature invisible: an athlete
+// who joined between runs never learned quests existed, so the next one read as
+// random rather than as an event they had been waiting for. One quiet line
+// instead — a fraction of the height of a live block, so a real run still lands.
+function renderQuestsIdle() {
+  return `<div class="questidle" data-k="questidle">
+    <span class="eyebrow">Quests</span>
+    <span>None running. Your coach sets these for a week at a time — when one is on, it appears here.</span>
+  </div>`;
+}
 function renderQuestBlock() {
   const run = activeQuestRun();
-  if (!run) return '';                     // no run on — the block does not exist
+  if (!run) return renderQuestsIdle();
   const qs = runQuests(run);
-  if (!qs.length) return '';
+  if (!qs.length) return renderQuestsIdle();
   const prog = qs.map(q => ({ q, p: questProgress(q, run) }));
   const doneN = prog.filter(x => x.p.done).length;
   const left = runDaysLeft(run);
@@ -3293,7 +3313,7 @@ function renderProgress(LI, earned, totalAch) {
       ${sectionLabel('Your habits', 'Tap for history')}
       <div class="pipkey">
         <span class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>
-        <span>One square per consistency tier — ${CONSISTENCY_TIERS.map(t => t.days).join(', ')} days in a row on that habit.</span>
+        <span>One square per tier — a ${CONSISTENCY_TIERS.slice(0, -1).map(t => t.days).join(', ')} or ${CONSISTENCY_TIERS[CONSISTENCY_TIERS.length - 1].days}-day <strong>run</strong> on that habit.</span>
       </div>
       ${hs.length ? hs.map(h => {
         const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
@@ -3303,7 +3323,7 @@ function renderProgress(LI, earned, totalAch) {
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span class="hlv">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span>` : '—'}</span>
+              <span class="hlv">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY RUN</span></span>` : '—'}</span>
             </div>
             <!-- Was rank · XP · today's status, which wrapped to two lines and
                  restated what Today already says. Progress is about standing. -->
@@ -3367,7 +3387,7 @@ function renderDetail(h) {
   const unit = (n, u) => n + '<span class="su">' + u + '</span>';
   const stats = [
     { v: unit(habitWeek(h), '/7'),          k: 'This week' },
-    { v: unit(habitBest(h), habitBest(h) === 1 ? 'day' : 'days'), k: 'Best streak' },
+    { v: unit(habitBest(h), habitBest(h) === 1 ? 'day' : 'days'), k: 'Longest run' },
     { v: unit(habitRate35(h), '%'),         k: 'Last 35 days' }
   ];
   const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h, AKEY());
@@ -3413,12 +3433,12 @@ function renderDetail(h) {
         <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
         <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">
           ${con.next
-            ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at ' + con.next.days
-              + ' days in a row · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
+            ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at a ' + con.next.days
+              + '-day run · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
             : '<strong style="color:var(--ink)">UNBREAKABLE</strong> — every tier cleared.'}
         </div>
         <div style="font-size:12px;line-height:1.4;color:var(--muted-soft)">
-          Best run so far: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
+          Longest run: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
         </div>
       </div>
 
@@ -3753,7 +3773,11 @@ function renderManual() {
       })()}
 
       ${block(h2('Consistency') +
-        p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a streak never takes a badge back.`) +
+        // Two words, one job each. The app used five phrasings for these two
+        // ideas, so a 24-day run beside a 2-day streak looked like the same
+        // number disagreeing with itself.
+        p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of everything you track. They are different numbers and they move at different speeds.`) +
+        p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a run never takes a badge back.`) +
         p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`) +
         `<div style="display:flex;flex-direction:column;gap:0">
           ${CONSISTENCY_TIERS.map((t, i) => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
