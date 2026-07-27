@@ -62,10 +62,11 @@ to mint**: the moment a reward costs Amir an hour, forty consistent athletes bec
 hours he owes. **Titles now show on the leaderboard and the roll call wall** (stage17);
 cards deliberately do not, because a card is drawn on the athlete's own phone and nobody
 else reads it. The server keeps its own record of what was earned (`public.hab_titles`)
-and **mints rather than recomputes** — a level can fall, both at a season reset and
-mid-season when adding a habit deletes perfect days, so any check against the *current*
-level would revoke titles people already own. The track is a third thing scored twice:
-`PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
+and **mints rather than recomputes** — a level can fall. Season resets drop everyone to 1
+by design, so any check against the *current* level would revoke titles people already own.
+(It could also fall mid-season, from the roster bug stage18 fixed; that half is gone, the
+season half is permanent, and either one alone justifies minting.) The track is a third
+thing scored twice: `PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
 
 **Two words, one job each — do not invent a third.** A **run** is consecutive days on
 *one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
@@ -111,7 +112,8 @@ server equivalent — see `XP_SYSTEM.md` §1) and `seasonStart`/`seasonName` (th
 `public.seasons`; the `XP_RULES` values are an offline fallback only).
 
 The scoring **logic** is also written twice — `bonusEvents()` in `habits.html` against
-`hab_bonus_xp()` in plpgsql (stage14 owns the current 6-arg version). Those two walk the
+`hab_bonus_xp()` in plpgsql (**stage18** owns the current version; stage14 owns its
+6-arg signature and everything else in it). Those two walk the
 log the same way on purpose. Changing how a badge or milestone is *counted* — not just
 what it pays — means editing both.
 
@@ -122,23 +124,27 @@ Beyond scoring, three more things live in more than one place:
 - **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
   server (`public.hab_titles`). Both are append-only; neither may ever subtract.
 
-### ⚠️ KNOWN BUG — a past day is scored against TODAY'S habit list
+### Days are settled units — the rule, and the thing that enforces it
 
-Not fixed yet. `dayPct()`, `isPerfect()` and the `daysWith3`/`perfectDays` counters in
-`bonusEvents()` all call `live()`, which is *"habits switched on right now"* — so they
-re-judge every day in history against the roster the athlete happens to have today.
-`hab_bonus_xp()` does the same server-side (`livehab` / `nlive` are single sets applied to
-every day). Both directions are wrong:
+**A day is scored against the habits that were switched on THAT day. A closed day never
+moves again.** Changing what you track changes what happens next, never what already
+happened.
 
-- **Add a habit** on day 6 and days 1–5 stop being perfect days — the athlete *loses* XP,
-  levels and milestone progress they had already earned. Measured: it drops the overall
-  level in 67 of 266 log lengths between 100 and 365 days.
-- **Switch a habit off** and days you skipped it retroactively *become* perfect — free XP
-  for history you did not earn.
+What enforces it is `CFG.roster` — a **timeline** of the tracked set, one entry per change,
+each naming the day it took effect. `rosterOn(day)` reads the entry in force; `dayPct()`,
+`isPerfect()` and the `daysWith3`/`perfectDays` counters take their denominator from it
+instead of `live()`. `hab_bonus_xp()` reads the same array out of the config and its
+`daylive`/`perday` CTEs join per day (stage18). **Only `stampRoster()` writes it, it is
+called from `saveCfg()` so every mutation path is covered, and it only ever appends.**
 
-The intended rule is **a day is scored against the habits that were switched on that
-day**, and a closed day never moves again. See `HABITS.md` → *Days are settled units* for
-the design and what it touches.
+Before stage18 all of those read `live()` — "habits switched on right now" — and re-judged
+history against a roster from the future. It cost 500xp (the CN milestone) in both
+directions: adding a habit deleted perfect days already earned, switching one off handed
+back perfect days that never happened. Both are proven fixed in the stage18 header.
+
+⚠️ **`live()` is for the present tense only** — what to draw on Today, what to nudge, what
+a perfect day is worth from here. **Any function that takes a `dayKey` must use
+`rosterOn(dayKey)`.** That is the whole invariant; it is one line to get wrong.
 
 **Seasons.** Scoring runs in seasons; only days from the current season's start earn XP,
 for personal levels *and* the boards. Currently **Pre-Season (opened 26 July 2026)** —
@@ -147,8 +153,9 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–17 are applied and live** (leaderboard, workout-days feed, seasons,
-bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles).
+**Supabase stages 9–18 are applied and live** (leaderboard, workout-days feed, seasons,
+bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
+per-day rosters).
 
 **Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
 the only test, and anything not `"free"` is coached, so no existing file needs editing.
