@@ -306,6 +306,22 @@ side delts hold at **15 (11 direct)**, rear delts hold at **12 (10 direct)** —
 Chest goes 0→**3**, developing. Per-day time **58 / 57 / 59 / 51 min** — tighter than before this
 fix, not longer.
 
+### Stale-notes fix · 2026-07-27 (Amir asked, "did you update this athlete's note?")
+
+Checking rather than assuming turned up a real miss: **the "Two Full Days On Your Shoulders"
+card still said Day 3 has "two different rear-delt movements."** True before the previous fix
+(Machine Reverse Fly + Incline Y-T-W Raise), false after it — removing the Y-T-W Raise left Day 3
+with one rear-delt movement, and I edited the exercises without re-checking that sentence
+against the new lineup. Exactly the class of bug the lint's face-pull check was built to catch,
+just on a different muscle and a different card. Fixed: "two different rear-delt movements" →
+"a rear-delt movement."
+
+**Lint hardened** with a general version of that check: any `<li><strong>Day N</strong>…` bullet
+in a notes card that states a count against Rear delts / Side delts / Chest / Back (`"a X
+movement"`, `"two X movements"`, …) is now cross-checked against how many exercises tagged to
+that muscle actually sit on that day. Verified non-vacuous — run against the file as it stood
+before this fix, it fails with exactly the miss above; run after, it passes.
+
 **Verification** — design audited against three lenses inline (clinical/injury · house-rules
 compliance lint vs COACHING-PRINCIPLES + `exercise_library.json` · dose & time-budget), not via
 the Workflow panel — the session was configured without subagent/workflow access and Amir was
