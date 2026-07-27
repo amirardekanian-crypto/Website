@@ -21,6 +21,12 @@ create table if not exists public.hab_contacts (
   athlete_id text primary key,
   email      text,
   whatsapp   text,
+  -- The name they asked for on the signup form. Stored here, NOT written to
+  -- leaderboard_optin: asking for a board name is not the same as being put on
+  -- a board, and the athlete does the joining themselves, in the app. It is
+  -- copied into data/<id>.json as `boardName` so the join box arrives
+  -- pre-filled and joining is one tap.
+  display_name text,
   -- 'proof' = signed up from the public habit-tracker page. 'coaching' = came
   -- in through the apply form. Room for whatever else sends people later.
   source     text not null default 'proof',
@@ -36,6 +42,10 @@ alter table public.hab_contacts enable row level security;
 
 create index if not exists hab_contacts_created_idx on public.hab_contacts (created_at desc);
 
+-- Added after the first version of this file, which had no such column because
+-- it wrote the name straight to leaderboard_optin. See add_contact below.
+alter table public.hab_contacts add column if not exists display_name text;
+
 -- Coach only. Athletes are `anon` and get nothing here — not even their own row,
 -- because the app has no reason to read it and every reason not to.
 drop policy if exists "coach manage contacts" on public.hab_contacts;
@@ -47,6 +57,26 @@ create policy "coach manage contacts" on public.hab_contacts
 -- ── Signing someone up ────────────────────────────────────────────────────
 -- One call does the whole job: mints the key if they do not have one, records
 -- the contact, and hands back the key so the link can be built. Coach only.
+--
+-- IT DOES NOT PUT THEM ON THE LEADERBOARD. The first version of this function
+-- did, on the reasoning that someone who typed a name into a field labelled
+-- "the name you want on the board" had asked for it. Three things were wrong
+-- with that:
+--
+--   1. `privacy.html` promises the board is off until the athlete joins it,
+--      and the coach's own description of the flow is "they start using it,
+--      and then if they want, they join the board". The code was the only
+--      party that disagreed.
+--   2. `CFG.onBoard` is a CLIENT flag in localStorage and is never read back
+--      from the server. So an auto-joined athlete was listed on everyone
+--      else's board while their own screen said "Not on the board" — and
+--      roll call, which gates on that flag, refused them.
+--   3. Every signup landed on the board at 0 XP, including the ones who never
+--      opened the link. A board padded with zeros is worth less than a short
+--      one full of people who are actually logging.
+--
+-- The name is kept on the contact row and copied into `data/<id>.json` as
+-- `boardName`, so when they do join, the box is already filled in.
 --
 -- The SQL editor carries no JWT, so `auth.jwt()` is NULL there — guarding on
 -- `is distinct from` alone would reject the coach at his own console (the bug
@@ -88,23 +118,18 @@ begin
     insert into public.athlete_keys (athlete_id, secret_key) values (p_athlete_id, v_key);
   end if;
 
-  insert into public.hab_contacts (athlete_id, email, whatsapp, source, tier)
+  insert into public.hab_contacts (athlete_id, email, whatsapp, display_name, source, tier)
   values (p_athlete_id, nullif(btrim(coalesce(p_email, '')), ''),
                         nullif(btrim(coalesce(p_whatsapp, '')), ''),
+                        nullif(btrim(coalesce(p_display_name, '')), ''),
                         coalesce(p_source, 'proof'), coalesce(p_tier, 'free'))
   on conflict (athlete_id) do update
-    set email    = coalesce(excluded.email, hab_contacts.email),
-        whatsapp = coalesce(excluded.whatsapp, hab_contacts.whatsapp),
-        source   = excluded.source,
-        tier     = excluded.tier,
-        updated_at = now();
-
-  -- Put them on the board straight away under the name they asked for. Joining
-  -- is what unlocks roll call, and someone who filled in a form asking to be on
-  -- a board should not have to find the join button.
-  if p_display_name is not null and btrim(p_display_name) <> '' then
-    perform public.set_leaderboard_optin(p_athlete_id, p_display_name, true, v_key);
-  end if;
+    set email        = coalesce(excluded.email, hab_contacts.email),
+        whatsapp     = coalesce(excluded.whatsapp, hab_contacts.whatsapp),
+        display_name = coalesce(excluded.display_name, hab_contacts.display_name),
+        source       = excluded.source,
+        tier         = excluded.tier,
+        updated_at   = now();
 
   return query select p_athlete_id, v_key;
 end; $fn$;
@@ -114,10 +139,15 @@ grant execute on function public.add_contact(text, text, text, text, text, text)
 -- Who has signed up, newest first, with how much they have actually logged.
 -- Adherence is the qualifying signal — far better than an email address.
 --   select * from public.contact_list();
-create or replace function public.contact_list()
+-- `shown_as` is the live board name if they have joined, otherwise the name
+-- they asked for on the form; `on_board` says which of the two it is.
+-- Dropped first: `create or replace` cannot change a function's OUT columns,
+-- and this signature gained shown_as/on_board after the first version shipped.
+drop function if exists public.contact_list();
+create function public.contact_list()
 returns table (
   athlete_id text, email text, whatsapp text, source text, tier text,
-  display_name text, days_logged int, signed_up timestamptz)
+  shown_as text, on_board boolean, days_logged int, signed_up timestamptz)
 language plpgsql security definer set search_path = public as $fn$
 begin
   if auth.jwt() is not null
@@ -126,7 +156,9 @@ begin
   end if;
   return query
   select c.athlete_id, c.email, c.whatsapp, c.source, c.tier,
-         o.display_name,
+         coalesce(o.display_name, c.display_name),
+         -- A row in leaderboard_optin IS the opt-in; leaving deletes it.
+         (o.athlete_id is not null),
          coalesce((
            select count(*)::int
            from jsonb_each(public.hab_log_of(ap.data, c.athlete_id)) d
