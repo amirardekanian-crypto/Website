@@ -64,9 +64,15 @@ which is a volume verdict. In-app stress reads 3–4/5, milder than the 7/10 at 
 B12 469, Hgb 12.8, HbA1c 4.5, FBS 92 — iron, thyroid, B12 and metabolic health all clean, which
 rules out the usual fatigue explanations. Flagged: **25(OH) vitamin D 23 ng/ml (insufficient)** —
 the plausible driver of the sleep-quality/energy picture, referred to her physician;
-**CRP 8.8 (<6)** with **Lymph% 45.3** — mild inflammation, lymphocyte-predominant. That draw sits
-**mid-layoff (Jun 29 → Jul 25)**, so the gap reads more like illness than disengagement — no
-notes card treats it as a discipline failure. Cholesterol 209 / HDL 56 / TG 152: mild, supports
+**CRP 8.8 (<6)** with **Lymph% 45.3** — mild inflammation, lymphocyte-predominant.
+**Cause of the layoff confirmed by Amir (2026-07-27): personal problems and stress, and the
+doctor visit that produced this panel** — life load, not training fatigue and not disengagement.
+The draw date sitting mid-layoff is explained by the appointment itself; the raised CRP is
+consistent with a stressful period and/or a minor concurrent illness, and is worth a recheck
+once she's settled. Treated throughout as life load per the separate-fatigue-from-life-load
+principle: no notes card frames the gap as a discipline failure, and the high-stress-client
+protocol (autoregulation + minimum effective dose + flexible session order) is now its own
+notes card rather than a buried paragraph. Cholesterol 209 / HDL 56 / TG 152: mild, supports
 the C3 Metabolic Shift; deliberately *not* addressed with programmed conditioning this cycle
 (adding cardio to a 45%-adherence hypertrophy block would cost the block). CA 125 6.2 — normal,
 reassuring against the cyst. **No lab values appear in `data/elmira_askari.json` — it is public.**
@@ -77,7 +83,10 @@ reassuring against the cyst. **No lab values appear in `data/elmira_askari.json`
 now teaches the format so C3's read isn't guesswork.
 
 **Capacity: increase — but the ceiling is exposure, not recovery.** She needs more delt volume
-and more completed sessions, not harder ones.
+and more completed sessions, not harder ones. With life load confirmed as the adherence driver,
+the volume jump is deliberately front-loaded into *frequency of exposure to the priority muscle*
+(delts every day) rather than into per-session intensity — a stressed athlete misses sessions,
+so the design has to make a missed session cost less.
 
 **Structure.** Amir held 4 days ("think of it as business" — it's what she's paying for), so the
 adherence fix is structural instead: **every one of the four days now carries direct delt work.**
@@ -167,6 +176,26 @@ DB Split Squat → Reverse Lunge · Hanging Knee Raise → captain's chair or Re
 **e1RM** — Barbell Hip Thrust **~40 kg** (30 × 10 @8) · Barbell RDL **~27 kg** (20 × 10 @9–10).
 No prior cycle to compare against. Both low-confidence pending the logging fix; C3 should get
 clean numbers for hip thrust, DB RDL, split squat and both presses.
+
+### Post-draft edit · 2026-07-27 (after Amir confirmed the cause of the layoff)
+
+Amir confirmed the June 29 → July 25 gap was **personal problems and stress, plus the doctor
+visit** that produced the blood panel — not illness, not disengagement. No programming changed;
+the delts-every-day structure was already the right answer for stress-driven, unpredictable
+adherence, and this confirms rather than revises it. Three athlete-facing edits:
+
+1. **New notes card, "A Short Session Still Counts"** — the high-stress-client protocol
+   (any day order · warm-up + first two exercises = a real session · drop every RPE by one on a
+   rough day · two days is still a training week) promoted from a buried final paragraph in the
+   RPE card to its own card, plus an explicit ask to message rather than go quiet, with the offer
+   to shrink the plan to two days or park it. She went silent for 26 days; the fix is making the
+   smaller version of the plan a named, permitted option instead of something she has to invent.
+2. **Autoregulation paragraph removed from "The RPE Is The Instruction"** so the two cards don't
+   duplicate each other.
+3. **Bloods card reworded** — the first draft's "rules out the usual explanations for feeling
+   flat" would have read as *nothing explains why you're tired* to someone who had just been
+   through a hard few months. Now states the panel rules out a physiological cause, acknowledges
+   a hard stretch does this on its own, and keeps the vitamin D as the concrete fixable thing.
 
 **Verification** — design audited against three lenses inline (clinical/injury · house-rules
 compliance lint vs COACHING-PRINCIPLES + `exercise_library.json` · dose & time-budget), not via
