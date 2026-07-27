@@ -165,6 +165,15 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **`exercise_library.json` (generated from Notion) is the source of truth for names —
   it is the video join key.** Author each exercise to the library's canonical spelling
   exactly; `/program-assemble` validates and normalizes misses. *(2026-06-15)*
+- **The library is a video-join key, not a whitelist — programming is never restricted to what's
+  already catalogued.** Pick whatever real movement is right for the athlete; a name not yet in
+  `exercise_library.json` just ships without a demo video until it's filmed and added to Notion
+  (the app handles a missing video gracefully — no play button, nothing breaks). Follow the naming
+  *convention* above regardless of whether the name is already catalogued. Compensate for the
+  missing video with a clear setup note when the movement is new to the athlete. *(2026-07-27,
+  Amir, verbatim: "you can prescribe any movement that you like" — said after Elmira C2 avoided a
+  genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only
+  library entries were available.)*
 - **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
   drift still finds the video and Notion renames don't break old programs — but
   word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
