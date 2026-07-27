@@ -59,6 +59,11 @@
     --accent-100: rgba(14,74,54,0.08);
     --clay: #C7552F;
     --clay-deep: #8E3A1E;
+    /* Text that sits ON a clay background. Clay inverts between themes — deep
+       clay is a dark brown in light mode and a light salmon in dark — so the
+       text on it has to invert too. Hard-coding white gave 2.4:1 in dark mode
+       on exactly the three surfaces that exist to warn you. */
+    --on-clay: #FAF7F2;
     --scrim: rgba(26,26,26,0.45);
     --divider: rgba(26,26,26,0.40);
     --rule: rgba(26,26,26,0.20);
@@ -77,6 +82,7 @@
     --accent-100: rgba(62,156,116,0.14);
     --clay: #E06B43;
     --clay-deep: #F09068;
+    --on-clay: #14120F;
     --scrim: rgba(0,0,0,0.55);
     --divider: rgba(240,237,230,0.34);
     --rule: rgba(240,237,230,0.18);
@@ -224,11 +230,11 @@
 
   /* ── Coach card ── */
   .coachcard {
-    background: var(--clay); color: #FAF7F2; padding: 20px;
+    background: var(--clay); color: var(--on-clay); padding: 20px;
     border-bottom: 2px solid var(--divider);
     display: flex; flex-direction: column; gap: 12px; animation: riseIn .3s ease;
   }
-  .coachcard .eyebrow { color: rgba(250,247,242,.8); }
+  .coachcard .eyebrow { color: var(--on-clay); opacity: .8; }
   /* The nudge changes copy as the day goes, and the lines are not all the same
      length. Without a floor the card resizes on a tick and shoves the habit list
      under the athlete's finger — a smaller version of the scroll bug the renderer
@@ -327,12 +333,12 @@
      a header flag. Now the day bar is gone it gets one unmissable strip, sitting
      directly above the list of things that would fix it. */
   .riskbar {
-    background: var(--clay-deep); color: #fff; padding: 9px 20px;
+    background: var(--clay-deep); color: var(--on-clay); padding: 9px 20px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
     font-size: 13px; letter-spacing: .05em; text-transform: uppercase;
   }
   .coachcard .cta {
-    align-self: flex-start; background: #FAF7F2; color: #1A1A1A; padding: 10px 14px;
+    align-self: flex-start; background: var(--on-clay); color: var(--clay); padding: 10px 14px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
   }
 
@@ -446,7 +452,7 @@
     text-transform: uppercase; animation: riseIn .25s ease;
   }
 
-  .demo-banner { background: var(--clay); color: #FAF7F2; padding: 8px 20px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+  .demo-banner { background: var(--clay); color: var(--on-clay); padding: 8px 20px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
 
   /* ── The XP flight ──────────────────────────────────────────────────────
      Points you just earned leave the habit that earned them and land in the
@@ -462,7 +468,7 @@
   }
   .xpfly > i {
     display: block; white-space: nowrap;
-    background: var(--clay); color: #FAF7F2; padding: 4px 8px;
+    background: var(--clay); color: var(--on-clay); padding: 4px 8px;
     font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .04em;
     animation: xpFlyY .74s cubic-bezier(.6,.04,.75,.6) both;
   }
@@ -503,7 +509,10 @@
     color: #FAF7F2;
     animation: lvScrim .22s ease;
   }
-  .lvwrap.rank { background: var(--clay); }
+  /* Pinned, not tokenised. The takeover is a full-bleed moment that should
+     look the same in both themes, and its type is white throughout — against
+     the dark theme's lighter clay that white drops to ~3:1. */
+  .lvwrap.rank { background: #C7552F; }
   .lvstage { position: relative; display: flex; align-items: center; justify-content: center; width: 200px; height: 200px; margin-bottom: 30px; }
   /* The burst is masked to a soft disc so it never collides with the type below. */
   .lvrays {
@@ -673,12 +682,12 @@
   /* Editing a day that is not today is a state you must never be in by
      accident, so it is announced in clay rather than implied by a highlight. */
   .backfill { display: flex; align-items: center; justify-content: space-between; gap: 12px;
-              margin: 12px 20px 0; padding: 12px 14px; background: var(--clay-deep); color: #fff; }
-  .backfill .eyebrow { color: rgba(255,255,255,.72); }
+              margin: 12px 20px 0; padding: 12px 14px; background: var(--clay-deep); color: var(--on-clay); }
+  .backfill .eyebrow { color: var(--on-clay); opacity: .72; }
   .backfill .bf-day { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
                       font-size: 19px; line-height: 1; text-transform: capitalize; }
-  .backfill button { flex: none; border: 2px solid rgba(255,255,255,.55); background: none;
-                     color: #fff; padding: 7px 11px; font-family: 'Barlow Condensed', sans-serif;
+  .backfill button { flex: none; border: 2px solid currentColor; background: none;
+                     color: var(--on-clay); padding: 7px 11px; font-family: 'Barlow Condensed', sans-serif;
                      font-weight: 900; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
 
   /* ── The streak ember ────────────────────────────────────────────────────
@@ -728,6 +737,7 @@
   /* A day that is about to break a real streak. The coach's card goes darker,
      and the day bar stops being green about it. */
   .coachcard.risk { background: var(--clay-deep); }
+  .coachcard.risk .cta { color: var(--clay-deep); }
   .bar.risk > span { background: var(--clay); }
   /* The nudge types itself on first paint — it is the coach talking, not a label. */
   /* Zero-width on purpose: the caret is drawn by a positioned ::before so it
