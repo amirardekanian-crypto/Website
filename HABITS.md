@@ -561,6 +561,77 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
 
 ---
 
+## Days are settled units — ⚠️ the rule the code does not yet follow
+
+**The rule.** *A day is scored against the habits that were switched on that day, and once
+a day is closed it never moves again.* Changing what you track changes what happens next,
+never what already happened.
+
+This is the athlete's mental model and it is the only defensible one. Someone who tracked
+five habits and cleared all five for five days had five perfect days. That is a fact about
+those days. Adding a sixth habit on day six is a decision about day six.
+
+**What the code does instead.** Three functions judge every past day against the roster the
+athlete has *right now*:
+
+| | reads | consequence |
+|---|---|---|
+| `dayPct(dayKey)` | `live()` | every past percentage moves — and the day-streak with it, via `dayQualifies()` |
+| `isPerfect(dayKey)` | `live()` | past perfect days appear and disappear |
+| `bonusEvents()` milestones | `live()`, `isPerfect()` | `daysWith3` and `perfectDays` recount, so **milestone XP is re-awarded or withdrawn** |
+
+`hab_bonus_xp()` mirrors the same mistake server-side: `livehab` and `nlive` are computed
+once from `p_cfg -> 'on'` and applied to every day in the walk.
+
+Both directions are wrong, and the second one is worse because nobody would report it:
+
+- **Adding** a habit deletes perfect days you already earned. `perfectDays` is worth 500xp
+  and `daysWith3` 75xp, so this is real XP, and it can cost a *level* — measured across log
+  lengths 100–365 days, it drops the overall level in **67 of 266 cases**, first at 105
+  days (level 21 → 20). This is why `hab_titles` mints rather than recomputes.
+- **Switching off** a habit hands back perfect days you never had. Free XP, and possibly a
+  milestone, for history that did not happen.
+
+### The fix: a dated roster, not a live one
+
+Store a **timeline of roster changes** on the config and derive each day's roster from it.
+Small, append-only, and it keeps XP a pure function of what is stored:
+
+```js
+// CFG.roster — appended to whenever the tracked set changes. Nothing else writes it.
+[ { from:'2026-07-26', ids:['strength','steps','sleep','fuel','water'] },
+  { from:'2026-08-01', ids:['strength','steps','sleep','fuel','water','mobility'] } ]
+
+function rosterOn(dayKey) {          // last entry whose `from` is on or before the day
+  let cur = null;
+  for (const e of (CFG.roster || [])) { if (e.from <= dayKey) cur = e; else break; }
+  return cur ? cur.ids : live().map(h => h.id);   // pre-timeline days: today's roster
+}
+```
+
+Then `dayPct`, `isPerfect` and the milestone counters take their denominator from
+`rosterOn(k)` instead of `live()`. `hab_bonus_xp()` reads the same array out of `p_cfg` and
+its `perday`/`perfect` CTEs join against the entry in force on `dl.d`.
+
+**Changes take effect from today, not retroactively and not tomorrow.** Today is still an
+open day — it is inside the 3-day backfill window and the athlete can still act on it — so
+a habit added this morning counts this evening. Yesterday is closed. That is exactly the
+line Amir drew: *days are separate from each other unless we can edit them.*
+
+**Existing athletes are seeded, not rescored.** On first load after the change,
+`CFG.roster = [{ from: <their first logged day>, ids: <current live ids> }]`. Their history
+scores exactly as it does today — nobody wakes up to a different level — and only changes
+made *from that point on* are frozen. A migration that rescored history would be the same
+class of bug this fix exists to remove.
+
+**Scope, if this gets built:** `dayPct` · `isPerfect` · `bonusEvents()` milestones ·
+a `stampRoster()` call on every habit toggle / custom add / `removeCustom` · the seed in
+the config loader · `hab_bonus_xp()` (`livehab` → per-day) · `XP_SYSTEM.md` §4.5 and the
+`daysWith3`/`perfectDays` entries · the manual's *Consistency* prose. Both scorers change,
+so it is one PR or the board and the phone disagree.
+
+---
+
 ## How it feels — the motion layer
 
 Proof is meant to read as a game, not a form. The mechanics of that live in a few
