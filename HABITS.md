@@ -408,12 +408,12 @@ wrong twice over:
 1. **Levels reset every season.** The day Amir opens Season 1 every athlete drops to level
    1, and a recomputing check would strip every title off the board at once while every
    Progress screen still showed them. The track exists precisely so levels *can* reset.
-2. **Level is not even monotonic inside a season.** `hab_bonus_xp` scores `daysWith3` and
-   `perfectDays` off habits that are currently switched **on**, so adding a habit you are
-   not yet doing deletes perfect days you already earned. Swept across log lengths
-   100–365 days that drops the level in **67 of 266 cases** — the first at 105 days, level
-   21 falling to 20. Level 21 is IRONCLAD. A recomputing check would take IRONCLAD off the
-   board at the exact moment the athlete added a habit.
+2. **Level used to move mid-season too.** Before stage18, `hab_bonus_xp` scored
+   `daysWith3` and `perfectDays` off habits currently switched **on**, so adding a habit
+   deleted perfect days already earned — dropping the level in **67 of 266** log lengths
+   between 100 and 365 days (first at 105 days, level 21 → 20, which is IRONCLAD).
+   *Days are settled units* fixed that, so this half no longer applies. Reason 1 alone is
+   permanent and sufficient, and it was this measurement that made the case for minting.
 
 So `hab_mint_titles()` records what the level has earned *at the moment it is called*, and
 that row is permanent. Minting runs on boot, which is what captures the peak on the day it
@@ -558,6 +558,83 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   so every season everyone can earn them again. Tier values are a multiplier on *that
   habit's* daily value, so a workout streak outpays a supplements streak. Detail in
   [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.5.
+
+---
+
+## Days are settled units
+
+**A day is scored against the habits that were switched on that day, and once a day is
+closed it never moves again.** Changing what you track changes what happens next, never
+what already happened.
+
+This is the athlete's mental model and it is the only defensible one. Someone who tracked
+five habits and cleared all five for five days had five perfect days. That is a fact about
+those days. Adding a sixth habit on day six is a decision about day six.
+
+### What enforces it
+
+The tracked set is a **timeline**, not a snapshot — `CFG.roster`, one entry per change,
+each naming the day it took effect:
+
+```js
+CFG.roster = [ { from:'2026-07-26', ids:['strength','steps','sleep','fuel','water'] },
+               { from:'2026-08-01', ids:['strength','steps','sleep','fuel','water','mobility'] } ]
+```
+
+A handful of entries a year, not one per day, so XP stays a pure function of what is
+stored. `rosterOn(dayKey)` returns the entry in force, and the three measures that need a
+denominator read it instead of `live()`: `dayPct()`, `isPerfect()`, and the
+`daysWith3`/`perfectDays` counters in `bonusEvents()`. The day-streak follows for free,
+because `dayQualifies()` is built on `dayPct()`.
+
+⚠️ **`live()` is the present tense only** — what to draw on Today, what to nudge, what a
+perfect day is worth from here. **Anything that takes a `dayKey` must use
+`rosterOn(dayKey)`.** That is the entire invariant and it is one line to get wrong.
+
+Only **`stampRoster()`** writes the timeline, and it only ever appends. It is called from
+`saveCfg()`, so every path that can change the tracked set is covered — both toggles,
+adding a custom habit, removing one, and anything added later — rather than four call
+sites somebody has to remember. Two rules keep it tidy: a change on a day that already has
+an entry overwrites it, and a change that lands back where it started collapses instead of
+stacking.
+
+**Changes take effect from today, not retroactively and not tomorrow.** Today is still an
+open day — inside the 3-day backfill window and still actionable — so a habit added this
+morning counts this evening. Yesterday is closed.
+
+**Existing athletes were seeded, not rescored.** The first stamp is dated at the athlete's
+first logged day with the roster they already had, so their history scores exactly as it
+did before this shipped. `anchorRoster()` pulls that first entry back if history arrives
+after it was stamped — on a new phone `loadLocal()` finds nothing and `syncFromCloud()`
+has not run yet. A day older than the whole timeline reads the *first* entry, so nothing
+mis-scores even if the anchor never runs.
+
+### What it fixed
+
+All three measures used to call `live()` — the roster the athlete had *right now* — and
+re-judged every day in history against it. `hab_bonus_xp()` did the same server-side.
+Proven on both scorers, 120 days of history, identical numbers client and server:
+
+| | perfect days | bonus XP |
+|---|---|---|
+| five habits, 120 clean days | 120 | 4,345 |
+| …then a sixth added, **old** | 0 | **3,845** — 500 XP deleted |
+| …then a sixth added, **fixed** | 100 | **4,345** — kept |
+| six habits, one never done | 0 | 3,625 |
+| …then that one switched off, **old** | 120 | **4,125** — 500 XP invented |
+| …then that one switched off, **fixed** | 20 | **3,625** — honest |
+
+The 500 is `CN` (perfectDays ≥ 100). The second direction is the worse one: nobody would
+ever report free XP. Base XP was never affected — `habitXp()` pays per habit per day, so a
+new habit adds nothing and a paused one keeps its points. It was only ever a denominator
+problem.
+
+`hab_bonus_xp()` carries the same timeline server-side (`supabase/stage18_day_rosters.sql`):
+`daylive` replaces `livehab` with one row per day-and-habit, and `nlive` became a column on
+`perday` rather than a scalar for all time. It reads `roster` straight off the config —
+`hab_cfg_of()` returns the whole blob, so it rides along with `on` and `custom`. Verified
+45/45 identical to the old function on configs with no timeline, which is the path every
+athlete is on until they open the new build.
 
 ---
 

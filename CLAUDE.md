@@ -62,10 +62,11 @@ to mint**: the moment a reward costs Amir an hour, forty consistent athletes bec
 hours he owes. **Titles now show on the leaderboard and the roll call wall** (stage17);
 cards deliberately do not, because a card is drawn on the athlete's own phone and nobody
 else reads it. The server keeps its own record of what was earned (`public.hab_titles`)
-and **mints rather than recomputes** — a level can fall, both at a season reset and
-mid-season when adding a habit deletes perfect days, so any check against the *current*
-level would revoke titles people already own. The track is a third thing scored twice:
-`PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
+and **mints rather than recomputes** — a level can fall. Season resets drop everyone to 1
+by design, so any check against the *current* level would revoke titles people already own.
+(It could also fall mid-season, from the roster bug stage18 fixed; that half is gone, the
+season half is permanent, and either one alone justifies minting.) The track is a third
+thing scored twice: `PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
 
 **Two words, one job each — do not invent a third.** A **run** is consecutive days on
 *one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
@@ -80,9 +81,70 @@ that way. Amir posts the day's coach line with
 `select public.set_coach_note('…');` and moderates with
 `select public.hide_note('<athlete_id>', '<date>');`.
 
-Also: XP is scored **twice** — `XP_RULES` in `habits.html` and the `xp_rules` row in
-Supabase (the leaderboard scores server-side). Change both together or the board and the
-athletes' own screens will disagree.
+### ⚠️ Everything in Proof that is scored TWICE — change both or they disagree
+
+The leaderboard scores **server-side**, the athlete's own screens score **client-side**,
+and they read from two different copies of the same rules. If you change one and not the
+other, the board and the athlete's phone will quietly show different numbers — the worst
+class of bug in this app, because nothing errors.
+
+The Supabase copy is **one row**: `public.xp_rules where id = 1`. It has 12 keys, and
+every one of them mirrors a constant in `habits.html`:
+
+| `xp_rules` key | `habits.html` | What breaks if they drift |
+|---|---|---|
+| `base`, `growth` | `XP_RULES.base/.growth` | Levels differ between board and phone |
+| `completionBonus`, `customXp` | `XP_RULES` | Daily XP differs |
+| `streakQualifyPct` | `XP_RULES` | The `qualify` quest and day-streaks differ |
+| `weights` | `XP_RULES.weights` | Every habit's value differs |
+| `targets` | `HABITS[].target` | What counts as "done" differs |
+| `tiers` | `CONSISTENCY_TIERS` | Badge XP differs |
+| `milestones` | `ACHIEVEMENTS` | Milestone XP differs |
+| `quests` | `QUEST_POOL` | A quest pays on one side only |
+| `passTrack` | `PASS_TRACK` | **Server refuses a title the app already gave** |
+| `questRuns` | — | Server-only; set by `set_quests()` / `clear_quests()` |
+
+Read the live row with:
+`select jsonb_object_keys(rules) from public.xp_rules where id = 1;`
+
+**Not** on the row, deliberately: `dailyCap` (a client write-time clamp in `setVal()`, no
+server equivalent — see `XP_SYSTEM.md` §1) and `seasonStart`/`seasonName` (the authority is
+`public.seasons`; the `XP_RULES` values are an offline fallback only).
+
+The scoring **logic** is also written twice — `bonusEvents()` in `habits.html` against
+`hab_bonus_xp()` in plpgsql (**stage18** owns the current version; stage14 owns its
+6-arg signature and everything else in it). Those two walk the
+log the same way on purpose. Changing how a badge or milestone is *counted* — not just
+what it pays — means editing both.
+
+Beyond scoring, three more things live in more than one place:
+- **App name** — `manifest.name`, `manifest.short_name`, `apple-mobile-web-app-title`.
+- **Docs** — `HABITS.md`, `XP_SYSTEM.md`, the manual prose in `renderManual()`,
+  `privacy.html`. (The manual's *numbers* read from live constants; its *prose* does not.)
+- **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
+  server (`public.hab_titles`). Both are append-only; neither may ever subtract.
+
+### Days are settled units — the rule, and the thing that enforces it
+
+**A day is scored against the habits that were switched on THAT day. A closed day never
+moves again.** Changing what you track changes what happens next, never what already
+happened.
+
+What enforces it is `CFG.roster` — a **timeline** of the tracked set, one entry per change,
+each naming the day it took effect. `rosterOn(day)` reads the entry in force; `dayPct()`,
+`isPerfect()` and the `daysWith3`/`perfectDays` counters take their denominator from it
+instead of `live()`. `hab_bonus_xp()` reads the same array out of the config and its
+`daylive`/`perday` CTEs join per day (stage18). **Only `stampRoster()` writes it, it is
+called from `saveCfg()` so every mutation path is covered, and it only ever appends.**
+
+Before stage18 all of those read `live()` — "habits switched on right now" — and re-judged
+history against a roster from the future. It cost 500xp (the CN milestone) in both
+directions: adding a habit deleted perfect days already earned, switching one off handed
+back perfect days that never happened. Both are proven fixed in the stage18 header.
+
+⚠️ **`live()` is for the present tense only** — what to draw on Today, what to nudge, what
+a perfect day is worth from here. **Any function that takes a `dayKey` must use
+`rosterOn(dayKey)`.** That is the whole invariant; it is one line to get wrong.
 
 **Seasons.** Scoring runs in seasons; only days from the current season's start earn XP,
 for personal levels *and* the boards. Currently **Pre-Season (opened 26 July 2026)** —
@@ -91,8 +153,9 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–17 are applied and live** (leaderboard, workout-days feed, seasons,
-bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles).
+**Supabase stages 9–18 are applied and live** (leaderboard, workout-days feed, seasons,
+bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
+per-day rosters).
 
 **Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
 the only test, and anything not `"free"` is coached, so no existing file needs editing.

@@ -1429,6 +1429,84 @@ function allHabits() {
 function habitById(id) { return allHabits().find(h => h.id === id) || HABITS[0]; }
 function live() { return allHabits().filter(h => CFG.on[h.id] !== false); }
 function offHabits() { return allHabits().filter(h => CFG.on[h.id] === false); }
+
+// ── A day is scored against the habits that were on THAT day ──────────────
+// `live()` is "what the athlete tracks right now", and reading it while scoring
+// a past day re-judges history against a roster from the future. Both
+// directions were wrong: adding a habit deleted perfect days already earned
+// (perfectDays is worth 500xp, so this cost real levels), and switching one off
+// handed back perfect days that never happened.
+//
+// So the tracked set is a TIMELINE, not a snapshot. One entry per change:
+//
+//   CFG.roster = [ { from:'2026-07-26', ids:[...] },
+//                  { from:'2026-08-01', ids:[...] } ]
+//
+// That is a handful of entries a year, not one per day, and XP stays a pure
+// function of what is stored — the property the whole app rests on.
+//
+// Only `stampRoster()` writes it, and it only ever appends.
+function firstLoggedDay() {
+  const ks = Object.keys(LOG || {}).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+  return ks[0] || null;
+}
+// Habit objects for a stored list of ids. A custom habit deleted by
+// removeCustom() is gone from allHabits() and its log entries went with it, so
+// it drops out of old rosters too — which is exactly what ✕ promises. The
+// non-destructive door is the toggle, and that keeps every point.
+let _rosterCache = null;
+function rosterHabits(ids) {
+  if (!_rosterCache) _rosterCache = new Map();
+  let hs = _rosterCache.get(ids);
+  if (!hs) { hs = allHabits().filter(h => ids.indexOf(h.id) >= 0); _rosterCache.set(ids, hs); }
+  return hs;
+}
+function rosterOn(dayKey) {
+  const t = CFG && CFG.roster;
+  if (!t || !t.length) return live();          // nothing stamped yet — behave as before
+  let cur = t[0];                              // a day older than the timeline reads its first entry
+  for (let i = 0; i < t.length && t[i].from <= dayKey; i++) cur = t[i];
+  return rosterHabits(cur.ids);
+}
+// Records the tracked set as of today. Called from saveCfg(), so every path that
+// can change which habits count is covered — the two toggles, adding a custom
+// habit, removing one, and anything added later.
+//
+// TODAY, not tomorrow: today is still an open day, inside the backfill window
+// and still actionable, so a habit added this morning counts tonight. Yesterday
+// is closed. Days are separate from each other unless you can still edit them.
+// The seed can be stamped before the athlete's history exists locally: on a new
+// phone `loadLocal()` finds nothing and `syncFromCloud()` has not run yet, so the
+// first stamp gets dated today and months of real history sit behind it. Nothing
+// mis-scores — rosterOn() reads the first entry for a day older than the
+// timeline — but the timeline should be true rather than rescued by a fallback.
+// Pull the first entry back to cover the log once the log has arrived. Its ids
+// are still the right answer for those days: they are the only roster ever
+// recorded for them.
+function anchorRoster() {
+  const t = CFG && CFG.roster;
+  if (!t || !t.length) return;
+  const first = firstLoggedDay();
+  if (first && first < t[0].from) { t[0].from = first; _rosterCache = null; }
+}
+function stampRoster() {
+  if (!CFG) return;
+  const ids = live().map(h => h.id).sort();
+  const t = CFG.roster || (CFG.roster = []);
+  const last = t.length ? t[t.length - 1] : null;
+  if (last && last.ids.length === ids.length && last.ids.every((v, i) => v === ids[i])) return;
+  // The FIRST stamp is dated from the athlete's first logged day, not today, so
+  // an athlete who already has history scores exactly as they did before this
+  // shipped. A migration that rescored history would be the same class of bug
+  // this whole mechanism exists to remove.
+  if (!last) { t.push({ from: firstLoggedDay() || TKEY(), ids }); return; }
+  if (last.from === TKEY()) last.ids = ids;    // changed their mind twice today
+  else t.push({ from: TKEY(), ids });
+  // Two edits in one day can land back where they started, one entry later.
+  const n = t.length;
+  if (n > 1 && t[n-1].ids.length === t[n-2].ids.length
+            && t[n-1].ids.every((v, i) => v === t[n-2].ids[i])) t.pop();
+}
 function valOf(dayKey, id) { const d = LOG[dayKey]; return (d && typeof d[id] === 'number') ? d[id] : 0; }
 function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
 function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
@@ -1477,6 +1555,9 @@ function migrateOld() {
 // through these two has to invalidate by hand — see syncFromCloud.
 function saveCfg() {
   CFG.updatedAt = Date.now();
+  // Before the cache is dropped, not after: stampRoster reads live(), and the
+  // stamp is part of what the next scoring pass must see.
+  stampRoster();
   invalidateBonus();
   try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
   markDirty();
@@ -1657,11 +1738,14 @@ async function syncFromCloud() {
 
 // ── Derived stats, all from real history ──────────────────────────────────
 function loggedDays() { return Object.keys(LOG).sort(); }
+// Both read the roster THAT DAY had, never the one the athlete has now — see
+// rosterOn(). dayQualifies() and therefore the whole day-streak follow from
+// dayPct, so fixing these two settles every past percentage in the app.
 function dayPct(dayKey) {
-  const hs = live(); if (!hs.length) return 0;
+  const hs = rosterOn(dayKey); if (!hs.length) return 0;
   return Math.round(hs.filter(h => isDone(h, dayKey)).length / hs.length * 100);
 }
-function isPerfect(dayKey) { const hs = live(); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
+function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
 function dayQualifies(dayKey) { return dayPct(dayKey) >= XP_RULES.streakQualifyPct; }
 function currentDayStreak() {
   let d = dayQualifies(TKEY()) ? today() : addDays(today(), -1), n = 0;
@@ -1764,7 +1848,7 @@ function tierXp(h, i) {
 // Recomputing this on every level read would be thousands of operations per
 // render, so it is cached and dropped whenever the log or the tracked set moves.
 let _bonusCache = null;
-function invalidateBonus() { _bonusCache = null; }
+function invalidateBonus() { _bonusCache = null; _rosterCache = null; }
 // Runs and counts are measured FROM THE SEASON START, not from all of history.
 // That is a fairness rule, not an implementation detail: a tier crosses once, so
 // scoring it against all-time runs would mean an athlete whose streak began
@@ -1802,7 +1886,10 @@ function bonusEvents() {
       lastDone[h.id] = k;
       hits[h.id] = (hits[h.id] || 0) + 1;
     });
-    if (live().filter(h => isDone(h, k)).length >= 3) with3++;
+    // rosterOn(k), not live(): these two counters pay 75xp and 500xp, so
+    // recounting them against today's habit list is how a retune used to take
+    // XP off history the athlete had already earned.
+    if (rosterOn(k).filter(h => isDone(h, k)).length >= 3) with3++;
     if (isPerfect(k)) perfect++;
     ACHIEVEMENTS.forEach(a => {
       if (claimed[a.code]) return;
@@ -4132,6 +4219,10 @@ function renderManual() {
         // number disagreeing with itself.
         p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of everything you track. They are different numbers and they move at different speeds.`) +
         p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a run never takes a badge back.`) +
+        // The athlete-facing half of "days are settled units". They will not read
+        // the word roster, and they should not have to: what they need to know is
+        // that changing the list is safe.
+        p(`<strong style="color:var(--ink)">Changing what you track is safe.</strong> A day is judged on the habits you had switched on <em>that day</em>. Add a habit today and the days behind you keep the scores they earned; switch one off and it does not go back and make old days look better than they were. Today counts from now, because today is still yours to finish.`) +
         p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`) +
         `<div style="display:flex;flex-direction:column;gap:0">
           ${CONSISTENCY_TIERS.map((t, i) => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
@@ -4743,6 +4834,11 @@ function showError(msg) {
   // Sessions finished in the training app tick the WORKOUT habit here. The
   // dates come from the server, not from the other app's storage.
   importWorkoutDays(await fetchWorkoutDays());
+  // Every source of logged days has now reported — local, cloud, and the
+  // training app. Settle the roster timeline against the full log before
+  // anything scores off it.
+  stampRoster();
+  anchorRoster();
   // Levels that arrived with a sync still get their moment; a first run (or a
   // changed XP system) only re-baselines, so nobody is ambushed by a queue.
   checkLevelUps();

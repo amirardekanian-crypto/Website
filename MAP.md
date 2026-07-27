@@ -152,7 +152,9 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`stage16_contacts`](supabase/stage16_contacts.sql) (coach-only contact book for free
   signups — `add_contact` / `contact_list` / `forget_contact`) ·
   [`stage17_titles`](supabase/stage17_titles.sql) (titles on the board — the minted
-  `hab_titles` record, `claim_titles` / `set_title`, and `passTrack` on `xp_rules`).
+  `hab_titles` record, `claim_titles` / `set_title`, and `passTrack` on `xp_rules`) ·
+  [`stage18_day_rosters`](supabase/stage18_day_rosters.sql) (a day is scored against the
+  habits that were on **that** day — the current `hab_bonus_xp`).
 - **Notion sync (exercise videos):** [`sync_notion.py`](sync_notion.py) +
   [`NOTION_SYNC.md`](NOTION_SYNC.md) → regenerates `exercise_library.json`.
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
