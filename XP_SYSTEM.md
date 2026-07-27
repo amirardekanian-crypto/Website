@@ -1,4 +1,4 @@
-# The XP system — Proof (`habits.html`)
+# The XP system — AA Proof (`habits.html`)
 
 Everything you can tune about levels, XP and achievements, and what changes when you do.
 This is the document to read before touching progression.
