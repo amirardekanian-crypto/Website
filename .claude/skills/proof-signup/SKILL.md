@@ -3,7 +3,7 @@ name: proof-signup
 description: Set up a free Proof (habit tracker) user from a signup form email. Use when Amir pastes a name/email/WhatsApp from a "PROOF signup" Web3Forms email, or says "add this person to the habit app", "sign them up for Proof", "give them a habit tracker link". Does the whole job — id, key, contact record, data file, commit, push — and hands back the WhatsApp message to send.
 ---
 
-# Sign someone up to Proof
+# Sign someone up to AA Proof
 
 Amir pastes a signup (usually straight out of the **PROOF signup — habit tracker**
 Web3Forms email). You turn it into a working private link and hand him a message
@@ -98,7 +98,7 @@ live on `main`, so **do not send it before the deploy is green.**
 
 Give him this, ready to paste, with the real link filled in:
 
-> Hey <first name> — here's your Proof link:
+> Hey <first name> — here's your AA Proof link:
 > https://www.amirardekani.com/habits.html?client=<id>&key=<key>
 >
 > Open it once on your phone and it stays there. Pick what you want to track and
