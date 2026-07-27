@@ -7,6 +7,10 @@ Durable context for working in this repo. Read the linked docs before diving in.
   Exercise Physiology; 1000+ tennis & padel players). Sells premium individualised
   programmes (USD tiers: $70/1mo · $180/3mo · $300/6mo — see `Content/PRODUCT.md`)
   delivered through a private web app (`program.html`, a PWA), backed by Supabase.
+- **The free habit tracker is the top of the funnel.** `habits.html` ("Proof") is offered
+  free to non-clients via `proof.html` (Instagram bio link, deliberately not in the nav).
+  They give a name, email and WhatsApp; Amir runs **`/proof-signup`** and they are live in
+  under two minutes. Free and coached athletes share **one board**. See *Free tier* below.
 - **Two audiences, deliberately different** (don't force them identical — match *facts &
   features*, not wording):
   - **English** site = competitive **tennis/padel** players. Voice: sharp, athletic, evidence-based.
@@ -66,8 +70,22 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–14 are applied and live** (leaderboard, workout-days feed, seasons,
-bonus XP for consistency tiers + milestones, weekly quests).
+**Supabase stages 9–16 are applied and live** (leaderboard, workout-days feed, seasons,
+bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts).
+
+**Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
+the only test, and anything not `"free"` is coached, so no existing file needs editing.
+Free mode keeps WORKOUT locked (with a line saying coached athletes earn it) and points
+every `program.html` route at `/form.html`. **Scoring is identical and the board is
+shared** — that is deliberate, and it is what makes upgrading free: flip the field, the
+pipeline writes the programme into the same file, and the athlete's whole history, level
+and board place carry over on the same id, key and link.
+⚠️ **`data/<id>.json` is a public static file** — anyone who guesses an id can fetch it.
+**Never put an email address or phone number there.** Contact details live in
+`public.hab_contacts` (stage16), coach-only behind RLS: `add_contact()` signs someone up
+in one call, `contact_list()` shows who signed up **and how many days they have logged**
+(the qualifying signal), `forget_contact()` erases them. Full walkthrough:
+`.claude/skills/proof-signup/SKILL.md`.
 
 **Quests are a lever Amir pulls, not a standing feature.** There are **none** unless he
 starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Start one with

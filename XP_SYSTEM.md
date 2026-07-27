@@ -52,6 +52,15 @@ const BACKFILL_DAYS = 3;   // today + this many days back are editable — secti
 const NOTE_MAX = 200;      // characters in a roll call sentence — section 11
 ```
 
+**Free users score on exactly these rules.** `"tier": "free"` in `data/<id>.json`
+(`isFree()` in the app) changes what the athlete can *reach* — WORKOUT stays locked and
+the programme links point at the apply form — and changes **nothing** about scoring.
+There is no free-tier multiplier, no separate ladder and no separate board, on the client
+or in Postgres; the server scores every athlete from the same `hab_log` with the same
+`xp_rules` row and does not know the tier exists. That is deliberate on both ends: the
+board is only worth topping if it is one board, and upgrading someone is then a one-field
+edit that costs them no history. See `HABITS.md` → *Two kinds of user*.
+
 ---
 
 ## 1. What each habit is worth

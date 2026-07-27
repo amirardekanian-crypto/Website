@@ -46,6 +46,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Apply form | [`form.html`](form.html) | [`form-fa.html`](form-fa.html) | Intake questionnaire → emails Amir (Web3Forms) |
 | Terms | [`terms.html`](terms.html) | [`terms-fa.html`](terms-fa.html) | Legal / training disclaimers |
 | Privacy | [`privacy.html`](privacy.html) | — | GDPR privacy notice |
+| Proof signup | [`proof.html`](proof.html) | — | Public landing page for the **free habit tracker** — what it is, then name + email + WhatsApp → emails Amir (Web3Forms). **Not linked from nav** on purpose: it's the Instagram bio link. Sign people up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill |
 | EN redirect | [`index-en.html`](index-en.html) | — | Permanent redirect to `/` |
 
 **Plumbing:** [`CNAME`](CNAME) (domain) · [`sitemap.xml`](sitemap.xml) ·
@@ -59,7 +60,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | File | What it is | Manual |
 |---|---|---|
 | [`program.html`](program.html) | The athlete PWA — Home · My Plan · Coach · Library [Read \| Train] · Habits (→ `habits.html`). Loads `data/<id>.json`. Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
-| [`habits.html`](habits.html) | **Proof** — habit tracker. Three tabs: Today · Progress · Crew (no chat; Settings sits behind the initials button in the header). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), full-screen level-up celebration, 5-tier consistency ladders, opt-in server-scored **leaderboard**, **Roll Call** (one sentence a day, shared), a **3-day backfill window** on the log, offline-durable saving. Reached from `program.html` (Home card + Habits tab). Same `?client=<id>&key=<key>` link as the program. Demo: `?client=demo` | [`HABITS.md`](HABITS.md) · [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
+| [`habits.html`](habits.html) | **Proof** — habit tracker. Three tabs: Today · Progress · Crew (no chat; Settings sits behind the initials button in the header). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), full-screen level-up celebration, 5-tier consistency ladders, opt-in server-scored **leaderboard**, **Roll Call** (one sentence a day, shared), a **3-day backfill window** on the log, offline-durable saving. Reached from `program.html` (Home card + Habits tab). Same `?client=<id>&key=<key>` link as the program. **Also runs standalone for free (non-coached) users** — `"tier": "free"` in `data/<id>.json` locks WORKOUT and swaps the programme links for coaching CTAs; they sign up at [`proof.html`](proof.html). Demo: `?client=demo` | [`HABITS.md`](HABITS.md) · [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
 | [`coach.html`](coach.html) | Coach dashboard — progress, charts, mint athlete links, messaging (Google sign-in) | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
 
@@ -109,6 +110,7 @@ The brain behind every program. Read the principles before touching sets/reps.
 | 5 | [`program-assemble`](.claude/skills/program-assemble/SKILL.md) | Build & validate `data/<id>.json` |
 | ✎ | [`program-edit`](.claude/skills/program-edit/SKILL.md) | Review / fix an existing program |
 | 🔬 | [`sc-research`](.claude/skills/sc-research/SKILL.md) | Find & translate the S&C evidence |
+| 🆓 | [`proof-signup`](.claude/skills/proof-signup/SKILL.md) | Turn a `proof.html` signup email into a live habit-tracker link (no programme) |
 
 **Content skills:** [`article`](.claude/skills/article/SKILL.md) (publish a blog) ·
 [`workout`](.claude/skills/workout/SKILL.md) (publish a Train session) ·
@@ -146,7 +148,9 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`stage11_seasons`](supabase/stage11_seasons.sql) ·
   [`stage12_bonus_xp`](supabase/stage12_bonus_xp.sql) (badge XP; **partly superseded**) ·
   [`stage14_quest_runs`](supabase/stage14_quest_runs.sql) (quests + the current `hab_bonus_xp`) ·
-  [`stage15_roll_call`](supabase/stage15_roll_call.sql) (one sentence a day).
+  [`stage15_roll_call`](supabase/stage15_roll_call.sql) (one sentence a day) ·
+  [`stage16_contacts`](supabase/stage16_contacts.sql) (coach-only contact book for free
+  signups — `add_contact` / `contact_list` / `forget_contact`).
 - **Notion sync (exercise videos):** [`sync_notion.py`](sync_notion.py) +
   [`NOTION_SYNC.md`](NOTION_SYNC.md) → regenerates `exercise_library.json`.
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
