@@ -571,7 +571,7 @@
                 "restSec": 75,
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -591,6 +591,36 @@
                   ],
                   "bad": [
                     "Lifting the hips off the pad to finish the rep"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-1"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Extend to straight legs and pause at the top",
+                    "Feel the quads squeeze hard at full extension"
+                  ],
+                  "bad": [
+                    "Slamming the pad down or bouncing out of the bottom"
                   ]
                 }
               },
@@ -1054,6 +1084,37 @@
                     "Letting the front knee cave in or pushing off the back foot"
                   ]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "note": "New machine for you — set the seat so the knees track over the toes, and stop the descent just before your lower back lifts off the pad. Your first set finds the working weight.",
+                "restSec": 120,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the platform away until the legs are nearly straight, knees soft at the top",
+                    "Feel the quads and glutes load evenly through the whole range"
+                  ],
+                  "bad": [
+                    "Locking the knees out hard or letting them cave inward"
+                  ]
+                }
               }
             ]
           },
@@ -1093,6 +1154,36 @@
                   ],
                   "bad": [
                     "Hyperextending the lower back past neutral at the top"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl the pad down and under, hips pinned to the seat",
+                    "Feel the hamstrings shorten hard at the bottom"
+                  ],
+                  "bad": [
+                    "Letting the hips rise off the seat to finish the rep"
                   ]
                 }
               },
@@ -1158,36 +1249,6 @@
                   ],
                   "bad": [
                     "Letting the cable drag your arm back down"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Face Pull",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×20 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 8"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Pull the rope toward your eyes and split the ends apart at the finish",
-                    "Feel the rear delts and the muscles between the blades working"
-                  ],
-                  "bad": [
-                    "Letting the elbows drop and turning it into a straight row"
                   ]
                 }
               }
@@ -1373,7 +1434,7 @@
       {
         "icon": "🎯",
         "title": "Shoulders On Every Day Now",
-        "body": "<p>You asked for more shoulder work, and your logs agreed with you — last cycle your delts got trained about a third as much as your glutes did.</p><p>So the program changes shape. <strong>Every single day now has direct shoulder work in it:</strong></p><ul><li><strong>Day 1</strong> — machine pressing, plus your cable lateral raise</li><li><strong>Day 2</strong> — a rear-delt raise once the glute work is done</li><li><strong>Day 3</strong> — dumbbell pressing, side delts and rear delts</li><li><strong>Day 4</strong> — lateral raises and face pulls to finish</li></ul><p>Side-delt volume is up, rear-delt volume has doubled, and the pressing has doubled. <strong>Whichever days you get to, your shoulders get trained.</strong></p>"
+        "body": "<p>You asked for more shoulder work, and your logs agreed with you — last cycle your delts got trained about a third as much as your glutes did.</p><p>So the program changes shape. <strong>Every single day now has direct shoulder work in it:</strong></p><ul><li><strong>Day 1</strong> — machine pressing, plus your cable lateral raise</li><li><strong>Day 2</strong> — a rear-delt raise once the glute work is done</li><li><strong>Day 3</strong> — dumbbell pressing, side delts and rear delts</li><li><strong>Day 4</strong> — a lateral raise to finish, after the leg work</li></ul><p>Side-delt volume is up, rear-delt volume has doubled, and the pressing has doubled. <strong>Whichever days you get to, your shoulders get trained.</strong></p>"
       },
       {
         "icon": "🩸",
