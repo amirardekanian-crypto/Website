@@ -4102,8 +4102,14 @@ function renderToday(LI, doneCount, pct) {
       ${past || CFG.toured ? '' : `
         <button class="rcprompt" data-k="tourprompt" ${on(() => startTour('today'))}>
           <span>
-            <span class="eyebrow">New here</span>
-            <span class="rcq">Want the one-minute tour of what everything does?</span>
+            <span class="eyebrow">The tour</span>
+            <!-- Not "New here". This row shows to anyone who has not been through
+                 the tour, which on the day it ships is EVERY existing athlete —
+                 greeting someone on day 240 as a newcomer is the app not knowing
+                 who it is talking to. They are not new; the tour is. -->
+            <span class="rcq">${loggedDays().length
+              ? 'New: a minute on what every button in here actually does.'
+              : 'Want the one-minute tour of what everything does?'}</span>
           </span>
           <span class="hd" style="font-size:19px;color:var(--clay-deep);flex:none">→</span>
         </button>`}
