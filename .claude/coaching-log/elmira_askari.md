@@ -21,8 +21,8 @@ from the shipped file + session data in the C2 read below, not from a C1 entry.)
 | Cable Hip Abduction | Active | C2 | kept by isolation-slot exception; 3→4 sets, RPE enforced at 9 |
 | 45° Back Extension | Active | C2 | now the trunk-supported hinge with the barbell RDL gone; bodyweight → loaded |
 | Bent-Over Dumbbell Rear Delt Raise | Active | C2 | fresh |
-| Incline Y-T-W Raise | Active | C2 | fresh — the delt slot on a glute day |
-| Seated Single-Arm Cable Row | Active | C2 | fresh (replaced Cable Row) |
+| Incline Y-T-W Raise | Available | C2 | one cycle only — removed as redundant with Machine Reverse Fly on the same day |
+| Seated Single-Arm Cable Row | Available | C2 | one cycle only — removed to make room for face pull + chest; back still hits its floor without it |
 | Machine Lying Leg Curl | Active | C2 | fresh — covers the hamstring volume lost with the barbell RDL |
 | Incline Dumbbell Curl | Active | C2 | fresh (replaced Dumbbell Bicep Curl) |
 | Reverse Crunch / Bench Crunch / Hanging Knee Raise / Decline Sit-Ups | Active | C2 | the crunch-family core block — she wants to *feel* core work |
@@ -32,7 +32,9 @@ from the shipped file + session data in the C2 read below, not from a C1 entry.)
 | Machine Leg Press | Active | C2 | fresh — second quad primary on D4, added for the ≥10 floor |
 | Machine Leg Extension | Active | C2 | fresh — quad isolation on D2, added for the ≥10 floor |
 | Machine Seated Leg Curl | Active | C2 | fresh — hamstring work on D4; distinct from the lying version on D2 |
-| Cable Face Pull | Available | C2 | rotated out mid-design to free a D4 slot; rear delts still 12 sets |
+| Cable Face Pull | Active | C2 | rotated out then back in — see the movement-variety correction below |
+| Machine Chest Press | Active | C2 | fresh — chest was missing entirely; light, framed as support not focus |
+| Leaning Cable Lateral Raise | Active | C2 | fresh, not yet in `exercise_library.json` — no demo video until filmed; ships with a setup note |
 | Cable Row / Cable Glute Kickback / Dumbbell Bicep Curl / Seated Machine Hip Abduction | Available | C1 | ordinary rotation |
 | **Cable Pallof Press** | **Disliked** | C1 | **"doesn't feel them"** (Amir, 2026-07-27). Do not reintroduce anti-rotation work |
 | **Dead Bug** | **Disliked** | C1 | same reason — she skipped all 3 sets on 2026-06-16. Avoid even as a warm-up item |
@@ -266,6 +268,43 @@ on their own cover both of your goals."
 **Lint extended** with both rules, plus a check that notes cards can't reference unprogrammed
 exercises. Verified non-vacuous: run against the prior commit it fails with exactly the three
 violations Amir found.
+
+### Movement-variety correction · 2026-07-27 (Amir)
+
+Amir caught the actual mechanism behind the last fix's 5-set lateral raises: **padding sets onto
+an existing movement instead of adding a new one is itself a corner-cut**, functionally the same
+failure as duplicating an exercise across days — reaching a number without doing the design work
+of finding fresh stimulus. He also flagged **zero chest exercises** as wrong for an intermediate
+athlete on a physique cycle (the posture principle argues for *low* horizontal-press volume, not
+*none*), and asked for **Cable Face Pull back** (removed two commits ago to make Day 4 fit, but
+Day 4 is now pure lower-body, so it has to live on an upper day instead).
+
+**Amir also clarified scope: exercise selection is not limited to `exercise_library.json`.**
+That file is the video-join key, not a whitelist — I can prescribe any real movement that fits the
+athlete, following only the naming *convention*, not restricted to what's already catalogued. A
+new exercise simply ships without a demo video until it's filmed and added to Notion; the app
+handles a missing video gracefully (no play button, nothing breaks). Recorded as a durable fact:
+**do not treat the library as a hard boundary on programming decisions going forward.**
+
+Fix — both padded exercises revert to a normal dose, and each is paired with one fresh movement
+rather than a second lateral-raise variant:
+
+- **D1** — Cable Lateral Raise 5→**4 sets**. Seated Single-Arm Cable Row removed (back was
+  already covered by Lat Pulldown + Chest-Supported Row; dropping it frees room without breaching
+  the back floor). **Cable Face Pull re-added** (3×20 @8) and **Machine Chest Press added** —
+  first chest exercise this cycle, dosed light and framed in its own note as support, not focus.
+- **D3** — Dumbbell Lateral Raise 5→**4 sets**. Incline Y-T-W Raise removed (Machine Reverse Fly
+  already covers the same rear-delt purpose; two isolation rear-delt moves on one day was
+  redundant). **Leaning Cable Lateral Raise added** — a cross-body cable raise, leaning away from
+  the stack, chosen specifically because it keeps tension on the side delt through the top of the
+  range where a standard raise goes slack. Not yet in `exercise_library.json`; ships with a setup
+  note since the athlete hasn't seen this variant before and there's no demo video yet.
+
+Both days land at exactly 7 working exercises — the accepted ceiling, not over it. Volume:
+side delts hold at **15 (11 direct)**, rear delts hold at **12 (10 direct)** — the fix moved
+*where* the sets come from, not how many there are. Back drops 11→**8**, exactly at its floor.
+Chest goes 0→**3**, developing. Per-day time **58 / 57 / 59 / 51 min** — tighter than before this
+fix, not longer.
 
 **Verification** — design audited against three lenses inline (clinical/injury · house-rules
 compliance lint vs COACHING-PRINCIPLES + `exercise_library.json` · dose & time-budget), not via

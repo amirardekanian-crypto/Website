@@ -257,7 +257,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "5 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -312,16 +312,16 @@
               },
               {
                 "type": "standard",
-                "name": "Seated Single-Arm Cable Row",
+                "name": "Cable Face Pull",
                 "videoUrl": null,
-                "restSec": 75,
+                "restSec": 60,
                 "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Each Side"
+                    "label": "×20 Reps"
                   },
                   {
                     "label": "Tempo 2-1-1-0"
@@ -332,11 +332,42 @@
                 ],
                 "cues": {
                   "good": [
-                    "Row the handle to your lower ribs, chest tall",
-                    "Feel that side of the mid-back contract at the finish"
+                    "Pull the rope toward your eyes, splitting the ends apart at the finish",
+                    "Feel the rear delts and the muscles between the blades working"
                   ],
                   "bad": [
-                    "Twisting the torso to drag the handle in"
+                    "Letting the elbows drop and turning it into a straight row"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Chest Press",
+                "videoUrl": null,
+                "note": "New to your program — chest was missing, and Amir wants it back in the mix. Keep it light and controlled; this supports the shoulder work this cycle, it isn't the focus.",
+                "restSec": 90,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the handles together until your arms are extended",
+                    "Feel the chest doing the pressing, not the shoulders rolling forward"
+                  ],
+                  "bad": [
+                    "Letting the shoulders round forward at the top of the press"
                   ]
                 }
               }
@@ -821,7 +852,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "5 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -876,20 +907,20 @@
               },
               {
                 "type": "standard",
-                "name": "Incline Y-T-W Raise",
+                "name": "Leaning Cable Lateral Raise",
                 "videoUrl": null,
-                "note": "Eight reps in each shape — Y, then T, then W — that's one set. Use very light weights or none at all; this one is about position, not load.",
-                "restSec": 60,
+                "note": "New setup — grab the low pulley with the far hand (crossing your body), lean away from the machine so your arm hangs across you, then raise it out and up. The lean is what makes this different from your usual raise: it keeps the cable pulling on the shoulder all the way to the top, instead of going slack there.",
+                "restSec": 75,
                 "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Reps"
+                    "label": "×12 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-1"
                   },
                   {
                     "label": "RPE 8"
@@ -897,11 +928,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Chest on the bench, trace each letter shape with straight arms",
-                    "Feel the rear delts and the muscles between the blades working"
+                    "Lean away from the machine and raise the handle out and up past shoulder height",
+                    "Feel the side delt stay under tension even at the very top of the raise"
                   ],
                   "bad": [
-                    "Shrugging the shoulders up toward your ears"
+                    "Standing upright — that lets the cable go slack and turns it into a normal raise"
                   ]
                 }
               },
@@ -1400,7 +1431,7 @@
       {
         "icon": "🎯",
         "title": "Two Full Days On Your Shoulders",
-        "body": "<p>You asked for more shoulder work, and your logs agreed with you — last cycle your delts got trained about a third as much as your glutes did.</p><p>So <strong>Day 1 and Day 3 are both shoulder days now</strong>, and they come at the muscle from different directions:</p><ul><li><strong>Day 1</strong> — machine pressing, your cable lateral raise, and rear-delt work</li><li><strong>Day 3</strong> — pressing overhead with dumbbells, lateral raises, and two different rear-delt movements</li></ul><p>Side-delt and rear-delt volume are both up sharply and the pressing has doubled. And <strong>Day 1 is the session you never miss</strong> — so the muscle you care about most now sits on the day you're most likely to train.</p>"
+        "body": "<p>You asked for more shoulder work, and your logs agreed with you — last cycle your delts got trained about a third as much as your glutes did.</p><p>So <strong>Day 1 and Day 3 are both shoulder days now</strong>, and they come at the muscle from different angles rather than just piling more sets onto one movement:</p><ul><li><strong>Day 1</strong> — machine pressing, your cable lateral raise, rear-delt work, a face pull, and a light chest movement</li><li><strong>Day 3</strong> — pressing overhead with dumbbells, a lateral raise, two different rear-delt movements, and a new cable raise that keeps tension on the shoulder all the way to the top of the movement</li></ul><p>Side-delt and rear-delt volume are both up sharply, the pressing has doubled, and — since it went missing entirely last cycle — <strong>chest is back in the program</strong>. And <strong>Day 1 is the session you never miss</strong>, so the muscle you care about most now sits on the day you're most likely to train.</p>"
       },
       {
         "icon": "🩸",
