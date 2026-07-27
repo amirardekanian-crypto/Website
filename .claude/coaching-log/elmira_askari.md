@@ -229,6 +229,44 @@ variety against C1), placed on the days with load headroom:
 Result: **quads 11.5 · hamstrings 11.5 · glutes 17.5**, all clearing the floor. Cost of the fix is
 the flatter undulation and longer lower days documented in the Volume & Dose section above.
 
+### Structural correction · 2026-07-27 (Amir — two rules I broke)
+
+Amir caught two things, both now standing principles:
+
+1. **Cable Lateral Raise appeared on Day 1 AND Day 4.** One exercise per cycle, full stop
+   (COACHING-PRINCIPLES → Exercise selection). I'd duplicated it to reach a side-delt number
+   because the library only holds two lateral-raise variants.
+2. **Upper-body work was sitting on both lower days** — Incline Y-T-W Raise on D2, Cable Lateral
+   Raise on D4. A day trains what it says it trains (COACHING-PRINCIPLES → Session structure).
+
+Both came from the same mistake: I invented "delts on all four days" as adherence insurance for an
+athlete who skips her back-half days, and paid for it by contaminating the split and duplicating a
+movement. **The insurance was also largely redundant** — D1 is already a shoulder day and it's the
+one session she never misses. The legitimate mechanisms for that problem are **day order** (the
+priority day goes first) and the short-week card, both of which this cycle already has.
+
+Fix — the delt volume moved onto the two upper days rather than being lost:
+
+- **D1** Cable Lateral Raise 4 → **5 sets**; keeps Bent-Over DB Rear Delt Raise.
+- **D3** Dumbbell Lateral Raise 4 → **5 sets**; **Incline Y-T-W Raise relocated here** from D2,
+  alongside Machine Reverse Fly.
+- **D2 and D4 are now purely lower-body.**
+
+Volume held: **side delts 14 (10 direct) · rear delts 12 (10 direct)**, all lower-body muscles
+still clear the ≥10 floor. Per-day load **20.5 / 21.5 / 19 / 17**, times **56 / 57 / 60 / 51** —
+better balanced than before the fix. D3 carries 7 working exercises; its peak single-muscle load is
+9 sets (rear delts), under the ~10 per-session ceiling.
+
+Two notes cards were rewritten because the restructure made them false: "Shoulders On Every Day
+Now" → **"Two Full Days On Your Shoulders"** (and it now names D1 as the session she never misses,
+which is the honest version of the adherence argument), and the short-week card's "shoulders are
+worked every single day" line → "Day 1 is your shoulder day and Day 2 is your glute day — those two
+on their own cover both of your goals."
+
+**Lint extended** with both rules, plus a check that notes cards can't reference unprogrammed
+exercises. Verified non-vacuous: run against the prior commit it fails with exactly the three
+violations Amir found.
+
 **Verification** — design audited against three lenses inline (clinical/injury · house-rules
 compliance lint vs COACHING-PRINCIPLES + `exercise_library.json` · dose & time-budget), not via
 the Workflow panel — the session was configured without subagent/workflow access and Amir was
