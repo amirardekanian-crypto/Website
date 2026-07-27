@@ -120,6 +120,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   mobilisation + activation of the day's patterns — not corrective theatre. (General
   shoulder mobility/activation before pressing — band pull-apart, pass-through, cat-cow —
   is fine; it preps the lift, it doesn't "fix posture.") *(2026-06-19)*
+- **One exercise appears ONCE per cycle — never the same movement on two different days.** If a
+  muscle needs more volume than one slot carries, add sets to that slot, or find a different
+  movement for the second exposure. Repeating the exercise across days reads to the athlete as the
+  program repeating itself, wastes a rotation slot, and hides the fact that the movement pool for
+  that muscle has run out — which is information you need, not something to paper over.
+  *(2026-07-27, Amir — Elmira C2 shipped Cable Lateral Raise on both Day 1 and Day 4 to reach a
+  side-delt target; the fix was 5 sets on one day plus a different raise on the other.)*
 - **A removed exercise stays removed unless re-earned.** When something is dropped for dislike,
   inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
   without a real reason and evidence the athlete has earned it back (pain resolved, capacity
@@ -183,6 +190,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   design-convenience order and rely on a notes card to re-map them. *(2026-07-24, Setareh C1
   — shipped with the run day after the control day; Amir had the order corrected to the
   ideal week and the days renumbered.)*
+- **A day trains what it says it trains — upper work on upper days, lower work on lower days.**
+  Never sprinkle a muscle onto the wrong half of the split to top up its weekly total. The day's
+  identity, its prep circuit and its fatigue profile are all built for one half of the body, so a
+  stray delt raise on a glute day is warmed up by nothing and lengthens a session that was already
+  dosed. If a muscle is under its target, add the volume on the days that actually train it.
+  *(2026-07-27, Amir — Elmira C2 put a rear-delt raise on the glute day and a lateral raise on the
+  single-leg day as "adherence insurance" for an athlete who reliably skips her back-half days.
+  The legitimate fixes for that are **day ORDER** — put the priority day first, where attendance
+  is highest — and the short-week/minimum-dose protocol. Not contaminating the split.)*
 - **Warm-up + preparation is always 10–15 minutes** — never a token 5-min cardio bookend.
   The full prep (cardio raise + mobilisation/activation circuit) should occupy 10 min
   minimum, up to 15. This is programmed time, not filler: it primes the patterns trained
@@ -313,6 +329,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   Use this as the working ceiling when sizing weekly/per-day muscle volume, not just intuition.
   *(2026-07-08, sc-research brief — Schoenfeld 2017, Iversen 2022 umbrella review, Pelland 2025
   meta-regression, Barbalho 2019, Krause Neto 2025 for glute-specific)*
+- **Women's lower body: quads, hamstrings and glutes each clear ≥10 working sets/week — a hard
+  floor, not a target.** The 10–20 range above is a rule to satisfy, not a band to approach from
+  below. Never sign a major lower-body muscle off as "maintenance by design" just because it isn't
+  the athlete's headline goal — under 10 needs a stated, genuinely good reason, and "it's
+  secondary to her physique goal" is not one. Where the sets go: the day with the lowest
+  cost-weighted load and spare time (see the bullet below), and prefer movements the athlete
+  hasn't seen in the prior cycle so the added volume also reads as new. *(2026-07-27, Amir,
+  verbatim: "specially for women every major muscle in lower body should get at least 10, this is
+  a hard rule, unless you have a very good reason not to" — Elmira C2 first shipped with quads at
+  5.5 and hamstrings at 7.5 sets/wk, both wrongly justified as secondary-by-design.)*
 - **Check for unused session-time budget before calling a day "done."** Estimate the day's
   actual working time (sets × rest + set duration) against its time cap — if there's real
   headroom (15+ min) and the athlete's recovery capacity allows it, that's free volume, not a

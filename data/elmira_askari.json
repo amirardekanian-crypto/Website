@@ -257,7 +257,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "4 Sets",
+                    "label": "5 Sets",
                     "style": "yellow"
                   },
                   {
@@ -571,7 +571,7 @@
                 "restSec": 75,
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -596,20 +596,19 @@
               },
               {
                 "type": "standard",
-                "name": "Incline Y-T-W Raise",
+                "name": "Machine Leg Extension",
                 "videoUrl": null,
-                "note": "Eight reps in each shape — Y, then T, then W — that's one set. Use very light weights or none at all; this one is about position, not load.",
-                "restSec": 60,
+                "restSec": 75,
                 "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Reps"
+                    "label": "×15 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-1-1-1"
                   },
                   {
                     "label": "RPE 8"
@@ -617,11 +616,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Chest on the bench, trace each letter shape with straight arms",
-                    "Feel the rear delts and the muscles between the blades working"
+                    "Extend to straight legs and pause at the top",
+                    "Feel the quads squeeze hard at full extension"
                   ],
                   "bad": [
-                    "Shrugging the shoulders up toward your ears"
+                    "Slamming the pad down or bouncing out of the bottom"
                   ]
                 }
               }
@@ -822,7 +821,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "4 Sets",
+                    "label": "5 Sets",
                     "style": "yellow"
                   },
                   {
@@ -872,6 +871,37 @@
                   ],
                   "bad": [
                     "Bending the elbows more through the set to cheat the weight"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Incline Y-T-W Raise",
+                "videoUrl": null,
+                "note": "Eight reps in each shape — Y, then T, then W — that's one set. Use very light weights or none at all; this one is about position, not load.",
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Chest on the bench, trace each letter shape with straight arms",
+                    "Feel the rear delts and the muscles between the blades working"
+                  ],
+                  "bad": [
+                    "Shrugging the shoulders up toward your ears"
                   ]
                 }
               },
@@ -1054,6 +1084,37 @@
                     "Letting the front knee cave in or pushing off the back foot"
                   ]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "note": "New machine for you — set the seat so the knees track over the toes, and stop the descent just before your lower back lifts off the pad. Your first set finds the working weight.",
+                "restSec": 120,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the platform away until the legs are nearly straight, knees soft at the top",
+                    "Feel the quads and glutes load evenly through the whole range"
+                  ],
+                  "bad": [
+                    "Locking the knees out hard or letting them cave inward"
+                  ]
+                }
               }
             ]
           },
@@ -1098,6 +1159,36 @@
               },
               {
                 "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Curl the pad down and under, hips pinned to the seat",
+                    "Feel the hamstrings shorten hard at the bottom"
+                  ],
+                  "bad": [
+                    "Letting the hips rise off the seat to finish the rep"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
                 "name": "Cable Hip Abduction",
                 "videoUrl": null,
                 "note": "You held this at the same setting all last cycle and only ever rated it 8 when I'd asked for 9 — there's a plate or two of headroom sitting unused here.",
@@ -1124,70 +1215,6 @@
                   ],
                   "bad": [
                     "Leaning away or swinging the leg with momentum"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Lateral Raise",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  {
-                    "label": "constant tension",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×15 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-1"
-                  },
-                  {
-                    "label": "RPE 9"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Lead with the elbow out to shoulder height",
-                    "Feel the side delt under tension the whole way through"
-                  ],
-                  "bad": [
-                    "Letting the cable drag your arm back down"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Face Pull",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×20 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-1-1-0"
-                  },
-                  {
-                    "label": "RPE 8"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Pull the rope toward your eyes and split the ends apart at the finish",
-                    "Feel the rear delts and the muscles between the blades working"
-                  ],
-                  "bad": [
-                    "Letting the elbows drop and turning it into a straight row"
                   ]
                 }
               }
@@ -1372,8 +1399,8 @@
       },
       {
         "icon": "🎯",
-        "title": "Shoulders On Every Day Now",
-        "body": "<p>You asked for more shoulder work, and your logs agreed with you — last cycle your delts got trained about a third as much as your glutes did.</p><p>So the program changes shape. <strong>Every single day now has direct shoulder work in it:</strong></p><ul><li><strong>Day 1</strong> — machine pressing, plus your cable lateral raise</li><li><strong>Day 2</strong> — a rear-delt raise once the glute work is done</li><li><strong>Day 3</strong> — dumbbell pressing, side delts and rear delts</li><li><strong>Day 4</strong> — lateral raises and face pulls to finish</li></ul><p>Side-delt volume is up, rear-delt volume has doubled, and the pressing has doubled. <strong>Whichever days you get to, your shoulders get trained.</strong></p>"
+        "title": "Two Full Days On Your Shoulders",
+        "body": "<p>You asked for more shoulder work, and your logs agreed with you — last cycle your delts got trained about a third as much as your glutes did.</p><p>So <strong>Day 1 and Day 3 are both shoulder days now</strong>, and they come at the muscle from different directions:</p><ul><li><strong>Day 1</strong> — machine pressing, your cable lateral raise, and rear-delt work</li><li><strong>Day 3</strong> — pressing overhead with dumbbells, lateral raises, and two different rear-delt movements</li></ul><p>Side-delt and rear-delt volume are both up sharply and the pressing has doubled. And <strong>Day 1 is the session you never miss</strong> — so the muscle you care about most now sits on the day you're most likely to train.</p>"
       },
       {
         "icon": "🩸",
@@ -1393,7 +1420,7 @@
       {
         "icon": "🔄",
         "title": "A Short Session Still Counts",
-        "body": "<p>Last cycle had a month in it where training stopped. You've told me why, and I'm not going to treat a stretch like that as a discipline problem — it wasn't. But I'd rather build the plan so it survives the next hard week than hope there won't be one.</p><p>So here's what you're allowed to do, officially:</p><ul><li><strong>Any order.</strong> The four days don't have to run 1-2-3-4. Do whichever one fits the day you're having.</li><li><strong>Short on time?</strong> The warm-up plus the first two exercises is a real session. Log it and go home — that's not half a workout, that's the workout.</li><li><strong>Rough day?</strong> Drop every RPE on the card by one and train lighter. Turning up light beats not turning up.</li><li><strong>Two days instead of four?</strong> Still a training week. Your shoulders are worked on every single day of this program precisely so a short week still moves you forward.</li></ul><p>The one thing I'd ask: <strong>if you know you're going to be off for a while, send me a message.</strong> I can shrink the plan to two days a week, or park it properly until you're ready — so you come back to something that fits, instead of something you feel behind on.</p>"
+        "body": "<p>Last cycle had a month in it where training stopped. You've told me why, and I'm not going to treat a stretch like that as a discipline problem — it wasn't. But I'd rather build the plan so it survives the next hard week than hope there won't be one.</p><p>So here's what you're allowed to do, officially:</p><ul><li><strong>Any order.</strong> The four days don't have to run 1-2-3-4. Do whichever one fits the day you're having.</li><li><strong>Short on time?</strong> The warm-up plus the first two exercises is a real session. Log it and go home — that's not half a workout, that's the workout.</li><li><strong>Rough day?</strong> Drop every RPE on the card by one and train lighter. Turning up light beats not turning up.</li><li><strong>Two days instead of four?</strong> Still a training week. Day 1 is your shoulder day and Day 2 is your glute day — those two on their own cover both of your goals.</li></ul><p>The one thing I'd ask: <strong>if you know you're going to be off for a while, send me a message.</strong> I can shrink the plan to two days a week, or park it properly until you're ready — so you come back to something that fits, instead of something you feel behind on.</p>"
       },
       {
         "icon": "🩺",

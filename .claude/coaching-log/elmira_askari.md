@@ -18,7 +18,6 @@ from the shipped file + session data in the C2 read below, not from a C1 entry.)
 | Cable Lateral Raise | Active | C2 | **athlete favourite — do not rotate out** (Amir, 2026-07-27). Ran RPE 10 vs prescribed 9 in C1; load reset |
 | Dumbbell Lateral Raise | Active | C2 | kept by isolation-slot exception (no third lateral-raise option in the library); 5 kg was too heavy in C1 |
 | Machine Reverse Fly | Active | C2 | kept by isolation-slot exception; 3→4 sets |
-| Cable Face Pull | Active | C2 | kept by isolation-slot exception; reps 15→20, load must move |
 | Cable Hip Abduction | Active | C2 | kept by isolation-slot exception; 3→4 sets, RPE enforced at 9 |
 | 45° Back Extension | Active | C2 | now the trunk-supported hinge with the barbell RDL gone; bodyweight → loaded |
 | Bent-Over Dumbbell Rear Delt Raise | Active | C2 | fresh |
@@ -30,6 +29,10 @@ from the shipped file + session data in the C2 read below, not from a C1 entry.)
 | Barbell Romanian Deadlift | Available | C1 | not banned — capped at 20 kg grinding RPE 9–10. Revisit once the DB version loads cleanly |
 | Dumbbell Bulgarian Split Squat | Available | C1 | RPE 9/9/10 with reps falling 10→8 on one exposure; re-earn after the split squat progresses |
 | Barbell Chest Press | Available | C1 | dropped on principle (posture client → horizontal press low/omitted), not on dislike |
+| Machine Leg Press | Active | C2 | fresh — second quad primary on D4, added for the ≥10 floor |
+| Machine Leg Extension | Active | C2 | fresh — quad isolation on D2, added for the ≥10 floor |
+| Machine Seated Leg Curl | Active | C2 | fresh — hamstring work on D4; distinct from the lying version on D2 |
+| Cable Face Pull | Available | C2 | rotated out mid-design to free a D4 slot; rear delts still 12 sets |
 | Cable Row / Cable Glute Kickback / Dumbbell Bicep Curl / Seated Machine Hip Abduction | Available | C1 | ordinary rotation |
 | **Cable Pallof Press** | **Disliked** | C1 | **"doesn't feel them"** (Amir, 2026-07-27). Do not reintroduce anti-rotation work |
 | **Dead Bug** | **Disliked** | C1 | same reason — she skipped all 3 sets on 2026-06-16. Avoid even as a warm-up item |
@@ -143,20 +146,25 @@ All C2-programmed exercises → Active. Cable Lateral Raise carries a standing d
 
 **Volume & Dose**
 
-| Muscle | sets/wk (C1 → C2) | goal | verdict |
-|---|---|---|---|
-| Side delts | 6 → **15** (11 direct) | 10–20 | developing — the point of the cycle |
-| Rear delts | 6 → **15** (13 direct) | 10–20 | developing; top of band, all low-cost, spread 3–4/day |
-| Front delts / press | 4 → **8** | 6–12 | developing |
-| Glutes | 17 → **16** | 12–20 | developing — held, not cut |
-| Back | 11 → **11** | 8–14 | maintaining by design; wasn't the deficit |
-| Hamstrings | ~7 → **7.5** | 6–12 | developing |
-| Quads | ~7 → **5.5** | 6–12 | maintenance by-design (secondary to the physique goal) |
-| Core | 6 → **12** | 8–16 | developing |
+| Muscle | sets/wk (C1 → C2) | direct | goal | verdict |
+|---|---|---|---|---|
+| Side delts | 6 → **15** | 11 | 10–20 | developing — the point of the cycle |
+| Rear delts | 6 → **12** | 10 | 10–20 | developing |
+| Front delts / press | 4 → **8** | 8 | 6–12 | developing |
+| Back | 11 → **11** | 11 | 8–14 | maintaining by design; wasn't the deficit |
+| **Glutes** | 17 → **17.5** | 11 | 10–20 | developing |
+| **Hamstrings** | 7 → **11.5** | 10 | 10–20 | developing — clears the women's lower-body floor |
+| **Quads** | 7 → **11.5** | 10 | 10–20 | developing — clears the women's lower-body floor |
+| Biceps | 3 → **3** | 3 | 3–10 | maintenance, low priority |
+| Core | 6 → **12** | 12 | 8–16 | developing |
 
-Per-day cost-weighted load: **D2 21 (peak) · D1 20 (peak) · D3 17 (moderate) · D4 14 (low)** —
-undulated, no two same-pattern peaks back-to-back (D1 upper / D2 lower). Time budget
-**54 / 54 / 53 / 47 min**, six working exercises per day, no cap breach and no dead headroom.
+Per-day cost-weighted load: **D2 23 (peak) · D1 20 · D4 18.5 · D3 17** — no two same-pattern
+peaks back-to-back (D1 upper / D2 lower). Time budget **54 / 62 / 53 / 56 min**; six working
+exercises on the upper days, seven on the lower days after the volume correction below. D4's
+glute total sits at exactly 10 sets — at the per-session ceiling, not over it. The undulation is
+flatter than the ideal one-peak/one-low shape: clearing a 10-set floor on three lower-body
+muscles across only two lower days necessarily loads both. Accepted — she has no session cap
+(her C1 sessions ran 42–88 min, D2 averaging 72), and the alternative was breaching the floor.
 
 **Progression levers** — Hip Thrust: load; +2.5–5 kg when all 8 land ≤RPE 9. Machine Shoulder
 Press: rebuild to 5 plates, then +1 plate at ≤RPE 8. Lat Pulldown: +1 plate at ≤RPE 8 (she's
@@ -196,6 +204,68 @@ adherence, and this confirms rather than revises it. Three athlete-facing edits:
    flat" would have read as *nothing explains why you're tired* to someone who had just been
    through a hard few months. Now states the panel rules out a physiological cause, acknowledges
    a hard stretch does this on its own, and keeps the vitamin D as the concrete fixable thing.
+
+### Volume correction · 2026-07-27 (Amir — women's lower-body floor)
+
+The cycle first shipped with **quads at 5.5 and hamstrings at 7.5 sets/week**, both written up as
+"maintenance by design" on the grounds that legs aren't her headline goal. Amir rejected that:
+**for women, every major lower-body muscle clears ≥10 working sets/week — a hard rule** unless
+there's a genuinely good stated reason. Now a standing principle
+(COACHING-PRINCIPLES.md → Volume & dosing). My error was reading the 10–20 range as a band to
+approach from below rather than a floor to clear.
+
+Fixed by adding volume to the two lower days, all three movements **fresh** (Amir asked for
+variety against C1), placed on the days with load headroom:
+
+- **D2** — Machine Lying Leg Curl 3 → **4 sets**; **Machine Leg Extension 3×15 @8** added (fresh
+  quad isolation, ×0.5 systemic cost, so the peak day absorbs it cheaply).
+- **D4** — **Machine Leg Press 3×12 @8** added as a second Primary (fresh; C1 used Hack Squat, so
+  this is a new machine, and D4 had only one primary). **Machine Seated Leg Curl 3×12 @8** added
+  (fresh, and genuinely distinct from the lying version on D2 — hip-flexed vs hip-extended).
+- **Cable Face Pull removed from D4** to hold the day at seven working exercises. Rear delts drop
+  15 → 12 (10 direct), still comfortably inside 10–20, and D4 keeps its delt slot via the Cable
+  Lateral Raise, so the delts-on-every-day structure is intact.
+
+Result: **quads 11.5 · hamstrings 11.5 · glutes 17.5**, all clearing the floor. Cost of the fix is
+the flatter undulation and longer lower days documented in the Volume & Dose section above.
+
+### Structural correction · 2026-07-27 (Amir — two rules I broke)
+
+Amir caught two things, both now standing principles:
+
+1. **Cable Lateral Raise appeared on Day 1 AND Day 4.** One exercise per cycle, full stop
+   (COACHING-PRINCIPLES → Exercise selection). I'd duplicated it to reach a side-delt number
+   because the library only holds two lateral-raise variants.
+2. **Upper-body work was sitting on both lower days** — Incline Y-T-W Raise on D2, Cable Lateral
+   Raise on D4. A day trains what it says it trains (COACHING-PRINCIPLES → Session structure).
+
+Both came from the same mistake: I invented "delts on all four days" as adherence insurance for an
+athlete who skips her back-half days, and paid for it by contaminating the split and duplicating a
+movement. **The insurance was also largely redundant** — D1 is already a shoulder day and it's the
+one session she never misses. The legitimate mechanisms for that problem are **day order** (the
+priority day goes first) and the short-week card, both of which this cycle already has.
+
+Fix — the delt volume moved onto the two upper days rather than being lost:
+
+- **D1** Cable Lateral Raise 4 → **5 sets**; keeps Bent-Over DB Rear Delt Raise.
+- **D3** Dumbbell Lateral Raise 4 → **5 sets**; **Incline Y-T-W Raise relocated here** from D2,
+  alongside Machine Reverse Fly.
+- **D2 and D4 are now purely lower-body.**
+
+Volume held: **side delts 14 (10 direct) · rear delts 12 (10 direct)**, all lower-body muscles
+still clear the ≥10 floor. Per-day load **20.5 / 21.5 / 19 / 17**, times **56 / 57 / 60 / 51** —
+better balanced than before the fix. D3 carries 7 working exercises; its peak single-muscle load is
+9 sets (rear delts), under the ~10 per-session ceiling.
+
+Two notes cards were rewritten because the restructure made them false: "Shoulders On Every Day
+Now" → **"Two Full Days On Your Shoulders"** (and it now names D1 as the session she never misses,
+which is the honest version of the adherence argument), and the short-week card's "shoulders are
+worked every single day" line → "Day 1 is your shoulder day and Day 2 is your glute day — those two
+on their own cover both of your goals."
+
+**Lint extended** with both rules, plus a check that notes cards can't reference unprogrammed
+exercises. Verified non-vacuous: run against the prior commit it fails with exactly the three
+violations Amir found.
 
 **Verification** — design audited against three lenses inline (clinical/injury · house-rules
 compliance lint vs COACHING-PRINCIPLES + `exercise_library.json` · dose & time-budget), not via
