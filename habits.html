@@ -275,6 +275,40 @@
   }
   .pipkey .pips { flex: none; }
 
+  /* A figure with its unit set inside it, rather than welded on at full size. */
+  .statnum { font-size: 26px; line-height: 1; letter-spacing: -.02em; }
+  .statnum .su { font-size: 13px; color: var(--muted-soft); margin-left: 2px; letter-spacing: 0; }
+
+  /* Today's cell in the 35-day grid, and the key that says which end is which. */
+  .grid35 .c.now { outline: 2px solid var(--clay-deep); outline-offset: 1px; }
+  .gridkey {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-soft);
+  }
+  .gridkey .gk { display: flex; align-items: center; gap: 5px; }
+  .gridkey .gk .c {
+    width: 9px; height: 9px; display: inline-block; flex: none;
+    border: 1px solid var(--rule); background: none; margin-left: 4px;
+  }
+  .gridkey .gk .c:first-child { margin-left: 0; }
+  .gridkey .gk .c.hit { background: var(--accent); border-color: var(--accent); }
+  .gridkey .gk .c.part { background: var(--accent-100); border-color: var(--accent); }
+
+  /* ── The manual ──────────────────────────────────────────────────────────
+     A dozen sections of prose. Without a way in it is a wall you scroll past
+     rather than a reference you use. */
+  .manh2 { font-size: 22px; line-height: 1; margin-bottom: 10px; scroll-margin-top: 8px; }
+  .manp { font-size: 14px; line-height: 1.62; color: var(--ink); margin-bottom: 12px; }
+  .mancontents { border-bottom: 2px solid var(--divider); }
+  .manlinks { display: flex; flex-wrap: wrap; gap: 6px; }
+  .manlink {
+    border: 1px solid var(--divider); background: none; color: var(--ink);
+    padding: 7px 10px; text-align: left;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 12px; letter-spacing: .03em; text-transform: uppercase; line-height: 1;
+  }
+  .manlink:hover { border-color: var(--accent); color: var(--accent); }
+
   /* Board chrome, compressed. */
   .boardbar {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -505,7 +539,11 @@
     letter-spacing: .1em; text-transform: uppercase; animation: lvUp .45s ease .9s both;
   }
   .lvwrap.rank .lvgo { color: var(--clay); }
-  .lvqueue { position: absolute; bottom: 22px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .16em; color: rgba(250,247,242,.6); }
+  /* Was pinned to the bottom of the viewport, which stranded it ~340px below
+     the button under a band of empty clay and made the stack read top-heavy.
+     It belongs with the button it describes: "Next" only means something if
+     you can see there is a next. */
+  .lvqueue { margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .16em; color: rgba(250,247,242,.6); }
 
   /* A third ground for the things that are NOT a level: consistency tiers,
      milestones and a perfect day. Deep green with clay-2 rays, so an athlete
@@ -531,6 +569,8 @@
   /* The streak was the smallest type in the row and the most motivating number
      in it. It now reads as a figure with a unit rather than "9D". */
   .hlv .ember { font-size: 11px; }
+  /* The ember used to sit after "LV 10" and carried a left margin for it. */
+  .hlv .ember:first-child { margin-left: 0; }
   .hlv .ember .u { font-size: 8px; opacity: .75; margin-left: 1px; }
 
   /* Cross-link back to the training programme — the other half of the pair.
@@ -2665,7 +2705,10 @@ function renderApp() {
                 : [today().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + ' · Day ' + dayNumber(), greeting()],
     // Not the level — the strip immediately below the header already says it.
     progress: [seasonName() + ' · day ' + dayNumber(), 'Progress'],
-    detail:   [openH.source, openH.name],
+    // openH.source was the eyebrow, so most habits announced themselves as
+    // "MANUAL" — which reads as the manual, the document in Settings. The goal
+    // is what an athlete actually wants reminding of at the top of the screen.
+    detail:   [openH.goal || openH.source, openH.name],
     board:    LB.view === 'roll'
                 ? ['One sentence each, past 7 days', 'Roll call']
                 : [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
@@ -2675,11 +2718,12 @@ function renderApp() {
   };
   const rights = {
     today: pct + '% DONE', progress: '',   // the stat grid states the badge count
-    detail: 'LV ' + habitLevel(openH).lv,
+    detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
+                     return s > 0 ? s + ' DAY' + (s === 1 ? '' : 'S') + ' RUNNING' : ''; })(),
     board: LB.view === 'roll'
              ? (RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length || '') && RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length + ' IN TODAY'
              : (LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : ''),
-    ranks: 'LV ' + overallLevel().lv,
+    ranks: '',                              // the hero says the level already
     settings: ''
   };
   const head = heads[UI.screen] || heads.today;
@@ -2849,8 +2893,16 @@ function habitRow(h, from) {
     <button class="body" ${on(() => openHabit(h.id, from))}>
       <span class="line1">
         <span class="nm">${esc(h.name)}</span>
+        <!-- One fact, the most interesting one available. "LV 10" sat on five
+             of eight rows at once and told you nothing at a glance; the run is
+             the number nobody wants to lose. Levels still announce themselves
+             the moment they change, via the flash chip, which is when they
+             actually matter — and Progress and the detail screen both carry
+             the level permanently. -->
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
-                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}${st > 0 ? `<span class="ember" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span>` : ''}</span>`}
+                  : st > 0
+                    ? `<span class="hlv" data-k="hlv"><span class="ember" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span></span>`
+                    : `<span class="hlv" data-k="hlv">LV ${hl.lv}</span>`}
       </span>
       <span class="status">${esc(status)}</span>
       ${h.kind === 'count'
@@ -3083,11 +3135,6 @@ function renderProgress(LI, earned, totalAch) {
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
   const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
-  const statusOf = (h) => {
-    const v = valOf(TKEY(), h.id);
-    if (isDone(h)) return 'Done today';
-    return h.kind === 'count' ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + ' today' : 'Not done today';
-  };
   return `
     <div data-k="screen:progress" style="${screenAnim()}">
       <!-- Progress used to open with the SAME 76px level hero as Today, so two
@@ -3194,10 +3241,13 @@ function renderDetail(h) {
       val: hit ? 'HIT' : 'MISS', hit, xp: xpFor(h, v)
     });
   }
+  // Units sit inside the figure at a smaller size rather than being welded to
+  // it — "3D" as 24px caps read as a token, not as three days.
+  const unit = (n, u) => n + '<span class="su">' + u + '</span>';
   const stats = [
-    { v: habitWeek(h) + '/7',       k: 'Past 7 days' },
-    { v: habitBest(h) + 'd',        k: 'Best streak' },
-    { v: habitRate35(h) + '%',      k: '35-day rate' }
+    { v: unit(habitWeek(h), '/7'),          k: 'This week' },
+    { v: unit(habitBest(h), habitBest(h) === 1 ? 'day' : 'days'), k: 'Best streak' },
+    { v: unit(habitRate35(h), '%'),         k: 'Last 35 days' }
   ];
   const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h, AKEY());
   const v = valOf(AKEY(), h.id);
@@ -3236,25 +3286,41 @@ function renderDetail(h) {
         <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
           <span>Consistency</span><span>${con.tier} of ${con.total}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-          <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
-          <div style="font-size:12px;color:var(--muted);text-align:right">
-            ${con.next ? esc(con.next.name) + ' at ' + con.next.days + ' days · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong><br>best run ' + con.best + 'd'
-                       : 'UNBREAKABLE — every tier cleared'}
-          </div>
+        <!-- Was pips on the left and a right-aligned two-line block opposite
+             them, which left "best run 3d" orphaned against the right margin
+             and read as a layout accident. One column, one line each. -->
+        <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
+        <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">
+          ${con.next
+            ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at ' + con.next.days
+              + ' days in a row · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
+            : '<strong style="color:var(--ink)">UNBREAKABLE</strong> — every tier cleared.'}
+        </div>
+        <div style="font-size:12px;line-height:1.4;color:var(--muted-soft)">
+          Best run so far: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
         ${stats.map((s, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
-          <div class="hd" style="font-size:24px;line-height:1">${esc(s.v)}</div>
+          <div class="hd statnum">${s.v}</div>
           <div class="eyebrow" style="letter-spacing:.1em">${esc(s.k)}</div>
         </div>`).join('')}
       </div>
 
+      <!-- The grid had no anchoring at all: 35 identical squares with nothing
+           saying which one is today, so the empty leading row read as broken
+           rather than as "before you started". -->
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
-        <div class="eyebrow" style="letter-spacing:.12em">Last 35 days</div>
-        <div class="grid35">${cells.map((c, i) => `<div class="c ${c}" style="animation-delay:${(i * 0.011).toFixed(3)}s"></div>`).join('')}</div>
+        <div class="eyebrow" style="letter-spacing:.12em;display:flex;justify-content:space-between">
+          <span>Last 35 days</span><span>${habitRate35(h)}% hit</span>
+        </div>
+        <div class="grid35">${cells.map((c, i) => `<div class="c ${c}${i === cells.length - 1 ? ' now' : ''}" style="animation-delay:${(i * 0.011).toFixed(3)}s"></div>`).join('')}</div>
+        <div class="gridkey">
+          <span>Five weeks ago</span>
+          <span class="gk"><i class="c hit"></i>hit <i class="c part"></i>part <i class="c"></i>none</span>
+          <span>Today</span>
+        </div>
       </div>
 
       <div>
@@ -3466,12 +3532,29 @@ function renderManual() {
   const perfectDay = live().reduce((s, h) => s + Math.round(baseXp(h) * XP_RULES.completionBonus), 0);
   const cum = (L) => { let s = 0; for (let n = 1; n < L; n++) s += levelCost(XP_RULES.base, n); return s; };
   const water = habitById('water'), steps = habitById('steps');
-  const h2 = (t) => `<div class="hd" style="font-size:22px;line-height:1;margin-bottom:10px">${t}</div>`;
-  const p = (t) => `<p style="font-size:13.5px;line-height:1.6;color:var(--muted);margin-bottom:12px">${t}</p>`;
+  // Each heading carries an id so the contents list at the top can jump to it.
+  // The manual is a dozen sections of prose; without a way in it is a wall you
+  // scroll past rather than a reference you use.
+  const slug = (t) => 'man-' + t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const h2 = (t) => `<div class="hd manh2" id="${slug(t)}">${t}</div>`;
+  // Body copy is ink, not muted. Muted is right for a caption and wrong for
+  // four hundred words you are meant to actually read.
+  const p = (t) => `<p class="manp">${t}</p>`;
   const block = (inner) => `<div class="block" style="display:flex;flex-direction:column">${inner}</div>`;
+  const jump = (t) => `<button class="manlink" ${on(() => {
+    const el = document.getElementById(slug(t));
+    if (el) el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+  })}>${esc(t)}</button>`;
+  const CONTENTS = ['The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
+                    'How to earn more', 'Levels and ranks', 'Consistency', 'Quests', 'Seasons',
+                    'The leaderboard', 'Your data'];
 
   return `
     <div data-k="screen:manual" style="${screenAnim()}">
+      <div class="block mancontents" data-k="mancontents">
+        <div class="eyebrow" style="letter-spacing:.12em;margin-bottom:10px">Contents</div>
+        <div class="manlinks">${CONTENTS.map(jump).join('')}</div>
+      </div>
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
