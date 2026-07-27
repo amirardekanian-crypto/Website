@@ -46,6 +46,13 @@ social layer**: the roll-call composer, the wall, the leaderboard and joining/re
 It opens on Roll Call, with the leaderboard as the second view. Today keeps a one-line
 *pointer* to Crew (not a second composer) that disappears once the athlete has written.
 
+**Installed, the app is called `AA Proof`.** The name lives in three places that must
+move together: `manifest.name`, `manifest.short_name` and the `apple-mobile-web-app-title`
+meta (iOS labels the home-screen icon from the meta and ignores the manifest). The offer
+is a sheet fired **once, after the athlete's first log** — never on arrival — with a
+permanent Settings row as the way back. iOS gets instructions, not a button:
+`beforeinstallprompt` is Chromium-only.
+
 **Two words, one job each — do not invent a third.** A **run** is consecutive days on
 *one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
 `streakQualifyPct` of everything they track ("2-day streak"). The app once used five

@@ -7,6 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- iOS labels a home-screen icon from THIS meta, not from the manifest. Without
+     it the icon would read "Proof — AA Performance" (the <title>) and be
+     truncated to something meaningless. Keep it in step with manifest.name. -->
+<meta name="apple-mobile-web-app-title" content="AA Proof">
 <meta name="theme-color" content="#FAF7F2">
 <title>Proof — AA Performance</title>
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -25,7 +29,7 @@
         (clientKey ? '&key=' + encodeURIComponent(clientKey) : '')
       : 'habits.html';
     var manifest = {
-      name: "Proof", short_name: "Proof",
+      name: "AA Proof", short_name: "AA Proof",
       description: "Daily health habits, tracked and coached.",
       start_url: startUrl, scope: "/", display: "standalone", orientation: "portrait",
       background_color: "#FAF7F2", theme_color: "#FAF7F2", lang: "en-GB",
@@ -1260,12 +1264,12 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
-             day:null, note:null, noteBusy:false, backTo:'today' };
+             day:null, note:null, noteBusy:false, backTo:'today', install:false };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
-  return { v:3, on, custom:[], onboarded:false, dark:false, seen:null, rulesSig:null,
+  return { v:3, on, custom:[], onboarded:false, installAsked:false, dark:false, seen:null, rulesSig:null,
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0 };
@@ -2051,6 +2055,81 @@ function checkUnlocks() {
 }
 function dismissCelebration() { UI.celebrate.shift(); haptic('tick'); render(); }
 
+// ── Add to home screen ────────────────────────────────────────────────────
+// Offered ONCE, and deliberately not on arrival. A pop-up before the app has
+// done anything is a stranger asking for a place on your phone; straight after
+// the first thing they log, it is "keep this" — and the manifest's start_url
+// carries their client+key, so the installed icon is *their* app, not a login
+// screen. A Settings row keeps it reachable for anyone who says no.
+//
+// beforeinstallprompt is Chromium-only. iOS Safari has no such event and no way
+// to trigger the OS sheet from script, so there the offer is instructions.
+let deferredInstall = null, _installTimer = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function isIOS() {
+  // iPadOS 13+ reports itself as a Mac; the touch-point count is what separates
+  // a real iPad from a desktop Safari.
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+// Already installed, or a shared demo nobody should be pinning to a home screen.
+function installable() { return !window.IS_DEMO && !isStandalone(); }
+
+function maybeOfferInstall() {
+  if (!installable() || !CFG || CFG.installAsked || _installTimer) return;
+  _installTimer = setTimeout(() => {
+    _installTimer = null;
+    // Never on top of something else. A celebration is the moment they came for,
+    // the log sheet is a task in progress, and any other screen means they went
+    // somewhere on purpose.
+    if (!installable() || CFG.installAsked || UI.celebrate.length || UI.sheet ||
+        UI.screen !== 'today' || UI.install) return;
+    UI.install = true;
+    render();
+  }, 1500);
+}
+function closeInstall() { UI.install = false; CFG.installAsked = true; saveCfg(); render(); }
+async function doInstall() {
+  const p = deferredInstall;
+  deferredInstall = null;
+  closeInstall();
+  if (!p) return;
+  p.prompt();
+  await p.userChoice.catch(() => {});
+}
+// The sheet is the app's own modal language — same scrim, same slide-up, same
+// left edge. The icon and the name are the real ones, so what they are agreeing
+// to is what they will find on their home screen.
+function renderInstall() {
+  const ios = isIOS(), canPrompt = !!deferredInstall;
+  return `
+    <div class="scrim" data-k="scrim:install" ${on(() => closeInstall())}></div>
+    <div class="sheet" data-k="sheet:install">
+      <div style="display:flex;align-items:center;gap:13px">
+        <!-- Width and height inline: a stale CSS cache has blown an unsized
+             lockup up to full width on this site before. -->
+        <img src="/assets/img/icon-192.png" alt="" width="54" height="54"
+             style="width:54px;height:54px;flex:none;display:block;border:1px solid var(--rule)">
+        <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <span class="hd" style="font-size:23px;line-height:1">AA Proof</span>
+          <span class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">On your home screen</span>
+        </span>
+      </div>
+      <div style="font-size:13.5px;line-height:1.55">
+        ${ios
+          ? `Tap <strong style="color:var(--ink)">Share</strong> in the browser bar, then <strong style="color:var(--ink)">Add to Home Screen</strong>.`
+          : `One tap to today, and it keeps working with no signal.`}
+        Nothing to download — it is this, kept where you can reach it.
+      </div>
+      ${canPrompt ? `<button class="btn btn-primary btn-block" ${on(() => doInstall())}>Add to home screen</button>` : ''}
+      <button class="btn btn-secondary btn-block" ${on(() => closeInstall())}>${canPrompt ? 'Not now' : (ios ? 'Got it' : 'Close')}</button>
+    </div>`;
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────
 function toast(text) {
   UI.toast = text; render();
@@ -2066,6 +2145,9 @@ function setVal(id, v) {
   if (!LOG[k]) LOG[k] = {};
   LOG[k][id] = Math.max(0, Math.min(v, capFor(habitById(id))));
   saveLog();
+  // The one door into the log is also the only place that knows they have just
+  // used the app for real — which is the moment to ask about the home screen.
+  maybeOfferInstall();
 }
 function toggleHabit(h) {
   // A locked habit is owned by another system — the athlete cannot claim it by
@@ -2888,6 +2970,7 @@ function renderApp() {
     </div>
     <div id="fx" data-k="fx" data-static></div>
     ${UI.sheet ? renderSheet() : ''}
+    ${UI.install ? renderInstall() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast" data-k="toast">${esc(UI.toast)}</div>` : ''}
     ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
 }
@@ -3716,7 +3799,8 @@ function renderManual() {
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
-        p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`))}
+        p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
+        p(`<strong style="color:var(--ink)">Put it on your home screen</strong> and it opens in one tap, looks like any other app and keeps working with no signal. ${isIOS() ? 'Tap Share in the browser bar, then Add to Home Screen.' : 'There is a row for it in Settings.'} There is nothing to download — it is this page, kept somewhere you can reach it.`))}
 
       ${block(h2('Forgot to log a day?') +
         p(`Use the row of days at the top of Today. You can go back <strong style="color:var(--ink)">${BACKFILL_DAYS} days</strong> and fill in or correct anything you missed — each day shows how much of it you completed, so it is easy to spot the one you forgot.`) +
@@ -4071,6 +4155,17 @@ function renderSettings() {
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
+      <!-- The way back to an offer they declined, and the only route for anyone
+           on a new phone. Gone once the app is installed, where it would be a
+           row that does nothing. -->
+      ${installable() ? `
+      <button class="selrow" data-k="row:install" ${on(() => { UI.install = true; render(); })}>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">Add to home screen</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Open it in one tap, and keep it working with no signal</span>
+        </span>
+        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+      </button>` : ''}
 
       ${sectionLabel('Your training')}
       <button class="selrow" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>
@@ -4262,6 +4357,14 @@ function showError(msg) {
   // Last-ditch attempt on the way out; keepalive is not available through the
   // client library, so this is best effort on top of the durable dirty flag.
   window.addEventListener('pagehide', () => { if (SYNC.dirty) pushNow(); });
+  // Registered here rather than beside beforeinstallprompt: it touches CFG,
+  // which does not exist until boot has run.
+  window.addEventListener('appinstalled', () => {
+    deferredInstall = null;
+    UI.install = false;
+    CFG.installAsked = true; saveCfg();
+    render();                       // drops the Settings row — it has no job now
+  });
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();
 </script>

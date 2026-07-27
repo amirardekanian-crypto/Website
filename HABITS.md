@@ -49,6 +49,29 @@ app stays inside the app shell — no browser bounce, no second install. Each ha
 passes the client id and the resolved key, because an installed PWA often opens
 without `&key=` in the URL.
 
+### Putting it on the home screen — **AA Proof**
+
+Proof carries its own manifest, built at load so `start_url` bakes in the athlete's
+`?client=…&key=…`. The installed icon is therefore **their** app, not a login screen.
+The app is called **AA Proof** in three places that must stay in step: `manifest.name`,
+`manifest.short_name`, and the `apple-mobile-web-app-title` meta — iOS labels a
+home-screen icon from that meta and ignores the manifest, so without it the icon would
+read `Proof — AA Performance` truncated to nothing.
+
+The offer is a sheet, and **it is not shown on arrival**. It fires once, ~1.5s after the
+athlete logs their **first** habit — `setVal()` is the one door into the log, so that is
+where it hooks. Before anything has happened it is a pop-up from a stranger; straight
+after the first tick it is *keep this*. It stands down for a celebration, the log sheet,
+any screen other than Today, demo mode, and an app already running standalone. Saying
+*Not now* sets `CFG.installAsked` and it never asks again — **Settings keeps a permanent
+row**, which is also the only route for someone on a new phone. The row disappears once
+the app is installed, where it would do nothing.
+
+`beforeinstallprompt` is Chromium-only: there the sheet has a real **Add to home screen**
+button wired to the deferred prompt. iOS Safari has no such event and no way to open the
+OS sheet from script, so there it shows the instruction — *Share → Add to Home Screen* —
+and no button that could not work.
+
 ---
 
 ## Two kinds of user — coached, and free
