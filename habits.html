@@ -2079,6 +2079,22 @@ function isIOS() {
 // Already installed, or a shared demo nobody should be pinning to a home screen.
 function installable() { return !window.IS_DEMO && !isStandalone(); }
 
+// THE MOST LIKELY WAY AN ATHLETE FIRST OPENS THIS APP is by tapping the link in
+// a WhatsApp message — so the first screen they ever see is inside WhatsApp's
+// own browser, not Safari or Chrome. In-app browsers cannot add anything to a
+// home screen: some have no share sheet at all, and the ones that do leave
+// "Add to Home Screen" out of it. Telling them to "tap Share" there sends them
+// looking for a button that is not on their phone.
+//
+// Detection is best-effort — these UA markers are reliable for the apps that
+// matter (Instagram, Facebook, WhatsApp on Android), and the iOS copy carries a
+// fallback line for the ones that hide, because a WKWebView can look like plain
+// Safari.
+function inAppBrowser() {
+  const ua = navigator.userAgent || '';
+  return /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|LinkedInApp|MicroMessenger|Twitter/i.test(ua);
+}
+
 function maybeOfferInstall() {
   if (!installable() || !CFG || CFG.installAsked || _installTimer) return;
   _installTimer = setTimeout(() => {
@@ -2105,7 +2121,22 @@ async function doInstall() {
 // left edge. The icon and the name are the real ones, so what they are agreeing
 // to is what they will find on their home screen.
 function renderInstall() {
-  const ios = isIOS(), canPrompt = !!deferredInstall;
+  const ios = isIOS(), canPrompt = !!deferredInstall, inApp = inAppBrowser();
+  // Three situations, three honest answers. Getting this wrong is worse than
+  // saying nothing: an instruction that names a button they do not have reads
+  // as "this app is broken", on the first screen they ever see.
+  const how = inApp
+    ? `You are inside another app's browser, which cannot do it. Open the menu
+       (<strong style="color:var(--ink)">&hellip;</strong> or
+       <strong style="color:var(--ink)">&#8942;</strong>) and choose
+       <strong style="color:var(--ink)">Open in ${ios ? 'Safari' : 'browser'}</strong>,
+       then try again from there.`
+    : ios
+      ? `Tap <strong style="color:var(--ink)">Share</strong> at the bottom of the screen, then
+         <strong style="color:var(--ink)">Add to Home Screen</strong>.
+         <span style="color:var(--muted)">Not seeing it? You are in another app's browser —
+         open this link in Safari first.</span>`
+      : `One tap to today, and it keeps working with no signal.`;
   return `
     <div class="scrim" data-k="scrim:install" ${on(() => closeInstall())}></div>
     <div class="sheet" data-k="sheet:install">
@@ -2120,13 +2151,11 @@ function renderInstall() {
         </span>
       </div>
       <div style="font-size:13.5px;line-height:1.55">
-        ${ios
-          ? `Tap <strong style="color:var(--ink)">Share</strong> in the browser bar, then <strong style="color:var(--ink)">Add to Home Screen</strong>.`
-          : `One tap to today, and it keeps working with no signal.`}
+        ${how}
         Nothing to download — it is this, kept where you can reach it.
       </div>
-      ${canPrompt ? `<button class="btn btn-primary btn-block" ${on(() => doInstall())}>Add to home screen</button>` : ''}
-      <button class="btn btn-secondary btn-block" ${on(() => closeInstall())}>${canPrompt ? 'Not now' : (ios ? 'Got it' : 'Close')}</button>
+      ${canPrompt && !inApp ? `<button class="btn btn-primary btn-block" ${on(() => doInstall())}>Add to home screen</button>` : ''}
+      <button class="btn btn-secondary btn-block" ${on(() => closeInstall())}>${canPrompt && !inApp ? 'Not now' : 'Got it'}</button>
     </div>`;
 }
 
