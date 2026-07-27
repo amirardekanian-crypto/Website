@@ -63,8 +63,21 @@ hand back a WhatsApp message with the link already in it.
 The difference between the two users is **one field** in `data/<id>.json`:
 
 ```json
-{ "athlete": { "id": "sara_karimi", "firstName": "Sara", "tier": "free" } }
+{ "athlete": { "id": "sara_karimi", "firstName": "Sara",
+               "boardName": "Sara K.", "tier": "free" } }
 ```
+
+…plus an optional `"boardName"` holding the name they typed on the form.
+
+**Signing someone up does not put them on the leaderboard.** They join themselves,
+from Crew, if and when they want to — which is what `privacy.html` promises and the
+only honest reading of a form field. `boardName` exists so that when they do, the box
+is already filled in with the name they chose. Two reasons this matters beyond the
+promise: `CFG.onBoard` is a **client** flag that is never read back from the server, so
+an auto-joined athlete would be listed on everyone else's board while their own screen
+said *"Not on the board"* and roll call refused them; and every signup would land on the
+board at 0 XP, including the ones who never open the link. A short board of people who
+are actually logging is worth more than a long one padded with zeros.
 
 `isFree()` is the only test in the app, and anything that is not `"free"` counts as
 coached — so no existing athlete file needs touching. In free mode:

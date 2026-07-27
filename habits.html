@@ -2338,7 +2338,12 @@ function programUrl() {
 }
 function goProgram() { window.location.href = programUrl(); }
 
+// `boardName` is the name a free signup typed on proof.html. Asking for a board
+// name is not the same as being on a board — nothing here joins them — but when
+// they do join, the box should already say what they asked for.
 function defaultDisplayName() {
+  const asked = (ATHLETE.boardName || '').trim();
+  if (asked) return asked.slice(0, 24);
   const f = (ATHLETE.firstName || 'Athlete').trim();
   const l = (ATHLETE.lastName || '').trim();
   return (l ? f + ' ' + l[0].toUpperCase() + '.' : f).slice(0, 24);
