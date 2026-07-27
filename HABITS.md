@@ -157,6 +157,19 @@ about standing, not about today.
 progress, a log button, its consistency ladder, this-week / best-streak / 35-day-rate
 stats, a 35-day grid, and the last five days with the XP each earned.
 
+Its header eyebrow is the habit's **goal**, not `h.source` — most habits are sourced
+`Manual`, so the screen used to announce itself as "MANUAL", which reads as *the manual*
+in Settings. The header's right slot carries the **current run**, not the level, because
+the hero directly beneath it is a 76px level. The **35-day grid marks today** and carries
+a key; without either it was 35 identical squares with no anchor, and the empty leading
+row read as broken rather than as "before you started".
+
+**A note on the habit-row badge.** A row shows the **run** when there is one and the
+level only when there isn't. `LV 10` sat on five of eight rows at once and told you
+nothing at a glance, while the run is the number nobody wants to lose. Levels still
+announce themselves the moment they change, through the flash chip — which is when they
+actually matter — and both Progress and the detail screen carry the level permanently.
+
 ### 03 · SETTINGS
 Profile · **The ranks** (the ladder, below) · **Read the manual** · link to the
 programme · sync status and a *Sync now* button · leaderboard status · dark mode ·
