@@ -8,11 +8,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- iOS labels a home-screen icon from THIS meta, not from the manifest. Without
-     it the icon would read "Proof — AA Performance" (the <title>) and be
+     it the icon would read "AA Proof — AA Performance" (the <title>) and be
      truncated to something meaningless. Keep it in step with manifest.name. -->
 <meta name="apple-mobile-web-app-title" content="AA Proof">
 <meta name="theme-color" content="#FAF7F2">
-<title>Proof — AA Performance</title>
+<title>AA Proof — AA Performance</title>
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 
@@ -3237,7 +3237,7 @@ function renderOnboarding() {
   return `
     <div data-k="onboarding" style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
       <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
-        <div class="hd" style="font-size:16px;line-height:1;letter-spacing:.02em">Proof</div>
+        <div class="hd" style="font-size:16px;line-height:1;letter-spacing:.02em">AA Proof</div>
         <div class="eyebrow">${nOn} tracked</div>
       </div>
       <div style="flex:1;display:flex;flex-direction:column;padding-top:26px;overflow:hidden;animation:riseIn .3s ease">
@@ -5222,7 +5222,7 @@ async function shareRankCard() {
     const blob = await buildRankCard();
     if (!blob) { toast('Could not build the card on this phone.'); return; }
     const file = new File([blob], 'proof-rank.png', { type: 'image/png' });
-    const text = LI.rank.label + ' · level ' + LI.lv + ' on Proof.';
+    const text = LI.rank.label + ' · level ' + LI.lv + ' on AA Proof.';
     // Share sheet where it exists (iOS and Android both do), download otherwise.
     if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
       await navigator.share({ files: [file], text: text });
@@ -5257,7 +5257,7 @@ function renderSettings() {
           <div class="hd" style="font-size:18px;line-height:1">${esc(ATHLETE_NAME || 'Athlete')}</div>
           <!-- A free athlete is not coached by anyone, and telling them they are
                is the first line of the first screen behind their own initials. -->
-          <div style="font-size:11px;line-height:1;color:var(--muted)">${isFree() ? 'Proof · free' : 'Coached by Amir'} · day ${dayNumber()}</div>
+          <div style="font-size:11px;line-height:1;color:var(--muted)">${isFree() ? 'AA Proof · free' : 'Coached by Amir'} · day ${dayNumber()}</div>
         </div>
       </div>
 
@@ -5500,7 +5500,7 @@ function showError(msg) {
   // changed XP system) only re-baselines, so nobody is ambushed by a queue.
   checkLevelUps();
   if (CFG.dark) document.body.setAttribute('data-dark', '');
-  document.title = 'Proof — ' + (ATHLETE.firstName || 'AA Performance');
+  document.title = 'AA Proof — ' + (ATHLETE.firstName || 'AA Performance');
 
   // An athlete who arrives with history owns whatever their level already
   // reached — silently, the same baselining every other unlock does, so opening

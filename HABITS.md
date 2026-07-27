@@ -20,7 +20,7 @@ Start here if you're picking this up in a fresh chat.
 
 ## The product in one breath
 
-**Proof** is a gamified daily habit tracker for Amir's coaching clients. The training
+**AA Proof** is a gamified daily habit tracker for Amir's coaching clients. The training
 programme (`program.html`) covers what happens in the gym; Proof covers the other
 twenty-three hours — sleep, steps, water, food, mobility, breathing, supplements.
 
@@ -50,14 +50,15 @@ app stays inside the app shell — no browser bounce, no second install. Each ha
 passes the client id and the resolved key, because an installed PWA often opens
 without `&key=` in the URL.
 
-### Putting it on the home screen — **AA Proof**
+### Putting it on the home screen
 
 Proof carries its own manifest, built at load so `start_url` bakes in the athlete's
 `?client=…&key=…`. The installed icon is therefore **their** app, not a login screen.
-The app is called **AA Proof** in three places that must stay in step: `manifest.name`,
+The app is called **AA Proof** everywhere on the site, and that name has to stay in
+step in three places specifically for the install identity: `manifest.name`,
 `manifest.short_name`, and the `apple-mobile-web-app-title` meta — iOS labels a
 home-screen icon from that meta and ignores the manifest, so without it the icon would
-read `Proof — AA Performance` truncated to nothing.
+read `AA Proof — AA Performance` truncated to nothing.
 
 The offer is a sheet, and **it is not shown on arrival**. It fires once, ~1.5s after the
 athlete logs their **first** habit — `setVal()` is the one door into the log, so that is

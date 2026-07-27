@@ -57,9 +57,14 @@ social layer**: the roll-call composer, the wall, the leaderboard and joining/re
 It opens on Roll Call, with the leaderboard as the second view. Today keeps a one-line
 *pointer* to Crew (not a second composer) that disappears once the athlete has written.
 
-**Installed, the app is called `AA Proof`.** The name lives in three places that must
-move together: `manifest.name`, `manifest.short_name` and the `apple-mobile-web-app-title`
-meta (iOS labels the home-screen icon from the meta and ignores the manifest). The offer
+**The app is called `AA Proof` everywhere on the site — not just once installed** (Amir,
+2026-07-27: "all over my website this is called AA Proof"). Use "AA Proof" in page titles,
+headings, body copy and docs; bare "Proof" is only correct as short-form inside a sentence
+that has already named it in full ("...Proof tracks the part nobody watches" reads fine
+right after an "AA Proof" heading). The name lives in three places that must move together
+for the PWA install identity specifically: `manifest.name`, `manifest.short_name` and the
+`apple-mobile-web-app-title` meta (iOS labels the home-screen icon from the meta and
+ignores the manifest). The offer
 is a sheet fired **once, after the athlete's first log** — never on arrival — with a
 permanent Settings row as the way back. iOS gets instructions, not a button:
 `beforeinstallprompt` is Chromium-only.
