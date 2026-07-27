@@ -10,8 +10,8 @@ Start here if you're picking this up in a fresh chat.
 > **⚠️ Keeping this honest.** When you change how the app works, these must move
 > together: **this file**, **`XP_SYSTEM.md`**, **`QUESTS.md`** (if you touched a quest),
 > and the **in-app manual**
-> (`renderManual()` in `habits.html`, which athletes read from Settings → *Read the
-> manual*). The manual reads its numbers straight from the live constants, so
+> (`renderManual()` in `habits.html`, which athletes reach from the initials button
+> top-right → *The manual*). The manual reads its numbers straight from the live constants, so
 > retuning XP never breaks it — but if you change *behaviour*, its prose needs
 > updating by hand. Same for `privacy.html` if you change what data is shared.
 
@@ -42,7 +42,7 @@ The two apps are **linked both ways**:
 | From | To | Where |
 |---|---|---|
 | `program.html` | Proof | **Daily Habits card** on Home *and* at the end of My Plan (a plain shortcut — it shows no level or XP, because that is Proof's job) |
-| Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings |
+| Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
 app stays inside the app shell — no browser bounce, no second install. Each handover
@@ -51,7 +51,14 @@ without `&key=` in the URL.
 
 ---
 
-## The four tabs
+## The three tabs
+
+`TODAY · PROGRESS · CREW`. **Settings is not a tab** — it lives behind the athlete's
+initials at the top-right of the header, and the same button becomes the way out of
+Settings, the manual and the ladder (none of which is a tab, so none has a tab to press
+to leave). The tab bar used to give Settings a quarter of the primary navigation for a
+screen an athlete opens three or four times ever, while the social layer — the thing that
+brings people back daily — was a chip inside a tab named after only half of what it held.
 
 ### 01 · TODAY — the daily loop
 The screen they actually live on. **In this order, and the order is the point:**
@@ -76,7 +83,8 @@ The screen they actually live on. **In this order, and the order is the point:**
    XP, with live progress and a countdown. **There are usually none**: quests only exist
    while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
    the point — seeing them means something is on.
-6. **Roll call** — the compose box for the day's one sentence. See *Roll call* below.
+6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
+   sentence is unwritten. The composer itself lives in CREW with its feed.
 7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
    weakest habit. The "recap" half.
 8. **The cross-link** back to the training programme.
@@ -100,7 +108,7 @@ a diary, not evidence.
 
 While an earlier day is selected the screen says so unmistakably (clay banner, the header
 title becomes the weekday, `· FILLING IN` in the eyebrow), and **the nudge and the roll
-call box stand down** — both are statements about *now*, and "drink three more glasses"
+call pointer stand down** — both are statements about *now*, and "drink three more glasses"
 is nonsense advice about last Saturday. Streaks, at-risk warnings and the perfect-day
 celebration stay anchored to the real today for the same reason. `AKEY()` self-heals: if
 the app is left open past midnight the window slides and it falls back to today rather
@@ -132,12 +140,12 @@ yet" rather than "this is dead".
 - **Leaving the board hides your lines** immediately, without deleting them. Re-joining
   brings them back.
 
-Read it on the **BOARD** tab, second view.
+Written and read in the **CREW** tab, which opens on it.
 
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
 
-**A slim level strip** (not a repeat of Today's hero — two of the four tabs used to open
+**A slim level strip** (not a repeat of Today's hero — two tabs used to open
 with the identical 76px level block) → **four season stats**: days logged, badges, day
 streak, perfect days → a one-line **key explaining the consistency pips**, which had no
 legend anywhere in the app and are empty for the first five days → **one row per habit**
@@ -170,8 +178,24 @@ nothing at a glance, while the run is the number nobody wants to lose. Levels st
 announce themselves the moment they change, through the flash chip — which is when they
 actually matter — and both Progress and the detail screen carry the level permanently.
 
-### 03 · SETTINGS
-Profile · **The ranks** (the ladder, below) · **Read the manual** · link to the
+### 03 · CREW — everyone else
+Opt-in only, and it holds the **whole** social layer. Two views, switched at the top:
+**Roll call** (the default) and **Leaderboard**.
+
+**Roll call** is the composer *and* the wall, in that order — you write at the top of the
+feed you are posting to. Behind it: the last seven days of one-sentence entries grouped
+by day, newest first, each line carrying the writer's display name, season rank and that
+day's completion. **Amir's own line leads its day** (clay left border, `YOUR COACH`).
+
+Roll call is the default because conversation rewards coming back and a ranking is a
+once-a-day glance. Today carries a **one-line pointer** into this tab that disappears
+once the athlete has written — a doorway, not a second composer.
+
+**Leaderboard** has two scopes: **this season** (the default) and **past week** (a rolling
+seven days, not a calendar week). Joining and renaming live with it.
+
+### Settings — behind the initials button
+Profile · **The ladder** · **The manual** · link to the
 programme · sync status and a *Sync now* button · leaderboard status · dark mode ·
 which habits are tracked (plus adding custom ones) · reset today's log.
 
@@ -198,23 +222,15 @@ one inherited colour, in `RANK_ART`. They escalate on purpose so the ladder read
 a glance: blocks being laid, then force, then machinery, then a burst. Anything with
 a curve or a rounded cap belongs to a different app.
 
-### 04 · BOARD
-Opt-in only. Two views, switched at the top: **Leaderboard** and **Roll call**.
-
-**Leaderboard** has two scopes: **this season** (the default) and **past week** (a rolling
-seven days, not a calendar week). See below.
+#### Inside the Crew tab
 
 Rows show **movement, not just standing**: a ▲/▼ chip against each name, and a green
 banner when the athlete has overtaken someone — *"You passed Bo and Cy since you last
 looked."* The server returns no history, so the last standing is remembered per scope
 on the device (`CFG.lbSeen`) and the next fetch is diffed against it.
 
-**Roll call** is the wall: the last seven days of one-sentence entries, grouped by day,
-newest first, each line carrying the writer's display name, season rank and that day's
-completion percentage. **Amir's own line leads its day** (clay left border, `YOUR COACH`)
-— set it with `select public.set_coach_note('…');`. A day reads top-down as *here is the
-brief, here is who answered*. Written on the TODAY tab; see *Roll call* above for the
-rules and the reasoning.
+Set the coach line with `select public.set_coach_note('…');`. A day reads top-down as
+*here is the brief, here is who answered*.
 
 **Moderation** is coach-only, in the Supabase SQL editor:
 
