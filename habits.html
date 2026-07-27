@@ -512,7 +512,11 @@
   .tourlay { position: fixed; inset: 0; z-index: 150; display: none; pointer-events: none; }
   .tourlay.on { display: block; }
   .tourmask, .tourblock { position: fixed; pointer-events: auto; }
-  .tourmask { background: var(--scrim); animation: fadeIn .2s ease; }
+  /* No animation by default. The panes are rebuilt once per step, so a fade on
+     the pane itself re-flashes the whole dimmer at every step — it is already
+     dark, and only the FIRST appearance is a transition worth showing. */
+  .tourmask { background: var(--scrim); }
+  .tourlay.opening .tourmask { animation: fadeIn .2s ease; }
   .tourring {
     position: fixed; pointer-events: none; border: 3px solid var(--clay);
     animation: tourPulse 1.7s ease-in-out infinite;
@@ -3464,15 +3468,25 @@ function startTour(back) {
   TOUR.i = 0;
   TOUR.on = true;
   TOUR.back = back || 'today';
+  _tourOpened = false;                         // the dimmer fades in once per run
   clearTimeout(_idleTimer);                    // nothing should breathe under the scrim
   const app = document.getElementById('app');
   if (app) app.addEventListener('click', tourTap, true);
   // Capture, so a scroll inside .scroll repositions the ring too — scroll does
   // not bubble, and the ring is drawn in viewport coordinates.
-  window.addEventListener('scroll', paintTour, true);
-  window.addEventListener('resize', paintTour);
-  window.addEventListener('orientationchange', paintTour);
+  window.addEventListener('scroll', tourReflow, true);
+  window.addEventListener('resize', tourReflow);
+  window.addEventListener('orientationchange', tourReflow);
   tourShow();
+}
+
+// Scroll fires per frame and can keep firing after the finger has gone, on
+// momentum. Coalesce to one reposition per frame, and reposition ONLY — never
+// rebuild. See the note on paintTour.
+let _tourRaf = 0;
+function tourReflow() {
+  if (!TOUR.on || _tourRaf) return;
+  _tourRaf = requestAnimationFrame(() => { _tourRaf = 0; if (TOUR.on) placeTour(); });
 }
 
 function endTour(finished) {
@@ -3481,9 +3495,10 @@ function endTour(finished) {
   CFG.toured = true; saveCfg();
   const app = document.getElementById('app');
   if (app) app.removeEventListener('click', tourTap, true);
-  window.removeEventListener('scroll', paintTour, true);
-  window.removeEventListener('resize', paintTour);
-  window.removeEventListener('orientationchange', paintTour);
+  window.removeEventListener('scroll', tourReflow, true);
+  window.removeEventListener('resize', tourReflow);
+  window.removeEventListener('orientationchange', tourReflow);
+  cancelAnimationFrame(_tourRaf); _tourRaf = 0;
   paintTour();                                  // tears the layer down
   if (UI.screen !== TOUR.back) go(TOUR.back); else render();
   if (finished) toast('That is the tour. It is in Settings if you want it again.');
@@ -3536,39 +3551,57 @@ function tourTap(ev) {
   setTimeout(() => { if (TOUR.on) tourGo(1); }, 700);
 }
 
+// PAINTING IS SPLIT IN TWO, AND THAT SPLIT IS THE WHOLE POINT.
+//
+//   paintTour()  — decides whether the layer should exist and, when the STEP
+//                  changes, builds its DOM once.
+//   placeTour()  — writes geometry onto those existing nodes. Never builds.
+//
+// It used to be one function that rebuilt the layer's innerHTML on every call,
+// and the scroll listener called it. `scrollIntoView({behavior:'smooth'})`
+// fires scroll ~20-25 times per step transition, and a phone keeps firing on
+// momentum after the finger has gone — so every step change tore down and
+// recreated the card and all four mask panes about 25 times. Measured: 2
+// intentional paints, 25 card rebuilds. Each rebuild restarted the card's
+// `riseIn` entrance animation and the panes' `fadeIn`, so the card visibly
+// re-entered and the dimmer re-faded, over and over. That is the "jumping and
+// ticking". Repositioning must never touch the DOM.
+let _tourKey = null, _tourCh = 0, _tourVW = 0, _tourOpened = false;
+
+function tourTeardown(lay) {
+  lay.className = 'tourlay';
+  lay.innerHTML = '';
+  _tourKey = null;
+}
+
 function paintTour() {
   const lay = document.getElementById('tour');
   if (!lay) return;
   const st = TOUR.on ? TOUR.steps[TOUR.i] : null;
   // Stand down for a celebration or the log sheet. Both own the screen, both
   // are the athlete's own doing, and both repaint this the moment they close.
-  if (!st || UI.celebrate.length || UI.sheet) { lay.className = 'tourlay'; lay.innerHTML = ''; return; }
+  if (!st || UI.celebrate.length || UI.sheet) { tourTeardown(lay); return; }
+  const key = TOUR.i + ':' + st.title;
+  if (key !== _tourKey) { buildTour(lay, st); _tourKey = key; }
+  placeTour();
+}
 
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const pad = st.pad == null ? 5 : st.pad;
-  let r = null;
-  const el = st.sel ? st.sel() : null;
-  if (el) {
-    const b = el.getBoundingClientRect();
-    // A target scrolled fully out of the viewport rings nothing — better a
-    // plain centred card than a clay box hard against the top edge.
-    if (b.width > 0 && b.height > 0 && b.bottom > 0 && b.top < vh) {
-      const t = Math.max(0, b.top - pad), l = Math.max(0, b.left - pad);
-      r = { t, l, w: Math.min(vw - l, b.width + pad * 2), h: Math.min(vh - t, b.height + pad * 2) };
-    }
-  }
-
+function buildTour(lay, st) {
   const n = TOUR.i + 1, total = TOUR.steps.length;
-  const cw = Math.min(vw - 28, 460), cx0 = Math.round((vw - cw) / 2), gap = 14;
-
-  // THE CARD IS MEASURED BEFORE THE HOLE IS CUT. Its height depends on the copy
-  // and on how narrow the phone is — the same step is 209px at 390 and well
-  // over 300 at 320 — and both the ring's size and the card's placement have to
-  // answer to it. Measuring afterwards left the card sitting on top of its own
-  // ring on every step of a 320px screen.
-  lay.className = 'tourlay on';
+  // `opening` only on the very first build of a run, so the dimmer fades in
+  // once and then simply stays dark as the athlete steps through.
+  lay.className = 'tourlay on' + (_tourOpened ? '' : ' opening');
+  _tourOpened = true;
+  // Every pane exists for the life of the step, whatever its size — placeTour
+  // hides the ones that come out empty rather than adding and removing nodes.
   lay.innerHTML =
-    `<div class="tourcard" style="width:${cw}px;left:${cx0}px;top:-9999px">
+    `<div class="tourmask" data-m="t"></div>
+     <div class="tourmask" data-m="b"></div>
+     <div class="tourmask" data-m="l"></div>
+     <div class="tourmask" data-m="r"></div>
+     ${st.act ? '' : '<div class="tourblock" data-m="k"></div>'}
+     <div class="tourring" data-m="ring"></div>
+     <div class="tourcard" data-m="card" style="top:-9999px">
        <span class="tourtip" style="display:none"></span>
        <div class="tourtop">
          <h4>${esc(st.title)}</h4>
@@ -3584,8 +3617,57 @@ function paintTour() {
        </div>
        ${st.last ? '' : '<button class="tourskip" data-t="skip">Skip the tour</button>'}
      </div>`;
-  const cEl = lay.querySelector('.tourcard');
-  const ch = cEl.offsetHeight;
+  // Bound once per step, not once per reposition. This layer lives outside
+  // #app, so the delegated handler that serves the rest of the app never sees it.
+  lay.querySelectorAll('[data-t]').forEach(b => {
+    b.addEventListener('click', ev => {
+      ev.stopPropagation();
+      const k = b.getAttribute('data-t');
+      if (k === 'next') tourGo(1);
+      else if (k === 'back') tourGo(-1);
+      else endTour(false);
+    });
+  });
+  // Swallow taps on the dimmed area — wandering off mid-tour is how a tutorial
+  // ends up half-read with no way back into it.
+  lay.querySelectorAll('.tourmask, .tourblock').forEach(m => {
+    m.addEventListener('click', ev => ev.stopPropagation());
+  });
+  _tourCh = 0;                                  // force a re-measure in placeTour
+}
+
+function placeTour() {
+  const lay = document.getElementById('tour');
+  const st = TOUR.on ? TOUR.steps[TOUR.i] : null;
+  if (!lay || !st || _tourKey === null) return;
+  const cEl = lay.querySelector('[data-m="card"]');
+  if (!cEl) return;
+
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const cw = Math.min(vw - 28, 460), cx0 = Math.round((vw - cw) / 2), gap = 14;
+  // Width drives height, so the measurement only has to be redone when the
+  // viewport width changes (rotation) or the step does. Not on every scroll —
+  // offsetHeight forces synchronous layout, which is the expensive part.
+  if (_tourCh === 0 || _tourVW !== vw) {
+    cEl.style.width = cw + 'px';
+    cEl.style.left = cx0 + 'px';
+    _tourCh = cEl.offsetHeight;
+    _tourVW = vw;
+  }
+  const ch = _tourCh;
+
+  const pad = st.pad == null ? 5 : st.pad;
+  let r = null;
+  const el = st.sel ? st.sel() : null;
+  if (el) {
+    const b = el.getBoundingClientRect();
+    // A target scrolled fully out of the viewport rings nothing — better a
+    // plain centred card than a clay box hard against the top edge.
+    if (b.width > 0 && b.height > 0 && b.bottom > 0 && b.top < vh) {
+      const t = Math.max(0, b.top - pad), l = Math.max(0, b.left - pad);
+      r = { t, l, w: Math.min(vw - l, b.width + pad * 2), h: Math.min(vh - t, b.height + pad * 2) };
+    }
+  }
 
   // PLACEMENT. The card must never cover the thing it is describing, and the
   // ring must never be squeezed to nothing — so the two are solved together
@@ -3635,47 +3717,39 @@ function paintTour() {
     }
   }
   cEl.style.top = top + 'px';
-  if (tip) {
-    const tEl = cEl.querySelector('.tourtip');
+
+  const tEl = cEl.querySelector('.tourtip');
+  if (tip && r) {
     tEl.className = 'tourtip ' + tip;
     tEl.style.display = '';
     tEl.style.left = Math.max(14, Math.min(cw - 32, Math.round(r.l + r.w / 2 - cx0 - 9))) + 'px';
+  } else {
+    tEl.style.display = 'none';
   }
 
-  const box = (x, y, w, h, cls) => (w > 0 && h > 0)
-    ? `<div class="${cls}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>` : '';
-  let panes;
+  // Style writes only, on nodes that already exist. A pane that comes out empty
+  // is hidden rather than removed, so the node set is stable for the step.
+  const put = (sel, x, y, w, h) => {
+    const n = lay.querySelector('[data-m="' + sel + '"]');
+    if (!n) return;
+    if (!(w > 0 && h > 0)) { n.style.display = 'none'; return; }
+    n.style.display = '';
+    n.style.left = x + 'px'; n.style.top = y + 'px';
+    n.style.width = w + 'px'; n.style.height = h + 'px';
+  };
   if (r) {
     const rb = r.t + r.h, rr = r.l + r.w;
-    panes = box(0, 0, vw, r.t, 'tourmask') +
-            box(0, rb, vw, vh - rb, 'tourmask') +
-            box(0, r.t, r.l, r.h, 'tourmask') +
-            box(rr, r.t, vw - rr, r.h, 'tourmask') +
-            // A step you only read gets its hole sealed, so a stray tap cannot
-            // fire the control being described.
-            (st.act ? '' : box(r.l, r.t, r.w, r.h, 'tourblock')) +
-            box(r.l, r.t, r.w, r.h, 'tourring');
+    put('t', 0, 0, vw, r.t);
+    put('b', 0, rb, vw, vh - rb);
+    put('l', 0, r.t, r.l, r.h);
+    put('r', rr, r.t, vw - rr, r.h);
+    put('k', r.l, r.t, r.w, r.h);          // absent on an `act` step
+    put('ring', r.l, r.t, r.w, r.h);
   } else {
-    panes = box(0, 0, vw, vh, 'tourmask');
+    put('t', 0, 0, vw, vh);
+    put('b', 0, 0, 0, 0); put('l', 0, 0, 0, 0); put('r', 0, 0, 0, 0);
+    put('k', 0, 0, 0, 0); put('ring', 0, 0, 0, 0);
   }
-  lay.insertAdjacentHTML('afterbegin', panes);
-
-  // Bound directly: this layer lives outside #app, so the delegated handler
-  // that serves the rest of the app never sees it.
-  lay.querySelectorAll('[data-t]').forEach(b => {
-    b.addEventListener('click', ev => {
-      ev.stopPropagation();
-      const k = b.getAttribute('data-t');
-      if (k === 'next') tourGo(1);
-      else if (k === 'back') tourGo(-1);
-      else endTour(false);
-    });
-  });
-  // Swallow taps on the dimmed area — wandering off mid-tour is how a tutorial
-  // ends up half-read with no way back into it.
-  lay.querySelectorAll('.tourmask, .tourblock').forEach(m => {
-    m.addEventListener('click', ev => ev.stopPropagation());
-  });
 }
 
 // ── App shell ─────────────────────────────────────────────────────────────
