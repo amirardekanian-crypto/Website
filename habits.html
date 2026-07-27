@@ -829,6 +829,37 @@
   .rankrow.here .subs i { border-color: rgba(250,247,242,.7); }
   .rankrow.here .subs i.on { background: var(--bg); border-color: var(--bg); }
 
+  /* ── The long game — the reward track ──────────────────────────────────
+     Deliberately built from .rankrow's vocabulary rather than a new one: it
+     is the same idea (a ladder you climb) and the app already has one look
+     for that. What differs is state — owned, equipped, locked — so only
+     those get new rules. */
+  .prow { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left;
+          padding: 13px 20px; border-bottom: 1px solid var(--rule); color: inherit; background: none; }
+  .prow .lvl {
+    width: 44px; height: 44px; flex: none; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1px;
+    border: 2px solid var(--rule); color: var(--muted-soft);
+  }
+  .prow .lvl b { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; line-height: 1; }
+  .prow .lvl i { font-family: 'Space Mono', monospace; font-style: normal; font-size: 7px; letter-spacing: .08em; }
+  .prow.owned .lvl { border-color: var(--accent); color: var(--accent); }
+  .prow.on { background: var(--accent); color: var(--bg); }
+  .prow.on .lvl { border-color: var(--bg); color: var(--bg); }
+  .prow.locked { opacity: .48; }
+  .prow .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; line-height: 1; text-transform: uppercase; }
+  .prow .meta { font-size: 11px; line-height: 1.35; color: var(--muted); }
+  .prow.on .meta { color: rgba(250,247,242,.82); }
+  .prow .tag { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .1em; white-space: nowrap; color: var(--clay-deep); }
+  .prow.on .tag { color: var(--bg); }
+  /* A 34px sample of the card treatment, so a name like NIGHTFALL means
+     something before you have ever exported one. */
+  .swatch { width: 34px; height: 34px; flex: none; border: 1px solid var(--rule); }
+  /* The title, wherever it is shown: small, clay, mono. It is a caption on a
+     person, not a heading. */
+  .ttl { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .12em;
+         text-transform: uppercase; color: var(--clay-deep); }
+
   /* Consistency pip ladder */
   .pips { display: flex; gap: 4px; }
   .pips i { width: 13px; height: 13px; border: 1.5px solid var(--box); display: block; }
@@ -1255,6 +1286,65 @@ const ACHIEVEMENTS = [
   { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays' }
 ];
 
+// ── THE LONG GAME — a reward track, and the one thing here that is kept ───
+// Every other number in this app is derived: change a rule and the whole
+// history is rescored. Rewards are the deliberate exception. They are RECORDED
+// when you reach the level (`CFG.pass.owned`) and never taken back — not by a
+// new season, not by a retune, not by switching a habit off. A reward you can
+// lose is not a reward, it is a rental.
+//
+// That also answers the season question without a second XP ladder. Levels
+// reset with the season, exactly as they do now; what you already unlocked does
+// not. "A new season resets your points, not your rewards."
+//
+// Everything here costs nothing to mint, which is the point: the coach cannot
+// owe forty people a phone call because forty people were consistent. What
+// makes a cosmetic worth having is an AUDIENCE, and this app has one — the
+// board, and a rank card built to be shared.
+const PASS_TRACK = [
+  { lv: 2,  kind:'title', id:'t_signed',    name:'SIGNED ON',        note:'You turned up and put your name to it.' },
+  { lv: 4,  kind:'title', id:'t_23',        name:'THE TWENTY-THREE', note:'For the hours nobody was watching.' },
+  { lv: 6,  kind:'card',  id:'c_ember',     name:'EMBER',            note:'A card that carries the fire.' },
+  { lv: 8,  kind:'title', id:'t_early',     name:'EARLY DOORS',      note:'In before it got interesting.' },
+  { lv:11,  kind:'title', id:'t_night',     name:'NIGHT SHIFT',      note:'Logged after the day had already gone.' },
+  { lv:14,  kind:'card',  id:'c_blueprint', name:'BLUEPRINT',        note:'Nothing about this was an accident.' },
+  { lv:17,  kind:'title', id:'t_between',   name:'BETWEEN SESSIONS', note:'The work that happens off the court.' },
+  { lv:21,  kind:'title', id:'t_iron',      name:'IRONCLAD',         note:'Twenty-one levels and no excuses.' },
+  { lv:25,  kind:'card',  id:'c_night',     name:'NIGHTFALL',        note:'Dark card. Quiet flex.' },
+  { lv:29,  kind:'title', id:'t_metronome', name:'THE METRONOME',    note:'Same tempo, every single day.' },
+  { lv:34,  kind:'title', id:'t_weather',   name:'WEATHERPROOF',     note:'Bad week, bad mood, logged anyway.' },
+  { lv:39,  kind:'card',  id:'c_flare',     name:'FLARE',            note:'The card they see coming.' },
+  { lv:44,  kind:'title', id:'t_unbroken',  name:'UNBROKEN',         note:'Not one quiet surrender.' },
+  { lv:50,  kind:'title', id:'t_proof',     name:'PROOF ITSELF',     note:'The name of the app. Now yours.' }
+];
+// The card everyone starts with, so the picker is never empty and the default
+// is a real choice rather than an absence.
+const CARD_BASE = { id:'c_paper', kind:'card', name:'HOUSE', note:'The card as it ships.' };
+
+function passItem(id) { return id === CARD_BASE.id ? CARD_BASE : PASS_TRACK.find(p => p.id === id) || null; }
+function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
+function passHas(id)  { return id === CARD_BASE.id || passOwned().indexOf(id) >= 0; }
+function passTitle()  { const t = CFG.pass && CFG.pass.title; return passHas(t) ? passItem(t) : null; }
+function passCard()   { const c = CFG.pass && CFG.pass.card;  return (passHas(c) && passItem(c)) || CARD_BASE; }
+function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p => p.lv > lv) || null; }
+// Records anything the athlete's level has reached and returns only what is NEW,
+// so the caller can celebrate it. Silent on first run for someone who arrives
+// with history — the same baselining every other unlock does.
+function claimRewards(silent) {
+  if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+  const lv = overallLevel().lv, owned = CFG.pass.owned || (CFG.pass.owned = []);
+  const fresh = PASS_TRACK.filter(p => p.lv <= lv && owned.indexOf(p.id) < 0);
+  if (!fresh.length) return [];
+  fresh.forEach(p => owned.push(p.id));
+  // A title lands equipped rather than waiting to be switched on — and it is
+  // the HIGHEST one, because baselining an athlete who arrives at level 37
+  // should not dress them in the level-2 title.
+  const top = fresh.filter(p => p.kind === 'title').pop();
+  if (top && !CFG.pass.title) CFG.pass.title = top.id;
+  saveCfg();
+  return silent ? [] : fresh;
+}
+
 // ── Identity & storage ────────────────────────────────────────────────────
 let ATHLETE_ID = '', ATHLETE_NAME = '', KEY = null, ATHLETE = {};
 let CFG = null, LOG = {};
@@ -1270,6 +1360,7 @@ let _toastTimer = null, _flashTimer = null;
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
   return { v:3, on, custom:[], onboarded:false, installAsked:false, dark:false, seen:null, rulesSig:null,
+           pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0 };
@@ -1970,6 +2061,12 @@ function checkLevelUps() {
   events.forEach(e => {
     if (e.big) { UI.celebrate.push(e); haptic(e.rankChanged ? 'rank' : 'level'); }
     else UI.flash[e.id] = e.to;
+  });
+  // Rewards ride behind the level that earned them, so the order reads as cause
+  // then effect rather than a prize arriving before the reason for it.
+  claimRewards(false).forEach(r => {
+    UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
+    haptic('rank');
   });
   if (events.length) {
     clearTimeout(_flashTimer);
@@ -2928,6 +3025,7 @@ function renderApp() {
     // at "How this works" made two screens feel like four.
     manual:   ['Everything, explained', 'The manual'],
     ranks:    ['Ten ranks, fifty levels', 'The ladder'],
+    pass:     ['Rewards a season cannot take', 'The long game'],
     settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
@@ -2942,6 +3040,7 @@ function renderApp() {
       return LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '';
     })(),
     ranks: '',                              // the hero says the level already
+    pass: (() => { const o = passOwned().length; return o ? o + '/' + PASS_TRACK.length : ''; })(),
     settings: ''
   };
   const head = heads[UI.screen] || heads.today;
@@ -2953,6 +3052,7 @@ function renderApp() {
   else if (UI.screen === 'crew') screenHtml = renderCrew();
   else if (UI.screen === 'manual') screenHtml = renderManual();
   else if (UI.screen === 'ranks') screenHtml = renderRanks();
+  else if (UI.screen === 'pass') screenHtml = renderPass();
   else screenHtml = renderSettings();
 
   // Three tabs: do it, see where you stand, see everyone else. Habits and
@@ -2963,7 +3063,8 @@ function renderApp() {
   // Settings, the manual and the ladder are not tabs. They sit "above" the tab
   // bar, so no tab lights up while you are in them and the initials button
   // becomes the way out.
-  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' || UI.screen === 'ranks');
+  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' ||
+                   UI.screen === 'ranks'    || UI.screen === 'pass');
   const activeTab = UI.screen === 'detail' ? 'progress' : (OVERLAY ? '' : UI.screen);
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
@@ -3080,6 +3181,17 @@ function renderBadgeCelebration(ev) {
         ? '+' + paid.toLocaleString() + ' XP.'
         : 'Yours on your all-time record. The ' + ev.ach.xp.toLocaleString()
           + ' XP lands when you do it again inside ' + seasonName() + '.');
+  } else if (ev.kind === 'reward') {
+    // The one unlock that pays nothing and is worth having anyway. Say what it
+    // IS and where it shows, because a reward nobody can see is just a number.
+    badge = ev.reward.kind === 'title' ? 'T' : 'C';
+    badgeLabel = ev.reward.kind === 'title' ? 'TITLE' : 'CARD';
+    codeClass = ' code';
+    kicker = 'Unlocked';
+    title = ev.reward.name;
+    sub = ev.reward.note + ' ' + (ev.reward.kind === 'title'
+      ? 'It sits under your name, and it is yours for good — a new season cannot take it back.'
+      : 'Pick it for your rank card in The long game. Yours for good.');
   } else {
     const n = live().length;
     badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
@@ -3417,6 +3529,7 @@ function renderProgress(LI, earned, totalAch) {
             <span class="hd" style="font-size:14px;line-height:1">${esc(LI.label)}</span>
             <span class="go">→</span>
           </span>
+          ${passTitle() ? `<span class="ttl" data-k="ttl">${esc(passTitle().name)}</span>` : ''}
           <span class="bar thin"><span data-fill style="width:${LI.pct}%"></span></span>
         </span>
         <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
@@ -3436,6 +3549,24 @@ function renderProgress(LI, earned, totalAch) {
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
           <div class="eyebrow">Perfect days</div></div>
       </div>
+
+      <!-- The reward track sits high, and it is the only thing on this screen
+           that points FORWARD. Everything else here reports what has already
+           happened; this says what is coming, which is what carries someone
+           through a week where the numbers are not moving much. -->
+      ${(() => {
+        const nx = nextReward(), eqT = passTitle(), got = passOwned().length;
+        const toNx = nx ? Math.max(0, cumXpTo(nx.lv) - LI.xp) : 0;
+        return `<button class="selrow" data-k="passrow" ${on(() => (UI.backTo = 'progress', go('pass')))}>
+          <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+            <span class="lbl" style="font-size:15px">The long game</span>
+            <span style="font-size:11px;line-height:1.35;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">${nx
+              ? `<strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv} — ${toNx.toLocaleString()} XP away`
+              : `Every reward unlocked · ${got}/${PASS_TRACK.length}`}${eqT ? ` · showing ${esc(eqT.name)}` : ''}</span>
+          </span>
+          <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+        </button>`;
+      })()}
 
       ${sectionLabel('Your habits', 'Tap for history')}
       <div class="pipkey">
@@ -3816,8 +3947,8 @@ function renderManual() {
     if (el) el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   })}>${esc(t)}</button>`;
   const CONTENTS = ['The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
-                    'How to earn more', 'Levels and ranks', 'Consistency', 'Quests', 'Seasons',
-                    'The leaderboard', 'Your data'];
+                    'How to earn more', 'Levels and ranks', 'The long game', 'Consistency', 'Quests',
+                    'Seasons', 'The leaderboard', 'Your data'];
 
   return `
     <div data-k="screen:manual" style="${screenAnim()}">
@@ -3879,6 +4010,18 @@ function renderManual() {
         </div>` +
         p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star — ${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)} — and there is no ceiling after that.`) +
         p(`<strong style="color:var(--ink)">Each habit has its own level too.</strong> They all climb at the same rate, so your level in a habit is really a measure of how often you do it. Drink water every day and train twice a week, and your water rank will leave your workout rank behind. That is the point.`))}
+
+      ${(() => {
+        const nx = nextReward(), got = passOwned().length, eq = passTitle();
+        return block(h2('The long game') +
+          p(`Levels pay out. There are <strong style="color:var(--ink)">${PASS_TRACK.length} rewards</strong> spread up the ladder, and reaching the level is all it takes — there is nothing to buy and nothing to claim.`) +
+          p(`Two kinds. <strong style="color:var(--ink)">Titles</strong> are a name you wear: it sits under your rank and it goes on the card you share. <strong style="color:var(--ink)">Cards</strong> change how that shared card looks. You choose which of the ones you own to use, and you can change your mind whenever.`) +
+          p(`<strong style="color:var(--ink)">They are kept.</strong> This is the one thing here a new season does not touch — your points go back to zero and every reward you have unlocked stays exactly where it is. Switching a habit off does not take them either.`) +
+          p(got
+            ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
+            : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
+          p(`Open it from <strong style="color:var(--ink)">Progress → The long game</strong>.`));
+      })()}
 
       ${(() => {
         const run = activeQuestRun(), qs = run ? runQuests(run) : [];
@@ -3949,6 +4092,89 @@ function renderManual() {
 // Every rank, its insignia, what it costs and where the athlete stands in it.
 // Games always show you the road ahead; before this, Proof's road existed only
 // inside a paragraph of the manual.
+// The CSS for a card treatment, used for both the swatch on this screen and the
+// canvas ground on the exported PNG. One definition, so the sample cannot lie
+// about what the athlete will actually get.
+const CARD_LOOK = {
+  c_paper:     'background:#0E4A36',
+  c_ember:     'background:radial-gradient(120% 100% at 15% 100%, #E06B43 0%, #A8422a 32%, #0E4A36 68%)',
+  c_blueprint: 'background:#0E4A36;background-image:linear-gradient(rgba(250,247,242,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(250,247,242,.22) 1px,transparent 1px);background-size:7px 7px',
+  c_night:     'background:#14120F',
+  // Hard colour stops, not a blend: at 34px a soft conic gradient averages out
+  // to a muddy grey and the swatch stops looking like either colour.
+  c_flare:     'background:conic-gradient(#C7552F 0deg 30deg, #0E4A36 30deg 90deg, #C7552F 90deg 120deg, #0E4A36 120deg 180deg, #C7552F 180deg 210deg, #0E4A36 210deg 270deg, #C7552F 270deg 300deg, #0E4A36 300deg 360deg)'
+};
+
+function renderPass() {
+  const LI = overallLevel(), lv = LI.lv;
+  const next = nextReward();
+  const owned = passOwned().length;
+  const eqT = passTitle(), eqC = passCard();
+  const toNext = next ? Math.max(0, cumXpTo(next.lv) - LI.xp) : 0;
+  const titles = PASS_TRACK.filter(p => p.kind === 'title');
+  const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
+
+  // One row, three states. Tapping an owned row equips it; tapping a locked one
+  // says what it costs rather than doing nothing, because a dead tap on a
+  // reward screen reads as a bug.
+  const row = (p, isOn, has) => `
+    <button class="prow ${isOn ? 'on' : (has ? 'owned' : 'locked')}" data-k="rw:${p.id}"
+      ${on(() => {
+        if (!has) { toast('Level ' + p.lv + ' unlocks ' + p.name + '.'); return; }
+        if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+        if (p.kind === 'title') CFG.pass.title = (CFG.pass.title === p.id) ? null : p.id;
+        else CFG.pass.card = p.id;
+        saveCfg(); haptic('done'); render();
+      })}>
+      ${p.kind === 'card'
+        ? `<span class="swatch" style="${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
+        : `<span class="lvl"><b>${p.lv || '—'}</b><i>LV</i></span>`}
+      <span style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+        <span class="nm">${esc(p.name)}</span>
+        <span class="meta">${esc(p.note)}</span>
+      </span>
+      <span class="tag">${isOn ? 'ON' : (has ? 'TAP' : 'LV ' + p.lv)}</span>
+    </button>`;
+
+  return `
+    <div data-k="screen:pass" style="${screenAnim()}">
+      <div class="block" style="display:flex;flex-direction:column;gap:13px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+          <span class="hd" style="font-size:26px;line-height:1">${owned} of ${PASS_TRACK.length}</span>
+          <span class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--muted)">LEVEL ${lv}</span>
+        </div>
+        ${next ? `
+          <div class="bar thin"><span data-fill style="width:${Math.max(2, Math.min(100, Math.round(LI.xp / Math.max(1, cumXpTo(next.lv)) * 100)))}%"></span></div>
+          <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+            <strong style="color:var(--ink)">${toNext.toLocaleString()} XP</strong> to level ${next.lv} and
+            <strong style="color:var(--ink)">${esc(next.name)}</strong> — ${esc(next.note.toLowerCase())}
+          </div>`
+        : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">Every reward on the track is yours. There is nothing left to unlock, which is its own kind of statement.</div>`}
+        <div style="font-size:12px;line-height:1.5;color:var(--muted-soft)">
+          These are kept. A new season sets your points back to zero and leaves every one of them alone.
+        </div>
+      </div>
+
+      ${sectionLabel('Titles')}
+      <div style="padding:0 20px 10px;font-size:12px;line-height:1.5;color:var(--muted)">
+        ${eqT ? `You are showing <strong style="color:var(--clay-deep)">${esc(eqT.name)}</strong>. Tap it again to show nothing.`
+              : 'Nothing showing. Tap one you own to wear it.'}
+      </div>
+      ${titles.map(p => row(p, eqT && eqT.id === p.id, passHas(p.id))).join('')}
+
+      ${sectionLabel('Cards')}
+      <div style="padding:0 20px 10px;font-size:12px;line-height:1.5;color:var(--muted)">
+        The look of the rank card you share. Yours is <strong style="color:var(--clay-deep)">${esc(eqC.name)}</strong>.
+      </div>
+      ${cards.map(p => row(p, eqC.id === p.id, passHas(p.id))).join('')}
+
+      <div style="padding:16px 20px 34px;display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-primary btn-block" ${on(() => shareRankCard())}>Share your card</button>
+        <button class="btn btn-secondary btn-block" ${on(() => go(UI.backTo === 'pass' ? 'progress' : (UI.backTo || 'progress')))}>Back</button>
+      </div>
+    </div>`;
+}
+
 function renderRanks() {
   const LI = overallLevel(), cur = LI.rank;
   const curIdx = RANKS.indexOf(cur.name);
@@ -4031,6 +4257,65 @@ function renderRanks() {
 // Brand rules apply: green ground, paper type, clay-2 as the only accent, hard
 // edges, Barlow Condensed uppercase.
 const CARD = { green:'#0E4A36', paper:'#FAF7F2', clay2:'#E06B43', ink:'#1A1A1A' };
+// The five card grounds, painted rather than imported so the export needs no
+// assets and stays offline-safe. Every one of them is green, clay, paper or
+// near-black — a card treatment is a change of structure, not of palette.
+function paintCardGround(x, S, id) {
+  if (id === 'c_night') {
+    x.fillStyle = '#14120F'; x.fillRect(0, 0, S, S);
+    x.strokeStyle = 'rgba(224,107,67,0.13)'; x.lineWidth = 2;
+    for (let i = 1; i < 9; i++) {
+      x.beginPath(); x.moveTo(i * S / 9, 0); x.lineTo(i * S / 9, S); x.stroke();
+      x.beginPath(); x.moveTo(0, i * S / 9); x.lineTo(S, i * S / 9); x.stroke();
+    }
+    return;
+  }
+  x.fillStyle = CARD.green; x.fillRect(0, 0, S, S);
+  if (id === 'c_ember') {
+    // Heat rising out of the bottom-left corner, where the insignia sits.
+    const g = x.createRadialGradient(S * 0.15, S, 0, S * 0.15, S, S * 1.15);
+    g.addColorStop(0, 'rgba(224,107,67,0.92)');
+    g.addColorStop(0.34, 'rgba(168,66,42,0.55)');
+    g.addColorStop(0.72, 'rgba(14,74,54,0)');
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+    return;
+  }
+  if (id === 'c_flare') {
+    // The celebration's ray burst, held still.
+    x.save(); x.translate(S / 2, S / 2);
+    // SOLID clay, not clay at half alpha: any warm colour blended over this
+    // green comes out brown, which is not in the palette and looks like a
+    // mistake. Narrow wedges keep it a burst rather than a background.
+    x.fillStyle = '#C7552F';
+    for (let i = 0; i < 14; i++) {
+      x.beginPath(); x.moveTo(0, 0);
+      const a = (i / 14) * Math.PI * 2, w = 0.032;
+      x.arc(0, 0, S, a - w, a + w);
+      x.closePath(); x.fill();
+    }
+    x.restore();
+    // The burst has to sit BEHIND the card, not across it. Without this the
+    // rays run straight through "DAY STREAK" and the clay eyebrows vanish into
+    // the clay wedges. Green, fading in over the half of the card that carries
+    // type, so the effect survives at the top where there is nothing to read.
+    const veil = x.createLinearGradient(0, S * 0.4, 0, S);
+    veil.addColorStop(0, 'rgba(14,74,54,0)');
+    veil.addColorStop(0.45, 'rgba(14,74,54,0.72)');
+    veil.addColorStop(1, 'rgba(14,74,54,0.92)');
+    x.fillStyle = veil; x.fillRect(0, S * 0.4, S, S * 0.6);
+    return;
+  }
+  // HOUSE and BLUEPRINT share a hairline grid; BLUEPRINT just draws it loud and
+  // close, which is the whole difference between texture and a drawing.
+  const blue = id === 'c_blueprint';
+  x.strokeStyle = blue ? 'rgba(250,247,242,0.16)' : 'rgba(250,247,242,0.055)';
+  x.lineWidth = 2;
+  const n = blue ? 27 : 9;
+  for (let i = 1; i < n; i++) {
+    x.beginPath(); x.moveTo(i * S / n, 0); x.lineTo(i * S / n, S); x.stroke();
+    x.beginPath(); x.moveTo(0, i * S / n); x.lineTo(S, i * S / n); x.stroke();
+  }
+}
 async function buildRankCard() {
   const S = 1080, LI = overallLevel(), r = LI.rank;
   const c = document.createElement('canvas');
@@ -4055,13 +4340,7 @@ async function buildRankCard() {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
   } catch (e) { /* fall back to system type rather than no card at all */ }
 
-  x.fillStyle = CARD.green; x.fillRect(0, 0, S, S);
-  // A quiet grid of hairlines — texture without a gradient or a glow.
-  x.strokeStyle = 'rgba(250,247,242,0.055)'; x.lineWidth = 2;
-  for (let i = 1; i < 9; i++) {
-    x.beginPath(); x.moveTo(i * S / 9, 0); x.lineTo(i * S / 9, S); x.stroke();
-    x.beginPath(); x.moveTo(0, i * S / 9); x.lineTo(S, i * S / 9); x.stroke();
-  }
+  paintCardGround(x, S, passCard().id);
   const PAD = 88;
   // Eyebrow
   x.fillStyle = CARD.clay2;
@@ -4081,13 +4360,31 @@ async function buildRankCard() {
   x.stroke(new Path2D(RANK_ART[r.name] || RANK_ART.ROOKIE));
   x.restore();
 
-  // Rank, big.
+  // Rank, big — but never wider than the card. "★1 UNTOUCHABLE 5" at 132px ran
+  // off the right edge and the card is built to be shared, so it has to fit
+  // every label the ladder can produce, not the short ones.
   x.fillStyle = CARD.paper;
-  x.font = '900 132px "Barlow Condensed", sans-serif';
-  x.fillText(r.label.toUpperCase(), PAD, by + box + 148);
+  const label = r.label.toUpperCase();
+  let size = 132;
+  x.font = '900 ' + size + 'px "Barlow Condensed", sans-serif';
+  while (size > 64 && x.measureText(label).width > S - PAD * 2) {
+    size -= 4;
+    x.font = '900 ' + size + 'px "Barlow Condensed", sans-serif';
+  }
+  x.fillText(label, PAD, by + box + 148);
   x.fillStyle = 'rgba(250,247,242,0.72)';
   x.font = '500 34px "Barlow", sans-serif';
   x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', PAD, by + box + 200);
+  // The title, if they are wearing one. Under the rank, in clay, small — this
+  // is the line that makes the card worth exporting a second time.
+  const ttl = passTitle();
+  if (ttl) {
+    x.fillStyle = CARD.clay2;
+    x.font = '700 26px "Space Mono", monospace';
+    x.letterSpacing = '5px';
+    x.fillText(ttl.name.toUpperCase(), PAD, by + box + 252);
+    x.letterSpacing = '0px';
+  }
 
   // Three facts, on a rule.
   // Three facts that are always worth showing. Deliberately not "today's %" —
@@ -4367,6 +4664,15 @@ function showError(msg) {
   checkLevelUps();
   if (CFG.dark) document.body.setAttribute('data-dark', '');
   document.title = 'Proof — ' + (ATHLETE.firstName || 'AA Performance');
+
+  // An athlete who arrives with history owns whatever their level already
+  // reached — silently, the same baselining every other unlock does, so opening
+  // the app for the first time after this ships is not fourteen takeovers.
+  //
+  // Unconditional, not `if (!CFG.pass)`: the config loader fills defaults from
+  // defaultCfg(), so CFG.pass always exists and that guard never fired. It is
+  // idempotent anyway — claimRewards only ever adds what is missing.
+  claimRewards(true);
 
   render();
   armIdle();
