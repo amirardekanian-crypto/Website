@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof — the habit tracker | Amir Ardekani</title>
+<meta name="description" content="Proof is a free habit tracker for the twenty-three hours outside the gym. Sleep, steps, water, food, mobility. Every habit earns points, points build levels, and there is a board with other people on it.">
+<link rel="canonical" href="https://www.amirardekani.com/proof.html">
+
+<meta property="og:title" content="Proof — the habit tracker">
+<meta property="og:description" content="Free. The twenty-three hours outside the gym, scored like a game. Sleep, steps, water, food, mobility — and a board with other people on it.">
+<meta property="og:image" content="https://www.amirardekani.com/assets/img/og-image.jpg">
+<meta property="og:url" content="https://www.amirardekani.com/proof.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta name="theme-color" content="#0E4A36">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
+
+<style>
+  /* ── Hero ────────────────────────────────────────────────────────────────
+     The green radial hero is the house look for a front door (see index-fa).
+     Clay is the only accent. No radius anywhere. */
+  .p-hero {
+    position: relative; overflow: hidden;
+    background: radial-gradient(120% 90% at 20% 0%, #14614A 0%, #0E4A36 55%, #0A3527 100%);
+    color: #FAF7F2;
+    padding: calc(120px + env(safe-area-inset-top)) var(--container-pad) 84px;
+  }
+  .p-hero-in { max-width: 900px; margin: 0 auto; }
+  .p-eyebrow {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: #E06B43; margin-bottom: 20px;
+  }
+  .p-hero h1 {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    font-size: clamp(44px, 9vw, 92px); line-height: .92; letter-spacing: -.02em;
+    margin: 0 0 22px;
+  }
+  .p-hero .lede { font-size: clamp(17px, 2.2vw, 21px); line-height: 1.55; max-width: 620px; color: rgba(250,247,242,.9); }
+  .p-free {
+    display: inline-block; margin-top: 30px; padding: 9px 14px;
+    border: 2px solid rgba(250,247,242,.4);
+    font-family: var(--font-display); font-weight: 900; font-size: 14px;
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+
+  /* ── Sections ── */
+  .p-wrap { max-width: 900px; margin: 0 auto; padding: 0 var(--container-pad); }
+  .p-sec { padding: 72px 0; }
+  .p-band { background: #F1ECE3; }
+  .p-sec h2 {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    font-size: clamp(28px, 5vw, 44px); line-height: 1; margin: 0 0 26px;
+  }
+  .p-sec p { font-size: 16.5px; line-height: 1.65; max-width: 660px; margin: 0 0 16px; }
+
+  .p-grid { display: grid; gap: 2px; background: #DAD3C7; margin-top: 34px; }
+  @media (min-width: 720px) { .p-grid { grid-template-columns: repeat(3, 1fr); } }
+  .p-card { background: #FAF7F2; padding: 26px 24px; }
+  .p-band .p-card { background: #F1ECE3; }
+  .p-card h3 {
+    font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
+    font-size: 19px; line-height: 1.05; margin: 0 0 10px;
+  }
+  .p-card p { font-size: 14.5px; line-height: 1.55; margin: 0; color: #4A463F; }
+  .p-num {
+    font-family: var(--font-mono, monospace); font-size: 11px; letter-spacing: .16em;
+    color: #C7552F; display: block; margin-bottom: 12px;
+  }
+
+  .p-habits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .p-habit {
+    border: 2px solid #DAD3C7; padding: 8px 12px;
+    font-family: var(--font-display); font-weight: 900; font-size: 14px;
+    letter-spacing: .05em; text-transform: uppercase;
+  }
+  .p-habit.locked { border-style: dashed; color: #8A857C; }
+
+  .p-quote {
+    border-left: 4px solid #C7552F; padding: 4px 0 4px 20px; margin: 30px 0 0;
+    font-size: 16px; line-height: 1.6; color: #4A463F; max-width: 620px;
+  }
+
+  /* ── The form ── */
+  .p-form-sec { background: #0E4A36; color: #FAF7F2; }
+  .p-form-sec h2 { color: #FAF7F2; }
+  .p-form-sec p { color: rgba(250,247,242,.85); }
+  .p-form { max-width: 520px; margin-top: 30px; }
+  .p-field { margin-bottom: 18px; }
+  .p-field label {
+    display: block; font-family: var(--font-display); font-weight: 900;
+    font-size: 13px; letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: 7px; color: rgba(250,247,242,.85);
+  }
+  .p-field input {
+    width: 100%; padding: 14px 14px; font-size: 16px; font-family: inherit;
+    background: rgba(250,247,242,.07); color: #FAF7F2;
+    border: 2px solid rgba(250,247,242,.28);
+  }
+  .p-field input:focus { outline: none; border-color: #E06B43; background: rgba(250,247,242,.12); }
+  .p-field input::placeholder { color: rgba(250,247,242,.45); }
+  .p-hint { font-size: 12.5px; line-height: 1.5; color: rgba(250,247,242,.62); margin-top: 6px; }
+  .p-submit {
+    width: 100%; padding: 17px 20px; margin-top: 8px; cursor: pointer;
+    background: #C7552F; color: #FAF7F2; border: 0;
+    font-family: var(--font-display); font-weight: 900; font-size: 17px;
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+  .p-submit:hover { background: #E06B43; }
+  .p-submit[disabled] { opacity: .55; cursor: default; }
+  .p-small { font-size: 12.5px; line-height: 1.6; color: rgba(250,247,242,.62); margin-top: 18px; }
+  .p-small a { color: rgba(250,247,242,.85); }
+
+  .p-done { display: none; }
+  .p-done.on { display: block; }
+  .p-done h2 { margin-bottom: 14px; }
+
+  /* Honeypot — bots fill it, humans never see it. */
+  .p-hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+</style>
+</head>
+<body class="grain">
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="site-nav" id="site-nav"></header>
+
+<main id="main">
+
+  <section class="p-hero">
+    <div class="p-hero-in">
+      <div class="p-eyebrow">Proof · the habit tracker</div>
+      <h1>The other<br>twenty-three<br>hours</h1>
+      <p class="lede">
+        Your training is one hour. The rest of the day decides whether it counts.
+        Proof tracks the part nobody watches — sleep, steps, water, food, mobility —
+        and scores it like a game, so the boring things start to feel like something.
+      </p>
+      <span class="p-free">Free · no payment, no card</span>
+    </div>
+  </section>
+
+  <section class="p-sec">
+    <div class="p-wrap">
+      <h2>What it actually is</h2>
+      <p>
+        A tracker you open once a day and tick. It takes about twenty seconds.
+        What makes it stick is what happens underneath.
+      </p>
+
+      <div class="p-grid">
+        <div class="p-card">
+          <span class="p-num">01</span>
+          <h3>Every habit has its own level</h3>
+          <p>Not one score for everything. You can be GRINDER 2 on water and ROOKIE 5 on training at the same time — which is usually the honest picture.</p>
+        </div>
+        <div class="p-card">
+          <span class="p-num">02</span>
+          <h3>Ten ranks, fifty levels</h3>
+          <p>ROOKIE through IMMORTAL, five levels each. Past fifty you start again carrying a star. There is no ceiling and nothing to buy.</p>
+        </div>
+        <div class="p-card">
+          <span class="p-num">03</span>
+          <h3>Runs you won't want to break</h3>
+          <p>Consecutive days on one habit build a run. Hit five, ten, twenty, thirty, sixty and each pays. Breaking one never takes a badge back.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-sec p-band">
+    <div class="p-wrap">
+      <h2>You are not doing it alone</h2>
+      <p>
+        The part most trackers miss. There is a board with other people on it, and a
+        wall where everyone gets <strong>one sentence a day</strong> — what broke you,
+        what you nearly talked yourself out of, what actually worked.
+      </p>
+      <p>
+        It is not a feed and there is no scrolling. One line each, and it stands until
+        midnight. I write one most days too.
+      </p>
+      <div class="p-quote">
+        "Legs went at rep 8. Finished anyway."<br>
+        "Travel day. Got the steps in, nothing else."<br>
+        "Slept nine hours and felt worse. Explain that."
+      </div>
+    </div>
+  </section>
+
+  <section class="p-sec">
+    <div class="p-wrap">
+      <h2>What you track</h2>
+      <p>Eight to start with. Switch off anything you would only lie about later — you can change all of it whenever you like.</p>
+      <div class="p-habits">
+        <span class="p-habit">Steps</span>
+        <span class="p-habit">Sleep</span>
+        <span class="p-habit">Water</span>
+        <span class="p-habit">Food</span>
+        <span class="p-habit">Mobility</span>
+        <span class="p-habit">Breathing</span>
+        <span class="p-habit">Supplements</span>
+        <span class="p-habit locked">Workout — coached athletes only</span>
+      </div>
+      <p style="margin-top:22px">
+        That last one is honest rather than coy. The training habit is worth the most
+        points of any of them, and it ticks itself when you finish a session in a
+        programme I have written for you. Without one it stays locked — so a perfect
+        day is something only my coached athletes can reach. Everything else is yours,
+        free, for as long as you want it.
+      </p>
+    </div>
+  </section>
+
+  <section class="p-sec p-form-sec" id="join">
+    <div class="p-wrap">
+      <div id="p-form-block">
+        <h2>Get your link</h2>
+        <p>
+          I set each person up by hand, so this is not instant — usually same day.
+          You will get a private link on WhatsApp. Open it once and it stays on your
+          phone; you can add it to your home screen and it works offline.
+        </p>
+
+        <form class="p-form" id="proofForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+          <input type="hidden" name="access_key" value="efc57e0c-997d-4d71-b07a-71c8268ec668">
+          <input type="hidden" name="subject" value="PROOF signup — habit tracker">
+          <input type="hidden" name="from_name" value="Proof signup">
+          <div class="p-hp" aria-hidden="true">
+            <label for="botcheck">Leave this empty</label>
+            <input type="checkbox" name="botcheck" id="botcheck" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="p-field">
+            <label for="pname">The name you want on the board</label>
+            <input type="text" id="pname" name="display_name" required maxlength="24"
+                   autocomplete="nickname" placeholder="Sara K.">
+            <div class="p-hint">This is what other people see. It does not have to be your real name.</div>
+          </div>
+
+          <div class="p-field">
+            <label for="pmail">Email</label>
+            <input type="email" id="pmail" name="email" required
+                   autocomplete="email" placeholder="you@example.com">
+          </div>
+
+          <div class="p-field">
+            <label for="pwa">WhatsApp number</label>
+            <input type="tel" id="pwa" name="whatsapp" required
+                   autocomplete="tel" placeholder="+98 …">
+            <div class="p-hint">This is where I send your link.</div>
+          </div>
+
+          <button type="submit" class="p-submit" id="pSubmit">Send me the link</button>
+        </form>
+
+        <p class="p-small">
+          I use your email and number to send your link and, occasionally, to ask how
+          you are getting on. Nothing else, and no list you did not ask for — you can
+          tell me to delete it at any time. See the
+          <a href="/privacy.html">privacy notice</a>.
+        </p>
+      </div>
+
+      <div class="p-done" id="pDone">
+        <h2>Sent</h2>
+        <p>
+          I will set you up and send the link to WhatsApp, usually the same day.
+          If you have not heard in 48 hours, message me — something went wrong and
+          I would rather know.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-sec p-band">
+    <div class="p-wrap">
+      <h2>And if you want the training too</h2>
+      <p>
+        Proof is free and stays free. It is not a trial and there is no upsell inside
+        it beyond the one locked habit, which is simply true.
+      </p>
+      <p>
+        If at some point you want the hour as well as the twenty-three — a programme
+        built for you, your sport and your week — that is what I actually do.
+      </p>
+      <p style="margin-top:26px">
+        <a class="btn btn-primary" href="/form.html">See about coaching</a>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script defer src="/assets/js/shared.js"></script>
+<script>
+  // Progressive enhancement: post in the background so the athlete stays on the
+  // page and sees a confirmation, rather than being thrown to Web3Forms' own
+  // success page. Falls back to a normal form POST if fetch fails.
+  (function () {
+    var form = document.getElementById('proofForm');
+    var btn = document.getElementById('pSubmit');
+    if (!form) return;
+    form.addEventListener('submit', function (ev) {
+      if (!form.reportValidity()) { ev.preventDefault(); return; }
+      ev.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      fetch(form.action, { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+        .then(function () {
+          document.getElementById('p-form-block').style.display = 'none';
+          document.getElementById('pDone').classList.add('on');
+          document.getElementById('join').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        })
+        .catch(function () {
+          btn.disabled = false;
+          btn.textContent = 'Send me the link';
+          form.submit();          // let the browser do it the old way
+        });
+    });
+  })();
+</script>
+</body>
+</html>

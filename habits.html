@@ -899,7 +899,8 @@ const HABITS = [
   // rename. LOCKED: it cannot be ticked by hand — finishing a session in
   // program.html is the only thing that earns it. See lockedHint below.
   { id:'strength', name:'WORKOUT',  code:'WO', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'From your programme', locked:true,
-    lockedHint:'Complete any day of your Workout in your Program to gain XP for this.' },
+    lockedHint:'Complete any day of your Workout in your Program to gain XP for this.',
+    freeHint:'Coached athletes earn this from their programme. It is the biggest habit on the list.' },
   { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
   { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
   { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                 source:'Manual' },
@@ -2070,7 +2071,7 @@ function toggleHabit(h) {
   // A locked habit is owned by another system — the athlete cannot claim it by
   // hand, so explain what does earn it instead of silently doing nothing. No
   // haptic and no XP flight either: nothing was earned to celebrate.
-  if (h.locked) { toast(h.lockedHint || 'This one is earned elsewhere.'); return; }
+  if (h.locked) { toast((isFree() && h.freeHint) || h.lockedHint || 'This one is earned elsewhere.'); return; }
   const done = isDone(h, AKEY()), before = habitXp(h), rect = UI._tapRect;
   setVal(h.id, done ? 0 : h.target);
   checkLevelUps();
@@ -2327,6 +2328,9 @@ async function fetchRollCall() {
 
 // The other half of the pair. Hand the id and key across exactly as this app
 // resolved them — an installed PWA often opens without ?key= in the URL.
+// Free Proof users have no programme. Anything in the app that assumes one has
+// to know that, or it sends them at a page that cannot load.
+function isFree() { return (ATHLETE.tier || '') === 'free'; }
 function programUrl() {
   let url = 'program.html?client=' + encodeURIComponent(ATHLETE_ID);
   if (KEY) url += '&key=' + encodeURIComponent(KEY);
@@ -2993,7 +2997,7 @@ function habitRow(h, from, lead) {
   const hl = habitLevel(h), flashed = UI.flash[h.id];
   const locked = !!h.locked && !done;
   const status = locked
-    ? (h.lockedHint || 'Earned elsewhere.')
+    ? ((isFree() && h.freeHint) || h.lockedHint || 'Earned elsewhere.')
     : (h.kind === 'count'
         ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
         : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)));
@@ -3027,7 +3031,7 @@ function habitRow(h, from, lead) {
         : ''}
     </button>
     ${h.kind === 'count' && !h.locked ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
-    ${locked ? `<button class="pluscell" ${on(goProgram)} aria-label="Open your programme">→</button>` : ''}
+    ${locked ? `<button class="pluscell" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))} aria-label="${isFree() ? 'See about coaching' : 'Open your programme'}">→</button>` : ''}
   </div>`;
 }
 
@@ -3185,13 +3189,19 @@ function renderToday(LI, doneCount, pct) {
       </div>
 
       <div class="crosslink-wrap">
-        <button class="crosslink" ${on(goProgram)}>
+        <!-- For a free user this pointed at a programme that does not exist. It
+             is now the one place in the app that mentions coaching, and it says
+             the same thing the locked WORKOUT row says: the training habit is
+             the biggest one here and it comes with a programme. -->
+        <button class="crosslink" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>
           <span class="crosslink-mark">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6M6 5v14M18 5v14M21 9v6M6 12h12"/></svg>
           </span>
           <span class="crosslink-body">
-            <span class="crosslink-title">Your training programme</span>
-            <span class="crosslink-sub">Today's session, your plan and the library</span>
+            <span class="crosslink-title">${isFree() ? 'Want the training too?' : 'Your training programme'}</span>
+            <span class="crosslink-sub">${isFree()
+              ? 'A programme built for you — and WORKOUT stops being locked'
+              : "Today's session, your plan and the library"}</span>
           </span>
           <span class="crosslink-go">→</span>
         </button>
@@ -3412,8 +3422,8 @@ function renderDetail(h) {
         </div>
         ${h.locked
           ? `<div style="display:flex;flex-direction:column;gap:10px">
-               <div style="font-size:13px;line-height:1.5;color:var(--muted)">${esc(h.lockedHint || '')}</div>
-               <button class="btn btn-primary btn-block" ${on(goProgram)}>Open your programme</button>
+               <div style="font-size:13px;line-height:1.5;color:var(--muted)">${esc((isFree() && h.freeHint) || h.lockedHint || '')}</div>
+               <button class="btn btn-primary btn-block" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>${isFree() ? 'See about coaching' : 'Open your programme'}</button>
              </div>`
           : `<div style="display:flex;gap:10px">
           <button class="btn ${done ? 'btn-secondary' : 'btn-primary'}" style="flex:1"
@@ -3712,7 +3722,7 @@ function renderManual() {
         p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it at the top of the <strong style="color:var(--ink)">CREW</strong> tab. Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
         p(`Change it as many times as you like until midnight. After that it stands — you can fix an old day's <em>log</em>, but not what you said about it.`) +
         p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Everyone else's lines are right underneath yours.`) +
-        p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach. Use Settings to message me privately.`))}
+        p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach.${isFree() ? '' : ' Use Settings to message me privately.'}`))}
 
       ${block(h2('What each habit is worth') +
         p(`Points are weighted by how much the habit actually moves your health. Your training session pays the most, then daily steps.`) +
@@ -3732,7 +3742,9 @@ function renderManual() {
 
       ${block(h2('How to earn more') +
         `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted)">
-          <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here — finish a session in your programme and it ticks itself, whether you got through all of it or not.</div>
+          <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here — ${isFree()
+            ? `it unlocks when you are on a coaching programme, and then it ticks itself every time you finish a session.`
+            : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken runs.</div>
@@ -3804,7 +3816,10 @@ function renderManual() {
 
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
-        p(`Your coach can see your habits as part of coaching you. Other athletes cannot — unless you join the leaderboard, and even then only your chosen name and points.`))}
+        p(`Your coach can see your habits as part of coaching you. Other athletes cannot — unless you join the leaderboard, and even then only your chosen name and points.`) +
+        (isFree()
+          ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong> — used to send you this link and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
+          : ''))}
 
       <div style="padding:4px 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => go('settings'))}>Back to settings</button>
@@ -4053,10 +4068,10 @@ function renderSettings() {
       </button>
 
       ${sectionLabel('Your training')}
-      <button class="selrow" ${on(goProgram)}>
+      <button class="selrow" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">Open your programme</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Today's session, your plan and the library</span>
+          <span class="lbl" style="font-size:15px">${isFree() ? 'See about coaching' : 'Open your programme'}</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">${isFree() ? 'A programme built for you, your sport and your week' : "Today's session, your plan and the library"}</span>
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
