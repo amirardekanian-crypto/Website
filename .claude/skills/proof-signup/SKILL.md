@@ -101,8 +101,10 @@ Give him this, ready to paste, with the real link filled in:
 > Hey <first name> — here's your Proof link:
 > https://www.amirardekani.com/habits.html?client=<id>&key=<key>
 >
-> Open it once on your phone and it stays there. Add it to your home screen and
-> it works offline. Pick what you want to track and tick things off daily.
+> Open it once on your phone and it stays there. Pick what you want to track and
+> tick things off daily — after the first one it'll offer to sit on your home
+> screen as **AA Proof**. Say yes; it opens in one tap and works
+> with no signal.
 >
 > When you want to be on the board with everyone else, it's the CREW tab —
 > your name's already in there as <display name>.
