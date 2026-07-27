@@ -72,6 +72,17 @@ button wired to the deferred prompt. iOS Safari has no such event and no way to 
 OS sheet from script, so there it shows the instruction — *Share → Add to Home Screen* —
 and no button that could not work.
 
+**The third case is the common one.** Amir sends the link over WhatsApp, so the first
+screen most athletes ever see is inside **WhatsApp's own browser** — and an in-app
+browser cannot add anything to a home screen. Some have no share sheet; the ones that do
+leave *Add to Home Screen* out of it. `inAppBrowser()` catches the apps that identify
+themselves (Instagram, Facebook, WhatsApp on Android, WeChat, Line, LinkedIn) and the
+sheet says *"open this in Safari first"* instead, with the install button suppressed
+because it could not work either. Detection is best-effort — a WKWebView can look exactly
+like Safari — so the plain-iOS copy carries the same escape hatch as a second line. An
+instruction naming a button the athlete does not have reads as *"this app is broken"*, on
+the first screen they ever see.
+
 ---
 
 ## Two kinds of user — coached, and free
