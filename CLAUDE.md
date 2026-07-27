@@ -86,6 +86,12 @@ and board place carry over on the same id, key and link.
 in one call, `contact_list()` shows who signed up **and how many days they have logged**
 (the qualifying signal), `forget_contact()` erases them. Full walkthrough:
 `.claude/skills/proof-signup/SKILL.md`.
+**Signing someone up must never join them to the leaderboard** — they join themselves
+from Crew. `privacy.html` promises that; `CFG.onBoard` is a client flag never read back
+from the server, so an auto-joined athlete would appear on everyone else's board while
+their own app said *"Not on the board"*; and every signup would sit on the board at 0 XP.
+The name they typed on the form goes in `data/<id>.json` as `"boardName"`, which only
+pre-fills the join box.
 
 **Quests are a lever Amir pulls, not a standing feature.** There are **none** unless he
 starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Start one with

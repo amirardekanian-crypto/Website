@@ -30,8 +30,7 @@ select athlete_id from public.athlete_keys where athlete_id like 'sara%';
 
 ### 2. Mint the key and record the contact
 
-One call does all of it — key, contact row, and putting them on the board under
-the name they asked for:
+One call does the key and the contact row:
 
 ```sql
 select * from public.add_contact(
@@ -47,6 +46,12 @@ It returns `aid` and `akey`. **Keep the key** — it goes in the link.
 Re-running it is safe: an existing key is reused, never rotated, so a link
 someone already has keeps working.
 
+> **It does not put them on the leaderboard, and it must not.** They join
+> themselves, from Crew, whenever they feel like it — that is what
+> `privacy.html` promises and it is the honest reading of a form field. It also
+> keeps the board free of names sitting at zero because someone signed up and
+> never opened the link.
+
 ### 3. Write their data file
 
 Free users have no programme, so the file is only an identity. Create
@@ -57,6 +62,7 @@ Free users have no programme, so the file is only an identity. Create
   "athlete": {
     "id": "sara_karimi",
     "firstName": "Sara",
+    "boardName": "Sara K.",
     "tier": "free"
   }
 }
@@ -65,6 +71,11 @@ Free users have no programme, so the file is only an identity. Create
 **`tier: "free"` matters.** It is what makes the app show *"Get a programme"*
 instead of a link to a programme that does not exist, and what changes the
 locked WORKOUT row to say it belongs to coached athletes.
+
+**`boardName` is the name they typed on the form.** Nothing joins them with it —
+it just pre-fills the join box in Crew, so saying yes to the board is one tap
+instead of a decision about what to call themselves. Leave it out and the app
+falls back to first name + last initial.
 
 > ⚠️ **Never put the email or the WhatsApp number in this file.** `data/*.json`
 > is a static file served by GitHub Pages — anyone who guesses an id can fetch
@@ -91,8 +102,10 @@ Give him this, ready to paste, with the real link filled in:
 > https://www.amirardekani.com/habits.html?client=<id>&key=<key>
 >
 > Open it once on your phone and it stays there. Add it to your home screen and
-> it works offline. Pick what you want to track, tick things off daily, and
-> you're on the board as <display name>.
+> it works offline. Pick what you want to track and tick things off daily.
+>
+> When you want to be on the board with everyone else, it's the CREW tab —
+> your name's already in there as <display name>.
 >
 > Shout if anything looks wrong.
 
@@ -113,6 +126,10 @@ select * from public.contact_list();
 `days_logged` is the number to look at. Someone twenty days in with a long run
 on sleep is a warm lead who has already shown you their adherence. Someone at
 zero after three weeks never started, and a nudge is wasted on them.
+
+`on_board` says whether they took the board up. Someone logging steadily but
+still off it is worth one message — the board is the thing that keeps people
+coming back, and they may simply not have found the CREW tab.
 
 ## If they ask to be deleted
 
@@ -135,7 +152,8 @@ They stay the same athlete — same id, same key, same history, same link. Run
 2. Change `"tier": "free"` to `"tier": "coached"` — or drop the field, since
    anything that is not `"free"` is treated as coached
 3. `select * from public.add_contact('<id>', null, null, null, 'coaching', 'coached');`
-   to update the tier on their contact row
+   to update the tier on their contact row (it will not touch their key, their
+   name or their board entry)
 
 Their XP, levels, runs and board position all survive, because none of it was
 ever tied to having a programme. The only thing that changes is that WORKOUT
