@@ -133,6 +133,9 @@
     padding: 32px; text-align: center; transition: opacity .4s ease;
   }
   .loading.hidden { opacity: 0; pointer-events: none; }
+  .errmark { font-size: 15px; letter-spacing: .22em; color: var(--accent); margin-bottom: 22px; }
+  .errhint { margin-top: 22px; font-size: 11px; line-height: 1.6; color: var(--muted-soft); }
+  .errhint code { font-family: 'Space Mono', monospace; font-size: 10px; }
   .spinner { width: 38px; height: 38px; border: 3px solid var(--track); border-top-color: var(--accent); animation: spin .8s linear infinite; }
   .errscreen { display: none; z-index: 9998; }
   .errscreen.on { display: flex; }
@@ -355,18 +358,27 @@
   .input:focus-visible { border-color: var(--accent); outline-offset: 0; }
 
   /* ── Toggle (square, 44×24) ── */
-  .sw { width: 44px; height: 24px; flex: none; border: 2px solid var(--ink); display: flex; align-items: center; padding: 2px; }
-  .sw > i { width: 16px; height: 16px; display: block; background: var(--ink); }
+  /* Off recedes. It used to be drawn in --ink for both border and knob, which
+     made it heavier than any type beside it — so Settings drew the eye
+     straight to whichever switches were turned OFF. */
+  .sw { width: 44px; height: 24px; flex: none; border: 2px solid var(--muted-soft); display: flex; align-items: center; padding: 2px; }
+  .sw > i { width: 16px; height: 16px; display: block; background: var(--muted-soft); }
   .sw.on { background: var(--accent); justify-content: flex-end; border-color: var(--accent); }
   .sw.on > i { background: var(--bg); }
 
   /* ── Select rows (goals, coach volume, motivation) ── */
+  /* 20px, like every other list row in the app. At 14px these rows sat six
+     pixels inside their own section headings, so Settings had no single left
+     edge — the cheapest possible reason for a screen to feel subtly wrong.
+     The border is 1px rule here rather than 2px divider because every instance
+     was already overriding it inline to exactly that. */
   .selrow {
-    width: 100%; text-align: left; padding: 15px 14px;
-    border-bottom: 2px solid var(--divider);
+    width: 100%; text-align: left; padding: 15px 20px;
+    border-bottom: 1px solid var(--rule);
     display: flex; justify-content: space-between; align-items: center; gap: 12px;
   }
   .selrow.on { background: var(--accent); color: var(--bg); }
+  .sectlbl { padding: 18px 20px 8px; letter-spacing: .12em; display: flex; justify-content: space-between; gap: 12px; }
   .selrow .lbl { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1.15; text-transform: uppercase; }
   .selrow .desc { font-size: 12px; line-height: 1.35; opacity: .75; margin-top: 5px; }
   .selrow .mark { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
@@ -693,10 +705,17 @@
     background: var(--muted-soft);
   }
   .ember[data-lvl="1"], .ember[data-lvl="2"], .ember[data-lvl="3"] { color: var(--clay-deep); }
-  .ember[data-lvl="1"]::before { background: var(--clay); animation: emberPulse 2.8s ease-in-out infinite; }
-  .ember[data-lvl="2"]::before { background: var(--clay); animation: emberPulse 1.5s ease-in-out infinite; }
+  .ember[data-lvl="1"]::before,
+  .ember[data-lvl="2"]::before,
+  .ember[data-lvl="3"]::before { background: var(--clay); }
   .ember[data-lvl="3"] { font-weight: 700; }
-  .ember[data-lvl="3"]::before { background: var(--clay); animation: emberFlicker 1.9s ease-in-out infinite; }
+  /* ONLY THE LONGEST RUN MOVES. Every streak used to animate, so a consistent
+     athlete opened Today to six clay dots pulsing at once — the effect was
+     designed for one. `.lead` marks the best current run on the screen; the
+     rest keep the colour and the weight, and hold still. */
+  .ember.lead[data-lvl="1"]::before { animation: emberPulse 2.8s ease-in-out infinite; }
+  .ember.lead[data-lvl="2"]::before { animation: emberPulse 1.5s ease-in-out infinite; }
+  .ember.lead[data-lvl="3"]::before { animation: emberFlicker 1.9s ease-in-out infinite; }
 
   /* The app noticing you have stalled. Breathes the box of the most valuable
      habit still undone, ~20s after you last touched anything. */
@@ -769,7 +788,15 @@
 <body>
 
 <div class="loading" id="loading"><div class="spinner"></div><div class="eyebrow" style="margin-top:20px">Loading proof</div></div>
-<div class="errscreen" id="error"><h2 class="hd">Can't load</h2><p id="error-msg"></p></div>
+<!-- Branded on purpose. Unbranded, a bad link reads as "this app is broken";
+     with the wordmark it reads as "the app is fine, my link is wrong" — which
+     is both true and the thing that gets the athlete to ask for a new one. -->
+<div class="errscreen" id="error">
+  <div class="errmark hd">PROOF</div>
+  <h2 class="hd">Can't load</h2>
+  <p id="error-msg"></p>
+  <p class="errhint">Your link should look like<br><code>amirardekani.com/habits.html?client=…</code></p>
+</div>
 
 <div class="app" id="app"></div>
 
@@ -2262,6 +2289,13 @@ function defaultDisplayName() {
 
 // ── Render helpers ────────────────────────────────────────────────────────
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// One section heading for the whole app. Progress and Settings each had their
+// own copy of this, and the two had drifted to different bottom padding — the
+// classic cost of duplicating a component instead of sharing it.
+function sectionLabel(title, right) {
+  return `<div class="eyebrow sectlbl"><span>${esc(title)}</span>${right ? `<span>${esc(right)}</span>` : ''}</div>`;
+}
 let _handlers = {};
 function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _handlers[id] = fn; return 'data-h="' + id + '"'; }
 
@@ -2666,7 +2700,11 @@ function renderOnboarding() {
         <div class="eyebrow">${nOn} tracked</div>
       </div>
       <div style="flex:1;display:flex;flex-direction:column;padding-top:26px;overflow:hidden;animation:riseIn .3s ease">
-        <div class="hd" style="font-size:38px;line-height:.98;letter-spacing:-.03em">Here's what<br>I'd track</div>
+        <!-- The one screen where using their name actually lands: it is the
+             first thing they ever see, and it is a coach talking to a person. -->
+        <div class="hd" style="font-size:38px;line-height:.98;letter-spacing:-.03em">${(ATHLETE.firstName || '').trim()
+          ? esc(ATHLETE.firstName.trim()) + ',<br>here is what<br>I\'d track'
+          : 'Here\'s what<br>I\'d track'}</div>
         <p style="margin:14px 0 16px;font-size:14px;color:var(--muted)">
           These are my suggestions. Switch off anything you'd only lie about later — you can change all of it whenever you like.
         </p>
@@ -2712,7 +2750,10 @@ function renderApp() {
     board:    LB.view === 'roll'
                 ? ['One sentence each, past 7 days', 'Roll call']
                 : [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
-    manual:   ['Everything, explained', 'How this works'],
+    // Screen titles are the canonical names, and the Settings rows that lead
+    // here now use exactly these words. Tapping "Read the manual" and arriving
+    // at "How this works" made two screens feel like four.
+    manual:   ['Everything, explained', 'The manual'],
     ranks:    ['Ten ranks, fifty levels', 'The ladder'],
     settings: ['Profile & tracking', 'Settings']
   };
@@ -2720,9 +2761,13 @@ function renderApp() {
     today: pct + '% DONE', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
                      return s > 0 ? s + ' DAY' + (s === 1 ? '' : 'S') + ' RUNNING' : ''; })(),
-    board: LB.view === 'roll'
-             ? (RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length || '') && RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length + ' IN TODAY'
-             : (LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : ''),
+    board: (() => {
+      if (LB.view === 'roll') {
+        const n = RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length;
+        return n ? n + ' IN TODAY' : '';
+      }
+      return LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '';
+    })(),
     ranks: '',                              // the hero says the level already
     settings: ''
   };
@@ -2871,7 +2916,12 @@ function renderBadgeCelebration(ev) {
 }
 
 // ── Habit row, shared by Today and Habits ─────────────────────────────────
-function habitRow(h, from) {
+// The best current run across the tracked habits. Used to decide which single
+// ember animates; see the `.ember.lead` rules.
+function leadStreak() {
+  return live().reduce((m, h) => Math.max(m, habitStreak(h)), 0);
+}
+function habitRow(h, from, lead) {
   const v = valOf(AKEY(), h.id), done = isDone(h, AKEY()), st = habitStreak(h);
   const hl = habitLevel(h), flashed = UI.flash[h.id];
   const locked = !!h.locked && !done;
@@ -2901,7 +2951,7 @@ function habitRow(h, from) {
              the level permanently. -->
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
                   : st > 0
-                    ? `<span class="hlv" data-k="hlv"><span class="ember" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span></span>`
+                    ? `<span class="hlv" data-k="hlv"><span class="ember${st === lead && st > 0 ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span></span>`
                     : `<span class="hlv" data-k="hlv">LV ${hl.lv}</span>`}
       </span>
       <span class="status">${esc(status)}</span>
@@ -3027,7 +3077,7 @@ function renderToday(LI, doneCount, pct) {
       </div>` : ''}
       ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${hs.length - doneCount} to go before midnight</div>` : ''}
 
-      ${hs.map(h => habitRow(h, 'today')).join('')}
+      ${(() => { const lead = leadStreak(); return hs.map(h => habitRow(h, 'today', lead)).join(''); })()}
 
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
@@ -3131,10 +3181,9 @@ function fmtQuestVal(q, v) {
 // one screen: overall level, then every habit's own rank, then the milestones.
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
-  const dayStreakNow = currentDayStreak(), bestStreak = bestDayStreak();
+  const dayStreakNow = currentDayStreak(), bestStreak = bestDayStreak(), lead = leadStreak();
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
-  const sectionLabel = (t, r) => `<div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between"><span>${t}</span><span>${r || ''}</span></div>`;
   return `
     <div data-k="screen:progress" style="${screenAnim()}">
       <!-- Progress used to open with the SAME 76px level hero as Today, so two
@@ -3182,7 +3231,7 @@ function renderProgress(LI, earned, totalAch) {
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span class="hlv">${st > 0 ? `<span class="ember" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span>` : '—'}</span>
+              <span class="hlv">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">DAY${st === 1 ? '' : 'S'}</span></span>` : '—'}</span>
             </div>
             <!-- Was rank · XP · today's status, which wrapped to two lines and
                  restated what Today already says. Progress is about standing. -->
@@ -3876,7 +3925,6 @@ function perfectDayXp() {
 // ── Settings ──────────────────────────────────────────────────────────────
 function renderSettings() {
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-  const sectionLabel = (t) => `<div class="eyebrow" style="padding:18px 20px 6px;letter-spacing:.12em">${t}</div>`;
   return `
     <div data-k="screen:settings" style="${screenAnim()}">
       <div class="block" style="display:flex;gap:14px;align-items:center;padding:18px 20px">
@@ -3891,23 +3939,23 @@ function renderSettings() {
       <!-- No leading icon here. It was the only row in Settings that had one,
            which pushed its label 70px right of every other row's and left the
            whole list with a ragged left edge. -->
-      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('ranks'))}>
+      <button class="selrow" ${on(() => go('ranks'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">The ranks</span>
+          <span class="lbl" style="font-size:15px">The ladder</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">All ${RANKS.length} ranks, what each one costs, and where you stand</span>
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
-      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('manual'))}>
+      <button class="selrow" ${on(() => go('manual'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">Read the manual</span>
+          <span class="lbl" style="font-size:15px">The manual</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Points, levels, ranks, consistency and the leaderboard — explained</span>
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
 
       ${sectionLabel('Your training')}
-      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(goProgram)}>
+      <button class="selrow" ${on(goProgram)}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">Open your programme</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Today's session, your plan and the library</span>
@@ -3929,7 +3977,7 @@ function renderSettings() {
       </div>
 
       ${sectionLabel('Leaderboard')}
-      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => go('board'))}>
+      <button class="selrow" ${on(() => go('board'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">${CFG.onBoard ? 'You are on the board' : 'Not on the board'}</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">
@@ -3937,15 +3985,19 @@ function renderSettings() {
                           : 'Other athletes only see you if you join · tap to have a look'}
           </span>
         </span>
-        <span class="mono" style="font-size:11px;color:var(--clay-deep)">${CFG.onBoard ? 'ON' : 'OFF'}</span>
+        <!-- An arrow, like every other row that navigates somewhere. This was a
+             clay ON/OFF, which made Settings express the same yes/no idea three
+             different ways on one screen — a switch, a word, and a tap-through.
+             The state is already in the label and the line beneath it. -->
+        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
 
       ${sectionLabel('Appearance')}
-      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
+      <button class="selrow" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
         <span class="lbl" style="font-size:15px">Dark mode</span>
         <span class="sw ${CFG.dark ? 'on' : ''}"><i></i></span>
       </button>
-      <button class="selrow" style="border-bottom:1px solid var(--rule)" ${on(() => { CFG.sound = !CFG.sound; saveCfg(); render(); if (CFG.sound) haptic('done'); })}>
+      <button class="selrow" ${on(() => { CFG.sound = !CFG.sound; saveCfg(); render(); if (CFG.sound) haptic('done'); })}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">Sound</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">A short blip when you tick something. Off by default.</span>
