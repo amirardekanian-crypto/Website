@@ -350,6 +350,54 @@ to explain the decision to the athlete.
 
 ---
 
+## The long game — rewards a season cannot take
+
+A reward track up the level ladder: **14 rewards**, reached by levelling and nothing
+else. There is nothing to buy, nothing to claim, and no second currency. It exists
+because the app could tell you your level *after* you earned it and never once told you
+what was coming — and "what is coming" is what carries someone through the week where the
+numbers barely move.
+
+Two kinds, both free to mint, which is the constraint that shapes the whole feature. A
+coach cannot owe forty people a phone call because forty people were consistent, so
+nothing on this track costs Amir anything to hand over:
+
+- **Titles** — a name the athlete wears. It sits under their rank on Progress and is
+  printed on the rank card they share.
+- **Cards** — the look of that shareable card. Five grounds (`HOUSE`, `EMBER`,
+  `BLUEPRINT`, `NIGHTFALL`, `FLARE`), all painted on the canvas, all inside the palette:
+  a treatment changes *structure*, never colour.
+
+A cosmetic is worth nothing without an audience — which is why most habit trackers cannot
+make rewards work. This one has two: the board, and a card built to be exported.
+
+**They are kept, and that is the one exception in the whole app.** Every other number here
+is derived, so retuning a rule rescores all of history. Rewards are *recorded* in
+`CFG.pass.owned` the moment the level is reached, and never taken back — not by a new
+season, not by a retune, not by switching a habit off. A reward you can lose is a rental.
+
+That also settles the season question without a second XP ladder: levels reset exactly as
+they do now, and what you already unlocked does not. *"A new season resets your points,
+not your rewards."*
+
+`claimRewards()` records anything the current level has reached and returns only what is
+**new**, so the caller can celebrate it — pushed onto the queue *behind* the level-up that
+earned it, so the takeovers read as cause then effect. It runs silently once at boot,
+which baselines an athlete arriving with history instead of firing fourteen takeovers at
+them. The highest title they own is equipped for them; earning a name and then having to
+go and switch it on is a step nobody asks for.
+
+Reached from **Progress → The long game**, which also states the next unlock and its
+distance in XP — the only forward-looking line on a screen that otherwise reports the past.
+
+⚠️ **Not yet on the leaderboard.** Titles show on Progress and on the exported card, both
+client-side. Putting one beside a name on the board means the server has to validate that
+the athlete actually earned it, which needs the track on the `xp_rules` row (the pattern
+`QUEST_POOL` already uses) — otherwise devtools could award anyone anything. That is the
+next step, and it is the step that gives titles their real audience.
+
+---
+
 ## The eight habits
 
 | Habit | Target | XP | Notes |

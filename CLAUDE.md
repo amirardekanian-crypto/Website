@@ -53,6 +53,15 @@ is a sheet fired **once, after the athlete's first log** — never on arrival �
 permanent Settings row as the way back. iOS gets instructions, not a button:
 `beforeinstallprompt` is Chromium-only.
 
+**The long game** is the reward track (`PASS_TRACK` in `habits.html`) — 14 titles and
+card looks unlocked purely by levelling, reached from Progress. **Rewards are the one
+thing in this app that is stored rather than derived** (`CFG.pass.owned`) and **nothing
+may ever revoke one** — not a season reset, not a retune, not switching a habit off. That
+is what lets levels keep resetting each season. Everything on the track must stay **free
+to mint**: the moment a reward costs Amir an hour, forty consistent athletes become forty
+hours he owes. Titles are not on the leaderboard yet — that needs server-side validation
+via `xp_rules`, exactly like `QUEST_POOL`.
+
 **Two words, one job each — do not invent a third.** A **run** is consecutive days on
 *one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
 `streakQualifyPct` of everything they track ("2-day streak"). The app once used five
