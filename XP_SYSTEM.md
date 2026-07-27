@@ -52,6 +52,14 @@ const BACKFILL_DAYS = 3;   // today + this many days back are editable — secti
 const NOTE_MAX = 200;      // characters in a roll call sentence — section 11
 ```
 
+**Rewards are the one exception to "nothing is stored".** `PASS_TRACK` hands out a title
+or a card look at 14 points up the ladder, and what has been unlocked is *recorded* in
+`CFG.pass.owned` rather than recomputed. That is deliberate and it must stay that way:
+levels reset with the season, so a derived reward would be taken back every reset, and a
+reward you can lose is a rental. `claimRewards()` only ever **adds**. Nothing in this
+document changes what a reward is worth, because a reward is worth no XP — see
+`HABITS.md` → *The long game*.
+
 **Free users score on exactly these rules.** `"tier": "free"` in `data/<id>.json`
 (`isFree()` in the app) changes what the athlete can *reach* — WORKOUT stays locked and
 the programme links point at the apply form — and changes **nothing** about scoring.
