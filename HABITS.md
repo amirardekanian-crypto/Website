@@ -51,6 +51,47 @@ without `&key=` in the URL.
 
 ---
 
+## Two kinds of user — coached, and free
+
+Proof is also **the way in for people who are not clients yet**. They land on
+[`proof.html`](proof.html) (the Instagram bio link — deliberately not in the site nav),
+read what it is, and leave a **display name, email and WhatsApp number**. Amir gets the
+form by email and runs the **`/proof-signup`** skill, which does the whole job in one
+pass: pick an id, mint the key, record the contact, write the data file, ship it, and
+hand back a WhatsApp message with the link already in it.
+
+The difference between the two users is **one field** in `data/<id>.json`:
+
+```json
+{ "athlete": { "id": "sara_karimi", "firstName": "Sara", "tier": "free" } }
+```
+
+`isFree()` is the only test in the app, and anything that is not `"free"` counts as
+coached — so no existing athlete file needs touching. In free mode:
+
+- **WORKOUT stays locked**, and says why: *"Coached athletes earn this from their
+  programme. It is the biggest habit on the list."* It is the one habit they can see
+  and cannot have, which is the honest version of the pitch.
+- Every route that would open `program.html` goes to **`/form.html`** instead — the
+  Today card, the Settings row, the habit detail button.
+- The Today card reads *"Want the training too?"* rather than *"Your training
+  programme"*.
+
+**Scoring is identical.** A free user earns the same XP, levels, runs, badges and board
+position as a paying athlete, and shares **one board** with them — that is the point.
+It also makes the upgrade free of migration: flip `"tier"` to `"coached"`, let the
+coaching pipeline write the programme into the same file, and their whole history,
+level and board place carry straight over. Same id, same key, same link.
+
+**Contact details never go in `data/*.json`** — that file is served statically by GitHub
+Pages and anyone who guesses an id can read it. Email and WhatsApp live in
+`public.hab_contacts` behind coach-only RLS (`supabase/stage16_contacts.sql`).
+`select * from public.contact_list();` shows who signed up **and how many days they have
+actually logged** — adherence is the qualifying signal, and a better one than an email
+address. `select public.forget_contact('<id>');` erases someone completely.
+
+---
+
 ## The three tabs
 
 `TODAY · PROGRESS · CREW`. **Settings is not a tab** — it lives behind the athlete's
@@ -331,6 +372,12 @@ Why it's built this way:
 - **The server is simply the truth.** Because the habit is locked, the import is
   idempotent — no once-only bookkeeping is needed, since the athlete cannot untick it
   and disagree.
+
+**For a free user there is no programme to open**, so the row's line changes to
+*"Coached athletes earn this from their programme. It is the biggest habit on the list."*
+and the arrow points at `/form.html`. The habit stays visible rather than being hidden —
+it is the one thing on the list they can see and cannot have, and that is a fairer pitch
+than a paywall banner.
 
 The habit's id is still `strength` internally so that renaming it to WORKOUT didn't
 orphan anyone's history or XP.

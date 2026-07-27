@@ -78,6 +78,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Two words for two ideas: `run` and `streak`.** A run is consecutive days on one habit; a streak is consecutive days at `streakQualifyPct` across everything tracked. The app previously used five phrasings — *day streak*, *24 DAYS*, *Best streak*, *Best run so far*, *days in a row* — so an athlete saw `24 DAYS` on water and `2` for DAY STREAK on Progress and could not reconcile them. Habit rows and the detail header read `24-DAY RUN`; the detail stat is `Longest run`; the pip key and the tier line both say *run*. Never introduce a third word for either.
 - **Quests say so when there is no run.** `renderQuestsIdle()` prints one muted line rather than nothing. Between runs the block used to vanish entirely, which kept "seeing quests means something is on" true but made the feature invisible — an athlete who joined between runs never learned quests existed, so the next run read as random instead of as an event. The idle line is a fraction of a live block's height on purpose.
 - **The error screen is branded.** Unbranded, a stale link reads as "this app is broken"; with the wordmark and the expected link shape it reads as "the app is fine, my link is wrong", which is both true and the thing that gets the athlete to ask for a new one.
+- **It also runs for people with no programme (`"tier": "free"`).** One field in `data/<id>.json` switches the app into free mode; `isFree()` is the only test, and everything not-`"free"` is treated as coached, so existing athlete files need no edit. In free mode WORKOUT stays locked and explains *why* ("Coached athletes earn this from their programme"), every route that would have opened `program.html` goes to `/form.html` instead, and the cross-link reads *"Want the training too?"* rather than *"Your training programme"*. **Nothing about scoring changes** — a free user earns XP, levels, runs and board position on exactly the same rules, which is what makes the upgrade path free: flip the field, the pipeline writes the programme, and their whole history survives. Free users sign up at [`proof.html`](proof.html) and are set up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill.
 - **One departure from the original design handoff:** STEPS and SLEEP are entered manually rather than synced from HealthKit, which a web app cannot read.
 - **Edit this when:** Changing the suggested habits or their XP weights, rank names, pacing, consistency tiers, milestones, or the nudge copy — all covered in [`XP_SYSTEM.md`](XP_SYSTEM.md).
 - **Don't touch:** The Supabase URL/key and the key-resolution block. The `migrateOld()` fold-forward (it rescues data from earlier shipped versions). The sync/dirty-flag logic. `noindex` on purpose.
@@ -98,12 +99,21 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The Supabase URL/key and the coach-email check. `noindex` on purpose.
 - **See also:** `CALL_LOG.md` — the full user manual for this page.
 
+#### `proof.html` — The free habit-tracker landing page (public)
+- **What it does:** The page you send people who are not clients. It explains what Proof is, what they'd track, that they'd be on one board with real coaching athletes, and then asks for three things — **display name, email, WhatsApp** — which arrive in your inbox via Web3Forms, same as the apply form. It ends on a soft coaching CTA rather than a hard sell: the tracker *is* the pitch.
+- **It is deliberately not in the nav.** It's the Instagram bio link and the thing you paste in DMs. Adding it to the site menu would put a free product next to the paid one on the front door.
+- **Signing someone up is a skill, not a chore:** paste the signup email at Claude and run [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) — it picks an id, mints the key, records the contact, writes `data/<id>.json` with `"tier": "free"`, ships it, and hands you back a WhatsApp message with the link in it.
+- **If deleted:** No one new can sign up for the free tracker; existing free users are unaffected (their links keep working).
+- **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, partials, Web3Forms (external), and — after signup — `supabase/stage16_contacts.sql`.
+- **Edit this when:** You want to change the pitch, the habits shown, or which fields you ask for. If you change the fields, change the `/proof-signup` skill and `privacy.html` §2.4 with them.
+- **Don't touch:** The Web3Forms `access_key` (breaks submissions). Never add a field that collects anything you would not want sitting in an email inbox.
+
 #### `privacy.html` — Privacy Notice
-- **What it does:** Your GDPR-compliant privacy statement covering the form, analytics, and embedded YouTube.
+- **What it does:** Your GDPR-compliant privacy statement covering the form, the two apps, the habit tracker and its board, free-tracker signups, analytics, and embedded YouTube.
 - **If deleted:** You break UK/EU law and the link in the footer 404s.
 - **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, partials.
-- **Edit this when:** You change what services you use, change retention periods, or update your contact details.
-- **Don't touch:** The structure — the numbered sections are there for legal reasons.
+- **Edit this when:** You change what services you use, change retention periods, or update your contact details. **Any new collection of personal data needs a section here with a lawful basis** — that is what §2.4 is for the `proof.html` signups.
+- **Don't touch:** The structure — the numbered sections are there for legal reasons. If you insert a section, renumber the ones after it (a duplicate `2.5` once shipped this way).
 
 #### `terms.html` — Terms of Use
 - **What it does:** Legal disclaimers around training, liability, intellectual property.
@@ -208,6 +218,7 @@ The site started with no backend. It now uses **Supabase** (a hosted Postgres da
   - `stage1_schema.sql` — the core: a table that stores each athlete's progress as one JSON blob, plus the coach dashboard's read access.
   - `stage2_keys.sql` — per-athlete secret keys, so an athlete's link (`program.html?client=<id>&key=<key>`) can write only their own data.
   - `stage3_messages.sql` — the two-way messaging table used by the coach dashboard.
+  - `stage16_contacts.sql` — the **contact book** for free habit-tracker signups: email and WhatsApp, who they are, where they came from, and how many days they have actually logged (`contact_list()`). Coach-only, behind RLS. It exists because `data/<id>.json` is a static file anyone can fetch if they guess an id — **contact details must never go in the repo**. `add_contact()` does a whole signup in one call; `forget_contact()` erases someone completely.
 - **If deleted:** No effect on the live database (it's already built) — you'd just lose the written record of how it was set up.
 - **Edit this when:** You change the database structure. Edit the SQL here *and* apply the same change in the Supabase dashboard so the two stay in sync.
 - **Don't touch:** Don't run these blind against the live database without understanding them — ask an AI assistant to walk you through any change first.
