@@ -125,6 +125,17 @@ what keeps both scorers honest; there is no server-side check.
 > quests (50k and 70k) need two and three days respectively; at 5× or above they are
 > one-day work again.
 
+**`bump()` clamps to the daily ceiling, not to the target — and this was a bug worth
+knowing about.** Today's `+` used to be `Math.min(h.target, cur + step)`, which *lowers*
+anything already logged above the target: the log sheet accepts up to `dailyCap × target`,
+so a real 12,000-step day plus one tap of `+` became 10,000 — **2,000 steps deleted**, and
+the toast reported it as `+0 XP · STEPS complete`. A control labelled `+` must never
+subtract. Daily XP is unchanged either way, because `xpFor()` still stops at the target;
+what changes is that a `total:` quest now counts the units the athlete actually walked
+past their target from Today as well as from the sheet, which is the behaviour the sheet
+already had. Past the target the toast says there is no more XP in it today rather than
+printing `+0 XP` under the word *complete*.
+
 **A perfect day is 420 XP** with the current numbers. That figure is the anchor for
 everything below — if you change `weights`, recompute it.
 

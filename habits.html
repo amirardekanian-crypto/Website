@@ -189,8 +189,12 @@
   /* ── Habit rows ── */
   .hrow { display: flex; align-items: stretch; border-bottom: 1px solid var(--rule); }
   .hrow.done { background: var(--accent-100); }
+  /* 2px, the app's structural rule weight, not the 1px used between rows. The
+     row has three tap targets and the seam is the only thing that says so —
+     at 1px it read as the same hairline that separates one habit from the next,
+     so the row looked like one big button that happened to do three things. */
   .hrow .checkcell {
-    flex: none; width: 64px; border-right: 1px solid var(--rule);
+    flex: none; width: 64px; border-right: 2px solid var(--divider);
     display: flex; align-items: center; justify-content: center;
   }
   .boxmark { width: 28px; height: 28px; border: 2px solid var(--box); display: block; transition: border-color .18s ease, background-color .18s ease; }
@@ -228,6 +232,10 @@
   .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); }
   .hrow .body .track { display: block; width: 100%; height: 4px; background: var(--track); margin-top: 2px; }
   .hrow .body .track > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
+  .hrow + .rowhint { padding: 10px 20px 14px; font-size: 11px; line-height: 1.5; color: var(--muted-soft); border-bottom: 2px solid var(--divider); }
+  .rowhint strong { color: var(--muted); font-weight: 600; }
+  .statnote { padding: 12px 20px 14px; font-size: 11.5px; line-height: 1.55; color: var(--muted); border-bottom: 2px solid var(--divider); }
+  .statnote strong { color: var(--ink); font-weight: 600; }
   /* No border-left. It only existed on rows that HAVE a plus, so the vertical
      rule appeared on the counter habits and vanished on the check-off ones,
      making the right edge of the list look broken halfway down. */
@@ -320,6 +328,7 @@
   .gridkey .gk .c:first-child { margin-left: 0; }
   .gridkey .gk .c.hit { background: var(--accent); border-color: var(--accent); }
   .gridkey .gk .c.part { background: var(--accent-100); border-color: var(--accent); }
+  .gridkey .gk .c.pre { border-style: dotted; opacity: .5; }
 
   /* ── The manual ──────────────────────────────────────────────────────────
      A dozen sections of prose. Without a way in it is a wall you scroll past
@@ -451,6 +460,9 @@
   .grid35 .c.hit { background: var(--accent); border-color: var(--accent); }
   .grid35 .c.part { background: var(--accent-100); border-color: var(--accent); }
   .grid35 .c.future { opacity: .25; }
+  /* Before you started. Not a miss — a miss is a day you had and did not use,
+     and a new athlete was being shown five weeks of them. */
+  .grid35 .c.pre { border-style: dotted; opacity: .4; }
 
   /* ── Sheet & toast ── */
   .scrim { position: absolute; inset: 0; z-index: 80; background: var(--scrim); animation: fadeIn .2s ease; }
@@ -474,6 +486,80 @@
   }
 
   .demo-banner { background: var(--clay); color: var(--on-clay); padding: 8px 20px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+
+  /* ── The tour ───────────────────────────────────────────────────────────
+     A game's first-run tutorial: a clay box drawn around the thing being
+     named, a message card beside it, everything else dimmed.
+
+     FOUR mask panes rather than one lid with a transparent window, because a
+     step marked `act` has to be completable by ACTUALLY DOING THE THING — and
+     a transparent lid still swallows the tap. The panes leave a real hole; a
+     step you only read gets `.tourblock` dropped into that hole to seal it.
+
+     It lives OUTSIDE #app on purpose. render() morphs #app's children against
+     the template, so anything in there that the template does not know about
+     is deleted on the next tick. This layer is painted imperatively by
+     paintTour() and the renderer never sees it.
+
+     z-index sits above #fx (120) and below the celebration takeover (200) —
+     a level earned mid-tour still gets its moment, and paintTour() stands the
+     whole layer down while one is on screen. */
+  /* `pointer-events: none` ON THE LAYER, auto on its children. The layer is a
+     full-viewport fixed div, and hit-testing does not care that it is
+     transparent — without this it swallows every tap in the app, so the hole
+     cut by the four mask panes is a hole you can see through and not one you
+     can reach through, and no `act` step could ever be completed. */
+  .tourlay { position: fixed; inset: 0; z-index: 150; display: none; pointer-events: none; }
+  .tourlay.on { display: block; }
+  .tourmask, .tourblock { position: fixed; pointer-events: auto; }
+  .tourmask { background: var(--scrim); animation: fadeIn .2s ease; }
+  .tourring {
+    position: fixed; pointer-events: none; border: 3px solid var(--clay);
+    animation: tourPulse 1.7s ease-in-out infinite;
+  }
+  /* Clay only — the house has no second accent. On dark, --clay is already the
+     lighter #E06B43, so the ring reads on both grounds without a second rule. */
+  @keyframes tourPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,.55); }
+    50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
+  }
+  .tourcard {
+    position: fixed; pointer-events: auto;
+    background: var(--bg); border: 2px solid var(--ink);
+    padding: 15px 16px 13px; display: flex; flex-direction: column; gap: 9px;
+    animation: riseIn .22s ease;
+    /* BOUNDED, so the ring always has somewhere to be. On a 320×568 phone an
+       unbounded card is well over half the viewport and there is no placement
+       that does not cover the thing being pointed at. The prose scrolls; the
+       title, the buttons and Skip never move. */
+    max-height: 56vh;
+  }
+  .tourcard .tourbody { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 9px; }
+  .tourcard .tourbody::-webkit-scrollbar { width: 0; }
+  .tourcard .tourtop { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .tourcard .tourn { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; color: var(--clay-deep); flex: none; }
+  .tourcard h4 {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase;
+    font-size: 20px; line-height: 1.02; letter-spacing: -.01em; min-width: 0;
+  }
+  .tourcard p { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .tourcard p strong { color: var(--ink); font-weight: 600; }
+  .tourcard .tournav { display: flex; gap: 8px; align-items: stretch; margin-top: 2px; }
+  .tourcard .tournav .btn { flex: 1; justify-content: center; padding: 12px 14px; }
+  .tourcard .tournav .tourback {
+    flex: none; width: 46px; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px;
+    border: 1px solid var(--divider); color: var(--muted);
+  }
+  .tourskip {
+    align-self: flex-start; font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted-soft); padding: 4px 0 0;
+  }
+  /* The pointing finger: a plain clay triangle off the card's edge, aimed at
+     the ring. No radius, no shadow, no icon set. */
+  .tourcard .tourtip { position: absolute; width: 0; height: 0; }
+  .tourcard .tourtip.up   { top: -9px;    border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 9px solid var(--ink); }
+  .tourcard .tourtip.down { bottom: -9px; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 9px solid var(--ink); }
 
   /* ── The XP flight ──────────────────────────────────────────────────────
      Points you just earned leave the habit that earned them and land in the
@@ -885,6 +971,10 @@
 </div>
 
 <div class="app" id="app"></div>
+<!-- The tour's layer. Outside #app because render() morphs #app against the
+     template and would delete anything it does not recognise; paintTour() owns
+     this node and nothing else ever touches it. -->
+<div class="tourlay" id="tour"></div>
 
 <script>
 // ════════════════════════════════════════════════════════════════════════
@@ -1368,7 +1458,10 @@ let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
-  return { v:3, on, custom:[], onboarded:false, installAsked:false, dark:false, seen:null, rulesSig:null,
+  // `toured` is separate from `onboarded` on purpose: everyone who already has
+  // the app skipped onboarding long ago, and the tour is the thing they never
+  // got. Leaving it false by default means it offers itself once to them too.
+  return { v:3, on, custom:[], onboarded:false, toured:false, installAsked:false, dark:false, seen:null, rulesSig:null,
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
@@ -2017,7 +2110,7 @@ function armIdle() {
   clearTimeout(_idleTimer);
   UI.idle = null;
   _idleTimer = setTimeout(() => {
-    if (UI.screen !== 'today' || UI.celebrate.length || UI.sheet || reduced()) return;
+    if (UI.screen !== 'today' || UI.celebrate.length || UI.sheet || TOUR.on || reduced()) return;
     const cand = live().filter(h => !isDone(h) && !h.locked)
                        .sort((a, b) => baseXp(b) - baseXp(a))[0];
     if (!cand) return;
@@ -2053,13 +2146,13 @@ function nudge() {
     const t = missing.filter(h => !h.locked).sort((a, b) => baseXp(b) - baseXp(a))[0];
     return { risk: true, key: 'risk',
              line: pickLine('risk', 'risk', { st: st, n: short }),
-             cta: t ? 'SAVE IT · ' + t.name : 'SEE THE RECAP',
+             cta: t ? 'SAVE IT · ' + t.name : 'SEE WHERE YOU STAND',
              target: t ? t.id : null };
   }
 
   // Everything done — the only nudge with nothing to ask for.
   if (!missing.length) {
-    return { key: 'done', line: pickLine('allDone', 'done'), cta: 'SEE THE RECAP', target: null };
+    return { key: 'done', line: pickLine('allDone', 'done'), cta: 'SEE WHERE YOU STAND', target: null };
   }
 
   // Nothing logged at all yet: point at the cheapest win rather than the biggest.
@@ -2084,7 +2177,7 @@ function nudge() {
   const st = currentDayStreak();
   if (st >= 5 && dayQualifies(TKEY())) {
     return { key: 'rolling', line: pickLine('rolling', 'rolling', { st: st }),
-             cta: 'SEE THE RECAP', target: null };
+             cta: 'SEE WHERE YOU STAND', target: null };
   }
 
   // Otherwise: the most valuable thing they can still action, in its own words.
@@ -2293,10 +2386,10 @@ function maybeOfferInstall() {
   _installTimer = setTimeout(() => {
     _installTimer = null;
     // Never on top of something else. A celebration is the moment they came for,
-    // the log sheet is a task in progress, and any other screen means they went
-    // somewhere on purpose.
+    // the log sheet is a task in progress, the tour is an explanation in
+    // progress, and any other screen means they went somewhere on purpose.
     if (!installable() || CFG.installAsked || UI.celebrate.length || UI.sheet ||
-        UI.screen !== 'today' || UI.install) return;
+        TOUR.on || UI.screen !== 'today' || UI.install) return;
     UI.install = true;
     render();
   }, 1500);
@@ -2388,14 +2481,25 @@ function toggleHabit(h) {
 }
 function bump(h) {
   const before = habitXp(h), rect = UI._tapRect;
-  const v = Math.min(h.target, valOf(AKEY(), h.id) + (h.step || 1));
+  const cur = valOf(AKEY(), h.id);
+  // Clamped to the DAILY CAP, not to the target. It used to be
+  // `Math.min(h.target, cur + step)`, which SUBTRACTS from anything already
+  // logged above the target: the sheet accepts up to dailyCap × target
+  // (30,000 steps), so a real 12,000-step day plus one tap of + became 10,000
+  // — 2,000 steps deleted — and the toast reported it as "+0 XP · STEPS
+  // complete". A control labelled + must never lower the number.
+  const v = Math.min(capFor(h), cur + (h.step || 1));
   setVal(h.id, v);
   checkLevelUps();
   render();
   const gained = habitXp(h) - before, complete = v >= h.target;
   haptic(complete ? 'done' : 'tick');
-  toast(complete ? '+' + gained + ' XP · ' + h.name + ' complete' + dayTag() + '.'
-                 : '+' + gained + ' XP' + dayTag() + '. Keep them coming.');
+  // Past the target there is nothing left to earn — xpFor() stops there — so
+  // say that rather than printing "+0 XP" under a word like "complete".
+  toast(gained > 0
+    ? (complete ? '+' + gained + ' XP · ' + h.name + ' complete' + dayTag() + '.'
+                : '+' + gained + ' XP' + dayTag() + '. Keep them coming.')
+    : h.name + ' was already done' + dayTag() + '. Logged, but there is no more XP in it today.');
   flyXp(gained, rect);
 }
 // Removing a custom habit takes its logged values with it. The app stops
@@ -2844,6 +2948,10 @@ function render() {
   fillBars(app);
   typeLines(app);
   bindGestures(app);
+  // The tour rings a live element measured in viewport coordinates, so every
+  // repaint can move it. Re-measuring here is what keeps the box on its target
+  // through a tick, a screen change or a celebration opening and closing.
+  if (TOUR.on) paintTour();
   document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
 }
 
@@ -3034,7 +3142,11 @@ function bindGestures(root) {
     sheet.addEventListener('pointercancel', release);
   }
 
-  root.querySelectorAll('.stepper button').forEach(btn => {
+  // The sheet's steppers AND Today's + . The + was left out, so logging 10,000
+  // steps from the list where the athlete actually stands was twenty taps while
+  // the same job inside the sheet was one hold — and nothing on either screen
+  // said which was which.
+  root.querySelectorAll('.stepper button, .hrow:not(.locked) .pluscell').forEach(btn => {
     if (_bound.has(btn)) return;
     _bound.add(btn);
     btn.addEventListener('pointerdown', () => startRepeat(btn));
@@ -3143,6 +3255,22 @@ function renderOnboarding() {
             <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
               <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
+              <!-- This screen used to sell WORKOUT as a normal habit worth more
+                   points than any other, switch already on, and say nothing
+                   about the padlock waiting on the next screen. For a free
+                   athlete it is the one habit they can never tick, and leaving
+                   it on quietly caps every day below 100% — which is worth
+                   knowing BEFORE it happens rather than being discovered as a
+                   day that would not complete. -->
+              <!-- States the lock; does NOT coach a free athlete around it.
+                   proof.html promises this in public and in Amir's own voice —
+                   "without one it stays locked, so a perfect day is something
+                   only my coached athletes can reach" — so an onboarding line
+                   suggesting they switch it off to reach 100% would quietly
+                   undo the one honest thing the funnel says. -->
+              ${h.locked ? `<span style="font-size:11px;line-height:1.35;color:var(--clay-deep)">${isFree()
+                ? 'Locked — this is the one that comes with a programme. It stays on your list, and it stays a padlock.'
+                : 'Locked — you cannot tick this one. Finishing a session in your programme ticks it for you.'}</span>` : ''}
             </span>
             <span class="sw ${CFG.on[h.id] !== false ? 'on' : ''}"><i></i></span>
           </button>`).join('')}
@@ -3151,8 +3279,403 @@ function renderOnboarding() {
       <button class="btn btn-primary btn-block" style="margin-top:18px" ${on(() => {
         if (!live().length) { toast('Pick at least one habit.'); return; }
         CFG.onboarded = true; saveCfg(); seedSeenLevels(); UI.screen = 'today'; render();
+        // Straight into the tour. This screen said WHAT to track and never a
+        // word about HOW any of it works — the athlete was handed a scoring
+        // system, three tabs and a row with three different tap targets, and
+        // left to guess. startTour renders itself.
+        startTour('today');
       })}>Start tracking</button>
     </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  THE TOUR — the game-style first run
+// ══════════════════════════════════════════════════════════════════════════
+// A clay box around the thing being named, a card beside it saying what it
+// does, and the rest of the screen dimmed. It walks the athlete across all
+// three tabs and into Settings, naming every control they would otherwise
+// have to discover by poking.
+//
+// THREE RULES IT IS BUILT ON:
+//
+//  1. **It points at the real thing, live.** Every target is resolved out of
+//     the actual DOM at the moment the step opens and measured with
+//     getBoundingClientRect, so the ring cannot drift out of step with a
+//     screen that has been retuned. Nothing here hard-codes a coordinate, and
+//     a step whose target does not exist is dropped when the list is built
+//     (`when`), not discovered missing halfway through.
+//
+//  2. **A step marked `act` can be finished by doing the thing.** The dimmer
+//     is four panes with a real hole in the middle rather than one lid with a
+//     transparent window, so the tap lands on the habit's own checkbox and
+//     logs it for real. That is the whole difference between a tutorial and a
+//     slideshow about a tutorial.
+//
+//  3. **It never traps anyone.** Skip is on every step, Back is on every step
+//     after the first, and the whole thing is replayable from Settings for
+//     ever. `CFG.toured` records that it has been offered, not that it must
+//     never appear again.
+//
+// It defaults to false for EXISTING athletes too, so everyone who has been
+// using the app since before this shipped gets the offer once — they are the
+// group who never had any explanation at all.
+const TOUR = { on:false, i:0, steps:[], back:'today' };
+
+// Targets are resolved lazily, every paint. `$t` scopes to #app so a stray
+// match in the tour's own layer can never be selected as its own target.
+function $t(sel) { return document.querySelector('#app ' + sel); }
+
+function tourSteps() {
+  const counter = live().some(h => h.kind === 'count' && !h.locked);
+  const S = [];
+
+  S.push({
+    title: 'This is the whole app',
+    body: `About a minute. It names every button worth knowing and gets out of the way.
+           You can stop whenever you like — it lives in Settings afterwards.`,
+    screen: 'today', cta: 'Show me'
+  });
+
+  S.push({
+    title: 'One row, three taps',
+    body: `Every habit on this list answers to three different taps, and they do three
+           different things. Here they are, one at a time.`,
+    screen: 'today', sel: () => $t('.hrow:not(.locked)'), pad: 0
+  });
+
+  S.push({
+    title: 'Tap the box to log it',
+    body: `That is the daily job, and most days it is the only thing you will touch.
+           On a habit you <strong>count</strong> — steps, sleep, water, meals — the box means
+           <strong>all of it, done</strong>, so it fills the target in one go. Tap it again to clear the day.`,
+    screen: 'today', sel: () => $t('.hrow:not(.locked) .checkcell'),
+    // Live, so the athlete can finish the step by actually doing it. The hint
+    // deliberately does not push: this app's whole argument is that the log is
+    // evidence rather than a diary, and a tutorial that talks someone into
+    // ticking a box they did not earn undermines it on the first screen.
+    act: true, hint: 'Tap it for real if you have already done it — the tour moves on either way.'
+  });
+
+  S.push({
+    title: 'Tap the name for its history',
+    body: `Its rank, its longest run, the last 35 days and what it pays. It is the biggest
+           part of the row and the only part that logs nothing — so tapping a habit to read
+           about it never costs you a day.`,
+    screen: 'today', sel: () => $t('.hrow:not(.locked) .body')
+  });
+
+  if (counter) S.push({
+    title: 'Tap + to add one',
+    body: `One glass, one meal, half an hour of sleep, 500 steps. <strong>Hold it down</strong>
+           and it keeps going, so ten thousand steps is not twenty taps.`,
+    // NOT live. A held + repeats ~9 times a second, and a tutorial is the one
+    // moment nobody is watching the number they are putting into their own log.
+    screen: 'today', sel: () => $t('.hrow:not(.locked) .pluscell')
+  });
+
+  S.push({
+    title: 'Forgot yesterday?',
+    body: `Today, and the ${BACKFILL_DAYS} days behind it. Tap one and everything you tick lands on
+           <strong>that</strong> day instead — the screen turns clay so you cannot forget you are back there.
+           Older than that and the log is shut: a record you can rewrite whenever you like is a diary, not proof.`,
+    screen: 'today', sel: () => $t('.daystrip')
+  });
+
+  S.push({
+    title: 'Everything pays XP',
+    body: `XP builds levels, levels carry ranks — ${esc(RANKS[0])} up to ${esc(RANKS[RANKS.length - 1])},
+           ${SUBS_PER_RANK} levels each. The bar is how far you are through this one.
+           <strong>Tap the rank</strong> to see the whole ladder and what each one costs.`,
+    screen: 'today', sel: () => $t('.hero-lv')
+  });
+
+  S.push({
+    title: 'One nudge a day',
+    body: `It reads what you have actually skipped and says so. Its button opens whatever it
+           is complaining about. It changes tomorrow, so there is no point arguing with it.`,
+    screen: 'today', sel: () => $t('.coachcard')
+  });
+
+  S.push({
+    title: 'Three tabs',
+    body: `<strong>Today</strong> is where you log. <strong>Progress</strong> is where you stand.
+           <strong>Crew</strong> is everyone else. That is the whole of it — there is no fourth screen hiding.`,
+    screen: 'today', sel: () => $t('.tabs'), pad: 0
+  });
+
+  S.push({
+    title: 'Where you stand',
+    body: `Days logged leads on purpose — it is the one that earns the other three.
+           <strong>Badges</strong> are the ${CONSISTENCY_TIERS.length} consistency tiers on each habit plus the
+           ${ACHIEVEMENTS.length} one-off milestones. All of it starts at zero and none of it stays there.`,
+    screen: 'progress', sel: () => $t('.statgrid')
+  });
+
+  S.push({
+    title: CFG.onBoard ? 'The board, and the wall' : 'The board is off until you join',
+    body: CFG.onBoard
+      ? `You are on it. Everyone else here is racing the same season, and each of you gets
+         <strong>one sentence a day</strong> on the wall — worth no points at all, which is exactly why
+         people write something true on it.`
+      : `Nobody can see you until you join, and joining takes a name you pick yourself — other
+         athletes see <strong>that name and your points</strong>, nothing else. Join and you also get
+         <strong>one sentence a day</strong> on the wall. Leave whenever you like.`,
+    screen: 'crew', before: () => { LB.view = 'board'; },
+    sel: () => $t('[data-tour="join"]')
+  });
+
+  S.push({
+    title: 'Your initials are the door',
+    body: `Top right, on every screen. Settings, your habit list, dark mode and the manual are
+           all behind it — and the same button closes them again. It is the only way in and the
+           only way out, so it is worth knowing.`,
+    screen: 'crew', sel: () => document.querySelector('.hdme'), act: true, cta: 'Open it'
+  });
+
+  S.push({
+    title: 'Switch off what you will not do',
+    body: `A habit you ignore only drags your day down. Switch it off here — it keeps every
+           point it has already banked and can come back whenever. Add your own at the bottom
+           of the list, worth ${XP_RULES.customXp} XP a day.`,
+    screen: 'settings', sel: () => $t('[data-tour="tracked"]')
+  });
+
+  S.push({
+    title: 'Everything else is in here',
+    body: `Points, levels, ranks, consistency, seasons, quests, the board and what happens to
+           your data — properly explained, in order. When something on a screen does not make
+           sense, the answer is in there.`,
+    screen: 'settings', sel: () => $t('[data-tour="manual"]')
+  });
+
+  S.push({
+    title: 'That is it',
+    body: `One tap a day and the rest looks after itself. If you want this again it is in
+           Settings, under <strong>How this works</strong>.`,
+    screen: 'settings', cta: 'Start logging', last: true
+  });
+
+  return S;
+}
+
+function startTour(back) {
+  if (!CFG) return;
+  TOUR.steps = tourSteps();
+  TOUR.i = 0;
+  TOUR.on = true;
+  TOUR.back = back || 'today';
+  clearTimeout(_idleTimer);                    // nothing should breathe under the scrim
+  const app = document.getElementById('app');
+  if (app) app.addEventListener('click', tourTap, true);
+  // Capture, so a scroll inside .scroll repositions the ring too — scroll does
+  // not bubble, and the ring is drawn in viewport coordinates.
+  window.addEventListener('scroll', paintTour, true);
+  window.addEventListener('resize', paintTour);
+  window.addEventListener('orientationchange', paintTour);
+  tourShow();
+}
+
+function endTour(finished) {
+  if (!TOUR.on) return;
+  TOUR.on = false;
+  CFG.toured = true; saveCfg();
+  const app = document.getElementById('app');
+  if (app) app.removeEventListener('click', tourTap, true);
+  window.removeEventListener('scroll', paintTour, true);
+  window.removeEventListener('resize', paintTour);
+  window.removeEventListener('orientationchange', paintTour);
+  paintTour();                                  // tears the layer down
+  if (UI.screen !== TOUR.back) go(TOUR.back); else render();
+  if (finished) toast('That is the tour. It is in Settings if you want it again.');
+  armIdle();
+}
+
+function tourGo(d) {
+  if (!TOUR.on) return;
+  const n = TOUR.i + d;
+  if (n < 0) return;
+  if (n >= TOUR.steps.length) { endTour(true); return; }
+  TOUR.i = n;
+  haptic('tab');
+  tourShow();
+}
+
+function tourShow() {
+  const st = TOUR.steps[TOUR.i];
+  if (!st) { endTour(true); return; }
+  if (st.before) st.before();
+  // go() owns nav direction, the scroll reset and the crew fetches; a step that
+  // stays put only needs a repaint.
+  if (st.screen && UI.screen !== st.screen) go(st.screen); else render();
+  // One frame for the new screen to lay out, then bring the target into view,
+  // then measure. Measuring before the scroll settles rings the wrong place.
+  requestAnimationFrame(() => {
+    const el = st.sel ? st.sel() : null;
+    // Aligned to the TOP of the scroller rather than centred when either the
+    // target is tall (its ring gets trimmed to the top, so centring would
+    // scroll away the only highlighted part) or the phone is short (on a 568px
+    // screen a centred target sits exactly where neither above nor below has
+    // room for the card). Roomy phones keep the nicer centred framing.
+    if (el && el.scrollIntoView) el.scrollIntoView({
+      block: (el.getBoundingClientRect().height > window.innerHeight * 0.45 ||
+              window.innerHeight < 700) ? 'start' : 'center',
+      behavior: reduced() ? 'auto' : 'smooth'
+    });
+    setTimeout(paintTour, (el && !reduced()) ? 320 : 30);
+  });
+}
+
+// A step marked `act` leaves its target tappable. When the athlete uses it for
+// real, wait for the tick, the toast and the XP flight to finish, then move on.
+function tourTap(ev) {
+  if (!TOUR.on) return;
+  const st = TOUR.steps[TOUR.i];
+  if (!st || !st.act || !st.sel) return;
+  const el = st.sel();
+  if (!el || !(el === ev.target || el.contains(ev.target))) return;
+  setTimeout(() => { if (TOUR.on) tourGo(1); }, 700);
+}
+
+function paintTour() {
+  const lay = document.getElementById('tour');
+  if (!lay) return;
+  const st = TOUR.on ? TOUR.steps[TOUR.i] : null;
+  // Stand down for a celebration or the log sheet. Both own the screen, both
+  // are the athlete's own doing, and both repaint this the moment they close.
+  if (!st || UI.celebrate.length || UI.sheet) { lay.className = 'tourlay'; lay.innerHTML = ''; return; }
+
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const pad = st.pad == null ? 5 : st.pad;
+  let r = null;
+  const el = st.sel ? st.sel() : null;
+  if (el) {
+    const b = el.getBoundingClientRect();
+    // A target scrolled fully out of the viewport rings nothing — better a
+    // plain centred card than a clay box hard against the top edge.
+    if (b.width > 0 && b.height > 0 && b.bottom > 0 && b.top < vh) {
+      const t = Math.max(0, b.top - pad), l = Math.max(0, b.left - pad);
+      r = { t, l, w: Math.min(vw - l, b.width + pad * 2), h: Math.min(vh - t, b.height + pad * 2) };
+    }
+  }
+
+  const n = TOUR.i + 1, total = TOUR.steps.length;
+  const cw = Math.min(vw - 28, 460), cx0 = Math.round((vw - cw) / 2), gap = 14;
+
+  // THE CARD IS MEASURED BEFORE THE HOLE IS CUT. Its height depends on the copy
+  // and on how narrow the phone is — the same step is 209px at 390 and well
+  // over 300 at 320 — and both the ring's size and the card's placement have to
+  // answer to it. Measuring afterwards left the card sitting on top of its own
+  // ring on every step of a 320px screen.
+  lay.className = 'tourlay on';
+  lay.innerHTML =
+    `<div class="tourcard" style="width:${cw}px;left:${cx0}px;top:-9999px">
+       <span class="tourtip" style="display:none"></span>
+       <div class="tourtop">
+         <h4>${esc(st.title)}</h4>
+         <span class="tourn">${n}/${total}</span>
+       </div>
+       <div class="tourbody">
+         <p>${st.body}</p>
+         ${st.hint ? `<p style="color:var(--clay-deep)">${esc(st.hint)}</p>` : ''}
+       </div>
+       <div class="tournav">
+         ${TOUR.i > 0 ? '<button class="btn tourback" data-t="back" aria-label="Back">&#8592;</button>' : ''}
+         <button class="btn btn-primary" data-t="next">${esc(st.cta || (st.last ? 'Done' : 'Next'))}</button>
+       </div>
+       ${st.last ? '' : '<button class="tourskip" data-t="skip">Skip the tour</button>'}
+     </div>`;
+  const cEl = lay.querySelector('.tourcard');
+  const ch = cEl.offsetHeight;
+
+  // PLACEMENT. The card must never cover the thing it is describing, and the
+  // ring must never be squeezed to nothing — so the two are solved together
+  // rather than the ring being drawn first and the card fitted around it.
+  //
+  //   A — card BELOW the ring. Room for the ring is whatever is left above the
+  //       card: hA = bottom edge − gap − card − ring top. A tall target (the
+  //       tracked-habit list is ~590px) gets trimmed to hA and keeps its top,
+  //       which is the part that identifies it.
+  //   B — card ABOVE the ring. Needs only that the ring starts low enough; the
+  //       ring is then clipped to the bottom of the viewport.
+  //
+  // A is preferred because reading downward from a highlight is the natural
+  // order. Sizing the ring by a fixed fraction and then choosing a side left
+  // the card on top of its own ring on every step of a 320px screen, where the
+  // card is more than half the viewport.
+  const EDGE = 12, MINRING = 36;
+  let top, tip = null;
+  if (!r) {
+    top = Math.round((vh - ch) / 2);
+  } else {
+    const hA = vh - EDGE - gap - ch - r.t;                 // ring height A allows
+    if (hA >= MINRING) {
+      r.h = Math.min(r.h, hA);
+      top = r.t + r.h + gap; tip = 'up';
+    } else if (r.t - gap - ch >= EDGE) {
+      r.h = Math.min(r.h, vh - r.t - EDGE);
+      top = r.t - gap - ch; tip = 'down';
+    } else {
+      // Neither side fits at the target's natural size — a tall block low on a
+      // short screen, e.g. the join box at the foot of CREW on a 320×568 phone,
+      // which cannot be scrolled any higher because it is the last thing there.
+      // Pin the card to an edge and trim the ring from the FAR side, taking
+      // whichever of the two leaves more of the target showing. Trimming from
+      // the top is the one that saves this case: the bottom of the join box is
+      // the name field and the Join button, which is the half worth ringing.
+      const cardAtBottom = vh - ch - EDGE, hCardBottom = cardAtBottom - gap - r.t;
+      const ringBelowCard = EDGE + ch + gap, hCardTop = (r.t + r.h) - ringBelowCard;
+      if (hCardTop > hCardBottom) {
+        top = EDGE;
+        r.h = Math.max(MINRING, Math.min(hCardTop, vh - ringBelowCard - EDGE));
+        r.t = ringBelowCard;
+      } else {
+        top = cardAtBottom;
+        r.h = Math.max(MINRING, hCardBottom);
+      }
+    }
+  }
+  cEl.style.top = top + 'px';
+  if (tip) {
+    const tEl = cEl.querySelector('.tourtip');
+    tEl.className = 'tourtip ' + tip;
+    tEl.style.display = '';
+    tEl.style.left = Math.max(14, Math.min(cw - 32, Math.round(r.l + r.w / 2 - cx0 - 9))) + 'px';
+  }
+
+  const box = (x, y, w, h, cls) => (w > 0 && h > 0)
+    ? `<div class="${cls}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>` : '';
+  let panes;
+  if (r) {
+    const rb = r.t + r.h, rr = r.l + r.w;
+    panes = box(0, 0, vw, r.t, 'tourmask') +
+            box(0, rb, vw, vh - rb, 'tourmask') +
+            box(0, r.t, r.l, r.h, 'tourmask') +
+            box(rr, r.t, vw - rr, r.h, 'tourmask') +
+            // A step you only read gets its hole sealed, so a stray tap cannot
+            // fire the control being described.
+            (st.act ? '' : box(r.l, r.t, r.w, r.h, 'tourblock')) +
+            box(r.l, r.t, r.w, r.h, 'tourring');
+  } else {
+    panes = box(0, 0, vw, vh, 'tourmask');
+  }
+  lay.insertAdjacentHTML('afterbegin', panes);
+
+  // Bound directly: this layer lives outside #app, so the delegated handler
+  // that serves the rest of the app never sees it.
+  lay.querySelectorAll('[data-t]').forEach(b => {
+    b.addEventListener('click', ev => {
+      ev.stopPropagation();
+      const k = b.getAttribute('data-t');
+      if (k === 'next') tourGo(1);
+      else if (k === 'back') tourGo(-1);
+      else endTour(false);
+    });
+  });
+  // Swallow taps on the dimmed area — wandering off mid-tour is how a tutorial
+  // ends up half-read with no way back into it.
+  lay.querySelectorAll('.tourmask, .tourblock').forEach(m => {
+    m.addEventListener('click', ev => ev.stopPropagation());
+  });
 }
 
 // ── App shell ─────────────────────────────────────────────────────────────
@@ -3429,15 +3952,22 @@ function habitRow(h, from, lead) {
 // "drink three more glasses" is nonsense advice about last Saturday.
 function dayStrip() {
   const active = AKEY();
+  // A day before the athlete's first logged one is not a 0% day, it is a day
+  // they did not have the app. Three chips reading 0% were the first thing a
+  // brand-new athlete saw, which reads as three days already lost.
+  // `|| TKEY()` matters: firstLoggedDay() is null until something is logged, so
+  // without it the case this exists for — day one, nothing logged — is the one
+  // case it would miss.
+  const first = firstLoggedDay() || TKEY();
   return `<div class="daystrip" data-k="daystrip">
     ${editableDays().map(k => {
-      const p = dayPct(k), sel = k === active;
-      return `<button class="daychip ${sel ? 'on' : ''} ${p >= 100 ? 'full' : ''}" data-k="dc:${k}"
+      const pre = k < first, p = dayPct(k), sel = k === active;
+      return `<button class="daychip ${sel ? 'on' : ''} ${!pre && p >= 100 ? 'full' : ''}" data-k="dc:${k}"
         ${on(() => setDay(k))} aria-pressed="${sel}"
-        aria-label="Log ${esc(dayLong(k))}, ${p}% done">
+        aria-label="Log ${esc(dayLong(k))}, ${pre ? 'before you started' : p + '% done'}">
         <span class="dl">${dayShort(k)}</span>
-        <span class="dp">${p}%</span>
-        <span class="dbar"><span data-fill style="width:${p}%"></span></span>
+        <span class="dp">${pre ? '—' : p + '%'}</span>
+        <span class="dbar"><span data-fill style="width:${pre ? 0 : p}%"></span></span>
       </button>`;
     }).join('')}
   </div>`;
@@ -3450,14 +3980,17 @@ function dayStrip() {
 function renderNoteBox() {
   if (window.IS_DEMO) return '';
   if (!CFG.onBoard) {
+    // The button used to be go('crew') — from the crew screen, which is the ONLY
+    // place this box renders. It scrolled to the top and did nothing else, on
+    // the one screen where a brand-new athlete is being asked to do something.
+    // The join box lives on the OTHER view of this tab, so that is where it goes.
     return `<div class="block notebox" data-k="notejoin" style="border-top:2px solid var(--divider)">
       <div class="eyebrow" style="letter-spacing:.12em">Roll call</div>
       <div style="font-size:13px;line-height:1.5;color:var(--muted)">
         Every athlete gets one sentence a day, and everyone else sees it. Join the
         board and you can leave yours — it uses the same name and nothing more.
       </div>
-      <button class="btn btn-secondary btn-block" ${on(() => go('crew'))}>Take a look at the crew</button>
-    </div>`;
+    </div>` + renderBoardJoin();
   }
   const posted = myNote(TKEY());
   // null means "no draft yet, show what is posted". Plain '' is a real draft —
@@ -3541,6 +4074,18 @@ function renderToday(LI, doneCount, pct) {
 
       ${(() => { const lead = leadStreak(); return hs.map(h => habitRow(h, 'today', lead)).join(''); })()}
 
+      <!-- DIRECTLY UNDER THE LIST IT DESCRIBES. This line used to be the very
+           last element on the screen — measured 580px below the fold, at the
+           bottom of a 1,310px scroll, in the smallest and faintest type in the
+           app — which meant the only permanent explanation of the row's three
+           tap targets sat two screens past the moment anyone needed it. It
+           still goes BELOW the list (the list is what the screen is for), just
+           immediately below rather than after everything else. -->
+      <div class="rowhint" data-k="rowhint">
+        Three taps per row: the <strong>box</strong> logs it, the <strong>name</strong> opens its
+        history, <strong>+</strong> adds one${live().some(h => h.kind === 'count' && !h.locked) ? ' (hold it to go faster)' : ''}.
+      </div>
+
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
         <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
@@ -3548,6 +4093,20 @@ function renderToday(LI, doneCount, pct) {
       </div>`}
 
       ${renderQuestBlock()}
+
+      <!-- The way back in for anyone who skipped the tour, and the way in for
+           every athlete who has been using the app since before it existed.
+           Below the habit list, like everything else on this screen that is not
+           the job — and it deletes itself the moment the tour has been run
+           once, so it costs a returning athlete nothing for ever. -->
+      ${past || CFG.toured ? '' : `
+        <button class="rcprompt" data-k="tourprompt" ${on(() => startTour('today'))}>
+          <span>
+            <span class="eyebrow">New here</span>
+            <span class="rcq">Want the one-minute tour of what everything does?</span>
+          </span>
+          <span class="hd" style="font-size:19px;color:var(--clay-deep);flex:none">→</span>
+        </button>`}
 
       <!-- A pointer, not a second copy. The compose box itself lives in CREW
            with the feed it posts to; this row exists so an athlete who only
@@ -3570,10 +4129,16 @@ function renderToday(LI, doneCount, pct) {
           <div><div class="figure" data-static data-num="weekXp" data-to="${weekXp}" style="font-size:34px;line-height:.95">${weekXp.toLocaleString()}</div>
             <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">XP earned</div></div>
         </div>
-        ${ranked.length > 1 ? `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
+        <!-- Only once there is something to rank. On a week with nothing in it
+             every habit is 0/7, so this named a "strongest" and a "weakest" out
+             of an eight-way tie — on day one, to someone who has not logged
+             anything yet, which reads as the app having already judged them. -->
+        ${ranked.length > 1 && strongest.w > 0 ? `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
           Strongest: <strong style="color:var(--ink)">${esc(strongest.h.name)}</strong> ${strongest.w}/7 ·
           weakest: <strong style="color:var(--ink)">${esc(weakest.h.name)}</strong> ${weakest.w}/7.
-        </div>` : ''}
+        </div>` : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
+          Nothing in the last seven days yet. Tick one thing and this fills up.
+        </div>`}
       </div>
 
       <div class="crosslink-wrap">
@@ -3595,9 +4160,6 @@ function renderToday(LI, doneCount, pct) {
         </button>
       </div>
 
-      <div style="padding:0 20px 30px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        Tap a habit's name for its history and rank. Steps, sleep, water and meals take a number — tap the +, or open the habit to log it.
-      </div>
     </div>`;
 }
 
@@ -3708,6 +4270,16 @@ function renderProgress(LI, earned, totalAch) {
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
           <div class="eyebrow">Perfect days</div></div>
       </div>
+      <!-- Four zeros and four words, three of which the app has never defined
+           anywhere an athlete has been. On day one this screen was a report of
+           nothing; the same line explains what fills each of them, and it is
+           gone the moment there is a single day in the log. -->
+      ${daysLogged === 0 ? `<div class="statnote" data-k="statnote">
+        A <strong>badge</strong> is one of the ${CONSISTENCY_TIERS.length} consistency tiers on a habit
+        or one of the ${ACHIEVEMENTS.length} milestones at the foot of this screen. A
+        <strong>day streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what you track.
+        A <strong>perfect day</strong> is all of it. All four start at zero and the first one moves today.
+      </div>` : ''}
 
       <!-- The reward track sits high, and it is the only thing on this screen
            that points FORWARD. Everything else here reports what has already
@@ -3777,22 +4349,39 @@ function renderProgress(LI, earned, totalAch) {
         </div>`;
       }).join('')}
 
-      <div style="padding:18px 20px 34px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+      <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
         The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is. The five squares are consistency tiers, from a 5-day run up to two months.
+      </div>
+      <!-- A second door to the manual, on the screen that uses the most words
+           the app has never defined — badge, tier, run, streak, season, rank.
+           Before this the ONLY routes to it were an unlabelled monogram in the
+           header and a button at the foot of the rank ladder. -->
+      <div style="padding:0 20px 34px">
+        <button class="btn btn-secondary btn-block" ${on(() => { UI.backTo = 'progress'; go('manual'); })}>What all of this means</button>
       </div>
     </div>`;
 }
 
 // ── Habit detail ──────────────────────────────────────────────────────────
 function renderDetail(h) {
+  // MISSED and NOT YET STARTED are not the same thing. Both the grid and the
+  // last-five list walked back from today unconditionally, so an athlete who
+  // opened a habit on their first afternoon was shown five days of MISS and a
+  // 35-square grid of failure for a period during which they did not have the
+  // app. `.c.pre` and a third key swatch mark those days as before-you-started.
+  // || TKEY() — null until the first thing is logged, which is exactly the day
+  // this is here to fix.
+  const first = firstLoggedDay() || TKEY();
+  const started = (k) => k >= first;
   const cells = [];
   for (let i = 34; i >= 0; i--) {
     const k = fmtKey(addDays(today(), -i)), v = valOf(k, h.id);
-    cells.push(v >= h.target ? 'hit' : (v > 0 ? 'part' : ''));
+    cells.push(!started(k) ? 'pre' : (v >= h.target ? 'hit' : (v > 0 ? 'part' : '')));
   }
   const logRows = [];
   for (let i = 1; i <= 5; i++) {
     const d = addDays(today(), -i), k = fmtKey(d), v = valOf(k, h.id), hit = v >= h.target;
+    if (!started(k)) continue;
     logRows.push({
       day: i === 1 ? 'YESTERDAY' : d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric' }).toUpperCase(),
       note: h.kind === 'count' ? fmtVal(h, v) + ' ' + h.unit + ' logged' : (hit ? 'Logged in the app' : 'Nothing logged'),
@@ -3876,13 +4465,13 @@ function renderDetail(h) {
         <div class="grid35">${cells.map((c, i) => `<div class="c ${c}${i === cells.length - 1 ? ' now' : ''}" style="animation-delay:${(i * 0.011).toFixed(3)}s"></div>`).join('')}</div>
         <div class="gridkey">
           <span>Five weeks ago</span>
-          <span class="gk"><i class="c hit"></i>hit <i class="c part"></i>part <i class="c"></i>none</span>
+          <span class="gk"><i class="c hit"></i>hit <i class="c part"></i>part <i class="c"></i>none${cells.indexOf('pre') >= 0 ? ' <i class="c pre"></i>before you started' : ''}</span>
           <span>Today</span>
         </div>
       </div>
 
       <div>
-        ${logRows.map(l => `<div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+        ${logRows.length ? logRows.map(l => `<div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px">
           <span style="display:flex;flex-direction:column;gap:3px">
             <span class="hd" style="font-size:14px;line-height:1">${esc(l.day)}</span>
             <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(l.note)}</span>
@@ -3891,7 +4480,12 @@ function renderDetail(h) {
             <span class="mono" style="display:block;font-size:10px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
             <span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">+${l.xp} XP</span>
           </span>
-        </div>`).join('')}
+        </div>`).join('')
+        // On day one every one of these rows would be a day from before the
+        // athlete had the app — five MISSes for a period they were not here.
+        : `<div style="padding:16px 20px;font-size:12.5px;line-height:1.5;color:var(--muted)">
+            No days behind you yet. Once there are, the last five sit here with what each one earned.
+          </div>`}
       </div>
 
       <div style="padding:18px 20px 34px">
@@ -3985,8 +4579,10 @@ function renderRollCall() {
       `<div style="padding:0 20px 20px"><button class="btn btn-secondary" ${on(() => { RC.loaded = false; fetchRollCall(); })}>Try again</button></div>`;
   }
   if (!RC.rows.length) {
+    // Not "one sentence on Today" — the composer moved up to this screen, and it
+    // is sitting directly above this line.
     return boardNote(CFG.onBoard
-      ? 'Nobody has said anything yet. One sentence on Today and you are the first voice on here.'
+      ? 'Nobody has said anything yet. Write one line up there and you are the first voice on here.'
       : 'Nothing on the wall yet. Join the board and you can leave a line of your own.');
   }
 
@@ -4068,7 +4664,7 @@ function renderBoardJoin() {
   const joined = !!CFG.onBoard;
   if (!joined) {
     return `
-      <div class="block" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
+      <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
         <div class="hd" style="font-size:20px;line-height:1">Join the board</div>
         <div style="font-size:13px;line-height:1.5;color:var(--muted)">
           Other athletes will see the name you pick here and your points — nothing else. No habits, no logs, no real name unless you use it. You can leave any time.
@@ -4081,7 +4677,7 @@ function renderBoardJoin() {
       </div>`;
   }
   return `
-    <div class="block" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
+    <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
       <div class="eyebrow" style="letter-spacing:.12em">You appear as</div>
       <div style="display:flex;gap:8px">
         <input class="input" id="boardname" maxlength="24" placeholder="${esc(CFG.boardName || defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
@@ -4114,7 +4710,7 @@ function renderManual() {
     const el = document.getElementById(slug(t));
     if (el) el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   })}>${esc(t)}</button>`;
-  const CONTENTS = ['The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
+  const CONTENTS = ['Start here', 'The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
                     'How to earn more', 'Levels and ranks', 'The long game', 'Consistency', 'Quests',
                     'Seasons', 'The leaderboard', 'Your data'];
 
@@ -4124,6 +4720,24 @@ function renderManual() {
         <div class="eyebrow" style="letter-spacing:.12em;margin-bottom:10px">Contents</div>
         <div class="manlinks">${CONTENTS.map(jump).join('')}</div>
       </div>
+      <!-- The manual opened on "The daily loop", which assumes you already know
+           what a loop, a level and a leaderboard are here. This section is the
+           one an athlete who is actually lost needs, and it is the one that
+           offers to just SHOW them instead. -->
+      ${block(h2('Start here') +
+        p(`Four things and you have the whole app.`) +
+        `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted);margin-bottom:14px">
+          <div>▸ <strong style="color:var(--ink)">Every habit row takes three different taps.</strong> The
+            <strong style="color:var(--ink)">box</strong> logs it. The <strong style="color:var(--ink)">name</strong>
+            opens that habit's history. <strong style="color:var(--ink)">+</strong> adds one unit at a time, and holding it goes faster.</div>
+          <div>▸ <strong style="color:var(--ink)">Three tabs.</strong> Today is where you log, Progress is where you stand, Crew is everyone else.</div>
+          <div>▸ <strong style="color:var(--ink)">Your initials, top right,</strong> open Settings from any screen — and close it again. Everything not on a tab is behind them, including this page.</div>
+          <div>▸ <strong style="color:var(--ink)">Everything you log pays XP</strong>, and XP is the only currency here. There is nothing to buy.</div>
+        </div>` +
+        `<button class="btn btn-primary btn-block" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>Show me around instead</button>` +
+        `<div style="height:12px"></div>` +
+        p(`A minute, and it points at each of those on the real screen. It is also in Settings under <strong style="color:var(--ink)">How this works</strong>, any time.`))}
+
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
@@ -4249,6 +4863,7 @@ function renderManual() {
 
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
+        p(`<strong style="color:var(--ink)">There is no password, and no sign-in — your link is your account.</strong> Put it on your home screen or keep the message it came in. Losing the link is the only way to lose your way back in, and even then nothing is deleted: ask me for a fresh one and your whole history is still there.`) +
         p(`Your coach can see your habits as part of coaching you. Other athletes cannot — unless you join the leaderboard, and even then only your chosen name and points.`) +
         (isFree()
           ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong> — used to send you this link and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
@@ -4634,11 +5249,26 @@ function renderSettings() {
         <div class="hd" style="width:52px;height:52px;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:21px">${esc(initials)}</div>
         <div style="display:flex;flex-direction:column;gap:4px">
           <div class="hd" style="font-size:18px;line-height:1">${esc(ATHLETE_NAME || 'Athlete')}</div>
-          <div style="font-size:11px;line-height:1;color:var(--muted)">Coached by Amir · day ${dayNumber()}</div>
+          <!-- A free athlete is not coached by anyone, and telling them they are
+               is the first line of the first screen behind their own initials. -->
+          <div style="font-size:11px;line-height:1;color:var(--muted)">${isFree() ? 'Proof · free' : 'Coached by Amir'} · day ${dayNumber()}</div>
         </div>
       </div>
 
       ${sectionLabel('How this works')}
+      <!-- First in the section, because it is the one an athlete who is lost
+           needs. HABITS.md used to list "replay onboarding" as deliberately
+           absent: that was true of the habit PICKER, which decides nothing and
+           is fully editable below. The tour is not a settings screen, it is the
+           only explanation of what the controls do, and a one-shot explanation
+           is worth very little. -->
+      <button class="selrow" data-k="row:tour" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>
+        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
+          <span class="lbl" style="font-size:15px">Show me around</span>
+          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">A minute, every button named — the tour you get on day one</span>
+        </span>
+        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+      </button>
       <!-- No leading icon here. It was the only row in Settings that had one,
            which pushed its label 70px right of every other row's and left the
            whole list with a ragged left edge. -->
@@ -4649,7 +5279,7 @@ function renderSettings() {
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
-      <button class="selrow" ${on(() => go('manual'))}>
+      <button class="selrow" data-k="row:manual" data-tour="manual" ${on(() => go('manual'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">The manual</span>
           <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Points, levels, ranks, consistency and the leaderboard — explained</span>
@@ -4689,6 +5319,13 @@ function renderSettings() {
       <div style="padding:10px 20px 4px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
         Every tick is written to this phone the moment you make it, then sent up when there's a connection. Close the app, lose signal, fly somewhere — nothing is lost.
       </div>
+      <!-- There is no password, no sign-in and no account screen, so the app
+           never had a reason to mention any of it — and therefore never told
+           anyone that the WhatsApp link IS the account. Losing it is the one
+           way to lose the lot, and it is worth one sentence. -->
+      <div style="padding:8px 20px 4px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+        There is no password here — <strong style="color:var(--muted)">your link is your account</strong>. Put it on your home screen, or keep the message. If you lose it, ask ${isFree() ? 'Amir' : 'your coach'} for a fresh one; nothing is gone.
+      </div>
 
       ${sectionLabel('Leaderboard')}
       <button class="selrow" ${on(() => go('crew'))}>
@@ -4719,6 +5356,7 @@ function renderSettings() {
         <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
       </button>
 
+      <div data-k="tracked" data-tour="tracked">
       ${sectionLabel('Tracked habits')}
       ${allHabits().map(h => {
         const custom = (CFG.custom || []).some(c => c.id === h.id);
@@ -4747,6 +5385,7 @@ function renderSettings() {
         })}>Add</button>
       </div>
       <div style="padding:6px 20px 0;font-size:11px;color:var(--muted-soft)">Custom habits are worth ${XP_RULES.customXp} XP a day. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
+      </div>
 
       <div style="padding:22px 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => { LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.'); })}>Reset today's log</button>
@@ -4826,14 +5465,26 @@ function showError(msg) {
   }
 
   loadLocal();
-  await syncFromCloud();
+  // NOTHING BELOW MAY HOLD THE SPINNER OPEN INDEFINITELY. Four server round
+  // trips run before the first paint, and on a bad connection — the hotel wifi
+  // that answers the handshake and then stalls — a fetch neither resolves nor
+  // rejects, so "Loading proof" is the entire app, for ever. The phone is the
+  // source of truth and every one of these is a refinement of what is already
+  // in localStorage, so each gets a ceiling and the app opens without it.
+  // A late answer is not lost: syncFromCloud runs again on foreground, and the
+  // season, quests and workout days are all re-fetched on the next launch.
+  const within = (p, ms, fallback) => Promise.race([
+    Promise.resolve(p).catch(() => fallback),
+    new Promise(res => setTimeout(() => res(fallback), ms))
+  ]);
+  await within(syncFromCloud(), 6000, null);
   // Which season we are in decides what scores, so settle that before anything
   // reads XP — including the workout import, which must not reach back further.
-  await fetchSeason();
-  await fetchQuests();
+  await within(fetchSeason(), 4000, null);
+  await within(fetchQuests(), 4000, null);
   // Sessions finished in the training app tick the WORKOUT habit here. The
   // dates come from the server, not from the other app's storage.
-  importWorkoutDays(await fetchWorkoutDays());
+  importWorkoutDays(await within(fetchWorkoutDays(), 4000, null));
   // Every source of logged days has now reported — local, cloud, and the
   // training app. Settle the roster timeline against the full log before
   // anything scores off it.
