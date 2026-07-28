@@ -1,87 +1,46 @@
-# How to use the coaching pipeline
+# Coaching pipeline — operating reference (for Claude)
 
-Plain-English guide. You talk normally; the skills do the work in stages; you
-approve each step. Always open Claude Code **in your Website folder** (the skills
-read this project's athlete data). They're saved in the project, so **every new
-chat in this folder already has them** — nothing to install.
+Amir doesn't read this file — he talks in plain language and expects the pipeline to just
+run. This is *your* reference: the end-to-end choreography across skills that no single
+`SKILL.md` owns by itself, because each skill only documents its own inputs/outputs. When
+a skill's own file conflicts with something here, the skill wins — this is sequencing
+only, never a second copy of a coaching judgment call (those live in
+`.claude/COACHING-PRINCIPLES.md` alone).
 
----
+## New client
+1. **`/athlete-intake`** — pulls their Web3Forms intake form, asks Amir for the gaps
+   (injuries, equipment, days/week) → produces the Athlete Brief.
+2. **`/program-roadmap`** — multi-cycle plan. **Locked once written** — design/engage read
+   it, never rewrite it.
+3. **`/program-design`** ("do prompt 1") — the cycle spec + coach-facing reports. Stop at
+   its STEP 1 checkpoint for any genuine coaching fork; don't stop for cosmetic ones (see
+   COACHING-PRINCIPLES.md → Process, "multi-lens panel").
+4. **`/program-engage`** ("do prompt 2") — app message, outcomes, notes, completion text.
+   Writes zero programming.
+5. **`/program-assemble`** ("build the json" / "ship it") — writes `data/<id>.json`,
+   advances the cycle, appends the coaching log entry.
+6. **Commit + push** — Amir iterates on the *live* site; don't stop at "written" or
+   "staged." See `CLAUDE.md` → "How Amir works."
 
-## The magic words (cheat sheet)
+## Returning client — next cycle
+1. Use whatever check-in/logs Amir pastes; otherwise `/program-design` pulls
+   `session_history` + reports itself via the athlete-brief agent.
+2. `/program-design` re-reads the athlete's coaching log (`.claude/coaching-log/<id>.md`)
+   first — why the last cycle looked the way it did — and **progresses that logic**, never
+   starts from a blank slate (COACHING-PRINCIPLES.md → Process, "cycles continue").
+3. Same design → engage → assemble → commit/push sequence as above.
 
-| Say this | What happens |
-|---|---|
-| "onboard new client [name]" | Gathers their intake (their form + asks you the gaps) |
-| "build the roadmap" | Lays out their multi-cycle plan, then locks it |
-| **"do prompt 1"** (or "design [name]'s program") | Designs the program — asks you on real decisions |
-| **"do prompt 2"** (or "write her notes") | Writes the app message, outcomes, notes, completion text |
-| "build the json" (or "ship it") | Writes/updates their `data/[id].json` file |
-| "commit and push" | Puts it live on the site |
+## Conversational rhythm Amir expects
+- Natural language works ("design Mehraneh's next cycle," "write her notes," "ship it") —
+  slash-command names work too, neither is required over the other.
+- Once he's said "go ahead" on a design, run the remaining steps without re-confirming each
+  one — only pause again at a genuine fork.
+- He gives blunt feedback; that's normal input, not friction to smooth over.
 
-You can talk normally — "design Mehraneh's next cycle," "write her notes,"
-"ship it." The slash names (`/program-design`) also work if you prefer.
-
----
-
-## Returning client — next cycle (the usual job)
-
-1. *(Best)* Paste their latest weekly/monthly check-in chat.
-2. Say **"design [name]'s next program."**
-3. I pull their logs (quietly, in the background), re-read *why* we built the last cycle the
-   way we did (your coaching log), review the cycle, and **stop to check with you** on any
-   real decision. Answer my questions.
-4. Say **"go ahead."** → I write the full program + your coach-only reports
-   (volume, progression sheet, e1RM).
-5. Say **"do prompt 2."** → app message & notes.
-6. Say **"build the json."** → updates their file, advances the cycle, and saves this
-   cycle's reasoning to your private coaching log (below).
-7. Say **"commit and push."** → live.
-
-## New client — onboarding
-
-1. Say **"onboard new client [name]"** → I pull their intake form and ask you
-   what's missing (injuries, equipment, days/week).
-2. Say **"build the roadmap."** → their cycles, locked.
-3. Say **"do prompt 1."** → their first program.
-4. Say **"do prompt 2."** → **"build the json."** → **"commit and push."**
-
----
-
-## Where the effort goes
-
-When I design (**prompt 1**) I pour everything into the **programming** — the analysis and
-the real training decisions. Exercise **names, chips, day names, and formatting are a polish
-pass *after*** the program exists, so I never spend the design on wording. If a name or chip
-looks rough mid-design, I'll flag it and fix it later (or you can). Tell me anytime if you'd
-rather I stop and sort a name out on the spot.
-
-## Your private coaching log
-
-Every time you ship a cycle, I save **why** that cycle looks the way it does — the read, the
-decisions, and your coach reports (volume, progression, e1RM) — to a private per-athlete file
-(`.claude/coaching-log/[id].md`). It's **append-only**: each cycle adds a new entry and old
-ones are never overwritten, so six months later you can open it and see exactly how we were
-thinking and why we changed something. It's **coach-only** — never shown in the athlete's app
-and never published on the site (it lives in `.claude/`, the same private spot as your
-principles).
-
-## How it gets smarter
-
-When you make a coaching call that should apply to *all* clients, I'll ask
-**"save this as a principle?"** Say yes and it's remembered forever (stored in
-`.claude/COACHING-PRINCIPLES.md`). One-off, client-specific calls aren't saved —
-you decide what's learned.
-
-## How to change how it works
-
-Just tell me: *"in program design, cap tennis sessions at 40 minutes"* or *"add
-hamstring curls to the default."* Or open the files yourself in
-`.claude/skills/` (they're plain text). To edit your saved philosophy, open
-`.claude/COACHING-PRINCIPLES.md`.
-
-## Using it in other chats / on another computer
-
-- **New chat, same computer:** already works — open it in the Website folder.
-- **Another computer:** `git pull` the repo there; the skills come with it.
-- It only *works* inside the Website project (it needs this project's athlete
-  data), so always run it from there.
+## Housekeeping
+- This file is sequencing only. A coaching judgment call, a naming rule, a communication
+  rule — anything Amir would call "how I coach" — belongs in `COACHING-PRINCIPLES.md`, not
+  here; if you're about to restate one here, stop and go add/point to it there instead.
+- To learn a new generalizable principle mid-conversation: offer to save it to
+  `COACHING-PRINCIPLES.md` (the save mechanic and its rules live in that file's own header,
+  not duplicated here).
