@@ -12,6 +12,12 @@ publish it. No athlete health/chat detail goes here — principles only.
 > How to add: append a dated bullet under the right section. Keep each principle one or
 > two lines, general (applies across athletes), and actionable.
 
+Sections run in the order a program actually gets made: assess the athlete, decide the
+training (exercise selection → recovery → structure → progression → volume → testing),
+*then* label it (exercise/cycle/day naming, cues, chips), then the athlete-facing text,
+then the process wrapper. That mirrors the standing rule in *Process* — athlete-first;
+naming & styling are downstream.
+
 ---
 
 ## Intake & assessment
@@ -61,15 +67,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   itself is the win. *(2026-07-12)*
 
 ## Exercise selection
-- **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
-  per pattern: Machine Shoulder Press > DB OHP · Leg Press > Back Squat · 45° Back
-  Extension > Barbell RDL · Chest-Supported Row > Barbell Row. *(2026-06-15)*
-- **Sport-performance athletes: transfer can override SFR** — state the trade-off
-  explicitly (e.g. Back Squat over Leg Press for a tennis player: lower SFR, higher
-  athletic transfer). *(2026-06-15)*
-- **Hypertrophy-accumulation blocks: machine/SFR primaries are acceptable even for sport
-  athletes** — transfer isn't lost, it's deferred to the later power/translation cycle
-  (e.g. Leg Press over Back Squat for a tennis player in a mass block). *(2026-07-12)*
+- **SFR (stimulus-to-fatigue ratio) leads exercise selection for general-fitness clients** —
+  pick the highest-SFR option per pattern (Machine Shoulder Press > DB OHP · Leg Press > Back
+  Squat · 45° Back Extension > Barbell RDL · Chest-Supported Row > Barbell Row). **For
+  sport-performance athletes, transfer can override SFR** — state the trade-off explicitly
+  (e.g. Back Squat over Leg Press for a tennis player: lower SFR, higher athletic transfer) —
+  **except in a hypertrophy-accumulation block, where machine/SFR primaries are fine even for
+  sport athletes**: transfer isn't lost, it's deferred to the later power/translation cycle
+  (e.g. Leg Press over Back Squat for a tennis player in a mass block). *(2026-06-15;
+  hypertrophy-block exception added 2026-07-12)*
 - **Accessories rotate every cycle** for variety — always to a *safe* alternative. **The goal is
   perceived novelty, not physiological necessity** — the athlete should feel the program changed,
   even when a new superset/format pairing is the bigger stimulus change that cycle. Don't skip
@@ -90,12 +96,12 @@ publish it. No athlete health/chat detail goes here — principles only.
   on the same three moves), picked for what the athlete's equipment/goals/injury history
   actually support. *(2026-07-18, Amir: Pooya's and Pegah's circuits had converged on identical
   exercises)*
-- **Rehab/corrective:** keep the best-in-class pieces; rotate the rest for freshness.
-  (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
-- **The "keep best-in-class" exception above is for rehab/corrective work only.** Don't stretch
-  it to general accessories just because their load is progressing well on paper — that kind of
-  progress is invisible to the athlete; new movements are what read as forward motion, and she's
-  paying monthly expecting to feel it. *(2026-07-13)*
+- **Rehab/corrective is the only place "keep the best-in-class pieces" applies** — rotate the
+  rest for freshness (coach may elect to rotate the whole block instead — done for Mehraneh C3).
+  Don't stretch the exception to general accessories just because their load is progressing well
+  on paper: that kind of progress is invisible to the athlete, new movements are what read as
+  forward motion, and she's paying monthly expecting to feel it. *(2026-06-15, scope-limited
+  2026-07-13)*
 - **Anything genuinely kept must still show a visible dose progression — never re-ship an
   identical prescription cycle to cycle.** Rotation isn't the only lever: a kept exercise's sets,
   rounds, load, or difficulty should move. Mehrnaz C2 initially re-shipped Medicine Ball
@@ -131,53 +137,6 @@ publish it. No athlete health/chat detail goes here — principles only.
   inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
   without a real reason and evidence the athlete has earned it back (pain resolved, capacity
   built). The log is what stops a bad fit silently reappearing months later. *(2026-06-28)*
-
-## Exercise naming
-*(This is the single source of truth for exercise names — `/program-design`,
-`/program-assemble`, and `/program-edit` all defer here; none should restate the rule.)*
-- **Word order = `[modification] [equipment] [movement]`** — modifications first
-  (stance / unilateral / defining setup), then equipment, then the movement. E.g.
-  "Standing Dumbbell Shoulder Press", "Chest-Supported Dumbbell Row", "Single-Arm Cable
-  Row". *(2026-06-15)*
-- **Equipment in the name only when the move has multiple implements** (cable / dumbbell /
-  barbell / machine / kettlebell); omit when equipment-agnostic. *(2026-06-15)*
-- **Bodyweight moves take the bare movement — no "Bodyweight" prefix** (Reverse Lunge,
-  Lateral Lunge, Glute Bridge — not "Bodyweight Reverse Lunge"). *(2026-06-19)*
-- **Defining setups DO belong in the name** (Chest-Supported, Heels-Elevated,
-  Half-Kneeling, Incline, B-Stance, Bottoms-Up, Single-Arm, Single-Leg). *(2026-06-15)*
-- **Never in the name → these are chips, not the name:** grip · focus/intent · range
-  qualifier · tempo emphasis · holds/durations · bare digits · parentheses · colons ·
-  commas. (A dose like a 30s plank → the `×`-prefixed reps chip; a pause/hold emphasis →
-  a modifier chip.) **Exception — digits in an established/canonical name stay** (45° Back
-  Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19)*
-- **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
-  `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
-- **An isometric hold on a dynamic library exercise KEEPS the canonical library name —
-  the video stays; the chip + Coach's Note carry the hold.** Amir's ruling (2026-07-24,
-  Setareh C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
-  it — the machine-setup video is still worth having, and the execution change is
-  communicated by the duration chip (`×30s`), the **`Tempo Iso` chip** (see "Chips &
-  modifiers" — Amir's rule), the `mid-range hold` modifier chip, and a Coach's Note
-  that states it's one continuous hold, not reps. When telling Amir about a
-  program, point at where the isometric lives (exercise + day) rather than assuming the
-  card reads as one. Longer-term option stands: add a dedicated isometric (Wall Sit,
-  Spanish Squat…) with its own video to the Notion library and rotate it in.
-- **`exercise_library.json` (generated from Notion) is the source of truth for names —
-  it is the video join key.** Author each exercise to the library's canonical spelling
-  exactly; `/program-assemble` validates and normalizes misses. *(2026-06-15)*
-- **The library is a video-join key, not a whitelist — programming is never restricted to what's
-  already catalogued.** Pick whatever real movement is right for the athlete; a name not yet in
-  `exercise_library.json` just ships without a demo video until it's filmed and added to Notion
-  (the app handles a missing video gracefully — no play button, nothing breaks). Follow the naming
-  *convention* above regardless of whether the name is already catalogued. Compensate for the
-  missing video with a clear setup note when the movement is new to the athlete. *(2026-07-27,
-  Amir, verbatim: "you can prescribe any movement that you like" — said after Elmira C2 avoided a
-  genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only
-  library entries were available.)*
-- **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
-  drift still finds the video and Notion renames don't break old programs — but
-  word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
-  still need the exact canonical name. *(2026-06-15)*
 
 ## Recovery & autoregulation
 - **Recovery capacity gates everything** — set the weekly volume ceiling *before*
@@ -275,28 +234,25 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
   per exercise, so the program is a starting point Amir adjusts each week. *(2026-06-15)*
 - **Set increments from logged data** (RPE/RIR, bar speed), not guesswork. *(2026-06-15)*
-- **Write once per cycle; adjust only on a report.** The program is authored once at design;
-  mid-cycle changes happen only when a session report / check-in gives a reason (pain, a
-  stall, flagged RPE drift) — never routine tweaking for its own sake. *(2026-07-12)*
+- **The program is written once per cycle and adjusted only on a real signal — never on a
+  fixed rewrite cadence or routine tweaking.** Amir doesn't rebuild weekly by default:
+  mid-cycle changes happen when a session report/check-in gives a reason — pain, a stall,
+  flagged/drifting RPE, a wellbeing/readiness dip. No signal, no rewrite. This also means no
+  self-progression rules get written into the program itself (no "add 2.5 kg when you
+  complete all sets…") — the athlete's job is to hit the prescribed RPE and log, and Amir
+  progresses it from what the logs show. *(2026-07-08/07-12)*
 - **Prescribe RPE, never load — with ONE exception: the exercise note.** Chips, cycle notes
   cards, messages, and completion text never contain target weights or kg increments — the
   athlete picks whatever load lands at the prescribed RPE. The one place load guidance may
   appear is that exercise's own `note` field (see *Communication*): a starting-weight
   suggestion drawn from the athlete's own past logs, or how to load, framed around the RPE.
   Coach-side load targets stay in the coaching log. *(2026-07-12)*
-- **Mid-cycle adjustments are report-driven only.** No self-progression rules in the program
-  ("add 2.5 kg when you complete all sets…") — Amir adjusts from the weekly logs and check-ins
-  when something is reported. The athlete's job is to hit the RPE and log. *(2026-07-12)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
   When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
   number — by convention, the top of the intended range — and write that. This applies to
   every exercise on every day, including circuit items and unilateral (`Each Side`) reps.
   *(2026-07-08, Niloufar C1 — caught 15 rep-range chips across the program and converted them.)*
-- **The program is written once per cycle and adjusted reactively, not on a fixed rewrite
-  cadence.** Amir doesn't rebuild the program every week by default — he steps in on a real
-  signal: a logged difficulty pattern (RPE consistently over/under the target) or a wellbeing/
-  readiness dip. No signal, no rewrite. *(2026-07-08)*
 - **Never tell the athlete the coach assigns/prescribes a specific weight.** The app has no
   weight-target field for a reason: the athlete self-selects load against the prescribed
   RPE/rep target, and that's the whole mechanism — Amir doesn't hand her a number. Athlete-
@@ -361,6 +317,102 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
   and track it cycle-over-cycle. No separate test day. *(2026-06-15)*
 
+## Exercise naming
+*(This is the single source of truth for exercise names — `/program-design`,
+`/program-assemble`, and `/program-edit` all defer here; none should restate the rule.)*
+- **Word order = `[modification] [equipment] [movement]`** — modifications first
+  (stance / unilateral / defining setup), then equipment, then the movement. E.g.
+  "Standing Dumbbell Shoulder Press", "Chest-Supported Dumbbell Row", "Single-Arm Cable
+  Row". *(2026-06-15)*
+- **Equipment in the name only when the move has multiple implements** (cable / dumbbell /
+  barbell / machine / kettlebell); omit when equipment-agnostic. *(2026-06-15)*
+- **Bodyweight moves take the bare movement — no "Bodyweight" prefix** (Reverse Lunge,
+  Lateral Lunge, Glute Bridge — not "Bodyweight Reverse Lunge"). *(2026-06-19)*
+- **Defining setups DO belong in the name** (Chest-Supported, Heels-Elevated,
+  Half-Kneeling, Incline, B-Stance, Bottoms-Up, Single-Arm, Single-Leg). *(2026-06-15)*
+- **Never in the name → these are chips, not the name:** grip · focus/intent · range
+  qualifier · tempo emphasis · holds/durations · bare digits · parentheses · colons ·
+  commas. (A dose like a 30s plank → the `×`-prefixed reps chip; a pause/hold emphasis →
+  a modifier chip.) **Exception — digits in an established/canonical name stay** (45° Back
+  Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19)*
+- **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
+  `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
+- **An isometric hold on a dynamic library exercise KEEPS the canonical library name —
+  the video stays; the chip + Coach's Note carry the hold.** Amir's ruling (2026-07-24,
+  Setareh C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
+  it — the machine-setup video is still worth having, and the execution change is
+  communicated by the duration chip (`×30s`), the **`Tempo Iso` chip** (see "Chips &
+  modifiers" — Amir's rule), the `mid-range hold` modifier chip, and a Coach's Note
+  that states it's one continuous hold, not reps. When telling Amir about a
+  program, point at where the isometric lives (exercise + day) rather than assuming the
+  card reads as one. Longer-term option stands: add a dedicated isometric (Wall Sit,
+  Spanish Squat…) with its own video to the Notion library and rotate it in.
+- **`exercise_library.json` (generated from Notion) is the source of truth for names —
+  it is the video join key.** Author each exercise to the library's canonical spelling
+  exactly; `/program-assemble` validates and normalizes misses. *(2026-06-15)*
+- **The library is a video-join key, not a whitelist — programming is never restricted to what's
+  already catalogued.** Pick whatever real movement is right for the athlete; a name not yet in
+  `exercise_library.json` just ships without a demo video until it's filmed and added to Notion
+  (the app handles a missing video gracefully — no play button, nothing breaks). Follow the naming
+  *convention* above regardless of whether the name is already catalogued. Compensate for the
+  missing video with a clear setup note when the movement is new to the athlete. *(2026-07-27,
+  Amir, verbatim: "you can prescribe any movement that you like" — said after Elmira C2 avoided a
+  genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only
+  library entries were available.)*
+- **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
+  drift still finds the video and Notion renames don't break old programs — but
+  word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
+  still need the exact canonical name. *(2026-06-15)*
+
+## Cycle & day naming
+- **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
+  Volume Engine, Bedrock), never dry labels. Set in /program-roadmap. *(2026-06-15)*
+- **Day names (`focusTag`) have sports-headline energy** — vivid, write them like a sports
+  writer trying to make the athlete *want* to train ("Built From The Legs Up", "Press, Pull,
+  Repeat", "Whole-Body Workhorse"), never spreadsheet labels ("Upper Body & Press" ✗). The
+  catch: the name must still embed the keyword that lands the right banner image, and avoid
+  cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
+
+## Coaching cues
+- **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
+  action/focus *outside* the body — where to push, what to move toward), one **internal**
+  cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
+  mistake that most risks injury). Calibrate the wording to training age. In the JSON the
+  external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`. *(2026-06-17)*
+
+## Chips & modifiers
+- **A modifier (`intent`) chip must be something the athlete actively does or holds in mind
+  that set** — a tempo/pause emphasis (`3s eccentric`, `2s top hold`), a sequencing order
+  (`right leg first`), or an effort cue (`max intent`). **A superset/complex pairing is never
+  a chip** — it's a structural decision (see "Session structure & time" above): the paired
+  exercises become one `type: circuit` block with a shared name + rest, not a `"superset"`
+  chip on a standalone standard exercise. A modifier chip is also never a restatement of the
+  target muscle or exercise category — if it just re-labels what the exercise already trains,
+  especially when that's already said in the internal cue right next to it, drop it; it's a
+  label, not an instruction. Test before adding one: could the athlete act on this mid-set, or
+  would removing it lose nothing? *(2026-07-05, Bardia C1 — dropped "knee control," "adductor
+  focus," "anti-rotation," "no push-off," "dysplasia stability" as redundant with cues/
+  rationale already stated elsewhere on the card. 2026-07-18, Pooya C3 — this file itself was
+  found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's
+  chip tables and the design SPEC template; all three fixed the same day, see "Session
+  structure & time.")*
+- **Hold exercises write `Iso` in the Tempo — Amir's rule, verbatim (2026-07-24): "if
+  it's a hold exercise, in the Tempo write Iso."** Every isometric/hold prescription
+  (iso holds on a machine, planks, wall sits…) carries a `"Tempo Iso"` chip in place of
+  a numeric tempo, so the card's TEMPO cell reads **Iso** and the athlete knows it's one
+  continuous hold, not reps. The parser routes any `Tempo <text>` label to the TEMPO
+  cell (`program.html` chip parsing), so this renders correctly today. Pairs with the
+  canonical-name ruling in "Exercise naming" — name stays library-canonical, the Tempo
+  cell + note carry the execution. *(2026-07-24, Setareh C1 — applied to the leg-extension holds
+  and Side Plank.)*
+- **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.** Any
+  sub-6 intent (easy run, recovery walk, low-effort control drill) is authored as **RPE 6**
+  (the scale's floor = easy/conversational), or the RPE chip is omitted entirely on a
+  `simple` item that doesn't need grading. A prescribed RPE the athlete literally cannot
+  select in the logger is a mismatch, not a nuance. *(2026-07-24, Setareh C1 — shipped with
+  RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
+  mismatch and all three were raised to 6.)*
+
 ## Communication & in-app text
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
@@ -401,55 +453,6 @@ publish it. No athlete health/chat detail goes here — principles only.
   the same issue has both (e.g. a standing injury protocol), the card states the full
   protocol/stop-rule ladder once; the exercise note gives only the point-of-action specifics
   for that exercise (starting depth, load, cue) — it never re-explains the ladder. *(2026-07-12)*
-
-## Coaching cues
-- **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
-  action/focus *outside* the body — where to push, what to move toward), one **internal**
-  cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
-  mistake that most risks injury). Calibrate the wording to training age. In the JSON the
-  external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`. *(2026-06-17)*
-
-## Chips & modifiers
-- **A modifier (`intent`) chip must be something the athlete actively does or holds in mind
-  that set** — a tempo/pause emphasis (`3s eccentric`, `2s top hold`), a sequencing order
-  (`right leg first`), or an effort cue (`max intent`). **A superset/complex pairing is never
-  a chip** — it's a structural decision (see "Session structure & time" below): the paired
-  exercises become one `type: circuit` block with a shared name + rest, not a `"superset"`
-  chip on a standalone standard exercise. A modifier chip is also never a restatement of the
-  target muscle or exercise category — if it just re-labels what the exercise already trains,
-  especially when that's already said in the internal cue right next to it, drop it; it's a
-  label, not an instruction. Test before adding one: could the athlete act on this mid-set, or
-  would removing it lose nothing? *(2026-07-05, Bardia C1 — dropped "knee control," "adductor
-  focus," "anti-rotation," "no push-off," "dysplasia stability" as redundant with cues/
-  rationale already stated elsewhere on the card. 2026-07-18, Pooya C3 — this file itself was
-  found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's
-  chip tables and the design SPEC template; all three fixed the same day, see "Session
-  structure & time.")*
-- **Hold exercises write `Iso` in the Tempo — Amir's rule, verbatim (2026-07-24): "if
-  it's a hold exercise, in the Tempo write Iso."** Every isometric/hold prescription
-  (iso holds on a machine, planks, wall sits…) carries a `"Tempo Iso"` chip in place of
-  a numeric tempo, so the card's TEMPO cell reads **Iso** and the athlete knows it's one
-  continuous hold, not reps. The parser routes any `Tempo <text>` label to the TEMPO
-  cell (`program.html` chip parsing), so this renders correctly today. Pairs with the
-  canonical-name ruling in "Exercise naming" — name stays library-canonical, the Tempo
-  cell + note carry the execution. *(2026-07-24, Setareh C1 — applied to the leg-extension holds
-  and Side Plank.)*
-- **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.** Any
-  sub-6 intent (easy run, recovery walk, low-effort control drill) is authored as **RPE 6**
-  (the scale's floor = easy/conversational), or the RPE chip is omitted entirely on a
-  `simple` item that doesn't need grading. A prescribed RPE the athlete literally cannot
-  select in the logger is a mismatch, not a nuance. *(2026-07-24, Setareh C1 — shipped with
-  RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
-  mismatch and all three were raised to 6.)*
-
-## Naming
-- **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
-  Volume Engine, Bedrock), never dry labels. Set in /program-roadmap. *(2026-06-15)*
-- **Day names (`focusTag`) have sports-headline energy** — vivid, write them like a sports
-  writer trying to make the athlete *want* to train ("Built From The Legs Up", "Press, Pull,
-  Repeat", "Whole-Body Workhorse"), never spreadsheet labels ("Upper Body & Press" ✗). The
-  catch: the name must still embed the keyword that lands the right banner image, and avoid
-  cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
 
 ## Process
 - **Every design pass runs a multi-lens panel — Amir's standing order, not an option.**
@@ -503,20 +506,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   rollouts, planks, hollow holds) skipped outright for those days. Restate it in that cycle's
   actual exercises, not copied verbatim cycle to cycle. *(2026-07-06, confirm-per-cycle
   2026-07-12)*
-- **Athlete-first; naming & styling are downstream.** The aim is always *what's good for
-  the athlete* — get the format, exercise selection and dose right first. Categorizing,
-  section names, chips and styling are a mechanical layer applied *after* that, and must
-  **never bend the programming logic or burn design energy**. Right training first; correct
-  labels and styling fall out afterward. *(2026-06-17)* Two concrete applications: **reps** —
-  design writes `8-10` if that's the natural hypertrophy zone, never spends budget
-  pre-picking one number; assemble mechanically takes the top of the range. **Exercise
-  Coach's Notes** — design only flags which exercise needs one + why (a `note_flag`, one
-  domain-language line); engage drafts the athlete-facing sentence; assemble places it.
-  Design's job is *deciding* what needs a note, never *writing* it. *(2026-07-12)*
-- **Design pass = programming first; polish later.** During /program-design put ALL the
-  reasoning into the coaching decisions + analysis (athlete read, SFR/transfer selection,
-  volume, sequencing, progression). Exercise **names, chips, day names, and formatting are a
-  polish pass AFTER the program exists** — nail the right movement + dose first; wording is
-  tidied later (/program-assemble format-lints, names finalize in Notion when videos are
-  added). Don't burn design budget perfecting names/chips mid-analysis; if a name/chip is
-  rough, flag it and move on. *(2026-06-15)*
+- **Athlete-first; naming & styling are downstream — programming first, polish later.** The
+  aim is always *what's good for the athlete*: get the format, exercise selection, dose and
+  sequencing right first, with ALL the reasoning going into coaching decisions and analysis.
+  Categorizing, section names, chips, exercise names and formatting are a mechanical polish
+  pass applied *after* the program exists, and must **never bend the programming logic or
+  burn design/analysis energy** — if a name or chip looks rough mid-design, flag it and move
+  on; final wording is tidied at /program-assemble and finalized in Notion when videos are
+  added. Two concrete applications: **reps** — design writes `8-10` if that's the natural
+  hypertrophy zone, never spends budget pre-picking one number; assemble mechanically takes
+  the top of the range. **Exercise Coach's Notes** — design only flags which exercise needs
+  one + why (a `note_flag`, one domain-language line); engage drafts the athlete-facing
+  sentence; assemble places it. Design's job is *deciding* what needs a note, never *writing*
+  it. *(2026-06-15/06-17, concrete applications added 2026-07-12)*
