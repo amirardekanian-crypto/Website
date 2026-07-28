@@ -26,6 +26,9 @@ Durable context for working in this repo. Read the linked docs before diving in.
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
+- `.claude/COACHING-HOWTO.md` — **for you, not Amir** (he never opens it): the pipeline's
+  end-to-end sequencing across skills, since no single `SKILL.md` documents the whole
+  chain. Read it when running a multi-step coaching job end to end.
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). `.claude/coaching-log/` is the coach-only per-athlete rationale log.
 
 ## Working on the habit app (`habits.html`) — keep four things in sync
