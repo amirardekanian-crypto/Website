@@ -9,7 +9,7 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 
 ## Step 0 — Read principles, then the file
 
-1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it.
+1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it. If you notice this checklist's wording (a number, a list, a formula) no longer matches what's currently in COACHING-PRINCIPLES.md, **stop and flag the mismatch to Amir** before applying either — don't silently pick one.
 2. Read `data/<athlete_id>.json`. Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim `.claude/coaching-log/<athlete_id>.md` (if it exists) for this cycle's rationale, so edits respect *why* each piece was chosen.
 
 ## Step 1 — Apply the structural checklist
@@ -55,44 +55,32 @@ If the athlete trains in a gym, the Warm-Up block uses a cardio machine — Bike
 
 ### Rule 1d — No corrective/postural drills without an indication
 
-Postural or scap-control correctives (scapular wall slides, postural-specific work) only belong in when the athlete has a **noted** posture issue or restriction. For a general client with none, remove them — prep is mobilisation + activation of the day's patterns, not corrective theatre. General shoulder mobility/activation before pressing (band pull-apart, pass-through, cat-cow) is fine; it preps the lift, it doesn't "fix posture."
+Per **COACHING-PRINCIPLES.md → "Exercise selection"** — flag any postural/scap-control corrective present without a noted posture issue/restriction on file; don't restate the rule here.
 
 ### Rule 2 — Core exercises go at the end
 
 Core isolation work (dead bug, bird dog, plank variations, ab work, Pallof press, hollow body) must appear in the **Core block, after Primary/Accessory** (before any conditioning), never in the warm-up or prep circuit.
 
-The only exception: an exercise doubles as activation AND core (e.g. dead bug as a breathing drill before a heavy hinge session) — flag it for Amir's judgement, don't auto-move it.
+The only exception: an exercise doubles as activation AND core **when it's explicitly framed as a breathing/bracing cue, not general ab work** (e.g. dead bug cued as a breathing drill before a heavy hinge session) — flag it for Amir's judgement, don't auto-move it. If it's just an ab exercise sitting early for convenience, it's a violation, not an exception.
 
 ### Rule 3 — Gym session block order
 
-Correct structure for a gym-based session — standard section names + order per SCHEMA "Standard section names" (the single source):
-
-1. **Activation & Prep** — Warm-Up + prep, must total **10–15 minutes** (cardio raise + mobilisation/activation circuit). Never a token 5-min bookend — this is programmed dose that primes the session's patterns. Block `title` is always exactly "Activation & Prep"; the circuit `name` inside can be descriptive ("Glute Activation", etc.). Logs nothing — no RPE chip.
-2. **[Power]** — if present (explosive/CNS work); free-named by content
-3. **Primary** — the main lifts (progression drivers), compound first
-4. **Accessory** — assistance / isolation work
-5. **Core** — if prescribed, after Primary/Accessory
-6. **[Conditioning]** — if present, always last; free-named by content
-
-Never collapse Primary + Accessory into one "Strength" block.
+Check block order + names against **SCHEMA.md → "Standard section names"** (the single source — don't re-enumerate it here) and **COACHING-PRINCIPLES.md → "Session structure & time"** for the *why* (Activation & Prep is a programmed 10–15 min, not a token bookend; sequencing is power/CNS → Primary → Accessory → corrective/Core → conditioning). Flag: Activation & Prep under 10 minutes or carrying an RPE chip, Primary + Accessory collapsed into one "Strength" block, Core placed anywhere but after Primary/Accessory, or a section `title` that doesn't match the standard names.
 
 ### Rule 4 — Set / muscle review AND per-day load before changing load
 
 Two tallies, both before touching any numbers and both shown to Amir for sign-off.
 
-**4a. Weekly sets per muscle** — tally and present. Targets for a foundation/beginner cycle (adjust upward in later cycles):
-- Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
-- Small muscles (shoulders, biceps, triceps): 6–12 sets/week
-- Core: count every set regardless of where it sits — activation circuit rounds count as sets just like Primary/Accessory block sets
+**4a. Weekly sets per muscle** — tally and present against **COACHING-PRINCIPLES.md → "Volume & dosing"** (the evidence-based ceiling, and the hard floor for women's lower body) rather than a separate number kept here — if this checklist and that section ever disagree, the principles file is right (see Step 0). Core counts every set regardless of where it sits — activation-circuit rounds count the same as Primary/Accessory sets.
 
 Flag anything very low (chest at 3 sets) or disproportionately high.
 
-**4b. Per-day load distribution** — raw set count lies, so weight each working set by systemic cost (**heavy compound ×1.5, moderate compound ×1.0, isolation ×0.5**) and tally the cost-weighted load per day. Then check:
+**4b. Per-day load distribution** — raw set count lies, so weight each working set by systemic cost per **COACHING-PRINCIPLES.md → "Volume & dosing"** and tally the cost-weighted load per day. Then check:
 - Does each day have a deliberate **load identity**, and does the week **undulate** (one peak / one–two moderate / one low day) — or is it four flat "RPE 6, everything matters" days?
 - Do two high-load days for the **same pattern** sit back-to-back (e.g. heavy hinge on consecutive days)?
 - Is any day a **grind** (≫6 working exercises) — a long session spikes cortisol even at low RPE, which matters most for poor-recovery clients.
 
-For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the cost-weighted table and a recommended undulation before proposing changes. See COACHING-PRINCIPLES.md → "Volume & dosing".
+For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the cost-weighted table and a recommended undulation before proposing changes.
 
 ## Step 2 — Present the audit
 
