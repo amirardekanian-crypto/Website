@@ -225,6 +225,12 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - **Names should be cool, not literal.** Workout titles, article headlines, post hooks — Amir wants
   evocative, punchy names (e.g. "Banded Lower Burner"), not flat descriptions ("Bodyweight & Band
   Strength"). Put the literal description in a tag/subtitle. When unsure, offer 3–4 options and let him pick.
+- **The `.claude/` coaching docs are Claude-only — Amir never opens them.** `COACHING-PRINCIPLES.md`,
+  `COACHING-HOWTO.md`, `.claude/skills/*`, `.claude/coaching-log/`: optimize their structure for how
+  *you* actually read and act on them (scannable, unambiguous, single-sourced, no restating a rule
+  that already lives elsewhere), not for human-manual convention. *(Amir, 2026-07-28, verbatim: "these
+  are only for claude's use, you can update all of these based on how claude can read them and act
+  based on them.")*
 
 ## Design work (Claude is Amir's visual designer)
 Standing role: Amir asks for carousels, reels, posts, result cards, web/app redesigns,
