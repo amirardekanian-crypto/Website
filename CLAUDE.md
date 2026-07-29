@@ -202,10 +202,12 @@ consistency badges survive. The server (`public.seasons`) is the authority; the 
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
 **Habit names are TASKS** — `🚶 Walk 10,000 steps`, not `STEPS`. Display only; the
-`id` never changes, so no history moves. **Seasonal events** (`EVENTS` in
-`habits.html`) are named blocks of the calendar with 2–3 goals; they pay a **title,
-never XP**, precisely to avoid a third thing scored twice — but their title ids must
-exist in `passTrack` on the `xp_rules` row or the server refuses them. **Milestones
+`id` never changes, so no history moves. **Events** (`EVENTS` in `habits.html`) are
+**28-day** blocks with 2–3 goals, running back to back from a fixed anchor so exactly one
+is always live — a duration bracket between a week and the rare badges, **not** calendar
+seasons (Amir, 2026-07-30). Windows are computed, never typed. They pay a **title, never
+XP**, precisely to avoid a third thing scored twice — but their title ids must exist in
+`passTrack` on the `xp_rules` row or the server refuses them. **Milestones
 carry a `tier`** (`week`/`long`/`rare`) for grouping on Progress; nothing scores off
 it. Full detail in `HABITS.md`.
 
