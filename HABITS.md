@@ -369,6 +369,16 @@ day. `lockedOnToday()` is what lets a switched-off row still say *"still counts 
 Settings carries the whole rule as **permanent copy**, not a toast — someone who switched
 something on three weeks ago should still be able to find out why it is counting.
 
+**Switching one ON is a two-tap confirm, not a toast, because a toast is easy to have
+never read** (Amir, 2026-07-30). A first tap on an add-on's switch only **arms** it — the
+switch outlines in clay and the row's own meta line restates the rule in place ("Tap
+again to turn it on — you cannot turn it back off until tomorrow"); nothing in `CFG.on`
+changes yet. A second tap, within `_confirmOnTimer`'s 3.2s window, actually commits it,
+clears `UI.confirmOnId`, and shows the existing toast. Missing the window — tapping
+elsewhere, waiting it out — disarms with no side effect at all: `CFG.on` was never
+touched by the first tap. Turning one **off** stays a single, immediate tap; there is
+nothing to confirm on the direction that never takes effect before tomorrow anyway.
+
 Proven against a nine-day log: adding supps today leaves Wednesday at 100% and takes today
 to 93%; switching it straight back off leaves today at **93%** (the dodge fails) and dates
 the removal to tomorrow. No SQL changed — the timeline format is the same, so
@@ -404,6 +414,23 @@ than writing to a day that has since closed.
 
 Backfilling **does** recompute XP, streaks, badges and quest progress — that is the point
 of allowing it. It does **not** reopen that day's roll call sentence.
+
+⚠️ **The row list you fill in must be that day's own roster, never the current one**
+(fixed 2026-07-30, after Amir asked why a day he'd ticked every visible row on still
+read 86%, not 100%). `renderToday()` used to build the tappable list from `live()` —
+today's tracked set — for every day, including a backfilled one. If an add-on has been
+switched off since, the row simply stopped existing: `live()` doesn't know it was ever
+tracked. The header's own `dayPct()` was never wrong — it already read `rosterOn(AKEY())`,
+per the roster invariant above — so an athlete could tick every row the screen showed
+them and still watch the day sit at 86%, with no way to see why or fix it. `rows` is now
+`rosterOn(AKEY())`, always the day's actual scored set; `hs` (`live()`) stays reserved for
+"your week" — the heat map and the strongest/weakest ranking, which are about what you
+track *now* regardless of which day you happen to be viewing. A row pulled in only
+because history asked for it, not the current toggle, carries **"paused now, but counted
+this day"** on its meta line so an unfamiliar habit reappearing mid-backfill explains
+itself; it is otherwise a completely normal, tappable row — `toggleHabit()`/`bump()`/
+`openHabit()` never gate on `CFG.on`, so logging it retroactively works exactly like any
+other habit.
 
 > The window is a **UI affordance, not a lock**. The app pushes its whole log blob to the
 > server, so devtools could always reach further back — true before this existed too.
