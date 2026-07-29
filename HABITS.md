@@ -180,18 +180,11 @@ The screen they actually live on. **In this order, and the order is the point:**
    streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
    tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
    repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
-6. **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
-   XP, with live progress and a countdown. **There are usually none**: quests only exist
-   while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
-   the point — seeing them means something is on. **Between runs it is one muted line**
-   rather than nothing: the block vanishing entirely kept that sentence true but made the
-   whole feature invisible, so an athlete who joined between runs never learned quests
-   existed and the next one read as random rather than as an event.
-7. **Roll call pointer** — a single row into the CREW tab, shown only while today's
+6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
    sentence is unwritten. The composer itself lives in CREW with its feed.
-8. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
+7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
    weakest habit. The "recap" half.
-9. **The cross-link** back to the training programme.
+8. **The cross-link** back to the training programme.
 
 > **Why the list sits above the commentary.** It used to be hero → nudge → quests →
 > habits, which put the first tickable row about **1,400px down**: you opened the app to
@@ -254,6 +247,22 @@ Emoji are the one place the app breaks its own rule — there are none anywhere 
 and glyph coverage genuinely varies by platform (🌬 rendered as a mangled box and
 was swapped for 💨). They stay because a list of eight tasks scans faster with them.
 Removing them is one edit to `HABITS[].name`.
+
+#### Quests wear the event card, on Progress
+Amir picked the event card out by name and asked for quests to use it — which is right
+beyond the aesthetics: **a quest run and an event are the same object at two lengths** (a
+set of goals, a clock, a reward), and they were drawn as two unrelated things. One card,
+two spans: seven days and twenty-eight. Quests sit *above* events, because the one with
+less time left is the one to act on, and a live card is clay while a finished one is green.
+
+**They are no longer on Today.** Today is for logging; a block of week-long targets there
+was commentary sitting above the list and pushed the habits down for something nobody acts
+on mid-tap. Between runs the section stays visible with one muted line — the block
+vanishing entirely kept *"seeing quests means something is on"* true but made the whole
+feature invisible, so an athlete who joined between runs never learned quests existed.
+
+Quest rows carry a name **and** a description, where an event goal is one line, so they
+split across two rows (`.g-lbl` / `.g-sub`) rather than wrapping under the bar.
 
 #### Events — the middle distance
 `EVENTS` in `habits.html`. Amir, 2026-07-30: *"by seasonal i didnt mean actual seasonal, it
