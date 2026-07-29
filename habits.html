@@ -288,7 +288,7 @@
   /* The level hero. The XP bar is a RING around the level number — the number
      and how far through it you are read as one object. */
   .hero-lv { display: flex; flex-direction: column; gap: 12px; }
-  .lvring { position: relative; flex: none; width: 86px; height: 86px; }
+  .lvring { position: relative; flex: none; width: 86px; height: 86px; padding: 0; border: 0; background: none; cursor: pointer; }
   .lvring svg { position: absolute; inset: 0; width: 100%; height: 100%;
                 transform: rotate(-90deg); display: block; }
   .lvring circle { fill: none; stroke-width: 3.4; }
@@ -298,20 +298,6 @@
   .lvring .in { position: absolute; inset: 0; display: flex; flex-direction: column;
                 align-items: center; justify-content: center; gap: 2px; }
   .lvring .lbl { font-size: 8px; font-weight: 700; letter-spacing: .14em; color: var(--muted-soft); }
-
-  /* Progress's slim level strip — the same information as Today's hero at a
-     fifth of the height, so the tab can lead with something of its own. */
-  .lvstrip {
-    width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
-    padding: 12px 20px; background: none; border-bottom: 2px solid var(--divider);
-  }
-  .lvstrip-num { font-size: 20px; line-height: 1; color: var(--accent); flex: none; }
-  .lvstrip-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-  .lvstrip-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
-  .lvstrip-top .hd { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lvstrip-top .go { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; color: var(--clay-deep); }
-  .lvstrip-next { flex: none; font-size: 12px; font-weight: 700; color: var(--muted); }
-  .lvstrip-next span { font-size: 8px; letter-spacing: .08em; color: var(--muted-soft); display: block; }
 
   /* Four season facts, equal weight. The old two-up made the day streak the
      biggest number on the tab, so a rebuilding athlete opened Progress to a
@@ -1344,10 +1330,6 @@
   #app .statgrid > div, #app .statgrid > div:nth-child(odd), #app .statgrid > div:nth-last-child(-n+2) {
     border: 0; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); padding: 12px 14px;
   }
-  #app .lvstrip { width: calc(100% - 32px); margin: 10px 16px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; padding: 12px 16px; }
-  #app .lvstrip-num { font-weight: 800; }
-  #app .lvstrip-top .go { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
-
   /* Grids & heat map */
   #app .grid35 .c { border: 0; border-radius: 6px; background: var(--surface); }
   #app .grid35 .c.hit { background: var(--hcol, var(--accent)); }
@@ -5348,10 +5330,10 @@ function renderToday(LI, doneCount, pct) {
           <!-- The XP ring: how far through this level, drawn AROUND the level
                number rather than as a bar under the block — the number and its
                progress are one object. r=15.5 in a 36 viewBox → C≈97.4. -->
-          <div class="lvring" data-k="lvring">
+          <button class="lvring" data-k="lvring" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
             <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
             <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 24 : 30}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
-          </div>
+          </button>
           <!-- The day streak sits ON the hero, not in a band under it. Amir
                asked for the number he already had to be made louder, and the
                band was a new field instead — a whole strip of screen to say one
@@ -5575,24 +5557,11 @@ function renderProgress(LI, earned, totalAch) {
   const perfectDays = seasonDays().filter(isPerfect).length;
   return `
     <div data-k="screen:progress" style="${screenAnim()}">
-      <!-- Progress used to open with the SAME 76px level hero as Today, so two
-           of the four tabs began with an identical block. The level still
-           belongs here as context, but not as the headline — the headline is
-           the season, which is the question this tab answers. -->
-      <button class="lvstrip" data-k="lvstrip" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
-        <span class="lvstrip-num hd">LV ${LI.lv}</span>
-        <span class="lvstrip-mid">
-          <span class="lvstrip-top">
-            ${rankCrest(LI.rank, 22)}
-            <span class="hd" style="font-size:14px;line-height:1">${esc(LI.label)}</span>
-            <span class="go">→</span>
-          </span>
-          ${passTitle() ? `<span data-k="ttl" style="align-self:flex-start;display:inline-flex">${titlePlate(passTitle(), true)}</span>` : ''}
-          <span class="bar thin"><span data-fill style="width:${LI.pct}%"></span></span>
-        </span>
-        <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
-      </button>
-
+      <!-- Progress used to open with a level/rank strip identical in spirit to
+           Today's hero and to the Locker's own card — three places stating the
+           same rank. Amir, 2026-07-30: this tab is about progress, not rank;
+           the level is one tap away on Today and lives properly in the Locker,
+           so it doesn't need a fourth appearance here. -->
       <!-- Days-logged leads on purpose. Perfect days and runs are both zero
            for anyone rebuilding, and opening your progress on a pair of zeros
            is a punishment for having had a bad week. Showing up is the stat
