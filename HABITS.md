@@ -786,8 +786,23 @@ Three rules follow on the client, all in `pushTitle()`:
   trip to feel like it worked;
 - the push only happens once they are **on the board**, the only place a title is
   published. Off the board they can still wear one; it shows on their card;
-- a refusal takes the title **off**, never out of `owned`. Wearing is revocable, owning is
-  not.
+- **a refusal to publish never un-equips it** (changed 2026-07-30 — see below). Wearing
+  stays exactly what the athlete chose; only the board's copy fails to catch up.
+
+⚠️ **This used to say the opposite** — "a refusal takes the title off, never out of
+`owned`" — and that was the actual bug behind an athlete reporting *"once I turned my
+title off I can't turn it back on."* `set_title()` validates the id against the server's
+`xp_rules.passTrack` catalogue before allowing it on, and if that catalogue is missing an
+id the client already knows about (exactly what `RUN-THIS-NOW.sql` exists to repair),
+every attempt to re-equip a perfectly-owned title failed server-side — and the old code
+reacted by clearing `CFG.pass.title` right back to null. Since `passTitle()` reads
+straight off `CFG.pass.owned`, that reset had nothing to do with what the athlete
+actually owned; it silently stripped their choice on every single tap, which read as the
+switch being broken. Turning a title **off** was never affected — `set_title(null)`
+skips validation entirely, so only the ON direction could ever fail this way, which is
+exactly why it looked one-directional. The toast still fires so the gap is honest
+("the board hasn't seen that unlock yet — it still shows on your own card"); it just no
+longer reaches back and un-does the athlete's own choice to make its point.
 
 `syncTitles()` reconciles the server's record back into `owned` on boot and **only ever
 adds**: the server's copy survives a cleared browser, the client's survives being offline,
