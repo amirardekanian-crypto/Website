@@ -413,6 +413,10 @@
   .sw > i { width: 16px; height: 16px; display: block; background: var(--muted-soft); }
   .sw.on { background: var(--accent); justify-content: flex-end; border-color: var(--accent); }
   .sw.on > i { background: var(--bg); }
+  /* Armed, waiting for the second tap that actually turns an add-on on —
+     see the comment above the Add-ons toggle handler. */
+  .sw.confirm { border-color: var(--clay-deep); }
+  .sw.confirm > i { background: var(--clay-deep); }
 
   /* ── Select rows (goals, coach volume, motivation) ── */
   /* 20px, like every other list row in the app. At 14px these rows sat six
@@ -2396,8 +2400,8 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
              day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null,
-             msOpen: {} };
-let _toastTimer = null, _flashTimer = null;
+             msOpen: {}, confirmOnId: null };
+let _toastTimer = null, _flashTimer = null, _confirmOnTimer = null;
 
 function defaultCfg() {
   const on = {}; HABITS.forEach(h => on[h.id] = true);
@@ -5184,7 +5188,7 @@ function streakFlame(now, best) {
 function leadStreak() {
   return live().reduce((m, h) => Math.max(m, habitStreak(h)), 0);
 }
-function habitRow(h, from, lead) {
+function habitRow(h, from, lead, pausedThen) {
   const v = valOf(AKEY(), h.id), done = isDone(h, AKEY()), st = habitStreak(h);
   const hl = habitLevel(h), flashed = UI.flash[h.id];
   const locked = !!h.locked && !done;
@@ -5192,7 +5196,8 @@ function habitRow(h, from, lead) {
     ? ((isFree() && h.freeHint) || h.lockedHint || 'Earned elsewhere.')
     : (h.kind === 'count'
         ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
-        : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)));
+        : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)))
+      + (pausedThen ? ' · paused now, but counted this day' : '');
   const pc = Math.min(100, Math.round(v / h.target * 100));
   const nudged = UI.idle === h.id && !done && !locked;
   const hue = habitHue(h), emoParts = splitEmoji(h.name), hEmo = emoParts[0], hLabel = emoParts[1];
@@ -5312,7 +5317,17 @@ function renderNoteBox() {
 }
 
 function renderToday(LI, doneCount, pct) {
+  // hs (live habits) drives "your week" — the heat map and the strongest/
+  // weakest ranking are about what you track NOW, regardless of which day
+  // you happen to be filling in. rows is what the day itself was actually
+  // scored on (rosterOn), which is what the tap targets below must show —
+  // ⚠️ see the note above dayParts(): a day is scored against its OWN
+  // roster, and a row list built from live() instead silently hides any
+  // habit you've since paused, so filling in that day can look complete
+  // while dayPct()/isPerfect() still judge it against a habit you were
+  // never shown. rows === hs on today itself; stampRoster() guarantees it.
   const hs = live();
+  const rows = rosterOn(AKEY());
   const n = nudge();
   const past = editingPast();
   const risk = !past && n.risk;
@@ -5391,7 +5406,7 @@ function renderToday(LI, doneCount, pct) {
            number, and the smaller one is the true one. -->
       ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
 
-      ${(() => { const lead = leadStreak(); return hs.map(h => habitRow(h, 'today', lead)).join(''); })()}
+      ${(() => { const lead = leadStreak(); return rows.map(h => habitRow(h, 'today', lead, past && CFG.on[h.id] === false)).join(''); })()}
 
       <!-- DIRECTLY UNDER THE LIST IT DESCRIBES. This line used to be the very
            last element on the screen — measured 580px below the fold, at the
@@ -7274,22 +7289,42 @@ function renderSettings() {
       ${addOnHabits().map(h => {
         const custom = (CFG.custom || []).some(c => c.id === h.id);
         const isOn = CFG.on[h.id] !== false, heldToday = lockedOnToday(h);
+        // Armed by a first tap on OFF→ON, cleared by a second tap or by the
+        // timeout — see the comment inside the handler below.
+        const arming = UI.confirmOnId === h.id;
         return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
           <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
             <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
-            <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP${!isOn && heldToday ? ' · still counts today' : ''}</span>
+            <span style="font-size:11px;line-height:1.2;color:${arming ? 'var(--clay-deep)' : 'var(--muted)'}">${arming
+              ? 'Tap again to turn it on — you cannot turn it back off until tomorrow.'
+              : esc(h.goal || h.source) + ' · ' + baseXp(h) + ' XP' + (!isOn && heldToday ? ' · still counts today' : '')}</span>
           </span>
           <span style="display:flex;gap:10px;align-items:center">
             ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
               ${on(() => removeCustom(h))} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
-            <button class="sw ${isOn ? 'on' : ''}" ${on(() => {
+            <button class="sw ${isOn ? 'on' : ''}${arming ? ' confirm' : ''}" ${on(() => {
               const turningOn = CFG.on[h.id] === false;
+              // Turning ON locks in today per stampRoster()'s TODAY-not-tomorrow
+              // rule — the permanent paragraph above this list says so, but a
+              // paragraph is easy to have never read. A first tap only ARMS the
+              // switch and restates the rule on the row itself; only a second
+              // tap, within the window, actually commits it. Turning off needs
+              // no such gate — it never takes effect before tomorrow either way.
+              if (turningOn && !arming) {
+                UI.confirmOnId = h.id; render();
+                clearTimeout(_confirmOnTimer);
+                _confirmOnTimer = setTimeout(() => {
+                  if (UI.confirmOnId === h.id) { UI.confirmOnId = null; render(); }
+                }, 3200);
+                return;
+              }
+              UI.confirmOnId = null;
               CFG.on[h.id] = !turningOn ? false : true;
               saveCfg(); render();
               toast(turningOn
                 ? h.name.replace(/^[^A-Za-z]+/, '') + ' is on from today. Miss it and it counts against your day.'
                 : h.name.replace(/^[^A-Za-z]+/, '') + ' comes off tomorrow. Today still counts it.');
-            })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
+            })} aria-label="${arming ? 'Confirm turning ' + esc(h.name) + ' on' : 'Toggle ' + esc(h.name)}"><i></i></button>
           </span>
         </div>`;
       }).join('')}
