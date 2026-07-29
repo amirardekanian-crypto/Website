@@ -150,6 +150,28 @@ Beyond scoring, three more things live in more than one place:
 - **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
   server (`public.hab_titles`). Both are append-only; neither may ever subtract.
 
+### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
+
+(Amir, 2026-07-30: *"lets say for example 5 habits are mandatory for everyone … then someone
+tries to turn on supplements or breathing only to get additional xp and achievements. this
+should be a bonus."*)
+
+**`core: true`** on five habits — train · steps · sleep · protein · water — means always
+tracked, **no off switch** (`live()` honours `core` regardless of `CFG.on`). Same five for
+every athlete, so a day score finally means the same thing across the board. Everything
+else is an **add-on**: opted in for the extra XP and badges, and once on it *counts*.
+
+**Two rules in `stampRoster()`, and they answer "why did Friday change Wednesday":**
+- **Adding lands TODAY.** You opted in, today is still yours to finish, and Settings says so
+  before you tap.
+- **Removing lands TOMORROW.** Otherwise switching a habit off at 23:00 deletes a miss you
+  already made, which would make the day score worthless. `lockedOnToday()` is what lets the
+  UI say *"still counts today"*.
+
+Neither ever reaches a closed day. Proven: adding supps today leaves Wednesday at 100% and
+takes today to 93%; switching it straight back off leaves today at **93%** and dates the
+removal to tomorrow.
+
 ### Days are settled units — the rule, and the thing that enforces it
 
 **A day is scored against the habits that were switched on THAT day. A closed day never

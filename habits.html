@@ -236,8 +236,18 @@
      large enough to read as two separate facts; the ember dot supplies the only
      other separator, which is why there is no middot. */
   .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
-  .hrow .body .status .ember { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+  .hrow .body .status .ember {
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    color: var(--clay-deep);
+  }
   .hrow .body .status .ember .u { font-size: 9px; opacity: .8; letter-spacing: .02em; }
+  /* The best streak on the screen gets a filled pill. One of them, never eight —
+     the same reasoning that keeps a single ember animating. */
+  .hrow .body .status .ember.lead {
+    background: var(--clay); color: var(--on-clay); padding: 2px 6px 2px 5px; margin-left: 3px;
+  }
+  .hrow .body .status .ember.lead::before { background: var(--on-clay); }
+  .hrow .body .status .ember.lead .u { opacity: .9; }
   .hrow .body .track { display: block; width: 100%; height: 4px; background: var(--track); margin-top: 2px; }
   .hrow .body .track > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
   .hrow + .rowhint { padding: 10px 20px 14px; font-size: 11px; line-height: 1.5; color: var(--muted-soft); border-bottom: 2px solid var(--divider); }
@@ -869,51 +879,50 @@
   .ember.lead[data-lvl="2"]::before { animation: emberPulse 1.5s ease-in-out infinite; }
   .ember.lead[data-lvl="3"]::before { animation: emberFlicker 1.9s ease-in-out infinite; }
 
-  /* ── The streak band ──────────────────────────────────────────────────────
-     CLAY, NEVER GREEN. On Today this sits directly under the level hero, which
-     is a green figure over a green bar; a second green block of the same shape
-     reads as one broken double-bar, which is exactly why the day's own
-     progress was taken off this screen in the first place. Clay also matches
-     the ember language the habit rows already use for runs, so the two kinds
-     of consistency look related without looking identical. */
-  .streakband {
-    display: flex; align-items: center; gap: 16px;
-    padding: 15px 20px; border-bottom: 2px solid var(--divider);
-    background: var(--clay-100);
+  /* ── The streak, as a flame ───────────────────────────────────────────────
+     Amir's note, verbatim: "i asked you to show their streak like habit streaks
+     or complete day streaks just bolder, flashier just something to catch the
+     eye." The band that was here did the opposite — it was a NEW FIELD, a whole
+     strip of screen to state one integer. This is the same number, loud, and it
+     costs no vertical space: it sits on the level hero on Today and inside the
+     stat grid on Progress.
+
+     Heat comes off emberLevel() — the same 0/5/15/30-day scale the habit rows
+     use — so a long streak visibly burns harder than a new one. */
+  @keyframes flameLick {
+    0%, 100% { transform: scaleY(1)    translateY(0);     opacity: 1 }
+    35%      { transform: scaleY(1.18) translateY(-1.5px); opacity: .85 }
+    70%      { transform: scaleY(.92)  translateY(.5px);   opacity: 1 }
   }
-  .streakband .sb-fig {
-    flex: none; display: flex; align-items: baseline; gap: 7px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    color: var(--clay-deep); letter-spacing: -.04em; font-size: 40px; line-height: .85;
+  .flame { display: block; flex: none; width: 11px; height: 14px; color: var(--muted-soft); }
+  .flame .f-out { fill: currentColor; }
+  .flame .f-in  { fill: var(--bg); opacity: .5; }
+  .lit .flame { color: var(--clay); }
+  .lit[data-lvl="2"] .flame,
+  .lit[data-lvl="3"] .flame { transform-origin: 50% 90%; }
+  .lit[data-lvl="2"] .flame { animation: flameLick 1.5s ease-in-out infinite; }
+  .lit[data-lvl="3"] .flame { animation: flameLick .85s ease-in-out infinite; }
+
+  /* Today — on the hero, left of the rank block. */
+  .dayflame {
+    flex: none; display: flex; align-items: center; gap: 5px; padding: 0 12px 0 0;
+    margin-right: 2px; border-right: 2px solid var(--divider); align-self: stretch;
   }
-  /* The flame is the ember dot at three sizes, not an emoji — the app has no
-     emoji in it anywhere and one would be the only thing on screen that
-     changes shape between platforms. */
-  .streakband .flame {
-    flex: none; width: 9px; height: 9px; background: var(--clay); align-self: center;
+  .dayflame .flame { width: 15px; height: 19px; }
+  .dayflame .n {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px;
+    line-height: .85; letter-spacing: -.03em; color: var(--muted);
   }
-  .streakband[data-lvl="0"] .flame { background: var(--muted-soft); }
-  .streakband[data-lvl="1"] .flame { animation: emberPulse 2.8s ease-in-out infinite; }
-  .streakband[data-lvl="2"] .flame { animation: emberPulse 1.5s ease-in-out infinite; }
-  .streakband[data-lvl="3"] .flame { animation: emberFlicker 1.9s ease-in-out infinite; }
-  .streakband[data-lvl="0"] .sb-fig { color: var(--muted); }
-  .streakband .sb-mid { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-  .streakband .sb-lbl {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px;
-    line-height: 1; letter-spacing: .06em; text-transform: uppercase; color: var(--ink);
+  .dayflame.lit .n { color: var(--clay-deep); }
+  .dayflame .u {
+    font-family: 'Space Mono', monospace; font-size: 7px; line-height: 1.15;
+    letter-spacing: .08em; color: var(--muted-soft);
   }
-  .streakband .sb-sub { font-size: 11px; line-height: 1.3; color: var(--muted); }
-  /* The seven-day trail. Squares, not dots: `.pips` already means "a ladder of
-     things you have cleared" everywhere else in the app, and this is the same
-     idea over days instead of tiers. Clay here, green there — see above. */
-  .streakband .sb-trail { flex: none; display: flex; gap: 3px; align-items: flex-end; }
-  .streakband .sb-trail i {
-    width: 9px; height: 9px; display: block; border: 1.5px solid var(--box); background: none;
-  }
-  .streakband .sb-trail i.ok { background: var(--clay); border-color: var(--clay); }
-  .streakband .sb-trail i.pre { border-color: var(--rule); }
-  /* Today reads as the live cell: taller, and outlined until it qualifies. */
-  .streakband .sb-trail i.now { height: 15px; border-color: var(--clay-deep); }
+
+  /* Progress — inside the stat grid, so the grid keeps four facts. */
+  .statgrid .flamefig { display: flex; align-items: center; gap: 6px; }
+  .statgrid .flamefig .flame { width: 13px; height: 17px; }
+  .statgrid .flamefig.lit { color: var(--clay-deep); }
 
   /* ── Milestone rows ───────────────────────────────────────────────────────
      These were a flat list at 45% opacity: nine things the athlete had mostly
@@ -1193,6 +1202,19 @@ const XP_RULES = {
   }
 };
 
+// ── CORE vs ADD-ON ────────────────────────────────────────────────────────
+// Amir, 2026-07-30: "lets say for example 5 habits are mandatory for everyone …
+// then someone tries to turn on supplements or breathing only to get additional
+// xp and achievements. this should be a bonus."
+//
+// `core: true` means the habit is ALWAYS tracked and has no off switch. Five of
+// them — train, steps, sleep, protein, water — which is the same list for every
+// athlete on the board, so a day score means the same thing for everyone and the
+// leaderboard compares like with like for the first time.
+//
+// Everything else is an ADD-ON: opted into for the extra XP and the badges, and
+// once added it counts, which is the point. See stampRoster() for the two rules
+// that make that fair — add lands today, removal lands tomorrow.
 const HABITS = [
   // The id stays 'strength' so nobody's history or XP is orphaned by the
   // rename. LOCKED: it cannot be ticked by hand — finishing a session in
@@ -1207,13 +1229,13 @@ const HABITS = [
   // row is keyed on it, so renaming is display-only and costs nobody a point.
   // `goal` is the second line, so it must NOT restate the name — on check-off
   // habits it now carries the coaching detail the name has no room for.
-  { id:'strength', name:'🏋 Finish your session', short:'Session', code:'WO', kind:'check', target:1,     unit:'session', goal:'45 min · from your programme',   source:'From your programme', locked:true,
+  { id:'strength', core:true, name:'🏋 Finish your session', short:'Session', code:'WO', kind:'check', target:1,     unit:'session', goal:'45 min · from your programme',   source:'From your programme', locked:true,
     lockedHint:'Complete any day of your Workout in your Program to gain XP for this.',
     freeHint:'Coached athletes earn this from their programme. It is the biggest habit on the list.' },
-  { id:'steps',    name:'🚶 Walk 10,000 steps', short:'Steps',   code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
-  { id:'sleep',    name:'🛏 Sleep 7.5+ hours', short:'Sleep',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
-  { id:'fuel',     name:'🍗 3 protein meals', short:'Protein', code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 meals, protein in each',       source:'Manual' },
-  { id:'water',    name:'💧 Drink 8 glasses', short:'Water',     code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
+  { id:'steps', core:true,    name:'🚶 Walk 10,000 steps', short:'Steps',   code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
+  { id:'sleep', core:true,    name:'🛏 Sleep 7.5+ hours', short:'Sleep',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
+  { id:'fuel', core:true,     name:'🍗 3 protein meals', short:'Protein', code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 meals, protein in each',       source:'Manual' },
+  { id:'water', core:true,    name:'💧 Drink 8 glasses', short:'Water',     code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
   { id:'mobility', name:'🧘 Stretch 10 minutes', short:'Mobility',  code:'MO', kind:'check', target:1,     unit:'session', goal:'Hips, ankles, T-spine',          source:'Manual' },
   { id:'breathe',  name:'💨 Breathe 10 minutes', short:'Breathe',  code:'BR', kind:'check', target:1,     unit:'session', goal:'Nasal, slow, before bed',        source:'Manual' },
   { id:'supps',    name:'💊 Take your supplements', short:'Supps', code:'SU', kind:'check', target:1,   unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
@@ -1841,8 +1863,23 @@ function habitById(id) { return allHabits().find(h => h.id === id) || HABITS[0];
 // column is 66px and "Take your supplements" is not. Custom habits never had one,
 // so they fall back to whatever the athlete typed.
 function shortName(h) { return h.short || h.name; }
-function live() { return allHabits().filter(h => CFG.on[h.id] !== false); }
-function offHabits() { return allHabits().filter(h => CFG.on[h.id] === false); }
+// A core habit is on whatever CFG.on says — including for athletes who switched
+// one off before core existed. That flips on their next save, dated TODAY, and
+// nothing behind them moves.
+function live() { return allHabits().filter(h => h.core || CFG.on[h.id] !== false); }
+function offHabits() { return allHabits().filter(h => !h.core && CFG.on[h.id] === false); }
+function addOnHabits() { return allHabits().filter(h => !h.core); }
+// Is this add-on locked on for the rest of today? Turning one ON applies now, so
+// turning it straight back off would be a way to dodge the miss — that is the
+// whole reason removal is dated tomorrow. This reports it so the UI can say so.
+function lockedOnToday(h) {
+  if (h.core) return false;
+  const t = (CFG && CFG.roster) || [];
+  if (!t.length) return false;
+  let cur = t[0];
+  for (let i = 0; i < t.length && t[i].from <= TKEY(); i++) cur = t[i];
+  return cur.ids.indexOf(h.id) >= 0;
+}
 
 // ── A day is scored against the habits that were on THAT day ──────────────
 // `live()` is "what the athlete tracks right now", and reading it while scoring
@@ -1903,24 +1940,63 @@ function anchorRoster() {
   const first = firstLoggedDay();
   if (first && first < t[0].from) { t[0].from = first; _rosterCache = null; }
 }
+function rosterAt(t, dayKey) {
+  let cur = t[0];
+  for (let i = 0; i < t.length && t[i].from <= dayKey; i++) cur = t[i];
+  return cur.ids.slice();
+}
+function sameIds(a, b) { return a.length === b.length && a.every((v, i) => v === b[i]); }
+function rosterPut(t, from, ids) {
+  const i = t.findIndex(e => e.from === from);
+  if (i >= 0) t[i].ids = ids; else t.push({ from, ids });
+  t.sort((x, y) => (x.from < y.from ? -1 : x.from > y.from ? 1 : 0));
+}
+function rosterDrop(t, from) {
+  const i = t.findIndex(e => e.from === from);
+  if (i >= 0) t.splice(i, 1);
+}
+// ── TWO RULES, and they are the whole answer to "why did Friday change Wednesday" ──
+//
+// Amir, 2026-07-30: "if i havent add on supplements on wednesday and i change my
+// settings on friday, why would it change my habits in wednesday? no games is
+// like that."
+//
+//   ADDING an add-on takes effect TODAY. You opted in, today is still yours to
+//   finish, so it counts — and the UI says so before you tap.
+//
+//   REMOVING one takes effect TOMORROW. Otherwise switching a habit off at 23:00
+//   is a way to delete a miss you already made, which is the one move that would
+//   make the whole day score worthless.
+//
+// Neither ever reaches a closed day. `rosterOn(day)` reads the entry in force on
+// that day, so Wednesday keeps the set Wednesday actually had, for ever.
 function stampRoster() {
   if (!CFG) return;
-  const ids = live().map(h => h.id).sort();
+  const want = live().map(h => h.id).sort();
   const t = CFG.roster || (CFG.roster = []);
-  const last = t.length ? t[t.length - 1] : null;
-  if (last && last.ids.length === ids.length && last.ids.every((v, i) => v === ids[i])) return;
-  // The FIRST stamp is dated from the athlete's first logged day, not today, so
-  // an athlete who already has history scores exactly as they did before this
-  // shipped. A migration that rescored history would be the same class of bug
-  // this whole mechanism exists to remove.
-  if (!last) { t.push({ from: firstLoggedDay() || TKEY(), ids }); return; }
-  if (last.from === TKEY()) last.ids = ids;    // changed their mind twice today
-  else t.push({ from: TKEY(), ids });
-  // Two edits in one day can land back where they started, one entry later.
-  const n = t.length;
-  if (n > 1 && t[n-1].ids.length === t[n-2].ids.length
-            && t[n-1].ids.every((v, i) => v === t[n-2].ids[i])) t.pop();
+  // First stamp is dated from the first logged day, so an athlete who already
+  // has history scores exactly as they did before any of this existed.
+  if (!t.length) { t.push({ from: firstLoggedDay() || TKEY(), ids: want }); return; }
+
+  const TK = TKEY(), TOM = fmtKey(addDays(today(), 1));
+  const held = rosterAt(t, TK);
+  // Today = what today already had, PLUS anything just switched on. Removals are
+  // deliberately not applied here.
+  const todayIds = held.slice();
+  want.forEach(id => { if (todayIds.indexOf(id) < 0) todayIds.push(id); });
+  todayIds.sort();
+
+  rosterPut(t, TK, todayIds);
+  // Tomorrow only needs an entry when it differs from today — i.e. when
+  // something was removed. Switching it back on before midnight deletes that
+  // entry again, so the timeline never fills with no-ops.
+  if (sameIds(todayIds, want)) rosterDrop(t, TOM); else rosterPut(t, TOM, want);
+
+  // Collapse any entry that says the same as the one before it.
+  for (let i = t.length - 1; i > 0; i--) if (sameIds(t[i].ids, t[i - 1].ids)) t.splice(i, 1);
+  _rosterCache = null;
 }
+
 function valOf(dayKey, id) { const d = LOG[dayKey]; return (d && typeof d[id] === 'number') ? d[id] : 0; }
 function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
 function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
@@ -3230,6 +3306,13 @@ function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _ha
 // A stroked tick rather than a ✓ glyph, so it can be drawn on. Hard corners and
 // a square cap keep it inside the modernist system — no rounded checkmark.
 const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg>';
+// Two paths: the body of the flame, and a brighter core sitting inside it. Drawn
+// rather than emoji'd — nothing in this app should change shape between an
+// iPhone and a Pixel, least of all the thing that marks a streak.
+const FLAME = '<svg class="flame" viewBox="0 0 24 24" aria-hidden="true">'
+  + '<path class="f-out" d="M12.6 1c.5 2.9-.5 4.7-1.9 6.3-1.9 2.2-4.7 4.3-4.7 8.2a8 8 0 0 0 16 0c0-3.2-1.4-5.2-2.9-7.1-1-1.3-2-2.5-2.5-4.1-.5 1.2-1.3 2.1-2.3 2.9.6-2 .8-4 .3-6.2Z"/>'
+  + '<path class="f-in" d="M12.2 12c.4 1.6-.2 2.6-1 3.5-.8.9-1.7 1.8-1.7 3.2a4 4 0 0 0 8 0c0-1.6-.8-2.6-1.7-3.6-.6-.7-1.1-1.4-1.3-2.3-.5.8-1.3 1.4-2.3 1.2Z"/>'
+  + '</svg>';
 
 function reduced() {
   return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -4383,27 +4466,13 @@ function bestHabitRun() {
   // consistency tier once it is crossed.
   return allHabits().reduce((m, h) => Math.max(m, habitBest(h)), 0);
 }
-function streakBand() {
-  const first = firstLoggedDay();
-  if (!first) return '';
-  const now = currentDayStreak(), best = bestDayStreak(), lvl = emberLevel(now);
-  const cells = [];
-  for (let i = 6; i >= 0; i--) {
-    const k = fmtKey(addDays(today(), -i)), pre = k < first;
-    cells.push(`<i class="${[pre ? 'pre' : '', !pre && dayQualifies(k) ? 'ok' : '', i === 0 ? 'now' : ''].filter(Boolean).join(' ')}"></i>`);
-  }
-  // Three states, three different things worth saying. A broken streak is the
-  // one that needs a sentence rather than a statistic.
-  const sub = now === 0
-    ? `Clear ${XP_RULES.streakQualifyPct}% of what you track today and it start${best > 0 ? 's again' : 's'}.`
-    : (now >= best ? 'Your longest yet — nothing above it.' : `Best ${best} days.`);
-  return `<div class="streakband" data-k="streakband" data-lvl="${lvl}">
-    <span class="sb-fig"><i class="flame" aria-hidden="true"></i><span data-static data-num="dstreak" data-to="${now}">${now}</span></span>
-    <span class="sb-mid">
-      <span class="sb-lbl">${now === 0 ? 'No streak' : 'Day streak'}</span>
-      <span class="sb-sub">${esc(sub)}</span>
-    </span>
-    <span class="sb-trail" aria-label="The last seven days">${cells.join('')}</span>
+function streakFlame(now, best) {
+  if (!firstLoggedDay()) return '';           // day one is not a report of zero
+  return `<div class="dayflame ${now > 0 ? 'lit' : ''}" data-lvl="${emberLevel(now)}" data-k="dayflame"
+        title="${now > 0 ? now + '-day streak' + (best > now ? ' · best ' + best : '') : 'No streak yet'}">
+    ${FLAME}
+    <span class="n" data-static data-num="dstreak" data-to="${now}">${now}</span>
+    <span class="u">DAY<br>STREAK</span>
   </div>`;
 }
 
@@ -4580,6 +4649,12 @@ function renderToday(LI, doneCount, pct) {
       <div class="block hero-lv">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:56px;line-height:.85">${LI.lv}</div>
+          <!-- The day streak sits ON the hero, not in a band under it. Amir
+               asked for the number he already had to be made louder, and the
+               band was a new field instead — a whole strip of screen to say one
+               integer. Here it is the loudest thing on the row after the level
+               itself, and it costs no vertical space at all. -->
+          ${streakFlame(currentDayStreak(), bestDayStreak())}
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:5px;min-width:0">
             <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
               ${rankIcon(LI.rank, 17)}
@@ -4591,12 +4666,6 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
       </div>
-
-      <!-- The streak, directly under the level and above the day strip it
-           describes. It is clay, not green, for the reason the day's own
-           progress bar is no longer here at all: a second green block of the
-           same shape under the hero read as one broken double-bar. -->
-      ${streakBand()}
 
       <!-- Day strip then habits, directly under the hero. The list is what the
            screen is FOR; it used to start ~1,400px down, behind the nudge and
@@ -4791,7 +4860,7 @@ function fmtQuestVal(q, v) {
 // one screen: overall level, then every habit's own rank, then the milestones.
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
-  const bestRun = bestHabitRun(), lead = leadStreak();
+  const bestRun = bestHabitRun(), lead = leadStreak(), dayStreakNow = currentDayStreak();
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
   return `
@@ -4814,14 +4883,6 @@ function renderProgress(LI, earned, totalAch) {
         <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
       </button>
 
-      <!-- The same band Today opens with, so the number an athlete is protecting
-           looks identical on both screens they check it from. It also takes the
-           day streak OUT of the grid below: it was a bare figure there with no
-           way to tell a streak climbing from one just broken, and repeating it
-           in both places would be the duplication this tab was reorganised to
-           remove. -->
-      ${streakBand()}
-
       <!-- Days-logged leads on purpose. Perfect days and runs are both zero
            for anyone rebuilding, and opening your progress on a pair of zeros
            is a punishment for having had a bad week. Showing up is the stat
@@ -4831,8 +4892,8 @@ function renderProgress(LI, earned, totalAch) {
           <div class="eyebrow">Days logged</div></div>
         <div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
           <div class="eyebrow">Badges</div></div>
-        <div><div class="figure" data-static data-num="bestrun" data-to="${bestRun}">${bestRun}</div>
-          <div class="eyebrow">Longest streak</div></div>
+        <div><div class="figure flamefig ${dayStreakNow > 0 ? 'lit' : ''}" data-lvl="${emberLevel(dayStreakNow)}">${FLAME}<span data-static data-num="streak" data-to="${dayStreakNow}">${dayStreakNow}</span></div>
+          <div class="eyebrow">Day streak${bestRun > dayStreakNow ? ' · best ' + bestRun : ''}</div></div>
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
           <div class="eyebrow">Perfect days</div></div>
       </div>
@@ -6021,18 +6082,50 @@ function renderSettings() {
       </button>
 
       <div data-k="tracked" data-tour="tracked">
-      ${sectionLabel('Tracked habits')}
-      ${allHabits().map(h => {
-        const custom = (CFG.custom || []).some(c => c.id === h.id);
-        return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
+      ${sectionLabel('The five', 'Everyone tracks these')}
+      <div style="padding:10px 20px 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+        These are the job, and they are the same for every athlete on the board — which is
+        what makes a day score mean the same thing for all of you. There is no off switch.
+      </div>
+      ${allHabits().filter(h => h.core).map(h => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
           <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
             <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
             <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
           </span>
+          <span class="mono" style="flex:none;font-size:8.5px;letter-spacing:.09em;color:var(--muted-soft);border:1px solid var(--rule);padding:4px 7px">ALWAYS ON</span>
+        </div>`).join('')}
+
+      ${sectionLabel('Add-ons', 'Extra points, extra badges')}
+      <!-- The warning is permanent, not a one-off toast. It is the rule the whole
+           thing turns on, and an athlete who switched something on three weeks
+           ago should still be able to find out why it is counting against them. -->
+      <div style="padding:10px 20px 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+        Optional, and worth real points on top of the five. <strong style="color:var(--ink)">Once you
+        switch one on it counts</strong> — miss it and it costs you the same as missing anything
+        else, so only add what you will actually do. Switching one on applies
+        <strong style="color:var(--ink)">today</strong>; switching it off applies
+        <strong style="color:var(--ink)">tomorrow</strong>, so you cannot drop one at midnight to
+        hide a miss. Days already gone never change either way.
+      </div>
+      ${addOnHabits().map(h => {
+        const custom = (CFG.custom || []).some(c => c.id === h.id);
+        const isOn = CFG.on[h.id] !== false, heldToday = lockedOnToday(h);
+        return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
+          <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+            <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
+            <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP${!isOn && heldToday ? ' · still counts today' : ''}</span>
+          </span>
           <span style="display:flex;gap:10px;align-items:center">
             ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
               ${on(() => removeCustom(h))} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
-            <button class="sw ${CFG.on[h.id] !== false ? 'on' : ''}" ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
+            <button class="sw ${isOn ? 'on' : ''}" ${on(() => {
+              const turningOn = CFG.on[h.id] === false;
+              CFG.on[h.id] = !turningOn ? false : true;
+              saveCfg(); render();
+              toast(turningOn
+                ? h.name.replace(/^[^A-Za-z]+/, '') + ' is on from today. Miss it and it counts against your day.'
+                : h.name.replace(/^[^A-Za-z]+/, '') + ' comes off tomorrow. Today still counts it.');
+            })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
           </span>
         </div>`;
       }).join('')}
