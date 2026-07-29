@@ -60,8 +60,9 @@ Today keeps a one-line *pointer* to Crew (not a second composer) that disappears
 athlete has written. **LOCKER is the reward track** (`PASS_TRACK` — see *The long game*
 below): the shareable rank card up top, titles and card skins as horizontal rails, then
 **the road** — the rank ladder and the 14 rewards merged into one scroll (2026-07-30: the
-standalone ladder screen is gone; tapping your rank on Today or Progress opens Locker
-directly now).
+standalone ladder screen is gone; tapping the rank *or the level ring* on Today's hero
+opens Locker directly now — Progress dropped its own level/rank strip the same day, so
+the rank lives in exactly one place outside the Locker itself).
 
 **Ranks, titles and medals wear metal now** — `METALS` (bronze → silver → gold →
 amethyst → prismatic) is a shared visual language: `rankCrest()` draws the tier-shaped,

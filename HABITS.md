@@ -426,14 +426,18 @@ Written and read in the **CREW** tab, which opens on it.
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
 
-**A slim level strip** (not a repeat of Today's hero — two tabs used to open
-with the identical 76px level block) → **four season stats**: days logged, badges,
-**day streak** (as the flame) and perfect days → a one-line
-**key explaining the consistency pips**, which had no
-legend anywhere in the app and are empty for the first five days → **one row per habit**
-(its level, rank, XP, progress bar and five pips, tapping through to full history) →
-paused habits with their banked XP → **seasonal events** → the sixteen one-off
-**milestones**, in three tiers.
+Opens straight on **four season stats**: days logged, badges, **day streak** (as the
+flame) and perfect days → a one-line **key explaining the consistency pips**, which had
+no legend anywhere in the app and are empty for the first five days → **one row per
+habit** (its level, rank, XP, progress bar and five pips, tapping through to full
+history) → paused habits with their banked XP → **seasonal events** → the sixteen
+one-off **milestones**, in three tiers.
+
+There used to be a level/rank strip up top too — the same information as Today's hero,
+squeezed to a fifth of the height. Amir, 2026-07-30: this tab is about progress, not
+rank, and the level is one tap away on Today's hero (now the ring itself is tappable,
+not just the rank name beside it) and lives properly in the Locker — a third
+appearance here was the duplication the strip was invented to avoid in the first place.
 
 Days-logged leads the stat grid deliberately. Perfect days and runs are both zero for
 anyone rebuilding after a bad week, and opening your own progress on a pair of zeros
@@ -519,8 +523,9 @@ recap — and doesn't ask athletes to configure it.
 ### The rank ladder lives on the Locker's road now
 It used to be its own screen, reached by tapping your rank; that screen is **gone**
 (Amir's redesign, 2026-07-30: *"two screens were describing the same climb"*). Tapping
-your rank — on Today's hero or on Progress — now opens the **Locker** tab directly, and
-`renderPass()`'s road interleaves the two: each of the 10 ranks is a header (crest, tier
+your rank — or the level ring beside it — on **Today's hero**, the only place either
+lives now, opens the **Locker** tab directly, and `renderPass()`'s road interleaves the
+two: each of the 10 ranks is a header (crest, tier
 label, level range, XP cost or "CLEARED", and — for the rank you're standing in — a pip
 row showing which of its sub-levels you've cleared), and the reward rows for that level
 range sit right under it. One scroll now shows the ranks ahead, their crests, and every
@@ -540,7 +545,12 @@ ceiling) is unchanged — see *The long game* below.
 **Today's level hero also changed shape**: the XP bar is a ring around the level number
 now (`.lvring`, an SVG circle with a `stroke-dashoffset` set from `LI.pct`), not a bar
 underneath it — the number and how far through it you are read as one object instead of
-two.
+two. The ring is a real button now too, same destination as the rank name beside it
+(Amir, 2026-07-30: it read as decoration when only half the block responded to a tap).
+
+**Progress lost its own level/rank strip entirely** (see *02 · PROGRESS*, below) — with
+Today's whole hero tappable and the Locker owning the rank properly, a third copy of
+the same rank was the duplication this app keeps finding and removing.
 
 #### Inside the Crew tab
 
