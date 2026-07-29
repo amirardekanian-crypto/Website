@@ -84,11 +84,20 @@ by design, so any check against the *current* level would revoke titles people a
 season half is permanent, and either one alone justifies minting.) The track is a third
 thing scored twice: `PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
 
-**Two words, one job each — do not invent a third.** A **run** is consecutive days on
-*one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
-`streakQualifyPct` of everything they track ("2-day streak"). The app once used five
-phrasings for these two ideas, so a 24-day run beside a 2-day streak looked like the same
-number disagreeing with itself. The manual teaches both in *Consistency*.
+**One word — `streak` — and two SCOPES.** (Amir, 2026-07-29: *"instead of Run i want to
+use word Streak everywhere in my App"*.) A **habit's streak** is consecutive days on *one*
+habit ("24-day streak", on its row). The **day streak** is consecutive days where the
+athlete cleared `streakQualifyPct` of the day's weight ("2-day streak", in the band at the
+top of Today and Progress).
+
+⚠️ This *reverses* the earlier rule, which called the per-habit one a **run** precisely so
+those two numbers could never be confused — the app had used five phrasings and a 24-day
+run beside a 2-day streak read as one number arguing with itself. Amir asked for one word,
+so the job of keeping them apart moved from the noun to the **label**: every place that
+shows a habit's streak sits *on that habit* (its row, its detail header), and the day one
+is always captioned **DAY STREAK**. Keep it that way, and do not reintroduce "run" — the
+manual and the day-one note on Progress are the only places that teach the difference, and
+they now teach it by scope. `bestHabitRun()` keeps its internal name; nothing shows it.
 
 **Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
 backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
@@ -141,6 +150,28 @@ Beyond scoring, three more things live in more than one place:
 - **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
   server (`public.hab_titles`). Both are append-only; neither may ever subtract.
 
+### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
+
+(Amir, 2026-07-30: *"lets say for example 5 habits are mandatory for everyone … then someone
+tries to turn on supplements or breathing only to get additional xp and achievements. this
+should be a bonus."*)
+
+**`core: true`** on five habits — train · steps · sleep · protein · water — means always
+tracked, **no off switch** (`live()` honours `core` regardless of `CFG.on`). Same five for
+every athlete, so a day score finally means the same thing across the board. Everything
+else is an **add-on**: opted in for the extra XP and badges, and once on it *counts*.
+
+**Two rules in `stampRoster()`, and they answer "why did Friday change Wednesday":**
+- **Adding lands TODAY.** You opted in, today is still yours to finish, and Settings says so
+  before you tap.
+- **Removing lands TOMORROW.** Otherwise switching a habit off at 23:00 deletes a miss you
+  already made, which would make the day score worthless. `lockedOnToday()` is what lets the
+  UI say *"still counts today"*.
+
+Neither ever reaches a closed day. Proven: adding supps today leaves Wednesday at 100% and
+takes today to 93%; switching it straight back off leaves today at **93%** and dates the
+removal to tomorrow.
+
 ### Days are settled units — the rule, and the thing that enforces it
 
 **A day is scored against the habits that were switched on THAT day. A closed day never
@@ -170,9 +201,17 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–19 are applied and live** (leaderboard, workout-days feed, seasons,
+**Habit names are TASKS** — `🚶 Walk 10,000 steps`, not `STEPS`. Display only; the
+`id` never changes, so no history moves. **Seasonal events** (`EVENTS` in
+`habits.html`) are named blocks of the calendar with 2–3 goals; they pay a **title,
+never XP**, precisely to avoid a third thing scored twice — but their title ids must
+exist in `passTrack` on the `xp_rules` row or the server refuses them. **Milestones
+carry a `tier`** (`week`/`long`/`rare`) for grouping on Progress; nothing scores off
+it. Full detail in `HABITS.md`.
+
+**Supabase stages 9–20 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
-per-day rosters, weighted day scores).
+per-day rosters, weighted day scores, milestone tiers + event titles).
 
 **The day score is WEIGHTED, and it is two numbers.** `dayParts(day, mode)` in
 `habits.html` sums `baseXp()` over `rosterOn(day)` rather than counting heads. `dayPct()`

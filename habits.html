@@ -231,7 +231,23 @@
   .hrow .body .line1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .hrow .body .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1; letter-spacing: .01em; text-transform: uppercase; }
   .hrow .body .stk { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
-  .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); }
+  /* The status line now carries two things — what you have done, and the streak
+     that describes it — so it is a flex row rather than a bare string. `gap` is
+     large enough to read as two separate facts; the ember dot supplies the only
+     other separator, which is why there is no middot. */
+  .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+  .hrow .body .status .ember {
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    color: var(--clay-deep);
+  }
+  .hrow .body .status .ember .u { font-size: 9px; opacity: .8; letter-spacing: .02em; }
+  /* The best streak on the screen gets a filled pill. One of them, never eight —
+     the same reasoning that keeps a single ember animating. */
+  .hrow .body .status .ember.lead {
+    background: var(--clay); color: var(--on-clay); padding: 2px 6px 2px 5px; margin-left: 3px;
+  }
+  .hrow .body .status .ember.lead::before { background: var(--on-clay); }
+  .hrow .body .status .ember.lead .u { opacity: .9; }
   .hrow .body .track { display: block; width: 100%; height: 4px; background: var(--track); margin-top: 2px; }
   .hrow .body .track > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
   .hrow + .rowhint { padding: 10px 20px 14px; font-size: 11px; line-height: 1.5; color: var(--muted-soft); border-bottom: 2px solid var(--divider); }
@@ -863,51 +879,50 @@
   .ember.lead[data-lvl="2"]::before { animation: emberPulse 1.5s ease-in-out infinite; }
   .ember.lead[data-lvl="3"]::before { animation: emberFlicker 1.9s ease-in-out infinite; }
 
-  /* ── The streak band ──────────────────────────────────────────────────────
-     CLAY, NEVER GREEN. On Today this sits directly under the level hero, which
-     is a green figure over a green bar; a second green block of the same shape
-     reads as one broken double-bar, which is exactly why the day's own
-     progress was taken off this screen in the first place. Clay also matches
-     the ember language the habit rows already use for runs, so the two kinds
-     of consistency look related without looking identical. */
-  .streakband {
-    display: flex; align-items: center; gap: 16px;
-    padding: 15px 20px; border-bottom: 2px solid var(--divider);
-    background: var(--clay-100);
+  /* ── The streak, as a flame ───────────────────────────────────────────────
+     Amir's note, verbatim: "i asked you to show their streak like habit streaks
+     or complete day streaks just bolder, flashier just something to catch the
+     eye." The band that was here did the opposite — it was a NEW FIELD, a whole
+     strip of screen to state one integer. This is the same number, loud, and it
+     costs no vertical space: it sits on the level hero on Today and inside the
+     stat grid on Progress.
+
+     Heat comes off emberLevel() — the same 0/5/15/30-day scale the habit rows
+     use — so a long streak visibly burns harder than a new one. */
+  @keyframes flameLick {
+    0%, 100% { transform: scaleY(1)    translateY(0);     opacity: 1 }
+    35%      { transform: scaleY(1.18) translateY(-1.5px); opacity: .85 }
+    70%      { transform: scaleY(.92)  translateY(.5px);   opacity: 1 }
   }
-  .streakband .sb-fig {
-    flex: none; display: flex; align-items: baseline; gap: 7px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    color: var(--clay-deep); letter-spacing: -.04em; font-size: 40px; line-height: .85;
+  .flame { display: block; flex: none; width: 11px; height: 14px; color: var(--muted-soft); }
+  .flame .f-out { fill: currentColor; }
+  .flame .f-in  { fill: var(--bg); opacity: .5; }
+  .lit .flame { color: var(--clay); }
+  .lit[data-lvl="2"] .flame,
+  .lit[data-lvl="3"] .flame { transform-origin: 50% 90%; }
+  .lit[data-lvl="2"] .flame { animation: flameLick 1.5s ease-in-out infinite; }
+  .lit[data-lvl="3"] .flame { animation: flameLick .85s ease-in-out infinite; }
+
+  /* Today — on the hero, left of the rank block. */
+  .dayflame {
+    flex: none; display: flex; align-items: center; gap: 5px; padding: 0 12px 0 0;
+    margin-right: 2px; border-right: 2px solid var(--divider); align-self: stretch;
   }
-  /* The flame is the ember dot at three sizes, not an emoji — the app has no
-     emoji in it anywhere and one would be the only thing on screen that
-     changes shape between platforms. */
-  .streakband .flame {
-    flex: none; width: 9px; height: 9px; background: var(--clay); align-self: center;
+  .dayflame .flame { width: 15px; height: 19px; }
+  .dayflame .n {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px;
+    line-height: .85; letter-spacing: -.03em; color: var(--muted);
   }
-  .streakband[data-lvl="0"] .flame { background: var(--muted-soft); }
-  .streakband[data-lvl="1"] .flame { animation: emberPulse 2.8s ease-in-out infinite; }
-  .streakband[data-lvl="2"] .flame { animation: emberPulse 1.5s ease-in-out infinite; }
-  .streakband[data-lvl="3"] .flame { animation: emberFlicker 1.9s ease-in-out infinite; }
-  .streakband[data-lvl="0"] .sb-fig { color: var(--muted); }
-  .streakband .sb-mid { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-  .streakband .sb-lbl {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px;
-    line-height: 1; letter-spacing: .06em; text-transform: uppercase; color: var(--ink);
+  .dayflame.lit .n { color: var(--clay-deep); }
+  .dayflame .u {
+    font-family: 'Space Mono', monospace; font-size: 7px; line-height: 1.15;
+    letter-spacing: .08em; color: var(--muted-soft);
   }
-  .streakband .sb-sub { font-size: 11px; line-height: 1.3; color: var(--muted); }
-  /* The seven-day trail. Squares, not dots: `.pips` already means "a ladder of
-     things you have cleared" everywhere else in the app, and this is the same
-     idea over days instead of tiers. Clay here, green there — see above. */
-  .streakband .sb-trail { flex: none; display: flex; gap: 3px; align-items: flex-end; }
-  .streakband .sb-trail i {
-    width: 9px; height: 9px; display: block; border: 1.5px solid var(--box); background: none;
-  }
-  .streakband .sb-trail i.ok { background: var(--clay); border-color: var(--clay); }
-  .streakband .sb-trail i.pre { border-color: var(--rule); }
-  /* Today reads as the live cell: taller, and outlined until it qualifies. */
-  .streakband .sb-trail i.now { height: 15px; border-color: var(--clay-deep); }
+
+  /* Progress — inside the stat grid, so the grid keeps four facts. */
+  .statgrid .flamefig { display: flex; align-items: center; gap: 6px; }
+  .statgrid .flamefig .flame { width: 13px; height: 17px; }
+  .statgrid .flamefig.lit { color: var(--clay-deep); }
 
   /* ── Milestone rows ───────────────────────────────────────────────────────
      These were a flat list at 45% opacity: nine things the athlete had mostly
@@ -945,6 +960,73 @@
     font-size: 12px; line-height: 1.4; color: var(--muted);
   }
   .msnext strong { color: var(--ink); }
+
+  /* ── The seven-day heat map ───────────────────────────────────────────────
+     One row per habit, one column per day, oldest on the left so it reads the
+     way a week does. The whole point is the SHAPE: a solid band across one row
+     and a gap-toothed one under it says more about where the week went than any
+     percentage. Same cell vocabulary as the 35-day grid on the habit detail —
+     hit / part / pre — so an athlete only learns it once. */
+  .heat { display: flex; flex-direction: column; gap: 5px; }
+  .heat .hr { display: grid; grid-template-columns: 66px repeat(7, 1fr); gap: 4px; align-items: center; }
+  .heat .hl {
+    font-size: 10px; line-height: 1.1; color: var(--muted); overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .heat .hc { height: 15px; border: 1px solid var(--rule); background: none; }
+  .heat .hc.hit  { background: var(--accent); border-color: var(--accent); }
+  .heat .hc.part { background: var(--accent-100); border-color: var(--accent); }
+  .heat .hc.pre  { border-style: dotted; opacity: .4; }
+  .heat .hc.today { outline: 2px solid var(--clay-deep); outline-offset: 1px; }
+  .heat .hd-lbl {
+    font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .04em;
+    text-align: center; color: var(--muted-soft); text-transform: uppercase;
+  }
+  .heat .hd-lbl.now { color: var(--clay-deep); font-weight: 700; }
+
+  /* ── Seasonal events ──────────────────────────────────────────────────────
+     The only card in the app with a border on all four sides. Everything else
+     is a full-bleed row separated by rules, which is right for a list you scan
+     — an event is not a list item, it is a thing that is ON, and it has to read
+     as an object you could walk up to. */
+  .evcard { margin: 14px 20px; border: 2px solid var(--divider); }
+  .evcard.live { border-color: var(--clay); }
+  .evcard.done { border-color: var(--accent); background: var(--accent-100); }
+  .evhd { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 12px; }
+  .evcard.live .evhd { background: var(--clay-100); }
+  .evhd .evnm {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px;
+    line-height: .95; text-transform: uppercase; letter-spacing: -.01em; color: var(--ink);
+  }
+  .evhd .evtag { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-top: 5px; display: block; }
+  .evhd .evstate {
+    flex: none; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .09em;
+    text-transform: uppercase; padding: 4px 7px; white-space: nowrap;
+  }
+  .evcard.live .evstate { background: var(--clay); color: var(--on-clay); }
+  .evcard.done .evstate { background: var(--accent); color: var(--bg); }
+  .evcard.over .evstate { border: 1px solid var(--rule); color: var(--muted-soft); }
+  .evblurb { padding: 0 16px 13px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+  .evgoal { display: flex; align-items: center; gap: 11px; padding: 9px 16px; border-top: 1px solid var(--rule); }
+  .evgoal .g-tick {
+    flex: none; width: 17px; height: 17px; border: 2px solid var(--box);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .evgoal.got .g-tick { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .evgoal .g-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .evgoal .g-lbl { font-size: 12.5px; line-height: 1.2; color: var(--ink); }
+  .evgoal.got .g-lbl { color: var(--muted); text-decoration: line-through; }
+  .evgoal .g-bar { height: 4px; background: var(--track); }
+  .evgoal .g-bar > span { display: block; height: 100%; background: var(--clay); transition: width .35s cubic-bezier(.2,.8,.2,1); }
+  .evgoal.got .g-bar > span { background: var(--accent); }
+  .evgoal .g-cnt { flex: none; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted-soft); white-space: nowrap; }
+  .evfoot {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 11px 16px; border-top: 2px solid var(--divider);
+    font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .evfoot strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .02em; color: var(--clay-deep); }
+  .evcard.done .evfoot strong { color: var(--accent); }
 
   /* The app noticing you have stalled. Breathes the box of the most valuable
      habit still undone, ~20s after you last touched anything. */
@@ -1120,20 +1202,43 @@ const XP_RULES = {
   }
 };
 
+// ── CORE vs ADD-ON ────────────────────────────────────────────────────────
+// Amir, 2026-07-30: "lets say for example 5 habits are mandatory for everyone …
+// then someone tries to turn on supplements or breathing only to get additional
+// xp and achievements. this should be a bonus."
+//
+// `core: true` means the habit is ALWAYS tracked and has no off switch. Five of
+// them — train, steps, sleep, protein, water — which is the same list for every
+// athlete on the board, so a day score means the same thing for everyone and the
+// leaderboard compares like with like for the first time.
+//
+// Everything else is an ADD-ON: opted into for the extra XP and the badges, and
+// once added it counts, which is the point. See stampRoster() for the two rules
+// that make that fair — add lands today, removal lands tomorrow.
 const HABITS = [
   // The id stays 'strength' so nobody's history or XP is orphaned by the
   // rename. LOCKED: it cannot be ticked by hand — finishing a session in
   // program.html is the only thing that earns it. See lockedHint below.
-  { id:'strength', name:'WORKOUT',  code:'WO', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'From your programme', locked:true,
+  // ── Names are TASKS, not nouns ─────────────────────────────────────────
+  // They used to be labels — WORKOUT, STEPS, WATER — which is what the thing
+  // IS, not what the athlete has to do about it. A list of nouns reads as a
+  // filing system; a list of instructions reads as a day's work, and the target
+  // is in the name so the row states the job before you tap anything.
+  //
+  // The `id` never changes. Every log entry, every level and every leaderboard
+  // row is keyed on it, so renaming is display-only and costs nobody a point.
+  // `goal` is the second line, so it must NOT restate the name — on check-off
+  // habits it now carries the coaching detail the name has no room for.
+  { id:'strength', core:true, name:'🏋 Finish your session', short:'Session', code:'WO', kind:'check', target:1,     unit:'session', goal:'45 min · from your programme',   source:'From your programme', locked:true,
     lockedHint:'Complete any day of your Workout in your Program to gain XP for this.',
     freeHint:'Coached athletes earn this from their programme. It is the biggest habit on the list.' },
-  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
-  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
-  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                 source:'Manual' },
-  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
-  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                 source:'Manual' },
-  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',               source:'Manual' },
-  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
+  { id:'steps', core:true,    name:'🚶 Walk 10,000 steps', short:'Steps',   code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
+  { id:'sleep', core:true,    name:'🛏 Sleep 7.5+ hours', short:'Sleep',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
+  { id:'fuel', core:true,     name:'🍗 3 protein meals', short:'Protein', code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 meals, protein in each',       source:'Manual' },
+  { id:'water', core:true,    name:'💧 Drink 8 glasses', short:'Water',     code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
+  { id:'mobility', name:'🧘 Stretch 10 minutes', short:'Mobility',  code:'MO', kind:'check', target:1,     unit:'session', goal:'Hips, ankles, T-spine',          source:'Manual' },
+  { id:'breathe',  name:'💨 Breathe 10 minutes', short:'Breathe',  code:'BR', kind:'check', target:1,     unit:'session', goal:'Nasal, slow, before bed',        source:'Manual' },
+  { id:'supps',    name:'💊 Take your supplements', short:'Supps', code:'SU', kind:'check', target:1,   unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
 // ── Weekly quests ─────────────────────────────────────────────────────────
 // A RUN of quests, not a permanent feature. There are none unless the coach
@@ -1155,14 +1260,14 @@ const HABITS = [
 const QUEST_POOL = [
   { id:'w_water5',   title:'THE WELL RUNS DEEP',  note:'Full water on 5 days',           kind:'daysHit:water',    need:5,     xp:150 },
   { id:'w_water7',   title:'SEVEN FOR SEVEN',     note:'Full water every single day',    kind:'daysHit:water',    need:7,     xp:220 },
-  { id:'w_steps50k', title:'FIFTY THOUSAND',      note:'50,000 steps across the run',    kind:'total:steps',      need:50000, xp:200 },
-  { id:'w_steps70k', title:'THE LONG WAY ROUND',  note:'70,000 steps across the run',    kind:'total:steps',      need:70000, xp:280 },
+  { id:'w_steps50k', title:'FIFTY THOUSAND',      note:'50,000 steps this week',    kind:'total:steps',      need:50000, xp:200 },
+  { id:'w_steps70k', title:'THE LONG WAY ROUND',  note:'70,000 steps this week',    kind:'total:steps',      need:70000, xp:280 },
   { id:'w_sleep5',   title:'LIGHTS OUT',          note:'Hit your sleep target 5 nights', kind:'daysHit:sleep',    need:5,     xp:180 },
   { id:'w_mob4',     title:'OILED HINGES',        note:'Mobility on 4 days',             kind:'daysHit:mobility', need:4,     xp:120 },
   { id:'w_breathe4', title:'DEAD CALM',           note:'Breathe on 4 days',              kind:'daysHit:breathe',  need:4,     xp:100 },
   { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',          kind:'daysHit:supps',    need:7,     xp:140 },
   { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',       kind:'daysHit:fuel',     need:5,     xp:140 },
-  { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions in the run',      kind:'daysHit:strength', need:3,     xp:250 },
+  { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions this week',      kind:'daysHit:strength', need:3,     xp:250 },
   { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 75% or better',        kind:'qualify',          need:5,     xp:220 },
   { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',               kind:'perfect',          need:2,     xp:300 }
 ];
@@ -1474,17 +1579,93 @@ const CONSISTENCY_TIERS = [
 // pays the most. Note it is WORKOUT-gated, so a free-tier athlete cannot earn
 // it (the habit is locked and only a finished session in program.html ticks it)
 // — the same is already true of HEAVY METAL.
+//
+// ── THREE TIERS, and the tier is the whole point ─────────────────────────
+// A single flat list gave a brand-new athlete one reachable row and nine walls,
+// and gave a two-year athlete nothing left to want. `tier` groups them on
+// Progress into three honest promises:
+//
+//   'week' — a good week gets you this. The section a new athlete lives in.
+//   'long' — weeks to months. The spine of the thing.
+//   'rare' — most people will never. That is what makes them worth having.
+//
+// Nothing else reads `tier`; it is presentation only. The scoring rail is
+// unchanged, which is why adding eight of these needed no new machinery on
+// either side — just more rows in ACHIEVEMENTS and in the `milestones` array on
+// the xp_rules row. ⚠️ Both, or the board pays a different number to the phone.
 const ACHIEVEMENTS = [
-  { code:'FB', name:'FIRST BLOOD',     note:'Your first session on the board',          xp:50,  need:1,   measure:'daysHit:strength' },
-  { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps' },
-  { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps' },
-  { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength' },
-  { code:'HS', name:'HUMAN SPRINKLER', note:'5 days running on full water',             xp:100, need:5,   measure:'streak:water' },
-  { code:'DP', name:'DAWN PATROL',     note:'10 days with 3+ habits logged',            xp:75,  need:10,  measure:'daysWith3' },
-  { code:'ZM', name:'ZEN MACHINE',     note:'10 breathing sessions in a row',           xp:100, need:10,  measure:'streak:breathe' },
-  { code:'BA', name:'BLACKOUT ARTIST', note:'10 nights at 7.5h or more',                xp:150, need:10,  measure:'streak:sleep' },
-  { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility' },
-  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays' }
+  // ── A good week ────────────────────────────────────────────────────────
+  { code:'FB', name:'FIRST BLOOD',     note:'Your first session on the board',          xp:50,  need:1,   measure:'daysHit:strength', tier:'week' },
+  { code:'CS', name:'CLEAN SWEEP',     note:'One perfect day. Everything, once.',       xp:100, need:1,   measure:'perfectDays',      tier:'week' },
+  { code:'HS', name:'HUMAN SPRINKLER', note:'5 days running on full water',             xp:100, need:5,   measure:'streak:water',     tier:'week' },
+  { code:'TS', name:'THE TONE SETTER', note:'3 straight days with a session',           xp:120, need:3,   measure:'streak:strength',  tier:'week' },
+  { code:'SW', name:'GROUND COVERED',  note:'7 days over your step target',             xp:130, need:7,   measure:'daysHit:steps',    tier:'week' },
+  { code:'FF', name:'FULLY FUELLED',   note:'5 days of three proper meals',             xp:110, need:5,   measure:'daysHit:fuel',     tier:'week' },
+  // ── The long haul ──────────────────────────────────────────────────────
+  { code:'DP', name:'DAWN PATROL',     note:'10 days with 3+ habits logged',            xp:75,  need:10,  measure:'daysWith3',        tier:'long' },
+  { code:'ZM', name:'ZEN MACHINE',     note:'10 breathing sessions in a row',           xp:100, need:10,  measure:'streak:breathe',   tier:'long' },
+  { code:'BA', name:'BLACKOUT ARTIST', note:'10 nights at 7.5h or more',                xp:150, need:10,  measure:'streak:sleep',     tier:'long' },
+  { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength',  tier:'long' },
+  { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility',  tier:'long' },
+  { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps',     tier:'long' },
+  { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps',    tier:'long' },
+  // ── Rare ───────────────────────────────────────────────────────────────
+  { code:'MC', name:'THE MACHINIST',   note:'150 sessions. A year of turning up.',      xp:750, need:150, measure:'daysHit:strength', tier:'rare' },
+  { code:'UB', name:'UNBREAKABLE',     note:'60 days running on full water',            xp:600, need:60,  measure:'streak:water',     tier:'rare' },
+  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays',      tier:'rare' }
+];
+const ACH_TIERS = [
+  { key:'week', label:'A good week',  sub:'Reachable in seven days' },
+  { key:'long', label:'The long haul', sub:'Weeks to months' },
+  { key:'rare', label:'Rare',          sub:'Most people never will' }
+];
+
+// ── SEASONAL EVENTS — the thing that keeps the app from going stale ───────
+// A milestone is for ever and a quest is for a week; neither gives the year any
+// SHAPE. An event is a named block of the calendar with two or three goals, and
+// the whole board is doing it at the same time — which is the part a milestone
+// can never have.
+//
+// ⚠️ EVENTS PAY NO XP, AND THAT IS DELIBERATE. They pay a TITLE. Two reasons,
+// and both matter:
+//   1. XP is scored twice (client + plpgsql). A new paying rail means new SQL
+//      that has to agree with the app for ever. A title is stored, append-only
+//      and free to mint — the same rule the reward track already runs on.
+//   2. A title is worth more here anyway. It shows on the leaderboard and on
+//      the roll call wall, so finishing SUMMER SHRED is something other people
+//      SEE. XP would just be a number nobody else reads.
+//
+// Goals reuse the quest `kind` grammar exactly, so they are measured from the
+// log alone and nothing new is stored. Dates are calendar dates, not the scoring
+// season — an event is "August", not "Season 1".
+const EVENTS = [
+  { id:'ev_summer26', name:'SUMMER SHRED', tag:'July – August', from:'2026-07-01', to:'2026-08-31',
+    blurb:'The block everyone skips. Do it anyway and it shows in September.',
+    title:{ id:'t_sunforged', name:'SUN-FORGED', note:'Trained through the summer nobody trains through.' },
+    goals:[ { kind:'daysHit:strength', need:20,     label:'20 sessions' },
+            { kind:'total:steps',      need:150000, label:'150,000 steps' },
+            { kind:'daysHit:fuel',     need:25,     label:'Meals logged on 25 days' } ] },
+
+  { id:'ev_autumn26', name:'THE BASE LAYER', tag:'September – October', from:'2026-09-01', to:'2026-10-31',
+    blurb:'Nothing flashy. Eight weeks of being impossible to knock over.',
+    title:{ id:'t_bedrock', name:'BEDROCK', note:'Built the base while everyone else chased peaks.' },
+    goals:[ { kind:'daysHit:sleep',    need:40,     label:'40 nights on target' },
+            { kind:'daysHit:mobility', need:30,     label:'30 mobility sessions' },
+            { kind:'qualify',          need:45,     label:'45 days on target' } ] },
+
+  { id:'ev_winter26', name:'WINTER ARMOUR', tag:'November – December', from:'2026-11-01', to:'2026-12-31',
+    blurb:'Dark at four, cold at six, and the season is decided right here.',
+    title:{ id:'t_coldforged', name:'COLD-FORGED', note:'The winter did not get a vote.' },
+    goals:[ { kind:'daysHit:strength', need:24,     label:'24 sessions' },
+            { kind:'total:water',      need:400,    label:'400 glasses of water' },
+            { kind:'perfect',          need:10,     label:'10 perfect days' } ] },
+
+  { id:'ev_newyear27', name:'THE RECKONING', tag:'January – February', from:'2027-01-01', to:'2027-02-28',
+    blurb:'Everyone starts in January. This is about still being here in February.',
+    title:{ id:'t_stillhere', name:'STILL HERE', note:'January is easy. February is the badge.' },
+    goals:[ { kind:'qualify',          need:50,     label:'50 days on target' },
+            { kind:'total:steps',      need:200000, label:'200,000 steps' },
+            { kind:'daysHit:strength', need:30,     label:'30 sessions' } ] }
 ];
 
 // ── THE LONG GAME — a reward track, and the one thing here that is kept ───
@@ -1522,7 +1703,13 @@ const PASS_TRACK = [
 // is a real choice rather than an absence.
 const CARD_BASE = { id:'c_paper', kind:'card', name:'HOUSE', note:'The card as it ships.' };
 
-function passItem(id) { return id === CARD_BASE.id ? CARD_BASE : PASS_TRACK.find(p => p.id === id) || null; }
+// Event titles are not on the level track — they are earned by finishing an
+// event — but everything downstream (titleName, the picker, the board) looks a
+// title up through here, so they have to resolve from the same door.
+function passItem(id) {
+  if (id === CARD_BASE.id) return CARD_BASE;
+  return PASS_TRACK.find(p => p.id === id) || eventTitles().find(t => t.id === id) || null;
+}
 function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
 function passHas(id)  { return id === CARD_BASE.id || passOwned().indexOf(id) >= 0; }
 function passTitle()  { const t = CFG.pass && CFG.pass.title; return passHas(t) ? passItem(t) : null; }
@@ -1532,6 +1719,52 @@ function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p =
 // this build does not know shows nothing rather than a raw `t_iron` — a cached
 // page can be older than the track on the server.
 function titleName(id) { const p = id && passItem(id); return (p && p.kind === 'title') ? p.name : ''; }
+// ── Events: measured, then claimed ────────────────────────────────────────
+// One goal, over the event's CALENDAR window. Same `kind` grammar as quests,
+// measured from the log alone, so nothing new is stored and there is nothing
+// for a second scorer to disagree with. Deliberately NOT season-bounded the way
+// quests are: an event is a block of the calendar, and a season reset in the
+// middle of August must not wipe half of SUMMER SHRED.
+function eventGoalProgress(g, ev) {
+  const parts = String(g.kind || '').split(':');
+  const kind = parts[0], hid = parts[1];
+  const h = hid ? habitById(hid) : null;
+  const last = ev.to < TKEY() ? ev.to : TKEY();      // the future has not happened
+  let have = 0;
+  for (let d = parseKey(ev.from); fmtKey(d) <= last; d = addDays(d, 1)) {
+    const k = fmtKey(d);
+    if (kind === 'daysHit') { if (h && isDone(h, k)) have++; }
+    else if (kind === 'total') { have += valOf(k, hid); }
+    else if (kind === 'qualify') { if (dayQualifies(k)) have++; }
+    else if (kind === 'perfect') { if (isPerfect(k)) have++; }
+  }
+  return { have, done: have >= g.need, pct: Math.max(0, Math.min(100, Math.round(have / g.need * 100))) };
+}
+function eventProgress(ev) {
+  const goals = ev.goals.map(g => Object.assign({}, g, eventGoalProgress(g, ev)));
+  return { goals, done: goals.every(g => g.done),
+           pct: Math.round(goals.reduce((s, g) => s + g.pct, 0) / goals.length) };
+}
+function eventState(ev) { const t = TKEY(); return t < ev.from ? 'soon' : (t > ev.to ? 'over' : 'live'); }
+function eventTitles() { return EVENTS.map(e => Object.assign({ kind:'title', event:e.id }, e.title)); }
+// Append-only, exactly like claimRewards(). An event title is never taken back —
+// not when the window closes, not by a season reset, not by a retune. Claimed
+// even after the window has shut, so someone who finishes on the last day and
+// does not open the app until September still gets it.
+function claimEventTitles(silent) {
+  if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+  const owned = CFG.pass.owned || (CFG.pass.owned = []);
+  const fresh = [];
+  EVENTS.forEach(ev => {
+    if (owned.indexOf(ev.title.id) >= 0 || eventState(ev) === 'soon') return;
+    if (!eventProgress(ev).done) return;
+    owned.push(ev.title.id);
+    fresh.push(Object.assign({ kind:'title', event:ev.id, evName:ev.name }, ev.title));
+  });
+  if (fresh.length) saveCfg();
+  return silent ? [] : fresh;
+}
+
 // Records anything the athlete's level has reached and returns only what is NEW,
 // so the caller can celebrate it. Silent on first run for someone who arrives
 // with history — the same baselining every other unlock does.
@@ -1626,8 +1859,27 @@ function allHabits() {
   }, c)));
 }
 function habitById(id) { return allHabits().find(h => h.id === id) || HABITS[0]; }
-function live() { return allHabits().filter(h => CFG.on[h.id] !== false); }
-function offHabits() { return allHabits().filter(h => CFG.on[h.id] === false); }
+// A compact label for anywhere the task-style name will not fit — the heat map
+// column is 66px and "Take your supplements" is not. Custom habits never had one,
+// so they fall back to whatever the athlete typed.
+function shortName(h) { return h.short || h.name; }
+// A core habit is on whatever CFG.on says — including for athletes who switched
+// one off before core existed. That flips on their next save, dated TODAY, and
+// nothing behind them moves.
+function live() { return allHabits().filter(h => h.core || CFG.on[h.id] !== false); }
+function offHabits() { return allHabits().filter(h => !h.core && CFG.on[h.id] === false); }
+function addOnHabits() { return allHabits().filter(h => !h.core); }
+// Is this add-on locked on for the rest of today? Turning one ON applies now, so
+// turning it straight back off would be a way to dodge the miss — that is the
+// whole reason removal is dated tomorrow. This reports it so the UI can say so.
+function lockedOnToday(h) {
+  if (h.core) return false;
+  const t = (CFG && CFG.roster) || [];
+  if (!t.length) return false;
+  let cur = t[0];
+  for (let i = 0; i < t.length && t[i].from <= TKEY(); i++) cur = t[i];
+  return cur.ids.indexOf(h.id) >= 0;
+}
 
 // ── A day is scored against the habits that were on THAT day ──────────────
 // `live()` is "what the athlete tracks right now", and reading it while scoring
@@ -1688,24 +1940,63 @@ function anchorRoster() {
   const first = firstLoggedDay();
   if (first && first < t[0].from) { t[0].from = first; _rosterCache = null; }
 }
+function rosterAt(t, dayKey) {
+  let cur = t[0];
+  for (let i = 0; i < t.length && t[i].from <= dayKey; i++) cur = t[i];
+  return cur.ids.slice();
+}
+function sameIds(a, b) { return a.length === b.length && a.every((v, i) => v === b[i]); }
+function rosterPut(t, from, ids) {
+  const i = t.findIndex(e => e.from === from);
+  if (i >= 0) t[i].ids = ids; else t.push({ from, ids });
+  t.sort((x, y) => (x.from < y.from ? -1 : x.from > y.from ? 1 : 0));
+}
+function rosterDrop(t, from) {
+  const i = t.findIndex(e => e.from === from);
+  if (i >= 0) t.splice(i, 1);
+}
+// ── TWO RULES, and they are the whole answer to "why did Friday change Wednesday" ──
+//
+// Amir, 2026-07-30: "if i havent add on supplements on wednesday and i change my
+// settings on friday, why would it change my habits in wednesday? no games is
+// like that."
+//
+//   ADDING an add-on takes effect TODAY. You opted in, today is still yours to
+//   finish, so it counts — and the UI says so before you tap.
+//
+//   REMOVING one takes effect TOMORROW. Otherwise switching a habit off at 23:00
+//   is a way to delete a miss you already made, which is the one move that would
+//   make the whole day score worthless.
+//
+// Neither ever reaches a closed day. `rosterOn(day)` reads the entry in force on
+// that day, so Wednesday keeps the set Wednesday actually had, for ever.
 function stampRoster() {
   if (!CFG) return;
-  const ids = live().map(h => h.id).sort();
+  const want = live().map(h => h.id).sort();
   const t = CFG.roster || (CFG.roster = []);
-  const last = t.length ? t[t.length - 1] : null;
-  if (last && last.ids.length === ids.length && last.ids.every((v, i) => v === ids[i])) return;
-  // The FIRST stamp is dated from the athlete's first logged day, not today, so
-  // an athlete who already has history scores exactly as they did before this
-  // shipped. A migration that rescored history would be the same class of bug
-  // this whole mechanism exists to remove.
-  if (!last) { t.push({ from: firstLoggedDay() || TKEY(), ids }); return; }
-  if (last.from === TKEY()) last.ids = ids;    // changed their mind twice today
-  else t.push({ from: TKEY(), ids });
-  // Two edits in one day can land back where they started, one entry later.
-  const n = t.length;
-  if (n > 1 && t[n-1].ids.length === t[n-2].ids.length
-            && t[n-1].ids.every((v, i) => v === t[n-2].ids[i])) t.pop();
+  // First stamp is dated from the first logged day, so an athlete who already
+  // has history scores exactly as they did before any of this existed.
+  if (!t.length) { t.push({ from: firstLoggedDay() || TKEY(), ids: want }); return; }
+
+  const TK = TKEY(), TOM = fmtKey(addDays(today(), 1));
+  const held = rosterAt(t, TK);
+  // Today = what today already had, PLUS anything just switched on. Removals are
+  // deliberately not applied here.
+  const todayIds = held.slice();
+  want.forEach(id => { if (todayIds.indexOf(id) < 0) todayIds.push(id); });
+  todayIds.sort();
+
+  rosterPut(t, TK, todayIds);
+  // Tomorrow only needs an entry when it differs from today — i.e. when
+  // something was removed. Switching it back on before midnight deletes that
+  // entry again, so the timeline never fills with no-ops.
+  if (sameIds(todayIds, want)) rosterDrop(t, TOM); else rosterPut(t, TOM, want);
+
+  // Collapse any entry that says the same as the one before it.
+  for (let i = t.length - 1; i > 0; i--) if (sameIds(t[i].ids, t[i - 1].ids)) t.splice(i, 1);
+  _rosterCache = null;
 }
+
 function valOf(dayKey, id) { const d = LOG[dayKey]; return (d && typeof d[id] === 'number') ? d[id] : 0; }
 function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
 function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
@@ -2431,6 +2722,12 @@ function checkLevelUps() {
     UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
     haptic('rank');
   });
+  // Finishing an event is the biggest single thing in the app that is not a
+  // level, so it takes over the screen like one.
+  claimEventTitles(false).forEach(r => {
+    UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
+    haptic('rank');
+  });
   if (events.length) {
     clearTimeout(_flashTimer);
     _flashTimer = setTimeout(() => { UI.flash = {}; render(); }, 1600);
@@ -3009,6 +3306,13 @@ function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _ha
 // A stroked tick rather than a ✓ glyph, so it can be drawn on. Hard corners and
 // a square cap keep it inside the modernist system — no rounded checkmark.
 const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg>';
+// Two paths: the body of the flame, and a brighter core sitting inside it. Drawn
+// rather than emoji'd — nothing in this app should change shape between an
+// iPhone and a Pixel, least of all the thing that marks a streak.
+const FLAME = '<svg class="flame" viewBox="0 0 24 24" aria-hidden="true">'
+  + '<path class="f-out" d="M12.6 1c.5 2.9-.5 4.7-1.9 6.3-1.9 2.2-4.7 4.3-4.7 8.2a8 8 0 0 0 16 0c0-3.2-1.4-5.2-2.9-7.1-1-1.3-2-2.5-2.5-4.1-.5 1.2-1.3 2.1-2.3 2.9.6-2 .8-4 .3-6.2Z"/>'
+  + '<path class="f-in" d="M12.2 12c.4 1.6-.2 2.6-1 3.5-.8.9-1.7 1.8-1.7 3.2a4 4 0 0 0 8 0c0-1.6-.8-2.6-1.7-3.6-.6-.7-1.1-1.4-1.3-2.3-.5.8-1.3 1.4-2.3 1.2Z"/>'
+  + '</svg>';
 
 function reduced() {
   return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -3957,7 +4261,7 @@ function renderApp() {
   const rights = {
     today: pct + '% DONE', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
-                     return s > 0 ? s + '-DAY RUN' : ''; })(),
+                     return s > 0 ? s + '-DAY STREAK' : ''; })(),
     crew: (() => {
       if (LB.view === 'roll') {
         const n = RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length;
@@ -4162,27 +4466,13 @@ function bestHabitRun() {
   // consistency tier once it is crossed.
   return allHabits().reduce((m, h) => Math.max(m, habitBest(h)), 0);
 }
-function streakBand() {
-  const first = firstLoggedDay();
-  if (!first) return '';
-  const now = currentDayStreak(), best = bestDayStreak(), lvl = emberLevel(now);
-  const cells = [];
-  for (let i = 6; i >= 0; i--) {
-    const k = fmtKey(addDays(today(), -i)), pre = k < first;
-    cells.push(`<i class="${[pre ? 'pre' : '', !pre && dayQualifies(k) ? 'ok' : '', i === 0 ? 'now' : ''].filter(Boolean).join(' ')}"></i>`);
-  }
-  // Three states, three different things worth saying. A broken streak is the
-  // one that needs a sentence rather than a statistic.
-  const sub = now === 0
-    ? `Clear ${XP_RULES.streakQualifyPct}% of what you track today and it start${best > 0 ? 's again' : 's'}.`
-    : (now >= best ? 'Your longest yet — nothing above it.' : `Best ${best} days.`);
-  return `<div class="streakband" data-k="streakband" data-lvl="${lvl}">
-    <span class="sb-fig"><i class="flame" aria-hidden="true"></i><span data-static data-num="dstreak" data-to="${now}">${now}</span></span>
-    <span class="sb-mid">
-      <span class="sb-lbl">${now === 0 ? 'No streak' : 'Day streak'}</span>
-      <span class="sb-sub">${esc(sub)}</span>
-    </span>
-    <span class="sb-trail" aria-label="The last seven days">${cells.join('')}</span>
+function streakFlame(now, best) {
+  if (!firstLoggedDay()) return '';           // day one is not a report of zero
+  return `<div class="dayflame ${now > 0 ? 'lit' : ''}" data-lvl="${emberLevel(now)}" data-k="dayflame"
+        title="${now > 0 ? now + '-day streak' + (best > now ? ' · best ' + best : '') : 'No streak yet'}">
+    ${FLAME}
+    <span class="n" data-static data-num="dstreak" data-to="${now}">${now}</span>
+    <span class="u">DAY<br>STREAK</span>
   </div>`;
 }
 
@@ -4214,18 +4504,22 @@ function habitRow(h, from, lead) {
     <button class="body" ${on(() => openHabit(h.id, from))}>
       <span class="line1">
         <span class="nm">${esc(h.name)}</span>
-        <!-- One fact, the most interesting one available. "LV 10" sat on five
-             of eight rows at once and told you nothing at a glance; the run is
-             the number nobody wants to lose. Levels still announce themselves
-             the moment they change, via the flash chip, which is when they
-             actually matter — and Progress and the detail screen both carry
-             the level permanently. -->
+        <!-- THE LEVEL, ALWAYS, ON THE RIGHT. These two facts used to compete for
+             one slot: the row showed the streak if there was one and the level
+             otherwise, so a habit's level vanished the moment it started going
+             well — which is exactly when someone wants to watch it climb. They
+             are both here now, in the two places they each belong: the level is
+             the row's right-hand anchor and never moves, and the streak rides
+             the status line under it, next to the progress it describes.
+             The flash chip still takes the slot for a moment when the level
+             actually changes, because that is the one time it should shout. -->
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
-                  : st > 0
-                    ? `<span class="hlv" data-k="hlv"><span class="ember${st === lead && st > 0 ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY RUN</span></span></span>`
-                    : `<span class="hlv" data-k="hlv">LV ${hl.lv}</span>`}
+                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}</span>`}
       </span>
-      <span class="status">${esc(status)}</span>
+      <span class="status">
+        <span>${esc(status)}</span>
+        ${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}" data-k="hst">${st}<span class="u">-day streak</span></span>` : ''}
+      </span>
       ${h.kind === 'count'
         ? `<span class="track"><span data-fill style="width:${pc}%"></span></span>`
         : ''}
@@ -4326,6 +4620,25 @@ function renderToday(LI, doneCount, pct) {
   for (let i = 0; i < 7; i++) if (dayQualifies(fmtKey(addDays(today(), -i)))) goodDays++;
   const ranked = hs.map(h => ({ h, w: habitWeek(h) })).sort((a, b) => b.w - a.w);
   const strongest = ranked[0], weakest = ranked[ranked.length - 1];
+  // The heat map. Oldest day on the left, because that is the direction a week
+  // runs in. Rows are ordered strongest-first so the eye lands on the solid
+  // bands and finds the gap-toothed ones underneath — the opposite order opens
+  // the block on the athlete's worst habit, which is a scolding, not a recap.
+  // ⚠️ rosterOn(k), not live(): a habit switched on midweek did not exist on
+  // Monday, and drawing it as three misses is the app inventing failures. Those
+  // cells read `pre`, exactly like days before the athlete joined.
+  const firstDay = firstLoggedDay();
+  const heatDays = [];
+  for (let i = 6; i >= 0; i--) heatDays.push(fmtKey(addDays(today(), -i)));
+  const heatRows = ranked.map(r => ({
+    h: r.h,
+    cells: heatDays.map(k => {
+      if (firstDay && k < firstDay) return 'pre';
+      if (rosterOn(k).indexOf(r.h) < 0) return 'pre';
+      const v = valOf(k, r.h.id);
+      return v >= r.h.target ? 'hit' : (v > 0 ? 'part' : '');
+    })
+  }));
 
   return `
     <div data-k="screen:today" style="${screenAnim()}">
@@ -4336,6 +4649,12 @@ function renderToday(LI, doneCount, pct) {
       <div class="block hero-lv">
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:56px;line-height:.85">${LI.lv}</div>
+          <!-- The day streak sits ON the hero, not in a band under it. Amir
+               asked for the number he already had to be made louder, and the
+               band was a new field instead — a whole strip of screen to say one
+               integer. Here it is the loudest thing on the row after the level
+               itself, and it costs no vertical space at all. -->
+          ${streakFlame(currentDayStreak(), bestDayStreak())}
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:5px;min-width:0">
             <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
               ${rankIcon(LI.rank, 17)}
@@ -4347,12 +4666,6 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
       </div>
-
-      <!-- The streak, directly under the level and above the day strip it
-           describes. It is clay, not green, for the reason the day's own
-           progress bar is no longer here at all: a second green block of the
-           same shape under the hero read as one broken double-bar. -->
-      ${streakBand()}
 
       <!-- Day strip then habits, directly under the hero. The list is what the
            screen is FOR; it used to start ~1,400px down, behind the nudge and
@@ -4437,9 +4750,19 @@ function renderToday(LI, doneCount, pct) {
              every habit is 0/7, so this named a "strongest" and a "weakest" out
              of an eight-way tie — on day one, to someone who has not logged
              anything yet, which reads as the app having already judged them. -->
-        ${ranked.length > 1 && strongest.w > 0 ? `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
-          Strongest: <strong style="color:var(--ink)">${esc(strongest.h.name)}</strong> ${strongest.w}/7 ·
-          weakest: <strong style="color:var(--ink)">${esc(weakest.h.name)}</strong> ${weakest.w}/7.
+        <!-- The heat map replaces the "strongest / weakest" sentence, which
+             named two habits out of eight and said nothing about the other six.
+             The grid says the same thing and the rest of it at once, and it
+             does not have to pick a loser to make its point. -->
+        ${heatRows.length && strongest.w > 0 ? `<div class="heat" data-k="heat">
+          <div class="hr">
+            <span></span>
+            ${heatDays.map(k => `<span class="hd-lbl ${k === TKEY() ? 'now' : ''}">${k === TKEY() ? 'TDY' : parseKey(k).toLocaleDateString('en-GB', { weekday:'short' }).slice(0, 2).toUpperCase()}</span>`).join('')}
+          </div>
+          ${heatRows.map(r => `<div class="hr">
+            <span class="hl" title="${esc(r.h.name)}">${esc(shortName(r.h))}</span>
+            ${r.cells.map((c, i) => `<span class="hc ${c} ${i === 6 ? 'today' : ''}"></span>`).join('')}
+          </div>`).join('')}
         </div>` : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
           Nothing in the last seven days yet. Tick one thing and this fills up.
         </div>`}
@@ -4537,7 +4860,7 @@ function fmtQuestVal(q, v) {
 // one screen: overall level, then every habit's own rank, then the milestones.
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
-  const bestRun = bestHabitRun(), lead = leadStreak();
+  const bestRun = bestHabitRun(), lead = leadStreak(), dayStreakNow = currentDayStreak();
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
   return `
@@ -4560,14 +4883,6 @@ function renderProgress(LI, earned, totalAch) {
         <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
       </button>
 
-      <!-- The same band Today opens with, so the number an athlete is protecting
-           looks identical on both screens they check it from. It also takes the
-           day streak OUT of the grid below: it was a bare figure there with no
-           way to tell a streak climbing from one just broken, and repeating it
-           in both places would be the duplication this tab was reorganised to
-           remove. -->
-      ${streakBand()}
-
       <!-- Days-logged leads on purpose. Perfect days and runs are both zero
            for anyone rebuilding, and opening your progress on a pair of zeros
            is a punishment for having had a bad week. Showing up is the stat
@@ -4577,8 +4892,8 @@ function renderProgress(LI, earned, totalAch) {
           <div class="eyebrow">Days logged</div></div>
         <div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
           <div class="eyebrow">Badges</div></div>
-        <div><div class="figure" data-static data-num="bestrun" data-to="${bestRun}">${bestRun}</div>
-          <div class="eyebrow">Longest run</div></div>
+        <div><div class="figure flamefig ${dayStreakNow > 0 ? 'lit' : ''}" data-lvl="${emberLevel(dayStreakNow)}">${FLAME}<span data-static data-num="streak" data-to="${dayStreakNow}">${dayStreakNow}</span></div>
+          <div class="eyebrow">Day streak${bestRun > dayStreakNow ? ' · best ' + bestRun : ''}</div></div>
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
           <div class="eyebrow">Perfect days</div></div>
       </div>
@@ -4589,12 +4904,16 @@ function renderProgress(LI, earned, totalAch) {
            STREAK as the two separate things they are — the band above is the
            streak, this grid holds the run — because the app used to have five
            phrasings for those two ideas and they read as one number arguing
-           with itself. -->
+           with itself. The word is now "streak" for both, so this line has to
+           separate them by SCOPE — a habit's own, versus the whole day's.
+           (No backticks in here: this comment lives inside a template literal
+           and one would close it.) -->
       ${daysLogged === 0 ? `<div class="statnote" data-k="statnote">
         A <strong>badge</strong> is one of the ${CONSISTENCY_TIERS.length} consistency tiers on a habit
-        or one of the ${ACHIEVEMENTS.length} milestones at the foot of this screen. A
-        <strong>run</strong> is consecutive days on one habit — a <strong>streak</strong> is consecutive days
-        where you cleared ${XP_RULES.streakQualifyPct}% of everything you track.
+        or one of the ${ACHIEVEMENTS.length} milestones at the foot of this screen.
+        Every habit has <strong>its own streak</strong> — consecutive days you did that one thing.
+        Your <strong>day streak</strong>, at the top, is consecutive days where you cleared
+        ${XP_RULES.streakQualifyPct}% of everything you track.
         A <strong>perfect day</strong> is all of it. All four start at zero and the first one moves today.
       </div>` : ''}
 
@@ -4619,7 +4938,7 @@ function renderProgress(LI, earned, totalAch) {
       ${sectionLabel('Your habits', 'Tap for history')}
       <div class="pipkey">
         <span class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>
-        <span>One square per tier — a ${CONSISTENCY_TIERS.slice(0, -1).map(t => t.days).join(', ')} or ${CONSISTENCY_TIERS[CONSISTENCY_TIERS.length - 1].days}-day <strong>run</strong> on that habit.</span>
+        <span>One square per tier — a ${CONSISTENCY_TIERS.slice(0, -1).map(t => t.days).join(', ')} or ${CONSISTENCY_TIERS[CONSISTENCY_TIERS.length - 1].days}-day <strong>streak</strong> on that habit.</span>
       </div>
       ${hs.length ? hs.map(h => {
         const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
@@ -4629,7 +4948,7 @@ function renderProgress(LI, earned, totalAch) {
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span class="hlv">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY RUN</span></span>` : '—'}</span>
+              <span class="hlv">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span>` : '—'}</span>
             </div>
             <!-- Was rank · XP · today's status, which wrapped to two lines and
                  restated what Today already says. Progress is about standing. -->
@@ -4656,6 +4975,50 @@ function renderProgress(LI, earned, totalAch) {
            is "how close am I" and the old row answered it in 8px mono at the
            far right. The section also states the collection count, and names
            the one nearest to falling. -->
+      <!-- EVENTS first. Everything below this is permanent and will still be
+           there next year; an event is the only thing on the screen with a
+           clock on it, so it goes where the eye lands. Events that have not
+           opened yet are not drawn at all — an athlete cannot act on November
+           in July, and four locked cards would bury the one that is live. -->
+      ${(() => {
+        const shown = EVENTS.filter(e => eventState(e) !== 'soon');
+        if (!shown.length) return '';
+        const doneN = shown.filter(e => eventProgress(e).done).length;
+        return sectionLabel('Events', doneN + ' of ' + shown.length + ' completed')
+          + shown.map(ev => {
+            const st = eventState(ev), p = eventProgress(ev), got = p.done;
+            const owned = passHas(ev.title.id);
+            const left = Math.max(0, Math.round((parseKey(ev.to) - today()) / 86400000) + 1);
+            const stateLbl = got ? 'Complete' : (st === 'live' ? (left === 1 ? 'Last day' : left + ' days left') : 'Closed');
+            return `<div class="evcard ${got ? 'done' : st}" data-k="ev:${ev.id}">
+              <div class="evhd">
+                <span style="flex:1;min-width:0">
+                  <span class="evnm">${esc(ev.name)}</span>
+                  <span class="evtag">${esc(ev.tag)}</span>
+                </span>
+                <span class="evstate">${esc(stateLbl)}</span>
+              </div>
+              <div class="evblurb">${esc(ev.blurb)}</div>
+              ${p.goals.map(g => `<div class="evgoal ${g.done ? 'got' : ''}">
+                <span class="g-tick">${g.done ? TICK : ''}</span>
+                <span class="g-mid">
+                  <span class="g-lbl">${esc(g.label)}</span>
+                  <span class="g-bar"><span data-fill style="width:${g.pct}%"></span></span>
+                </span>
+                <span class="g-cnt">${g.done ? 'DONE' : Math.round(g.have).toLocaleString() + ' / ' + g.need.toLocaleString()}</span>
+              </div>`).join('')}
+              <div class="evfoot">
+                <span>${got && owned ? 'Title earned' : 'Finish all three'}</span>
+                <strong>${esc(ev.title.name)}</strong>
+              </div>
+            </div>`;
+          }).join('');
+      })()}
+
+      <!-- Milestones, in three tiers. One flat list gave a new athlete a single
+           reachable row above nine walls, and gave a two-year athlete nothing
+           left to want. The tier is the promise: a good week, the long haul, or
+           something most people never get. -->
       ${(() => {
         const rows = ACHIEVEMENTS.map(a => {
           // Clamped: THE CENTURION reads 143/100 without it, and a bar past
@@ -4663,31 +5026,36 @@ function renderProgress(LI, earned, totalAch) {
           const have = Math.min(measureAch(a), a.need), got = have >= a.need;
           return { a, have, got, pct: Math.round(have / a.need * 100) };
         });
-        const gotN = rows.filter(r => r.got).length;
         // Only once something is genuinely under way. "Closest" chosen from
         // rows that are all sitting at zero is not information, it is the app
         // picking a favourite out of nothing.
         const near = rows.filter(r => !r.got && r.have > 0).sort((x, y) => y.pct - x.pct)[0];
-        return sectionLabel('Milestones', gotN + ' of ' + ACHIEVEMENTS.length)
+        const row = r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
+            <span class="code">${esc(r.a.code)}</span>
+            <span class="ms-mid">
+              <span class="ms-name">${esc(r.a.name)}</span>
+              <span class="ms-note">${esc(r.a.note)}</span>
+              <span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>
+            </span>
+            <span class="ms-right">
+              <span class="ms-xp">+${r.a.xp} XP</span>
+              <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
+            </span>
+          </div>`;
+        return sectionLabel('Milestones', rows.filter(r => r.got).length + ' of ' + ACHIEVEMENTS.length)
           + (near ? `<div class="msnext" data-k="msnext">
               <strong>${esc(near.a.name)}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
             </div>` : '')
-          + rows.map(r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
-              <span class="code">${esc(r.a.code)}</span>
-              <span class="ms-mid">
-                <span class="ms-name">${esc(r.a.name)}</span>
-                <span class="ms-note">${esc(r.a.note)}</span>
-                <span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>
-              </span>
-              <span class="ms-right">
-                <span class="ms-xp">+${r.a.xp} XP</span>
-                <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
-              </span>
-            </div>`).join('');
+          + ACH_TIERS.map(t => {
+              const inTier = rows.filter(r => (r.a.tier || 'long') === t.key);
+              if (!inTier.length) return '';
+              return sectionLabel(t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
+                   + inTier.map(row).join('');
+            }).join('');
       })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is. The five squares are consistency tiers, from a 5-day run up to two months.
+        The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is. The five squares are consistency tiers, from a 5-day streak up to two months.
       </div>
       <!-- A second door to the manual, on the screen that uses the most words
            the app has never defined — badge, tier, run, streak, season, rank.
@@ -4730,7 +5098,7 @@ function renderDetail(h) {
   const unit = (n, u) => n + '<span class="su">' + u + '</span>';
   const stats = [
     { v: unit(habitWeek(h), '/7'),          k: 'This week' },
-    { v: unit(habitBest(h), habitBest(h) === 1 ? 'day' : 'days'), k: 'Longest run' },
+    { v: unit(habitBest(h), habitBest(h) === 1 ? 'day' : 'days'), k: 'Longest streak' },
     { v: unit(habitRate35(h), '%'),         k: 'Last 35 days' }
   ];
   const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h, AKEY());
@@ -4777,11 +5145,11 @@ function renderDetail(h) {
         <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">
           ${con.next
             ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at a ' + con.next.days
-              + '-day run · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
+              + '-day streak · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
             : '<strong style="color:var(--ink)">UNBREAKABLE</strong> — every tier cleared.'}
         </div>
         <div style="font-size:12px;line-height:1.4;color:var(--muted-soft)">
-          Longest run: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
+          Longest streak: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
         </div>
       </div>
 
@@ -5115,7 +5483,7 @@ function renderManual() {
             : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
-          <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken runs.</div>
+          <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken streaks.</div>
           <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
         </div>`)}
 
@@ -5150,7 +5518,7 @@ function renderManual() {
             p(`There are none running right now. When there are, they appear on your Today screen with a countdown, and everybody on the app gets the same ones.`));
         }
         return block(h2('Quests') +
-          p(`Your coach has a run going: <strong style="color:var(--ink)">${qs.length} quest${qs.length === 1 ? '' : 's'}</strong>, ending ${esc(runEndLabel(run))}. They are targets for the week rather than the day, and they expire when the run does, finished or not.`) +
+          p(`Your coach has quests on right now: <strong style="color:var(--ink)">${qs.length} of them</strong>, ending ${esc(runEndLabel(run))}. They are targets for the week rather than the day, and they expire on that date, finished or not.`) +
           `<div style="display:flex;flex-direction:column;gap:0">
             ${qs.map(q => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
               <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
@@ -5165,10 +5533,14 @@ function renderManual() {
       })()}
 
       ${block(h2('Consistency') +
-        // Two words, one job each. The app used five phrasings for these two
-        // ideas, so a 24-day run beside a 2-day streak looked like the same
-        // number disagreeing with itself.
-        p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the day was worth. They are different numbers and they move at different speeds.`) +
+        // ONE word, two scopes. The app used to call the per-habit one a "run"
+        // precisely so a 24-day water run could not be confused with a 2-day day
+        // streak — Amir asked for `streak` everywhere, so the job of keeping
+        // them apart moves from the noun to the SCOPE, and this paragraph is
+        // now the only thing doing it. Every label says which one it means:
+        // habit rows and the detail header carry the habit's own, the band at
+        // the top of Today and Progress is always "DAY STREAK".
+        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the whole day was worth. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
         // The athlete-facing half of the weighted day score. Without this, a rest
         // day reading 71% while the streak survives looks like a bug on the one
         // screen they check every morning.
@@ -5710,18 +6082,50 @@ function renderSettings() {
       </button>
 
       <div data-k="tracked" data-tour="tracked">
-      ${sectionLabel('Tracked habits')}
-      ${allHabits().map(h => {
-        const custom = (CFG.custom || []).some(c => c.id === h.id);
-        return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
+      ${sectionLabel('The five', 'Everyone tracks these')}
+      <div style="padding:10px 20px 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+        These are the job, and they are the same for every athlete on the board — which is
+        what makes a day score mean the same thing for all of you. There is no off switch.
+      </div>
+      ${allHabits().filter(h => h.core).map(h => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
           <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
             <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
             <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
           </span>
+          <span class="mono" style="flex:none;font-size:8.5px;letter-spacing:.09em;color:var(--muted-soft);border:1px solid var(--rule);padding:4px 7px">ALWAYS ON</span>
+        </div>`).join('')}
+
+      ${sectionLabel('Add-ons', 'Extra points, extra badges')}
+      <!-- The warning is permanent, not a one-off toast. It is the rule the whole
+           thing turns on, and an athlete who switched something on three weeks
+           ago should still be able to find out why it is counting against them. -->
+      <div style="padding:10px 20px 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+        Optional, and worth real points on top of the five. <strong style="color:var(--ink)">Once you
+        switch one on it counts</strong> — miss it and it costs you the same as missing anything
+        else, so only add what you will actually do. Switching one on applies
+        <strong style="color:var(--ink)">today</strong>; switching it off applies
+        <strong style="color:var(--ink)">tomorrow</strong>, so you cannot drop one at midnight to
+        hide a miss. Days already gone never change either way.
+      </div>
+      ${addOnHabits().map(h => {
+        const custom = (CFG.custom || []).some(c => c.id === h.id);
+        const isOn = CFG.on[h.id] !== false, heldToday = lockedOnToday(h);
+        return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
+          <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+            <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
+            <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP${!isOn && heldToday ? ' · still counts today' : ''}</span>
+          </span>
           <span style="display:flex;gap:10px;align-items:center">
             ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
               ${on(() => removeCustom(h))} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
-            <button class="sw ${CFG.on[h.id] !== false ? 'on' : ''}" ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
+            <button class="sw ${isOn ? 'on' : ''}" ${on(() => {
+              const turningOn = CFG.on[h.id] === false;
+              CFG.on[h.id] = !turningOn ? false : true;
+              saveCfg(); render();
+              toast(turningOn
+                ? h.name.replace(/^[^A-Za-z]+/, '') + ' is on from today. Miss it and it counts against your day.'
+                : h.name.replace(/^[^A-Za-z]+/, '') + ' comes off tomorrow. Today still counts it.');
+            })} aria-label="Toggle ${esc(h.name)}"><i></i></button>
           </span>
         </div>`;
       }).join('')}
@@ -5857,6 +6261,7 @@ function showError(msg) {
   // defaultCfg(), so CFG.pass always exists and that guard never fired. It is
   // idempotent anyway — claimRewards only ever adds what is missing.
   claimRewards(true);
+  claimEventTitles(true);
   // And the other half of the same record. Minting on boot is what makes the
   // server's copy keep up with a level that is about to reset: the peak is
   // captured on the day it happens, while the level is still there to prove it.

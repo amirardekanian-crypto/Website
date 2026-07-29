@@ -307,7 +307,13 @@ is per habit, so it never needed a denominator. Full design in `HABITS.md` →
 `rosterOn(dayKey)`, or it will quietly re-judge history again.
 
 Milestones keep flat values — they are one-off and genuinely hard — totalling
-**1,625 XP** across the ten. The exception is **FIRST BLOOD** (`FB`, 50xp, one logged
+**3,585 XP** across the sixteen, in three tiers (`tier` on each entry: `week`,
+`long`, `rare`; grouping only, nothing scores off it). The 1,350 that sits in `rare`
+needs 150 sessions or a 60-day water run, so it is a year of work rather than a
+windfall; the 610 in `week` is the deliberate part, because an athlete's first
+fortnight used to be worth almost nothing in one-offs and that is exactly the
+fortnight where people quit. **Seasonal events (`EVENTS`) pay no XP at all** — they
+pay a title, for the reasons in `HABITS.md`. The exception is **FIRST BLOOD** (`FB`, 50xp, one logged
 session): every other milestone needs at least five days, so the whole section was
 unreachable for an athlete's first working week and rendered as nine greyed rows on the
 screen they open to see how they are doing. It pays the least of any of them precisely
