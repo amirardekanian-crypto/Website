@@ -307,7 +307,24 @@ is per habit, so it never needed a denominator. Full design in `HABITS.md` →
 `rosterOn(dayKey)`, or it will quietly re-judge history again.
 
 Milestones keep flat values — they are one-off and genuinely hard — totalling
-**1,575 XP** across the nine. **Weekly quests ride the same rail** (§8.5): dated on the
+**1,625 XP** across the ten. The exception is **FIRST BLOOD** (`FB`, 50xp, one logged
+session): every other milestone needs at least five days, so the whole section was
+unreachable for an athlete's first working week and rendered as nine greyed rows on the
+screen they open to see how they are doing. It pays the least of any of them precisely
+because it is the easiest — the ladder only stays honest while the hardest work pays most.
+Note it is WORKOUT-gated, so a free-tier athlete cannot earn it (the habit is locked and
+only a finished session in `program.html` ticks it); the same was already true of
+HEAVY METAL.
+
+⚠️ **`measureAch()` and `bonusEvents()` are the display half and the paying half of the
+same measures, and they must agree.** `daysWith3` read `live()` in the display half long
+after stage18 fixed the paying half to `rosterOn(day)`, so switching a habit off dropped
+days from the counter on Progress while the 75xp already paid correctly stayed put — a
+progress figure falling while the XP behind it does not. Fixed; the rule is the same one
+as everywhere else in this file: **any function that takes a `dayKey` uses
+`rosterOn(dayKey)`.** The two halves still differ in one respect *by design* — the display
+walks `loggedDays()` (a badge is judged on the best run ever) while the ledger walks
+`seasonDays()` (it is only *paid* inside the season). See rule 2 above. **Weekly quests ride the same rail** (§8.5): dated on the
 day they complete, so they need no special handling in any window.
 
 `bonusEvents()` is cached and dropped by `invalidateBonus()`, which `saveLog()` and
@@ -390,11 +407,77 @@ after its baseline block.
 
 ---
 
-## 6. Day streaks
+## 6. The day score, and day streaks
 
-`streakQualifyPct: 80` — a day counts toward the day-streak if at least 80% of the
-athlete's tracked habits are done. Set it to `100` to demand a perfect day, or `60`
-to be kinder. This also drives the "days on target" figure in the weekly recap.
+**The day score is weighted, and it is two numbers.** Both come from `dayParts(day, mode)`
+in `habits.html`, which walks `rosterOn(day)` and sums `baseXp()` rather than counting
+heads. A headcount said a supplement and a training session were the same day's work; the
+percentage was the last number in the app that still believed that.
+
+It is **binary, not pro-rata** — `xpFor()` already pays pro-rata *with* a completion
+bonus, so a linear percentage would be the one number here that does not reward finishing.
+You could otherwise sit at 80% having completed nothing at all.
+
+| | Denominator | Used by |
+|---|---|---|
+| **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the header, the day strip, the roll call wall |
+| **`gatePct()`** — what the athlete could *do* | same, minus any **locked** habit they did not earn that day | day streaks, and nothing else |
+
+⚠️ **The gate is what makes weighting safe, not a nicety.** WORKOUT is 100 of 350 — 28.6%
+of the default day — against a threshold that allows 25% of slack. Weighted straight into
+the denominator it stops being a weight and becomes a **precondition**: a rest day tops out
+at 250/350 = 71% and can never qualify, so a 4×/week athlete's streak dies every rest day.
+Worse, a **free-tier athlete's WORKOUT is locked for life** — their ceiling would be 71%
+for ever and they would never have a qualifying day again, while `proof.html` promises them
+in Amir's own voice that only the *perfect* day is out of reach. Dropping an unearned lock
+from **both halves** of the fraction fixes all of it: a rest day with everything else done
+is 250/250 = 100%. Finishing a session can then only ever help — it re-enters the
+denominator already complete.
+
+`isPerfect()` is deliberately **not** weighted and not gated: still `every(isDone)` over
+the whole roster, padlock included. It is what keeps `proof.html` true, and it is the
+client twin of the server's `ndone >= nlive`.
+
+### `streakQualifyPct: 75`
+
+A day counts toward the day-streak at **75% of the weight it could have earned**. The five
+points from the old 80 are load-bearing: the gate's denominator on a rest day is the seven
+daily habits (250), so the worst single miss is **steps at 190/250 = 76%**. At 80 that
+fails and steps quietly becomes a *second* precondition alongside the session; at 75 the
+old promise — *miss any one thing and the day still counts* — survives on every roster on
+the board.
+
+| rest day, missing… | of 250 | % | counts at 75 |
+|---|---|---|---|
+| nothing | 250 | 100 | ✅ |
+| supps *or* breathe | 230 | 92 | ✅ |
+| fuel | 210 | 84 | ✅ |
+| sleep | 200 | 80 | ✅ |
+| **steps** (worst single miss) | 190 | **76** | ✅ |
+| sleep + supps | 180 | 72 | ❌ |
+| steps + supps | 170 | 68 | ❌ |
+
+**Nobody's streak got shorter when this shipped.** Verified over a 61-day log: 0 days
+stopped qualifying, 6 started. Set it to `100` to demand a perfect day, or lower to be
+kinder. This also drives the "days on target" figure in the weekly recap.
+
+**Both halves are scored twice**, as ever. The server mirror is
+`supabase/stage19_weighted_days.sql` — the `perday` CTE gains `wdone`/`glive`, and the `qd`
+CTE (the `qualify` quest kind, the **only** path from a day fraction to XP) reads them. The
+gate's exclusion list arrives as a new `xp_rules` key, `unearnable`, because the server has
+no `locked` flag: `p_rules` carries `targets` and `weights` only.
+
+```sql
+update public.xp_rules
+set rules = rules || '{"unearnable":["strength"],"streakQualifyPct":75}'::jsonb,
+    updated_at = now()
+where id = 1;
+```
+
+With the key **absent** the server behaves exactly as it did before, which is what lets the
+SQL be deployed ahead of the client. `with3` (DP, 75xp) and `perfect` (CN, 500xp) still
+read the *head counts* `ndone`/`nlive` — moving them onto the weighted columns would
+silently redefine two paying milestones.
 
 ---
 
@@ -519,7 +602,8 @@ update public.xp_rules set rules = jsonb_build_object(
   'tiers', '[{"days":5,"mult":0.5},{"days":10,"mult":1},{"days":20,"mult":2},
              {"days":30,"mult":3},{"days":60,"mult":6}]'::jsonb,
   -- mirrors ACHIEVEMENTS; `measure` strings are read exactly as the app reads them
-  'milestones', '[{"code":"RR","need":30,"xp":200,"measure":"daysHit:steps"},
+  'milestones', '[{"code":"FB","need":1,"xp":50,"measure":"daysHit:strength"},
+                  {"code":"RR","need":30,"xp":200,"measure":"daysHit:steps"},
                   {"code":"IM","need":16,"xp":150,"measure":"streak:supps"},
                   {"code":"HM","need":12,"xp":150,"measure":"streak:strength"},
                   {"code":"HS","need":5,"xp":100,"measure":"streak:water"},

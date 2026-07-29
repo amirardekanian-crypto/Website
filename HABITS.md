@@ -157,30 +157,38 @@ The screen they actually live on. **In this order, and the order is the point:**
    level. Today's own completion is *not* repeated here; the header and the day strip
    both already carry it, and a second green bar of the same shape directly beneath the
    first read as one broken double-bar.
-2. **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
+2. **The streak band** — the current day streak, how it compares to the best ever, and
+   the seven days behind it as a trail, so the shape of the week is visible instead of
+   inferred from one integer. **Clay, never green**, for the reason the day's own progress
+   bar is not here at all (see 1). Before it existed, the day streak — the number the whole
+   qualify rule exists to produce — appeared on this screen in exactly one circumstance: a red
+   bar warning it was about to be lost. The only moment it showed up was the moment it was
+   bad news. Hidden entirely until the first logged day: a zero over an empty trail is the
+   loudest possible way to open an app on day one. The same band opens PROGRESS.
+3. **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
    completion, that choose **which day you are logging**. See *The backfill window* below.
-3. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
+4. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
    Only counter habits carry a progress track; on a check-off habit it could only ever
    read 0% or 100%, which was noise on half the list.
-4. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
+5. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
    random from a library of **83 lines across 13 situations** (`NUDGES`): one bucket per
    habit, plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and
    streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
    tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
    repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
-5. **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
+6. **Quests, when a run is on** *(catalogue: [`QUESTS.md`](QUESTS.md))* — targets for the *week* rather than the day, worth real
    XP, with live progress and a countdown. **There are usually none**: quests only exist
    while Amir has a run going, and a run lasts 7 days from the day he starts it. That is
    the point — seeing them means something is on. **Between runs it is one muted line**
    rather than nothing: the block vanishing entirely kept that sentence true but made the
    whole feature invisible, so an athlete who joined between runs never learned quests
    existed and the next one read as random rather than as an event.
-6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
+7. **Roll call pointer** — a single row into the CREW tab, shown only while today's
    sentence is unwritten. The composer itself lives in CREW with its feed.
-7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
+8. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
    weakest habit. The "recap" half.
-8. **The cross-link** back to the training programme.
+9. **The cross-link** back to the training programme.
 
 > **Why the list sits above the commentary.** It used to be hero → nudge → quests →
 > habits, which put the first tickable row about **1,400px down**: you opened the app to
@@ -193,9 +201,34 @@ The screen they actually live on. **In this order, and the order is the point:**
 **Streak at risk** gets one clay strip immediately above the list, rather than being
 said three ways at once (card, day-bar and header flag) as it was before.
 
+#### The day score is weighted — and it is two numbers
+Full detail in [`XP_SYSTEM.md`](XP_SYSTEM.md) §6; the shape of it matters here because it
+is what the day strip and the header show. Both come from `dayParts(day, mode)`, which
+sums `baseXp()` over `rosterOn(day)` instead of counting heads — a headcount said a
+supplement and a training session were the same day's work, and the percentage was the
+last number in the app that still believed that. It is **binary, not pro-rata**: `xpFor()`
+already pays pro-rata *with* a completion bonus, so a linear percentage would be the one
+number here that does not reward finishing.
+
+- **`dayPct()`** — what the day was *worth*, over the whole roster. The header, the day
+  strip, the roll call wall. On a rest day it reads ~71%, and that is the honest number.
+- **`gatePct()`** — what the athlete could *do*. A **locked** habit they did not earn that
+  day leaves the denominator. Day streaks read this and nothing else.
+
+⚠️ **The gate is what makes weighting safe.** WORKOUT is 100 of 350 — 28.6% of the default
+day — against a threshold allowing 25% of slack, so weighted into the denominator it stops
+being a weight and becomes a *precondition*: a rest day could never qualify, and a
+free-tier athlete (whose WORKOUT is locked for life) would never have a qualifying day
+again — while `proof.html` promises them only the *perfect* day is out of reach.
+`isPerfect()` is deliberately untouched, which is what keeps that promise true.
+
+`streakQualifyPct` moved 80 → **75** with it: the worst single miss on a rest day is steps
+at 190/250 = 76%, so at 80 steps quietly became a second precondition. Verified over a
+61-day log: **0 days stopped qualifying, 6 started.**
+
 #### Run vs streak — two words, one job each
 A **run** is consecutive days on *one* habit ("a 24-day run on water"). A **streak** is
-consecutive days where the athlete cleared `streakQualifyPct` of everything they track
+consecutive days where the athlete cleared `streakQualifyPct` of the day's *weight*
 ("a 2-day streak"). They are different numbers moving at different speeds.
 
 The app used to say it five ways — *day streak*, *24 DAYS*, *Best streak*, *Best run so
@@ -256,25 +289,34 @@ Written and read in the **CREW** tab, which opens on it.
 Habits and achievements merged, because they were two views of one question.
 
 **A slim level strip** (not a repeat of Today's hero — two tabs used to open
-with the identical 76px level block) → **four season stats**: days logged, badges, day
-streak, perfect days → a one-line **key explaining the consistency pips**, which had no
+with the identical 76px level block) → **the streak band** (the same one Today opens with)
+→ **four season stats**: days logged, badges, longest run, perfect days → a one-line
+**key explaining the consistency pips**, which had no
 legend anywhere in the app and are empty for the first five days → **one row per habit**
 (its level, rank, XP, progress bar and five pips, tapping through to full history) →
-paused habits with their banked XP → the nine one-off **milestones**.
+paused habits with their banked XP → the ten one-off **milestones**.
 
-Days-logged leads the stat grid deliberately. Streak and perfect-days are both zero for
+Days-logged leads the stat grid deliberately. Perfect days and runs are both zero for
 anyone rebuilding after a bad week, and opening your own progress on a pair of zeros
 punishes exactly the athlete who most needs to keep going. Showing up is the stat that is
 almost always positive, and it is the one that earns the others.
+
+**The day streak is not in the grid** — it is the band above it, so the two screens an
+athlete checks their standing from open with the identical object. It was a bare figure
+in a tile with no way to tell a streak climbing from one that had just broken, and
+repeating it in both places would be the duplication this tab was reorganised to remove.
+Its old slot now holds **longest run** — the best single-habit run ever, which is genuinely
+different information and quietly teaches the run/streak split the app depends on.
 
 A habit row's meta line is **rank · XP** only. It used to append today's status too,
 which wrapped every row to two lines and restated what Today already says — Progress is
 about standing, not about today.
 
 **Nothing-logged-yet is taught, not reported.** On a log with no days in it the stat grid
-carries one line defining *badge*, *day streak* and *perfect day* — three of its four
-words were used nowhere else an athlete had been — and it disappears at the first logged
-day. Today's seven-day recap no longer names a "strongest" and "weakest" habit out of an
+carries one line defining *badge*, *run*, *streak* and *perfect day* — words that were used
+nowhere else an athlete had been — and it disappears at the first logged
+day. It teaches *run* and *streak* side by side on purpose: the band above holds the
+streak, the grid holds the run, and those are the two words the app must never blur. Today's seven-day recap no longer names a "strongest" and "weakest" habit out of an
 eight-way tie at 0/7. The foot of Progress carries a second door to the manual.
 
 **Habit detail** (reached from here or from Today) shows that habit's rank and level
