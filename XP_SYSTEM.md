@@ -307,7 +307,24 @@ is per habit, so it never needed a denominator. Full design in `HABITS.md` →
 `rosterOn(dayKey)`, or it will quietly re-judge history again.
 
 Milestones keep flat values — they are one-off and genuinely hard — totalling
-**1,575 XP** across the nine. **Weekly quests ride the same rail** (§8.5): dated on the
+**1,625 XP** across the ten. The exception is **FIRST BLOOD** (`FB`, 50xp, one logged
+session): every other milestone needs at least five days, so the whole section was
+unreachable for an athlete's first working week and rendered as nine greyed rows on the
+screen they open to see how they are doing. It pays the least of any of them precisely
+because it is the easiest — the ladder only stays honest while the hardest work pays most.
+Note it is WORKOUT-gated, so a free-tier athlete cannot earn it (the habit is locked and
+only a finished session in `program.html` ticks it); the same was already true of
+HEAVY METAL.
+
+⚠️ **`measureAch()` and `bonusEvents()` are the display half and the paying half of the
+same measures, and they must agree.** `daysWith3` read `live()` in the display half long
+after stage18 fixed the paying half to `rosterOn(day)`, so switching a habit off dropped
+days from the counter on Progress while the 75xp already paid correctly stayed put — a
+progress figure falling while the XP behind it does not. Fixed; the rule is the same one
+as everywhere else in this file: **any function that takes a `dayKey` uses
+`rosterOn(dayKey)`.** The two halves still differ in one respect *by design* — the display
+walks `loggedDays()` (a badge is judged on the best run ever) while the ledger walks
+`seasonDays()` (it is only *paid* inside the season). See rule 2 above. **Weekly quests ride the same rail** (§8.5): dated on the
 day they complete, so they need no special handling in any window.
 
 `bonusEvents()` is cached and dropped by `invalidateBonus()`, which `saveLog()` and
@@ -519,7 +536,8 @@ update public.xp_rules set rules = jsonb_build_object(
   'tiers', '[{"days":5,"mult":0.5},{"days":10,"mult":1},{"days":20,"mult":2},
              {"days":30,"mult":3},{"days":60,"mult":6}]'::jsonb,
   -- mirrors ACHIEVEMENTS; `measure` strings are read exactly as the app reads them
-  'milestones', '[{"code":"RR","need":30,"xp":200,"measure":"daysHit:steps"},
+  'milestones', '[{"code":"FB","need":1,"xp":50,"measure":"daysHit:strength"},
+                  {"code":"RR","need":30,"xp":200,"measure":"daysHit:steps"},
                   {"code":"IM","need":16,"xp":150,"measure":"streak:supps"},
                   {"code":"HM","need":12,"xp":150,"measure":"streak:strength"},
                   {"code":"HS","need":5,"xp":100,"measure":"streak:water"},
