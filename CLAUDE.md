@@ -202,7 +202,8 @@ consistency badges survive. The server (`public.seasons`) is the authority; the 
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
 **Habit names are TASKS** — `🚶 Walk 10,000 steps`, not `STEPS`. Display only; the
-`id` never changes, so no history moves. **`EVENTS`** are **multi-goal milestones** — three goals each, rendered as cards in an
+`id` never changes, so no history moves. **`EVENTS`** are **multi-goal milestones** — three goals each, rendered as **milestone
+rows** (goals on the note line, title where XP goes; the `evcard` is quests-only) in an
 `A few weeks` group *inside* the Milestones section, between the week badges and the long
 ones. **No dates at all**: the few weeks is how long the WORK takes, not a window you can
 miss (Amir, 2026-07-30, after two wrong shapes — calendar seasons, then rotating 28-day

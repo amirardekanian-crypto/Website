@@ -261,8 +261,8 @@ on mid-tap. Between runs the section stays visible with one muted line — the b
 vanishing entirely kept *"seeing quests means something is on"* true but made the whole
 feature invisible, so an athlete who joined between runs never learned quests existed.
 
-Quest rows carry a name **and** a description, where an event goal is one line, so they
-split across two rows (`.g-lbl` / `.g-sub`) rather than wrapping under the bar.
+Quest rows carry a name **and** a description, so each goal splits across two lines
+(`.g-lbl` / `.g-sub`) rather than wrapping under the bar.
 
 #### "A few weeks" — multi-goal milestones, no dates
 `EVENTS` in `habits.html`, rendered as the middle group **inside** the Milestones section.
@@ -279,8 +279,11 @@ and each is measured over the athlete's whole history — an athlete who arrives
 history behind them simply has some of it done, exactly like every other badge here.
 
 **They are a different KIND of milestone, not a different section.** A badge is one
-measure; these are three, so they render as cards rather than rows — the same card the
-quests use. The tier order is by how long the work takes:
+measure; these are three — but they wear the **same row** as every other milestone
+(Amir, 2026-07-29: the card form read as a quest; the `evcard` is quests-only now).
+The three goals share the row's note line, ticking off as they fall, the bar is the
+average of the three, and the right column carries the title the event pays where the
+other rows carry XP. The tier order is by how long the work takes:
 
 `A good week` → **`A few weeks`** → `The long haul` → `Rare`
 
