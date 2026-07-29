@@ -3797,8 +3797,17 @@ async function pushTitle() {
   } catch (e) {
     const msg = String((e && e.message) || e);
     if (/not earned|unknown title/i.test(msg)) {
-      CFG.pass.title = null; saveCfg(); render();
-      toast('The board has not seen that unlock yet. It will once your next day syncs.');
+      // NOT CFG.pass.title = null here. That used to strip the athlete's own
+      // choice back to nothing the instant the board refused it — so tapping
+      // a title back on, watching it flip, then watching the app silently
+      // revert it looked exactly like "I can't turn my title back on" (it
+      // is what an athlete reported, 2026-07-30). passTitle() already reads
+      // straight off CFG.pass.owned, independent of whatever the server's
+      // copy says, so their own card keeps showing what they picked — this
+      // is a refusal to PUBLISH, not proof they never earned it, and the
+      // fix for a stale server catalogue belongs on the server, not in a
+      // client-side unequip nobody asked for.
+      toast('The board has not seen that unlock yet. It still shows on your own card.');
     } else if (!/join the board|function|does not exist|schema/i.test(msg)) {
       toast('Could not reach the board. Your title will show once you have signal.');
     }
