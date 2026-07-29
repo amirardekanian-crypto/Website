@@ -427,6 +427,15 @@
   }
   .selrow.on { background: var(--accent); color: var(--bg); }
   .sectlbl { padding: 18px 20px 8px; letter-spacing: .12em; display: flex; justify-content: space-between; gap: 12px; }
+  /* A tier group's own header, doubling as its collapse toggle. Closed by
+     default — see the comment at msTierHeader() — so the chevron points
+     down at rest and turns to point up once opened. */
+  .msth { width: 100%; text-align: left; cursor: pointer; }
+  .msth .msth-r { display: flex; align-items: center; gap: 8px; }
+  .msth .chev { flex: none; width: 9px; height: 9px; stroke: currentColor; stroke-width: 2.4;
+                fill: none; stroke-linecap: round; stroke-linejoin: round;
+                transition: transform .2s cubic-bezier(.2,.8,.2,1); }
+  .msth.open .chev { transform: rotate(180deg); }
   .selrow .lbl { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1.15; text-transform: uppercase; }
   .selrow .desc { font-size: 12px; line-height: 1.35; opacity: .75; margin-top: 5px; }
   .selrow .mark { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
@@ -2386,7 +2395,8 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
-             day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null };
+             day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null,
+             msOpen: {} };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
@@ -3909,6 +3919,20 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'
 // classic cost of duplicating a component instead of sharing it.
 function sectionLabel(title, right) {
   return `<div class="eyebrow sectlbl"><span>${esc(title)}</span>${right ? `<span>${esc(right)}</span>` : ''}</div>`;
+}
+// A milestone tier's own header, doubling as its collapse toggle. Closed by
+// nature — four groups of five-ish rows each read as a wall on first open,
+// so only the label, the count and the chevron show until tapped. UI.msOpen
+// is keyed by tier so each group remembers its own state for the session.
+function msTierHeader(key, label, right) {
+  const open = !!UI.msOpen[key];
+  return `<button class="eyebrow sectlbl msth${open ? ' open' : ''}" data-k="mstoggle:${key}" ${on(() => {
+    UI.msOpen[key] = !UI.msOpen[key];
+    render();
+  })}>
+    <span>${esc(label)}</span>
+    <span class="msth-r"><span>${esc(right)}</span><svg class="chev" viewBox="0 0 12 8"><path d="M1 1.5 6 6.5 11 1.5"/></svg></span>
+  </button>`;
 }
 let _handlers = {};
 function on(fn) { const id = 'h' + (Math.random().toString(36).slice(2, 9)); _handlers[id] = fn; return 'data-h="' + id + '"'; }
@@ -5680,8 +5704,9 @@ function renderProgress(LI, earned, totalAch) {
         // title it pays where the others carry XP. No dates on any of it: the
         // few weeks is how long the work takes, not a slot you can miss.
         const evDone = EVENTS.filter(e => eventProgress(e).done).length;
-        const evCards = sectionLabel('A few weeks', evDone + '/' + EVENTS.length)
-          + EVENTS.map(ev => {
+        const evOpen = !!UI.msOpen.events;
+        const evCards = msTierHeader('events', 'A few weeks', evDone + '/' + EVENTS.length)
+          + (evOpen ? EVENTS.map(ev => {
             const p = eventProgress(ev), got = p.done, hit = p.goals.filter(g => g.done).length;
             const w = ev.name.split(/\s+/);
             const code = (w.length > 1 ? w[0][0] + w[1][0] : ev.name.slice(0, 2)).toUpperCase();
@@ -5697,15 +5722,21 @@ function renderProgress(LI, earned, totalAch) {
                 <span class="ms-cnt">${got ? 'UNLOCKED' : hit + '/' + p.goals.length}</span>
               </span>
             </div>`;
-          }).join('');
+          }).join('') : '');
+        // Each tier is toggled off by nature — five-ish full-strength rows per
+        // group read as a wall stacked four deep on first open. The header
+        // (label, count, chevron) always shows; the rows only render once
+        // UI.msOpen[key] is true, so opening one costs nothing until tapped.
         const tierBlock = key => {
           const inTier = rows.filter(r => (r.a.tier || 'long') === key);
           if (!inTier.length) return '';
           const t = ACH_TIERS.find(x => x.key === key);
-          return sectionLabel(t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
-               + inTier.map(row).join('');
+          const open = !!UI.msOpen[key];
+          return msTierHeader(key, t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
+               + (open ? inTier.map(row).join('') : '');
         };
         return sectionLabel('Milestones', (rows.filter(r => r.got).length + evDone) + ' of ' + (ACHIEVEMENTS.length + EVENTS.length))
+          + `<div style="padding:0 20px 14px;font-size:12px;line-height:1.5;color:var(--muted)">Complete these challenges for rewards — XP, medals and titles, yours for good once you cross the line.</div>`
           + (near ? `<div class="msnext" data-k="msnext">
               <strong>${esc(near.a.name)}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
             </div>` : '')
