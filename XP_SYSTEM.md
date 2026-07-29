@@ -407,11 +407,77 @@ after its baseline block.
 
 ---
 
-## 6. Day streaks
+## 6. The day score, and day streaks
 
-`streakQualifyPct: 80` — a day counts toward the day-streak if at least 80% of the
-athlete's tracked habits are done. Set it to `100` to demand a perfect day, or `60`
-to be kinder. This also drives the "days on target" figure in the weekly recap.
+**The day score is weighted, and it is two numbers.** Both come from `dayParts(day, mode)`
+in `habits.html`, which walks `rosterOn(day)` and sums `baseXp()` rather than counting
+heads. A headcount said a supplement and a training session were the same day's work; the
+percentage was the last number in the app that still believed that.
+
+It is **binary, not pro-rata** — `xpFor()` already pays pro-rata *with* a completion
+bonus, so a linear percentage would be the one number here that does not reward finishing.
+You could otherwise sit at 80% having completed nothing at all.
+
+| | Denominator | Used by |
+|---|---|---|
+| **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the header, the day strip, the roll call wall |
+| **`gatePct()`** — what the athlete could *do* | same, minus any **locked** habit they did not earn that day | day streaks, and nothing else |
+
+⚠️ **The gate is what makes weighting safe, not a nicety.** WORKOUT is 100 of 350 — 28.6%
+of the default day — against a threshold that allows 25% of slack. Weighted straight into
+the denominator it stops being a weight and becomes a **precondition**: a rest day tops out
+at 250/350 = 71% and can never qualify, so a 4×/week athlete's streak dies every rest day.
+Worse, a **free-tier athlete's WORKOUT is locked for life** — their ceiling would be 71%
+for ever and they would never have a qualifying day again, while `proof.html` promises them
+in Amir's own voice that only the *perfect* day is out of reach. Dropping an unearned lock
+from **both halves** of the fraction fixes all of it: a rest day with everything else done
+is 250/250 = 100%. Finishing a session can then only ever help — it re-enters the
+denominator already complete.
+
+`isPerfect()` is deliberately **not** weighted and not gated: still `every(isDone)` over
+the whole roster, padlock included. It is what keeps `proof.html` true, and it is the
+client twin of the server's `ndone >= nlive`.
+
+### `streakQualifyPct: 75`
+
+A day counts toward the day-streak at **75% of the weight it could have earned**. The five
+points from the old 80 are load-bearing: the gate's denominator on a rest day is the seven
+daily habits (250), so the worst single miss is **steps at 190/250 = 76%**. At 80 that
+fails and steps quietly becomes a *second* precondition alongside the session; at 75 the
+old promise — *miss any one thing and the day still counts* — survives on every roster on
+the board.
+
+| rest day, missing… | of 250 | % | counts at 75 |
+|---|---|---|---|
+| nothing | 250 | 100 | ✅ |
+| supps *or* breathe | 230 | 92 | ✅ |
+| fuel | 210 | 84 | ✅ |
+| sleep | 200 | 80 | ✅ |
+| **steps** (worst single miss) | 190 | **76** | ✅ |
+| sleep + supps | 180 | 72 | ❌ |
+| steps + supps | 170 | 68 | ❌ |
+
+**Nobody's streak got shorter when this shipped.** Verified over a 61-day log: 0 days
+stopped qualifying, 6 started. Set it to `100` to demand a perfect day, or lower to be
+kinder. This also drives the "days on target" figure in the weekly recap.
+
+**Both halves are scored twice**, as ever. The server mirror is
+`supabase/stage19_weighted_days.sql` — the `perday` CTE gains `wdone`/`glive`, and the `qd`
+CTE (the `qualify` quest kind, the **only** path from a day fraction to XP) reads them. The
+gate's exclusion list arrives as a new `xp_rules` key, `unearnable`, because the server has
+no `locked` flag: `p_rules` carries `targets` and `weights` only.
+
+```sql
+update public.xp_rules
+set rules = rules || '{"unearnable":["strength"],"streakQualifyPct":75}'::jsonb,
+    updated_at = now()
+where id = 1;
+```
+
+With the key **absent** the server behaves exactly as it did before, which is what lets the
+SQL be deployed ahead of the client. `with3` (DP, 75xp) and `perfect` (CN, 500xp) still
+read the *head counts* `ndone`/`nlive` — moving them onto the weighted columns would
+silently redefine two paying milestones.
 
 ---
 

@@ -1086,7 +1086,14 @@ const XP_RULES = {
   growth: 0.55,           // cost(n) = base × n^growth — higher = steeper climb
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
-  streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  // A day counts toward the day-streak at this % of the WEIGHT it could earn —
+  // see dayParts(). 75, not 80, and the five points are load-bearing: the gate's
+  // denominator on a rest day is the seven daily habits (250), so the worst
+  // single miss is steps at 190/250 = 76%. At 80 that fails and steps quietly
+  // becomes a second precondition alongside the session; at 75 the old promise
+  // — "miss any one thing and the day still counts" — survives on every roster
+  // on the board. Nobody's streak gets shorter; some get longer.
+  streakQualifyPct: 75,
   // The most a counter habit will accept in one day, as a multiple of its target
   // (steps 30,000 · water 24 · sleep 22.5h). Daily XP was always capped by
   // xpFor(), but a `total:` quest counts RAW UNITS — so without a ceiling one
@@ -1156,7 +1163,7 @@ const QUEST_POOL = [
   { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',          kind:'daysHit:supps',    need:7,     xp:140 },
   { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',       kind:'daysHit:fuel',     need:5,     xp:140 },
   { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions in the run',      kind:'daysHit:strength', need:3,     xp:250 },
-  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 80% or better',        kind:'qualify',          need:5,     xp:220 },
+  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 75% or better',        kind:'qualify',          need:5,     xp:220 },
   { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',               kind:'perfect',          need:2,     xp:300 }
 ];
 const QUEST_RUN_DAYS = 7;
@@ -1932,13 +1939,54 @@ async function syncFromCloud() {
 function loggedDays() { return Object.keys(LOG).sort(); }
 // Both read the roster THAT DAY had, never the one the athlete has now — see
 // rosterOn(). dayQualifies() and therefore the whole day-streak follow from
-// dayPct, so fixing these two settles every past percentage in the app.
-function dayPct(dayKey) {
-  const hs = rosterOn(dayKey); if (!hs.length) return 0;
-  return Math.round(hs.filter(h => isDone(h, dayKey)).length / hs.length * 100);
+// gatePct, so these settle every percentage in the app.
+//
+// ── The day score is WEIGHTED, and it is two numbers, not one ─────────────
+// A headcount says a supplement and a training session are the same day's
+// work, which nobody believes — and it was the last number in the app still
+// counting heads. xpFor() has always been weighted; so has every nudge, which
+// sorts what to chase by baseXp(). The percentage now agrees with them.
+//
+// It is BINARY, not pro-rata. xpFor() already pays pro-rata *with* a completion
+// bonus, so a linear percentage would be the one number here that does not
+// reward finishing — you could sit at 75%, over the bar, having finished nothing.
+//
+//   'score' — what the day was WORTH. Everything on that day's roster counts,
+//             the session included. The header, the day strip, the wall.
+//   'gate'  — what the athlete could actually DO. A LOCKED habit they did not
+//             earn that day leaves the denominator entirely. Streaks only.
+//
+// ⚠️ The gate is not a nicety, it is the thing that makes weighting safe.
+// WORKOUT is 100 of 350 — 28.6% of the default day — against a threshold that
+// allows 25% of slack. Weighted into the denominator it stops being a weight
+// and becomes a PRECONDITION: a rest day tops out at 250/350 = 71% and can
+// never qualify, so a 4x/week athlete's streak dies every rest day. Worse, a
+// free-tier athlete's WORKOUT is locked for good — their ceiling is 71% for
+// life and they would never have a qualifying day again, while proof.html
+// promises them in Amir's own voice that only the *perfect* day is out of
+// reach. Dropping an unearned lock from both halves of the fraction fixes all
+// of it: a rest day with everything else done is 250/250 = 100%.
+//
+// Finishing a session can then only ever HELP — it re-enters the denominator
+// already done, at 100% of itself.
+//
+// isPerfect() is deliberately untouched: still every(isDone) over the whole
+// roster, padlock included. It is what keeps proof.html true, and it is the
+// client twin of the server's `ndone >= nlive`.
+// ⚠️ rosterOn(dayKey), never live() — see the roster note above.
+function dayParts(dayKey, mode) {
+  let done = 0, total = 0;
+  rosterOn(dayKey).forEach(h => {
+    const hit = isDone(h, dayKey), w = baseXp(h);
+    if (mode === 'gate' && h.locked && !hit) return;
+    total += w; if (hit) done += w;
+  });
+  return { done, total };
 }
+function dayPct(dayKey)  { const p = dayParts(dayKey, 'score'); return p.total ? Math.round(p.done / p.total * 100) : 0; }
+function gatePct(dayKey) { const p = dayParts(dayKey, 'gate');  return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
-function dayQualifies(dayKey) { return dayPct(dayKey) >= XP_RULES.streakQualifyPct; }
+function dayQualifies(dayKey) { return gatePct(dayKey) >= XP_RULES.streakQualifyPct; }
 function currentDayStreak() {
   let d = dayQualifies(TKEY()) ? today() : addDays(today(), -1), n = 0;
   while (dayQualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
@@ -2233,12 +2281,25 @@ function armIdle() {
 function atRisk() {
   return new Date().getHours() >= 20 && !dayQualifies(TKEY()) && currentDayStreak() > 0;
 }
-// How many more habits would rescue the day.
+// How many more habits would rescue the day. Not a headcount any more: the day
+// is scored by weight, so the answer is the FEWEST remaining habits that close
+// the gap — which is simply the heaviest ones first. Greedy is exactly right
+// here, not an approximation: to reach a total in the fewest picks you always
+// take the biggest available.
+//
+// Locked habits are skipped because the athlete cannot tick them, which is the
+// same rule the gate itself uses — and it is why this can never run out of
+// road. Doing every unlocked habit leaves only unearned locks, and those are
+// not in the denominator, so the day lands on 100%.
 function shortOfQualifying() {
-  const hs = live();
-  if (!hs.length) return 0;
-  const need = Math.ceil(hs.length * XP_RULES.streakQualifyPct / 100);
-  return Math.max(1, need - hs.filter(h => isDone(h)).length);
+  const p = dayParts(TKEY(), 'gate');
+  if (!p.total) return 0;
+  const need = p.total * XP_RULES.streakQualifyPct / 100;
+  const left = rosterOn(TKEY()).filter(h => !isDone(h) && !h.locked)
+                               .sort((a, b) => baseXp(b) - baseXp(a));
+  let have = p.done, n = 0;
+  while (have < need && n < left.length) { have += baseXp(left[n]); n++; }
+  return Math.max(1, n);
 }
 
 // ── The nudge (one a day, driven by what is actually missing) ─────────────
@@ -2317,6 +2378,11 @@ function rulesSignature() {
   const src = JSON.stringify([
     XP_RULES.base, XP_RULES.growth, XP_RULES.completionBonus, XP_RULES.customXp,
     XP_RULES.weights, HABITS.map(h => [h.id, h.target]),
+    // The qualify threshold was missing here, which mattered the moment the day
+    // score became weighted: it decides every day streak and the `qualify`
+    // quest kind, so moving it has to re-baseline rather than silently restate
+    // an athlete's history at them.
+    XP_RULES.streakQualifyPct,
     // Tier days AND their multipliers, plus every milestone's cost and payout —
     // all of these now move real XP, so retuning any of them has to re-baseline
     // rather than fire a wall of celebrations nobody earned today.
@@ -4077,7 +4143,7 @@ function renderBadgeCelebration(ev) {
 
 // ── The streak band, shared by Today and Progress ─────────────────────────
 // The day streak is this app's headline consistency number — the whole point of
-// the 80% rule — and TODAY showed it in exactly one circumstance: a red bar
+// the qualify rule — and TODAY showed it in exactly one circumstance: a red bar
 // saying it was about to be lost. The only moment it appeared was the moment it
 // was bad news. On PROGRESS it was one of four equal tiles, a bare figure with
 // no sense of whether it was climbing or had just been broken.
@@ -4299,7 +4365,10 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <button ${on(() => setDay(TKEY()))}>Back to today</button>
       </div>` : ''}
-      ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${hs.length - doneCount} to go before midnight</div>` : ''}
+      <!-- What RESCUES the day, not what is left of it. "3 to go" was every
+           remaining habit; under a weighted score those are not the same
+           number, and the smaller one is the true one. -->
+      ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
 
       ${(() => { const lead = leadStreak(); return hs.map(h => habitRow(h, 'today', lead)).join(''); })()}
 
@@ -5099,7 +5168,22 @@ function renderManual() {
         // Two words, one job each. The app used five phrasings for these two
         // ideas, so a 24-day run beside a 2-day streak looked like the same
         // number disagreeing with itself.
-        p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of everything you track. They are different numbers and they move at different speeds.`) +
+        p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the day was worth. They are different numbers and they move at different speeds.`) +
+        // The athlete-facing half of the weighted day score. Without this, a rest
+        // day reading 71% while the streak survives looks like a bug on the one
+        // screen they check every morning.
+        p(`<strong style="color:var(--ink)">Not every habit is worth the same.</strong> Your day score is weighted — a session counts for more than a supplement, exactly as the points do — so it is a measure of how much of the day you got, not how many boxes you ticked. On a rest day it will read well under 100%, and that is honest: the session was part of the day and you did not do it.`) +
+        // The rest-day figure is computed from THIS athlete's roster, not typed
+        // in: someone tracking five habits sees their own number, and it stays
+        // true if the weights are ever retuned. The paragraph only appears when
+        // they actually have a locked habit — without one there is no gap to
+        // explain, and the sentence would contradict itself at 100%.
+        ((() => {
+          const hs = live(), tot = hs.reduce((s, h) => s + baseXp(h), 0);
+          const lock = hs.filter(h => h.locked).reduce((s, h) => s + baseXp(h), 0);
+          if (!tot || !lock) return '';
+          return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day — even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
+        })()) +
         p(`Your streak sits at the top of <strong style="color:var(--ink)">Today</strong> and <strong style="color:var(--ink)">Progress</strong>, with the last seven days beside it — a filled square is a day that counted. Your longest single-habit run is in the stats on Progress, and each habit carries its own run in its row.`) +
         p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a run never takes a badge back.`) +
         // The athlete-facing half of "days are settled units". They will not read

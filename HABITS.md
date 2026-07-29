@@ -161,7 +161,7 @@ The screen they actually live on. **In this order, and the order is the point:**
    the seven days behind it as a trail, so the shape of the week is visible instead of
    inferred from one integer. **Clay, never green**, for the reason the day's own progress
    bar is not here at all (see 1). Before it existed, the day streak — the number the whole
-   80% rule exists to produce — appeared on this screen in exactly one circumstance: a red
+   qualify rule exists to produce — appeared on this screen in exactly one circumstance: a red
    bar warning it was about to be lost. The only moment it showed up was the moment it was
    bad news. Hidden entirely until the first logged day: a zero over an empty trail is the
    loudest possible way to open an app on day one. The same band opens PROGRESS.
@@ -201,9 +201,34 @@ The screen they actually live on. **In this order, and the order is the point:**
 **Streak at risk** gets one clay strip immediately above the list, rather than being
 said three ways at once (card, day-bar and header flag) as it was before.
 
+#### The day score is weighted — and it is two numbers
+Full detail in [`XP_SYSTEM.md`](XP_SYSTEM.md) §6; the shape of it matters here because it
+is what the day strip and the header show. Both come from `dayParts(day, mode)`, which
+sums `baseXp()` over `rosterOn(day)` instead of counting heads — a headcount said a
+supplement and a training session were the same day's work, and the percentage was the
+last number in the app that still believed that. It is **binary, not pro-rata**: `xpFor()`
+already pays pro-rata *with* a completion bonus, so a linear percentage would be the one
+number here that does not reward finishing.
+
+- **`dayPct()`** — what the day was *worth*, over the whole roster. The header, the day
+  strip, the roll call wall. On a rest day it reads ~71%, and that is the honest number.
+- **`gatePct()`** — what the athlete could *do*. A **locked** habit they did not earn that
+  day leaves the denominator. Day streaks read this and nothing else.
+
+⚠️ **The gate is what makes weighting safe.** WORKOUT is 100 of 350 — 28.6% of the default
+day — against a threshold allowing 25% of slack, so weighted into the denominator it stops
+being a weight and becomes a *precondition*: a rest day could never qualify, and a
+free-tier athlete (whose WORKOUT is locked for life) would never have a qualifying day
+again — while `proof.html` promises them only the *perfect* day is out of reach.
+`isPerfect()` is deliberately untouched, which is what keeps that promise true.
+
+`streakQualifyPct` moved 80 → **75** with it: the worst single miss on a rest day is steps
+at 190/250 = 76%, so at 80 steps quietly became a second precondition. Verified over a
+61-day log: **0 days stopped qualifying, 6 started.**
+
 #### Run vs streak — two words, one job each
 A **run** is consecutive days on *one* habit ("a 24-day run on water"). A **streak** is
-consecutive days where the athlete cleared `streakQualifyPct` of everything they track
+consecutive days where the athlete cleared `streakQualifyPct` of the day's *weight*
 ("a 2-day streak"). They are different numbers moving at different speeds.
 
 The app used to say it five ways — *day streak*, *24 DAYS*, *Best streak*, *Best run so

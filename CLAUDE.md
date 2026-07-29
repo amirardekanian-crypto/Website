@@ -104,7 +104,7 @@ and they read from two different copies of the same rules. If you change one and
 other, the board and the athlete's phone will quietly show different numbers — the worst
 class of bug in this app, because nothing errors.
 
-The Supabase copy is **one row**: `public.xp_rules where id = 1`. It has 12 keys, and
+The Supabase copy is **one row**: `public.xp_rules where id = 1`. It has 13 keys, and
 every one of them mirrors a constant in `habits.html`:
 
 | `xp_rules` key | `habits.html` | What breaks if they drift |
@@ -112,6 +112,7 @@ every one of them mirrors a constant in `habits.html`:
 | `base`, `growth` | `XP_RULES.base/.growth` | Levels differ between board and phone |
 | `completionBonus`, `customXp` | `XP_RULES` | Daily XP differs |
 | `streakQualifyPct` | `XP_RULES` | The `qualify` quest and day-streaks differ |
+| `unearnable` | `HABITS[].locked` | The streak **gate** differs — a rest day counts on one side only (stage19) |
 | `weights` | `XP_RULES.weights` | Every habit's value differs |
 | `targets` | `HABITS[].target` | What counts as "done" differs |
 | `tiers` | `CONSISTENCY_TIERS` | Badge XP differs |
@@ -169,9 +170,20 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–18 are applied and live** (leaderboard, workout-days feed, seasons,
+**Supabase stages 9–19 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
-per-day rosters).
+per-day rosters, weighted day scores).
+
+**The day score is WEIGHTED, and it is two numbers.** `dayParts(day, mode)` in
+`habits.html` sums `baseXp()` over `rosterOn(day)` rather than counting heads. `dayPct()`
+is what the day was *worth* (whole roster — header, day strip, wall); `gatePct()` is what
+the athlete could *do* (a **locked** habit they did not earn that day leaves the
+denominator) and **day streaks read only that**. The gate is not a nicety: WORKOUT is
+28.6% of the default day, so weighting it into the denominator makes it a *precondition* —
+a rest day could never qualify and a free-tier athlete, whose WORKOUT is locked for life,
+would never have a qualifying day again. `isPerfect()` stays unweighted and ungated, which
+is what keeps `proof.html`'s promise true. `streakQualifyPct` moved 80 → **75** with it.
+Full detail in `XP_SYSTEM.md` §6; server half in `supabase/stage19_weighted_days.sql`.
 
 **Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
 the only test, and anything not `"free"` is coached, so no existing file needs editing.
