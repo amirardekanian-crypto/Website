@@ -212,6 +212,17 @@ back perfect days that never happened. Both are proven fixed in the stage18 head
 a perfect day is worth from here. **Any function that takes a `dayKey` must use
 `rosterOn(dayKey)`.** That is the whole invariant; it is one line to get wrong.
 
+**It got that one line wrong again, 2026-07-30 — in the UI, not the scoring.** Every
+scoring function already read `rosterOn(dayKey)` correctly, but `renderToday()` built the
+tappable row list itself from `live()` even while backfilling a past day. The header's
+`dayPct()` was right; the rows the athlete could actually see and tick were missing
+whatever add-on habit had since been switched off — so ticking every visible row could
+still leave the day short of 100%, with nothing on screen explaining why. Fixed by
+splitting `hs` (still `live()`, for "your week": the heat map and strongest/weakest
+ranking, correctly about *now* regardless of which day is open) from `rows`
+(`rosterOn(AKEY())`, what actually gets rendered and logged). See `HABITS.md`'s
+*backfill window* section for the full account.
+
 **Seasons.** Scoring runs in seasons; only days from the current season's start earn XP,
 for personal levels *and* the boards. Currently **Pre-Season (opened 26 July 2026)** —
 Amir launches the real one on command with `select public.start_season('Season 1');` in
