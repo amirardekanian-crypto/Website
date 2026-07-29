@@ -500,12 +500,15 @@ once the athlete has written — a doorway, not a second composer.
 seven days, not a calendar week). Joining and renaming live with it.
 
 ### Settings — behind the initials button
-Profile · **Show me around** (the tour) · **The ladder** · **The manual** · link to the
-programme · sync status and a *Sync now* button · leaderboard status · dark mode ·
-which habits are tracked (plus adding custom ones) · reset today's log.
+Profile · **Show me around** (the tour) · **The manual** · link to the programme · sync
+status and a *Sync now* button · leaderboard status · dark mode · which habits are
+tracked (plus adding custom ones) · reset today's log.
 
-Deliberately *not* here: coach volume, motivation display. The app has one mode — XP and
-levels, nudge and recap — and doesn't ask athletes to configure it.
+Deliberately *not* here: coach volume, motivation display, and — since this redesign —
+**the ladder**, which used to be its own row. Tapping your rank goes straight to the
+Locker now (see below), so a Settings row pointing at the same place was a second door
+to something one tap already reaches. The app has one mode — XP and levels, nudge and
+recap — and doesn't ask athletes to configure it.
 
 > **This used to say "replay onboarding" was deliberately absent too.** That ruling was
 > about the habit *picker*, which decides nothing and is fully editable in the list
@@ -513,25 +516,31 @@ levels, nudge and recap — and doesn't ask athletes to configure it.
 > explanation of what the app's controls do — and an explanation you can see exactly once
 > is worth very little. *Show me around* is the first row in *How this works*.
 
-### The rank ladder
-Reachable by **tapping your rank** on Today or Progress, and from a Settings row.
-Shows all 10 ranks with their own insignia, what each one costs in XP, which are
-cleared, which one you are standing in (and how far through it), and what the star
-means past level 50. Games always show you the road ahead; before this, Proof's road
-existed only inside a paragraph of the manual.
+### The rank ladder lives on the Locker's road now
+It used to be its own screen, reached by tapping your rank; that screen is **gone**
+(Amir's redesign, 2026-07-30: *"two screens were describing the same climb"*). Tapping
+your rank — on Today's hero or on Progress — now opens the **Locker** tab directly, and
+`renderPass()`'s road interleaves the two: each of the 10 ranks is a header (crest, tier
+label, level range, XP cost or "CLEARED", and — for the rank you're standing in — a pip
+row showing which of its sub-levels you've cleared), and the reward rows for that level
+range sit right under it. One scroll now shows the ranks ahead, their crests, and every
+title or skin each one hands you, instead of two screens telling the same story twice.
+`TAB_ORDER` (the array that decides which way a tab transition slides) gained `'pass'`
+in the same pass — it had been missing since Locker became a tab, which meant the app
+picked the wrong slide direction into and out of it.
 
-**Share your rank** builds a 1080×1080 card on a canvas and hands it to the OS share
-sheet (or downloads it where there isn't one). The insignia is drawn from the *same*
-`RANK_ART` path data through `Path2D`, so a rank can never look different on the card
-than it does in the app. Green ground, paper type, clay-2 accent, Barlow Condensed —
-and it waits on `document.fonts.load()` for each face first, because canvas silently
-falls back to a system sans if the font has not downloaded yet, which is exactly how a
-brand card stops looking like the brand.
+Insignia are **drawn, not imported** — straight lines, hard corners, square caps, one
+inherited colour, in `RANK_ART` — and rendered through the shared `rankCrest()`/metal
+system described above, so a rank never looks different in the road, the Today hero, or
+the share card. They escalate on purpose so the road reads at a glance: blocks being
+laid, then force, then machinery, then a burst. Anything with a curve or a rounded cap
+belongs to a different app. What the star means past level 50 (prestige with no
+ceiling) is unchanged — see *The long game* below.
 
-Insignia are **drawn, not imported** — straight lines, hard corners, square caps,
-one inherited colour, in `RANK_ART`. They escalate on purpose so the ladder reads at
-a glance: blocks being laid, then force, then machinery, then a burst. Anything with
-a curve or a rounded cap belongs to a different app.
+**Today's level hero also changed shape**: the XP bar is a ring around the level number
+now (`.lvring`, an SVG circle with a `stroke-dashoffset` set from `LI.pct`), not a bar
+underneath it — the number and how far through it you are read as one object instead of
+two.
 
 #### Inside the Crew tab
 
@@ -648,13 +657,14 @@ go and switch it on is a step nobody asks for.
 
 Reached from its own tab, **LOCKER** — the fourth on the main bar (Amir's own redesign,
 2026-07-29, promoted it out from a row inside Progress). It opens on the shareable rank
-card, then a horizontal rail of titles, a rail of card skins, and **the road**: every
-reward in level order, the next one framed with a progress bar and its distance in XP —
-the only forward-looking screen in the app; everywhere else reports the past.
+card, then a horizontal rail of titles, a rail of card skins, and **the road**: the 10
+ranks and the 14 rewards merged into one scroll (see *The rank ladder lives on the
+Locker's road now*, above) — the only forward-looking screen in the app; everywhere
+else reports the past.
 
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
-metal-rimmed badge for a rank — the ladder, the Today hero and the share card all call
+metal-rimmed badge for a rank — the road, the Today hero and the share card all call
 it, so a rank never looks different in two places. `titlePlate()` renders an owned title
 as a metal nameplate; rarity follows the level it unlocks at (bronze under 13, silver from
 13, gold from 21), except **event titles and PROOF ITSELF, which are always prismatic**
