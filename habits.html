@@ -1413,6 +1413,98 @@
   #app .plate.locked { opacity: .7; }
   #app .plate.locked .plate-in { background: var(--card); color: var(--muted-soft); }
 
+  /* ── Share picker ── the card is previewed by the same painter that exports it. */
+  #app .sharesheet { padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; max-height: 92%; overflow-y: auto; }
+  #app .sharehd { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  #app .sharex { width: 32px; height: 32px; border-radius: 999px; border: 0; background: var(--surface); color: var(--muted); font-size: 13px; flex: none; }
+  #app .sharepwrap {
+    position: relative; align-self: center; height: 296px; max-width: 100%;
+    border-radius: 18px; overflow: hidden; background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 18px 40px -22px rgba(35,31,53,.7);
+  }
+  #app .sharepwrap img { width: 100%; height: 100%; object-fit: contain; display: block; transition: opacity .18s ease; }
+  #app .sharepwrap .spinner { position: absolute; width: 22px; height: 22px; border-width: 2px; }
+  #app .sharerail { display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden; min-height: 78px; padding: 2px 0 6px; scrollbar-width: none; }
+  #app .sharerail::-webkit-scrollbar { display: none; }
+  #app .scard {
+    flex: none; width: 66px; border: 0; border-radius: 16px; background: var(--card); box-shadow: var(--shadow);
+    padding: 9px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-family: 'Outfit', sans-serif; cursor: pointer; color: var(--muted);
+  }
+  #app .scard.on { background: var(--accent); color: #fff; box-shadow: 0 6px 0 var(--accent-700); }
+  #app .scard-em { font-size: 19px; line-height: 1; }
+  #app .scard-nm { font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+  #app .sharenote { font-size: 11.5px; line-height: 1.45; color: var(--muted); text-align: center; }
+  #app .sharesizes { display: flex; gap: 7px; justify-content: center; }
+  #app .sharebtns { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── Celebration extras ── confetti, coins and the crest/medal stage. */
+  @keyframes lvConf {
+    0%   { opacity: 0; transform: translate(0,0) rotate(0) }
+    12%  { opacity: 1 }
+    100% { opacity: 0; transform: translate(var(--cx), var(--cy)) rotate(var(--cr)) }
+  }
+  @keyframes lvCoin {
+    0%   { opacity: 0; transform: translate(0,0) scale(.4) }
+    20%  { opacity: 1; transform: translate(calc(var(--cx) * .4), calc(var(--cy) * .5)) scale(1.1) }
+    100% { opacity: 0; transform: translate(var(--cx), var(--cy)) scale(.7) }
+  }
+  @keyframes lvSheen { 0% { transform: translateX(-140%) } 60%, 100% { transform: translateX(320%) } }
+  .lvconf { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 3; }
+  .lvconf i {
+    position: absolute; top: -4%; width: 10px; height: 16px; border-radius: 2px;
+    animation: lvConf 2.5s cubic-bezier(.25,.6,.4,1) both;
+  }
+  .lvconf i.dot { border-radius: 999px; height: 10px; }
+  .lvcoins { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+  .lvcoins i {
+    position: absolute; top: 50%; left: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+    border-radius: 999px; background: linear-gradient(145deg,#FFE29A,#F2B23C 55%,#B87A14);
+    box-shadow: 0 0 0 2px rgba(23,20,43,.35);
+    animation: lvCoin 1.15s cubic-bezier(.2,.7,.3,1) both;
+  }
+  .lvcoins i::after { content: '✦'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: rgba(23,20,43,.55); }
+  /* A crest or a medal replaces the square badge — no box, no border. */
+  .lvbadge.art { background: none; border: 0; width: auto; height: auto; box-shadow: none; overflow: visible; }
+  .lvbadge.art .sheen {
+    position: absolute; top: 0; bottom: 0; left: 0; width: 34%;
+    background: linear-gradient(105deg, transparent, rgba(255,255,255,.7), transparent);
+    animation: lvSheen 2.6s ease-in-out 1s infinite;
+  }
+  .lvmedal { position: relative; width: 168px; height: 168px; border-radius: 999px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .lvmedal .disc { width: 136px; height: 136px; border-radius: 999px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 56px; line-height: 1; }
+  .lvmedal .stars { font-size: 11px; letter-spacing: .1em; color: rgba(35,31,53,.5); }
+  .lvxp {
+    margin-top: 14px; display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(246,244,255,.12); border-radius: 999px; padding: 7px 15px;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px; color: #B7F0E4;
+    animation: lvUp .45s ease .85s both;
+  }
+  .lvactions { display: flex; align-items: center; gap: 9px; margin-top: 26px; animation: lvUp .45s ease .9s both; }
+  .lvactions .lvgo { margin-top: 0; }
+  .lvshare {
+    background: none; border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF;
+    border-radius: 999px; padding: 13px 18px;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13.5px; cursor: pointer;
+  }
+  .lvshare:hover { border-color: #F6F4FF; }
+  #app .lvwrap { background: #17142B; }
+  #app .lvwrap.rank { background: #4B3FBF; }
+  #app .lvwrap.badge { background: #1B1735; }
+  #app .lvwrap .lvrays { background: repeating-conic-gradient(#6C5CE7 0deg 7deg, transparent 7deg 22deg); }
+  #app .lvwrap.rank .lvrays { background: repeating-conic-gradient(#FFFFFF 0deg 6deg, transparent 6deg 20deg); }
+  #app .lvwrap.badge .lvrays { background: repeating-conic-gradient(#F2B23C 0deg 7deg, transparent 7deg 22deg); }
+  #app .lvwrap.streak { background: #241326; }
+  #app .lvwrap.streak .lvrays { background: repeating-conic-gradient(#FF8A5B 0deg 7deg, transparent 7deg 22deg); }
+  #app .lvwrap.streak .lvshock { border-color: #FF8A5B; }
+  #app .lvwrap.streak .lvkicker { color: #FFD9A0; }
+  #app .lvwrap.streak .lvgo { color: #C2451F; }
+  #app .lvwrap.streak .lvshards i { background: #FF8A5B; }
+  .lvflame { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .lvflame .fl { font-size: 74px; line-height: 1; }
+  .lvflame .n { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 76px; line-height: .9; letter-spacing: -.03em; color: #FFD9A0; }
+
   /* Roll call */
   #app .rcprompt .rcq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.25; }
   #app .noteq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; letter-spacing: 0; }
@@ -2048,6 +2140,9 @@ const MAX_LEVEL_SCAN = 5000;                             // loop guard
 // Flat values inverted the weighting the rest of the system rests on: sixty straight
 // days of SUPPS (20 XP a day) paid exactly as much as sixty straight days of
 // WORKOUT (100 a day), which is not true and the athlete can feel it.
+// The day-streak marks worth stopping the screen for. Tight early (the first
+// week is where people quit), spread out later so it stays an event.
+const DAY_STREAK_MARKS = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 300, 365];
 const CONSISTENCY_TIERS = [
   { days: 5,  name: 'KINDLED',     mult: 0.5 },
   { days: 10, name: 'STEADY',      mult: 1 },
@@ -2298,7 +2393,7 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
-             day:null, note:null, noteBusy:false, backTo:'today', install:false };
+             day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null };
 let _toastTimer = null, _flashTimer = null;
 
 function defaultCfg() {
@@ -3261,6 +3356,7 @@ function seedUnlocks() {
   CFG.seenAch = currentAch();
   CFG.seenPerfect = isPerfect(TKEY()) ? TKEY() : null;
   CFG.seenQuests = currentQuests();
+  CFG.seenStreak = DAY_STREAK_MARKS.filter(d => d <= currentDayStreak()).pop() || 0;
 }
 function checkUnlocks() {
   if (!CFG.seenTiers || !Array.isArray(CFG.seenAch) || !Array.isArray(CFG.seenQuests)) { seedUnlocks(); saveCfg(); return; }
@@ -3293,6 +3389,21 @@ function checkUnlocks() {
   // a burst the moment somebody switched a habit off, because every thin day
   // behind them would retroactively become perfect.
   if (isPerfect(TKEY()) && CFG.seenPerfect !== TKEY()) events.push({ kind:'perfect', id:TKEY() });
+
+  // The DAY STREAK crossing a mark. This is the number the whole qualify rule
+  // exists to protect, and nothing in the app ever celebrated it — the only time
+  // it was mentioned was the red bar warning you were about to lose it. A streak
+  // is the strongest predictor that somebody logs again tomorrow, so every mark
+  // gets a takeover of its own.
+  const dstreak = currentDayStreak();
+  const markSeen = CFG.seenStreak || 0;
+  const mark = DAY_STREAK_MARKS.filter(d => d <= dstreak).pop() || 0;
+  if (mark > markSeen) {
+    events.push({ kind:'streak', id:'s' + mark, days:mark, best:mark >= bestHabitRun() });
+    CFG.seenStreak = mark;
+  } else if (dstreak === 0 && markSeen) {
+    CFG.seenStreak = 0;   // streak broken — the marks are all back on the table
+  }
 
   // Quests. Only this week's get a takeover — an older week completing is
   // history arriving late (a cloud sync, a backfilled session), not a moment.
@@ -4837,6 +4948,7 @@ function renderApp() {
     </div>
     <div id="fx" data-k="fx" data-static></div>
     ${UI.sheet ? renderSheet() : ''}
+    ${UI.share ? renderShareSheet() : ''}
     ${UI.install ? renderInstall() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast" data-k="toast">${esc(UI.toast)}</div>` : ''}
     ${UI.celebrate.length ? renderCelebration(UI.celebrate[0]) : ''}`;
@@ -4851,6 +4963,42 @@ const SHARDS = [[0,-118],[84,-84],[118,0],[84,84],[0,118],[-84,84],[-118,0],[-84
 function shardHtml() {
   return SHARDS.map((s, i) => `<i style="--dx:${s[0]}px;--dy:${s[1]}px;animation-delay:${(0.22 + i * 0.025).toFixed(3)}s"></i>`).join('');
 }
+// Confetti and coins — the two things every game does on a win and this app did
+// not. Deterministic per celebration so a re-render never re-scrambles mid-fall.
+const CONF_COLOURS = ['#6C5CE7', '#35D0BA', '#F2B23C', '#FF8A5B', '#F27DA8', '#F6F4FF'];
+function confettiHtml(n) {
+  let seed = 11;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  let out = '';
+  for (let i = 0; i < (n || 26); i++) {
+    const left = Math.round(rnd() * 100);
+    const drift = Math.round((rnd() - 0.5) * 120);
+    const fall = 620 + Math.round(rnd() * 380);
+    const rot = Math.round((rnd() - 0.5) * 900);
+    const delay = (rnd() * 1.5).toFixed(2);
+    const dur = (2 + rnd() * 1.6).toFixed(2);
+    out += `<i class="${i % 3 === 0 ? 'dot' : ''}" style="left:${left}%;--cx:${drift}px;--cy:${fall}px;--cr:${rot}deg;`
+         + `background:${CONF_COLOURS[i % CONF_COLOURS.length]};animation-delay:${delay}s;animation-duration:${dur}s"></i>`;
+  }
+  return `<div class="lvconf">${out}</div>`;
+}
+function coinHtml(n) {
+  let out = '';
+  const count = n || 10;
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2;
+    out += `<i style="--cx:${Math.round(Math.cos(a) * 150)}px;--cy:${Math.round(Math.sin(a) * 150 - 60)}px;`
+         + `animation-delay:${(0.3 + i * 0.045).toFixed(2)}s"></i>`;
+  }
+  return `<div class="lvcoins">${out}</div>`;
+}
+// Every takeover ends the same way: continue, or turn the moment into a post.
+function lvActions(shareKind) {
+  return `<div class="lvactions">
+      <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
+      ${shareKind ? `<button class="lvshare" ${on(e => { e.stopPropagation(); UI.celebrate = []; saveCfg(); openShare(shareKind); })}>Share it</button>` : ''}
+    </div>`;
+}
 function renderCelebration(ev) {
   if (ev.kind) return renderBadgeCelebration(ev);
   const isHabit = !ev.overall;
@@ -4862,18 +5010,22 @@ function renderCelebration(ev) {
   // next one bursts properly instead of inheriting a spent animation.
   return `
     <div class="lvwrap ${promoted ? 'rank' : ''}" data-k="cel:lv:${esc(ev.id)}:${ev.to}" ${on(dismissCelebration)}>
+      ${confettiHtml(promoted ? 34 : 22)}
       <div class="lvstage">
         <div class="lvrays"></div>
         <div class="lvshock"></div>
         <div class="lvshards">${shardHtml()}</div>
-        <div class="lvbadge">${promoted ? rankIcon(r, 54, 'stroke-width:1.9') : `<span class="n">${ev.to}</span><span class="l">LEVEL</span>`}</div>
+        ${coinHtml(promoted ? 12 : 8)}
+        <div class="lvbadge${promoted ? ' art' : ''}">${promoted
+          ? rankCrest(r, 132)
+          : `<span class="n">${ev.to}</span><span class="l">LEVEL</span>`}</div>
       </div>
       <div class="lvkicker">${prestiged ? 'Prestige' : (promoted ? 'Rank up' : 'Level up')}</div>
       <div class="lvrank">${esc(isHabit ? h.name : r.label)}</div>
       ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
                 : `<div class="lvsub">Overall level ${ev.to} · ${info.into} / ${info.need} XP</div>`}
       <div class="lvbar"><span style="--w:${info.pct}%"></span></div>
-      <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
+      ${lvActions(isHabit ? null : 'rank')}
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
 }
@@ -4888,66 +5040,96 @@ function nameList(hs) {
 // Tiers, milestones and perfect days borrow the same machinery but land on the
 // green ground, so the KIND of win is readable before a word of it is.
 function renderBadgeCelebration(ev) {
-  let badge, badgeLabel, kicker, title, sub, codeClass = '';
+  let badge, badgeLabel, kicker, title, sub, codeClass = '', art = null, ground = 'badge', share = 'medal', xpLine = 0;
   if (ev.kind === 'tier') {
-    // The LEDGER, not the tier table. A run that began before the season opened
-    // still earns the badge but banks nothing (XP_SYSTEM.md §4.5), and reading
-    // the figure off CONSISTENCY_TIERS promised XP that never arrived.
     const paid = ev.habits.reduce((s, h) => s + tierPaid(h, ev.tierIndex), 0);
     badge = String(ev.tier.days); badgeLabel = 'DAYS';
     kicker = 'Consistency';
     title = ev.tier.name;
+    xpLine = paid;
     sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. '
         + (paid > 0
-            ? '+' + paid.toLocaleString() + ' XP, and the badge is yours for good.'
+            ? 'The badge is yours for good.'
             : 'The badge is yours for good. The run started before ' + seasonName()
               + ', so it pays nothing this season.');
+    // The medal, in the habit's own colour, instead of a number in a box.
+    const h0 = ev.habits[0];
+    art = `<div class="lvmedal" style="background:${METALS[ev.tierIndex >= 3 ? 'gold' : ev.tierIndex >= 1 ? 'silver' : 'bronze'].rim}">
+        <span class="disc" style="background:${habitHue(h0)[1]}">${splitEmoji(h0.name)[0] || '✨'}
+          <span class="stars">${'★'.repeat(Math.min(3, ev.tierIndex + 1))}</span></span>
+        <span class="sheen"></span>
+      </div>`;
+  } else if (ev.kind === 'streak') {
+    // The day streak crossing a mark — the single strongest signal that somebody
+    // is going to keep going, and the app used to say nothing at all about it.
+    ground = 'streak'; share = 'streak';
+    kicker = 'Day streak';
+    title = ev.days + ' DAYS';
+    sub = ev.days + ' days in a row at ' + XP_RULES.streakQualifyPct + '% or better. '
+        + (ev.best ? 'That is a new personal best.' : 'Keep it lit.');
+    art = `<div class="lvflame"><span class="fl">🔥</span><span class="n">${ev.days}</span></div>`;
   } else if (ev.kind === 'quest') {
     badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
     kicker = 'Quest complete';
     title = ev.quest.title;
-    sub = ev.quest.note + '. +' + ev.quest.xp.toLocaleString() + ' XP.';
+    xpLine = ev.quest.xp;
+    sub = ev.quest.note + '.';
+    share = 'rank';
   } else if (ev.kind === 'milestone') {
-    // Same rule as tiers: measureAch() counts all of history, bonusEvents() only
-    // pays what was crossed inside the season, so ask the ledger what landed.
     const paid = milestonePaid(ev.ach.code);
-    badge = ev.ach.code; badgeLabel = 'MILESTONE'; codeClass = ' code';
-    kicker = 'Unlocked';
+    kicker = 'Medal unlocked';
     title = ev.ach.name;
-    sub = ev.ach.note + '. ' + (paid > 0
-        ? '+' + paid.toLocaleString() + ' XP.'
-        : 'Yours on your all-time record. The ' + ev.ach.xp.toLocaleString()
-          + ' XP lands when you do it again inside ' + seasonName() + '.');
+    xpLine = paid;
+    sub = ev.ach.note + '.' + (paid > 0 ? '' : ' Yours on your all-time record — the '
+          + ev.ach.xp.toLocaleString() + ' XP lands when you do it again inside ' + seasonName() + '.');
+    const part = String(ev.ach.measure || '').split(':');
+    const hh = part[1] ? habitById(part[1]) : null;
+    const mk = ev.ach.tier === 'rare' ? 'gold' : ev.ach.tier === 'long' ? 'silver' : 'bronze';
+    art = `<div class="lvmedal" style="background:${METALS[mk].rim}">
+        <span class="disc" style="background:${hh ? habitHue(hh)[1] : '#EFECFB'}">${hh ? (splitEmoji(hh.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨')}
+          <span class="stars">${'★'.repeat(ev.ach.tier === 'rare' ? 3 : ev.ach.tier === 'long' ? 2 : 1)}</span></span>
+        <span class="sheen"></span>
+      </div>`;
   } else if (ev.kind === 'reward') {
-    // The one unlock that pays nothing and is worth having anyway. Say what it
-    // IS and where it shows, because a reward nobody can see is just a number.
-    badge = ev.reward.kind === 'title' ? 'T' : 'C';
-    badgeLabel = ev.reward.kind === 'title' ? 'TITLE' : 'CARD';
-    codeClass = ' code';
     kicker = 'Unlocked';
     title = ev.reward.name;
     sub = ev.reward.note + ' ' + (ev.reward.kind === 'title'
       ? 'It sits under your name, and it is yours for good — a new season cannot take it back.'
-      : 'Pick it for your rank card in your Locker. Yours for good.');
+      : 'Pick it for your card in your Locker. Yours for good.');
+    share = 'rank';
+    art = ev.reward.kind === 'title'
+      ? `<div style="position:relative">${titlePlate(ev.reward)}<span class="sheen"></span></div>`
+      : `<div style="position:relative;width:132px;height:166px;border-radius:20px;${CARD_LOOK[ev.reward.id] || CARD_LOOK.c_paper};box-shadow:0 18px 40px -18px rgba(0,0,0,.8)"><span class="sheen"></span></div>`;
   } else {
+    // A perfect day. The one every consistency system is really built around.
     const n = live().length;
     badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
     kicker = 'Clean sweep';
     title = 'Perfect day';
-    sub = 'Every habit you track, done. ' + dayXp(ev.id).toLocaleString() + ' XP today.';
+    xpLine = dayXp(ev.id);
+    sub = 'Every habit you track, done.';
+    share = 'receipt';
+    art = `<div class="lvmedal" style="background:${METALS.gold.rim}">
+        <span class="disc" style="background:#E6F7F4">🏆<span class="stars">${n} / ${n}</span></span>
+        <span class="sheen"></span>
+      </div>`;
   }
   return `
-    <div class="lvwrap badge" data-k="cel:${esc(ev.kind)}:${esc(String(ev.id))}" ${on(dismissCelebration)}>
+    <div class="lvwrap ${ground}" data-k="cel:${esc(ev.kind || 'perfect')}:${esc(String(ev.id))}" ${on(dismissCelebration)}>
+      ${confettiHtml(ev.kind === 'milestone' || !ev.kind ? 34 : 26)}
       <div class="lvstage">
         <div class="lvrays"></div>
         <div class="lvshock"></div>
         <div class="lvshards">${shardHtml()}</div>
-        <div class="lvbadge"><span class="n${codeClass}">${esc(badge)}</span><span class="l">${esc(badgeLabel)}</span></div>
+        ${coinHtml(xpLine ? 12 : 8)}
+        <div class="lvbadge${art ? ' art' : ''}">${art
+          || `<span class="n${codeClass}">${esc(badge)}</span><span class="l">${esc(badgeLabel)}</span>`}</div>
       </div>
       <div class="lvkicker">${esc(kicker)}</div>
       <div class="lvrank">${esc(title)}</div>
       <div class="lvsub">${esc(sub)}</div>
-      <button class="lvgo">${UI.celebrate.length > 1 ? 'Next' : 'Continue'}</button>
+      ${xpLine > 0 ? `<div class="lvxp">+${xpLine.toLocaleString()} XP banked</div>` : ''}
+      ${lvActions(share)}
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
     </div>`;
 }
@@ -5165,7 +5347,7 @@ function renderToday(LI, doneCount, pct) {
           ${streakFlame(currentDayStreak(), bestDayStreak())}
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:5px;min-width:0">
             <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
-              ${rankIcon(LI.rank, 17)}
+              ${rankCrest(LI.rank, 26)}
               <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
               <span class="go">→</span>
             </button>
@@ -6195,7 +6377,7 @@ function renderPass() {
           <span style="font-weight:700;font-size:14.5px;line-height:1.25">Your card, as the crew sees it</span>
           <span style="font-size:11.5px;line-height:1.4;color:#A9A3C9">${eqT ? `Wearing ${titlePlate(eqT, true)} on` : 'No title on'} the <strong style="color:#CBC6E4">${esc(eqC.name)}</strong> skin · ${owned} of ${PASS_TRACK.length} kept</span>
           <span style="display:flex;gap:7px;margin-top:2px">
-            <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => shareRankCard())}>Share it →</button>
+            <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => openShare('rank'))}>Share it →</button>
           </span>
         </span>
       </div>
@@ -6361,154 +6543,629 @@ function paintCardGround(x, S, id) {
   x.fillStyle = g; x.fillRect(0, 0, S, S);
   grid(0.045, 9);
 }
-async function buildRankCard() {
-  const S = 1080, LI = overallLevel(), r = LI.rank;
+async function buildShareCard(kind, sizeKey) {
+  const dim = SHARE_SIZES[sizeKey] || SHARE_SIZES.post;
+  const W = dim[0], H = dim[1];
   const c = document.createElement('canvas');
-  c.width = S; c.height = S;
+  c.width = W; c.height = H;
   const x = c.getContext('2d');
-  // `fonts.ready` alone is not enough: a face the page has never painted at that
-  // weight may not be downloaded yet, and canvas silently falls back to a system
-  // sans — which is exactly how a brand card stops looking like the brand. Ask
-  // for each face explicitly and wait for it.
   try {
     if (document.fonts && document.fonts.load) {
-      await Promise.all([
-        document.fonts.load('800 104px "Outfit"'),
-        document.fonts.load('800 84px "Outfit"'),
-        document.fonts.load('800 30px "Outfit"'),
-        document.fonts.load('700 27px "Outfit"'),
-        document.fonts.load('700 20px "Outfit"'),
-        document.fonts.load('600 33px "Outfit"'),
-        document.fonts.load('600 24px "Outfit"')
-      ]);
+      await Promise.all(['800 104px "Outfit"', '800 84px "Outfit"', '800 34px "Outfit"',
+                         '700 27px "Outfit"', '700 22px "Outfit"', '600 33px "Outfit"',
+                         '600 26px "Outfit"'].map(f => document.fonts.load(f)));
     }
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
-  } catch (e) { /* fall back to system type rather than no card at all */ }
+  } catch (e) { /* system type beats no card */ }
+  await loadBrandMark();
 
-  paintCardGround(x, S, passCard().id);
-  const PAD = 96, CX = S / 2;
-  const mk = rankMetalKey(r.name), mm = METALS[mk];
-
-  // Eyebrow, centred.
-  x.textAlign = 'center';
-  x.fillStyle = CARD.gold;
-  x.font = '700 27px "Outfit", sans-serif';
-  x.letterSpacing = '9px';
-  x.fillText('PROOF · ' + seasonName().toUpperCase(), CX, 150);
-  x.letterSpacing = '0px';
-
-  // The crest — the SAME tier shape, metal and glyph the app shows, at card
-  // scale. RANK_ART via Path2D stays the single source of truth.
-  const CW = 296, CH = 332, CYc = 360;
-  crestPath(x, CX, CYc, CW, CH, mk);
-  x.fillStyle = metalFill(x, CX - CW / 2, CYc - CH / 2, CW, CH, mk);
-  x.fill();
-  crestPath(x, CX, CYc, CW * 0.845, CH * 0.845, mk);
-  x.fillStyle = '#2B2547';
-  x.fill();
-  x.save();
-  const g = 132;
-  x.translate(CX - g / 2, CYc - g / 2);
-  x.scale(g / 24, g / 24);
-  x.strokeStyle = mk === 'prisma' ? '#F6F4FF' : mm.ink;
-  x.lineWidth = 2; x.lineCap = 'round'; x.lineJoin = 'round';
-  x.stroke(new Path2D(RANK_ART[r.name] || RANK_ART.ROOKIE));
-  x.restore();
-
-  // Rank, big and centred — shrunk until every label the ladder can produce
-  // fits, because this card is built to be shared.
-  x.fillStyle = CARD.paper;
-  const label = r.label.toUpperCase();
-  let size = 104;
-  x.font = '800 ' + size + 'px "Outfit", sans-serif';
-  while (size > 54 && x.measureText(label).width > S - PAD * 2) {
-    size -= 4;
-    x.font = '800 ' + size + 'px "Outfit", sans-serif';
-  }
-  x.fillText(label, CX, 642);
-  x.fillStyle = 'rgba(246,244,255,0.66)';
-  x.font = '600 33px "Outfit", sans-serif';
-  x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', CX, 694);
-
-  // The title, worn as a metal plate — the line that makes the card worth
-  // exporting a second time.
-  const ttl = passTitle();
-  if (ttl) {
-    const tk = titleMetalKey(ttl);
-    x.font = '800 29px "Outfit", sans-serif';
-    x.letterSpacing = '6px';
-    const tname = ttl.name.toUpperCase();
-    const tw = x.measureText(tname).width + 88, th = 66, ty = 730;
-    const rr = (xx, yy, ww, hh, rad) => { x.beginPath(); x.moveTo(xx + rad, yy); x.arcTo(xx + ww, yy, xx + ww, yy + hh, rad); x.arcTo(xx + ww, yy + hh, xx, yy + hh, rad); x.arcTo(xx, yy + hh, xx, yy, rad); x.arcTo(xx, yy, xx + ww, yy, rad); x.closePath(); };
-    rr(CX - tw / 2, ty, tw, th, th / 2);
-    x.fillStyle = metalFill(x, CX - tw / 2, ty, tw, th, tk);
-    x.fill();
-    rr(CX - tw / 2 + 5, ty + 5, tw - 10, th - 10, (th - 10) / 2);
-    x.fillStyle = CARD.ink;
-    x.fill();
-    x.fillStyle = tk === 'prisma' ? '#CBC6E4' : METALS[tk].ink;
-    x.fillText(tname, CX + 3, ty + 44);
-    x.letterSpacing = '0px';
-  }
-
-  // Rule + three facts. Deliberately not "today's %" — that reads as 12% for
-  // most of the day and this card gets shared.
-  const stats = [
-    [String(currentDayStreak()), 'DAY STREAK'],
-    [String(allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0) + currentAch().length), 'MEDALS'],
-    [String(seasonDays().filter(isPerfect).length), 'PERFECT DAYS']
-  ];
-  const ry = S - PAD - 216;
-  x.strokeStyle = 'rgba(246,244,255,0.16)'; x.lineWidth = 2;
-  x.beginPath(); x.moveTo(PAD, ry); x.lineTo(S - PAD, ry); x.stroke();
-  stats.forEach((st, i) => {
-    const sx = S / 6 + i * (S / 3);
-    x.fillStyle = i === 0 ? CARD.orange : (i === 2 ? CARD.teal : CARD.paper);
-    x.font = '800 84px "Outfit", sans-serif';
-    x.fillText(st[0], sx, ry + 104);
-    x.fillStyle = 'rgba(246,244,255,0.5)';
-    x.font = '700 20px "Outfit", sans-serif';
-    x.letterSpacing = '4px';
-    x.fillText(st[1], sx, ry + 146);
-    x.letterSpacing = '0px';
-  });
-
-  // Sign-off.
-  x.textAlign = 'left';
-  x.fillStyle = CARD.gold;
-  x.font = '800 30px "Outfit", sans-serif';
-  x.fillText('@AMIRARDEKANIAN', PAD, S - PAD + 10);
-  x.fillStyle = 'rgba(246,244,255,0.45)';
-  x.font = '600 24px "Outfit", sans-serif';
-  const site = 'AMIRARDEKANI.COM';
-  x.fillText(site, S - PAD - x.measureText(site).width, S - PAD + 10);
-
+  const painter = SHARE_PAINT[kind] || SHARE_PAINT.rank;
+  const footTop = H - 176;
+  const area = { top: 120, bottom: footTop - 24, cx: W / 2 };
+  area.cy = (area.top + area.bottom) / 2;
+  const ink = painter.ground(x, W, H, area);
+  painter.body(x, W, H, area);
+  scFooter(x, W, H, ink !== false);
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
-async function shareRankCard() {
-  const LI = overallLevel();
+
+// ── The share picker ────────────────────────────────────────────────
+// Five cards × three formats. The athlete sees the real thing before they post
+// it — the preview IS the export, painted by the same code.
+function openShare(kind) {
+  UI.share = { kind: kind || 'rank', size: 'post', busy: true };
+  render();
+  paintSharePreview();
+}
+function setShare(patch) {
+  if (!UI.share) return;
+  Object.assign(UI.share, patch, { busy: true });
+  render();
+  paintSharePreview();
+}
+let SHARE_URL = null;
+async function paintSharePreview() {
+  if (!UI.share) return;
+  const want = UI.share.kind + ':' + UI.share.size;
   try {
-    const blob = await buildRankCard();
-    if (!blob) { toast('Could not build the card on this phone.'); return; }
-    const file = new File([blob], 'proof-rank.png', { type: 'image/png' });
-    const text = LI.rank.label + ' · level ' + LI.lv + ' on AA Proof.';
-    // Share sheet where it exists (iOS and Android both do), download otherwise.
-    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+    const blob = await buildShareCard(UI.share.kind, UI.share.size);
+    if (!UI.share || UI.share.kind + ':' + UI.share.size !== want) return;   // superseded
+    if (SHARE_URL) URL.revokeObjectURL(SHARE_URL);
+    SHARE_URL = URL.createObjectURL(blob);
+    UI.share.blob = blob;
+    UI.share.busy = false;
+    const img = document.getElementById('shareprev');
+    if (img) { img.src = SHARE_URL; img.style.opacity = '1'; }
+    const wrap = document.getElementById('sharepwrap');
+    if (wrap) wrap.style.aspectRatio = SHARE_SIZES[UI.share.size][0] + ' / ' + SHARE_SIZES[UI.share.size][1];
+  } catch (e) {
+    UI.share.busy = false;
+    toast('Could not build the card on this phone.');
+  }
+}
+async function doShare(saveOnly) {
+  if (!UI.share) return;
+  const blob = UI.share.blob || await buildShareCard(UI.share.kind, UI.share.size);
+  if (!blob) { toast('Could not build the card on this phone.'); return; }
+  const card = SHARE_CARDS.find(s => s.id === UI.share.kind) || SHARE_CARDS[0];
+  const name = 'aa-proof-' + UI.share.kind + '-' + UI.share.size + '.png';
+  const LI = overallLevel();
+  const text = card.caption(LI) + ' — tracked on AA Proof · amirardekani.com';
+  try {
+    const file = new File([blob], name, { type: 'image/png' });
+    if (!saveOnly && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
       await navigator.share({ files: [file], text: text });
       return;
     }
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'proof-rank.png';
+    a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-    toast('Card saved to your downloads.');
+    toast('Saved to your downloads.');
   } catch (e) {
-    // A cancelled share sheet throws AbortError — that is not a failure.
     if (e && e.name === 'AbortError') return;
     toast('Could not share the card just now.');
   }
 }
+function renderShareSheet() {
+  const S = UI.share, dim = SHARE_SIZES[S.size];
+  const sizeChip = (k, label) => `<button class="chip ${S.size === k ? 'chip-on' : ''}" data-k="sz:${k}"
+    ${on(() => setShare({ size: k }))}>${label}</button>`;
+  return `
+    <div class="scrim" data-k="scrim:share" ${on(() => { UI.share = null; render(); })}></div>
+    <div class="sheet sharesheet" data-k="sharesheet">
+        <div class="sharehd">
+          <span class="hd" style="font-size:19px">Share your proof</span>
+          <button class="sharex" ${on(() => { UI.share = null; render(); })} aria-label="Close">&#10005;</button>
+        </div>
+        <div id="sharepwrap" class="sharepwrap" style="aspect-ratio:${dim[0]} / ${dim[1]}">
+          <img id="shareprev" alt="Your card" style="opacity:${S.busy ? '0' : '1'}">
+          ${S.busy ? '<span class="spinner"></span>' : ''}
+        </div>
+        <div class="sharerail">
+          ${SHARE_CARDS.map(sc => `<button class="scard ${S.kind === sc.id ? 'on' : ''}" data-k="sc:${sc.id}"
+            ${on(() => setShare({ kind: sc.id }))}>
+            <span class="scard-em">${sc.emoji}</span>
+            <span class="scard-nm">${esc(sc.name)}</span>
+          </button>`).join('')}
+        </div>
+        <div class="sharenote">${esc((SHARE_CARDS.find(s => s.id === S.kind) || SHARE_CARDS[0]).note)}</div>
+        <div class="sharesizes">
+          ${sizeChip('post', 'Post 4:5')}${sizeChip('story', 'Story 9:16')}${sizeChip('square', 'Square 1:1')}
+        </div>
+        <div class="sharebtns">
+          <button class="btn btn-primary btn-block" ${on(() => doShare(false))}>Share it</button>
+          <button class="btn btn-secondary btn-block" ${on(() => doShare(true))}>Save the image</button>
+        </div>
+    </div>`;
+}
+// Kept as the name every existing call site uses.
+function shareRankCard() { openShare('rank'); }
+
+// ── Canvas kit ─────────────────────────────────────────────────────
+let BRAND_MARK = null, BRAND_TRIED = false;
+function loadBrandMark() {
+  return new Promise(res => {
+    if (BRAND_MARK || BRAND_TRIED) return res(BRAND_MARK);
+    const im = new Image();
+    im.onload = () => { BRAND_MARK = im; BRAND_TRIED = true; res(im); };
+    im.onerror = () => { BRAND_TRIED = true; res(null); };
+    im.src = 'assets/img/icon-192.png';
+  });
+}
+function scRR(x, px, py, w, h, r) {
+  x.beginPath();
+  x.moveTo(px + r, py);
+  x.arcTo(px + w, py, px + w, py + h, r);
+  x.arcTo(px + w, py + h, px, py + h, r);
+  x.arcTo(px, py + h, px, py, r);
+  x.arcTo(px, py, px + w, py, r);
+  x.closePath();
+}
+function scGrid(x, W, H, alpha, step) {
+  x.strokeStyle = 'rgba(246,244,255,' + alpha + ')'; x.lineWidth = 2;
+  for (let i = step; i < W; i += step) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H); x.stroke(); }
+  for (let j = step; j < H; j += step) { x.beginPath(); x.moveTo(0, j); x.lineTo(W, j); x.stroke(); }
+}
+function scInk(x, W, H, glow) {
+  x.fillStyle = CARD.ink; x.fillRect(0, 0, W, H);
+  const g = x.createRadialGradient(W / 2, H * 0.16, 0, W / 2, H * 0.16, W * 0.95);
+  g.addColorStop(0, glow || 'rgba(108,92,231,0.5)');
+  g.addColorStop(1, 'rgba(108,92,231,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  scGrid(x, W, H, 0.04, 108);
+}
+// Deterministic sprinkle — the same card always exports the same confetti.
+function scConfetti(x, W, H, top, colors) {
+  let seed = 7;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  for (let i = 0; i < 26; i++) {
+    const px = rnd() * W, py = top + rnd() * (H * 0.4);
+    const w = 10 + rnd() * 8, h = 16 + rnd() * 12;
+    x.save(); x.translate(px, py); x.rotate(rnd() * Math.PI);
+    x.globalAlpha = 0.5 + rnd() * 0.5;
+    x.fillStyle = colors[i % colors.length];
+    if (i % 3 === 0) { x.beginPath(); x.arc(0, 0, w / 2, 0, Math.PI * 2); x.fill(); }
+    else x.fillRect(-w / 2, -h / 2, w, h);
+    x.restore();
+  }
+  x.globalAlpha = 1;
+}
+function scCrest(x, cx, cy, w, rankName) {
+  const key = rankMetalKey(rankName), m = METALS[key];
+  const h = w * 1.12, bw = Math.max(4, w * 0.085);
+  crestPath(x, cx, cy, w, h, key);
+  x.fillStyle = metalFill(x, cx - w / 2, cy - h / 2, w, h, key);
+  x.fill();
+  crestPath(x, cx, cy, w - bw * 2, h - bw * 2, key);
+  x.fillStyle = '#2B2547'; x.fill();
+  x.save();
+  const g = w * 0.46;
+  x.translate(cx - g / 2, cy - g / 2);
+  x.scale(g / 24, g / 24);
+  x.strokeStyle = key === 'prisma' ? '#F6F4FF' : m.ink;
+  x.lineWidth = 2; x.lineCap = 'round'; x.lineJoin = 'round';
+  x.stroke(new Path2D(RANK_ART[(rankName && rankName.name) || rankName] || RANK_ART.ROOKIE));
+  x.restore();
+}
+function scMedal(x, cx, cy, r, metalKey, tint, emoji) {
+  x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2);
+  x.fillStyle = metalFill(x, cx - r, cy - r, r * 2, r * 2, metalKey); x.fill();
+  x.beginPath(); x.arc(cx, cy, r * 0.82, 0, Math.PI * 2);
+  x.fillStyle = tint; x.fill();
+  x.font = (r * 0.85) + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(emoji, cx, cy + r * 0.04);
+  x.textBaseline = 'alphabetic';
+}
+// The plate a title is worn on, canvas-side.
+function scPlate(x, cx, y, text, metalKey) {
+  x.font = '800 29px "Outfit", sans-serif';
+  x.letterSpacing = '6px';
+  const tw = x.measureText(text).width + 92, th = 68;
+  scRR(x, cx - tw / 2, y, tw, th, th / 2);
+  x.fillStyle = metalFill(x, cx - tw / 2, y, tw, th, metalKey); x.fill();
+  scRR(x, cx - tw / 2 + 5, y + 5, tw - 10, th - 10, (th - 10) / 2);
+  x.fillStyle = CARD.ink; x.fill();
+  x.fillStyle = metalKey === 'prisma' ? '#CBC6E4' : METALS[metalKey].ink;
+  x.textAlign = 'center';
+  x.fillText(text, cx + 3, y + 45);
+  x.letterSpacing = '0px';
+  return th;
+}
+function scEyebrow(x, cx, y, text, colour) {
+  x.textAlign = 'center';
+  x.fillStyle = colour || CARD.gold;
+  x.font = '700 25px "Outfit", sans-serif';
+  x.letterSpacing = '9px';
+  x.fillText(text, cx + 4, y);
+  x.letterSpacing = '0px';
+}
+function scFit(x, text, max, start, min, weight) {
+  let s = start;
+  x.font = (weight || 800) + ' ' + s + 'px "Outfit", sans-serif';
+  while (s > min && x.measureText(text).width > max) {
+    s -= 4;
+    x.font = (weight || 800) + ' ' + s + 'px "Outfit", sans-serif';
+  }
+  return s;
+}
+function scStats(x, W, y, stats, ink) {
+  const PAD = 96;
+  x.strokeStyle = ink ? 'rgba(246,244,255,0.16)' : 'rgba(35,31,53,0.12)';
+  x.lineWidth = 2;
+  x.beginPath(); x.moveTo(PAD, y); x.lineTo(W - PAD, y); x.stroke();
+  x.textAlign = 'center';
+  stats.forEach((st, i) => {
+    const sx = W / (stats.length * 2) + i * (W / stats.length);
+    x.fillStyle = st[2] || (ink ? CARD.paper : CARD.card);
+    x.font = '800 76px "Outfit", sans-serif';
+    x.fillText(st[0], sx, y + 96);
+    x.fillStyle = ink ? 'rgba(246,244,255,0.5)' : 'rgba(35,31,53,0.5)';
+    x.font = '700 20px "Outfit", sans-serif';
+    x.letterSpacing = '4px';
+    x.fillText(st[1], sx, y + 136);
+    x.letterSpacing = '0px';
+  });
+}
+// The fixed brand lockup. Every card carries it, so a stranger who has never
+// heard of this app learns three things: the mark, the name, and where to go.
+function scFooter(x, W, H, ink) {
+  const PAD = 96, mark = 68, my = H - PAD - 34, baseline = my + 30;
+  x.strokeStyle = ink ? 'rgba(246,244,255,0.12)' : 'rgba(35,31,53,0.12)';
+  x.lineWidth = 2;
+  x.beginPath(); x.moveTo(PAD, my - 40); x.lineTo(W - PAD, my - 40); x.stroke();
+  scRR(x, PAD, my - 22, mark, mark, 20);
+  if (BRAND_MARK) { x.save(); x.clip(); x.drawImage(BRAND_MARK, PAD, my - 22, mark, mark); x.restore(); }
+  else {
+    x.fillStyle = CARD.grape; x.fill();
+    x.textAlign = 'center'; x.fillStyle = '#fff';
+    x.font = '800 26px "Outfit", sans-serif';
+    x.fillText('AA', PAD + mark / 2, my + 12);
+  }
+  x.textAlign = 'left';
+  x.fillStyle = ink ? CARD.paper : CARD.card;
+  x.font = '800 30px "Outfit", sans-serif';
+  x.letterSpacing = '3px';
+  x.fillText('AA PROOF', PAD + mark + 24, baseline - 24);
+  x.letterSpacing = '0px';
+  x.fillStyle = ink ? 'rgba(246,244,255,0.55)' : 'rgba(35,31,53,0.55)';
+  x.font = '600 22px "Outfit", sans-serif';
+  x.fillText('The habit tracker that keeps score', PAD + mark + 24, baseline + 8);
+  x.textAlign = 'right';
+  x.fillStyle = ink ? CARD.gold : CARD.grape;
+  x.font = '700 22px "Outfit", sans-serif';
+  x.letterSpacing = '2px';
+  x.fillText('AMIRARDEKANI.COM', W - PAD, baseline - 8);
+  x.letterSpacing = '0px';
+  x.textAlign = 'left';
+}
+// The newest thing worth showing off: a milestone if there is one, otherwise the
+// habit carrying the longest run.
+function latestMedal() {
+  const codes = currentAch();
+  if (codes.length) {
+    const a = ACHIEVEMENTS.filter(z => codes.indexOf(z.code) !== -1).slice(-1)[0];
+    const part = String(a.measure || '').split(':');
+    const h = part[1] ? habitById(part[1]) : null;
+    return { metal: a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze',
+             tint: h ? habitHue(h)[1] : '#EFECFB',
+             emoji: h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨'),
+             name: a.name, note: a.note, xp: a.xp,
+             stars: a.tier === 'rare' ? 3 : a.tier === 'long' ? 2 : 1,
+             tierName: a.tier === 'rare' ? 'GOLD · RARE' : a.tier === 'long' ? 'SILVER · THE LONG HAUL' : 'BRONZE · A GOOD WEEK' };
+  }
+  const best = live().slice().sort((a, b) => habitStreak(b) - habitStreak(a))[0];
+  if (!best || habitStreak(best) < 2) return null;
+  const c = consistencyFor(best), st = habitStreak(best);
+  return { metal: c.tier >= 4 ? 'gold' : c.tier >= 2 ? 'silver' : 'bronze',
+           tint: habitHue(best)[1], emoji: splitEmoji(best.name)[0] || '✨',
+           name: (c.name || 'ON A RUN'), note: st + ' days of ' + splitEmoji(best.name)[1].toLowerCase() + ' in a row',
+           xp: 0, stars: Math.max(1, Math.min(3, c.tier)), tierName: 'CONSISTENCY' };
+}
+
+// ── The five cards ─────────────────────────────────────────────────
+const SHARE_PAINT = {
+  // THE RANK — the flex. Wears the skin the athlete picked in the Locker.
+  rank: {
+    ground: (x, W, H) => { paintCardGround(x, Math.max(W, H), passCard().id); return true; },
+    body: (x, W, H, a) => {
+      const LI = overallLevel(), r = LI.rank, ttl = passTitle();
+      const statsY = a.bottom - 150;
+      const cw = Math.min(300, W * 0.28);
+      // Centre the crest block in whatever room the format leaves above the
+      // stats — a 9:16 story has 570px more of it than a 4:5 post.
+      const blockH = 60 + cw * 1.12 + 96 + 52 + 34 + (ttl ? 102 : 0);
+      let y = a.top + Math.max(20, (statsY - a.top - blockH) / 2);
+      scEyebrow(x, a.cx, y, 'PROOF · ' + seasonName().toUpperCase());
+      const cy = y + 60 + cw * 0.56;
+      scCrest(x, a.cx, cy, cw, r.name);
+      y = cy + cw * 0.56 + 96;
+      x.textAlign = 'center';
+      x.fillStyle = CARD.paper;
+      scFit(x, r.label.toUpperCase(), W - 192, 104, 54);
+      x.fillText(r.label.toUpperCase(), a.cx, y);
+      y += 52;
+      x.fillStyle = 'rgba(246,244,255,0.66)';
+      x.font = '600 33px "Outfit", sans-serif';
+      x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', a.cx, y);
+      if (ttl) { y += 34; scPlate(x, a.cx, y, ttl.name.toUpperCase(), titleMetalKey(ttl)); }
+      scStats(x, W, statsY, [
+        [String(currentDayStreak()), 'DAY STREAK', CARD.orange],
+        [String(allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0) + currentAch().length), 'MEDALS'],
+        [String(seasonDays().filter(isPerfect).length), 'PERFECT DAYS', CARD.teal]
+      ], true);
+    }
+  },
+  // THE RECEIPT — today's habits, ticked. The card a stranger decodes instantly.
+  receipt: {
+    ground: (x, W, H) => {
+      x.fillStyle = '#F6F4FF'; x.fillRect(0, 0, W, H);
+      x.fillStyle = CARD.card; x.fillRect(0, 0, W, 250);
+      return false;
+    },
+    body: (x, W, H, a) => {
+      const k = TKEY(), hs = live(), pct = dayPct(k), done = hs.filter(h => isDone(h, k)).length;
+      const PAD = 96;
+      x.textAlign = 'left';
+      x.fillStyle = 'rgba(246,244,255,0.6)';
+      x.font = '700 22px "Outfit", sans-serif';
+      x.letterSpacing = '6px';
+      x.fillText(today().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long' }).toUpperCase()
+                 + ' · DAY ' + dayNumber(), PAD, 120);
+      x.letterSpacing = '0px';
+      x.fillStyle = CARD.paper;
+      x.font = '800 62px "Outfit", sans-serif';
+      x.fillText(pct === 100 ? 'A perfect day.' : (pct >= 75 ? 'Day on target.' : 'Today, logged.'), PAD, 196);
+      // The percentage chip, right-aligned in the header.
+      const chipW = 178, chipH = 96, chipX = W - PAD - chipW;
+      scRR(x, chipX, 92, chipW, chipH, 24);
+      x.fillStyle = pct === 100 ? CARD.teal : CARD.grape; x.fill();
+      x.textAlign = 'center';
+      x.fillStyle = pct === 100 ? '#0C4B43' : '#fff';
+      x.font = '800 46px "Outfit", sans-serif';
+      x.fillText(pct + '%', chipX + chipW / 2, 152);
+      x.font = '700 17px "Outfit", sans-serif';
+      x.letterSpacing = '3px';
+      x.fillText(done + ' OF ' + hs.length, chipX + chipW / 2, 176);
+      x.letterSpacing = '0px';
+      // Rows, sized to whatever space the format leaves.
+      const listTop = 300, listBottom = a.bottom - 118;
+      const rowH = Math.min(104, Math.max(58, (listBottom - listTop) / Math.max(1, hs.length)));
+      hs.forEach((h, i) => {
+        const ry = listTop + i * rowH, mid = ry + rowH / 2;
+        const hue = habitHue(h), ep = splitEmoji(h.name), isD = isDone(h, k);
+        const tile = Math.min(66, rowH - 14);
+        scRR(x, PAD, mid - tile / 2, tile, tile, tile * 0.32);
+        x.fillStyle = hue[1]; x.fill();
+        x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.font = (tile * 0.52) + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+        x.fillText(ep[0] || '•', PAD + tile / 2, mid + 1);
+        x.textBaseline = 'alphabetic';
+        x.textAlign = 'left';
+        x.fillStyle = isD ? CARD.card : 'rgba(35,31,53,0.45)';
+        x.font = '600 32px "Outfit", sans-serif';
+        x.fillText(ep[1], PAD + tile + 26, mid + 11);
+        const st = habitStreak(h);
+        let rx = W - PAD;
+        const tr = 24;
+        x.beginPath(); x.arc(rx - tr, mid, tr, 0, Math.PI * 2);
+        if (isD) {
+          x.fillStyle = hue[0]; x.fill();
+          x.strokeStyle = '#fff'; x.lineWidth = 6; x.lineCap = 'round'; x.lineJoin = 'round';
+          x.beginPath();
+          x.moveTo(rx - tr - 11, mid); x.lineTo(rx - tr - 2, mid + 9); x.lineTo(rx - tr + 12, mid - 9);
+          x.stroke();
+        } else { x.strokeStyle = 'rgba(35,31,53,0.18)'; x.lineWidth = 5; x.stroke(); }
+        if (st > 1) {
+          x.textAlign = 'right';
+          x.fillStyle = CARD.orange;
+          x.font = '700 24px "Outfit", sans-serif';
+          x.fillText('🔥 ' + st, rx - tr * 2 - 22, mid + 9);
+          x.textAlign = 'left';
+        }
+      });
+      // Banked strip.
+      const by = a.bottom - 96;
+      scRR(x, PAD, by, W - PAD * 2, 82, 22);
+      x.fillStyle = CARD.card; x.fill();
+      x.fillStyle = 'rgba(246,244,255,0.6)';
+      x.font = '700 22px "Outfit", sans-serif';
+      x.letterSpacing = '4px';
+      x.fillText('BANKED TODAY', PAD + 30, by + 51);
+      x.letterSpacing = '0px';
+      x.textAlign = 'right';
+      x.fillStyle = CARD.teal;
+      x.font = '800 38px "Outfit", sans-serif';
+      x.fillText('+' + dayXp(k).toLocaleString() + ' XP', W - PAD - 30, by + 54);
+      x.textAlign = 'left';
+    }
+  },
+  // THE STREAK — one number, poster-loud.
+  streak: {
+    ground: (x, W, H) => { scInk(x, W, H, 'rgba(255,138,91,0.42)'); return true; },
+    body: (x, W, H, a) => {
+      const now = currentDayStreak(), best = Math.max(now, bestHabitRun());
+      x.textAlign = 'center';
+      scEyebrow(x, a.cx, a.cy - 260, now >= best ? 'PERSONAL BEST' : 'ON A RUN', CARD.orange);
+      x.font = '150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+      x.fillText('🔥', a.cx, a.cy - 120);
+      const g = x.createLinearGradient(0, a.cy - 60, 0, a.cy + 110);
+      g.addColorStop(0, '#FFD9A0'); g.addColorStop(1, CARD.orange);
+      x.fillStyle = g;
+      const n = String(now);
+      const sz = scFit(x, n, W - 200, 400, 180);
+      x.fillText(n, a.cx, a.cy + 96);
+      x.fillStyle = CARD.paper;
+      x.font = '800 40px "Outfit", sans-serif';
+      x.letterSpacing = '12px';
+      x.fillText(now === 1 ? 'DAY IN A ROW' : 'DAYS IN A ROW', a.cx + 6, a.cy + 168);
+      x.letterSpacing = '0px';
+      x.fillStyle = 'rgba(246,244,255,0.6)';
+      x.font = '600 28px "Outfit", sans-serif';
+      x.fillText(live().length + ' habits, logged every day.' + (best > now ? ' Best: ' + best + '.' : ' Not one missed.'), a.cx, a.cy + 224);
+      // A dot per day, wrapped.
+      const dots = Math.min(now, 40), per = 20, dot = 18, gap = 10;
+      const rows = Math.ceil(dots / per);
+      for (let i = 0; i < dots; i++) {
+        const rw = Math.min(per, dots - Math.floor(i / per) * per);
+        const col = i % per, row = Math.floor(i / per);
+        const startX = a.cx - (rw * (dot + gap) - gap) / 2;
+        scRR(x, startX + col * (dot + gap), a.cy + 280 + row * (dot + gap), dot, dot, 5);
+        x.fillStyle = CARD.orange; x.fill();
+      }
+    }
+  },
+  // THE UNLOCK — a single medal, big.
+  medal: {
+    ground: (x, W, H) => { scInk(x, W, H, 'rgba(242,178,60,0.34)'); return true; },
+    body: (x, W, H, a) => {
+      const m = latestMedal();
+      x.textAlign = 'center';
+      if (!m) {
+        x.fillStyle = CARD.paper; x.font = '800 56px "Outfit", sans-serif';
+        x.fillText('No medals yet.', a.cx, a.cy);
+        x.fillStyle = 'rgba(246,244,255,0.6)'; x.font = '600 30px "Outfit", sans-serif';
+        x.fillText('Log a day and the first one lands.', a.cx, a.cy + 52);
+        return;
+      }
+      scConfetti(x, W, H, a.top, [CARD.gold, CARD.grape, CARD.teal, CARD.orange, '#F27DA8']);
+      scEyebrow(x, a.cx, a.cy - 250, 'MEDAL UNLOCKED · ' + m.tierName, CARD.gold);
+      scMedal(x, a.cx, a.cy - 60, 150, m.metal, m.tint, m.emoji);
+      x.fillStyle = 'rgba(35,31,53,0.5)';
+      x.font = '30px "Outfit", sans-serif';
+      x.fillText('★'.repeat(m.stars), a.cx, a.cy + 22);
+      x.textAlign = 'center';
+      x.fillStyle = CARD.paper;
+      const sz = scFit(x, m.name.toUpperCase(), W - 200, 84, 46);
+      x.fillText(m.name.toUpperCase(), a.cx, a.cy + 190);
+      x.fillStyle = 'rgba(246,244,255,0.62)';
+      x.font = '600 30px "Outfit", sans-serif';
+      const words = m.note.split(' ');
+      let line = '', ly = a.cy + 246;
+      words.forEach(w => {
+        if (x.measureText(line + ' ' + w).width > W - 280 && line) { x.fillText(line, a.cx, ly); ly += 40; line = w; }
+        else line = line ? line + ' ' + w : w;
+      });
+      if (line) x.fillText(line, a.cx, ly);
+      if (m.xp) {
+        const cw = 220, cx0 = a.cx - cw / 2, cy0 = ly + 34;
+        scRR(x, cx0, cy0, cw, 62, 31);
+        x.fillStyle = 'rgba(246,244,255,0.1)'; x.fill();
+        x.fillStyle = '#B7F0E4';
+        x.font = '700 28px "Outfit", sans-serif';
+        x.fillText('+' + m.xp.toLocaleString() + ' XP', a.cx, cy0 + 41);
+      }
+    }
+  },
+  // THE WRAP — the month as a grid.
+  wrap: {
+    ground: (x, W, H) => {
+      const g = x.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#8F7BF0'); g.addColorStop(0.55, '#5A4BD4'); g.addColorStop(1, '#3B2F9E');
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      return true;
+    },
+    body: (x, W, H, a) => {
+      const PAD = 96;
+      const now = today(), month = now.getMonth(), year = now.getFullYear();
+      const first = new Date(year, month, 1), dim = new Date(year, month + 1, 0).getDate();
+      const lead = (first.getDay() + 6) % 7;                     // Monday-first
+      const keys = [];
+      for (let d = 1; d <= dim; d++) keys.push(fmtKey(new Date(year, month, d)));
+      const cols = 7, gap = 14;
+      const cell = (W - PAD * 2 - gap * (cols - 1)) / cols;
+      const rows = Math.ceil((lead + dim) / cols);
+      // Row height shrinks (cells go a little short of square) when a 5- or
+      // 6-row month would otherwise push the stat boxes and footer off the
+      // bottom in the shorter formats — a real overlap seen in "post" and
+      // "square" during any month whose grid needs a 5th row. Column width
+      // stays full-bleed; only the vertical rhythm gives.
+      let rowH = cell, gapV = gap;
+      const chromeH = 150 + 34 + 40 + 132 + 24 + 116;
+      const maxGridH = (a.bottom - a.top) - chromeH;
+      if (maxGridH > 0 && rows * (rowH + gapV) > maxGridH) {
+        const shrink = maxGridH / (rows * (rowH + gapV));
+        rowH = Math.max(16, rowH * shrink);
+        gapV = Math.max(6, gapV * shrink);
+      }
+      // The whole block is centred in the format's body area, so a story does
+      // not leave 600px of empty purple under the month.
+      const blockH = 150 + rows * (rowH + gapV) + 34 + 40 + 132 + 156 + 116;
+      const base = a.top + Math.max(0, (a.bottom - a.top - blockH) / 2);
+      x.textAlign = 'left';
+      x.fillStyle = 'rgba(255,255,255,0.7)';
+      x.font = '700 22px "Outfit", sans-serif';
+      x.letterSpacing = '7px';
+      x.fillText(now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }).toUpperCase() + ' · ' + dim + ' DAYS', PAD, base + 10);
+      x.letterSpacing = '0px';
+      x.fillStyle = '#fff';
+      x.font = '800 66px "Outfit", sans-serif';
+      x.fillText('My month, logged.', PAD, base + 92);
+      const gy = base + 150;
+      for (let i = 0; i < lead + dim; i++) {
+        const col = i % cols, row = Math.floor(i / cols);
+        const px = PAD + col * (cell + gap), py = gy + row * (rowH + gapV);
+        scRR(x, px, py, cell, rowH, 12);
+        if (i < lead) { x.fillStyle = 'rgba(255,255,255,0.10)'; x.fill(); continue; }
+        const key = keys[i - lead], p = dayPct(key);
+        const future = key > TKEY();
+        x.fillStyle = future ? 'rgba(255,255,255,0.10)'
+                    : isPerfect(key) ? CARD.teal
+                    : p >= XP_RULES.streakQualifyPct ? '#fff'
+                    : p > 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)';
+        x.fill();
+      }
+      const legendY = gy + rows * (rowH + gapV) + 34;
+      const leg = [[CARD.teal, 'PERFECT'], ['#fff', 'ON TARGET'], ['rgba(255,255,255,0.2)', 'MISSED']];
+      let lx = PAD;
+      x.font = '700 20px "Outfit", sans-serif';
+      leg.forEach(l => {
+        scRR(x, lx, legendY - 14, 18, 18, 5); x.fillStyle = l[0]; x.fill();
+        x.fillStyle = 'rgba(255,255,255,0.72)';
+        x.letterSpacing = '3px';
+        x.fillText(l[1], lx + 28, legendY);
+        lx += 28 + x.measureText(l[1]).width + 46;
+        x.letterSpacing = '0px';
+      });
+      // Two stat blocks and the most consistent habit.
+      const onTarget = keys.filter(kk => kk <= TKEY() && dayPct(kk) >= XP_RULES.streakQualifyPct).length;
+      const xpMonth = keys.reduce((s, kk) => s + dayXp(kk), 0);
+      const bw = (W - PAD * 2 - 24) / 2, by = legendY + 40;
+      [[String(onTarget) + '/' + dim, 'DAYS ON TARGET', '#fff'],
+       [xpMonth.toLocaleString(), 'XP EARNED', '#B7F0E4']].forEach((s, i) => {
+        const px = PAD + i * (bw + 24);
+        scRR(x, px, by, bw, 132, 26);
+        x.fillStyle = 'rgba(255,255,255,0.14)'; x.fill();
+        x.fillStyle = s[2];
+        x.font = '800 62px "Outfit", sans-serif';
+        x.fillText(s[0], px + 28, by + 74);
+        x.fillStyle = 'rgba(255,255,255,0.75)';
+        x.font = '700 20px "Outfit", sans-serif';
+        x.letterSpacing = '3px';
+        x.fillText(s[1], px + 28, by + 108);
+        x.letterSpacing = '0px';
+      });
+      const top = live().slice().sort((p, q) => habitStreak(q) - habitStreak(p))[0];
+      if (top) {
+        const sy = by + 156, ep = splitEmoji(top.name);
+        scRR(x, PAD, sy, W - PAD * 2, 116, 26);
+        x.fillStyle = 'rgba(23,20,43,0.35)'; x.fill();
+        x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.font = '46px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+        x.fillText(ep[0] || '•', PAD + 58, sy + 58);
+        x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+        x.fillStyle = 'rgba(255,255,255,0.6)';
+        x.font = '700 19px "Outfit", sans-serif';
+        x.letterSpacing = '4px';
+        x.fillText('MOST CONSISTENT', PAD + 104, sy + 48);
+        x.letterSpacing = '0px';
+        x.fillStyle = '#fff';
+        x.font = '700 32px "Outfit", sans-serif';
+        x.fillText(ep[1], PAD + 104, sy + 88);
+        x.textAlign = 'right';
+        x.fillStyle = '#FFD9A0';
+        x.font = '800 30px "Outfit", sans-serif';
+        x.fillText('🔥' + habitStreak(top), W - PAD - 30, sy + 72);
+        x.textAlign = 'left';
+      }
+    }
+  }
+};
+const SHARE_SIZES = { post: [1080, 1350], story: [1080, 1920], square: [1080, 1080] };
+const SHARE_CARDS = [
+  { id:'rank',    name:'Rank',    emoji:'🏵️', note:'Your crest, level, title and season stats.',
+    caption: LI => LI.rank.label + ' · level ' + LI.lv },
+  { id:'receipt', name:'The day', emoji:'✅', note:"Today's habits, ticked — the one that explains itself.",
+    caption: () => dayPct(TKEY()) + '% of my day, done' },
+  { id:'streak',  name:'Streak',  emoji:'🔥', note:'One number, as loud as it goes.',
+    caption: () => currentDayStreak() + ' days in a row' },
+  { id:'medal',   name:'Medal',   emoji:'🏅', note:'Your newest medal and what it cost.',
+    caption: () => { const m = latestMedal(); return m ? m.name : 'A new medal'; } },
+  { id:'wrap',    name:'Month',   emoji:'🗓️', note:'The whole month as a grid. Wrapped-style.',
+    caption: () => 'My month, logged' }
+];
 
 // A perfect day at the current weights — used to translate XP into days.
 function perfectDayXp() {
