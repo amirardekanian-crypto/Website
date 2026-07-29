@@ -26,6 +26,9 @@ Durable context for working in this repo. Read the linked docs before diving in.
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
+- `.claude/COACHING-HOWTO.md` — **for you, not Amir** (he never opens it): the pipeline's
+  end-to-end sequencing across skills, since no single `SKILL.md` documents the whole
+  chain. Read it when running a multi-step coaching job end to end.
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). `.claude/coaching-log/` is the coach-only per-athlete rationale log.
 
 ## Working on the habit app (`habits.html`) — keep four things in sync
@@ -275,6 +278,12 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - **Names should be cool, not literal.** Workout titles, article headlines, post hooks — Amir wants
   evocative, punchy names (e.g. "Banded Lower Burner"), not flat descriptions ("Bodyweight & Band
   Strength"). Put the literal description in a tag/subtitle. When unsure, offer 3–4 options and let him pick.
+- **The `.claude/` coaching docs are Claude-only — Amir never opens them.** `COACHING-PRINCIPLES.md`,
+  `COACHING-HOWTO.md`, `.claude/skills/*`, `.claude/coaching-log/`: optimize their structure for how
+  *you* actually read and act on them (scannable, unambiguous, single-sourced, no restating a rule
+  that already lives elsewhere), not for human-manual convention. *(Amir, 2026-07-28, verbatim: "these
+  are only for claude's use, you can update all of these based on how claude can read them and act
+  based on them.")*
 
 ## Design work (Claude is Amir's visual designer)
 Standing role: Amir asks for carousels, reels, posts, result cards, web/app redesigns,
