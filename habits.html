@@ -990,6 +990,8 @@
      — an event is not a list item, it is a thing that is ON, and it has to read
      as an object you could walk up to. */
   .evcard { margin: 14px 20px; border: 2px solid var(--divider); }
+  /* `live` is the quest card only — it is the one thing here with a clock.
+     An unfinished event card is neutral, because nothing is running out. */
   .evcard.live { border-color: var(--clay); }
   .evcard.done { border-color: var(--accent); background: var(--accent-100); }
   .evhd { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 12px; }
@@ -1659,45 +1661,35 @@ const ACH_TIERS = [
 // Goals reuse the quest `kind` grammar exactly, so they measure from the log
 // alone. Deliberately NOT season-bounded the way quests are: a scoring season
 // resetting mid-event must not wipe half of it.
-const EVENT_ANCHOR = '2026-07-06';    // the Monday the first event opened
-const EVENT_DAYS = 28;
 const EVENTS = [
-  { id:'ev_foundry', name:'THE FOUNDRY', tag:'Four weeks',
+  { id:'ev_foundry', name:'THE FOUNDRY', tag:'About four weeks of work',
     blurb:'Four weeks of putting the work in. No tricks in it — just more of it than you would do on your own.',
     title:{ id:'t_sunforged', name:'SUN-FORGED', note:'Four weeks in the fire.' },
     goals:[ { kind:'daysHit:strength', need:16,     label:'16 sessions' },
             { kind:'total:steps',      need:200000, label:'200,000 steps' },
             { kind:'daysHit:fuel',     need:20,     label:'Protein on 20 days' } ] },
 
-  { id:'ev_bedrock', name:'BEDROCK', tag:'Four weeks',
+  { id:'ev_bedrock', name:'BEDROCK', tag:'About four weeks of work',
     blurb:'Nothing flashy. Four weeks of the boring half — the one that decides whether the loud half works.',
     title:{ id:'t_bedrock', name:'BEDROCK', note:'Built the base nobody claps for.' },
     goals:[ { kind:'daysHit:sleep',    need:20,     label:'20 nights on target' },
             { kind:'daysHit:mobility', need:16,     label:'16 mobility sessions' },
             { kind:'qualify',          need:20,     label:'20 days on target' } ] },
 
-  { id:'ev_coldblood', name:'COLD BLOOD', tag:'Four weeks',
+  { id:'ev_coldblood', name:'COLD BLOOD', tag:'About four weeks of work',
     blurb:'The block where it stops being interesting. Everyone is good for two weeks. This is the other two.',
     title:{ id:'t_coldforged', name:'COLD-FORGED', note:'Kept going after it stopped being fun.' },
     goals:[ { kind:'daysHit:strength', need:18,     label:'18 sessions' },
             { kind:'daysHit:water',    need:22,     label:'Full water on 22 days' },
             { kind:'perfect',          need:6,      label:'6 perfect days' } ] },
 
-  { id:'ev_standing', name:'STILL STANDING', tag:'Four weeks',
+  { id:'ev_standing', name:'STILL STANDING', tag:'About four weeks of work',
     blurb:'Anyone can start. Four weeks later, still on the board, still logging — that is the whole test.',
     title:{ id:'t_stillhere', name:'STILL HERE', note:'Starting is easy. This was not.' },
     goals:[ { kind:'qualify',          need:24,     label:'24 days on target' },
             { kind:'total:steps',      need:250000, label:'250,000 steps' },
             { kind:'daysHit:fuel',     need:24,     label:'Protein on 24 days' } ] }
 ];
-// Windows are COMPUTED, not typed: event i runs for EVENT_DAYS from the anchor,
-// straight after event i-1. One live at a time, for ever, with no dates to keep
-// in step by hand.
-function eventWindow(i) {
-  const from = addDays(parseKey(EVENT_ANCHOR), i * EVENT_DAYS);
-  return { from: fmtKey(from), to: fmtKey(addDays(from, EVENT_DAYS - 1)) };
-}
-function datedEvents() { return EVENTS.map((e, i) => Object.assign({}, e, eventWindow(i))); }
 
 // ── THE LONG GAME — a reward track, and the one thing here that is kept ───
 // Every other number in this app is derived: change a rule and the whole
@@ -1751,43 +1743,49 @@ function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p =
 // page can be older than the track on the server.
 function titleName(id) { const p = id && passItem(id); return (p && p.kind === 'title') ? p.name : ''; }
 // ── Events: measured, then claimed ────────────────────────────────────────
-// One goal, over the event's CALENDAR window. Same `kind` grammar as quests,
-// measured from the log alone, so nothing new is stored and there is nothing
-// for a second scorer to disagree with. Deliberately NOT season-bounded the way
-// quests are: an event is a block of the calendar, and a season reset in the
-// middle of August must not wipe half of SUMMER SHRED.
-function eventGoalProgress(g, ev) {
+// A goal is measured over the athlete's WHOLE history. There is no window —
+// Amir, 2026-07-30: "the seasons should be other kinds of milestones, they just
+// take few weeks to complete but are not long term." So the "few weeks" is how
+// long the WORK takes, not a calendar slot you can miss. Nothing expires,
+// everything is workable from any day, and an athlete who arrives with history
+// already behind them simply has some of it done — which is exactly how every
+// other badge on this screen behaves.
+//
+// Same `kind` grammar as quests, so it is all measured from the log and nothing
+// new is stored.
+let _evCache = null;
+function eventGoalProgress(g) {
   const parts = String(g.kind || '').split(':');
   const kind = parts[0], hid = parts[1];
   const h = hid ? habitById(hid) : null;
-  const last = ev.to < TKEY() ? ev.to : TKEY();      // the future has not happened
   let have = 0;
-  for (let d = parseKey(ev.from); fmtKey(d) <= last; d = addDays(d, 1)) {
-    const k = fmtKey(d);
+  loggedDays().forEach(k => {
     if (kind === 'daysHit') { if (h && isDone(h, k)) have++; }
     else if (kind === 'total') { have += valOf(k, hid); }
     else if (kind === 'qualify') { if (dayQualifies(k)) have++; }
     else if (kind === 'perfect') { if (isPerfect(k)) have++; }
-  }
+  });
   return { have, done: have >= g.need, pct: Math.max(0, Math.min(100, Math.round(have / g.need * 100))) };
 }
+// Cached: four events x three goals over a long log is thousands of isDone and
+// dayQualifies calls, and this renders on every Progress draw. Dropped by
+// invalidateBonus(), which every mutation path already calls.
 function eventProgress(ev) {
-  const goals = ev.goals.map(g => Object.assign({}, g, eventGoalProgress(g, ev)));
-  return { goals, done: goals.every(g => g.done),
-           pct: Math.round(goals.reduce((s, g) => s + g.pct, 0) / goals.length) };
+  if (!_evCache) _evCache = {};
+  if (_evCache[ev.id]) return _evCache[ev.id];
+  const goals = ev.goals.map(g => Object.assign({}, g, eventGoalProgress(g)));
+  return (_evCache[ev.id] = { goals, done: goals.every(g => g.done),
+           pct: Math.round(goals.reduce((s, g) => s + g.pct, 0) / goals.length) });
 }
-function eventState(ev) { const t = TKEY(); return t < ev.from ? 'soon' : (t > ev.to ? 'over' : 'live'); }
 function eventTitles() { return EVENTS.map(e => Object.assign({ kind:'title', event:e.id }, e.title)); }
 // Append-only, exactly like claimRewards(). An event title is never taken back —
-// not when the window closes, not by a season reset, not by a retune. Claimed
-// even after the window has shut, so someone who finishes on the last day and
-// does not open the app until September still gets it.
+// not by a season reset, not by a retune, not by switching a habit off.
 function claimEventTitles(silent) {
   if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
   const owned = CFG.pass.owned || (CFG.pass.owned = []);
   const fresh = [];
-  datedEvents().forEach(ev => {
-    if (owned.indexOf(ev.title.id) >= 0 || eventState(ev) === 'soon') return;
+  EVENTS.forEach(ev => {
+    if (owned.indexOf(ev.title.id) >= 0) return;
     if (!eventProgress(ev).done) return;
     owned.push(ev.title.id);
     fresh.push(Object.assign({ kind:'title', event:ev.id, evName:ev.name }, ev.title));
@@ -2410,7 +2408,7 @@ function tierXp(h, i) {
 // Recomputing this on every level read would be thousands of operations per
 // render, so it is cached and dropped whenever the log or the tracked set moves.
 let _bonusCache = null;
-function invalidateBonus() { _bonusCache = null; _rosterCache = null; }
+function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; }
 // Runs and counts are measured FROM THE SEASON START, not from all of history.
 // That is a fairness rule, not an implementation detail: a tier crosses once, so
 // scoring it against all-time runs would mean an athlete whose streak began
@@ -5014,51 +5012,10 @@ function renderProgress(LI, earned, totalAch) {
            is "how close am I" and the old row answered it in 8px mono at the
            far right. The section also states the collection count, and names
            the one nearest to falling. -->
-      <!-- QUESTS, then EVENTS: seven days above twenty-eight, because the one
-           with less time left is the one to act on. Both wear the same card —
-           they are the same object at two lengths. -->
+      <!-- Quests keep their own section: they are the only thing here with a
+           clock on it, and the one with least time left is the one to act on. -->
       ${sectionLabel('Quests', 'Seven days')}
       ${renderQuestBlock()}
-
-      <!-- Everything below this is permanent and will still be
-           there next year; an event is the only thing on the screen with a
-           clock on it, so it goes where the eye lands. Events that have not
-           opened yet are not drawn at all — an athlete cannot act on November
-           in July, and four locked cards would bury the one that is live. -->
-      ${(() => {
-        const shown = datedEvents().filter(e => eventState(e) !== 'soon');
-        if (!shown.length) return '';
-        const doneN = shown.filter(e => eventProgress(e).done).length;
-        return sectionLabel('Events', doneN + ' of ' + shown.length + ' completed')
-          + shown.map(ev => {
-            const st = eventState(ev), p = eventProgress(ev), got = p.done;
-            const owned = passHas(ev.title.id);
-            const left = Math.max(0, Math.round((parseKey(ev.to) - today()) / 86400000) + 1);
-            const stateLbl = got ? 'Complete' : (st === 'live' ? (left === 1 ? 'Last day' : left + ' days left') : 'Closed');
-            return `<div class="evcard ${got ? 'done' : st}" data-k="ev:${ev.id}">
-              <div class="evhd">
-                <span style="flex:1;min-width:0">
-                  <span class="evnm">${esc(ev.name)}</span>
-                  <span class="evtag">${esc(ev.tag)}</span>
-                </span>
-                <span class="evstate">${esc(stateLbl)}</span>
-              </div>
-              <div class="evblurb">${esc(ev.blurb)}</div>
-              ${p.goals.map(g => `<div class="evgoal ${g.done ? 'got' : ''}">
-                <span class="g-tick">${g.done ? TICK : ''}</span>
-                <span class="g-mid">
-                  <span class="g-lbl">${esc(g.label)}</span>
-                  <span class="g-bar"><span data-fill style="width:${g.pct}%"></span></span>
-                </span>
-                <span class="g-cnt">${g.done ? 'DONE' : Math.round(g.have).toLocaleString() + ' / ' + g.need.toLocaleString()}</span>
-              </div>`).join('')}
-              <div class="evfoot">
-                <span>${got && owned ? 'Title earned' : 'Finish all three'}</span>
-                <strong>${esc(ev.title.name)}</strong>
-              </div>
-            </div>`;
-          }).join('');
-      })()}
 
       <!-- Milestones, in three tiers. One flat list gave a new athlete a single
            reachable row above nine walls, and gave a two-year athlete nothing
@@ -5087,16 +5044,50 @@ function renderProgress(LI, earned, totalAch) {
               <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
             </span>
           </div>`;
-        return sectionLabel('Milestones', rows.filter(r => r.got).length + ' of ' + ACHIEVEMENTS.length)
+        // A FEW WEEKS sits between the week badges and the long ones, in card
+        // form rather than row form, because each is three goals rather than
+        // one. Same section, same list — a different KIND of milestone, which
+        // is exactly how Amir described them. No dates on any of it: the few
+        // weeks is how long the work takes, not a slot you can miss.
+        const evDone = EVENTS.filter(e => eventProgress(e).done).length;
+        const evCards = sectionLabel('A few weeks', evDone + '/' + EVENTS.length)
+          + EVENTS.map(ev => {
+            const p = eventProgress(ev), got = p.done;
+            return `<div class="evcard ${got ? 'done' : ''}" data-k="ev:${ev.id}">
+              <div class="evhd">
+                <span style="flex:1;min-width:0">
+                  <span class="evnm">${esc(ev.name)}</span>
+                  <span class="evtag">${esc(ev.tag)}</span>
+                </span>
+                <span class="evstate">${got ? 'Complete' : p.pct + '%'}</span>
+              </div>
+              <div class="evblurb">${esc(ev.blurb)}</div>
+              ${p.goals.map(g => `<div class="evgoal ${g.done ? 'got' : ''}">
+                <span class="g-tick">${g.done ? TICK : ''}</span>
+                <span class="g-mid">
+                  <span class="g-lbl">${esc(g.label)}</span>
+                  <span class="g-bar"><span data-fill style="width:${g.pct}%"></span></span>
+                </span>
+                <span class="g-cnt">${g.done ? 'DONE' : Math.round(g.have).toLocaleString() + ' / ' + g.need.toLocaleString()}</span>
+              </div>`).join('')}
+              <div class="evfoot">
+                <span>${got ? 'Title earned' : 'Finish all three'}</span>
+                <strong>${esc(ev.title.name)}</strong>
+              </div>
+            </div>`;
+          }).join('');
+        const tierBlock = key => {
+          const inTier = rows.filter(r => (r.a.tier || 'long') === key);
+          if (!inTier.length) return '';
+          const t = ACH_TIERS.find(x => x.key === key);
+          return sectionLabel(t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
+               + inTier.map(row).join('');
+        };
+        return sectionLabel('Milestones', (rows.filter(r => r.got).length + evDone) + ' of ' + (ACHIEVEMENTS.length + EVENTS.length))
           + (near ? `<div class="msnext" data-k="msnext">
               <strong>${esc(near.a.name)}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
             </div>` : '')
-          + ACH_TIERS.map(t => {
-              const inTier = rows.filter(r => (r.a.tier || 'long') === t.key);
-              if (!inTier.length) return '';
-              return sectionLabel(t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
-                   + inTier.map(row).join('');
-            }).join('');
+          + tierBlock('week') + evCards + tierBlock('long') + tierBlock('rare');
       })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
