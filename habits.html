@@ -1083,7 +1083,7 @@
   }
 
   /* ── Rank insignia ── */
-  .rankart { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: square; stroke-linejoin: miter; }
+  .rankart { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   /* The rank label on a level hero is a door to the ladder, so it looks like one. */
   .ranklink { display: flex; align-items: center; gap: 8px; text-align: left; color: inherit; }
   .ranklink .go { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px; color: var(--clay-deep); }
@@ -1405,6 +1405,13 @@
   #app .ttl { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
   #app .passline { border-radius: 16px; margin: 0 16px 10px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13.5px; text-transform: none; letter-spacing: 0; color: #fff; }
   #app .delta.up { color: var(--teal-deep); }
+  #app .medal { flex: none; width: 42px; height: 42px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+  #app .medal-in { width: 33px; height: 33px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; }
+  #app .rankrow .subs i { transform: rotate(45deg); border-radius: 3px; }
+  #app .plate { flex: none; border: 0; padding: 2.5px; border-radius: 999px; background: #E3DFF3; cursor: pointer; font-family: 'Outfit', sans-serif; }
+  #app .plate-in { display: block; border-radius: 999px; background: #231F35; font-weight: 800; font-size: 11px; letter-spacing: .12em; padding: 8px 13px; white-space: nowrap; color: #CBC6E4; text-transform: uppercase; }
+  #app .plate.locked { opacity: .7; }
+  #app .plate.locked .plate-in { background: var(--card); color: var(--muted-soft); }
 
   /* Roll call */
   #app .rcprompt .rcq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.25; }
@@ -1916,16 +1923,16 @@ const RANKS = ['ROOKIE','CONTENDER','GRINDER','OPERATOR','ENFORCER','PREDATOR','
 // reads at a glance — blocks being laid, then force, then machinery, then a
 // burst. Anything with a curve or a rounded cap belongs to a different app.
 const RANK_ART = {
-  ROOKIE:      'M9 9h6v6H9z',
-  CONTENDER:   'M3 14h6v6H3zM15 8h6v6h-6z',
-  GRINDER:     'M4 20V15M12 20V10M20 20V5',
-  OPERATOR:    'M12 2v6M12 16v6M2 12h6M16 12h6M8 8h8v8H8z',
-  ENFORCER:    'M12 2 21 6v7l-9 9-9-9V6z',
-  PREDATOR:    'M4 3 8 21M11 2 15 20M18 4 22 20',
-  MACHINE:     'M7 7h10v10H7zM12 2v5M12 17v5M2 12h5M17 12h5',
-  RELENTLESS:  'M3 13 12 4l9 9M3 21l9-9 9 9',
-  UNTOUCHABLE: 'M12 2 22 12 12 22 2 12zM12 8l4 4-4 4-4-4z',
-  IMMORTAL:    'M12 1v6M12 17v6M1 12h6M17 12h6M4 4l4.5 4.5M15.5 15.5 20 20M20 4l-4.5 4.5M8.5 15.5 4 20M10 10h4v4h-4z'
+  ROOKIE:      'M4 16l8-7 8 7',
+  CONTENDER:   'M6 3v18M6 4h12l-3.5 4 3.5 4H6',
+  GRINDER:     'M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2 19 19M19 5l-2.8 2.8M7.8 16.2 5 19M12 8l4 4-4 4-4-4z',
+  OPERATOR:    'M12 2v4M12 18v4M2 12h4M18 12h4M12 7a5 5 0 0 1 0 10 5 5 0 0 1 0-10z',
+  ENFORCER:    'M12 2l8 3v7c0 5-3.5 8.2-8 10-4.5-1.8-8-5-8-10V5zM12 6v9',
+  PREDATOR:    'M6 3c2.5 5.5 2.5 12-1 18M13 2c2.5 6 2.5 13-1 19M20 4c1.5 5 .5 11-2 15',
+  MACHINE:     'M12 3l7.5 4.3v9.4L12 21l-7.5-4.3V7.7zM12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z',
+  RELENTLESS:  'M4 13l8-8 8 8M4 21l8-8 8 8M12 5v3',
+  UNTOUCHABLE: 'M7 3h10l5 6-10 12L2 9zM2 9h20M12 9l-4-6M12 9l4-6',
+  IMMORTAL:    'M3 19h18M3 19V7l5.5 4.5L12 3l3.5 8.5L21 7v12'
 };
 // `rank` is a rankFor() result, or a bare rank name.
 function rankIcon(rank, size, extra) {
@@ -1935,6 +1942,90 @@ function rankIcon(rank, size, extra) {
   return '<svg class="rankart" viewBox="0 0 24 24" aria-hidden="true" '
        + 'style="width:' + px + 'px;height:' + px + 'px' + (extra ? ';' + extra : '') + '">'
        + '<path d="' + d + '"/></svg>';
+}
+// ── Tier metals ── two ranks per metal, CoD/League-style, shared by the DOM
+// crests, the title plates, the medals and the canvas share card.
+const METALS = {
+  bronze:   { label:'Bronze',    rim:'linear-gradient(145deg,#E2A377,#B06A3B 55%,#8A4E28)',  ink:'#E2A377', flat:['#E2A377','#8A4E28'] },
+  silver:   { label:'Silver',    rim:'linear-gradient(145deg,#E8ECF5,#AEB6C9 55%,#7C8499)',  ink:'#C9CEDC', flat:['#E8ECF5','#7C8499'] },
+  gold:     { label:'Gold',      rim:'linear-gradient(145deg,#FFE29A,#F2B23C 50%,#B87A14)',  ink:'#F2B23C', flat:['#FFE29A','#B87A14'] },
+  amethyst: { label:'Amethyst',  rim:'linear-gradient(145deg,#C9B8FF,#8F7BF0 50%,#5A48C9)',  ink:'#C9B8FF', flat:['#C9B8FF','#5A48C9'] },
+  prisma:   { label:'Prismatic', rim:'conic-gradient(from 210deg,#6C5CE7,#3EC6E0,#35D0BA,#F2B23C,#F27DA8,#6C5CE7)', ink:'#F6F4FF', flat:['#8F7BF0','#3EC6E0'] }
+};
+const TIER_KEYS = ['bronze','bronze','silver','silver','gold','gold','amethyst','amethyst','prisma','prisma'];
+const CREST_CLIPS = {
+  bronze:   'polygon(50% 0,100% 12%,100% 62%,50% 100%,0 62%,0 12%)',
+  silver:   'polygon(50% 0,93% 14%,100% 55%,50% 100%,0 55%,7% 14%)',
+  gold:     'polygon(50% 0,93% 14%,100% 55%,50% 100%,0 55%,7% 14%)',
+  amethyst: 'polygon(50% 0,100% 18%,88% 68%,50% 100%,12% 68%,0 18%)',
+  prisma:   'polygon(50% 0,100% 18%,88% 68%,50% 100%,12% 68%,0 18%)'
+};
+function rankMetalKey(name) {
+  const n = (name && name.name) || name || RANKS[0];
+  return TIER_KEYS[Math.max(0, RANKS.indexOf(n))] || 'bronze';
+}
+// The crest: tier shape + metal rim around the rank glyph. Pure inline markup
+// so it works at any size the app needs (ladder 36px, hero 62px).
+function rankCrest(rank, w) {
+  const name = (rank && rank.name) || rank || RANKS[0];
+  const key = rankMetalKey(name), m = METALS[key], clip = CREST_CLIPS[key];
+  const h = Math.round(w * 1.12), bw = Math.max(3, Math.round(w * 0.09));
+  const glow = key === 'gold' ? 'box-shadow:inset 0 0 0 1.5px rgba(242,178,60,.4);'
+             : key === 'amethyst' ? 'box-shadow:inset 0 0 ' + Math.round(w * 0.24) + 'px rgba(143,123,240,.5);' : '';
+  return '<span style="flex:none;width:' + w + 'px;height:' + h + 'px;clip-path:' + clip + ';background:' + m.rim + ';display:flex;align-items:center;justify-content:center">'
+       + '<span style="width:' + (w - bw * 2) + 'px;height:' + (h - bw * 2) + 'px;clip-path:' + clip + ';background:radial-gradient(90% 70% at 50% 22%,#3A2F6B,#231F35);' + glow + 'display:flex;align-items:center;justify-content:center">'
+       + rankIcon(name, Math.round(w * 0.46), 'color:' + (key === 'prisma' ? '#F6F4FF' : m.ink))
+       + '</span></span>';
+}
+// Canvas twins of the same crest, for the share card.
+function crestPath(x, cx, cy, w, h, key) {
+  const pts = key === 'bronze' ? [[.5,0],[1,.12],[1,.62],[.5,1],[0,.62],[0,.12]]
+            : (key === 'amethyst' || key === 'prisma') ? [[.5,0],[1,.18],[.88,.68],[.5,1],[.12,.68],[0,.18]]
+            : [[.5,0],[.93,.14],[1,.55],[.5,1],[0,.55],[.07,.14]];
+  x.beginPath();
+  pts.forEach((p, i) => { const px = cx - w / 2 + p[0] * w, py = cy - h / 2 + p[1] * h; i ? x.lineTo(px, py) : x.moveTo(px, py); });
+  x.closePath();
+}
+function metalFill(x, px, py, w, h, key) {
+  const g = x.createLinearGradient(px, py, px + w, py + h);
+  if (key === 'prisma') {
+    ['#6C5CE7', '#3EC6E0', '#35D0BA', '#F2B23C', '#F27DA8'].forEach((c, i) => g.addColorStop(i / 4, c));
+  } else {
+    const m = METALS[key] || METALS.bronze;
+    g.addColorStop(0, m.flat[0]); g.addColorStop(1, m.flat[1]);
+  }
+  return g;
+}
+// ── Title plates ── a nameplate you wear. Rarity: bronze → silver (lv 13+) →
+// gold (lv 21+); event titles and PROOF ITSELF are prismatic.
+function titleMetalKey(p) {
+  if (!p) return 'bronze';
+  if (p.event || p.id === 't_proof') return 'prisma';
+  const lv = p.lv || 0;
+  return lv >= 21 ? 'gold' : lv >= 13 ? 'silver' : 'bronze';
+}
+function titlePlate(p, small) {
+  const m = METALS[titleMetalKey(p)];
+  return '<span style="display:inline-flex;vertical-align:middle;padding:' + (small ? 1.5 : 2.5) + 'px;border-radius:999px;background:' + m.rim + '">'
+       + '<span style="border-radius:999px;background:#231F35;color:' + (titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink) + ';font-weight:800;font-size:' + (small ? 8 : 11) + 'px;letter-spacing:.13em;padding:' + (small ? '3px 8px' : '8px 13px') + ';white-space:nowrap;text-transform:uppercase">' + esc(p.name) + '</span></span>';
+}
+// ── Medals ── milestones as emblems: metal rim by tier, habit-tint disc, the
+// habit's own emoji in the middle. Events wear the prismatic rim.
+const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅' };
+const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁' };
+function achMedal(a, got) {
+  const key = a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze';
+  const part = String(a.measure || '').split(':');
+  const h = part[1] ? habitById(part[1]) : null;
+  const emo = h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨');
+  const tint = h ? habitHue(h)[1] : '#EFECFB';
+  if (!got) return '<span class="medal" style="border:2.5px dashed var(--box);background:var(--surface)"><span class="medal-in" style="filter:grayscale(1);opacity:.5">' + emo + '</span></span>';
+  return '<span class="medal" style="background:' + METALS[key].rim + '"><span class="medal-in" style="background:' + tint + '">' + emo + '</span></span>';
+}
+function evMedal(ev, got) {
+  const emo = EV_EMOJI[ev.id] || '🏆';
+  if (!got) return '<span class="medal" style="border:2.5px dashed var(--box);background:var(--surface)"><span class="medal-in" style="filter:grayscale(1);opacity:.5">' + emo + '</span></span>';
+  return '<span class="medal" style="background:' + METALS.prisma.rim + '"><span class="medal-in" style="background:#231F35">' + emo + '</span></span>';
 }
 // The leaderboard hands back a rendered label ("GRINDER 2", "★1 ROOKIE 1"), so
 // pull the rank name back out of it to pick the insignia.
@@ -4670,7 +4761,7 @@ function renderApp() {
     // at "How this works" made two screens feel like four.
     manual:   ['Everything, explained', 'The manual'],
     ranks:    ['Ten ranks, fifty levels', 'The ladder'],
-    pass:     ['Rewards a season cannot take', 'The long game'],
+    pass:     ['Rewards a season cannot take back', 'Locker'],
     settings: ['Profile & tracking', 'Settings']
   };
   const rights = {
@@ -4704,12 +4795,13 @@ function renderApp() {
   // achievements are one "Progress" tab — they were two views of one question —
   // and CREW holds the whole social layer, which was previously a chip inside
   // a tab named after only half of what it contained.
-  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['CREW','crew','03']];
+  const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['CREW','crew','03'],['LOCKER','pass','04']];
   // Settings, the manual and the ladder are not tabs. They sit "above" the tab
   // bar, so no tab lights up while you are in them and the initials button
-  // becomes the way out.
+  // becomes the way out. The Locker IS a tab now — it is the battle pass, and
+  // battle passes live on the main bar.
   const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' ||
-                   UI.screen === 'ranks'    || UI.screen === 'pass');
+                   UI.screen === 'ranks');
   const activeTab = UI.screen === 'detail' ? 'progress' : (OVERLAY ? '' : UI.screen);
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
@@ -4836,7 +4928,7 @@ function renderBadgeCelebration(ev) {
     title = ev.reward.name;
     sub = ev.reward.note + ' ' + (ev.reward.kind === 'title'
       ? 'It sits under your name, and it is yours for good — a new season cannot take it back.'
-      : 'Pick it for your rank card in The long game. Yours for good.');
+      : 'Pick it for your rank card in your Locker. Yours for good.');
   } else {
     const n = live().length;
     badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
@@ -5297,11 +5389,11 @@ function renderProgress(LI, earned, totalAch) {
         <span class="lvstrip-num hd">LV ${LI.lv}</span>
         <span class="lvstrip-mid">
           <span class="lvstrip-top">
-            ${rankIcon(LI.rank, 14)}
+            ${rankCrest(LI.rank, 22)}
             <span class="hd" style="font-size:14px;line-height:1">${esc(LI.label)}</span>
             <span class="go">→</span>
           </span>
-          ${passTitle() ? `<span class="ttl" data-k="ttl">${esc(passTitle().name)}</span>` : ''}
+          ${passTitle() ? `<span data-k="ttl" style="align-self:flex-start;display:inline-flex">${titlePlate(passTitle(), true)}</span>` : ''}
           <span class="bar thin"><span data-fill style="width:${LI.pct}%"></span></span>
         </span>
         <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
@@ -5341,23 +5433,6 @@ function renderProgress(LI, earned, totalAch) {
         A <strong>perfect day</strong> is all of it. All four start at zero and the first one moves today.
       </div>` : ''}
 
-      <!-- The reward track sits high, and it is the only thing on this screen
-           that points FORWARD. Everything else here reports what has already
-           happened; this says what is coming, which is what carries someone
-           through a week where the numbers are not moving much. -->
-      ${(() => {
-        const nx = nextReward(), eqT = passTitle(), got = passOwned().length;
-        const toNx = nx ? Math.max(0, cumXpTo(nx.lv) - LI.xp) : 0;
-        return `<button class="selrow" data-k="passrow" ${on(() => (UI.backTo = 'progress', go('pass')))}>
-          <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-            <span class="lbl" style="font-size:15px">The long game</span>
-            <span style="font-size:11px;line-height:1.35;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">${nx
-              ? `<strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv} — ${toNx.toLocaleString()} XP away`
-              : `Every reward unlocked · ${got}/${PASS_TRACK.length}`}${eqT ? ` · showing ${esc(eqT.name)}` : ''}</span>
-          </span>
-          <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
-        </button>`;
-      })()}
 
       ${sectionLabel('Your habits', 'Tap for history')}
       <div class="pipkey">
@@ -5423,7 +5498,7 @@ function renderProgress(LI, earned, totalAch) {
         // picking a favourite out of nothing.
         const near = rows.filter(r => !r.got && r.have > 0).sort((x, y) => y.pct - x.pct)[0];
         const row = r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
-            <span class="code">${esc(r.a.code)}</span>
+            ${achMedal(r.a, r.got)}
             <span class="ms-mid">
               <span class="ms-name">${esc(r.a.name)}</span>
               <span class="ms-note">${esc(r.a.note)}</span>
@@ -5448,7 +5523,7 @@ function renderProgress(LI, earned, totalAch) {
             const w = ev.name.split(/\s+/);
             const code = (w.length > 1 ? w[0][0] + w[1][0] : ev.name.slice(0, 2)).toUpperCase();
             return `<div class="msrow evrow ${got ? 'got' : ''}" data-k="ev:${ev.id}">
-              <span class="code">${esc(code)}</span>
+              ${evMedal(ev, got)}
               <span class="ms-mid">
                 <span class="ms-name">${esc(ev.name)}</span>
                 <span class="ms-note">${p.goals.map(g => `<i class="g${g.done ? ' got' : ''}">${esc(g.label)}</i>`).join(' · ')}</span>
@@ -5744,7 +5819,7 @@ function rollLine(r, i) {
       <span class="rc-name" style="min-width:0;display:flex;align-items:baseline">
         <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.is_me ? 'You' : r.display_name)}</span>
         ${(() => { const t = r.is_coach ? '' : titleName(r.title);
-                   return t ? `<span class="rc-title">${esc(t)}</span>` : ''; })()}
+                   return t ? `<span style="flex:none;margin-left:7px">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''; })()}
       </span>
       <span class="rc-meta">${esc(meta)}</span>
     </div>
@@ -5773,10 +5848,9 @@ function boardRow(r, lead, i) {
       <div style="display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.2;color:var(--muted);min-width:0">
         ${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="flex:none">${esc(r.rank_label)}</span>
         ${(() => { const t = titleName(r.title);
-                   // Clay, so the earned thing is the one that catches the eye
-                   // on a line that is otherwise rank furniture.
-                   return t ? `<span style="flex:none;color:var(--muted-soft)">·</span>
-             <span class="hd" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;letter-spacing:.06em;color:var(--clay-deep)">${esc(t)}</span>` : ''; })()}
+                   // The plate, not plain text — the earned thing is the one
+                   // that catches the eye on a line of rank furniture.
+                   return t ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''; })()}
       </div>
       <div class="bar" style="height:3px;width:100%"><span data-fill style="width:${pct}%"></span></div>
     </div>
@@ -5927,7 +6001,7 @@ function renderManual() {
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
-          p(`Open it from <strong style="color:var(--ink)">Progress → The long game</strong>.`));
+          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. Titles, card skins and the reward road all live there.`));
       })()}
 
       ${(() => {
@@ -6028,13 +6102,13 @@ function renderManual() {
 // canvas ground on the exported PNG. One definition, so the sample cannot lie
 // about what the athlete will actually get.
 const CARD_LOOK = {
-  c_paper:     'background:#0E4A36',
-  c_ember:     'background:radial-gradient(120% 100% at 15% 100%, #E06B43 0%, #A8422a 32%, #0E4A36 68%)',
-  c_blueprint: 'background:#0E4A36;background-image:linear-gradient(rgba(250,247,242,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(250,247,242,.22) 1px,transparent 1px);background-size:7px 7px',
-  c_night:     'background:#14120F',
+  c_paper:     'background:linear-gradient(180deg,#6C5CE7,#4B3FBF)',
+  c_ember:     'background:radial-gradient(120% 100% at 15% 100%, #FF8A5B 0%, #C74E28 35%, #17142B 78%)',
+  c_blueprint: 'background:#5A4BD4;background-image:linear-gradient(rgba(246,244,255,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(246,244,255,.3) 1px,transparent 1px);background-size:7px 7px',
+  c_night:     'background:#17142B;background-image:radial-gradient(120% 70% at 50% 0%,rgba(108,92,231,.55),transparent 65%)',
   // Hard colour stops, not a blend: at 34px a soft conic gradient averages out
   // to a muddy grey and the swatch stops looking like either colour.
-  c_flare:     'background:conic-gradient(#C7552F 0deg 30deg, #0E4A36 30deg 90deg, #C7552F 90deg 120deg, #0E4A36 120deg 180deg, #C7552F 180deg 210deg, #0E4A36 210deg 270deg, #C7552F 270deg 300deg, #0E4A36 300deg 360deg)'
+  c_flare:     'background:conic-gradient(#6C5CE7 0deg 30deg, #17142B 30deg 90deg, #FF8A5B 90deg 120deg, #17142B 120deg 180deg, #6C5CE7 180deg 210deg, #17142B 210deg 270deg, #FF8A5B 270deg 300deg, #17142B 300deg 360deg)'
 };
 
 function renderPass() {
@@ -6043,69 +6117,106 @@ function renderPass() {
   const owned = passOwned().length;
   const eqT = passTitle(), eqC = passCard();
   const toNext = next ? Math.max(0, cumXpTo(next.lv) - LI.xp) : 0;
-  const titles = PASS_TRACK.filter(p => p.kind === 'title');
+  const nextPct = next ? Math.max(2, Math.min(100, Math.round(LI.xp / Math.max(1, cumXpTo(next.lv)) * 100))) : 100;
+  const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles());
   const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
 
-  // One row, three states. Tapping an owned row equips it; tapping a locked one
-  // says what it costs rather than doing nothing, because a dead tap on a
-  // reward screen reads as a bug.
-  const row = (p, isOn, has) => `
-    <button class="prow ${isOn ? 'on' : (has ? 'owned' : 'locked')}" data-k="rw:${p.id}"
-      ${on(() => {
-        if (!has) { toast('Level ' + p.lv + ' unlocks ' + p.name + '.'); return; }
-        if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
-        if (p.kind === 'title') CFG.pass.title = (CFG.pass.title === p.id) ? null : p.id;
-        else CFG.pass.card = p.id;
-        saveCfg(); haptic('done'); render();
-        // Not awaited: the row has already changed state, and the board catching
-        // up a second later is not something the athlete should have to watch.
-        if (p.kind === 'title') pushTitle();
-      })}>
-      ${p.kind === 'card'
-        ? `<span class="swatch" style="${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
-        : `<span class="lvl"><b>${p.lv || '—'}</b><i>LV</i></span>`}
-      <span style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
-        <span class="nm">${esc(p.name)}</span>
-        <span class="meta">${esc(p.note)}</span>
-      </span>
-      <span class="tag">${isOn ? 'ON' : (has ? 'TAP' : 'LV ' + p.lv)}</span>
-    </button>`;
+  const wear = p => {
+    if (!passHas(p.id) && p.id !== CARD_BASE.id) { toast((p.lv ? 'Level ' + p.lv : 'Finishing its event') + ' unlocks ' + p.name + '.'); return; }
+    if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+    if (p.kind === 'title') { CFG.pass.title = (CFG.pass.title === p.id) ? null : p.id; }
+    else CFG.pass.card = p.id;
+    saveCfg(); haptic('done'); render();
+    if (p.kind === 'title') pushTitle();
+  };
+
+  // Titles rail — metal plates, one worn at a time.
+  const plateBtn = p => {
+    const has = passHas(p.id), isOn = eqT && eqT.id === p.id;
+    if (!has) return `<button class="plate locked" data-k="rw:${p.id}" ${on(() => wear(p))}><span class="plate-in">🔒 ${p.lv ? 'LV ' + p.lv : esc(p.name)}</span></button>`;
+    const m = METALS[titleMetalKey(p)];
+    return `<button class="plate" data-k="rw:${p.id}" style="background:${m.rim};${isOn ? 'box-shadow:0 0 0 2px rgba(108,92,231,.5),0 6px 16px -8px rgba(108,92,231,.8);' : ''}" ${on(() => wear(p))}>
+      <span class="plate-in" style="color:${titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink}">${isOn ? '◆ ' : ''}${esc(p.name)}</span></button>`;
+  };
+  // Skins rail — the card grounds, honest swatches from CARD_LOOK.
+  const skinBtn = p => {
+    const has = p.id === CARD_BASE.id || passHas(p.id), isOn = eqC.id === p.id;
+    return `<button data-k="rw:${p.id}" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit" ${on(() => wear(p))}>
+      <span style="width:48px;height:60px;border-radius:12px;${has ? (CARD_LOOK[p.id] || CARD_LOOK.c_paper) : 'background:var(--surface);border:2px dashed var(--box)'};${isOn ? 'box-shadow:0 0 0 2.5px var(--accent),0 6px 14px -6px rgba(108,92,231,.8);' : ''}${has ? '' : 'display:flex;align-items:center;justify-content:center;'}">${has ? '' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;color:var(--muted-soft)"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'}</span>
+      <span style="font-size:9px;font-weight:${isOn ? 800 : 700};letter-spacing:.04em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : (has ? '' : ' · LV ' + p.lv)}</span></button>`;
+  };
+
+  // The road — every reward in level order, with a YOU marker before the next.
+  const road = PASS_TRACK.map(p => {
+    const has = passHas(p.id), isNext = next && next.id === p.id;
+    const preview = p.kind === 'card'
+      ? `<span style="flex:none;width:26px;height:33px;border-radius:7px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
+      : '';
+    const marker = isNext ? `<span style="display:flex;align-items:center;gap:7px;margin-left:12px;padding:2px 0">
+        <span style="width:2.5px;height:13px;background:var(--accent);border-radius:99px;margin-left:8px"></span>
+        <span style="font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--accent);background:var(--surface);border-radius:999px;padding:3px 9px">YOU · LV ${lv} · ${nextPct}% THERE</span></span>` : '';
+    if (isNext) return marker + `
+      <div style="display:flex;gap:13px;align-items:center;border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow);padding:10px 12px;margin:2px 0" data-k="road:${p.id}">
+        <span style="flex:none;width:38px;height:38px;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">${p.lv}</span>
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+          <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-weight:700;font-size:13.5px">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="flex:none;font-size:10px;font-weight:800;color:var(--accent)">NEXT · LV ${p.lv}</span></span>
+          <span class="bar thin" style="height:6px"><span data-fill style="width:${nextPct}%"></span></span>
+          <span style="font-size:10.5px;color:var(--muted)">${toNext.toLocaleString()} XP — about ${Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp())))} good day${Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp()))) === 1 ? '' : 's'}</span>
+        </span>${preview}
+      </div>`;
+    if (has) return `
+      <div style="display:flex;gap:13px;align-items:center;padding:7px 0 7px 4px" data-k="road:${p.id}">
+        <span style="flex:none;width:34px;height:34px;border-radius:999px;background:var(--teal);color:#0C4B43;display:flex;align-items:center;justify-content:center">${TICK}</span>
+        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span style="display:flex;flex-direction:column"><span style="font-weight:700;font-size:13.5px">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="font-size:10.5px;color:var(--muted-soft)">Level ${p.lv}</span></span>
+          <span style="flex:none;display:flex;align-items:center;gap:8px">${preview}<span style="font-size:10px;font-weight:700;color:var(--teal-deep)">KEPT</span></span>
+        </span>
+      </div>`;
+    return `
+      <div style="display:flex;gap:13px;align-items:center;padding:7px 0 7px 4px;opacity:.62" data-k="road:${p.id}">
+        <span style="flex:none;width:34px;height:34px;border-radius:999px;border:2px dashed var(--box);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${p.lv}</span>
+        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span style="display:flex;flex-direction:column"><span style="font-weight:700;font-size:13.5px;color:var(--muted)">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="font-size:10.5px;color:var(--muted-soft)">Level ${p.lv} · ${esc(p.note)}</span></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;width:13px;height:13px;color:var(--muted-soft)"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        </span>
+      </div>`;
+  }).join('');
 
   return `
     <div data-k="screen:pass" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:13px">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
-          <span class="hd" style="font-size:26px;line-height:1">${owned} of ${PASS_TRACK.length}</span>
-          <span class="mono" style="font-size:10px;letter-spacing:.1em;color:var(--muted)">LEVEL ${lv}</span>
-        </div>
-        ${next ? `
-          <div class="bar thin"><span data-fill style="width:${Math.max(2, Math.min(100, Math.round(LI.xp / Math.max(1, cumXpTo(next.lv)) * 100)))}%"></span></div>
-          <div style="font-size:13px;line-height:1.5;color:var(--muted)">
-            <strong style="color:var(--ink)">${toNext.toLocaleString()} XP</strong> to level ${next.lv} and
-            <strong style="color:var(--ink)">${esc(next.name)}</strong> — ${esc(next.note.toLowerCase())}
-          </div>`
-        : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">Every reward on the track is yours. There is nothing left to unlock, which is its own kind of statement.</div>`}
-        <div style="font-size:12px;line-height:1.5;color:var(--muted-soft)">
-          These are kept. A new season sets your points back to zero and leaves every one of them alone.
-        </div>
+      <!-- What you are wearing, as the crew sees it, with the share button ON
+           the preview — the card is the point of owning any of this. -->
+      <div style="margin:14px 16px;border-radius:22px;background:#231F35;color:#F6F4FF;padding:14px;display:flex;gap:13px;align-items:center">
+        <span style="flex:none;width:74px;height:92px;border-radius:12px;${CARD_LOOK[eqC.id] || CARD_LOOK.c_paper};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 0 0 2px rgba(246,244,255,.12)">
+          ${rankCrest(LI.rank, 26)}
+          <span style="font-weight:800;font-size:8px;letter-spacing:.04em;color:#F6F4FF;text-shadow:0 1px 2px rgba(0,0,0,.4)">${esc(LI.label.toUpperCase())}</span>
+        </span>
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+          <span style="font-weight:700;font-size:14.5px;line-height:1.25">Your card, as the crew sees it</span>
+          <span style="font-size:11.5px;line-height:1.4;color:#A9A3C9">${eqT ? `Wearing ${titlePlate(eqT, true)} on` : 'No title on'} the <strong style="color:#CBC6E4">${esc(eqC.name)}</strong> skin · ${owned} of ${PASS_TRACK.length} kept</span>
+          <span style="display:flex;gap:7px;margin-top:2px">
+            <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => shareRankCard())}>Share it →</button>
+          </span>
+        </span>
       </div>
 
-      ${sectionLabel('Titles')}
-      <div style="padding:0 20px 10px;font-size:12px;line-height:1.5;color:var(--muted)">
-        ${eqT ? `You are showing <strong style="color:var(--clay-deep)">${esc(eqT.name)}</strong>. Tap it again to show nothing.`
-              : 'Nothing showing. Tap one you own to wear it.'}
+      ${sectionLabel('Titles', (CFG.pass && CFG.pass.owned ? titles.filter(p => passHas(p.id)).length : 0) + ' of ' + titles.length)}
+      <div style="display:flex;gap:8px;overflow-x:auto;padding:2px 20px 6px;scrollbar-width:none">
+        ${titles.map(plateBtn).join('')}
       </div>
-      ${titles.map(p => row(p, eqT && eqT.id === p.id, passHas(p.id))).join('')}
+      <div style="padding:0 20px 12px;font-size:11px;color:var(--muted-soft)">Tap to wear one — it shows on the board, the wall and your card. ${eqT ? 'Tap it again to show nothing.' : ''}</div>
 
-      ${sectionLabel('Cards')}
-      <div style="padding:0 20px 10px;font-size:12px;line-height:1.5;color:var(--muted)">
-        The look of the rank card you share. Yours is <strong style="color:var(--clay-deep)">${esc(eqC.name)}</strong>.
+      ${sectionLabel('Card skins', cards.filter(p => p.id === CARD_BASE.id || passHas(p.id)).length + ' of ' + cards.length)}
+      <div style="display:flex;gap:10px;overflow-x:auto;padding:2px 20px 14px;scrollbar-width:none">
+        ${cards.map(skinBtn).join('')}
       </div>
-      ${cards.map(p => row(p, eqC.id === p.id, passHas(p.id))).join('')}
 
-      <div style="padding:16px 20px 34px;display:flex;flex-direction:column;gap:10px">
-        <button class="btn btn-primary btn-block" ${on(() => shareRankCard())}>Share your card</button>
-        <button class="btn btn-secondary btn-block" ${on(() => go(UI.backTo === 'pass' ? 'progress' : (UI.backTo || 'progress')))}>Back</button>
+      ${sectionLabel('The road', PASS_TRACK.length + ' rewards to level 50')}
+      <div style="padding:2px 16px 6px;display:flex;flex-direction:column">${road}</div>
+      <div style="margin:8px 16px 14px;border-radius:16px;background:var(--surface);padding:11px 14px;font-size:11.5px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
+
+      <div style="padding:0 20px 34px">
+        <button class="btn btn-secondary btn-block" ${on(() => { UI.backTo = 'pass'; go('manual'); })}>How rewards work</button>
       </div>
     </div>`;
 }
@@ -6122,9 +6233,7 @@ function renderRanks() {
     <div data-k="screen:ranks" style="${screenAnim()}">
       <div class="block" style="display:flex;flex-direction:column;gap:14px">
         <div style="display:flex;align-items:center;gap:16px">
-          <div style="width:74px;height:74px;flex:none;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center">
-            ${rankIcon(cur, 42)}
-          </div>
+          ${rankCrest(cur, 62)}
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
             <div class="eyebrow" style="letter-spacing:.14em">You are</div>
             <div class="hd" style="font-size:26px;line-height:1;letter-spacing:-.01em">${esc(cur.label)}</div>
@@ -6152,13 +6261,13 @@ function renderRanks() {
         const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
         const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
         return `<div class="rankrow ${cls}">
-          <div class="badge">${rankIcon(name, 26)}</div>
+          ${rankCrest(name, 36)}
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
               <span class="nm">${esc(name)}</span>
               <span class="tag">${here ? 'YOU ARE HERE' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
             </div>
-            <div class="meta">Levels ${first}–${last}${here ? ' · you are on ' + cur.sub + ' of ' + SUBS_PER_RANK : ''}</div>
+            <div class="meta">${METALS[TIER_KEYS[i]].label} tier · Levels ${first}–${last}${here ? ' · you are on ' + cur.sub + ' of ' + SUBS_PER_RANK : ''}</div>
             <div class="subs">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}"></i>`).join('')}</div>
           </div>
         </div>`;
@@ -6189,67 +6298,68 @@ function renderRanks() {
 // 1080×1080, drawn on a canvas so it can be shared straight out of the app. The
 // insignia is the SAME path data the app draws, run through Path2D — one source
 // of truth, so a rank can never look different on the card than it does in here.
-// Brand rules apply: green ground, paper type, clay-2 as the only accent, hard
-// edges, Barlow Condensed uppercase.
-const CARD = { green:'#0E4A36', paper:'#FAF7F2', clay2:'#E06B43', ink:'#1A1A1A' };
+// Brand rules apply: ink ground, grape glow, gold for the earned things,
+// Outfit type, round caps — the same MEADOW the app wears.
+const CARD = { ink:'#17142B', card:'#231F35', paper:'#F6F4FF', gold:'#F2B23C', grape:'#6C5CE7', teal:'#35D0BA', orange:'#FF8A5B' };
 // The five card grounds, painted rather than imported so the export needs no
 // assets and stays offline-safe. Every one of them is green, clay, paper or
 // near-black — a card treatment is a change of structure, not of palette.
 function paintCardGround(x, S, id) {
-  if (id === 'c_night') {
-    x.fillStyle = '#14120F'; x.fillRect(0, 0, S, S);
-    x.strokeStyle = 'rgba(224,107,67,0.13)'; x.lineWidth = 2;
-    for (let i = 1; i < 9; i++) {
-      x.beginPath(); x.moveTo(i * S / 9, 0); x.lineTo(i * S / 9, S); x.stroke();
-      x.beginPath(); x.moveTo(0, i * S / 9); x.lineTo(S, i * S / 9); x.stroke();
+  const grid = (alpha, n) => {
+    x.strokeStyle = 'rgba(246,244,255,' + alpha + ')'; x.lineWidth = 2;
+    for (let i = 1; i < n; i++) {
+      x.beginPath(); x.moveTo(i * S / n, 0); x.lineTo(i * S / n, S); x.stroke();
+      x.beginPath(); x.moveTo(0, i * S / n); x.lineTo(S, i * S / n); x.stroke();
     }
+  };
+  if (id === 'c_paper') {
+    const g = x.createLinearGradient(0, 0, 0, S);
+    g.addColorStop(0, '#6C5CE7'); g.addColorStop(1, '#4B3FBF');
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+    grid(0.07, 9);
     return;
   }
-  x.fillStyle = CARD.green; x.fillRect(0, 0, S, S);
+  if (id === 'c_blueprint') {
+    x.fillStyle = '#5A4BD4'; x.fillRect(0, 0, S, S);
+    grid(0.22, 27);
+    return;
+  }
+  // The three dark grounds share the ink base.
+  x.fillStyle = CARD.ink; x.fillRect(0, 0, S, S);
   if (id === 'c_ember') {
-    // Heat rising out of the bottom-left corner, where the insignia sits.
     const g = x.createRadialGradient(S * 0.15, S, 0, S * 0.15, S, S * 1.15);
-    g.addColorStop(0, 'rgba(224,107,67,0.92)');
-    g.addColorStop(0.34, 'rgba(168,66,42,0.55)');
-    g.addColorStop(0.72, 'rgba(14,74,54,0)');
+    g.addColorStop(0, 'rgba(255,138,91,0.9)');
+    g.addColorStop(0.35, 'rgba(199,78,40,0.55)');
+    g.addColorStop(0.75, 'rgba(23,20,43,0)');
     x.fillStyle = g; x.fillRect(0, 0, S, S);
+    grid(0.045, 9);
     return;
   }
   if (id === 'c_flare') {
-    // The celebration's ray burst, held still.
-    x.save(); x.translate(S / 2, S / 2);
-    // SOLID clay, not clay at half alpha: any warm colour blended over this
-    // green comes out brown, which is not in the palette and looks like a
-    // mistake. Narrow wedges keep it a burst rather than a background.
-    x.fillStyle = '#C7552F';
+    // The celebration's ray burst, held still — grape and orange wedges.
+    x.save(); x.translate(S / 2, S * 0.33);
     for (let i = 0; i < 14; i++) {
+      x.fillStyle = i % 2 ? 'rgba(255,138,91,0.5)' : 'rgba(108,92,231,0.55)';
       x.beginPath(); x.moveTo(0, 0);
       const a = (i / 14) * Math.PI * 2, w = 0.032;
-      x.arc(0, 0, S, a - w, a + w);
+      x.arc(0, 0, S * 1.2, a - w, a + w);
       x.closePath(); x.fill();
     }
     x.restore();
-    // The burst has to sit BEHIND the card, not across it. Without this the
-    // rays run straight through "DAY STREAK" and the clay eyebrows vanish into
-    // the clay wedges. Green, fading in over the half of the card that carries
-    // type, so the effect survives at the top where there is nothing to read.
-    const veil = x.createLinearGradient(0, S * 0.4, 0, S);
-    veil.addColorStop(0, 'rgba(14,74,54,0)');
-    veil.addColorStop(0.45, 'rgba(14,74,54,0.72)');
-    veil.addColorStop(1, 'rgba(14,74,54,0.92)');
-    x.fillStyle = veil; x.fillRect(0, S * 0.4, S, S * 0.6);
+    // Ink veil over the reading half so type survives the burst.
+    const veil = x.createLinearGradient(0, S * 0.34, 0, S);
+    veil.addColorStop(0, 'rgba(23,20,43,0)');
+    veil.addColorStop(0.4, 'rgba(23,20,43,0.82)');
+    veil.addColorStop(1, 'rgba(23,20,43,0.96)');
+    x.fillStyle = veil; x.fillRect(0, 0, S, S);
     return;
   }
-  // HOUSE and BLUEPRINT share a hairline grid; BLUEPRINT just draws it loud and
-  // close, which is the whole difference between texture and a drawing.
-  const blue = id === 'c_blueprint';
-  x.strokeStyle = blue ? 'rgba(250,247,242,0.16)' : 'rgba(250,247,242,0.055)';
-  x.lineWidth = 2;
-  const n = blue ? 27 : 9;
-  for (let i = 1; i < n; i++) {
-    x.beginPath(); x.moveTo(i * S / n, 0); x.lineTo(i * S / n, S); x.stroke();
-    x.beginPath(); x.moveTo(0, i * S / n); x.lineTo(S, i * S / n); x.stroke();
-  }
+  // NIGHTFALL — the grape glow ground the whole system leans on.
+  const g = x.createRadialGradient(S / 2, 0, 0, S / 2, 0, S * 0.9);
+  g.addColorStop(0, 'rgba(108,92,231,0.5)');
+  g.addColorStop(1, 'rgba(108,92,231,0)');
+  x.fillStyle = g; x.fillRect(0, 0, S, S);
+  grid(0.045, 9);
 }
 async function buildRankCard() {
   const S = 1080, LI = overallLevel(), r = LI.rank;
@@ -6263,95 +6373,115 @@ async function buildRankCard() {
   try {
     if (document.fonts && document.fonts.load) {
       await Promise.all([
-        document.fonts.load('900 132px "Barlow Condensed"'),
-        document.fonts.load('900 86px "Barlow Condensed"'),
-        document.fonts.load('900 32px "Barlow Condensed"'),
-        document.fonts.load('700 26px "Space Mono"'),
-        document.fonts.load('700 20px "Space Mono"'),
-        document.fonts.load('500 34px "Barlow"'),
-        document.fonts.load('400 26px "Barlow"')
+        document.fonts.load('800 104px "Outfit"'),
+        document.fonts.load('800 84px "Outfit"'),
+        document.fonts.load('800 30px "Outfit"'),
+        document.fonts.load('700 27px "Outfit"'),
+        document.fonts.load('700 20px "Outfit"'),
+        document.fonts.load('600 33px "Outfit"'),
+        document.fonts.load('600 24px "Outfit"')
       ]);
     }
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
   } catch (e) { /* fall back to system type rather than no card at all */ }
 
   paintCardGround(x, S, passCard().id);
-  const PAD = 88;
-  // Eyebrow
-  x.fillStyle = CARD.clay2;
-  x.font = '700 26px "Space Mono", monospace';
-  x.letterSpacing = '6px';
-  x.fillText('PROOF · AA PERFORMANCE', PAD, PAD + 26);
+  const PAD = 96, CX = S / 2;
+  const mk = rankMetalKey(r.name), mm = METALS[mk];
+
+  // Eyebrow, centred.
+  x.textAlign = 'center';
+  x.fillStyle = CARD.gold;
+  x.font = '700 27px "Outfit", sans-serif';
+  x.letterSpacing = '9px';
+  x.fillText('PROOF · ' + seasonName().toUpperCase(), CX, 150);
   x.letterSpacing = '0px';
 
-  // Insignia in a paper square, drawn from RANK_ART via Path2D.
-  const box = 260, bx = PAD, by = 210;
-  x.fillStyle = CARD.paper; x.fillRect(bx, by, box, box);
+  // The crest — the SAME tier shape, metal and glyph the app shows, at card
+  // scale. RANK_ART via Path2D stays the single source of truth.
+  const CW = 296, CH = 332, CYc = 360;
+  crestPath(x, CX, CYc, CW, CH, mk);
+  x.fillStyle = metalFill(x, CX - CW / 2, CYc - CH / 2, CW, CH, mk);
+  x.fill();
+  crestPath(x, CX, CYc, CW * 0.845, CH * 0.845, mk);
+  x.fillStyle = '#2B2547';
+  x.fill();
   x.save();
-  const g = 150;                                   // glyph size inside the square
-  x.translate(bx + (box - g) / 2, by + (box - g) / 2);
+  const g = 132;
+  x.translate(CX - g / 2, CYc - g / 2);
   x.scale(g / 24, g / 24);
-  x.strokeStyle = CARD.green; x.lineWidth = 2; x.lineCap = 'square'; x.lineJoin = 'miter';
+  x.strokeStyle = mk === 'prisma' ? '#F6F4FF' : mm.ink;
+  x.lineWidth = 2; x.lineCap = 'round'; x.lineJoin = 'round';
   x.stroke(new Path2D(RANK_ART[r.name] || RANK_ART.ROOKIE));
   x.restore();
 
-  // Rank, big — but never wider than the card. "★1 UNTOUCHABLE 5" at 132px ran
-  // off the right edge and the card is built to be shared, so it has to fit
-  // every label the ladder can produce, not the short ones.
+  // Rank, big and centred — shrunk until every label the ladder can produce
+  // fits, because this card is built to be shared.
   x.fillStyle = CARD.paper;
   const label = r.label.toUpperCase();
-  let size = 132;
-  x.font = '900 ' + size + 'px "Barlow Condensed", sans-serif';
-  while (size > 64 && x.measureText(label).width > S - PAD * 2) {
+  let size = 104;
+  x.font = '800 ' + size + 'px "Outfit", sans-serif';
+  while (size > 54 && x.measureText(label).width > S - PAD * 2) {
     size -= 4;
-    x.font = '900 ' + size + 'px "Barlow Condensed", sans-serif';
+    x.font = '800 ' + size + 'px "Outfit", sans-serif';
   }
-  x.fillText(label, PAD, by + box + 148);
-  x.fillStyle = 'rgba(250,247,242,0.72)';
-  x.font = '500 34px "Barlow", sans-serif';
-  x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', PAD, by + box + 200);
-  // The title, if they are wearing one. Under the rank, in clay, small — this
-  // is the line that makes the card worth exporting a second time.
+  x.fillText(label, CX, 642);
+  x.fillStyle = 'rgba(246,244,255,0.66)';
+  x.font = '600 33px "Outfit", sans-serif';
+  x.fillText('Level ' + LI.lv + ' · ' + LI.xp.toLocaleString() + ' XP', CX, 694);
+
+  // The title, worn as a metal plate — the line that makes the card worth
+  // exporting a second time.
   const ttl = passTitle();
   if (ttl) {
-    x.fillStyle = CARD.clay2;
-    x.font = '700 26px "Space Mono", monospace';
-    x.letterSpacing = '5px';
-    x.fillText(ttl.name.toUpperCase(), PAD, by + box + 252);
+    const tk = titleMetalKey(ttl);
+    x.font = '800 29px "Outfit", sans-serif';
+    x.letterSpacing = '6px';
+    const tname = ttl.name.toUpperCase();
+    const tw = x.measureText(tname).width + 88, th = 66, ty = 730;
+    const rr = (xx, yy, ww, hh, rad) => { x.beginPath(); x.moveTo(xx + rad, yy); x.arcTo(xx + ww, yy, xx + ww, yy + hh, rad); x.arcTo(xx + ww, yy + hh, xx, yy + hh, rad); x.arcTo(xx, yy + hh, xx, yy, rad); x.arcTo(xx, yy, xx + ww, yy, rad); x.closePath(); };
+    rr(CX - tw / 2, ty, tw, th, th / 2);
+    x.fillStyle = metalFill(x, CX - tw / 2, ty, tw, th, tk);
+    x.fill();
+    rr(CX - tw / 2 + 5, ty + 5, tw - 10, th - 10, (th - 10) / 2);
+    x.fillStyle = CARD.ink;
+    x.fill();
+    x.fillStyle = tk === 'prisma' ? '#CBC6E4' : METALS[tk].ink;
+    x.fillText(tname, CX + 3, ty + 44);
     x.letterSpacing = '0px';
   }
 
-  // Three facts, on a rule.
-  // Three facts that are always worth showing. Deliberately not "today's %" —
-  // that reads as 12% for most of the day and this card gets shared.
+  // Rule + three facts. Deliberately not "today's %" — that reads as 12% for
+  // most of the day and this card gets shared.
   const stats = [
     [String(currentDayStreak()), 'DAY STREAK'],
-    [String(allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0)), 'BADGES'],
+    [String(allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0) + currentAch().length), 'MEDALS'],
     [String(seasonDays().filter(isPerfect).length), 'PERFECT DAYS']
   ];
-  const ry = S - PAD - 210;
-  x.strokeStyle = 'rgba(250,247,242,0.3)'; x.lineWidth = 3;
+  const ry = S - PAD - 216;
+  x.strokeStyle = 'rgba(246,244,255,0.16)'; x.lineWidth = 2;
   x.beginPath(); x.moveTo(PAD, ry); x.lineTo(S - PAD, ry); x.stroke();
   stats.forEach((st, i) => {
-    const sx = PAD + i * ((S - PAD * 2) / 3);
-    x.fillStyle = CARD.paper;
-    x.font = '900 86px "Barlow Condensed", sans-serif';
-    x.fillText(st[0], sx, ry + 92);
-    x.fillStyle = CARD.clay2;
-    x.font = '700 20px "Space Mono", monospace';
-    x.letterSpacing = '3px';
-    x.fillText(st[1], sx, ry + 128);
+    const sx = S / 6 + i * (S / 3);
+    x.fillStyle = i === 0 ? CARD.orange : (i === 2 ? CARD.teal : CARD.paper);
+    x.font = '800 84px "Outfit", sans-serif';
+    x.fillText(st[0], sx, ry + 104);
+    x.fillStyle = 'rgba(246,244,255,0.5)';
+    x.font = '700 20px "Outfit", sans-serif';
+    x.letterSpacing = '4px';
+    x.fillText(st[1], sx, ry + 146);
     x.letterSpacing = '0px';
   });
 
   // Sign-off.
-  x.fillStyle = CARD.paper;
-  x.font = '900 32px "Barlow Condensed", sans-serif';
-  x.fillText('@AMIRARDEKANIAN', PAD, S - PAD);
-  x.fillStyle = 'rgba(250,247,242,0.55)';
-  x.font = '400 26px "Barlow", sans-serif';
+  x.textAlign = 'left';
+  x.fillStyle = CARD.gold;
+  x.font = '800 30px "Outfit", sans-serif';
+  x.fillText('@AMIRARDEKANIAN', PAD, S - PAD + 10);
+  x.fillStyle = 'rgba(246,244,255,0.45)';
+  x.font = '600 24px "Outfit", sans-serif';
   const site = 'AMIRARDEKANI.COM';
-  x.fillText(site, S - PAD - x.measureText(site).width, S - PAD);
+  x.fillText(site, S - PAD - x.measureText(site).width, S - PAD + 10);
 
   return new Promise(res => c.toBlob(res, 'image/png'));
 }
