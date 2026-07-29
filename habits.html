@@ -285,8 +285,19 @@
      was rewritten to kill. Four lines holds almost every nudge in the library. */
   .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 3.3em; }
 
-  /* The level hero. One bar, not two — see the comment in renderToday(). */
+  /* The level hero. The XP bar is a RING around the level number — the number
+     and how far through it you are read as one object. */
   .hero-lv { display: flex; flex-direction: column; gap: 12px; }
+  .lvring { position: relative; flex: none; width: 86px; height: 86px; }
+  .lvring svg { position: absolute; inset: 0; width: 100%; height: 100%;
+                transform: rotate(-90deg); display: block; }
+  .lvring circle { fill: none; stroke-width: 3.4; }
+  .lvring .rail { stroke: var(--track); }
+  .lvring .run { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 97.4;
+                 transition: stroke-dashoffset .35s cubic-bezier(.2,.8,.2,1); }
+  .lvring .in { position: absolute; inset: 0; display: flex; flex-direction: column;
+                align-items: center; justify-content: center; gap: 2px; }
+  .lvring .lbl { font-size: 8px; font-weight: 700; letter-spacing: .14em; color: var(--muted-soft); }
 
   /* Progress's slim level strip — the same information as Today's hero at a
      fifth of the height, so the tab can lead with something of its own. */
@@ -814,7 +825,7 @@
      Four days, today first. Each carries its own completion so you can see at
      a glance which one you forgot — the whole reason the strip exists. */
   .daystrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-              gap: 6px; padding: 14px 20px 0; }
+              gap: 6px; padding: 14px 20px 16px; }
   .daychip { display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
              border: 2px solid var(--divider); padding: 8px 8px 7px; background: none;
              color: var(--ink); text-align: left; min-width: 0; }
@@ -3623,12 +3634,12 @@ function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(AKEY(), h.id); rend
 // initials button in the header. The slot it freed went to the social layer,
 // which is the thing that brings people back daily and which used to be a chip
 // inside another tab.
-const TAB_ORDER = ['today', 'progress', 'crew'];
+const TAB_ORDER = ['today', 'progress', 'crew', 'pass'];
 function navDir(from, to) {
   // Settings joins the list of screens that push in from the right and pop
   // back out to the left — it is no longer a tab you slide sideways into.
-  if (to === 'detail' || to === 'manual' || to === 'ranks' || to === 'settings') return 1;
-  if (from === 'detail' || from === 'manual' || from === 'ranks' || from === 'settings') return -1;
+  if (to === 'detail' || to === 'manual' || to === 'settings') return 1;
+  if (from === 'detail' || from === 'manual' || from === 'settings') return -1;
   const a = TAB_ORDER.indexOf(from), b = TAB_ORDER.indexOf(to);
   if (a < 0 || b < 0 || a === b) return 0;
   return b > a ? 1 : -1;
@@ -4479,8 +4490,8 @@ function tourSteps() {
   S.push({
     title: 'Everything pays XP',
     body: `XP builds levels, levels carry ranks — ${esc(RANKS[0])} up to ${esc(RANKS[RANKS.length - 1])},
-           ${SUBS_PER_RANK} levels each. The bar is how far you are through this one.
-           <strong>Tap the rank</strong> to see the whole ladder and what each one costs.`,
+           ${SUBS_PER_RANK} levels each. The ring around the number is how far you are through this one.
+           <strong>Tap the rank</strong> to open the Locker — the whole road, every rank, every reward.`,
     screen: 'today', sel: () => $t('.hero-lv')
   });
 
@@ -4871,7 +4882,6 @@ function renderApp() {
     // here now use exactly these words. Tapping "Read the manual" and arriving
     // at "How this works" made two screens feel like four.
     manual:   ['Everything, explained', 'The manual'],
-    ranks:    ['Ten ranks, fifty levels', 'The ladder'],
     pass:     ['Rewards a season cannot take back', 'Locker'],
     settings: ['Profile & tracking', 'Settings']
   };
@@ -4886,7 +4896,6 @@ function renderApp() {
       }
       return LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '';
     })(),
-    ranks: '',                              // the hero says the level already
     pass: (() => { const o = passOwned().length; return o ? o + '/' + PASS_TRACK.length : ''; })(),
     settings: ''
   };
@@ -4898,7 +4907,6 @@ function renderApp() {
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
   else if (UI.screen === 'crew') screenHtml = renderCrew();
   else if (UI.screen === 'manual') screenHtml = renderManual();
-  else if (UI.screen === 'ranks') screenHtml = renderRanks();
   else if (UI.screen === 'pass') screenHtml = renderPass();
   else screenHtml = renderSettings();
 
@@ -4907,12 +4915,11 @@ function renderApp() {
   // and CREW holds the whole social layer, which was previously a chip inside
   // a tab named after only half of what it contained.
   const tabDefs = [['TODAY','today','01'],['PROGRESS','progress','02'],['CREW','crew','03'],['LOCKER','pass','04']];
-  // Settings, the manual and the ladder are not tabs. They sit "above" the tab
+  // Settings and the manual are not tabs. They sit "above" the tab
   // bar, so no tab lights up while you are in them and the initials button
   // becomes the way out. The Locker IS a tab now — it is the battle pass, and
   // battle passes live on the main bar.
-  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' ||
-                   UI.screen === 'ranks');
+  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual');
   const activeTab = UI.screen === 'detail' ? 'progress' : (OVERLAY ? '' : UI.screen);
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
@@ -5337,16 +5344,22 @@ function renderToday(LI, doneCount, pct) {
            read as one broken double-bar and stated a number the header and the
            day strip were both already showing. -->
       <div class="block hero-lv">
-        <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:56px;line-height:.85">${LI.lv}</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <!-- The XP ring: how far through this level, drawn AROUND the level
+               number rather than as a bar under the block — the number and its
+               progress are one object. r=15.5 in a 36 viewBox → C≈97.4. -->
+          <div class="lvring" data-k="lvring">
+            <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
+            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 24 : 30}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
+          </div>
           <!-- The day streak sits ON the hero, not in a band under it. Amir
                asked for the number he already had to be made louder, and the
                band was a new field instead — a whole strip of screen to say one
                integer. Here it is the loudest thing on the row after the level
                itself, and it costs no vertical space at all. -->
           ${streakFlame(currentDayStreak(), bestDayStreak())}
-          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:5px;min-width:0">
-            <button class="ranklink" ${on(() => go('ranks'))} aria-label="See the rank ladder">
+          <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+            <button class="ranklink" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
               ${rankCrest(LI.rank, 26)}
               <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
               <span class="go">→</span>
@@ -5354,7 +5367,6 @@ function renderToday(LI, doneCount, pct) {
             <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${esc(LI.nextLabel)}</div>
           </div>
         </div>
-        <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
       </div>
 
       <!-- Day strip then habits, directly under the hero. The list is what the
@@ -5567,7 +5579,7 @@ function renderProgress(LI, earned, totalAch) {
            of the four tabs began with an identical block. The level still
            belongs here as context, but not as the headline — the headline is
            the season, which is the question this tab answers. -->
-      <button class="lvstrip" data-k="lvstrip" ${on(() => go('ranks'))} aria-label="See the rank ladder">
+      <button class="lvstrip" data-k="lvstrip" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
         <span class="lvstrip-num hd">LV ${LI.lv}</span>
         <span class="lvstrip-mid">
           <span class="lvstrip-top">
@@ -6183,7 +6195,7 @@ function renderManual() {
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
-          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. Titles, card skins and the reward road all live there.`));
+          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. Titles, card skins, the rank ladder and the reward road all live there.`));
       })()}
 
       ${(() => {
@@ -6277,9 +6289,10 @@ function renderManual() {
 }
 
 // ── The rank ladder ───────────────────────────────────────────────────────
-// Every rank, its insignia, what it costs and where the athlete stands in it.
-// Games always show you the road ahead; before this, Proof's road existed only
-// inside a paragraph of the manual.
+// The rank ladder and the reward road are ONE list here — every rank is a
+// header on the road and its rewards sit under it, so the road ahead shows
+// the crests, the titles and the skins in a single scroll. (The separate
+// ladder screen is gone; two screens were describing the same climb.)
 // The CSS for a card treatment, used for both the swatch on this screen and the
 // canvas ground on the exported PNG. One definition, so the sample cannot lie
 // about what the athlete will actually get.
@@ -6328,17 +6341,22 @@ function renderPass() {
       <span style="font-size:9px;font-weight:${isOn ? 800 : 700};letter-spacing:.04em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : (has ? '' : ' · LV ' + p.lv)}</span></button>`;
   };
 
-  // The road — every reward in level order, with a YOU marker before the next.
-  const road = PASS_TRACK.map(p => {
+  // The road — the rank ladder and the rewards, merged into ONE list. Every
+  // rank is a header on the road and the rewards it pays sit under it, so one
+  // scroll shows the levels ahead, their crests, and what each one hands you
+  // and when. (The separate ladder screen is gone — two screens were
+  // describing the same climb.)
+  const cur = LI.rank, curIdx = RANKS.indexOf(cur.name);
+  const rankTop = (curIdx + 1) * SUBS_PER_RANK + cur.star * LEVELS_PER_CYCLE;
+  const toRankUp = Math.max(0, cumXpTo(rankTop + 1) - LI.xp);
+  const nextRankName = RANKS[(curIdx + 1) % RANKS.length];
+  const rewardRow = p => {
     const has = passHas(p.id), isNext = next && next.id === p.id;
     const preview = p.kind === 'card'
       ? `<span style="flex:none;width:26px;height:33px;border-radius:7px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
       : '';
-    const marker = isNext ? `<span style="display:flex;align-items:center;gap:7px;margin-left:12px;padding:2px 0">
-        <span style="width:2.5px;height:13px;background:var(--accent);border-radius:99px;margin-left:8px"></span>
-        <span style="font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--accent);background:var(--surface);border-radius:999px;padding:3px 9px">YOU · LV ${lv} · ${nextPct}% THERE</span></span>` : '';
-    if (isNext) return marker + `
-      <div style="display:flex;gap:13px;align-items:center;border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow);padding:10px 12px;margin:2px 0" data-k="road:${p.id}">
+    if (isNext) return `
+      <div style="display:flex;gap:13px;align-items:center;border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow);padding:10px 12px;margin:4px 0" data-k="road:${p.id}">
         <span style="flex:none;width:38px;height:38px;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">${p.lv}</span>
         <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
           <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-weight:700;font-size:13.5px">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="flex:none;font-size:10px;font-weight:800;color:var(--accent)">NEXT · LV ${p.lv}</span></span>
@@ -6362,7 +6380,30 @@ function renderPass() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;width:13px;height:13px;color:var(--muted-soft)"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
         </span>
       </div>`;
-  }).join('');
+  };
+  const road = RANKS.map((name, i) => {
+    const first = i * SUBS_PER_RANK + 1, last = (i + 1) * SUBS_PER_RANK;
+    const here = curIdx === i;
+    const passed = cur.star > 0 || curIdx > i;
+    const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
+    const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
+    return `
+      <div style="display:flex;gap:12px;align-items:center;padding:${i ? '16px' : '6px'} 0 8px${i ? ';border-top:1px solid var(--rule);margin-top:6px' : ''}${here || passed ? '' : ';opacity:.62'}" data-k="road-rank:${name}">
+        ${rankCrest(name, 34)}
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+          <span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+            <span class="hd" style="font-size:15.5px;line-height:1">${esc(name)}</span>
+            <span style="flex:none;font-size:9.5px;font-weight:800;letter-spacing:.08em;color:${here ? 'var(--accent)' : 'var(--muted-soft)'}">${here ? 'YOU ARE HERE' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
+          </span>
+          <span style="font-size:10.5px;line-height:1.35;color:var(--muted)">${METALS[TIER_KEYS[i]].label} tier · Levels ${first}–${last}${here && toRankUp > 0 ? ` · ${toRankUp.toLocaleString()} XP to ${esc(nextRankName)}` : ''}</span>
+          ${here || passed ? `<span class="pips">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
+        </span>
+      </div>` + PASS_TRACK.filter(p => p.lv >= first && p.lv <= last).map(rewardRow).join('');
+  }).join('') + `
+    <div style="display:flex;flex-direction:column;gap:6px;padding:16px 4px 6px;border-top:1px solid var(--rule);margin-top:6px">
+      <span class="hd" style="font-size:15.5px;line-height:1">Past ${RANKS.length * SUBS_PER_RANK}: the star</span>
+      <span style="font-size:12px;line-height:1.55;color:var(--muted)">Clear ${esc(RANKS[RANKS.length - 1])} ${SUBS_PER_RANK} and the road starts again carrying a star — <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE + 1).label)}</strong>, then <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE * 2 + 1).label)}</strong>, and on forever. The star is the real flex.</span>
+    </div>`;
 
   return `
     <div data-k="screen:pass" style="${screenAnim()}">
@@ -6393,7 +6434,7 @@ function renderPass() {
         ${cards.map(skinBtn).join('')}
       </div>
 
-      ${sectionLabel('The road', PASS_TRACK.length + ' rewards to level 50')}
+      ${sectionLabel('The road', RANKS.length + ' ranks · ' + PASS_TRACK.length + ' rewards')}
       <div style="padding:2px 16px 6px;display:flex;flex-direction:column">${road}</div>
       <div style="margin:8px 16px 14px;border-radius:16px;background:var(--surface);padding:11px 14px;font-size:11.5px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
 
@@ -6403,79 +6444,6 @@ function renderPass() {
     </div>`;
 }
 
-function renderRanks() {
-  const LI = overallLevel(), cur = LI.rank;
-  const curIdx = RANKS.indexOf(cur.name);
-  // The last level of the current rank, and what it takes to clear the whole rank.
-  const rankTop = (curIdx + 1) * SUBS_PER_RANK + cur.star * LEVELS_PER_CYCLE;
-  const toRankUp = Math.max(0, cumXpTo(rankTop + 1) - LI.xp);
-  const nextName = RANKS[(curIdx + 1) % RANKS.length];
-
-  return `
-    <div data-k="screen:ranks" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:14px">
-        <div style="display:flex;align-items:center;gap:16px">
-          ${rankCrest(cur, 62)}
-          <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
-            <div class="eyebrow" style="letter-spacing:.14em">You are</div>
-            <div class="hd" style="font-size:26px;line-height:1;letter-spacing:-.01em">${esc(cur.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">Level ${LI.lv} · ${LI.xp.toLocaleString()} XP</div>
-          </div>
-        </div>
-        <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
-        <div style="font-size:13px;line-height:1.5;color:var(--muted)">
-          ${toRankUp > 0
-            ? `<strong style="color:var(--ink)">${toRankUp.toLocaleString()} XP</strong> and you are ${esc(nextName)}. That is about ${Math.max(1, Math.round(toRankUp / Math.max(1, perfectDayXp())))} good day${Math.max(1, Math.round(toRankUp / Math.max(1, perfectDayXp()))) === 1 ? '' : 's'}.`
-            : `You have cleared every rank in this cycle. Level ${rankTop + 1} starts the ladder again with a star.`}
-        </div>
-      </div>
-
-      <div class="eyebrow" style="padding:18px 20px 8px;letter-spacing:.12em;display:flex;justify-content:space-between">
-        <span>The ladder</span><span>${RANKS.length} ranks · ${SUBS_PER_RANK} levels each</span>
-      </div>
-
-      ${RANKS.map((name, i) => {
-        const first = i * SUBS_PER_RANK + 1, last = (i + 1) * SUBS_PER_RANK;
-        const here = curIdx === i;
-        const passed = cur.star > 0 || curIdx > i;
-        const cls = here ? 'here' : (passed ? 'passed' : 'locked');
-        // Within the current rank, how many sub-levels are cleared.
-        const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
-        const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
-        return `<div class="rankrow ${cls}">
-          ${rankCrest(name, 36)}
-          <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
-              <span class="nm">${esc(name)}</span>
-              <span class="tag">${here ? 'YOU ARE HERE' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
-            </div>
-            <div class="meta">${METALS[TIER_KEYS[i]].label} tier · Levels ${first}–${last}${here ? ' · you are on ' + cur.sub + ' of ' + SUBS_PER_RANK : ''}</div>
-            <div class="subs">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}"></i>`).join('')}</div>
-          </div>
-        </div>`;
-      }).join('')}
-
-      <div class="block" style="display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--divider)">
-        <div class="hd" style="font-size:20px;line-height:1">Past ${RANKS.length * SUBS_PER_RANK}: the star</div>
-        <div style="font-size:13px;line-height:1.55;color:var(--muted)">
-          Clear ${esc(RANKS[RANKS.length - 1])} ${SUBS_PER_RANK} and the ladder starts again carrying a star —
-          <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE + 1).label)}</strong>, then
-          <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE * 2 + 1).label)}</strong>, and on forever.
-          There is no ceiling. The star is the real flex.
-        </div>
-      </div>
-
-      <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:12px">
-        <button class="btn btn-primary btn-block" ${on(shareRankCard)}>Share your rank</button>
-        <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
-          Ranks come from your overall level, which is every point you have earned this season —
-          habits, quests, consistency tiers and milestones together. Each habit also carries its
-          own rank on the same ladder.
-        </div>
-        <button class="btn btn-secondary btn-block" ${on(() => go('manual'))}>How the points work</button>
-      </div>
-    </div>`;
-}
 // ── The shareable rank card ───────────────────────────────────────────────
 // 1080×1080, drawn on a canvas so it can be shared straight out of the app. The
 // insignia is the SAME path data the app draws, run through Path2D — one source
@@ -6660,8 +6628,6 @@ function renderShareSheet() {
         </div>
     </div>`;
 }
-// Kept as the name every existing call site uses.
-function shareRankCard() { openShare('rank'); }
 
 // ── Canvas kit ─────────────────────────────────────────────────────
 let BRAND_MARK = null, BRAND_TRIED = false;
@@ -7201,16 +7167,7 @@ function renderSettings() {
         </span>
         <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
       </button>
-      <!-- No leading icon here. It was the only row in Settings that had one,
-           which pushed its label 70px right of every other row's and left the
-           whole list with a ragged left edge. -->
-      <button class="selrow" ${on(() => go('ranks'))}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">The ladder</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">All ${RANKS.length} ranks, what each one costs, and where you stand</span>
-        </span>
-        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
-      </button>
+      <!-- No "ladder" row: the ladder lives on the road in the Locker tab now. -->
       <button class="selrow" data-k="row:manual" data-tour="manual" ${on(() => go('manual'))}>
         <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
           <span class="lbl" style="font-size:15px">The manual</span>

@@ -53,13 +53,15 @@ marked `act` can be completed by actually doing the thing. Full detail in `HABIT
 **Navigation is four tabs: `TODAY · PROGRESS · CREW · LOCKER`** (Amir's own redesign,
 2026-07-29, promoted the reward track from a row inside Progress to its own tab). Settings
 is still **not** a tab — it lives behind the athlete's initials at the top-right of the
-header, and that same button becomes the way out of Settings, the manual and the ladder.
+header, and that same button becomes the way out of Settings and the manual.
 **CREW holds the entire social layer**: the roll-call composer, the wall, the leaderboard
 and joining/renaming. It opens on Roll Call, with the leaderboard as the second view.
 Today keeps a one-line *pointer* to Crew (not a second composer) that disappears once the
 athlete has written. **LOCKER is the reward track** (`PASS_TRACK` — see *The long game*
 below): the shareable rank card up top, titles and card skins as horizontal rails, then
-the full road of 14 rewards in level order.
+**the road** — the rank ladder and the 14 rewards merged into one scroll (2026-07-30: the
+standalone ladder screen is gone; tapping your rank on Today or Progress opens Locker
+directly now).
 
 **Ranks, titles and medals wear metal now** — `METALS` (bronze → silver → gold →
 amethyst → prismatic) is a shared visual language: `rankCrest()` draws the tier-shaped,
