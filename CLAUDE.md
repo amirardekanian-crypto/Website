@@ -50,12 +50,27 @@ existing athletes so they get the offer once too. It lives in its own `<div id="
 and its dimmer is four mask panes with a **real hole**, not a transparent lid, so a step
 marked `act` can be completed by actually doing the thing. Full detail in `HABITS.md`.
 
-**Navigation is three tabs: `TODAY · PROGRESS · CREW`.** Settings is **not** a tab — it
-lives behind the athlete's initials at the top-right of the header, and that same button
-becomes the way out of Settings, the manual and the ladder. **CREW holds the entire
-social layer**: the roll-call composer, the wall, the leaderboard and joining/renaming.
-It opens on Roll Call, with the leaderboard as the second view. Today keeps a one-line
-*pointer* to Crew (not a second composer) that disappears once the athlete has written.
+**Navigation is four tabs: `TODAY · PROGRESS · CREW · LOCKER`** (Amir's own redesign,
+2026-07-29, promoted the reward track from a row inside Progress to its own tab). Settings
+is still **not** a tab — it lives behind the athlete's initials at the top-right of the
+header, and that same button becomes the way out of Settings, the manual and the ladder.
+**CREW holds the entire social layer**: the roll-call composer, the wall, the leaderboard
+and joining/renaming. It opens on Roll Call, with the leaderboard as the second view.
+Today keeps a one-line *pointer* to Crew (not a second composer) that disappears once the
+athlete has written. **LOCKER is the reward track** (`PASS_TRACK` — see *The long game*
+below): the shareable rank card up top, titles and card skins as horizontal rails, then
+the full road of 14 rewards in level order.
+
+**Ranks, titles and medals wear metal now** — `METALS` (bronze → silver → gold →
+amethyst → prismatic) is a shared visual language: `rankCrest()` draws the tier-shaped,
+metal-rimmed badge next to a rank name (ladder, hero, share card all call the same
+function so a rank never looks different in two places); `titlePlate()` renders an owned
+title as a metal nameplate, rarity tied to the level it unlocks at (bronze under 13,
+silver 13+, gold 21+) with **event titles and PROOF ITSELF prismatic** regardless of
+level; `achMedal()`/`evMedal()` render a badge/event's own emoji in a tinted disc behind
+a metal rim (dashed and greyed while unearned). All of it is presentation over the same
+underlying data — `RANKS`, `PASS_TRACK`, `ACHIEVEMENTS`, `EVENTS` — nothing here changes
+what is earned or when, only how it is drawn.
 
 **The app is called `AA Proof` everywhere on the site — not just once installed** (Amir,
 2026-07-27: "all over my website this is called AA Proof"). Use "AA Proof" in page titles,
