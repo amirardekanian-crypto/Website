@@ -157,14 +157,17 @@ The screen they actually live on. **In this order, and the order is the point:**
    level. Today's own completion is *not* repeated here; the header and the day strip
    both already carry it, and a second green bar of the same shape directly beneath the
    first read as one broken double-bar.
-2. **The streak band** — the current day streak, how it compares to the best ever, and
-   the seven days behind it as a trail, so the shape of the week is visible instead of
-   inferred from one integer. **Clay, never green**, for the reason the day's own progress
-   bar is not here at all (see 1). Before it existed, the day streak — the number the whole
-   qualify rule exists to produce — appeared on this screen in exactly one circumstance: a red
-   bar warning it was about to be lost. The only moment it showed up was the moment it was
-   bad news. Hidden entirely until the first logged day: a zero over an empty trail is the
-   loudest possible way to open an app on day one. The same band opens PROGRESS.
+2. **The streak flame** — sits *on* the level hero, left of the rank block: a drawn flame
+   (never an emoji — nothing here should change shape between an iPhone and a Pixel) and the
+   day-streak number in clay, licking faster the longer the streak runs, on the same
+   0/5/15/30-day heat scale the habit rows use. Hidden until the first logged day.
+   ⚠️ This briefly had a whole **band** to itself and Amir killed it (2026-07-30, *"i hate
+   that … i asked you to show their streak … just bolder, flashier just something to catch
+   the eye"*). The lesson is worth keeping: he asked for an existing number to be made
+   **louder**, and a band is a *new field* — a whole strip of screen to state one integer,
+   on the screen whose own layout note says anything added goes below the habit list. The
+   flame costs no vertical space at all. Progress carries the same flame inside its stat
+   grid, so the day streak is one of its four facts again.
 3. **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
    completion, that choose **which day you are logging**. See *The backfill window* below.
 4. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
@@ -226,17 +229,127 @@ again — while `proof.html` promises them only the *perfect* day is out of reac
 at 190/250 = 76%, so at 80 steps quietly became a second precondition. Verified over a
 61-day log: **0 days stopped qualifying, 6 started.**
 
-#### Run vs streak — two words, one job each
-A **run** is consecutive days on *one* habit ("a 24-day run on water"). A **streak** is
-consecutive days where the athlete cleared `streakQualifyPct` of the day's *weight*
-("a 2-day streak"). They are different numbers moving at different speeds.
+#### Habit names are TASKS, not nouns
+They were labels — WORKOUT, STEPS, WATER — which is what the thing *is*, not what
+the athlete has to do about it. A list of nouns reads as a filing system; a list of
+instructions reads as a day's work. Each name now carries its own target
+(*🚶 Walk 10,000 steps*, *💧 Drink 8 glasses*), so the row states the job before
+anything is tapped, and `goal` — the second line — carries the coaching detail the
+name has no room for rather than restating it.
 
-The app used to say it five ways — *day streak*, *24 DAYS*, *Best streak*, *Best run so
-far*, *days in a row* — so `24 DAYS` on a habit row beside `2` for DAY STREAK on Progress
-read as one number disagreeing with itself. Habit rows and the detail header now read
-`24-DAY RUN`, the detail stat is `Longest run`, and the pip key and tier line both say
-*run*. **Do not introduce a third word for either idea.** The manual teaches both under
-*Consistency*.
+**The `id` never changes.** Every log entry, level and leaderboard row is keyed on
+it, so renaming is display-only and costs nobody a point. `weights` on the
+`xp_rules` row is still keyed `strength`, not `session`, for the same reason.
+
+Two of Amir's examples were deliberately *not* taken literally, because both would
+have changed what is measured rather than what is displayed:
+- **"3L of water"** — the log stores *glasses* (target 8). Switching the unit to
+  litres would silently reinterpret every historical entry: a logged `8` becomes 8
+  litres. Doing it properly needs a one-off conversion of every athlete's log.
+- **"protein target"** — the log stores *meals* (target 3), not grams. The name
+  points at protein (*🍗 3 protein meals*) without claiming to measure it. A real
+  protein habit is a new tracked thing, not a rename.
+
+Emoji are the one place the app breaks its own rule — there are none anywhere else,
+and glyph coverage genuinely varies by platform (🌬 rendered as a mangled box and
+was swapped for 💨). They stay because a list of eight tasks scans faster with them.
+Removing them is one edit to `HABITS[].name`.
+
+#### Seasonal events
+`EVENTS` in `habits.html`. A named block of the *calendar* — not the scoring season
+— with two or three goals, the whole board doing it at once. Reachable from the top
+of Progress; events that have not opened yet are not drawn at all, because an
+athlete cannot act on November in July and four locked cards would bury the live one.
+
+**They pay a TITLE, never XP, and that is the design.** XP is scored twice, so a new
+paying rail means new plpgsql that has to agree with the app for ever. A title is
+stored, append-only and free to mint — the same rule the reward track runs on — and
+it is worth *more* here anyway, because titles show on the leaderboard and the roll
+call wall. Finishing SUMMER SHRED is something other people see; XP would be a number
+nobody else reads.
+
+Goals reuse the quest `kind` grammar exactly (`daysHit:`, `total:`, `qualify`,
+`perfect`) so they are measured from the log alone. Deliberately **not**
+season-bounded the way quests are: a season reset in the middle of August must not
+wipe half of SUMMER SHRED. The four event title ids must also exist in `passTrack`
+on the `xp_rules` row or the server refuses a title the app has already awarded —
+see `supabase/stage20_tiers_and_events.sql`.
+
+#### Milestones come in three tiers
+`tier` on each entry in `ACHIEVEMENTS`, grouped on Progress by `ACH_TIERS`:
+
+| tier | promise | count |
+|---|---|---|
+| `week` | a good week gets you this | 6 |
+| `long` | weeks to months | 7 |
+| `rare` | most people never will | 3 |
+
+One flat list gave a new athlete a single reachable row above nine walls, and gave a
+two-year athlete nothing left to want. Nothing but the Progress screen reads `tier`
+— it is presentation only, which is why adding six milestones needed no new
+machinery on either side, just more rows in `ACHIEVEMENTS` **and** in the
+`milestones` array on the `xp_rules` row. ⚠️ Both, or the board pays a different
+number to the phone.
+
+#### One word — `streak` — and two scopes
+A **habit's streak** is consecutive days on *one* habit ("a 24-day streak on water"); it
+sits on that habit's row and in its detail header. The **day streak** is consecutive days
+where the athlete cleared `streakQualifyPct` of the day's weight; it is the band at the top
+of Today and Progress, and it is always captioned *DAY STREAK*.
+
+⚠️ **This reverses the old rule.** The per-habit one used to be called a **run**, precisely
+so a 24-day water run could not be mistaken for a 2-day day-streak — the app had once used
+five phrasings (*day streak*, *24 DAYS*, *Best streak*, *Best run so far*, *days in a row*)
+and they read as one number arguing with itself. Amir asked for `streak` everywhere
+(2026-07-29), so the disambiguation moved from the **noun** to the **scope**: a habit's
+streak is only ever shown *on that habit*, and the whole-day one is only ever shown with
+the word *day* attached. The manual's *Consistency* section and the day-one note on
+Progress are the two places that teach it, and both were rewritten to do so.
+
+**Do not reintroduce "run" in athlete-facing copy.** `bestHabitRun()` keeps its internal
+name because nothing renders it; the Progress tile it feeds reads *Longest streak*.
+
+#### Five core habits, and opt-in add-ons
+(Amir, 2026-07-30.) **`core: true`** on five — train · steps · sleep · protein · water.
+Always tracked, **no off switch**: `live()` honours `core` whatever `CFG.on` says, so even
+an athlete who switched one off before this existed gets it back, dated today, with nothing
+behind them moving. The same five for everyone is what makes a day score mean the same
+thing across the whole board.
+
+Everything else — mobility, breathing, supplements, anything custom — is an **add-on**,
+worth real points on top, and **once switched on it counts**.
+
+**The two rules in `stampRoster()`, which are the answer to "why did Friday change
+Wednesday":**
+
+| | takes effect |
+|---|---|
+| Switching an add-on **on** | **today** — you opted in, and today is still yours to finish |
+| Switching one **off** | **tomorrow** — or dropping it at 23:00 would delete a miss you already made |
+
+Neither ever reaches a closed day; `rosterOn(day)` still reads the entry in force on that
+day. `lockedOnToday()` is what lets a switched-off row still say *"still counts today"*.
+Settings carries the whole rule as **permanent copy**, not a toast — someone who switched
+something on three weeks ago should still be able to find out why it is counting.
+
+Proven against a nine-day log: adding supps today leaves Wednesday at 100% and takes today
+to 93%; switching it straight back off leaves today at **93%** (the dodge fails) and dates
+the removal to tomorrow. No SQL changed — the timeline format is the same, so
+`hab_bonus_xp` reads it exactly as before.
+
+#### The seven-day heat map
+Bottom of Today, inside *The last seven days*. One row per tracked habit, one column per
+day, oldest on the left. The point is the **shape**: a solid band on one row above a
+gap-toothed one says more about where the week went than any percentage, and it replaced a
+"strongest / weakest" sentence that named two habits out of eight and said nothing about
+the other six.
+
+Rows are ordered strongest-first so the eye lands on what is working before what is not.
+Cells reuse the 35-day grid's vocabulary — `hit` / `part` / `pre` — so the athlete learns
+it once. ⚠️ It reads `rosterOn(k)`, not `live()`: a habit switched on midweek did not exist
+on Monday, and drawing it as three misses is the app inventing failures. Those cells render
+`pre`, exactly like days before the athlete joined. Labels use `HABITS[].short` (*Steps*,
+*Protein*, *Supps*) because the task-style names do not fit a 66px column.
 
 #### The backfill window
 Nobody logs perfectly on the day, every day, so **the last `BACKFILL_DAYS` (3) days plus
@@ -289,12 +402,13 @@ Written and read in the **CREW** tab, which opens on it.
 Habits and achievements merged, because they were two views of one question.
 
 **A slim level strip** (not a repeat of Today's hero — two tabs used to open
-with the identical 76px level block) → **the streak band** (the same one Today opens with)
-→ **four season stats**: days logged, badges, longest run, perfect days → a one-line
+with the identical 76px level block) → **four season stats**: days logged, badges,
+**day streak** (as the flame) and perfect days → a one-line
 **key explaining the consistency pips**, which had no
 legend anywhere in the app and are empty for the first five days → **one row per habit**
 (its level, rank, XP, progress bar and five pips, tapping through to full history) →
-paused habits with their banked XP → the ten one-off **milestones**.
+paused habits with their banked XP → **seasonal events** → the sixteen one-off
+**milestones**, in three tiers.
 
 Days-logged leads the stat grid deliberately. Perfect days and runs are both zero for
 anyone rebuilding after a bad week, and opening your own progress on a pair of zeros
