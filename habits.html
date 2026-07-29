@@ -1025,6 +1025,14 @@
     padding: 11px 16px; border-top: 2px solid var(--divider);
     font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
   }
+  .evgoal .g-cnt.stack { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+  .evgoal .g-cnt .g-xp { color: var(--muted-soft); }
+  .evgoal .g-cnt .g-xp.got { color: var(--clay-deep); font-weight: 700; }
+  /* A quest carries a name AND a description; an event goal is one line. Two
+     rows rather than one wrapped one, so the bar never sits under a hanging
+     word. */
+  .evgoal .g-sub { font-size: 10.5px; line-height: 1.25; color: var(--muted-soft); }
+  .evgoal.got .g-sub { text-decoration: none; }
   .evfoot strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .02em; color: var(--clay-deep); }
   .evcard.done .evfoot strong { color: var(--accent); }
 
@@ -4726,7 +4734,6 @@ function renderToday(LI, doneCount, pct) {
         <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
       </div>`}
 
-      ${renderQuestBlock()}
 
       <!-- The way back in for anyone who skipped the tour, and the way in for
            every athlete who has been using the app since before it existed.
@@ -4821,54 +4828,63 @@ function renderToday(LI, doneCount, pct) {
 // who joined between runs never learned quests existed, so the next one read as
 // random rather than as an event they had been waiting for. One quiet line
 // instead — a fraction of the height of a live block, so a real run still lands.
+// Between runs this stays visible rather than vanishing. The block disappearing
+// entirely kept "seeing quests means something is on" true, but made the whole
+// feature invisible — an athlete who joined between runs never learned quests
+// existed, and the next one read as random rather than as an event.
 function renderQuestsIdle() {
   return `<div class="questidle" data-k="questidle">
-    <span class="eyebrow">Quests</span>
-    <span>None running. Your coach sets these for a week at a time — when one is on, it appears here.</span>
+    <span>None running right now. Your coach sets these a week at a time — when one is on it appears here, worth real points on top of your habits.</span>
   </div>`;
 }
+// Quests wear the EVENT card. Amir picked that design out by name and asked for
+// it here — which is right beyond the aesthetics: a quest run and an event are
+// the same object at two lengths (a set of goals, a clock, a reward), and they
+// were drawn as two unrelated things. One card, two spans: seven days and
+// twenty-eight.
+//
+// It lives on PROGRESS, above the events, and no longer on Today. Today is for
+// logging; a block of week-long targets there was commentary sitting above the
+// list, and it pushed the habits down for something nobody acts on mid-tap.
 function renderQuestBlock() {
   const run = activeQuestRun();
   if (!run) return renderQuestsIdle();
   const qs = runQuests(run);
   if (!qs.length) return renderQuestsIdle();
   const prog = qs.map(q => ({ q, p: questProgress(q, run) }));
-  const doneN = prog.filter(x => x.p.done).length;
+  const doneN = prog.filter(x => x.p.done).length, allDone = doneN === qs.length;
   const left = runDaysLeft(run);
   const earned = prog.filter(x => x.p.done).reduce((s, x) => s + x.q.xp, 0);
   const onOffer = qs.reduce((s, q) => s + q.xp, 0);
 
-  return `
-    <div class="block" data-k="quests:${esc(run.start)}" style="display:flex;flex-direction:column;gap:12px;border-bottom:2px solid var(--divider)">
-      <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
-        <span>Quests</span>
-        <span>${doneN} of ${qs.length} · ${left > 1 ? left + ' days left' : 'last day'}</span>
-      </div>
-      ${prog.map(({ q, p }) => `
-        <div data-k="q:${esc(q.id)}" style="display:flex;gap:12px;align-items:center;${p.done ? '' : 'opacity:.92'}">
-          <div class="hd" style="width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;
-            ${p.done ? 'background:var(--accent);color:var(--bg);border:2px solid var(--accent)' : 'border:2px solid var(--box);color:var(--muted-soft)'}">
-            ${p.done ? '<span style="width:17px;height:17px;display:block">' + TICK + '</span>' : 'Q'}
-          </div>
-          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
-              <span class="hd" style="font-size:15px;line-height:1">${esc(q.title)}</span>
-              <span class="mono" style="flex:none;font-size:10px;font-weight:700;color:${p.done ? 'var(--clay-deep)' : 'var(--muted-soft)'}">+${q.xp}</span>
-            </div>
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">
-              ${esc(q.note)} · <strong style="color:var(--ink)">${fmtQuestVal(q, p.have)} / ${fmtQuestVal(q, p.need)}</strong>
-            </div>
-            <div class="bar" style="height:4px;width:100%"><span data-fill style="width:${p.pct}%"></span></div>
-          </div>
-        </div>`).join('')}
-      <div style="font-size:11px;line-height:1.4;color:var(--muted-soft)">
-        ${doneN === qs.length
-          ? 'Every quest cleared — ' + earned.toLocaleString() + ' XP banked.'
-          : earned > 0
-            ? earned.toLocaleString() + ' XP banked, ' + (onOffer - earned).toLocaleString() + ' still on the table. This run ends ' + esc(runEndLabel(run)) + '.'
-            : onOffer.toLocaleString() + ' XP on the table. This run ends ' + esc(runEndLabel(run)) + ', finished or not.'}
-      </div>
-    </div>`;
+  return `<div class="evcard ${allDone ? 'done' : 'live'}" data-k="quests:${esc(run.start)}">
+    <div class="evhd">
+      <span style="flex:1;min-width:0">
+        <span class="evnm">This week</span>
+        <span class="evtag">Seven days · set by your coach</span>
+      </span>
+      <span class="evstate">${allDone ? 'Complete' : (left > 1 ? left + ' days left' : 'Last day')}</span>
+    </div>
+    <div class="evblurb">${allDone
+      ? 'Every one of them cleared. Nothing left on the table this week.'
+      : 'Targets for the week rather than the day. They expire ' + esc(runEndLabel(run)) + ', finished or not.'}</div>
+    ${prog.map(({ q, p }) => `<div class="evgoal ${p.done ? 'got' : ''}" data-k="q:${esc(q.id)}">
+      <span class="g-tick">${p.done ? TICK : ''}</span>
+      <span class="g-mid">
+        <span class="g-lbl">${esc(q.title)}</span>
+        <span class="g-sub">${esc(q.note)}</span>
+        <span class="g-bar"><span data-fill style="width:${p.pct}%"></span></span>
+      </span>
+      <span class="g-cnt stack">
+        <span>${p.done ? 'DONE' : fmtQuestVal(q, p.have) + ' / ' + fmtQuestVal(q, p.need)}</span>
+        <span class="g-xp ${p.done ? 'got' : ''}">+${q.xp} XP</span>
+      </span>
+    </div>`).join('')}
+    <div class="evfoot">
+      <span>${earned > 0 ? earned.toLocaleString() + ' XP banked' : 'On the table'}</span>
+      <strong>${allDone ? earned.toLocaleString() + ' XP' : (onOffer - earned).toLocaleString() + ' XP'}</strong>
+    </div>
+  </div>`;
 }
 function runEndLabel(run) {
   return parseKey(runEndKey(run)).toLocaleDateString('en-GB', { weekday: 'long' });
@@ -4998,7 +5014,13 @@ function renderProgress(LI, earned, totalAch) {
            is "how close am I" and the old row answered it in 8px mono at the
            far right. The section also states the collection count, and names
            the one nearest to falling. -->
-      <!-- EVENTS first. Everything below this is permanent and will still be
+      <!-- QUESTS, then EVENTS: seven days above twenty-eight, because the one
+           with less time left is the one to act on. Both wear the same card —
+           they are the same object at two lengths. -->
+      ${sectionLabel('Quests', 'Seven days')}
+      ${renderQuestBlock()}
+
+      <!-- Everything below this is permanent and will still be
            there next year; an event is the only thing on the screen with a
            clock on it, so it goes where the eye lands. Events that have not
            opened yet are not drawn at all — an athlete cannot act on November
