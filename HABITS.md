@@ -255,25 +255,40 @@ and glyph coverage genuinely varies by platform (🌬 rendered as a mangled box 
 was swapped for 💨). They stay because a list of eight tasks scans faster with them.
 Removing them is one edit to `HABITS[].name`.
 
-#### Seasonal events
-`EVENTS` in `habits.html`. A named block of the *calendar* — not the scoring season
-— with two or three goals, the whole board doing it at once. Reachable from the top
-of Progress; events that have not opened yet are not drawn at all, because an
-athlete cannot act on November in July and four locked cards would bury the live one.
+#### Events — the middle distance
+`EVENTS` in `habits.html`. Amir, 2026-07-30: *"by seasonal i didnt mean actual seasonal, it
+meant something more than a week and less that rare or very long like 100 days."* So these
+are **not** calendar seasons — they are a **duration bracket**, filling the gap the badge
+tiers leave open:
 
-**They pay a TITLE, never XP, and that is the design.** XP is scored twice, so a new
-paying rail means new plpgsql that has to agree with the app for ever. A title is
-stored, append-only and free to mint — the same rule the reward track runs on — and
-it is worth *more* here anyway, because titles show on the leaderboard and the roll
-call wall. Finishing SUMMER SHRED is something other people see; XP would be a number
-nobody else reads.
+| | span |
+|---|---|
+| a good week | 7 days |
+| **► an event** | **28 days** ← nothing lived here before |
+| the long haul | 10–30 days, single habit |
+| rare | 60–150 days |
 
-Goals reuse the quest `kind` grammar exactly (`daysHit:`, `total:`, `qualify`,
-`perfect`) so they are measured from the log alone. Deliberately **not**
-season-bounded the way quests are: a season reset in the middle of August must not
-wipe half of SUMMER SHRED. The four event title ids must also exist in `passTrack`
-on the `xp_rules` row or the server refuses a title the app has already awarded —
-see `supabase/stage20_tiers_and_events.sql`.
+Four weeks is long enough that it cannot be crammed and short enough to be worth starting
+on day one. Each event runs **once, back to back from a fixed anchor** (`EVENT_ANCHOR`,
+`EVENT_DAYS = 28`), so there is always exactly one live and it changes every four weeks —
+the part that keeps the app from going stale. Windows are **computed** by `eventWindow(i)`,
+never typed, so there are no dates to keep in step by hand; `datedEvents()` is what every
+consumer reads. Events that have not opened are not drawn at all — an athlete cannot act on
+October in July, and locked cards would bury the live one.
+
+**They pay a TITLE, never XP**, and that is the design. XP is scored twice, so a new paying
+rail means new plpgsql that has to agree with the app for ever. A title is stored,
+append-only and free to mint — the same rule the reward track runs on — and it is worth
+*more* here anyway, because titles show on the leaderboard and the roll call wall.
+Finishing one is something other people see; XP would be a number nobody else reads.
+
+⚠️ **The four `title.id` values are registered in `passTrack` on the `xp_rules` row.** Names,
+goals, blurbs and windows can be rewritten freely — the server only ever validates the id —
+but changing an **id** needs another SQL round trip.
+
+Goals reuse the quest `kind` grammar exactly (`daysHit:`, `total:`, `qualify`, `perfect`) so
+they measure from the log alone. Deliberately **not** season-bounded the way quests are: a
+scoring season resetting mid-event must not wipe half of it.
 
 #### Milestones come in three tiers
 `tier` on each entry in `ACHIEVEMENTS`, grouped on Progress by `ACH_TIERS`:
