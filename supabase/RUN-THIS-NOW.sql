@@ -1,78 +1,83 @@
 -- ═══════════════════════════════════════════════════════════════════════════
---  AMIR — PASTE THIS WHOLE FILE INTO THE SUPABASE SQL EDITOR AND PRESS RUN.
+--  AMIR — ONE MORE PASTE. Supabase → SQL Editor → New query → paste → Run.
 -- ═══════════════════════════════════════════════════════════════════════════
 --
---  Supabase → your project → SQL Editor → New query → paste → Run.
---  It takes about two seconds. It deletes nothing and it is safe to run twice.
+--  Your last check came back:  badges 16 · bar 75 · titles 5
 --
---  WHY: the app and the database each keep their own copy of the scoring rules.
---  The app has been updated; this is the other half. Until it runs, the
---  leaderboard pays slightly less than each athlete's own screen shows, because
---  the database still knows about 10 badges and the app knows about 16.
+--  The first two are right — the badge list and the qualifying bar are done.
+--  The third is not: the app can hand out 18 titles and card looks, and the
+--  server's list only knows 5. The server REFUSES a title it does not
+--  recognise, so 13 of them would simply never appear next to anyone's name on
+--  the leaderboard or the wall.
 --
---  It does three things:
---    1. Tells the server which habit cannot be ticked by hand (the session), so
---       a rest day is not judged against a workout nobody could log, and moves
---       the qualifying bar to 75%.
---    2. Adds the six new badges, taking the list from 10 to 16.
---    3. Adds the four seasonal event titles, so the server accepts a title the
---       app has awarded instead of refusing it.
+--  That gap is older than today — the four new event titles went in fine, but
+--  the level-track titles were never all there to begin with.
 --
---  The check at the bottom prints what it did. Expect:
---    qualify_pct 75 · unearnable ["strength"] · milestones 16 · pass_track 18
+--  This statement only ever ADDS. It reads whatever is in the list now, works
+--  out which of the 18 are missing, and appends just those. Nothing is removed,
+--  nothing anyone has already earned is touched (earned titles live in a
+--  separate table, public.hab_titles), and running it twice does nothing the
+--  second time.
+--
+--  Expect afterwards:  badges 16 · bar 75 · titles 18
 -- ═══════════════════════════════════════════════════════════════════════════
 
 begin;
 
--- ── 1. The weighted day score + the streak gate (stage 19) ────────────────
+with cur as (
+  select coalesce(rules -> 'passTrack', '[]'::jsonb) as pt
+  from public.xp_rules where id = 1
+),
+want as (
+  select '[
+    {"lv":2, "kind":"title","id":"t_signed",    "name":"SIGNED ON"},
+    {"lv":4, "kind":"title","id":"t_23",        "name":"THE TWENTY-THREE"},
+    {"lv":6, "kind":"card", "id":"c_ember",     "name":"EMBER"},
+    {"lv":8, "kind":"title","id":"t_early",     "name":"EARLY DOORS"},
+    {"lv":11,"kind":"title","id":"t_night",     "name":"NIGHT SHIFT"},
+    {"lv":14,"kind":"card", "id":"c_blueprint", "name":"BLUEPRINT"},
+    {"lv":17,"kind":"title","id":"t_between",   "name":"BETWEEN SESSIONS"},
+    {"lv":21,"kind":"title","id":"t_iron",      "name":"IRONCLAD"},
+    {"lv":25,"kind":"card", "id":"c_night",     "name":"NIGHTFALL"},
+    {"lv":29,"kind":"title","id":"t_metronome", "name":"THE METRONOME"},
+    {"lv":34,"kind":"title","id":"t_weather",   "name":"WEATHERPROOF"},
+    {"lv":39,"kind":"card", "id":"c_flare",     "name":"FLARE"},
+    {"lv":44,"kind":"title","id":"t_unbroken",  "name":"UNBROKEN"},
+    {"lv":50,"kind":"title","id":"t_proof",     "name":"PROOF ITSELF"},
+    {"lv":0, "kind":"title","id":"t_sunforged", "name":"SUN-FORGED"},
+    {"lv":0, "kind":"title","id":"t_bedrock",   "name":"BEDROCK"},
+    {"lv":0, "kind":"title","id":"t_coldforged","name":"COLD-FORGED"},
+    {"lv":0, "kind":"title","id":"t_stillhere", "name":"STILL HERE"}
+  ]'::jsonb as pt
+),
+missing as (
+  select coalesce(jsonb_agg(w.val), '[]'::jsonb) as pt
+  from jsonb_array_elements((select pt from want)) w(val)
+  where not exists (
+    select 1 from jsonb_array_elements((select pt from cur)) c(val)
+    where c.val ->> 'id' = w.val ->> 'id'
+  )
+)
 update public.xp_rules
-set rules = rules || '{"unearnable":["strength"],"streakQualifyPct":75}'::jsonb,
+set rules = jsonb_set(rules, '{passTrack}',
+      (select pt from cur) || (select pt from missing)),
     updated_at = now()
 where id = 1;
-
--- ── 2. Badges: 10 -> 16 (stage 20) ───────────────────────────────────────
-update public.xp_rules
-set rules = rules || jsonb_build_object('milestones', '[
-    {"code":"FB","need":1,  "xp":50, "measure":"daysHit:strength"},
-    {"code":"CS","need":1,  "xp":100,"measure":"perfectDays"},
-    {"code":"HS","need":5,  "xp":100,"measure":"streak:water"},
-    {"code":"TS","need":3,  "xp":120,"measure":"streak:strength"},
-    {"code":"SW","need":7,  "xp":130,"measure":"daysHit:steps"},
-    {"code":"FF","need":5,  "xp":110,"measure":"daysHit:fuel"},
-    {"code":"DP","need":10, "xp":75, "measure":"daysWith3"},
-    {"code":"ZM","need":10, "xp":100,"measure":"streak:breathe"},
-    {"code":"BA","need":10, "xp":150,"measure":"streak:sleep"},
-    {"code":"HM","need":12, "xp":150,"measure":"streak:strength"},
-    {"code":"RB","need":14, "xp":150,"measure":"streak:mobility"},
-    {"code":"IM","need":16, "xp":150,"measure":"streak:supps"},
-    {"code":"RR","need":30, "xp":200,"measure":"daysHit:steps"},
-    {"code":"MC","need":150,"xp":750,"measure":"daysHit:strength"},
-    {"code":"UB","need":60, "xp":600,"measure":"streak:water"},
-    {"code":"CN","need":100,"xp":500,"measure":"perfectDays"}
-  ]'::jsonb),
-  updated_at = now()
-where id = 1;
-
--- ── 3. The four seasonal event titles (stage 20) ─────────────────────────
--- Guarded, so running this file twice does not add them twice.
-update public.xp_rules
-set rules = jsonb_set(rules, '{passTrack}', (rules -> 'passTrack') || '[
-      {"lv":0,"kind":"title","id":"t_sunforged", "name":"SUN-FORGED"},
-      {"lv":0,"kind":"title","id":"t_bedrock",   "name":"BEDROCK"},
-      {"lv":0,"kind":"title","id":"t_coldforged","name":"COLD-FORGED"},
-      {"lv":0,"kind":"title","id":"t_stillhere", "name":"STILL HERE"}
-    ]'::jsonb),
-    updated_at = now()
-where id = 1
-  and not (rules -> 'passTrack') @> '[{"id":"t_sunforged"}]'::jsonb;
 
 commit;
 
 -- ── The check ────────────────────────────────────────────────────────────
-select rules ->> 'streakQualifyPct'                       as qualify_pct,
-       rules -> 'unearnable'                              as unearnable,
-       jsonb_array_length(rules -> 'milestones')          as milestones,
-       jsonb_array_length(rules -> 'passTrack')           as pass_track,
-       (select sum((m ->> 'xp')::int)
-          from jsonb_array_elements(rules -> 'milestones') m) as badge_xp_total
+-- Expect: badges 16 · bar 75 · titles 18 · missing_from_server 0
+select jsonb_array_length(rules -> 'milestones') as badges,
+       rules ->> 'streakQualifyPct'              as bar,
+       jsonb_array_length(rules -> 'passTrack')  as titles,
+       (select count(*)
+          from (values ('t_signed'),('t_23'),('c_ember'),('t_early'),('t_night'),
+                       ('c_blueprint'),('t_between'),('t_iron'),('c_night'),
+                       ('t_metronome'),('t_weather'),('c_flare'),('t_unbroken'),
+                       ('t_proof'),('t_sunforged'),('t_bedrock'),('t_coldforged'),
+                       ('t_stillhere')) v(id)
+         where not exists (
+           select 1 from jsonb_array_elements(rules -> 'passTrack') e(val)
+           where e.val ->> 'id' = v.id)) as missing_from_server
 from public.xp_rules where id = 1;
