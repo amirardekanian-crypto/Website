@@ -61,7 +61,7 @@ pool (see [Adding a new one](#adding-a-new-one)).
 | `w_steps70k` | **THE LONG WAY ROUND** | 70,000 steps | 280 |
 | `w_train3` | **THREE HARD DAYS** | Three sessions | 250 |
 | `w_water7` | **SEVEN FOR SEVEN** | Full water every day | 220 |
-| `w_qualify5` | **FIVE ON TARGET** | 5 days at 80%+ | 220 |
+| `w_qualify5` | **FIVE ON TARGET** | 5 days at 75%+ | 220 |
 | `w_steps50k` | **FIFTY THOUSAND** | 50,000 steps | 200 |
 | `w_sleep5` | **LIGHTS OUT** | Sleep target 5 nights | 180 |
 | `w_water5` | **THE WELL RUNS DEEP** | Full water on 5 days | 150 |
@@ -157,8 +157,8 @@ some, cross out the rest, add your own.
 |---|---|---|---|
 | ONE CLEAN SWEEP | One perfect day | `perfect` · 1 | 160 |
 | THREE PERFECT | Three perfect days | `perfect` · 3 | 500 |
-| HALF DECENT | 3 days at 80%+ | `qualify` · 3 | 120 |
-| SEVEN FROM SEVEN | Every day at 80%+ | `qualify` · 7 | 420 |
+| HALF DECENT | 3 days at 75%+ | `qualify` · 3 | 120 |
+| SEVEN FROM SEVEN | Every day at 75%+ | `qualify` · 7 | 420 |
 
 ---
 
@@ -178,7 +178,7 @@ alone — which is what lets the app and the leaderboard agree:
 |---|---|
 | `daysHit:<habit>` | Completed that habit on N separate days of the run |
 | `total:<habit>` | Accumulated N units across the run (target or not) |
-| `qualify` | N days at 80% of habits or better |
+| `qualify` | N days at 75% of the day's weight or better |
 | `perfect` | N days with every tracked habit done |
 
 Habit ids: `strength` (WORKOUT), `steps`, `sleep`, `fuel`, `water`, `mobility`,
@@ -203,7 +203,7 @@ Honest list — none of these work today, and each needs a new `kind`.
 | "Beat last week's steps" | Nothing compares one window to another |
 | "Log everything before 10am" | The log stores **days**, not timestamps |
 | "Train three days in a row" | Streaks aren't a quest measure (only a badge one) |
-| "No zero days" | Would need a per-quest `qualify` threshold, not the fixed 80% |
+| "No zero days" | Would need a per-quest `qualify` threshold, not the fixed 75% |
 | A quest for one athlete only | Quests are global by design — it's what keeps the board fair |
 | "Beat someone on the board" | Quests can't read the leaderboard |
 

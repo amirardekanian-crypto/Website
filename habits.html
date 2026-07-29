@@ -63,6 +63,7 @@
     --accent-100: rgba(14,74,54,0.08);
     --clay: #C7552F;
     --clay-deep: #8E3A1E;
+    --clay-100: rgba(199,85,47,0.09);
     /* Text that sits ON a clay background. Clay inverts between themes — deep
        clay is a dark brown in light mode and a light salmon in dark — so the
        text on it has to invert too. Hard-coding white gave 2.4:1 in dark mode
@@ -86,6 +87,7 @@
     --accent-100: rgba(62,156,116,0.14);
     --clay: #E06B43;
     --clay-deep: #F09068;
+    --clay-100: rgba(224,107,67,0.15);
     --on-clay: #14120F;
     --scrim: rgba(0,0,0,0.55);
     --divider: rgba(240,237,230,0.34);
@@ -861,6 +863,89 @@
   .ember.lead[data-lvl="2"]::before { animation: emberPulse 1.5s ease-in-out infinite; }
   .ember.lead[data-lvl="3"]::before { animation: emberFlicker 1.9s ease-in-out infinite; }
 
+  /* ── The streak band ──────────────────────────────────────────────────────
+     CLAY, NEVER GREEN. On Today this sits directly under the level hero, which
+     is a green figure over a green bar; a second green block of the same shape
+     reads as one broken double-bar, which is exactly why the day's own
+     progress was taken off this screen in the first place. Clay also matches
+     the ember language the habit rows already use for runs, so the two kinds
+     of consistency look related without looking identical. */
+  .streakband {
+    display: flex; align-items: center; gap: 16px;
+    padding: 15px 20px; border-bottom: 2px solid var(--divider);
+    background: var(--clay-100);
+  }
+  .streakband .sb-fig {
+    flex: none; display: flex; align-items: baseline; gap: 7px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    color: var(--clay-deep); letter-spacing: -.04em; font-size: 40px; line-height: .85;
+  }
+  /* The flame is the ember dot at three sizes, not an emoji — the app has no
+     emoji in it anywhere and one would be the only thing on screen that
+     changes shape between platforms. */
+  .streakband .flame {
+    flex: none; width: 9px; height: 9px; background: var(--clay); align-self: center;
+  }
+  .streakband[data-lvl="0"] .flame { background: var(--muted-soft); }
+  .streakband[data-lvl="1"] .flame { animation: emberPulse 2.8s ease-in-out infinite; }
+  .streakband[data-lvl="2"] .flame { animation: emberPulse 1.5s ease-in-out infinite; }
+  .streakband[data-lvl="3"] .flame { animation: emberFlicker 1.9s ease-in-out infinite; }
+  .streakband[data-lvl="0"] .sb-fig { color: var(--muted); }
+  .streakband .sb-mid { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  .streakband .sb-lbl {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px;
+    line-height: 1; letter-spacing: .06em; text-transform: uppercase; color: var(--ink);
+  }
+  .streakband .sb-sub { font-size: 11px; line-height: 1.3; color: var(--muted); }
+  /* The seven-day trail. Squares, not dots: `.pips` already means "a ladder of
+     things you have cleared" everywhere else in the app, and this is the same
+     idea over days instead of tiers. Clay here, green there — see above. */
+  .streakband .sb-trail { flex: none; display: flex; gap: 3px; align-items: flex-end; }
+  .streakband .sb-trail i {
+    width: 9px; height: 9px; display: block; border: 1.5px solid var(--box); background: none;
+  }
+  .streakband .sb-trail i.ok { background: var(--clay); border-color: var(--clay); }
+  .streakband .sb-trail i.pre { border-color: var(--rule); }
+  /* Today reads as the live cell: taller, and outlined until it qualifies. */
+  .streakband .sb-trail i.now { height: 15px; border-color: var(--clay-deep); }
+
+  /* ── Milestone rows ───────────────────────────────────────────────────────
+     These were a flat list at 45% opacity: nine things the athlete had mostly
+     not done, greyed out, which reads as a report card rather than a shelf.
+     Every row is full-strength now and carries a BAR — the question an athlete
+     actually has about a milestone is "how close am I", and the old row
+     answered it in 8px mono at the far right. */
+  .msrow { display: flex; gap: 14px; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--rule); }
+  .msrow .code {
+    flex: none; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; letter-spacing: .02em;
+    border: 2px solid var(--box); color: var(--muted);
+  }
+  .msrow.got .code { background: var(--clay); border-color: var(--clay); color: var(--on-clay); }
+  .msrow .ms-mid { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+  .msrow .ms-name {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
+    line-height: 1; text-transform: uppercase; color: var(--muted);
+  }
+  .msrow.got .ms-name { color: var(--ink); }
+  .msrow .ms-note { font-size: 11px; line-height: 1.3; color: var(--muted-soft); }
+  .msrow .ms-bar { height: 5px; background: var(--track); }
+  .msrow .ms-bar > span { display: block; height: 100%; background: var(--clay); transition: width .35s cubic-bezier(.2,.8,.2,1); }
+  .msrow.got .ms-bar { display: none; }
+  .msrow .ms-right { flex: none; display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+  .msrow .ms-xp { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted-soft); }
+  .msrow.got .ms-xp { color: var(--clay-deep); font-weight: 700; }
+  .msrow .ms-cnt { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; color: var(--muted-soft); }
+  .msrow.got .ms-cnt { color: var(--clay-deep); }
+  /* The one nearest to falling. Named at the top of the section rather than
+     left for the athlete to find by comparing nine bars. */
+  .msnext {
+    display: flex; align-items: center; gap: 10px; padding: 12px 20px;
+    border-bottom: 1px solid var(--rule); background: var(--clay-100);
+    font-size: 12px; line-height: 1.4; color: var(--muted);
+  }
+  .msnext strong { color: var(--ink); }
+
   /* The app noticing you have stalled. Breathes the box of the most valuable
      habit still undone, ~20s after you last touched anything. */
   @keyframes idleBreathe {
@@ -1001,7 +1086,14 @@ const XP_RULES = {
   growth: 0.55,           // cost(n) = base × n^growth — higher = steeper climb
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
-  streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  // A day counts toward the day-streak at this % of the WEIGHT it could earn —
+  // see dayParts(). 75, not 80, and the five points are load-bearing: the gate's
+  // denominator on a rest day is the seven daily habits (250), so the worst
+  // single miss is steps at 190/250 = 76%. At 80 that fails and steps quietly
+  // becomes a second precondition alongside the session; at 75 the old promise
+  // — "miss any one thing and the day still counts" — survives on every roster
+  // on the board. Nobody's streak gets shorter; some get longer.
+  streakQualifyPct: 75,
   // The most a counter habit will accept in one day, as a multiple of its target
   // (steps 30,000 · water 24 · sleep 22.5h). Daily XP was always capped by
   // xpFor(), but a `total:` quest counts RAW UNITS — so without a ceiling one
@@ -1071,7 +1163,7 @@ const QUEST_POOL = [
   { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',          kind:'daysHit:supps',    need:7,     xp:140 },
   { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',       kind:'daysHit:fuel',     need:5,     xp:140 },
   { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions in the run',      kind:'daysHit:strength', need:3,     xp:250 },
-  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 80% or better',        kind:'qualify',          need:5,     xp:220 },
+  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 75% or better',        kind:'qualify',          need:5,     xp:220 },
   { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',               kind:'perfect',          need:2,     xp:300 }
 ];
 const QUEST_RUN_DAYS = 7;
@@ -1373,7 +1465,17 @@ const CONSISTENCY_TIERS = [
 ];
 
 // One-off milestones, measured against real history — nothing is seeded.
+//
+// FIRST BLOOD is the way in. Every other milestone here needs at least five
+// days, so the whole section was unreachable for the first working week — nine
+// greyed rows on the screen an athlete opens to see how they are doing. It pays
+// the least of any of them on purpose: it is the easiest thing in the list by an
+// order of magnitude, and the ladder stays honest only while the hardest work
+// pays the most. Note it is WORKOUT-gated, so a free-tier athlete cannot earn
+// it (the habit is locked and only a finished session in program.html ticks it)
+// — the same is already true of HEAVY METAL.
 const ACHIEVEMENTS = [
+  { code:'FB', name:'FIRST BLOOD',     note:'Your first session on the board',          xp:50,  need:1,   measure:'daysHit:strength' },
   { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps' },
   { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps' },
   { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength' },
@@ -1837,13 +1939,54 @@ async function syncFromCloud() {
 function loggedDays() { return Object.keys(LOG).sort(); }
 // Both read the roster THAT DAY had, never the one the athlete has now — see
 // rosterOn(). dayQualifies() and therefore the whole day-streak follow from
-// dayPct, so fixing these two settles every past percentage in the app.
-function dayPct(dayKey) {
-  const hs = rosterOn(dayKey); if (!hs.length) return 0;
-  return Math.round(hs.filter(h => isDone(h, dayKey)).length / hs.length * 100);
+// gatePct, so these settle every percentage in the app.
+//
+// ── The day score is WEIGHTED, and it is two numbers, not one ─────────────
+// A headcount says a supplement and a training session are the same day's
+// work, which nobody believes — and it was the last number in the app still
+// counting heads. xpFor() has always been weighted; so has every nudge, which
+// sorts what to chase by baseXp(). The percentage now agrees with them.
+//
+// It is BINARY, not pro-rata. xpFor() already pays pro-rata *with* a completion
+// bonus, so a linear percentage would be the one number here that does not
+// reward finishing — you could sit at 75%, over the bar, having finished nothing.
+//
+//   'score' — what the day was WORTH. Everything on that day's roster counts,
+//             the session included. The header, the day strip, the wall.
+//   'gate'  — what the athlete could actually DO. A LOCKED habit they did not
+//             earn that day leaves the denominator entirely. Streaks only.
+//
+// ⚠️ The gate is not a nicety, it is the thing that makes weighting safe.
+// WORKOUT is 100 of 350 — 28.6% of the default day — against a threshold that
+// allows 25% of slack. Weighted into the denominator it stops being a weight
+// and becomes a PRECONDITION: a rest day tops out at 250/350 = 71% and can
+// never qualify, so a 4x/week athlete's streak dies every rest day. Worse, a
+// free-tier athlete's WORKOUT is locked for good — their ceiling is 71% for
+// life and they would never have a qualifying day again, while proof.html
+// promises them in Amir's own voice that only the *perfect* day is out of
+// reach. Dropping an unearned lock from both halves of the fraction fixes all
+// of it: a rest day with everything else done is 250/250 = 100%.
+//
+// Finishing a session can then only ever HELP — it re-enters the denominator
+// already done, at 100% of itself.
+//
+// isPerfect() is deliberately untouched: still every(isDone) over the whole
+// roster, padlock included. It is what keeps proof.html true, and it is the
+// client twin of the server's `ndone >= nlive`.
+// ⚠️ rosterOn(dayKey), never live() — see the roster note above.
+function dayParts(dayKey, mode) {
+  let done = 0, total = 0;
+  rosterOn(dayKey).forEach(h => {
+    const hit = isDone(h, dayKey), w = baseXp(h);
+    if (mode === 'gate' && h.locked && !hit) return;
+    total += w; if (hit) done += w;
+  });
+  return { done, total };
 }
+function dayPct(dayKey)  { const p = dayParts(dayKey, 'score'); return p.total ? Math.round(p.done / p.total * 100) : 0; }
+function gatePct(dayKey) { const p = dayParts(dayKey, 'gate');  return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
-function dayQualifies(dayKey) { return dayPct(dayKey) >= XP_RULES.streakQualifyPct; }
+function dayQualifies(dayKey) { return gatePct(dayKey) >= XP_RULES.streakQualifyPct; }
 function currentDayStreak() {
   let d = dayQualifies(TKEY()) ? today() : addDays(today(), -1), n = 0;
   while (dayQualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
@@ -2090,7 +2233,16 @@ function consistencyFor(h) {
 }
 function measureAch(a) {
   if (a.measure === 'perfectDays') return loggedDays().filter(isPerfect).length;
-  if (a.measure === 'daysWith3') return loggedDays().filter(k => live().filter(h => isDone(h, k)).length >= 3).length;
+  // rosterOn(k), not live(). This is the DISPLAY half of daysWith3; bonusEvents()
+  // is the half that pays, and it was corrected in stage18 while this one was
+  // missed. The two then disagreed in the one direction that is hardest to
+  // notice: switching a habit off dropped days from the counter on Progress
+  // (they no longer had three habits DONE from today's list) while the 75xp the
+  // milestone had already paid correctly stayed put, because the ledger scores
+  // each day against the roster that day actually had. A progress figure that
+  // falls while the XP behind it does not is the same class of bug as the board
+  // and the phone disagreeing — nothing errors, it just quietly lies.
+  if (a.measure === 'daysWith3') return loggedDays().filter(k => rosterOn(k).filter(h => isDone(h, k)).length >= 3).length;
   const parts = a.measure.split(':'), kind = parts[0], h = habitById(parts[1]);
   if (kind === 'streak') return habitStreak(h);
   if (kind === 'daysHit') return loggedDays().filter(k => isDone(h, k)).length;
@@ -2129,12 +2281,25 @@ function armIdle() {
 function atRisk() {
   return new Date().getHours() >= 20 && !dayQualifies(TKEY()) && currentDayStreak() > 0;
 }
-// How many more habits would rescue the day.
+// How many more habits would rescue the day. Not a headcount any more: the day
+// is scored by weight, so the answer is the FEWEST remaining habits that close
+// the gap — which is simply the heaviest ones first. Greedy is exactly right
+// here, not an approximation: to reach a total in the fewest picks you always
+// take the biggest available.
+//
+// Locked habits are skipped because the athlete cannot tick them, which is the
+// same rule the gate itself uses — and it is why this can never run out of
+// road. Doing every unlocked habit leaves only unearned locks, and those are
+// not in the denominator, so the day lands on 100%.
 function shortOfQualifying() {
-  const hs = live();
-  if (!hs.length) return 0;
-  const need = Math.ceil(hs.length * XP_RULES.streakQualifyPct / 100);
-  return Math.max(1, need - hs.filter(h => isDone(h)).length);
+  const p = dayParts(TKEY(), 'gate');
+  if (!p.total) return 0;
+  const need = p.total * XP_RULES.streakQualifyPct / 100;
+  const left = rosterOn(TKEY()).filter(h => !isDone(h) && !h.locked)
+                               .sort((a, b) => baseXp(b) - baseXp(a));
+  let have = p.done, n = 0;
+  while (have < need && n < left.length) { have += baseXp(left[n]); n++; }
+  return Math.max(1, n);
 }
 
 // ── The nudge (one a day, driven by what is actually missing) ─────────────
@@ -2213,6 +2378,11 @@ function rulesSignature() {
   const src = JSON.stringify([
     XP_RULES.base, XP_RULES.growth, XP_RULES.completionBonus, XP_RULES.customXp,
     XP_RULES.weights, HABITS.map(h => [h.id, h.target]),
+    // The qualify threshold was missing here, which mattered the moment the day
+    // score became weighted: it decides every day streak and the `qualify`
+    // quest kind, so moving it has to re-baseline rather than silently restate
+    // an athlete's history at them.
+    XP_RULES.streakQualifyPct,
     // Tier days AND their multipliers, plus every milestone's cost and payout —
     // all of these now move real XP, so retuning any of them has to re-baseline
     // rather than fire a wall of celebrations nobody earned today.
@@ -3971,6 +4141,51 @@ function renderBadgeCelebration(ev) {
     </div>`;
 }
 
+// ── The streak band, shared by Today and Progress ─────────────────────────
+// The day streak is this app's headline consistency number — the whole point of
+// the qualify rule — and TODAY showed it in exactly one circumstance: a red bar
+// saying it was about to be lost. The only moment it appeared was the moment it
+// was bad news. On PROGRESS it was one of four equal tiles, a bare figure with
+// no sense of whether it was climbing or had just been broken.
+//
+// Both screens now open the same band: the number, how it compares to the best
+// ever, and the seven days behind it so the shape of the week is visible at a
+// glance rather than inferred from a single integer.
+//
+// Hidden entirely until there is a first logged day. A zero over an empty trail
+// is the loudest possible way to open an app on day one, and these screens
+// already go to some trouble not to do that — see the `pre` day chips and the
+// statgrid's day-one note.
+function bestHabitRun() {
+  // allHabits(), not live(): a run you earned does not stop having happened
+  // because you paused the habit, which is the same rule that keeps a
+  // consistency tier once it is crossed.
+  return allHabits().reduce((m, h) => Math.max(m, habitBest(h)), 0);
+}
+function streakBand() {
+  const first = firstLoggedDay();
+  if (!first) return '';
+  const now = currentDayStreak(), best = bestDayStreak(), lvl = emberLevel(now);
+  const cells = [];
+  for (let i = 6; i >= 0; i--) {
+    const k = fmtKey(addDays(today(), -i)), pre = k < first;
+    cells.push(`<i class="${[pre ? 'pre' : '', !pre && dayQualifies(k) ? 'ok' : '', i === 0 ? 'now' : ''].filter(Boolean).join(' ')}"></i>`);
+  }
+  // Three states, three different things worth saying. A broken streak is the
+  // one that needs a sentence rather than a statistic.
+  const sub = now === 0
+    ? `Clear ${XP_RULES.streakQualifyPct}% of what you track today and it start${best > 0 ? 's again' : 's'}.`
+    : (now >= best ? 'Your longest yet — nothing above it.' : `Best ${best} days.`);
+  return `<div class="streakband" data-k="streakband" data-lvl="${lvl}">
+    <span class="sb-fig"><i class="flame" aria-hidden="true"></i><span data-static data-num="dstreak" data-to="${now}">${now}</span></span>
+    <span class="sb-mid">
+      <span class="sb-lbl">${now === 0 ? 'No streak' : 'Day streak'}</span>
+      <span class="sb-sub">${esc(sub)}</span>
+    </span>
+    <span class="sb-trail" aria-label="The last seven days">${cells.join('')}</span>
+  </div>`;
+}
+
 // ── Habit row, shared by Today and Habits ─────────────────────────────────
 // The best current run across the tracked habits. Used to decide which single
 // ember animates; see the `.ember.lead` rules.
@@ -4133,6 +4348,12 @@ function renderToday(LI, doneCount, pct) {
         <div class="bar thin"><span data-fill style="width:${LI.pct}%"></span></div>
       </div>
 
+      <!-- The streak, directly under the level and above the day strip it
+           describes. It is clay, not green, for the reason the day's own
+           progress bar is no longer here at all: a second green block of the
+           same shape under the hero read as one broken double-bar. -->
+      ${streakBand()}
+
       <!-- Day strip then habits, directly under the hero. The list is what the
            screen is FOR; it used to start ~1,400px down, behind the nudge and
            the quest block, so opening the app to log meant scrolling to log. -->
@@ -4144,7 +4365,10 @@ function renderToday(LI, doneCount, pct) {
         </div>
         <button ${on(() => setDay(TKEY()))}>Back to today</button>
       </div>` : ''}
-      ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${hs.length - doneCount} to go before midnight</div>` : ''}
+      <!-- What RESCUES the day, not what is left of it. "3 to go" was every
+           remaining habit; under a weighted score those are not the same
+           number, and the smaller one is the true one. -->
+      ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
 
       ${(() => { const lead = leadStreak(); return hs.map(h => habitRow(h, 'today', lead)).join(''); })()}
 
@@ -4313,7 +4537,7 @@ function fmtQuestVal(q, v) {
 // one screen: overall level, then every habit's own rank, then the milestones.
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
-  const dayStreakNow = currentDayStreak(), bestStreak = bestDayStreak(), lead = leadStreak();
+  const bestRun = bestHabitRun(), lead = leadStreak();
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
   return `
@@ -4336,7 +4560,15 @@ function renderProgress(LI, earned, totalAch) {
         <span class="lvstrip-next mono">${LI.toNext.toLocaleString()}<span> TO GO</span></span>
       </button>
 
-      <!-- Days-logged leads on purpose. Streak and perfect-days are both zero
+      <!-- The same band Today opens with, so the number an athlete is protecting
+           looks identical on both screens they check it from. It also takes the
+           day streak OUT of the grid below: it was a bare figure there with no
+           way to tell a streak climbing from one just broken, and repeating it
+           in both places would be the duplication this tab was reorganised to
+           remove. -->
+      ${streakBand()}
+
+      <!-- Days-logged leads on purpose. Perfect days and runs are both zero
            for anyone rebuilding, and opening your progress on a pair of zeros
            is a punishment for having had a bad week. Showing up is the stat
            that is almost always positive, and it is the one that earns the rest. -->
@@ -4345,19 +4577,24 @@ function renderProgress(LI, earned, totalAch) {
           <div class="eyebrow">Days logged</div></div>
         <div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
           <div class="eyebrow">Badges</div></div>
-        <div><div class="figure" data-static data-num="streak" data-to="${dayStreakNow}">${dayStreakNow}</div>
-          <div class="eyebrow">Day streak${bestStreak > dayStreakNow ? ' · best ' + bestStreak : ''}</div></div>
+        <div><div class="figure" data-static data-num="bestrun" data-to="${bestRun}">${bestRun}</div>
+          <div class="eyebrow">Longest run</div></div>
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
           <div class="eyebrow">Perfect days</div></div>
       </div>
       <!-- Four zeros and four words, three of which the app has never defined
            anywhere an athlete has been. On day one this screen was a report of
            nothing; the same line explains what fills each of them, and it is
-           gone the moment there is a single day in the log. -->
+           gone the moment there is a single day in the log. It teaches RUN and
+           STREAK as the two separate things they are — the band above is the
+           streak, this grid holds the run — because the app used to have five
+           phrasings for those two ideas and they read as one number arguing
+           with itself. -->
       ${daysLogged === 0 ? `<div class="statnote" data-k="statnote">
         A <strong>badge</strong> is one of the ${CONSISTENCY_TIERS.length} consistency tiers on a habit
         or one of the ${ACHIEVEMENTS.length} milestones at the foot of this screen. A
-        <strong>day streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what you track.
+        <strong>run</strong> is consecutive days on one habit — a <strong>streak</strong> is consecutive days
+        where you cleared ${XP_RULES.streakQualifyPct}% of everything you track.
         A <strong>perfect day</strong> is all of it. All four start at zero and the first one moves today.
       </div>` : ''}
 
@@ -4412,22 +4649,42 @@ function renderProgress(LI, earned, totalAch) {
           </div>
         </div>`).join('') : ''}
 
-      ${sectionLabel('Milestones')}
-      ${ACHIEVEMENTS.map(a => {
-        const have = measureAch(a), got = have >= a.need;
-        return `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:15px 20px;opacity:${got ? '1' : '.45'}">
-          <div class="hd" style="width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;
-            ${got ? 'background:var(--accent);color:var(--bg);border:2px solid var(--accent)' : 'border:2px solid rgba(128,128,128,.5)'}">${a.code}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
-            <div class="hd" style="font-size:15px;line-height:1">${esc(a.name)}</div>
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${esc(a.note)}</div>
-          </div>
-          <div style="flex:none;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-            <div class="mono" style="font-size:11px;color:${got ? 'var(--clay-deep)' : 'var(--muted-soft)'}">+${a.xp} XP</div>
-            <div class="mono" style="font-size:8px;letter-spacing:.08em;color:var(--muted-soft)">${got ? 'UNLOCKED' : have + '/' + a.need}</div>
-          </div>
-        </div>`;
-      }).join('')}
+      <!-- Milestones. These were nine rows at 45% opacity — mostly things the
+           athlete had NOT done, greyed out, which reads as a report card rather
+           than a shelf being filled. Every row is full strength now and carries
+           a bar, because the question an athlete actually has about a milestone
+           is "how close am I" and the old row answered it in 8px mono at the
+           far right. The section also states the collection count, and names
+           the one nearest to falling. -->
+      ${(() => {
+        const rows = ACHIEVEMENTS.map(a => {
+          // Clamped: THE CENTURION reads 143/100 without it, and a bar past
+          // 100% would run outside its own track.
+          const have = Math.min(measureAch(a), a.need), got = have >= a.need;
+          return { a, have, got, pct: Math.round(have / a.need * 100) };
+        });
+        const gotN = rows.filter(r => r.got).length;
+        // Only once something is genuinely under way. "Closest" chosen from
+        // rows that are all sitting at zero is not information, it is the app
+        // picking a favourite out of nothing.
+        const near = rows.filter(r => !r.got && r.have > 0).sort((x, y) => y.pct - x.pct)[0];
+        return sectionLabel('Milestones', gotN + ' of ' + ACHIEVEMENTS.length)
+          + (near ? `<div class="msnext" data-k="msnext">
+              <strong>${esc(near.a.name)}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
+            </div>` : '')
+          + rows.map(r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
+              <span class="code">${esc(r.a.code)}</span>
+              <span class="ms-mid">
+                <span class="ms-name">${esc(r.a.name)}</span>
+                <span class="ms-note">${esc(r.a.note)}</span>
+                <span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>
+              </span>
+              <span class="ms-right">
+                <span class="ms-xp">+${r.a.xp} XP</span>
+                <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
+              </span>
+            </div>`).join('');
+      })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
         The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is. The five squares are consistency tiers, from a 5-day run up to two months.
@@ -4859,7 +5116,7 @@ function renderManual() {
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken runs.</div>
-          <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The nine on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
+          <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
         </div>`)}
 
       ${block(h2('Levels and ranks') +
@@ -4911,7 +5168,23 @@ function renderManual() {
         // Two words, one job each. The app used five phrasings for these two
         // ideas, so a 24-day run beside a 2-day streak looked like the same
         // number disagreeing with itself.
-        p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of everything you track. They are different numbers and they move at different speeds.`) +
+        p(`Two words worth keeping straight. A <strong style="color:var(--ink)">run</strong> is consecutive days on <em>one</em> habit — 24 days of water is a 24-day run. A <strong style="color:var(--ink)">streak</strong> is consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the day was worth. They are different numbers and they move at different speeds.`) +
+        // The athlete-facing half of the weighted day score. Without this, a rest
+        // day reading 71% while the streak survives looks like a bug on the one
+        // screen they check every morning.
+        p(`<strong style="color:var(--ink)">Not every habit is worth the same.</strong> Your day score is weighted — a session counts for more than a supplement, exactly as the points do — so it is a measure of how much of the day you got, not how many boxes you ticked. On a rest day it will read well under 100%, and that is honest: the session was part of the day and you did not do it.`) +
+        // The rest-day figure is computed from THIS athlete's roster, not typed
+        // in: someone tracking five habits sees their own number, and it stays
+        // true if the weights are ever retuned. The paragraph only appears when
+        // they actually have a locked habit — without one there is no gap to
+        // explain, and the sentence would contradict itself at 100%.
+        ((() => {
+          const hs = live(), tot = hs.reduce((s, h) => s + baseXp(h), 0);
+          const lock = hs.filter(h => h.locked).reduce((s, h) => s + baseXp(h), 0);
+          if (!tot || !lock) return '';
+          return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day — even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
+        })()) +
+        p(`Your streak sits at the top of <strong style="color:var(--ink)">Today</strong> and <strong style="color:var(--ink)">Progress</strong>, with the last seven days beside it — a filled square is a day that counted. Your longest single-habit run is in the stats on Progress, and each habit carries its own run in its row.`) +
         p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a run never takes a badge back.`) +
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
