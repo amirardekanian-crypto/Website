@@ -157,14 +157,17 @@ The screen they actually live on. **In this order, and the order is the point:**
    level. Today's own completion is *not* repeated here; the header and the day strip
    both already carry it, and a second green bar of the same shape directly beneath the
    first read as one broken double-bar.
-2. **The streak band** — the current day streak, how it compares to the best ever, and
-   the seven days behind it as a trail, so the shape of the week is visible instead of
-   inferred from one integer. **Clay, never green**, for the reason the day's own progress
-   bar is not here at all (see 1). Before it existed, the day streak — the number the whole
-   qualify rule exists to produce — appeared on this screen in exactly one circumstance: a red
-   bar warning it was about to be lost. The only moment it showed up was the moment it was
-   bad news. Hidden entirely until the first logged day: a zero over an empty trail is the
-   loudest possible way to open an app on day one. The same band opens PROGRESS.
+2. **The streak flame** — sits *on* the level hero, left of the rank block: a drawn flame
+   (never an emoji — nothing here should change shape between an iPhone and a Pixel) and the
+   day-streak number in clay, licking faster the longer the streak runs, on the same
+   0/5/15/30-day heat scale the habit rows use. Hidden until the first logged day.
+   ⚠️ This briefly had a whole **band** to itself and Amir killed it (2026-07-30, *"i hate
+   that … i asked you to show their streak … just bolder, flashier just something to catch
+   the eye"*). The lesson is worth keeping: he asked for an existing number to be made
+   **louder**, and a band is a *new field* — a whole strip of screen to state one integer,
+   on the screen whose own layout note says anything added goes below the habit list. The
+   flame costs no vertical space at all. Progress carries the same flame inside its stat
+   grid, so the day streak is one of its four facts again.
 3. **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
    completion, that choose **which day you are logging**. See *The backfill window* below.
 4. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
@@ -306,6 +309,34 @@ Progress are the two places that teach it, and both were rewritten to do so.
 **Do not reintroduce "run" in athlete-facing copy.** `bestHabitRun()` keeps its internal
 name because nothing renders it; the Progress tile it feeds reads *Longest streak*.
 
+#### Five core habits, and opt-in add-ons
+(Amir, 2026-07-30.) **`core: true`** on five — train · steps · sleep · protein · water.
+Always tracked, **no off switch**: `live()` honours `core` whatever `CFG.on` says, so even
+an athlete who switched one off before this existed gets it back, dated today, with nothing
+behind them moving. The same five for everyone is what makes a day score mean the same
+thing across the whole board.
+
+Everything else — mobility, breathing, supplements, anything custom — is an **add-on**,
+worth real points on top, and **once switched on it counts**.
+
+**The two rules in `stampRoster()`, which are the answer to "why did Friday change
+Wednesday":**
+
+| | takes effect |
+|---|---|
+| Switching an add-on **on** | **today** — you opted in, and today is still yours to finish |
+| Switching one **off** | **tomorrow** — or dropping it at 23:00 would delete a miss you already made |
+
+Neither ever reaches a closed day; `rosterOn(day)` still reads the entry in force on that
+day. `lockedOnToday()` is what lets a switched-off row still say *"still counts today"*.
+Settings carries the whole rule as **permanent copy**, not a toast — someone who switched
+something on three weeks ago should still be able to find out why it is counting.
+
+Proven against a nine-day log: adding supps today leaves Wednesday at 100% and takes today
+to 93%; switching it straight back off leaves today at **93%** (the dodge fails) and dates
+the removal to tomorrow. No SQL changed — the timeline format is the same, so
+`hab_bonus_xp` reads it exactly as before.
+
 #### The seven-day heat map
 Bottom of Today, inside *The last seven days*. One row per tracked habit, one column per
 day, oldest on the left. The point is the **shape**: a solid band on one row above a
@@ -371,8 +402,8 @@ Written and read in the **CREW** tab, which opens on it.
 Habits and achievements merged, because they were two views of one question.
 
 **A slim level strip** (not a repeat of Today's hero — two tabs used to open
-with the identical 76px level block) → **the streak band** (the same one Today opens with)
-→ **four season stats**: days logged, badges, longest run, perfect days → a one-line
+with the identical 76px level block) → **four season stats**: days logged, badges,
+**day streak** (as the flame) and perfect days → a one-line
 **key explaining the consistency pips**, which had no
 legend anywhere in the app and are empty for the first five days → **one row per habit**
 (its level, rank, XP, progress bar and five pips, tapping through to full history) →
