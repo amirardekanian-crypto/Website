@@ -170,9 +170,17 @@ the Supabase SQL editor. That resets every score to zero and deletes nothing; st
 consistency badges survive. The server (`public.seasons`) is the authority; the app
 fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
 
-**Supabase stages 9–19 are applied and live** (leaderboard, workout-days feed, seasons,
+**Habit names are TASKS** — `🚶 Walk 10,000 steps`, not `STEPS`. Display only; the
+`id` never changes, so no history moves. **Seasonal events** (`EVENTS` in
+`habits.html`) are named blocks of the calendar with 2–3 goals; they pay a **title,
+never XP**, precisely to avoid a third thing scored twice — but their title ids must
+exist in `passTrack` on the `xp_rules` row or the server refuses them. **Milestones
+carry a `tier`** (`week`/`long`/`rare`) for grouping on Progress; nothing scores off
+it. Full detail in `HABITS.md`.
+
+**Supabase stages 9–20 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
-per-day rosters, weighted day scores).
+per-day rosters, weighted day scores, milestone tiers + event titles).
 
 **The day score is WEIGHTED, and it is two numbers.** `dayParts(day, mode)` in
 `habits.html` sums `baseXp()` over `rosterOn(day)` rather than counting heads. `dayPct()`

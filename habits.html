@@ -946,6 +946,50 @@
   }
   .msnext strong { color: var(--ink); }
 
+  /* ── Seasonal events ──────────────────────────────────────────────────────
+     The only card in the app with a border on all four sides. Everything else
+     is a full-bleed row separated by rules, which is right for a list you scan
+     — an event is not a list item, it is a thing that is ON, and it has to read
+     as an object you could walk up to. */
+  .evcard { margin: 14px 20px; border: 2px solid var(--divider); }
+  .evcard.live { border-color: var(--clay); }
+  .evcard.done { border-color: var(--accent); background: var(--accent-100); }
+  .evhd { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 12px; }
+  .evcard.live .evhd { background: var(--clay-100); }
+  .evhd .evnm {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px;
+    line-height: .95; text-transform: uppercase; letter-spacing: -.01em; color: var(--ink);
+  }
+  .evhd .evtag { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-top: 5px; display: block; }
+  .evhd .evstate {
+    flex: none; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .09em;
+    text-transform: uppercase; padding: 4px 7px; white-space: nowrap;
+  }
+  .evcard.live .evstate { background: var(--clay); color: var(--on-clay); }
+  .evcard.done .evstate { background: var(--accent); color: var(--bg); }
+  .evcard.over .evstate { border: 1px solid var(--rule); color: var(--muted-soft); }
+  .evblurb { padding: 0 16px 13px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+  .evgoal { display: flex; align-items: center; gap: 11px; padding: 9px 16px; border-top: 1px solid var(--rule); }
+  .evgoal .g-tick {
+    flex: none; width: 17px; height: 17px; border: 2px solid var(--box);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .evgoal.got .g-tick { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .evgoal .g-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .evgoal .g-lbl { font-size: 12.5px; line-height: 1.2; color: var(--ink); }
+  .evgoal.got .g-lbl { color: var(--muted); text-decoration: line-through; }
+  .evgoal .g-bar { height: 4px; background: var(--track); }
+  .evgoal .g-bar > span { display: block; height: 100%; background: var(--clay); transition: width .35s cubic-bezier(.2,.8,.2,1); }
+  .evgoal.got .g-bar > span { background: var(--accent); }
+  .evgoal .g-cnt { flex: none; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted-soft); white-space: nowrap; }
+  .evfoot {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 11px 16px; border-top: 2px solid var(--divider);
+    font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .evfoot strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .02em; color: var(--clay-deep); }
+  .evcard.done .evfoot strong { color: var(--accent); }
+
   /* The app noticing you have stalled. Breathes the box of the most valuable
      habit still undone, ~20s after you last touched anything. */
   @keyframes idleBreathe {
@@ -1124,16 +1168,26 @@ const HABITS = [
   // The id stays 'strength' so nobody's history or XP is orphaned by the
   // rename. LOCKED: it cannot be ticked by hand — finishing a session in
   // program.html is the only thing that earns it. See lockedHint below.
-  { id:'strength', name:'WORKOUT',  code:'WO', kind:'check', target:1,     unit:'session', goal:'1 session · 45 min',             source:'From your programme', locked:true,
+  // ── Names are TASKS, not nouns ─────────────────────────────────────────
+  // They used to be labels — WORKOUT, STEPS, WATER — which is what the thing
+  // IS, not what the athlete has to do about it. A list of nouns reads as a
+  // filing system; a list of instructions reads as a day's work, and the target
+  // is in the name so the row states the job before you tap anything.
+  //
+  // The `id` never changes. Every log entry, every level and every leaderboard
+  // row is keyed on it, so renaming is display-only and costs nobody a point.
+  // `goal` is the second line, so it must NOT restate the name — on check-off
+  // habits it now carries the coaching detail the name has no room for.
+  { id:'strength', name:'🏋 Finish your session', code:'WO', kind:'check', target:1,     unit:'session', goal:'45 min · from your programme',   source:'From your programme', locked:true,
     lockedHint:'Complete any day of your Workout in your Program to gain XP for this.',
     freeHint:'Coached athletes earn this from their programme. It is the biggest habit on the list.' },
-  { id:'steps',    name:'STEPS',    code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
-  { id:'sleep',    name:'SLEEP',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
-  { id:'fuel',     name:'FUEL',     code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 logged meals',                 source:'Manual' },
-  { id:'water',    name:'WATER',    code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
-  { id:'mobility', name:'MOBILITY', code:'MO', kind:'check', target:1,     unit:'session', goal:'10 min stretch',                 source:'Manual' },
-  { id:'breathe',  name:'BREATHE',  code:'BR', kind:'check', target:1,     unit:'session', goal:'10 min breathing',               source:'Manual' },
-  { id:'supps',    name:'SUPPS',    code:'SU', kind:'check', target:1,     unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
+  { id:'steps',    name:'🚶 Walk 10,000 steps',   code:'SP', kind:'count', target:10000, unit:'steps',   goal:'10,000 steps',                   source:'Enter daily', step:500 },
+  { id:'sleep',    name:'🛏 Sleep 7.5+ hours',    code:'SL', kind:'count', target:7.5,   unit:'hours',   goal:'7.5 hours',                      source:'Enter daily', step:0.5, dec:1 },
+  { id:'fuel',     name:'🍗 3 protein meals', code:'FU', kind:'count', target:3,     unit:'meals',   goal:'3 meals, protein in each',       source:'Manual' },
+  { id:'water',    name:'💧 Drink 8 glasses',     code:'WA', kind:'count', target:8,     unit:'glasses', goal:'8 glasses',                      source:'Manual' },
+  { id:'mobility', name:'🧘 Stretch 10 minutes',  code:'MO', kind:'check', target:1,     unit:'session', goal:'Hips, ankles, T-spine',          source:'Manual' },
+  { id:'breathe',  name:'💨 Breathe 10 minutes',  code:'BR', kind:'check', target:1,     unit:'session', goal:'Nasal, slow, before bed',        source:'Manual' },
+  { id:'supps',    name:'💊 Take your supplements', code:'SU', kind:'check', target:1,   unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
 // ── Weekly quests ─────────────────────────────────────────────────────────
 // A RUN of quests, not a permanent feature. There are none unless the coach
@@ -1474,17 +1528,93 @@ const CONSISTENCY_TIERS = [
 // pays the most. Note it is WORKOUT-gated, so a free-tier athlete cannot earn
 // it (the habit is locked and only a finished session in program.html ticks it)
 // — the same is already true of HEAVY METAL.
+//
+// ── THREE TIERS, and the tier is the whole point ─────────────────────────
+// A single flat list gave a brand-new athlete one reachable row and nine walls,
+// and gave a two-year athlete nothing left to want. `tier` groups them on
+// Progress into three honest promises:
+//
+//   'week' — a good week gets you this. The section a new athlete lives in.
+//   'long' — weeks to months. The spine of the thing.
+//   'rare' — most people will never. That is what makes them worth having.
+//
+// Nothing else reads `tier`; it is presentation only. The scoring rail is
+// unchanged, which is why adding eight of these needed no new machinery on
+// either side — just more rows in ACHIEVEMENTS and in the `milestones` array on
+// the xp_rules row. ⚠️ Both, or the board pays a different number to the phone.
 const ACHIEVEMENTS = [
-  { code:'FB', name:'FIRST BLOOD',     note:'Your first session on the board',          xp:50,  need:1,   measure:'daysHit:strength' },
-  { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps' },
-  { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps' },
-  { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength' },
-  { code:'HS', name:'HUMAN SPRINKLER', note:'5 days running on full water',             xp:100, need:5,   measure:'streak:water' },
-  { code:'DP', name:'DAWN PATROL',     note:'10 days with 3+ habits logged',            xp:75,  need:10,  measure:'daysWith3' },
-  { code:'ZM', name:'ZEN MACHINE',     note:'10 breathing sessions in a row',           xp:100, need:10,  measure:'streak:breathe' },
-  { code:'BA', name:'BLACKOUT ARTIST', note:'10 nights at 7.5h or more',                xp:150, need:10,  measure:'streak:sleep' },
-  { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility' },
-  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays' }
+  // ── A good week ────────────────────────────────────────────────────────
+  { code:'FB', name:'FIRST BLOOD',     note:'Your first session on the board',          xp:50,  need:1,   measure:'daysHit:strength', tier:'week' },
+  { code:'CS', name:'CLEAN SWEEP',     note:'One perfect day. Everything, once.',       xp:100, need:1,   measure:'perfectDays',      tier:'week' },
+  { code:'HS', name:'HUMAN SPRINKLER', note:'5 days running on full water',             xp:100, need:5,   measure:'streak:water',     tier:'week' },
+  { code:'TS', name:'THE TONE SETTER', note:'3 straight days with a session',           xp:120, need:3,   measure:'streak:strength',  tier:'week' },
+  { code:'SW', name:'GROUND COVERED',  note:'7 days over your step target',             xp:130, need:7,   measure:'daysHit:steps',    tier:'week' },
+  { code:'FF', name:'FULLY FUELLED',   note:'5 days of three proper meals',             xp:110, need:5,   measure:'daysHit:fuel',     tier:'week' },
+  // ── The long haul ──────────────────────────────────────────────────────
+  { code:'DP', name:'DAWN PATROL',     note:'10 days with 3+ habits logged',            xp:75,  need:10,  measure:'daysWith3',        tier:'long' },
+  { code:'ZM', name:'ZEN MACHINE',     note:'10 breathing sessions in a row',           xp:100, need:10,  measure:'streak:breathe',   tier:'long' },
+  { code:'BA', name:'BLACKOUT ARTIST', note:'10 nights at 7.5h or more',                xp:150, need:10,  measure:'streak:sleep',     tier:'long' },
+  { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength',  tier:'long' },
+  { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility',  tier:'long' },
+  { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps',     tier:'long' },
+  { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps',    tier:'long' },
+  // ── Rare ───────────────────────────────────────────────────────────────
+  { code:'MC', name:'THE MACHINIST',   note:'150 sessions. A year of turning up.',      xp:750, need:150, measure:'daysHit:strength', tier:'rare' },
+  { code:'UB', name:'UNBREAKABLE',     note:'60 days running on full water',            xp:600, need:60,  measure:'streak:water',     tier:'rare' },
+  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays',      tier:'rare' }
+];
+const ACH_TIERS = [
+  { key:'week', label:'A good week',  sub:'Reachable in seven days' },
+  { key:'long', label:'The long haul', sub:'Weeks to months' },
+  { key:'rare', label:'Rare',          sub:'Most people never will' }
+];
+
+// ── SEASONAL EVENTS — the thing that keeps the app from going stale ───────
+// A milestone is for ever and a quest is for a week; neither gives the year any
+// SHAPE. An event is a named block of the calendar with two or three goals, and
+// the whole board is doing it at the same time — which is the part a milestone
+// can never have.
+//
+// ⚠️ EVENTS PAY NO XP, AND THAT IS DELIBERATE. They pay a TITLE. Two reasons,
+// and both matter:
+//   1. XP is scored twice (client + plpgsql). A new paying rail means new SQL
+//      that has to agree with the app for ever. A title is stored, append-only
+//      and free to mint — the same rule the reward track already runs on.
+//   2. A title is worth more here anyway. It shows on the leaderboard and on
+//      the roll call wall, so finishing SUMMER SHRED is something other people
+//      SEE. XP would just be a number nobody else reads.
+//
+// Goals reuse the quest `kind` grammar exactly, so they are measured from the
+// log alone and nothing new is stored. Dates are calendar dates, not the scoring
+// season — an event is "August", not "Season 1".
+const EVENTS = [
+  { id:'ev_summer26', name:'SUMMER SHRED', tag:'July – August', from:'2026-07-01', to:'2026-08-31',
+    blurb:'The block everyone skips. Do it anyway and it shows in September.',
+    title:{ id:'t_sunforged', name:'SUN-FORGED', note:'Trained through the summer nobody trains through.' },
+    goals:[ { kind:'daysHit:strength', need:20,     label:'20 sessions' },
+            { kind:'total:steps',      need:150000, label:'150,000 steps' },
+            { kind:'daysHit:fuel',     need:25,     label:'Meals logged on 25 days' } ] },
+
+  { id:'ev_autumn26', name:'THE BASE LAYER', tag:'September – October', from:'2026-09-01', to:'2026-10-31',
+    blurb:'Nothing flashy. Eight weeks of being impossible to knock over.',
+    title:{ id:'t_bedrock', name:'BEDROCK', note:'Built the base while everyone else chased peaks.' },
+    goals:[ { kind:'daysHit:sleep',    need:40,     label:'40 nights on target' },
+            { kind:'daysHit:mobility', need:30,     label:'30 mobility sessions' },
+            { kind:'qualify',          need:45,     label:'45 days on target' } ] },
+
+  { id:'ev_winter26', name:'WINTER ARMOUR', tag:'November – December', from:'2026-11-01', to:'2026-12-31',
+    blurb:'Dark at four, cold at six, and the season is decided right here.',
+    title:{ id:'t_coldforged', name:'COLD-FORGED', note:'The winter did not get a vote.' },
+    goals:[ { kind:'daysHit:strength', need:24,     label:'24 sessions' },
+            { kind:'total:water',      need:400,    label:'400 glasses of water' },
+            { kind:'perfect',          need:10,     label:'10 perfect days' } ] },
+
+  { id:'ev_newyear27', name:'THE RECKONING', tag:'January – February', from:'2027-01-01', to:'2027-02-28',
+    blurb:'Everyone starts in January. This is about still being here in February.',
+    title:{ id:'t_stillhere', name:'STILL HERE', note:'January is easy. February is the badge.' },
+    goals:[ { kind:'qualify',          need:50,     label:'50 days on target' },
+            { kind:'total:steps',      need:200000, label:'200,000 steps' },
+            { kind:'daysHit:strength', need:30,     label:'30 sessions' } ] }
 ];
 
 // ── THE LONG GAME — a reward track, and the one thing here that is kept ───
@@ -1522,7 +1652,13 @@ const PASS_TRACK = [
 // is a real choice rather than an absence.
 const CARD_BASE = { id:'c_paper', kind:'card', name:'HOUSE', note:'The card as it ships.' };
 
-function passItem(id) { return id === CARD_BASE.id ? CARD_BASE : PASS_TRACK.find(p => p.id === id) || null; }
+// Event titles are not on the level track — they are earned by finishing an
+// event — but everything downstream (titleName, the picker, the board) looks a
+// title up through here, so they have to resolve from the same door.
+function passItem(id) {
+  if (id === CARD_BASE.id) return CARD_BASE;
+  return PASS_TRACK.find(p => p.id === id) || eventTitles().find(t => t.id === id) || null;
+}
 function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
 function passHas(id)  { return id === CARD_BASE.id || passOwned().indexOf(id) >= 0; }
 function passTitle()  { const t = CFG.pass && CFG.pass.title; return passHas(t) ? passItem(t) : null; }
@@ -1532,6 +1668,52 @@ function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p =
 // this build does not know shows nothing rather than a raw `t_iron` — a cached
 // page can be older than the track on the server.
 function titleName(id) { const p = id && passItem(id); return (p && p.kind === 'title') ? p.name : ''; }
+// ── Events: measured, then claimed ────────────────────────────────────────
+// One goal, over the event's CALENDAR window. Same `kind` grammar as quests,
+// measured from the log alone, so nothing new is stored and there is nothing
+// for a second scorer to disagree with. Deliberately NOT season-bounded the way
+// quests are: an event is a block of the calendar, and a season reset in the
+// middle of August must not wipe half of SUMMER SHRED.
+function eventGoalProgress(g, ev) {
+  const parts = String(g.kind || '').split(':');
+  const kind = parts[0], hid = parts[1];
+  const h = hid ? habitById(hid) : null;
+  const last = ev.to < TKEY() ? ev.to : TKEY();      // the future has not happened
+  let have = 0;
+  for (let d = parseKey(ev.from); fmtKey(d) <= last; d = addDays(d, 1)) {
+    const k = fmtKey(d);
+    if (kind === 'daysHit') { if (h && isDone(h, k)) have++; }
+    else if (kind === 'total') { have += valOf(k, hid); }
+    else if (kind === 'qualify') { if (dayQualifies(k)) have++; }
+    else if (kind === 'perfect') { if (isPerfect(k)) have++; }
+  }
+  return { have, done: have >= g.need, pct: Math.max(0, Math.min(100, Math.round(have / g.need * 100))) };
+}
+function eventProgress(ev) {
+  const goals = ev.goals.map(g => Object.assign({}, g, eventGoalProgress(g, ev)));
+  return { goals, done: goals.every(g => g.done),
+           pct: Math.round(goals.reduce((s, g) => s + g.pct, 0) / goals.length) };
+}
+function eventState(ev) { const t = TKEY(); return t < ev.from ? 'soon' : (t > ev.to ? 'over' : 'live'); }
+function eventTitles() { return EVENTS.map(e => Object.assign({ kind:'title', event:e.id }, e.title)); }
+// Append-only, exactly like claimRewards(). An event title is never taken back —
+// not when the window closes, not by a season reset, not by a retune. Claimed
+// even after the window has shut, so someone who finishes on the last day and
+// does not open the app until September still gets it.
+function claimEventTitles(silent) {
+  if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
+  const owned = CFG.pass.owned || (CFG.pass.owned = []);
+  const fresh = [];
+  EVENTS.forEach(ev => {
+    if (owned.indexOf(ev.title.id) >= 0 || eventState(ev) === 'soon') return;
+    if (!eventProgress(ev).done) return;
+    owned.push(ev.title.id);
+    fresh.push(Object.assign({ kind:'title', event:ev.id, evName:ev.name }, ev.title));
+  });
+  if (fresh.length) saveCfg();
+  return silent ? [] : fresh;
+}
+
 // Records anything the athlete's level has reached and returns only what is NEW,
 // so the caller can celebrate it. Silent on first run for someone who arrives
 // with history — the same baselining every other unlock does.
@@ -2428,6 +2610,12 @@ function checkLevelUps() {
   // Rewards ride behind the level that earned them, so the order reads as cause
   // then effect rather than a prize arriving before the reason for it.
   claimRewards(false).forEach(r => {
+    UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
+    haptic('rank');
+  });
+  // Finishing an event is the biggest single thing in the app that is not a
+  // level, so it takes over the screen like one.
+  claimEventTitles(false).forEach(r => {
     UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
     haptic('rank');
   });
@@ -4656,6 +4844,50 @@ function renderProgress(LI, earned, totalAch) {
            is "how close am I" and the old row answered it in 8px mono at the
            far right. The section also states the collection count, and names
            the one nearest to falling. -->
+      <!-- EVENTS first. Everything below this is permanent and will still be
+           there next year; an event is the only thing on the screen with a
+           clock on it, so it goes where the eye lands. Events that have not
+           opened yet are not drawn at all — an athlete cannot act on November
+           in July, and four locked cards would bury the one that is live. -->
+      ${(() => {
+        const shown = EVENTS.filter(e => eventState(e) !== 'soon');
+        if (!shown.length) return '';
+        const doneN = shown.filter(e => eventProgress(e).done).length;
+        return sectionLabel('Events', doneN + ' of ' + shown.length + ' completed')
+          + shown.map(ev => {
+            const st = eventState(ev), p = eventProgress(ev), got = p.done;
+            const owned = passHas(ev.title.id);
+            const left = Math.max(0, Math.round((parseKey(ev.to) - today()) / 86400000) + 1);
+            const stateLbl = got ? 'Complete' : (st === 'live' ? (left === 1 ? 'Last day' : left + ' days left') : 'Closed');
+            return `<div class="evcard ${got ? 'done' : st}" data-k="ev:${ev.id}">
+              <div class="evhd">
+                <span style="flex:1;min-width:0">
+                  <span class="evnm">${esc(ev.name)}</span>
+                  <span class="evtag">${esc(ev.tag)}</span>
+                </span>
+                <span class="evstate">${esc(stateLbl)}</span>
+              </div>
+              <div class="evblurb">${esc(ev.blurb)}</div>
+              ${p.goals.map(g => `<div class="evgoal ${g.done ? 'got' : ''}">
+                <span class="g-tick">${g.done ? TICK : ''}</span>
+                <span class="g-mid">
+                  <span class="g-lbl">${esc(g.label)}</span>
+                  <span class="g-bar"><span data-fill style="width:${g.pct}%"></span></span>
+                </span>
+                <span class="g-cnt">${g.done ? 'DONE' : Math.round(g.have).toLocaleString() + ' / ' + g.need.toLocaleString()}</span>
+              </div>`).join('')}
+              <div class="evfoot">
+                <span>${got && owned ? 'Title earned' : 'Finish all three'}</span>
+                <strong>${esc(ev.title.name)}</strong>
+              </div>
+            </div>`;
+          }).join('');
+      })()}
+
+      <!-- Milestones, in three tiers. One flat list gave a new athlete a single
+           reachable row above nine walls, and gave a two-year athlete nothing
+           left to want. The tier is the promise: a good week, the long haul, or
+           something most people never get. -->
       ${(() => {
         const rows = ACHIEVEMENTS.map(a => {
           // Clamped: THE CENTURION reads 143/100 without it, and a bar past
@@ -4663,27 +4895,32 @@ function renderProgress(LI, earned, totalAch) {
           const have = Math.min(measureAch(a), a.need), got = have >= a.need;
           return { a, have, got, pct: Math.round(have / a.need * 100) };
         });
-        const gotN = rows.filter(r => r.got).length;
         // Only once something is genuinely under way. "Closest" chosen from
         // rows that are all sitting at zero is not information, it is the app
         // picking a favourite out of nothing.
         const near = rows.filter(r => !r.got && r.have > 0).sort((x, y) => y.pct - x.pct)[0];
-        return sectionLabel('Milestones', gotN + ' of ' + ACHIEVEMENTS.length)
+        const row = r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
+            <span class="code">${esc(r.a.code)}</span>
+            <span class="ms-mid">
+              <span class="ms-name">${esc(r.a.name)}</span>
+              <span class="ms-note">${esc(r.a.note)}</span>
+              <span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>
+            </span>
+            <span class="ms-right">
+              <span class="ms-xp">+${r.a.xp} XP</span>
+              <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
+            </span>
+          </div>`;
+        return sectionLabel('Milestones', rows.filter(r => r.got).length + ' of ' + ACHIEVEMENTS.length)
           + (near ? `<div class="msnext" data-k="msnext">
               <strong>${esc(near.a.name)}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
             </div>` : '')
-          + rows.map(r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
-              <span class="code">${esc(r.a.code)}</span>
-              <span class="ms-mid">
-                <span class="ms-name">${esc(r.a.name)}</span>
-                <span class="ms-note">${esc(r.a.note)}</span>
-                <span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>
-              </span>
-              <span class="ms-right">
-                <span class="ms-xp">+${r.a.xp} XP</span>
-                <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
-              </span>
-            </div>`).join('');
+          + ACH_TIERS.map(t => {
+              const inTier = rows.filter(r => (r.a.tier || 'long') === t.key);
+              if (!inTier.length) return '';
+              return sectionLabel(t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
+                   + inTier.map(row).join('');
+            }).join('');
       })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
@@ -5857,6 +6094,7 @@ function showError(msg) {
   // defaultCfg(), so CFG.pass always exists and that guard never fired. It is
   // idempotent anyway — claimRewards only ever adds what is missing.
   claimRewards(true);
+  claimEventTitles(true);
   // And the other half of the same record. Minting on boot is what makes the
   // server's copy keep up with a level that is about to reset: the peak is
   // captured on the day it happens, while the level is still there to prove it.

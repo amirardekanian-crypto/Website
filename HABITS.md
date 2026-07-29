@@ -226,6 +226,68 @@ again — while `proof.html` promises them only the *perfect* day is out of reac
 at 190/250 = 76%, so at 80 steps quietly became a second precondition. Verified over a
 61-day log: **0 days stopped qualifying, 6 started.**
 
+#### Habit names are TASKS, not nouns
+They were labels — WORKOUT, STEPS, WATER — which is what the thing *is*, not what
+the athlete has to do about it. A list of nouns reads as a filing system; a list of
+instructions reads as a day's work. Each name now carries its own target
+(*🚶 Walk 10,000 steps*, *💧 Drink 8 glasses*), so the row states the job before
+anything is tapped, and `goal` — the second line — carries the coaching detail the
+name has no room for rather than restating it.
+
+**The `id` never changes.** Every log entry, level and leaderboard row is keyed on
+it, so renaming is display-only and costs nobody a point. `weights` on the
+`xp_rules` row is still keyed `strength`, not `session`, for the same reason.
+
+Two of Amir's examples were deliberately *not* taken literally, because both would
+have changed what is measured rather than what is displayed:
+- **"3L of water"** — the log stores *glasses* (target 8). Switching the unit to
+  litres would silently reinterpret every historical entry: a logged `8` becomes 8
+  litres. Doing it properly needs a one-off conversion of every athlete's log.
+- **"protein target"** — the log stores *meals* (target 3), not grams. The name
+  points at protein (*🍗 3 protein meals*) without claiming to measure it. A real
+  protein habit is a new tracked thing, not a rename.
+
+Emoji are the one place the app breaks its own rule — there are none anywhere else,
+and glyph coverage genuinely varies by platform (🌬 rendered as a mangled box and
+was swapped for 💨). They stay because a list of eight tasks scans faster with them.
+Removing them is one edit to `HABITS[].name`.
+
+#### Seasonal events
+`EVENTS` in `habits.html`. A named block of the *calendar* — not the scoring season
+— with two or three goals, the whole board doing it at once. Reachable from the top
+of Progress; events that have not opened yet are not drawn at all, because an
+athlete cannot act on November in July and four locked cards would bury the live one.
+
+**They pay a TITLE, never XP, and that is the design.** XP is scored twice, so a new
+paying rail means new plpgsql that has to agree with the app for ever. A title is
+stored, append-only and free to mint — the same rule the reward track runs on — and
+it is worth *more* here anyway, because titles show on the leaderboard and the roll
+call wall. Finishing SUMMER SHRED is something other people see; XP would be a number
+nobody else reads.
+
+Goals reuse the quest `kind` grammar exactly (`daysHit:`, `total:`, `qualify`,
+`perfect`) so they are measured from the log alone. Deliberately **not**
+season-bounded the way quests are: a season reset in the middle of August must not
+wipe half of SUMMER SHRED. The four event title ids must also exist in `passTrack`
+on the `xp_rules` row or the server refuses a title the app has already awarded —
+see `supabase/stage20_tiers_and_events.sql`.
+
+#### Milestones come in three tiers
+`tier` on each entry in `ACHIEVEMENTS`, grouped on Progress by `ACH_TIERS`:
+
+| tier | promise | count |
+|---|---|---|
+| `week` | a good week gets you this | 6 |
+| `long` | weeks to months | 7 |
+| `rare` | most people never will | 3 |
+
+One flat list gave a new athlete a single reachable row above nine walls, and gave a
+two-year athlete nothing left to want. Nothing but the Progress screen reads `tier`
+— it is presentation only, which is why adding six milestones needed no new
+machinery on either side, just more rows in `ACHIEVEMENTS` **and** in the
+`milestones` array on the `xp_rules` row. ⚠️ Both, or the board pays a different
+number to the phone.
+
 #### Run vs streak — two words, one job each
 A **run** is consecutive days on *one* habit ("a 24-day run on water"). A **streak** is
 consecutive days where the athlete cleared `streakQualifyPct` of the day's *weight*
@@ -294,7 +356,8 @@ with the identical 76px level block) → **the streak band** (the same one Today
 **key explaining the consistency pips**, which had no
 legend anywhere in the app and are empty for the first five days → **one row per habit**
 (its level, rank, XP, progress bar and five pips, tapping through to full history) →
-paused habits with their banked XP → the ten one-off **milestones**.
+paused habits with their banked XP → **seasonal events** → the sixteen one-off
+**milestones**, in three tiers.
 
 Days-logged leads the stat grid deliberately. Perfect days and runs are both zero for
 anyone rebuilding after a bad week, and opening your own progress on a pair of zeros
