@@ -264,40 +264,38 @@ feature invisible, so an athlete who joined between runs never learned quests ex
 Quest rows carry a name **and** a description, where an event goal is one line, so they
 split across two rows (`.g-lbl` / `.g-sub`) rather than wrapping under the bar.
 
-#### Events — the middle distance
-`EVENTS` in `habits.html`. Amir, 2026-07-30: *"by seasonal i didnt mean actual seasonal, it
-meant something more than a week and less that rare or very long like 100 days."* So these
-are **not** calendar seasons — they are a **duration bracket**, filling the gap the badge
-tiers leave open:
+#### "A few weeks" — multi-goal milestones, no dates
+`EVENTS` in `habits.html`, rendered as the middle group **inside** the Milestones section.
+Amir, 2026-07-30: *"the seasons should be other kinds of milestones, they just take few
+weeks to complete but are not long term."*
 
-| | span |
-|---|---|
-| a good week | 7 days |
-| **► an event** | **28 days** ← nothing lived here before |
-| the long haul | 10–30 days, single habit |
-| rare | 60–150 days |
+They went through two wrong shapes first, and the reasons are worth keeping:
+1. **Calendar seasons** (Jul–Aug, Nov–Dec) — wrong, he never meant real seasons.
+2. **28-day rotating windows, one live at a time** — still wrong, because a *window* is a
+   slot you can miss. The "few weeks" is **how long the work takes**, not when it runs.
 
-Four weeks is long enough that it cannot be crammed and short enough to be worth starting
-on day one. Each event runs **once, back to back from a fixed anchor** (`EVENT_ANCHOR`,
-`EVENT_DAYS = 28`), so there is always exactly one live and it changes every four weeks —
-the part that keeps the app from going stale. Windows are **computed** by `eventWindow(i)`,
-never typed, so there are no dates to keep in step by hand; `datedEvents()` is what every
-consumer reads. Events that have not opened are not drawn at all — an athlete cannot act on
-October in July, and locked cards would bury the live one.
+So there are **no dates anywhere**. Nothing expires, everything is workable from any day,
+and each is measured over the athlete's whole history — an athlete who arrives with
+history behind them simply has some of it done, exactly like every other badge here.
 
-**They pay a TITLE, never XP**, and that is the design. XP is scored twice, so a new paying
-rail means new plpgsql that has to agree with the app for ever. A title is stored,
-append-only and free to mint — the same rule the reward track runs on — and it is worth
-*more* here anyway, because titles show on the leaderboard and the roll call wall.
-Finishing one is something other people see; XP would be a number nobody else reads.
+**They are a different KIND of milestone, not a different section.** A badge is one
+measure; these are three, so they render as cards rather than rows — the same card the
+quests use. The tier order is by how long the work takes:
 
-⚠️ **The four `title.id` values are registered in `passTrack` on the `xp_rules` row.** Names,
-goals, blurbs and windows can be rewritten freely — the server only ever validates the id —
-but changing an **id** needs another SQL round trip.
+`A good week` → **`A few weeks`** → `The long haul` → `Rare`
 
-Goals reuse the quest `kind` grammar exactly (`daysHit:`, `total:`, `qualify`, `perfect`) so
-they measure from the log alone. Deliberately **not** season-bounded the way quests are: a
-scoring season resetting mid-event must not wipe half of it.
+**They pay a TITLE, never XP.** XP is scored twice, so a new paying rail means new plpgsql
+that has to agree with the app for ever. A title is stored, append-only and free to mint —
+the same rule the reward track runs on — and it is worth more here anyway, because titles
+show on the leaderboard and the wall.
+
+⚠️ The four `title.id` values are registered in `passTrack` on the `xp_rules` row. Names,
+goals and blurbs are free to rewrite — the server only validates the **id** — but changing
+an id needs a SQL round trip.
+
+`eventProgress()` is **cached** (`_evCache`, dropped by `invalidateBonus()`): four cards ×
+three goals over a long log is thousands of `isDone`/`dayQualifies` calls, and it renders
+on every Progress draw.
 
 #### Milestones come in three tiers
 `tier` on each entry in `ACHIEVEMENTS`, grouped on Progress by `ACH_TIERS`:
