@@ -860,7 +860,9 @@
     68%      { opacity: 1;  transform: scale(1.32) }
     84%      { opacity: .6; transform: scale(.95) }
   }
-  .ember { position: relative; padding-left: 9px; margin-left: 7px; }
+  /* nowrap: a chip that wraps mid-phrase splits its pill background into two
+     offset boxes. The label is one unit; the line breaks before it or not at all. */
+  .ember { position: relative; padding-left: 9px; margin-left: 7px; white-space: nowrap; }
   .ember::before {
     content: ''; position: absolute; left: 0; top: 50%;
     width: 5px; height: 5px; margin-top: -2.5px;
@@ -952,6 +954,11 @@
   .msrow.got .ms-xp { color: var(--clay-deep); font-weight: 700; }
   .msrow .ms-cnt { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; color: var(--muted-soft); }
   .msrow.got .ms-cnt { color: var(--clay-deep); }
+  /* A FEW WEEKS rows: three goals share the note line. A goal never breaks
+     mid-phrase — the line wraps between goals, at the separators. */
+  .msrow .ms-note .g { font-style: normal; white-space: nowrap; }
+  .msrow .ms-note .g.got { color: var(--clay-deep); }
+  .msrow .ms-note .g.got::before { content: '✓ '; }
   /* The one nearest to falling. Named at the top of the section rather than
      left for the athlete to find by comparing nine bars. */
   .msnext {
@@ -1375,6 +1382,8 @@
   #app .msrow .ms-bar > span { background: var(--gold, #F2B23C); }
   #app .msrow .ms-xp, #app .msrow .ms-cnt { font-family: 'Outfit', sans-serif; font-weight: 600; }
   #app .msrow.got .ms-xp, #app .msrow.got .ms-cnt { color: var(--teal-deep); }
+  #app .msrow .ms-note .g.got { color: var(--teal-deep); }
+  #app .msrow.evrow .ms-xp { font-size: 10px; letter-spacing: 0.04em; }
   #app .msnext { background: var(--surface); border-bottom: 0; margin: 0 16px 10px; border-radius: 16px; }
   #app .rankrow .badge { border: 0; border-radius: 999px; background: var(--surface); }
   #app .rankrow.passed .badge { background: var(--accent-100); color: var(--accent); }
@@ -5357,13 +5366,16 @@ function renderProgress(LI, earned, totalAch) {
       </div>
       ${hs.length ? hs.map(h => {
         const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
+        // splitEmoji: the emoji sits in its own flex-none span so a wrapped
+        // name lines up under its own first word, not under the emoji.
+        const ep = splitEmoji(h.name);
         return `<button class="row-rule" data-k="prow:${h.id}" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
           ${on(() => openHabit(h.id, 'progress'))}>
           <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-              <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span class="hlv">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span>` : '—'}</span>
+              <span class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span></span>
+              <span class="hlv" style="flex:none">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span>` : '—'}</span>
             </div>
             <!-- Was rank · XP · today's status, which wrapped to two lines and
                  restated what Today already says. Progress is about standing. -->
@@ -5378,7 +5390,7 @@ function renderProgress(LI, earned, totalAch) {
         off.map(h => `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:13px 20px;opacity:.45">
           <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--box)">${habitLevel(h).lv}</div>
           <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
-            <div class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</div>
+            <div class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${(ep => `${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span>`)(splitEmoji(h.name))}</div>
             <div style="font-size:11px;line-height:1.3;color:var(--muted)">Paused · ${habitLevel(h).xp.toLocaleString()} XP banked</div>
           </div>
         </div>`).join('') : ''}
@@ -5422,36 +5434,30 @@ function renderProgress(LI, earned, totalAch) {
               <span class="ms-cnt">${r.got ? 'UNLOCKED' : r.have + '/' + r.a.need}</span>
             </span>
           </div>`;
-        // A FEW WEEKS sits between the week badges and the long ones, in card
-        // form rather than row form, because each is three goals rather than
-        // one. Same section, same list — a different KIND of milestone, which
-        // is exactly how Amir described them. No dates on any of it: the few
-        // weeks is how long the work takes, not a slot you can miss.
+        // A FEW WEEKS sits between the week badges and the long ones, wearing
+        // the SAME row as every other milestone (Amir, 2026-07-29: the card
+        // form read as a quest, and a quest is the one thing here with a clock
+        // on it). Three goals share the note line — ticked as they fall — the
+        // bar is the average of the three, and the right column carries the
+        // title it pays where the others carry XP. No dates on any of it: the
+        // few weeks is how long the work takes, not a slot you can miss.
         const evDone = EVENTS.filter(e => eventProgress(e).done).length;
         const evCards = sectionLabel('A few weeks', evDone + '/' + EVENTS.length)
           + EVENTS.map(ev => {
-            const p = eventProgress(ev), got = p.done;
-            return `<div class="evcard ${got ? 'done' : ''}" data-k="ev:${ev.id}">
-              <div class="evhd">
-                <span style="flex:1;min-width:0">
-                  <span class="evnm">${esc(ev.name)}</span>
-                  <span class="evtag">${esc(ev.tag)}</span>
-                </span>
-                <span class="evstate">${got ? 'Complete' : p.pct + '%'}</span>
-              </div>
-              <div class="evblurb">${esc(ev.blurb)}</div>
-              ${p.goals.map(g => `<div class="evgoal ${g.done ? 'got' : ''}">
-                <span class="g-tick">${g.done ? TICK : ''}</span>
-                <span class="g-mid">
-                  <span class="g-lbl">${esc(g.label)}</span>
-                  <span class="g-bar"><span data-fill style="width:${g.pct}%"></span></span>
-                </span>
-                <span class="g-cnt">${g.done ? 'DONE' : Math.round(g.have).toLocaleString() + ' / ' + g.need.toLocaleString()}</span>
-              </div>`).join('')}
-              <div class="evfoot">
-                <span>${got ? 'Title earned' : 'Finish all three'}</span>
-                <strong>${esc(ev.title.name)}</strong>
-              </div>
+            const p = eventProgress(ev), got = p.done, hit = p.goals.filter(g => g.done).length;
+            const w = ev.name.split(/\s+/);
+            const code = (w.length > 1 ? w[0][0] + w[1][0] : ev.name.slice(0, 2)).toUpperCase();
+            return `<div class="msrow evrow ${got ? 'got' : ''}" data-k="ev:${ev.id}">
+              <span class="code">${esc(code)}</span>
+              <span class="ms-mid">
+                <span class="ms-name">${esc(ev.name)}</span>
+                <span class="ms-note">${p.goals.map(g => `<i class="g${g.done ? ' got' : ''}">${esc(g.label)}</i>`).join(' · ')}</span>
+                <span class="ms-bar"><span data-fill style="width:${p.pct}%"></span></span>
+              </span>
+              <span class="ms-right">
+                <span class="ms-xp">${esc(ev.title.name)}</span>
+                <span class="ms-cnt">${got ? 'UNLOCKED' : hit + '/' + p.goals.length}</span>
+              </span>
             </div>`;
           }).join('');
         const tierBlock = key => {
