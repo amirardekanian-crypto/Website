@@ -316,6 +316,18 @@ machinery on either side, just more rows in `ACHIEVEMENTS` **and** in the
 `milestones` array on the `xp_rules` row. ⚠️ Both, or the board pays a different
 number to the phone.
 
+**Every tier group — including "A few weeks" — is toggled off by nature**
+(Amir, 2026-07-30): the header (`msTierHeader()`) always shows the label, the
+count and a chevron, but the rows underneath only render once that group's
+entry in `UI.msOpen` is true. Four groups of five-ish full-strength rows each
+read as a wall stacked four deep on first open; collapsed, the whole section
+is four one-line headers plus one line explaining what they're for —
+**"Complete these challenges for rewards — XP, medals and titles, yours for
+good once you cross the line"** — sitting right under the section's own count.
+Each group remembers its own open/closed state independently for the
+session; nothing here is stored, so every visit to Progress starts closed
+again.
+
 #### One word — `streak` — and two scopes
 A **habit's streak** is consecutive days on *one* habit ("a 24-day streak on water"); it
 sits on that habit's row and in its detail header. The **day streak** is consecutive days
@@ -430,8 +442,10 @@ Opens straight on **four season stats**: days logged, badges, **day streak** (as
 flame) and perfect days → a one-line **key explaining the consistency pips**, which had
 no legend anywhere in the app and are empty for the first five days → **one row per
 habit** (its level, rank, XP, progress bar and five pips, tapping through to full
-history) → paused habits with their banked XP → **seasonal events** → the sixteen
-one-off **milestones**, in three tiers.
+history) → paused habits with their banked XP → **quests** → the sixteen one-off
+**milestones** and the four "A few weeks" events, in four groups — *A good week*, *A few
+weeks*, *The long haul*, *Rare* — each **toggled off by nature** (see *Milestones come in
+three tiers*, below), with one line above them explaining what completing one is worth.
 
 There used to be a level/rank strip up top too — the same information as Today's hero,
 squeezed to a fifth of the height. Amir, 2026-07-30: this tab is about progress, not
