@@ -646,8 +646,20 @@ which baselines an athlete arriving with history instead of firing fourteen take
 them. The highest title they own is equipped for them; earning a name and then having to
 go and switch it on is a step nobody asks for.
 
-Reached from **Progress → The long game**, which also states the next unlock and its
-distance in XP — the only forward-looking line on a screen that otherwise reports the past.
+Reached from its own tab, **LOCKER** — the fourth on the main bar (Amir's own redesign,
+2026-07-29, promoted it out from a row inside Progress). It opens on the shareable rank
+card, then a horizontal rail of titles, a rail of card skins, and **the road**: every
+reward in level order, the next one framed with a progress bar and its distance in XP —
+the only forward-looking screen in the app; everywhere else reports the past.
+
+Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
+bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
+metal-rimmed badge for a rank — the ladder, the Today hero and the share card all call
+it, so a rank never looks different in two places. `titlePlate()` renders an owned title
+as a metal nameplate; rarity follows the level it unlocks at (bronze under 13, silver from
+13, gold from 21), except **event titles and PROOF ITSELF, which are always prismatic**
+regardless of level. None of this changes what is earned or when — it is presentation
+over the same `PASS_TRACK`/`ACHIEVEMENTS`/`EVENTS` data.
 
 ### Titles on the board (stage 17)
 
