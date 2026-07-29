@@ -1620,53 +1620,76 @@ const ACH_TIERS = [
   { key:'rare', label:'Rare',          sub:'Most people never will' }
 ];
 
-// ── SEASONAL EVENTS — the thing that keeps the app from going stale ───────
-// A milestone is for ever and a quest is for a week; neither gives the year any
-// SHAPE. An event is a named block of the calendar with two or three goals, and
-// the whole board is doing it at the same time — which is the part a milestone
-// can never have.
+// ── EVENTS — the middle distance ──────────────────────────────────────────
+// Amir, 2026-07-30: "by seasonal i didnt mean actual seasonal, it meant
+// something more than a week and less than rare or very long like 100 days."
 //
-// ⚠️ EVENTS PAY NO XP, AND THAT IS DELIBERATE. They pay a TITLE. Two reasons,
-// and both matter:
-//   1. XP is scored twice (client + plpgsql). A new paying rail means new SQL
-//      that has to agree with the app for ever. A title is stored, append-only
-//      and free to mint — the same rule the reward track already runs on.
-//   2. A title is worth more here anyway. It shows on the leaderboard and on
-//      the roll call wall, so finishing SUMMER SHRED is something other people
-//      SEE. XP would just be a number nobody else reads.
+// So these are NOT calendar seasons. They are a DURATION BRACKET, sitting in the
+// gap the badge tiers leave open:
 //
-// Goals reuse the quest `kind` grammar exactly, so they are measured from the
-// log alone and nothing new is stored. Dates are calendar dates, not the scoring
-// season — an event is "August", not "Season 1".
+//   a good week   7 days
+//   ► an event    28 days      ← nothing lived here before
+//   the long haul 10–30 days (single habit)
+//   rare          60–150 days
+//
+// Four weeks is long enough that you cannot cram it and short enough to still be
+// worth starting on day one. Each event runs ONCE, back to back from a fixed
+// anchor, so there is always exactly one live and it changes every four weeks —
+// which is the part that keeps the app from going stale.
+//
+// ⚠️ EVENTS PAY A TITLE, NEVER XP, and that is the design. XP is scored twice
+// (client + plpgsql), so a new paying rail means new SQL that has to agree with
+// the app for ever. A title is stored, append-only and free to mint — the same
+// rule the reward track already runs on — and it is worth more here anyway,
+// because titles show on the leaderboard and the roll call wall. Finishing one
+// is something other people SEE; XP would be a number nobody else reads.
+//
+// ⚠️ The four `title.id` values are the ones already registered in `passTrack`
+// on the xp_rules row. Names and goals can be rewritten freely — the server only
+// ever validates the id — but changing an id means another SQL round trip.
+//
+// Goals reuse the quest `kind` grammar exactly, so they measure from the log
+// alone. Deliberately NOT season-bounded the way quests are: a scoring season
+// resetting mid-event must not wipe half of it.
+const EVENT_ANCHOR = '2026-07-06';    // the Monday the first event opened
+const EVENT_DAYS = 28;
 const EVENTS = [
-  { id:'ev_summer26', name:'SUMMER SHRED', tag:'July – August', from:'2026-07-01', to:'2026-08-31',
-    blurb:'The block everyone skips. Do it anyway and it shows in September.',
-    title:{ id:'t_sunforged', name:'SUN-FORGED', note:'Trained through the summer nobody trains through.' },
-    goals:[ { kind:'daysHit:strength', need:20,     label:'20 sessions' },
-            { kind:'total:steps',      need:150000, label:'150,000 steps' },
-            { kind:'daysHit:fuel',     need:25,     label:'Meals logged on 25 days' } ] },
-
-  { id:'ev_autumn26', name:'THE BASE LAYER', tag:'September – October', from:'2026-09-01', to:'2026-10-31',
-    blurb:'Nothing flashy. Eight weeks of being impossible to knock over.',
-    title:{ id:'t_bedrock', name:'BEDROCK', note:'Built the base while everyone else chased peaks.' },
-    goals:[ { kind:'daysHit:sleep',    need:40,     label:'40 nights on target' },
-            { kind:'daysHit:mobility', need:30,     label:'30 mobility sessions' },
-            { kind:'qualify',          need:45,     label:'45 days on target' } ] },
-
-  { id:'ev_winter26', name:'WINTER ARMOUR', tag:'November – December', from:'2026-11-01', to:'2026-12-31',
-    blurb:'Dark at four, cold at six, and the season is decided right here.',
-    title:{ id:'t_coldforged', name:'COLD-FORGED', note:'The winter did not get a vote.' },
-    goals:[ { kind:'daysHit:strength', need:24,     label:'24 sessions' },
-            { kind:'total:water',      need:400,    label:'400 glasses of water' },
-            { kind:'perfect',          need:10,     label:'10 perfect days' } ] },
-
-  { id:'ev_newyear27', name:'THE RECKONING', tag:'January – February', from:'2027-01-01', to:'2027-02-28',
-    blurb:'Everyone starts in January. This is about still being here in February.',
-    title:{ id:'t_stillhere', name:'STILL HERE', note:'January is easy. February is the badge.' },
-    goals:[ { kind:'qualify',          need:50,     label:'50 days on target' },
+  { id:'ev_foundry', name:'THE FOUNDRY', tag:'Four weeks',
+    blurb:'Four weeks of putting the work in. No tricks in it — just more of it than you would do on your own.',
+    title:{ id:'t_sunforged', name:'SUN-FORGED', note:'Four weeks in the fire.' },
+    goals:[ { kind:'daysHit:strength', need:16,     label:'16 sessions' },
             { kind:'total:steps',      need:200000, label:'200,000 steps' },
-            { kind:'daysHit:strength', need:30,     label:'30 sessions' } ] }
+            { kind:'daysHit:fuel',     need:20,     label:'Protein on 20 days' } ] },
+
+  { id:'ev_bedrock', name:'BEDROCK', tag:'Four weeks',
+    blurb:'Nothing flashy. Four weeks of the boring half — the one that decides whether the loud half works.',
+    title:{ id:'t_bedrock', name:'BEDROCK', note:'Built the base nobody claps for.' },
+    goals:[ { kind:'daysHit:sleep',    need:20,     label:'20 nights on target' },
+            { kind:'daysHit:mobility', need:16,     label:'16 mobility sessions' },
+            { kind:'qualify',          need:20,     label:'20 days on target' } ] },
+
+  { id:'ev_coldblood', name:'COLD BLOOD', tag:'Four weeks',
+    blurb:'The block where it stops being interesting. Everyone is good for two weeks. This is the other two.',
+    title:{ id:'t_coldforged', name:'COLD-FORGED', note:'Kept going after it stopped being fun.' },
+    goals:[ { kind:'daysHit:strength', need:18,     label:'18 sessions' },
+            { kind:'daysHit:water',    need:22,     label:'Full water on 22 days' },
+            { kind:'perfect',          need:6,      label:'6 perfect days' } ] },
+
+  { id:'ev_standing', name:'STILL STANDING', tag:'Four weeks',
+    blurb:'Anyone can start. Four weeks later, still on the board, still logging — that is the whole test.',
+    title:{ id:'t_stillhere', name:'STILL HERE', note:'Starting is easy. This was not.' },
+    goals:[ { kind:'qualify',          need:24,     label:'24 days on target' },
+            { kind:'total:steps',      need:250000, label:'250,000 steps' },
+            { kind:'daysHit:fuel',     need:24,     label:'Protein on 24 days' } ] }
 ];
+// Windows are COMPUTED, not typed: event i runs for EVENT_DAYS from the anchor,
+// straight after event i-1. One live at a time, for ever, with no dates to keep
+// in step by hand.
+function eventWindow(i) {
+  const from = addDays(parseKey(EVENT_ANCHOR), i * EVENT_DAYS);
+  return { from: fmtKey(from), to: fmtKey(addDays(from, EVENT_DAYS - 1)) };
+}
+function datedEvents() { return EVENTS.map((e, i) => Object.assign({}, e, eventWindow(i))); }
 
 // ── THE LONG GAME — a reward track, and the one thing here that is kept ───
 // Every other number in this app is derived: change a rule and the whole
@@ -1755,7 +1778,7 @@ function claimEventTitles(silent) {
   if (!CFG.pass) CFG.pass = { owned: [], title: null, card: null };
   const owned = CFG.pass.owned || (CFG.pass.owned = []);
   const fresh = [];
-  EVENTS.forEach(ev => {
+  datedEvents().forEach(ev => {
     if (owned.indexOf(ev.title.id) >= 0 || eventState(ev) === 'soon') return;
     if (!eventProgress(ev).done) return;
     owned.push(ev.title.id);
@@ -4981,7 +5004,7 @@ function renderProgress(LI, earned, totalAch) {
            opened yet are not drawn at all — an athlete cannot act on November
            in July, and four locked cards would bury the one that is live. -->
       ${(() => {
-        const shown = EVENTS.filter(e => eventState(e) !== 'soon');
+        const shown = datedEvents().filter(e => eventState(e) !== 'soon');
         if (!shown.length) return '';
         const doneN = shown.filter(e => eventProgress(e).done).length;
         return sectionLabel('Events', doneN + ' of ' + shown.length + ' completed')
