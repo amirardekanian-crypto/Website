@@ -345,24 +345,40 @@ logs.
 
 ## 5. Celebrations
 
-A full-screen, game-style takeover fires for five things:
+A full-screen, game-style takeover fires for these:
 
 | Trigger | Detected in | Ground |
 |---|---|---|
-| **Any overall level** | `checkLevelUps()` | near-black, clay rays |
-| **A rank promotion** on any habit (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | full clay |
-| **A consistency tier** cleared on any habit | `checkUnlocks()` | deep green, clay-2 rays |
-| **A milestone** unlocked | `checkUnlocks()` | deep green, clay-2 rays |
-| **A perfect day** — every tracked habit done | `checkUnlocks()` | deep green, clay-2 rays |
-| **A weekly quest** completed (this week only) | `checkUnlocks()` | deep green, clay-2 rays |
+| **Any overall level** | `checkLevelUps()` | grape rays |
+| **A rank promotion** on any habit (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | full grape |
+| **A consistency tier** cleared on any habit | `checkUnlocks()` | badge ground, metal medal |
+| **A milestone** unlocked | `checkUnlocks()` | badge ground, metal medal |
+| **A perfect day** — every tracked habit done | `checkUnlocks()` | badge ground, gold medal |
+| **A day streak crossing a mark** — 3/7/14/21/30/50/75/100/150/200/300/365 days | `checkUnlocks()` | ember ground, a drawn flame |
+| **A weekly quest** completed (this week only) | `checkUnlocks()` | badge ground, metal medal |
+| **A reward** (title or card) unlocked | `claimRewards()` | badge ground, the plate/skin itself |
 
 Routine habit levels flash a small chip in that habit's row instead. This split is
 deliberate: an athlete completing eight habits on day one would otherwise get nine
 full-screen takeovers back to back. If several big ones land together they queue and
 show a "2 more to go" counter.
 
-The three grounds are the point — an athlete can tell which *kind* of win landed
-before reading a word of it. Green is never a level and never a rank.
+The ground is the point — an athlete can tell which *kind* of win landed before
+reading a word of it. Grape is never a badge, and ember is only ever the day streak.
+Confetti and a scatter of coins play once per takeover (`confettiHtml()`/`coinHtml()`
+in `habits.html`), deterministic per event so a re-render never re-scrambles it
+mid-fall. Every takeover but a habit-level chip carries a **Share it** button
+(`lvActions()`) straight into the share picker below, pre-selecting the card that
+matches what was just earned.
+
+**The day streak celebration is new** (Amir: *"the app used to say nothing about the
+one number the whole qualify rule exists to protect"*). `DAY_STREAK_MARKS` in
+`habits.html` is the tuned list of days worth stopping the screen for — tight in the
+first week, when people quit, and spreading out after so it stays an event rather
+than a weekly chime. `CFG.seenStreak` tracks the highest mark already shown and
+**resets to 0 the moment the streak breaks**, so every mark is back on the table for
+the next run. It pays no XP of its own — the streak's value is already priced into
+`gatePct()` and the qualify quest; this takeover is recognition, not a second payout.
 
 ### What `checkUnlocks()` guarantees
 

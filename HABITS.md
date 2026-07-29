@@ -661,6 +661,33 @@ as a metal nameplate; rarity follows the level it unlocks at (bronze under 13, s
 regardless of level. None of this changes what is earned or when — it is presentation
 over the same `PASS_TRACK`/`ACHIEVEMENTS`/`EVENTS` data.
 
+### The share picker — five cards, one painter
+
+"Share it" (the Locker's card preview, and the button on every celebration takeover)
+opens a **sheet**, not a single fixed image. `SHARE_CARDS` in `habits.html` lists five:
+**Rank** (crest, level, title, season stats), **The day** (today's habits ticked — "the
+one that explains itself"), **Streak** (the day streak, poster-loud), **Medal**
+(`latestMedal()` — the newest thing worth showing off: a milestone if one exists,
+otherwise the habit carrying the longest run), and **Month** (the calendar as a grid,
+Wrapped-style). Each renders in three formats — Post 4:5, Story 9:16, Square 1:1
+(`SHARE_SIZES`) — and **the preview IS the export**: `paintSharePreview()` calls the
+exact same `buildShareCard()` the Save/Share buttons use, so there is no separate
+low-fidelity thumbnail to fall out of sync with the real thing.
+
+Every painter is a `{ ground, body }` pair in `SHARE_PAINT`, sharing a small canvas kit
+(`scRR`, `scFit`, `scEyebrow`, `scStats`, `scConfetti`, …) so the five stay one family
+rather than five one-off drawings. `scFooter()` always signs the card the same way —
+the brand mark (or an "AA" fallback if the image hasn't loaded), "AA PROOF", and the
+site handle.
+
+⚠️ The **Month** card's calendar grid must fit inside a fixed body area that also holds
+its stat boxes and the footer. A 5-row month (most months, depending on which weekday
+the 1st falls on) is taller than a 4-row one, and in the shorter formats (Post, Square)
+that extra row used to push the "most consistent habit" strip straight through the
+footer text. The fix: row height (not column width) shrinks to whatever the month
+actually needs — cells go a little short of square only when a 5th (or 6th) row would
+otherwise overflow. Story, with 570px more room, never needs to shrink at all.
+
 ### Titles on the board (stage 17)
 
 A title now appears **beside the athlete's name on the leaderboard and on the roll-call
