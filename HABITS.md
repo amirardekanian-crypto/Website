@@ -288,17 +288,37 @@ machinery on either side, just more rows in `ACHIEVEMENTS` **and** in the
 `milestones` array on the `xp_rules` row. ⚠️ Both, or the board pays a different
 number to the phone.
 
-#### Run vs streak — two words, one job each
-A **run** is consecutive days on *one* habit ("a 24-day run on water"). A **streak** is
-consecutive days where the athlete cleared `streakQualifyPct` of the day's *weight*
-("a 2-day streak"). They are different numbers moving at different speeds.
+#### One word — `streak` — and two scopes
+A **habit's streak** is consecutive days on *one* habit ("a 24-day streak on water"); it
+sits on that habit's row and in its detail header. The **day streak** is consecutive days
+where the athlete cleared `streakQualifyPct` of the day's weight; it is the band at the top
+of Today and Progress, and it is always captioned *DAY STREAK*.
 
-The app used to say it five ways — *day streak*, *24 DAYS*, *Best streak*, *Best run so
-far*, *days in a row* — so `24 DAYS` on a habit row beside `2` for DAY STREAK on Progress
-read as one number disagreeing with itself. Habit rows and the detail header now read
-`24-DAY RUN`, the detail stat is `Longest run`, and the pip key and tier line both say
-*run*. **Do not introduce a third word for either idea.** The manual teaches both under
-*Consistency*.
+⚠️ **This reverses the old rule.** The per-habit one used to be called a **run**, precisely
+so a 24-day water run could not be mistaken for a 2-day day-streak — the app had once used
+five phrasings (*day streak*, *24 DAYS*, *Best streak*, *Best run so far*, *days in a row*)
+and they read as one number arguing with itself. Amir asked for `streak` everywhere
+(2026-07-29), so the disambiguation moved from the **noun** to the **scope**: a habit's
+streak is only ever shown *on that habit*, and the whole-day one is only ever shown with
+the word *day* attached. The manual's *Consistency* section and the day-one note on
+Progress are the two places that teach it, and both were rewritten to do so.
+
+**Do not reintroduce "run" in athlete-facing copy.** `bestHabitRun()` keeps its internal
+name because nothing renders it; the Progress tile it feeds reads *Longest streak*.
+
+#### The seven-day heat map
+Bottom of Today, inside *The last seven days*. One row per tracked habit, one column per
+day, oldest on the left. The point is the **shape**: a solid band on one row above a
+gap-toothed one says more about where the week went than any percentage, and it replaced a
+"strongest / weakest" sentence that named two habits out of eight and said nothing about
+the other six.
+
+Rows are ordered strongest-first so the eye lands on what is working before what is not.
+Cells reuse the 35-day grid's vocabulary — `hit` / `part` / `pre` — so the athlete learns
+it once. ⚠️ It reads `rosterOn(k)`, not `live()`: a habit switched on midweek did not exist
+on Monday, and drawing it as three misses is the app inventing failures. Those cells render
+`pre`, exactly like days before the athlete joined. Labels use `HABITS[].short` (*Steps*,
+*Protein*, *Supps*) because the task-style names do not fit a 66px column.
 
 #### The backfill window
 Nobody logs perfectly on the day, every day, so **the last `BACKFILL_DAYS` (3) days plus

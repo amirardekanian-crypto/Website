@@ -84,11 +84,20 @@ by design, so any check against the *current* level would revoke titles people a
 season half is permanent, and either one alone justifies minting.) The track is a third
 thing scored twice: `PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
 
-**Two words, one job each — do not invent a third.** A **run** is consecutive days on
-*one* habit ("24-day run"). A **streak** is consecutive days where the athlete cleared
-`streakQualifyPct` of everything they track ("2-day streak"). The app once used five
-phrasings for these two ideas, so a 24-day run beside a 2-day streak looked like the same
-number disagreeing with itself. The manual teaches both in *Consistency*.
+**One word — `streak` — and two SCOPES.** (Amir, 2026-07-29: *"instead of Run i want to
+use word Streak everywhere in my App"*.) A **habit's streak** is consecutive days on *one*
+habit ("24-day streak", on its row). The **day streak** is consecutive days where the
+athlete cleared `streakQualifyPct` of the day's weight ("2-day streak", in the band at the
+top of Today and Progress).
+
+⚠️ This *reverses* the earlier rule, which called the per-habit one a **run** precisely so
+those two numbers could never be confused — the app had used five phrasings and a 24-day
+run beside a 2-day streak read as one number arguing with itself. Amir asked for one word,
+so the job of keeping them apart moved from the noun to the **label**: every place that
+shows a habit's streak sits *on that habit* (its row, its detail header), and the day one
+is always captioned **DAY STREAK**. Keep it that way, and do not reintroduce "run" — the
+manual and the day-one note on Progress are the only places that teach the difference, and
+they now teach it by scope. `bestHabitRun()` keeps its internal name; nothing shows it.
 
 **Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
 backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
