@@ -50,13 +50,13 @@
       "message": {
         "paragraphs": [
           "Cycle 1 was about learning the patterns. This one is about making them show. Your shoulders and glutes get genuinely loaded now — more sets, taken closer to failure, on the lifts you've already proven you can drive.",
-          "The big change is shape. Shoulders used to live on two days; now they're on all four. They were the thing you asked for and the thing your logs said was most under-trained, so they're no longer stuck on the days that are easiest to skip.",
+          "The big change is shape. Shoulders now get two full days built entirely around them — Day 1 and Day 3 — instead of being squeezed in as an afterthought. They were the thing you asked for and the thing your logs said was most under-trained, so they're no longer stuck on the days that are easiest to skip.",
           "Week one sits close to where Cycle 1 finished — you've had time away and we're re-entering, not restarting. From week two the volume climbs. Hit the RPE on the card, log every set the same way, and this is the block where the mirror starts agreeing with the work."
         ],
         "outcomes": [
           "Rounder, wider-looking delts — the shape you came here for",
           "A heavier hip thrust, and a hinge you can finally load without grinding",
-          "Shoulders trained four days a week instead of two",
+          "Two full days built entirely around your shoulders now, not squeezed in",
           "A back and rear delts strong enough to hold your posture without thinking about it",
           "Core work you can actually feel, done where it belongs — at the end",
           "A clean, readable log that shows exactly how much stronger you got"
@@ -247,9 +247,9 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Cable Lateral Raise",
+                "name": "Banded Lateral Raise",
                 "videoUrl": null,
-                "note": "You ran this at 10 out of 10 on all three sets last cycle when I'd asked for 9. Drop the pin a plate or two — fifteen controlled reps beats twelve you have to throw.",
+                "note": "Swapped from cable — even the lightest pin was too much for this one. Stand on the band, one handle per hand, and pick a band thickness that lets all fifteen reps stay controlled: you ran the cable version at 10 out of 10 last cycle when I'd asked for 9, so start light here too.",
                 "restSec": 75,
                 "chips": [
                   {
@@ -276,7 +276,7 @@
                     "Feel the side of the shoulder burn the whole way through"
                   ],
                   "bad": [
-                    "Letting the cable yank your arm back down"
+                    "Letting the band yank your arm back down"
                   ]
                 }
               },
@@ -342,7 +342,7 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Chest Press",
+                "name": "Barbell Chest Press",
                 "videoUrl": null,
                 "note": "New to your program — chest was missing, and Amir wants it back in the mix. Keep it light and controlled; this supports the shoulder work this cycle, it isn't the focus.",
                 "restSec": 90,
@@ -629,6 +629,7 @@
                 "type": "standard",
                 "name": "Machine Leg Extension",
                 "videoUrl": null,
+                "note": "This machine is out of order until it's fixed. Until then, do Spanish Squats instead for the same sets/reps/RPE: loop a band low around a rack, step into it so it sits behind your knees, then sit back into the band and hold an upright torso as you squat — it isolates the quads the same way the machine does.",
                 "restSec": 75,
                 "chips": [
                   {
@@ -907,13 +908,13 @@
               },
               {
                 "type": "standard",
-                "name": "Leaning Cable Lateral Raise",
+                "name": "Leaning Dumbbell Lateral Raise",
                 "videoUrl": null,
-                "note": "New setup — grab the low pulley with the far hand (crossing your body), lean away from the machine so your arm hangs across you, then raise it out and up. The lean is what makes this different from your usual raise: it keeps the cable pulling on the shoulder all the way to the top, instead of going slack there.",
+                "note": "Swapped from the cable version, and dropped to two sets — that's what you were already doing in practice, and back-to-back near-failure raise work is where your form breaks down first. Hold a rack or pole with your inside hand, lean your whole body away from it, and raise the dumbbell out and up with the outside arm. The lean is what makes this different from your usual raise: it keeps the side delt loaded all the way to the top instead of going slack there.",
                 "restSec": 75,
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "2 Sets",
                     "style": "yellow"
                   },
                   {
@@ -928,11 +929,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Lean away from the machine and raise the handle out and up past shoulder height",
+                    "Lean your whole body away and raise the dumbbell out and up past shoulder height",
                     "Feel the side delt stay under tension even at the very top of the raise"
                   ],
                   "bad": [
-                    "Standing upright — that lets the cable go slack and turns it into a normal raise"
+                    "Standing upright — that lets gravity off the shoulder and turns it into a normal raise"
                   ]
                 }
               },
@@ -1011,7 +1012,7 @@
         "id": 4,
         "focusTag": "One Leg At A Time",
         "completionTitle": "Finished Strong",
-        "completionMessage": "Single-leg work, side glutes and a last hit on the delts — the quiet session that keeps everything balanced. Rest up.",
+        "completionMessage": "Single-leg work and side glutes — the quiet session that keeps everything balanced. Rest up.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -1190,8 +1191,9 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Seated Leg Curl",
+                "name": "Stability Ball Leg Curl",
                 "videoUrl": null,
+                "note": "Swapped in — no seated leg curl machine to use. Lie on your back, heels on the ball, and curl it in toward your glutes by driving your hips up first, then bending the knees.",
                 "restSec": 75,
                 "chips": [
                   {
@@ -1210,11 +1212,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Curl the pad down and under, hips pinned to the seat",
-                    "Feel the hamstrings shorten hard at the bottom"
+                    "Drive the hips up first, then roll the ball in toward your glutes with the heels",
+                    "Feel the hamstrings shorten hard as the ball comes in"
                   ],
                   "bad": [
-                    "Letting the hips rise off the seat to finish the rep"
+                    "Letting the hips sag or drop before the curl finishes"
                   ]
                 }
               },
