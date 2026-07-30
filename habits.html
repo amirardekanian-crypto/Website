@@ -286,18 +286,31 @@
   .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 3.3em; }
 
   /* The level hero. The XP bar is a RING around the level number — the number
-     and how far through it you are read as one object. */
+     and how far through it you are read as one object.
+     ONE geometry, two sizes: `.lvring` is the 86px hero button on Today,
+     `.hring` the 46px disc on every habit row on Progress. Both are r=15.5 in
+     a 36 viewBox (C≈97.4), so the arc is the same arithmetic and a level is
+     drawn the same way wherever it appears. That is the whole point of the
+     smaller one (Amir, 2026-07-30): a habit's level used to be a filled square
+     with an XP bar under the row — two shapes for one fact, and neither of them
+     the shape Today uses for exactly the same fact. */
   .hero-lv { display: flex; flex-direction: column; gap: 12px; }
-  .lvring { position: relative; flex: none; width: 86px; height: 86px; padding: 0; border: 0; background: none; cursor: pointer; }
-  .lvring svg { position: absolute; inset: 0; width: 100%; height: 100%;
+  .lvring, .hring { position: relative; flex: none; }
+  .lvring { width: 86px; height: 86px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .hring { display: block; width: 46px; height: 46px; }
+  .lvring svg, .hring svg { position: absolute; inset: 0; width: 100%; height: 100%;
                 transform: rotate(-90deg); display: block; }
-  .lvring circle { fill: none; stroke-width: 3.4; }
-  .lvring .rail { stroke: var(--track); }
-  .lvring .run { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 97.4;
+  .lvring circle, .hring circle { fill: none; stroke-width: 3.4; }
+  .lvring .rail, .hring .rail { stroke: var(--track); }
+  .lvring .run, .hring .run { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 97.4;
                  transition: stroke-dashoffset .35s cubic-bezier(.2,.8,.2,1); }
-  .lvring .in { position: absolute; inset: 0; display: flex; flex-direction: column;
+  .lvring .in, .hring .in { position: absolute; inset: 0; display: flex; flex-direction: column;
                 align-items: center; justify-content: center; gap: 2px; }
   .lvring .lbl { font-size: 8px; font-weight: 700; letter-spacing: .14em; color: var(--muted-soft); }
+  /* The number, and nothing else. The hero has room to caption itself LEVEL;
+     a 46px disc in a list does not, and the row it sits in is the caption. */
+  .hring .figure { font-size: 19px; line-height: 1; }
+  .hring.wide .figure { font-size: 15px; }
 
   /* Four season facts, equal weight. The old two-up made the day streak the
      biggest number on the tab, so a rebuilding athlete opened Progress to a
@@ -5191,6 +5204,21 @@ function streakFlame(now, best) {
   </div>`;
 }
 
+// ── The level disc, the hero's ring at habit-row size ─────────────────────
+// Amir, 2026-07-30: a habit's level on Progress was a filled square, its rank
+// name in the meta line and its progress in a bar under the row — three
+// elements for the one fact Today draws as a single object. This is that
+// object, smaller: same `.lvring` geometry (r=15.5 in a 36 viewBox → C≈97.4),
+// so the arc arithmetic is written once and a level never looks like two
+// different things in two tabs. Number only — no LEVEL caption, no rank name.
+// The bar it replaces is not lost information: the ring IS the bar, bent.
+function habitRing(li) {
+  return `<span class="hring${li.lv > 99 ? ' wide' : ''}" title="Level ${li.lv} · ${li.pct}% of the way to ${li.lv + 1}">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - li.pct / 100)).toFixed(1)}"></circle></svg>
+      <span class="in"><span class="figure">${li.lv}</span></span>
+    </span>`;
+}
+
 // ── Habit row, shared by Today and Habits ─────────────────────────────────
 // The best current run across the tracked habits. Used to decide which single
 // ember animates; see the `.ember.lead` rules.
@@ -5657,16 +5685,26 @@ function renderProgress(LI, earned, totalAch) {
         const ep = splitEmoji(h.name);
         return `<button class="row-rule" data-k="prow:${h.id}" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
           ${on(() => openHabit(h.id, 'progress'))}>
-          <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--accent);color:var(--bg)">${hl.lv}</div>
+          ${habitRing(hl)}
           <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-              <span class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span></span>
-              <span class="hlv" style="flex:none">${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span>` : '—'}</span>
-            </div>
+            <!-- THE NAME GETS THE WHOLE LINE. It used to share it with the streak
+                 chip, which left 99px for a name — every habit here wrapped to
+                 two or three lines, and "Finish your session" took three. The
+                 streak moved down beside the XP, which is where Today already
+                 keeps it: the level anchors the row (there, on the right; here,
+                 as the ring on the left) and the streak rides the line under it,
+                 next to the numbers it belongs with. -->
+            <span class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span></span>
             <!-- Was rank · XP · today's status, which wrapped to two lines and
-                 restated what Today already says. Progress is about standing. -->
-            <div style="font-size:11px;line-height:1.3;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(hl.label)} · ${hl.xp.toLocaleString()} XP</div>
-            <div class="bar" style="height:4px;width:100%"><span data-fill style="width:${hl.pct}%"></span></div>
+                 restated what Today already says. Then rank · XP — and the rank
+                 name went too (Amir, 2026-07-30): what an athlete reads off this
+                 row is the level NUMBER, the ladder of rank names lives in the
+                 Locker, and dropping it hands the line back to the habit's own
+                 name. The bar that sat under here is now the ring on the left. -->
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;font-size:11px;line-height:1.3;color:var(--muted)">
+              <span style="flex:none">${hl.xp.toLocaleString()} XP</span>
+              ${st > 0 ? `<span class="hlv" style="flex:none"><span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span></span>` : ''}
+            </div>
           </div>
           <div class="pips" style="flex:none">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
         </button>`;
@@ -5674,7 +5712,7 @@ function renderProgress(LI, earned, totalAch) {
 
       ${off.length ? sectionLabel('Paused', 'Turn on in Settings') +
         off.map(h => `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:13px 20px;opacity:.45">
-          <div class="hd" style="width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--box)">${habitLevel(h).lv}</div>
+          ${habitRing(habitLevel(h))}
           <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
             <div class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${(ep => `${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span>`)(splitEmoji(h.name))}</div>
             <div style="font-size:11px;line-height:1.3;color:var(--muted)">Paused · ${habitLevel(h).xp.toLocaleString()} XP banked</div>
@@ -5768,7 +5806,7 @@ function renderProgress(LI, earned, totalAch) {
       })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is. The five squares are consistency tiers, from a 5-day streak up to two months.
+        The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is, and the ring around it is how far through that level you are. The five squares are consistency tiers, from a 5-day streak up to two months.
       </div>
       <!-- A second door to the manual, on the screen that uses the most words
            the app has never defined — badge, tier, run, streak, season, rank.
