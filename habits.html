@@ -5709,11 +5709,14 @@ function renderProgress(LI, earned, totalAch) {
                  name went too (Amir, 2026-07-30): what an athlete reads off this
                  row is the level NUMBER, the ladder of rank names lives in the
                  Locker, and dropping it hands the line back to the habit's own
-                 name. The bar that sat under here is now the ring on the left. -->
-            <div style="display:flex;align-items:center;gap:8px;min-width:0;font-size:11px;line-height:1.3;color:var(--muted)">
-              <span style="flex:none">${hl.xp.toLocaleString()} XP</span>
-              ${st > 0 ? `<span class="hlv" style="flex:none"><span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span></span>` : ''}
-            </div>
+                 name. The bar that sat under here is now the ring on the left.
+                 The XP figure followed the same day (Amir: "useless there") —
+                 XP is what the ring and the level number already communicate;
+                 restating the raw count added a line without adding information.
+                 Only the streak remains, and only when there is one. -->
+            ${st > 0 ? `<div style="min-width:0;font-size:11px;line-height:1.3">
+              <span class="hlv"><span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span></span>
+            </div>` : ''}
           </div>
           <div class="pips" style="flex:none">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
         </button>`;
