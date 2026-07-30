@@ -743,6 +743,31 @@ ranks and the 14 rewards merged into one scroll (see *The rank ladder lives on t
 Locker's road now*, above) — the only forward-looking screen in the app; everywhere
 else reports the past.
 
+**The road is one connected line now, not ten separate rows** (Amir, 2026-07-30: "level
+circles ... and emblems in line with each other. they should actually be connected to
+each other with a vertical bar ... starting from rookie emblem until where we are right
+now"). `roadIconCol()` wraps every rank crest and reward circle in a fixed 34px column
+carrying two line segments, one above the icon and one below; every column shares the
+same width and left edge, so the segments thread into one unbroken bar running the length
+of the whole scroll. The bar is **accent-filled through every node already reached and
+`var(--track)` after** — reached means `passHas(p.id)` for a reward, `here || passed` for
+a rank — so the seam between filled and unfilled sits exactly at the boundary between the
+last thing owned and the next thing coming, which is "where we are right now" without
+needing a second marker to say so: the NEXT reward is already ringed in accent and
+labelled, right at that seam.
+
+Getting the segments to actually meet (no visible break at every rank change) meant
+moving each row's vertical spacing off the row itself — where it was real CSS padding,
+shrinking the flex content box `align-self:stretch` measures against — and onto the
+content span instead, so the icon column's height still equals the full row. The `margin`
+that gave the NEXT card and each rank-row breathing room came off for the same reason: a
+margin sits *outside* the box a sibling's `align-self:stretch` can reach, so it opened a
+gap in the line exactly at the two places most likely to be looked at — the current
+position, and every rank boundary. `hideAbove` on the very first node keeps nothing
+poking out above Rookie. Verified: max on-screen gap is 1px (subpixel rounding) at every
+level tested, in both themes, with the icon columns pixel-aligned at a single x the whole
+way down.
+
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
 metal-rimmed badge for a rank — the road, the Today hero and the share card all call
