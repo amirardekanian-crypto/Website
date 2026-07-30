@@ -444,9 +444,9 @@
   }
   .selrow.on { background: var(--accent); color: var(--bg); }
   .sectlbl { padding: 18px 20px 8px; letter-spacing: .12em; display: flex; justify-content: space-between; gap: 12px; }
-  /* A tier group's own header, doubling as its collapse toggle. Closed by
-     default — see the comment at msTierHeader() — so the chevron points
-     down at rest and turns to point up once opened. */
+  /* A tier group's own header, doubling as its collapse toggle. Open by
+     default — see the comment at msTierHeader() — so the chevron points up
+     at rest and turns to point down once an athlete closes it. */
   .msth { width: 100%; text-align: left; cursor: pointer; }
   .msth .msth-r { display: flex; align-items: center; gap: 8px; }
   .msth .chev { flex: none; width: 9px; height: 9px; stroke: currentColor; stroke-width: 2.4;
@@ -2413,7 +2413,7 @@ const K_META = () => ATHLETE_ID + '_hab_meta';
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
              day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null,
-             msOpen: {}, confirmOnId: null };
+             confirmOnId: null };
 let _toastTimer = null, _flashTimer = null, _confirmOnTimer = null;
 
 function defaultCfg() {
@@ -2425,7 +2425,10 @@ function defaultCfg() {
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
-           onBoard:false, boardName:null, notes:null, updatedAt:0 };
+           onBoard:false, boardName:null, notes:null, updatedAt:0,
+           // Milestone tier open/closed, keyed by tier — missing key reads as
+           // open. See msTierHeader().
+           msOpen:null };
 }
 
 // ── Dates ─────────────────────────────────────────────────────────────────
@@ -3946,14 +3949,18 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'
 function sectionLabel(title, right) {
   return `<div class="eyebrow sectlbl"><span>${esc(title)}</span>${right ? `<span>${esc(right)}</span>` : ''}</div>`;
 }
-// A milestone tier's own header, doubling as its collapse toggle. Closed by
-// nature — four groups of five-ish rows each read as a wall on first open,
-// so only the label, the count and the chevron show until tapped. UI.msOpen
-// is keyed by tier so each group remembers its own state for the session.
+// A milestone tier's own header, doubling as its collapse toggle. OPEN by
+// nature (Amir, 2026-07-30: they start on; a toggle-off is a choice, not the
+// default) — and keyed on CFG, not UI, so that choice is a real memory: it
+// survives a re-render, a reload, a new device, not just the session. Missing
+// from CFG.msOpen reads as open, so nothing needs seeding for it and every
+// athlete who already has a save opens exactly the same way an athlete who
+// has never touched the toggle does.
 function msTierHeader(key, label, right) {
-  const open = !!UI.msOpen[key];
+  const open = (CFG.msOpen || {})[key] !== false;
   return `<button class="eyebrow sectlbl msth${open ? ' open' : ''}" data-k="mstoggle:${key}" ${on(() => {
-    UI.msOpen[key] = !UI.msOpen[key];
+    (CFG.msOpen || (CFG.msOpen = {}))[key] = !open;
+    saveCfg();
     render();
   })}>
     <span>${esc(label)}</span>
@@ -5431,7 +5438,13 @@ function renderToday(LI, doneCount, pct) {
               <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
               <span class="go">→</span>
             </button>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="xp" data-to="${LI.xp}">${LI.xp.toLocaleString()}</span> XP · ${esc(LI.nextLabel)}</div>
+            <!-- Was the running XP total then the distance to next, e.g.
+                 "1,799 XP · 131 XP to level 5" — the total meant nothing on
+                 its own (Amir, 2026-07-30: "we dont want to know how many xp
+                 we have, its useless, just how many xp to next level is
+                 enough") and repeated the unit right next to itself. Distance
+                 alone is the number that is actually actionable today. -->
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(LI.nextLabel)}</div>
           </div>
         </div>
       </div>
@@ -5778,7 +5791,7 @@ function renderProgress(LI, earned, totalAch) {
         // title it pays where the others carry XP. No dates on any of it: the
         // few weeks is how long the work takes, not a slot you can miss.
         const evDone = EVENTS.filter(e => eventProgress(e).done).length;
-        const evOpen = !!UI.msOpen.events;
+        const evOpen = (CFG.msOpen || {}).events !== false;
         const evCards = msTierHeader('events', 'A few weeks', evDone + '/' + EVENTS.length)
           + (evOpen ? EVENTS.map(ev => {
             const p = eventProgress(ev), got = p.done, hit = p.goals.filter(g => g.done).length;
@@ -5797,15 +5810,15 @@ function renderProgress(LI, earned, totalAch) {
               </span>
             </div>`;
           }).join('') : '');
-        // Each tier is toggled off by nature — five-ish full-strength rows per
-        // group read as a wall stacked four deep on first open. The header
-        // (label, count, chevron) always shows; the rows only render once
-        // UI.msOpen[key] is true, so opening one costs nothing until tapped.
+        // Each tier is OPEN by nature and stays that way until the athlete
+        // closes it — see msTierHeader(). The header (label, count, chevron)
+        // always shows; the rows render whenever CFG.msOpen[key] isn't
+        // explicitly false.
         const tierBlock = key => {
           const inTier = rows.filter(r => (r.a.tier || 'long') === key);
           if (!inTier.length) return '';
           const t = ACH_TIERS.find(x => x.key === key);
-          const open = !!UI.msOpen[key];
+          const open = (CFG.msOpen || {})[key] !== false;
           return msTierHeader(key, t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
                + (open ? inTier.map(row).join('') : '');
         };
@@ -6380,6 +6393,32 @@ const CARD_LOOK = {
   c_flare:     'background:conic-gradient(#6C5CE7 0deg 30deg, #17142B 30deg 90deg, #FF8A5B 90deg 120deg, #17142B 120deg 180deg, #6C5CE7 180deg 210deg, #17142B 210deg 270deg, #FF8A5B 270deg 300deg, #17142B 300deg 360deg)'
 };
 
+// Threads every rank crest and reward circle on the road onto ONE vertical
+// line (Amir, 2026-07-30: "level circles ... and emblems in line with each
+// other. they should actually be connected to each other with a vertical
+// bar ... starting from rookie emblem until where we are right now"). The
+// line is accent-filled through every node already reached and var(--track)
+// after — the seam between the two IS the current position, so nothing else
+// has to mark it; the very next node (already ringed as NEXT, or labelled
+// YOU ARE HERE) sits right at that seam.
+//
+// One fixed-width column, same width as a rank crest, wraps every icon: two
+// line segments (flex:1 each) push the icon to true vertical centre and
+// carry the colour on either side of it. `align-self:stretch` on the column
+// (paired with `align-items:stretch` on the row, and the row's OWN vertical
+// spacing moved onto the content span instead of the row itself) is what
+// keeps the segments meeting exactly at the row boundary — padding on the
+// row would open a gap in the line at every rank change. `hideAbove` caps
+// the very top of the road so nothing pokes out above Rookie.
+function roadIconCol(iconHtml, reached, hideAbove) {
+  const wire = reached ? 'var(--accent)' : 'var(--track)';
+  return `<span style="position:relative;flex:none;width:34px;align-self:stretch;display:flex;flex-direction:column;align-items:center">
+      <span style="width:3px;flex:1;min-height:6px;background:${hideAbove ? 'transparent' : wire}"></span>
+      <span style="flex:none;display:flex;align-items:center;justify-content:center">${iconHtml}</span>
+      <span style="width:3px;flex:1;min-height:6px;background:${wire}"></span>
+    </span>`;
+}
+
 function renderPass() {
   const LI = overallLevel(), lv = LI.lv;
   const next = nextReward();
@@ -6427,29 +6466,29 @@ function renderPass() {
   const rewardRow = p => {
     const has = passHas(p.id), isNext = next && next.id === p.id;
     const preview = p.kind === 'card'
-      ? `<span style="flex:none;width:26px;height:33px;border-radius:7px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
+      ? `<span style="flex:none;align-self:center;width:26px;height:33px;border-radius:7px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper}"></span>`
       : '';
     if (isNext) return `
-      <div style="display:flex;gap:13px;align-items:center;border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow);padding:10px 12px;margin:4px 0" data-k="road:${p.id}">
-        <span style="flex:none;width:38px;height:38px;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">${p.lv}</span>
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;gap:13px;align-items:stretch;border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow)" data-k="road:${p.id}">
+        ${roadIconCol(`<span style="width:34px;height:34px;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">${p.lv}</span>`, false)}
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:10px 12px 10px 0">
           <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-weight:700;font-size:13.5px">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="flex:none;font-size:10px;font-weight:800;color:var(--accent)">NEXT · LV ${p.lv}</span></span>
           <span class="bar thin" style="height:6px"><span data-fill style="width:${nextPct}%"></span></span>
           <span style="font-size:10.5px;color:var(--muted)">${toNext.toLocaleString()} XP — about ${Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp())))} good day${Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp()))) === 1 ? '' : 's'}</span>
-        </span>${preview}
+        </span>${preview ? `<span style="display:flex;align-items:center;padding-right:12px">${preview}</span>` : ''}
       </div>`;
     if (has) return `
-      <div style="display:flex;gap:13px;align-items:center;padding:7px 0 7px 4px" data-k="road:${p.id}">
-        <span style="flex:none;width:34px;height:34px;border-radius:999px;background:var(--teal);color:#0C4B43;display:flex;align-items:center;justify-content:center">${TICK}</span>
-        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <div style="display:flex;gap:13px;align-items:stretch" data-k="road:${p.id}">
+        ${roadIconCol(`<span style="width:34px;height:34px;border-radius:999px;background:var(--teal);color:#0C4B43;display:flex;align-items:center;justify-content:center">${TICK}</span>`, true)}
+        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0">
           <span style="display:flex;flex-direction:column"><span style="font-weight:700;font-size:13.5px">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="font-size:10.5px;color:var(--muted-soft)">Level ${p.lv}</span></span>
           <span style="flex:none;display:flex;align-items:center;gap:8px">${preview}<span style="font-size:10px;font-weight:700;color:var(--teal-deep)">KEPT</span></span>
         </span>
       </div>`;
     return `
-      <div style="display:flex;gap:13px;align-items:center;padding:7px 0 7px 4px;opacity:.62" data-k="road:${p.id}">
-        <span style="flex:none;width:34px;height:34px;border-radius:999px;border:2px dashed var(--box);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${p.lv}</span>
-        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <div style="display:flex;gap:13px;align-items:stretch;opacity:.62" data-k="road:${p.id}">
+        ${roadIconCol(`<span style="width:34px;height:34px;border-radius:999px;border:2px dashed var(--box);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">${p.lv}</span>`, false)}
+        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0">
           <span style="display:flex;flex-direction:column"><span style="font-weight:700;font-size:13.5px;color:var(--muted)">${esc(p.name)}${p.kind === 'card' ? ' skin' : ' title'}</span><span style="font-size:10.5px;color:var(--muted-soft)">Level ${p.lv} · ${esc(p.note)}</span></span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;width:13px;height:13px;color:var(--muted-soft)"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
         </span>
@@ -6462,9 +6501,9 @@ function renderPass() {
     const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
     const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
     return `
-      <div style="display:flex;gap:12px;align-items:center;padding:${i ? '16px' : '6px'} 0 8px${i ? ';border-top:1px solid var(--rule);margin-top:6px' : ''}${here || passed ? '' : ';opacity:.62'}" data-k="road-rank:${name}">
-        ${rankCrest(name, 34)}
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;gap:12px;align-items:stretch;${i ? 'border-top:1px solid var(--rule)' : ''}${here || passed ? '' : ';opacity:.62'}" data-k="road-rank:${name}">
+        ${roadIconCol(rankCrest(name, 34), here || passed, i === 0)}
+        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:${i ? '16px' : '6px'} 0 8px">
           <span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
             <span class="hd" style="font-size:15.5px;line-height:1">${esc(name)}</span>
             <span style="flex:none;font-size:9.5px;font-weight:800;letter-spacing:.08em;color:${here ? 'var(--accent)' : 'var(--muted-soft)'}">${here ? 'YOU ARE HERE' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
