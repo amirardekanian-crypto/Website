@@ -468,7 +468,7 @@ Habits and achievements merged, because they were two views of one question.
 Opens straight on **four season stats**: days logged, badges, **day streak** (as the
 flame) and perfect days → a one-line **key explaining the consistency pips**, which had
 no legend anywhere in the app and are empty for the first five days → **one row per
-habit** (its level, rank, XP, progress bar and five pips, tapping through to full
+habit** (its level in a ring, its XP, its streak and five pips, tapping through to full
 history) → paused habits with their banked XP → **quests** → the sixteen one-off
 **milestones** and the four "A few weeks" events, in four groups — *A good week*, *A few
 weeks*, *The long haul*, *Rare* — each **toggled off by nature** (see *Milestones come in
@@ -492,9 +492,26 @@ repeating it in both places would be the duplication this tab was reorganised to
 Its old slot now holds **longest run** — the best single-habit run ever, which is genuinely
 different information and quietly teaches the run/streak split the app depends on.
 
-A habit row's meta line is **rank · XP** only. It used to append today's status too,
-which wrapped every row to two lines and restated what Today already says — Progress is
-about standing, not about today.
+**A habit's level is the hero's ring, at row size** (Amir, 2026-07-30). It was a filled
+square, with the rank name in the meta line and the level's progress as a bar under the
+row — three elements for the one fact Today draws as a single object, and none of them
+that object. `habitRing()` renders `.hring`: the same geometry as `.lvring` (r=15.5 in a
+36 viewBox → C≈97.4, so the arc arithmetic is written once), 46px instead of 86, and the
+**number only** — no LEVEL caption, no rank name. The bar is not lost information, it is
+the ring: bent around the number it describes.
+
+The rank name went with it because the level *number* is what an athlete reads off this
+row, the ladder of rank names lives properly in the Locker, and a fourth place to state a
+rank is the duplication this tab keeps being reorganised to remove.
+
+A habit row's meta line is therefore **XP · streak**, and the habit's **name has the whole
+line above it**. It used to append today's status (which wrapped every row and restated
+what Today already says), then it was rank · XP with the streak chip sharing the name's
+line — which left **99px for a name**, so every habit on this tab wrapped to two lines and
+"Finish your session" took three. Moving the streak down beside the XP is the split Today
+already uses: the level anchors the row (there on the right, here as the ring on the left)
+and the streak rides the line under the name, next to the numbers it belongs with. Names
+now fit on one line at 375px, and the rows lost ~25% of their height on the way.
 
 **Nothing-logged-yet is taught, not reported.** On a log with no days in it the stat grid
 carries one line defining *badge*, *run*, *streak* and *perfect day* — words that were used
@@ -588,6 +605,9 @@ now (`.lvring`, an SVG circle with a `stroke-dashoffset` set from `LI.pct`), not
 underneath it — the number and how far through it you are read as one object instead of
 two. The ring is a real button now too, same destination as the rank name beside it
 (Amir, 2026-07-30: it read as decoration when only half the block responded to a tap).
+Later the same day it stopped being the hero's alone: **every habit row on Progress wears
+the same ring at 46px** (`.hring` / `habitRing()`), so a level is one shape everywhere in
+the app rather than a ring here and a filled square with a bar there — see *02 · PROGRESS*.
 
 **Progress lost its own level/rank strip entirely** (see *02 · PROGRESS*, below) — with
 Today's whole hero tappable and the Locker owning the rank properly, a third copy of
