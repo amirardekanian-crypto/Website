@@ -112,6 +112,14 @@ publish it. No athlete health/chat detail goes here — principles only.
   Extension + Hip Thrust) and defer the loaded *free* hinge (barbell RDL/deadlift) one
   cycle — build the brace first, then load the free pattern (the brace is its permission
   slip). Also high-SFR, so little stimulus is lost. *(2026-06-15)*
+- **Chronic-back clients: AXIAL loading defers a cycle too, not just the free hinge.** The
+  first cycle runs a supported knee-dominant primary (Leg Press / Hack Squat) instead of the
+  Back Squat; the squat re-enters the next cycle only after a fully pain-free one. Same logic
+  as the hinge rule above — the pain-free cycle is the permission slip, and SFR means almost
+  nothing is lost by waiting. Applies to the *fallbacks* too: don't let a fallback quietly
+  re-admit the free pattern the cycle deferred. *(2026-07-30, Amir, on Faraz C1: "leg press as
+  its safer a bit for his lower back, if he was pain free the whole cycle then we can progress
+  to a back squat")*
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
 - **No corrective/postural drills without an indication.** Postural or scap-control
@@ -127,6 +135,19 @@ publish it. No athlete health/chat detail goes here — principles only.
   that muscle has run out — which is information you need, not something to paper over.
   *(2026-07-27, Amir — Elmira C2 shipped Cable Lateral Raise on both Day 1 and Day 4 to reach a
   side-delt target; the fix was 5 sets on one day plus a different raise on the other.)*
+- **One-exercise-once-per-cycle applies to WORKING exercises only** (Primary / Accessory / Core /
+  conditioning). **Activation & Prep items may repeat across days** — a primer's job is to prime
+  the day's patterns, so repetition there is the point, not program repetition. *(2026-07-30, Amir
+  — the rule as written had no carve-out, which would have banned the same warm-up bike or glute
+  bridge on two days.)*
+- **A missing demo video NEVER shapes the prescription — Amir adds URLs manually.** *(Amir,
+  2026-07-30, verbatim: "i will always add url for all the videos that doesnt have a url, this is
+  not your worry, you always prescribe what is best for the athlete, and the ill add videos
+  manually.")* Prescribe the best movement for the athlete, always; don't downgrade a choice,
+  substitute a lesser exercise, or hedge because a name isn't in `exercise_library.json` yet.
+  Off-library picks are normal and expected — just follow the naming convention and note them for
+  Amir. Extends "the library is a video-join key, not a whitelist" (Exercise naming) from
+  permission into a standing instruction.
 - **A removed exercise stays removed unless re-earned.** When something is dropped for dislike,
   inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
   without a real reason and evidence the athlete has earned it back (pain resolved, capacity
@@ -364,6 +385,24 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Communication & in-app text
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
   for WhatsApp/IG are separate, on request. *(2026-06-15)*
+- **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
+  *(Amir, 2026-07-30, verbatim: "write in a friendly human voice, dont let them think ai wrote
+  these, let them think i wrote them, and my english is not very high level.")* This governs
+  all athlete-facing copy: cycle messages, notes cards, Coach's Notes, completion messages,
+  WhatsApp text. How to hit it:
+  - **Simple, everyday words.** Short sentences. If a plainer word exists, use it ("build up"
+    not "accumulate", "for now" not "at this stage", "that's fine" not "that is entirely
+    acceptable"). His English is good but not literary — polished prose is the tell.
+  - **Warm and direct, coach-to-athlete.** Speak *to* him ("you", "your back"), use
+    contractions, allow a little informality and the odd short fragment. "Trust me on this one."
+  - **Ban the AI tells**: em-dashes, semicolons, "moreover/furthermore/additionally", tricolons
+    and balanced triads, "it's not X, it's Y" antithesis, "Let's dive in", corporate-motivational
+    filler, and headings on a two-sentence note. Vary sentence length — perfectly even rhythm
+    reads generated.
+  - **Say the real reason in plain words.** "Your back has history, so we start with the leg
+    press" beats "we are prioritising trunk-supported loading patterns."
+  - Read it back and ask: *would a busy coach type this on his phone?* If it reads like a
+    brochure or a textbook, rewrite it.
 - **Notes speak in the athlete's app language — day numbers + on-screen names, never
   design-side shorthand.** The athlete sees "Day 4 — Quiet Feet, Iron Trunk", not "the
   Control day"; a notes card that references days by the coach's internal labels

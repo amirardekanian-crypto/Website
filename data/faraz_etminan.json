@@ -1,0 +1,665 @@
+{
+  "athlete": {
+    "id": "faraz_etminan",
+    "key": "f6c19dcbd2a14bd1a4d7911dca3fdff1",
+    "firstName": "Faraz",
+    "lastName": "Etminan"
+  },
+  "sport": {
+    "badge": "🏋️ General Fitness"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bedrock",
+      "tagline": "The base that holds",
+      "weeks": "Weeks 1–4",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-28",
+      "focuses": [
+        "Rebuild the brace and posterior chain with trunk-supported hinging — no loaded free hinge, low back stays quiet.",
+        "Heavy upper-back and scapular bias aimed straight at fixing the posture — pulling beats pressing this block."
+      ],
+      "message": {
+        "paragraphs": [
+          "Welcome, Faraz. This first block is about building your base back up before we load anything heavy. Your back has a long history, so we're not jumping straight into squats and deadlifts. Everything here is picked so your back stays quiet while the rest of you gets stronger.",
+          "The main job is your upper back. That rounded posture you want to fix doesn't come from stretching, it comes from getting the muscles between your shoulder blades strong enough to hold you up. So you'll pull a lot more than you push in these four weeks.",
+          "Keep every set at 7 out of 10 effort, no more. You should leave the gym feeling like you had a bit left. That's on purpose, not me going easy on you."
+        ],
+        "outcomes": [
+          "All 12 sessions logged",
+          "Back stays pain-free for the full 4 weeks",
+          "Standing taller by week 4",
+          "Leg press and hip thrust moving up every week",
+          "Real numbers on the board to build cycle 2 from"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Rigging",
+      "tagline": "Wire the upper back",
+      "weeks": "Weeks 5–9",
+      "startDate": "2026-08-29",
+      "endDate": "2026-10-02",
+      "focuses": [
+        "Hypertrophy-bias upper back and posterior chain — rows, pulls, rear delts — the engine of the tone and posture goal.",
+        "The hinge graduates: light dumbbell RDL grooved at RPE 7 or under while the hip thrust still carries the load."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Block two is where your upper back starts working properly. More pulling, heavier, and you'll actually feel the muscles that hold your posture doing their job.",
+          "And if your back stays quiet through these four weeks, the squat comes back. That's the deal I'm making with you.",
+          "Give me one quiet month and the bar is yours."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Keystone",
+      "tagline": "Earn the bar",
+      "weeks": "Weeks 10–14",
+      "startDate": "2026-10-03",
+      "endDate": "2026-11-06",
+      "focuses": [
+        "First real strength push — barbell RDL enters at conservative loads, squat and press build toward RPE 8 top sets.",
+        "Upper-back volume held as the standing posture floor; the week gets a sharper load identity — one peak, one moderate, one low day."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Rebuild & Reset",
+      "tagline": "Sharpen the axe",
+      "weeks": "Weeks 15–18",
+      "startDate": "2026-11-07",
+      "endDate": "2026-12-04",
+      "focuses": [
+        "Planned back-off — volume down roughly 40%, every RPE capped at 7, more movement variety so it reads as a new program, not a punishment.",
+        "Posture consolidation and an honest check-in on sleep and stress before the heaviest block is allowed to start."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Ironworks",
+      "tagline": "Strength, poured and cast",
+      "weeks": "Weeks 19–23",
+      "startDate": "2026-12-05",
+      "endDate": "2027-01-08",
+      "focuses": [
+        "The heaviest block of the roadmap — top-set and back-off work on squat, hinge and press at RPE 7–8.",
+        "Accessories cut to the minimum effective dose so the recovery budget goes to the bar."
+      ]
+    },
+    {
+      "num": 6,
+      "name": "Silhouette",
+      "tagline": "Shape becomes visible",
+      "weeks": "Weeks 24–28",
+      "startDate": "2027-01-09",
+      "endDate": "2027-02-12",
+      "focuses": [
+        "Hypertrophy finishing block biased to upper back, shoulders and arms — the visible shape payoff.",
+        "Strength held on low-dose heavy anchors; closes with a posture re-check and the next-arc decision."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bedrock",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Legs, Glutes, Built to Last",
+        "completionTitle": "Base Built",
+        "completionMessage": "That's the heaviest day of your week done. Get a proper meal in tonight and walk a bit tomorrow if you can.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min", "style": "dark" }],
+                "cues": {
+                  "good": ["Easy spin, build a light sweat"],
+                  "bad": ["Don't grind at high resistance"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Hip & Back Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Move one vertebra at a time"],
+                      "bad": ["Don't rush through the middle back"]
+                    }
+                  },
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Knees sweep side to side, trunk stays tall"],
+                      "bad": ["Don't collapse the chest to force the turn"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Push the floor away with your heels"],
+                      "bad": ["Don't arch at the top"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Stretch the band to your chest"],
+                      "bad": ["Don't shrug up"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "note": "No leg press numbers on you yet, so start moderate. Only go as deep as your lower back stays flat against the pad — that's your depth for now.",
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the platform away through mid-foot", "Quads loading, lower back glued to the pad"],
+                  "bad": ["Don't let your hips tuck or roll off the pad at the bottom"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 120,
+                "note": "Start with just the bar and a small plate each side. This one usually jumps up fast once you know the movement, so don't be shy about adding weight.",
+                "chips": [
+                  { "label": "1s top squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive the bar straight up to the ceiling", "Glutes finish the lift"],
+                  "bad": ["Don't finish with the lower back — ribs down, chin tucked"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Seated Row",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the handle to your belly button", "Shoulder blades squeeze together"],
+                  "bad": ["Let the shoulder blades reach forward at the stretch, not your lower back — stay tall"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the pad down and under the seat", "Hamstrings doing all the work"],
+                  "bad": ["Don't let the weight yank you back up — control the return"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Pallof Press",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2s hold", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press straight out and hold the line", "Side abs bracing, hips square"],
+                  "bad": ["Don't let the cable twist you toward the stack"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Press, Pull, Stand Tall",
+        "completionTitle": "Shoulders Back",
+        "completionMessage": "That's the posture work right there. Every one of those rows is the reason you'll stand taller in a few weeks.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min", "style": "dark" }],
+                "cues": {
+                  "good": ["Easy spin, let the shoulders loosen up"],
+                  "bad": ["Don't grind at high resistance"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Shoulder & Upper Back Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Scapular Wall Slide",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Slide arms up the wall without losing contact"],
+                      "bad": ["Don't let the ribs flare off the wall"]
+                    }
+                  },
+                  {
+                    "name": "Quadruped Thoracic Rotation",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Top arm sweeps open like a book cover"],
+                      "bad": ["Don't let the knees separate"]
+                    }
+                  },
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Push the floor away at the top"],
+                      "bad": ["Don't bend the elbows — it's all shoulder blade"]
+                    }
+                  },
+                  {
+                    "name": "Band External Rotation",
+                    "detail": "×12 Each Side",
+                    "cues": {
+                      "good": ["Rotate the band out, elbow pinned to your side"],
+                      "bad": ["Don't drift the elbow off your side"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 105,
+                "note": "This is the most important exercise in your programme for your posture. Chest stays on the pad the whole time so your lower back does nothing.",
+                "chips": [
+                  { "label": "1s squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Row the dumbbells to your hips", "Shoulder blades pull down and together"],
+                  "bad": ["Don't shrug — keep the neck long"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Shoulder Press",
+                "videoUrl": null,
+                "restSec": 105,
+                "note": "You've been pressing 10kg dumbbells, but a machine feels different. Start light in week one and build from there.",
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press the handles straight up", "Shoulders push, ribs stay down"],
+                  "bad": ["Don't arch off the seat to grind out reps"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the rope to your forehead and split it apart", "Rear delts and upper back squeeze"],
+                  "bad": ["Don't drop the elbows — keep them high"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Hammer Curl",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Curl to shoulder height", "Biceps and forearm tension the whole way"],
+                  "bad": ["Don't swing from the hips"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30m Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Walk tall, eyes forward", "Side abs holding you dead level"],
+                  "bad": ["Don't lean toward or away from the weight"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Full-Body, Steady and Light",
+        "completionTitle": "Quiet Work",
+        "completionMessage": "Easy day done, and it still counts for a lot. Your back gets stronger on days like this one.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "3 min", "style": "dark" }],
+                "cues": {
+                  "good": ["Easy spin, nice and light"],
+                  "bad": ["Don't grind at high resistance"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Full-Body Reset Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "World's Greatest Stretch",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": ["Long lunge, elbow to instep, then rotate up"],
+                      "bad": ["Don't let the back knee crash down"]
+                    }
+                  },
+                  {
+                    "name": "Kneeling Thoracic Extension",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Sit back to heels, let the chest drop through the arms"],
+                      "bad": ["Don't arch the lower back to fake the range"]
+                    }
+                  },
+                  {
+                    "name": "Dowel Hip Hinge",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Push the hips back, dowel stays in three points of contact"],
+                      "bad": ["Don't lose the dowel contact at your head or low back"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge March",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": ["Hips stay high while the knee lifts"],
+                      "bad": ["Don't let the hips dip as the foot leaves the floor"]
+                    }
+                  },
+                  {
+                    "name": "Prone Y Raise",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Lift the arms into a Y off the floor"],
+                      "bad": ["Don't shrug toward the ears"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "45° Back Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Bodyweight only this week, even if it feels easy — I want to see how your back responds first. If it's completely quiet after week one, hold a light dumbbell from week two.",
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Hinge down until the hamstrings stretch, rise to a straight line", "Glutes and hamstrings lift — the spine stays quiet"],
+                  "bad": ["Don't hyperextend past straight at the top"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the bar to your collarbone", "Elbows drive down, lats do the work"],
+                  "bad": ["Don't rock back to heave the weight down"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Incline Push-Up",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Set your hands on a bench or a bar in the rack. Pick a height where the last rep still feels like a 6 out of 10 — higher hands means easier, so go higher if you need to.",
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Push the bench away to a full lockout", "Chest works, body one straight line"],
+                  "bad": ["Don't sag the hips or flare the elbows wide"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Machine Calf Raise",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "1s pause at bottom", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×15 Reps" },
+                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press up to your tallest tiptoe", "Full stretch at the bottom, squeeze at the top"],
+                  "bad": ["Don't bounce out of the bottom"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "exhale as you lower", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Lower one arm and the opposite leg slowly to the floor", "Lower back pressed flat into the floor the whole time"],
+                  "bad": ["Don't hold your breath"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Faraz",
+    "cards": [
+      {
+        "icon": "😴",
+        "title": "Your stress is the real limit",
+        "body": "<p>You told me stress is a <strong>9 out of 10</strong> and your sleep quality is a 5. That's the number I built this whole block around, not your training experience.</p><p>When you sleep badly and life is heavy, your body can't recover from hard training the same way. So the effort stays at 7 out of 10 and the sessions stay short. This isn't me being careful for no reason, it's the fastest way forward for someone with your week.</p><p><strong>On a bad day, take 1 off every effort target.</strong> If it says 7, do 6. Anything already at 6 stays at 6. You'll still get the benefit.</p>"
+      },
+      {
+        "icon": "🩹",
+        "title": "Your back: what's ok, what's not",
+        "body": "<p>Your lower back gave you problems for years and it's quiet now. I want to keep it that way, so here's how to read it in the gym.</p><p><strong>Normal and fine:</strong> muscle burn, being tired, feeling stiff the next morning. Keep training through all of that.</p><p><strong>Not fine:</strong> sharp pain, anything shooting down your leg, numbness or pins and needles, or pain that gets worse with every rep instead of staying the same.</p><ul><li><strong>Mild and it fades:</strong> finish the set, write it in your log.</li><li><strong>Building up, or it changes how you move:</strong> stop that exercise, use the swap on the card, message me.</li><li><strong>Sharp, shooting, numb, or just feels wrong:</strong> stop the session and message me before the next one.</li></ul><p>Messaging me early is never overreacting. It's the whole point of having a coach.</p>"
+      },
+      {
+        "icon": "⚖️",
+        "title": "How to pick your weights",
+        "body": "<p>I don't give you a weight to lift. You find it yourself, and here's how that works.</p><p><strong>On a new exercise, start too light on purpose.</strong> Do your first set, then ask how hard that was out of 10. If it was a 5, go up next set. If it was an 8 or 9, come down. By your second week you'll know your numbers.</p><p><strong>Week to week:</strong> if you hit all your reps and it felt like a 7 or easier, put a little more on next week. If you missed reps or it felt like a 9, stay on the same weight and do it again. Repeating a weight is not standing still, it's how it's supposed to go.</p><p><strong>Going down is not failing.</strong> Bad sleep, stressful week, back feels tight, take weight off. I'd much rather see that in your log than see you grind through something.</p>"
+      },
+      {
+        "icon": "🧍",
+        "title": "Why rows fix your posture",
+        "body": "<p>You asked me to fix the hunch in your upper back. I want you to know what's actually doing that job, because it's not the stretching.</p><p><strong>It's the rows and the pulldowns.</strong> Rounded shoulders happen when the muscles across your upper back are too weak to hold you upright all day. Stretching gives you 20 minutes of feeling better. Getting those muscles strong changes how you stand when you're not thinking about it.</p><p>That's why you pull about twice as much as you press in this block, and why there's almost no chest work. The short shoulder blade drills in your warm up matter too, don't skip them to save time.</p><p>Be patient with this one. Real posture change takes months, not weeks. You should feel a bit taller by week 4, and that's just the start.</p>"
+      },
+      {
+        "icon": "👏",
+        "title": "You already did the hard part",
+        "body": "<p>You lost 9kg and you've held it for 20 days. I don't want that to go unmentioned, because keeping weight off is genuinely harder than losing it and most people don't manage it.</p><p>You also did it during a rough patch, which makes it more impressive, not less. <strong>That's a stable base to build from now.</strong></p><p>From here the scale is not something we chase. We're building, not shrinking.</p>"
+      },
+      {
+        "icon": "🍽️",
+        "title": "Eat to build, not to cut",
+        "body": "<p>You said your food is mostly on track, so I'm not changing anything yet. One thing though.</p><p><strong>Don't try to keep losing weight during this block.</strong> You're asking your body to build muscle and recover on 5 out of 10 sleep and a stressful week. Cutting food on top of that is how people get tired, weak and injured.</p><p>Eat normally, get protein at every meal, and let training do the shape change. We'll look at your food properly at the end of the block once I can see how you're recovering.</p>"
+      },
+      {
+        "icon": "📱",
+        "title": "Three days, and the promise",
+        "body": "<p>Three sessions a week, in any order that fits your week. If Tuesday falls apart, move it. Nothing here depends on the exact days.</p><p><strong>Day 3 is your safety net.</strong> On a brutal week, do the back extension and the pulldown and leave. That's 15 minutes and it still counts as a session. Two sessions done properly beats three you skipped because you didn't have time for all of them.</p><p>And log every set, even the bad ones. <strong>Your log is the only way I can see how you're doing.</strong> An honest bad week tells me more than a perfect looking one.</p>"
+      },
+      {
+        "icon": "🎾",
+        "title": "You'll want to go heavier. Don't.",
+        "body": "<p>You coached tennis for 10 years, so you know how to move and you'll pick these exercises up fast. That's an advantage. It's also the thing most likely to get you in trouble in the next four weeks.</p><p><strong>You're going to feel like the weights are too light.</strong> Especially in weeks 1 and 2. That's the design, not a mistake. I'm using this block to see how your back and your recovery handle regular training before we put real load on you.</p><p>Do it my way for four quiet weeks and cycle 2 gets a lot more interesting.</p>"
+      }
+    ]
+  }
+}
