@@ -1,0 +1,759 @@
+{
+  "athlete": {
+    "id": "mehdi_rahmani",
+    "firstName": "Mehdi",
+    "lastName": "Rahmani",
+    "key": "6eeec83723ec416d9aaed6f11d116ffe"
+  },
+  "sport": {
+    "badge": "🎾 Tennis Performance & Durability"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bedrock",
+      "tagline": "Baselines from the bar.",
+      "weeks": "Weeks 1–4",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-28",
+      "focuses": [
+        "Prove the 3-day rhythm and calibrate every main pattern — hinge, squat, pull, single-leg — on straight sets, baselines from the bar, not the résumé.",
+        "Install the four-site tendon armour your job never gives you — elbow, shoulder, knee and Achilles — plus the posterior-chain and scapular base everything else builds on."
+      ],
+      "message": {
+        "paragraphs": [
+          "Mehdi, you told me you want to lift heavy and keep your joints safe while you're on court 7 or 8 hours a day. That's exactly what we're building. But we don't start heavy. This first month is about finding your real numbers on four lifts, and putting some armour on the joints your job hammers every single day.",
+          "Your job for these 4 weeks is simple. Show up 3 times, log honestly. The weights will feel easy at first and that's on purpose, because I need to see how you move before we load you up.",
+          "By the end of the month you'll know your working weights, the holds will stop feeling strange, and you'll be ready for month 2 when the loads start climbing."
+        ],
+        "outcomes": [
+          "Working weights found on all 4 main lifts",
+          "12 sessions logged in 4 weeks",
+          "40-second loaded wall sit without shaking",
+          "Squat and RDL owned at the full 3-second tempo",
+          "Both calf holds up to 35 seconds",
+          "Protein target hit on training days"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Tendon Bank",
+      "tagline": "Deposits before withdrawals.",
+      "weeks": "Weeks 5–9",
+      "startDate": "2026-08-29",
+      "endDate": "2026-10-02",
+      "focuses": [
+        "Heavy-slow-resistance loading at 5–8 reps on the calibrated lifts, loads climbing weekly from logged RPE — connective tissue built under real load before the heavy block.",
+        "Single-leg robustness plus the isometric minimum as session bookends; a programmed back-off closes the cycle."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Next month the loads start climbing for real. Same four lifts, just slower and heavier, and that's where tendons actually get tough.",
+          "The joint work doubles too. Twice the attention on knees, elbows and shoulders, because month 3 is when the bar gets properly heavy and I want you ready for it.",
+          "Nothing new to learn. Just more of what you'll already own.",
+          "You find the numbers now. Next month we grow them."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Payday",
+      "tagline": "The heavy you asked for.",
+      "weeks": "Weeks 10–14",
+      "startDate": "2026-10-03",
+      "endDate": "2026-11-06",
+      "focuses": [
+        "First genuinely heavy block — top sets of 5 at RPE 7–8, tiny set counts, long rests, on lifts practiced for 9 weeks.",
+        "Isometrics and posterior-chain accessories at maintenance minimum; heavy lower days never sit next to your heaviest court days."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Double Down",
+      "tagline": "Heavier. Same logic.",
+      "weeks": "Weeks 15–19",
+      "startDate": "2026-11-07",
+      "endDate": "2026-12-11",
+      "focuses": [
+        "The same lifts progressed to triples at RPE 8 — never a grinder, never a tested max; the second heavy exposure is where your numbers actually move.",
+        "Upper-limb armour — elbow, wrist, shoulder — takes the featured accessory slot."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "The Keeper",
+      "tagline": "A rhythm for life.",
+      "weeks": "Weeks 20–24",
+      "startDate": "2026-12-12",
+      "endDate": "2027-01-15",
+      "focuses": [
+        "Heavy anchors held at full intensity, half the volume — the permanent year-round rhythm, stress-tested against your worst court weeks.",
+        "Weak-link audit and e1RM re-check from six months of logs — the isometric minimum becomes the for-life floor."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bedrock",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Squat Day, Bar Gets Real",
+        "completionTitle": "Legs Banked",
+        "completionMessage": "Squat's in the log and your knees just picked up some armour. Get some food in you and stay off your feet if you can.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min" }
+                ],
+                "cues": {
+                  "good": [
+                    "Smooth circles, light sweat by the end",
+                    "Legs waking, breathing stays conversational"
+                  ],
+                  "bad": [
+                    "Don't race it — it's a ramp, not a workout"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Squat Day Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away with your heels",
+                        "Glutes lifting, not lower back"
+                      ],
+                      "bad": [
+                        "Don't hyperextend at the top"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Tear the band apart to your chest",
+                        "Shoulder blades squeezing together"
+                      ],
+                      "bad": [
+                        "Don't shrug up"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Goblet Squat",
+                    "detail": "×8",
+                    "cues": {
+                      "good": [
+                        "Light kettlebell — sit between your heels",
+                        "Hips and ankles opening, weight mid-foot"
+                      ],
+                      "bad": [
+                        "Don't let the elbows drop inside the knees"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Back Squat",
+                "note": "You've got no numbers on file yet, so start lighter than you think and build up over the first two sessions. Keep the lowering to 2 seconds this week, then go to the full 3 seconds from week 2. Only settle at the harder RPE once the bar is still moving well.",
+                "videoUrl": null,
+                "restSec": 135,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor apart",
+                    "Quads and glutes loading through the whole descent"
+                  ],
+                  "bad": [
+                    "Don't let the knees cave in"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "1s squeeze at top", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the dumbbells to your hips",
+                    "Shoulder blades drawing down and together"
+                  ],
+                  "bad": [
+                    "Don't shrug toward the ears"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Shoulder Press",
+                "note": "Only a few sets here on purpose. Your shoulders already work overhead all day on court, so this keeps the pattern going without adding to that load.",
+                "videoUrl": null,
+                "restSec": 75,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press straight up without leaning back",
+                    "Delts working, neck relaxed"
+                  ],
+                  "bad": [
+                    "Don't arch the lower back off the pad"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Wall Sit",
+                "note": "Put a plate or a dumbbell on your lap once you're steady in the position. Bodyweight alone is too easy for you and won't do the job. The last 10 seconds should be a real fight.",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "plate on lap", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×40s" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press the floor through mid-foot, back flat on the wall",
+                    "Quads burning evenly, kneecaps tracking straight"
+                  ],
+                  "bad": [
+                    "Don't slide your hands onto your thighs"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Machine Calf Raise",
+                "note": "Use the machine rather than holding dumbbells, so your hands are free and the hold stays rock steady. One long hold at mid height, not reps.",
+                "videoUrl": null,
+                "restSec": 30,
+                "chips": [
+                  { "label": "mid-range hold", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30s" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Push tall through the balls of the feet and freeze",
+                    "Calf and Achilles loaded and steady"
+                  ],
+                  "bad": [
+                    "Don't drop the heels fast"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Hinge Hard, Chain Reaction",
+        "completionTitle": "Back Chain Done",
+        "completionMessage": "Hamstrings, glutes and back did the work today, and that's the stuff that keeps you moving well on court. Eat properly tonight.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rowing",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min" }
+                ],
+                "cues": {
+                  "good": [
+                    "Long smooth strokes",
+                    "Hips hinging each stroke, back long"
+                  ],
+                  "bad": [
+                    "Don't yank with the arms"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Hinge Day Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Band Good Morning",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push hips back into the band",
+                        "Hamstrings stretch-loading"
+                      ],
+                      "bad": [
+                        "Don't round the back"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": [
+                        "Arch and round slowly through the full range",
+                        "Each segment of the spine moving"
+                      ],
+                      "bad": [
+                        "Don't rush the transitions"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Scapular Pull-Up",
+                    "detail": "×6",
+                    "cues": {
+                      "good": [
+                        "Pull the shoulder blades down without bending the elbows",
+                        "Lats setting the shoulders"
+                      ],
+                      "bad": [
+                        "Don't kip or swing"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Romanian Deadlift",
+                "note": "Start light and let the hinge feel right first. Just below the knee is plenty of range for now. Use straps from week 2 onwards, because your grip is never meant to be what stops this lift. Your hands get plenty of work on court.",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3s eccentric", "style": "dark" },
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-1-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the hips back to the wall behind you",
+                    "Hamstrings loading like cables"
+                  ],
+                  "bad": [
+                    "Don't round the lower back"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the elbows down to the ribs",
+                    "Lats doing the pull, not the biceps"
+                  ],
+                  "bad": [
+                    "Don't lean far back and heave"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Landmine Press",
+                "note": "If your gym has no landmine attachment, just wedge the bar into a corner. This angle is much kinder on a shoulder that works overhead all day.",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Press up and slightly forward along the bar's arc",
+                    "Delts and upper chest sharing the work"
+                  ],
+                  "bad": [
+                    "Don't let the ribs flare"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Band External Rotation",
+                "note": "Keep your elbow pinned to your ribs and hold completely still. Staying strict matters more than using a strong band. We'll go heavier later in the month once you own the position.",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "hold at 90°", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30s Each Side" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pin the elbow to the ribs, press the band out and freeze",
+                    "Back of the shoulder holding, blade set down"
+                  ],
+                  "bad": [
+                    "Don't shrug the shoulder"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Side Plank",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×30s Each Side" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor away, one long line head to feet",
+                    "Side of the trunk and glute holding you up"
+                  ],
+                  "bad": [
+                    "Don't let the hips sag"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "One Leg, Full Control",
+        "completionTitle": "One Leg At A Time",
+        "completionMessage": "Single leg work is the closest thing in the gym to what you actually do out there. That's your week finished, well done.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [
+                  { "label": "4 min" }
+                ],
+                "cues": {
+                  "good": [
+                    "Smooth circles, light sweat by the end",
+                    "Legs waking, breathing stays conversational"
+                  ],
+                  "bad": [
+                    "Don't race it — it's a ramp, not a workout"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Single-Leg Day Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Reverse Lunge",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Step back onto a rail, drop straight down",
+                        "Front leg owning the balance"
+                      ],
+                      "bad": [
+                        "Don't push off the back foot"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": [
+                        "Push the ground away sideways",
+                        "Side of the hips burning"
+                      ],
+                      "bad": [
+                        "Don't let the knees collapse inward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Single-Leg Glute Bridge",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Drive the heel down, hips to the ceiling",
+                        "One glute doing all the work"
+                      ],
+                      "bad": [
+                        "Don't let the pelvis rotate"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Bulgarian Split Squat",
+                "note": "Balance is what will limit you in week 1, not strength. Start with bodyweight or very light dumbbells and let the depth come as your balance settles.",
+                "videoUrl": null,
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the floor away through the front mid-foot",
+                    "Front-leg quad and glute doing all the work"
+                  ],
+                  "bad": [
+                    "Don't tip forward"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "45° Back Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "squeeze glutes at top", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Hinge down, then squeeze tall through the hips",
+                    "Glutes and hamstrings lifting, not the lower back"
+                  ],
+                  "bad": [
+                    "Don't hyperextend past a straight line"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "1s hold at face", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the rope to the eyebrows, elbows high and wide",
+                    "Rear delts and between the blades working"
+                  ],
+                  "bad": [
+                    "Don't turn it into a row"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Wrist Extension",
+                "note": "This one's for your elbow, from all the balls you feed every day. Light dumbbell, hold it dead still, and lower it slow at the end. Don't rush this.",
+                "videoUrl": null,
+                "restSec": 30,
+                "chips": [
+                  { "label": "hold at top", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×30s Each Side" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": [
+                    "Knuckles up to the ceiling, hold dead still",
+                    "Top of the forearm near the elbow working"
+                  ],
+                  "bad": [
+                    "Don't let the wrist collapse fast"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Dumbbell Calf Raise",
+                "note": "Rest the dumbbell on your knee and just steady it with your hand. Bent knee hits the deeper calf muscle, which is the one your court movement actually runs on.",
+                "videoUrl": null,
+                "restSec": 30,
+                "chips": [
+                  { "label": "mid-range hold", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×35s" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": [
+                    "Heels up, freeze at mid-height",
+                    "Deep calf working behind the shin"
+                  ],
+                  "bad": [
+                    "Don't bounce"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "programHistory": [],
+  "notes": {
+    "greeting": "For You, Mehdi",
+    "cards": [
+      {
+        "icon": "🎾",
+        "title": "Why Only 3 Short Sessions",
+        "body": "<p>You might look at this program and think it's not much. 3 sessions, 45 minutes, weights that feel light. That's deliberate.</p><p>You already train more than almost anyone I coach. 7 or 8 hours on court every day is a massive amount of work for your legs and your shoulder. <strong>The last thing you need from me is more tiredness.</strong></p><p>Court gives you thousands of quick, light movements. What it never gives you is heavy slow loading, and that's the thing that makes tendons and muscle tough. So that's all the gym does for you. Short sessions, low volume, and we push the weight instead of the hours.</p>"
+      },
+      {
+        "icon": "🎯",
+        "title": "How To Pick Your Weights",
+        "body": "<p>The app never tells you a weight. You find it yourself using the RPE number on each exercise. <strong>RPE is just how hard the set felt out of 10.</strong> RPE 6 means you could have done about 4 more reps if you had to.</p><p>For a lift you've never done, start lighter than you think. Do the first set, then decide:</p><ul><li><strong>Felt easier than the target?</strong> Go up a bit on the next set.</li><li><strong>Felt about right?</strong> Stay there and log it.</li><li><strong>Felt harder than the target?</strong> Drop the weight straight away, not next week.</li></ul><p>Week to week it's the same idea. Hit all your reps at or under the target RPE, add a small jump next session. Missed reps or it felt like a grind, stay on the same weight and do it again.</p><p>And listen, <strong>going lighter is not failing.</strong> Some days you'll have coached 8 hours and slept badly. Dropping the weight on those days is the smart move. I'd rather see an honest log than a hero one.</p>"
+      },
+      {
+        "icon": "😬",
+        "title": "Week 1 Will Feel Strange",
+        "body": "<p>The squat and the RDL have a slow lowering phase, 2 seconds this week and 3 seconds from week 2. Your legs and hamstrings probably aren't used to that, so expect some stiffness for a day or two after the first sessions.</p><p><strong>That stiffness is normal and it fades.</strong> It shouldn't stop you working on court. If it does, or if something feels sharp instead of just stiff, message me and we'll pull the weight back.</p><p>This is exactly why week 1 is light. I'd rather you feel a bit stiff than wreck yourself before a full coaching day.</p>"
+      },
+      {
+        "icon": "🛡️",
+        "title": "Don't Skip The Boring Holds",
+        "body": "<p>The wall sit, the calf holds, the shoulder and wrist holds. They look like nothing. They're the reason you'll still be coaching pain free in 5 years.</p><p>Your knees, achilles, shoulder and elbows take a beating every day on court. <strong>Long hard holds are what actually thickens a tendon up</strong> and makes it handle that load. Fast reps don't do it, and you get plenty of fast on court already.</p><p>So treat them like real sets. Dead still, full time, and heavy enough that the last 10 seconds are a fight. If a hold feels easy it isn't working.</p>"
+      },
+      {
+        "icon": "🍳",
+        "title": "Protein Is Your Muscle Insurance",
+        "body": "<p>You said your eating is a bit up and down. That's the one thing that can quietly undo all of this, because you're burning a lot of calories on court before you even touch a weight.</p><p><strong>Aim for around 120 to 150g of protein a day.</strong> For you that's about 4 solid portions. Eggs or yoghurt in the morning, meat or chicken with two meals, something quick after training.</p><p>Don't worry about the rest of the diet yet. Just protein, every day, and tell me at the check-in how it's going. If you keep your muscle on 3 short sessions a week, protein is doing most of that job.</p>"
+      },
+      {
+        "icon": "🔁",
+        "title": "When The Week Falls Apart",
+        "body": "<p>You told me your weeks are heavy and stretched. Some of them will beat you. That's normal and I've already planned for it.</p><p><strong>On a bad week, do 2 sessions instead of 3. In each one do the first main lift plus one back or hamstring exercise, then go home.</strong> That counts as a full week in my book.</p><p>What I don't want is you binning the whole week because you couldn't do it properly. 2 short sessions keeps everything moving. Zero is what sets you back.</p>"
+      },
+      {
+        "icon": "😴",
+        "title": "Your Sleep Is Your Edge",
+        "body": "<p>One thing on your form stood out. You rated your sleep 10 out of 10 at 7 to 8 hours a night. <strong>That's genuinely rare</strong> and it's a big reason I think this plan will work for you.</p><p>Most people I coach are fighting bad sleep on top of a busy life. You're not. It means your body can actually absorb the work, even with your court hours.</p><p>Protect it. It's doing more for your recovery than any supplement or stretch ever will.</p>"
+      }
+    ]
+  }
+}
