@@ -510,14 +510,18 @@ The rank name went with it because the level *number* is what an athlete reads o
 row, the ladder of rank names lives properly in the Locker, and a fourth place to state a
 rank is the duplication this tab keeps being reorganised to remove.
 
-A habit row's meta line is therefore **XP · streak**, and the habit's **name has the whole
-line above it**. It used to append today's status (which wrapped every row and restated
-what Today already says), then it was rank · XP with the streak chip sharing the name's
-line — which left **99px for a name**, so every habit on this tab wrapped to two lines and
-"Finish your session" took three. Moving the streak down beside the XP is the split Today
-already uses: the level anchors the row (there on the right, here as the ring on the left)
-and the streak rides the line under the name, next to the numbers it belongs with. Names
-now fit on one line at 375px, and the rows lost ~25% of their height on the way.
+A habit row's **name has the whole line to itself**, and the meta line beneath it holds
+**only the streak — and only when there is one** (Amir, 2026-07-30: the raw XP figure was
+"useless there" and came off the same day). It used to append today's status (which
+wrapped every row and restated what Today already says), then rank · XP, then XP · streak
+with the streak chip sharing the name's line — which left **99px for a name**, so every
+habit on this tab wrapped to two lines and "Finish your session" took three. XP is not
+missing information: the ring and the level number already say it, just converted into
+the currency that actually means something to look at. A row with no streak now shows
+just the name, the ring and the pips — nothing invented to fill the second line. Moving
+the streak off the name's line is the split Today already uses: the level anchors the row
+(there on the right, here as the ring on the left) and the streak rides the line under the
+name, next to nothing that duplicates it. Names fit on one line at 375px.
 
 **Nothing-logged-yet is taught, not reported.** On a log with no days in it the stat grid
 carries one line defining *badge*, *run*, *streak* and *perfect day* — words that were used
