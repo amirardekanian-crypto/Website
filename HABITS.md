@@ -160,7 +160,13 @@ The screen they actually live on. **In this order, and the order is the point:**
 2. **The streak flame** — sits *on* the level hero, left of the rank block: a drawn flame
    (never an emoji — nothing here should change shape between an iPhone and a Pixel) and the
    day-streak number in clay, licking faster the longer the streak runs, on the same
-   0/5/15/30-day heat scale the habit rows use. Hidden until the first logged day.
+   0/5/15/30-day heat scale the habit rows use. Hidden until the first logged day —
+   **and hidden on a zero** (Amir, 2026-07-30: *"if there is no streak its better not to
+   show it, and only show it if there are streak days"*). It is the rule the habit rows
+   have always followed: they draw an ember or nothing. An unlit flame over a `0` is not
+   a fact worth the space, it is the hero opening on the one number the athlete has just
+   lost, so it only ever appears `lit`. The count is not gone from the app — the stat
+   grid on Progress still carries it with the best ever beside it.
    ⚠️ This briefly had a whole **band** to itself and Amir killed it (2026-07-30, *"i hate
    that … i asked you to show their streak … just bolder, flashier just something to catch
    the eye"*). The lesson is worth keeping: he asked for an existing number to be made

@@ -5188,6 +5188,15 @@ function renderBadgeCelebration(ev) {
 // is the loudest possible way to open an app on day one, and these screens
 // already go to some trouble not to do that — see the `pre` day chips and the
 // statgrid's day-one note.
+//
+// Hidden on a ZERO too (Amir, 2026-07-30: "if there is no streak its better not
+// to show it, and only show it if there are streak days"). Same rule the habit
+// rows have always followed — they draw an ember or nothing — and the same
+// reasoning as day one, one step further: an unlit flame over a 0 is not a
+// fact worth the space, it is the app opening with the one number the athlete
+// has just lost. The streak comes back the day it exists again, lit, which is
+// the moment it means something. The count is not gone from the app: the stat
+// grid on Progress still carries it, with the best ever beside it.
 function bestHabitRun() {
   // allHabits(), not live(): a run you earned does not stop having happened
   // because you paused the habit, which is the same rule that keeps a
@@ -5195,9 +5204,9 @@ function bestHabitRun() {
   return allHabits().reduce((m, h) => Math.max(m, habitBest(h)), 0);
 }
 function streakFlame(now, best) {
-  if (!firstLoggedDay()) return '';           // day one is not a report of zero
-  return `<div class="dayflame ${now > 0 ? 'lit' : ''}" data-lvl="${emberLevel(now)}" data-k="dayflame"
-        title="${now > 0 ? now + '-day streak' + (best > now ? ' · best ' + best : '') : 'No streak yet'}">
+  if (!firstLoggedDay() || now <= 0) return '';   // day one, and a broken streak, are not reports
+  return `<div class="dayflame lit" data-lvl="${emberLevel(now)}" data-k="dayflame"
+        title="${now}-day streak${best > now ? ' · best ' + best : ''}">
     ${FLAME}
     <span class="n" data-static data-num="dstreak" data-to="${now}">${now}</span>
     <span class="u">DAY<br>STREAK</span>
