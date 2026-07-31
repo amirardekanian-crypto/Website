@@ -4481,6 +4481,20 @@ function renderOnboarding() {
             </span>
             <span class="sw ${CFG.on[h.id] !== false ? 'on' : ''}"><i></i></span>
           </button>`).join('')}
+
+          <!-- The list is not the whole offer, and this screen used to imply it
+               was. Told here rather than left for an athlete to discover in
+               Settings weeks later: the thing they most want to hold themselves
+               to is often not one of the eight. No composer on this screen on
+               purpose — onboarding stays one decision, and the tour walks them
+               to the real one a minute later. The XP reads from the live
+               constant so it cannot drift from what the habit actually pays. -->
+          <div style="padding:16px 0 2px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+            <strong style="color:var(--ink)">And you can add your own.</strong> Anything you want to
+            hold yourself to — no screens in bed, ten minutes of reading — counts like the rest and
+            pays ${XP_RULES.customXp} XP a day. You'll find it in Settings, under your initials at
+            the top right, once you have started.
+          </div>
         </div>
       </div>
       <button class="btn btn-primary btn-block" style="margin-top:18px" ${on(() => {

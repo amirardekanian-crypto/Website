@@ -903,6 +903,11 @@ there is no off switch) and then **Add-ons** (real toggles, **all starting off**
 the same warning Settings carries — once one is on, it counts). Everything stays editable
 in Settings afterwards.
 
+It closes with a line saying **athletes can add their own** — worth `customXp` (25) a day,
+found in Settings under the initials. There is **no composer on this screen on purpose**:
+onboarding stays one decision, and the tour walks them to the real one a minute later. The
+XP figure interpolates `XP_RULES.customXp` so it cannot drift from what the habit pays.
+
 ⚠️ **It used to render all eight as one flat list of switches.** Tapping a core row
 flipped `CFG.on`, the switch animated off, and `live()` went on returning the habit
 regardless — so the athlete reached Today to find the habit they had just declined
