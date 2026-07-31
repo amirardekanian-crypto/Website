@@ -2417,7 +2417,18 @@ const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, to
 let _toastTimer = null, _flashTimer = null, _confirmOnTimer = null;
 
 function defaultCfg() {
-  const on = {}; HABITS.forEach(h => on[h.id] = true);
+  // ⚠️ ADD-ONS START OFF. The five core habits are on regardless — live() honours
+  // `core` and never reads this — so what this line actually decides is whether a
+  // new athlete is opted INTO the add-ons before they have chosen anything.
+  // They used to be, which sat badly against the rule the add-ons run on: once
+  // one is on it COUNTS, and missing it costs the same as missing anything else.
+  // An athlete tapping straight through onboarding was signed up to three habits
+  // they had never agreed to and would be marked down for. Opt-in is the honest
+  // default for something that can only cost you.
+  // Existing athletes are unaffected: loadCfg() merges the saved `on` over this,
+  // so every choice already made wins. It also means any add-on introduced in
+  // future arrives OFF for everyone rather than silently starting to score.
+  const on = {}; HABITS.forEach(h => on[h.id] = !!h.core);
   // `toured` is separate from `onboarded` on purpose: everyone who already has
   // the app skipped onboarding long ago, and the tour is the thing they never
   // got. Leaving it false by default means it offers itself once to them too.
@@ -4457,9 +4468,10 @@ function renderOnboarding() {
                moment it is on. Better said before they pick than discovered
                on the first day one of them costs points. -->
           <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
-            Optional, and worth real points on top of the five. <strong style="color:var(--ink)">Once you
-            switch one on it counts</strong> — miss it and it costs you the same as missing anything
-            else, so only add what you will actually do.
+            Optional, and worth real points on top of the five. <strong style="color:var(--ink)">They
+            start off</strong> — switch on only what you will actually do, because
+            <strong style="color:var(--ink)">once one is on it counts</strong> and missing it costs you
+            the same as missing anything else.
           </div>
           ${addOns.map(h => `<button style="width:100%;text-align:left;padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px" class="row-rule"
             ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}>

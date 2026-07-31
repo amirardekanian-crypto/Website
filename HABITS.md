@@ -887,11 +887,21 @@ The **first five are `core`** — always tracked, no off switch (see *CORE vs AD
 above). Athletes can switch any of the **add-ons** off and add their own (worth
 `customXp`, 25).
 
+⚠️ **Add-ons default to OFF** (`defaultCfg()`: `on[h.id] = !!h.core`) — they are opt-in,
+not opt-out. They used to arrive switched on, which sat badly against the rule they run
+on: *once one is on it counts*, and missing it costs the same as missing anything else.
+An athlete tapping straight through onboarding was signed up to three habits they had
+never agreed to and would be marked down for. **Existing athletes are unaffected** —
+`loadLocal()` merges the saved `on` over the defaults, so every choice already made wins;
+it also means any add-on added in future arrives off for everyone rather than silently
+starting to score. The five are unaffected either way: `live()` honours `core` and never
+reads this map for them.
+
 **Onboarding** is one screen, and it is grouped exactly like Settings → the tracked
 list: **The five** (inert rows, each carrying an `ALWAYS ON` chip and a line saying
-there is no off switch) and then **Add-ons** (real toggles, under the same warning
-Settings carries — once one is on, it counts). Everything stays editable in Settings
-afterwards.
+there is no off switch) and then **Add-ons** (real toggles, **all starting off**, under
+the same warning Settings carries — once one is on, it counts). Everything stays editable
+in Settings afterwards.
 
 ⚠️ **It used to render all eight as one flat list of switches.** Tapping a core row
 flipped `CFG.on`, the switch animated off, and `live()` went on returning the habit
