@@ -7,7 +7,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Machine Leg Press | Active | C1 | primary — depth-capped ~90° (knee ruling) |
 | Dumbbell Romanian Deadlift | Active | C1 | primary — patterning dose; C2 loads it |
 | Machine Hip Thrust | Active | C1 | machine deliberately (setup tax); Barbell Hip Thrust planned C2 |
-| Machine Leg Extension (isometric holds) | Active | C1 | THE knee-tendon isometric — 60–90°, 30s→45s, 2×/wk; ships under the canonical library name per Amir's ruling (video stays; chip + note carry the hold) |
+| Machine Leg Extension | Active | C1 | iso protocol RETIRED 2026-07-31 (knee proven under competition) — now dynamic 3×12 @RPE7, D1 only; Amir's call at wk-1 check-in |
 | Standing Machine Calf Raise | Active | C1 | run prep |
 | Half-Kneeling Pallof Press | Active | C1 | — |
 | Lat Pulldown | Active | C1 | primary |
@@ -16,12 +16,12 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Cable Face Pull | Active | C1 | — |
 | Seated Machine Calf Raise | Active | C1 | soleus — run prep |
 | Suitcase Carry | Active | C1 | — |
-| Box Step-Up | Active | C1 | landing prep — start 15–20cm, checklist-gated |
+| Dumbbell Box Step-Up | Active | C1 | loaded 2026-07-31 (was bodyweight Box Step-Up); height still checklist-gated — one lever at a time |
 | Lateral Step-Down | Active | C1 | control rehearsal — start ~10cm, checklist-gated |
 | Machine Seated Leg Curl | Active | C1 | avoid-cue: shy of full bend on any pinch |
 | Dead Bug | Active | C1 | — |
 | Side Plank | Active | C1 | — |
-| Walk-Run Intervals | Active | C1 | 4-week ladder, check-in-gated, "ladder IS the run budget" |
+| Walk-Run Intervals | Active | C1 | ladder COMPRESSED 2026-07-31 (wk2 3×6′ · wk3 2×9′ · wk4 continuous 18–20′), still check-in-gated, still the run budget |
 | Machine Chest Press | Active | C1 | added pre-start by Amir (2026-07-24); starter 2-set dose — C1 chest-zero stance revised |
 | Dumbbell Lateral Raise | Active | C1 | added pre-start by Amir (2026-07-24) |
 
@@ -107,3 +107,16 @@ New standing rule from Amir, verbatim: "if it's a hold exercise, in the Tempo wr
 - **Lean the cycle's framing and selection toward tennis performance** — transfer can override SFR for her from C2 (per principles), and consider introducing loaded lateral-strength work (e.g. Lateral Lunge / Cossack pattern) a beat earlier than the roadmap's minimum, still checklist-gated; lateral bounds remain last-in per the knee-history rule.
 - Plyo timeline unchanged: C3 absorption first. Tolerating competition ≠ cleared for prescribed plyo.
 - **Celebrate the win in C2's notes** — a competition played on a quiet knee three days into the program is the genuine-win card, and it pairs with closing the "watch the knee" loop if the trend holds through C1.
+
+### In-cycle edit · 2026-07-31 (Amir, same day — supersedes actions 1 & 3 above)
+
+Amir's ruling on the check-in, verbatim intent: *load her legs a bit better · do we need the isometrics? · the cardio can be a little bit more continuous.* The precautionary knee scaffolding is relaxed on evidence; the monitoring stays. Applied:
+
+1. **Isometrics RETIRED.** The 2×/wk tendon-hold protocol was medicine for an unproven tendon; a competition on a quiet knee is better evidence than any gym test. D1's Machine Leg Extension converted to **dynamic 3×12 @RPE 7** (canonical name now matches execution — video re-teaches correctly); D4's second iso dose **removed outright** (also restores one-exercise-once-per-cycle, which the 2×/wk protocol had as its stated exception). Pain-gating stays in the note (pinch/catch = stop + message).
+2. **Legs loaded better** (within the recovery-driven RPE-7 ceiling, which stands — it was never knee-logic): Leg Press 3→**4 sets**, RPE 6→**7** · DB RDL RPE 6→**7**, "patterning only" framing dropped — loaded now, not C2 · Box Step-Up → **Dumbbell Box Step-Up** @RPE 7 (load this week, height on green mornings — one lever at a time) · Seated Leg Curl 3→**4 sets** (hamstrings were the week's floor). **90° depth cap on the leg press KEPT** — cheap insurance on an unimaged knee, costs no load; revisit at C2 design.
+3. **Run ladder compressed toward continuous:** wk2 3×(6′/1.5′) · wk3 2×(9′/1.5′) · wk4 **one continuous 18–20′ run**. Ladder card, D3 prescription, cycle focuses/outcomes and message all rewritten to match. Still check-in-gated, still the only run budget. This pulls C1's exit ahead of the roadmap's "near-continuous 18′" — C2's run block starts from continuous, not toward it.
+4. Cycle `focuses` + `outcomes` updated (iso outcome line replaced with leg-loading; running outcome now "continuous 18 to 20 min"). Morning-check card's gated list updated (iso load → leg-work load). Ledger rows updated.
+
+**New weekly picture:** quads ~13 dynamic sets · hamstrings 7 · glutes ~9–10 · everything else unchanged. Hamstrings still under the ≥10 floor — accepted for C1 (recovery ceiling + C2 HSR leads); C2 must clear it.
+
+**Unchanged on purpose:** morning knee checklist + escalation triggers, physio-baseline recommendation on record, zero plyo (C3 absorption first), RPE-7 cycle ceiling, 60′ session caps (D1 ≈ 55′ post-edit, D4 ≈ 45′).

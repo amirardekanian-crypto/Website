@@ -18,20 +18,20 @@
       "startDate": "2026-07-28",
       "endDate": "2026-08-24",
       "focuses": [
-        "Rebuild knee-tendon capacity with isometric-led, carefully-gated loading.",
-        "Calibrate honest working weights on every lift and return to running on a 4-week ladder."
+        "Load the legs with real weight now the knee has proven itself, morning checks still standing guard.",
+        "Calibrate honest working weights on every lift and build back to continuous running."
       ],
       "message": {
         "paragraphs": [
-          "Groundwork is the cycle that buys everything after it. You're on court every day — the court already trains your speed and reactions; what it can't give you is a bulletproof knee and a strength base with real numbers on it. That's this month: tendon work that rebuilds the knee's capacity, honest baselines on every lift, and your first structured steps back to running.",
+          "Groundwork is the cycle that buys everything after it. You're on court every day — the court already trains your speed and reactions; what it can't give you is a bulletproof knee and a strength base with real numbers on it. That's this month: leg work that rebuilds the knee's capacity, honest baselines on every lift, and your first structured steps back to running.",
           "The mental focus is patience at effort 6–7. Nothing this month is meant to feel heroic — it's meant to be repeatable, precise, and pass the morning knee check four weeks straight.",
-          "By August 24: working weights on the board, eighteen minutes of near-continuous running on a quiet knee, and a body ready for what comes next — where it gets heavy."
+          "By August 24: working weights on the board, a continuous run on a quiet knee, and a body ready for what comes next — where it gets heavy."
         ],
         "outcomes": [
           "Working weights calibrated on all five lifts",
-          "18 min of near-continuous running, knee quiet",
+          "A continuous 18 to 20 minute run, knee quiet",
           "Four straight weeks of passing morning knee checks",
-          "Iso holds built from 30s to 45s at real effort",
+          "Real load on the leg press, hip thrust and leg extension",
           "The 5-touch week locked in around daily court time"
         ]
       }
@@ -185,10 +185,10 @@
                 "name": "Machine Leg Press",
                 "videoUrl": null,
                 "restSec": 120,
-                "note": "Set the machine's range stop so your knees never bend past 90° — that's the ceiling this cycle. Start week 1 lighter than feels necessary; the first set's RPE tells you where to go.",
+                "note": "Keep the range stop at 90°, that part stays. But the brakes are off the load now. Take last week's weight, add a little, and work at a true 7. Three clean reps left in the tank, every set.",
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -198,7 +198,7 @@
                     "label": "Tempo 3-0-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 7"
                   }
                 ],
                 "cues": {
@@ -216,7 +216,7 @@
                 "name": "Dumbbell Romanian Deadlift",
                 "videoUrl": null,
                 "restSec": 120,
-                "note": "Start light and treat this as pattern practice — a crisp hinge, no grinding. Next cycle loads this properly; this month earns it.",
+                "note": "Plan upgraded: we load this now, not next cycle. Keep the hinge crisp and pick dumbbells that make it a real 7. No grinding, no rounding.",
                 "chips": [
                   {
                     "label": "3 Sets",
@@ -229,7 +229,7 @@
                     "label": "Tempo 3-0-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 7"
                   }
                 ],
                 "cues": {
@@ -288,33 +288,29 @@
                 "name": "Machine Leg Extension",
                 "videoUrl": null,
                 "restSec": 90,
-                "note": "Hold mid-range — knee bent between 60–90°, never near lockout. Week 1 is 30s holds at effort 6; add ~5s each week so week 4 is 45s at effort 7. Mild burn is the target — past 2/10 discomfort, back off.",
+                "note": "No more holds. Your knee earned normal reps, so this is straight quad work now. Smooth up, controlled down. Any pinch or catch in the knee, stop the set and message me.",
                 "chips": [
                   {
-                    "label": "mid-range hold",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "4 Sets",
+                    "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×30s"
+                    "label": "×12 Reps"
                   },
                   {
-                    "label": "Tempo Iso"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 7"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Press up into the pad and hold dead still",
-                    "Quads humming, kneecap pulled up tight"
+                    "Press the pad up smooth, no kicking",
+                    "Quads doing every inch of the work"
                   ],
                   "bad": [
-                    "Don't grind into pain — mild effort-burn only"
+                    "Don't slam into the top or let the weight drop"
                   ]
                 }
               },
@@ -805,13 +801,13 @@
                 "type": "circuit",
                 "name": "Walk-Run Intervals",
                 "videoUrl": null,
-                "rounds": "×5 Rounds",
+                "rounds": "×3 Rounds",
                 "logWeight": false,
-                "note": "Week 2 unlocked: five rounds of 3 minutes easy running, 90 seconds walking, flat route. A whole competition on court and the knee stayed quiet, so you earned this rung. We still climb together at each check-in, never solo.",
+                "note": "Week 2, upgraded: three rounds of 6 minutes easy running, 90 seconds walking, flat route. A whole competition on court and the knee stayed quiet, so the ladder climbs faster now. Still conversational pace, still check the knee next morning.",
                 "items": [
                   {
                     "name": "Easy Run",
-                    "detail": "3 min · RPE 6",
+                    "detail": "6 min · RPE 6",
                     "cues": {
                       "good": [
                         "Short light steps, land under your hips",
@@ -945,10 +941,10 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Box Step-Up",
+                "name": "Dumbbell Box Step-Up",
                 "videoUrl": null,
                 "restSec": 60,
-                "note": "Start on a 15–20cm box. Height only rises after a green week of morning knee checks — this is landing prep, quality over load.",
+                "note": "Same box height, but now hold a dumbbell in each hand. One lever at a time: load moves this week, height moves when the mornings stay green.",
                 "chips": [
                   {
                     "label": "slow lowering",
@@ -962,7 +958,7 @@
                     "label": "×8 Each Side"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 7"
                   }
                 ],
                 "cues": {
@@ -1009,47 +1005,13 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Leg Extension",
-                "videoUrl": null,
-                "restSec": 90,
-                "note": "Same protocol as the Lower day — mid-range hold, 30s building to 45s. Second dose of the week is what makes the tendon adapt.",
-                "chips": [
-                  {
-                    "label": "mid-range hold",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "4 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×30s"
-                  },
-                  {
-                    "label": "Tempo Iso"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Press up into the pad and hold dead still",
-                    "Quads humming, kneecap pulled up tight"
-                  ],
-                  "bad": [
-                    "Don't grind into pain — mild effort-burn only"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
                 "name": "Machine Seated Leg Curl",
                 "videoUrl": null,
                 "restSec": 75,
+                "note": "One extra set from this week. Hamstrings are the quietest muscle in your week, so this slot works a bit harder now.",
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -1210,12 +1172,12 @@
       {
         "icon": "✅",
         "title": "The Morning Knee Check",
-        "body": "<p>The morning after any leg session or run, run this <strong>30-second check</strong>:</p><ul><li>No new swelling compared to the other knee</li><li>Knee straightens fully flat, same as the other side</li><li>Zero catching or clicking overnight or on stairs</li><li>Any soreness ≤2/10 and gone within the day</li></ul><p><strong>All four pass = green.</strong> That's what unlocks every progression this cycle — run ladder, box height, iso load. Any fail = we repeat last week's dose, no drama.</p><p>A fail on straightening or catching isn't a repeat — <strong>that's a message to me, same day.</strong></p>"
+        "body": "<p>The morning after any leg session or run, run this <strong>30-second check</strong>:</p><ul><li>No new swelling compared to the other knee</li><li>Knee straightens fully flat, same as the other side</li><li>Zero catching or clicking overnight or on stairs</li><li>Any soreness ≤2/10 and gone within the day</li></ul><p><strong>All four pass = green.</strong> That's what unlocks every progression this cycle — run ladder, box height, the load on your leg work. Any fail = we repeat last week's dose, no drama.</p><p>A fail on straightening or catching isn't a repeat — <strong>that's a message to me, same day.</strong></p>"
       },
       {
         "icon": "🏃‍♀️",
         "title": "The Run Ladder",
-        "body": "<p>You're running again — on a ladder we climb together. Each week's rung only unlocks at our check-in, off a green morning check:</p><ul><li><strong>Week 1:</strong> 6 × (2 min run / 1.5 min walk)</li><li><strong>Week 2:</strong> 5 × (3 min / 1.5 min)</li><li><strong>Week 3:</strong> 4 × (4.5 min / 1.5 min)</li><li><strong>Week 4:</strong> 3 × (6 min / 1.5 min)</li></ul><p>Flat route, conversational pace — if you can't talk, you're too fast.</p><p><strong>The ladder IS the run budget.</strong> No extra runs outside it this cycle — a spontaneous long run is exactly the move that cost you two days of a locked knee. Next cycle buys continuous running; this one buys the knee.</p>"
+        "body": "<p>You're running again, and the knee already passed a bigger test than this ladder. So we climb it faster now. Each rung still unlocks at our check-in, off a green morning check:</p><ul><li><strong>Week 1:</strong> 6 × (2 min run / 1.5 min walk) — done, knee quiet</li><li><strong>Week 2:</strong> 3 × (6 min / 1.5 min)</li><li><strong>Week 3:</strong> 2 × (9 min / 1.5 min)</li><li><strong>Week 4:</strong> one continuous run, 18 to 20 min</li></ul><p>Flat route, conversational pace. If you can't talk, you're too fast.</p><p><strong>The ladder is still the run budget.</strong> No extra runs outside it this cycle. Big court weeks plus running is a mix we manage on purpose, not by feel.</p>"
       },
       {
         "icon": "📈",
