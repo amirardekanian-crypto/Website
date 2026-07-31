@@ -88,3 +88,22 @@ New standing rule from Amir, verbatim: "if it's a hold exercise, in the Tempo wr
 **Duty-of-care thread (standing).** Unimaged 2-day mechanical-locking knee. Physio baseline assessment recommended on record (her call; training proceeds in parallel). **Race question (2026-07-24):** she asked to run a race ~Tuesday feeling "ok"; Amir prescribed an easy 2–3 km knee-check run → pain = physio, fine = "may race but I advise against." Coaching read logged for the record: process good (graded test + hard escalation + stated advice), but a small asymptomatic run cannot clear a 16 km race — the recommendation is to decouple the check from race permission and keep the race off the table this cycle (harm-reduction: run/walk easy, assess first), consistent with the roadmap's return-to-run-not-race-prep stance and the "ladder IS the run budget" rule.
 
 **Deliverables produced (2026-07-24/25, kept OUT of the repo — private health data, in the coaching conversation/scratchpad only):** athlete self-report pack (confidence scales + TSK-11 + daily knee-check diary) and coach battery (master data sheet + QASLS + SEBT/Y-balance recording sheet + 24-week testing calendar), as print-ready PDFs.
+
+---
+
+### Week-1 check-in · 2026-07-31 (in-cycle, C1)
+
+**Report (via Amir).** Heavy tennis week — lots of court time **including a competition** — and the knee stayed completely quiet: no pain, no reported catching/locking, no injury. First real-world evidence the knee tolerates cutting + competition-intensity load, not just gym loading. Goal emphasis confirmed by the athlete: **tennis performance is the driver.** Running is now a tool (aerobic base + graded impact tolerance that buys the C3+ plyo timeline), not a goal in itself — the 16k race-prep question is effectively closed, consistent with the standing "return-to-run, not race prep" stance.
+
+**Actions taken (app updated same day):**
+1. **Run ladder advanced to the week-2 rung** — Day 3 now 5 × (3 min run / 1.5 min walk), note rewritten to say the knee earned it. This is the check-in gate working as designed, not a self-advance.
+2. **Box-height progression green-lit** per the existing note protocol (green week → height may rise); no JSON change needed, the note already carries it.
+3. **No structural change to C1** — deliberate. Calibration + tendon capacity IS the tennis base; one good week doesn't overturn the load-careful ruling, and transfer work is C2+ by the locked roadmap. Iso holds continue their written build (35s in week 2 per the note's add-5s-per-week scheme; chips stay as authored).
+
+**Watch item.** The competition was load *beyond* plan in week 1 — tolerated, but if competitions recur mid-cycle, cumulative load management (drop-day order: Day 5 → Day 4) becomes the live lever. Physio baseline recommendation **stands** — asymptomatic under load is reassuring, not imaging; the unimaged locking episode keeps its duty-of-care thread and the morning-checklist gating stays on every impact progression.
+
+**C2 design directives (for /program-design to read):**
+- Proceed confidently to the planned loading step-ups: Barbell Hip Thrust in, DB RDL gets loaded, HSR leads — the knee has now earned it on evidence, not just quiet time.
+- **Lean the cycle's framing and selection toward tennis performance** — transfer can override SFR for her from C2 (per principles), and consider introducing loaded lateral-strength work (e.g. Lateral Lunge / Cossack pattern) a beat earlier than the roadmap's minimum, still checklist-gated; lateral bounds remain last-in per the knee-history rule.
+- Plyo timeline unchanged: C3 absorption first. Tolerating competition ≠ cleared for prescribed plyo.
+- **Celebrate the win in C2's notes** — a competition played on a quiet knee three days into the program is the genuine-win card, and it pairs with closing the "watch the knee" loop if the trend holds through C1.

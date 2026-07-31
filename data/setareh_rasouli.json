@@ -805,13 +805,13 @@
                 "type": "circuit",
                 "name": "Walk-Run Intervals",
                 "videoUrl": null,
-                "rounds": "×6 Rounds",
+                "rounds": "×5 Rounds",
                 "logWeight": false,
-                "note": "Week 1: six rounds of 2 minutes easy running, 90 seconds walking, flat route. We climb the ladder together at each check-in — never solo.",
+                "note": "Week 2 unlocked: five rounds of 3 minutes easy running, 90 seconds walking, flat route. A whole competition on court and the knee stayed quiet, so you earned this rung. We still climb together at each check-in, never solo.",
                 "items": [
                   {
                     "name": "Easy Run",
-                    "detail": "2 min · RPE 6",
+                    "detail": "3 min · RPE 6",
                     "cues": {
                       "good": [
                         "Short light steps, land under your hips",
