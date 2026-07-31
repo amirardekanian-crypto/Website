@@ -903,10 +903,25 @@ there is no off switch) and then **Add-ons** (real toggles, **all starting off**
 the same warning Settings carries — once one is on, it counts). Everything stays editable
 in Settings afterwards.
 
-It closes with a line saying **athletes can add their own** — worth `customXp` (25) a day,
-found in Settings under the initials. There is **no composer on this screen on purpose**:
-onboarding stays one decision, and the tour walks them to the real one a minute later. The
-XP figure interpolates `XP_RULES.customXp` so it cannot drift from what the habit pays.
+It closes with a third section, **Your own** — a real composer, not a pointer at Settings
+(Amir, 2026-07-31: *"what i meant was that to let them actually add there"*). Type a name,
+press **Add**, and the habit appears immediately as a row with its own switch **and an ✕**,
+worth `customXp` (25) a day. The ✕ is there because this is the screen where the typo
+happens, so it is the screen that has to be able to undo it. Custom rows are `<div>`s with
+their own switch button rather than one big `<button>` like the built-in add-ons — a row
+with two controls cannot be a button without nesting one inside another.
+
+⚠️ **Both composers call the same `addCustomHabit()`.** Settings and onboarding used to be
+one copy each; the id scheme (`c_<slug>_<base36 time>`) is what every logged value is filed
+under for the life of the habit, so two copies of it is exactly the kind of thing that
+drifts. `UI._newName` is read through the delegated `input` listener on `#app`; both fields
+carry `id="newhabit"` and only ever one is mounted, so there is nothing to disambiguate.
+
+⚠️ **It clears the box by hand, after `render()`.** `morphAttrs()` deliberately skips
+`value` on a live `<input>` so a re-render mid-keystroke cannot yank the caret away — which
+also means clearing `UI._newName` alone leaves the typed name sitting in the field, looking
+like the tap did nothing when it had in fact done the whole job. That affected the Settings
+composer too, from before onboarding had one; fixing it in the shared function fixed both.
 
 ⚠️ **It used to render all eight as one flat list of switches.** Tapping a core row
 flipped `CFG.on`, the switch animated off, and `live()` went on returning the habit

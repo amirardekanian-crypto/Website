@@ -3646,6 +3646,31 @@ function bump(h) {
 // on the leaderboard and nowhere else, and the two could never reconcile. The
 // toggle beside it is still the non-destructive door: switching a habit off
 // pauses it and keeps every point.
+// Adding an athlete's own habit. Shared by Settings and the onboarding screen so
+// the two composers can never drift — the id scheme in particular, which is what
+// every logged value is filed under for the life of the habit.
+// Reads the box through UI._newName, which the delegated `input` listener on #app
+// keeps in step; both screens give their field id="newhabit" and only one of them
+// is ever mounted, so there is no duplicate to disambiguate.
+// The habit arrives ON: it exists because the athlete just asked for it.
+function addCustomHabit() {
+  const name = String(UI._newName || '').trim();
+  if (!name) return;
+  const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20) + '_' + Date.now().toString(36);
+  CFG.custom = (CFG.custom || []).concat([{ id, name: name.toUpperCase(), goal: name }]);
+  CFG.on[id] = true; UI._newName = '';
+  if (CFG.seen) CFG.seen[id] = 1;
+  saveCfg(); render();
+  // Clearing UI._newName is not enough to empty the box: morphAttrs() skips
+  // `value` on a live input on purpose, so that a re-render mid-keystroke can
+  // never yank the caret out from under someone typing. Nothing is being typed
+  // at this instant — the habit has just been committed — so the field is
+  // cleared by hand, after the render. Without it the name sits in the box
+  // looking like the tap did nothing, and it did the whole job.
+  const box = document.getElementById('newhabit');
+  if (box) box.value = '';
+  toast(name.toUpperCase() + ' added · ' + XP_RULES.customXp + ' XP a day.');
+}
 function removeCustom(h) {
   CFG.custom = (CFG.custom || []).filter(c => c.id !== h.id);
   delete CFG.on[h.id];
@@ -4412,7 +4437,12 @@ function flyXp(amount, rect) {
 // declined sitting in their list. The lock is stated here, once, where the
 // decision is actually being made.
 function renderOnboarding() {
-  const nOn = live().length, core = allHabits().filter(h => h.core), addOns = addOnHabits();
+  const nOn = live().length, core = allHabits().filter(h => h.core);
+  // The athlete's own habits are add-ons too (addOnHabits() is everything without
+  // `core`), but they get their own section and an ✕, so split them out here.
+  const isCustom = id => (CFG.custom || []).some(c => c.id === id);
+  const addOns = addOnHabits().filter(h => !isCustom(h.id));
+  const customs = addOnHabits().filter(h => isCustom(h.id));
   return `
     <div data-k="onboarding" style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
       <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
@@ -4483,18 +4513,40 @@ function renderOnboarding() {
           </button>`).join('')}
 
           <!-- The list is not the whole offer, and this screen used to imply it
-               was. Told here rather than left for an athlete to discover in
-               Settings weeks later: the thing they most want to hold themselves
-               to is often not one of the eight. No composer on this screen on
-               purpose — onboarding stays one decision, and the tour walks them
-               to the real one a minute later. The XP reads from the live
-               constant so it cannot drift from what the habit actually pays. -->
-          <div style="padding:16px 0 2px;font-size:11.5px;line-height:1.5;color:var(--muted)">
-            <strong style="color:var(--ink)">And you can add your own.</strong> Anything you want to
-            hold yourself to — no screens in bed, ten minutes of reading — counts like the rest and
-            pays ${XP_RULES.customXp} XP a day. You'll find it in Settings, under your initials at
-            the top right, once you have started.
+               was. The thing an athlete most wants to hold themselves to is
+               often not one of the eight, and the moment they are deciding what
+               to track is the moment to let them say so — not weeks later once
+               they happen to find Settings. Same composer, same addCustomHabit()
+               as Settings, so the id scheme every logged value is filed under
+               cannot drift between the two. -->
+          <div class="eyebrow" style="display:flex;justify-content:space-between;gap:12px;padding:22px 0 8px;border-bottom:2px solid var(--divider)">
+            <span>Your own</span><span>${XP_RULES.customXp} XP a day</span>
           </div>
+          <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+            Anything you want to hold yourself to — no screens in bed, ten minutes of reading.
+            It scores like everything else, and you can add more whenever you like.
+          </div>
+          <div style="display:flex;gap:8px;padding-bottom:2px">
+            <input class="input" id="newhabit" maxlength="40" placeholder="e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
+            <button class="btn btn-primary" style="padding:0 16px" ${on(addCustomHabit)}>Add</button>
+          </div>
+          <!-- Their own habits get the ✕ here as well as in Settings: this is
+               the screen where the typo happens, so it is the screen that has
+               to be able to undo it. A row with two controls cannot be one big
+               <button> like the add-ons above — nesting buttons is invalid and
+               the taps collide — so these are <div> rows with their own switch. -->
+          ${customs.map(h => `<div class="row-rule" style="padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+              <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
+              <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
+            </span>
+            <span style="display:flex;gap:10px;align-items:center">
+              <button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
+                ${on(() => removeCustom(h))} aria-label="Remove ${esc(h.name)}">✕</button>
+              <button class="sw ${CFG.on[h.id] !== false ? 'on' : ''}" ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}
+                aria-label="Toggle ${esc(h.name)}"><i></i></button>
+            </span>
+          </div>`).join('')}
         </div>
       </div>
       <button class="btn btn-primary btn-block" style="margin-top:18px" ${on(() => {
@@ -7513,15 +7565,7 @@ function renderSettings() {
       }).join('')}
       <div style="padding:14px 20px 4px;display:flex;gap:8px">
         <input class="input" id="newhabit" maxlength="40" placeholder="Add a habit — e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
-        <button class="btn btn-primary" style="padding:0 16px" ${on(() => {
-          const name = String(UI._newName || '').trim();
-          if (!name) return;
-          const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20) + '_' + Date.now().toString(36);
-          CFG.custom = (CFG.custom || []).concat([{ id, name: name.toUpperCase(), goal: name }]);
-          CFG.on[id] = true; UI._newName = '';
-          if (CFG.seen) CFG.seen[id] = 1;
-          saveCfg(); render(); toast(name.toUpperCase() + ' added · ' + XP_RULES.customXp + ' XP a day.');
-        })}>Add</button>
+        <button class="btn btn-primary" style="padding:0 16px" ${on(addCustomHabit)}>Add</button>
       </div>
       <div style="padding:6px 20px 0;font-size:11px;color:var(--muted-soft)">Custom habits are worth ${XP_RULES.customXp} XP a day. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
       </div>
