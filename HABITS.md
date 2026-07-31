@@ -883,10 +883,35 @@ notes are presentation and stay in the app.
 | BREATHE | 10 min | 20 | Tick |
 | SUPPS | 1 dose | 20 | Vitamin D · creatine · omega-3 |
 
-Athletes can switch any of them off and add their own (worth `customXp`, 25).
+The **first five are `core`** — always tracked, no off switch (see *CORE vs ADD-ON*
+above). Athletes can switch any of the **add-ons** off and add their own (worth
+`customXp`, 25).
 
-**Onboarding** is one screen that *suggests* this set with every item as a toggle —
-it decides nothing for them, and everything stays editable in Settings afterwards.
+**Onboarding** is one screen, and it is grouped exactly like Settings → the tracked
+list: **The five** (inert rows, each carrying an `ALWAYS ON` chip and a line saying
+there is no off switch) and then **Add-ons** (real toggles, under the same warning
+Settings carries — once one is on, it counts). Everything stays editable in Settings
+afterwards.
+
+⚠️ **It used to render all eight as one flat list of switches.** Tapping a core row
+flipped `CFG.on`, the switch animated off, and `live()` went on returning the habit
+regardless — so the athlete reached Today to find the habit they had just declined
+sitting in their list, on the first screen they ever saw. The lock is now stated where
+the decision is actually made.
+
+⚠️ **Declining a suggestion during onboarding is not a "removal".** `stampRoster()`
+dates removals to *tomorrow* so nobody can switch a habit off at 23:00 to erase a miss
+— but the roster is stamped before onboarding is ever seen (`migrateOld()` ends in
+`saveCfg()`), so switching a suggested add-on off on that screen used to leave it on
+**today's** roster. Day one was then scored against a habit the athlete had explicitly
+said no to and had never once been able to tick. `stampRoster()` now collapses the
+timeline to a single entry dated today while `!CFG.onboarded` **and** the log is empty
+— an empty log being the proof that no closed day exists to re-judge, which is the only
+thing the tomorrow rule protects. Proven: declining an add-on at onboarding leaves it
+off today *and* tomorrow; after onboarding, with a logged day, switching one off still
+holds it on today and drops it tomorrow, and a returning athlete's old roster entries
+do not move.
+
 **The locked habit says so on that screen**, in clay, under its name: it used to be sold
 there as the highest-value habit on the list with its switch on and no mention of the
 padlock waiting on the very next screen. The free wording states the lock and stops —

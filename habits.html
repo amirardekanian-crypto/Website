@@ -2598,6 +2598,21 @@ function stampRoster() {
   if (!CFG) return;
   const want = live().map(h => h.id).sort();
   const t = CFG.roster || (CFG.roster = []);
+  // ⚠️ ONBOARDING DECIDES THE STARTING SET — nothing on that screen is a
+  // "removal". The rule below dates removals to TOMORROW so nobody can switch a
+  // habit off at 23:00 to erase a miss they already made; but the roster is
+  // stamped before onboarding is ever seen (migrateOld() ends in saveCfg()),
+  // so declining one of the suggestions on the first screen used to leave it
+  // sitting on TODAY's roster. Day one was then scored against a habit the
+  // athlete had explicitly said no to and could never have ticked.
+  // Guarded on an empty log as well as the flag: no logged day at all is the
+  // proof that there is no closed day here to re-judge, which is the only
+  // thing the tomorrow rule exists to protect.
+  if (!CFG.onboarded && !Object.keys(LOG).length) {
+    CFG.roster = [{ from: TKEY(), ids: want }];
+    _rosterCache = null;
+    return;
+  }
   // First stamp is dated from the first logged day, so an athlete who already
   // has history scores exactly as they did before any of this existed.
   if (!t.length) { t.push({ from: firstLoggedDay() || TKEY(), ids: want }); return; }
@@ -4376,9 +4391,17 @@ function flyXp(amount, rect) {
   }, { once: true });
 }
 
-// ── Onboarding — one screen: the suggested habit set, all editable ─────────
+// ── Onboarding — one screen: the five, then the add-ons on offer ───────────
+// ⚠️ It is grouped exactly like Settings → the tracked list, and for the same
+// reason: five habits are CORE and have no off switch, so a screen that draws
+// them with a working toggle is lying on the first thing an athlete ever sees.
+// It used to render every habit as one flat list of switches — tapping a core
+// row flipped CFG.on, the switch animated off, and live() went on returning it
+// regardless, so the athlete arrived on Today to find the habit they had just
+// declined sitting in their list. The lock is stated here, once, where the
+// decision is actually being made.
 function renderOnboarding() {
-  const nOn = live().length;
+  const nOn = live().length, core = allHabits().filter(h => h.core), addOns = addOnHabits();
   return `
     <div data-k="onboarding" style="height:100%;display:flex;flex-direction:column;padding:calc(28px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom))">
       <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:2px solid var(--divider)">
@@ -4391,12 +4414,18 @@ function renderOnboarding() {
         <div class="hd" style="font-size:38px;line-height:.98;letter-spacing:-.03em">${(ATHLETE.firstName || '').trim()
           ? esc(ATHLETE.firstName.trim()) + ',<br>here is what<br>I\'d track'
           : 'Here\'s what<br>I\'d track'}</div>
-        <p style="margin:14px 0 16px;font-size:14px;color:var(--muted)">
-          These are my suggestions. Switch off anything you'd only lie about later — you can change all of it whenever you like.
+        <p style="margin:14px 0 4px;font-size:14px;color:var(--muted)">
+          Five of these are the job and everyone tracks them. The rest are yours — take on what you'll actually do, and change them whenever you like.
         </p>
-        <div style="flex:1;overflow-y:auto;border-top:2px solid var(--divider)">
-          ${allHabits().map(h => `<button style="width:100%;text-align:left;padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px" class="row-rule"
-            ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}>
+        <div style="flex:1;overflow-y:auto">
+          <div class="eyebrow" style="display:flex;justify-content:space-between;gap:12px;padding:18px 0 8px;border-bottom:2px solid var(--divider)">
+            <span>The five</span><span>Everyone tracks these</span>
+          </div>
+          <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+            These are the same for every athlete on the board — which is what makes a day
+            score mean the same thing for all of you. There is no off switch.
+          </div>
+          ${core.map(h => `<div class="row-rule" style="padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px">
             <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
               <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
@@ -4416,6 +4445,27 @@ function renderOnboarding() {
               ${h.locked ? `<span style="font-size:11px;line-height:1.35;color:var(--clay-deep)">${isFree()
                 ? 'Locked — this is the one that comes with a programme. It stays on your list, and it stays a padlock.'
                 : 'Locked — you cannot tick this one. Finishing a session in your programme ticks it for you.'}</span>` : ''}
+            </span>
+            <span class="mono" style="flex:none;font-size:8.5px;letter-spacing:.09em;color:var(--muted-soft);border:1px solid var(--rule);padding:4px 7px">ALWAYS ON</span>
+          </div>`).join('')}
+
+          <div class="eyebrow" style="display:flex;justify-content:space-between;gap:12px;padding:22px 0 8px;border-bottom:2px solid var(--divider)">
+            <span>Add-ons</span><span>Extra points, extra badges</span>
+          </div>
+          <!-- Same warning Settings carries, for the same reason: an add-on is
+               not a free bonus, it is a habit that counts against you the
+               moment it is on. Better said before they pick than discovered
+               on the first day one of them costs points. -->
+          <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+            Optional, and worth real points on top of the five. <strong style="color:var(--ink)">Once you
+            switch one on it counts</strong> — miss it and it costs you the same as missing anything
+            else, so only add what you will actually do.
+          </div>
+          ${addOns.map(h => `<button style="width:100%;text-align:left;padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px" class="row-rule"
+            ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}>
+            <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+              <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
+              <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
             </span>
             <span class="sw ${CFG.on[h.id] !== false ? 'on' : ''}"><i></i></span>
           </button>`).join('')}
@@ -4577,11 +4627,16 @@ function tourSteps() {
     screen: 'crew', sel: () => document.querySelector('.hdme'), act: true, cta: 'Open it'
   });
 
+  // ⚠️ Names both halves of this section, because it points at a list where the
+  // top five say ALWAYS ON. It used to say "switch off what you will not do"
+  // flat out — true of the add-ons, a lie about the five, and told on the first
+  // run to an athlete who cannot yet tell the two groups apart.
   S.push({
-    title: 'Switch off what you will not do',
-    body: `A habit you ignore only drags your day down. Switch it off here — it keeps every
-           point it has already banked and can come back whenever. Add your own at the bottom
-           of the list, worth ${XP_RULES.customXp} XP a day.`,
+    title: 'The five, and what you add',
+    body: `The five at the top are the job — everyone on the board tracks them, and they have
+           no off switch. Everything under them is yours: switch off an add-on you will not do
+           and it keeps every point it has already banked, or add your own at the bottom of the
+           list, worth ${XP_RULES.customXp} XP a day.`,
     screen: 'settings', sel: () => $t('[data-tour="tracked"]')
   });
 
@@ -6336,7 +6391,11 @@ function renderManual() {
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
         // that changing the list is safe.
-        p(`<strong style="color:var(--ink)">Changing what you track is safe.</strong> A day is judged on the habits you had switched on <em>that day</em>. Add a habit today and the days behind you keep the scores they earned; switch one off and it does not go back and make old days look better than they were. Today counts from now, because today is still yours to finish.`) +
+        // Names the split before promising history is safe: "switch one off" is
+        // only true of the add-ons, and this is the one screen that explains how
+        // tracking works rather than just showing it.
+        p(`<strong style="color:var(--ink)">Five habits are fixed.</strong> Your session, steps, sleep, protein and water are the same for everyone on the board — that is what makes a day score mean the same thing for all of you, and they have no off switch. Everything else is an add-on: optional, worth real points on top, and once one is on it counts like anything else.`) +
+        p(`<strong style="color:var(--ink)">Changing what you track is safe.</strong> A day is judged on the habits you had switched on <em>that day</em>. Add an add-on today and the days behind you keep the scores they earned; switch one off and it does not go back and make old days look better than they were. Today counts from now, because today is still yours to finish.`) +
         p(`<strong style="color:var(--ink)">Clearing a tier pays.</strong> What it pays depends on the habit: a tier on your workout is worth more than the same tier on your supplements, because a day of it is worth more. The figures below are for ${esc((live()[0] || HABITS[0]).name.toLowerCase())}; open any habit to see its own.`) +
         `<div style="display:flex;flex-direction:column;gap:0">
           ${CONSISTENCY_TIERS.map((t, i) => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">

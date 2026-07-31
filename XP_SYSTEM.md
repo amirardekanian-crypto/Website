@@ -306,6 +306,15 @@ is per habit, so it never needed a denominator. Full design in `HABITS.md` →
 ⚠️ **`live()` is the present tense only.** Any function that takes a `dayKey` must use
 `rosterOn(dayKey)`, or it will quietly re-judge history again.
 
+⚠️ **Onboarding is exempt from the removals-land-tomorrow rule.** `stampRoster()` dates a
+removal to tomorrow so a habit cannot be switched off at 23:00 to erase a miss — but the
+roster is first stamped before onboarding is ever seen (`migrateOld()` ends in
+`saveCfg()`), so declining one of the suggestions on that screen used to leave it on
+**today's** roster and score day one against a habit the athlete had just said no to. It
+now collapses to a single entry dated today while `!CFG.onboarded` **and** `LOG` is empty;
+an empty log is the proof that there is no closed day to re-judge, which is the only thing
+the tomorrow rule protects. Full account in `HABITS.md` → *The eight habits*.
+
 Milestones keep flat values — they are one-off and genuinely hard — totalling
 **3,585 XP** across the sixteen, in three tiers (`tier` on each entry: `week`,
 `long`, `rare`; grouping only, nothing scores off it). The 1,350 that sits in `rare`
