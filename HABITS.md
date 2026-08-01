@@ -768,6 +768,31 @@ poking out above Rookie. Verified: max on-screen gap is 1px (subpixel rounding) 
 level tested, in both themes, with the icon columns pixel-aligned at a single x the whole
 way down.
 
+**The current rank carries a "you are here" panel — the next LEVEL, then the next rank**
+(Amir, 2026-08-01, at level 4: *"this is what it shows, it should show that im in the way
+to level 5 and contender"*). The road lists ranks and rewards, and rewards are two to five
+levels apart, so between them it had nothing to say: a level-4 athlete 76 XP from level 5
+was told only that CONTENDER was 806 XP away and that a skin waited at level 6. The next
+level is the step you can actually take today; the rank is what the step is for. Under the
+current rank's pips (with the level you are standing on now ringed, `.pips i.now`, so four
+filled pips no longer read as "rank nearly finished" without saying which one is live) sits
+one panel: **`LEVEL n → n+1`** with the XP left, the within-level bar (`LI.pct`, the same
+number the Today hero's ring draws), and then the rank line — *"Then CONTENDER at level 6 —
+806 XP away."*, or *"Level 6 makes you CONTENDER."* when the next level **is** the rank-up.
+The rank named there comes from `rankFor(rankTop + 1)`, not `RANKS[i + 1]`, so past level 50
+it promises **★1 ROOKIE** rather than plain ROOKIE; the tier line's level range gained the
+same star offset the row's XP figure already had (a ★1 athlete's Rookie row said "Levels
+1–5" beside "at level 56"). `roadIconCol()` gained a `topPx` argument for this row only —
+the panel makes it tall enough that a truly centred crest floats far below the rank name it
+belongs to; the bottom segment stays `flex:1`, so the line is still unbroken.
+
+**The NEXT reward's bar measures the leg, not the climb.** It was `LI.xp / cumXpTo(next.lv)`
+— progress from *zero XP ever* — which showed the level-4 athlete above a bar **70% full**
+while the caption beside it said 806 XP to go, and would have shown ~85% to a level-25
+athlete with two months of work left before the level-39 card. It is anchored to the reward
+below it now (`legFrom`), so it reads 41%, and it resets only when a reward is actually
+collected — levelling up inside a leg pushes it forward instead of throwing it back.
+
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
 metal-rimmed badge for a rank — the road, the Today hero and the share card all call
