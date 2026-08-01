@@ -1,0 +1,49 @@
+#!/bin/sh
+# Blocks a commit that would ship a broken habits.html.
+#
+# Why: an HTML comment sitting inside a JS template literal in habits.html
+# has broken the live app TWICE in one afternoon (2026-08-01) — a stray
+# backtick in the comment prose silently terminates the template literal,
+# the parser can resync into something that still "parses" but never
+# reaches the app's own boot call, and the site sits on its loading screen
+# forever with nothing in the console. It even reached production once,
+# via a commit nobody in this session ran on purpose — which is exactly the
+# case a hook protects against that "remember to test" does not: it runs on
+# every commit, regardless of who or what created it.
+#
+# This only runs the check when habits.html is actually staged, so it costs
+# nothing on commits that do not touch it.
+#
+# NOTE: this checks the WORKING-TREE copy of habits.html, not the exact
+# staged blob. That is a real gap if you ever `git add -p` a partial hunk —
+# for this repo's actual workflow (always the whole file, together) it is
+# not one in practice. If that ever changes, check the staged blob instead:
+#   git show :habits.html > /tmp/staged.html && check_js_syntax.py /tmp/staged.html
+
+repo_root=$(git rev-parse --show-toplevel) || exit 1
+cd "$repo_root" || exit 1
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+echo "$staged" | grep -qx "habits.html" || exit 0
+
+PY=python
+command -v python >/dev/null 2>&1 || PY=python3
+
+echo "pre-commit: habits.html changed — checking it actually boots..."
+
+"$PY" scripts/check_js_syntax.py habits.html
+syntax_status=$?
+
+"$PY" scripts/check_habits_boots.py habits.html
+boot_status=$?
+
+if [ $syntax_status -ne 0 ] || [ $boot_status -ne 0 ]; then
+  echo ""
+  echo "pre-commit: BLOCKED — habits.html failed the check(s) above."
+  echo "Fix it, or in a genuine emergency: git commit --no-verify"
+  echo "(but that is what let the last one through, so read the errors first)."
+  exit 1
+fi
+
+echo "pre-commit: habits.html OK — committing."
+exit 0

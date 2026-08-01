@@ -385,3 +385,30 @@ for the Tehran general-fitness audience. Don't touch those pages over this direc
   `min-height:100vh` (shrink it, e.g. `.hero{min-height:520px!important}`, to capture lower sections).
 - Stale **CSS cache** can render unsized elements huge (it once blew up the nav logo). Inline
   width/height on critical lockups as a safeguard.
+
+## habits.html has a pre-commit guard — set it up once per clone
+A stray backtick inside an HTML comment that sits inside a JS template literal has broken
+the live app **twice in one afternoon** (2026-08-01): it silently terminates the template
+literal, the parser can resync into something that still "parses" but never reaches the
+app's own boot call, and the site sits on its loading screen forever with **nothing in the
+console**. It even reached production once, via a commit nobody ran on purpose — an
+external process on this machine (auto-commit tool, unclear which) picked up habits.html
+mid-edit while it was deliberately broken for a test and pushed it straight to `main`,
+which is what GitHub Pages serves from. Live for about 15 minutes before caught and
+reverted (`e85969c`).
+
+`scripts/check_js_syntax.py` and `scripts/check_habits_boots.py` now guard against this —
+the first catches the exact backtick-in-comment pattern deterministically (a real parse
+check alone is **not** reliable here, since the resync doesn't always throw), the second
+proves the app actually renders content into `#app`, not just that it parses. Both are
+wired into `.githooks/pre-commit`, which blocks a commit that touches habits.html unless
+it passes both.
+
+**This only runs if `core.hooksPath` points at the tracked `.githooks/` directory** — that
+is a per-clone git config, not something `git clone` sets up on its own. Run once per
+clone:
+```
+git config core.hooksPath .githooks
+```
+Skip a check only in a genuine emergency with `git commit --no-verify` — that is exactly
+what let the incident above through, so read the errors first.
