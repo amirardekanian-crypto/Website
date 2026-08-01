@@ -153,11 +153,22 @@ brings people back daily — was a chip inside a tab named after only half of wh
 ### 01 · TODAY — the daily loop
 The screen they actually live on. **In this order, and the order is the point:**
 
-1. **Level hero** — overall level, rank label, XP, and one bar: progress to the next
-   level. Today's own completion is *not* repeated here; the header and the day strip
-   both already carry it, and a second green bar of the same shape directly beneath the
-   first read as one broken double-bar.
-2. **The streak flame** — sits *on* the level hero, left of the rank block: a drawn flame
+1. **The hero card** — a floating white card (Amir, 2026-08-01: *"i like the design of the
+   hero that looks like a card"*) carrying, on one row: the **level ring**, the **rank**
+   (a link into the Locker), **distance to the next level** and its bar, and the **streak
+   tile** hard right. Today's own completion is *not* repeated here; the header and the
+   day strip both already carry it.
+   **Underneath, inside the same card, is the week** — `weekReport()`: seven cells,
+   oldest on the left, each shaded by that day's `dayPct` with today outlined. The height
+   is constant on purpose — a bar chart of seven days invites reading the tallest as a
+   win, and these are percentages of different-sized days, not a race. Days before the
+   athlete's first log are drawn empty rather than at 0%, the same rule the day strip and
+   the heat map follow.
+   ⚠️ The block at the bottom of Today is no longer headed *"The last seven days"* — with
+   the hero opening on a seven-day row, two headings naming the same span read as one
+   section printed twice. It is **"Your week, habit by habit"**: the hero answers *how
+   complete was each day*, that block answers *which habit is carrying me*.
+2. **The streak flame** — sits *on* the hero card, hard right of the rank block: a drawn flame
    (never an emoji — nothing here should change shape between an iPhone and a Pixel) and the
    day-streak number in clay, licking faster the longer the streak runs, on the same
    0/5/15/30-day heat scale the habit rows use. Hidden until the first logged day —
@@ -178,8 +189,17 @@ The screen they actually live on. **In this order, and the order is the point:**
    completion, that choose **which day you are logging**. See *The backfill window* below.
 4. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
-   Only counter habits carry a progress track; on a check-off habit it could only ever
-   read 0% or 100%, which was noise on half the list.
+   Only counter habits carry a meter; on a check-off habit it could only ever read 0% or
+   100%, which was noise on half the list.
+   **The meter is SEGMENTED, not a straight bar** (Amir, 2026-08-01: *"water and fuel
+   which has numbers, should be looking like this. its not a straight bar"*). `segBar()`
+   draws **one pip per `step`** — eight glasses is eight pips, three meals is three — so
+   the meter counts the same unit the `+` button adds, which a continuous 0–100% bar
+   could never say. Capped at 20 pips so 10,000 steps stays a meter rather than a comb
+   (steps → 20, sleep → 15), with the leading partial pip dimmed so part-way progress is
+   still visible at any cap. The status line gained the other half of the same fact: a
+   counter habit you have not finished reads `5 of 8 glasses · 3 to go` — the position
+   *and* the job.
 5. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
    random from a library of **83 lines across 13 situations** (`NUDGES`): one bucket per
    habit, plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and
@@ -468,6 +488,39 @@ yet" rather than "this is dead".
 
 Written and read in the **CREW** tab, which opens on it.
 
+**The composer is the dark card; every line is its own card** (Amir, 2026-08-01: *"each
+comment has its own card … and i like how your message has a card like the dark blue
+card"*). Writing and reading are the two halves of this screen and they used to be drawn
+the same way, so the box you type in was the first of nine identical rows. `.rccomp` is
+inverted (`--ink-card`) with a translucent field and a **`62% day rides along · 58/200`**
+meter beside *Post it →* — your day travels with the line, and that is the one thing an
+athlete was never told before posting. Each line is an `.rccard`: a **tinted initial
+disc** (`avatar()`, hue derived from the display name, so it is stable for ever without
+the server storing a byte), the name, the sentence, and **achievement chips underneath**.
+
+⚠️ **`--ink-card` goes DARKER than `--card` in dark mode, not lighter.** At `#201B3D`
+against a `#282250` card the two were eight points apart and the one card on the wall
+meant to read as *not one of these* read as one of these. It is `#100C24`.
+
+**What the chips can honestly say** (`rcChips()`), and this is a real limit worth knowing:
+
+| Chip | As of | Where it comes from |
+|---|---|---|
+| `88% day` | **the day they wrote it** | `hab_notes.pct`, stored with the line |
+| `🔥 N-day streak` | **the day they wrote it** | `dayStreakAt(day)` — walked back from that date, **your own lines only** |
+| rank · title | **now** | `roll_call()` scores a rank live and keeps no history of it |
+
+The streak is the athlete's own because it needs a *log* to compute and this device holds
+exactly one. If `roll_call()` is ever taught to return a per-line streak, hand it through
+as **`r.streak`** and every card gets one — the chip is already written for it, and the
+client falls back to the local calculation only when the field is absent. That is the one
+change that would make the wall show everybody's run.
+
+⚠️ `dayStreakAt()` is now the single definition of a day streak — `currentDayStreak()`
+delegates to it. **Today is not a settled day**, so an unfinished today must not break the
+count; that rule (previously local to `currentDayStreak`) lives inside `dayStreakAt` so
+the hero tile and the wall chip can never disagree about the same integer.
+
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
 
@@ -571,22 +624,70 @@ once the athlete has written — a doorway, not a second composer.
 **Leaderboard** has two scopes: **this season** (the default) and **past week** (a rolling
 seven days, not a calendar week). Joining and renaming live with it.
 
-### Settings — behind the initials button
-Profile · **Show me around** (the tour) · **The manual** · link to the programme · sync
-status and a *Sync now* button · leaderboard status · dark mode · which habits are
-tracked (plus adding custom ones) · reset today's log.
+**The board is a PANEL** (Amir, 2026-08-01: *"i like this design of the leaderboard
+better"*). One tinted frame — `.lbwrap` — carrying its own heading (*Leaderboard* ·
+*resets with the season*), its own scope switch and its own rows, so the standings read
+as a thing you have opened rather than as the rest of the screen continuing. Each row is
+a card: **🥇🥈🥉 for the top three** and a plain number below, the same tinted initial
+disc the wall uses, the name, a sub-line, and the score hard right in teal. Your own row
+is filled in accent and carries **`N behind <name>`** — the gap to the person directly
+above, which is the only distance you can close. It closes with the rule it runs on:
+*XP only counts when the day is logged — nobody climbs this board from the sofa.*
 
-Deliberately *not* here: coach volume, motivation display, and — since this redesign —
-**the ladder**, which used to be its own row. Tapping your rank goes straight to the
-Locker now (see below), so a Settings row pointing at the same place was a second door
+⚠️ **The per-row bar is gone.** With ten rows it drew ten different lengths of the fact
+the number beside it already stated, and the number is what people read.
+
+⚠️ **The sub-line splits by who it is about, for the same reason the wall's chips do.**
+Yours reads `🔥 3 · 5/7 days on target`, computed live from the log on this device;
+everyone else's reads their **rank** (and title plate), because `leaderboard_top()`
+returns `pos · display_name · title · xp · level · rank_label` and no streak. Teaching
+that RPC to return a streak and a days-on-target count is the one change that would give
+every row the same line — until then the app does not invent numbers it cannot know.
+
+### Settings — behind the initials button, and it is a LIST OF DOORS
+Redesigned 2026-08-01 (Amir, with a reference screen: *"i want the habits to be modified
+in its own tab like this … plus a back button needs to be added everywhere that you go
+inside the setting"*). It used to be every control in the app stacked end to end — eight
+sections, the whole habit roster inline, the reset button at the bottom of a very long
+scroll. It is now titled **You**, and it is a profile card plus **three grouped cards**,
+each row a door with an icon tile, a name, a line of explanation and its current value:
+
+| Card | Rows |
+|---|---|
+| — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
+| Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
+| How this works | **The tour** · **The manual — how XP works** · **The long game** (Locker) · **Open your programme** / **See about coaching** |
+| Crew & data | **Crew board** (your board name, or `Not joined`) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed) |
+
+Two rows open **sub-screens** rather than navigating: `UI.sub` is `'habits'` or
+`'appearance'`, nothing else reads it, and `go()` clears it on the way out so leaving
+Settings and coming back always lands on the list.
+
+**Every screen inside the overlay now has a back button** — `‹` on the *left* of the
+header, beside the title, next to the existing `✕` on the right. They are not the same
+control and that is the point: `overlayBack()` goes exactly **one** step (sub-screen →
+the list → wherever you came from) while `✕` still leaves the whole overlay in one tap.
+Before this, from behind a door the only way out was all the way out.
+
+⚠️ **The tour walks through here**, and two of its steps had to learn about the door.
+Step 14 rings `[data-tour="tracked"]` — now inside *Habits & targets* — so it carries
+`before: () => { UI.sub = 'habits' }`; step 15 rings `[data-tour="manual"]`, which is on
+the list the door opens off, so it carries `before: () => { UI.sub = null }`. `before`
+runs ahead of the repaint in `tourShow()`. Without them the tour rings empty space on the
+fourteenth step of a new athlete's first minute. Proven: walked end to end, all 15 steps
+find their target.
+
+Deliberately *not* here: coach volume, motivation display, and — since the 2026-07-30
+redesign — **the ladder**, which used to be its own row. Tapping your rank goes straight
+to the Locker (see below), so a Settings row pointing at the same place was a second door
 to something one tap already reaches. The app has one mode — XP and levels, nudge and
 recap — and doesn't ask athletes to configure it.
 
 > **This used to say "replay onboarding" was deliberately absent too.** That ruling was
-> about the habit *picker*, which decides nothing and is fully editable in the list
-> further down this same screen. It is not about **the tour**, which is the only
-> explanation of what the app's controls do — and an explanation you can see exactly once
-> is worth very little. *Show me around* is the first row in *How this works*.
+> about the habit *picker*, which decides nothing and is fully editable behind *Habits &
+> targets*. It is not about **the tour**, which is the only explanation of what the app's
+> controls do — and an explanation you can see exactly once is worth very little.
+> *The tour* is the first row in the second card.
 
 ### The rank ladder lives on the Locker's road now
 It used to be its own screen, reached by tapping your rank; that screen is **gone**
@@ -660,7 +761,7 @@ nothing anywhere pointing at it.
 The tour is a clay box drawn around the thing being named, a card beside it saying what
 that thing does, and everything else dimmed. **15 steps**, about a minute, across Today,
 Progress, Crew and Settings. It runs straight off *Start tracking*, and it is replayable
-for ever from **Settings → How this works → Show me around** and from the manual's new
+for ever from **Settings → The tour** and from the manual's new
 **Start here** section.
 
 `TOUR`, `tourSteps()`, `startTour()`, `tourShow()`, `tourTap()` and `paintTour()` in
