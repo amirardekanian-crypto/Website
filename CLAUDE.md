@@ -43,9 +43,11 @@ next chat will be working from a lie:
    does and the tour is actively lying, on the first screen a new athlete sees.
 
 **The tour is the first run.** *Start tracking* on the onboarding screen goes straight
-into it; it is replayable for ever from **Settings → How this works → Show me around**
+into it; it is replayable for ever from **Settings → The tour**
 and from the manual's **Start here** section, and `CFG.toured` defaults to false for
-existing athletes so they get the offer once too. It lives in its own `<div id="tour">`
+existing athletes so they get the offer once too. ⚠️ Two of its steps now open and close
+a **Settings sub-screen** in their `before` hook (the habit roster moved behind *Habits &
+targets*) — see the Settings section of `HABITS.md`. It lives in its own `<div id="tour">`
 **outside `#app`** — `render()` morphs `#app` against the template and would delete it —
 and its dimmer is four mask panes with a **real hole**, not a transparent lid, so a step
 marked `act` can be completed by actually doing the thing. Full detail in `HABITS.md`.
@@ -54,6 +56,24 @@ marked `act` can be completed by actually doing the thing. Full detail in `HABIT
 2026-07-29, promoted the reward track from a row inside Progress to its own tab). Settings
 is still **not** a tab — it lives behind the athlete's initials at the top-right of the
 header, and that same button becomes the way out of Settings and the manual.
+**Settings is a list of doors now** (Amir, 2026-08-01): a profile card and three grouped
+cards, with the habit roster and the appearance switches behind their own sub-screens
+(`UI.sub`). Every overlay screen carries a **back chevron on the left of the header** —
+`overlayBack()` goes exactly one step, while the `✕` on the right still leaves the whole
+overlay in one tap. Full account in `HABITS.md`.
+
+**The five screens Amir picked out are PANELS** (2026-08-01, from reference screens he
+sent): Today opens on a **hero card** that carries the level, the streak tile and a
+seven-day report inside one card; the roll-call composer is an inverted dark card and
+every line on the wall is its own card with **achievement chips** under it; the
+leaderboard is a framed panel of row-cards with medals for the top three; and counted
+habits (water, protein, steps, sleep) draw a **segmented meter — one pip per `step`** —
+rather than a straight bar. The palette, type and tokens are unchanged (the MEADOW skin);
+this is layout only. ⚠️ Two of those carry a real data limit: **your own** streak and
+days-on-target are computed from the log on this device, and nobody else's are, because
+neither `roll_call()` nor `leaderboard_top()` returns them. The client reads `r.streak`
+first and falls back to the local calculation, so teaching either RPC to return one is
+all it would take — see `HABITS.md`. Do not fill the gap by inventing a number.
 **CREW holds the entire social layer**: the roll-call composer, the wall, the leaderboard
 and joining/renaming. It opens on Roll Call, with the leaderboard as the second view.
 Today keeps a one-line *pointer* to Crew (not a second composer) that disappears once the
