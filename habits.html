@@ -823,7 +823,7 @@
   .rc-say { font-size: 14px; line-height: 1.45; color: var(--ink); }
 
   /* ── The backfill day strip ──────────────────────────────────────────────
-     Four days, today first. Each carries its own completion so you can see at
+     Four days, today on the right. Each carries its own completion so you can see at
      a glance which one you forgot — the whole reason the strip exists. */
   .daystrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
               gap: 6px; padding: 14px 20px 16px; }
@@ -1790,8 +1790,13 @@
   #app .wk-bar { position: relative; width: 100%; height: 30px; border-radius: 11px; background: var(--track); overflow: hidden; }
   #app .wk-bar > i { position: absolute; inset: 0; border-radius: 11px; background: var(--accent); }
   #app .wk-bar.now { background: none; box-shadow: inset 0 0 0 2px var(--accent); }
-  #app .wk-l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; }
-  #app .wk-l.now { color: var(--accent); font-weight: 800; }
+  #app .wk-l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; white-space: nowrap; }
+  /* "Today" is five characters in a cell sized for one, so it drops a step and
+     is allowed to sit over its neighbours' whitespace — they are single letters
+     with room to spare either side. `overflow: visible` on the column is what
+     lets it, and nowrap is what stops it stacking into two lines. */
+  #app .wk-l.now { color: var(--accent); font-weight: 800; font-size: 9.5px; letter-spacing: -.01em; }
+  #app .wk-d { overflow: visible; }
 
   /* ── 2. Settings as grouped cards ── */
   #app .hdleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -1875,11 +1880,7 @@
   #app .rccard.coach .rc-say { color: #F6F4FF; }
   #app .rccard.coach .rchip { background: rgba(246,244,255,.10); color: #CBC6E4; }
   #app .rc-head { display: flex; align-items: center; gap: 10px; }
-  #app .rcav {
-    flex: none; width: 36px; height: 36px; border-radius: 999px;
-    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
-  }
-  #app .rccard .rc-name { flex: 1; min-width: 0; }
+  #app .rccard .rc-name { flex: 1; min-width: 0; font-size: 15px; }
   #app .rccard .rc-meta { border-radius: 999px; background: var(--surface); color: var(--muted); padding: 4px 9px; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
   #app .rccard.coach .rc-meta { background: rgba(246,244,255,.12); color: #CBC6E4; }
   #app .rccard .rc-say { font-size: 14px; line-height: 1.5; }
@@ -1910,7 +1911,6 @@
   #app .lbpos { flex: none; width: 24px; text-align: center; font-size: 15px; font-weight: 800; color: var(--muted-soft); line-height: 1; }
   #app .lbrow.me .lbpos { color: rgba(255,255,255,.75); }
   #app .lbpos.medal { font-size: 19px; }
-  #app .lbav { flex: none; width: 38px; height: 38px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
   #app .lbmid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   #app .lbnm { font-weight: 700; font-size: 15px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #app .lbsub { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 11.5px; line-height: 1.2; color: var(--muted); }
@@ -2064,30 +2064,11 @@ function habitHue(h) {
   let n = 0; for (const ch of String(h.id)) n = (n * 31 + ch.codePointAt(0)) >>> 0;
   return HUE_CYCLE[n % HUE_CYCLE.length];
 }
-// ── People, as discs ──────────────────────────────────────────────────────
-// The wall and the board are lists of names, and a list of names reads as a
-// spreadsheet. A tinted initial disc gives each athlete something to recognise
-// before they read anything — and it is derived from the display name, so it is
-// stable for ever without the server storing a single extra byte. Same palette
-// as the habits, so nobody arrives wearing a colour the app does not own.
-const PERSON_HUES = [
-  ['#EFECFB', '#6C5CE7'], ['#FFE9DF', '#D65A26'], ['#E3ECFD', '#3565C4'],
-  ['#FDF1DA', '#A87516'], ['#DFF4FA', '#1E8AA3'], ['#F6E8FA', '#8E43AC'],
-  ['#FCE7EF', '#C2456F'], ['#EDF6DC', '#5A8A1F']
-];
-function personHue(name) {
-  let n = 0; for (const ch of String(name || '?')) n = (n * 31 + ch.codePointAt(0)) >>> 0;
-  return PERSON_HUES[n % PERSON_HUES.length];
-}
-function personInitials(name) {
-  return String(name || '?').trim().split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '?';
-}
-// `cls` is .rcav or .lbav — one function, two sizes, so a person never wears
-// two different discs on two screens.
-function avatar(name, cls) {
-  const c = personHue(name);
-  return `<span class="${cls}" aria-hidden="true" style="background:${c[0]};color:${c[1]}">${esc(personInitials(name))}</span>`;
-}
+// ⚠️ NO AVATARS IN CREW (Amir, 2026-08-01: "in crew remove the circle with
+// peoples initials"). The wall and the board carried a tinted initial disc per
+// athlete; both are now name-first. Do not put them back — the only initials
+// left in the app are the athlete's OWN, on the header button and the Settings
+// profile card, and those identify the door rather than a person on a list.
 
 // Habit names carry their own emoji ('💧 Drink 8 glasses'); the tile shows it
 // and the row label drops it. Falls back to the two-letter code for any name
@@ -2827,9 +2808,13 @@ function oldestLoggable() { return fmtKey(addDays(today(), -BACKFILL_DAYS)); }
 function canLog(dayKey) { return !!dayKey && dayKey <= TKEY() && dayKey >= oldestLoggable(); }
 const AKEY = () => (canLog(UI.day) ? UI.day : TKEY());   // the day being edited
 function editingPast() { return AKEY() !== TKEY(); }
+// OLDEST FIRST, TODAY ON THE RIGHT (Amir, 2026-08-01). It ran today-first, which
+// put the day you are almost always logging at the far left and made the strip
+// read backwards against every other week in the app — the hero's seven-day row,
+// the heat map and the 35-day grid all run left-to-right into now.
 function editableDays() {
   const out = [];
-  for (let i = 0; i <= BACKFILL_DAYS; i++) out.push(fmtKey(addDays(today(), -i)));
+  for (let i = BACKFILL_DAYS; i >= 0; i--) out.push(fmtKey(addDays(today(), -i)));
   return out;
 }
 function dayShort(k) {
@@ -4287,13 +4272,30 @@ const NOTE_MAX = 200;
 const RC = { rows:[], loading:false, error:null, loaded:false };
 let _notePctTimer = null;
 
+// ── THE WALL IS SEVEN DAYS, AND ONLY SEVEN ────────────────────────────────
+// Amir, 2026-08-01: "only the messages from member for the last 7 days should be
+// shown, anything before that shouldnt be saved." Today plus the six days behind
+// it — the same span as the hero's week — and nothing older is kept anywhere.
+//
+// It is enforced in THREE places on purpose, because each one owns a different
+// copy and any one of them alone leaves stale lines somewhere:
+//   1. `rollFloor()`      — what the client will draw, whatever the RPC returns.
+//   2. `setMyNote()`      — the local mirror of your own lines (was 14 days).
+//   3. `supabase/stage21_roll_call_retention.sql` — the SERVER's copy, which is
+//      the only one that makes "shouldn't be saved" literally true. ⚠️ NOT YET
+//      APPLIED — it deletes rows, so Amir runs it in the SQL editor himself.
+//      Until he does, the wall SHOWS seven days and the server still HOLDS more.
+const ROLL_DAYS = 7;
+function rollFloor() { return fmtKey(addDays(today(), -(ROLL_DAYS - 1))); }
+
 function myNote(k) { return (CFG.notes && CFG.notes[k]) || ''; }
 // A local mirror of what is on the wall, so your own line survives a reload and
-// shows up offline. Pruned to the fortnight — it is a cache, not an archive.
+// shows up offline. It is a cache of the wall, so it keeps exactly what the wall
+// keeps — no more.
 function setMyNote(k, body) {
   const next = Object.assign({}, CFG.notes || {});
   if (body) next[k] = body; else delete next[k];
-  const floor = fmtKey(addDays(today(), -14));
+  const floor = rollFloor();
   Object.keys(next).forEach(d => { if (d < floor) delete next[d]; });
   CFG.notes = next;
   saveCfg();
@@ -4345,10 +4347,16 @@ async function fetchRollCall() {
     const sb = _sb();
     if (!sb) throw new Error('offline');
     const { data, error } = await sb.rpc('roll_call', {
-      p_athlete_id: ATHLETE_ID, p_key: KEY, p_days: 7
+      p_athlete_id: ATHLETE_ID, p_key: KEY, p_days: ROLL_DAYS
     });
     if (error) throw error;
-    RC.rows = data || [];
+    // ⚠️ FILTERED AGAIN HERE, and not redundantly. roll_call() computes its own
+    // floor as `current_date - p_days`, which is today plus SEVEN days back —
+    // eight days, not seven — and it uses the SERVER's date, which is not the
+    // athlete's local one. This is the client's own week, on the client's own
+    // clock, and it is the same span the hero card draws.
+    const floor = rollFloor();
+    RC.rows = (data || []).filter(r => String(r.day) >= floor);
     RC.error = null;
   } catch (e) {
     const msg = String((e && e.message) || e);
@@ -5783,7 +5791,11 @@ function weekReport() {
     const fill = p > 0 ? (0.22 + 0.78 * p / 100).toFixed(2) : '0';
     out += `<div class="wk-d">
       <span class="wk-bar ${now ? 'now' : ''}" title="${esc(dayLong(k))}${pre ? '' : ' · ' + p + '%'}"><i style="opacity:${fill}"></i></span>
-      <span class="wk-l ${now ? 'now' : ''}">${esc(d.toLocaleDateString('en-GB', { weekday: 'narrow' }))}</span>
+      <!-- Today is named, not lettered (Amir, 2026-08-01). A single "S" under
+           the outlined cell made the athlete decode which end was now from the
+           outline alone; the word says it outright, and it is the only cell that
+           needs to be read rather than scanned. -->
+      <span class="wk-l ${now ? 'now' : ''}">${now ? 'Today' : esc(d.toLocaleDateString('en-GB', { weekday: 'narrow' }))}</span>
     </div>`;
   }
   return `<div class="weekrep" data-k="weekrep">
@@ -5886,7 +5898,7 @@ function habitRow(h, from, lead, pausedThen) {
 }
 
 // ── Today ─────────────────────────────────────────────────────────────────
-// Four days, today first. The nudge and the at-risk warning are statements
+// Four days, today on the RIGHT. The nudge and the at-risk warning are statements
 // about now, so they stand down while you are filling in an earlier day —
 // "drink three more glasses" is nonsense advice about last Saturday.
 function dayStrip() {
@@ -6749,7 +6761,6 @@ function rollLine(r, i) {
       data-k="rc:${esc(r.day)}:${esc(String(r.display_name))}"
       style="animation-delay:${(Math.min(i, 12) * 0.04).toFixed(2)}s">
     <div class="rc-head">
-      ${avatar(r.is_coach ? 'AMIR' : (r.display_name || '?'), 'rcav')}
       <span class="rc-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</span>
       ${r.is_coach ? '<span class="rc-meta">YOUR COACH</span>' : ''}
     </div>
@@ -6789,7 +6800,6 @@ function boardRow(r, ahead, i) {
   return `<div class="lbrow ${r.is_me ? 'me' : ''}" data-k="brow:${esc(String(r.display_name || r.pos))}"
     style="animation-delay:${((i || 0) * 0.05).toFixed(2)}s">
     <span class="lbpos ${r.pos <= 3 ? 'medal' : ''}">${r.pos <= 3 ? MEDALS[r.pos - 1] : r.pos}</span>
-    ${avatar(r.display_name || '?', 'lbav')}
     <span class="lbmid">
       <span class="lbnm">${esc(r.is_me ? 'You' : r.display_name)}</span>
       <span class="lbsub">
