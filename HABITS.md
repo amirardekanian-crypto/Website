@@ -163,7 +163,12 @@ The screen they actually live on. **In this order, and the order is the point:**
    is constant on purpose — a bar chart of seven days invites reading the tallest as a
    win, and these are percentages of different-sized days, not a race. Days before the
    athlete's first log are drawn empty rather than at 0%, the same rule the day strip and
-   the heat map follow.
+   the heat map follow. Six cells are captioned with a **narrow weekday letter** and the
+   seventh reads **"Today"** in full (Amir, 2026-08-01) — a single `S` under the outlined
+   cell made the athlete decode which end was now from the outline alone. It is the one
+   caption meant to be *read* rather than scanned, so it drops to 9.5px and is allowed to
+   bleed into its neighbours' whitespace (`overflow: visible` on `.wk-d`, `nowrap` on the
+   label). Measured: 26.8px in a 23.1px cell at **320px**, no wrap, well inside the card.
    ⚠️ The block at the bottom of Today is no longer headed *"The last seven days"* — with
    the hero opening on a seven-day row, two headings naming the same span read as one
    section printed twice. It is **"Your week, habit by habit"**: the hero answers *how
@@ -185,8 +190,12 @@ The screen they actually live on. **In this order, and the order is the point:**
    on the screen whose own layout note says anything added goes below the habit list. The
    flame costs no vertical space at all. Progress carries the same flame inside its stat
    grid, so the day streak is one of its four facts again.
-3. **The day strip** — four chips (`TODAY · SAT · FRI · THU`), each showing that day's
+3. **The day strip** — four chips (`THU · FRI · SAT · TODAY`), each showing that day's
    completion, that choose **which day you are logging**. See *The backfill window* below.
+   ⚠️ **Oldest on the left, today on the RIGHT** (Amir, 2026-08-01). It ran today-first,
+   which put the day you are almost always logging at the far left and made the strip read
+   backwards against every other week in the app — the hero's seven-day row, the heat map
+   and the 35-day grid all run left-to-right *into* now. `editableDays()` owns the order.
 4. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
    Only counter habits carry a meter; on a check-off habit it could only ever read 0% or
@@ -494,9 +503,43 @@ card"*). Writing and reading are the two halves of this screen and they used to 
 the same way, so the box you type in was the first of nine identical rows. `.rccomp` is
 inverted (`--ink-card`) with a translucent field and a **`62% day rides along · 58/200`**
 meter beside *Post it →* — your day travels with the line, and that is the one thing an
-athlete was never told before posting. Each line is an `.rccard`: a **tinted initial
-disc** (`avatar()`, hue derived from the display name, so it is stable for ever without
-the server storing a byte), the name, the sentence, and **achievement chips underneath**.
+athlete was never told before posting. Each line is an `.rccard`: the name, the sentence,
+and **achievement chips underneath**.
+
+⚠️ **No avatars in CREW** (Amir, same day: *"in crew remove the circle with peoples
+initials"*). Both the wall and the board briefly carried a tinted initial disc per
+athlete; both are name-first now, and `avatar()`/`personHue()` are deleted rather than
+left unused. The only initials still in the app are the athlete's **own** — the header
+button and the Settings profile card — and those identify a door, not a person on a list.
+
+### The wall is SEVEN DAYS, and nothing older is kept
+Amir, 2026-08-01: *"only the messages from member for the last 7 days should be shown,
+anything before that shouldnt be saved."* Today plus the six days behind it — the same
+span the hero card draws. It is enforced in **three** places, each owning a different
+copy, and any one alone leaves stale lines somewhere:
+
+| # | Where | What it governs |
+|---|---|---|
+| 1 | `ROLL_DAYS` / `rollFloor()` in `fetchRollCall()` | What the client will **draw**, whatever the RPC returns |
+| 2 | `setMyNote()` | The local mirror of your **own** lines (was 14 days) |
+| 3 | `supabase/stage21_roll_call_retention.sql` | The **server's** copy — the only one that makes "shouldn't be saved" true |
+
+⚠️ **Stage 21 is NOT applied.** It deletes rows from `hab_notes`, so Amir runs it in the
+SQL editor himself; until he does, the wall *shows* seven days and the server still
+*holds* more. It adds a `purge_old_notes()` function and a **statement-level AFTER
+trigger** on insert/update, so the table sweeps itself on ordinary traffic — no cron.
+
+⚠️ **The client floor is 7 days and the server floor is 9, and they must not be
+"tidied" to match.** `hab_notes.day` is the athlete's LOCAL day (that is why
+`set_day_note()` accepts up to `current_date + 1`); Tehran rolls over eight and a half
+hours before UTC and Los Angeles seven hours after. A server floor of `current_date - 6`
+would delete a line still inside somebody's own week on the far side of the date line.
+So: **the client is the display authority** (exactly 7, local clock) and **the server is
+the retention authority** (9, with two days of timezone slack).
+
+The client filters again after the RPC returns, and that is not redundant: `roll_call()`
+computes `current_date - p_days`, which is today plus seven days back — **eight** days —
+on the **server's** date.
 
 ⚠️ **`--ink-card` goes DARKER than `--card` in dark mode, not lighter.** At `#201B3D`
 against a `#282250` card the two were eight points apart and the one card on the wall
@@ -628,9 +671,9 @@ seven days, not a calendar week). Joining and renaming live with it.
 better"*). One tinted frame — `.lbwrap` — carrying its own heading (*Leaderboard* ·
 *resets with the season*), its own scope switch and its own rows, so the standings read
 as a thing you have opened rather than as the rest of the screen continuing. Each row is
-a card: **🥇🥈🥉 for the top three** and a plain number below, the same tinted initial
-disc the wall uses, the name, a sub-line, and the score hard right in teal. Your own row
-is filled in accent and carries **`N behind <name>`** — the gap to the person directly
+a card: **🥇🥈🥉 for the top three** and a plain number below, the name, a sub-line, and
+the score hard right in teal. Your own row is filled in accent and carries
+**`N behind <name>`** — the gap to the person directly
 above, which is the only distance you can close. It closes with the rule it runs on:
 *XP only counts when the day is logged — nobody climbs this board from the sofa.*
 
