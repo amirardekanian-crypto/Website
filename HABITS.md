@@ -768,30 +768,42 @@ poking out above Rookie. Verified: max on-screen gap is 1px (subpixel rounding) 
 level tested, in both themes, with the icon columns pixel-aligned at a single x the whole
 way down.
 
-**The current rank carries a "you are here" panel — the next LEVEL, then the next rank**
-(Amir, 2026-08-01, at level 4: *"this is what it shows, it should show that im in the way
-to level 5 and contender"*). The road lists ranks and rewards, and rewards are two to five
-levels apart, so between them it had nothing to say: a level-4 athlete 76 XP from level 5
-was told only that CONTENDER was 806 XP away and that a skin waited at level 6. The next
-level is the step you can actually take today; the rank is what the step is for. Under the
-current rank's pips (with the level you are standing on now ringed, `.pips i.now`, so four
-filled pips no longer read as "rank nearly finished" without saying which one is live) sits
-one panel: **`LEVEL n → n+1`** with the XP left, the within-level bar (`LI.pct`, the same
-number the Today hero's ring draws), and then the rank line — *"Then CONTENDER at level 6 —
-806 XP away."*, or *"Level 6 makes you CONTENDER."* when the next level **is** the rank-up.
-The rank named there comes from `rankFor(rankTop + 1)`, not `RANKS[i + 1]`, so past level 50
-it promises **★1 ROOKIE** rather than plain ROOKIE; the tier line's level range gained the
-same star offset the row's XP figure already had (a ★1 athlete's Rookie row said "Levels
-1–5" beside "at level 56"). `roadIconCol()` gained a `topPx` argument for this row only —
-the panel makes it tall enough that a truly centred crest floats far below the rank name it
-belongs to; the bottom segment stays `flex:1`, so the line is still unbroken.
+### Every level is a node — the road reads like a battle pass
 
-**The NEXT reward's bar measures the leg, not the climb.** It was `LI.xp / cumXpTo(next.lv)`
-— progress from *zero XP ever* — which showed the level-4 athlete above a bar **70% full**
-while the caption beside it said 806 XP to go, and would have shown ~85% to a level-25
-athlete with two months of work left before the level-39 card. It is anchored to the reward
-below it now (`legFrom`), so it reads 41%, and it resets only when a reward is actually
-collected — levelling up inside a leg pushes it forward instead of throwing it back.
+Amir, 2026-08-01, at level 4: *"look the box highlighted as my next objective, my objective
+is level 5 first and not level 6 … i dont want any explanation of how many xp i need for
+next achievement or level, i have them on today's tab. I just wanna know where im standing
+regarding the next achievements (what i will unlock later). This is like league of legends
+battlepass."* Two separate faults, both fixed by the same rewrite.
+
+**The ring was on the next REWARD, not the next level.** The road listed only the 10 ranks
+and the 14 rewards, and rewards are two to five levels apart — so the one highlighted box on
+the screen was EMBER at level 6 while he stood on level 4, and level 5, the single step he
+could actually take, was not drawn anywhere. **Every level from 1 to `LEVELS_PER_CYCLE` is a
+row now.** Levels that pay something carry it; levels that pay nothing are a small numbered
+bead on the line, which is what makes the distance to the next reward legible without
+printing a number. Four states, from `lvIn` (position inside the current star cycle, so this
+survives prestige): **done** · **here** (accent node, ringed, *YOU ARE HERE* — the only place
+those words appear) · **next** (`lvIn + 1`, the **only** ringed box on the road) · **later**.
+On the last level of a cycle the next step is off the end of the list, so level 51 is drawn
+anyway — there is always exactly one next objective.
+
+**No XP anywhere on this screen.** The Today hero owns the arithmetic (`LI.nextLabel`, "76 XP
+to level 5") and the Locker owns the position. Gone: the rank rows' cumulative cost, the
+next card's *"806 XP — about 2 good days"*, and the whole level panel that shipped earlier the
+same day. What the NEXT box says instead is what the level **hands over** — `paysAt(n)` names
+the rank and the reward together (level 6 is CONTENDER *and* the Ember skin), and when the
+next level pays nothing it looks ahead: *"Then CONTENDER and EMBER skin at level 6."* Its bar
+carries no label on purpose — position, not a second copy of the count.
+
+Two things `paysAt()` gets right that are easy to miss: a reward **already owned is not a
+promise** (a season reset drops levels to 1 and keeps the shelf, so the climb back up passes
+titles the athlete has been wearing for months — ranks are never filtered, those genuinely
+reset), and the rank it names comes from `rankFor()`, so past level 50 it promises **★1
+ROOKIE** rather than plain ROOKIE. The wire follows the **climb**, not the shelf: a KEPT
+reward above the current position keeps its teal tick but the line into it stays `var(--track)`.
+The rank headers lost their pips — the level nodes are the pips now — and their level range
+carries the star offset its XP figure used to have.
 
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
