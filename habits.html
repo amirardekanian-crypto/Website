@@ -45,7 +45,7 @@
     document.head.appendChild(link);
   })();
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   /* ── Tokens ────────────────────────────────────────────────────────────
@@ -147,7 +147,7 @@
   .loading.hidden { opacity: 0; pointer-events: none; }
   .errmark { font-size: 15px; letter-spacing: .22em; color: var(--accent); margin-bottom: 22px; }
   .errhint { margin-top: 22px; font-size: 11px; line-height: 1.6; color: var(--muted-soft); }
-  .errhint code { font-family: 'Space Mono', monospace; font-size: 10px; }
+  .errhint code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; }
   .spinner { width: 38px; height: 38px; border: 3px solid var(--track); border-top-color: var(--accent); animation: spin .8s linear infinite; }
   .errscreen { display: none; z-index: 9998; }
   .errscreen.on { display: flex; }
@@ -1221,8 +1221,16 @@
   #app .apphd { border-bottom: 0; padding-bottom: 8px; }
   #app .apphd .title { font-weight: 700; letter-spacing: -0.01em; }
   #app .apphd .right { color: var(--muted-soft); font-weight: 700; letter-spacing: 0.04em; }
+  /* Zero padding + no background = a no-op wherever no inline conic-gradient is
+     set (every screen but Today), so `.hdme` sits exactly where it always has. */
+  #app .hdmewrap { display: flex; border-radius: 999px; padding: 3px; transition: background .3s; }
   #app .hdme { border-radius: 999px; color: #fff; box-shadow: 0 3px 0 var(--accent-700); }
-  #app .hdme.closing { border-radius: 999px; border: 2px solid var(--box); background: var(--card); box-shadow: var(--shadow); }
+  /* `color` added: #app .hdme{color:#fff} (1 id + 1 class) beats this rule's
+     unset color property via the cascade even though .closing is MORE specific
+     — a more specific rule only wins the properties it actually sets. Without
+     this line the ✕ that closes Settings/Manual/habit-history rendered white
+     text on the light MEADOW card: invisible. */
+  #app .hdme.closing { border-radius: 999px; border: 2px solid var(--box); background: var(--card); box-shadow: var(--shadow); color: var(--muted); }
   #app .block { border-bottom: 1px solid var(--rule); }
 
   /* Bars & tracks */
@@ -1245,7 +1253,9 @@
 
   /* Habit rows → cards */
   #app .hrow { margin: 0 16px 10px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; }
-  #app .hrow.done { background: var(--card); }
+  /* A subtle teal ring so "done" reads at a glance, not just from the small
+     checkmark badge in the corner. */
+  #app .hrow.done { background: var(--card); box-shadow: var(--shadow), 0 0 0 1.5px rgba(53,208,186,.4); }
   #app .hrow .checkcell { width: 64px; border-right: 0; padding-left: 10px; }
   #app .htile {
     position: relative; width: 44px; height: 44px; border-radius: 15px;
@@ -1304,7 +1314,9 @@
   /* Coach card → dark ink card */
   #app .coachcard { margin: 14px 16px; border-radius: 22px; background: #231F35; color: #F6F4FF; border-bottom: 0; padding: 16px; }
   #app .coachcard .eyebrow { color: #A9A3C9; opacity: 1; }
-  #app .coachcard .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 17.5px; line-height: 1.32; letter-spacing: 0; text-transform: none; min-height: 4.1em; }
+  /* ~4 lines reserved was mostly-empty card for a short nudge; ~2 lines still
+     stops the card resizing on every tick without making short copy look lost. */
+  #app .coachcard .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 17.5px; line-height: 1.32; letter-spacing: 0; text-transform: none; min-height: 2.7em; }
   #app .coachcard .cta { background: var(--accent); color: #fff; border-radius: 999px; padding: 11px 16px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0; text-transform: none; box-shadow: 0 3px 0 var(--accent-700); }
   #app .coachcard.risk { background: #C74E28; }
   #app .coachcard.risk .eyebrow { color: rgba(255,246,241,0.75); }
@@ -1358,7 +1370,12 @@
   #app .heat .hd-lbl { font-family: 'Outfit', sans-serif; font-weight: 600; }
   #app .heat .hd-lbl.now { color: var(--accent); }
   #app .gridkey .gk .c { border-radius: 3px; }
-  #app .pips i, #app .subs i { border-radius: 4px; }
+  /* Split from a shared rule: consistency-tier pips are dots now, matching
+     every other dot/pill in MEADOW. `.subs i` keeps square here on purpose —
+     `.rankrow .subs i` (below) turns it into the intentionally diamond-shaped
+     sub-level tick, and a diamond needs a starting square, not a starting dot. */
+  #app .pips i { border-radius: 999px; }
+  #app .subs i { border-radius: 4px; }
 
   /* Event / quest cards */
   #app .evcard { border: 0; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); overflow: hidden; }
@@ -2464,12 +2481,17 @@ function achMedal(a, got) {
   const h = part[1] ? habitById(part[1]) : null;
   const emo = h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨');
   const tint = h ? habitHue(h)[1] : '#EFECFB';
-  if (!got) return '<span class="medal" style="border:2.5px dashed var(--box);background:var(--surface)"><span class="medal-in" style="filter:grayscale(1);opacity:.5">' + emo + '</span></span>';
+  // Not-yet-earned reads as DIMMED, not broken — the same convention the
+  // Locker's road already uses for locked rewards (.rart.lockd): keep the real
+  // metal-rim gradient and habit hue, just at opacity .4. A fully desaturated,
+  // dashed-border grey disc reads as "something went wrong here", not "you
+  // haven't got this yet".
+  if (!got) return '<span class="medal" style="background:' + METALS[key].rim + ';opacity:.4"><span class="medal-in" style="background:' + tint + '">' + emo + '</span></span>';
   return '<span class="medal" style="background:' + METALS[key].rim + '"><span class="medal-in" style="background:' + tint + '">' + emo + '</span></span>';
 }
 function evMedal(ev, got) {
   const emo = EV_EMOJI[ev.id] || '🏆';
-  if (!got) return '<span class="medal" style="border:2.5px dashed var(--box);background:var(--surface)"><span class="medal-in" style="filter:grayscale(1);opacity:.5">' + emo + '</span></span>';
+  if (!got) return '<span class="medal" style="background:' + METALS.prisma.rim + ';opacity:.4"><span class="medal-in" style="background:#231F35">' + emo + '</span></span>';
   return '<span class="medal" style="background:' + METALS.prisma.rim + '"><span class="medal-in" style="background:#231F35">' + emo + '</span></span>';
 }
 // The leaderboard hands back a rendered label ("GRINDER 2", "★1 ROOKIE 1"), so
@@ -4546,7 +4568,8 @@ function render() {
   // repaint can move it. Re-measuring here is what keeps the box on its target
   // through a tick, a screen change or a celebration opening and closing.
   if (TOUR.on) paintTour();
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#0F1A15' : '#FAF7F2');
+  // MEADOW's real --bg values, not the brutalist palette this line predates.
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#17142B' : '#F6F4FF');
 }
 
 // ── Numbers that count ────────────────────────────────────────────────────
@@ -5465,7 +5488,9 @@ function renderApp() {
             : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
   };
   const rights = {
-    today: pct + '% DONE', progress: '',   // the stat grid states the badge count
+    // The "68% DONE" text label moved onto the avatar itself — see .hdmewrap
+    // below — so it is not said twice in the same header.
+    today: '', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
                      return s > 0 ? s + '-DAY STREAK' : ''; })(),
     crew: (() => {
@@ -5526,12 +5551,20 @@ function renderApp() {
         <!-- One control, two states, always in the same place: your initials
              open Settings from anywhere, and become the way out of Settings,
              the manual and the ladder — none of which is a tab any more, so
-             none of them has a tab to press to leave. -->
-        <button class="hdme ${OVERLAY ? 'closing' : ''}" data-k="hdme"
-          aria-label="${OVERLAY ? 'Close' : 'Settings'}"
-          ${on(() => (OVERLAY ? go(UI.backTo || 'today') : (UI.backTo = UI.screen, go('settings'))))}>
-          ${OVERLAY ? '&#10005;' : esc(initials)}
-        </button>
+             none of them has a tab to press to leave.
+             ON TODAY, the avatar also wears the day's completion as a ring —
+             replaces the separate "68% DONE" text label the header used to
+             carry next to it, so the same fact is not said twice. Everywhere
+             else .hdmewrap's inline style is the empty string, which the CSS
+             rule makes a zero-padding, background-none no-op. -->
+        <span class="hdmewrap" style="${UI.screen === 'today' && !OVERLAY ? 'background:conic-gradient(var(--accent) ' + pct + '%, var(--track) 0)' : ''}"
+          ${UI.screen === 'today' && !OVERLAY ? 'aria-label="' + pct + '% of today logged"' : ''}>
+          <button class="hdme ${OVERLAY ? 'closing' : ''}" data-k="hdme"
+            aria-label="${OVERLAY ? 'Close' : 'Settings'}"
+            ${on(() => (OVERLAY ? go(UI.backTo || 'today') : (UI.backTo = UI.screen, go('settings'))))}>
+            ${OVERLAY ? '&#10005;' : esc(initials)}
+          </button>
+        </span>
       </div>
     </div>
     <div class="scroll" id="scroll" data-k="scroll">${screenHtml}</div>
@@ -5550,7 +5583,12 @@ function renderApp() {
 }
 function greeting() {
   const h = new Date().getHours();
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const base = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  // ATHLETE_NAME is not resolved until the athlete record loads, so this falls
+  // back to the bare greeting rather than printing "Good morning, undefined"
+  // on the frame or two before boot finishes.
+  const first = (ATHLETE_NAME || '').trim().split(/\s+/)[0];
+  return first ? base + ', ' + first : base;
 }
 
 // ── Level-up takeover ─────────────────────────────────────────────────────
@@ -6128,7 +6166,10 @@ function renderToday(LI, doneCount, pct) {
               ? 'New: a minute on what every button in here actually does.'
               : 'Want the one-minute tour of what everything does?'}</span>
           </span>
-          <span class="hd" style="font-size:19px;color:var(--clay-deep);flex:none">→</span>
+          <!-- Purple, not clay: clay/orange is reserved for streak & urgency
+               (embers, risk banners) elsewhere in the app; purple is the
+               "this leads somewhere" affordance everywhere else a row navigates. -->
+          <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
         </button>`}
 
       <!-- A pointer, not a second copy. The compose box itself lives in CREW
@@ -6141,7 +6182,10 @@ function renderToday(LI, doneCount, pct) {
             <span class="eyebrow">Roll call</span>
             <span class="rcq">${esc(pickLine('prompt', 'rollcall'))}</span>
           </span>
-          <span class="hd" style="font-size:19px;color:var(--clay-deep);flex:none">→</span>
+          <!-- Purple, not clay: clay/orange is reserved for streak & urgency
+               (embers, risk banners) elsewhere in the app; purple is the
+               "this leads somewhere" affordance everywhere else a row navigates. -->
+          <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
         </button>`}
 
       <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
