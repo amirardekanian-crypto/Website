@@ -737,84 +737,66 @@ them. The highest title they own is equipped for them; earning a name and then h
 go and switch it on is a step nobody asks for.
 
 Reached from its own tab, **LOCKER** — the fourth on the main bar (Amir's own redesign,
-2026-07-29, promoted it out from a row inside Progress). It opens on the shareable rank
-card, then a horizontal rail of titles, a rail of card skins, and **the road**: the 10
-ranks and the 14 rewards merged into one scroll (see *The rank ladder lives on the
-Locker's road now*, above) — the only forward-looking screen in the app; everywhere
-else reports the past.
+2026-07-29, promoted it out from a row inside Progress). It reads as a **battle pass**
+(Amir, 2026-08-01, pasting a full redesign: *"this should be the redesign of my locker …
+This is like league of legends battlepass"*): a season hero states where you are and what
+lands next, a loadout shows what you have actually won, and below both a single **track**
+threads every rank gate and reward node on one spine.
 
-**The road is one connected line now, not ten separate rows** (Amir, 2026-07-30: "level
-circles ... and emblems in line with each other. they should actually be connected to
-each other with a vertical bar ... starting from rookie emblem until where we are right
-now"). `roadIconCol()` wraps every rank crest and reward circle in a fixed 34px column
-carrying two line segments, one above the icon and one below; every column shares the
-same width and left edge, so the segments thread into one unbroken bar running the length
-of the whole scroll. The bar is **accent-filled through every node already reached and
-`var(--track)` after** — reached means `passHas(p.id)` for a reward, `here || passed` for
-a rank — so the seam between filled and unfilled sits exactly at the boundary between the
-last thing owned and the next thing coming, which is "where we are right now" without
-needing a second marker to say so: the NEXT reward is already ringed in accent and
-labelled, right at that seam.
+**Getting there took three shapes in one day**, each one fixing what the last one got
+wrong, worth keeping straight because the same mistakes are easy to reintroduce:
 
-Getting the segments to actually meet (no visible break at every rank change) meant
-moving each row's vertical spacing off the row itself — where it was real CSS padding,
-shrinking the flex content box `align-self:stretch` measures against — and onto the
-content span instead, so the icon column's height still equals the full row. The `margin`
-that gave the NEXT card and each rank-row breathing room came off for the same reason: a
-margin sits *outside* the box a sibling's `align-self:stretch` can reach, so it opened a
-gap in the line exactly at the two places most likely to be looked at — the current
-position, and every rank boundary. `hideAbove` on the very first node keeps nothing
-poking out above Rookie. Verified: max on-screen gap is 1px (subpixel rounding) at every
-level tested, in both themes, with the icon columns pixel-aligned at a single x the whole
-way down.
+1. First build: the road listed only the 10 ranks and the 14 rewards. The one highlighted
+   box was always the next *reward* — two to five levels away — so at level 4 the ring sat
+   on EMBER at level 6 and the single step he could actually take, level 5, was not drawn
+   anywhere. *"my objective is level 5 first and not level 6."*
+2. Second build: every level became its own row, and the ring moved to `level + 1` — but
+   only when it wrote out what was coming ("Then CONTENDER and EMBER skin at level 6"),
+   which sat *inside the level-5 box* and read as though level 5 itself were CONTENDER.
+   *"the level 5 is the contender … this is a mess. You dont need to write what happens
+   next at 6, they understand that by looking."*
+3. **The shape that shipped**: position and reward are drawn by two different things, so
+   neither can be mistaken for the other.
 
-### Every level is a node — the road reads like a battle pass
+**The marker (`.trow.mark`, `road-you`) is its own node on the spine**, not a rank band and
+not a reward. It drops into the athlete's current rank's list of rewards at the exact cut
+point — after every reward that rank has already paid, before the ones it has not:
 
-Amir, 2026-08-01, at level 4: *"look the box highlighted as my next objective, my objective
-is level 5 first and not level 6 … i dont want any explanation of how many xp i need for
-next achievement or level, i have them on today's tab. I just wanna know where im standing
-regarding the next achievements (what i will unlock later). This is like league of legends
-battlepass."* Two separate faults, both fixed by the same rewrite.
+```js
+const cut = rw.findIndex(p => p.lv > lv);
+const at = cut < 0 ? rw.length : cut;
+return rw.slice(0, at).map(rewardRow).join('') + youAreHereRow + rw.slice(at).map(rewardRow).join('');
+```
 
-**The ring was on the next REWARD, not the next level.** The road listed only the 10 ranks
-and the 14 rewards, and rewards are two to five levels apart — so the one highlighted box on
-the screen was EMBER at level 6 while he stood on level 4, and level 5, the single step he
-could actually take, was not drawn anywhere. **Every level from 1 to `LEVELS_PER_CYCLE` is a
-row now.** Levels that pay something carry it; levels that pay nothing are a small numbered
-bead on the line, which is what makes the distance to the next reward legible without
-printing a number. Four states, from `lvIn` (position inside the current star cycle, so this
-survives prestige): **done** · **here** · **next** · **later**.
+At level 4 that reads: SIGNED ON (kept) → THE TWENTY-THREE (kept) → **YOU ARE HERE · LEVEL
+4** → CONTENDER (the rank gate) → EMBER (locked, ringed NEXT). CONTENDER opens at level 6;
+the marker sitting on its own pill, above the CONTENDER gate, is what makes it impossible to
+read the rank as something level 4 already reached. The rank band itself says **IN
+PROGRESS** now instead of *YOU ARE HERE* — it used to carry that label before the marker
+existed and would say it again the moment the athlete reached the gate, one rank position
+lying about two different levels.
 
-**At most two rows are ever marked, and usually only one.** `here` is the accent node
-labelled *YOU ARE HERE* — the only place those words appear. `next` is `lvIn + 1`, ringed —
-**but only when that level actually hands something over.** Amir, on the first attempt at
-this: *"if there is no specific achievement for the next level there is no need for high
-light. Just show them where they are."* Level 5 pays nothing, so standing on level 4 there is
-no second box at all; standing on level 5 the ring lands on level 6, which pays CONTENDER and
-the Ember skin. Both marked rows are the **same shape** — node, `Level n`, the reward name if
-there is one, and the tag. On the last level of a cycle the next step is off the end of the
-list, so level 51 is drawn anyway.
+**A reward already owned is never dangled.** `nextReward()` — read by both the Locker and
+the manual's *"Next is X at level Y"* — skips anything `passHas()` already returns true for,
+not just anything past the current level:
+```js
+function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p => p.lv > lv && !passHas(p.id)) || null; }
+```
+A season reset drops levels to 1 and keeps the shelf, so an athlete rebuilding from level 3
+who already owns everything through level 14 must not have the pass hero announce "NEXT ON
+THE PASS: SIGNED ON" for a title they have worn for months. Both call sites get this for
+free from the one function.
 
-**Nothing on the road is explained in prose.** The first build wrote *"Then CONTENDER and
-EMBER skin at level 6."* inside the level-5 box, which read as though level 5 handed over
-CONTENDER — *"the level 5 is the contender … this is a mess. You dont need to write what
-happens next at 6, they understand that by looking."* He is right: the CONTENDER header and
-the Ember row are sitting directly underneath. `paysAt(n)` survives only as the **test** for
-whether `next` deserves a ring, not as a sentence.
+**Reward art is the real thing, not a placeholder.** `art()` draws the actual card ground
+(`CARD_LOOK`) for a skin or a metal nameplate swatch for a title, greyed (`filter:
+grayscale(.5); opacity:.5`) rather than swapped out while locked — a pass tempts by showing
+you the exact thing you have not got, not a generic lock icon standing in for it.
 
-**No XP anywhere on this screen.** The Today hero owns the arithmetic (`LI.nextLabel`, "76 XP
-to level 5") and the Locker owns the position. Gone: the rank rows' cumulative cost, the old
-next card's *"806 XP — about 2 good days"*, and the level panel that shipped earlier the same
-day. No progress bar either — a bar is the count wearing a different hat.
-
-Two things `paysAt()` gets right that are easy to miss: a reward **already owned is not a
-promise** (a season reset drops levels to 1 and keeps the shelf, so the climb back up passes
-titles the athlete has been wearing for months — ranks are never filtered, those genuinely
-reset), and the rank it counts comes from `rankFor()`, so the prestige level rings correctly.
-The wire follows the **climb**, not the shelf: a KEPT reward above the current position keeps
-its teal tick but the line into it stays `var(--track)`. The rank headers lost their pips —
-the level nodes are the pips now — and their level range carries the star offset its XP
-figure used to have.
+**The hero's progress bar measures the current LEG, not the whole climb** — from the last
+reward collected to the next one, so it resets to a fresh 4% the moment a reward is picked
+up rather than crawling from a number that means less every level. `Your loadout` holds only
+what is **owned** (titles and skins both), so the road below stays the only place a locked
+thing is ever listed — nothing appears twice.
 
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
