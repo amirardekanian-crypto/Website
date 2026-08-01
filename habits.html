@@ -783,7 +783,6 @@
   /* ── Roll call ───────────────────────────────────────────────────────────
      The compose box, and the wall it posts to. Flat, square, no bubbles: this
      is a noticeboard, not a chat app. */
-  .notebox { display: flex; flex-direction: column; gap: 10px; }
   /* Today's pointer to the conversation. Quiet on purpose — it is a doorway,
      not a demand, and it disappears the moment the athlete has written. */
   .rcprompt {
@@ -808,30 +807,20 @@
   .noterow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .noterow .mono { font-size: 11px; font-weight: 700; color: var(--muted-soft); }
   .noterow .mono.tight { color: var(--clay-deep); }
-  .notebox .btn[disabled] { opacity: .4; }
+  .rccomp .btn[disabled] { opacity: .4; }
 
   .rcday { display: flex; align-items: baseline; justify-content: space-between;
            padding: 16px 20px 8px; font-family: 'Barlow Condensed', sans-serif;
            font-weight: 900; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
   .rcday .mono { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted-soft); }
-  .rcline { padding: 12px 20px; border-bottom: 1px solid var(--rule);
-            display: flex; flex-direction: column; gap: 5px;
-            animation: riseIn .34s cubic-bezier(.16,1,.3,1) both; }
-  .rcline.me { background: var(--accent-100); }
-  .rcline.coach { border-left: 4px solid var(--clay-deep); }
-  .rc-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  /* One card per voice — `.rccard`, in the panels layer. `.rcline`, the flat
+     bordered row this used to be, is gone; these three are all it left behind
+     and the card still uses every one of them. */
   .rc-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
              font-size: 16px; line-height: 1; }
   .rc-meta { flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
              font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--muted-soft); }
-  /* Sits with the NAME, not with the rank — a title is part of who is talking.
-     Ellipsised because the name beside it is the thing that must never truncate. */
-  .rc-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-              margin-left: 7px; font-size: 11px; font-weight: 900; letter-spacing: .06em;
-              color: var(--clay-deep); }
-  .rcline.coach .rc-meta { color: var(--clay-deep); }
   .rc-say { font-size: 14px; line-height: 1.45; color: var(--ink); }
-  @media (prefers-reduced-motion: reduce) { .rcline { animation: none; } }
 
   /* ── The backfill day strip ──────────────────────────────────────────────
      Four days, today first. Each carries its own completion so you can see at
@@ -1091,8 +1080,7 @@
   }
   @keyframes caretBlink { 0%, 50% { opacity: 1 } 51%, 100% { opacity: 0 } }
 
-  /* Leaderboard rows arrive in order, each with its share of the leader's score. */
-  .brow { animation: riseIn .34s cubic-bezier(.16,1,.3,1) both; }
+  /* Leaderboard rows arrive in order — the entrance lives on `.lbrow` now. */
   /* Movement, not just standing. Green for climbing, muted for slipping — a drop
      is information, not a punishment, so it never gets the accent. */
   .delta { font-size: 9px; font-weight: 700; letter-spacing: .04em; line-height: 1; }
@@ -1528,10 +1516,6 @@
   #app .rcprompt .rcq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.25; }
   #app .noteq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; letter-spacing: 0; }
   #app .rc-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; }
-  #app .rcline.me { background: var(--surface); }
-  #app .rcline.coach { border-left: 4px solid var(--accent); }
-  #app .rcline.coach .rc-meta { color: var(--accent); }
-  #app .rc-title { color: var(--accent); font-family: 'Outfit', sans-serif; }
   #app .rcday { font-family: 'Outfit', sans-serif; font-weight: 700; text-transform: none; letter-spacing: 0.01em; }
   #app .boardday { color: var(--muted-soft); }
 
@@ -1602,6 +1586,194 @@
     0%, 100% { transform: scale(1); box-shadow: inset 0 0 0 2px var(--box); }
     50%      { transform: scale(1.14); box-shadow: inset 0 0 0 2px var(--accent); }
   }
+
+  /* ═══ MEADOW · panels ════════════════════════════════════════════════════
+     The skin above turned rows into cards. This layer turns the five screens
+     Amir picked out into PANELS: a hero card that carries the week, Settings as
+     grouped cards with their own sub-screens, roll call as one card per voice,
+     the board as a standings panel, and counted habits as a segmented meter
+     rather than a straight bar. Same tokens, same type, no new colours. */
+  /* ⚠️ `--ink-card` is the INVERTED surface — the composer and the coach's line.
+     In dark mode it has to go DARKER than `--card` (#282250), not lighter: at
+     #201B3D the two were eight points apart and the one card on the wall that is
+     meant to read as "not one of these" read as one of these. The whole device
+     is contrast against the cards around it, so it inverts with them. */
+  :root { --danger: #C2365B; --danger-100: rgba(194,54,91,0.10); --ink-card: #231F35; }
+  body[data-dark] { --danger: #FF7A9C; --danger-100: rgba(255,122,156,0.14); --ink-card: #100C24; }
+
+  /* ── 1. The hero card, and the week under it ── */
+  #app .hero-lv {
+    margin: 4px 16px 12px; padding: 16px; gap: 14px;
+    border-radius: 24px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0;
+  }
+  #app .hero-top { display: flex; align-items: center; gap: 13px; }
+  #app .hero-lv .lvring { width: 74px; height: 74px; }
+  #app .hero-lv .lvring circle { stroke-width: 4; }
+  #app .hero-lv .lvring .figure { font-size: 26px !important; }
+  #app .herobody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  #app .heroxp { font-size: 12.5px; line-height: 1.25; color: var(--muted); }
+  #app .heroxp b { color: var(--accent); font-weight: 800; }
+  #app .herobar { height: 9px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  #app .herobar > span {
+    display: block; height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-700), var(--accent));
+    transition: width .35s cubic-bezier(.2,.8,.2,1);
+  }
+  /* The streak tile keeps its own colour and sits on the right of the row, so
+     the level and the streak are two objects rather than one crowded lockup. It
+     renders only when there IS a streak — see streakFlame(). */
+  #app .hero-top .dayflame { flex-direction: column; gap: 1px; padding: 9px 13px; border-radius: 18px; text-align: center; }
+  #app .hero-top .dayflame .flame { width: 20px; height: 25px; }
+  #app .hero-top .dayflame .n { font-size: 26px; }
+  #app .hero-top .dayflame .u { line-height: 1.1; }
+
+  #app .weekrep { display: flex; align-items: center; gap: 12px; padding-top: 13px; border-top: 1px solid var(--rule); }
+  #app .weekrep .wk-cap { flex: none; width: 46px; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; color: var(--muted-soft); }
+  #app .weekrep .wk-days { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  #app .wk-d { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+  #app .wk-bar { position: relative; width: 100%; height: 30px; border-radius: 11px; background: var(--track); overflow: hidden; }
+  #app .wk-bar > i { position: absolute; inset: 0; border-radius: 11px; background: var(--accent); }
+  #app .wk-bar.now { background: none; box-shadow: inset 0 0 0 2px var(--accent); }
+  #app .wk-l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; }
+  #app .wk-l.now { color: var(--accent); font-weight: 800; }
+
+  /* ── 2. Settings as grouped cards ── */
+  #app .hdleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  #app .hdback {
+    flex: none; width: 32px; height: 32px; border-radius: 999px;
+    background: var(--card); border: 1.5px solid var(--box); box-shadow: var(--shadow);
+    color: var(--accent); font-size: 17px; font-weight: 800; line-height: 1;
+    display: flex; align-items: center; justify-content: center; padding-bottom: 2px;
+  }
+  #app .hdback:hover { border-color: var(--accent); }
+  #app .profcard {
+    margin: 4px 16px 14px; padding: 15px 16px; border-radius: 22px;
+    background: var(--card); box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 14px; width: auto; text-align: left;
+  }
+  #app .profav {
+    flex: none; width: 56px; height: 56px; border-radius: 999px;
+    background: var(--accent); color: #fff; font-weight: 800; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #app .cardgrp {
+    margin: 0 16px 14px; border-radius: 22px; overflow: hidden;
+    background: var(--card); box-shadow: var(--shadow);
+  }
+  #app .navrow {
+    display: flex; align-items: center; gap: 13px; width: 100%; text-align: left;
+    padding: 13px 15px; border-bottom: 1px solid var(--rule); background: none; color: inherit;
+  }
+  #app .cardgrp > *:last-child, #app .cardgrp > *:last-child.navrow { border-bottom: 0; }
+  #app .navrow:hover { background: var(--surface); }
+  #app .navtile {
+    flex: none; width: 38px; height: 38px; border-radius: 13px; background: var(--surface);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1;
+  }
+  #app .navmid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #app .navnm { font-weight: 700; font-size: 15px; line-height: 1.25; }
+  #app .navsub { font-size: 11.5px; line-height: 1.35; color: var(--muted); }
+  #app .navval { flex: none; font-size: 12.5px; font-weight: 600; color: var(--muted-soft); white-space: nowrap; }
+  #app .navgo { flex: none; font-size: 17px; font-weight: 700; color: var(--box); line-height: 1; }
+  #app .navrow.danger .navtile { background: var(--danger-100); }
+  #app .navrow.danger .navnm { color: var(--danger); }
+  #app .navpill {
+    flex: none; border-radius: 999px; border: 1.5px solid var(--danger); color: var(--danger);
+    background: none; padding: 7px 13px; font-size: 12px; font-weight: 700; line-height: 1;
+  }
+  #app .navrow.armed .navpill { background: var(--danger); color: #fff; }
+  #app .setnote { padding: 0 26px 16px; font-size: 11.5px; line-height: 1.55; color: var(--muted-soft); }
+  #app .setnote strong { color: var(--muted); font-weight: 700; }
+  /* Habit rows inside the Habits & targets sub-screen. */
+  #app .hsrow { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-bottom: 1px solid var(--rule); }
+  #app .hstile { flex: none; width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
+  #app .hslock { flex: none; border-radius: 999px; background: var(--surface); color: var(--muted-soft); padding: 5px 10px; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
+
+  /* ── 3. Roll call: the dark composer, one card per voice ── */
+  #app .rccomp {
+    margin: 0 16px 14px; padding: 16px; border-radius: 24px;
+    background: var(--ink-card); color: #F6F4FF; border-bottom: 0;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  #app .rccomp .eyebrow { color: #A9A3C9; }
+  #app .rccomp .noteq { color: #F6F4FF; }
+  #app .rccomp .input {
+    background: rgba(246,244,255,.07); border: 1.5px solid rgba(246,244,255,.18);
+    color: #F6F4FF; border-radius: 16px; min-height: 64px; padding: 13px 14px; font-size: 14px;
+  }
+  #app .rccomp .input::placeholder { color: rgba(246,244,255,.42); }
+  #app .rccomp .input:focus-visible { border-color: var(--accent); }
+  #app .rccomp .noterow .mono { color: #A9A3C9; font-size: 11.5px; }
+  #app .rccomp .noterow .mono.tight { color: var(--clay); }
+  #app .rccomp .btn-secondary { background: none; border-color: rgba(246,244,255,.28); color: #F6F4FF; }
+  #app .rccomp .setnote { padding: 0; color: rgba(246,244,255,.5); }
+  #app .rccard {
+    margin: 0 16px 10px; padding: 14px 15px; border-radius: 22px;
+    background: var(--card); box-shadow: var(--shadow); border-bottom: 0; border-left: 0;
+    display: flex; flex-direction: column; gap: 10px;
+    animation: riseIn .34s cubic-bezier(.16,1,.3,1) both;
+  }
+  @media (prefers-reduced-motion: reduce) { #app .rccard, #app .lbrow { animation: none; } }
+  #app .rccard.me { background: var(--card); box-shadow: var(--shadow), 0 0 0 2px var(--accent); }
+  #app .rccard.coach { background: var(--ink-card); color: #F6F4FF; box-shadow: var(--shadow); }
+  #app .rccard.coach .rc-say { color: #F6F4FF; }
+  #app .rccard.coach .rchip { background: rgba(246,244,255,.10); color: #CBC6E4; }
+  #app .rc-head { display: flex; align-items: center; gap: 10px; }
+  #app .rcav {
+    flex: none; width: 36px; height: 36px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
+  }
+  #app .rccard .rc-name { flex: 1; min-width: 0; }
+  #app .rccard .rc-meta { border-radius: 999px; background: var(--surface); color: var(--muted); padding: 4px 9px; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+  #app .rccard.coach .rc-meta { background: rgba(246,244,255,.12); color: #CBC6E4; }
+  #app .rccard .rc-say { font-size: 14px; line-height: 1.5; }
+  #app .rc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  #app .rchip {
+    display: inline-flex; align-items: center; gap: 5px; border-radius: 999px;
+    background: var(--surface); color: var(--muted); padding: 5px 10px;
+    font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap;
+  }
+  #app .rchip.pct { background: rgba(53,208,186,.16); color: var(--teal-deep); }
+  #app .rchip.fire { background: var(--clay-100); color: var(--clay); }
+  body[data-dark] #app .rchip.pct { background: rgba(53,208,186,.16); color: #6FE3D0; }
+
+  /* ── 4. The board as a standings panel ── */
+  #app .lbwrap { margin: 0 16px 14px; padding: 14px 13px 13px; border-radius: 24px; background: var(--surface); }
+  #app .lbhd { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 4px 12px; }
+  #app .lbhd .h { font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
+  #app .lbhd .r { font-size: 11.5px; color: var(--muted-soft); }
+  #app .lbwrap .boardbar { padding: 0 0 12px; border-bottom: 0; }
+  #app .lbwrap .chips { display: flex; gap: 7px; }
+  #app .lbrow {
+    display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+    padding: 11px 12px; margin-bottom: 8px; border-radius: 18px;
+    background: var(--card); box-shadow: var(--shadow);
+    animation: riseIn .34s cubic-bezier(.16,1,.3,1) both;
+  }
+  #app .lbrow.me { background: var(--accent); color: #fff; box-shadow: 0 10px 20px -14px var(--accent-700); }
+  #app .lbpos { flex: none; width: 24px; text-align: center; font-size: 15px; font-weight: 800; color: var(--muted-soft); line-height: 1; }
+  #app .lbrow.me .lbpos { color: rgba(255,255,255,.75); }
+  #app .lbpos.medal { font-size: 19px; }
+  #app .lbav { flex: none; width: 38px; height: 38px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+  #app .lbmid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  #app .lbnm { font-weight: 700; font-size: 15px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #app .lbsub { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 11.5px; line-height: 1.2; color: var(--muted); }
+  #app .lbrow.me .lbsub { color: rgba(255,255,255,.8); }
+  #app .lbright { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  /* teal-deep is a 4.5:1 near-miss on a #282250 card, so the score — the one
+     number on the row anybody actually reads — brightens with the theme. */
+  #app .lbxp { font-weight: 800; font-size: 14.5px; line-height: 1.1; color: var(--teal-deep); }
+  body[data-dark] #app .lbxp { color: var(--teal); }
+  #app .lbrow.me .lbxp { color: #fff; }
+  #app .lbgap { font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.78); }
+  #app .lbfoot { border-radius: 16px; background: var(--accent-100); color: var(--accent); padding: 12px 14px; font-size: 12px; line-height: 1.45; font-weight: 600; }
+  #app .lbsplit { padding: 6px 4px 8px; font-size: 10px; font-weight: 700; letter-spacing: .09em; color: var(--muted-soft); }
+
+  /* ── 5. Counted habits get a segmented meter, not a straight bar ── */
+  #app .segbar { display: flex; gap: 3px; width: 100%; margin-top: 4px; }
+  #app .segbar i { flex: 1; min-width: 3px; height: 7px; border-radius: 999px; background: var(--track); transition: background-color .2s ease, opacity .2s ease; }
+  #app .segbar i.on { background: var(--hcol, var(--accent)); }
+  #app .segbar i.part { background: var(--hcol, var(--accent)); opacity: .4; }
 </style>
 </head>
 <body>
@@ -1736,6 +1908,31 @@ function habitHue(h) {
   let n = 0; for (const ch of String(h.id)) n = (n * 31 + ch.codePointAt(0)) >>> 0;
   return HUE_CYCLE[n % HUE_CYCLE.length];
 }
+// ── People, as discs ──────────────────────────────────────────────────────
+// The wall and the board are lists of names, and a list of names reads as a
+// spreadsheet. A tinted initial disc gives each athlete something to recognise
+// before they read anything — and it is derived from the display name, so it is
+// stable for ever without the server storing a single extra byte. Same palette
+// as the habits, so nobody arrives wearing a colour the app does not own.
+const PERSON_HUES = [
+  ['#EFECFB', '#6C5CE7'], ['#FFE9DF', '#D65A26'], ['#E3ECFD', '#3565C4'],
+  ['#FDF1DA', '#A87516'], ['#DFF4FA', '#1E8AA3'], ['#F6E8FA', '#8E43AC'],
+  ['#FCE7EF', '#C2456F'], ['#EDF6DC', '#5A8A1F']
+];
+function personHue(name) {
+  let n = 0; for (const ch of String(name || '?')) n = (n * 31 + ch.codePointAt(0)) >>> 0;
+  return PERSON_HUES[n % PERSON_HUES.length];
+}
+function personInitials(name) {
+  return String(name || '?').trim().split(/\s+/).map(w => w[0] || '').join('').slice(0, 2).toUpperCase() || '?';
+}
+// `cls` is .rcav or .lbav — one function, two sizes, so a person never wears
+// two different discs on two screens.
+function avatar(name, cls) {
+  const c = personHue(name);
+  return `<span class="${cls}" aria-hidden="true" style="background:${c[0]};color:${c[1]}">${esc(personInitials(name))}</span>`;
+}
+
 // Habit names carry their own emoji ('💧 Drink 8 glasses'); the tile shows it
 // and the row label drops it. Falls back to the two-letter code for any name
 // without one.
@@ -2410,10 +2607,13 @@ const K_CFG  = () => ATHLETE_ID + '_hab_cfg';
 const K_LOG  = () => ATHLETE_ID + '_hab_log';
 const K_META = () => ATHLETE_ID + '_hab_meta';
 
+// `sub` is the Settings sub-screen — null (the root list), 'habits' or
+// 'appearance'. Settings is a list of doors now rather than one long scroll, so
+// the screen needs to know which door is open. go() clears it on the way out.
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
              day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null,
-             confirmOnId: null };
+             confirmOnId: null, sub: null };
 let _toastTimer = null, _flashTimer = null, _confirmOnTimer = null;
 
 function defaultCfg() {
@@ -2928,8 +3128,18 @@ function dayPct(dayKey)  { const p = dayParts(dayKey, 'score'); return p.total ?
 function gatePct(dayKey) { const p = dayParts(dayKey, 'gate');  return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
 function dayQualifies(dayKey) { return gatePct(dayKey) >= XP_RULES.streakQualifyPct; }
-function currentDayStreak() {
-  let d = dayQualifies(TKEY()) ? today() : addDays(today(), -1), n = 0;
+function currentDayStreak() { return dayStreakAt(TKEY()); }
+// The day streak as it stood on a GIVEN day. The wall shows a line beside what
+// the athlete had actually strung together when they wrote it — "up to the day
+// they commented" — so a card read a week later still says what it said then.
+//
+// ⚠️ TODAY IS NOT A SETTLED DAY. An unfinished today must not break the count,
+// or the number falls to zero every midnight and climbs back at bedtime. That
+// is the one rule currentDayStreak() has always had, and it lives here now so
+// the hero tile and the wall chip can never disagree about the same integer.
+function dayStreakAt(dayKey) {
+  let d = (dayKey === TKEY() && !dayQualifies(dayKey)) ? addDays(parseKey(dayKey), -1) : parseKey(dayKey);
+  let n = 0;
   while (dayQualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
   return n;
 }
@@ -3722,11 +3932,29 @@ function go(screen) {
   // Leaving Today drops the backfill day — except into a habit's detail, which
   // is a round trip you take mid-edit to check the history you are filling in.
   if (screen !== 'detail' && screen !== 'today') UI.day = null;
+  // Leaving Settings closes whichever door was open inside it, so coming back
+  // in lands on the list rather than halfway down a sub-screen you had left.
+  if (screen !== 'settings') UI.sub = null;
   UI.screen = screen; UI.open = null;
   haptic('tab');
   render();
   resetScroll();
   if (screen === 'crew') { fetchBoard(); if (!RC.loaded) fetchRollCall(); }
+}
+// Settings sub-screens travel like screens — in from the right, out to the
+// left — without being screens, so the tab bar and the header stay put.
+function goSub(name) {
+  UI._navDir = name ? 1 : -1;
+  UI.sub = name || null;
+  UI.confirmReset = false; UI.confirmOnId = null;
+  haptic('tab'); render(); resetScroll();
+}
+// ONE back control, and it always goes exactly one step: out of a sub-screen to
+// the Settings list, and out of the list (or the manual) to wherever you came
+// from. The ✕ beside it still leaves the whole overlay in one tap.
+function overlayBack() {
+  if (UI.screen === 'settings' && UI.sub) { goSub(null); return; }
+  go(UI.backTo || 'today');
 }
 
 // ── Leaderboard ───────────────────────────────────────────────────────────
@@ -4709,27 +4937,33 @@ function tourSteps() {
   // top five say ALWAYS ON. It used to say "switch off what you will not do"
   // flat out — true of the add-ons, a lie about the five, and told on the first
   // run to an athlete who cannot yet tell the two groups apart.
+  // ⚠️ The roster moved behind a door (Settings → Habits & targets), so this
+  // step has to OPEN it before the ring is measured. `before` runs ahead of the
+  // repaint in tourShow(); without it the selector matches nothing and the tour
+  // rings empty space on the fourteenth step of a new athlete's first minute.
   S.push({
     title: 'The five, and what you add',
     body: `The five at the top are the job — everyone on the board tracks them, and they have
            no off switch. Everything under them is yours: switch off an add-on you will not do
            and it keeps every point it has already banked, or add your own at the bottom of the
            list, worth ${XP_RULES.customXp} XP a day.`,
-    screen: 'settings', sel: () => $t('[data-tour="tracked"]')
+    screen: 'settings', before: () => { UI.sub = 'habits'; }, sel: () => $t('[data-tour="tracked"]')
   });
 
+  // …and this one has to shut it again, because the manual row is on the list
+  // the door opens off, not inside it.
   S.push({
     title: 'Everything else is in here',
     body: `Points, levels, ranks, consistency, seasons, quests, the board and what happens to
            your data — properly explained, in order. When something on a screen does not make
            sense, the answer is in there.`,
-    screen: 'settings', sel: () => $t('[data-tour="manual"]')
+    screen: 'settings', before: () => { UI.sub = null; }, sel: () => $t('[data-tour="manual"]')
   });
 
   S.push({
     title: 'That is it',
     body: `One tap a day and the rest looks after itself. If you want this again it is in
-           Settings, under <strong>How this works</strong>.`,
+           Settings, under <strong>The tour</strong>.`,
     screen: 'settings', cta: 'Start logging', last: true
   });
 
@@ -5055,7 +5289,10 @@ function renderApp() {
     // at "How this works" made two screens feel like four.
     manual:   ['Everything, explained', 'The manual'],
     pass:     ['Rewards a season cannot take back', 'Locker'],
-    settings: ['Profile & tracking', 'Settings']
+    // Settings is a list of doors, so its header names the door you are behind.
+    settings: UI.sub === 'habits'     ? ['Settings', 'Habits & targets']
+            : UI.sub === 'appearance' ? ['Settings', 'Appearance']
+            : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
   };
   const rights = {
     today: pct + '% DONE', progress: '',   // the stat grid states the badge count
@@ -5101,9 +5338,18 @@ function renderApp() {
   return `
     ${window.IS_DEMO ? '<div class="demo-banner" data-k="banner">Demo mode — nothing is saved to the cloud</div>' : ''}
     <div class="apphd" data-k="apphd">
-      <div style="min-width:0">
-        <div class="eyebrow">${esc(head[0])}</div>
-        <div class="title hd">${esc(head[1])}</div>
+      <div class="hdleft">
+        <!-- A BACK BUTTON EVERYWHERE INSIDE THE OVERLAY (Amir, 2026-08-01).
+             The ✕ on the right leaves the whole thing in one tap, which is the
+             right control when Settings is one screen — but Settings is a list
+             of doors now, and from behind one of them the only way out was all
+             the way out. This goes exactly one step: sub-screen → the list →
+             back where you came from. See overlayBack(). -->
+        ${OVERLAY ? `<button class="hdback" data-k="hdback" aria-label="Back" ${on(overlayBack)}>&#8249;</button>` : ''}
+        <div style="min-width:0">
+          <div class="eyebrow">${esc(head[0])}</div>
+          <div class="title hd">${esc(head[1])}</div>
+        </div>
       </div>
       <div class="hdright">
         <span class="right mono">${esc(rights[UI.screen] || '')}</span>
@@ -5353,6 +5599,56 @@ function streakFlame(now, best) {
   </div>`;
 }
 
+// ── The week, under the hero ──────────────────────────────────────────────
+// Seven cells, oldest on the left, shaded by what the day was WORTH (dayPct —
+// the whole roster, the same number the day strip and the wall print). Height
+// is constant on purpose: a bar chart of seven days invites reading the tallest
+// as a win, and these are percentages of different-sized days, not a race.
+// Today keeps its outline whether or not it has anything in it yet, so the row
+// always says which end is now.
+//
+// Days before the athlete's first log are drawn empty rather than at 0% — the
+// same rule the day strip and the heat map follow. A week of grey on day one is
+// three days already lost, and they never had the app.
+function weekReport() {
+  const first = firstLoggedDay();
+  let out = '';
+  for (let i = 6; i >= 0; i--) {
+    const d = addDays(today(), -i), k = fmtKey(d), now = i === 0;
+    const pre = first ? k < first : true;
+    const p = pre ? 0 : dayPct(k);
+    // 0.22 keeps a barely-started day visible; full days land on solid accent.
+    const fill = p > 0 ? (0.22 + 0.78 * p / 100).toFixed(2) : '0';
+    out += `<div class="wk-d">
+      <span class="wk-bar ${now ? 'now' : ''}" title="${esc(dayLong(k))}${pre ? '' : ' · ' + p + '%'}"><i style="opacity:${fill}"></i></span>
+      <span class="wk-l ${now ? 'now' : ''}">${esc(d.toLocaleDateString('en-GB', { weekday: 'narrow' }))}</span>
+    </div>`;
+  }
+  return `<div class="weekrep" data-k="weekrep">
+    <span class="wk-cap">7 DAYS</span>
+    <div class="wk-days">${out}</div>
+  </div>`;
+}
+
+// ── The segmented meter ───────────────────────────────────────────────────
+// Amir, on water and protein: "its not a straight bar." One pip per STEP of the
+// habit, so the bar counts the thing the + button adds — eight glasses is eight
+// pips and tapping + fills one, which a continuous 0–100% bar could never say.
+// Capped at 20 so 10,000 steps stays a meter rather than a comb; the leading
+// partial pip is dimmed so part-way progress is still visible at any cap.
+function segBar(h, v) {
+  const step = h.step || 1;
+  let n = Math.round(h.target / step);
+  if (!isFinite(n) || n < 1) n = 1;
+  if (n > 20) n = 20;
+  const per = h.target / n;
+  const full = Math.max(0, Math.min(n, Math.floor(v / per + 1e-9)));
+  const part = full < n && v - full * per > 1e-9;
+  let out = '';
+  for (let i = 0; i < n; i++) out += `<i class="${i < full ? 'on' : (i === full && part ? 'part' : '')}"></i>`;
+  return `<span class="segbar" aria-hidden="true">${out}</span>`;
+}
+
 // ── The level disc, the hero's ring at habit-row size ─────────────────────
 // Amir, 2026-07-30: a habit's level on Progress was a filled square, its rank
 // name in the meta line and its progress in a bar under the row — three
@@ -5378,13 +5674,17 @@ function habitRow(h, from, lead, pausedThen) {
   const v = valOf(AKEY(), h.id), done = isDone(h, AKEY()), st = habitStreak(h);
   const hl = habitLevel(h), flashed = UI.flash[h.id];
   const locked = !!h.locked && !done;
+  // What is LEFT, on a habit you count and have not finished — the number the
+  // + button is about. "5 of 8 glasses" states the position; "3 to go" states
+  // the job, and it is the half an athlete acts on.
+  const left = h.kind === 'count' && !done && !locked ? h.target - v : 0;
   const status = locked
     ? ((isFree() && h.freeHint) || h.lockedHint || 'Earned elsewhere.')
     : (h.kind === 'count'
         ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
+          + (left > 0 ? ' · ' + fmtVal(h, left) + ' to go' : '')
         : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source)))
       + (pausedThen ? ' · paused now, but counted this day' : '');
-  const pc = Math.min(100, Math.round(v / h.target * 100));
   const nudged = UI.idle === h.id && !done && !locked;
   const hue = habitHue(h), emoParts = splitEmoji(h.name), hEmo = emoParts[0], hLabel = emoParts[1];
   return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''}" data-k="row:${h.id}" style="--hcol:${hue[0]};--hbg:${hue[1]}">
@@ -5414,9 +5714,9 @@ function habitRow(h, from, lead, pausedThen) {
         <span>${esc(status)}</span>
         ${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}" data-k="hst">${st}<span class="u">-day streak</span></span>` : ''}
       </span>
-      ${h.kind === 'count'
-        ? `<span class="track"><span data-fill style="width:${pc}%"></span></span>`
-        : ''}
+      <!-- One pip per step, not a continuous bar (Amir, 2026-08-01). See
+           segBar(): the meter now counts the same unit the + button adds. -->
+      ${h.kind === 'count' ? segBar(h, v) : ''}
     </button>
     ${h.kind === 'count' && !h.locked ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
     ${locked ? `<button class="pluscell" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))} aria-label="${isFree() ? 'See about coaching' : 'Open your programme'}">→</button>` : ''}
@@ -5461,9 +5761,9 @@ function renderNoteBox() {
     // place this box renders. It scrolled to the top and did nothing else, on
     // the one screen where a brand-new athlete is being asked to do something.
     // The join box lives on the OTHER view of this tab, so that is where it goes.
-    return `<div class="block notebox" data-k="notejoin" style="border-top:2px solid var(--divider)">
+    return `<div class="rccomp" data-k="notejoin">
       <div class="eyebrow" style="letter-spacing:.12em">Roll call</div>
-      <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+      <div style="font-size:13.5px;line-height:1.5;color:#CBC6E4">
         Every athlete gets one sentence a day, and everyone else sees it. Join the
         board and you can leave yours — it uses the same name and nothing more.
       </div>
@@ -5475,27 +5775,33 @@ function renderNoteBox() {
   const draft = UI.note === null ? posted : UI.note;
   const left = NOTE_MAX - draft.length;
   const changed = draft.trim() !== posted;
-  return `<div class="block notebox" data-k="notebox" style="border-top:2px solid var(--divider)">
+  // THE COMPOSER IS THE DARK CARD (Amir, 2026-08-01). Writing and reading are
+  // the two halves of this screen and they used to be drawn the same way, so
+  // the box you type in was the first of nine identical rows. Inverted, it is
+  // unmistakably yours and the wall underneath is unmistakably everyone else's.
+  return `<div class="rccomp" data-k="notebox">
     <!-- Not "Roll call" — the screen title and the view chip both already say
          it, and three of the same words on one screen is noise. -->
     <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
-      <span>Your line today</span><span>${posted ? 'ANSWERED' : 'ONE SENTENCE'}</span>
+      <span>Roll call · today</span><span>${posted ? 'ANSWERED' : 'ONE SENTENCE'}</span>
     </div>
     <div class="noteq" data-k="noteq">${esc(pickLine('prompt', 'rollcall'))}</div>
     <input class="input" id="dayline" maxlength="${NOTE_MAX}" data-k="dayline"
            placeholder="Say something about today…" value="${esc(draft)}"
            aria-label="Your line for today">
     <div class="noterow">
-      <span class="mono ${left <= 20 ? 'tight' : ''}">${left}</span>
+      <!-- Your day rides along with the line, which is the one thing an athlete
+           is not told before they post. Said here, next to the button. -->
+      <span class="mono ${left <= 20 ? 'tight' : ''}">${dayPct(TKEY())}% day rides along · ${draft.length}/${NOTE_MAX}</span>
       <div style="display:flex;gap:8px">
         ${posted ? `<button class="btn btn-secondary" style="padding:0 12px"
           ${on(() => postNote(''))}>Delete</button>` : ''}
         <button class="btn btn-primary" style="padding:0 16px"
           ${UI.noteBusy || !changed ? 'disabled' : ''}
-          ${on(() => postNote(draft))}>${posted ? 'Change it' : 'Post'}</button>
+          ${on(() => postNote(draft))}>${posted ? 'Change it' : 'Post it →'}</button>
       </div>
     </div>
-    <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
+    <div class="setnote">
       Everyone on the board sees this next to your name and today's percentage.
       Change it as often as you like until midnight — after that it stands.
     </div>
@@ -5550,8 +5856,14 @@ function renderToday(LI, doneCount, pct) {
            directly beneath it as a second green bar of identical shape, which
            read as one broken double-bar and stated a number the header and the
            day strip were both already showing. -->
+      <!-- THE HERO IS A CARD (Amir, 2026-08-01), and it carries the week. Ring,
+           rank and distance-to-next on the top row with the streak tile on the
+           right; the last seven days underneath, inside the same card. The two
+           belong together — the ring is where you are, the week is how you got
+           here — and as two separate blocks they were the first 300px of the
+           screen saying one thing twice. -->
       <div class="block hero-lv">
-        <div style="display:flex;align-items:center;gap:14px">
+        <div class="hero-top">
           <!-- The XP ring: how far through this level, drawn AROUND the level
                number rather than as a bar under the block — the number and its
                progress are one object. r=15.5 in a 36 viewBox → C≈97.4. -->
@@ -5559,15 +5871,9 @@ function renderToday(LI, doneCount, pct) {
             <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
             <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 24 : 30}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
           </button>
-          <!-- The day streak sits ON the hero, not in a band under it. Amir
-               asked for the number he already had to be made louder, and the
-               band was a new field instead — a whole strip of screen to say one
-               integer. Here it is the loudest thing on the row after the level
-               itself, and it costs no vertical space at all. -->
-          ${streakFlame(currentDayStreak(), bestDayStreak())}
-          <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+          <div class="herobody">
             <button class="ranklink" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
-              ${rankCrest(LI.rank, 26)}
+              ${rankCrest(LI.rank, 24)}
               <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
               <span class="go">→</span>
             </button>
@@ -5577,9 +5883,21 @@ function renderToday(LI, doneCount, pct) {
                  we have, its useless, just how many xp to next level is
                  enough") and repeated the unit right next to itself. Distance
                  alone is the number that is actually actionable today. -->
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(LI.nextLabel)}</div>
+            <div class="heroxp"><b>${esc(String(LI.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ','))}</b> XP to level ${LI.lv + 1}</div>
+            <!-- The ring is the same fraction bent round a circle. Both, because
+                 the ring reads at a glance and the bar reads precisely — and
+                 because this is the bar Amir picked out of the reference. -->
+            <div class="herobar"><span data-fill style="width:${LI.pct}%"></span></div>
           </div>
+          <!-- The day streak sits ON the hero, not in a band under it. Amir
+               asked for the number he already had to be made louder, and the
+               band was a new field instead — a whole strip of screen to say one
+               integer. It renders ONLY while a streak is actually running:
+               streakFlame() returns nothing on day one and nothing on a broken
+               one, because neither is a report worth a tile. -->
+          ${streakFlame(currentDayStreak(), bestDayStreak())}
         </div>
+        ${weekReport()}
       </div>
 
       <!-- Day strip then habits, directly under the hero. The list is what the
@@ -5653,7 +5971,12 @@ function renderToday(LI, doneCount, pct) {
         </button>`}
 
       <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
-        <div class="eyebrow" style="letter-spacing:.12em">The last seven days</div>
+        <!-- Not "The last seven days" any more: the hero card now opens the
+             screen with a seven-day row, and two headings saying the same span
+             read as the same section printed twice. The hero answers "how
+             complete was each day"; this answers "which habit is carrying me",
+             and the heading now says so. -->
+        <div class="eyebrow" style="letter-spacing:.12em">Your week, habit by habit</div>
         <div style="display:flex;gap:22px">
           <div><div class="figure" style="font-size:34px;line-height:.95"><span data-static data-num="goodDays" data-to="${goodDays}">${goodDays}</span><span style="font-size:16px;color:var(--muted)">/7</span></div>
             <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">Days on target</div></div>
@@ -6135,17 +6458,18 @@ function renderCrew() {
     const top = LB.rows.filter(r => r.pos <= 10);
     const me = LB.rows.find(r => r.is_me);
     const outside = me && me.pos > 10;
-    // Everyone's bar is drawn against the leader's score, so the gap is visible
-    // rather than arithmetic.
-    const lead = Math.max(1, ...LB.rows.map(r => Number(r.xp) || 0));
+    // The row directly above each one, so "You" can print the gap to the person
+    // in front. LB.rows is already ordered by position.
+    const ahead = (row) => LB.rows[LB.rows.indexOf(row) - 1] || null;
     body = `
       ${LB.passed.length ? `<div class="passline" data-k="passed">
         You passed ${esc(LB.passed.slice(0, 2).join(' and '))}${LB.passed.length > 2 ? ' and ' + (LB.passed.length - 2) + ' more' : ''} since you last looked.
       </div>` : ''}
-      <div>
-        ${top.map((r, i) => boardRow(r, lead, i)).join('')}
-      </div>
-      ${outside ? `<div class="eyebrow" style="padding:16px 20px 6px;letter-spacing:.12em">Your position</div>${boardRow(me, lead, top.length)}` : ''}`;
+      ${top.map((r, i) => boardRow(r, ahead(r), i)).join('')}
+      ${outside ? `<div class="lbsplit">YOUR POSITION</div>${boardRow(me, ahead(me), top.length)}` : ''}
+      <!-- The rule the whole board runs on, stated where it is read. Server-
+           scored from the log means a day nobody logs is a day nobody scores. -->
+      <div class="lbfoot">XP only counts when the day is logged — nobody climbs this board from the sofa.</div>`;
   }
 
   const viewBtn = (key, label) => `<button class="chip ${LB.view === key ? 'chip-on' : ''}"
@@ -6165,13 +6489,23 @@ function renderCrew() {
         <div class="mono boardday">DAY ${dayOfSeason}</div>
       </div>
       ${LB.view === 'roll' ? renderNoteBox() + renderRollCall() : `
-        <div class="boardbar sub">
-          <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
+        <!-- The board is a PANEL now (Amir, 2026-08-01): its own title, its own
+             scope switch and its own rows, all inside one tinted frame — so the
+             standings read as a thing you have opened rather than as the rest of
+             the screen continuing. -->
+        <div class="lbwrap" data-k="lbwrap">
+          <div class="lbhd">
+            <span class="h">Leaderboard</span>
+            <span class="r">resets with the season</span>
+          </div>
+          <div class="boardbar">
+            <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
+          </div>
+          ${body}
         </div>
         <div class="boardnote">${LB.scope === 'week'
           ? 'Today and the six days before it. Server-scored from what you logged.'
           : 'Everything since ' + esc(started) + '. Server-scored from what you logged.'}</div>
-        ${body}
         ${renderBoardJoin()}`}
     </div>`;
 }
@@ -6221,53 +6555,91 @@ function rcDayLabel(day) {
   if (day === fmtKey(addDays(today(), -1))) return 'Yesterday';
   return parseKey(day).toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
 }
-function rollLine(r, i) {
+// ── What a voice was carrying when it spoke ───────────────────────────────
+// Amir asked for "some of their achievement (up to the day they commented)"
+// under each card. Two of the three chips are genuinely as-of-that-day: the
+// percentage is stored WITH the line (hab_notes.pct, written when it was
+// posted), and the streak is walked back from that date rather than from today.
+// The rank and the title are as-of-NOW — the wall's RPC scores a rank live and
+// records no history of it — so they are drawn as the standing badges they are
+// and never captioned with a date.
+//
+// ⚠️ The streak only ever appears on the athlete's OWN lines, because it is the
+// one number that needs a log to compute and this device holds exactly one. If
+// roll_call() is ever taught to return a per-line streak, hand it through as
+// `r.streak` and every card gets one — the chip is already written for it.
+function rcChips(r) {
+  if (r.is_coach) return '';
+  const out = [];
   const pct = (r.pct === null || r.pct === undefined) ? null : Number(r.pct);
-  const meta = r.is_coach ? 'YOUR COACH'
-             : [r.rank_label ? String(r.rank_label).toUpperCase() : '', pct === null ? '' : pct + '%']
-                 .filter(Boolean).join(' · ');
-  return `<div class="rcline ${r.is_coach ? 'coach' : ''} ${r.is_me ? 'me' : ''}"
+  if (pct !== null) out.push(`<span class="rchip pct">${pct}% day</span>`);
+  const st = (r.streak !== null && r.streak !== undefined) ? Number(r.streak)
+           : (r.is_me ? dayStreakAt(r.day) : 0);
+  if (st > 0) out.push(`<span class="rchip fire">🔥 ${st}-day streak</span>`);
+  if (r.rank_label) out.push(`<span class="rchip">${rankIcon(rankNameOf(r.rank_label), 12, 'stroke-width:2.4')}${esc(r.rank_label)}</span>`);
+  const t = titleName(r.title);
+  if (t) out.push(titlePlate(passItem(r.title) || { name: t }, true));
+  return out.length ? `<div class="rc-chips">${out.join('')}</div>` : '';
+}
+function rollLine(r, i) {
+  const name = r.is_me ? 'You' : r.display_name;
+  return `<div class="rccard ${r.is_coach ? 'coach' : ''} ${r.is_me ? 'me' : ''}"
       data-k="rc:${esc(r.day)}:${esc(String(r.display_name))}"
       style="animation-delay:${(Math.min(i, 12) * 0.04).toFixed(2)}s">
-    <div class="rc-top">
-      <span class="rc-name" style="min-width:0;display:flex;align-items:baseline">
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.is_me ? 'You' : r.display_name)}</span>
-        ${(() => { const t = r.is_coach ? '' : titleName(r.title);
-                   return t ? `<span style="flex:none;margin-left:7px">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''; })()}
-      </span>
-      <span class="rc-meta">${esc(meta)}</span>
+    <div class="rc-head">
+      ${avatar(r.is_coach ? 'AMIR' : (r.display_name || '?'), 'rcav')}
+      <span class="rc-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</span>
+      ${r.is_coach ? '<span class="rc-meta">YOUR COACH</span>' : ''}
     </div>
     <div class="rc-say">${esc(r.body)}</div>
+    ${rcChips(r)}
   </div>`;
 }
 function boardNote(text) {
   return `<div style="padding:24px 20px;font-size:13px;line-height:1.55;color:var(--muted)">${esc(text)}</div>`;
 }
-function boardRow(r, lead, i) {
-  const medal = r.pos <= 3;
-  const pct = Math.max(2, Math.round((Number(r.xp) || 0) / (lead || 1) * 100));
-  return `<div class="row-rule brow" data-k="brow:${esc(String(r.display_name || r.pos))}"
-    style="display:flex;gap:14px;align-items:center;padding:14px 20px;animation-delay:${((i || 0) * 0.05).toFixed(2)}s;${r.is_me ? 'background:var(--accent-100);' : ''}">
-    <div style="width:38px;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-      <span class="hd" style="font-size:22px;line-height:1;color:${medal ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${r.pos}</span>
-      ${(() => { const d = LB.deltas[r.display_name];
-                 if (!d) return '';
-                 return '<span class="mono delta ' + (d > 0 ? 'up' : 'down') + '">' + (d > 0 ? '▲' : '▼') + Math.abs(d) + '</span>'; })()}
-    </div>
-    <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
-        <span class="hd" style="font-size:16px;line-height:1">${esc(r.is_me ? 'You' : r.display_name)}</span>
-        <span class="mono" style="flex:none;font-size:13px;font-weight:700">${Number(r.xp || 0).toLocaleString()}<span style="font-size:9px;color:var(--muted-soft)"> XP</span></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.2;color:var(--muted);min-width:0">
-        ${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="flex:none">${esc(r.rank_label)}</span>
-        ${(() => { const t = titleName(r.title);
-                   // The plate, not plain text — the earned thing is the one
-                   // that catches the eye on a line of rank furniture.
-                   return t ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''; })()}
-      </div>
-      <div class="bar" style="height:3px;width:100%"><span data-fill style="width:${pct}%"></span></div>
-    </div>
+// ── One standing, as a card ───────────────────────────────────────────────
+// Amir picked this shape out (2026-08-01): medal or place, a face, the name,
+// what they are carrying under it, and the score hard right. The bar under
+// every row is gone — with ten rows it drew ten different lengths of the same
+// fact the number already stated, and it is the number people read.
+//
+// `ahead` is the row directly above this one, and only "You" gets the gap
+// printed: the distance that matters is the one you can close.
+const MEDALS = ['🥇', '🥈', '🥉'];
+function boardRow(r, ahead, i) {
+  const xp = Number(r.xp || 0);
+  const gap = r.is_me && ahead ? Math.max(0, Number(ahead.xp || 0) - xp) : 0;
+  const d = LB.deltas[r.display_name];
+  const t = titleName(r.title);
+  // Your own streak and week are on this device; nobody else's are. So the
+  // sub-line reads live for you and standing-badges for everyone else, rather
+  // than the app inventing a number it cannot know.
+  let sub;
+  if (r.is_me) {
+    let good = 0;
+    for (let n = 0; n < 7; n++) if (dayQualifies(fmtKey(addDays(today(), -n)))) good++;
+    const st = currentDayStreak();
+    sub = `<span style="flex:none">${st > 0 ? '🔥 ' + st + ' · ' : ''}${good}/7 days on target</span>`;
+  } else {
+    sub = `${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.rank_label)}</span>`;
+  }
+  return `<div class="lbrow ${r.is_me ? 'me' : ''}" data-k="brow:${esc(String(r.display_name || r.pos))}"
+    style="animation-delay:${((i || 0) * 0.05).toFixed(2)}s">
+    <span class="lbpos ${r.pos <= 3 ? 'medal' : ''}">${r.pos <= 3 ? MEDALS[r.pos - 1] : r.pos}</span>
+    ${avatar(r.display_name || '?', 'lbav')}
+    <span class="lbmid">
+      <span class="lbnm">${esc(r.is_me ? 'You' : r.display_name)}</span>
+      <span class="lbsub">
+        ${sub}
+        ${d ? `<span class="mono delta ${d > 0 ? 'up' : 'down'}" style="flex:none">${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>` : ''}
+        ${t && !r.is_me ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''}
+      </span>
+    </span>
+    <span class="lbright">
+      <span class="lbxp">${xp.toLocaleString()} XP</span>
+      ${gap > 0 ? `<span class="lbgap">${gap.toLocaleString()} behind ${esc(ahead.is_me ? 'you' : ahead.display_name)}</span>` : ''}
+    </span>
   </div>`;
 }
 // Joining is explicit and reversible, and the handle is theirs to choose —
@@ -6349,7 +6721,7 @@ function renderManual() {
         </div>` +
         `<button class="btn btn-primary btn-block" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>Show me around instead</button>` +
         `<div style="height:12px"></div>` +
-        p(`A minute, and it points at each of those on the real screen. It is also in Settings under <strong style="color:var(--ink)">How this works</strong>, any time.`))}
+        p(`A minute, and it points at each of those on the real screen. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`))}
 
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
@@ -6390,7 +6762,7 @@ function renderManual() {
             ? `it unlocks when you are on a coaching programme, and then it ticks itself every time you finish a session.`
             : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
-          <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings.</div>
+          <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Habits &amp; targets</strong>.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken streaks.</div>
           <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
         </div>`)}
@@ -7445,153 +7817,210 @@ function perfectDayXp() {
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────
+// A LIST OF DOORS, NOT ONE LONG SCROLL (Amir, 2026-08-01, with a reference
+// screen). Settings used to be every control in the app stacked end to end —
+// eight sections, the whole habit roster inline, a reset button at the bottom of
+// a 2,000px page. It is now a profile card and three grouped cards, each row a
+// door; the two that hold real controls (the habit roster, the look of the app)
+// open as sub-screens, and every one of them has a back button in the header.
+//
+// ⚠️ `UI.sub` is the open door and NOTHING else reads it. go() clears it on the
+// way out, so leaving Settings and coming back always lands on the list.
+// `attrs` exists for exactly one caller: the tour rings the manual row by
+// `[data-tour="manual"]`, and a tour target has to be an attribute the step can
+// select rather than a class the skin might restyle.
+function navRow(icon, name, sub, right, handler, cls, attrs) {
+  return `<button class="navrow ${cls || ''}" ${attrs || ''} ${on(handler)}>
+    <span class="navtile" aria-hidden="true">${icon}</span>
+    <span class="navmid">
+      <span class="navnm">${esc(name)}</span>
+      ${sub ? `<span class="navsub">${esc(sub)}</span>` : ''}
+    </span>
+    ${right || '<span class="navgo">&#8250;</span>'}
+  </button>`;
+}
+function navVal(text) { return `<span class="navval">${esc(text)}</span>`; }
+
 function renderSettings() {
+  if (UI.sub === 'habits')     return renderSettingsHabits();
+  if (UI.sub === 'appearance') return renderSettingsAppearance();
+
+  const LI = overallLevel();
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const onCount = live().filter(h => !h.core).length, addTotal = addOnHabits().length;
   return `
     <div data-k="screen:settings" style="${screenAnim()}">
-      <div class="block" style="display:flex;gap:14px;align-items:center;padding:18px 20px">
-        <div class="hd" style="width:52px;height:52px;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:21px">${esc(initials)}</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div class="hd" style="font-size:18px;line-height:1">${esc(ATHLETE_NAME || 'Athlete')}</div>
+      <!-- The rank on this card is a LINK, not a label: the rank lives in the
+           Locker and nowhere else, so the one place it appears outside it opens
+           it rather than restating it. -->
+      <button class="profcard" ${on(() => go('pass'))} aria-label="Open the Locker">
+        <span class="profav">${esc(initials)}</span>
+        <span class="navmid">
+          <span class="navnm" style="font-size:17px">${esc(ATHLETE_NAME || 'Athlete')}</span>
           <!-- A free athlete is not coached by anyone, and telling them they are
                is the first line of the first screen behind their own initials. -->
-          <div style="font-size:11px;line-height:1;color:var(--muted)">${isFree() ? 'AA Proof · free' : 'Coached by Amir'} · day ${dayNumber()}</div>
-        </div>
-      </div>
-
-      ${sectionLabel('How this works')}
-      <!-- First in the section, because it is the one an athlete who is lost
-           needs. HABITS.md used to list "replay onboarding" as deliberately
-           absent: that was true of the habit PICKER, which decides nothing and
-           is fully editable below. The tour is not a settings screen, it is the
-           only explanation of what the controls do, and a one-shot explanation
-           is worth very little. -->
-      <button class="selrow" data-k="row:tour" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">Show me around</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">A minute, every button named — the tour you get on day one</span>
+          <span class="navsub">Day ${dayNumber()} · ${esc(LI.label)} · ${esc(isFree() ? 'AA Proof · free' : 'Coached by Amir')}</span>
         </span>
-        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
-      </button>
-      <!-- No "ladder" row: the ladder lives on the road in the Locker tab now. -->
-      <button class="selrow" data-k="row:manual" data-tour="manual" ${on(() => go('manual'))}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">The manual</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Points, levels, ranks, consistency and the leaderboard — explained</span>
-        </span>
-        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
-      </button>
-      <!-- The way back to an offer they declined, and the only route for anyone
-           on a new phone. Gone once the app is installed, where it would be a
-           row that does nothing. -->
-      ${installable() ? `
-      <button class="selrow" data-k="row:install" ${on(() => { UI.install = true; render(); })}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">Add to home screen</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">Open it in one tap, and keep it working with no signal</span>
-        </span>
-        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
-      </button>` : ''}
-
-      ${sectionLabel('Your training')}
-      <button class="selrow" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">${isFree() ? 'See about coaching' : 'Open your programme'}</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">${isFree() ? 'A programme built for you, your sport and your week' : "Today's session, your plan and the library"}</span>
-        </span>
-        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
+        <span class="navgo">&#8250;</span>
       </button>
 
-      ${sectionLabel('Your data')}
-      <div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0">
-          <span class="hd" style="font-size:14px;line-height:1">Sync</span>
-          <span class="mono" style="font-size:10px;letter-spacing:.08em;color:var(--muted)" data-sync>${syncLabel()}</span>
-        </span>
-        <button class="btn btn-secondary" style="padding:10px 14px;font-size:13px"
-          ${on(async () => { if (window.IS_DEMO) { toast('Demo mode — nothing is sent.'); return; } markDirty(); await pushNow(); toast(SYNC.dirty ? 'Still offline — it is saved here and will go up on its own.' : 'Everything is up to date.'); })}>Sync now</button>
+      <div class="cardgrp">
+        ${navRow('🎯', 'Habits & targets',
+                 'The five, your add-ons and anything you invent',
+                 navVal(onCount + ' of ' + addTotal + ' add-ons on'),
+                 () => goSub('habits'))}
+        ${navRow('🎨', 'Appearance', 'Dark mode and the tick sound',
+                 navVal(CFG.dark ? 'Dark' : 'Light'),
+                 () => goSub('appearance'))}
+        ${installable() ? navRow('📱', 'Install on your phone',
+                 'Open it in one tap, and keep it working with no signal', '',
+                 () => { UI.install = true; render(); }) : ''}
       </div>
-      <div style="padding:10px 20px 4px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        Every tick is written to this phone the moment you make it, then sent up when there's a connection. Close the app, lose signal, fly somewhere — nothing is lost.
+
+      <div class="cardgrp">
+        <!-- First in the group, because it is the one an athlete who is lost
+             needs. The tour is not a settings screen, it is the only explanation
+             of what the controls do, and a one-shot explanation is worth little. -->
+        ${navRow('🧭', 'The tour', 'A minute, every button named', '',
+                 () => { UI.backTo = 'settings'; startTour('settings'); })}
+        ${navRow('📖', 'The manual — how XP works',
+                 'Points, levels, ranks, consistency and the board', '',
+                 () => go('manual'), '', 'data-tour="manual"')}
+        ${navRow('🎁', 'The long game', 'Every rank and every reward on one road', '',
+                 () => go('pass'))}
+        ${navRow(isFree() ? '💬' : '🏋', isFree() ? 'See about coaching' : 'Open your programme',
+                 isFree() ? 'A programme built for you, your sport and your week'
+                          : "Today's session, your plan and the library", '',
+                 () => (isFree() ? (window.location.href = '/form.html') : goProgram()))}
       </div>
+
+      <div class="cardgrp">
+        ${navRow('👥', 'Crew board',
+                 CFG.onBoard ? 'Tap to rename or leave' : 'Other athletes only see you if you join',
+                 navVal(CFG.onBoard ? (CFG.boardName || defaultDisplayName()) : 'Not joined'),
+                 () => go('crew'))}
+        ${navRow('☁️', 'Sync', 'Everything is saved here first, then sent up',
+                 `<span class="navval" data-sync>${esc(syncLabel())}</span>`,
+                 async () => { if (window.IS_DEMO) { toast('Demo mode — nothing is sent.'); return; }
+                               markDirty(); await pushNow();
+                               toast(SYNC.dirty ? 'Still offline — it is saved here and will go up on its own.' : 'Everything is up to date.'); })}
+        <!-- Destructive, so it asks once. The armed state disarms itself after a
+             couple of seconds if the second tap never comes. -->
+        ${navRow('🧨', "Reset today's log",
+                 'Wipes today only. XP already banked stays banked.',
+                 `<span class="navpill">${UI.confirmReset ? 'Sure?' : 'Wipe'}</span>`,
+                 () => {
+                   if (!UI.confirmReset) {
+                     UI.confirmReset = true; render();
+                     setTimeout(() => { if (UI.confirmReset) { UI.confirmReset = false; render(); } }, 2600);
+                     return;
+                   }
+                   UI.confirmReset = false;
+                   LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.');
+                 },
+                 'danger' + (UI.confirmReset ? ' armed' : ''))}
+      </div>
+
       <!-- There is no password, no sign-in and no account screen, so the app
            never had a reason to mention any of it — and therefore never told
            anyone that the WhatsApp link IS the account. Losing it is the one
            way to lose the lot, and it is worth one sentence. -->
-      <div style="padding:8px 20px 4px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        There is no password here — <strong style="color:var(--muted)">your link is your account</strong>. Put it on your home screen, or keep the message. If you lose it, ask ${isFree() ? 'Amir' : 'your coach'} for a fresh one; nothing is gone.
+      <div class="setnote">
+        Every tick is written to this phone the moment you make it, then sent up when
+        there's a connection. There is no password here — <strong>your link is your
+        account</strong>. Put it on your home screen, or keep the message. If you lose
+        it, ask ${isFree() ? 'Amir' : 'your coach'} for a fresh one; nothing is gone.
       </div>
+      <div style="height:20px"></div>
+    </div>`;
+}
 
-      ${sectionLabel('Leaderboard')}
-      <button class="selrow" ${on(() => go('crew'))}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">${CFG.onBoard ? 'You are on the board' : 'Not on the board'}</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">
-            ${CFG.onBoard ? 'Appearing as ' + esc(CFG.boardName || defaultDisplayName()) + ' · tap to rename or leave'
-                          : 'Other athletes only see you if you join · tap to have a look'}
+// ── Settings → Appearance ─────────────────────────────────────────────────
+function renderSettingsAppearance() {
+  return `
+    <div data-k="screen:settings:appearance" style="${screenAnim()}">
+      <div class="cardgrp" style="margin-top:4px">
+        <button class="navrow" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
+          <span class="navtile" aria-hidden="true">${CFG.dark ? '🌙' : '☀️'}</span>
+          <span class="navmid">
+            <span class="navnm">Dark mode</span>
+            <span class="navsub">Follows nothing — it is whatever you set here.</span>
           </span>
-        </span>
-        <!-- An arrow, like every other row that navigates somewhere. This was a
-             clay ON/OFF, which made Settings express the same yes/no idea three
-             different ways on one screen — a switch, a word, and a tap-through.
-             The state is already in the label and the line beneath it. -->
-        <span class="hd" style="font-size:19px;color:var(--clay-deep)">→</span>
-      </button>
+          <span class="sw ${CFG.dark ? 'on' : ''}"><i></i></span>
+        </button>
+        <button class="navrow" ${on(() => { CFG.sound = !CFG.sound; saveCfg(); render(); if (CFG.sound) haptic('done'); })}>
+          <span class="navtile" aria-hidden="true">🔔</span>
+          <span class="navmid">
+            <span class="navnm">Sound</span>
+            <span class="navsub">A short blip when you tick something. Off by default.</span>
+          </span>
+          <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
+        </button>
+      </div>
+      <div style="height:20px"></div>
+    </div>`;
+}
 
-      ${sectionLabel('Appearance')}
-      <button class="selrow" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })}>
-        <span class="lbl" style="font-size:15px">Dark mode</span>
-        <span class="sw ${CFG.dark ? 'on' : ''}"><i></i></span>
-      </button>
-      <button class="selrow" ${on(() => { CFG.sound = !CFG.sound; saveCfg(); render(); if (CFG.sound) haptic('done'); })}>
-        <span style="display:flex;flex-direction:column;gap:4px;min-width:0;text-align:left">
-          <span class="lbl" style="font-size:15px">Sound</span>
-          <span style="font-size:11px;line-height:1.3;color:var(--muted);text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-weight:400">A short blip when you tick something. Off by default.</span>
-        </span>
-        <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
-      </button>
-
+// ── Settings → Habits & targets ───────────────────────────────────────────
+// The roster, on its own screen (Amir, 2026-08-01). ⚠️ `data-tour="tracked"`
+// stays on the wrapper — the tour's fourteenth step rings this list, and its
+// `before` hook is what opens this door before the ring is measured. Move the
+// attribute and the tour points at nothing on the first screen a new athlete
+// sees. Everything below is the same behaviour it has always had: the five have
+// no off switch, an add-on arms on the first tap and commits on the second, and
+// removal is always dated tomorrow.
+function renderSettingsHabits() {
+  return `
+    <div data-k="screen:settings:habits" style="${screenAnim()}">
       <div data-k="tracked" data-tour="tracked">
-      ${sectionLabel('The five', 'Everyone tracks these')}
-      <div style="padding:10px 20px 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+      <div class="eyebrow sectlbl"><span>The five</span><span>EVERYONE TRACKS THESE</span></div>
+      <div class="setnote">
         These are the job, and they are the same for every athlete on the board — which is
         what makes a day score mean the same thing for all of you. There is no off switch.
       </div>
-      ${allHabits().filter(h => h.core).map(h => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
-          <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-            <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
-            <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
-          </span>
-          <span class="mono" style="flex:none;font-size:8.5px;letter-spacing:.09em;color:var(--muted-soft);border:1px solid var(--rule);padding:4px 7px">ALWAYS ON</span>
-        </div>`).join('')}
+      <div class="cardgrp">
+        ${allHabits().filter(h => h.core).map(h => {
+          const hue = habitHue(h), em = splitEmoji(h.name);
+          return `<div class="hsrow">
+            <span class="hstile" style="background:${hue[1]}">${em[0] || esc(h.code)}</span>
+            <span class="navmid">
+              <span class="navnm">${esc(em[1])}</span>
+              <span class="navsub">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
+            </span>
+            <span class="hslock">ALWAYS ON</span>
+          </div>`;
+        }).join('')}
+      </div>
 
-      ${sectionLabel('Add-ons', 'Extra points, extra badges')}
+      <div class="eyebrow sectlbl"><span>Add-ons</span><span>EXTRA POINTS, EXTRA BADGES</span></div>
       <!-- The warning is permanent, not a one-off toast. It is the rule the whole
            thing turns on, and an athlete who switched something on three weeks
            ago should still be able to find out why it is counting against them. -->
-      <div style="padding:10px 20px 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
-        Optional, and worth real points on top of the five. <strong style="color:var(--ink)">Once you
-        switch one on it counts</strong> — miss it and it costs you the same as missing anything
-        else, so only add what you will actually do. Switching one on applies
-        <strong style="color:var(--ink)">today</strong>; switching it off applies
-        <strong style="color:var(--ink)">tomorrow</strong>, so you cannot drop one at midnight to
-        hide a miss. Days already gone never change either way.
+      <div class="setnote">
+        Optional, and worth real points on top of the five. <strong>Once you switch one on
+        it counts</strong> — miss it and it costs you the same as missing anything else, so
+        only add what you will actually do. Switching one on applies <strong>today</strong>;
+        switching it off applies <strong>tomorrow</strong>, so you cannot drop one at midnight
+        to hide a miss. Days already gone never change either way.
       </div>
+      <div class="cardgrp">
       ${addOnHabits().map(h => {
         const custom = (CFG.custom || []).some(c => c.id === h.id);
         const isOn = CFG.on[h.id] !== false, heldToday = lockedOnToday(h);
         // Armed by a first tap on OFF→ON, cleared by a second tap or by the
         // timeout — see the comment inside the handler below.
         const arming = UI.confirmOnId === h.id;
-        return `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px">
-          <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-            <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
-            <span style="font-size:11px;line-height:1.2;color:${arming ? 'var(--clay-deep)' : 'var(--muted)'}">${arming
+        const hue = habitHue(h), em = splitEmoji(h.name);
+        return `<div class="hsrow">
+          <span class="hstile" style="background:${hue[1]};${isOn ? '' : 'filter:grayscale(1);opacity:.6'}">${em[0] || esc(h.code)}</span>
+          <span class="navmid">
+            <span class="navnm">${esc(em[1])}</span>
+            <span class="navsub" style="${arming ? 'color:var(--clay)' : ''}">${arming
               ? 'Tap again to turn it on — you cannot turn it back off until tomorrow.'
               : esc(h.goal || h.source) + ' · ' + baseXp(h) + ' XP' + (!isOn && heldToday ? ' · still counts today' : '')}</span>
           </span>
-          <span style="display:flex;gap:10px;align-items:center">
-            ${custom ? `<button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
+          <span style="display:flex;gap:10px;align-items:center;flex:none">
+            ${custom ? `<button class="navval" style="color:var(--danger);padding:4px 6px"
               ${on(() => removeCustom(h))} aria-label="Remove ${esc(h.name)}">✕</button>` : ''}
             <button class="sw ${isOn ? 'on' : ''}${arming ? ' confirm' : ''}" ${on(() => {
               const turningOn = CFG.on[h.id] === false;
@@ -7619,26 +8048,14 @@ function renderSettings() {
           </span>
         </div>`;
       }).join('')}
-      <div style="padding:14px 20px 4px;display:flex;gap:8px">
+      </div>
+      <div style="padding:0 16px 4px;display:flex;gap:8px">
         <input class="input" id="newhabit" maxlength="40" placeholder="Add a habit — e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
         <button class="btn btn-primary" style="padding:0 16px" ${on(addCustomHabit)}>Add</button>
       </div>
-      <div style="padding:6px 20px 0;font-size:11px;color:var(--muted-soft)">Custom habits are worth ${XP_RULES.customXp} XP a day. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
+      <div class="setnote" style="padding-top:10px">Custom habits are worth ${XP_RULES.customXp} XP a day. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
       </div>
-
-      <div style="padding:22px 20px 34px">
-        <button class="btn ${UI.confirmReset ? 'confirmr' : 'btn-secondary'} btn-block" ${on(() => {
-          // Destructive, so it asks once. The armed state disarms itself after a
-          // couple of seconds if the second tap never comes.
-          if (!UI.confirmReset) {
-            UI.confirmReset = true; render();
-            setTimeout(() => { if (UI.confirmReset) { UI.confirmReset = false; render(); } }, 2600);
-            return;
-          }
-          UI.confirmReset = false;
-          LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.');
-        })}>${UI.confirmReset ? 'Sure? Tap again to wipe today' : "Reset today's log"}</button>
-      </div>
+      <div style="height:20px"></div>
     </div>`;
 }
 
