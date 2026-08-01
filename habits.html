@@ -911,11 +911,17 @@
   .flame { display: block; flex: none; width: 11px; height: 14px; color: var(--muted-soft); }
   .flame .f-out { fill: currentColor; }
   .flame .f-in  { fill: var(--bg); opacity: .5; }
-  .lit .flame { color: var(--clay); }
-  .lit[data-lvl="2"] .flame,
-  .lit[data-lvl="3"] .flame { transform-origin: 50% 90%; }
-  .lit[data-lvl="2"] .flame { animation: flameLick 1.5s ease-in-out infinite; }
-  .lit[data-lvl="3"] .flame { animation: flameLick .85s ease-in-out infinite; }
+  /* Was lit-but-static at level 1 (only [data-lvl="2"]/[data-lvl="3"] carried
+     the lick), so a young streak read as an icon, not a flame. The base .lit
+     rule now licks at every level; the per-level rules only shorten the
+     duration as heat climbs. */
+  .lit .flame { color: var(--clay); transform-origin: 50% 90%; animation: flameLick 2.6s ease-in-out infinite; }
+  .lit[data-lvl="2"] .flame { animation-duration: 1.5s; }
+  .lit[data-lvl="3"] .flame { animation-duration: .85s; }
+  /* The inner tongue breathes on its own beat, so even the slowest lick still
+     reads as fire rather than a still icon between licks. */
+  @keyframes flameInner { 0%, 100% { opacity: .5 } 50% { opacity: .82 } }
+  .lit .flame .f-in { animation: flameInner 1.3s ease-in-out infinite; }
 
   /* Today — on the hero, left of the rank block. */
   .dayflame {
@@ -1221,9 +1227,33 @@
   #app .apphd { border-bottom: 0; padding-bottom: 8px; }
   #app .apphd .title { font-weight: 700; letter-spacing: -0.01em; }
   #app .apphd .right { color: var(--muted-soft); font-weight: 700; letter-spacing: 0.04em; }
-  /* Zero padding + no background = a no-op wherever no inline conic-gradient is
-     set (every screen but Today), so `.hdme` sits exactly where it always has. */
-  #app .hdmewrap { display: flex; border-radius: 999px; padding: 3px; transition: background .3s; }
+  /* No padding here — Today's inline style adds its own 3px along with the
+     ring; every other screen gets no `style` attribute at all, so this stays a
+     true no-op and `.hdme` sits exactly where it always has. */
+  #app .hdmewrap { flex: none; display: flex; border-radius: 999px; }
+  /* The day's ring sweeps in when Today arrives, and glides when a tick moves
+     it. --avp is registered so the conic edge can animate at all — a bare CSS
+     custom property cannot interpolate inside a conic-gradient() argument
+     without @property declaring its syntax. */
+  @property --avp { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+  @keyframes avpArrive { from { --avp: 0% } }
+  #app .hdright .hdmewrap[style] { animation: avpArrive .9s cubic-bezier(.2,.8,.2,1); transition: --avp .5s cubic-bezier(.2,.8,.2,1); }
+  /* The level ring draws itself on arrival — the same sweep, one object down.
+     `from` only: it lands on whatever offset the render already set inline, so
+     a tick's new value is not overwritten by the arrival keyframe. Today's hero
+     ring only (.lvring), not the smaller per-row rings on Progress (.hring) —
+     those remount on every scroll-triggered re-render and would never stop
+     sweeping. */
+  @keyframes ringArrive { from { stroke-dashoffset: 97.4 } }
+  #app .lvring .run { animation: ringArrive .9s cubic-bezier(.2,.8,.2,1); }
+  /* The paper follows the clock: warm at dawn, the house lilac through the
+     afternoon, deeper as the evening comes. Cards stay white — only the paper
+     breathes — and dark mode keeps its own night regardless of the hour
+     (:not([data-dark]) is the guard). The transition also gives the existing
+     dark-mode toggle its crossfade for free, where it used to cut. */
+  body[data-daypart="morning"]:not([data-dark]) { --bg: #FAF0E9; }
+  body[data-daypart="evening"]:not([data-dark]) { --bg: #EDEAF9; }
+  body, .app, .apphd, .tabs { transition: background-color .8s ease; }
   #app .hdme { border-radius: 999px; color: #fff; box-shadow: 0 3px 0 var(--accent-700); }
   /* `color` added: #app .hdme{color:#fff} (1 id + 1 class) beats this rule's
      unset color property via the cascade even though .closing is MORE specific
@@ -3994,6 +4024,7 @@ function toggleHabit(h) {
   haptic('done');
   toast('+' + gained + ' XP · ' + h.name + ' logged' + (editingPast() ? dayTag() + '.' : '. Look at you.'));
   flyXp(gained, rect);
+  tickJuice(h, rect);
 }
 function bump(h) {
   const before = habitXp(h), rect = UI._tapRect;
@@ -4008,7 +4039,7 @@ function bump(h) {
   setVal(h.id, v);
   checkLevelUps();
   render();
-  const gained = habitXp(h) - before, complete = v >= h.target;
+  const gained = habitXp(h) - before, complete = v >= h.target, wasDone = cur >= h.target;
   haptic(complete ? 'done' : 'tick');
   // Past the target there is nothing left to earn — xpFor() stops there — so
   // say that rather than printing "+0 XP" under a word like "complete".
@@ -4017,6 +4048,10 @@ function bump(h) {
                 : '+' + gained + ' XP' + dayTag() + '. Keep them coming.')
     : h.name + ' was already done' + dayTag() + '. Logged, but there is no more XP in it today.');
   flyXp(gained, rect);
+  // Only the tap that CROSSES into done, never a bump made after it — a
+  // counter habit you keep adding to past its target should not re-fire the
+  // squish and confetti on every extra tap.
+  if (complete && !wasDone) tickJuice(h, rect);
 }
 // Removing a custom habit takes its logged values with it. The app stops
 // counting a removed habit the moment it leaves CFG.custom — allHabits() no
@@ -4568,8 +4603,13 @@ function render() {
   // repaint can move it. Re-measuring here is what keeps the box on its target
   // through a tick, a screen change or a celebration opening and closing.
   if (TOUR.on) paintTour();
-  // MEADOW's real --bg values, not the brutalist palette this line predates.
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', CFG.dark ? '#17142B' : '#F6F4FF');
+  // The paper follows the clock (see the daypart rules in the skin); the
+  // installed app's chrome follows the paper. MEADOW's real --bg values, not
+  // the brutalist palette this used to sync before the daypart split existed.
+  const _dp = (hh => hh < 12 ? 'morning' : hh < 18 ? 'afternoon' : 'evening')(new Date().getHours());
+  document.body.setAttribute('data-daypart', _dp);
+  document.querySelector('meta[name="theme-color"]').setAttribute('content',
+    CFG.dark ? '#17142B' : ({ morning: '#FAF0E9', afternoon: '#F6F4FF', evening: '#EDEAF9' })[_dp]);
 }
 
 // ── Numbers that count ────────────────────────────────────────────────────
@@ -4846,6 +4886,39 @@ function flyXp(amount, rect) {
       );
     }
   }, { once: true });
+}
+
+// ── Tick juice ───────────────────────────────────────────────────────────
+// The physical moment of a completed habit: the tile squishes underfoot and a
+// pinch of confetti leaves the checkbox. Through the animation API, like the
+// hero pulse above, so the next render cannot strip it mid-move. Fires only on
+// the tap that COMPLETES a habit — not every counter increment — or it would
+// be wallpaper by Wednesday.
+const TICK_CONF = ['#6C5CE7', '#35D0BA', '#F2B23C', '#FF8A5B', '#F27DA8', '#8F7BF0'];
+function tickJuice(h, rect) {
+  if (reduced()) return;
+  const row = document.querySelector('[data-k="row:' + h.id + '"]');
+  const tile = row && row.querySelector('.htile');
+  if (tile && tile.animate) {
+    tile.animate(
+      [{ transform: 'scale(1,1)' }, { transform: 'scale(1.16,.84)', offset: .35 }, { transform: 'scale(.95,1.06)', offset: .7 }, { transform: 'scale(1,1)' }],
+      { duration: 380, easing: 'cubic-bezier(.2,.8,.25,1)' });
+  }
+  const app = document.getElementById('app'), fx = document.getElementById('fx');
+  if (!app || !fx || !rect) return;
+  const box = app.getBoundingClientRect();
+  const x = rect.left - box.left + rect.width / 2, y = rect.top - box.top + rect.height / 2;
+  for (let i = 0; i < 6; i++) {
+    const p = document.createElement('i');
+    const a = i * 1.05 + (i % 2 ? .5 : 0), d = 24 + (i % 3) * 9;
+    p.style.cssText = 'position:absolute;left:' + x + 'px;top:' + y + 'px;margin:-2px 0 0 -2px;width:' + (i % 2 ? 4 : 5) + 'px;height:' + (i % 2 ? 4 : 5) + 'px;border-radius:' + (i % 2 ? '99px' : '2px') + ';background:' + TICK_CONF[i] + ';pointer-events:none';
+    fx.appendChild(p);
+    if (!p.animate) { p.remove(); continue; }
+    p.animate(
+      [{ transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+       { transform: 'translate(' + Math.round(Math.cos(a) * d) + 'px,' + (Math.round(Math.sin(a) * d) - 16) + 'px) rotate(' + (120 + i * 40) + 'deg)', opacity: 0 }],
+      { duration: 640, easing: 'cubic-bezier(.2,.7,.4,1)' }).onfinish = () => p.remove();
+  }
 }
 
 // ── Onboarding — one screen: the five, then the add-ons on offer ───────────
@@ -5555,10 +5628,12 @@ function renderApp() {
              ON TODAY, the avatar also wears the day's completion as a ring —
              replaces the separate "68% DONE" text label the header used to
              carry next to it, so the same fact is not said twice. Everywhere
-             else .hdmewrap's inline style is the empty string, which the CSS
-             rule makes a zero-padding, background-none no-op. -->
-        <span class="hdmewrap" style="${UI.screen === 'today' && !OVERLAY ? 'background:conic-gradient(var(--accent) ' + pct + '%, var(--track) 0)' : ''}"
-          ${UI.screen === 'today' && !OVERLAY ? 'aria-label="' + pct + '% of today logged"' : ''}>
+             else there is no style attribute at all, so .hdmewrap[style]'s
+             arrival animation never fires and the wrapper is a true no-op.
+             --avp (not a bare percentage) is what lets the ring both sweep in
+             on arrival and glide to a new value on a tick — see @property
+             --avp above. -->
+        <span class="hdmewrap" data-k="hdmewrap" ${UI.screen === 'today' ? `style="padding:3px;--avp:${pct}%;background:conic-gradient(var(--accent) var(--avp),var(--track) 0)" aria-label="${pct}% of today done"` : ''}>
           <button class="hdme ${OVERLAY ? 'closing' : ''}" data-k="hdme"
             aria-label="${OVERLAY ? 'Close' : 'Settings'}"
             ${on(() => (OVERLAY ? go(UI.backTo || 'today') : (UI.backTo = UI.screen, go('settings'))))}>
