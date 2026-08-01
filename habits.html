@@ -1432,6 +1432,162 @@
   #app .plate.locked { opacity: .7; }
   #app .plate.locked .plate-in { background: var(--card); color: var(--muted-soft); }
 
+  /* ── THE PASS ═══════════════════════════════════════════════════════════
+     The Locker reads as a battle pass: a season hero that states where you
+     are and what lands next, a loadout of what you actually own, and one
+     continuous TRACK — a spine with rank gates and reward nodes threaded on
+     it. Locked rewards keep their art (greyed, not hidden), because a pass
+     works by showing you the thing you have not got yet. */
+  #app .pass-hero {
+    position: relative; overflow: hidden; margin: 14px 16px 0;
+    border-radius: 24px; background: #231F35; color: #F6F4FF; padding: 16px;
+    display: flex; flex-direction: column; gap: 13px;
+  }
+  #app .pass-hero::before {
+    content: ''; position: absolute; width: 250px; height: 250px; right: -78px; top: -118px;
+    border-radius: 999px; pointer-events: none;
+    background: radial-gradient(circle, rgba(108,92,231,.95), transparent 68%);
+  }
+  #app .pass-hero > * { position: relative; }
+  #app .ph-top { display: flex; align-items: center; gap: 14px; }
+  #app .ph-ring {
+    flex: none; width: 78px; height: 78px; border-radius: 999px; display: grid; place-items: center;
+    background: conic-gradient(#35D0BA var(--p,0%), rgba(246,244,255,.16) 0);
+  }
+  #app .ph-ring > span {
+    width: 65px; height: 65px; border-radius: 999px; background: #231F35;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  }
+  #app .ph-lv { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 29px; line-height: .88; letter-spacing: -.035em; }
+  #app .ph-lvl { font-style: normal; font-size: 7.5px; font-weight: 700; letter-spacing: .18em; color: #A9A3C9; }
+  #app .ph-id { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  #app .ph-rank { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+  #app .ph-rank b {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #app .ph-sub { font-size: 11px; line-height: 1.35; color: #A9A3C9; }
+  #app .ph-kept {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
+    background: rgba(246,244,255,.11); padding: 4px 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: .04em; color: #CBC6E4;
+  }
+  #app .ph-kept i { font-style: normal; color: #35D0BA; font-weight: 800; }
+  #app .ph-next {
+    display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; cursor: pointer;
+    border: 0; border-radius: 17px; background: rgba(246,244,255,.09); padding: 10px 12px;
+    font-family: 'Outfit', sans-serif; color: inherit;
+  }
+  #app .ph-next:active { background: rgba(246,244,255,.16); }
+  #app .ph-nb { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  #app .ph-nk { font-size: 8.5px; font-weight: 800; letter-spacing: .15em; color: #A99BF5; }
+  #app .ph-nn { font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #app .ph-nx { font-size: 10.5px; color: #A9A3C9; }
+  #app .ph-next .bar { background: rgba(246,244,255,.18); }
+  #app .ph-next .bar > span { background: #35D0BA; }
+  #app .ph-go { flex: none; font-size: 17px; font-weight: 800; color: #CBC6E4; }
+
+  /* Loadout — what you own and what you are wearing. */
+  #app .loadout {
+    display: flex; gap: 13px; align-items: center; margin: 0 16px;
+    border-radius: 20px; background: var(--card); box-shadow: var(--shadow); padding: 13px;
+  }
+  #app .lo-card {
+    flex: none; width: 66px; height: 84px; border-radius: 12px; display: flex;
+    flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    box-shadow: 0 8px 18px -10px rgba(35,31,53,.85);
+  }
+  #app .lo-card b { font-weight: 800; font-size: 7.5px; letter-spacing: .05em; color: #F6F4FF; text-shadow: 0 1px 2px rgba(0,0,0,.45); }
+  #app .lo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  #app .lo-line { font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+  #app .lo-rail { margin-top: 11px; display: flex; flex-direction: column; gap: 7px; }
+  #app .lo-rl { padding: 0 20px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; color: var(--muted-soft); }
+  #app .rail { display: flex; gap: 8px; overflow-x: auto; padding: 2px 20px 4px; scrollbar-width: none; }
+  #app .rail::-webkit-scrollbar { display: none; }
+  #app .lo-empty {
+    flex: none; border-radius: 999px; border: 1.5px dashed var(--box); padding: 8px 13px;
+    font-size: 10.5px; font-weight: 700; color: var(--muted-soft); white-space: nowrap;
+  }
+
+  /* Reward art — the real swatch, greyed while locked so it still tempts. */
+  #app .rart { position: relative; flex: none; border-radius: 10px; overflow: hidden; display: block; box-shadow: 0 5px 12px -6px rgba(35,31,53,.7); }
+  /* Locked art keeps its HUE — the tier escalation from bronze to prismatic is
+     the thing worth wanting, so it is dimmed rather than drained. */
+  #app .rart.lockd { filter: grayscale(.5); opacity: .5; box-shadow: none; }
+  #app .rart .lk { position: absolute; inset: 0; display: grid; place-items: center; color: #FFF; }
+  #app .rart .lk svg { width: 14px; height: 14px; }
+
+  /* The track — one spine, rank gates and reward nodes threaded on it. */
+  #app .track { padding: 0 16px; display: flex; flex-direction: column; }
+  #app .trow { display: flex; gap: 11px; align-items: stretch; }
+  #app .tn-rail { flex: none; width: 32px; position: relative; display: flex; align-items: center; justify-content: center; }
+  #app .tn-rail::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 3px;
+    margin-left: -1.5px; background: var(--track); border-radius: 2px;
+  }
+  #app .track > .trow:first-child .tn-rail::before { top: 50%; }
+  #app .track > .trow:last-child .tn-rail::before { bottom: 50%; }
+  #app .trow.got .tn-rail::before, #app .trow.done .tn-rail::before { background: #35D0BA; }
+  #app .trow.now .tn-rail::before { background: #35D0BA; }
+  /* The player marker. A rank BAND is a chapter heading — GRINDER opens at level
+     11 — so it cannot also say "you are here" when you are at 13 and two rewards
+     deep into it. The position is its own node on the spine, and it is the point
+     where teal turns grey. */
+  #app .trow.mark .tn-rail::before { background: linear-gradient(180deg, #35D0BA 0 50%, var(--track) 50%); }
+  #app .trow.mark .tn-wrap { padding: 7px 0; }
+  #app .tn-you { position: relative; flex: none; width: 17px; height: 17px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 3.5px var(--bg), 0 0 0 6.5px var(--accent); }
+  #app .youtag {
+    display: inline-flex; align-items: center; border-radius: 999px; background: var(--accent);
+    color: #FFF; padding: 4px 11px; font-size: 9px; font-weight: 800; letter-spacing: .12em;
+  }
+  #app .tn-wrap { flex: 1; min-width: 0; padding: 4px 0; }
+  #app .tn-dot {
+    position: relative; flex: none; width: 30px; height: 30px; border-radius: 999px;
+    display: grid; place-items: center; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 11.5px;
+    background: var(--bg); border: 2.5px solid var(--track); color: var(--muted);
+  }
+  #app .trow.got .tn-dot { background: #35D0BA; border-color: #35D0BA; color: #0C4B43; }
+  #app .trow.got .tn-dot .tick { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 3.4; }
+  #app .trow.next .tn-dot { background: var(--accent); border-color: var(--accent); color: #FFF; box-shadow: 0 0 0 5px rgba(108,92,231,.20); }
+  #app .tn-gate { position: relative; flex: none; width: 15px; height: 15px; border-radius: 4px; transform: rotate(45deg); background: var(--track); }
+  #app .trow.done .tn-gate { background: #35D0BA; }
+  #app .trow.now .tn-gate { background: var(--accent); box-shadow: 0 0 0 5px rgba(108,92,231,.18); }
+  #app .tn-card {
+    display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; border: 0; cursor: pointer;
+    font-family: 'Outfit', sans-serif; border-radius: 18px; background: var(--card);
+    box-shadow: var(--shadow); padding: 11px 12px;
+  }
+  #app .trow.lockd .tn-card { background: transparent; box-shadow: none; padding: 8px 12px; }
+  #app .trow.next .tn-card { box-shadow: 0 0 0 2px var(--accent), 0 16px 28px -18px rgba(108,92,231,.95); }
+  #app .tn-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  #app .tn-kind { font-size: 8.5px; font-weight: 800; letter-spacing: .14em; color: var(--muted-soft); }
+  #app .trow.next .tn-kind { color: var(--accent); }
+  #app .tn-name { font-size: 14px; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #app .trow.lockd .tn-name { color: var(--muted); }
+  #app .tn-note { font-size: 11px; line-height: 1.35; color: var(--muted-soft); }
+  #app .tn-bar { margin-top: 4px; }
+  #app .tn-xp { font-size: 10.5px; font-weight: 700; color: var(--accent); }
+  #app .tn-flag { flex: none; align-self: flex-start; font-size: 8.5px; font-weight: 800; letter-spacing: .1em; border-radius: 999px; padding: 3px 8px; }
+  #app .trow.got .tn-flag { background: rgba(53,208,186,.22); color: var(--teal-deep); }
+  #app .trow.next .tn-flag { background: var(--accent); color: #FFF; }
+
+  /* Rank gates — the chapter headings of the pass. */
+  #app .tband { display: flex; gap: 11px; align-items: center; border-radius: 18px; background: var(--surface); padding: 11px 13px; }
+  #app .trow.now .tband { background: #231F35; color: #F6F4FF; box-shadow: 0 16px 30px -20px rgba(35,31,53,.95); }
+  #app .trow.lockd .tband { background: transparent; padding: 9px 13px; }
+  #app .trow.band.lockd { opacity: .66; }
+  #app .tb-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  #app .tb-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+  #app .tb-meta { font-size: 10.5px; line-height: 1.35; color: var(--muted); }
+  #app .trow.now .tb-meta { color: #A9A3C9; }
+  #app .trow.now .tb-meta strong { color: #35D0BA; font-weight: 700; }
+  #app .tb-right { flex: none; font-size: 8.5px; font-weight: 800; letter-spacing: .11em; color: var(--muted-soft); text-align: right; white-space: nowrap; }
+  #app .trow.now .tb-right { color: #35D0BA; }
+  #app .trow.done .tb-right { color: var(--teal-deep); }
+  #app .trow.now .pips i { border-color: rgba(246,244,255,.38); }
+  #app .trow.now .pips i.on { background: #35D0BA; border-color: #35D0BA; }
+  #app .tstar { border-radius: 18px; border: 1.5px dashed var(--box); background: transparent; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+
   /* ── Share picker ── the card is previewed by the same painter that exports it. */
   #app .sharesheet { padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; max-height: 92%; overflow-y: auto; }
   #app .sharehd { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -2328,7 +2484,13 @@ function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
 function passHas(id)  { return id === CARD_BASE.id || passOwned().indexOf(id) >= 0; }
 function passTitle()  { const t = CFG.pass && CFG.pass.title; return passHas(t) ? passItem(t) : null; }
 function passCard()   { const c = CFG.pass && CFG.pass.card;  return (passHas(c) && passItem(c)) || CARD_BASE; }
-function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p => p.lv > lv) || null; }
+// Not just the first reward past your level — the first one you do not
+// ALREADY OWN. A season reset drops levels to 1 and keeps the shelf, so an
+// athlete climbing back up has usually kept most of what the early levels
+// pay; without the ownership check both the Locker and the manual ("Next is
+// X at level Y") would describe a reward the athlete has been wearing for
+// months as though it were still ahead of them.
+function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p => p.lv > lv && !passHas(p.id)) || null; }
 // The board and the wall hand back a title's ID; its NAME lives here. An id
 // this build does not know shows nothing rather than a raw `t_iron` — a cached
 // page can be older than the track on the server.
@@ -6415,7 +6577,7 @@ function renderManual() {
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
-          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. Titles and card skins live there, and under them <strong style="color:var(--ink)">the road</strong> — every level from 1 to ${LEVELS_PER_CYCLE}, marked where you are standing, with the rank and the reward each one hands over. No points on that screen; it is only ever about position.`));
+          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. It reads like a pass: what you are wearing up top, what you own in a loadout, and below that <strong style="color:var(--ink)">the pass</strong> — one track with every rank and reward threaded on it, and a marker showing exactly where you stand.`));
       })()}
 
       ${(() => {
@@ -6530,38 +6692,38 @@ const CARD_LOOK = {
   c_flare:     'background:conic-gradient(#6C5CE7 0deg 30deg, #17142B 30deg 90deg, #FF8A5B 90deg 120deg, #17142B 120deg 180deg, #6C5CE7 180deg 210deg, #17142B 210deg 270deg, #FF8A5B 270deg 300deg, #17142B 300deg 360deg)'
 };
 
-// Threads every rank crest and reward circle on the road onto ONE vertical
-// line (Amir, 2026-07-30: "level circles ... and emblems in line with each
-// other. they should actually be connected to each other with a vertical
-// bar ... starting from rookie emblem until where we are right now"). The
-// line is accent-filled through every node already reached and var(--track)
-// after — the seam between the two IS the current position, so nothing else
-// has to mark it; the very next node (already ringed as NEXT, or labelled
-// YOU ARE HERE) sits right at that seam.
+// ── The pass ─────────────────────────────────────────────────────────────
+// The Locker reads as a battle pass (Amir, 2026-08-01, pasting a redesign
+// after two rounds of feedback on the level-by-level version this replaces:
+// "this should be the redesign of my locker"). A season hero states where
+// you are and what lands next; a loadout shows what you have actually won;
+// one continuous TRACK threads the rank gates and reward nodes on a single
+// spine. Locked rewards keep their real art, greyed rather than hidden — a
+// pass works by showing you the thing you have not got yet.
 //
-// One fixed-width column, same width as a rank crest, wraps every icon: two
-// line segments (flex:1 each) push the icon to true vertical centre and
-// carry the colour on either side of it. `align-self:stretch` on the column
-// (paired with `align-items:stretch` on the row, and the row's OWN vertical
-// spacing moved onto the content span instead of the row itself) is what
-// keeps the segments meeting exactly at the row boundary — padding on the
-// row would open a gap in the line at every rank change. `hideAbove` caps
-// the very top of the road so nothing pokes out above Rookie.
-function roadIconCol(iconHtml, reached, hideAbove) {
-  const wire = reached ? 'var(--accent)' : 'var(--track)';
-  return `<span style="position:relative;flex:none;width:34px;align-self:stretch;display:flex;flex-direction:column;align-items:center">
-      <span style="width:3px;flex:1;min-height:6px;background:${hideAbove ? 'transparent' : wire}"></span>
-      <span style="flex:none;display:flex;align-items:center;justify-content:center">${iconHtml}</span>
-      <span style="width:3px;flex:1;min-height:6px;background:${wire}"></span>
-    </span>`;
-}
-
+// The position marker is its OWN node on the spine now, not a rank band or a
+// reward pretending to be one (Amir, at level 4: "the level 5 is the
+// contender ... this is a mess" — CONTENDER opens at level 6, and the road's
+// old "YOU ARE HERE" sat on the CONTENDER band, so level 4 read as CONTENDER
+// too). `.trow.mark` drops in wherever the athlete actually stands — after
+// every reward their current rank has already paid, before the ones it has
+// not — so the marker can never land on the wrong rung again.
 function renderPass() {
-  const LI = overallLevel();
+  const LI = overallLevel(), lv = LI.lv;
+  const next = nextReward();
   const owned = passOwned().length;
   const eqT = passTitle(), eqC = passCard();
+  // The hero bar measures the SEGMENT between the last reward and the next one,
+  // not progress against the whole track — a pass is read one tier at a time.
+  const toNext = next ? Math.max(0, cumXpTo(next.lv) - LI.xp) : 0;
+  const prevRw = PASS_TRACK.filter(p => p.lv <= lv).slice(-1)[0];
+  const fromXp = cumXpTo(prevRw ? prevRw.lv : 1);
+  const nextPct = next ? Math.max(4, Math.min(100, Math.round((LI.xp - fromXp) / Math.max(1, cumXpTo(next.lv) - fromXp) * 100))) : 100;
+  const nextDays = Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp())));
   const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles());
   const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
+  const myTitles = titles.filter(p => passHas(p.id));
+  const myCards = cards.filter(p => passHas(p.id));
 
   const wear = p => {
     if (!passHas(p.id) && p.id !== CARD_BASE.id) { toast((p.lv ? 'Level ' + p.lv : 'Finishing its event') + ' unlocks ' + p.name + '.'); return; }
@@ -6571,178 +6733,182 @@ function renderPass() {
     saveCfg(); haptic('done'); render();
     if (p.kind === 'title') pushTitle();
   };
+  // Scroll the track to a node rather than describing where it is. No
+  // scrollIntoView: the app's scroller is a div, and moving the window under it
+  // strands the header.
+  const jumpTo = id => {
+    const el = document.querySelector('[data-k="road:' + id + '"]');
+    const sc = document.getElementById('scroll');
+    if (!el || !sc) return;
+    const r = el.getBoundingClientRect(), s = sc.getBoundingClientRect();
+    sc.scrollTo({ top: Math.max(0, sc.scrollTop + (r.top - s.top) - 14), behavior: 'smooth' });
+  };
 
-  // Titles rail — metal plates, one worn at a time.
+  const LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  // A reward's art is the actual thing it hands over: the real card ground for a
+  // skin, a metal nameplate for a title. Locked art is greyed, never hidden.
+  const art = (p, has, w) => {
+    w = w || 46;
+    const inner = p.kind === 'card'
+      ? '<span style="position:absolute;inset:0;' + (CARD_LOOK[p.id] || CARD_LOOK.c_paper) + '"></span>'
+      : '<span style="position:absolute;inset:0;background:' + METALS[titleMetalKey(p)].rim + '"></span>'
+        + '<span style="position:absolute;left:15%;right:15%;top:37%;height:24%;border-radius:999px;background:#231F35"></span>';
+    return '<span class="rart' + (has ? '' : ' lockd') + '" style="width:' + w + 'px;height:' + Math.round(w * 1.26) + 'px">'
+         + inner + (has ? '' : '<span class="lk">' + LOCK + '</span>') + '</span>';
+  };
+
+  // Loadout rails hold what you OWN. They fill up as you climb, which is the
+  // point of a locker — the road below is the only place locked things live, so
+  // nothing is listed twice.
   const plateBtn = p => {
-    const has = passHas(p.id), isOn = eqT && eqT.id === p.id;
-    if (!has) return `<button class="plate locked" data-k="rw:${p.id}" ${on(() => wear(p))}><span class="plate-in">🔒 ${p.lv ? 'LV ' + p.lv : esc(p.name)}</span></button>`;
-    const m = METALS[titleMetalKey(p)];
+    const isOn = eqT && eqT.id === p.id, m = METALS[titleMetalKey(p)];
     return `<button class="plate" data-k="rw:${p.id}" style="background:${m.rim};${isOn ? 'box-shadow:0 0 0 2px rgba(108,92,231,.5),0 6px 16px -8px rgba(108,92,231,.8);' : ''}" ${on(() => wear(p))}>
       <span class="plate-in" style="color:${titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink}">${isOn ? '◆ ' : ''}${esc(p.name)}</span></button>`;
   };
-  // Skins rail — the card grounds, honest swatches from CARD_LOOK.
   const skinBtn = p => {
-    const has = p.id === CARD_BASE.id || passHas(p.id), isOn = eqC.id === p.id;
+    const isOn = eqC.id === p.id;
     return `<button data-k="rw:${p.id}" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit" ${on(() => wear(p))}>
-      <span style="width:48px;height:60px;border-radius:12px;${has ? (CARD_LOOK[p.id] || CARD_LOOK.c_paper) : 'background:var(--surface);border:2px dashed var(--box)'};${isOn ? 'box-shadow:0 0 0 2.5px var(--accent),0 6px 14px -6px rgba(108,92,231,.8);' : ''}${has ? '' : 'display:flex;align-items:center;justify-content:center;'}">${has ? '' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;color:var(--muted-soft)"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'}</span>
-      <span style="font-size:9px;font-weight:${isOn ? 800 : 700};letter-spacing:.04em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : (has ? '' : ' · LV ' + p.lv)}</span></button>`;
+      <span style="width:48px;height:60px;border-radius:12px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper};${isOn ? 'box-shadow:0 0 0 2.5px var(--accent),0 6px 14px -6px rgba(108,92,231,.8);' : ''}"></span>
+      <span style="font-size:9px;font-weight:${isOn ? 800 : 700};letter-spacing:.04em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : ''}</span></button>`;
   };
 
-  // ── The road ───────────────────────────────────────────────────────────────
-  // A LEVEL ladder, read the way a battle pass reads (Amir, 2026-08-01: "look
-  // the box highlighted as my next objective, my objective is level 5 first and
-  // not level 6 ... this is like league of legends battlepass"). It used to
-  // list only the ranks and the 14 rewards, so the one ringed NEXT box was
-  // whatever reward came next — two levels above him — and the single step he
-  // could actually take was not on the screen at all. Every level is a node
-  // now; rewards hang off the levels that pay one, and the ring is always on
-  // level + 1. Nothing else is highlighted.
-  //
-  // And NO XP anywhere on this screen ("i dont want any explanation of how many
-  // xp i need for next achievement or level, i have them on today's tab. I just
-  // wanna know where im standing regarding the next achievements"). The Today
-  // hero owns the arithmetic. The Locker owns the position: what is behind you,
-  // the one step in front of you, and what is waiting further up.
-  const cur = LI.rank;
-  const lvIn = ((LI.lv - 1) % LEVELS_PER_CYCLE) + 1;   // where you stand in THIS cycle
-  const starOff = cur.star * LEVELS_PER_CYCLE;          // what to PRINT on a star run
-  const NODE = {
-    done:  'background:var(--accent);color:#fff',
-    here:  'background:var(--accent);color:#fff;outline:2.5px solid var(--accent);outline-offset:2.5px',
-    next:  'background:var(--card);color:var(--accent);border:2.5px solid var(--accent)',
-    later: 'border:2px dashed var(--box);background:var(--card);color:var(--muted-soft)'
-  };
-  const node = (n, size, state) => `<span style="flex:none;width:${size}px;height:${size}px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:${size >= 30 ? 12.5 : 10}px;${NODE[state]}">${n}</span>`;
-  // What a level HANDS OVER, in plain words — a rank, a reward, or both on the
-  // same level (level 6 is CONTENDER *and* the Ember skin). This is the only
-  // thing the road promises now, so it has to name everything.
-  //
-  // A reward already owned is NOT a promise. A season reset drops levels to 1
-  // and keeps the shelf, so the athlete climbing back up owns most of what the
-  // early levels pay; without this filter the road would dangle titles they have
-  // been wearing for months. Ranks are never filtered — those genuinely reset.
-  const paysAt = n => {
-    const bits = [];
-    if ((n - 1) % SUBS_PER_RANK === 0) { const r = rankFor(n + starOff); bits.push((r.star ? '★' + r.star + ' ' : '') + r.name); }
-    PASS_TRACK.filter(p => p.lv === n && !passHas(p.id)).forEach(p => bits.push(p.name + (p.kind === 'card' ? ' skin' : ' title')));
-    return bits;
-  };
-  const levelRow = n => {
-    const rw = PASS_TRACK.find(p => p.lv === n), has = rw && passHas(rw.id);
-    const done = n < lvIn, isHere = n === lvIn;
-    // The next level is only worth ringing if it actually HANDS SOMETHING OVER
-    // (Amir, 2026-08-01: "if there is no specific achievement for the next level
-    // there is no need for high light. Just show them where they are"). Level 5
-    // pays nothing, so level 5 gets no box and the only marker on the road stays
-    // on level 4, where he is. And nothing spells out what waits further up —
-    // "you dont need to write what happens next at 6, they understand that by
-    // looking": the rank header and the reward row are sitting right there.
-    const isNext = n === lvIn + 1 && paysAt(n).length > 0;
-    const shown = n + starOff;
-    const preview = rw && rw.kind === 'card'
-      ? `<span style="flex:none;align-self:center;width:26px;height:33px;border-radius:7px;${CARD_LOOK[rw.id] || CARD_LOOK.c_paper}"></span>`
-      : '';
-    const rwName = rw ? esc(rw.name) + (rw.kind === 'card' ? ' skin' : ' title') : '';
+  // ── The track ───────────────────────────────────────────────────────────
+  // One spine. Rank gates are its chapter headings, rewards are the nodes
+  // between them, and the rail is teal behind you and grey ahead.
+  const cur = LI.rank, curIdx = RANKS.indexOf(cur.name);
+  const rankTop = (curIdx + 1) * SUBS_PER_RANK + cur.star * LEVELS_PER_CYCLE;
+  const toRankUp = Math.max(0, cumXpTo(rankTop + 1) - LI.xp);
+  const nextRankName = RANKS[(curIdx + 1) % RANKS.length];
 
-    // Where you stand, and — only when it pays — the step in front of you. One
-    // shape for both, so the road has at most two marked rows and no prose.
-    if (isHere || isNext) return `
-      <div style="display:flex;gap:13px;align-items:stretch${isNext ? ';border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow)' : ''}" data-k="road-lv:${n}">
-        ${roadIconCol(node(shown, 30, isHere ? 'here' : 'next'), isHere)}
-        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px ${isNext ? '12px' : '0'} 9px 0">
-          <span style="display:flex;flex-direction:column;min-width:0">
-            <span class="hd" style="font-size:14px;line-height:1.15">Level ${shown}</span>
-            ${rw ? `<span style="font-size:10.5px;color:var(--muted-soft)">${rwName}${has ? ' · kept' : ''}</span>` : ''}
-          </span>
-          <span style="flex:none;display:flex;align-items:center;gap:8px">${preview}<span style="font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--accent)">${isHere ? 'YOU ARE HERE' : 'NEXT'}</span></span>
-        </span>
-      </div>`;
-
-    // A level that pays a reward: kept, or still locked with its line of flavour.
-    if (rw) return has ? `
-      <div style="display:flex;gap:13px;align-items:stretch" data-k="road-lv:${n}">
-        ${roadIconCol(`<span style="flex:none;width:34px;height:34px;border-radius:999px;background:var(--teal);color:#0C4B43;display:flex;align-items:center;justify-content:center">${TICK}</span>`, done)}
-        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0">
-          <span style="font-weight:700;font-size:13.5px">${rwName}</span>
-          <span style="flex:none;display:flex;align-items:center;gap:8px">${preview}<span style="font-size:10px;font-weight:700;color:var(--teal-deep)">KEPT</span></span>
-        </span>
-      </div>` : `
-      <div style="display:flex;gap:13px;align-items:stretch;opacity:.62" data-k="road-lv:${n}">
-        ${roadIconCol(node(shown, 34, done ? 'done' : 'later'), done)}
-        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0">
-          <span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:700;font-size:13.5px;color:var(--muted)">${rwName}</span><span style="font-size:10.5px;color:var(--muted-soft)">${esc(rw.note)}</span></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;width:13px;height:13px;color:var(--muted-soft)"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-        </span>
-      </div>`;
-
-    // A level that pays nothing is still a rung on the ladder — a small numbered
-    // bead on the line. Most steps are just steps, and seeing them is what makes
-    // the distance to the next reward legible without printing a single number.
+  const rewardRow = p => {
+    const has = passHas(p.id), isNext = !has && next && next.id === p.id;
+    const st = has ? 'got' : (isNext ? 'next' : 'lockd');
+    const kind = p.kind === 'card' ? 'CARD SKIN' : 'TITLE';
     return `
-      <div style="display:flex;gap:13px;align-items:stretch${done ? '' : ';opacity:.55'}" data-k="road-lv:${n}">
-        ${roadIconCol(node(shown, 22, done ? 'done' : 'later'), done)}
-        <span style="flex:1;padding:3px 0"></span>
+      <div class="trow node ${st}" data-k="road:${p.id}">
+        <span class="tn-rail"><b class="tn-dot">${has ? TICK : p.lv}</b></span>
+        <span class="tn-wrap">
+          <button class="tn-card" ${on(() => wear(p))} aria-label="${esc(p.name)} — ${has ? 'tap to wear' : 'unlocks at level ' + p.lv}">
+            ${art(p, has)}
+            <span class="tn-body">
+              <span class="tn-kind">${kind} · LEVEL ${p.lv}</span>
+              <span class="tn-name">${esc(p.name)}</span>
+              <span class="tn-note">${esc(p.note)}</span>
+              ${isNext ? `<span class="bar thin tn-bar" style="height:6px"><span data-fill style="width:${nextPct}%"></span></span>
+              <span class="tn-xp">${toNext.toLocaleString()} XP — about ${nextDays} good day${nextDays === 1 ? '' : 's'}</span>` : ''}
+            </span>
+            ${has ? '<span class="tn-flag">KEPT</span>' : (isNext ? '<span class="tn-flag">NEXT</span>' : '')}
+          </button>
+        </span>
       </div>`;
   };
 
   const road = RANKS.map((name, i) => {
     const first = i * SUBS_PER_RANK + 1, last = (i + 1) * SUBS_PER_RANK;
-    const here = lvIn >= first && lvIn <= last, passed = lvIn > last;
-    const levels = [];
-    for (let n = first; n <= last; n++) levels.push(levelRow(n));
+    const here = curIdx === i;
+    const passed = cur.star > 0 || curIdx > i;
+    const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
+    const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
+    const st = here ? 'now' : (passed ? 'done' : 'lockd');
     return `
-      <div style="display:flex;gap:12px;align-items:stretch;${i ? 'border-top:1px solid var(--rule)' : ''}${here || passed ? '' : ';opacity:.62'}" data-k="road-rank:${name}">
-        ${roadIconCol(rankCrest(name, 34), here || passed, i === 0)}
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:${i ? '16px' : '6px'} 0 8px">
-          <span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
-            <span class="hd" style="font-size:15.5px;line-height:1">${esc(name)}</span>
-            ${passed ? '<span style="flex:none;font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--muted-soft)">CLEARED</span>' : ''}
-          </span>
-          <span style="font-size:10.5px;line-height:1.35;color:var(--muted)">${METALS[TIER_KEYS[i]].label} tier · Levels ${first + starOff}–${last + starOff}</span>
+      <div class="trow band ${st}" data-k="road-rank:${name}">
+        <span class="tn-rail"><b class="tn-gate"></b></span>
+        <span class="tn-wrap">
+          <div class="tband">
+            ${rankCrest(name, 38)}
+            <span class="tb-mid">
+              <span class="tb-name">${esc(name)}</span>
+              <span class="tb-meta">${METALS[TIER_KEYS[i]].label} tier · Levels ${first}–${last}${here && toRankUp > 0 ? ` · <strong>${toRankUp.toLocaleString()} XP to ${esc(nextRankName)}</strong>` : ''}</span>
+              ${here || passed ? `<span class="pips">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
+            </span>
+            <span class="tb-right">${here ? 'IN<br>PROGRESS' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
+          </div>
         </span>
-      </div>` + levels.join('');
-  }).join('')
-    // On the very last level of a cycle the next step is off the end of the
-    // road — level 51 is the prestige. Draw it anyway, so there is ALWAYS
-    // exactly one ringed next objective on this screen.
-    + (lvIn === LEVELS_PER_CYCLE ? levelRow(LEVELS_PER_CYCLE + 1) : '') + `
-    <div style="display:flex;flex-direction:column;gap:6px;padding:16px 4px 6px;border-top:1px solid var(--rule);margin-top:6px">
-      <span class="hd" style="font-size:15.5px;line-height:1">Past ${RANKS.length * SUBS_PER_RANK}: the star</span>
-      <span style="font-size:12px;line-height:1.55;color:var(--muted)">Clear ${esc(RANKS[RANKS.length - 1])} ${SUBS_PER_RANK} and the road starts again carrying a star — <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE + 1).label)}</strong>, then <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE * 2 + 1).label)}</strong>, and on forever. The star is the real flex.</span>
+      </div>` + (() => {
+        const rw = PASS_TRACK.filter(p => p.lv >= first && p.lv <= last);
+        if (!here) return rw.map(rewardRow).join('');
+        // The marker goes where the athlete actually stands: after every reward
+        // this rank has already paid out, before the ones it has not.
+        const cut = rw.findIndex(p => p.lv > lv);
+        const at = cut < 0 ? rw.length : cut;
+        return rw.slice(0, at).map(rewardRow).join('') + `
+      <div class="trow mark" data-k="road-you">
+        <span class="tn-rail"><b class="tn-you"></b></span>
+        <span class="tn-wrap"><span class="youtag">YOU ARE HERE · LEVEL ${lv}</span></span>
+      </div>` + rw.slice(at).map(rewardRow).join('');
+      })();
+  }).join('') + `
+    <div class="trow band lockd">
+      <span class="tn-rail"><b class="tn-gate"></b></span>
+      <span class="tn-wrap">
+        <div class="tstar">
+          <span class="tb-name">Past ${RANKS.length * SUBS_PER_RANK}: the star</span>
+          <span class="tb-meta">Clear ${esc(RANKS[RANKS.length - 1])} ${SUBS_PER_RANK} and the road starts again carrying a star — <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE + 1).label)}</strong>, then <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE * 2 + 1).label)}</strong>, and on forever. The star is the real flex.</span>
+        </div>
+      </span>
     </div>`;
 
   return `
     <div data-k="screen:pass" style="${screenAnim()}">
-      <!-- What you are wearing, as the crew sees it, with the share button ON
-           the preview — the card is the point of owning any of this. -->
-      <div style="margin:14px 16px;border-radius:22px;background:#231F35;color:#F6F4FF;padding:14px;display:flex;gap:13px;align-items:center">
-        <span style="flex:none;width:74px;height:92px;border-radius:12px;${CARD_LOOK[eqC.id] || CARD_LOOK.c_paper};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 0 0 2px rgba(246,244,255,.12)">
-          ${rankCrest(LI.rank, 26)}
-          <span style="font-weight:800;font-size:8px;letter-spacing:.04em;color:#F6F4FF;text-shadow:0 1px 2px rgba(0,0,0,.4)">${esc(LI.label.toUpperCase())}</span>
-        </span>
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
-          <span style="font-weight:700;font-size:14.5px;line-height:1.25">Your card, as the crew sees it</span>
-          <span style="font-size:11.5px;line-height:1.4;color:#A9A3C9">${eqT ? `Wearing ${titlePlate(eqT, true)} on` : 'No title on'} the <strong style="color:#CBC6E4">${esc(eqC.name)}</strong> skin · ${owned} of ${PASS_TRACK.length} kept</span>
-          <span style="display:flex;gap:7px;margin-top:2px">
-            <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => openShare('rank'))}>Share it →</button>
+      <!-- Season hero: where you are, and the very next thing the pass pays out.
+           Everything else on this screen is detail under those two facts. -->
+      <div class="pass-hero">
+        <div class="ph-top">
+          <span class="ph-ring" style="--p:${LI.pct}%"><span>
+            <b class="ph-lv">${LI.lv}</b><i class="ph-lvl">LEVEL</i>
+          </span></span>
+          <span class="ph-id">
+            <span class="ph-rank">${rankCrest(LI.rank, 24)}<b>${esc(LI.label)}</b></span>
+            <span class="ph-sub">${esc(METALS[rankMetalKey(cur.name)].label)} tier · ${LI.into.toLocaleString()} / ${LI.need.toLocaleString()} XP into this level</span>
+            <span class="ph-kept"><i>${owned}</i> of ${PASS_TRACK.length} rewards kept</span>
           </span>
+        </div>
+        ${next ? `
+        <button class="ph-next" ${on(() => jumpTo(next.id))} aria-label="Jump to the next reward on the track">
+          ${art(next, passHas(next.id), 40)}
+          <span class="ph-nb">
+            <span class="ph-nk">NEXT ON THE PASS · LV ${next.lv}</span>
+            <span class="ph-nn">${esc(next.name)}</span>
+            <span class="bar thin" style="height:6px"><span data-fill style="width:${nextPct}%"></span></span>
+            <span class="ph-nx">${toNext.toLocaleString()} XP to go — about ${nextDays} good day${nextDays === 1 ? '' : 's'}</span>
+          </span>
+          <span class="ph-go">↓</span>
+        </button>` : `
+        <div class="ph-next" style="cursor:default">
+          <span class="ph-nb">
+            <span class="ph-nk">THE PASS IS CLEARED</span>
+            <span class="ph-nx">Every reward on the road is yours. The star carries the climb from here.</span>
+          </span>
+        </div>`}
+      </div>
+
+      ${sectionLabel('Your loadout', owned + ' of ' + PASS_TRACK.length + ' kept')}
+      <div class="loadout">
+        <span class="lo-card" style="${CARD_LOOK[eqC.id] || CARD_LOOK.c_paper}">
+          ${rankCrest(LI.rank, 24)}
+          <b>${esc(LI.label.toUpperCase())}</b>
+        </span>
+        <span class="lo-body">
+          <span class="lo-line">${eqT ? 'Wearing ' + titlePlate(eqT, true) : 'No title'} on the <strong style="color:var(--ink)">${esc(eqC.name)}</strong> skin — this is what the crew sees.</span>
+          <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => openShare('rank'))}>Share it →</button>
         </span>
       </div>
 
-      ${sectionLabel('Titles', (CFG.pass && CFG.pass.owned ? titles.filter(p => passHas(p.id)).length : 0) + ' of ' + titles.length)}
-      <div style="display:flex;gap:8px;overflow-x:auto;padding:2px 20px 6px;scrollbar-width:none">
-        ${titles.map(plateBtn).join('')}
+      <div class="lo-rail">
+        <span class="lo-rl">TITLES · ${myTitles.length} OF ${titles.length}</span>
+        <div class="rail">${myTitles.length
+          ? myTitles.map(plateBtn).join('')
+          : `<span class="lo-empty">Nothing yet — your first lands at level ${PASS_TRACK[0].lv}</span>`}</div>
       </div>
-      <div style="padding:0 20px 12px;font-size:11px;color:var(--muted-soft)">Tap to wear one — it shows on the board, the wall and your card. ${eqT ? 'Tap it again to show nothing.' : ''}</div>
-
-      ${sectionLabel('Card skins', cards.filter(p => p.id === CARD_BASE.id || passHas(p.id)).length + ' of ' + cards.length)}
-      <div style="display:flex;gap:10px;overflow-x:auto;padding:2px 20px 14px;scrollbar-width:none">
-        ${cards.map(skinBtn).join('')}
+      <div class="lo-rail">
+        <span class="lo-rl">CARD SKINS · ${myCards.length} OF ${cards.length}</span>
+        <div class="rail">${myCards.map(skinBtn).join('')}</div>
       </div>
+      <div style="padding:8px 20px 2px;font-size:11px;line-height:1.45;color:var(--muted-soft)">Tap a title to wear it${eqT ? ', tap it again to show nothing' : ''}. It rides on the board, the wall and your card.</div>
 
-      ${sectionLabel('The road', RANKS.length + ' ranks · ' + PASS_TRACK.length + ' rewards')}
-      <div style="padding:2px 16px 6px;display:flex;flex-direction:column">${road}</div>
-      <div style="margin:8px 16px 14px;border-radius:16px;background:var(--surface);padding:11px 14px;font-size:11.5px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
+      ${sectionLabel('The pass', RANKS.length + ' ranks · ' + PASS_TRACK.length + ' rewards')}
+      <div class="track">${road}</div>
+      <div style="margin:10px 16px 14px;border-radius:16px;background:var(--surface);padding:11px 14px;font-size:11.5px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
 
       <div style="padding:0 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => { UI.backTo = 'pass'; go('manual'); })}>How rewards work</button>
