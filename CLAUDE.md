@@ -265,6 +265,12 @@ it. Full detail in `HABITS.md`.
 **Supabase stages 9–20 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
 per-day rosters, weighted day scores, milestone tiers + event titles).
+⚠️ **`stage21_roll_call_retention.sql` is written but NOT applied.** It is the only
+destructive migration in the folder — it deletes `hab_notes` rows older than nine days —
+so Amir runs it himself. The client already limits the wall to seven days
+(`ROLL_DAYS`/`rollFloor()`), so until stage 21 runs the wall *shows* a week and the server
+still *holds* more. The two floors differ on purpose (client 7 on the local clock, server
+9 with timezone slack) — the file's header explains why, and they must not be matched up.
 
 **The day score is WEIGHTED, and it is two numbers.** `dayParts(day, mode)` in
 `habits.html` sums `baseXp()` over `rosterOn(day)` rather than counting heads. `dayPct()`
