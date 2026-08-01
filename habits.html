@@ -6627,54 +6627,36 @@ function renderPass() {
     PASS_TRACK.filter(p => p.lv === n && !passHas(p.id)).forEach(p => bits.push(p.name + (p.kind === 'card' ? ' skin' : ' title')));
     return bits;
   };
-  const lookAhead = from => {
-    for (let n = from; n <= LEVELS_PER_CYCLE; n++) { const b = paysAt(n); if (b.length) return { lv: n, bits: b }; }
-    return null;
-  };
-  const bold = bits => bits.map(b => `<strong style="color:var(--ink)">${esc(b)}</strong>`).join(' and ');
-
   const levelRow = n => {
     const rw = PASS_TRACK.find(p => p.lv === n), has = rw && passHas(rw.id);
-    const done = n < lvIn, isHere = n === lvIn, isNext = n === lvIn + 1;
+    const done = n < lvIn, isHere = n === lvIn;
+    // The next level is only worth ringing if it actually HANDS SOMETHING OVER
+    // (Amir, 2026-08-01: "if there is no specific achievement for the next level
+    // there is no need for high light. Just show them where they are"). Level 5
+    // pays nothing, so level 5 gets no box and the only marker on the road stays
+    // on level 4, where he is. And nothing spells out what waits further up —
+    // "you dont need to write what happens next at 6, they understand that by
+    // looking": the rank header and the reward row are sitting right there.
+    const isNext = n === lvIn + 1 && paysAt(n).length > 0;
     const shown = n + starOff;
     const preview = rw && rw.kind === 'card'
       ? `<span style="flex:none;align-self:center;width:26px;height:33px;border-radius:7px;${CARD_LOOK[rw.id] || CARD_LOOK.c_paper}"></span>`
       : '';
     const rwName = rw ? esc(rw.name) + (rw.kind === 'card' ? ' skin' : ' title') : '';
 
-    // Where you stand. The only place the words "you are here" appear.
-    if (isHere) return `
-      <div style="display:flex;gap:13px;align-items:stretch" data-k="road-lv:${n}">
-        ${roadIconCol(node(shown, 30, 'here'), true)}
-        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0">
+    // Where you stand, and — only when it pays — the step in front of you. One
+    // shape for both, so the road has at most two marked rows and no prose.
+    if (isHere || isNext) return `
+      <div style="display:flex;gap:13px;align-items:stretch${isNext ? ';border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow)' : ''}" data-k="road-lv:${n}">
+        ${roadIconCol(node(shown, 30, isHere ? 'here' : 'next'), isHere)}
+        <span style="flex:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px ${isNext ? '12px' : '0'} 9px 0">
           <span style="display:flex;flex-direction:column;min-width:0">
             <span class="hd" style="font-size:14px;line-height:1.15">Level ${shown}</span>
             ${rw ? `<span style="font-size:10.5px;color:var(--muted-soft)">${rwName}${has ? ' · kept' : ''}</span>` : ''}
           </span>
-          <span style="flex:none;display:flex;align-items:center;gap:8px">${preview}<span style="font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--accent)">YOU ARE HERE</span></span>
+          <span style="flex:none;display:flex;align-items:center;gap:8px">${preview}<span style="font-size:9.5px;font-weight:800;letter-spacing:.08em;color:var(--accent)">${isHere ? 'YOU ARE HERE' : 'NEXT'}</span></span>
         </span>
       </div>`;
-
-    // The one step you can take next — the ONLY ringed box on the whole road.
-    // The bar under it has no number on it on purpose: it says how far along
-    // you are without restating what Today already counts.
-    if (isNext) {
-      const own = paysAt(n), ahead = own.length ? null : lookAhead(n + 1);
-      return `
-      <div style="display:flex;gap:13px;align-items:stretch;border-radius:18px;background:var(--card);box-shadow:0 0 0 2px var(--accent),var(--shadow)" data-k="road-lv:${n}">
-        ${roadIconCol(node(shown, 30, 'next'), false)}
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;padding:10px 12px 10px 0">
-          <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-            <span class="hd" style="font-size:14px;line-height:1.15">Level ${shown}</span>
-            <span style="flex:none;font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--accent)">NEXT</span>
-          </span>
-          <span class="bar thin" style="height:6px"><span data-fill style="width:${Math.max(4, LI.pct)}%"></span></span>
-          <span style="font-size:10.5px;line-height:1.4;color:var(--muted)">${own.length
-            ? `Unlocks ${bold(own)}.`
-            : (ahead ? `Then ${bold(ahead.bits)} at level ${ahead.lv + starOff}.` : 'Keep climbing.')}</span>
-        </span>${preview ? `<span style="display:flex;align-items:center;padding-right:12px">${preview}</span>` : ''}
-      </div>`;
-    }
 
     // A level that pays a reward: kept, or still locked with its line of flavour.
     if (rw) return has ? `

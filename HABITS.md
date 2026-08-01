@@ -783,27 +783,38 @@ could actually take, was not drawn anywhere. **Every level from 1 to `LEVELS_PER
 row now.** Levels that pay something carry it; levels that pay nothing are a small numbered
 bead on the line, which is what makes the distance to the next reward legible without
 printing a number. Four states, from `lvIn` (position inside the current star cycle, so this
-survives prestige): **done** · **here** (accent node, ringed, *YOU ARE HERE* — the only place
-those words appear) · **next** (`lvIn + 1`, the **only** ringed box on the road) · **later**.
-On the last level of a cycle the next step is off the end of the list, so level 51 is drawn
-anyway — there is always exactly one next objective.
+survives prestige): **done** · **here** · **next** · **later**.
+
+**At most two rows are ever marked, and usually only one.** `here` is the accent node
+labelled *YOU ARE HERE* — the only place those words appear. `next` is `lvIn + 1`, ringed —
+**but only when that level actually hands something over.** Amir, on the first attempt at
+this: *"if there is no specific achievement for the next level there is no need for high
+light. Just show them where they are."* Level 5 pays nothing, so standing on level 4 there is
+no second box at all; standing on level 5 the ring lands on level 6, which pays CONTENDER and
+the Ember skin. Both marked rows are the **same shape** — node, `Level n`, the reward name if
+there is one, and the tag. On the last level of a cycle the next step is off the end of the
+list, so level 51 is drawn anyway.
+
+**Nothing on the road is explained in prose.** The first build wrote *"Then CONTENDER and
+EMBER skin at level 6."* inside the level-5 box, which read as though level 5 handed over
+CONTENDER — *"the level 5 is the contender … this is a mess. You dont need to write what
+happens next at 6, they understand that by looking."* He is right: the CONTENDER header and
+the Ember row are sitting directly underneath. `paysAt(n)` survives only as the **test** for
+whether `next` deserves a ring, not as a sentence.
 
 **No XP anywhere on this screen.** The Today hero owns the arithmetic (`LI.nextLabel`, "76 XP
-to level 5") and the Locker owns the position. Gone: the rank rows' cumulative cost, the
-next card's *"806 XP — about 2 good days"*, and the whole level panel that shipped earlier the
-same day. What the NEXT box says instead is what the level **hands over** — `paysAt(n)` names
-the rank and the reward together (level 6 is CONTENDER *and* the Ember skin), and when the
-next level pays nothing it looks ahead: *"Then CONTENDER and EMBER skin at level 6."* Its bar
-carries no label on purpose — position, not a second copy of the count.
+to level 5") and the Locker owns the position. Gone: the rank rows' cumulative cost, the old
+next card's *"806 XP — about 2 good days"*, and the level panel that shipped earlier the same
+day. No progress bar either — a bar is the count wearing a different hat.
 
 Two things `paysAt()` gets right that are easy to miss: a reward **already owned is not a
 promise** (a season reset drops levels to 1 and keeps the shelf, so the climb back up passes
 titles the athlete has been wearing for months — ranks are never filtered, those genuinely
-reset), and the rank it names comes from `rankFor()`, so past level 50 it promises **★1
-ROOKIE** rather than plain ROOKIE. The wire follows the **climb**, not the shelf: a KEPT
-reward above the current position keeps its teal tick but the line into it stays `var(--track)`.
-The rank headers lost their pips — the level nodes are the pips now — and their level range
-carries the star offset its XP figure used to have.
+reset), and the rank it counts comes from `rankFor()`, so the prestige level rings correctly.
+The wire follows the **climb**, not the shelf: a KEPT reward above the current position keeps
+its teal tick but the line into it stays `var(--track)`. The rank headers lost their pips —
+the level nodes are the pips now — and their level range carries the star offset its XP
+figure used to have.
 
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
 bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
