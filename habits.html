@@ -1166,6 +1166,12 @@
   .pips { display: flex; gap: 4px; }
   .pips i { width: 13px; height: 13px; border: 1.5px solid var(--box); display: block; }
   .pips i.on { background: var(--accent); border-color: var(--accent); }
+  /* The pip you are STANDING ON, on the Locker's current-rank row. Filled pips
+     say "levels reached"; without this, four filled pips out of five read as
+     "rank nearly finished" and never say which level is the live one. Outline
+     rather than box-shadow so it needs no background match, and 1.5+1.5px so it
+     stays inside the 4px gap and never touches the neighbouring pip. */
+  .pips i.now { outline: 1.5px solid var(--accent); outline-offset: 1.5px; }
 
   /* ═══ MEADOW skin ══════════════════════════════════════════════════════
      Cosy-game re-skin, appended as an override layer. `#app`-scoped selectors
@@ -6547,10 +6553,16 @@ const CARD_LOOK = {
 // keeps the segments meeting exactly at the row boundary — padding on the
 // row would open a gap in the line at every rank change. `hideAbove` caps
 // the very top of the road so nothing pokes out above Rookie.
-function roadIconCol(iconHtml, reached, hideAbove) {
+// `topPx` pins the icon a fixed distance from the top of the row instead of
+// centring it. Only the current rank needs it: that row carries the "you are
+// here" panel underneath, so true vertical centring drops its crest a hundred
+// pixels below the rank name it belongs to. The bottom segment stays flex:1, so
+// the wire is still continuous either way.
+function roadIconCol(iconHtml, reached, hideAbove, topPx) {
   const wire = reached ? 'var(--accent)' : 'var(--track)';
+  const top = topPx ? `flex:none;height:${topPx}px` : 'flex:1;min-height:6px';
   return `<span style="position:relative;flex:none;width:34px;align-self:stretch;display:flex;flex-direction:column;align-items:center">
-      <span style="width:3px;flex:1;min-height:6px;background:${hideAbove ? 'transparent' : wire}"></span>
+      <span style="width:3px;${top};background:${hideAbove ? 'transparent' : wire}"></span>
       <span style="flex:none;display:flex;align-items:center;justify-content:center">${iconHtml}</span>
       <span style="width:3px;flex:1;min-height:6px;background:${wire}"></span>
     </span>`;
@@ -6562,7 +6574,16 @@ function renderPass() {
   const owned = passOwned().length;
   const eqT = passTitle(), eqC = passCard();
   const toNext = next ? Math.max(0, cumXpTo(next.lv) - LI.xp) : 0;
-  const nextPct = next ? Math.max(2, Math.min(100, Math.round(LI.xp / Math.max(1, cumXpTo(next.lv)) * 100))) : 100;
+  // The NEXT-reward bar measures the LEG — from the reward below it to the one
+  // above — not from zero XP. Measured from zero it is a lie that gets worse the
+  // higher you climb: a level-4 athlete 806 XP short of the level-6 skin saw a
+  // bar 70% full (1,854 of 2,660 XP ever earned), and a level-25 athlete heading
+  // for the level-39 card would see ~85% with two months of work still to do.
+  // Anchored to the previous reward it reads 41%, and it only ever resets when a
+  // reward is actually collected — levelling up inside a leg pushes it forward.
+  const prevRw = next ? PASS_TRACK.filter(p => p.lv < next.lv).pop() : null;
+  const legFrom = cumXpTo(prevRw ? prevRw.lv : 1);
+  const nextPct = next ? Math.max(2, Math.min(100, Math.round((LI.xp - legFrom) / Math.max(1, cumXpTo(next.lv) - legFrom) * 100))) : 100;
   const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles());
   const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
 
@@ -6599,7 +6620,31 @@ function renderPass() {
   const cur = LI.rank, curIdx = RANKS.indexOf(cur.name);
   const rankTop = (curIdx + 1) * SUBS_PER_RANK + cur.star * LEVELS_PER_CYCLE;
   const toRankUp = Math.max(0, cumXpTo(rankTop + 1) - LI.xp);
-  const nextRankName = RANKS[(curIdx + 1) % RANKS.length];
+  // rankFor(), not RANKS[i+1] — past level 50 the road starts again carrying a
+  // star, and the plain name would promise ROOKIE to someone about to become
+  // ★1 ROOKIE.
+  const nrk = rankFor(rankTop + 1);
+  const nextRankName = (nrk.star ? '★' + nrk.star + ' ' : '') + nrk.name;
+  // The "you are here" panel, on the current rank only. The road used to name
+  // the rank you are IN and the reward two levels up, and nothing in between —
+  // so a level-4 athlete 76 XP from level 5 was told only that CONTENDER was
+  // 806 XP away (Amir, 2026-08-01: "Im lvl 4 ... it should show that im in the
+  // way to level 5 and contender"). The next LEVEL is the step you can actually
+  // take today; the rank is what the step is for. Both, in that order.
+  const youAreHere = () => {
+    const capped = LI.lv >= rankTop;      // the next level IS the rank-up
+    return `
+      <span style="display:flex;flex-direction:column;gap:5px;margin-top:6px;border-radius:12px;background:var(--surface);padding:9px 11px">
+        <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+          <span style="font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--accent)">LEVEL ${LI.lv} → ${LI.lv + 1}</span>
+          <span style="flex:none;font-size:10.5px;color:var(--muted)"><strong style="color:var(--ink)">${LI.toNext.toLocaleString()} XP</strong> to go</span>
+        </span>
+        <span class="bar thin" style="height:6px"><span data-fill style="width:${Math.max(3, LI.pct)}%"></span></span>
+        <span style="font-size:10.5px;line-height:1.4;color:var(--muted)">${capped
+          ? `Level ${LI.lv + 1} makes you <strong style="color:var(--ink)">${esc(nextRankName)}</strong>.`
+          : `Then <strong style="color:var(--ink)">${esc(nextRankName)}</strong> at level ${rankTop + 1} — ${toRankUp.toLocaleString()} XP away.`}</span>
+      </span>`;
+  };
   const rewardRow = p => {
     const has = passHas(p.id), isNext = next && next.id === p.id;
     const preview = p.kind === 'card'
@@ -6639,14 +6684,15 @@ function renderPass() {
     const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
     return `
       <div style="display:flex;gap:12px;align-items:stretch;${i ? 'border-top:1px solid var(--rule)' : ''}${here || passed ? '' : ';opacity:.62'}" data-k="road-rank:${name}">
-        ${roadIconCol(rankCrest(name, 34), here || passed, i === 0)}
+        ${roadIconCol(rankCrest(name, 34), here || passed, i === 0, here ? (i ? 7 : 1) : 0)}
         <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:${i ? '16px' : '6px'} 0 8px">
           <span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
             <span class="hd" style="font-size:15.5px;line-height:1">${esc(name)}</span>
             <span style="flex:none;font-size:9.5px;font-weight:800;letter-spacing:.08em;color:${here ? 'var(--accent)' : 'var(--muted-soft)'}">${here ? 'YOU ARE HERE' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
           </span>
-          <span style="font-size:10.5px;line-height:1.35;color:var(--muted)">${METALS[TIER_KEYS[i]].label} tier · Levels ${first}–${last}${here && toRankUp > 0 ? ` · ${toRankUp.toLocaleString()} XP to ${esc(nextRankName)}` : ''}</span>
-          ${here || passed ? `<span class="pips">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}"></i>`).join('')}</span>` : ''}
+          <span style="font-size:10.5px;line-height:1.35;color:var(--muted)">${METALS[TIER_KEYS[i]].label} tier · Levels ${first + cur.star * LEVELS_PER_CYCLE}–${last + cur.star * LEVELS_PER_CYCLE}</span>
+          ${here || passed ? `<span class="pips">${Array.from({ length: SUBS_PER_RANK }, (_, s) => `<i class="${s < subsOn ? 'on' : ''}${here && s === cur.sub - 1 ? ' now' : ''}"></i>`).join('')}</span>` : ''}
+          ${here ? youAreHere() : ''}
         </span>
       </div>` + PASS_TRACK.filter(p => p.lv >= first && p.lv <= last).map(rewardRow).join('');
   }).join('') + `
