@@ -211,6 +211,12 @@ publish it. No athlete health/chat detail goes here — principles only.
   life, not load). *(2026-06-15)*
 - **Never program past a fatigue wall** — build a deload/back-off after dense weeks
   (Mehraneh ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)*
+- **Concurrent athletes (heavy sport schedule alongside the gym) always get a double-day
+  rule in autoregulation.** When most gym days will also be sport days, the program must say
+  what to do on one: gym after the sport session, or at least 4–6 h apart; if the gap is
+  impossible, run the minimum effective dose with the primary capped at RPE 6. Silence on
+  double days is a design gap, not a detail — at 5–6 sport days/week they are the norm, not
+  the edge case. *(2026-08-02, Behnam C1 — caught by the dose/time audit)*
 
 ## Session structure & time
 - **`workouts.days[]` is authored in the best execution order.** The order days appear in
@@ -381,6 +387,12 @@ publish it. No athlete health/chat detail goes here — principles only.
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
   and track it cycle-over-cycle. No separate test day. *(2026-06-15)*
+- **A baseline max-rep test is an AMRAP to TECHNICAL failure, filmed — never an unstated
+  all-out set.** The set ends at the first rep that slows, shortens, or breaks position
+  (~2 shy of grind), and if the cycle carries an RPE ceiling, the test is written as an
+  explicit, stated exception to it — two lines of a program must never give opposite
+  instructions for the same set. *(2026-08-02, Behnam C1 — all three audit lenses
+  independently caught the unstated contradiction)*
 
 ## Communication & in-app text
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
