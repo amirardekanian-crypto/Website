@@ -2874,9 +2874,49 @@ const CARD_BASE = { id:'c_paper', kind:'card', name:'HOUSE', note:'The card as i
 // Event titles are not on the level track — they are earned by finishing an
 // event — but everything downstream (titleName, the picker, the board) looks a
 // title up through here, so they have to resolve from the same door.
+// ── THE SEASON RECORD ─────────────────────────────────────────────────────
+// A season reset drops every level to 1 and always did. What it used to do as
+// well was DELETE the fact that the season happened at all — nineteen thousand
+// XP and an OPERATOR rank, gone, with nothing anywhere saying it ever existed.
+// So when a season closes the server archives every athlete's final standing
+// (supabase/stage25) and the Locker grows a shelf of them. A reset stops being
+// an erasure and becomes an archive, which is the honest version of the thing.
+//
+// Cached in CFG exactly like the season and the quest pool, so a phone with no
+// signal still shows the shelf. Empty until the first season actually closes,
+// and the shelf renders nothing at all until then.
+function seasonRecords() {
+  const r = CFG && CFG.seasons;
+  return Array.isArray(r) ? r : [];
+}
+// The titles those records carry. This build has never heard of their ids —
+// they are minted by the server, named after a season that did not exist when
+// this file was written — so the NAME travels with the record and everything
+// downstream resolves through passItem() as usual. Prismatic, like the event
+// titles: a season title can never be earned again, because the season is over.
+function seasonTitles() {
+  return seasonRecords().filter(r => r && r.title).map(r => ({
+    kind: 'title', id: r.title, event: true, season: true,
+    name: String(r.season_name || 'SEASON').toUpperCase(),
+    note: 'You were there, and it is over. Nobody can earn this one now.'
+  }));
+}
+async function fetchSeasonRecord() {
+  if (window.IS_DEMO || !ATHLETE_ID) return;
+  try {
+    const sb = _sb();
+    if (!sb) return;
+    const { data, error } = await sb.rpc('season_record', { p_athlete_id: ATHLETE_ID, p_key: KEY });
+    if (error || !Array.isArray(data)) return;          // not deployed yet / offline → keep the cache
+    if (JSON.stringify(data) !== JSON.stringify(CFG.seasons)) { CFG.seasons = data; saveCfgQuiet(); }
+  } catch (e) { /* keep whatever we last cached */ }
+}
 function passItem(id) {
   if (id === CARD_BASE.id) return CARD_BASE;
-  return PASS_TRACK.find(p => p.id === id) || eventTitles().find(t => t.id === id) || null;
+  return PASS_TRACK.find(p => p.id === id)
+      || eventTitles().find(t => t.id === id)
+      || seasonTitles().find(t => t.id === id)
+      || null;
 }
 function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
 function passHas(id)  { return id === CARD_BASE.id || passOwned().indexOf(id) >= 0; }
@@ -3006,7 +3046,7 @@ function defaultCfg() {
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null, seenStreak:null,
            seenComeback:null,
-           questPool:null, questRuns:null, sound:false, lbSeen:null,
+           questPool:null, questRuns:null, seasons:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().
@@ -3788,6 +3828,11 @@ function seasonStart() { return (CFG.season && CFG.season.startsOn) || XP_RULES.
 function seasonName()  { return (CFG.season && CFG.season.name)     || XP_RULES.seasonName; }
 function inSeason(dayKey) { return dayKey >= seasonStart(); }   // ISO dates compare as strings
 function seasonDays() { return loggedDays().filter(inSeason); }
+// "Days logged" for celebration copy — the same definition the Progress stat
+// grid already uses (a day with real content, not a bare empty LOG entry left
+// by a reset), so the number a takeover cites never disagrees with the number
+// on Progress.
+function seasonDaysLogged() { return seasonDays().filter(k => dayPct(k) > 0).length; }
 async function fetchSeason() {
   if (window.IS_DEMO || !ATHLETE_ID) return;
   try {
@@ -4529,6 +4574,19 @@ function setVal(id, v) {
   // used the app for real — which is the moment to ask about the home screen.
   maybeOfferInstall();
 }
+// A small rotating pool of identity closers appended to the log toast, gated
+// on the habit's OWN streak so a claim is never made that the number on
+// screen doesn't back. Today only — habitStreak() always reads the actual
+// present day, so appending it while backfilling a past day would describe a
+// streak that has nothing to do with the day just logged.
+function closerLine(h) {
+  if (editingPast()) return '';
+  const hs = habitStreak(h);
+  if (hs === 3)  return ' Three days straight on this one. That is a pattern, not a mood.';
+  if (hs === 7)  return ' Seven straight days of this one. Past the point of coincidence.';
+  if (hs >= 10 && hs % 5 === 0) return ' ' + hs + ' straight on this one. Metronomes do not ask how they feel.';
+  return '';
+}
 function toggleHabit(h) {
   // A locked habit is owned by another system — the athlete cannot claim it by
   // hand, so explain what does earn it instead of silently doing nothing. No
@@ -4541,7 +4599,7 @@ function toggleHabit(h) {
   if (done) { haptic('tick'); return; }        // unticking earns nothing to fly
   const gained = habitXp(h) - before;
   haptic('done');
-  toast('+' + gained + ' XP · ' + h.name + ' logged' + (editingPast() ? dayTag() + '.' : '. Look at you.'));
+  toast('+' + gained + ' XP · ' + h.name + ' logged' + (editingPast() ? dayTag() + '.' : '. Look at you.' + closerLine(h)));
   flyXp(gained, rect);
   tickJuice(h, rect);
 }
@@ -4566,7 +4624,7 @@ function bump(h) {
   // Past the target there is nothing left to earn — xpFor() stops there — so
   // say that rather than printing "+0 XP" under a word like "complete".
   toast(gained > 0
-    ? (complete ? '+' + gained + ' XP · ' + h.name + ' complete' + dayTag() + '.'
+    ? (complete ? '+' + gained + ' XP · ' + h.name + ' complete' + dayTag() + '.' + closerLine(h)
                 : '+' + gained + ' XP' + dayTag() + '. Keep them coming.')
     : h.name + ' was already done' + dayTag() + '. Logged, but there is no more XP in it today.');
   flyXp(gained, rect);
@@ -6275,8 +6333,15 @@ function renderCelebration(ev) {
       </div>
       <div class="lvkicker">${prestiged ? 'Prestige' : (promoted ? 'Rank up' : 'Level up')}</div>
       <div class="lvrank">${esc(isHabit ? h.name : r.label)}</div>
+      <!-- Overall level/rank sub-lines cite days logged this season rather than
+           XP-into-level — that fraction already lives permanently on Today's
+           hero, so the takeover is free to spend its one line on what the
+           number MEANS instead of restating it. Per-habit rank-ups (isHabit)
+           are unchanged: no clean evidence stat for a per-habit rank exists
+           yet, so this doesn't overreach into a claim it can't back. -->
       ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
-                : `<div class="lvsub">Overall level ${ev.to} · ${info.into} / ${info.need} XP</div>`}
+                : promoted ? `<div class="lvsub">A season can take the rank back. It cannot take back the ${seasonDaysLogged()} days that earned it.</div>`
+                : `<div class="lvsub">Overall level ${ev.to} · ${seasonDaysLogged()} days logged this season. Levels are just days wearing a number.</div>`}
       <div class="lvbar"><span style="--w:${info.pct}%"></span></div>
       ${lvActions(isHabit ? null : 'rank')}
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
@@ -6301,6 +6366,7 @@ function renderBadgeCelebration(ev) {
     title = ev.tier.name;
     xpLine = paid;
     sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. '
+        + 'The habit did not get easier. You got harder to stop. '
         + (paid > 0
             ? 'The badge is yours for good.'
             : 'The badge is yours for good. The run started before ' + seasonName()
@@ -6318,8 +6384,13 @@ function renderBadgeCelebration(ev) {
     ground = 'streak'; share = 'streak';
     kicker = 'Day streak';
     title = ev.days + ' DAYS';
-    sub = ev.days + ' days in a row at ' + XP_RULES.streakQualifyPct + '% or better. '
-        + (ev.best ? 'That is a new personal best.' : 'Keep it lit.');
+    // ev.best overrides the per-mark verdict — beating your own record is the
+    // one comparison the app can make with total honesty, so it always wins.
+    const verdict = ev.best ? 'The old benchmark was also you. It still lost.'
+        : ev.days === 14 ? 'At this length it stops being a streak and starts being a schedule.'
+        : ev.days === 30 ? 'That is not motivation — motivation quits by Wednesday.'
+        : 'One day is a decision. ' + ev.days + ' is a character reference. Keep it lit.';
+    sub = ev.days + ' days in a row at ' + XP_RULES.streakQualifyPct + '% or better. ' + verdict;
     art = `<div class="lvflame"><span class="fl">🔥</span><span class="n">${ev.days}</span></div>`;
   } else if (ev.kind === 'comeback') {
     // Deliberately warm, and deliberately NOT congratulatory about the gap. The
@@ -6360,7 +6431,7 @@ function renderBadgeCelebration(ev) {
     kicker = 'Unlocked';
     title = ev.reward.name;
     sub = ev.reward.note + ' ' + (ev.reward.kind === 'title'
-      ? 'It sits under your name, and it is yours for good — a new season cannot take it back.'
+      ? 'A rank says where you stand this season; a title says what you are. It sits under your name for good — a new season cannot take it back.'
       : 'Pick it for your card in your Locker. Yours for good.');
     share = 'rank';
     art = ev.reward.kind === 'title'
@@ -6369,11 +6440,17 @@ function renderBadgeCelebration(ev) {
   } else {
     // A perfect day. The one every consistency system is really built around.
     const n = live().length;
+    // Judged on this season, same denominator as the Progress stat grid and
+    // the month wrap card — today's LOG is already saved by the time this
+    // fires, so isPerfect(TKEY()) is already counted in it.
+    const perfectCount = seasonDays().filter(isPerfect).length;
     badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
     kicker = 'Clean sweep';
     title = 'Perfect day';
     xpLine = dayXp(ev.id);
-    sub = 'Every habit you track, done.';
+    sub = 'Every habit you track, done. ' + (perfectCount <= 1
+      ? 'That is the first perfect day on your record. It has been done once now, which makes it repeatable.'
+      : 'Perfect day number ' + perfectCount + ' — you appear to be collecting them.');
     share = 'receipt';
     art = `<div class="lvmedal" style="background:${METALS.gold.rim}">
         <span class="disc" style="background:#E6F7F4">🏆<span class="stars">${n} / ${n}</span></span>
@@ -7797,7 +7874,7 @@ function renderPass() {
   const fromXp = cumXpTo(prevRw ? prevRw.lv : 1);
   const nextPct = next ? Math.max(4, Math.min(100, Math.round((LI.xp - fromXp) / Math.max(1, cumXpTo(next.lv) - fromXp) * 100))) : 100;
   const nextDays = Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp())));
-  const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles());
+  const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles()).concat(seasonTitles());
   const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
   const myTitles = titles.filter(p => passHas(p.id));
   const myCards = cards.filter(p => passHas(p.id));
@@ -7982,6 +8059,34 @@ function renderPass() {
         <div class="rail">${myCards.map(skinBtn).join('')}</div>
       </div>
       <div style="padding:8px 20px 2px;font-size:11px;line-height:1.45;color:var(--muted-soft)">Tap a title to wear it${eqT ? ', tap it again to show nothing' : ''}. It rides on the board, the wall and your card.</div>
+
+      <!-- ── SEASONS ────────────────────────────────────────────────────────
+           Only once there IS one. A heading over an empty box on the screen a
+           new athlete opens to see what they can win is the app apologising
+           for itself. The whole block disappears until their first season
+           closes, exactly like the streak flame on day one. -->
+      ${(() => {
+        const recs = seasonRecords();
+        if (!recs.length) return '';
+        return sectionLabel('Seasons', recs.length + (recs.length === 1 ? ' finished' : ' finished'))
+          + `<div style="padding:0 20px 4px;font-size:12px;line-height:1.5;color:var(--muted)">Where you finished, kept for good. Points reset with a season; this does not.</div>`
+          + recs.map(r => {
+              const li = levelInfo(Number(r.xp) || 0, XP_RULES.base);
+              const rk = rankFor(Number(r.level) || 1);
+              const t = passItem(r.title);
+              return `<div class="msrow got" data-k="sn:${esc(String(r.starts_on))}">
+                ${rankCrest(rk, 34)}
+                <span class="ms-mid">
+                  <span class="ms-name">${esc(String(r.season_name || 'SEASON'))}</span>
+                  <span class="ms-note">${esc(rk.label)} · level ${Number(r.level) || 1} · ${(Number(r.xp) || 0).toLocaleString()} XP</span>
+                </span>
+                <span class="ms-right">
+                  <span class="ms-xp">${t && passHas(t.id) ? 'TITLE' : ''}</span>
+                  <span class="ms-cnt">${esc(dayShort(String(r.ended_on)) === 'TODAY' ? 'ENDED' : String(r.ended_on).slice(0, 7))}</span>
+                </span>
+              </div>`;
+            }).join('');
+      })()}
 
       ${sectionLabel('The pass', RANKS.length + ' ranks · ' + PASS_TRACK.length + ' rewards')}
       <div class="track">${road}</div>
@@ -9037,6 +9142,9 @@ function showError(msg) {
   // reads XP — including the workout import, which must not reach back further.
   await within(fetchSeason(), 4000, null);
   await within(fetchQuests(), 4000, null);
+  // The archive of seasons already finished. Cheap, cached, and empty for
+  // everyone until the first season actually closes — see seasonRecords().
+  await within(fetchSeasonRecord(), 4000, null);
   // Sessions finished in the training app tick the WORKOUT habit here. The
   // dates come from the server, not from the other app's storage.
   importWorkoutDays(await within(fetchWorkoutDays(), 4000, null));
