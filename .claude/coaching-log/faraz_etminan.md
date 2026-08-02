@@ -7,7 +7,8 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Exercise | Status | Last cycle | Note |
 |---|---|---|---|
 | Machine Leg Press | Active | C1 | primary — Amir's call over Back Squat, safer for his back this cycle |
-| Barbell Hip Thrust | Active | C1 | primary |
+| Barbell Hip Thrust | Available | C1 | swapped out after Day 1 — see mid-cycle note below; safe to reuse later |
+| Cable Pull Through | Active | C1 | primary — hinge alternative to Hip Thrust, added Day 1 |
 | Chest-Supported Dumbbell Row | Active | C1 | primary — the posture lift |
 | Machine Shoulder Press | Active | C1 | primary |
 | 45° Back Extension | Active | C1 | primary — bodyweight week 1 |
@@ -99,3 +100,37 @@ pain-flagged.
 50kg×10), Bench ≈53kg (est. from 40kg×10) — neither programmed this cycle; they're the
 C2/C3 reference points. First real e1RMs will come from this cycle's logs (leg press,
 hip thrust, row, press) — nothing to compare against yet, first-cycle baseline only.
+
+### Mid-cycle amendment — 2026-08-02 (after Day 1, report-driven)
+
+Three changes from Amir after Faraz's first live session, all report-driven per the
+"mid-cycle changes happen only on a real signal" rule — no rewrite, targeted swaps only.
+
+1. **Standing Cat-Cow replaces Cat-Cow** (Day 1 prep). Faraz couldn't/wouldn't get on the
+   floor in the gym — Amir's read: possibly can't lie down, possibly self-conscious.
+   Swapped to a standing version of the same spinal flex/extend pattern, same cue logic.
+2. **No resistance bands at his gym** — a real equipment gap missed at design time (his
+   intake never listed bands as available kit, and I used them anyway). Fixed both
+   occurrences: **Bent-Over Dumbbell Rear Delt Raise (very light)** replaces Band
+   Pull-Apart (Day 1 prep), **Cable External Rotation** replaces Band External Rotation
+   (Day 2 prep) — fixed proactively before Faraz hit the same wall on Day 2.
+3. **Cable Pull Through replaces Barbell Hip Thrust** (Day 1 Primary). Amir's read: Faraz
+   back-squatted a full 60kg on his own with no pain — real evidence his back tolerates
+   real load right now — so Amir called for a hinge movement instead of another hip-thrust
+   variant (his shorthand: "another hinge movement... DB RDL or Cable RDL").
+   **Flagged, not blocked:** a pain-free squat doesn't fully validate hinge tolerance —
+   squat and hinge load the lumbar spine differently, and this is technically the loaded
+   free hinge the roadmap gated to C2 (Rigging), pulled forward to C1 week 1 on one
+   session's data. Went with the more conservative of Amir's two named options — cable's
+   resistance vector is more forgiving on lumbar shear than a free DB RDL — dosed as a
+   brand-new pattern (RPE 6 week 1, same calibration logic already used for 45° Back
+   Extension), with a full stop-rule reminder folded into the note. Fallback if the
+   station's busy or anything feels off: **Reverse Hyperextension** (fully trunk-supported,
+   the conservative option).
+   **Carries to C2 design:** the hinge has already progressed early. When Rigging is
+   designed, re-check whether "DB RDL grooved" is still a genuine graduation or now a
+   repeat of Cable Pull Through — pick the actual next step from how C1 actually went,
+   not from the roadmap's original wording.
+4. **Consider saving as a principle:** squat-tolerance ≠ hinge-tolerance for a chronic-back
+   client — a pain-free squat is good news but doesn't clear a loaded free hinge on its
+   own, because the two patterns load the lumbar spine differently. Pending Amir's OK.

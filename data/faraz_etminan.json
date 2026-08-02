@@ -136,11 +136,11 @@
                 "warmup": true,
                 "items": [
                   {
-                    "name": "Cat-Cow",
-                    "detail": "×8",
+                    "name": "Standing Cat-Cow",
+                    "detail": "×10",
                     "cues": {
-                      "good": ["Move one vertebra at a time"],
-                      "bad": ["Don't rush through the middle back"]
+                      "good": ["Round then arch through your spine, hands resting on your thighs"],
+                      "bad": ["Don't just move your hips — let the middle back join in"]
                     }
                   },
                   {
@@ -160,11 +160,11 @@
                     }
                   },
                   {
-                    "name": "Band Pull-Apart",
+                    "name": "Bent-Over Dumbbell Rear Delt Raise",
                     "detail": "×15",
                     "cues": {
-                      "good": ["Stretch the band to your chest"],
-                      "bad": ["Don't shrug up"]
+                      "good": ["Hinge forward slightly, raise the dumbbells out to the sides"],
+                      "bad": ["Keep it light — this is a warm-up, not a working set"]
                     }
                   }
                 ]
@@ -194,20 +194,19 @@
               },
               {
                 "type": "standard",
-                "name": "Barbell Hip Thrust",
+                "name": "Cable Pull Through",
                 "videoUrl": null,
-                "restSec": 120,
-                "note": "Start with just the bar and a small plate each side. This one usually jumps up fast once you know the movement, so don't be shy about adding weight.",
+                "restSec": 105,
+                "note": "New movement for you and no numbers yet, so start light — bodyweight-feel effort only this week, even if it feels too easy. Your back's had a long history, so we earn this one slow. RPE 7 is fine from week 2 if it stayed quiet.",
                 "chips": [
-                  { "label": "1s top squeeze", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×10 Reps" },
-                  { "label": "Tempo 2-0-1-1" },
-                  { "label": "RPE 7" }
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 6" }
                 ],
                 "cues": {
-                  "good": ["Drive the bar straight up to the ceiling", "Glutes finish the lift"],
-                  "bad": ["Don't finish with the lower back — ribs down, chin tucked"]
+                  "good": ["Push your hips back like closing a door behind you with them", "Hamstrings load like springs — the cable just adds tension"],
+                  "bad": ["Don't round your lower back to reach further — stop the hinge where your back stays flat"]
                 }
               }
             ]
@@ -328,10 +327,10 @@
                     }
                   },
                   {
-                    "name": "Band External Rotation",
+                    "name": "Cable External Rotation",
                     "detail": "×12 Each Side",
                     "cues": {
-                      "good": ["Rotate the band out, elbow pinned to your side"],
+                      "good": ["Cable at elbow height, rotate the forearm out and away"],
                       "bad": ["Don't drift the elbow off your side"]
                     }
                   }
