@@ -533,7 +533,7 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Shoulder Press",
+                "name": "Standing Dumbbell Overhead Press",
                 "videoUrl": null,
                 "restSec": 90,
                 "note": "Two sets is the plan, not a typo — your serve already presses overhead every day. This slot stays small on purpose.",
@@ -554,17 +554,17 @@
                 ],
                 "cues": {
                   "good": [
-                    "Press straight to the ceiling",
-                    "Shoulders working, ribs stacked"
+                    "Press the dumbbells straight overhead to a full lockout",
+                    "Shoulders driving the weight up, ribs stacked down over your hips"
                   ],
                   "bad": [
-                    "Don't arch the lower back to press"
+                    "Don't arch your lower back or lean back to press"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Machine Chest Press",
+                "name": "Barbell Chest Press",
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
@@ -584,13 +584,14 @@
                 ],
                 "cues": {
                   "good": [
-                    "Press the handles away in a smooth line",
-                    "Chest doing the push, shoulder blades resting back on the pad"
+                    "Drive the bar up and slightly back over your mid-chest",
+                    "Chest pushing the bar; shoulder blades pinned back and down into the bench"
                   ],
                   "bad": [
-                    "Don't shrug the shoulders up as you press"
+                    "Don't flare your elbows wide or bounce the bar off your chest"
                   ]
-                }
+                },
+                "note": "New movement this cycle — keep your elbows tucked to about 45°, lower under control to a light touch on your chest (no bounce), and keep it a light 2-set feeler while you find your working weight. It stays deliberately small; your serve already trains the press every day."
               },
               {
                 "type": "standard",
