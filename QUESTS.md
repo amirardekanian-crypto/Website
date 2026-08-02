@@ -17,9 +17,49 @@ The mechanics — how they're scored, why they're safe, how the app and the serv
 
 | | |
 |---|---|
-| **Running** | `NO NEGOTIATION` + `LIGHTS OUT` |
-| **Window** | Mon 27 July → Sun 2 Aug 2026 |
-| **Worth** | 320 XP |
+| **Running** | `FIFTY THOUSAND` + `THREE HARD DAYS` + `THE WELL RUNS DEEP` |
+| **Window** | Mon 3 Aug → Sun 9 Aug 2026 |
+| **Worth** | 600 XP |
+
+Started 2026-08-02 with:
+
+```sql
+select public.set_quests('2026-08-03', array['w_steps50k','w_train3','w_water5']);
+```
+
+**Why this set** (Amir picked it after the 27 Jul run was reviewed). The previous week
+ran `NO NEGOTIATION` + `LIGHTS OUT` — supplements and sleep, the two cheapest,
+purely self-reported habits in the pool (`supps` carries the *lowest* weight of all
+eight, 20). Elmira cleared both and took the board on **+320 quest XP** while walking
+**500 steps a day** and never once finishing her water; Pegooli, who led base XP by 447,
+finished third. Nothing was miscalculated — both scorers agreed to the XP — but a 140 XP
+quest sitting on a 24 XP/day box is a 7× multiplier on the easiest thing in the app,
+against 2.5× on `w_train3`. **When picking a set, check the multiplier against the
+habit's weight, not just the headline XP.**
+
+This set deliberately puts the XP on the two things that week let people skip — volume
+(steps) and water — plus real sessions. Where the board actually stood over the previous
+seven days, for sizing:
+
+| | steps | sessions | full-water days |
+|---|---|---|---|
+| Amir | 68,000 | 3 | 7 |
+| Pegooli | 51,500 | 2 | 6 |
+| Nillish | 40,500 | 4 | ~4 |
+| Dela | 39,500 | 1 | 0 |
+| Pooya | 22,000 | 2 | 1 |
+| Mehraneh | 16,500 | 1 | 1 |
+| Elmira | 2,500 | 5 | 0 |
+
+⚠️ 50k, not 70k: **nobody** cleared 70,000 steps that week — Amir topped the board at
+68,000 — so `THE LONG WAY ROUND` would have gone unclaimed by everyone. A quest no one
+can win is a dead block on the Today screen for seven days.
+
+### Previous runs (kept — their XP still counts)
+
+| Window | Quests | Worth |
+|---|---|---|
+| Mon 27 Jul → Sun 2 Aug 2026 | `NO NEGOTIATION` + `LIGHTS OUT` | 320 XP |
 
 Check any time:
 
