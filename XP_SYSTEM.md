@@ -146,7 +146,7 @@ printing `+0 XP` under the word *complete*.
 > too. `setVal()`, `bump()` and the sheet's `+` now take their ceiling as
 > `max(capFor(h), what is already logged)`: **the cap clamps new input, never history.**
 
-**How many habits an athlete may add: `MAX_CUSTOM = 5`.** A custom habit is a one-tap
+**How many habits an athlete may add: `MAX_CUSTOM = 3`.** A custom habit is a one-tap
 check worth `customXp × completionBonus` = **30 XP a day**, it earns its own consistency
 tiers on top, and the server pays for it too — `hab_xp()` pays `customXp` for every key in
 a day it does not recognise. Uncapped that was a faucet, not a feature: twenty junk habits
@@ -507,9 +507,17 @@ in `habits.html`, which walks `rosterOn(day)` and sums `baseXp()` rather than co
 heads. A headcount said a supplement and a training session were the same day's work; the
 percentage was the last number in the app that still believed that.
 
-It is **binary, not pro-rata** — `xpFor()` already pays pro-rata *with* a completion
-bonus, so a linear percentage would be the one number here that does not reward finishing.
-You could otherwise sit at 80% having completed nothing at all.
+`dayPct()` is **binary, not pro-rata** — `xpFor()` already pays pro-rata *with* a
+completion bonus, so a linear percentage would be the one number here that does not reward
+finishing. You could otherwise sit at 80% having completed nothing at all.
+
+⚠️ **`gatePct()` is pro-rata, and only `gatePct()`** (2026-08-02). The two halves answer
+different questions: the score half asks *what was this day worth*, where a target you did
+not hit is a target you did not hit; the gate half asks *did this day count*, and there
+all-or-nothing produced an indefensible cliff — **9,500 of 10,000 steps scored zero**, so a
+95%-effort day could read as a dead streak. In gate mode an incomplete counter now
+contributes `min(v / target, 1) × weight`. That one change takes a 9,500-step day from 67%
+to 98%.
 
 | | Denominator | Used by |
 |---|---|---|
@@ -533,12 +541,31 @@ client twin of the server's `ndone >= nlive`.
 
 ### `streakQualifyPct: 75`
 
-A day counts toward the day-streak at **75% of the weight it could have earned**. The five
-points from the old 80 are load-bearing: the gate's denominator on a rest day is the seven
-daily habits (250), so the worst single miss is **steps at 190/250 = 76%**. At 80 that
-fails and steps quietly becomes a *second* precondition alongside the session; at 75 the
-old promise — *miss any one thing and the day still counts* — survives on every roster on
-the board.
+A day counts toward the day-streak at **75% of the weight it could have earned, OR with at
+most one thing left undone.** Either door opens it.
+
+⚠️ **The second door is the promise, and it exists because the percentage alone was a lie
+on the roster most athletes have** (2026-08-02). Everything below this paragraph was worked
+out on the *eight-habit* roster — denominator 250, worst single miss steps at 190/250 = 76%,
+just clear. But `defaultCfg()` starts every add-on **OFF**, so the shipped default is the
+five core habits and the gate denominator is **180**:
+
+| core-only roster, missing… | of 180 | % | old rule | now |
+|---|---|---|---|---|
+| steps | 120 | 67 | ❌ | ✅ |
+| sleep | 130 | 72 | ❌ | ✅ |
+| fuel | 140 | 78 | ✅ | ✅ |
+| water | 150 | 83 | ✅ | ✅ |
+| steps **and** water | 90 | 50 | ❌ | ❌ |
+
+So a brand-new athlete had to fully hit **both steps and sleep every single day** to hold
+any streak, while a veteran with three add-ons switched on got the forgiving version the
+tuning was written for. It was backwards twice over: the people the 75% gate exists to
+protect were the only ones it did not cover, and because padding the denominator softens
+the gate, **opting into the cheapest self-reported add-ons was literally streak insurance**.
+`done > 0` is also required, so a one-habit roster cannot qualify on an empty day.
+
+The eight-habit reasoning still holds and is kept below for the record.
 
 | rest day, missing… | of 250 | % | counts at 75 |
 |---|---|---|---|
@@ -566,6 +593,14 @@ set rules = rules || '{"unearnable":["strength"],"streakQualifyPct":75}'::jsonb,
     updated_at = now()
 where id = 1;
 ```
+
+**Superseded by `stage22_gate_and_comeback.sql`** (2026-08-02), which rewrites the same
+function: `perday` gains `gpart` (the pro-rata gate numerator) and `gmiss` (how many gate
+habits are incomplete), a shared `qualday` CTE becomes the single definition of "this day
+counted" for both the `qualify` quest and the comeback walk, and four new keys arrive —
+`gateV2`, `lapseDays`, `comebackXp`, `comebackStick`. Every one defaults to the old
+behaviour, so stage22 is a no-op until they are written. Apply the file, deploy the client,
+*then* write the keys — in that order, or the board is forgiving while the phone is not.
 
 With the key **absent** the server behaves exactly as it did before, which is what lets the
 SQL be deployed ahead of the client. `with3` (DP, 75xp) and `perfect` (CN, 500xp) still
@@ -600,6 +635,73 @@ Enforcing the window server-side means diffing the previous snapshot against the
 one on every save, and rejecting or reverting changes to closed days. Buildable; judged
 not worth the complexity for a board among one coach's own clients. If the board ever
 opens up beyond that, revisit it.
+
+---
+
+## 6.6 The comeback — the one thing you cannot earn by never slipping
+
+*(Amir, 2026-08-02: "make the economy pays for comeback".)*
+
+Every **continuation** moment in this app was priced — the 20:00 at-risk nudge, day-streak
+marks at 3/7/14/21/30/50/75/100 — and the **return after a lapse**, the highest-leverage
+moment in habit formation and the one every tracker handles worst, paid nothing at all. A
+lapsed athlete's day one again scored exactly like any other day. Amir's own coaching
+principles already say *"a hard week survived"* is a genuine win worth its own card; this
+is the app finally agreeing.
+
+```js
+const LAPSE_DAYS = 3;      // consecutive non-qualifying days that make it a lapse
+const COMEBACK_XP = 50;    // flat, every time
+const COMEBACK_STICK = 7;  // qualifying days after a return before it counts as STUCK
+```
+
+**`LAPSE_DAYS: 3` matches `BACKFILL_DAYS`.** Once you are three days gone you can no longer
+repair those days, so the absence is permanent rather than a wobble — that is the honest
+definition of a lapse in this app, and it means the two windows move together if either is
+retuned.
+
+**It cannot be farmed, and that is arithmetic rather than a rule.** Three non-qualifying
+days forfeit roughly 750 XP of ordinary habit XP to collect 50. Proven in the browser: the
+same athlete logging four straight days scores **1,400 XP**; lapsing three days and logging
+two scores **432**. So the bonus stays **repeatable**, which it must be — the fourth return
+matters as much as the first — and no anti-abuse machinery is needed.
+
+### What it pays
+
+| | | |
+|---|---|---|
+| **The return** | dated bonus, `comeback` kind | 50 XP, every time |
+| **BACK IN THE FIGHT** | `comebackRun` ≥ 7 | 200 XP |
+| **THE LONG ROAD BACK** | `comebackRun` ≥ 21 | 400 XP |
+| **HARD TO KILL** | `comebacksStuck` ≥ 3 | 300 XP |
+| **UNSINKABLE** | `comebacksStuck` ≥ 5 | 600 XP |
+| **BACKBONE** (event) | 2 stuck · 14-day run · 30 days on target | the **UNBOWED** title |
+
+The badges deliberately reward the **week after**, not the reappearance: returning is easy,
+staying is the job. `comebackRun` is the longest stretch of qualifying days held after any
+single comeback; `comebacksStuck` counts comebacks held for `COMEBACK_STICK` days or more.
+
+### Two things that are easy to get wrong
+
+⚠️ **`comebackRuns()` walks the CALENDAR, not `loggedDays()`.** A lapse is mostly days with
+nothing in them at all, and a day with nothing in it never appears in the log — so walking
+logged days would skip every real disappearance, which is the only thing the function
+exists to notice. Every day it can *emit* on is a qualifying day, and a qualifying day
+always has entries, so the milestone ledger can still find each one in `seasonDays()`.
+
+⚠️ **A comeback needs a previous qualifying day.** You cannot return somewhere you have
+never been, so an athlete's first-ever qualifying day is a *start*. The client tracks this
+with an `everQualified` flag; the server gets it for free, because `lag()` over qualifying
+days is null on the first one. The two must agree exactly or the board and the phone pay
+different XP.
+
+Scopes follow the split in §4.5 exactly: `comebackRuns(true)` walks all history for the
+**display** half (`measureAch()`, the event goals), `comebackRuns(false)` walks the season
+for the **ledger**, because bonus XP is only ever paid inside the season.
+
+**Server half: `supabase/stage22_gate_and_comeback.sql`** — and it is a **no-op until its
+rules keys are written**, deliberately, so the file can be applied before the client ships.
+See the four-step rollout in its header.
 
 ---
 
@@ -948,66 +1050,19 @@ finish. It re-posts the same body with a new `pct`; it never changes their words
 
 ## 12. Open economy decisions — Amir's call, and each needs BOTH scorers
 
-A game-design review of the reward system (2026-08-02) found five things that are not
-bugs but **tuning choices**, every one of which changes what a day is worth and therefore
-has to land in `habits.html` *and* the Supabase side together (section 8). None of them
-have been made. They are ordered by impact-per-effort.
+A game-design review of the reward system (2026-08-02) found five tuning choices — not
+bugs — every one of which changes what a day is worth and so has to land in `habits.html`
+*and* the Supabase side together (section 8).
 
-### 12.1 The streak gate is unfair on the roster most athletes actually have
+**Two have since shipped** and moved out of this list:
 
-**This is the most consequential finding in the review.** Section 6's whole argument for
-`streakQualifyPct: 75` — *"miss any one thing and the day still counts"* — is worked
-through on the **eight-habit** roster: gate denominator 250, worst single miss steps at
-190/250 = **76%**, just clear. But `defaultCfg()` starts every add-on **OFF**, so the
-shipped default is the five core habits, and with the locked session out of the gate the
-denominator is **180**:
+- ~~12.1 the streak gate is unfair on the default roster~~ → **done**, see §6 (the two-door
+  gate and pro-rata counters) and `stage22_gate_and_comeback.sql`.
+- ~~12.2 nothing pays for the comeback~~ → **done**, see §6.6.
 
-| Miss, on the core-only roster | Gate | Streak survives? |
-|---|---|---|
-| steps (60) | 120/180 = **67%** | ✗ |
-| sleep (50) | 130/180 = **72%** | ✗ |
-| fuel (40) | 140/180 = 78% | ✓ |
-| water (30) | 150/180 = 83% | ✓ |
+The three below are still open, ordered by impact-per-effort.
 
-So a brand-new athlete must fully hit **both** steps and sleep every single day to hold
-any streak, while a veteran with three add-ons switched on gets the forgiving version the
-tuning was written for. It is backwards twice over: the people the 75% gate exists to
-protect are the ones it does not cover, and because padding the denominator softens the
-gate, **opting into the cheapest self-reported add-ons is literally streak insurance**
-(supps + breathe + mobility is 80 of weight for about twenty unverifiable minutes).
-
-Compounding it, the gate is binary per habit — `dayParts()` uses `isDone()`, so 9,500 of
-10,000 steps contributes **zero**, and a 95%-effort day can read as a dead streak.
-
-Two ways out:
-
-- **Cheap:** `dayQualifies()` becomes *"gatePct ≥ 75 **or** at most one unlocked habit
-  incomplete"*. One rule, restores the stated promise on every roster.
-- **Better:** make the `gate` mode of `dayParts()` **pro-rata for counters** —
-  `min(v / target, 1) × weight` instead of all-or-nothing. Fixes the 9,500-steps cliff at
-  the same time, and is closer to what the athlete believes is being measured.
-
-Either lands in `dayQualifies()`/`dayParts()` client-side and the `qd` CTE in
-`stage19_weighted_days.sql` server-side, and must be added to `rulesSignature()` so it
-re-baselines instead of firing celebrations.
-
-### 12.2 Nothing in the economy pays for the comeback
-
-Every *continuation* moment is priced — the 20:00 at-risk nudge, marks at
-3/7/14/21/30/50/75/100 — and the **return after a lapse**, which habit-formation research
-and game economics agree is the highest-leverage moment in the whole loop, pays nothing at
-all. A lapsed athlete's day one again is scored identically to any other day, and the only
-thing that speaks to them is the generic "empty day" nudge line.
-
-Proposal: one new event kind in `bonusEvents()` / `hab_bonus_xp()` — **the first
-qualifying day preceded by ≥3 non-qualifying ones pays a small flat bonus (~40–60 XP)**.
-Price it below FIRST BLOOD's 50 so it stays the cheapest thing on the ledger and cannot be
-farmed by alternating (three dark days cost far more than the bonus pays). It is a pure
-function of the log and dated on the return day, so the season window and both leaderboard
-windows filter it with machinery that already exists. Worth pairing with a nudge line that
-names it.
-
-### 12.3 FIRST BLOOD is unreachable for the free tier — the top of the funnel
+### 12.1 FIRST BLOOD is unreachable for the free tier — the top of the funnel
 
 FIRST BLOOD is explicitly *"the way in"* but measures `daysHit:strength`, and free-tier
 athletes have WORKOUT locked for life. The audience `proof.html` recruits therefore has no
@@ -1019,7 +1074,7 @@ Proposal: one `week`-tier row reachable on day one without a session, reusing th
 — priced under FIRST BLOOD's 50 to keep the easiest-pays-least ladder honest. One row in
 `ACHIEVEMENTS`, one in the `milestones` array on the `xp_rules` row.
 
-### 12.4 Season 2 is a reward dead zone for anyone who levelled in season 1
+### 12.2 Season 2 is a reward dead zone for anyone who levelled in season 1
 
 `nextReward()` correctly skips rewards already owned, so a veteran who peaked at level 21
 re-climbs **20,830 XP (~62 days at 336/day)** before the track pays anything new, while
@@ -1033,9 +1088,9 @@ a thing that can only be earned *that* season, which is the retention story a re
 Requires registering the ids in `passTrack` **ahead of** season close (the server refuses a
 title it does not know) plus a mint step in `start_season()`. Largest of the five.
 
-### 12.5 Custom habits: the cap is a patch, exclusion is the fix
+### 12.3 Custom habits: the cap is a patch, exclusion is the fix
 
-`MAX_CUSTOM = 5` (section 1) closed the worst of the faucet client-side, but a custom
+`MAX_CUSTOM = 3` (section 1) closed the worst of the faucet client-side, but a custom
 habit still pays 30 XP a day plus its own consistency tiers onto a **shared** board, the
 server pays `customXp` for any key it does not recognise, and there is still no
 server-side check at all — so a tampered log is unbounded.

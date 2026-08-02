@@ -2102,10 +2102,13 @@ const HABITS = [
 // ✕ removes a custom habit, so the coach could watch the board be distorted and
 // have no answer to it. That is a strange hole in an app called Proof.
 //
-// Five is more than anyone has asked for and far below what would bend the
-// board. The cap counts how many EXIST, not how many are switched on: a paused
-// habit costs nothing to switch back on.
-const MAX_CUSTOM = 5;
+// Three (Amir, 2026-08-02). Three is 90 XP a day against a 336 XP core day —
+// about a quarter, which is a real add-on and not a second scoreboard. It is
+// also about as many things as anyone actually holds themselves to at once; a
+// list of ten is a wish list, and the app should not help write one.
+// The cap counts how many EXIST, not how many are switched on: a paused habit
+// costs nothing to switch back on.
+const MAX_CUSTOM = 3;
 function customCount() { return ((CFG && CFG.custom) || []).length; }
 function customRoom()  { return Math.max(0, MAX_CUSTOM - customCount()); }
 // ── MEADOW: one colour per habit ─────────────────────────────────────
@@ -2547,8 +2550,9 @@ function titlePlate(p, small) {
 }
 // ── Medals ── milestones as emblems: metal rim by tier, habit-tint disc, the
 // habit's own emoji in the middle. Events wear the prismatic rim.
-const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅' };
-const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁' };
+const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅',
+                        comebackRun:'🔄', comebacksStuck:'🛡️' };
+const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁', ev_backbone:'🔄' };
 function achMedal(a, got) {
   const key = a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze';
   const part = String(a.measure || '').split(':');
@@ -2592,6 +2596,29 @@ const MAX_LEVEL_SCAN = 5000;                             // loop guard
 // The day-streak marks worth stopping the screen for. Tight early (the first
 // week is where people quit), spread out later so it stays an event.
 const DAY_STREAK_MARKS = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 300, 365];
+
+// ── THE COMEBACK ──────────────────────────────────────────────────────────
+// (Amir, 2026-08-02: "make the economy pays for comeback".)
+//
+// Every continuation moment in this app was priced — the 20:00 warning, marks
+// at 3/7/14/21/30 — and the RETURN AFTER A LAPSE, which is the highest-leverage
+// moment in habit formation and the one every tracker handles worst, paid
+// nothing at all. A lapsed athlete's day one again scored exactly like any
+// other day. Amir's own coaching principles already say "a hard week survived"
+// is a genuine win worth its own card; this is the app finally agreeing.
+//
+// LAPSE_DAYS is 3 to match BACKFILL_DAYS: once you are three days gone you can
+// no longer repair those days, so the damage is permanent and the absence is
+// real rather than a wobble.
+//
+// ⚠️ IT CANNOT BE FARMED, and that is arithmetic rather than a rule. Three
+// non-qualifying days forfeit roughly 750 XP of ordinary habit XP to collect
+// 50. Nobody can lapse their way up the board, so no anti-abuse machinery is
+// needed and the bonus can stay repeatable — which it must be, because the
+// second comeback matters as much as the first.
+const LAPSE_DAYS = 3;      // consecutive non-qualifying days that make it a lapse
+const COMEBACK_XP = 50;    // flat, every time — priced under FIRST BLOOD's 50-XP floor
+const COMEBACK_STICK = 7;  // qualifying days after a return before it counts as STUCK
 const CONSISTENCY_TIERS = [
   { days: 5,  name: 'KINDLED',     mult: 0.5 },
   { days: 10, name: 'STEADY',      mult: 1 },
@@ -2640,7 +2667,15 @@ const ACHIEVEMENTS = [
   { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility',  tier:'long' },
   { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps',     tier:'long' },
   { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps',    tier:'long' },
+  // ── Coming back ────────────────────────────────────────────────────────
+  // Returning is easy; staying is the job, so the badges reward the WEEK AFTER
+  // rather than the reappearance. The return itself is already paid, on the day
+  // it happens, by the dated bonus in bonusEvents() — see LAPSE_DAYS.
+  { code:'BF', name:'BACK IN THE FIGHT', note:'Fell off, came back, held it a week',    xp:200, need:COMEBACK_STICK, measure:'comebackRun',    tier:'long' },
+  { code:'LR', name:'THE LONG ROAD BACK', note:'Three weeks straight after a comeback', xp:400, need:21,  measure:'comebackRun',      tier:'long' },
+  { code:'HK', name:'HARD TO KILL',    note:'Three comebacks that each stuck',          xp:300, need:3,   measure:'comebacksStuck',   tier:'long' },
   // ── Rare ───────────────────────────────────────────────────────────────
+  { code:'US', name:'UNSINKABLE',      note:'Five times down. Five times back.',        xp:600, need:5,   measure:'comebacksStuck',   tier:'rare' },
   { code:'MC', name:'THE MACHINIST',   note:'150 sessions. A year of turning up.',      xp:750, need:150, measure:'daysHit:strength', tier:'rare' },
   { code:'UB', name:'UNBREAKABLE',     note:'60 days running on full water',            xp:600, need:60,  measure:'streak:water',     tier:'rare' },
   { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays',      tier:'rare' }
@@ -2709,7 +2744,18 @@ const EVENTS = [
     title:{ id:'t_stillhere', name:'STILL HERE', note:'Starting is easy. This was not.' },
     goals:[ { kind:'qualify',          need:24,     label:'24 days on target' },
             { kind:'total:steps',      need:250000, label:'250,000 steps' },
-            { kind:'daysHit:fuel',     need:24,     label:'Protein on 24 days' } ] }
+            { kind:'daysHit:fuel',     need:24,     label:'Protein on 24 days' } ] },
+
+  // The comeback event. Every other one here rewards an unbroken stretch; this
+  // is the only thing in the app you cannot earn by never slipping, which is
+  // the point of it. ⚠️ Its title id must also exist in `passTrack` on the
+  // xp_rules row or the server refuses to mint it — see stage22.
+  { id:'ev_backbone', name:'BACKBONE', tag:'However long it takes',
+    blurb:'Nobody gets a clean run. This one is not about never falling off — it is about what you do the week after.',
+    title:{ id:'t_unbowed', name:'UNBOWED', note:'Fell off. Came back. Did it again.' },
+    goals:[ { kind:'comebacksStuck',   need:2,      label:'2 comebacks that held a week' },
+            { kind:'comebackRun',      need:14,     label:'14 straight days after a comeback' },
+            { kind:'qualify',          need:30,     label:'30 days on target' } ] }
 ];
 
 // ── THE LONG GAME — a reward track, and the one thing here that is kept ───
@@ -2784,6 +2830,13 @@ let _evCache = null;
 function eventGoalProgress(g) {
   const parts = String(g.kind || '').split(':');
   const kind = parts[0], hid = parts[1];
+  // Comeback goals answer from their own walk rather than a per-day tally —
+  // ahead of the loop, because neither is a count of days. All-time, like every
+  // other event goal.
+  if (kind === 'comebackRun' || kind === 'comebacksStuck') {
+    const have = kind === 'comebackRun' ? bestComebackRun() : comebacksStuck();
+    return { have, done: have >= g.need, pct: Math.max(0, Math.min(100, Math.round(have / g.need * 100))) };
+  }
   const h = hid ? habitById(hid) : null;
   let have = 0;
   loggedDays().forEach(k => {
@@ -2874,6 +2927,7 @@ function defaultCfg() {
   return { v:3, on, custom:[], onboarded:false, toured:false, installAsked:false, dark:false, seen:null, rulesSig:null,
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null, seenStreak:null,
+           seenComeback:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Milestone tier open/closed, keyed by tier — missing key reads as
@@ -3491,18 +3545,50 @@ function loggedDays() { return Object.keys(LOG).sort(); }
 // client twin of the server's `ndone >= nlive`.
 // ⚠️ rosterOn(dayKey), never live() — see the roster note above.
 function dayParts(dayKey, mode) {
-  let done = 0, total = 0;
+  let done = 0, total = 0, missing = 0;
   rosterOn(dayKey).forEach(h => {
     const hit = isDone(h, dayKey), w = baseXp(h);
     if (mode === 'gate' && h.locked && !hit) return;
-    total += w; if (hit) done += w;
+    total += w;
+    if (hit) { done += w; return; }
+    missing++;
+    // ⚠️ GATE ONLY: PART OF A COUNTER IS PART OF THE JOB. The gate used to be
+    // all-or-nothing per habit, so 9,500 of 10,000 steps counted as zero and a
+    // 95%-effort day could read as a dead streak. That cliff is indefensible on
+    // the one number the athlete is asked to protect. The SCORE half stays
+    // binary on purpose — it answers "what was this day worth", and a target
+    // you did not hit is a target you did not hit.
+    if (mode === 'gate' && h.target > 0) {
+      const v = valOf(dayKey, h.id);
+      if (v > 0) done += w * Math.min(1, v / h.target);
+    }
   });
-  return { done, total };
+  return { done, total, missing };
 }
 function dayPct(dayKey)  { const p = dayParts(dayKey, 'score'); return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function gatePct(dayKey) { const p = dayParts(dayKey, 'gate');  return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
-function dayQualifies(dayKey) { return gatePct(dayKey) >= XP_RULES.streakQualifyPct; }
+// ⚠️ TWO WAYS THROUGH THE GATE, and the second one is the promise.
+// `streakQualifyPct` was tuned against the EIGHT-habit roster — gate denominator
+// 250, worst single miss steps at 190/250 = 76%, just clear — and the promise
+// written down beside it was "miss any one thing and the day still counts".
+// But defaultCfg() starts every add-on OFF, so the shipped default is the five
+// core habits and the gate denominator is 180. On that roster missing steps
+// alone is 120/180 = 67% and missing sleep alone is 130/180 = 72%: both fatal.
+// The athletes the 75% gate exists to protect were the only ones it did not
+// cover, while a veteran with three add-ons on got the forgiving version — and
+// since padding the denominator softens the gate, opting into the cheapest
+// self-reported habits was literally streak insurance. Backwards twice over.
+//
+// So the rule is now the promise itself, said out loud: clear 75% of the
+// weight, OR leave at most one thing undone. `done > 0` keeps a roster of one
+// from qualifying on an empty day.
+function dayQualifies(dayKey) {
+  const p = dayParts(dayKey, 'gate');
+  if (!p.total) return false;
+  if (p.done / p.total * 100 >= XP_RULES.streakQualifyPct) return true;
+  return p.missing <= 1 && p.done > 0;
+}
 function currentDayStreak() { return dayStreakAt(TKEY()); }
 // The day streak as it stood on a GIVEN day. The wall shows a line beside what
 // the athlete had actually strung together when they wrote it — "up to the day
@@ -3537,6 +3623,63 @@ function runLength(days) {
   return best;
 }
 function bestDayStreak() { return Math.max(runLength(loggedDays().filter(dayQualifies)), currentDayStreak()); }
+
+// ── Comebacks ─────────────────────────────────────────────────────────────
+// Every comeback the athlete has made, each with how long they were gone and
+// how many qualifying days they strung together afterwards. One walk answers
+// all of it: the dated bonus, both "came back and held it" badges, the
+// resilience count and the BACKBONE event.
+//
+// ⚠️ THIS WALKS THE CALENDAR, NOT loggedDays(). A lapse is mostly days with
+// nothing in them at all, and a day with nothing in it never appears in the
+// log — so walking logged days would skip every real disappearance, which is
+// the only thing this function exists to notice. Every day it can EMIT on is a
+// qualifying day, and a qualifying day always has entries, so the milestone
+// ledger in bonusEvents() can still find each one in seasonDays().
+//
+// Two scopes, matching the split the rest of the badge system already uses
+// (XP_SYSTEM.md §4.5): `all` walks the whole history for the DISPLAY half —
+// measureAch() and the event goals, so a badge is judged on everything the
+// athlete has ever done — while the default walks the season for the LEDGER,
+// because bonus XP is only ever paid inside the season.
+let _cbCache = { all: null, season: null };
+function comebackRuns(all) {
+  const key = all ? 'all' : 'season';
+  if (_cbCache[key]) return _cbCache[key];
+  const days = all ? loggedDays() : seasonDays();
+  const out = [];
+  if (!days.length) { _cbCache[key] = out; return out; }
+  // From the first day they logged, never earlier: days before an athlete
+  // arrived are not days they missed. Same rule the heat map and day strip use.
+  let d = parseKey(days[0]), dark = 0, cur = null, everQualified = false;
+  const end = today();
+  while (d <= end) {
+    const k = fmtKey(d);
+    if (dayQualifies(k)) {
+      if (cur) cur.run++;
+      // ⚠️ `everQualified` — you cannot come back from somewhere you have never
+      // been. Without it an athlete whose first few days all fell short would be
+      // handed a comeback for their first good day, which is a start, not a
+      // return. It is also what lets the server express this as a plain
+      // lag() over qualifying days instead of a calendar walk, and these two
+      // have to agree exactly or the board and the phone pay different XP.
+      else if (everQualified && dark >= LAPSE_DAYS) { cur = { day: k, gone: dark, run: 1 }; out.push(cur); }
+      everQualified = true;
+      dark = 0;
+    } else {
+      if (everQualified) dark++;
+      cur = null;                     // the run ended; the next return starts fresh
+    }
+    d = addDays(d, 1);
+  }
+  _cbCache[key] = out;
+  return out;
+}
+// The longest stretch held after any single comeback, and how many comebacks
+// went the distance. Both are all-time for display; bonusEvents() computes its
+// own season-scoped versions on the ledger walk.
+function bestComebackRun() { return comebackRuns(true).reduce((m, c) => Math.max(m, c.run), 0); }
+function comebacksStuck()  { return comebackRuns(true).filter(c => c.run >= COMEBACK_STICK).length; }
 function habitStreak(h) {
   let d = isDone(h, TKEY()) ? today() : addDays(today(), -1), n = 0;
   while (isDone(h, fmtKey(d))) { n++; d = addDays(d, -1); }
@@ -3624,7 +3767,7 @@ function tierXp(h, i) {
 // Recomputing this on every level read would be thousands of operations per
 // render, so it is cached and dropped whenever the log or the tracked set moves.
 let _bonusCache = null;
-function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; }
+function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; _cbCache = { all:null, season:null }; }
 // Runs and counts are measured FROM THE SEASON START, not from all of history.
 // That is a fairness rule, not an implementation detail: a tier crosses once, so
 // scoring it against all-time runs would mean an athlete whose streak began
@@ -3655,7 +3798,26 @@ function bonusEvents() {
   // the day each measure first reaches its target.
   const streak = {}, lastDone = {}, hits = {}, claimed = {};
   let with3 = 0, perfect = 0;
+  // Comeback progress AS OF each day, so the two badges below are paid on the
+  // day they were actually crossed like everything else on this ledger. Built
+  // from the season-scoped walk; every day it names is a qualifying day and so
+  // is guaranteed to appear in `days`.
+  const cbRunAt = {}, cbStuckAt = {};
+  (() => {
+    let best = 0, stuck = 0;
+    comebackRuns(false).forEach(c => {
+      for (let i = 0; i < c.run; i++) {
+        const k = fmtKey(addDays(parseKey(c.day), i));
+        best = Math.max(best, i + 1);
+        if (i + 1 === COMEBACK_STICK) stuck++;
+        cbRunAt[k] = best; cbStuckAt[k] = stuck;
+      }
+    });
+  })();
+  let cbRunNow = 0, cbStuckNow = 0;
   days.forEach(k => {
+    if (cbRunAt[k] !== undefined) cbRunNow = cbRunAt[k];
+    if (cbStuckAt[k] !== undefined) cbStuckNow = cbStuckAt[k];
     hs.forEach(h => {
       if (!isDone(h, k)) { streak[h.id] = 0; return; }
       streak[h.id] = (lastDone[h.id] && fmtKey(addDays(parseKey(lastDone[h.id]), 1)) === k) ? (streak[h.id] || 0) + 1 : 1;
@@ -3672,6 +3834,8 @@ function bonusEvents() {
       let have = 0;
       if (a.measure === 'perfectDays') have = perfect;
       else if (a.measure === 'daysWith3') have = with3;
+      else if (a.measure === 'comebackRun') have = cbRunNow;
+      else if (a.measure === 'comebacksStuck') have = cbStuckNow;
       else {
         const p = a.measure.split(':');
         if (p[0] === 'streak') have = streak[p[1]] || 0;
@@ -3685,6 +3849,12 @@ function bonusEvents() {
 
   // Weekly quests pay the same way: dated, so windows filter them for free.
   questEvents().forEach(e => out.push(e));
+
+  // The comeback. Dated on the day they came back, like everything else here,
+  // so the season window and both leaderboard windows filter it with no special
+  // case. Repeatable on purpose — the fourth return matters as much as the
+  // first, and three dark days cost far more than this pays. See LAPSE_DAYS.
+  comebackRuns(false).forEach(c => out.push({ day: c.day, xp: COMEBACK_XP, kind: 'comeback', id: 'cb' + c.day, gone: c.gone }));
 
   _bonusCache = out;
   return out;
@@ -3779,6 +3949,10 @@ function measureAch(a) {
   // falls while the XP behind it does not is the same class of bug as the board
   // and the phone disagreeing — nothing errors, it just quietly lies.
   if (a.measure === 'daysWith3') return loggedDays().filter(k => rosterOn(k).filter(h => isDone(h, k)).length >= 3).length;
+  // Comeback measures, all-time like every other display measure here — and
+  // ahead of the split, because neither carries a habit id.
+  if (a.measure === 'comebackRun') return bestComebackRun();
+  if (a.measure === 'comebacksStuck') return comebacksStuck();
   const parts = a.measure.split(':'), kind = parts[0], h = habitById(parts[1]);
   // habitBest, not habitStreak — the BEST run ever, exactly like consistencyFor()
   // above. This is the display-and-judging half of a milestone, and a badge is
@@ -3851,7 +4025,12 @@ function shortOfQualifying() {
                                .sort((a, b) => baseXp(b) - baseXp(a));
   let have = p.done, n = 0;
   while (have < need && n < left.length) { have += baseXp(left[n]); n++; }
-  return Math.max(1, n);
+  // The gate has a second door — at most one thing left undone — so the honest
+  // answer to "what saves today" is whichever route is fewer taps. Without this
+  // the nudge kept quoting the heaviest-first number while the athlete was
+  // actually one tick from qualifying by the count rule. See dayQualifies().
+  const byCount = Math.max(0, left.length - 1);
+  return Math.max(1, Math.min(n, byCount));
 }
 
 // ── The nudge (one a day, driven by what is actually missing) ─────────────
@@ -3950,6 +4129,11 @@ function rulesSignature() {
     // explanation. Both are precisely what the re-baseline path exists for.
     questPool().map(q => [q.id, q.kind, q.need, q.xp]),
     questRuns().map(r => [r.start, r.ids]),
+    // The GATE RULE itself, not just its threshold. Pro-rata counters and the
+    // one-miss door change which days qualify, which moves every day streak,
+    // every `qualify` quest and every comeback — bump this token whenever that
+    // logic changes, or athletes get a wall of celebrations for a rule change.
+    'gate2', LAPSE_DAYS, COMEBACK_XP, COMEBACK_STICK,
     seasonStart()   // a new season resets every score, so re-baseline instead of celebrating
   ]);
   let hash = 0;
@@ -4027,6 +4211,8 @@ function seedUnlocks() {
   CFG.seenPerfect = isPerfect(TKEY()) ? TKEY() : null;
   CFG.seenQuests = currentQuests();
   CFG.seenStreak = DAY_STREAK_MARKS.filter(d => d <= currentDayStreak()).pop() || 0;
+  const cb = comebackRuns(false).find(c => c.day === TKEY());
+  CFG.seenComeback = cb ? TKEY() : null;
 }
 function checkUnlocks() {
   // seenStreak is in this guard too. It shipped later than the other three, so
@@ -4036,7 +4222,8 @@ function checkUnlocks() {
   // fires a full-screen takeover for a mark crossed weeks before the feature
   // existed. Baselining means recording an athlete's history, not replaying it.
   if (!CFG.seenTiers || !Array.isArray(CFG.seenAch) || !Array.isArray(CFG.seenQuests)
-      || typeof CFG.seenStreak !== 'number') { seedUnlocks(); saveCfg(); return; }
+      || typeof CFG.seenStreak !== 'number'
+      || CFG.seenComeback === undefined) { seedUnlocks(); saveCfg(); return; }
   const tiers = currentTiers(), ach = currentAch(), events = [];
 
   // Tiers are COALESCED BY TIER, not reported per habit. An athlete who has been
@@ -4088,6 +4275,17 @@ function checkUnlocks() {
     CFG.seenStreak = mark;
   } else if (dstreak === 0 && markSeen) {
     CFG.seenStreak = 0;   // streak broken — the marks are all back on the table
+  }
+
+  // THE COMEBACK. The whole reason this mechanic exists is the moment, not the
+  // 50 XP: an athlete who went dark for days has just opened the app and done
+  // the work anyway, and until now the screen had nothing whatsoever to say
+  // about it. Today only — an older comeback surfacing through a cloud sync or
+  // a backfill is history arriving late, exactly like a quest.
+  const cbToday = comebackRuns(false).find(c => c.day === TKEY());
+  if (cbToday && CFG.seenComeback !== TKEY()) {
+    events.push({ kind:'comeback', id:'cb' + TKEY(), gone: cbToday.gone });
+    CFG.seenComeback = TKEY();
   }
 
   // Quests. Only this week's get a takeover — an older week completing is
@@ -6045,6 +6243,17 @@ function renderBadgeCelebration(ev) {
     sub = ev.days + ' days in a row at ' + XP_RULES.streakQualifyPct + '% or better. '
         + (ev.best ? 'That is a new personal best.' : 'Keep it lit.');
     art = `<div class="lvflame"><span class="fl">🔥</span><span class="n">${ev.days}</span></div>`;
+  } else if (ev.kind === 'comeback') {
+    // Deliberately warm, and deliberately NOT congratulatory about the gap. The
+    // athlete knows they were gone; the app's job here is to say the days
+    // behind them do not have to be paid off before today counts.
+    ground = 'streak'; share = 'rank';
+    kicker = 'Back on it';
+    title = 'SECOND WIND';
+    xpLine = COMEBACK_XP;
+    sub = ev.gone + ' days off, and you opened it anyway. That is the hard part — '
+        + 'the run starts again from today, not from where it broke.';
+    art = `<div class="lvflame"><span class="fl">🔄</span><span class="n">${ev.gone}</span></div>`;
   } else if (ev.kind === 'quest') {
     badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
     kicker = 'Quest complete';
@@ -7396,7 +7605,9 @@ function renderManual() {
         // now the only thing doing it. Every label says which one it means:
         // habit rows and the detail header carry the habit's own, the band at
         // the top of Today and Progress is always "DAY STREAK".
-        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the whole day was worth. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
+        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the whole day was worth — <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. Miss one habit and the day still counts, every time, whatever you track. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
+        p(`Part of a counter counts toward it, too. Nine thousand of your ten thousand steps is not nothing, and the day streak no longer pretends it is — it reads that as nearly all of your steps rather than none of them.`) +
+        p(`<strong style="color:var(--ink)">And if you disappear, coming back pays.</strong> Miss ${LAPSE_DAYS} days or more, then have a day that counts, and that is a comeback: <strong style="color:var(--ink)">${COMEBACK_XP} XP</strong> on the spot, every time it happens, and the app will say so. Hold it for a week and there is a medal in it; do that ${3} times and there is another. Nobody gets a clean run, and the days behind you do not have to be paid off before today counts.`) +
         // The athlete-facing half of the weighted day score. Without this, a rest
         // day reading 71% while the streak survives looks like a bug on the one
         // screen they check every morning.
