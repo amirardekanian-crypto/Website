@@ -240,14 +240,27 @@ Full detail in [`XP_SYSTEM.md`](XP_SYSTEM.md) §6; the shape of it matters here 
 is what the day strip and the header show. Both come from `dayParts(day, mode)`, which
 sums `baseXp()` over `rosterOn(day)` instead of counting heads — a headcount said a
 supplement and a training session were the same day's work, and the percentage was the
-last number in the app that still believed that. It is **binary, not pro-rata**: `xpFor()`
-already pays pro-rata *with* a completion bonus, so a linear percentage would be the one
-number here that does not reward finishing.
+last number in the app that still believed that.
+
+**Both halves give partial credit on a counter now** (Amir, 2026-08-02: *"for all the
+habits that have bars to fill... i want that to be added toward their day completion
+percentage"*). Two of three protein servings is 2/3 of the job, not zero. This was
+gate-only until today — the day streak forgave a near-miss the header still read as zero
+for — so `dayPct()` and `gatePct()` finally agree on what a partial counter is worth.
+`isPerfect()` is untouched and does the job the old binary rule was protecting: a day can
+read 91% without being *perfect*, because perfect still means every box actually ticked,
+and only that unlocks the perfect-day takeover.
 
 - **`dayPct()`** — what the day was *worth*, over the whole roster. The header, the day
   strip, the roll call wall. On a rest day it reads ~71%, and that is the honest number.
 - **`gatePct()`** — what the athlete could *do*. A **locked** habit they did not earn that
   day leaves the denominator. Day streaks read this and nothing else.
+
+⚠️ `dayPct()` is **client-only** — it is computed here and sent up as a pre-computed
+number when posting a roll call (`p_pct`), never recomputed server-side, so this needed no
+Supabase migration. The server keeps its own score-half twin, `wdone`, for one narrow
+legacy purpose (see §6) — it stays binary on purpose and is never shown to anyone as a
+percentage.
 
 ⚠️ **The gate is what makes weighting safe.** WORKOUT is 100 of 350 — 28.6% of the default
 day — against a threshold allowing 25% of slack, so weighted into the denominator it stops
@@ -1281,8 +1294,19 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   on got the forgiving version the 75% was tuned for. Padding the denominator softened the
   gate, which made opting into cheap self-reported habits *streak insurance*. The gate also
   gives **partial credit on counters** now, so 9,500 of 10,000 steps is 98% rather than
-  zero. `dayPct()` — what the day was *worth* — stays binary, and `isPerfect()` is
-  untouched. [`XP_SYSTEM.md`](XP_SYSTEM.md) §6.
+  zero. `isPerfect()` is untouched. [`XP_SYSTEM.md`](XP_SYSTEM.md) §6.
+  ⚠️ **Superseded later the same day**: `dayPct()` went pro-rata too, see below — it no
+  longer "stays binary."
+
+- **`dayPct()` also went pro-rata** (2026-08-02, later the same day, Amir: *"for all the
+  habits that have bars to fill... i want that to be added toward their day completion
+  percentage"*). The score half — the header, the day strip, the roll call wall — now gives
+  the same partial credit on a counter that the gate already gave, so the two numbers agree
+  on what a near-miss is worth. `isPerfect()` is the backstop for the reason it was binary
+  in the first place: a day can read 91% on partial credit without being *perfect*, because
+  perfect still means every box actually ticked. Client-only, no server migration — `dayPct()`
+  is computed here and sent up pre-computed when posting a roll call, never recomputed
+  server-side. [`XP_SYSTEM.md`](XP_SYSTEM.md) §6.
 
 - **Coming back pays** (2026-08-02, Amir: *"make the economy pays for comeback"*). Miss
   `LAPSE_DAYS` (3) or more in a row, then have a day that counts, and that is a comeback:
