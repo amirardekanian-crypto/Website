@@ -176,7 +176,10 @@ The screen they actually live on. **In this order, and the order is the point:**
 2. **The streak flame** — sits *on* the hero card, hard right of the rank block: a drawn flame
    (never an emoji — nothing here should change shape between an iPhone and a Pixel) and the
    day-streak number in clay, licking faster the longer the streak runs, on the same
-   0/5/15/30-day heat scale the habit rows use. Hidden until the first logged day —
+   0/3/14/30-day heat scale the habit rows use (moved off 5/15/30 on 2026-08-02 so the
+   flame steps up **on** a `DAY_STREAK_MARKS` day — the app was firing a full-screen
+   takeover for the 3- and 7-day marks while the permanent indicator stayed at its
+   coldest until day 5 and then did not move again until 15). Hidden until the first logged day —
    **and hidden on a zero** (Amir, 2026-07-30: *"if there is no streak its better not to
    show it, and only show it if there are streak days"*). It is the rule the habit rows
    have always followed: they draw an ember or nothing. An unlit flame over a `0` is not
@@ -1081,7 +1084,19 @@ It closes with a third section, **Your own** — a real composer, not a pointer 
 (Amir, 2026-07-31: *"what i meant was that to let them actually add there"*). Type a name,
 press **Add**, and the habit appears immediately as a row with its own switch **and an ✕**,
 worth `customXp` (25) a day. The ✕ is there because this is the screen where the typo
-happens, so it is the screen that has to be able to undo it. Custom rows are `<div>`s with
+happens, so it is the screen that has to be able to undo it.
+
+⚠️ **`MAX_CUSTOM = 5`, and duplicate names are rejected** (2026-08-02). A custom habit is
+a one-tap check worth 30 XP a day *and* it earns its own consistency tiers, and the server
+pays for it too — `hab_xp()` pays `customXp` for every key in a day it does not recognise.
+Uncapped that was a faucet: twenty junk habits are twenty taps and ~600 XP a day, roughly
+double a coached athlete's perfect one, on a board shared with people doing the real work,
+and nothing could take it back because only the athlete's own ✕ removes one. The id
+carries a timestamp, so "Reading" typed twice used to make two habits that both scored.
+Both guards live in `addCustomHabit()` so the onboarding composer and Settings cannot
+disagree, and both composers hide at the cap. This is a **client-side guard with no server
+equivalent**, exactly like `dailyCap` — the stronger fix (excluding customs from board
+scoring entirely) needs a migration and is written up in `XP_SYSTEM.md`. Custom rows are `<div>`s with
 their own switch button rather than one big `<button>` like the built-in add-ons — a row
 with two controls cannot be a button without nesting one inside another.
 
@@ -1450,9 +1465,52 @@ The athlete's phone is the record; the server is the mirror.
 - Retries back off (5s → 15s → 45s → 2m → 5m) and re-fire on reconnect, on foreground,
   on `pagehide` and at every launch.
 - Each push sends the **complete snapshot**, so a newer push supersedes an older one.
+  Built from **memory**, not re-read from localStorage: a failed `setItem` (quota, a
+  browser refusing storage) is swallowed but still marks dirty, so reading the payload
+  back off disk could upload a snapshot older than what the athlete is looking at — or
+  `{}`, which `save_progress` would write straight over their cloud log — and then report
+  it as SYNCED.
 - The cloud merge keeps the **larger** logged value per habit, so a stale device can
-  never erase a real number.
+  never erase a real number — **except on days this device has edited and not yet
+  uploaded**, which are ours outright. `max()` is a defence against a stale *other*
+  device, and turning it on our own corrections meant a deliberate 0 always lost to a 1
+  the cloud had not been told about: un-tick a mis-tap offline, get killed by iOS, and the
+  tick came back at the next launch and was re-uploaded as the truth. Nothing in the app
+  could remove a wrong tick. The unsent day keys are persisted beside the dirty flag.
 - Settings shows live sync state and a *Sync now* button.
+
+**Four sync bugs fixed 2026-08-02, all of them silent:**
+
+- **A replacement phone could wipe every other device.** `defaultCfg()` had no
+  `migrated3`, so `migrateOld()` ended in `saveCfg()` even having migrated nothing —
+  stamping a factory-default config as newest *and* dirty before the cloud was ever read.
+  Both halves of the adopt test then failed, the athlete's real config was refused, and
+  the defaults were pushed up for every other device to inherit. A migration that
+  migrated nothing now saves **quietly** (`saveCfgQuiet()` — writes localStorage, does not
+  stamp `updatedAt`, does not mark dirty).
+- **Opening Crew re-crowned a stale config.** `applyBoardDeltas()` persisted its
+  leaderboard-position snapshot through `saveCfg()`, so a read-only screen promoted
+  whatever config that phone held to globally-newest and deleted another device's custom
+  habits. Now quiet too.
+- **Nothing ever re-pulled.** The boot comment claimed `syncFromCloud` ran again on
+  foreground; there was exactly one call site, at boot. A resident PWA never read the
+  cloud again, so two devices ping-ponged the snapshot, each push dropping what the other
+  had logged. `pullFresh()` now runs on foreground and reconnect — never concurrent, at
+  most once a minute, and it pulls *before* the reconnect push.
+- **Uploads could overtake the first download.** `SYNC.ready` latches false until boot's
+  `get_progress` has had its turn; the 1.2s debounce could otherwise beat it and replace
+  a real cloud log with an empty one. And `pushNow()` no longer clears the dirty flag
+  unconditionally — a write counter means an edit made *during* the round trip is not
+  reported as sent, which it was, while the badge said SYNCED.
+
+⚠️ **Owned rewards are unioned on cloud adoption, never replaced.** Everything else in
+that block is newest-device-wins, which is right for a setting and catastrophic for a
+possession — a card earned on the tablet is simply absent from an older config the phone
+wrote, so the phone winning deleted it. Titles limp back (`syncTitles()` re-mints from
+`hab_titles`); **card skins are client-only**, and `claimRewards()` only re-grants what
+the *current* level reaches, so after a season reset a lost card was gone for good. Both
+sides only ever append, so the union is the truth. What they were *wearing* is a
+preference, so the newer config still wins — but never into an empty slot.
 
 Storage keys, all owned solely by Proof: `<id>_hab_cfg` (settings), `<id>_hab_log`
 (the daily log), `<id>_hab_meta` (sync state). They ride the existing `save_progress` /
