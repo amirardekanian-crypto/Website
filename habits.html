@@ -3656,9 +3656,16 @@ function loggedDays() { return Object.keys(LOG).sort(); }
 // counting heads. xpFor() has always been weighted; so has every nudge, which
 // sorts what to chase by baseXp(). The percentage now agrees with them.
 //
-// It is BINARY, not pro-rata. xpFor() already pays pro-rata *with* a completion
-// bonus, so a linear percentage would be the one number here that does not
-// reward finishing — you could sit at 75%, over the bar, having finished nothing.
+// Both halves give PARTIAL CREDIT on a counter (Amir, 2026-08-02: "for all
+// the habits that have bars to fill... i want that to be added toward their
+// day completion percentage"). Two of three protein servings is 2/3 of the
+// job, not zero. This used to be gate-only — "the SCORE half stays binary on
+// purpose, a target you did not hit is a target you did not hit" — which
+// meant the day streak forgave a near-miss the header still read as zero for
+// that habit. isPerfect() is the backstop for the old worry (sitting at a
+// high % having finished nothing): it is still every(isDone), untouched, so
+// a day can read 91% without being *perfect* — perfect still means every box
+// actually ticked, and only that unlocks the perfect-day takeover and badge.
 //
 //   'score' — what the day was WORTH. Everything on that day's roster counts,
 //             the session included. The header, the day strip, the wall.
@@ -3682,6 +3689,13 @@ function loggedDays() { return Object.keys(LOG).sort(); }
 // isPerfect() is deliberately untouched: still every(isDone) over the whole
 // roster, padlock included. It is what keeps proof.html true, and it is the
 // client twin of the server's `ndone >= nlive`.
+// ⚠️ dayPct() is CLIENT-ONLY — computed here and sent up as a pre-computed
+// number (`p_pct`) when posting a roll call; nothing recomputes it
+// server-side. The server's own score-half twin, `wdone` in
+// stage22_gate_and_comeback.sql, stays binary on purpose — it is a legacy
+// fallback for the `qualify` quest kind when `gateV2` is off, never shown to
+// anyone as a percentage, so it is deliberately left alone rather than
+// rewritten to match. See XP_SYSTEM.md §6.
 // ⚠️ rosterOn(dayKey), never live() — see the roster note above.
 function dayParts(dayKey, mode) {
   let done = 0, total = 0, missing = 0;
@@ -3691,13 +3705,10 @@ function dayParts(dayKey, mode) {
     total += w;
     if (hit) { done += w; return; }
     missing++;
-    // ⚠️ GATE ONLY: PART OF A COUNTER IS PART OF THE JOB. The gate used to be
-    // all-or-nothing per habit, so 9,500 of 10,000 steps counted as zero and a
-    // 95%-effort day could read as a dead streak. That cliff is indefensible on
-    // the one number the athlete is asked to protect. The SCORE half stays
-    // binary on purpose — it answers "what was this day worth", and a target
-    // you did not hit is a target you did not hit.
-    if (mode === 'gate' && h.target > 0) {
+    // PART OF A COUNTER IS PART OF THE JOB, in both modes now. 9,500 of
+    // 10,000 steps is 95% of the job, not zero, whether the question is "did
+    // this day qualify" (gate) or "what was this day worth" (score).
+    if (h.target > 0) {
       const v = valOf(dayKey, h.id);
       if (v > 0) done += w * Math.min(1, v / h.target);
     }

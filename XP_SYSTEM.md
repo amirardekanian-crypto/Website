@@ -567,22 +567,35 @@ in `habits.html`, which walks `rosterOn(day)` and sums `baseXp()` rather than co
 heads. A headcount said a supplement and a training session were the same day's work; the
 percentage was the last number in the app that still believed that.
 
-`dayPct()` is **binary, not pro-rata** — `xpFor()` already pays pro-rata *with* a
-completion bonus, so a linear percentage would be the one number here that does not reward
-finishing. You could otherwise sit at 80% having completed nothing at all.
+⚠️ **Both halves are pro-rata now** (2026-08-02, Amir: *"for all the habits that have bars
+to fill, like sleep, water, steps, food or anything else, i want that to be added toward
+their day completion percentage"*). An incomplete counter contributes `min(v / target, 1)
+× weight` in either mode — 9,500 of 10,000 steps is 95% of the job, not zero, whether the
+question is *did this day count* (gate) or *what was this day worth* (score). That one
+change takes a 9,500-step day from 67% to 98% under either half.
 
-⚠️ **`gatePct()` is pro-rata, and only `gatePct()`** (2026-08-02). The two halves answer
-different questions: the score half asks *what was this day worth*, where a target you did
-not hit is a target you did not hit; the gate half asks *did this day count*, and there
-all-or-nothing produced an indefensible cliff — **9,500 of 10,000 steps scored zero**, so a
-95%-effort day could read as a dead streak. In gate mode an incomplete counter now
-contributes `min(v / target, 1) × weight`. That one change takes a 9,500-step day from 67%
-to 98%.
+This was gate-only from earlier the same day until this change. The original reasoning for
+keeping the score half binary was real: `xpFor()` already pays pro-rata *with* a completion
+bonus, so a linear percentage risked being the one number that did not reward finishing —
+you could sit at 80% having completed nothing at all. That worry is `isPerfect()`'s job,
+not `dayPct()`'s: `isPerfect()` stays `every(isDone)`, untouched, so a day reading high on
+partial credit still cannot trigger the perfect-day takeover or badge unless every habit
+actually hit its target. With that backstop in place, quietly rounding a near-finished
+counter down to nothing was the less honest of the two numbers.
 
 | | Denominator | Used by |
 |---|---|---|
 | **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the header, the day strip, the roll call wall |
 | **`gatePct()`** — what the athlete could *do* | same, minus any **locked** habit they did not earn that day | day streaks, and nothing else |
+
+⚠️ **`dayPct()` needed no server migration.** It is computed client-side and sent up as a
+pre-computed number (`p_pct`) when posting a roll call — nothing recomputes it
+server-side, so there is no second copy to drift out of sync. The server's own score-half
+column, `wdone` (`stage22_gate_and_comeback.sql`), is a *different* thing: an internal
+fallback inside the `qualday` CTE, used only for the `qualify` quest kind when `gateV2` is
+off, never surfaced to anyone as a percentage. It is left exactly as shipped — still
+binary, and its "stays binary on purpose" comment there now describes only that narrow
+fallback, not the score half in general.
 
 ⚠️ **The gate is what makes weighting safe, not a nicety.** WORKOUT is 100 of 350 — 28.6%
 of the default day — against a threshold that allows 25% of slack. Weighted straight into
