@@ -1239,6 +1239,27 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   habit's* daily value, so a workout streak outpays a supplements streak. Detail in
   [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.5.
 
+- **Milestones come in MARKS** (2026-08-02, Amir: *"as ive seen in call of duty you can
+  unlock achievements again but next levels of them"*). A family is one achievement earned
+  again at a higher bar — `HUMAN SPRINKLER I` (5 days) → `II` (20) → `III` (60). The
+  numeral is display-only; each rung is its own row with its own code, need and XP, so no
+  scoring machinery changed. **32 milestones now, worth 9,585 XP**, up from 20 and 5,085 —
+  and since milestone XP re-pays every season, that widens the runway a returning veteran
+  has in a new one. `DAWN PATROL I` is the **free tier's way in**: the shelf's only day-one
+  badge used to be `FIRST BLOOD`, which is WORKOUT-gated and therefore unreachable for the
+  whole funnel. Five badges were renamed so families read as one thing — codes untouched,
+  so no history moved. [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.6.
+
+- **Custom habits have a server ceiling now** (`maxCustom`, 3). The client cap is a UI rule
+  and the log is just JSON, so a tampered copy with fifty junk keys was paid fifty times.
+  `hab_xp()` pays for at most three unrecognised keys per day. Honest athletes are
+  unaffected — measured live, a 3-custom day scores identically before and after, while a
+  10-custom day drops 336 → 126. [`XP_SYSTEM.md`](XP_SYSTEM.md) §1.
+
+- **Overlapping quest runs are clipped** in both scorers, so starting a run mid-week is
+  safe now: the later run takes over from its start date instead of both scoring the same
+  days and paying a shared quest twice. [`XP_SYSTEM.md`](XP_SYSTEM.md) §8.5.
+
 - **The day streak has TWO doors** (2026-08-02): clear `streakQualifyPct` of the day's
   weight, **or** leave at most one thing undone. The percentage alone was a lie on the
   roster most athletes actually have — add-ons ship OFF, so on the core five, missing steps

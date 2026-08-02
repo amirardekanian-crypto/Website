@@ -169,6 +169,7 @@ every one of them mirrors a constant in `habits.html`:
 | `questRuns` | — | Server-only; set by `set_quests()` / `clear_quests()` |
 | `gateV2` | the two-door rule in `dayQualifies()` | Day streaks and the `qualify` quest differ (stage22) |
 | `lapseDays`, `comebackXp`, `comebackStick` | `LAPSE_DAYS`/`COMEBACK_XP`/`COMEBACK_STICK` | **The comeback pays on one side only** (stage22) |
+| `maxCustom` | `MAX_CUSTOM` | A tampered log outscores the board (stage24) |
 
 Read the live row with:
 `select jsonb_object_keys(rules) from public.xp_rules where id = 1;`
@@ -263,6 +264,13 @@ XP**, to avoid a third thing scored twice — but their title ids must exist in 
 on the `xp_rules` row or the server refuses them. **Milestones
 carry a `tier`** (`week`/`long`/`rare`) for grouping on Progress; nothing scores off
 it. Full detail in `HABITS.md`.
+
+**`stage24_marks_quests_customcap.sql` — applied 2026-08-02** (as `stage24a/b/c`). Three
+things that all had to hit both scorers at once: `hab_xp()` gained the `maxCustom` ceiling
+on unrecognised keys; `hab_bonus_xp()`'s `qruns` CTE now clips a run at the next run's
+start so overlapping runs cannot double-pay a shared quest; and the twelve new milestone
+rungs plus THE CENTURION's 500 → 1,200 retune landed on the `milestones` array. It also
+dropped the fossil map-object still sitting at `passTrack[0]` from the stage20 incident.
 
 **Supabase stages 9–23 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
