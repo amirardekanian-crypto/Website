@@ -256,6 +256,24 @@ and only that unlocks the perfect-day takeover.
 - **`gatePct()`** — what the athlete could *do*. A **locked** habit they did not earn that
   day leaves the denominator. Day streaks read this and nothing else.
 
+⚠️ **"On target" has exactly ONE definition: `dayQualifies()`.** Never
+`dayPct(k) >= streakQualifyPct` — that is a third rule, and it is wrong twice over: it
+uses the whole-roster denominator (so an unearned locked session counts *against* the
+athlete) and it skips the gate's second door (*at most one thing undone*). Anything that
+labels a day on-target/missed, counts on-target days, or colours a cell by it must call
+`dayQualifies()`.
+
+It was written the wrong way in the month share card — both the ON TARGET cell shading and
+the "DAYS ON TARGET" figure — until 2026-08-02. Replayed across the eleven athletes on the
+board it mislabelled **13 day-cells over 6 of them**; on Amir's own log it disagreed with
+his real streak on **4 of 8 days**. Friday 31 July is the clean example: **53% by worth,
+79% by the gate**, the streak counted it, and the card drew it as missed. That two-number
+gap is not a bug — it is this whole section — but only one of the two decides anything, and
+a share card is the worst place to state the other one.
+
+The same confusion had reached the **manual prose**, which described the gate as *"75% of
+what the whole day was worth"* — i.e. `dayPct`, the number that does **not** decide. Fixed
+to say *what you could actually do that day*, with the rest-day gap named outright.
 ⚠️ `dayPct()` is **client-only** — it is computed here and sent up as a pre-computed
 number when posting a roll call (`p_pct`), never recomputed server-side, so this needed no
 Supabase migration. The server keeps its own score-half twin, `wdone`, for one narrow

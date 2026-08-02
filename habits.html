@@ -7130,7 +7130,7 @@ function renderProgress(LI, earned, totalAch) {
         or one of the ${ACHIEVEMENTS.length} milestones at the foot of this screen.
         Every habit has <strong>its own streak</strong> — consecutive days you did that one thing.
         Your <strong>day streak</strong>, at the top, is consecutive days where you cleared
-        ${XP_RULES.streakQualifyPct}% of everything you track.
+        ${XP_RULES.streakQualifyPct}% of what you could do that day — or left no more than one thing undone.
         A <strong>perfect day</strong> is all of it. All four start at zero and the first one moves today.
       </div>` : ''}
 
@@ -7802,7 +7802,7 @@ function renderManual() {
         // now the only thing doing it. Every label says which one it means:
         // habit rows and the detail header carry the habit's own, the band at
         // the top of Today and Progress is always "DAY STREAK".
-        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the whole day was worth — <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. Miss one habit and the day still counts, every time, whatever you track. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
+        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of <strong style="color:var(--ink)">what you could actually do that day</strong> — <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. That is deliberately not the same number as the percentage on the day itself: the day's own score counts your whole roster, and this one leaves out a locked session you had no way to tick, which is why a rest day can read low and still keep the streak. Miss one habit and the day still counts, every time, whatever you track. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
         p(`Part of a counter counts toward it, too. Nine thousand of your ten thousand steps is not nothing, and the day streak no longer pretends it is — it reads that as nearly all of your steps rather than none of them.`) +
         p(`<strong style="color:var(--ink)">And if you disappear, coming back pays.</strong> Miss ${LAPSE_DAYS} days or more, then have a day that counts, and that is a comeback: <strong style="color:var(--ink)">${COMEBACK_XP} XP</strong> on the spot, every time it happens, and the app will say so. Hold it for a week and there is a medal in it; do that ${3} times and there is another. Nobody gets a clean run, and the days behind you do not have to be paid off before today counts.`) +
         // The athlete-facing half of the weighted day score. Without this, a rest
@@ -7820,7 +7820,7 @@ function renderManual() {
           if (!tot || !lock) return '';
           return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day — even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
         })()) +
-        p(`Your streak sits at the top of <strong style="color:var(--ink)">Today</strong> and <strong style="color:var(--ink)">Progress</strong>, with the last seven days beside it — a filled square is a day that counted. Your longest single-habit run is in the stats on Progress, and each habit carries its own run in its row.`) +
+        p(`Your streak sits at the top of <strong style="color:var(--ink)">Today</strong> and <strong style="color:var(--ink)">Progress</strong>, with the last seven days beside it — a filled square is a day that counted. The best day streak you have ever had is beside it on Progress, and each habit carries its own streak in its row.`) +
         p(`Every badge is earned on your longest run ever — the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike — so breaking a run never takes one back.`) +
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
@@ -8764,9 +8764,19 @@ const SHARE_PAINT = {
         if (i < lead) { x.fillStyle = 'rgba(255,255,255,0.10)'; x.fill(); continue; }
         const key = keys[i - lead], p = dayPct(key);
         const future = key > TKEY();
+        // ⚠️ dayQualifies(key), NOT dayPct(key) >= streakQualifyPct. The legend
+        // under this grid says ON TARGET, and "on target" has exactly one
+        // definition in this app — the gate in dayQualifies(). Comparing
+        // dayPct to the threshold is a THIRD rule: it uses the whole-roster
+        // denominator (so an unearned locked habit counts against you) and it
+        // ignores the gate's second door entirely. On Amir's own log it
+        // disagreed with his real streak on 4 of 8 days — Fri 31 Jul was 53%
+        // by worth, 79% by the gate, and the streak counted it while this card
+        // drew it as missed. Shading stays keyed to `p` (worth) because that
+        // is a heat scale, but the ON TARGET cut is the gate.
         x.fillStyle = future ? 'rgba(255,255,255,0.10)'
                     : isPerfect(key) ? CARD.teal
-                    : p >= XP_RULES.streakQualifyPct ? '#fff'
+                    : dayQualifies(key) ? '#fff'
                     : p > 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)';
         x.fill();
       }
@@ -8783,7 +8793,8 @@ const SHARE_PAINT = {
         x.letterSpacing = '0px';
       });
       // Two stat blocks and the most consistent habit.
-      const onTarget = keys.filter(kk => kk <= TKEY() && dayPct(kk) >= XP_RULES.streakQualifyPct).length;
+      // dayQualifies(kk) — the same one definition the shading above now uses.
+      const onTarget = keys.filter(kk => kk <= TKEY() && dayQualifies(kk)).length;
       const xpMonth = keys.reduce((s, kk) => s + dayXp(kk), 0);
       const bw = (W - PAD * 2 - 24) / 2, by = legendY + 40;
       [[String(onTarget) + '/' + dim, 'DAYS ON TARGET', '#fff'],
