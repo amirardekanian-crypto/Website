@@ -327,8 +327,18 @@ denominator) and **day streaks read only that**. The gate is not a nicety: WORKO
 28.6% of the default day, so weighting it into the denominator makes it a *precondition* —
 a rest day could never qualify and a free-tier athlete, whose WORKOUT is locked for life,
 would never have a qualifying day again. `isPerfect()` stays unweighted and ungated, which
-is what keeps `proof.html`'s promise true. `streakQualifyPct` moved 80 → **75** with it.
-Full detail in `XP_SYSTEM.md` §6; server half in `supabase/stage19_weighted_days.sql`.
+is what keeps `proof.html`'s promise true. `streakQualifyPct` moved 80 → 75 with it, and
+back to **80** on 2026-08-02 (Amir: *"I think 75% is very low"*) — safe now only because
+the gate has a **second door**: `dayQualifies()` also passes a day that left **at most one
+thing undone**, so missing one habit still counts at 80, and 80 only tightens the day that
+missed *several* things by a little each. Nobody lost XP, a title or a level to the change
+(all derived-but-never-revoked; verified across all 11 athletes) — only streak counters
+moved. Full detail in `XP_SYSTEM.md` §6; server half in `supabase/stage19_weighted_days.sql`.
+
+⚠️ Changing this threshold means **both scorers plus the prose**: `XP_RULES.streakQualifyPct`
+in `habits.html`, `streakQualifyPct` on the `xp_rules` row, and any quest `note` that spells
+the number out (`w_qualify5` said "5 days at 75% or better" in *both* pools — it now says
+"5 days on target" so the text can never name a stale bar again).
 
 **Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
 the only test, and anything not `"free"` is coached, so no existing file needs editing.
