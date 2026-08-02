@@ -23,7 +23,7 @@ const XP_RULES = {
   growth: 0.55,           // cost(n) = base × n^growth
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
-  streakQualifyPct: 75,   // a day counts toward the day-streak at this % of the day's WEIGHT
+  streakQualifyPct: 80,   // a day counts toward the day-streak at this % of the day's WEIGHT
   dailyCap: 3,            // most a counter takes in a day, × its target — section 1
   seasonStart: '2026-07-26',   // fallback only — the server is the authority
   seasonName: 'Pre-Season',    // see section 7
@@ -612,9 +612,9 @@ denominator already complete.
 the whole roster, padlock included. It is what keeps `proof.html` true, and it is the
 client twin of the server's `ndone >= nlive`.
 
-### `streakQualifyPct: 75`
+### `streakQualifyPct: 80`
 
-A day counts toward the day-streak at **75% of the weight it could have earned, OR with at
+A day counts toward the day-streak at **80% of the weight it could have earned, OR with at
 most one thing left undone.** Either door opens it.
 
 ⚠️ **The second door is the promise, and it exists because the percentage alone was a lie
@@ -662,7 +662,7 @@ no `locked` flag: `p_rules` carries `targets` and `weights` only.
 
 ```sql
 update public.xp_rules
-set rules = rules || '{"unearnable":["strength"],"streakQualifyPct":75}'::jsonb,
+set rules = rules || '{"unearnable":["strength"],"streakQualifyPct":80}'::jsonb,
     updated_at = now()
 where id = 1;
 ```
