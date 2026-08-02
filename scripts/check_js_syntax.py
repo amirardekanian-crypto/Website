@@ -84,7 +84,22 @@ BROWSER_CANDIDATES = [
     r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
     r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    # Linux, incl. the Playwright-managed Chromium the cloud sandboxes ship
+    # (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers). Without these the guard
+    # returns "no Edge or Chrome found" and exits 2 on every non-Windows
+    # machine — which is where most of the work on habits.html actually gets
+    # done, so the check it exists to run was silently never running there.
+    "/opt/pw-browsers/chromium/chrome-linux/chrome",
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
 ]
+# The pinned Playwright builds are versioned directories (chromium-1194/...),
+# so glob rather than hardcode a build number that moves under us.
+BROWSER_CANDIDATES += sorted(
+    (str(p) for p in Path("/opt/pw-browsers").glob("chromium-*/chrome-linux/chrome")),
+    reverse=True,
+)
 
 SCRIPT_RE = re.compile(
     r"<script(?![^>]*\bsrc\s*=)[^>]*>(.*?)</script>", re.IGNORECASE | re.DOTALL
