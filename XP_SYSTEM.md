@@ -23,7 +23,7 @@ const XP_RULES = {
   growth: 0.55,           // cost(n) = base × n^growth
   completionBonus: 1.2,   // multiplier once a habit's target is met
   customXp: 25,           // per-completion value of an athlete-added habit
-  streakQualifyPct: 80,   // a day counts toward the day-streak at this % done
+  streakQualifyPct: 75,   // a day counts toward the day-streak at this % of the day's WEIGHT
   dailyCap: 3,            // most a counter takes in a day, × its target — section 1
   seasonStart: '2026-07-26',   // fallback only — the server is the authority
   seasonName: 'Pre-Season',    // see section 7
@@ -136,6 +136,29 @@ past their target from Today as well as from the sheet, which is the behaviour t
 already had. Past the target the toast says there is no more XP in it today rather than
 printing `+0 XP` under the word *complete*.
 
+> **The same subtraction came back through the other operand, fixed 2026-08-02.**
+> `capFor()` reads the habit's *current* target, but every stored value was clamped
+> against the target in force when it was written — so **lowering a target** strands real
+> numbers above the new ceiling, and `Math.min(cap, …)` then lowers them exactly the way
+> `Math.min(target, …)` used to. Opening yesterday's sheet and pressing **Save without
+> editing anything** was enough: `setVal()` re-clamped a genuine 30,000-step day down to
+> 24,000. Invisible in XP, visible only as lost units in a `total:` quest — on the board
+> too. `setVal()`, `bump()` and the sheet's `+` now take their ceiling as
+> `max(capFor(h), what is already logged)`: **the cap clamps new input, never history.**
+
+**How many habits an athlete may add: `MAX_CUSTOM = 5`.** A custom habit is a one-tap
+check worth `customXp × completionBonus` = **30 XP a day**, it earns its own consistency
+tiers on top, and the server pays for it too — `hab_xp()` pays `customXp` for every key in
+a day it does not recognise. Uncapped that was a faucet, not a feature: twenty junk habits
+are twenty taps and roughly **600 XP a day**, about double a coached athlete's genuinely
+perfect one, on a board shared with people doing the real work — and nothing could take it
+back, since only the athlete's own ✕ removes a custom habit. `addCustomHabit()` now
+enforces the count and rejects a duplicate name (the id carries a timestamp, so "Reading"
+twice used to make two habits that both scored), and both composers hide at the cap.
+Like `dailyCap`, this is a **client write-time guard with no server equivalent** — see the
+note in §8 on excluding customs from board scoring, which is the stronger fix and needs a
+migration.
+
 **A perfect day is 420 XP** with the current numbers. That figure is the anchor for
 everything below — if you change `weights`, recompute it.
 
@@ -149,21 +172,46 @@ cost(level n → n+1) = base × n^growth
 
 With `base: 300` and `growth: 0.55`, no two levels cost the same:
 
-| Level | Cost of this level | Total XP to reach it | Days at 80% adherence |
-|---|---|---|---|
-| 2 | 300 | 300 | **~1 day** |
-| 5 | 730 | 1,930 | ~6 |
-| 10 | 1,060 | 6,270 | ~19 |
-| 15 | 1,290 | 12,190 | ~36 |
-| **20** | 1,520 | **19,270** | **~57 (≈2 months)** |
-| 30 | 1,930 | 42,600 | ~127 |
-| 50 | 2,590 | 116,000 | ~345 |
+⚠️ **These rows are computed from the shipped constants — do not hand-edit them.**
+Regenerate after any change to `base`, `growth`, `completionBonus` or `weights`:
+
+```
+python -c "
+base, growth = 300, 0.55
+def cost(n): return max(10, round(base * n**growth / 10) * 10)
+cum = 0
+for lv in range(1, 51):
+    if lv in (2,5,10,15,20,30,50): print(lv, cost(lv-1), cum, round(cum/336), round(cum/268.8))
+    cum += cost(lv)"
+```
+
+| Level | Cost of this level | Total XP to reach it | Days @80%, full roster | Days @80%, core only |
+|---|---|---|---|---|
+| 2 | 300 | 300 | **~1 day** | **~1 day** |
+| 5 | 640 | 1,930 | ~6 | ~7 |
+| 10 | 1,000 | 6,270 | ~19 | ~23 |
+| 15 | 1,280 | 12,140 | ~36 | ~45 |
+| **20** | 1,520 | **19,270** | **~57 (≈2 months)** | ~72 |
+| 30 | 1,910 | 36,660 | ~109 | ~136 |
+| 50 | 2,550 | 81,830 | ~244 | ~304 |
+
+**Two columns, because the shipped default is not the full roster.** `defaultCfg()`
+starts every add-on OFF, so a new athlete's perfect day is the five core habits —
+280 × 1.2 = **336 XP**, against **420** for all eight. At 80% adherence that is 268.8
+vs 336 a day, and the same ladder therefore takes about 25% longer for the athlete
+who never opts into anything. Quote the column that matches who you are talking about.
 
 This was tuned to two deliberate anchors:
 
 1. **One full day of habits gets you to level 2** — a perfect day is 420 XP, level 2 costs 300.
 2. **About two months of solid work gets you to level 20** — 19,270 XP is 57 days at 80%
    adherence (46 days if perfect, 76 days at 60%).
+
+Anchor 2 still holds exactly. The rows either side of it did not: this table was
+hand-written and drifted from the code, overstating level 30 by 16% and level 50 by
+42% (it claimed 116,000 XP and ~345 days for PROOF ITSELF, against a real 81,830 and
+~244). Tuning "the long game" means tuning against these numbers, so they have to be
+the ones the app actually produces.
 
 ### If you want to change the pace
 
@@ -339,7 +387,21 @@ progress figure falling while the XP behind it does not. Fixed; the rule is the 
 as everywhere else in this file: **any function that takes a `dayKey` uses
 `rosterOn(dayKey)`.** The two halves still differ in one respect *by design* — the display
 walks `loggedDays()` (a badge is judged on the best run ever) while the ledger walks
-`seasonDays()` (it is only *paid* inside the season). See rule 2 above. **Weekly quests ride the same rail** (§8.5): dated on the
+`seasonDays()` (it is only *paid* inside the season). See rule 2 above.
+
+**The same rule was broken a second way, on the `streak:` measures, and fixed 2026-08-02.**
+`measureAch()` returned `habitStreak(h)` — the run ending *today* — for all eight
+streak-measured milestones (HS · TS · ZM · BA · HM · RB · IM · UB), while the tiers beside
+them correctly used `habitBest(h)`. So a badge the athlete had earned and been shown a
+takeover for greyed back to `0/5` the day their streak broke, the earned-milestone count on
+Progress dropped, and the XP it had paid stayed exactly where it was — the identical
+"progress figure falling while the XP behind it does not" fault as `daysWith3`. Worse,
+`currentAch()` feeds `CFG.seenAch`, so the code fell out of the seen list and rebuilding the
+streak fired the full **"Medal unlocked · +N XP banked"** takeover again, for XP that had
+landed weeks earlier and could not land twice (`bonusEvents()` pays each milestone once per
+season). It now reads `habitBest(h)`, which folds in the live run, so an unearned badge
+still shows real progress. `CFG.seenAch` and `CFG.seenQuests` are also **unioned** rather
+than replaced now: they record what has already had its moment, so they may only ever grow. **Weekly quests ride the same rail** (§8.5): dated on the
 day they complete, so they need no special handling in any window.
 
 `bonusEvents()` is cached and dropped by `invalidateBonus()`, which `saveLog()` and
@@ -734,6 +796,24 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 Past runs are kept on purpose — the XP athletes earned in them keeps counting. Clearing
 a *finished* run would retroactively take those points away.
 
+> ⚠️ **Never start a run before the previous one has ended.** `set_quests()` accepts any
+> start date and only replaces a run starting on the *same* one, so a mid-week start
+> leaves two runs covering today — and `questEvents()` walks every run independently, as
+> does `hab_bonus_xp()`. A quest id present in both **pays twice** off one stretch of
+> logging. The board and the phone agree (both scorers overpay identically), so nothing
+> looks wrong; it is simply the wrong number. Fixing it properly means clipping each run's
+> window in *both* scorers, which is a migration — until then this is a rule, not a
+> safeguard. The client half of the mess is fixed: `activeQuestRun()` now returns the
+> **latest-starting** covering run rather than the first, so newly announced quests appear
+> immediately instead of hiding behind last week's list, and completing one of them fires
+> its takeover instead of silently raising XP.
+>
+> `rulesSignature()` now includes the quest pool and the run list. It is the one scoring
+> input the server can change while the app is running — `fetchQuests()` overwrites it at
+> every launch, before `checkLevelUps()` reads a level — so retuning a quest's payout used
+> to hand athletes a full **LEVEL UP** takeover for XP nobody earned that day, and lowering
+> one dropped their level with no word of explanation. Both now re-baseline quietly.
+
 Both commands are **coach-only**: they reject any signed-in user who is not Amir, and
 are not callable by athletes at all. They deliberately *do* work from the Supabase SQL
 editor, which carries no JWT — an earlier version guarded on the email alone and locked
@@ -863,3 +943,106 @@ of that line, and `hab_notes` would need the same treatment `hab_xp` gets.
 then keeps logging, the percentage beside it is quietly brought up to date (debounced 4s)
 rather than leaving "38%" under a sentence written at lunchtime on a day they went on to
 finish. It re-posts the same body with a new `pct`; it never changes their words.
+
+---
+
+## 12. Open economy decisions — Amir's call, and each needs BOTH scorers
+
+A game-design review of the reward system (2026-08-02) found five things that are not
+bugs but **tuning choices**, every one of which changes what a day is worth and therefore
+has to land in `habits.html` *and* the Supabase side together (section 8). None of them
+have been made. They are ordered by impact-per-effort.
+
+### 12.1 The streak gate is unfair on the roster most athletes actually have
+
+**This is the most consequential finding in the review.** Section 6's whole argument for
+`streakQualifyPct: 75` — *"miss any one thing and the day still counts"* — is worked
+through on the **eight-habit** roster: gate denominator 250, worst single miss steps at
+190/250 = **76%**, just clear. But `defaultCfg()` starts every add-on **OFF**, so the
+shipped default is the five core habits, and with the locked session out of the gate the
+denominator is **180**:
+
+| Miss, on the core-only roster | Gate | Streak survives? |
+|---|---|---|
+| steps (60) | 120/180 = **67%** | ✗ |
+| sleep (50) | 130/180 = **72%** | ✗ |
+| fuel (40) | 140/180 = 78% | ✓ |
+| water (30) | 150/180 = 83% | ✓ |
+
+So a brand-new athlete must fully hit **both** steps and sleep every single day to hold
+any streak, while a veteran with three add-ons switched on gets the forgiving version the
+tuning was written for. It is backwards twice over: the people the 75% gate exists to
+protect are the ones it does not cover, and because padding the denominator softens the
+gate, **opting into the cheapest self-reported add-ons is literally streak insurance**
+(supps + breathe + mobility is 80 of weight for about twenty unverifiable minutes).
+
+Compounding it, the gate is binary per habit — `dayParts()` uses `isDone()`, so 9,500 of
+10,000 steps contributes **zero**, and a 95%-effort day can read as a dead streak.
+
+Two ways out:
+
+- **Cheap:** `dayQualifies()` becomes *"gatePct ≥ 75 **or** at most one unlocked habit
+  incomplete"*. One rule, restores the stated promise on every roster.
+- **Better:** make the `gate` mode of `dayParts()` **pro-rata for counters** —
+  `min(v / target, 1) × weight` instead of all-or-nothing. Fixes the 9,500-steps cliff at
+  the same time, and is closer to what the athlete believes is being measured.
+
+Either lands in `dayQualifies()`/`dayParts()` client-side and the `qd` CTE in
+`stage19_weighted_days.sql` server-side, and must be added to `rulesSignature()` so it
+re-baselines instead of firing celebrations.
+
+### 12.2 Nothing in the economy pays for the comeback
+
+Every *continuation* moment is priced — the 20:00 at-risk nudge, marks at
+3/7/14/21/30/50/75/100 — and the **return after a lapse**, which habit-formation research
+and game economics agree is the highest-leverage moment in the whole loop, pays nothing at
+all. A lapsed athlete's day one again is scored identically to any other day, and the only
+thing that speaks to them is the generic "empty day" nudge line.
+
+Proposal: one new event kind in `bonusEvents()` / `hab_bonus_xp()` — **the first
+qualifying day preceded by ≥3 non-qualifying ones pays a small flat bonus (~40–60 XP)**.
+Price it below FIRST BLOOD's 50 so it stays the cheapest thing on the ledger and cannot be
+farmed by alternating (three dark days cost far more than the bonus pays). It is a pure
+function of the log and dated on the return day, so the season window and both leaderboard
+windows filter it with machinery that already exists. Worth pairing with a nudge line that
+names it.
+
+### 12.3 FIRST BLOOD is unreachable for the free tier — the top of the funnel
+
+FIRST BLOOD is explicitly *"the way in"* but measures `daysHit:strength`, and free-tier
+athletes have WORKOUT locked for life. The audience `proof.html` recruits therefore has no
+entry badge: their first reachable milestone is a perfect day or a 5-day streak.
+
+Proposal: one `week`-tier row reachable on day one without a session, reusing the existing
+`daysWith3` measure so both scorers already know how to count it —
+`{ code:'GO', name:'ON THE CLOCK', note:'Three habits logged in one day', xp:40, need:1, measure:'daysWith3', tier:'week' }`
+— priced under FIRST BLOOD's 50 to keep the easiest-pays-least ladder honest. One row in
+`ACHIEVEMENTS`, one in the `milestones` array on the `xp_rules` row.
+
+### 12.4 Season 2 is a reward dead zone for anyone who levelled in season 1
+
+`nextReward()` correctly skips rewards already owned, so a veteran who peaked at level 21
+re-climbs **20,830 XP (~62 days at 336/day)** before the track pays anything new, while
+milestone XP re-pays in silence (`seenAch` persists, so no celebrations). Two months of
+rank dings and nothing to want.
+
+Proposal: mint **one prismatic title per season at its close**, keyed to peak rank —
+`PRE-SEASON OPERATOR`. It uses the append-only title machinery `EVENTS` already ride, is
+free to mint, is never revoked, and shows on the board and the wall. Every season then has
+a thing that can only be earned *that* season, which is the retention story a reset needs.
+Requires registering the ids in `passTrack` **ahead of** season close (the server refuses a
+title it does not know) plus a mint step in `start_season()`. Largest of the five.
+
+### 12.5 Custom habits: the cap is a patch, exclusion is the fix
+
+`MAX_CUSTOM = 5` (section 1) closed the worst of the faucet client-side, but a custom
+habit still pays 30 XP a day plus its own consistency tiers onto a **shared** board, the
+server pays `customXp` for any key it does not recognise, and there is still no
+server-side check at all — so a tampered log is unbounded.
+
+The honest fix for a product named Proof: **score custom habits on their own per-habit
+ladder but exclude them from overall XP and board scoring** — any id not present in
+`weights` scores 0 in the overall total and in `hab_xp()`, and customs leave `dayParts()`.
+The athlete keeps the tracking and the streaks; the board only ever reflects the five core
+habits and the built-in add-ons, which is the only way it compares like with like. One
+symmetrical rule in both scorers.
