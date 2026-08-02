@@ -527,10 +527,10 @@ copy, and any one alone leaves stale lines somewhere:
 | 2 | `setMyNote()` | The local mirror of your **own** lines (was 14 days) |
 | 3 | `supabase/stage21_roll_call_retention.sql` | The **server's** copy — the only one that makes "shouldn't be saved" true |
 
-⚠️ **Stage 21 is NOT applied.** It deletes rows from `hab_notes`, so Amir runs it in the
-SQL editor himself; until he does, the wall *shows* seven days and the server still
-*holds* more. It adds a `purge_old_notes()` function and a **statement-level AFTER
-trigger** on insert/update, so the table sweeps itself on ordinary traffic — no cron.
+**Stage 21 — applied 2026-08-02.** It adds a `purge_old_notes()` function and a
+**statement-level AFTER trigger** on insert/update, so `hab_notes` sweeps itself on
+ordinary traffic — no cron needed. Verified live: a row backdated 40 days was gone the
+moment the next row was written, leaving only what was actually inside the window.
 
 ⚠️ **The client floor is 7 days and the server floor is 9, and they must not be
 "tidied" to match.** `hab_notes.day` is the athlete's LOCAL day (that is why

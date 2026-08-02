@@ -264,15 +264,37 @@ on the `xp_rules` row or the server refuses them. **Milestones
 carry a `tier`** (`week`/`long`/`rare`) for grouping on Progress; nothing scores off
 it. Full detail in `HABITS.md`.
 
-**Supabase stages 9–20 are applied and live** (leaderboard, workout-days feed, seasons,
+**Supabase stages 9–23 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
-per-day rosters, weighted day scores, milestone tiers + event titles).
-⚠️ **`stage21_roll_call_retention.sql` is written but NOT applied.** It is the only
-destructive migration in the folder — it deletes `hab_notes` rows older than nine days —
-so Amir runs it himself. The client already limits the wall to seven days
-(`ROLL_DAYS`/`rollFloor()`), so until stage 21 runs the wall *shows* a week and the server
-still *holds* more. The two floors differ on purpose (client 7 on the local clock, server
-9 with timezone slack) — the file's header explains why, and they must not be matched up.
+per-day rosters, weighted day scores, milestone tiers + event titles, weighted-gate +
+comeback economy, the roll-call retention prune, the title-mint fix).
+
+**`stage21_roll_call_retention.sql` — applied 2026-08-02.** The wall's SAVED half now
+matches its SHOWN half: a statement-level trigger on `hab_notes` sweeps anything older
+than `current_date - 8` on every write, so the table self-maintains with no cron. The
+client still shows exactly 7 days (`ROLL_DAYS`/`rollFloor()`, local clock); the server
+keeps 9 days (UTC, with two days of timezone slack) so nobody's post vanishes from the
+server side of the date line before the client's own week is up. **Do not match the two
+floors** — that slack is why nothing inside any athlete's real 7-day window is ever
+deleted early. `select public.purge_old_notes()` is available for an on-demand sweep;
+the trigger already keeps it clean without it.
+
+⚠️ **`stage23_title_mint_fix.sql` — applied 2026-08-02.** `hab_mint_titles()` and
+`set_title()` were written against `passTrack` as a plain `{title_id: level}` object
+(stage17's original shape); at some point before stage22, the live `xp_rules.passTrack`
+drifted into a JSONB ARRAY of `{id, lv, kind, name}` objects (mirroring `PASS_TRACK` in
+`habits.html`, plus the four EVENT titles at `lv:0`) and neither function was updated to
+match. `jsonb_each_text()` on an array is a hard Postgres error, called with no exception
+handling from both `claim_titles()` (every app boot) and `set_title()` (equipping a
+title) — so **no title minted server-side for four days** before this was found and
+fixed (`select max(earned_on) from hab_titles` was 2026-07-29; 11 athletes were owed a
+title at the time of the fix, all backfilled). The fix reads the array correctly and
+draws a real distinction the naive fix would have missed: entries with a genuine `lv > 0`
+(the level track) are minted only when `hab_season_level() >= lv`; entries at `lv: 0`
+(event titles — completion is computed client-side only, with no independent server
+check, same trust boundary the rest of the app already runs on) are recorded directly
+when equipped. Cards are still never auto-minted server-side, unchanged from stage17.
+`supabase/stage23_title_mint_fix.sql` has the full account and is safe to re-run.
 
 **The day score is WEIGHTED, and it is two numbers.** `dayParts(day, mode)` in
 `habits.html` sums `baseXp()` over `rosterOn(day)` rather than counting heads. `dayPct()`
