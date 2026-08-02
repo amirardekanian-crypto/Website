@@ -781,8 +781,33 @@ One line in the Supabase SQL editor:
 
 ```sql
 select public.start_season('Season 1');                -- starts today
-select public.start_season('Season 1', '2026-08-01');  -- or a chosen date
+select public.start_season('Season 1', '2026-07-30');  -- or backdated
 ```
+
+⚠️ **A future date is now refused** (stage25). It used to be advertised here, and it was
+quietly destructive: `current_season()` filters `starts_on <= current_date`, so a row dated
+next month is invisible to it — the archive would freeze at *today's* numbers with an
+`ended_on` weeks away, the command would hand back the OLD season's name (reading as a
+failure and inviting a re-run that inserted a duplicate), and the remaining weeks of play
+would never be archived at all. Start a season on the day it begins.
+
+⚠️ **`start_season()` is coach-only now, and was not before.** `set_quests()`,
+`clear_quests()`, `set_coach_note()` and `hide_note()` have always carried an
+`auth.jwt()` email guard; the one function that **resets every athlete's score** carried
+none, while being executable by `anon`. The anon key ships inside `habits.html` and is
+meant to be public, so any reader could have POSTed `/rest/v1/rpc/start_season` and wiped
+the board. Fixed in stage25 with the identical guard (a null JWT is the SQL editor, which
+is what keeps the command above working for Amir).
+
+**Made a mistake? Undo it:**
+
+```sql
+select public.undo_season('2026-08-01');   -- the date the new season started
+```
+
+That removes the season row *and* the archive rows written when it closed the previous
+one. It deliberately does **not** un-mint titles — nothing in this app may ever revoke a
+reward, so an athlete who briefly held a season title keeps it.
 
 That is the whole reset. It **deletes nothing** — it inserts a new row in
 `public.seasons`, and from that date every score is computed from zero. Athletes see
@@ -791,6 +816,47 @@ from zero."*
 
 To check what's live: `select * from public.current_season();`
 To see the history: `select * from public.seasons order by starts_on;`
+
+### 7.5 The season record — a reset stops being an erasure
+
+*(stage25, closing what was §12.1.)*
+
+A reset dropped every level to 1 and **deleted the fact that the season happened**.
+Nineteen thousand XP and an OPERATOR rank, gone, with no record anywhere. That, more than
+the missing reward, was why season 2 felt empty for a veteran.
+
+When a season closes, `hab_close_season()` archives every athlete who scored anything into
+`public.hab_season_results` — final level and final XP — and the Locker grows a **Seasons
+shelf** showing where they finished. Append-only, free to mint, never revoked.
+
+Everyone who reached **level 5** in that season also gets a title naming it. It can never
+be earned again, because the season is over — the one thing the level track cannot offer,
+and the reason to finish a season rather than coast the last fortnight.
+
+**Run the dry run before you ever start a season.** It is at the bottom of
+`supabase/stage25_season_record.sql` and prints the exact numbers that are about to be
+frozen, using the same expression the archive uses.
+
+Three traps worth knowing, all found by review before this shipped:
+
+- ⚠️ **The archived `level` is derived from the archived `xp`**, not from
+  `hab_season_level()`. That function is hard-wired to `current_season()` and
+  `current_date`, so using it made the level count a day the XP did not — the two columns
+  described different windows and the boundary day was counted in *both* seasons.
+- ⚠️ **Season titles are NOT registered in `passTrack`.** An entry there with `lv: 0` is
+  self-awardable — stage23 made `set_title()` record those directly on trust, which is
+  right for event titles and catastrophic here, since it would make the level-5 threshold
+  decorative and the result unrevokable. `set_title()` instead grew a third branch: a
+  title it does not recognise is allowed **only if the server already minted it**. Owning
+  it is the permission.
+- ⚠️ **`public.seasons` now has a unique index on `starts_on`.** Without it two rows could
+  share a start date, collapsing two archives onto one primary key and colliding their
+  title ids.
+
+Two RPCs feed the client: `season_record(athlete, key)` for the athlete's own shelf, and
+`season_list()` — every season's name — so that **any** `t_sn_…` title resolves on the
+leaderboard and the roll-call wall. Without the second one a season title renders blank
+for everybody except the person wearing it.
 
 ### What resets and what doesn't
 
@@ -1111,35 +1177,22 @@ finish. It re-posts the same body with a new `pct`; it never changes their words
 
 ---
 
-## 12. Open economy decisions — Amir's call, and each needs BOTH scorers
+## 12. Open economy decisions
 
 A game-design review (2026-08-02) found five tuning choices — not bugs — each of which
-changes what a day is worth and so has to land in `habits.html` *and* Supabase together
+changes what a day is worth and so had to land in `habits.html` *and* Supabase together
 (section 8).
 
-**Four have since shipped** and moved out of this list:
+**All five have shipped.** Nothing is open.
 
-- ~~the streak gate is unfair on the default roster~~ → **done**, §6 (two-door gate,
-  pro-rata counters) + `stage22`.
-- ~~nothing pays for the comeback~~ → **done**, §6.6 + `stage22`.
-- ~~FIRST BLOOD is unreachable for the free tier~~ → **done**, §4.6 (`DAWN PATROL I`) +
-  `stage24`.
-- ~~custom habits have no server-side ceiling~~ → **done**, §1 (`maxCustom`) + `stage24`.
-  Amir's call was to limit rather than exclude: honest customs still score on the board,
-  only the unbounded tail is gone.
-
-One is still open.
-
-### 12.1 Season 2 is a reward dead zone for anyone who levelled in season 1
-
-`nextReward()` correctly skips rewards already owned, so a veteran who peaked at level 21
-re-climbs **20,830 XP (~62 days at 336/day)** before the track pays anything new, while
-milestone XP re-pays in silence (`seenAch` persists, so no celebrations). Two months of
-rank dings and nothing to want.
-
-Proposal: mint **one prismatic title per season at its close**, keyed to peak rank —
-`PRE-SEASON OPERATOR`. It uses the append-only title machinery `EVENTS` already ride, is
-free to mint, is never revoked, and shows on the board and the wall. Every season then has
-a thing that can only be earned *that* season, which is the retention story a reset needs.
-Requires registering the ids in `passTrack` **ahead of** season close (the server refuses a
-title it does not know) plus a mint step in `start_season()`. Largest of the five.
+- ~~the streak gate is unfair on the default roster~~ → §6 (two-door gate, pro-rata
+  counters) + `stage22`.
+- ~~nothing pays for the comeback~~ → §6.6 + `stage22`.
+- ~~FIRST BLOOD is unreachable for the free tier~~ → §4.6 (`DAWN PATROL I`) + `stage24`.
+- ~~custom habits have no server-side ceiling~~ → §1 (`maxCustom`) + `stage24`. Amir's
+  call was to limit rather than exclude: honest customs still score on the board, only
+  the unbounded tail is gone.
+- ~~season 2 is a reward dead zone for veterans~~ → §7.5 (the season record and its
+  title) + `stage25`. Amir's own suggestion — milestone **marks** (§4.6) — took most of
+  the sting out of this one independently, by nearly doubling the badge shelf that
+  re-pays every season.

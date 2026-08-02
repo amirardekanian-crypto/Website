@@ -2889,33 +2889,54 @@ function seasonRecords() {
   const r = CFG && CFG.seasons;
   return Array.isArray(r) ? r : [];
 }
-// The titles those records carry. This build has never heard of their ids —
-// they are minted by the server, named after a season that did not exist when
-// this file was written — so the NAME travels with the record and everything
-// downstream resolves through passItem() as usual. Prismatic, like the event
-// titles: a season title can never be earned again, because the season is over.
+// Every season that has ever run — name and start date only. This is what lets
+// ANY `t_sn_…` id resolve to a readable name, not just the athlete's own.
+// ⚠️ Without it a season title renders as BLANK on the leaderboard and the roll
+// call wall for everybody except the person wearing it, because they are the
+// only one with that row in their own record. Season names are not secret.
+function seasonNames() { const s = CFG && CFG.seasonNames; return Array.isArray(s) ? s : []; }
+// A season title, resolved from whichever source knows the name. The id carries
+// the season's start date, so it is self-describing enough to find.
+function seasonTitleFor(id) {
+  const m = /^t_sn_(\d{4})(\d{2})(\d{2})$/.exec(String(id || ''));
+  if (!m) return null;
+  const key = m[1] + '-' + m[2] + '-' + m[3];
+  const on = s => String(s.starts_on || '').slice(0, 10) === key;
+  const s = seasonNames().find(on) || seasonRecords().find(on);
+  if (!s) return null;
+  return { kind:'title', id: id, event: true, season: true,
+           name: String(s.name || s.season_name || 'SEASON').toUpperCase(),
+           note: 'You were there, and it is over. Nobody can earn this one now.' };
+}
+// The ones from the athlete's OWN record — what the Locker's title rail offers.
+// Prismatic like the event titles: a season title can never be earned again,
+// because the season is over.
 function seasonTitles() {
-  return seasonRecords().filter(r => r && r.title).map(r => ({
-    kind: 'title', id: r.title, event: true, season: true,
-    name: String(r.season_name || 'SEASON').toUpperCase(),
-    note: 'You were there, and it is over. Nobody can earn this one now.'
-  }));
+  return seasonRecords().filter(r => r && r.title)
+                        .map(r => seasonTitleFor(r.title)).filter(Boolean);
 }
 async function fetchSeasonRecord() {
   if (window.IS_DEMO || !ATHLETE_ID) return;
   try {
     const sb = _sb();
     if (!sb) return;
-    const { data, error } = await sb.rpc('season_record', { p_athlete_id: ATHLETE_ID, p_key: KEY });
-    if (error || !Array.isArray(data)) return;          // not deployed yet / offline → keep the cache
-    if (JSON.stringify(data) !== JSON.stringify(CFG.seasons)) { CFG.seasons = data; saveCfgQuiet(); }
-  } catch (e) { /* keep whatever we last cached */ }
+    const [rec, list] = await Promise.all([
+      sb.rpc('season_record', { p_athlete_id: ATHLETE_ID, p_key: KEY }),
+      sb.rpc('season_list')
+    ]);
+    let changed = false;
+    if (!rec.error && Array.isArray(rec.data)
+        && JSON.stringify(rec.data) !== JSON.stringify(CFG.seasons)) { CFG.seasons = rec.data; changed = true; }
+    if (!list.error && Array.isArray(list.data)
+        && JSON.stringify(list.data) !== JSON.stringify(CFG.seasonNames)) { CFG.seasonNames = list.data; changed = true; }
+    if (changed) saveCfgQuiet();      // not the athlete's own edit — see saveCfgQuiet()
+  } catch (e) { /* not deployed yet, or offline — keep whatever we last cached */ }
 }
 function passItem(id) {
   if (id === CARD_BASE.id) return CARD_BASE;
   return PASS_TRACK.find(p => p.id === id)
       || eventTitles().find(t => t.id === id)
-      || seasonTitles().find(t => t.id === id)
+      || seasonTitleFor(id)          // resolves ANY season's title, not just our own
       || null;
 }
 function passOwned()  { return (CFG.pass && CFG.pass.owned) || []; }
@@ -3046,7 +3067,7 @@ function defaultCfg() {
            pass:{ owned:[], title:null, card:null },
            seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null, seenStreak:null,
            seenComeback:null,
-           questPool:null, questRuns:null, seasons:null, sound:false, lbSeen:null,
+           questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().

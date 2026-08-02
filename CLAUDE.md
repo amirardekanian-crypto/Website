@@ -272,6 +272,21 @@ start so overlapping runs cannot double-pay a shared quest; and the twelve new m
 rungs plus THE CENTURION's 500 → 1,200 retune landed on the `milestones` array. It also
 dropped the fossil map-object still sitting at `passTrack[0]` from the stage20 incident.
 
+**`stage25_season_record.sql` — applied 2026-08-02.** Closes the last open economy
+decision. A closing season now archives every athlete's final level and XP into
+`public.hab_season_results` (the Locker's **Seasons shelf**) and mints a title naming that
+season to everyone who reached level 5 — unrepeatable by definition, which is the one
+thing the level track cannot offer. ⚠️ It also fixes a **pre-existing security hole**:
+`start_season()` — the function that resets every score — had no coach guard while being
+executable by `anon`, unlike `set_quests`/`clear_quests`/`set_coach_note`/`hide_note`. It
+now carries the same `auth.jwt()` guard, refuses future-dated starts (which silently froze
+the archive weeks early and could never be corrected), and ships `undo_season()`. Season
+titles are deliberately **not** in `passTrack` — an `lv:0` entry there is self-awardable
+since stage23 — so `set_title()` grew a third branch: an unrecognised title is allowed only
+if the server already minted it. The first draft of this file was rewritten after an
+adversarial review found 20 defects in it, 2 critical; the traps are documented in its
+header.
+
 **Supabase stages 9–23 are applied and live** (leaderboard, workout-days feed, seasons,
 bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
 per-day rosters, weighted day scores, milestone tiers + event titles, weighted-gate +
