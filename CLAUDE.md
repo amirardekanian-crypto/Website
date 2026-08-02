@@ -167,6 +167,8 @@ every one of them mirrors a constant in `habits.html`:
 | `quests` | `QUEST_POOL` | A quest pays on one side only |
 | `passTrack` | `PASS_TRACK` | **Server refuses a title the app already gave** |
 | `questRuns` | — | Server-only; set by `set_quests()` / `clear_quests()` |
+| `gateV2` | the two-door rule in `dayQualifies()` | Day streaks and the `qualify` quest differ (stage22) |
+| `lapseDays`, `comebackXp`, `comebackStick` | `LAPSE_DAYS`/`COMEBACK_XP`/`COMEBACK_STICK` | **The comeback pays on one side only** (stage22) |
 
 Read the live row with:
 `select jsonb_object_keys(rules) from public.xp_rules where id = 1;`

@@ -2091,6 +2091,26 @@ const HABITS = [
   { id:'breathe',  name:'💨 Breathe 10 minutes', short:'Breathe',  code:'BR', kind:'check', target:1,     unit:'session', goal:'Nasal, slow, before bed',        source:'Manual' },
   { id:'supps',    name:'💊 Take your supplements', short:'Supps', code:'SU', kind:'check', target:1,   unit:'dose',    goal:'Vitamin D · creatine · omega-3',  source:'Manual' }
 ];
+// ── HOW MANY HABITS AN ATHLETE MAY ADD ────────────────────────────────────
+// A custom habit is a one-tap check worth customXp × completionBonus = 30 XP a
+// day, it earns its own consistency-tier bonuses on top, and the SERVER pays
+// for it too — hab_xp() pays customXp for every key in a day it does not
+// recognise. Uncapped, that is a faucet rather than a feature: twenty junk
+// habits are twenty taps and roughly 600 XP a day, about double what a coached
+// athlete gets for a genuinely perfect one, on a board shared with people doing
+// the actual work. Nothing could take it back, either — only the athlete's own
+// ✕ removes a custom habit, so the coach could watch the board be distorted and
+// have no answer to it. That is a strange hole in an app called Proof.
+//
+// Three (Amir, 2026-08-02). Three is 90 XP a day against a 336 XP core day —
+// about a quarter, which is a real add-on and not a second scoreboard. It is
+// also about as many things as anyone actually holds themselves to at once; a
+// list of ten is a wish list, and the app should not help write one.
+// The cap counts how many EXIST, not how many are switched on: a paused habit
+// costs nothing to switch back on.
+const MAX_CUSTOM = 3;
+function customCount() { return ((CFG && CFG.custom) || []).length; }
+function customRoom()  { return Math.max(0, MAX_CUSTOM - customCount()); }
 // ── MEADOW: one colour per habit ─────────────────────────────────────
 // [solid, tint] — the solid fills the tick, the track and the 35-day grid; the
 // tint is the emoji tile behind it. Custom habits cycle the same palette so
@@ -2128,11 +2148,23 @@ function splitEmoji(s) {
 // delta, put everything back. Nothing is saved and nothing re-renders.
 function previewXp(h, val) {
   const k = AKEY();
-  const day = LOG[k], had = day && Object.prototype.hasOwnProperty.call(day, h.id), prev = had ? day[h.id] : undefined;
+  const day = LOG[k], hadDay = !!day;
+  const had = day && Object.prototype.hasOwnProperty.call(day, h.id), prev = had ? day[h.id] : undefined;
   const before = habitXp(h);
   (LOG[k] = LOG[k] || {})[h.id] = val;
   const after = habitXp(h);
-  if (had) LOG[k][h.id] = prev; else delete LOG[k][h.id];
+  // Put the log back EXACTLY as it was — including the absence of the day
+  // itself. Deleting only the habit key left an empty {} behind, and because
+  // renderSheet() calls this on every render, merely OPENING a counter's sheet
+  // on a day never logged planted one: no tap, no save. Nothing prunes them,
+  // the next real save writes them to localStorage and the next push syncs them
+  // for good, and loggedDays() counts them — so a brand-new athlete who browsed
+  // the day strip once reads "Day 4" on their first day, on the header and on
+  // the card they share, and the coach's days-logged signal counts a day the
+  // app was never used.
+  if (had) LOG[k][h.id] = prev;
+  else if (hadDay) delete LOG[k][h.id];
+  else delete LOG[k];
   return Math.max(0, after - before);
 }
 // ── Weekly quests ─────────────────────────────────────────────────────────
@@ -2186,7 +2218,22 @@ function runQuests(run) {
 // The run covering today, if any. There is usually none, and that is fine.
 function activeQuestRun() {
   const t = TKEY();
-  return questRuns().find(r => t >= r.start && t <= runEndKey(r)) || null;
+  // The LATEST-STARTING run that covers today. Runs are appended and nothing
+  // stops two overlapping — set_quests() takes any start date and only replaces
+  // a run that starts on the same one — so returning the first match meant
+  // announcing "new quests from today" mid-week left every athlete staring at
+  // last week's list until it expired, while completing one of the NEW quests
+  // raised their XP with no takeover at all, because the celebration filter
+  // keys off whichever run this function returns.
+  //
+  // ⚠️ Overlapping runs also DOUBLE-PAY any quest id they share: questEvents()
+  // walks every run independently and so does the server's hab_bonus_xp(), so
+  // the board and the phone agree and both overpay. Fixing that means clipping
+  // each run's window in BOTH scorers; until then the rule is simply not to
+  // start a run before the last one has ended. See XP_SYSTEM.md §8.5.
+  const covering = questRuns().filter(r => t >= r.start && t <= runEndKey(r));
+  if (!covering.length) return null;
+  return covering.reduce((best, r) => (r.start > best.start ? r : best));
 }
 // Whole days left in a run, counting today.
 function runDaysLeft(run) {
@@ -2503,8 +2550,9 @@ function titlePlate(p, small) {
 }
 // ── Medals ── milestones as emblems: metal rim by tier, habit-tint disc, the
 // habit's own emoji in the middle. Events wear the prismatic rim.
-const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅' };
-const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁' };
+const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅',
+                        comebackRun:'🔄', comebacksStuck:'🛡️' };
+const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁', ev_backbone:'🔄' };
 function achMedal(a, got) {
   const key = a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze';
   const part = String(a.measure || '').split(':');
@@ -2548,6 +2596,29 @@ const MAX_LEVEL_SCAN = 5000;                             // loop guard
 // The day-streak marks worth stopping the screen for. Tight early (the first
 // week is where people quit), spread out later so it stays an event.
 const DAY_STREAK_MARKS = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 300, 365];
+
+// ── THE COMEBACK ──────────────────────────────────────────────────────────
+// (Amir, 2026-08-02: "make the economy pays for comeback".)
+//
+// Every continuation moment in this app was priced — the 20:00 warning, marks
+// at 3/7/14/21/30 — and the RETURN AFTER A LAPSE, which is the highest-leverage
+// moment in habit formation and the one every tracker handles worst, paid
+// nothing at all. A lapsed athlete's day one again scored exactly like any
+// other day. Amir's own coaching principles already say "a hard week survived"
+// is a genuine win worth its own card; this is the app finally agreeing.
+//
+// LAPSE_DAYS is 3 to match BACKFILL_DAYS: once you are three days gone you can
+// no longer repair those days, so the damage is permanent and the absence is
+// real rather than a wobble.
+//
+// ⚠️ IT CANNOT BE FARMED, and that is arithmetic rather than a rule. Three
+// non-qualifying days forfeit roughly 750 XP of ordinary habit XP to collect
+// 50. Nobody can lapse their way up the board, so no anti-abuse machinery is
+// needed and the bonus can stay repeatable — which it must be, because the
+// second comeback matters as much as the first.
+const LAPSE_DAYS = 3;      // consecutive non-qualifying days that make it a lapse
+const COMEBACK_XP = 50;    // flat, every time — priced under FIRST BLOOD's 50-XP floor
+const COMEBACK_STICK = 7;  // qualifying days after a return before it counts as STUCK
 const CONSISTENCY_TIERS = [
   { days: 5,  name: 'KINDLED',     mult: 0.5 },
   { days: 10, name: 'STEADY',      mult: 1 },
@@ -2596,7 +2667,15 @@ const ACHIEVEMENTS = [
   { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility',  tier:'long' },
   { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps',     tier:'long' },
   { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps',    tier:'long' },
+  // ── Coming back ────────────────────────────────────────────────────────
+  // Returning is easy; staying is the job, so the badges reward the WEEK AFTER
+  // rather than the reappearance. The return itself is already paid, on the day
+  // it happens, by the dated bonus in bonusEvents() — see LAPSE_DAYS.
+  { code:'BF', name:'BACK IN THE FIGHT', note:'Fell off, came back, held it a week',    xp:200, need:COMEBACK_STICK, measure:'comebackRun',    tier:'long' },
+  { code:'LR', name:'THE LONG ROAD BACK', note:'Three weeks straight after a comeback', xp:400, need:21,  measure:'comebackRun',      tier:'long' },
+  { code:'HK', name:'HARD TO KILL',    note:'Three comebacks that each stuck',          xp:300, need:3,   measure:'comebacksStuck',   tier:'long' },
   // ── Rare ───────────────────────────────────────────────────────────────
+  { code:'US', name:'UNSINKABLE',      note:'Five times down. Five times back.',        xp:600, need:5,   measure:'comebacksStuck',   tier:'rare' },
   { code:'MC', name:'THE MACHINIST',   note:'150 sessions. A year of turning up.',      xp:750, need:150, measure:'daysHit:strength', tier:'rare' },
   { code:'UB', name:'UNBREAKABLE',     note:'60 days running on full water',            xp:600, need:60,  measure:'streak:water',     tier:'rare' },
   { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays',      tier:'rare' }
@@ -2665,7 +2744,18 @@ const EVENTS = [
     title:{ id:'t_stillhere', name:'STILL HERE', note:'Starting is easy. This was not.' },
     goals:[ { kind:'qualify',          need:24,     label:'24 days on target' },
             { kind:'total:steps',      need:250000, label:'250,000 steps' },
-            { kind:'daysHit:fuel',     need:24,     label:'Protein on 24 days' } ] }
+            { kind:'daysHit:fuel',     need:24,     label:'Protein on 24 days' } ] },
+
+  // The comeback event. Every other one here rewards an unbroken stretch; this
+  // is the only thing in the app you cannot earn by never slipping, which is
+  // the point of it. ⚠️ Its title id must also exist in `passTrack` on the
+  // xp_rules row or the server refuses to mint it — see stage22.
+  { id:'ev_backbone', name:'BACKBONE', tag:'However long it takes',
+    blurb:'Nobody gets a clean run. This one is not about never falling off — it is about what you do the week after.',
+    title:{ id:'t_unbowed', name:'UNBOWED', note:'Fell off. Came back. Did it again.' },
+    goals:[ { kind:'comebacksStuck',   need:2,      label:'2 comebacks that held a week' },
+            { kind:'comebackRun',      need:14,     label:'14 straight days after a comeback' },
+            { kind:'qualify',          need:30,     label:'30 days on target' } ] }
 ];
 
 // ── THE LONG GAME — a reward track, and the one thing here that is kept ───
@@ -2740,6 +2830,13 @@ let _evCache = null;
 function eventGoalProgress(g) {
   const parts = String(g.kind || '').split(':');
   const kind = parts[0], hid = parts[1];
+  // Comeback goals answer from their own walk rather than a per-day tally —
+  // ahead of the loop, because neither is a count of days. All-time, like every
+  // other event goal.
+  if (kind === 'comebackRun' || kind === 'comebacksStuck') {
+    const have = kind === 'comebackRun' ? bestComebackRun() : comebacksStuck();
+    return { have, done: have >= g.need, pct: Math.max(0, Math.min(100, Math.round(have / g.need * 100))) };
+  }
   const h = hid ? habitById(hid) : null;
   let have = 0;
   loggedDays().forEach(k => {
@@ -2829,7 +2926,8 @@ function defaultCfg() {
   // got. Leaving it false by default means it offers itself once to them too.
   return { v:3, on, custom:[], onboarded:false, toured:false, installAsked:false, dark:false, seen:null, rulesSig:null,
            pass:{ owned:[], title:null, card:null },
-           seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null,
+           seenTiers:null, seenAch:null, seenPerfect:null, seenQuests:null, seenStreak:null,
+           seenComeback:null,
            questPool:null, questRuns:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
            // Milestone tier open/closed, keyed by tier — missing key reads as
@@ -3062,6 +3160,9 @@ function loadLocal() {
   try {
     const m = JSON.parse(localStorage.getItem(K_META()) || '{}');
     SYNC.dirty = !!m.dirty; SYNC.lastOk = m.lastOk || null;
+    // Unsent day edits survive the app being killed, or the correction they
+    // represent would be undone by the next cloud merge — see _dirtyDays.
+    if (Array.isArray(m.days)) m.days.forEach(d => _dirtyDays.add(d));
   } catch (e) {}
   migrateOld();
 }
@@ -3083,10 +3184,22 @@ function migrateOld() {
     });
     LOG[day] = out;
   });
+  const hadRetired = ('coach' in CFG) || ('motiv' in CFG) || ('goals' in CFG);
   delete CFG.coach; delete CFG.motiv; delete CFG.goals;   // retired settings
+  const wasV = CFG.v;
   CFG.v = 3; CFG.migrated3 = true;
   if (touched) saveLog();
-  saveCfg();
+  // ⚠️ QUIET UNLESS SOMETHING ACTUALLY MOVED. On a brand-new device this
+  // function migrates nothing — the log is empty and the config is already v3 —
+  // and the only edit it makes is its own `migrated3` flag. It still ended in
+  // saveCfg(), which stamps updatedAt and marks the config dirty, and that is
+  // what made opening the app on a replacement phone destructive rather than
+  // merely empty: both halves of the adopt test in syncFromCloud() then fail, so
+  // the athlete's real cloud config is refused, deterministically, on the one
+  // device that has nothing of its own to lose — and the factory defaults are
+  // pushed up for every other device to inherit. A migration that migrated
+  // nothing has nothing to announce.
+  if (touched || hadRetired || wasV !== 3) saveCfg(); else saveCfgQuiet();
 }
 // Both of these drop the bonus cache: the log obviously moves it, and so does
 // the config, because which habits are TRACKED decides what counts as a perfect
@@ -3100,6 +3213,29 @@ function saveCfg() {
   invalidateBonus();
   try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
   markDirty();
+}
+// The same write, WITHOUT claiming this device holds the newest config.
+// `updatedAt` is the whole of how the app decides whose copy wins — every other
+// device adopts the newer one wholesale in syncFromCloud() — and markDirty()
+// queues that copy for upload. Stamping is therefore right for a change the
+// ATHLETE made and wrong for bookkeeping the app does to itself. Two callers
+// used to stamp anyway, and both could hand a stale config the crown:
+//   · migrateOld() ended here even when it had migrated nothing, so a brand-new
+//     phone promoted a factory-default config to newest before it had ever read
+//     the cloud — and then refused the cloud copy, because the adopt test needs
+//     `!SYNC.dirty` and a newer timestamp and this device had just failed both.
+//     The defaults went up and every other device inherited them: custom
+//     habits, the roster timeline, board name and settings, gone.
+//   · applyBoardDeltas() saves a leaderboard position snapshot. Merely OPENING
+//     Crew on a phone whose boot-time pull had timed out re-crowned its stale
+//     config, deleting work done on another device and re-scoring closed days.
+// Neither is a change to what the athlete tracks, so neither may outrank one.
+// stampRoster() still runs: it is called from every persist path on purpose, so
+// that the roster timeline can never miss a mutation (see its own header).
+function saveCfgQuiet() {
+  stampRoster();
+  invalidateBonus();
+  try { localStorage.setItem(K_CFG(), JSON.stringify(CFG)); } catch (e) {}
 }
 function saveLog() {
   invalidateBonus();
@@ -3147,7 +3283,9 @@ function importWorkoutDays(src) {
 }
 
 function saveMeta() {
-  try { localStorage.setItem(K_META(), JSON.stringify({ dirty: SYNC.dirty, lastOk: SYNC.lastOk })); } catch (e) {}
+  try { localStorage.setItem(K_META(), JSON.stringify({
+    dirty: SYNC.dirty, lastOk: SYNC.lastOk, days: Array.from(_dirtyDays)
+  })); } catch (e) {}
 }
 
 // ── Durable sync ──────────────────────────────────────────────────────────
@@ -3158,9 +3296,22 @@ function saveMeta() {
 // an older one and no intermediate state can be lost or applied out of order.
 // Retries run with exponential backoff and fire again on reconnect, on
 // foreground, and at boot — nothing is dropped silently.
-const SYNC = { dirty:false, syncing:false, lastOk:null, lastErr:null, attempts:0 };
+// `ready` is the boot latch: false until the first get_progress has had its
+// turn. See pushNow() for why an upload must never overtake the first download.
+const SYNC = { dirty:false, syncing:false, lastOk:null, lastErr:null, attempts:0, ready:false };
 const RETRY_MS = [5000, 15000, 45000, 120000, 300000];
 let _sbClient = null, _pushTimer = null, _retryTimer = null;
+// Bumped on every local write. pushNow() records it beside the payload it
+// builds, so a write that lands DURING the round trip cannot be reported sent.
+let _writeGen = 0;
+// Day keys this device has written and not yet uploaded, persisted with the
+// dirty flag so they survive the app being killed. The cloud log merge takes
+// max() per habit, which is the right defence against a stale OTHER device and
+// exactly the wrong one for this device's own unsent corrections: un-ticking a
+// mis-tap writes 0, and max(1, 0) is 1, so the tick came back at the next
+// launch and the pending push then uploaded it as the truth. Nothing in the app
+// could remove a wrong tick, and its XP and its effect on the day score stayed.
+const _dirtyDays = new Set();
 
 function _sb() {
   if (_sbClient) return _sbClient;
@@ -3170,27 +3321,55 @@ function _sb() {
 }
 function markDirty() {
   if (window.IS_DEMO) return;
-  SYNC.dirty = true; saveMeta();
+  SYNC.dirty = true; _writeGen++; saveMeta();
   clearTimeout(_pushTimer);
   _pushTimer = setTimeout(pushNow, 1200);
 }
 async function pushNow() {
-  if (window.IS_DEMO || !ATHLETE_ID || SYNC.syncing || !SYNC.dirty) return SYNC.dirty === false;
+  if (window.IS_DEMO || !ATHLETE_ID || !SYNC.dirty) return SYNC.dirty === false;
+  // A push already in flight is not a reason to drop this one — its payload was
+  // built before the write that woke us, so it cannot contain it. Used to
+  // return silently and schedule nothing, which is how an edit went missing.
+  if (SYNC.syncing) { clearTimeout(_pushTimer); _pushTimer = setTimeout(pushNow, 1200); return false; }
+  // ⚠️ NEVER UPLOAD BEFORE THE FIRST DOWNLOAD HAS HAD ITS TURN. We always send
+  // the COMPLETE snapshot and save_progress replaces what is stored, so a push
+  // that beats boot's get_progress overwrites the athlete's cloud log with
+  // whatever this device is holding — and on a phone opening their link for the
+  // first time, that is nothing at all. The debounce is 1.2s and the pull is a
+  // network round trip, so it was never a rare race; on a replacement phone for
+  // a lost one it is the difference between restoring a history and erasing it.
+  // Re-arm rather than give up: boot lifts the latch the moment the pull
+  // settles, and it settles within its own ceiling even offline.
+  if (!SYNC.ready) { clearTimeout(_pushTimer); _pushTimer = setTimeout(pushNow, 1200); return false; }
   if (navigator.onLine === false) { scheduleRetry(); return false; }
   SYNC.syncing = true; refreshSyncBadge();
   let okay = false;
+  const sentGen = _writeGen;
   try {
     const sb = _sb();
     if (!sb) throw new Error('Supabase not loaded');
+    // Serialised from MEMORY, not re-read off disk. saveCfg/saveLog swallow a
+    // failed setItem — a full quota, a browser that refuses storage — and mark
+    // dirty anyway, so reading the payload back from localStorage could upload
+    // a snapshot older than what the athlete is looking at, or '{}', which
+    // save_progress would write straight over their cloud log. Then report it
+    // as SYNCED. Memory is the copy that is definitely true.
     const payload = {};
-    payload[K_CFG()] = localStorage.getItem(K_CFG()) || '{}';
-    payload[K_LOG()] = localStorage.getItem(K_LOG()) || '{}';
+    payload[K_CFG()] = JSON.stringify(CFG || {});
+    payload[K_LOG()] = JSON.stringify(LOG || {});
     const { error } = await sb.rpc('save_progress', {
       p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME, p_data: payload, p_key: KEY
     });
     if (error) throw new Error(error.message || 'save rejected');
-    SYNC.dirty = false; SYNC.attempts = 0; SYNC.lastErr = null; SYNC.lastOk = Date.now();
-    clearTimeout(_retryTimer);
+    SYNC.attempts = 0; SYNC.lastErr = null; SYNC.lastOk = Date.now();
+    // ⚠️ ONLY DECLARE IT SENT IF NOTHING WAS WRITTEN WHILE WE WERE AWAY. Tick
+    // SLEEP and the push starts; tick WATER 300ms later, mid-flight; the push
+    // returns and used to clear the flag for both — but WATER was never in that
+    // payload. The re-armed timer then found nothing dirty and did nothing, the
+    // boot catch-up did nothing, and the badge said SYNCED while the board
+    // scored a day with a habit missing from it.
+    if (_writeGen === sentGen) { SYNC.dirty = false; _dirtyDays.clear(); clearTimeout(_retryTimer); }
+    else { clearTimeout(_pushTimer); _pushTimer = setTimeout(pushNow, 1200); }
     okay = true;
   } catch (e) {
     SYNC.lastErr = String((e && e.message) || e);
@@ -3241,6 +3420,12 @@ async function syncFromCloud() {
     try {
       const cloudLog = JSON.parse(data[K_LOG()] || '{}') || {};
       Object.keys(cloudLog).forEach(day => {
+        // A day THIS device has edited and not yet uploaded is ours outright.
+        // max() below is the defence against a stale other device overwriting a
+        // real number, and it must not be turned on our own corrections: a
+        // deliberate 0 always loses to a 1 the cloud has not been told about
+        // yet, so an un-ticked mis-tap came straight back. See _dirtyDays.
+        if (_dirtyDays.has(day)) return;
         const mine = LOG[day] || {}, theirs = cloudLog[day] || {}, out = Object.assign({}, mine);
         Object.keys(theirs).forEach(id => { out[id] = Math.max(Number(theirs[id]) || 0, Number(mine[id]) || 0); });
         LOG[day] = out;
@@ -3254,6 +3439,7 @@ async function syncFromCloud() {
         const keepSeen = CFG.seen, keepSig = CFG.rulesSig;
         const keepTiers = CFG.seenTiers, keepAch = CFG.seenAch, keepPerfect = CFG.seenPerfect;
         const keepQuests = CFG.seenQuests;
+        const keepPass = CFG.pass || {};
         CFG = Object.assign(defaultCfg(), cloudCfg);
         CFG.on = Object.assign(defaultCfg().on, cloudCfg.on || {});
         if (!CFG.seen) CFG.seen = keepSeen;
@@ -3265,6 +3451,24 @@ async function syncFromCloud() {
         if (!Array.isArray(CFG.seenAch)) CFG.seenAch = keepAch;
         if (!CFG.seenPerfect) CFG.seenPerfect = keepPerfect;
         if (!Array.isArray(CFG.seenQuests)) CFG.seenQuests = keepQuests;
+        // ⚠️ REWARDS ARE UNIONED, NEVER REPLACED. Everything else in this block
+        // is newest-device-wins, which is right for a setting and catastrophic
+        // for a possession. The Locker makes exactly one promise — nothing ever
+        // takes a reward back, not a season reset, not a retune, not another
+        // phone — and adopting a config wholesale broke it: a card earned on the
+        // tablet is simply absent from an older config written by the phone, so
+        // the phone's copy winning deleted it. Titles would limp back (syncTitles
+        // re-mints from hab_titles); CARD SKINS ARE CLIENT-ONLY with no server
+        // record, and claimRewards only re-grants what the CURRENT level
+        // reaches, so once a season reset drops the level a lost card is gone
+        // for good. Both sides only ever append, so the union is the truth.
+        CFG.pass = CFG.pass || { owned:[], title:null, card:null };
+        const mineOwned = keepPass.owned || [], theirsOwned = CFG.pass.owned || [];
+        CFG.pass.owned = theirsOwned.concat(mineOwned.filter(id => theirsOwned.indexOf(id) < 0));
+        // What they were WEARING is a preference, not a possession, so the newer
+        // config still wins — but never into an empty slot.
+        if (!CFG.pass.title) CFG.pass.title = keepPass.title || null;
+        if (!CFG.pass.card)  CFG.pass.card  = keepPass.card  || null;
         localStorage.setItem(K_CFG(), JSON.stringify(CFG));
       }
     } catch (e) {}
@@ -3273,6 +3477,32 @@ async function syncFromCloud() {
     invalidateBonus();
     migrateOld();
   } catch (e) { /* offline — the phone still holds everything */ }
+}
+
+// A pull that is safe to fire on a lifecycle event. The boot comment has long
+// claimed "syncFromCloud runs again on foreground" and nothing ever did it —
+// there was exactly one call site, at boot — so an installed PWA that sits
+// resident for days never read the cloud again. That is not just staleness:
+// pushNow() uploads the COMPLETE snapshot and save_progress replaces what is
+// stored, so two devices that never re-read each other ping-pong the cloud
+// copy, each push dropping whatever the other logged since it last launched.
+// The board is scored from that copy, so it quietly disagreed with the phone in
+// the athlete's hand — and a stale config that never refreshes is also what let
+// a passive screen re-crown itself in the two accounts above.
+// Never concurrent, and at most once a minute: iOS fires visibilitychange
+// generously and a tab switch should not cost a round trip.
+let _pulling = false, _lastPull = 0;
+async function pullFresh() {
+  if (window.IS_DEMO || !ATHLETE_ID || _pulling) return;
+  if (Date.now() - _lastPull < 60000) return;
+  _pulling = true;
+  try { await syncFromCloud(); }
+  finally { _pulling = false; _lastPull = Date.now(); }
+  // Anything that arrived from another device gets the same moment it would
+  // have got here, exactly as boot gives it one.
+  checkLevelUps();
+  render();
+  refreshSyncBadge();
 }
 
 // ── Derived stats, all from real history ──────────────────────────────────
@@ -3315,18 +3545,50 @@ function loggedDays() { return Object.keys(LOG).sort(); }
 // client twin of the server's `ndone >= nlive`.
 // ⚠️ rosterOn(dayKey), never live() — see the roster note above.
 function dayParts(dayKey, mode) {
-  let done = 0, total = 0;
+  let done = 0, total = 0, missing = 0;
   rosterOn(dayKey).forEach(h => {
     const hit = isDone(h, dayKey), w = baseXp(h);
     if (mode === 'gate' && h.locked && !hit) return;
-    total += w; if (hit) done += w;
+    total += w;
+    if (hit) { done += w; return; }
+    missing++;
+    // ⚠️ GATE ONLY: PART OF A COUNTER IS PART OF THE JOB. The gate used to be
+    // all-or-nothing per habit, so 9,500 of 10,000 steps counted as zero and a
+    // 95%-effort day could read as a dead streak. That cliff is indefensible on
+    // the one number the athlete is asked to protect. The SCORE half stays
+    // binary on purpose — it answers "what was this day worth", and a target
+    // you did not hit is a target you did not hit.
+    if (mode === 'gate' && h.target > 0) {
+      const v = valOf(dayKey, h.id);
+      if (v > 0) done += w * Math.min(1, v / h.target);
+    }
   });
-  return { done, total };
+  return { done, total, missing };
 }
 function dayPct(dayKey)  { const p = dayParts(dayKey, 'score'); return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function gatePct(dayKey) { const p = dayParts(dayKey, 'gate');  return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
-function dayQualifies(dayKey) { return gatePct(dayKey) >= XP_RULES.streakQualifyPct; }
+// ⚠️ TWO WAYS THROUGH THE GATE, and the second one is the promise.
+// `streakQualifyPct` was tuned against the EIGHT-habit roster — gate denominator
+// 250, worst single miss steps at 190/250 = 76%, just clear — and the promise
+// written down beside it was "miss any one thing and the day still counts".
+// But defaultCfg() starts every add-on OFF, so the shipped default is the five
+// core habits and the gate denominator is 180. On that roster missing steps
+// alone is 120/180 = 67% and missing sleep alone is 130/180 = 72%: both fatal.
+// The athletes the 75% gate exists to protect were the only ones it did not
+// cover, while a veteran with three add-ons on got the forgiving version — and
+// since padding the denominator softens the gate, opting into the cheapest
+// self-reported habits was literally streak insurance. Backwards twice over.
+//
+// So the rule is now the promise itself, said out loud: clear 75% of the
+// weight, OR leave at most one thing undone. `done > 0` keeps a roster of one
+// from qualifying on an empty day.
+function dayQualifies(dayKey) {
+  const p = dayParts(dayKey, 'gate');
+  if (!p.total) return false;
+  if (p.done / p.total * 100 >= XP_RULES.streakQualifyPct) return true;
+  return p.missing <= 1 && p.done > 0;
+}
 function currentDayStreak() { return dayStreakAt(TKEY()); }
 // The day streak as it stood on a GIVEN day. The wall shows a line beside what
 // the athlete had actually strung together when they wrote it — "up to the day
@@ -3336,8 +3598,18 @@ function currentDayStreak() { return dayStreakAt(TKEY()); }
 // or the number falls to zero every midnight and climbs back at bedtime. That
 // is the one rule currentDayStreak() has always had, and it lives here now so
 // the hero tile and the wall chip can never disagree about the same integer.
+//
+// The same step-back applies to ANY day that did not qualify, not just today,
+// and that is what makes the wall honest. It used to be conditioned on today,
+// so a line posted on a travel day showed the live streak all day — the
+// today-exclusion was active — and then silently dropped to nothing at midnight
+// once the day closed below the gate, for the rest of that card's week on the
+// wall. A card is supposed to say what it said when it was written; the pct
+// chip beside it is frozen server-side at post time for exactly this reason.
+// Reporting the run as it stood at the END OF THE DAY BEFORE is both what was
+// displayed at the time and the only reading that never changes afterwards.
 function dayStreakAt(dayKey) {
-  let d = (dayKey === TKEY() && !dayQualifies(dayKey)) ? addDays(parseKey(dayKey), -1) : parseKey(dayKey);
+  let d = !dayQualifies(dayKey) ? addDays(parseKey(dayKey), -1) : parseKey(dayKey);
   let n = 0;
   while (dayQualifies(fmtKey(d))) { n++; d = addDays(d, -1); }
   return n;
@@ -3351,6 +3623,63 @@ function runLength(days) {
   return best;
 }
 function bestDayStreak() { return Math.max(runLength(loggedDays().filter(dayQualifies)), currentDayStreak()); }
+
+// ── Comebacks ─────────────────────────────────────────────────────────────
+// Every comeback the athlete has made, each with how long they were gone and
+// how many qualifying days they strung together afterwards. One walk answers
+// all of it: the dated bonus, both "came back and held it" badges, the
+// resilience count and the BACKBONE event.
+//
+// ⚠️ THIS WALKS THE CALENDAR, NOT loggedDays(). A lapse is mostly days with
+// nothing in them at all, and a day with nothing in it never appears in the
+// log — so walking logged days would skip every real disappearance, which is
+// the only thing this function exists to notice. Every day it can EMIT on is a
+// qualifying day, and a qualifying day always has entries, so the milestone
+// ledger in bonusEvents() can still find each one in seasonDays().
+//
+// Two scopes, matching the split the rest of the badge system already uses
+// (XP_SYSTEM.md §4.5): `all` walks the whole history for the DISPLAY half —
+// measureAch() and the event goals, so a badge is judged on everything the
+// athlete has ever done — while the default walks the season for the LEDGER,
+// because bonus XP is only ever paid inside the season.
+let _cbCache = { all: null, season: null };
+function comebackRuns(all) {
+  const key = all ? 'all' : 'season';
+  if (_cbCache[key]) return _cbCache[key];
+  const days = all ? loggedDays() : seasonDays();
+  const out = [];
+  if (!days.length) { _cbCache[key] = out; return out; }
+  // From the first day they logged, never earlier: days before an athlete
+  // arrived are not days they missed. Same rule the heat map and day strip use.
+  let d = parseKey(days[0]), dark = 0, cur = null, everQualified = false;
+  const end = today();
+  while (d <= end) {
+    const k = fmtKey(d);
+    if (dayQualifies(k)) {
+      if (cur) cur.run++;
+      // ⚠️ `everQualified` — you cannot come back from somewhere you have never
+      // been. Without it an athlete whose first few days all fell short would be
+      // handed a comeback for their first good day, which is a start, not a
+      // return. It is also what lets the server express this as a plain
+      // lag() over qualifying days instead of a calendar walk, and these two
+      // have to agree exactly or the board and the phone pay different XP.
+      else if (everQualified && dark >= LAPSE_DAYS) { cur = { day: k, gone: dark, run: 1 }; out.push(cur); }
+      everQualified = true;
+      dark = 0;
+    } else {
+      if (everQualified) dark++;
+      cur = null;                     // the run ended; the next return starts fresh
+    }
+    d = addDays(d, 1);
+  }
+  _cbCache[key] = out;
+  return out;
+}
+// The longest stretch held after any single comeback, and how many comebacks
+// went the distance. Both are all-time for display; bonusEvents() computes its
+// own season-scoped versions on the ledger walk.
+function bestComebackRun() { return comebackRuns(true).reduce((m, c) => Math.max(m, c.run), 0); }
+function comebacksStuck()  { return comebackRuns(true).filter(c => c.run >= COMEBACK_STICK).length; }
 function habitStreak(h) {
   let d = isDone(h, TKEY()) ? today() : addDays(today(), -1), n = 0;
   while (isDone(h, fmtKey(d))) { n++; d = addDays(d, -1); }
@@ -3438,7 +3767,7 @@ function tierXp(h, i) {
 // Recomputing this on every level read would be thousands of operations per
 // render, so it is cached and dropped whenever the log or the tracked set moves.
 let _bonusCache = null;
-function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; }
+function invalidateBonus() { _bonusCache = null; _rosterCache = null; _evCache = null; _cbCache = { all:null, season:null }; }
 // Runs and counts are measured FROM THE SEASON START, not from all of history.
 // That is a fairness rule, not an implementation detail: a tier crosses once, so
 // scoring it against all-time runs would mean an athlete whose streak began
@@ -3469,7 +3798,26 @@ function bonusEvents() {
   // the day each measure first reaches its target.
   const streak = {}, lastDone = {}, hits = {}, claimed = {};
   let with3 = 0, perfect = 0;
+  // Comeback progress AS OF each day, so the two badges below are paid on the
+  // day they were actually crossed like everything else on this ledger. Built
+  // from the season-scoped walk; every day it names is a qualifying day and so
+  // is guaranteed to appear in `days`.
+  const cbRunAt = {}, cbStuckAt = {};
+  (() => {
+    let best = 0, stuck = 0;
+    comebackRuns(false).forEach(c => {
+      for (let i = 0; i < c.run; i++) {
+        const k = fmtKey(addDays(parseKey(c.day), i));
+        best = Math.max(best, i + 1);
+        if (i + 1 === COMEBACK_STICK) stuck++;
+        cbRunAt[k] = best; cbStuckAt[k] = stuck;
+      }
+    });
+  })();
+  let cbRunNow = 0, cbStuckNow = 0;
   days.forEach(k => {
+    if (cbRunAt[k] !== undefined) cbRunNow = cbRunAt[k];
+    if (cbStuckAt[k] !== undefined) cbStuckNow = cbStuckAt[k];
     hs.forEach(h => {
       if (!isDone(h, k)) { streak[h.id] = 0; return; }
       streak[h.id] = (lastDone[h.id] && fmtKey(addDays(parseKey(lastDone[h.id]), 1)) === k) ? (streak[h.id] || 0) + 1 : 1;
@@ -3486,6 +3834,8 @@ function bonusEvents() {
       let have = 0;
       if (a.measure === 'perfectDays') have = perfect;
       else if (a.measure === 'daysWith3') have = with3;
+      else if (a.measure === 'comebackRun') have = cbRunNow;
+      else if (a.measure === 'comebacksStuck') have = cbStuckNow;
       else {
         const p = a.measure.split(':');
         if (p[0] === 'streak') have = streak[p[1]] || 0;
@@ -3499,6 +3849,12 @@ function bonusEvents() {
 
   // Weekly quests pay the same way: dated, so windows filter them for free.
   questEvents().forEach(e => out.push(e));
+
+  // The comeback. Dated on the day they came back, like everything else here,
+  // so the season window and both leaderboard windows filter it with no special
+  // case. Repeatable on purpose — the fourth return matters as much as the
+  // first, and three dark days cost far more than this pays. See LAPSE_DAYS.
+  comebackRuns(false).forEach(c => out.push({ day: c.day, xp: COMEBACK_XP, kind: 'comeback', id: 'cb' + c.day, gone: c.gone }));
 
   _bonusCache = out;
   return out;
@@ -3593,8 +3949,22 @@ function measureAch(a) {
   // falls while the XP behind it does not is the same class of bug as the board
   // and the phone disagreeing — nothing errors, it just quietly lies.
   if (a.measure === 'daysWith3') return loggedDays().filter(k => rosterOn(k).filter(h => isDone(h, k)).length >= 3).length;
+  // Comeback measures, all-time like every other display measure here — and
+  // ahead of the split, because neither carries a habit id.
+  if (a.measure === 'comebackRun') return bestComebackRun();
+  if (a.measure === 'comebacksStuck') return comebacksStuck();
   const parts = a.measure.split(':'), kind = parts[0], h = habitById(parts[1]);
-  if (kind === 'streak') return habitStreak(h);
+  // habitBest, not habitStreak — the BEST run ever, exactly like consistencyFor()
+  // above. This is the display-and-judging half of a milestone, and a badge is
+  // never taken back (XP_SYSTEM.md §4.5); the ledger in bonusEvents() already
+  // knew that and pays each one once per season. Judging it on the CURRENT run
+  // meant half the shelf lied in both directions: break a water streak and
+  // HUMAN SPRINKLER greyed back to 0/5 with the milestone tally dropping, while
+  // the 100xp it paid stayed put — and because currentAch() feeds CFG.seenAch,
+  // rebuilding the streak fired the full "Medal unlocked · +100 XP banked"
+  // takeover again for XP that had already landed weeks earlier. habitBest folds
+  // in the live run, so an unearned badge still shows real progress toward it.
+  if (kind === 'streak') return habitBest(h);
   if (kind === 'daysHit') return loggedDays().filter(k => isDone(h, k)).length;
   return 0;
 }
@@ -3605,7 +3975,13 @@ function dayNumber() {
 }
 
 // How hot a streak reads: 0 none · 1 warm from 5 days · 2 burning from 15 · 3 from 30.
-function emberLevel(st) { return st >= 30 ? 3 : st >= 15 ? 2 : st >= 5 ? 1 : 0; }
+// Thresholds sit ON day-streak marks (3 · 14 · 30), not beside them. At 5/15/30
+// the app fired a full-screen takeover for the 3-day and 7-day marks while the
+// flame on the hero stayed at its coldest until day 5 and then did not move
+// again until 15 — the celebration and the permanent indicator disagreeing
+// about when the streak got hotter. Now the flame visibly steps up on a day the
+// athlete has just been told matters.
+function emberLevel(st) { return st >= 30 ? 3 : st >= 14 ? 2 : st >= 3 ? 1 : 0; }
 
 // ── The app noticing you have stalled ─────────────────────────────────────
 // Twenty seconds after the last tap, the most valuable habit still undone starts
@@ -3649,7 +4025,12 @@ function shortOfQualifying() {
                                .sort((a, b) => baseXp(b) - baseXp(a));
   let have = p.done, n = 0;
   while (have < need && n < left.length) { have += baseXp(left[n]); n++; }
-  return Math.max(1, n);
+  // The gate has a second door — at most one thing left undone — so the honest
+  // answer to "what saves today" is whichever route is fewer taps. Without this
+  // the nudge kept quoting the heaviest-first number while the athlete was
+  // actually one tick from qualifying by the count rule. See dayQualifies().
+  const byCount = Math.max(0, left.length - 1);
+  return Math.max(1, Math.min(n, byCount));
 }
 
 // ── The nudge (one a day, driven by what is actually missing) ─────────────
@@ -3738,6 +4119,21 @@ function rulesSignature() {
     // rather than fire a wall of celebrations nobody earned today.
     CONSISTENCY_TIERS.map(t => [t.days, t.mult]),
     ACHIEVEMENTS.map(a => [a.code, a.need, a.xp]),
+    // The quest config is the one scoring input that can change WHILE THE APP
+    // IS RUNNING: everything above is a build-time constant, but fetchQuests()
+    // overwrites these from the xp_rules row at every launch, before
+    // checkLevelUps() reads a single level. Leaving them out meant a coach
+    // raising a quest's payout handed athletes a full LEVEL UP takeover — and
+    // possibly a Locker reward — for XP nobody earned that day, while lowering
+    // one, or clearing a finished run, dropped their level with no word of
+    // explanation. Both are precisely what the re-baseline path exists for.
+    questPool().map(q => [q.id, q.kind, q.need, q.xp]),
+    questRuns().map(r => [r.start, r.ids]),
+    // The GATE RULE itself, not just its threshold. Pro-rata counters and the
+    // one-miss door change which days qualify, which moves every day streak,
+    // every `qualify` quest and every comeback — bump this token whenever that
+    // logic changes, or athletes get a wall of celebrations for a rule change.
+    'gate2', LAPSE_DAYS, COMEBACK_XP, COMEBACK_STICK,
     seasonStart()   // a new season resets every score, so re-baseline instead of celebrating
   ]);
   let hash = 0;
@@ -3815,9 +4211,19 @@ function seedUnlocks() {
   CFG.seenPerfect = isPerfect(TKEY()) ? TKEY() : null;
   CFG.seenQuests = currentQuests();
   CFG.seenStreak = DAY_STREAK_MARKS.filter(d => d <= currentDayStreak()).pop() || 0;
+  const cb = comebackRuns(false).find(c => c.day === TKEY());
+  CFG.seenComeback = cb ? TKEY() : null;
 }
 function checkUnlocks() {
-  if (!CFG.seenTiers || !Array.isArray(CFG.seenAch) || !Array.isArray(CFG.seenQuests)) { seedUnlocks(); saveCfg(); return; }
+  // seenStreak is in this guard too. It shipped later than the other three, so
+  // an install upgrading across that release passed the check with all three
+  // present, matched the rules signature (nothing in it had moved), and reached
+  // the day-streak block with seenStreak undefined — which coerces to 0 and
+  // fires a full-screen takeover for a mark crossed weeks before the feature
+  // existed. Baselining means recording an athlete's history, not replaying it.
+  if (!CFG.seenTiers || !Array.isArray(CFG.seenAch) || !Array.isArray(CFG.seenQuests)
+      || typeof CFG.seenStreak !== 'number'
+      || CFG.seenComeback === undefined) { seedUnlocks(); saveCfg(); return; }
   const tiers = currentTiers(), ach = currentAch(), events = [];
 
   // Tiers are COALESCED BY TIER, not reported per habit. An athlete who has been
@@ -3857,10 +4263,29 @@ function checkUnlocks() {
   const markSeen = CFG.seenStreak || 0;
   const mark = DAY_STREAK_MARKS.filter(d => d <= dstreak).pop() || 0;
   if (mark > markSeen) {
-    events.push({ kind:'streak', id:'s' + mark, days:mark, best:mark >= bestHabitRun() });
+    // bestDayStreak(), not bestHabitRun(): this celebration is about the DAY
+    // streak, and bestHabitRun() is the longest run on any ONE habit — the two
+    // scopes the app works hard to keep apart. Comparing across them was wrong
+    // in both directions: a 30-day supplements run made a genuine all-time-best
+    // 14-day day streak read "Keep it lit", while an athlete who rotates which
+    // habit they miss was told a routine 7-day re-cross was a personal best.
+    // Comparing the RUN rather than the mark also survives a backfill that
+    // jumps several marks at once.
+    events.push({ kind:'streak', id:'s' + mark, days:mark, best: dstreak >= bestDayStreak() });
     CFG.seenStreak = mark;
   } else if (dstreak === 0 && markSeen) {
     CFG.seenStreak = 0;   // streak broken — the marks are all back on the table
+  }
+
+  // THE COMEBACK. The whole reason this mechanic exists is the moment, not the
+  // 50 XP: an athlete who went dark for days has just opened the app and done
+  // the work anyway, and until now the screen had nothing whatsoever to say
+  // about it. Today only — an older comeback surfacing through a cloud sync or
+  // a backfill is history arriving late, exactly like a quest.
+  const cbToday = comebackRuns(false).find(c => c.day === TKEY());
+  if (cbToday && CFG.seenComeback !== TKEY()) {
+    events.push({ kind:'comeback', id:'cb' + TKEY(), gone: cbToday.gone });
+    CFG.seenComeback = TKEY();
   }
 
   // Quests. Only this week's get a takeover — an older week completing is
@@ -3877,8 +4302,14 @@ function checkUnlocks() {
   });
 
   CFG.seenTiers = tiers;
-  CFG.seenAch = ach;
-  CFG.seenQuests = quests;
+  // UNION, not replacement. These two are records of what has already had its
+  // moment, so they may only ever grow. Replacing them meant any dip in a
+  // measure — a badge whose streak broke, a quest run the coach cancelled —
+  // silently put a celebration the athlete had already been given back on the
+  // table, to be fired at them a second time when the measure recovered.
+  const keep = (was, now) => was.concat(now.filter(x => was.indexOf(x) < 0));
+  CFG.seenAch = keep(CFG.seenAch, ach);
+  CFG.seenQuests = keep(CFG.seenQuests, quests);
   if (isPerfect(TKEY())) CFG.seenPerfect = TKEY();
   saveCfg();
   if (!events.length) return;
@@ -4004,7 +4435,17 @@ function setVal(id, v) {
   const k = AKEY();
   if (!canLog(k)) return;                  // the window has closed — write nothing
   if (!LOG[k]) LOG[k] = {};
-  LOG[k][id] = Math.max(0, Math.min(v, capFor(habitById(id))));
+  // The cap clamps NEW INPUT; it never deletes what is already recorded.
+  // capFor() reads the habit's current target, but every stored value was
+  // clamped against the target in force when it was written — so lowering a
+  // target strands real numbers above the new ceiling, and re-clamping them on
+  // the next touch destroys them silently. Opening yesterday's sheet and
+  // pressing Save without editing anything was enough to turn a genuine 30,000
+  // step day into 24,000, invisible in XP (xpFor stops at the target) and
+  // visible only as lost units in a `total:` quest, on the board as well.
+  const ceiling = Math.max(capFor(habitById(id)), Number(LOG[k][id]) || 0);
+  LOG[k][id] = Math.max(0, Math.min(v, ceiling));
+  _dirtyDays.add(k);                       // ours until it is uploaded — see the cloud merge
   saveLog();
   // The one door into the log is also the only place that knows they have just
   // used the app for real — which is the moment to ask about the home screen.
@@ -4035,7 +4476,10 @@ function bump(h) {
   // (30,000 steps), so a real 12,000-step day plus one tap of + became 10,000
   // — 2,000 steps deleted — and the toast reported it as "+0 XP · STEPS
   // complete". A control labelled + must never lower the number.
-  const v = Math.min(capFor(h), cur + (h.step || 1));
+  // Math.max(cur, …) so the cap operand cannot do what the target operand used
+  // to: if a retune left `cur` above the ceiling, the bare Math.min handed back
+  // the ceiling and + lowered the number all over again.
+  const v = Math.max(cur, Math.min(capFor(h), cur + (h.step || 1)));
   setVal(h.id, v);
   checkLevelUps();
   render();
@@ -4070,6 +4514,20 @@ function bump(h) {
 function addCustomHabit() {
   const name = String(UI._newName || '').trim();
   if (!name) return;
+  // Both guards live here rather than in the two composers, so the onboarding
+  // screen and Settings can never disagree about what is allowed. See MAX_CUSTOM.
+  if (customRoom() <= 0) {
+    toast('That is all ' + MAX_CUSTOM + ' of your own. Remove one to make room.');
+    return;
+  }
+  // Names are compared as they are DISPLAYED, because the id carries a
+  // timestamp — so without this, adding "Reading" twice made two habits that
+  // both scored, and one real behaviour paid double for the life of the season.
+  const upper = name.toUpperCase();
+  if ((CFG.custom || []).some(c => String(c.name || '').toUpperCase() === upper)) {
+    toast(upper + ' is already on your list.');
+    return;
+  }
   const id = 'c_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20) + '_' + Date.now().toString(36);
   CFG.custom = (CFG.custom || []).concat([{ id, name: name.toUpperCase(), goal: name }]);
   CFG.on[id] = true; UI._newName = '';
@@ -4090,6 +4548,9 @@ function removeCustom(h) {
   delete CFG.on[h.id];
   Object.keys(LOG).forEach(day => {
     if (LOG[day] && typeof LOG[day] === 'object') delete LOG[day][h.id];
+    // Every day this touched is now a local deletion the cloud does not know
+    // about, and the merge would hand every one of those values straight back.
+    _dirtyDays.add(day);
   });
   saveLog();                 // both of these invalidate the bonus cache
   saveCfg();
@@ -4194,7 +4655,13 @@ function applyBoardDeltas() {
   const snap = {};
   LB.rows.forEach(r => { snap[r.display_name] = r.pos; });
   CFG.lbSeen = Object.assign({}, CFG.lbSeen || {}, { [LB.scope]: snap });
-  saveCfg();
+  // Quiet: this is a record of where everyone stood last time THIS phone looked
+  // at the board, not a change to what the athlete tracks. Through saveCfg() it
+  // stamped updatedAt and pushed the whole config, so opening Crew on a device
+  // whose boot pull had failed promoted its stale config to newest and deleted
+  // another device's custom habits — a read-only screen quietly rewriting the
+  // athlete's settings everywhere. See saveCfgQuiet().
+  saveCfgQuiet();
 }
 async function fetchBoard() {
   if (window.IS_DEMO) { LB.error = 'demo'; LB.loaded = true; render(); return; }
@@ -5018,12 +5485,12 @@ function renderOnboarding() {
           </div>
           <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
             Anything you want to hold yourself to — no screens in bed, ten minutes of reading.
-            It scores like everything else, and you can add more whenever you like.
+            It scores like everything else, and you can keep up to ${MAX_CUSTOM} of them.
           </div>
-          <div style="display:flex;gap:8px;padding-bottom:2px">
+          ${customRoom() ? `<div style="display:flex;gap:8px;padding-bottom:2px">
             <input class="input" id="newhabit" maxlength="40" placeholder="e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
             <button class="btn btn-primary" style="padding:0 16px" ${on(addCustomHabit)}>Add</button>
-          </div>
+          </div>` : `<div style="padding-bottom:2px;font-size:11.5px;color:var(--muted)">That is all ${MAX_CUSTOM} of your own. Remove one to make room.</div>`}
           <!-- Their own habits get the ✕ here as well as in Settings: this is
                the screen where the typo happens, so it is the screen that has
                to be able to undo it. A row with two controls cannot be one big
@@ -5211,8 +5678,8 @@ function tourSteps() {
     title: 'The five, and what you add',
     body: `The five at the top are the job — everyone on the board tracks them, and they have
            no off switch. Everything under them is yours: switch off an add-on you will not do
-           and it keeps every point it has already banked, or add your own at the bottom of the
-           list, worth ${XP_RULES.customXp} XP a day.`,
+           and it keeps every point it has already banked, or add up to ${MAX_CUSTOM} of your own
+           at the bottom of the list, worth ${XP_RULES.customXp} XP a day each.`,
     screen: 'settings', before: () => { UI.sub = 'habits'; }, sel: () => $t('[data-tour="tracked"]')
   });
 
@@ -5776,6 +6243,17 @@ function renderBadgeCelebration(ev) {
     sub = ev.days + ' days in a row at ' + XP_RULES.streakQualifyPct + '% or better. '
         + (ev.best ? 'That is a new personal best.' : 'Keep it lit.');
     art = `<div class="lvflame"><span class="fl">🔥</span><span class="n">${ev.days}</span></div>`;
+  } else if (ev.kind === 'comeback') {
+    // Deliberately warm, and deliberately NOT congratulatory about the gap. The
+    // athlete knows they were gone; the app's job here is to say the days
+    // behind them do not have to be paid off before today counts.
+    ground = 'streak'; share = 'rank';
+    kicker = 'Back on it';
+    title = 'SECOND WIND';
+    xpLine = COMEBACK_XP;
+    sub = ev.gone + ' days off, and you opened it anyway. That is the hard part — '
+        + 'the run starts again from today, not from where it broke.';
+    art = `<div class="lvflame"><span class="fl">🔄</span><span class="n">${ev.gone}</span></div>`;
   } else if (ev.kind === 'quest') {
     badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
     kicker = 'Quest complete';
@@ -5872,6 +6350,14 @@ function bestHabitRun() {
   // consistency tier once it is crossed.
   return allHabits().reduce((m, h) => Math.max(m, habitBest(h)), 0);
 }
+// ⚠️ HIDDEN ON A ZERO, AND THAT IS A RULING, NOT AN OVERSIGHT. Amir, 2026-07-30:
+// "if there is no streak its better not to show it, and only show it if there
+// are streak days" — after he had already killed a louder version of this tile.
+// A review in 2026-08 proposed showing the BEST streak here once the current one
+// dies, on the reasoning that the app celebrates eight marks on the way up and
+// then goes silent at the moment loss aversion peaks. It may well be right, but
+// it is his call to make and he has made the opposite one twice; the best-ever
+// figure is on Progress in the meantime. Do not add it here without asking.
 function streakFlame(now, best) {
   if (!firstLoggedDay() || now <= 0) return '';   // day one, and a broken streak, are not reports
   return `<div class="dayflame lit" data-lvl="${emberLevel(now)}" data-k="dayflame"
@@ -6131,7 +6617,15 @@ function renderToday(LI, doneCount, pct) {
     h: r.h,
     cells: heatDays.map(k => {
       if (firstDay && k < firstDay) return 'pre';
-      if (rosterOn(k).indexOf(r.h) < 0) return 'pre';
+      // Compared by ID, never by object identity. allHabits() builds a fresh
+      // object for every CUSTOM habit on each call, and rosterOn() serves ones
+      // built by a different call, so indexOf() could never match a custom
+      // habit — every cell on an athlete's own habit drew as `pre`, the shade
+      // meaning "you had not started yet". Weeks of real work rendered as
+      // nothing, on the one screen that reports the week, while the day scores
+      // beside it counted that habit perfectly well. The id is the stable key
+      // the rest of the app files everything under; use it here too.
+      if (!rosterOn(k).some(x => x.id === r.h.id)) return 'pre';
       const v = valOf(k, r.h.id);
       return v >= r.h.target ? 'hit' : (v > 0 ? 'part' : '');
     })
@@ -7111,7 +7605,9 @@ function renderManual() {
         // now the only thing doing it. Every label says which one it means:
         // habit rows and the detail header carry the habit's own, the band at
         // the top of Today and Progress is always "DAY STREAK".
-        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the whole day was worth. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
+        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of what the whole day was worth — <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. Miss one habit and the day still counts, every time, whatever you track. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
+        p(`Part of a counter counts toward it, too. Nine thousand of your ten thousand steps is not nothing, and the day streak no longer pretends it is — it reads that as nearly all of your steps rather than none of them.`) +
+        p(`<strong style="color:var(--ink)">And if you disappear, coming back pays.</strong> Miss ${LAPSE_DAYS} days or more, then have a day that counts, and that is a comeback: <strong style="color:var(--ink)">${COMEBACK_XP} XP</strong> on the spot, every time it happens, and the app will say so. Hold it for a week and there is a medal in it; do that ${3} times and there is another. Nobody gets a clean run, and the days behind you do not have to be paid off before today counts.`) +
         // The athlete-facing half of the weighted day score. Without this, a rest
         // day reading 71% while the streak survives looks like a bug on the one
         // screen they check every morning.
@@ -7128,7 +7624,7 @@ function renderManual() {
           return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day — even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
         })()) +
         p(`Your streak sits at the top of <strong style="color:var(--ink)">Today</strong> and <strong style="color:var(--ink)">Progress</strong>, with the last seven days beside it — a filled square is a day that counted. Your longest single-habit run is in the stats on Progress, and each habit carries its own run in its row.`) +
-        p(`Each habit has ${CONSISTENCY_TIERS.length} tiers, earned on your longest run ever — so breaking a run never takes a badge back.`) +
+        p(`Every badge is earned on your longest run ever — the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike — so breaking a run never takes one back.`) +
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
         // that changing the list is safe.
@@ -7825,7 +8321,14 @@ const SHARE_PAINT = {
       return false;
     },
     body: (x, W, H, a) => {
-      const k = TKEY(), hs = live(), pct = dayPct(k), done = hs.filter(h => isDone(h, k)).length;
+      // rosterOn(k), not live(): the pct beside these numbers is scored against
+      // the day's own roster, and removals do not land until TOMORROW — so for
+      // the rest of the day an add-on switched off is still counted by dayPct()
+      // while live() has already dropped it. The card then read "6 OF 6" under a
+      // 95% chip, with the habit responsible for the gap missing from the list
+      // that was supposed to explain it. Same live()-vs-roster fault the Today
+      // screen's row list was fixed for; the card kept the old pattern.
+      const k = TKEY(), hs = rosterOn(k), pct = dayPct(k), done = hs.filter(h => isDone(h, k)).length;
       const PAD = 96;
       x.textAlign = 'left';
       x.fillStyle = 'rgba(246,244,255,0.6)';
@@ -8344,11 +8847,11 @@ function renderSettingsHabits() {
         </div>`;
       }).join('')}
       </div>
-      <div style="padding:0 16px 4px;display:flex;gap:8px">
+      ${customRoom() ? `<div style="padding:0 16px 4px;display:flex;gap:8px">
         <input class="input" id="newhabit" maxlength="40" placeholder="Add a habit — e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
         <button class="btn btn-primary" style="padding:0 16px" ${on(addCustomHabit)}>Add</button>
-      </div>
-      <div class="setnote" style="padding-top:10px">Custom habits are worth ${XP_RULES.customXp} XP a day. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
+      </div>` : ''}
+      <div class="setnote" style="padding-top:10px">Custom habits are worth ${XP_RULES.customXp} XP a day, and you can keep ${MAX_CUSTOM}${customRoom() ? ' — ' + customRoom() + ' still free' : ', which is all of them'}. Switch one off to pause it and keep its points; ✕ removes it and its history for good.</div>
       </div>
       <div style="height:20px"></div>
     </div>`;
@@ -8358,7 +8861,11 @@ function renderSettingsHabits() {
 function renderSheet() {
   const h = habitById(UI.sheet);
   const stepBy = h.step || 1;
-  const cap = capFor(h), atCap = UI.sheetVal >= cap;
+  // The ceiling never sits BELOW what is already logged. A target lowered on
+  // the xp_rules row drops capFor() under values written when the old target
+  // was in force, and clamping to the bare cap then turned + into a control
+  // that lowers the number and Save into one that deletes real steps.
+  const cap = Math.max(capFor(h), valOf(AKEY(), h.id) || 0), atCap = UI.sheetVal >= cap;
   const gain = previewXp(h, UI.sheetVal);
   return `
     <div class="scrim" data-k="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
@@ -8433,13 +8940,19 @@ function showError(msg) {
   // rejects, so "Loading proof" is the entire app, for ever. The phone is the
   // source of truth and every one of these is a refinement of what is already
   // in localStorage, so each gets a ceiling and the app opens without it.
-  // A late answer is not lost: syncFromCloud runs again on foreground, and the
-  // season, quests and workout days are all re-fetched on the next launch.
+  // A late answer is not lost: pullFresh() runs syncFromCloud again on every
+  // foreground and reconnect, and the season, quests and workout days are all
+  // re-fetched on the next launch.
   const within = (p, ms, fallback) => Promise.race([
     Promise.resolve(p).catch(() => fallback),
     new Promise(res => setTimeout(() => res(fallback), ms))
   ]);
   await within(syncFromCloud(), 6000, null);
+  // The pull has had its turn — uploads may start. Everything above this line
+  // runs against a phone that may never have seen the cloud copy, so nothing
+  // above it is allowed to overwrite one. See pushNow().
+  SYNC.ready = true;
+  _lastPull = Date.now();          // boot counts as the first pull — see pullFresh()
   // Which season we are in decides what scores, so settle that before anything
   // reads XP — including the workout import, which must not reach back further.
   await within(fetchSeason(), 4000, null);
@@ -8479,13 +8992,16 @@ function showError(msg) {
   // Anything still unsent from a previous session goes up now.
   if (SYNC.dirty) pushNow();
 
-  window.addEventListener('online', () => { SYNC.attempts = 0; pushNow(); refreshSyncBadge(); });
+  // Read before writing: our push replaces the stored snapshot wholesale, so
+  // coming back online with a pull first is what stops this device erasing days
+  // another one logged while we were dark.
+  window.addEventListener('online', () => { SYNC.attempts = 0; pullFresh().then(pushNow); refreshSyncBadge(); });
   window.addEventListener('offline', refreshSyncBadge);
   // Coming back to the app is a fresh start: never resume pointed at an
   // earlier day, or the first tap after lunch quietly lands on Saturday.
   window.addEventListener('visibilitychange', () => {
     if (document.hidden) pushNow();
-    else { if (UI.day) { UI.day = null; render(); } refreshSyncBadge(); }
+    else { if (UI.day) { UI.day = null; render(); } refreshSyncBadge(); pullFresh(); }
   });
   // Last-ditch attempt on the way out; keepalive is not available through the
   // client library, so this is best effort on top of the durable dirty flag.
