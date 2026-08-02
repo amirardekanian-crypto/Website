@@ -2031,8 +2031,22 @@ const XP_RULES = {
   // single miss is steps at 190/250 = 76%. At 80 that fails and steps quietly
   // becomes a second precondition alongside the session; at 75 the old promise
   // — "miss any one thing and the day still counts" — survives on every roster
-  // on the board. Nobody's streak gets shorter; some get longer.
-  streakQualifyPct: 75,
+  // on the board.
+  //
+  // ⚠️ RAISED BACK TO 80 (Amir, 2026-08-02: "I think 75% is very low. Make it
+  // 80."). The paragraph above is the reasoning from when this went 80 → 75,
+  // and it is now OUT OF DATE in the one way that matters: it predates the
+  // GATE'S SECOND DOOR. dayQualifies() no longer asks the percentage alone —
+  // `missing <= 1 && done > 0` passes a day that left at most one thing
+  // undone, whatever the arithmetic says. So the exact failure this comment
+  // was written to prevent (miss steps alone on a rest day and lose the day)
+  // cannot happen at 80 either: one miss is one miss, and it goes through the
+  // second door. What 80 actually tightens is the day that missed THREE
+  // things by a little each — Amir's own Fri 31 Jul, 79% on partial credit
+  // for steps, sleep and protein, which is precisely the day he looked at and
+  // said the bar was too low. Do not "restore" 75 from the paragraph above
+  // without re-reading dayQualifies() first.
+  streakQualifyPct: 80,
   // The most a counter habit will accept in one day, as a multiple of its target
   // (steps 30,000 · water 24 · sleep 22.5h). Daily XP was always capped by
   // xpFor(), but a `total:` quest counts RAW UNITS — so without a ceiling one
@@ -2201,7 +2215,11 @@ const QUEST_POOL = [
   { id:'w_supps7',   title:'NO NEGOTIATION',      note:'Supplements every day',          kind:'daysHit:supps',    need:7,     xp:140 },
   { id:'w_fuel5',    title:'ON THE RECORD',       note:'Log your meals on 5 days',       kind:'daysHit:fuel',     need:5,     xp:140 },
   { id:'w_train3',   title:'THREE HARD DAYS',     note:'Three sessions this week',      kind:'daysHit:strength', need:3,     xp:250 },
-  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days at 75% or better',        kind:'qualify',          need:5,     xp:220 },
+  // ⚠️ The note reads the live threshold rather than stating a number, so
+  // moving streakQualifyPct can never leave this quest describing the old bar.
+  // It said "75% or better" as flat text until 2026-08-02, the day the gate
+  // moved to 80.
+  { id:'w_qualify5', title:'FIVE ON TARGET',      note:'5 days on target',               kind:'qualify',          need:5,     xp:220 },
   { id:'w_perfect2', title:'TWICE PERFECT',       note:'Two clean sweeps',               kind:'perfect',          need:2,     xp:300 }
 ];
 const QUEST_RUN_DAYS = 7;
@@ -7595,18 +7613,21 @@ function boardRow(r, ahead, i) {
   const gap = r.is_me && ahead ? Math.max(0, Number(ahead.xp || 0) - xp) : 0;
   const d = LB.deltas[r.display_name];
   const t = titleName(r.title);
-  // Your own streak and week are on this device; nobody else's are. So the
-  // sub-line reads live for you and standing-badges for everyone else, rather
-  // than the app inventing a number it cannot know.
-  let sub;
-  if (r.is_me) {
-    let good = 0;
-    for (let n = 0; n < 7; n++) if (dayQualifies(fmtKey(addDays(today(), -n)))) good++;
-    const st = currentDayStreak();
-    sub = `<span style="flex:none">${st > 0 ? '🔥 ' + st + ' · ' : ''}${good}/7 days on target</span>`;
-  } else {
-    sub = `${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.rank_label)}</span>`;
-  }
+  // EVERY ROW READS THE SAME, INCLUDING YOUR OWN — rank, then title.
+  //
+  // ⚠️ This used to special-case `is_me` into a streak-and-week line, on the
+  // reasoning that your own streak is known on this device and nobody else's
+  // is. That was true and it was still the wrong call: it made the athlete's
+  // row the ONLY one on the board with no rank and no title, so the one
+  // screen where a title is meant to be seen was the one screen that hid
+  // yours from you. Amir, 2026-08-02: "why the fuck do i still see non sence
+  // below my name just let me see my level like every one else" — and, in the
+  // same breath, "i cant change my title". Those were one bug: equipping
+  // worked, `set_title` published it, every other athlete could see it, and
+  // the owner could not, so it read as a dead button. The streak and the week
+  // are both already on Today and Progress; the rank was nowhere on this
+  // screen. Do not reintroduce a self-only sub-line here.
+  const sub = `${rankIcon(rankNameOf(r.rank_label), 13, 'stroke-width:2.4')}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.rank_label)}</span>`;
   return `<div class="lbrow ${r.is_me ? 'me' : ''}" data-k="brow:${esc(String(r.display_name || r.pos))}"
     style="animation-delay:${((i || 0) * 0.05).toFixed(2)}s">
     <span class="lbpos ${r.pos <= 3 ? 'medal' : ''}">${r.pos <= 3 ? MEDALS[r.pos - 1] : r.pos}</span>
@@ -7615,7 +7636,7 @@ function boardRow(r, ahead, i) {
       <span class="lbsub">
         ${sub}
         ${d ? `<span class="mono delta ${d > 0 ? 'up' : 'down'}" style="flex:none">${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>` : ''}
-        ${t && !r.is_me ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''}
+        ${t ? `<span style="flex:none">${titlePlate(passItem(r.title) || { name: t }, true)}</span>` : ''}
       </span>
     </span>
     <span class="lbright">

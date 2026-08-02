@@ -291,6 +291,36 @@ again — while `proof.html` promises them only the *perfect* day is out of reac
 at 190/250 = 76%, so at 80 steps quietly became a second precondition. Verified over a
 61-day log: **0 days stopped qualifying, 6 started.**
 
+#### …and back to 80 (2026-08-02)
+
+Amir, looking at a Friday that counted on 79%: *"I think 75% is very low. Make it 80."*
+
+The paragraph above is the argument against 80, and it no longer holds — it predates the
+gate's **second door**. `dayQualifies()` does not ask the percentage alone: `missing <= 1
+&& done > 0` passes any day that left at most one thing undone. So the exact failure 75 was
+chosen to prevent — miss steps alone on a rest day, lose the day — cannot happen at 80
+either. What 80 tightens is the day that missed **three things by a little each**, which is
+literally the day that prompted the change (Fri 31 Jul: steps 7,000/10,000, sleep 6/7.5,
+protein 2/3 → 79%).
+
+Measured across all eleven athletes on the board before shipping:
+
+| | qualifying days 75 → 80 | streak 75 → 80 |
+|---|---|---|
+| Amir | 7 → 5 | **5 → 2** |
+| Elmira | 2 → 0 | 0 → 0 |
+| Pegooli | 6 → 5 | 2 → 2 |
+| Maryam | 2 → 1 | 2 → 1 |
+| Faraz | 1 → 0 | 1 → 0 |
+| Nillish, Dela, Mehraneh, Pooya, Ghazal, Sina | unchanged | unchanged |
+
+⚠️ **Streaks are derived, so raising the bar shortens them retroactively** — Amir's own
+went 5 → 2 the moment this shipped. That is the cost of the knob and it is worth stating
+out loud before turning it. **XP, titles and levels did not move for anyone** (checked at
+both thresholds across all 11): the bonus ledger only reads `qualify` for the day-streak
+milestones and the `w_qualify5` quest, neither of which was in play. Rewards are still
+append-only.
+
 #### Habit names are TASKS, not nouns
 They were labels — WORKOUT, STEPS, WATER — which is what the thing *is*, not what
 the athlete has to do about it. A list of nouns reads as a filing system; a list of
@@ -724,12 +754,25 @@ above, which is the only distance you can close. It closes with the rule it runs
 ⚠️ **The per-row bar is gone.** With ten rows it drew ten different lengths of the fact
 the number beside it already stated, and the number is what people read.
 
-⚠️ **The sub-line splits by who it is about, for the same reason the wall's chips do.**
-Yours reads `🔥 3 · 5/7 days on target`, computed live from the log on this device;
-everyone else's reads their **rank** (and title plate), because `leaderboard_top()`
-returns `pos · display_name · title · xp · level · rank_label` and no streak. Teaching
-that RPC to return a streak and a days-on-target count is the one change that would give
-every row the same line — until then the app does not invent numbers it cannot know.
+**Every row reads the same, including your own: rank, then title plate.** `boardRow()` has
+no `is_me` branch — do not add one back.
+
+⚠️ It had one until 2026-08-02. Yours read `🔥 3 · 5/7 days on target`, computed live from
+the log on this device, because `leaderboard_top()` returns `pos · display_name · title ·
+xp · level · rank_label` and no streak — so rather than invent a number it could not know
+for everyone else, the app showed you a different one. Defensible, and still wrong: it made
+the athlete's own row **the only one on the board with no rank and no title**, and the
+title plate was suppressed twice over (`t && !r.is_me`).
+
+That produced a bug report that did not look like this one at all — *"i cant change my
+title"*. Equipping worked, `saveCfg()` stored it, `set_title()` published it, `hab_titles`
+had it, and every other athlete could see **THE TWENTY-THREE** on his row. The owner could
+not, on the one screen a title exists to be seen on, so the button read as dead. Amir,
+2026-08-02: *"why the fuck do i still see non sence below my name just let me see my level
+like every one else."*
+
+The streak and the seven-day count were never lost — both are on Today and Progress, where
+they are the point. The rank was nowhere on Crew at all.
 
 ### Settings — behind the initials button, and it is a LIST OF DOORS
 Redesigned 2026-08-01 (Amir, with a reference screen: *"i want the habits to be modified
