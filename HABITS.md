@@ -603,12 +603,22 @@ anyone rebuilding after a bad week, and opening your own progress on a pair of z
 punishes exactly the athlete who most needs to keep going. Showing up is the stat that is
 almost always positive, and it is the one that earns the others.
 
-**The day streak is not in the grid** — it is the band above it, so the two screens an
-athlete checks their standing from open with the identical object. It was a bare figure
-in a tile with no way to tell a streak climbing from one that had just broken, and
-repeating it in both places would be the duplication this tab was reorganised to remove.
-Its old slot now holds **longest run** — the best single-habit run ever, which is genuinely
-different information and quietly teaches the run/streak split the app depends on.
+**The day streak is the third tile**, drawn as the lit flame rather than a bare figure, so
+a streak climbing reads differently from one that has just broken. Its caption carries
+`· best N` — and that N is **`bestDayStreak()`**, never `bestHabitRun()`.
+
+⚠️ It was `bestHabitRun()` until 2026-08-02, and this is the trap to know about. The slot
+used to be a tile of its own called **LONGEST RUN** (the best single-habit run ever) while
+the day streak lived in a band above the grid; when the day streak moved down into the
+grid, the old `bestRun` variable came with it and ended up glued to the new caption. The
+number was never wrong — it was answering a different question from the one its label
+asked. Amir's own Progress screen read **`5 · BEST 8` on 8 logged days with a missed day
+in them**, because 8 was his *water* streak. It is the exact collision the one-word/two-scopes
+rule exists to prevent (see CLAUDE.md): the app has one noun, `streak`, so **the label is
+the only thing keeping the scopes apart** — a habit's streak always sits *on that habit*,
+and anything captioned DAY STREAK must be computed by a `*DayStreak()` function. The same
+bug sat in the shareable **streak card** (`SHARE_CARDS.streak`), where it decided
+PERSONAL BEST vs ON A RUN and printed a `Best: N.` footer; both were fixed together.
 
 **A habit's level is the hero's ring, at row size** (Amir, 2026-07-30). It was a filled
 square, with the rank name in the meta line and the level's progress as a bar under the

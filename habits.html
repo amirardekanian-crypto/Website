@@ -7082,7 +7082,15 @@ function fmtQuestVal(q, v) {
 // one screen: overall level, then every habit's own rank, then the milestones.
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
-  const bestRun = bestHabitRun(), lead = leadStreak(), dayStreakNow = currentDayStreak();
+  // ⚠️ bestDayStreak(), NOT bestHabitRun(). This tile is captioned DAY STREAK,
+  // so its "best" has to be the best DAY streak. It held bestHabitRun() until
+  // 2026-08-02, a leftover from when this slot was its own LONGEST RUN tile:
+  // when the day streak moved into the grid the old variable came with it and
+  // ended up under the new label. Amir's own screen read "5 · BEST 8" with
+  // 8 days logged and one of them missed — the 8 was his WATER streak. Exactly
+  // the two-scopes collision CLAUDE.md warns about, printed as one number
+  // arguing with itself.
+  const bestDay = bestDayStreak(), lead = leadStreak(), dayStreakNow = currentDayStreak();
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
   return `
@@ -7102,7 +7110,7 @@ function renderProgress(LI, earned, totalAch) {
         <div><div class="hd statfrac"><span data-static data-num="unlocked" data-to="${earned}">${earned}</span><span class="of">/${totalAch}</span></div>
           <div class="eyebrow">Badges</div></div>
         <div><div class="figure flamefig ${dayStreakNow > 0 ? 'lit' : ''}" data-lvl="${emberLevel(dayStreakNow)}">${FLAME}<span data-static data-num="streak" data-to="${dayStreakNow}">${dayStreakNow}</span></div>
-          <div class="eyebrow">Day streak${bestRun > dayStreakNow ? ' · best ' + bestRun : ''}</div></div>
+          <div class="eyebrow">Day streak${bestDay > dayStreakNow ? ' · best ' + bestDay : ''}</div></div>
         <div><div class="figure" data-static data-num="perfect" data-to="${perfectDays}">${perfectDays}</div>
           <div class="eyebrow">Perfect days</div></div>
       </div>
@@ -8625,7 +8633,13 @@ const SHARE_PAINT = {
   streak: {
     ground: (x, W, H) => { scInk(x, W, H, 'rgba(255,138,91,0.42)'); return true; },
     body: (x, W, H, a) => {
-      const now = currentDayStreak(), best = Math.max(now, bestHabitRun());
+      // Same wrong scope the Progress tile carried until 2026-08-02: this card
+      // says DAYS IN A ROW, so its best-ever is the best DAY streak. With
+      // bestHabitRun() here a personal-best day streak got the "ON A RUN"
+      // eyebrow and a "Best: 8." footer borrowed from a single habit — on a
+      // card built to be shared, which is the worst place to state a number
+      // the athlete cannot find anywhere else in the app.
+      const now = currentDayStreak(), best = bestDayStreak();
       x.textAlign = 'center';
       scEyebrow(x, a.cx, a.cy - 260, now >= best ? 'PERSONAL BEST' : 'ON A RUN', CARD.orange);
       x.font = '150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
