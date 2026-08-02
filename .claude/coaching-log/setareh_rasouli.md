@@ -12,7 +12,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Half-Kneeling Pallof Press | Active | C1 | — |
 | Lat Pulldown | Active | C1 | primary |
 | Chest-Supported Dumbbell Row | Active | C1 | primary |
-| Machine Shoulder Press | Active | C1 | token 2-set dose by design (daily serve) |
+| Standing Dumbbell Overhead Press | Active | C1 | equipment swap from Machine Shoulder Press (no machine at gym), 2026-08-02; token 2-set dose (daily serve) |
 | Cable Face Pull | Active | C1 | — |
 | Seated Machine Calf Raise | Active | C1 | soleus — run prep |
 | Suitcase Carry | Active | C1 | — |
@@ -22,7 +22,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Dead Bug | Active | C1 | — |
 | Side Plank | Active | C1 | — |
 | Walk-Run Intervals | Active | C1 | ladder COMPRESSED 2026-07-31 (wk2 3×6′ · wk3 2×9′ · wk4 continuous 18–20′), still check-in-gated, still the run budget |
-| Machine Chest Press | Active | C1 | added pre-start by Amir (2026-07-24); starter 2-set dose — C1 chest-zero stance revised |
+| Barbell Chest Press | Active | C1 | swap from Machine Chest Press (Amir, 2026-08-02); light 2-set feeler, elbows ~45°. Machine Chest Press → Available (equipment) |
 | Dumbbell Lateral Raise | Active | C1 | added pre-start by Amir (2026-07-24) |
 
 ## Cycle 01 — Groundwork · 2026-07-24 · NEW
@@ -120,3 +120,12 @@ Amir's ruling on the check-in, verbatim intent: *load her legs a bit better · d
 **New weekly picture:** quads ~13 dynamic sets · hamstrings 7 · glutes ~9–10 · everything else unchanged. Hamstrings still under the ≥10 floor — accepted for C1 (recovery ceiling + C2 HSR leads); C2 must clear it.
 
 **Unchanged on purpose:** morning knee checklist + escalation triggers, physio-baseline recommendation on record, zero plyo (C3 absorption first), RPE-7 cycle ceiling, 60′ session caps (D1 ≈ 55′ post-edit, D4 ≈ 45′).
+
+### In-cycle edit · 2026-08-02 (Amir) — Day 2 equipment swaps
+
+Independent of the 2026-07-31 check-in (this only touches two Day-2 upper accessories; the leg-loading / iso-retirement / run-compression changes are untouched). Her gym reality after the first sessions:
+
+1. **Machine Shoulder Press → Standing Dumbbell Overhead Press** — no shoulder-press machine at the gym. Canonical library name (video joins). Cues updated for the standing free-DB version; the token-2-set rationale (serve loads overhead daily) is implement-agnostic and unchanged.
+2. **Machine Chest Press → Barbell Chest Press** (Amir's call). Canonical name (video joins). Coach's Note added: new movement, elbows ~45°, controlled light touch, stays a light 2-set feeler. Dose unchanged (2×10 @RPE 6).
+
+**Flag on record:** barbell horizontal pressing cuts slightly against the deliberately-low-horizontal-press rule for a daily-serving tennis shoulder; at 2 light sets it's fine and it's Amir's call — shoulder-friendly note mitigates, watch the shoulder early. Both machine versions stay `Available` (equipment reason, no dislike/pain).
