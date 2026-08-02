@@ -119,7 +119,8 @@ target** in one day (steps 30,000 · water 24 · sleep 22.5h · meals 9), clampe
 without a ceiling one tap-and-hold on the stepper logged 9,999,999 steps and
 cleared *"50,000 steps across the run"* on the spot, on the leaderboard as well as
 on the phone. The server scores whatever the log holds, so capping at write time is
-what keeps both scorers honest; there is no server-side check.
+what keeps both scorers honest. (`dailyCap` itself still has no server mirror — but see
+`maxCustom` below, which closed the one hole where that mattered.)
 
 > Raising this is a quest-balance decision, not a logging one. At 3× the two steps
 > quests (50k and 70k) need two and three days respectively; at 5× or above they are
@@ -155,9 +156,20 @@ perfect one, on a board shared with people doing the real work — and nothing c
 back, since only the athlete's own ✕ removes a custom habit. `addCustomHabit()` now
 enforces the count and rejects a duplicate name (the id carries a timestamp, so "Reading"
 twice used to make two habits that both scored), and both composers hide at the cap.
-Like `dailyCap`, this is a **client write-time guard with no server equivalent** — see the
-note in §8 on excluding customs from board scoring, which is the stronger fix and needs a
-migration.
+
+**And since 2026-08-02 the server has its own ceiling: `maxCustom` (3).** The client cap is
+a UI rule, and the log is just JSON in a row — a tampered copy with fifty junk keys was
+paid fifty times, about 1,500 XP a day, straight onto the shared board. `hab_xp()` now pays
+`customXp` for at most `maxCustom` unrecognised keys **per day**. Measured on the live
+database: a day holding water plus ten junk customs scored **336 → 126**, while an honest
+day with three customs stayed at **126, unchanged**. Zero athletes had more than three
+custom keys on any day when it was switched on, so nobody real was affected.
+
+⚠️ It is a **ceiling, not a rejection** — a day that happens to hold a stale key from a
+removed habit degrades by one payment rather than erroring, and an athlete legitimately at
+the cap does not lose a day's score if the coach retunes something. This is deliberately
+*not* the same as excluding customs from the board (§12): honest custom habits still score
+exactly as they always did, and only the unbounded tail is gone.
 
 **A perfect day is 420 XP** with the current numbers. That figure is the anchor for
 everything below — if you change `weights`, recompute it.
@@ -411,6 +423,54 @@ invalidate by hand** — `syncFromCloud()` and `importWorkoutDays()` do. `saveCf
 calls `stampRoster()`, which is why every path that changes the tracked set records
 itself without anyone having to remember. The cold walk is ~7ms over 400 days of full
 logs.
+
+---
+
+## 4.6 Milestones come in MARKS
+
+*(Amir, 2026-08-02: "as ive seen in call of duty you can unlock achievements again but next
+levels of them. so like some milestones can have different levels.")*
+
+A **family** is one achievement you can earn again at a higher bar: same name, a roman
+numeral after it. `HUMAN SPRINKLER I` (5 days) → `II` (20) → `III` (60).
+
+`mark` is **display only**. Each rung is an ordinary independent row on the existing rail —
+its own `code`, `need` and `xp` — which is why adding twelve of them needed no new scoring
+machinery on either side. ⚠️ But every rung still has to exist in the `milestones` array on
+the `xp_rules` row too, or the board underpays. Verified programmatically after the change:
+32 rows client-side, 32 server-side, zero mismatches on code/need/xp/measure.
+
+Two rules the ladder keeps, both machine-checked:
+
+1. **Inside a family, a higher mark always pays more than the one below.** A test walks
+   every family in `need` order and asserts `xp` strictly increases.
+2. **Every habit gets at least a II**, so whichever habits an athlete favours, there is
+   always a next rung in something they actually do.
+
+Three names carry **no mark** on purpose — `FIRST BLOOD`, `THE MACHINIST`, `THE CENTURION`.
+They are the entry and the two trophies, not rungs, and a numeral would make them look like
+waypoints to something else.
+
+**`DAWN PATROL I` is the free tier's way in** (this also closes what was §12.1). The badge
+shelf's only day-one row was `FIRST BLOOD`, which is WORKOUT-gated — and a free athlete's
+WORKOUT is locked for life, so the entire funnel landed on a screen whose entry badge they
+could never earn. `DAWN PATROL I` needs three habits logged once, reachable on their first
+evening, and pays 40 against FIRST BLOOD's 50 because it is the easier of the two.
+
+⚠️ **Five badges were renamed** so their families read as one thing: `THE TONE SETTER` →
+`HEAVY METAL I`, `ROAD RUNNER` → `GROUND COVERED II`, `UNBREAKABLE` → `HUMAN SPRINKLER III`,
+`THE LONG ROAD BACK` → `BACK IN THE FIGHT II`, `UNSINKABLE` → `HARD TO KILL II`. Display
+only — every `code` is untouched, so no history, XP or medal moved. (`UNBREAKABLE` had to go
+regardless: it was also the 60-day `CONSISTENCY_TIERS` name, and two different things
+wearing one name on the same screen is exactly the confusion this app keeps fixing.)
+
+`THE CENTURION` went **500 → 1,200**. `CLEAN SWEEP III` pays 600 for thirty perfect days, so
+a hundred of them had to outpay it by a distance or the last rung of the hardest ladder in
+the app was worth less per day than the rung below it.
+
+The shelf is now **32 milestones worth 9,585 XP** in total, up from 20 and 5,085. Since
+milestone XP re-pays every season (§4.5), that also widens the runway a returning veteran
+has to climb in a new season — which is part of what §12.2 was about.
 
 ---
 
@@ -898,17 +958,20 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 Past runs are kept on purpose — the XP athletes earned in them keeps counting. Clearing
 a *finished* run would retroactively take those points away.
 
-> ⚠️ **Never start a run before the previous one has ended.** `set_quests()` accepts any
-> start date and only replaces a run starting on the *same* one, so a mid-week start
-> leaves two runs covering today — and `questEvents()` walks every run independently, as
-> does `hab_bonus_xp()`. A quest id present in both **pays twice** off one stretch of
-> logging. The board and the phone agree (both scorers overpay identically), so nothing
-> looks wrong; it is simply the wrong number. Fixing it properly means clipping each run's
-> window in *both* scorers, which is a migration — until then this is a rule, not a
-> safeguard. The client half of the mess is fixed: `activeQuestRun()` now returns the
-> **latest-starting** covering run rather than the first, so newly announced quests appear
-> immediately instead of hiding behind last week's list, and completing one of them fires
-> its takeover instead of silently raising XP.
+**Overlapping runs are CLIPPED, in both scorers** (2026-08-02). `set_quests()` accepts any
+start date and only replaces a run starting on the *same* one, so a mid-week start used to
+leave two runs covering the same days — and since `questEvents()` walks every run
+independently, as does `hab_bonus_xp()`, a quest id present in both **paid twice** off one
+stretch of logging. Both scorers did it identically, so the board and the phone agreed and
+were both wrong: the hardest kind of error to notice here.
+
+A run's window now ends **the day before the next run starts** — a later run simply takes
+over, which is the same rule `activeQuestRun()` already used for display. `runEndKey()` on
+the client and the `qruns` CTE's `least(rstart + 6, next_start - 1)` on the server. Proven
+to agree on the live database: runs starting 27 July and 31 July clip the first to
+**30 July** on both sides, against a natural end of 2 August.
+
+You can now start a run whenever you like; the overlap simply hands over.
 >
 > `rulesSignature()` now includes the quest pool and the run list. It is the one scoring
 > input the server can change while the app is running — `fetchQuests()` overwrites it at
@@ -1050,31 +1113,24 @@ finish. It re-posts the same body with a new `pct`; it never changes their words
 
 ## 12. Open economy decisions — Amir's call, and each needs BOTH scorers
 
-A game-design review of the reward system (2026-08-02) found five tuning choices — not
-bugs — every one of which changes what a day is worth and so has to land in `habits.html`
-*and* the Supabase side together (section 8).
+A game-design review (2026-08-02) found five tuning choices — not bugs — each of which
+changes what a day is worth and so has to land in `habits.html` *and* Supabase together
+(section 8).
 
-**Two have since shipped** and moved out of this list:
+**Four have since shipped** and moved out of this list:
 
-- ~~12.1 the streak gate is unfair on the default roster~~ → **done**, see §6 (the two-door
-  gate and pro-rata counters) and `stage22_gate_and_comeback.sql`.
-- ~~12.2 nothing pays for the comeback~~ → **done**, see §6.6.
+- ~~the streak gate is unfair on the default roster~~ → **done**, §6 (two-door gate,
+  pro-rata counters) + `stage22`.
+- ~~nothing pays for the comeback~~ → **done**, §6.6 + `stage22`.
+- ~~FIRST BLOOD is unreachable for the free tier~~ → **done**, §4.6 (`DAWN PATROL I`) +
+  `stage24`.
+- ~~custom habits have no server-side ceiling~~ → **done**, §1 (`maxCustom`) + `stage24`.
+  Amir's call was to limit rather than exclude: honest customs still score on the board,
+  only the unbounded tail is gone.
 
-The three below are still open, ordered by impact-per-effort.
+One is still open.
 
-### 12.1 FIRST BLOOD is unreachable for the free tier — the top of the funnel
-
-FIRST BLOOD is explicitly *"the way in"* but measures `daysHit:strength`, and free-tier
-athletes have WORKOUT locked for life. The audience `proof.html` recruits therefore has no
-entry badge: their first reachable milestone is a perfect day or a 5-day streak.
-
-Proposal: one `week`-tier row reachable on day one without a session, reusing the existing
-`daysWith3` measure so both scorers already know how to count it —
-`{ code:'GO', name:'ON THE CLOCK', note:'Three habits logged in one day', xp:40, need:1, measure:'daysWith3', tier:'week' }`
-— priced under FIRST BLOOD's 50 to keep the easiest-pays-least ladder honest. One row in
-`ACHIEVEMENTS`, one in the `milestones` array on the `xp_rules` row.
-
-### 12.2 Season 2 is a reward dead zone for anyone who levelled in season 1
+### 12.1 Season 2 is a reward dead zone for anyone who levelled in season 1
 
 `nextReward()` correctly skips rewards already owned, so a veteran who peaked at level 21
 re-climbs **20,830 XP (~62 days at 336/day)** before the track pays anything new, while
@@ -1087,17 +1143,3 @@ free to mint, is never revoked, and shows on the board and the wall. Every seaso
 a thing that can only be earned *that* season, which is the retention story a reset needs.
 Requires registering the ids in `passTrack` **ahead of** season close (the server refuses a
 title it does not know) plus a mint step in `start_season()`. Largest of the five.
-
-### 12.3 Custom habits: the cap is a patch, exclusion is the fix
-
-`MAX_CUSTOM = 3` (section 1) closed the worst of the faucet client-side, but a custom
-habit still pays 30 XP a day plus its own consistency tiers onto a **shared** board, the
-server pays `customXp` for any key it does not recognise, and there is still no
-server-side check at all — so a tampered log is unbounded.
-
-The honest fix for a product named Proof: **score custom habits on their own per-habit
-ladder but exclude them from overall XP and board scoring** — any id not present in
-`weights` scores 0 in the overall total and in `hab_xp()`, and customs leave `dayParts()`.
-The athlete keeps the tracking and the streaks; the board only ever reflects the five core
-habits and the built-in add-ons, which is the only way it compares like with like. One
-symmetrical rule in both scorers.

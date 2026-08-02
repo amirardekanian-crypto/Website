@@ -963,6 +963,12 @@
     line-height: 1; text-transform: uppercase; color: var(--muted);
   }
   .msrow.got .ms-name { color: var(--ink); }
+  /* The rung numeral. Deliberately quieter than the name — it is which one of
+     these you are on, not what it is called. */
+  .msrow .ms-mk {
+    font-style: normal; font-size: 11.5px; font-weight: 700; letter-spacing: .06em;
+    margin-left: 5px; opacity: .62; vertical-align: 1px;
+  }
   .msrow .ms-note { font-size: 11px; line-height: 1.3; color: var(--muted-soft); }
   .msrow .ms-bar { height: 5px; background: var(--track); }
   .msrow .ms-bar > span { display: block; height: 100%; background: var(--clay); transition: width .35s cubic-bezier(.2,.8,.2,1); }
@@ -2210,7 +2216,22 @@ function questRuns() {
   const r = CFG.questRuns;
   return Array.isArray(r) ? r.filter(x => x && typeof x.start === 'string' && Array.isArray(x.ids)) : [];
 }
-function runEndKey(run) { return fmtKey(addDays(parseKey(run.start), QUEST_RUN_DAYS - 1)); }
+// A run's last scoring day — CLIPPED AT THE NEXT RUN'S START.
+// ⚠️ Two runs must never both score the same day. questEvents() walks every run
+// independently and so does the server's hab_bonus_xp(), so a quest id present
+// in two overlapping runs paid TWICE off one stretch of logging — on the board
+// as well as on the phone, which meant the two scorers agreed and were both
+// wrong, the hardest kind of error to notice here. set_quests() accepts any
+// start date and only replaces a run starting on the same one, so overlap was
+// always one mid-week announcement away. A later run simply takes over from its
+// own start date, which is the rule activeQuestRun() already displays.
+function runEndKey(run) {
+  const natural = fmtKey(addDays(parseKey(run.start), QUEST_RUN_DAYS - 1));
+  const next = questRuns().map(r => r.start).filter(s => s > run.start).sort()[0];
+  if (!next) return natural;
+  const dayBefore = fmtKey(addDays(parseKey(next), -1));
+  return dayBefore < natural ? dayBefore : natural;
+}
 function runQuests(run) {
   const pool = questPool();
   return run.ids.map(id => pool.find(q => q.id === id)).filter(Boolean);
@@ -2246,8 +2267,10 @@ function questProgress(q, run) {
   const kind = parts[0], hid = parts[1];
   const h = hid ? habitById(hid) : null;
   let have = 0, doneDay = null;
+  const endK = runEndKey(run);                   // clipped if another run starts inside this one
   for (let i = 0; i < QUEST_RUN_DAYS; i++) {
     const k = fmtKey(addDays(start, i));
+    if (k > endK) break;                         // a later run has taken over — see runEndKey()
     if (k > TKEY()) break;                       // the future has not happened
     // Season-bounded like everything else that pays: a run straddling the season
     // opening must not count the days before it, or the server (which never sees
@@ -2553,6 +2576,10 @@ function titlePlate(p, small) {
 const MEASURE_EMOJI = { perfectDays:'🏆', daysWith3:'📋', qualify:'✅',
                         comebackRun:'🔄', comebacksStuck:'🛡️' };
 const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️', ev_standing:'🏁', ev_backbone:'🔄' };
+// A rung's full name, numeral included — "HUMAN SPRINKLER II". One helper so
+// the row, the takeover and the nearest-badge line can never disagree about
+// what a thing is called. See the `mark` note on ACHIEVEMENTS.
+function achName(a) { return a.name + (a.mark ? ' ' + a.mark : ''); }
 function achMedal(a, got) {
   const key = a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze';
   const part = String(a.measure || '').split(':');
@@ -2651,34 +2678,85 @@ const CONSISTENCY_TIERS = [
 // unchanged, which is why adding eight of these needed no new machinery on
 // either side — just more rows in ACHIEVEMENTS and in the `milestones` array on
 // the xp_rules row. ⚠️ Both, or the board pays a different number to the phone.
+// ── MILESTONES COME IN MARKS NOW ──────────────────────────────────────────
+// (Amir, 2026-08-02: "as ive seen in call of duty you can unlock achievements
+// again but next levels of them. so like some milestones can have different
+// levels".)
+//
+// A FAMILY is one achievement you can earn again at a higher bar: same name,
+// a roman numeral after it, its own `code`, its own `need` and its own XP.
+// `mark` is DISPLAY ONLY — nothing scores off it, and each rung is an ordinary
+// independent row on the same rail everything else uses, which is why adding
+// twelve of them needed no new machinery on either side. ⚠️ But every rung is
+// still a row in the `milestones` array on the xp_rules row too, or the board
+// pays a different number to the phone.
+//
+// Two rules the ladder has to keep:
+//   1. Inside a family, a higher mark ALWAYS pays more than the one below it.
+//   2. Every habit gets at least a II, so whichever habits an athlete favours,
+//      there is always a next rung in something they actually do.
+//
+// The three standalone names — FIRST BLOOD, THE MACHINIST, THE CENTURION —
+// deliberately carry NO mark. They are not rungs on a ladder, they are the
+// entry and the two trophies, and a numeral would make them look like
+// waypoints on the way to something else.
+//
+// ⚠️ FIVE BADGES WERE RENAMED to make their families read as one thing:
+// THE TONE SETTER → HEAVY METAL I · ROAD RUNNER → GROUND COVERED II ·
+// UNBREAKABLE → HUMAN SPRINKLER III · THE LONG ROAD BACK → BACK IN THE FIGHT II
+// · UNSINKABLE → HARD TO KILL II. Display only — every `code` is untouched, so
+// nobody's history, XP or medal moves. (UNBREAKABLE had to go anyway: it was
+// also the name of the 60-day CONSISTENCY_TIER, and two different things
+// wearing one name on the same screen is the confusion this app keeps fixing.)
 const ACHIEVEMENTS = [
   // ── A good week ────────────────────────────────────────────────────────
+  // DAWN PATROL I is the FREE TIER'S WAY IN. FIRST BLOOD is WORKOUT-gated, and
+  // a free athlete's WORKOUT is locked for life — so the badge shelf's only
+  // day-one row was one they could never have, on the screen the whole funnel
+  // lands on. This one needs three habits logged once, which anybody can do on
+  // their first evening, and it pays less than FIRST BLOOD because it is the
+  // easier of the two.
+  { code:'GO', name:'DAWN PATROL',     mark:'I',   note:'Three habits, one day. You started.',     xp:40,  need:1,   measure:'daysWith3',        tier:'week' },
   { code:'FB', name:'FIRST BLOOD',     note:'Your first session on the board',          xp:50,  need:1,   measure:'daysHit:strength', tier:'week' },
-  { code:'CS', name:'CLEAN SWEEP',     note:'One perfect day. Everything, once.',       xp:100, need:1,   measure:'perfectDays',      tier:'week' },
-  { code:'HS', name:'HUMAN SPRINKLER', note:'5 days running on full water',             xp:100, need:5,   measure:'streak:water',     tier:'week' },
-  { code:'TS', name:'THE TONE SETTER', note:'3 straight days with a session',           xp:120, need:3,   measure:'streak:strength',  tier:'week' },
-  { code:'SW', name:'GROUND COVERED',  note:'7 days over your step target',             xp:130, need:7,   measure:'daysHit:steps',    tier:'week' },
-  { code:'FF', name:'FULLY FUELLED',   note:'5 days of three proper meals',             xp:110, need:5,   measure:'daysHit:fuel',     tier:'week' },
+  { code:'CS', name:'CLEAN SWEEP',     mark:'I',   note:'One perfect day. Everything, once.',      xp:100, need:1,   measure:'perfectDays',      tier:'week' },
+  { code:'HS', name:'HUMAN SPRINKLER', mark:'I',   note:'5 days running on full water',            xp:100, need:5,   measure:'streak:water',     tier:'week' },
+  { code:'TS', name:'HEAVY METAL',     mark:'I',   note:'3 straight days with a session',          xp:120, need:3,   measure:'streak:strength',  tier:'week' },
+  { code:'SW', name:'GROUND COVERED',  mark:'I',   note:'7 days over your step target',            xp:130, need:7,   measure:'daysHit:steps',    tier:'week' },
+  { code:'FF', name:'FULLY FUELLED',   mark:'I',   note:'5 days of three proper meals',            xp:110, need:5,   measure:'daysHit:fuel',     tier:'week' },
   // ── The long haul ──────────────────────────────────────────────────────
-  { code:'DP', name:'DAWN PATROL',     note:'10 days with 3+ habits logged',            xp:75,  need:10,  measure:'daysWith3',        tier:'long' },
-  { code:'ZM', name:'ZEN MACHINE',     note:'10 breathing sessions in a row',           xp:100, need:10,  measure:'streak:breathe',   tier:'long' },
-  { code:'BA', name:'BLACKOUT ARTIST', note:'10 nights at 7.5h or more',                xp:150, need:10,  measure:'streak:sleep',     tier:'long' },
-  { code:'HM', name:'HEAVY METAL',     note:'12 straight days with a session',          xp:150, need:12,  measure:'streak:strength',  tier:'long' },
-  { code:'RB', name:'RUBBER BAND',     note:'14-day mobility streak',                   xp:150, need:14,  measure:'streak:mobility',  tier:'long' },
-  { code:'IM', name:'IRON MONK',       note:'16-day supplement streak',                 xp:150, need:16,  measure:'streak:supps',     tier:'long' },
-  { code:'RR', name:'ROAD RUNNER',     note:'30 days over your step target',            xp:200, need:30,  measure:'daysHit:steps',    tier:'long' },
+  { code:'DP', name:'DAWN PATROL',     mark:'II',  note:'10 days with 3+ habits logged',           xp:75,  need:10,  measure:'daysWith3',        tier:'long' },
+  { code:'ZM', name:'ZEN MACHINE',     mark:'I',   note:'10 breathing sessions in a row',          xp:100, need:10,  measure:'streak:breathe',   tier:'long' },
+  { code:'BA', name:'BLACKOUT ARTIST', mark:'I',   note:'10 nights at 7.5h or more',               xp:150, need:10,  measure:'streak:sleep',     tier:'long' },
+  { code:'HM', name:'HEAVY METAL',     mark:'II',  note:'12 straight days with a session',         xp:150, need:12,  measure:'streak:strength',  tier:'long' },
+  { code:'RB', name:'RUBBER BAND',     mark:'I',   note:'14-day mobility streak',                  xp:150, need:14,  measure:'streak:mobility',  tier:'long' },
+  { code:'IM', name:'IRON MONK',       mark:'I',   note:'16-day supplement streak',                xp:150, need:16,  measure:'streak:supps',     tier:'long' },
+  { code:'RR', name:'GROUND COVERED',  mark:'II',  note:'30 days over your step target',           xp:200, need:30,  measure:'daysHit:steps',    tier:'long' },
+  { code:'HS2',name:'HUMAN SPRINKLER', mark:'II',  note:'20 days running on full water',           xp:250, need:20,  measure:'streak:water',     tier:'long' },
+  { code:'FF2',name:'FULLY FUELLED',   mark:'II',  note:'25 days of three proper meals',           xp:300, need:25,  measure:'daysHit:fuel',     tier:'long' },
+  { code:'CS2',name:'CLEAN SWEEP',     mark:'II',  note:'Ten perfect days',                        xp:300, need:10,  measure:'perfectDays',      tier:'long' },
+  { code:'ZM2',name:'ZEN MACHINE',     mark:'II',  note:'30 breathing sessions in a row',          xp:280, need:30,  measure:'streak:breathe',   tier:'long' },
+  { code:'DP3',name:'DAWN PATROL',     mark:'III', note:'50 days with 3+ habits logged',           xp:250, need:50,  measure:'daysWith3',        tier:'long' },
+  { code:'BA2',name:'BLACKOUT ARTIST', mark:'II',  note:'30 nights at 7.5h or more',               xp:350, need:30,  measure:'streak:sleep',     tier:'long' },
+  { code:'HM3',name:'HEAVY METAL',     mark:'III', note:'30 straight days with a session',         xp:350, need:30,  measure:'streak:strength',  tier:'long' },
+  { code:'RB2',name:'RUBBER BAND',     mark:'II',  note:'40-day mobility streak',                  xp:350, need:40,  measure:'streak:mobility',  tier:'long' },
+  { code:'IM2',name:'IRON MONK',       mark:'II',  note:'45-day supplement streak',                xp:380, need:45,  measure:'streak:supps',     tier:'long' },
+  { code:'CS3',name:'CLEAN SWEEP',     mark:'III', note:'Thirty perfect days',                     xp:600, need:30,  measure:'perfectDays',      tier:'long' },
   // ── Coming back ────────────────────────────────────────────────────────
   // Returning is easy; staying is the job, so the badges reward the WEEK AFTER
   // rather than the reappearance. The return itself is already paid, on the day
   // it happens, by the dated bonus in bonusEvents() — see LAPSE_DAYS.
-  { code:'BF', name:'BACK IN THE FIGHT', note:'Fell off, came back, held it a week',    xp:200, need:COMEBACK_STICK, measure:'comebackRun',    tier:'long' },
-  { code:'LR', name:'THE LONG ROAD BACK', note:'Three weeks straight after a comeback', xp:400, need:21,  measure:'comebackRun',      tier:'long' },
-  { code:'HK', name:'HARD TO KILL',    note:'Three comebacks that each stuck',          xp:300, need:3,   measure:'comebacksStuck',   tier:'long' },
+  { code:'BF', name:'BACK IN THE FIGHT', mark:'I',  note:'Fell off, came back, held it a week',   xp:200, need:COMEBACK_STICK, measure:'comebackRun', tier:'long' },
+  { code:'LR', name:'BACK IN THE FIGHT', mark:'II', note:'Three weeks straight after a comeback', xp:400, need:21,  measure:'comebackRun',      tier:'long' },
+  { code:'HK', name:'HARD TO KILL',    mark:'I',   note:'Three comebacks that each stuck',         xp:300, need:3,   measure:'comebacksStuck',   tier:'long' },
   // ── Rare ───────────────────────────────────────────────────────────────
-  { code:'US', name:'UNSINKABLE',      note:'Five times down. Five times back.',        xp:600, need:5,   measure:'comebacksStuck',   tier:'rare' },
+  { code:'US', name:'HARD TO KILL',    mark:'II',  note:'Five times down. Five times back.',       xp:600, need:5,   measure:'comebacksStuck',   tier:'rare' },
+  { code:'UB', name:'HUMAN SPRINKLER', mark:'III', note:'60 days running on full water',           xp:600, need:60,  measure:'streak:water',     tier:'rare' },
+  { code:'SW3',name:'GROUND COVERED',  mark:'III', note:'100 days over your step target',          xp:500, need:100, measure:'daysHit:steps',    tier:'rare' },
   { code:'MC', name:'THE MACHINIST',   note:'150 sessions. A year of turning up.',      xp:750, need:150, measure:'daysHit:strength', tier:'rare' },
-  { code:'UB', name:'UNBREAKABLE',     note:'60 days running on full water',            xp:600, need:60,  measure:'streak:water',     tier:'rare' },
-  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:500, need:100, measure:'perfectDays',      tier:'rare' }
+  // Bumped 500 → 1,200. A hundred perfect days has to outpay CLEAN SWEEP III
+  // at thirty (600) by a distance, or the last rung of the hardest ladder in
+  // the app is worth less per day than the rung below it.
+  { code:'CN', name:'THE CENTURION',   note:'100 perfect days. Nobody has done this.',  xp:1200, need:100, measure:'perfectDays',     tier:'rare' }
 ];
 const ACH_TIERS = [
   { key:'week', label:'A good week',  sub:'Reachable in seven days' },
@@ -6263,8 +6341,10 @@ function renderBadgeCelebration(ev) {
     share = 'rank';
   } else if (ev.kind === 'milestone') {
     const paid = milestonePaid(ev.ach.code);
-    kicker = 'Medal unlocked';
-    title = ev.ach.name;
+    // "Medal upgraded" on anything past the first rung — earning HUMAN
+    // SPRINKLER III should not read like a badge you have already had twice.
+    kicker = (ev.ach.mark && ev.ach.mark !== 'I') ? 'Medal upgraded' : 'Medal unlocked';
+    title = achName(ev.ach);
     xpLine = paid;
     sub = ev.ach.note + '.' + (paid > 0 ? '' : ' Yours on your all-time record — the '
           + ev.ach.xp.toLocaleString() + ' XP lands when you do it again inside ' + seasonName() + '.');
@@ -7017,7 +7097,7 @@ function renderProgress(LI, earned, totalAch) {
         const row = r => `<div class="msrow ${r.got ? 'got' : ''}" data-k="ms:${r.a.code}">
             ${achMedal(r.a, r.got)}
             <span class="ms-mid">
-              <span class="ms-name">${esc(r.a.name)}</span>
+              <span class="ms-name">${esc(r.a.name)}${r.a.mark ? `<i class="ms-mk">${r.a.mark}</i>` : ''}</span>
               <span class="ms-note">${esc(r.a.note)}</span>
               <span class="ms-bar"><span data-fill style="width:${r.pct}%"></span></span>
             </span>
@@ -7068,7 +7148,7 @@ function renderProgress(LI, earned, totalAch) {
         return sectionLabel('Milestones', (rows.filter(r => r.got).length + evDone) + ' of ' + (ACHIEVEMENTS.length + EVENTS.length))
           + `<div style="padding:0 20px 14px;font-size:12px;line-height:1.5;color:var(--muted)">Complete these challenges for rewards — XP, medals and titles, yours for good once you cross the line.</div>`
           + (near ? `<div class="msnext" data-k="msnext">
-              <strong>${esc(near.a.name)}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
+              <strong>${esc(achName(near.a))}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
             </div>` : '')
           + tierBlock('week') + evCards + tierBlock('long') + tierBlock('rare');
       })()}
@@ -8267,7 +8347,7 @@ function latestMedal() {
     return { metal: a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze',
              tint: h ? habitHue(h)[1] : '#EFECFB',
              emoji: h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨'),
-             name: a.name, note: a.note, xp: a.xp,
+             name: achName(a), note: a.note, xp: a.xp,
              stars: a.tier === 'rare' ? 3 : a.tier === 'long' ? 2 : 1,
              tierName: a.tier === 'rare' ? 'GOLD · RARE' : a.tier === 'long' ? 'SILVER · THE LONG HAUL' : 'BRONZE · A GOOD WEEK' };
   }
