@@ -38,7 +38,18 @@ BROWSER_CANDIDATES = [
     r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
     r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    # Linux, incl. the Playwright-managed Chromium the cloud sandboxes ship —
+    # see the same list in check_js_syntax.py. Without these this guard exits 2
+    # everywhere except Windows, so the boot it proves was never being proved.
+    "/opt/pw-browsers/chromium/chrome-linux/chrome",
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
 ]
+BROWSER_CANDIDATES += sorted(
+    (str(p) for p in Path("/opt/pw-browsers").glob("chromium-*/chrome-linux/chrome")),
+    reverse=True,
+)
 
 # Only appears in the DOM once renderApp() has actually run and replaced
 # #app's initial empty markup — the single strongest "the whole script
