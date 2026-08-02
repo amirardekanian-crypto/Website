@@ -1086,7 +1086,7 @@ press **Add**, and the habit appears immediately as a row with its own switch **
 worth `customXp` (25) a day. The ✕ is there because this is the screen where the typo
 happens, so it is the screen that has to be able to undo it.
 
-⚠️ **`MAX_CUSTOM = 5`, and duplicate names are rejected** (2026-08-02). A custom habit is
+⚠️ **`MAX_CUSTOM = 3`, and duplicate names are rejected** (2026-08-02). A custom habit is
 a one-tap check worth 30 XP a day *and* it earns its own consistency tiers, and the server
 pays for it too — `hab_xp()` pays `customXp` for every key in a day it does not recognise.
 Uncapped that was a faucet: twenty junk habits are twenty taps and ~600 XP a day, roughly
@@ -1238,6 +1238,33 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   so every season everyone can earn them again. Tier values are a multiplier on *that
   habit's* daily value, so a workout streak outpays a supplements streak. Detail in
   [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.5.
+
+- **The day streak has TWO doors** (2026-08-02): clear `streakQualifyPct` of the day's
+  weight, **or** leave at most one thing undone. The percentage alone was a lie on the
+  roster most athletes actually have — add-ons ship OFF, so on the core five, missing steps
+  alone was 67% and missing sleep alone 72%, both fatal, while a veteran with three add-ons
+  on got the forgiving version the 75% was tuned for. Padding the denominator softened the
+  gate, which made opting into cheap self-reported habits *streak insurance*. The gate also
+  gives **partial credit on counters** now, so 9,500 of 10,000 steps is 98% rather than
+  zero. `dayPct()` — what the day was *worth* — stays binary, and `isPerfect()` is
+  untouched. [`XP_SYSTEM.md`](XP_SYSTEM.md) §6.
+
+- **Coming back pays** (2026-08-02, Amir: *"make the economy pays for comeback"*). Miss
+  `LAPSE_DAYS` (3) or more in a row, then have a day that counts, and that is a comeback:
+  **50 XP**, dated on the day, repeatable, with a full-screen takeover. It cannot be
+  farmed — three dark days forfeit ~750 XP to collect 50 (measured: four straight days pays
+  1,400; lapsing three and logging two pays 432). The badges deliberately reward the **week
+  after** rather than the reappearance: BACK IN THE FIGHT (hold 7 days), THE LONG ROAD BACK
+  (21), HARD TO KILL (3 comebacks that stuck), UNSINKABLE (5), plus the **BACKBONE** event
+  paying the **UNBOWED** title — the only thing in the app you cannot earn by never
+  slipping. ⚠️ The walk reads the **calendar, not the log**, because a lapse is mostly days
+  with nothing in them; and a comeback needs a *previous* qualifying day, since you cannot
+  return somewhere you have never been. [`XP_SYSTEM.md`](XP_SYSTEM.md) §6.6.
+
+⚠️ Both of the above are scored twice. The server half is
+`supabase/stage22_gate_and_comeback.sql`, which is a **no-op until its rules keys are
+written** — apply it, deploy the client, *then* write the keys, or the board is forgiving
+while the phone is not.
 
 ---
 
