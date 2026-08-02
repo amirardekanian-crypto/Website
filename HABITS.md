@@ -1239,6 +1239,20 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   habit's* daily value, so a workout streak outpays a supplements streak. Detail in
   [`XP_SYSTEM.md`](XP_SYSTEM.md) §4.5.
 
+- **A season is archived now, not erased** (2026-08-02). When a season closes, every
+  athlete's final level and XP are snapshotted into `hab_season_results` and the **Locker
+  grows a Seasons shelf** — *"PRE-SEASON · ENFORCER 3 · level 23 · 21,400 XP"*, kept for
+  good. Everyone who reached level 5 also gets a **title naming that season**, which can
+  never be earned again because the season is over. That was the honest answer to a
+  veteran opening day 1 of season 2 with nothing new to want: the reset used to delete the
+  evidence that the season ever happened. The shelf renders **nothing at all** until a
+  season has actually closed, like the streak flame on day one.
+  ⚠️ `start_season()` is **coach-only now and was not before** — it had no auth guard at
+  all while being executable by `anon`, so anyone with the public key in `habits.html`
+  could have reset the board. Future-dated starts are refused, and `undo_season()` puts
+  back the one-command undo the archive would otherwise have removed.
+  [`XP_SYSTEM.md`](XP_SYSTEM.md) §7.5.
+
 - **Milestones come in MARKS** (2026-08-02, Amir: *"as ive seen in call of duty you can
   unlock achievements again but next levels of them"*). A family is one achievement earned
   again at a higher bar — `HUMAN SPRINKLER I` (5 days) → `II` (20) → `III` (60). The
