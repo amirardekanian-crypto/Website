@@ -3045,6 +3045,9 @@ let ATHLETE_ID = '';
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 let _sbClient = null, _sbTimer = null, _sbId = '', _sbName = '', _sbKey = null;
+// Raw (un-hooked) setItem — used for bookkeeping writes that must not
+// re-trigger the backup push (setupCloudBackup wraps localStorage.setItem).
+const _lsRawSet = localStorage.setItem.bind(localStorage);
 function _sb() {
   if (_sbClient) return _sbClient;
   if (!window.supabase || !window.supabase.createClient) return null;
@@ -3060,13 +3063,25 @@ function _snapshot() {
     // this app must never push them — a stale copy here would overwrite habit
     // progress the athlete logged on another device.
     if (k && k.indexOf(prefix + 'hab_') === 0) continue;
+    // Local-only freshness stamp — pushed as the snapshot-level 'snapAt' below,
+    // never as its own key (a cloud copy restored onto a fresh device would
+    // masquerade as local edit history there).
+    if (k === prefix + 'lastEditAt') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
+  // When this snapshot's data was last edited on this device. syncFromCloud
+  // compares it against the local stamp so a STALE cloud snapshot (pushes
+  // failed offline mid-workout) can never overwrite fresher local data.
+  out[prefix + 'snapAt'] = localStorage.getItem(prefix + 'lastEditAt') || new Date().toISOString();
   return out;
 }
-function _pushSnapshot() {
+// Debounced by default. Pass immediate=true when there may be no "later":
+// the app is being hidden/killed (iOS suspends timers the moment the page is
+// hidden, so a debounced push scheduled from visibilitychange never runs) or
+// the connection just came back after offline pushes were dropped.
+function _pushSnapshot(immediate) {
   clearTimeout(_sbTimer);
-  _sbTimer = setTimeout(async () => {
+  const send = async () => {
     try {
       const sb = _sb();
       if (!sb || !_sbId) return;
@@ -3080,7 +3095,8 @@ function _pushSnapshot() {
         p_key:          _sbKey
       });
     } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
-  }, 1500);
+  };
+  if (immediate) { send(); } else { _sbTimer = setTimeout(send, 1500); }
 }
 // Pull this athlete's saved progress from the cloud on EVERY load and merge it
 // into whatever is on this device, so a returning device (the coach's PC, a
@@ -3107,10 +3123,22 @@ async function syncFromCloud(athleteId, key) {
     const { data, error } = await sb.rpc('get_progress', { p_athlete_id: athleteId, p_key: key || null });
     if (error || !data || typeof data !== 'object') return;   // offline / rejected → keep local
     const prefix = athleteId + '_';
+    // Freshness check: the cloud snapshot carries the timestamp of its last
+    // edit ('snapAt'); this device stamps 'lastEditAt' on every progress write.
+    // If THIS device edited more recently than the cloud snapshot was taken —
+    // the classic case: a workout logged offline, every push silently dropped,
+    // then the OS killed the PWA and this reload has signal again — the cloud
+    // copy is the stale side, and letting it win conflicts would wipe the whole
+    // session (and the immediate re-push would then cement the loss). ISO
+    // strings compare correctly as plain strings.
+    const cloudAt = data[prefix + 'snapAt'] || '';
+    const localAt = localStorage.getItem(prefix + 'lastEditAt') || '';
+    const preferLocal = !!(localAt && (!cloudAt || localAt > cloudAt));
     Object.keys(data).forEach(k => {
       if (k.indexOf(prefix) !== 0) return;
+      if (k === prefix + 'snapAt' || k === prefix + 'lastEditAt') return;  // bookkeeping, not data
       const localVal = localStorage.getItem(k);
-      const merged   = mergeStoredValue(k, localVal, data[k]);
+      const merged   = mergeStoredValue(k, localVal, data[k], preferLocal);
       if (merged != null && merged !== localVal) {
         try { localStorage.setItem(k, merged); } catch (e) { /* storage full — skip */ }
       }
@@ -3120,8 +3148,9 @@ async function syncFromCloud(athleteId, key) {
 
 // Merge one stored value, local vs cloud. Non-destructive: prefer real data over
 // blanks so a returning device never wipes entered weights/RPE/notes; on a true
-// conflict the cloud value wins (it's the shared latest).
-function mergeStoredValue(key, localVal, cloudVal) {
+// conflict the FRESHER side wins — the cloud by default (it's the shared latest),
+// this device when preferLocal says its edits post-date the cloud snapshot.
+function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
   if (cloudVal == null) return localVal;
   if (localVal == null || localVal === cloudVal) return cloudVal;
   // Per-set logs: merge field-by-field so a blank set on one side never erases a
@@ -3131,7 +3160,9 @@ function mergeStoredValue(key, localVal, cloudVal) {
       const L = JSON.parse(localVal), C = JSON.parse(cloudVal);
       if (Array.isArray(L) && Array.isArray(C)) {
         const n = Math.max(L.length, C.length), out = [];
-        const pick = (a, b) => (b != null && b !== '') ? b : (a || '');   // real value wins; cloud breaks ties
+        const pick = preferLocal
+          ? (a, b) => (a != null && a !== '') ? a : (b || '')    // real value wins; local breaks ties
+          : (a, b) => (b != null && b !== '') ? b : (a || '');   // real value wins; cloud breaks ties
         for (let i = 0; i < n; i++) {
           const a = L[i] || {}, b = C[i] || {};
           out.push({ w: pick(a.w, b.w), r: pick(a.r, b.r), d: !!(a.d || b.d) });
@@ -3140,8 +3171,9 @@ function mergeStoredValue(key, localVal, cloudVal) {
       }
     } catch (e) { /* not parseable — fall through */ }
   }
-  // Scalars (notes, RPE, session note, etc.): a non-empty cloud value wins; an
-  // empty cloud value never overwrites a real local one.
+  // Scalars (notes, RPE, session note, etc.): the fresher side wins, but an
+  // empty value never overwrites a real one in either direction.
+  if (preferLocal) return (localVal !== '') ? localVal : cloudVal;
   return (cloudVal !== '') ? cloudVal : localVal;
 }
 
@@ -3150,14 +3182,25 @@ function setupCloudBackup(athleteId, data, key) {
   _sbKey = key || null;
   const a = (data && data.athlete) || {};
   _sbName = [a.firstName, a.lastName].filter(Boolean).join(' ');
-  const origSet = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function (key, val) {
-    origSet(key, val);                                  // real save always happens first
-    try { if (typeof key === 'string' && key.indexOf(_sbId + '_') === 0) _pushSnapshot(); }
+    _lsRawSet(key, val);                                // real save always happens first
+    try {
+      if (typeof key === 'string' && key.indexOf(_sbId + '_') === 0) {
+        // Stamp when this device last edited real progress data — the freshness
+        // signal syncFromCloud uses. Raw write: must not recurse into the hook.
+        _lsRawSet(_sbId + '_lastEditAt', new Date().toISOString());
+        _pushSnapshot();
+      }
+    }
     catch (e) { /* never let backup interfere with the app */ }
   };
   _pushSnapshot();                                       // back up what's already stored
-  window.addEventListener('visibilitychange', () => { if (document.hidden) _pushSnapshot(); });
+  // Hidden/killed → flush NOW: a debounced timer never fires once iOS suspends
+  // the page, and a backgrounded PWA is routinely killed without warning.
+  document.addEventListener('visibilitychange', () => { if (document.hidden) _pushSnapshot(true); });
+  window.addEventListener('pagehide', () => _pushSnapshot(true));
+  // Connection back after offline logging → push what the gym couldn't send.
+  window.addEventListener('online', () => _pushSnapshot(true));
 }
 
 // ── Cloud-session retry queue ──────────────────────────────────────────

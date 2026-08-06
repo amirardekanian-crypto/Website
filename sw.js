@@ -1,6 +1,6 @@
 // AA Performance — Service Worker
 // Bump CACHE version any time you push a breaking change to the app shell.
-const CACHE = 'aap-v1';
+const CACHE = 'aap-v2';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -47,7 +47,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(request)
         .then(res => {
-          caches.open(CACHE).then(c => c.put(request, res.clone()));
+          if (res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
           return res;
         })
         .catch(() => caches.match(request))
@@ -55,9 +55,23 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // JSON (athlete data, articles, workouts) — always network, never SW-cached.
-  // The app already uses { cache: 'no-cache' } on these fetches.
-  if (url.pathname.endsWith('.json')) return;
+  // JSON (athlete data, articles, workouts) — network-first so updates land
+  // immediately, but keep the last good copy as an offline fallback. Without
+  // this, a PWA relaunch with no signal dies on the "Could not load data"
+  // screen mid-workout: the OS killing the backgrounded app forces a full
+  // reload, and data/<id>.json was the one thing that had to come from the
+  // network.
+  if (url.pathname.endsWith('.json')) {
+    e.respondWith(
+      fetch(request)
+        .then(res => {
+          if (res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
+          return res;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
 
   // Static assets (CSS, JS, images, fonts) — cache-first, network fallback.
   e.respondWith(
