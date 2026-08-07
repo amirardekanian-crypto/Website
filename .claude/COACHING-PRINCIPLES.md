@@ -226,6 +226,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   design-convenience order and rely on a notes card to re-map them. *(2026-07-24, Setareh C1
   — shipped with the run day after the control day; Amir had the order corrected to the
   ideal week and the days renumbered.)*
+- **An OPTIONAL day still sits in its correct place in the week — you mark it optional, you
+  don't move it.** Optionality is a label on the day, never a reason to demote it to the end of
+  `days[]` or to order the week around the loaded days alone. Author every day in the best
+  execution order — restoration/recovery days included, since *where they fall between loaded
+  days* is the whole point of them — then write "optional" on the ones that are. A restoration
+  day parked after the last lifting day reads as an afterthought and loses the spacing it was
+  designed to provide. *(2026-08-07, Amir, on Maryam C1)*
 - **A day trains what it says it trains — upper work on upper days, lower work on lower days.**
   Never sprinkle a muscle onto the wrong half of the split to top up its weekly total. The day's
   identity, its prep circuit and its fatigue profile are all built for one half of the body, so a
@@ -314,6 +321,18 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Mid-cycle adjustments are report-driven only.** No self-progression rules in the program
   ("add 2.5 kg when you complete all sets…") — Amir adjusts from the weekly logs and check-ins
   when something is reported. The athlete's job is to hit the RPE and log. *(2026-07-12)*
+- **The RPE printed on a card is the athlete's NORMAL working target and never moves mid-cycle
+  — every temporary reduction is explained in the notes, never baked into the prescription.**
+  *(Amir, 2026-08-07: "i wont change the program RPE in middle of the cycle … in their program
+  you must write their normal effort target, but explain in the notes to reduce rpe for those
+  reasons.")* Week-1 calibration, a deload/back-off week, a low-readiness day, a medication
+  change, a period week — all of these are **notes-card instructions to the athlete**, not a
+  lower number authored onto the exercise. The card is a stable reference she reads all cycle;
+  rewriting it for a temporary condition breaks the week-to-week progression read (a logged
+  RPE 6 then means two different things) and forces a mid-cycle edit the program is not
+  supposed to need. A genuinely light day in the design — an undulation choice, a low-CNS
+  accessory — is different: that IS its normal target and belongs on the card.
+  *(2026-08-07)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
   When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
