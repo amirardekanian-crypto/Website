@@ -1,0 +1,674 @@
+{
+  "athlete": {
+    "id": "siavash_shirdel",
+    "key": "233ecde6a5c84b2fa868c85969aca906",
+    "firstName": "Siavash",
+    "lastName": "Shirdel"
+  },
+  "sport": {
+    "badge": "🎾 Tennis Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bedrock",
+      "tagline": "Tendons before torque",
+      "weeks": "Weeks 1–4",
+      "startDate": "2026-08-09",
+      "endDate": "2026-09-05",
+      "focuses": [
+        "Re-load two years of detrained tissue with tempo and isometric strength work.",
+        "Re-groove every movement pattern and armour the coaching wear zones.",
+        "Log week-one baselines on all three main lifts."
+      ],
+      "message": {
+        "paragraphs": [
+          "Four years training together, two years away, and you're back. That's what this month is really about. Bedrock is the base layer of everything we're going to build.",
+          "Your strength comes back fast, muscle memory is real and you have 4 years of it stored. Tendons are slower, they need time under load. So everything this month is slow and controlled on purpose. Three days a week, under an hour, built to fit around your court schedule.",
+          "By the end of week 4 you'll have your baseline numbers logged, joints that accept load again, and a clean base under you. Then we start collecting your strength back."
+        ],
+        "outcomes": [
+          "Baseline numbers logged on all three main lifts",
+          "12 controlled sessions done around court weeks",
+          "Zero tendon flare-ups",
+          "Squat, hinge and single-leg patterns automatic again",
+          "Calf and elbow armour routines running"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Strength Reclaim",
+      "tagline": "Muscle memory, managed",
+      "weeks": "Weeks 5–10",
+      "startDate": "2026-09-06",
+      "endDate": "2026-10-17",
+      "focuses": [
+        "Rebuild maximal strength on heavy bilateral lifts, intensity before volume.",
+        "Muscle returns through back-off volume while elastic groundwork begins."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Cycle 2 is called Strength Reclaim. The slow tempo work has done its job by then, and the bar finally starts climbing. Heavy, short sessions that fit your life exactly like this month does. Four years of strength is stored in your body and next month we go collect it.",
+          "Muscle memory, managed."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Power Transfer",
+      "tagline": "Spring earned, not stolen",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-10-18",
+      "endDate": "2026-11-21",
+      "focuses": [
+        "Convert rebuilt strength into rate of force development with jumps and throws.",
+        "Plyometric volume budgeted around court hours and play days."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Court Voltage",
+      "tagline": "Cash it on court",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-11-22",
+      "endDate": "2026-12-26",
+      "focuses": [
+        "Express the new engine in tennis actions, serve power and first step.",
+        "Gym volume drops so freshness shows on playing days."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bedrock",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Built From The Legs Up",
+        "completionTitle": "Roots Down",
+        "completionMessage": "Biggest session of the week done. Those slow squats are pouring the foundation everything else gets built on. Eat well tonight and let it settle in.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min" }],
+                "cues": {
+                  "good": ["Smooth circles, rising pace", "Legs warming, breath easy"],
+                  "bad": ["Don't race it"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Movement Prep Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Leg Swings",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Tall pendulum swing, controlled, no fling", "Hip loosening each rep"],
+                      "bad": ["Don't force end range"]
+                    }
+                  },
+                  {
+                    "name": "Squat",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Sit between the heels, slow", "Knees tracking over toes"],
+                      "bad": ["Don't rush the descent"]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Hips to ceiling", "Glutes lift, not lower back"],
+                      "bad": ["Don't hyperextend at the top"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Stretch the band wide", "Shoulder blades squeeze"],
+                      "bad": ["Don't shrug"]
+                    }
+                  },
+                  {
+                    "name": "Ankle Dorsiflexion Rocks",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Knee over toe, heel down", "Ankle opening forward"],
+                      "bad": ["Don't let the heel lift"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Back Squat",
+                "videoUrl": null,
+                "note": "Two years off means we start lighter than your ego wants. Ramp up with 2 or 3 easy sets first, then week 1 stays at RPE 6. Your tendons need the head start, your strength will catch up fast.",
+                "restSec": 120,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×6 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive the floor apart as you stand", "Whole foot rooted, quads loading through the 3-count down"],
+                  "bad": ["Don't cut the descent short to beat the tempo"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the elbows to the back pockets", "Shoulder blades squeeze together at the top"],
+                  "bad": ["Don't bounce the chest off the pad"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm Landmine Press",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Press the bar up and slightly forward along its arc", "Ribs stacked over hips, trunk quiet"],
+                  "bad": ["Don't arch the lower back to finish"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Standing Machine Calf Raise",
+                "videoUrl": null,
+                "note": "One continuous 40 second hold at mid height, not reps. This is armour for your Achilles against all the standing hours on court.",
+                "restSec": 60,
+                "chips": [
+                  { "label": "mid-range hold", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×40s" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Rise to mid-height and freeze there", "Steady tension through calf and Achilles, no shaking"],
+                  "bad": ["Don't sink lower as it fatigues"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Pallof Press",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×20s Each Side" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Press the handle straight out and hold it dead still", "Side abs doing the anti-rotation work"],
+                  "bad": ["Don't let the hips turn toward the stack"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "The Hinge Restored",
+        "completionTitle": "The Quiet Work",
+        "completionMessage": "Hamstrings loaded and calves plated. Nobody sees this work, but it's what keeps you on court all season.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rowing",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min" }],
+                "cues": {
+                  "good": ["Long smooth strokes", "Hips hinging each pull"],
+                  "bad": ["Don't yank the handle"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Movement Prep Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": ["Arch and round segment by segment", "Each vertebra moving"],
+                      "bad": ["Don't rush between shapes"]
+                    }
+                  },
+                  {
+                    "name": "Good Morning",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Push hips to the wall behind, unloaded", "Hamstrings lengthening"],
+                      "bad": ["Don't round the back"]
+                    }
+                  },
+                  {
+                    "name": "Hamstring Scoop",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": ["Scoop the floor past the front heel", "Hamstring stretching"],
+                      "bad": ["Don't bounce"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": ["Stretch the band wide", "Shoulder blades squeeze"],
+                      "bad": ["Don't shrug"]
+                    }
+                  },
+                  {
+                    "name": "Band Pass-Through",
+                    "detail": "×10",
+                    "cues": {
+                      "good": ["Big slow circle over head", "Chest opening"],
+                      "bad": ["Don't bend the elbows"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Romanian Deadlift",
+                "videoUrl": null,
+                "note": "Use straps on your work sets, your grip already does 30 hours a week on court. Ramp in first, then let the hamstrings stretch and hold through the slow 3 count down.",
+                "restSec": 120,
+                "chips": [
+                  { "label": "4 Sets", "style": "yellow" },
+                  { "label": "×8 Reps" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Push the hips back to the wall behind you", "Hamstrings lengthen and hold the load through the 3-count"],
+                  "bad": ["Don't let the bar drift away from the thighs"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the bar to the collarbone", "Armpit muscles pull the elbows down"],
+                  "bad": ["Don't lean back to move the weight"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lying Leg Curl",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Pull the heels to the glutes", "Hamstrings curling the pad, hips pinned down"],
+                  "bad": ["Don't let the hips lift off the bench"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable External Rotation",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×12 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Rotate the forearm out like opening a gate", "Small muscle behind the shoulder doing the turn"],
+                  "bad": ["Don't let the elbow leave the ribs"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Seated Machine Calf Raise",
+                "videoUrl": null,
+                "note": "Same rule, one continuous hold, no reps. Bent knees reach the deeper calf muscle that carries you through long coaching days.",
+                "restSec": 60,
+                "chips": [
+                  { "label": "mid-range hold", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×40s" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Rise to mid-height and freeze", "Deep calf working under the bent knee"],
+                  "bad": ["Don't bounce out of the hold"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "slow and controlled", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Reach the opposite arm and leg long", "Lower back pressed flat into the floor"],
+                  "bad": ["Don't hold your breath through the reach"]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Built On One Leg",
+        "completionTitle": "One Leg at a Time",
+        "completionMessage": "Tennis lives on one leg and now your training does too. That's the week's work done. Recovery is part of the program, take it.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Stationary Bike",
+                "videoUrl": null,
+                "chips": [{ "label": "4 min" }],
+                "cues": {
+                  "good": ["Smooth circles, rising pace", "Legs warming, breath easy"],
+                  "bad": ["Don't race it"]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Movement Prep Circuit",
+                "rounds": "×2 Rounds",
+                "restSec": 60,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Banded Lateral Walk",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Step wide against the band", "Outside hip burning"],
+                      "bad": ["Don't let the knees cave"]
+                    }
+                  },
+                  {
+                    "name": "Reverse Lunge",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": ["Step back long, drop straight down, slow", "Front leg controlling"],
+                      "bad": ["Don't push off the back foot"]
+                    }
+                  },
+                  {
+                    "name": "Single-Leg Glute Bridge",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": ["Drive through one heel", "One glute doing all the work"],
+                      "bad": ["Don't let the hips tilt"]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×12",
+                    "cues": {
+                      "good": ["Stretch the band wide", "Shoulder blades squeeze"],
+                      "bad": ["Don't shrug"]
+                    }
+                  },
+                  {
+                    "name": "Ankle Dorsiflexion Rocks",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": ["Knee over toe, heel down", "Ankle opening forward"],
+                      "bad": ["Don't let the heel lift"]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Split Squat",
+                "videoUrl": null,
+                "note": "Light dumbbells first, own the balance. A short ramp each side, then work. If this looks solid all month, there's a harder version waiting in Cycle 2.",
+                "restSec": 120,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×8 Each Side" },
+                  { "label": "Tempo 3-0-1-0" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drop the back knee straight down to the floor", "Front heel heavy, glute and quad share the work"],
+                  "bad": ["Don't let the front knee collapse inward"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "note": "Set the bench and bar up before the session starts so it doesn't eat your hour. Push up smooth, hold the squeeze one second, lower under control.",
+                "restSec": 90,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Drive the hips up under control to a firm lockout", "Full one-second glute squeeze at the top, ribs down"],
+                  "bad": ["Don't finish the lift with the lower back"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Face Pull",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Pull the rope to the bridge of the nose, hands finish high", "Rear delts and mid-back own the pull"],
+                  "bad": ["Don't turn it into a row, elbows stay high"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Wall Sit",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×40s" },
+                  { "label": "Tempo Iso" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Slide down until thighs are parallel, back flat on the wall", "Quads burning steady, breathing calm"],
+                  "bad": ["Don't creep up the wall as it burns"]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "note": "Choose the weight by how hard your side abs fight to keep you level, not by what your grip can hold. Your hands work enough on court already.",
+                "restSec": 60,
+                "chips": [
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×30m Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Walk tall as if a book is on your head", "Side abs opposite the load keep you level"],
+                  "bad": ["Don't lean away from the weight"]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Cable Wood Chop",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  { "label": "3s return", "style": "dark" },
+                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "×10 Each Side" },
+                  { "label": "RPE 6" }
+                ],
+                "cues": {
+                  "good": ["Draw a slow diagonal from shoulder to opposite hip", "Trunk rotates, arms just steer"],
+                  "bad": ["Don't rush the way back up"]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Siavash",
+    "cards": [
+      {
+        "icon": "🎯",
+        "title": "Week One: Find Your Numbers",
+        "body": "<p>The app never gives you a weight. <strong>You find it with the RPE target.</strong> Week 1 everything is RPE 6, which means you end every set knowing you had 4 more clean reps in you. Start lighter than you think. The first set will tell you if you should go up.</p><p>From week 2: hit all the reps at or under the target RPE, then add a little next time. <strong>Small jumps, one small plate at a time.</strong> Some weeks it will feel too easy. Good. That headroom is protecting your tendons while they catch up.</p><p>Some days last week's weight feels heavier. Drop it down. <strong>Going lighter on a rough day is the plan working.</strong> Nothing is lost.</p><p>And log every set this month. Cycle 2 gets built from those numbers.</p>"
+      },
+      {
+        "icon": "🦴",
+        "title": "The First Month Trap",
+        "body": "<p>Here's the thing about coming back after 2 years. <strong>Strength returns in weeks, tendons take months.</strong> Around weeks 3 to 6 you'll feel strong and want to push. That exact moment is where comebacks go wrong.</p><p>Four spots to listen to: <strong>your Achilles, the front of your knee, high up the back of your thigh, and the outside of your elbow.</strong></p><ul><li>Normal: muscle burn during a set, tired legs, next day stiffness that fades by midday.</li><li>Not normal: a sharp spot, pain that builds through a set, or morning stiffness in one of those four places that is still there the next day.</li></ul><p>If one shows up, message me before your next session. We pull that pattern back for a week and keep everything else moving. <strong>One quiet week beats a lost month.</strong></p>"
+      },
+      {
+        "icon": "📅",
+        "title": "Court Days and Gym Days",
+        "body": "<p>Most of your gym days will also be court days. That's your life, and the program is built for it.</p><ul><li><strong>Lift after coaching, not before.</strong> Or leave 4 to 6 hours between them.</li><li>No gap possible? Run the short version: the day's main lift plus one pull, main lift kept easy.</li><li><strong>Real match tomorrow?</strong> Don't do Day 1 or Day 3 today. Move it or run the short version. Legs stay fresh for match day, always.</li><li>The app asks how you feel before each session. Answer it honestly and it will tell you to take things one notch easier on rough days.</li></ul><p>Days can move around your week. Just keep one day without lifting between Day 1 and Day 3.</p>"
+      },
+      {
+        "icon": "😴",
+        "title": "Your Sleep Is the Job",
+        "body": "<p>You rated your sleep 4 out of 10. You're in bed 7 to 8 hours, so the hours are fine. <strong>The quality is what's stealing your recovery,</strong> and this whole program runs on recovery.</p><ul><li>Same sleep and wake time every day, even after late coaching.</li><li>Caffeine stops after lunch.</li><li>Screen off 30 minutes before bed. Room dark and cool.</li></ul><p>Pick one this week, add the next one next week. We'll go through it at every check-in. <strong>Fix the sleep and everything in this program pays double.</strong></p>"
+      },
+      {
+        "icon": "🍗",
+        "title": "Eat Like You Train",
+        "body": "<p>You told me your eating has no structure right now. At 66 kg with muscle on the goal list, <strong>food is half this program.</strong></p><ul><li><strong>Protein at every meal.</strong> A palm-sized portion minimum. Chicken, meat, fish, eggs, yogurt.</li><li>Don't train empty. Something real 2 to 3 hours before lifting, even on a coaching day.</li><li>Eat properly after sessions. That's when the rebuild happens.</li></ul><p>No counting, no apps, not yet. Just these three rules for 4 weeks. We look at it together at the check-ins and build from there.</p>"
+      },
+      {
+        "icon": "💪",
+        "title": "Two Minutes for Your Elbow",
+        "body": "<p>You feed thousands of balls a week. That load lands on the outside of the elbow, and it's exactly how tennis elbow starts. We armour it before it ever complains.</p><p>On days you don't lift: <strong>light band or a small weight, palm down, lift the back of your hand up slow, lower it slower.</strong> 12 to 15 reps, 2 rounds each side. Two minutes, 2 to 3 times a week.</p><p>Do it in front of the TV. Boring on purpose. It works.</p>"
+      }
+    ]
+  }
+}
