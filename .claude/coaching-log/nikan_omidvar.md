@@ -150,14 +150,24 @@ numbers from C2 onward.
 **Benchmarks this cycle must produce:** Machine Leg Press e1RM up ≥10% by week 4 with the depth cap
 held on a filmed top set · Chest-Supported Dumbbell Row e1RM up by end of cycle.
 
-**Measurement protocol (fixed 2026-08-08, after shipping)** — the battery was originally specified
-by metric name only ("hip IR in degrees", "seated thoracic rotation") with no protocol and no
-confirmed equipment, which made three of the five measures unperformable and left the Box Drop
-ankle-symmetry gate unenforceable. Rebuilt around **a phone and a tape measure only**: ankle
-knee-to-wall and sit-tolerance are written numbers; hip IR, wrist extension and thoracic rotation
-are **fixed-setup videos compared week to week** (same table, same chair, same phone position), so
-the trend is readable without a goniometer. Body mass fortnightly, height monthly against a wall.
-⚠️ Still unconfirmed: whether he owns a tape measure and bathroom scales.
+**⚠️ Monitoring rebuilt 2026-08-08, after shipping — SCOPE CORRECTION (Amir).** The panel-designed
+battery was a ROM-assessment stack (hip IR in degrees, seated thoracic rotation, wrist
+extension/pronation/supination, ankle knee-to-wall) and it was wrong on two counts: it was specified
+by metric name with no protocol, and more fundamentally **it asked an S&C coach to assess and
+interpret joint range, which is a physio's job.** Amir: *"i havent studied those… we should just talk
+about symptoms, if anything hurts, refer. and try to mobilise and strength."*
+
+Replaced with a symptom + performance stack entirely inside S&C scope: **four forced-choice symptom
+questions weekly** (minutes before the back talks · which side is stiffer · how many forehands before
+the wrist starts · did anything stop you doing something) · **training data** (loads, reps, RPE) ·
+**movement quality on the filmed lifts** (leg press hip position, back-extension neutrality, landing
+mechanics) · **body mass fortnightly and stature monthly** for fuelling and growth-related load
+management. The Box Drop gate lost its ankle-symmetry criterion and now rests on filmed landing
+quality plus zero logged knee pain — both coach-observable.
+
+The cycle's mobility rationale is unchanged; only how it is *verified* changed. It is now tested the
+S&C way — does the wrist bother him on fewer forehands, can he sit longer, is he getting stronger —
+rather than by goniometry nobody here is qualified to read.
 
 **Open questions carried into C2**
 - **Wrist diagnosis** — extensor origin at the elbow end vs distally over the radius on impact. Changes

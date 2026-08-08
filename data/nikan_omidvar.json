@@ -18,9 +18,9 @@
       "startDate": "2026-08-08",
       "endDate": "2026-09-11",
       "focuses": [
-        "Restore the rotation budget, hip internal rotation and thoracic rotation loaded and measured, so the low back and forearm stop paying for it.",
+        "Restore the rotation the sport needs, hip and upper back, so the low back and forearm stop paying for what they cannot supply.",
         "Get genuinely strong in the two patterns his tissues already own, supported knee-dominant and trunk-supported hinge, plus strapped pulling.",
-        "Gated on evidence, not on the calendar: weekly ROM battery and sit-tolerance, filmed top sets, and a clinician on the wrist by 2026-08-22."
+        "Gated on what a coach can actually see: filmed top sets and landings, a weekly symptom check-in, and a clinician on the wrist by 2026-08-22."
       ],
       "message": {
         "paragraphs": [
@@ -30,12 +30,12 @@
           "Five weeks. Hips turning better, leg press up, and a quieter wrist without us really touching the wrist."
         ],
         "outcomes": [
-          "Hip rotation improved on both sides",
           "Leg press and row both moving up, leg press by 10% or more",
           "Wrist seen by a doctor or physio by the 22nd",
           "Every top set filmed and sent",
           "Landings clean enough to earn the box",
-          "Sitting through a school day without your back complaining"
+          "Sitting longer before your back complains",
+          "Fewer forehands that bother the wrist"
         ]
       }
     },
@@ -549,7 +549,7 @@
                     "label": "RPE 6"
                   }
                 ],
-                "note": "This is your weekly wrist test, so it runs first, before anything else has tired the arm out. Same position, same weight, same hold, every week. It has to stay completely pain free, so if you feel anything at all, that's the end of it for that day.",
+                "note": "This runs first, before anything else has tired the arm out. Same position and same weight every week so you can feel whether it's getting easier. It has to stay completely pain free, so if you feel anything at all, that's the end of it for that day and you tell me.",
                 "cues": {
                   "good": [
                     "Hold the hand still against the resistance",
@@ -584,7 +584,7 @@
                     "label": "RPE 7"
                   }
                 ],
-                "note": "Stop at the first pinch you feel in the front of the hip. That pinch is your end range, it's not something to push through. This is the number I care most about this cycle.",
+                "note": "Stop at the first pinch you feel in the front of the hip. That pinch is your end range, it's not something to push through. This is the movement this whole block is built around, so don't rush it.",
                 "cues": {
                   "good": [
                     "Turn the foot out and away against the band",
@@ -918,7 +918,7 @@
                     "label": "RPE 7"
                   }
                 ],
-                "note": "Weeks 3 to 5, and you don't get it by reaching week 3, you get it by earning it on film. Clean step downs and clean stick landings, both filmed, and I clear them before you start. Low box, and stop at 12 landings.",
+                "note": "Weeks 3 to 5, and you don't get it by reaching week 3, you get it by earning it on film. Clean step downs and clean stick landings, both filmed and cleared by me, and no knee pain logged in weeks 1 and 2. Low box, and stop at 12 landings.",
                 "cues": {
                   "good": [
                     "Land soft and freeze like a statue",
@@ -1189,8 +1189,8 @@
       },
       {
         "icon": "📏",
-        "title": "How to take your numbers",
-        "body": "<p>Every rehab day starts with this, before you touch anything else. About five minutes. All you need is a <strong>tape measure and your phone</strong>.</p><p><strong>Two numbers you write down:</strong></p><ul><li><strong>Ankle.</strong> Stand facing a wall, one foot flat, toes pointing straight at it. Push your knee forward to touch the wall without your heel lifting off the floor. Slide the foot back until that's only just possible. Measure from your big toe to the wall in cm. Both feet, write both down.</li><li><strong>Sitting.</strong> How many minutes you can sit before your back starts talking to you. You already know this one, just write it.</li></ul><p><strong>Three things you film instead of measure.</strong> These need angles you can't get with a tape measure on your own, so a video compared week to week does the job better than a number you had to guess at:</p><ul><li><strong>Hip turn.</strong> Sit on a table or high bench, knees bent over the edge and held together. Keep the knee still and swing one foot outward as far as it goes. Phone straight in front of you, on the floor or propped up. Both legs.</li><li><strong>Wrist.</strong> Palms flat together in front of your chest like you're praying, elbows out sideways. Lower your hands as far as you can while the palms stay flat together. Film from the side.</li><li><strong>Upper back turn.</strong> Sit on a chair, feet flat, arms crossed on your chest. Turn as far as you can each way without your hips moving. Film from straight in front.</li></ul><p><strong>Same setup every single week.</strong> Same table, same chair, same phone position. The exact number doesn't matter to me, what matters is whether it's moving the right way, and that only works if nothing else changes.</p><p>Also: <strong>weigh yourself every two weeks</strong>, morning, after the toilet, before you eat or drink anything. And once a month stand against a wall with a book flat on your head, mark the wall and measure it. You're fifteen and still growing, and that changes what I let you jump off.</p><p>Why numbers instead of just asking how you feel. Because a joint quietly loses movement before it ever starts hurting, and honestly, you're not great at telling me when something hurts. <strong>A tape measure doesn't have that problem.</strong></p>"
+        "title": "Your weekly check-in",
+        "body": "<p>Every rehab day starts with two minutes of this, before you touch anything else. No measuring, no equipment. I just need to know what your body is actually doing.</p><p><strong>Four questions. Write the answers in your log:</strong></p><ul><li><strong>How many minutes can you sit</strong> before your back starts talking to you?</li><li><strong>Which side feels stiffer this week</strong>, left or right? Pick one, don't say neither.</li><li><strong>How many forehands</strong> before the wrist starts? Give me a number.</li><li><strong>Did anything stop you doing something</strong> this week, on court or in the gym?</li></ul><p>You'll notice none of those can be answered with \"I'm fine\". That's on purpose.</p><p>Two other things. <strong>Weigh yourself every two weeks</strong>, morning, after the toilet, before you eat or drink. And once a month stand against a wall with a book flat on your head and measure it. You're fifteen and still growing, and that changes what I'll let you jump off.</p><p>If something hurts, tell me and I'll send you to someone who can properly look at it. <strong>My job is making you strong and keeping you moving. Working out what's going on inside a joint is a physio's job, and I'm not going to pretend otherwise.</strong></p>"
       },
       {
         "icon": "😴",
