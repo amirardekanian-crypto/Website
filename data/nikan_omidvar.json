@@ -19,7 +19,8 @@
       "endDate": "2026-09-11",
       "focuses": [
         "Restore the rotation budget, hip internal rotation and thoracic rotation loaded and measured, so the low back and forearm stop paying for it.",
-        "Get genuinely strong in the two patterns his tissues already own, supported knee-dominant and trunk-supported hinge, plus strapped pulling."
+        "Get genuinely strong in the two patterns his tissues already own, supported knee-dominant and trunk-supported hinge, plus strapped pulling.",
+        "Gated on evidence, not on the calendar: weekly ROM battery and sit-tolerance, filmed top sets, and a clinician on the wrist by 2026-08-22."
       ],
       "message": {
         "paragraphs": [
@@ -30,9 +31,9 @@
         ],
         "outcomes": [
           "Hip rotation improved on both sides",
-          "Leg press up 10% or more",
-          "Row moving up week to week",
-          "Wrist test number holding or better",
+          "Leg press and row both moving up, leg press by 10% or more",
+          "Wrist seen by a doctor or physio by the 22nd",
+          "Every top set filmed and sent",
           "Landings clean enough to earn the box",
           "Sitting through a school day without your back complaining"
         ]
@@ -1170,6 +1171,11 @@
         "icon": "⚖️",
         "title": "How to find your weights",
         "body": "<p>I don't put a weight on your card. You find it every session against the RPE number, and that number just means how hard the set should feel. RPE 8 means you finished with about two good reps still in you.</p><p><strong>New movement:</strong> start lighter than you think. Do the first set, feel where the effort landed, then adjust. Being too light on set one costs you nothing.</p><p><strong>Week to week:</strong> if you hit all your reps and it felt at or under the target, go up a small amount next time. If it was already at the top of the target, or you missed reps, stay on the same weight and do it again. Repeating a weight is not standing still.</p><p><strong>Rough day:</strong> if a set is grinding harder than the number says it should, drop the weight. <strong>That's you reading it right, not you failing.</strong></p>"
+      },
+      {
+        "icon": "📹",
+        "title": "Film these, every week",
+        "body": "<p>I'm not in the gym standing next to you, so <strong>video is how I actually coach you.</strong> Three things get filmed.</p><ul><li><strong>Leg press:</strong> your heaviest set, every week. I'm watching one thing, whether your hips stay on the pad at the bottom.</li><li><strong>Back extension:</strong> one set in week 1 and one in week 2, with the dowel along your back so I can see it stays flat.</li><li><strong>Step downs and stick landings:</strong> end of week 2. This is the film that decides whether you start box drops in week 3.</li></ul><p>Send them to me on WhatsApp. <strong>Box drops don't start until I've seen that film and cleared it</strong>, and the leg press doesn't keep climbing if I can't see what your back is doing underneath it.</p><p>If the videos stop coming, the weight stops moving. Same deal I make with everyone.</p>"
       },
       {
         "icon": "🤚",
