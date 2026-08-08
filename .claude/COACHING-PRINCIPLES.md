@@ -580,18 +580,27 @@ publish it. No athlete health/chat detail goes here — principles only.
   a gate that exists in the coach's head and nowhere the athlete can actually read it — the
   exercise-level Coach's Note tells him what to do *on the lift*, this card is what tells him the
   video is mandatory and what happens without it. *(2026-08-08)*
-- **A MEASUREMENT is not real until its PROTOCOL is written and its EQUIPMENT is confirmed.**
-  *(Amir, 2026-08-08, verbatim: "you talked about measuring something, what the hell is he supposed
-  to measure?")* Naming a metric — "hip internal rotation", "thoracic rotation", "wrist extension"
-  — is a design-side decision, not an instruction. It becomes real only when the athlete has been
-  told the exact setup, the exact position, what to write down, and with what. **Default kit is a
-  phone and a tape measure.** Anything needing a goniometer, a second person or clinic equipment
-  gets replaced by a **fixed-setup photo or video compared week to week** — the *trend* is what
-  gates progression, never the absolute value, so a repeatable picture beats a precise number the
-  athlete cannot actually produce. Confirm the kit exists before the cycle ships; never leave it to
-  be improvised in week 3. This is doubly binding when the measure **gates a progression** (see the
-  gate principle above): an unmeasurable gate is not a safety rule, it is a blocked cycle nobody
-  planned. *(2026-08-08)*
+- **⚠️ STAY IN SCOPE: track SYMPTOMS and PERFORMANCE. Never build a joint-assessment battery —
+  that is a physio's job.** *(Amir, 2026-08-08, verbatim: "im a strength and conditioning coach.
+  how am i supposed to work with hip turn or wrist and upper back turn measurement? i havent
+  studied those. we should just talk about symptoms, if anything hurts, refer. and try to mobilise
+  and strength. but its a physio job to asses.")* A monitoring stack may contain **only** what an
+  S&C coach is qualified to collect *and interpret*:
+  - **Symptom reports** — what hurts, where, when, what it stopped them doing, how long they can
+    sit/run/hit before it starts. Asked as forced-choice comparatives, never yes/no.
+  - **Training data** — loads, reps, RPE, adherence, session length.
+  - **Movement quality on the lifts themselves** — filmed top sets, landing mechanics. This is
+    technique coaching and it *is* the job.
+  - **Body mass and stature** — fuelling and growth-related load management.
+
+  **Range-of-motion assessment is out of scope.** No ROM battery, no goniometry, no asking the
+  athlete to film joints for measurement, and **never gate a progression on a number you are not
+  qualified to interpret** — an S&C coach staring at a hip-rotation video has no defensible basis
+  for a load decision. Train mobility, train strength, watch symptoms, refer out when something
+  hurts. This does not weaken a cycle whose *rationale* is a mobility restriction — the hypothesis
+  is still tested the S&C way: **does the symptom settle, can they do more, do they move better
+  under load.** Extends "Know the referral line — coaching is not diagnosis" (Intake & assessment)
+  from pain into assessment. *(2026-08-08)*
 - **The monitoring stack stays SMALL — five measures run religiously beat fifteen that get
   abandoned.** An abandoned monitoring system is worse than a minimal one, because gates then get
   passed on nothing at all while everyone believes they were measured. Cut every metric that does
