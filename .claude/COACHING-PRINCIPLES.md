@@ -561,6 +561,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   any athlete with a history of training through pain, a self-reported gate is not a gate. Ask in
   forced-choice comparatives they cannot answer with "fine" (*which side is stiffer this week ·
   how many strokes before it starts · what did it stop you doing*), never yes/no or open. *(2026-08-08)*
+- **A FILM gate is not real until the athlete is told to film.** Deciding a criterion resolves to
+  video (see above) is a design-time call — it only works once /program-engage turns it into an
+  explicit notes card: which exercise, which weeks, where to send it, and the consequence if it
+  stops. Precedent, verbatim: *"These lifts are new to you and I'm not standing next to you, so
+  video is how I coach you… weight goes up on those three only after I've seen the film and
+  cleared it. If the videos stop coming, the weight stops moving."* (Behnam C1, `📹 Film your top
+  sets`.) A film-gated exercise with only a design-side `note_flag` and no matching notes card is
+  a gate that exists in the coach's head and nowhere the athlete can actually read it — the
+  exercise-level Coach's Note tells him what to do *on the lift*, this card is what tells him the
+  video is mandatory and what happens without it. *(2026-08-08)*
 - **The monitoring stack stays SMALL — five measures run religiously beat fifteen that get
   abandoned.** An abandoned monitoring system is worse than a minimal one, because gates then get
   passed on nothing at all while everyone believes they were measured. Cut every metric that does
