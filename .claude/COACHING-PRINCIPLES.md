@@ -59,6 +59,19 @@ publish it. No athlete health/chat detail goes here — principles only.
   than resolved. /program-design flags the resolution; /program-engage writes one genuine
   acknowledgment line (not a full card) — pairs naturally with a wins note when the resolution
   itself is the win. *(2026-07-12)*
+- **A decision to program AROUND pain instead of referring out needs a DATE and named escalation
+  triggers — otherwise it stands forever by silence.** "Coach around it and monitor" is a real
+  option, but written without an expiry it is a default, not a decision: nobody revisits it and
+  the athlete keeps loading the thing. Write the triggers that override it (night pain, loss of
+  range, numbness/tingling, pain arriving *earlier* session to session) plus a hard calendar
+  checkpoint — typically ~6 weeks of genuine offloading — at which it goes to a clinician
+  regardless of what the athlete says or wants. *(2026-08-08)*
+- **For an athlete who hides pain, show the MODIFICATION MENU in writing before they have anything
+  to hide.** They under-report because they believe reporting costs them training or match time.
+  Hand them up front exactly what happens to a session when each symptom is reported — reporting
+  always buys a **modification, never a ban** — then demonstrate it once, deliberately, early. It
+  is the only countermeasure that fixes the cause rather than policing the symptom, and it makes
+  every other monitoring measure cheaper. *(2026-08-08)*
 
 ## Exercise selection
 - **SFR leads for general-fitness clients.** Pick the highest stimulus-to-fatigue option
@@ -402,6 +415,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   spare and nothing added in it is an under-dosed session, even if every individual exercise
   looks reasonable on its own. *(2026-07-08, Niloufar C1 — first draft left 20–25 min unused
   on three lifting days; caught only because Amir compared it against her training age.)*
+- **The PATTERN is deferred; the EFFORT never is.** Any cycle that withholds a movement pattern
+  (axial loading, the free hinge, cutting) must still carry a real strength benchmark the athlete
+  has to hit in the patterns they DO own. Without one, "train them hard inside what's safe" stays
+  a sentence in the rationale and quietly doesn't happen — and the programming itself tells the
+  athlete you think they are breakable. *(2026-08-08)*
 
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
@@ -538,6 +556,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   This caught real issues on its first run (Setareh C1: a deep-flexion warm-up leak on a
   locking-history knee, a 60-min cap breach, an unwritten run ladder) — the panel is the
   quality gate, not ceremony. *(2026-07-24)*
+- **Every progression gate resolves to a MEASUREMENT, a FILM, or a THIRD PARTY — never the
+  athlete's word.** That includes a gate written against "their log", because the log is them. For
+  any athlete with a history of training through pain, a self-reported gate is not a gate. Ask in
+  forced-choice comparatives they cannot answer with "fine" (*which side is stiffer this week ·
+  how many strokes before it starts · what did it stop you doing*), never yes/no or open. *(2026-08-08)*
+- **The monitoring stack stays SMALL — five measures run religiously beat fifteen that get
+  abandoned.** An abandoned monitoring system is worse than a minimal one, because gates then get
+  passed on nothing at all while everyone believes they were measured. Cut every metric that does
+  not feed a gate or a deload trigger. *(2026-08-08)*
+- **A gate that depends on someone ELSE acting is scoped to a variable, never to whole-cycle
+  progression.** If the athlete met every training criterion but a third party has not booked the
+  appointment, hold back density or volume — do not repeat the cycle. A six-week block repeating
+  because a parent has not made a phone call is a scheduling failure wearing a safety rule's
+  clothes. *(2026-08-08)*
 - **Reassessment is scheduled, not only reactive.** You adjust day-to-day on what you observe
   (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
   trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
