@@ -580,6 +580,18 @@ publish it. No athlete health/chat detail goes here — principles only.
   a gate that exists in the coach's head and nowhere the athlete can actually read it — the
   exercise-level Coach's Note tells him what to do *on the lift*, this card is what tells him the
   video is mandatory and what happens without it. *(2026-08-08)*
+- **A MEASUREMENT is not real until its PROTOCOL is written and its EQUIPMENT is confirmed.**
+  *(Amir, 2026-08-08, verbatim: "you talked about measuring something, what the hell is he supposed
+  to measure?")* Naming a metric — "hip internal rotation", "thoracic rotation", "wrist extension"
+  — is a design-side decision, not an instruction. It becomes real only when the athlete has been
+  told the exact setup, the exact position, what to write down, and with what. **Default kit is a
+  phone and a tape measure.** Anything needing a goniometer, a second person or clinic equipment
+  gets replaced by a **fixed-setup photo or video compared week to week** — the *trend* is what
+  gates progression, never the absolute value, so a repeatable picture beats a precise number the
+  athlete cannot actually produce. Confirm the kit exists before the cycle ships; never leave it to
+  be improvised in week 3. This is doubly binding when the measure **gates a progression** (see the
+  gate principle above): an unmeasurable gate is not a safety rule, it is a blocked cycle nobody
+  planned. *(2026-08-08)*
 - **The monitoring stack stays SMALL — five measures run religiously beat fifteen that get
   abandoned.** An abandoned monitoring system is worse than a minimal one, because gates then get
   passed on nothing at all while everyone believes they were measured. Cut every metric that does

@@ -150,6 +150,15 @@ numbers from C2 onward.
 **Benchmarks this cycle must produce:** Machine Leg Press e1RM up ≥10% by week 4 with the depth cap
 held on a filmed top set · Chest-Supported Dumbbell Row e1RM up by end of cycle.
 
+**Measurement protocol (fixed 2026-08-08, after shipping)** — the battery was originally specified
+by metric name only ("hip IR in degrees", "seated thoracic rotation") with no protocol and no
+confirmed equipment, which made three of the five measures unperformable and left the Box Drop
+ankle-symmetry gate unenforceable. Rebuilt around **a phone and a tape measure only**: ankle
+knee-to-wall and sit-tolerance are written numbers; hip IR, wrist extension and thoracic rotation
+are **fixed-setup videos compared week to week** (same table, same chair, same phone position), so
+the trend is readable without a goniometer. Body mass fortnightly, height monthly against a wall.
+⚠️ Still unconfirmed: whether he owns a tape measure and bathroom scales.
+
 **Open questions carried into C2**
 - **Wrist diagnosis** — extensor origin at the elbow end vs distally over the radius on impact. Changes
   the entire rehab-day progression: isometric→eccentric→loaded-through-range is right for a
