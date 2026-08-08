@@ -149,6 +149,32 @@ For each training day in the program spec (Day 1…N), tied to that day's focus 
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.
 Per day: `DAY [n] — [focus]` · `Title:` (2–4 words) · `Message:` (1–2 sentences).
 
+## PART 5 — WHATSAPP HANDOFF MESSAGES (always produced, in the ATHLETE'S OWN LANGUAGE)
+*(Amir, 2026-08-08: "this actually should be part of our program writing pipeline.")* The in-app
+text stays English (PART 1–4). These two are what Amir actually pastes into WhatsApp to hand the
+programme over, so they are written in **the athlete's own language** — Farsi for Iran-based /
+Farsi-speaking athletes, English otherwise. They are pipeline output now, not an on-request extra.
+They live in chat + a scratch file, **never** in `data/<id>.json`.
+
+**MESSAGE 1 — the introduction.** Welcome · the programme link (with `?client=` + `&key=`) · one
+line telling them to add it to their home screen · **why their programme looks the way it does**
+(the actual diagnosis, in plain words they'll recognise from their own body) · the week's shape
+and which day is non-negotiable · what they should have by the end · and a pointer that the
+second message is coming and matters.
+
+**MESSAGE 2 — what to watch for.** The *actionable* half, mirroring the notes cards but as
+instructions: what to film and what it unlocks · any dated appointment or referral, with the
+escalation triggers · the weekly measurements and why they're numbers not feelings · fuelling ·
+the rest-day / load rule · and the **modification menu** (reporting buys a change, never a ban),
+which for a pain-hiding athlete is the single most important paragraph in either message. Fold
+any outstanding question (unquantified swim volume, missing history) in here so the answer comes
+back without a separate ask.
+
+Voice: same rules as all athlete-facing text — it must sound like Amir wrote it. Warm, direct,
+simple words, short sentences. When writing Farsi, use natural colloquial Farsi with **Persian
+numerals**, and give any date in the **Persian calendar first** with the Gregorian in brackets —
+that's the calendar the athlete actually lives by.
+
 Hand off to **/program-assemble** to write everything into `data/<id>.json`.
 
 ## Don'ts
