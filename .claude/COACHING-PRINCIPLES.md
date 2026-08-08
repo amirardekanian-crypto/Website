@@ -580,6 +580,21 @@ publish it. No athlete health/chat detail goes here — principles only.
   appointment, hold back density or volume — do not repeat the cycle. A six-week block repeating
   because a parent has not made a phone call is a scheduling failure wearing a safety rule's
   clothes. *(2026-08-08)*
+- **⚠️ EVERY program build ENDS with a COACH HANDOFF BRIEF — everything to measure, gate, film
+  and watch for, and WHY.** *(Amir, 2026-08-08, verbatim: "if there are things to be measured, to
+  gate, to film or to watch for, i should be informed to watch for and think about it… sometimes
+  you write something your self, and im not aware of which is stupid. you are my assistant and i
+  need to be on top of everything.")* The last thing /program-assemble does, after the JSON
+  validates and the log is archived, is tell Amir **in chat**, as its own clearly-headed section:
+  every **measurement** he has to take or collect · every **gate** and exactly what clears it ·
+  every **film** he has to review and by when · every **date-stamped escalation** (referrals,
+  appointments, checkpoints) · and every **decision made on his behalf** that overrides, extends
+  or fills a gap in something he said. One line each, each with its reason. It is a to-do list he
+  can act on, not a recap of the programming. A program whose coach has to reverse-engineer his
+  own responsibilities out of a long design write-up is a handoff failure, however good the
+  programming underneath it is. **Anything the athlete must do repeatedly to keep a gate alive
+  (filming, weekly measures, an appointment) also belongs in the PLAN he can see** — a cycle
+  focus line and/or a `message.outcomes` entry — not only in a notes card. *(2026-08-08)*
 - **Reassessment is scheduled, not only reactive.** You adjust day-to-day on what you observe
   (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
   trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a

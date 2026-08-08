@@ -183,7 +183,28 @@ reasoning is allowed to live. See `.claude/coaching-log/README.md` for the conve
   memory, just start the table clean from here. See `.claude/coaching-log/README.md` →
   "Exercise Ledger" for the exact format and status values.
 
-## Step 6 — Ship
+## Step 6 — COACH HANDOFF BRIEF (mandatory, never skip, never bury)
+**Amir's standing order (2026-08-08).** Before shipping, print a clearly-headed section in chat
+telling him everything the program now requires of *him*. This is a to-do list he can act on, not
+a recap of the programming — he must never have to reverse-engineer his own responsibilities out
+of the design write-up. See COACHING-PRINCIPLES.md → Process → "EVERY program build ENDS with a
+COACH HANDOFF BRIEF". Cover, one line each, each with its reason:
+- **MEASURE** — every number he or the athlete must collect, how often, and what it feeds.
+- **GATE** — every progression gate, and *exactly* what clears it (never the athlete's word).
+- **FILM** — every filmed set he must review, by when, and what is blocked until he clears it.
+- **DATES** — every date-stamped escalation: referrals, appointments, checkpoints, expiries.
+- **WATCH** — trigger conditions that fire a deload, a stop, or a referral.
+- **⚠️ MY CALLS** — every decision made on his behalf: anything that **overrides** something he
+  said, **extends** it past what he actually approved, or **fills a gap** he never ruled on.
+  State it plainly and offer to reverse it. This section is the whole point; put it last so it
+  lands, and never let it be implied rather than written.
+
+Cross-check before writing it: anything the athlete must do *repeatedly* to keep a gate alive
+(filming, weekly measures, booking an appointment) must ALSO appear in the plan he can see — a
+`cycles[].focuses` line and/or a `message.outcomes` entry — not only in a notes card. If it is
+missing there, fix the JSON before shipping, don't just mention it in the brief.
+
+## Step 7 — Ship
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm the coaching-log entry was appended.
 - Commit + push **only if Amir asks** — include **both** `data/<id>.json` and
   `.claude/coaching-log/<id>.md` in the commit. End commit messages with the project's
