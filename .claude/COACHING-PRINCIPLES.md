@@ -432,8 +432,17 @@ publish it. No athlete health/chat detail goes here — principles only.
   independently caught the unstated contradiction)*
 
 ## Communication & in-app text
-- **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** Farsi briefs
-  for WhatsApp/IG are separate, on request. *(2026-06-15)*
+- **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** *(2026-06-15)*
+- **The WhatsApp handoff messages are PIPELINE OUTPUT, and they are written in the ATHLETE'S OWN
+  LANGUAGE — not English, and not on request.** *(Amir, 2026-08-08: "this actually should be part
+  of our program writing pipeline.")* Every finished programme ships with two: **(1)** the
+  introduction — link, why their programme looks the way it does in plain words they recognise
+  from their own body, the week's shape, what they'll have by the end; **(2)** what to watch for —
+  what to film and what it unlocks, dated appointments + escalation triggers, the weekly measures,
+  fuelling, the rest rule, and the modification menu. Farsi for Iran-based athletes, English
+  otherwise. In Farsi use Persian numerals and put the **Persian calendar date first** with the
+  Gregorian in brackets. These never enter `data/<id>.json` — the in-app text stays English.
+  Owned by /program-engage PART 5. *(2026-08-08)*
 - **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
   *(Amir, 2026-07-30, verbatim: "write in a friendly human voice, dont let them think ai wrote
   these, let them think i wrote them, and my english is not very high level.")* This governs
