@@ -28,7 +28,7 @@ Static site on GitHub Pages → **amirardekani.com**, backed by Supabase.
 - **`index.html` — Home:** the pitch. Hero (*Move Better. Hit Harder. Last Longer.*), benefits, credentials, FAQ, CTAs to apply. Speaks to competitive players.
 - **`form.html` — Apply:** a 7-section intake questionnaire (progress bar + success screen); submissions email Amir via Web3Forms.
 - **`privacy.html` / `terms.html`:** legal.
-- **`coach.html` — Coach dashboard (private):** Amir's admin view (see below).
+- **`coach.html` — The Coach's Box (private):** Amir's admin view — coaching *and* Proof in one place (see below).
 - **`call-log.html` — Weekly check-in log (private):** Amir's tool for logging the weekly athlete check-in calls, with AI-assisted weekly summaries and end-of-cycle reports (see below).
 
 ---
@@ -63,15 +63,30 @@ Programme (~6 months)
 
 ---
 
-## The coach dashboard (`coach.html`)
+## The Coach's Box (`coach.html`)
 
-Amir signs in with Google (locked to his email) and sees everything the app syncs up:
-- Every athlete's progress — sessions completed, last active, their notes.
-- **Training load (ACWR)**, **readiness** trend, **adherence %** charts — auto-regulation at a glance.
-- **Alert triage** — red / amber flags (silent athlete, load spike, low readiness).
-- Mint a secure **per-athlete link**; send messages.
+Amir signs in with Google (locked to his email) and gets mission control over
+**both halves of the business** — the coached athletes and the free Proof crew —
+in four tabs:
 
-This is the proof behind "the coach actually watches you" — the payoff beat in the app reel.
+- **Today** — the day's play. How many of the crew have logged today, the
+  roll-call wall (where he writes the day's coach line and can hide a post),
+  a single **needs-you** queue (notes awaiting a reply, unread messages, quiet
+  athletes, new signups), the **quest-week lever** (start or cancel a 7-day
+  quest run), and a **Proof pulse** showing every athlete's last 7 days as
+  presence dots, most silent first.
+- **Athletes** — one roster across both systems, and a full file per person:
+  secure links, **training load (ACWR)** / **readiness** / **adherence** charts,
+  messages, weekly check-in logs, the prescribed program, and every finished
+  session compared against what was prescribed.
+- **Proof** — the server-scored leaderboard exactly as the crew sees it, the
+  season, titles being minted, and the **signup funnel** with days-logged as the
+  qualifying signal (a free athlete past 14 logged days is flagged as worth a
+  WhatsApp).
+- **Links** — copyable deep links to every published article and workout.
+
+This is the proof behind "the coach actually watches you" — the payoff beat in
+the app reel.
 
 ---
 

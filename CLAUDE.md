@@ -140,9 +140,10 @@ they now teach it by scope. `bestHabitRun()` keeps its internal name; nothing sh
 **Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
 backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
 Roll call pays **no XP** on purpose and no scoring function reads `hab_notes`; keep it
-that way. Amir posts the day's coach line with
-`select public.set_coach_note('…');` and moderates with
-`select public.hide_note('<athlete_id>', '<date>');`.
+that way. Amir posts the day's coach line and moderates the wall from **`coach.html` →
+Today** (composer at the top of *The wall*; Hide/Show on any line) — or in SQL with
+`select public.set_coach_note('…');` and
+`select public.hide_note('<athlete_id>', '<date>');`. Same two functions either way.
 
 ### ⚠️ Everything in Proof that is scored TWICE — change both or they disagree
 
@@ -361,9 +362,12 @@ The name they typed on the form goes in `data/<id>.json` as `"boardName"`, which
 pre-fills the join box.
 
 **Quests are a lever Amir pulls, not a standing feature.** There are **none** unless he
-starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Start one with
-`select public.set_quests('2026-07-29', array['w_water5','w_steps50k']);` and cancel with
-`select public.clear_quests('2026-07-29');` in the Supabase SQL editor. Past runs are kept
+starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Pull the lever
+from **`coach.html` → Today → Quest week** (tick 1–4 from the pool, *Start the week*;
+*Cancel this run* while one is live) — or in SQL with
+`select public.set_quests('2026-07-29', array['w_water5','w_steps50k']);` and
+`select public.clear_quests('2026-07-29');`. The dashboard always starts a run **from
+today**; SQL is the way to back-date or future-date one. Past runs are kept
 so their XP keeps counting. The 12-quest pool lives on the `xp_rules` row **and** as
 `QUEST_POOL` in `habits.html` (offline fallback) — change both together.
 **`QUESTS.md` is the catalogue** — what's running, the built quests, ready-made themed

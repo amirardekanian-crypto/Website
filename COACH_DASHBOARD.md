@@ -1,228 +1,254 @@
-# Coach Dashboard — User Manual
+# The Coach's Box — user manual
 
-A plain-English guide to `coach.html`: your private dashboard for tracking
-athlete progress. Every threshold below is the real value from the code, so
-this doubles as the reference for how flagging actually works.
+A plain-English guide to `coach.html`: Amir's private mission control. Every
+threshold below is the real value from the code, so this doubles as the
+reference for how the flagging actually works.
+
+**Redesigned 2026-08-09.** The old dashboard was a triage list of coached
+athletes and nothing else — built before Proof existed, so it could not see the
+habit crew, the wall, the board or the funnel, which is most of what happens on
+a given day. It went unused. This version opens on **what today needs**, and it
+covers **both halves of the business** in one place.
 
 ---
 
 ## 1. Getting in
 
-Open `coach.html` (your private dashboard URL) and **Sign in with Google** using
-`amirardekanian@gmail.com`. Any other account is rejected. The page has no menu
-and isn't indexed by Google — it's only for you.
+Open `coach.html` and **Sign in with Google** as `amirardekanian@gmail.com`.
+Any other account is rejected. The page isn't indexed and has no nav link.
 
-> The Google check is the convenience gate; the real security is in the database
-> (Row Level Security), so even if someone reached the page, they can't read
-> athlete data without your account.
+> The Google check is the convenience gate; the real security is Row Level
+> Security in the database — every coach-only table policy and every coach RPC
+> checks `auth.jwt() ->> 'email'`. Reaching the page without the account gets
+> you nothing.
+
+**Preview without signing in:** `coach.html?demo=1` renders the whole layout
+against synthetic data. Nothing is fetched and every write is a no-op, so it's
+safe to open anywhere — handy for screenshots or design work.
 
 ---
 
-## 2. The front page — the triage queue
+## 2. The four tabs
 
-Instead of a flat list, athletes are sorted by **who needs you most**, in three groups:
+| Tab | What it's for |
+|---|---|
+| **Today** | The day's play: who's on court, what's on the wall, who needs you, the quest lever |
+| **Athletes** | The whole roster — coached and Proof-only — with a full file per person |
+| **Proof** | The board, the season, the signup funnel, titles minted |
+| **Links** | Copyable deep links to every published article and workout |
 
-| Group | Colour | Meaning |
+The URL carries the view (`#today`, `#athletes`, `#proof`, `#links`,
+`#a/<athlete_id>`), so any screen can be bookmarked or reloaded in place.
+**↻ Refresh** re-pulls everything.
+
+---
+
+## 3. TODAY
+
+### The scoreboard
+
+Four counters across the hero, each one a link to the panel that explains it:
+
+| Counter | What it counts |
+|---|---|
+| **On court today** | Proof athletes with a log entry for today ÷ everyone on Proof |
+| **Wall lines today** | Roll-call posts today, hidden ones excluded |
+| **Sessions this week** | Finished training sessions in the last 7 days, whole roster |
+| **Waiting on you** | Session notes needing a reply + unread chat messages |
+
+Beside them: the current season and how many days into it you are.
+
+### The wall — read it *and* write it
+
+The roll call, straight from `hab_notes`, newest day first. Two days by default,
+**Show the full week** for all seven.
+
+- **Your line to the crew** is the composer at the top. It writes today's coach
+  line via `set_coach_note()` — the same line the crew sees pinned in their app.
+  Posting again updates it; **Take it down** deletes it. 200 characters, the
+  server's own limit.
+- **Hide / Show** on any athlete's line calls `hide_note()`. Hidden lines stay
+  visible *to you*, greyed and tagged, so moderation is reversible and you can
+  still see what you hid.
+- Each line shows the athlete's **day score** for that day (the `pct` the app
+  stored when they posted).
+
+This replaces running `select public.set_coach_note('…')` in the SQL editor.
+The SQL still works and is still documented — this is a second door to the same
+function, not a new mechanism.
+
+### Needs you
+
+One list, most urgent first, everything that's actually waiting on a human:
+
+| Row | Trigger |
+|---|---|
+| **Day N note: "…"** | A finished session carries an athlete note and `coach_status` is still `new` |
+| **N unread messages** | Athlete messages with `read_by_coach = false` |
+| **No session for N days** | A coached athlete with history and no session for > 7 days |
+| **Silent on Proof — N days** | A Proof athlete with no log for ≥ 3 days |
+| **New signup** | A contact created in the last 7 days |
+
+Tap any row to open that person's file. Opening a file marks their chat read.
+
+### Quest week
+
+The lever, not just the readout. If a run is live you see its quests, the XP each
+pays and which day of seven it's on, with **Cancel this run**. If none is live
+you get the pool as checkboxes — pick one to four, **Start the week**, and it
+runs seven days from today via `set_quests()`. Cancelling calls `clear_quests()`;
+quests already paid keep their XP.
+
+### Proof pulse
+
+Every Proof athlete, **most silent first**, with seven presence dots (one per
+day, today ringed in clay) and their server-scored level. This is the retention
+screen — a row of grey dots is someone drifting before they churn.
+
+---
+
+## 4. ATHLETES
+
+One row per person across **both** systems, sorted by who needs attention
+(waiting replies first, then quiet coached athletes, then silent Proof
+athletes). Search by name or id; re-sort by recent activity or name.
+
+Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
+habits but have no program file) or **No file** — their level, anything waiting
+a reply, an ACWR pill *only when it's amber or red*, their session count, their
+Proof week (`n/7`) and seven presence dots.
+
+**+ New secure link** mints a per-athlete key and copies the program link.
+
+---
+
+## 5. The athlete file (`#a/<id>`)
+
+Everything about one person, in the order you'd actually want it.
+
+**Links** — the program link and, for anyone on Proof, the Proof link, both
+one-tap copyable. **Rotate key** issues a new one (the old link stops syncing
+immediately, so only do it when you'll send the new one).
+
+**Proof strip** (anyone with habit logs or a contact record) — server-scored
+level, 14 presence dots, their week, their board name and worn title, WhatsApp
+and email buttons, and their wall lines this week with hide/show on each.
+
+**The three charts** — training load, readiness, adherence. Unchanged from the
+old dashboard; §6 explains them.
+
+**Messages** — the full thread, with a composer.
+
+**Weekly check-in calls** — every `call_logs` row, plus **Copy cycle prompt**,
+which bundles a cycle's check-ins and sessions into a ready-to-paste report
+prompt. **+ New call log** opens `call-log.html` for that athlete.
+
+**Prescribed program** — the current cycle from `data/<id>.json`, day → block →
+exercise with chips, video links and a "Last logged" line under anything they've
+logged. Works before their first session.
+
+**Training logs by day** — each program day collapsed, showing its most recent
+session in full: meta, athlete note, reply buttons, a **prescribed-vs-done**
+comparison, and the exercise log as sent. Earlier runs of the same day nest
+beneath. **+ Add past session from email** backfills a session from a report
+email.
+
+**Live activity** — the rolling snapshot, per day.
+
+---
+
+## 6. The three metrics
+
+### ACWR — acute:chronic workload ratio
+
+Every session's load = **session RPE × duration in minutes** (Foster's method,
+AU = arbitrary units). *Acute* = last 7 days; *chronic* = the 28-day weekly
+average; **ACWR = acute ÷ chronic**.
+
+| ACWR | Label | Meaning |
 |---|---|---|
-| 🔴 **Needs attention** | red | At least one serious flag — look today |
-| 🟡 **Watch** | amber | A mild flag — keep an eye on |
-| 🟢 **On track** | green | No flags. **Collapsed by default** — click "tap to show" to expand |
+| **0.8 – 1.3** | Optimal | Training matches their fitness |
+| **1.3 – 1.5** | Climbing | Ramping faster than ideal |
+| **> 1.5** | High load | Spike — elevated injury risk |
+| **< 0.8** | Low load | Detraining / under-loading |
 
-**Controls at the top:**
-
-- **Search box** — filter by name (type "tom" → only Tom).
-- **Sort dropdown:**
-  - *Needs attention* (default) — the grouped triage view above
-  - *Recently active* — most recent first, flat list
-  - *Name* — alphabetical, flat list
-- **+ New secure link** — create a new athlete's private link (unchanged from before).
-
-**Who shows up:** every athlete you've issued a **secure link** to appears here —
-*plus* anyone who has training activity. So a new athlete shows the moment you
-create their link, **before they ever open the app**, as a calm grey
-**"Not started"** card. Click it to view their program. (Athletes appear from
-the `athlete_keys` table + activity; the dashboard can't list the `data/` folder
-directly because it's a static site. So if a legacy athlete has a JSON file but
-no key, just generate their secure link and they'll appear.)
-
----
-
-## 3. What's on each athlete card
-
-| Element | What it means | What it needs to appear |
-|---|---|---|
-| **Coloured left border** | Red = needs attention, amber = watch, none = on track | A flag (see §5) |
-| **Name** | Athlete's name | From their data file / sessions |
-| **"last active … · N sessions"** | When they last synced, and how many finished sessions exist | Any activity |
-| **Sparkline** (blue line) | Their training-load trend, session by session | **≥ 2 sessions with both RPE *and* duration logged** |
-| **ACWR pill** | Workload safety zone (see §4) | ≥ 2 weeks of sessions with duration; otherwise shows **"ACWR · building"** |
-| **Readiness pill** | Their latest readiness score /5 | At least one completed readiness check |
-| **Adherence pill** | % of planned sessions completed (see §4) | A program file (`data/<id>.json`) + at least one finished session |
-| **🔒 / ⚠ badge** | 🔒 = secure link, ⚠ = old "legacy" link anyone could write to | Whether you've generated a secure link for them |
-| **Flag chips** | Plain-English reasons they're flagged (up to 3) | A triggered flag |
-
----
-
-## 4. The two key metrics explained
-
-### ACWR — Acute:Chronic Workload Ratio
-
-**The headline injury-risk number.** It compares how hard they've trained *this
-week* against their *recent month's average*.
-
-- **How it's calculated:** Every session's load = **session RPE × duration in
-  minutes** (sports-science "Foster method", measured in AU = arbitrary units).
-  - *Acute* = total load in the **last 7 days**
-  - *Chronic* = average weekly load over the **last 28 days**
-  - **ACWR = acute ÷ chronic**
-- **Zones:**
-
-| ACWR | Label | Colour | Meaning |
-|---|---|---|---|
-| **0.8 – 1.3** | Optimal | green | Training matches their fitness — the sweet spot |
-| **1.3 – 1.5** | Climbing | amber | Ramping up faster than ideal |
-| **> 1.5** | High load | red | Spike — elevated injury risk |
-| **< 0.8** | Low load | amber | Detraining / under-loading |
-
-- **"Building baseline":** Shown until there's **~2 weeks of data**. ACWR is
-  meaningless on a few sessions, so it deliberately won't show a number yet.
+Shows **"Building baseline"** until there are ~2 weeks of data, because the
+ratio is meaningless before that.
 
 ### Readiness
 
-**A daily self-report of how fresh they feel** (sleep, energy, soreness, stress,
-overall), averaged into a composite score out of 5 (**higher = fresher**).
-
-- The dashboard tracks each athlete's **personal baseline** (their own average),
-  so "2/5" is read as *"down from their usual 4.1"* — not a generic number.
-- A drop against *their own baseline* is what flags them, which catches problems
-  an absolute cutoff would miss.
+The athlete's self-report (sleep, energy, soreness, stress, overall) as a
+composite out of 5, **higher = fresher**. The dashboard tracks each athlete's
+own baseline, so a 2/5 reads as *"down from their usual 4.1"* rather than
+against a generic cutoff.
 
 ### Adherence
 
-**Did they actually do the sessions you planned?**
-
-- **How it's calculated:** Planned sessions = their program's day count
-  (`workouts.days`) × the number of weeks. Completed sessions come from
-  `session_history` (a partial counts as half).
-  **Adherence % = completed ÷ planned.**
-- Measured over the **last 4 weeks** — but the window shrinks for athletes who
-  started less than 4 weeks ago, so a new athlete isn't unfairly penalised.
-- **Colours:** green ≥ 85%, amber 60–84%, red < 60%.
-- If no program file exists for them, adherence simply isn't shown.
+Planned = their program's day count × weeks; completed comes from
+`session_history` with a partial counting as half. Measured over 4 weeks, and
+the window shrinks for athletes who started more recently so nobody is punished
+for weeks before they began. Green ≥ 85%, amber 60–84%, red < 60%.
 
 ---
 
-## 5. How flagging works (exact triggers)
+## 7. PROOF
 
-An athlete's group = the **most severe** flag they have. Here's every rule:
+**The board** — `leaderboard_top()`, the server's own scorer, season or week.
+These are the exact rows and the exact order the crew sees in their app.
 
-| Flag chip | Trigger | Severity |
-|---|---|---|
-| **Silent — X days, no training** | No activity for **> 14 days** | 🔴 red |
-| **Quiet — X days idle** | No activity for **8–14 days** | 🟡 amber |
-| **Load spike — ACWR X** | ACWR **> 1.5** | 🔴 red |
-| **Load climbing — ACWR X** | ACWR **1.3–1.5** | 🟡 amber |
-| **Detraining — ACWR X** | ACWR **< 0.8** | 🟡 amber |
-| **Readiness ↓ X vs Y usual** | Latest readiness is **≥ 1.0 below** their baseline | 🔴 red |
-| **Readiness dipping** | Latest readiness is **0.5–1.0 below** baseline | 🟡 amber |
-| **Low adherence — X% of plan** | Adherence **< 50%** | 🔴 red |
-| **Adherence slipping — X%** | Adherence **50–69%** | 🟡 amber |
-| **Last session left partial** | Their most recent session was finished as "Partial" | 🟡 amber |
+**Titles minted** — the last 30 rows of `hab_titles`, newest first. A quiet
+health check: if this stops moving, minting has broken (it did once, silently,
+for four days — see stage23).
 
-*(ACWR and readiness flags only fire once there's enough data — see §4.)*
+**Season** — which season is live and how far in. Starting or closing one stays
+in the SQL editor deliberately: it resets every score, and that shouldn't be a
+button on a dashboard.
 
-**Tunable values** live near the top of the `<script>` in `coach.html`:
-`QUIET_DAYS = 7` (idle threshold) and the ACWR/readiness cut-offs inside the
-`acwrZone` and `triage` functions.
+**The funnel** — everyone from `contact_list()`, newest first, with **days
+logged** as the qualifying signal. A free athlete past **14 logged days** is
+flagged *ready to upgrade?* — they've proven the habit, so the coaching pitch is
+earned rather than cold. WhatsApp opens a chat; **forget** erases their contact
+details via `forget_contact()` (their logs and board place are untouched).
 
 ---
 
-## 6. The athlete detail page
+## 8. ⚠ What this page deliberately does NOT do
 
-Click any card to open it. Below the secure-link panel you get **three charts**,
-the **prescribed program**, then the finished-session records and live activity.
+**It never scores Proof.** XP, levels, day scores and streaks are already
+computed twice — the client in `habits.html` and plpgsql in Supabase — and those
+two must agree (see `CLAUDE.md`, *Everything in Proof that is scored TWICE*). A
+third scorer here would be a third thing to keep in sync and the first to drift.
 
-**Training load card:**
+So every Proof number on this page is one of exactly two things:
 
-- Big number = **current ACWR** + its zone, colour-coded
-- "X AU this week vs Y AU weekly average" — the raw figures behind the ratio
-- **8-week bar chart** of weekly load — see if they're ramping, steady, or dropping off
+1. **A presence fact** — "this day has a non-empty log entry", the same test
+   `contact_list()` uses server-side. That's what the dots, `n/7`, "on court
+   today" and the silence counters are.
+2. **A number the server returned** — `hab_season_level()`, `leaderboard_top()`,
+   `contact_list()`.
 
-**Readiness card:**
-
-- Big number = **latest score /5** vs "usual" (baseline)
-- The +/- vs their session average
-- **Line chart** of readiness per session, with the baseline drawn as a
-  **dashed line** — so a dip is obvious at a glance
-
-**Adherence card:**
-
-- Big number = **adherence %** over the measured window
-- "X of Y planned sessions completed"
-- A **progress bar** coloured green / amber / red
-
-**Prescribed program** (collapsible section)
-
-The plan you wrote, pulled live from their `data/<id>.json` — so it's always in
-sync with what the athlete sees in their app. It shows:
-
-- The **current cycle** — name, weeks, and focuses
-- Each training **day → block → exercise**, with the prescription **chips**
-  (sets · reps · tempo · RPE), any circuit sub-items, and a **▶ video** link
-  (resolved from `exercise_library.json`, same as the athlete's app)
-- Under any exercise they've logged, a subtle **"Last logged: …"** line (weights
-  / RPE / note) — and nothing where there's no log
-
-This works **even before an athlete's first session**, so you can review a new
-athlete's program straight after creating their link.
+If you want a new Proof number here, get the server to return it. Don't compute
+it in this file.
 
 ---
 
-## 7. What feeds the dashboard — what athletes must do
+## 9. Where the data comes from
 
-Everything comes from the athlete's app (`program.html`) when they tap
-**Finish / Send to Coach**. For each metric to work:
-
-| Metric | Athlete must… |
+| Source | Feeds |
 |---|---|
-| Appears at all | Nothing — they appear as soon as you create their secure link (or once they train) |
-| **Prescribed program** | Have a `data/<id>.json` file — shows immediately, no training needed |
-| **Session RPE** | Rate the session 1–10 (required to send) |
-| **Training load + ACWR + sparkline** | Have a **duration** logged for the session — without it there's no load number |
-| **Readiness** | Complete the readiness check at the **start** of a session (not tap "skip") |
-| **Adherence** | Have a `data/<id>.json` program file (defines sessions/week) + finish sessions |
-| **Last active** | Any sync — happens automatically as they use the app |
+| `session_history` | Sessions, ACWR, readiness, adherence, notes to reply |
+| `athlete_progress` | Last active, live snapshot, and the habit log behind every presence dot |
+| `athlete_keys` | Secure links, and the key `leaderboard_top()` is called with |
+| `messages` | Chat threads and unread counts |
+| `hab_notes` | The wall, the coach line, moderation |
+| `hab_contacts` via `contact_list()` | The funnel, contact buttons, days logged |
+| `leaderboard_optin` | Who's on the board, their display name and worn title |
+| `hab_titles` | Titles-minted feed |
+| `xp_rules` | The quest pool and the live runs |
+| `seasons` | Which season, and what day of it |
+| `call_logs` | Weekly check-ins (loaded per athlete, on open) |
+| `data/<id>.json` | Names, tier, prescribed program, sessions/week |
 
-So if an athlete never logs duration, you'll see RPE and readiness but ACWR will
-stay blank. If they always skip the readiness check, the readiness chart stays empty.
-
----
-
-## 8. Why is everything saying "building baseline" right now?
-
-Because the `session_history` table is essentially empty so far. **This is
-expected, not a bug.** The dashboard lights up automatically as athletes start
-finishing sessions — you don't need to do anything. Give it ~2 weeks of real
-session data and the ACWR/readiness intelligence fills in on its own.
-
----
-
-## 9. Where the data lives (for reference)
-
-Three Supabase tables feed the dashboard:
-
-| Table | Holds | Drives |
-|---|---|---|
-| `session_history` | One row per finished session (RPE, duration, readiness, status, date, summary) | ACWR, readiness, flags, charts, finished-session records |
-| `athlete_progress` | Live rolling snapshot of an athlete's in-app progress | "Last active", live-activity view |
-| `athlete_keys` | Each athlete's secret link key | 🔒 / ⚠ badge, secure links |
-
----
-
-*Features added: triage front page; workload / readiness / adherence charts; a
-read-only prescribed-program view; and a roster that lists every athlete you've
-issued a secure link to (not just those who've trained). Charts are hand-rolled
-inline SVG (no external library), so the dashboard stays self-contained and works
-offline like the rest of the site. The styling matches `program.html` — the
-Roland-Garros palette (green / clay / ochre on warm paper), the same fonts, and a
-sticky brand nav.*
+Coach writes go through the guarded RPCs — `set_coach_note`, `hide_note`,
+`set_quests`, `clear_quests`, `forget_contact`, `save_session` — each of which
+enforces the coach email itself.
