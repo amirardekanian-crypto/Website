@@ -50,12 +50,15 @@ dates, are correctly kept as separate rows.)
 | Pooya Pasandideh | `pooya_pnd2` |
 | Pegah Hemmati | `pegah_hmt2` |
 | Mehraneh Zohourian | `mhrn_zhr2` |
-| Mehrnaz Khadem | `Mhrnz_khdm1` |
+| Mehrnaz Khadem | `Mhrnz_khdm2` |
 | Dela Yazdani | `dela_yazdani` |
 | Juan Galbete | `juan_glbt` |
 | Ghazal Pakbaten | `ghazal_pakbaten` |
 
-Stale/duplicate ids to **ignore**: `pooya_pasandideh`, `pooya_pnd1`, `mhrn_zhr1`.
+Retired duplicate ids, all **deleted 9 Aug 2026** — if one turns up in an old email,
+file the session under the live id in the table above, never re-create these:
+`pooya_pasandideh`, `pooya_pnd1`, `pegah_hemmati`, `Pegah_hmt1`, `Mhrnz_khdm1`,
+`mhrn_zhr1`.
 For a new athlete, the id is whatever their secure link uses (`?client=<id>`), which
 must match a `data/<id>.json` program file.
 
@@ -112,8 +115,15 @@ on conflict (athlete_id, day, completed_on) do update set
   case-sensitive host: `data/Ghzl_pak.json` should be `data/ghazal_pakbaten.json`;
   `data/mhrnz_khdm1.json` should be `data/Mhrnz_khdm1.json`.~~ **Fixed 5 Jun 2026** —
   both files renamed to match their `athlete_id` exactly.
-- Stale / duplicate athlete records to clean up: `pooya_pasandideh` (progress row, no
-  key or data file; live id is `pooya_pnd2`), the orphan `data/pooya_pnd1.json`, and
-  `mhrn_zhr1` vs `mhrn_zhr2` (live id is `mhrn_zhr2`).
+- ~~Stale / duplicate athlete records to clean up: `pooya_pasandideh`, the orphan
+  `data/pooya_pnd1.json`, and `mhrn_zhr1` vs `mhrn_zhr2`.~~ **Done 9 Aug 2026.** Three
+  retired ids deleted from Supabase (`pooya_pasandideh`, `pegah_hemmati`, `Mhrnz_khdm1`
+  — 3 progress rows, 15 sessions, 2 keys) plus their orphan files
+  (`data/pooya_pnd1.json`, `data/Pegah_hmt1.json`, `data/Mhrnz_khdm1.json`). Each
+  athlete's **live** id was left untouched: `pooya_pnd2` (48 sessions), `pegah_hmt2`
+  (36), `Mhrnz_khdm2` (3). Mehrnaz's two ids never overlapped — the old one's last
+  session was 11 Jul, the new one's first was 25 Jul.
+  Every deleted row is restorable from `public.retired_ids_backup_20260809` (RLS on,
+  coach-only). Drop it once you're happy: `drop table public.retired_ids_backup_20260809;`
 
 _Last full backfill: 5 Jun 2026 — 85 sessions, 8 athletes, 21 Apr–5 Jun._
