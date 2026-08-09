@@ -195,10 +195,10 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Barbell Hip Thrust",
+                "name": "Machine Hip Thrust",
                 "videoUrl": null,
                 "restSec": 120,
-                "note": "You said 80kg for 10, so this is your strongest lift and we start here. Begin around half of that today and build up over your sets until it sits at a 7 out of 10. I want a real number I can trust, not the old one.",
+                "note": "Switched you to the machine since the bar was bothering your hips. The numbers from the barbell version don't carry across, so treat this as a fresh start: go light on your first set and build up until it sits at a 7 out of 10.",
                 "chips": [
                   {
                     "label": "1s top hold",
