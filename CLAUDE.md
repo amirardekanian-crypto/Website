@@ -437,8 +437,19 @@ reference for mechanics only, not for language/voice.
 for the Tehran general-fitness audience. Don't touch those pages over this directive.
 
 ## Verifying the live site (important gotchas)
-- This sandbox **cannot reach amirardekani.com** (proxy blocks the host). Confirm deploys via the
-  GitHub Actions **"pages build and deployment"** run on `main` (it's `event: dynamic`), not a live fetch.
+- **You CAN fetch the live site — do that, it is the real proof.** (This note used to say the
+  proxy blocked the host; that was wrong as of 2026-08-09.) The apex 301s to `www`, so follow
+  redirects, and diff what is served against your working copy:
+  ```
+  curl -sL -o /tmp/live.html https://amirardekani.com/coach.html   # -L matters: apex -> www
+  python -c "import hashlib;a=open('/tmp/live.html','rb').read().replace(b'\r\n',b'\n');b=open('coach.html','rb').read().replace(b'\r\n',b'\n');print(hashlib.sha256(a).hexdigest()==hashlib.sha256(b).hexdigest())"
+  ```
+  A deleted file should 404 and a kept one should 200 — that check caught nothing but proves the
+  whole commit shipped, not just the page you edited.
+- **Do not treat a missing Actions run as a failed deploy.** The "pages build and deployment" run
+  (`event: dynamic`) sometimes never appears for a commit — on 2026-08-09 a merge deployed
+  correctly with no run listed for its SHA, and runs for an *earlier* SHA appeared twice. The
+  Actions list is a weak signal; the live fetch above is the strong one.
   Tell Amir to **hard-refresh** to bypass browser cache.
 - For visual checks: serve with `python3 -m http.server` and screenshot with Chromium at
   `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. Two headless quirks: scroll-reveal hides
