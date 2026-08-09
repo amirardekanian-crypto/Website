@@ -488,6 +488,12 @@ const AMIR_ATHLETE_ID = 'amir_ardekani';          // the board is fetched throug
 const QUIET_SESSION_DAYS = 7;                     // coached athlete idle threshold
 const QUIET_HABIT_DAYS = 3;                       // Proof athlete silent threshold
 const UPGRADE_DAYS = 14;                          // free athlete with this many logged days = upgrade candidate
+// "Waiting on you" means this fortnight. Notes are only marked read when the
+// coach acts on them, so without a window the counter silently accumulates
+// every note ever written (51 of them, back to June, on the day this shipped)
+// and the headline number stops meaning anything. Older ones become a backlog
+// row you can discharge in one tap.
+const NEEDS_WINDOW_DAYS = 14;
 
 const DEMO = new URLSearchParams(location.search).has('demo');
 const sb = DEMO ? null : supabase.createClient(SB_URL, SB_KEY);
@@ -690,9 +696,15 @@ function assemble() {
     a.perWeek = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0;
     a.onBoard = !!S.optin[a.id];
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;
+    // Split unanswered notes at the window: `recent` is what "waiting" means
+    // anywhere a count is shown; `stale` is backlog. Every note still keeps its
+    // own reply buttons on the athlete's file regardless of age.
+    const cut = addDays(todayKey(), -NEEDS_WINDOW_DAYS);
     a.needReplySessions = a.sessions.filter(sessionNeedsReply);
+    a.needReplyRecent = a.needReplySessions.filter(s => s.completed_on && s.completed_on >= cut);
+    a.needReplyStale = a.needReplySessions.length - a.needReplyRecent.length;
     a.unreadMsgs = S.msgs.filter(m => m.athlete_id === a.id && m.sender === 'athlete' && !m.read_by_coach).length;
-    a.toReply = a.needReplySessions.length + a.unreadMsgs;
+    a.toReply = a.needReplyRecent.length + a.unreadMsgs;
     const t = todayKey();
     a.habToday = !!a.habDays[t];
     a.hab7 = 0; for (let i = 0; i < 7; i++) if (a.habDays[addDays(t, -i)]) a.hab7++;
@@ -934,7 +946,7 @@ window.toggleHide = toggleHide;
 function needPanelHtml() {
   const items = [];
   Object.values(S.ath).forEach(a => {
-    a.needReplySessions.forEach(s => items.push({
+    a.needReplyRecent.forEach(s => items.push({
       sev: 'clay', id: a.id, n: a.name,
       s: `Day ${s.day} note: “${sessionNoteText(s)}”`, sort: 0,
     }));
@@ -959,11 +971,36 @@ function needPanelHtml() {
       <span class="b"><span class="n">${esc(i.n)}</span><div class="s">${esc(i.s)}</div></span>
       <span class="go">open →</span>
     </button>`).join('');
+  const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
+  const staleRow = stale ? `
+    <div class="need" style="border-style:dashed">
+      <span class="dot" style="background:var(--muted-soft)"></span>
+      <span class="b"><span class="n">${stale} older note${stale === 1 ? '' : 's'}</span>
+        <div class="s">Never marked read, older than ${NEEDS_WINDOW_DAYS} days — history, not today's work</div></span>
+      <button class="btn sm" onclick="clearNoteBacklog()">Clear</button>
+    </div>` : '';
   return `
     <div class="phead"><span class="t hd">Needs you</span><span class="r">${items.length ? items.length + ' open' : ''}</span></div>
     ${list || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
-    ${items.length > 10 ? `<p class="empty">+ ${items.length - 10} more — see Athletes.</p>` : ''}`;
+    ${items.length > 10 ? `<p class="empty">+ ${items.length - 10} more — see Athletes.</p>` : ''}
+    ${staleRow}`;
 }
+// Discharge the backlog in one action. Only touches notes older than the
+// window that are still 'new' — nothing recent, and nothing already handled.
+async function clearNoteBacklog() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const cut = addDays(todayKey(), -NEEDS_WINDOW_DAYS);
+  const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
+  if (!confirm(`Mark ${stale} note${stale === 1 ? '' : 's'} older than ${cut} as read?\n\nThey stay on each athlete's file and you can still reply to any of them — this only clears them out of "needs you".`)) return;
+  const { error } = await sb.from('session_history')
+    .update({ coach_status: 'read' })
+    .lt('completed_on', cut)
+    .or('coach_status.is.null,coach_status.eq.new');
+  if (error) { alert('Could not clear: ' + error.message); return; }
+  toast('Backlog cleared');
+  refetch(['hist']);
+}
+window.clearNoteBacklog = clearNoteBacklog;
 
 // The quest lever: show the live run, or the picker to start one. Runs last
 // 7 days from their start date; the pool lives on the xp_rules row.
@@ -1997,8 +2034,13 @@ async function renderProof() {
       : '<p class="empty">Nobody on the board yet.</p>';
 
   const funnel = (S.contacts || []).slice().sort((a, b) => String(b.signed_up).localeCompare(String(a.signed_up)));
+  // Signed up and never logged a single day is its own bucket, and the biggest
+  // one — a different problem from someone logging and drifting. They need a
+  // first-day nudge, not a coaching pitch.
+  const neverStarted = funnel.filter(c => !c.days_logged).length;
   const funnelHtml = funnel.length ? funnel.map(c => {
     const hot = c.tier === 'free' && c.days_logged >= UPGRADE_DAYS;
+    const cold = !c.days_logged;
     const wa = c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : '';
     const mail = c.email ? `<button class="abtn" onclick="copyText('${esc(c.email)}', this)">✉ copy email</button>` : '';
     return `<div class="fun ${hot ? 'hotlead' : ''}">
@@ -2006,6 +2048,7 @@ async function renderProof() {
         <div class="nm">${esc(c.shown_as || nameOf(c.athlete_id))}
           <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '?')}</span>
           ${c.on_board ? '<span class="chip court">on board</span>' : ''}
+          ${cold ? '<span class="chip">never started</span>' : ''}
           ${hot ? '<span class="chip clay">ready to upgrade?</span>' : ''}
         </div>
         <div class="sub">${esc(c.athlete_id)} · signed up ${timeAgo(c.signed_up)}${c.source ? ' · via ' + esc(c.source) : ''}</div>
@@ -2053,7 +2096,7 @@ async function renderProof() {
         </section>
         <section class="panel">
           <div class="phead"><span class="t hd">The funnel</span><span class="r">${funnel.length} signup${funnel.length === 1 ? '' : 's'}</span></div>
-          <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.</p>
+          <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${funnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}</p>
           ${funnelHtml}
         </section>
       </div>
@@ -2158,6 +2201,9 @@ function demoStore() {
     mkSession('elmira_askari', 'Elmira', 2, 3, 9, 65, 'Partial — ran out of time'),
     mkSession('dela_yazdani', 'Dela', 1, 1, 6, 40, 'Complete'),
     mkSession('faraz_etminan', 'Faraz', 1, 9, 7, 50, 'Complete'),
+    // Older than NEEDS_WINDOW_DAYS, still unanswered — exercises the backlog row.
+    mkSession('dela_yazdani', 'Dela', 2, 22, 7, 45, 'Complete', 'Left arm was dead after this one'),
+    mkSession('faraz_etminan', 'Faraz', 2, 30, 6, 40, 'Complete', 'No space for suitcase walks here'),
   ];
   S.keys = { pegah_hmt2: 'demo', elmira_askari: 'demo', dela_yazdani: 'demo', amir_ardekani: 'demo', faraz_etminan: 'demo', reza_jamal: 'demo' };
   S.msgs = [
@@ -2174,6 +2220,7 @@ function demoStore() {
   S.contacts = [
     { athlete_id: 'sara_free', email: 'sara@example.com', whatsapp: '+44 7000 000000', source: 'proof.html', tier: 'free', shown_as: 'Sara', on_board: true, days_logged: 17, signed_up: new Date(Date.now() - 18 * 86400000).toISOString() },
     { athlete_id: 'reza_jamal', email: 'reza@example.com', whatsapp: '+98 912 000 0000', source: 'proof.html', tier: 'free', shown_as: 'Reza', on_board: false, days_logged: 3, signed_up: new Date(Date.now() - 2 * 86400000).toISOString() },
+    { athlete_id: 'nadia_k', email: 'nadia@example.com', whatsapp: '+98 912 111 1111', source: 'proof.html', tier: 'free', shown_as: 'Nadia', on_board: false, days_logged: 0, signed_up: new Date(Date.now() - 5 * 86400000).toISOString() },
   ];
   S.rules = {
     quests: [
