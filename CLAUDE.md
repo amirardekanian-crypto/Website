@@ -446,6 +446,10 @@ for the Tehran general-fitness audience. Don't touch those pages over this direc
   ```
   A deleted file should 404 and a kept one should 200 — that check caught nothing but proves the
   whole commit shipped, not just the page you edited.
+  ⚠ **Pick a served file as your marker.** `_config.yml` excludes the `.md` docs, so
+  `amirardekani.com/CLAUDE.md` is a permanent 404 — polling one to confirm a docs-only commit
+  waits for ever. A docs-only change has nothing to verify live; check `git ls-remote origin main`
+  instead.
 - **Do not treat a missing Actions run as a failed deploy.** The "pages build and deployment" run
   (`event: dynamic`) sometimes never appears for a commit — on 2026-08-09 a merge deployed
   correctly with no run listed for its SHA, and runs for an *earlier* SHA appeared twice. The
