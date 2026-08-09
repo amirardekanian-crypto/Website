@@ -69,9 +69,15 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 
 ---
 
-## The three commands
+## Two ways to pull the lever
 
-Run these in the **Supabase SQL editor**.
+**From the dashboard** (the everyday way): `coach.html` → **Today** → **Quest week**.
+With no run live you get the pool as checkboxes — tick 1–4 and *Start the week*, which
+runs 7 days **from today**. While a run is live you see its quests, the XP each pays and
+which day of seven it's on, with *Cancel this run*.
+
+**From SQL** (for anything the dashboard can't do — back-dating or future-dating a run):
+run these in the **Supabase SQL editor**. Same functions, same effect.
 
 ```sql
 -- start a run (any day in the week works; it runs 7 days from that date)

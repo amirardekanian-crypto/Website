@@ -861,10 +861,13 @@ banner when the athlete has overtaken someone — *"You passed Bo and Cy since y
 looked."* The server returns no history, so the last standing is remembered per scope
 on the device (`CFG.lbSeen`) and the next fetch is diffed against it.
 
-Set the coach line with `select public.set_coach_note('…');`. A day reads top-down as
-*here is the brief, here is who answered*.
+Set the coach line from **`coach.html` → Today → The wall** — the composer at the top
+writes today's line, and posting again updates it. A day reads top-down as *here is the
+brief, here is who answered*.
 
-**Moderation** is coach-only, in the Supabase SQL editor:
+**Moderation** is coach-only. The dashboard puts a **Hide / Show** button on every line
+(hidden lines stay visible *to Amir*, greyed and tagged, so it is reversible and he can
+still read what he hid). The SQL editor does the same job, plus back-dating:
 
 ```sql
 select public.set_coach_note('Everyone in. No excuses today.');  -- your line for today

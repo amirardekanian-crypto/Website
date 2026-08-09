@@ -29,7 +29,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | How to run the coaching skills (intake → ship) | [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md) |
 | The home page / hero | [`index.html`](index.html) (EN) · [`index-fa.html`](index-fa.html) (FA) |
 | The athlete training app | [`program.html`](program.html) |
-| The coach dashboard | [`coach.html`](coach.html) · manual: [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
+| The coach dashboard ("The Coach's Box") | [`coach.html`](coach.html) · manual: [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | Where one athlete's program lives | `data/<athlete-id>.json` → [`SCHEMA.md`](SCHEMA.md) |
 | Brand images / icons / photos | [Assets ↓](#-assets--every-image-icon--photo) |
 
@@ -61,7 +61,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 |---|---|---|
 | [`program.html`](program.html) | The athlete PWA — Home · My Plan · Coach · Library [Read \| Train] · Habits (→ `habits.html`). Loads `data/<id>.json`. Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
 | [`habits.html`](habits.html) | **AA Proof** — habit tracker. Three tabs: Today · Progress · Crew (no chat; Settings sits behind the initials button in the header). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), **The long game** (a 14-reward track of titles + shareable-card looks, kept for good across season resets), full-screen level-up celebration, 5-tier consistency ladders, opt-in server-scored **leaderboard**, **Roll Call** (one sentence a day, shared), a **3-day backfill window** on the log, offline-durable saving. **Installs to the home screen** (own manifest, `start_url` carries the athlete's link; offered once after their first log, plus a permanent Settings row). Reached from `program.html` (Home card + Habits tab). Same `?client=<id>&key=<key>` link as the program. **Also runs standalone for free (non-coached) users** — `"tier": "free"` in `data/<id>.json` locks WORKOUT and swaps the programme links for coaching CTAs; they sign up at [`proof.html`](proof.html). Demo: `?client=demo` | [`HABITS.md`](HABITS.md) · [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
-| [`coach.html`](coach.html) | Coach dashboard — progress, charts, mint athlete links, messaging (Google sign-in) | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
+| [`coach.html`](coach.html) | **The Coach's Box** — mission control for coaching *and* Proof, four tabs: **Today** (on-court count, the roll-call wall with the coach-line composer + hide/show moderation, a needs-you queue, the quest-week lever, a 7-day Proof pulse) · **Athletes** (one roster across both systems, one file per person: links, Proof strip, ACWR/readiness/adherence charts, messages, call logs, prescribed program, session logs) · **Proof** (server-scored board, season, signup funnel with upgrade flags, titles minted) · **Links**. Google sign-in. Preview the layout with `?demo=1`. ⚠ Never scores Proof itself — presence facts + server RPCs only | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
 
 ---
