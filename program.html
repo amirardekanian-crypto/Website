@@ -3045,9 +3045,25 @@ let ATHLETE_ID = '';
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 let _sbClient = null, _sbTimer = null, _sbId = '', _sbName = '', _sbKey = null;
-// Raw (un-hooked) setItem — used for bookkeeping writes that must not
-// re-trigger the backup push (setupCloudBackup wraps localStorage.setItem).
-const _lsRawSet = localStorage.setItem.bind(localStorage);
+// Keys this device has DELETED, waiting to be forgotten server-side. The row is
+// merged with `data = old || new`, which can add and overwrite but never remove,
+// so without an explicit list a deleted key lives in the cloud for ever and is
+// pulled straight back on the next boot. Cleared only once a push succeeds.
+let _sbDrop = [];
+// Raw (un-hooked) setItem/removeItem — used for bookkeeping writes that must not
+// re-trigger the backup push (setupCloudBackup wraps both).
+const _lsRawSet    = localStorage.setItem.bind(localStorage);
+const _lsRawRemove = localStorage.removeItem.bind(localStorage);
+// Keep the pending deletes on disk. A delete made in a no-signal gym, followed by
+// the OS killing the backgrounded PWA, would otherwise be forgotten — the key
+// would stay in the cloud and arm that day all over again. Raw write: bookkeeping,
+// not progress, so it must not recurse into the hook or count as an edit.
+function _persistDrops() {
+  try {
+    if (_sbDrop.length) _lsRawSet(_sbId + '_drops', JSON.stringify(_sbDrop));
+    else _lsRawRemove(_sbId + '_drops');
+  } catch (e) { /* storage full or blocked — the queue still works in memory */ }
+}
 function _sb() {
   if (_sbClient) return _sbClient;
   if (!window.supabase || !window.supabase.createClient) return null;
@@ -3067,6 +3083,12 @@ function _snapshot() {
     // never as its own key (a cloud copy restored onto a fresh device would
     // masquerade as local edit history there).
     if (k === prefix + 'lastEditAt') continue;
+    // Device-local bookkeeping, never progress: the pending-delete queue, and the
+    // athlete's secret key. The key especially must never round-trip — a stale
+    // copy in the shared blob gets written back over the working one on the next
+    // boot (the stored key is consulted before the JSON), and from then on every
+    // RPC is rejected and the athlete silently stops syncing for good.
+    if (k === prefix + 'drops' || k === prefix + 'skey') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -3088,12 +3110,20 @@ function _pushSnapshot(immediate) {
       // Write via a SECURITY DEFINER function: athletes can save but can't
       // read the table (reads are coach-only). Avoids the upsert read-back
       // that RLS would otherwise reject.
-      await sb.rpc('save_progress', {
+      const drops = _sbDrop.slice();
+      const { error } = await sb.rpc('save_progress', {
         p_athlete_id:   _sbId,
         p_athlete_name: _sbName,
         p_data:         _snapshot(),
-        p_key:          _sbKey
+        p_key:          _sbKey,
+        p_drop:         drops.length ? drops : null
       });
+      // Only forget the pending deletes once the server has actually applied
+      // them — an offline push must leave them queued for the next attempt.
+      if (!error && drops.length) {
+        _sbDrop = _sbDrop.filter(k => drops.indexOf(k) === -1);
+        _persistDrops();
+      }
     } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
   };
   if (immediate) { send(); } else { _sbTimer = setTimeout(send, 1500); }
@@ -3134,16 +3164,106 @@ async function syncFromCloud(athleteId, key) {
     const cloudAt = data[prefix + 'snapAt'] || '';
     const localAt = localStorage.getItem(prefix + 'lastEditAt') || '';
     const preferLocal = !!(localAt && (!cloudAt || localAt > cloudAt));
+    // A day the CLOUD still thinks is finished must not be restored onto this
+    // device — see staleCloudPlan() for why that was destroying live sessions.
+    const plan = staleCloudPlan(data, prefix);
     Object.keys(data).forEach(k => {
       if (k.indexOf(prefix) !== 0) return;
       if (k === prefix + 'snapAt' || k === prefix + 'lastEditAt') return;  // bookkeeping, not data
+      if (k === prefix + 'drops'  || k === prefix + 'skey')       return;  // ditto — see _snapshot()
+      if (plan.skip.has(k)) return;
+      // Weights are the athlete's working loads and always come back; the RPE and
+      // done-ticks of a session that is already over must not, or they re-tick
+      // today's rows. Strip them from the CLOUD side only, so anything this device
+      // logged today still wins the merge below.
+      const cloudVal = plan.weightsOnly.has(k) ? stripSetLogSession(data[k]) : data[k];
       const localVal = localStorage.getItem(k);
-      const merged   = mergeStoredValue(k, localVal, data[k], preferLocal);
+      const merged   = mergeStoredValue(k, localVal, cloudVal, preferLocal);
       if (merged != null && merged !== localVal) {
         try { localStorage.setItem(k, merged); } catch (e) { /* storage full — skip */ }
       }
     });
   } catch (e) { /* offline / function not deployed — app still works from local */ }
+}
+
+// ── Never let the cloud resurrect a finished day ───────────────────────────────
+// save_progress merges server-side with `data = old || new`, so the cloud row is
+// an ACCUMULATOR: a key this device deletes is never removed up there. removeItem
+// isn't hooked either, so nothing even tries. That is fine for most keys — but
+// `_completed_d<N>` is not data, it is a TRIGGER: autoResetStaleDays() reads a
+// completed stamp dated anything but today as "that session is over" and wipes
+// the whole day (checks, per-exercise RPE, per-set RPE + done-ticks, timer,
+// readiness, session RPE, day note). Since syncFromCloud now merges on EVERY load
+// rather than only onto an empty device, a weeks-old stamp came back on every
+// boot — so reloading mid-workout destroyed the session the athlete was in the
+// middle of, on every platform. Weights survived, which is exactly what athletes
+// reported. Measured live before this fix: 51 of 52 stamps in the cloud were
+// stale, i.e. nearly every athlete was one reload away from losing their session.
+//
+// So a day-scoped key is restored only while it still belongs to TODAY. Anything
+// older is left in the cloud but ignored here — inert instead of destructive.
+// Local's own stale copies are untouched: autoResetStaleDays() still cleans those,
+// which is the case this must NOT break (a device left closed overnight).
+function staleCloudPlan(data, prefix) {
+  const plan = { skip: new Set(), weightsOnly: new Set() };
+  const today = new Date().toDateString();
+  const over  = {};                                   // day id -> already finished
+  Object.keys(data).forEach(k => {
+    if (k.indexOf(prefix) !== 0) return;
+    const m = k.slice(prefix.length).match(/^completed_d(\d+)$/);
+    if (m && String(data[k]) !== today) over[m[1]] = true;
+  });
+
+  const sameDay = v => { const d = new Date(v); return !isNaN(d.getTime()) && d.toDateString() === today; };
+
+  Object.keys(data).forEach(k => {
+    if (k.indexOf(prefix) !== 0) return;
+    const rel = k.slice(prefix.length);
+    // Exactly the per-day keys autoResetStaleDays() owns.
+    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|timer_|readiness_)(\d+)$/);
+    if (dm && over[dm[1]]) { plan.skip.add(k); return; }
+    // A timer/readiness for a day with no completed stamp at all still carries its
+    // own date — a session abandoned last week must not come back running.
+    if (/^(?:timer|readiness)_\d+$/.test(rel)) {
+      let stamp = null;
+      try { const o = JSON.parse(data[k]); stamp = o && (o.sessionStart || o.timestamp); } catch (e) {}
+      if (stamp && !sameDay(stamp)) plan.skip.add(k);
+    }
+  });
+
+  // Per-exercise keys carry no date, so map them back through the program. An
+  // exercise is only treated as finished when EVERY day it appears in is over —
+  // shared names must never cost a live day its data.
+  const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
+  const seen = {};                                    // exercise key -> {any, live}
+  days.forEach(day => {
+    const finished = !!over[String(day.id)];
+    (day.blocks || []).forEach(block => {
+      (block.exercises || []).forEach(ex => {
+        const k = String(ex.name || '').replace(/\s+/g, '_');
+        if (!k) return;
+        const s = seen[k] || (seen[k] = { any: false, live: false });
+        s.any = true;
+        if (!finished) s.live = true;
+      });
+    });
+  });
+  Object.keys(seen).forEach(k => {
+    if (!seen[k].any || seen[k].live) return;
+    plan.skip.add(prefix + 'rpe_' + k);               // stale RPE would pre-fill today
+    plan.weightsOnly.add(prefix + 'setlog_' + k);     // keep the load, drop RPE + ticks
+  });
+  return plan;
+}
+
+// Cloud copy of a per-set log for a session that is over: keep the weights, clear
+// the RPE and done-ticks. Mirrors what autoResetStaleDays() does locally.
+function stripSetLogSession(val) {
+  try {
+    const a = JSON.parse(val);
+    if (!Array.isArray(a)) return val;
+    return JSON.stringify(a.map(s => ({ w: (s && s.w) || '', r: '', d: false })));
+  } catch (e) { return val; }
 }
 
 // Merge one stored value, local vs cloud. Non-destructive: prefer real data over
@@ -3180,6 +3300,10 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
 function setupCloudBackup(athleteId, data, key) {
   _sbId = athleteId;
   _sbKey = key || null;
+  // Pick up any deletes a previous run never managed to send.
+  try { _sbDrop = JSON.parse(localStorage.getItem(athleteId + '_drops') || '[]') || []; }
+  catch (e) { _sbDrop = []; }
+  if (!Array.isArray(_sbDrop)) _sbDrop = [];
   const a = (data && data.athlete) || {};
   _sbName = [a.firstName, a.lastName].filter(Boolean).join(' ');
   localStorage.setItem = function (key, val) {
@@ -3189,6 +3313,23 @@ function setupCloudBackup(athleteId, data, key) {
         // Stamp when this device last edited real progress data — the freshness
         // signal syncFromCloud uses. Raw write: must not recurse into the hook.
         _lsRawSet(_sbId + '_lastEditAt', new Date().toISOString());
+        _pushSnapshot();
+      }
+    }
+    catch (e) { /* never let backup interfere with the app */ }
+  };
+  // Deletions have to travel too, or the cloud keeps handing them back — the bug
+  // that wiped live sessions. Deliberately does NOT stamp lastEditAt:
+  // autoResetStaleDays() deletes on every boot, and counting that as an "edit"
+  // would let a device that merely opened the app claim to be fresher than a
+  // genuinely newer snapshot from another one.
+  localStorage.removeItem = function (key) {
+    _lsRawRemove(key);                                  // real delete always happens first
+    try {
+      if (typeof key === 'string'
+          && key.indexOf(_sbId + '_') === 0
+          && key.indexOf(_sbId + '_hab_') !== 0) {      // habits.html owns its own keys
+        if (_sbDrop.indexOf(key) === -1) { _sbDrop.push(key); _persistDrops(); }
         _pushSnapshot();
       }
     }
@@ -5692,6 +5833,22 @@ function autoResetStaleDays() {
   try { checkState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) {}
   let checkStateChanged = false;
 
+  // Per-exercise keys are built from the NAME alone (setLogKey), and 21 of the 22
+  // live programmes reuse a name across days — "Stationary Bike" sits in all four
+  // of Pooya's. Clearing a finished day by name therefore reaches sideways into a
+  // day that is NOT over and blanks the RPE and done-ticks the athlete logged
+  // there today. Collect the names that still belong to a live day (finished
+  // today, or not finished at all — which is what a session in progress looks
+  // like) and leave those exercises alone.
+  const liveNames = new Set();
+  days.forEach(d => {
+    const on = localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id);
+    if (on && on !== today) return;                 // this day is stale — not protective
+    (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+      liveNames.add(String(ex.name || '').replace(/\s+/g, '_'));
+    }));
+  });
+
   days.forEach(day => {
     const completedKey = ATHLETE_ID + '_completed_d' + day.id;
     const completedOn  = localStorage.getItem(completedKey);
@@ -5723,6 +5880,7 @@ function autoResetStaleDays() {
       (day.blocks || []).forEach(block => {
         (block.exercises || []).forEach(ex => {
           const k = ex.name.replace(/\s+/g, '_');
+          if (liveNames.has(k)) return;             // same name also sits in a day that isn't over
           // Circuit RPE: round 1 uses the legacy (no-suffix) key, later rounds
           // use _r<round>. Clear every round this exercise has.
           const rounds = ex.type === 'circuit' ? parseRoundCount(ex.rounds) : 1;
