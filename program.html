@@ -3497,6 +3497,12 @@ function getVideoUrl(ex) {
   const _currentCycle = (DATA.cycles || [])[DATA.currentCycleIndex || 0];
   document.title = `${DATA.athlete.firstName} ${DATA.athlete.lastName}${_currentCycle ? ' — ' + _currentCycle.name : ''}`;
 
+  // If an exercise was renamed since last time, bring its weights and notes onto
+  // the new name — the storage key is the display name, so a rename orphans them
+  // and the card comes back blank. Runs BEFORE the stale-day sweep so anything it
+  // carries over is then judged by exactly the same rules as everything else.
+  adoptRenamedExercises();
+
   // Clear per-session data (checks, per-exercise RPE, day note, session RPE) for any day
   // that was completed on a previous date. Weight inputs and per-exercise notes are PRESERVED
   // because they're useful starting points (weights) or personal context (movement notes).
@@ -5818,6 +5824,111 @@ function toggleNote(card) {
   const scope = card.closest('#notes-container') || document;
   scope.querySelectorAll('.note-card.open').forEach(c => c.classList.remove('open'));
   if (!wasOpen) card.classList.add('open');
+}
+
+// ── Carry an exercise's history across a rename ──────────────────────────────
+// Every per-exercise key is built from the DISPLAY NAME (setLogKey, circuitWKey,
+// the note key), so the day a programme renames a movement — even by one hyphen —
+// the athlete's weights and personal note for it are orphaned and the card comes
+// back blank. Real, and visible in the live data: juan_glbt holds BOTH
+// `Half_Kneeling_Single_Arm_Cable_Row` and `Half-Kneeling_Single-Arm_Cable_Row`;
+// dela_yazdani has seven such pairs (`DB_Arnold_Press` / `Dumbbell_Arnold_Press`,
+// `Leg_Press` / `Machine_Leg_Press`, `Seated_Leg_Curl` / `Machine_Seated_Leg_Curl`
+// …) with real weights logged on both sides of each.
+//
+// At boot, match orphaned keys back to an exercise in the CURRENT programme and
+// copy the data across. Cautious by design, because a weight shown against the
+// wrong movement is worse than an honest blank:
+//   • COPY, never move — the old key stays, so this is safe to re-run and a bad
+//     match destroys nothing
+//   • never overwrite a key that already holds something
+//   • only DURABLE data travels: weights and notes. Per-set RPE and done-ticks
+//     are session state (autoResetStaleDays clears them daily), and carrying them
+//     would make a renamed exercise reappear already ticked
+//   • match in tiers, tightest first, and only when exactly ONE orphan maps to
+//     exactly ONE current name — any ambiguity in either direction is left alone
+const EX_ABBREV = { db: 'dumbbell', bb: 'barbell', kb: 'kettlebell' };
+// Only keys whose value is worth keeping across sessions. `_rpe_` is deliberately
+// absent — see above.
+const EX_DURABLE_PREFIXES = ['setlog_', 'note_', 'cwlog_', 'wlog_'];
+
+// Four progressively looser identities for one exercise name. Compared tier by
+// tier so a loose rule can never win where a tight one already decided.
+function exNameVariants(sfx) {
+  const base = normExName(sfx);                                   // case, punctuation, accents
+  const toks = base.split(' ').filter(Boolean);
+  const abbrev = toks.map(t => EX_ABBREV[t] || t).join(' ');      // "DB" -> "dumbbell"
+  // Drop the word "machine" and ignore word order: catches "Leg Press" vs
+  // "Machine Leg Press" and "Leg Press Machine".
+  const noMachine = abbrev.split(' ').filter(t => t && t !== 'machine').sort().join(' ');
+  // Drop a trailing qualifier: "Cossack Squat (Bodyweight)" vs "Cossack Squat".
+  const noParen = normExName(String(sfx).replace(/\([^)]*\)/g, ' '));
+  return [base, abbrev, noMachine, noParen];
+}
+
+function adoptRenamedExercises() {
+  if (!ATHLETE_ID || !DATA || !DATA.workouts) return;
+  const current = new Set();
+  (DATA.workouts.days || []).forEach(d =>
+    (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+      const s = String(ex.name || '').replace(/\s+/g, '_');
+      if (s) current.add(s);
+    })));
+  if (!current.size) return;
+
+  // Snapshot the keys first — we write to localStorage while walking this.
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.indexOf(ATHLETE_ID + '_') === 0) keys.push(k);
+  }
+  const splitKey = k => {
+    const rest = k.slice(ATHLETE_ID.length + 1);
+    const pfx = EX_DURABLE_PREFIXES.filter(p => rest.indexOf(p) === 0)[0];
+    return pfx ? { pfx: pfx, name: rest.slice(pfx.length) } : null;
+  };
+
+  const orphans = new Set();
+  keys.forEach(k => {
+    const p = splitKey(k);
+    if (p && p.name && !current.has(p.name)) orphans.add(p.name);
+  });
+  if (!orphans.size) return;
+
+  const indexBy = names => {
+    const store = [{}, {}, {}, {}];
+    names.forEach(n => exNameVariants(n).forEach((v, tier) => {
+      if (!v) return;
+      (store[tier][v] || (store[tier][v] = [])).push(n);
+    }));
+    return store;
+  };
+  const curIdx = indexBy(current), orpIdx = indexBy(orphans);
+
+  const adopted = [];
+  orphans.forEach(orphan => {
+    const vs = exNameVariants(orphan);
+    for (let tier = 0; tier < vs.length; tier++) {
+      const v = vs[tier];
+      if (!v) continue;
+      const targets = curIdx[tier][v] || [];
+      const rivals  = orpIdx[tier][v] || [];
+      if (targets.length !== 1 || rivals.length !== 1) continue;   // ambiguous — hands off
+      keys.forEach(k => {
+        const p = splitKey(k);
+        if (!p || p.name !== orphan) return;
+        const to = ATHLETE_ID + '_' + p.pfx + targets[0];
+        if (localStorage.getItem(to) != null) return;              // never overwrite
+        let val = localStorage.getItem(k);
+        if (val == null || val === '') return;
+        // Weights carry, the old session's RPE and ticks do not.
+        if (p.pfx === 'setlog_') val = stripSetLogSession(val);
+        try { localStorage.setItem(to, val); adopted.push(p.pfx + targets[0]); } catch (e) {}
+      });
+      break;                                                       // tightest tier wins
+    }
+  });
+  if (adopted.length) console.info('[program] carried history across rename:', adopted.join(', '));
 }
 
 // Wipes per-session data for any day completed on a previous calendar date.
