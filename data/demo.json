@@ -26,23 +26,22 @@
       "tagline": "Earn the adaptation",
       "weeks": "Weeks 6–10",
       "focuses": [
-        "Progress the foundational lifts with real, trackable load.",
-        "Introduce rotational power work that transfers to the court.",
-        "Continue consolidating shoulder health while adding pressing volume.",
-        "Improve single-leg stability under load."
+        "Progress the squat and hinge with real, trackable load.",
+        "Build the rotational power that sits behind every shot.",
+        "Armour the shoulder so the serve holds up all season.",
+        "Sharpen change of direction — the first step to the ball."
       ],
       "message": {
         "paragraphs": [
           "This is where the body starts genuinely changing. Foundation Forge taught your nervous system how to move; this cycle teaches it how to produce force.",
-          "Every strength lift now has a concrete rep and tempo prescription. You'll feel weights get heavier, sets get harder, and progress become visible session by session. The goal is not to chase fatigue — it is to chase clean, heavy reps at the tempos written.",
-          "Rotational work enters for the first time this cycle. Treat the med-ball slams as tennis practice, not conditioning."
+          "Every strength lift now has a concrete rep and tempo prescription. You'll feel weights get heavier and progress become visible session by session. The goal is not to chase fatigue — it is to chase clean, heavy reps at the tempos written.",
+          "Jumps and throws come first in every session, while you're fresh. Treat the bounds and med-ball throws as tennis practice, not conditioning — every rep is maximum intent, then full recovery."
         ],
         "outcomes": [
-          "Measurable strength gains in the back squat and RDL",
-          "Confident, pain-free overhead pressing",
-          "Improved single-leg balance and knee control on landings",
-          "Faster, more coordinated rotational output",
-          "No in-session shoulder irritation"
+          "Measurable strength gains in the back squat and Romanian deadlift",
+          "Sharper, more controlled first step and change of direction",
+          "Confident, pain-free overhead pressing and serving",
+          "Rotational power that shows up in your groundstrokes"
         ]
       }
     },
@@ -89,21 +88,22 @@
     }
   ],
   "workouts": {
-    "label": "Program 02 · Month Two",
+    "label": "Cycle 2 of 5 · Load & Build",
     "days": [
       {
         "id": 1,
-        "focusTag": "Squat & Glute Activation",
+        "focusTag": "Acceleration & Squat Strength",
         "completionTitle": "Day 1 Done",
-        "completionMessage": "Great work. Rest up and come back stronger.",
+        "completionMessage": "That first step to the ball gets built right here. Rest up.",
         "blocks": [
           {
             "title": "Warm-Up",
-            "icon": "🚲",
+            "icon": "🚣",
             "exercises": [
               {
                 "type": "simple",
-                "name": "Bike",
+                "name": "Rowing",
+                "videoUrl": "https://www.youtube.com/watch?v=6_eLpWiNijE",
                 "chips": [
                   {
                     "label": "5 minutes",
@@ -112,11 +112,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Steady pace, gradually increase RPM",
-                    "Light sweat by the end"
+                    "Build from easy to a light sweat",
+                    "Long, smooth strokes — drive with the legs"
                   ],
                   "bad": [
-                    "Don't go all-out — this is a warm-up"
+                    "Don't race it — you're raising temperature, not training"
                   ]
                 }
               }
@@ -129,44 +129,102 @@
               {
                 "type": "circuit",
                 "name": "Dynamic Mobility",
-                "rounds": "×3 Rounds",
+                "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "90/90 Hip Rotation",
-                    "detail": "×12",
+                    "name": "World's Greatest Stretch",
+                    "detail": "×5/side",
+                    "videoUrl": "https://www.youtube.com/watch?v=CXnge363CH8",
                     "cues": {
                       "good": [
-                        "Keep chest tall throughout",
-                        "Drive knees to the floor with control"
+                        "Drive the back hip forward before you rotate",
+                        "Reach tall and follow your hand with your eyes"
                       ],
                       "bad": [
-                        "Don't rush — own each transition"
+                        "Don't rush the rotation — own each position"
                       ]
                     }
                   },
                   {
-                    "name": "Goblet Squat",
-                    "detail": "×6",
+                    "name": "Leg Swings",
+                    "detail": "×10/side",
+                    "videoUrl": "https://www.youtube.com/watch?v=difYoBtZi2s",
                     "cues": {
                       "good": [
-                        "Push the floor away on the way up",
-                        "Elbows inside the knees at the bottom"
+                        "Stand tall and hold something for balance",
+                        "Let the range build swing by swing"
                       ],
                       "bad": [
-                        "Don't let the chest drop forward"
+                        "Don't force the end range with a kick"
                       ]
                     }
                   },
                   {
                     "name": "Ankle Dorsiflexion Rocks",
                     "detail": "×8/side",
+                    "videoUrl": "https://www.youtube.com/watch?v=f2gbLLXVGFE",
                     "cues": {
                       "good": [
-                        "Drive knee over the little toe",
-                        "Keep heel glued to the floor"
+                        "Drive the knee over the little toe",
+                        "Keep the heel glued to the floor"
                       ],
                       "bad": [
                         "Don't let the arch collapse inward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Squat to Stand",
+                    "detail": "×6",
+                    "videoUrl": "https://www.youtube.com/watch?v=UBn54JasK2U",
+                    "cues": {
+                      "good": [
+                        "Pull yourself down by the toes, chest tall",
+                        "Stand up slowly, keeping the spine long"
+                      ],
+                      "bad": [
+                        "Don't round the low back at the bottom"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Activation",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Glute & Core Prep",
+                "rounds": "×2 Rounds",
+                "items": [
+                  {
+                    "name": "Banded Glute Bridge",
+                    "detail": "×15",
+                    "videoUrl": "https://www.youtube.com/watch?v=GaxOodE1Irk",
+                    "cues": {
+                      "good": [
+                        "Push the knees out against the band",
+                        "Squeeze the glutes at the top, ribs down"
+                      ],
+                      "bad": [
+                        "Don't arch the low back to finish the rep"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Dead Bug",
+                    "detail": "×8/side",
+                    "videoUrl": "https://www.youtube.com/watch?v=-VykQ1HD0Vw",
+                    "cues": {
+                      "good": [
+                        "Press the low back into the floor the whole set",
+                        "Move slowly, breathe out as you extend"
+                      ],
+                      "bad": [
+                        "Don't let the ribs flare or the back arch"
                       ]
                     }
                   }
@@ -180,49 +238,51 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Broad Jump",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×5 Reps"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Swing arms aggressively",
-                    "Land soft — absorb through hips and knees"
-                  ],
-                  "bad": [
-                    "Don't land stiff-legged"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Lateral Bound",
+                "name": "Box Jump",
+                "videoUrl": "https://www.youtube.com/watch?v=NBY9-kTuHEk",
                 "chips": [
                   {
                     "label": "stick landing",
                     "style": "dark"
                   },
                   {
-                    "label": "3 Sets"
+                    "label": "4 Sets"
                   },
                   {
-                    "label": "×5/side"
+                    "label": "×4 Reps"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Push off the inside foot hard",
-                    "Stick the landing for 2 seconds — freeze"
+                    "Swing the arms hard and jump tall",
+                    "Land quiet, hips back, and freeze for 2 seconds"
                   ],
                   "bad": [
-                    "Don't wobble on landing — control it"
+                    "Don't chase box height — quality of landing is the point"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Leg Box Jump",
+                "videoUrl": "https://www.youtube.com/watch?v=L0zdoG31yXg",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×4/side"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Use a low box — control beats height",
+                    "Land on the same leg and absorb through the hip"
+                  ],
+                  "bad": [
+                    "Don't let the knee collapse inward on landing"
                   ]
                 }
               }
@@ -235,7 +295,7 @@
               {
                 "type": "standard",
                 "name": "Barbell Back Squat",
-                "videoUrl": "https://www.youtube.com/watch?v=ultWZbUMPL8",
+                "videoUrl": "https://www.youtube.com/watch?v=rrJIyZGlK8c",
                 "chips": [
                   {
                     "label": "4 Sets",
@@ -254,64 +314,351 @@
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Push the floor away",
-                    "Big breath, brace hard before every rep"
+                    "Three seconds down, one second pause, drive up",
+                    "Brace before you unrack, keep the chest proud"
                   ],
                   "bad": [
-                    "Don't let your knees cave on the way up"
+                    "Don't bounce out of the bottom — the pause is the work"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Single-Leg Hip Lift",
+                "name": "Dumbbell Bulgarian Split Squat",
+                "videoUrl": "https://www.youtube.com/watch?v=8kvZmrlOo2M",
                 "chips": [
                   {
                     "label": "3 Sets"
                   },
                   {
-                    "label": "×10+10"
+                    "label": "×8/side"
                   },
                   {
-                    "label": "Tempo 2-1-2"
+                    "label": "RPE 7"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Drive through the heel",
-                    "Squeeze the glute at the top for a full second"
+                    "Most of the weight through the front heel",
+                    "Keep the torso tall and the back knee soft"
                   ],
                   "bad": [
-                    "Don't hyperextend the lower back at the top"
+                    "Don't let the front knee cave in"
                   ]
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "🎯",
+            "exercises": [
               {
                 "type": "standard",
-                "name": "Lateral Step-Down",
+                "name": "Machine Lying Leg Curl",
+                "videoUrl": "https://www.youtube.com/watch?v=SbSNUXPRkc8",
                 "chips": [
                   {
                     "label": "3 Sets"
                   },
                   {
-                    "label": "×6+6"
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "RPE 7"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Tap the heel softly — don't crash down",
-                    "Control the descent with the standing leg"
+                    "Squeeze the hamstring at the top",
+                    "Lower under control for three seconds"
                   ],
                   "bad": [
-                    "Don't let the knee shoot inward"
+                    "Don't let the hips lift off the pad"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Cable Pallof Press",
+                "name": "Standing Machine Calf Raise",
+                "videoUrl": "https://www.youtube.com/watch?v=g_E7_q1z2bo",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Full stretch at the bottom, full height at the top",
+                    "Pause a beat at the top of every rep"
+                  ],
+                  "bad": [
+                    "Don't bounce through the reps"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half Kneeling Pallof Press",
+                "videoUrl": "https://www.youtube.com/watch?v=dmoZPkjzhQ4",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10/side"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Resist the twist — that's the whole exercise",
+                    "Squeeze the down glute and stay tall"
+                  ],
+                  "bad": [
+                    "Don't let the ribs flare as you press out"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Upper Body & Shoulder Armour",
+        "completionTitle": "Day 2 Done",
+        "completionMessage": "Shoulder work is the long game. You're building a serve that lasts.",
+        "blocks": [
+          {
+            "title": "Warm-Up",
+            "icon": "🚣",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Rowing",
+                "videoUrl": "https://www.youtube.com/watch?v=6_eLpWiNijE",
+                "chips": [
+                  {
+                    "label": "5 minutes",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Easy pace, long strokes",
+                    "Finish warm, not tired"
+                  ],
+                  "bad": [
+                    "Don't start hard — this is preparation"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Shoulder Prep",
+            "icon": "🧘",
+            "exercises": [
+              {
+                "type": "circuit",
+                "name": "Shoulder Prep",
+                "rounds": "×2 Rounds",
+                "items": [
+                  {
+                    "name": "Scapular Wall Slide",
+                    "detail": "×10",
+                    "videoUrl": "https://www.youtube.com/watch?v=XwN3hXN4ZZE",
+                    "cues": {
+                      "good": [
+                        "Keep wrists and elbows on the wall",
+                        "Slide slowly and reach tall at the top"
+                      ],
+                      "bad": [
+                        "Don't let the low back peel off the wall"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc",
+                    "cues": {
+                      "good": [
+                        "Pull the band apart with straight arms",
+                        "Squeeze the shoulder blades together"
+                      ],
+                      "bad": [
+                        "Don't shrug the shoulders up to your ears"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Prone Y-T-W",
+                    "detail": "×6 each",
+                    "videoUrl": "https://www.youtube.com/watch?v=QdGTI4Lshg4",
+                    "cues": {
+                      "good": [
+                        "Thumbs up, lift from the shoulder blade",
+                        "Small range done well beats a big sloppy lift"
+                      ],
+                      "bad": [
+                        "Don't crane the neck to help the lift"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "videoUrl": "https://www.youtube.com/watch?v=ESJ6Ghvgr6k",
+                    "cues": {
+                      "good": [
+                        "Move one segment at a time",
+                        "Breathe out as you round, in as you arch"
+                      ],
+                      "bad": [
+                        "Don't rush — this is spinal mobility, not cardio"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Power",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Medicine Ball Slam",
+                "videoUrl": "https://www.youtube.com/watch?v=CkO1mfSBvv4",
+                "chips": [
+                  {
+                    "label": "4 Sets"
+                  },
+                  {
+                    "label": "×5 Reps"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Reach tall, then throw the ball through the floor",
+                    "Full body — finish with the hips"
+                  ],
+                  "bad": [
+                    "Don't lob it — every rep is maximum intent"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Strength",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Incline Dumbbell Press",
+                "videoUrl": "https://www.youtube.com/watch?v=jMQA3XtJSgo",
+                "chips": [
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Three seconds down, press with control",
+                    "Keep the shoulder blades pinned back and down"
+                  ],
+                  "bad": [
+                    "Don't flare the elbows straight out to the sides"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Single-Arm Dumbbell Row",
+                "videoUrl": "https://www.youtube.com/watch?v=ZRSGpBUVcNw",
+                "chips": [
+                  {
+                    "label": "4 Sets"
+                  },
+                  {
+                    "label": "×8/side"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Pull the elbow to the hip, not the armpit",
+                    "Keep the hips square to the floor"
+                  ],
+                  "bad": [
+                    "Don't twist the torso to move a heavier bell"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Single-Arm Landmine Press",
+                "videoUrl": "https://www.youtube.com/watch?v=ORoOn93dnh4",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×8/side"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Squeeze the down glute to lock the pelvis",
+                    "Press up and slightly forward, ribs down"
+                  ],
+                  "bad": [
+                    "Don't lean back to get the weight up"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Shoulder Health",
+            "icon": "🛡",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Side Lying Dumbbell External Rotation",
+                "videoUrl": "https://www.youtube.com/watch?v=_qPQKid-LRs",
                 "chips": [
                   {
                     "label": "3 Sets"
@@ -323,296 +670,63 @@
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Lock the hips — zero rotation",
-                    "Press straight out from the sternum"
+                    "Light weight, elbow pinned to your side",
+                    "Rotate from the shoulder, slow on the way back"
                   ],
                   "bad": [
-                    "Don't let the cable pull you into rotation"
+                    "Don't let the elbow drift away from the ribs"
                   ]
                 }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "focusTag": "Shoulder Rehab & Upper Body",
-        "completionTitle": "Day 2 Done",
-        "completionMessage": "Shoulder work is the long game. You're building it right.",
-        "blocks": [
-          {
-            "title": "Warm-Up",
-            "icon": "🚲",
-            "exercises": [
-              {
-                "type": "simple",
-                "name": "Arm Bike / Ski Erg / Cross Trainer",
-                "chips": [
-                  {
-                    "label": "5 minutes",
-                    "style": "dark"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Light effort — get blood moving into shoulders and upper back"
-                  ],
-                  "bad": [
-                    "Don't grip too hard"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "title": "Shoulder Activation",
-            "icon": "🧘",
-            "exercises": [
-              {
-                "type": "circuit",
-                "name": "Shoulder Activation",
-                "rounds": "×3 Rounds",
-                "items": [
-                  {
-                    "name": "Band Pull-Apart",
-                    "detail": "×15",
-                    "cues": {
-                      "good": [
-                        "Squeeze shoulder blades together at end range",
-                        "Keep arms straight"
-                      ],
-                      "bad": [
-                        "Don't shrug the shoulders up"
-                      ]
-                    },
-                    "videoUrl": "https://www.youtube.com/watch?v=MnDpmNYUjbc"
-                  },
-                  {
-                    "name": "Scapular Wall Slide",
-                    "detail": "×10",
-                    "cues": {
-                      "good": [
-                        "Keep wrists and elbows touching the wall",
-                        "Slide up as high as you can without arching"
-                      ],
-                      "bad": [
-                        "Don't let the lower back peel off the wall"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Band External Rotation",
-                    "detail": "×12/side",
-                    "cues": {
-                      "good": [
-                        "Pin a towel between elbow and rib cage",
-                        "Rotate out slowly"
-                      ],
-                      "bad": [
-                        "Don't let the elbow drift away from the body"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Side Lying Dumbbell External Rotation",
-                    "detail": "×10/side",
-                    "cues": {
-                      "good": [
-                        "Light weight only — 1–2 kg max",
-                        "Rotate from the shoulder, not the wrist"
-                      ],
-                      "bad": [
-                        "Don't roll the body backward for momentum"
-                      ]
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "title": "Strength",
-            "icon": "💪",
-            "exercises": [
+              },
               {
                 "type": "standard",
                 "name": "Cable Face Pull",
-                "chips": [
-                  {
-                    "label": "Priority",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×15"
-                  },
-                  {
-                    "label": "Tempo 2-0-2"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Pull to the ears, elbows high",
-                    "Squeeze the rear delts at the top"
-                  ],
-                  "bad": [
-                    "Don't use momentum — this is a control exercise"
-                  ]
-                },
-                "videoUrl": "https://www.youtube.com/watch?v=0Po47vvj9g4"
-              },
-              {
-                "type": "standard",
-                "name": "Half-Kneeling Single-Arm Dumbbell Press",
+                "videoUrl": "https://www.youtube.com/watch?v=0Po47vvj9g4",
                 "chips": [
                   {
                     "label": "3 Sets"
                   },
                   {
-                    "label": "×10+10"
-                  },
-                  {
-                    "label": "Tempo 2-1-2"
-                  },
-                  {
-                    "label": "RPE 6–7"
+                    "label": "×15 Reps"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Squeeze the down-knee glute for stability",
-                    "Press slightly in front of the ear"
+                    "Pull to the forehead, elbows high",
+                    "Finish by rotating the knuckles back"
                   ],
                   "bad": [
-                    "Don't arch the lower back to press higher"
+                    "Don't turn it into a heavy row"
                   ]
                 }
-              },
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
               {
                 "type": "standard",
-                "name": "Dumbbell 3-Point Row",
+                "name": "Copenhagen Plank",
+                "videoUrl": "https://www.youtube.com/watch?v=aDsaGBnvDQo",
                 "chips": [
                   {
                     "label": "3 Sets"
                   },
                   {
-                    "label": "×10+10"
-                  },
-                  {
-                    "label": "Tempo 3-1-1"
+                    "label": "×20s/side"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Initiate the pull from the elbow, not the hand",
-                    "3-second lower — own the eccentric"
+                    "Start with the bottom knee down if needed",
+                    "Squeeze the top leg into the bench"
                   ],
                   "bad": [
-                    "Don't rotate the torso to pull the weight up"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Incline Dumbbell Press",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×10"
-                  },
-                  {
-                    "label": "Tempo 3-1-1"
-                  },
-                  {
-                    "label": "RPE 6–7"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Set the shoulder blades back and down before pressing",
-                    "Control the descent — 3 seconds down"
-                  ],
-                  "bad": [
-                    "Don't flare elbows past 45 degrees"
-                  ]
-                },
-                "videoUrl": "https://www.youtube.com/watch?v=jMQA3XtJSgo"
-              },
-              {
-                "type": "standard",
-                "name": "Lat Pulldown",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×10"
-                  },
-                  {
-                    "label": "Tempo 3-1-1"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Pull the bar to the upper chest",
-                    "Lead with the elbows — think armpits"
-                  ],
-                  "bad": [
-                    "Don't lean back excessively to pull heavier"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Incline Y-T Raise",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×10 each shape"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Thumbs up for Y, palms down for T",
-                    "Lift from the shoulder — not the wrist"
-                  ],
-                  "bad": [
-                    "Don't use more than 2 kg — this is activation, not loading"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Suitcase Carry",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×20m/side"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Walk tall — imagine a string pulling your head up",
-                    "Keep the unloaded side from leaning"
-                  ],
-                  "bad": [
-                    "Don't rush — slow, controlled steps"
+                    "Don't let the hips sag toward the floor"
                   ]
                 }
               }
@@ -622,17 +736,18 @@
       },
       {
         "id": 3,
-        "focusTag": "Hinge & Rotational Power",
+        "focusTag": "Change of Direction & Rotational Power",
         "completionTitle": "Day 3 Done",
-        "completionMessage": "Rotational power locked in. See you next week.",
+        "completionMessage": "That's the power behind your forehand. See you next week.",
         "blocks": [
           {
             "title": "Warm-Up",
-            "icon": "🚲",
+            "icon": "🚣",
             "exercises": [
               {
                 "type": "simple",
-                "name": "Bike",
+                "name": "Rowing",
+                "videoUrl": "https://www.youtube.com/watch?v=6_eLpWiNijE",
                 "chips": [
                   {
                     "label": "5 minutes",
@@ -641,63 +756,80 @@
                 ],
                 "cues": {
                   "good": [
-                    "Steady build-up over 5 minutes"
+                    "Gradual build to a light sweat",
+                    "Smooth, unhurried strokes"
                   ],
                   "bad": [
-                    "Don't skip the warm-up"
+                    "Don't arrive at the first jump already tired"
                   ]
                 }
               }
             ]
           },
           {
-            "title": "Activation",
+            "title": "Dynamic Mobility",
             "icon": "🧘",
             "exercises": [
               {
                 "type": "circuit",
-                "name": "Activation",
+                "name": "Dynamic Mobility",
                 "rounds": "×2 Rounds",
                 "items": [
                   {
-                    "name": "Dumbbell Walking Lunge",
-                    "detail": "×6+6",
+                    "name": "90/90 Hip Switch",
+                    "detail": "×8",
+                    "videoUrl": "https://www.youtube.com/watch?v=XnN_68tZfqc",
                     "cues": {
                       "good": [
-                        "Long stride, front shin vertical at the bottom",
-                        "Drive through the front heel to stand"
+                        "Keep the chest tall through the switch",
+                        "Drive both knees down with control"
                       ],
                       "bad": [
-                        "Don't let the front knee shoot forward over the toe"
+                        "Don't use momentum to throw the knees over"
                       ]
                     }
                   },
                   {
-                    "name": "Hip Airplane",
-                    "detail": "×4+4 · 3s hold",
+                    "name": "Open Book",
+                    "detail": "×8/side",
+                    "videoUrl": "https://www.youtube.com/watch?v=XmpMtdllbfQ",
                     "cues": {
                       "good": [
-                        "Hinge from the hip — not the back",
-                        "Hold the T-position for a full 3 seconds"
+                        "Keep the knees stacked and still",
+                        "Follow your hand with your eyes and exhale"
                       ],
                       "bad": [
-                        "Don't rotate the hips open — stay square"
+                        "Don't let the bottom knee roll open"
                       ]
                     }
                   },
                   {
-                    "name": "Dead Bug",
-                    "detail": "×6+6",
+                    "name": "Inchworm",
+                    "detail": "×6",
+                    "videoUrl": "https://www.youtube.com/watch?v=pv_8CdDPAAk",
                     "cues": {
                       "good": [
-                        "Press lower back into the floor throughout",
-                        "Exhale as you extend the leg"
+                        "Walk the hands out to a long plank",
+                        "Keep the legs as straight as your hamstrings allow"
                       ],
                       "bad": [
-                        "Don't let the lower back arch off the floor"
+                        "Don't let the hips sag in the plank position"
                       ]
-                    },
-                    "videoUrl": "https://www.youtube.com/watch?v=-VykQ1HD0Vw"
+                    }
+                  },
+                  {
+                    "name": "Cossack Squat",
+                    "detail": "×6/side",
+                    "videoUrl": "https://www.youtube.com/watch?v=dhDjKmTX8tU",
+                    "cues": {
+                      "good": [
+                        "Sit into one hip, other foot flat and toes up",
+                        "Chest tall the whole way through"
+                      ],
+                      "bad": [
+                        "Don't let the heel of the working leg lift"
+                      ]
+                    }
                   }
                 ]
               }
@@ -709,84 +841,107 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Low Box Rebound Jump",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×6 Reps"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Spend as little time on the ground as possible",
-                    "Think 'hot floor' — bounce off fast"
-                  ],
-                  "bad": [
-                    "Don't sink into a deep squat on landing"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Single-Leg Lateral Hop",
+                "name": "Lateral Bound",
+                "videoUrl": "https://www.youtube.com/watch?v=9lRCe2KNuTk",
                 "chips": [
                   {
                     "label": "stick landing",
                     "style": "dark"
                   },
                   {
-                    "label": "3 Sets"
+                    "label": "4 Sets"
                   },
                   {
-                    "label": "×5+5"
+                    "label": "×4/side"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Explode sideways off one leg",
-                    "Stick the landing — hold for 2 seconds"
+                    "Push hard off the inside foot",
+                    "Stick the landing for 2 seconds — freeze it"
                   ],
                   "bad": [
-                    "Don't let the knee collapse inward on landing"
+                    "Don't wobble on landing — control before distance"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lateral Line Hop",
+                "videoUrl": "https://www.youtube.com/watch?v=MuPAc9YTg-8",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×20 seconds"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Stay on the balls of the feet, quick and light",
+                    "Minimum ground contact time"
+                  ],
+                  "bad": [
+                    "Don't sink into deep squats between hops"
                   ]
                 }
               }
             ]
           },
           {
-            "title": "Med Ball — Rotational Power",
-            "icon": "🏐",
+            "title": "Rotational Power",
+            "icon": "🎾",
             "exercises": [
               {
                 "type": "standard",
-                "name": "Rotational Wall Slam",
+                "name": "Medicine Ball Rotational Throw",
+                "videoUrl": "https://www.youtube.com/watch?v=mxf1D3NtxMo",
                 "chips": [
                   {
-                    "label": "Max Intent",
-                    "style": "yellow"
+                    "label": "court transfer",
+                    "style": "dark"
                   },
                   {
-                    "label": "3 Sets"
+                    "label": "4 Sets"
                   },
                   {
-                    "label": "×6/side"
-                  },
-                  {
-                    "label": "2–3 kg"
+                    "label": "×5/side"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Hips first, trunk follows, arm releases last",
-                    "Same sequence as a forehand — rotate from the ground up"
+                    "Drive from the back hip, let the arms follow",
+                    "Throw as hard as you can — every rep is intent"
                   ],
                   "bad": [
-                    "Don't muscle it with the arms — this is a whole-body rotation"
+                    "Don't arm it — the power comes from the ground up"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Medicine Ball Rotational Slam",
+                "videoUrl": "https://www.youtube.com/watch?v=bxmEsIhAfCg",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×6/side"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Rotate through the hips, finish through the ball",
+                    "Reset your stance between reps"
+                  ],
+                  "bad": [
+                    "Don't round the back to reach the floor"
                   ]
                 }
               }
@@ -799,13 +954,14 @@
               {
                 "type": "standard",
                 "name": "Barbell Romanian Deadlift",
+                "videoUrl": "https://www.youtube.com/watch?v=bT5OOBgY4bc",
                 "chips": [
                   {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Reps"
+                    "label": "×6 Reps"
                   },
                   {
                     "label": "Tempo 3-1-1"
@@ -817,78 +973,112 @@
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Push the hips back like closing a car door",
-                    "Bar stays close to the legs — drag it down"
+                    "Push the hips back, bar stays close to the legs",
+                    "Feel the hamstrings load, then drive the hips forward"
                   ],
                   "bad": [
-                    "Don't round the lower back — if you feel it rounding, stop the set"
-                  ]
-                },
-                "videoUrl": "https://www.youtube.com/watch?v=bT5OOBgY4bc"
-              },
-              {
-                "type": "standard",
-                "name": "Dumbbell Single-Leg Romanian Deadlift",
-                "chips": [
-                  {
-                    "label": "3 Sets"
-                  },
-                  {
-                    "label": "×6+6"
-                  }
-                ],
-                "hasRest": true,
-                "cues": {
-                  "good": [
-                    "Reach the DB toward the floor, not forward",
-                    "Standing leg has a slight knee bend — not locked"
-                  ],
-                  "bad": [
-                    "Don't let the hip open up — stay square to the floor"
+                    "Don't turn it into a squat — this is a hinge"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Cable Wood Chop",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": "https://www.youtube.com/watch?v=hg9MMvd-MY8",
                 "chips": [
                   {
                     "label": "3 Sets"
                   },
                   {
-                    "label": "×12+12"
+                    "label": "×8 Reps"
+                  },
+                  {
+                    "label": "RPE 7"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Initiate from the hips, not the arms",
-                    "Lock the arms and rotate the trunk"
+                    "Chin tucked, ribs down, squeeze at the top",
+                    "Full lockout on every rep"
                   ],
                   "bad": [
-                    "Don't pull with the arms — they're just along for the ride"
+                    "Don't hyperextend the low back at the top"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Plank with Shoulder Taps",
+                "name": "Lateral Box Step-Up",
+                "videoUrl": "https://www.youtube.com/watch?v=fN_OXflqK1A",
                 "chips": [
                   {
                     "label": "3 Sets"
                   },
                   {
-                    "label": "×10+10"
+                    "label": "×8/side"
                   }
                 ],
                 "hasRest": true,
                 "cues": {
                   "good": [
-                    "Widen the feet for a more stable base",
-                    "Tap the opposite shoulder without rotating"
+                    "Drive through the whole working foot",
+                    "Lower yourself down slowly — don't drop"
                   ],
                   "bad": [
-                    "Don't rock side to side — the goal is anti-rotation"
+                    "Don't push off the trailing foot to cheat"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Cable Pallof Press",
+                "videoUrl": "https://www.youtube.com/watch?v=tvzoG7Ua05Y",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×10/side"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Resist the rotation — brace before you press",
+                    "Move only the arms, keep the hips locked"
+                  ],
+                  "bad": [
+                    "Don't let the torso twist toward the cable"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": "https://www.youtube.com/watch?v=51gqdYyaqUQ",
+                "chips": [
+                  {
+                    "label": "3 Sets"
+                  },
+                  {
+                    "label": "×20m/side"
+                  }
+                ],
+                "hasRest": true,
+                "cues": {
+                  "good": [
+                    "Stand tall, shoulders level, walk slowly",
+                    "Squeeze the opposite side to stay upright"
+                  ],
+                  "bad": [
+                    "Don't lean away from the weight"
                   ]
                 }
               }
