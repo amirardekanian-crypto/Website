@@ -37,6 +37,42 @@ Two gotchas bite every file (both hit reel-6 in production):
   stillmode kills animations. Anything that must persist gets a transitioned rule
   (`.on .thing{opacity:1}`); reserve keyframes for transient effects.
 
+**A third gotcha, found building `clip-prescription` and specific to this file's
+loop pattern (a single self-looping scene, not reel-6's multi-scene swap):**
+put the `transition:` (duration + delay + easing) on the `.scene.on X` rule
+**only** — never on the base/hidden rule. The house `play()` driver removes
+`.on`, then re-adds it 60ms later to re-arm the loop. If the base rule also
+carries the transition, removing `.on` starts the SAME slow transition in
+reverse — and 60ms against a .3–.6s transition barely moves it, so on loop 2
+the element just stays at its "shown" value forever, because the class returns
+before the reverse has gone anywhere. (This doesn't hit reel-6/reel-4: there,
+a *different* scene/screen takes over when one loses `.on`, so the losing
+scene stays off for the rest of the whole loop — seconds, not 60ms — plenty
+of time to genuinely settle. It only bites a single scene that has to reset
+and re-show itself in one short gap, which is exactly this file's shape.) The
+base rule should declare no transition at all (an instant snap); the reveal
+rule declares the full `transition:` shorthand. Where a reveal is staggered
+per item (`.st-1`, `.cue-2`, …), the delay must live on a **compound**
+selector scoped to `.scene.on` too (`.scene.on .stat.st-1{transition-delay:…}`)
+— a bare `.st-1{transition-delay:…}` has lower specificity than the shorthand
+`.scene.on .stat{transition:…}` that sets it, so the shorthand's implicit
+`0s` silently wins and every item fires at once.
+
+**Verify the loop, not just the two stillmodes.** `?beat=0`/`?beat=1` catch
+whether a *single* pass is correct, but the bug above only shows up on the
+*second* loop — screenshotting a guessed timestamp mid-loop is not reliable
+enough to catch or rule it out (confirmed empirically: several screenshots at
+guessed instants each told a different, misleading story). The real check:
+run the file headless with a proxy that has `fonts.googleapis.com` reachable
+but `localhost` bypassed (`chromium.launch({ proxy: { server: HTTPS_PROXY,
+bypass: 'localhost,127.0.0.1' } })` — without the bypass the local dev server
+itself gets proxied and every request 403s), then from `page.evaluate` run a
+`setInterval` that reads `getComputedStyle(el).opacity` (or `.transform`) on
+every element the reveal must reset, tagged with `performance.now()`, for at
+least two full loop periods. A clean trace looks like `0,0,0,1,1,1,1,0,0,0,1,1…`
+— repeating, symmetric, dropping fully to the base value every loop. Anything
+that flatlines at the shown value after loop 1 has the bug above.
+
 ---
 
 ## ① BUILD FIRST — `Content/clip-prescription.html` · 7.2s
