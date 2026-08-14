@@ -207,3 +207,111 @@ native-Farsi critic). Final = pain-first hook/problem/process + product-first
 deliverables/CTA + authority-angle price beat, with all critic fixes applied
 («هر روز» overclaim removed; slide-8 absolute guarantee removed; colloquial
 ezafe spelling «ـه‌ی» throughout).
+
+---
+
+## ASSET 3 — "The System" reel (the second pin: why this is different)
+
+Added 2026-08-14 after Amir named his differentiators: the 6-month needs-analysis
+plan, linked cycles the athlete understands, detailed programming, a living
+system that adjusts from weekly check-ins, and delivery in his own app.
+
+**Positioning:** the explainer reel answers *how does it work* (process + price);
+this one answers *why it's different*. Pin both (IG allows 3 pins). Suggested
+covers: explainer «روشِ کار» · this one «فرقش چیه؟». Record the explainer first.
+
+**Length:** ~82s · ~203 words. Same rules: each beat its own take.
+
+### Beat 1 — Hook · the contrast (۸ ثانیه)
+
+> بیشترِ مربی‌ها بهت یه برنامه می‌فروشن؛ من برات یه مسیرِ شیش‌ماهه می‌سازم.
+> بذار نشونت بدم فرقش کجاست.
+
+- **On-screen:** «برنامه نمی‌فروشم — مسیر می‌سازم»
+- **Shot:** talking head, calm, no music yet.
+
+### Beat 2 — Needs analysis (۱۶ ثانیه)
+
+> قبل از هر حرکتی، تحلیلِ نیاز: ورزشِ تو از بدنت چی می‌خواد، و بازیکنِ حرفه‌ای چی داره که تو هنوز نداری — اسپرینت، تغییرِ مسیر، قدرتِ چرخشی، نفسِ ستِ سوم.
+> مسیرِ تو از جایی که الان هستی شروع می‌شه و به همونا می‌رسه.
+
+- **On-screen:** «تحلیلِ نیاز: زمین چی می‌خواد؟»
+- **Shot:** court B-roll synced to the four demands; back to camera for the last line.
+
+### Beat 3 — The linked map (۱۹ ثانیه)
+
+> بعد نقشه‌ی شیش‌ماهه رو می‌چینم: سیکل‌های حدوداً پنج‌هفته‌ای، هر کدوم یه مأموریت — یکی پایه می‌سازه، یکی قدرت، یکی توان، یکی بدنتو ضدِ آسیب می‌کنه — و هر کدوم رو قبلی سواره.
+> از روزِ اول کلِ نقشه رو می‌بینی: هر ماه چی‌کار می‌کنه، چرا، و چطوری به بعدی وصله.
+
+- **On-screen:** «۶ ماه · سیکل به سیکل · هر کدوم یه دلیل»
+- **Shot:** **the money shot** — screen-record the app's cycle card opening: the
+  mission name, the WHY text, the expected outcomes, the «CYCLE ۲ OF ۵» meter.
+  Showing the map beats claiming it.
+
+### Beat 4 — Programmed in detail (۹ ثانیه)
+
+> تازه بعدِ این، برنامه‌ریزیِ دقیق شروع می‌شه: برای هر حرکت — ست، تکرار، شدتِ هدف، تمپو، استراحت.
+> هیچی بی‌دلیل نیست.
+
+- **On-screen:** «ست · تکرار · شدت · تمپو · استراحت»
+- **Shot:** close screen-record of one exercise card's prescription line.
+
+### Beat 5 — A living system (۱۶ ثانیه)
+
+> و مهم‌ترین فرق: این یه برنامه‌ی یه‌بار-بنویس-و-خداحافظ نیست؛ یه سیستمِ مربی‌گریِ آنلاینه.
+> هر هفته چک‌این داریم؛ هر چی گزارش بدی — حرکتی اذیت کنه، هفته‌ت سنگین شه، جوابِ بدنت فرق کنه — برنامه همون‌جا تنظیم می‌شه.
+> هیچ‌وقت رو یه برنامه‌ی کهنه تمرین نمی‌کنی.
+
+- **On-screen:** «برنامه‌ی زنده — هر هفته تنظیم می‌شه»
+- **Shot:** readiness check + chat B-roll; back to camera for the last line.
+
+### Beat 6 — The app + CTA (۱۴ ثانیه)
+
+> همه‌ی اینا تو اپِ خودمه: تمرین‌هات، ویدیوی هر حرکت، یادداشت‌های شخصیِ من، و مربی‌گریِ دوطرفه — تمرینت دیده می‌شه، نه فقط فرستاده.
+> جدی‌ای؟ دایرکت بده، بنویس START. یه نقشه تا هدفت. یه مربی تو جیبت.
+
+- **On-screen:** «دایرکت بده: START · لینک تو بایو»
+- **Shot:** fast app montage → talking head; end card as in the explainer reel.
+
+### Alternative hooks
+
+1. **(master)** «بیشترِ مربی‌ها بهت یه برنامه می‌فروشن؛ من برات یه مسیرِ شیش‌ماهه می‌سازم.»
+2. «برنامه‌ی ماهِ سومت رو همین الان می‌تونم نشونت بدم — قبل از این‌که شروع کرده باشی.» — proof-of-planning as curiosity; only a mapped system can say this.
+3. «فرقِ یه برنامه با یه سیستم؟ شیش ماه.» — punchiest; needs a confident dry delivery.
+4. «برنامه‌ای که ندونه ماهِ بعد چیه، برنامه نیست؛ حدسه.» — echoes the explainer's «برنامه‌ی آماده = حدس» motif, nice continuity between the two pins.
+
+### Caption (paste-ready)
+
+> بیشترِ مربی‌ها بهت یه برنامه می‌فروشن؛ من برات یه مسیرِ شیش‌ماهه می‌سازم.
+> تحلیلِ نیاز از ورزشت. نقشه‌ی شیش‌ماهه که هر سیکلش یه دلیل داره و هر ماهش به بعدی وصله. برنامه‌ریزیِ دقیقِ هر حرکت. و سیستمی که هر هفته با چک‌این زنده می‌مونه — همه تو اپِ خودم.
+> از روزِ اول کلِ نقشه رو می‌بینی: هر ماه چی‌کار می‌کنه، چرا، و بعدش چی.
+> جدی‌ای؟ دایرکت بده، فقط بنویس START — یا لینک تو بایو.
+> ‎#تنیس #پدل #بدنسازی_تنیس #آمادگی_جسمانی #مربی_آنلاین
+
+---
+
+## The differentiator toolkit — one line per claim, reusable anywhere
+
+How to explain a differentiator, in three rules: **contrast** (most coaches X —
+I do Y) · **show the artifact** (the cycle card's WHY on screen beats claiming
+it) · **one claim per breath** (never stack two differentiators in a sentence).
+
+Paste-ready lines for DMs, story answers and captions:
+
+1. **نقشه‌ی شیش‌ماهه از تحلیلِ نیاز**
+   «بیشتر مربی‌ها از حرکت شروع می‌کنن؛ من از تحلیلِ نیاز — از جایی که هستی، تا جایی که زمین ازت می‌خواد.»
+2. **ماه‌های به‌هم‌وصل**
+   «هر سیکل یه مأموریته و هر کدوم رو قبلی سواره — از روزِ اول کلِ نقشه رو می‌بینی: هر ماه چی‌کار می‌کنه، چرا، و بعدش چی.»
+3. **برنامه‌ریزیِ دقیق**
+   «هر حرکت: ست، تکرار، شدتِ هدف، تمپو، استراحت. هیچی بی‌دلیل نیست.»
+4. **سیستمِ زنده، نه برنامه‌ی یه‌بار-بنویس**
+   «هر چی تو چک‌اینِ هفتگی گزارش بدی، برنامه همون‌جا تنظیم می‌شه — هیچ‌وقت رو برنامه‌ی کهنه تمرین نمی‌کنی.»
+5. **اپِ خودم**
+   «تمرینت دیده می‌شه، نه فقط فرستاده: ویدیوی هر حرکت، یادداشت‌های شخصیِ من، مربی‌گریِ دوطرفه.»
+
+**Best DM use:** when someone balks at the price, answer with line 4 then line 1 —
+the living system and the map are what a cheap PDF can never match.
+
+**B-roll additions for this reel:** the cycle card opened (mission + WHY +
+outcomes text visible), the «CYCLE ۲ OF ۵» meter, one exercise card's
+prescription line up close. All from `program.html?client=demo`.
