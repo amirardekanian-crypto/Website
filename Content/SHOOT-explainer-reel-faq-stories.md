@@ -315,3 +315,96 @@ the living system and the map are what a cheap PDF can never match.
 **B-roll additions for this reel:** the cycle card opened (mission + WHY +
 outcomes text visible), the «CYCLE ۲ OF ۵» meter, one exercise card's
 prescription line up close. All from `program.html?client=demo`.
+
+---
+
+## ASSET 4 — The Instagram profile itself (bio, name field, highlights, pins)
+
+Added 2026-08-14. The profile is what every reel viewer taps next — it has to
+repeat the same differentiators in ~150 characters. Language: **Farsi**, matching
+the content directive; international tennis/padel players are served by the
+English-site door on `links.html`, so the bio doesn't have to be bilingual.
+
+### Name field (the bold line — 30 char limit, and it IS searchable)
+
+Instagram indexes this field, so it carries the keyword, not just the name.
+Pick one:
+
+| Chars | Text |
+|---|---|
+| 30 | `امیر اردکانی · مربی تنیس و پدل` |
+| 28 | `امیر اردکانی · بدنسازیِ تنیس` |
+| 27 | `امیر اردکانی | مربی بدنسازی` ← **recommended** (widest search net) |
+| 28 | `Amir Ardekani | مربی بدنسازی` (only if he wants Latin discoverability) |
+
+### Bio (150 char limit — all four fit, counts are worst-case)
+
+**Option A — differentiator-led (131 chars) ← recommended.** It's the only one
+that states the thing no competitor can copy: a system, not a program.
+
+```
+مربیِ بدنسازیِ تنیس و پدل 🎾
+دوتا ارشد · تجربه‌ی +۱۰۰۰ بازیکن
+برنامه نمی‌فروشم؛ مسیرِ ۶ ماهه می‌سازم — تو اپِ خودم
+دایرکت: START 👇
+```
+
+**Option B — pain-led (125 chars).** Mirrors the explainer reel's hook, so a
+viewer who taps through from the reel sees the same sentence twice.
+
+```
+تو کورت قوی، تو باشگاه گم؟ 🎾
+مربیِ بدنسازیِ تنیس و پدل · دوتا ارشد
+برنامه‌ی اختصاصی + اپ + چک‌این هفتگی
+دایرکت بده: START 👇
+```
+
+**Option C — authority-led (143 chars).** Both degrees spelled out; use if the
+Tehran market needs the credentials up front.
+
+```
+مربیِ بدنسازیِ حرفه‌ای 🎾 تنیس و پدل
+ارشد قدرت و آماده‌سازی · ارشد فیزیولوژی ورزشی
++۱۰۰۰ بازیکن · برنامه‌ی اختصاصی تو اپِ خودت
+دایرکت: START 👇
+```
+
+**Option D — system-led (129 chars).** The bluntest contrast line of the four.
+
+```
+مربیِ بدنسازیِ تنیس و پدل · دوتا ارشد
+یه برنامه نه — یه سیستمِ ۶ ماهه، تو اپِ خودم
+هر هفته چک‌این، هر هفته تنظیم
+دایرکت: START 👇
+```
+
+⚠ **Do not put the price in the bio.** It's the first slide of the highlight,
+which is where a curious visitor looks — and the bio's 150 characters are better
+spent on the differentiator that makes the price make sense.
+
+### The rest of the profile
+
+- **Link:** `amirardekani.com/links.html` (Apply · AA Proof · site · EN site).
+- **Category:** *Personal Trainer* — or *Sports & Fitness Instruction* if he
+  wants to read less one-to-one. Not "Public Figure": it hides the intent.
+- **Contact:** WhatsApp button if the number is safe to publish; otherwise leave
+  DM as the only channel, which the bio CTA already names.
+- **Highlights, in this order** (first three are what's visible without scrolling):
+  1. **«سؤالا»** — the FAQ highlight (Asset 2)
+  2. **«نتیجه‌ها»** — athlete results/testimonials, as they accumulate
+  3. **«اپ»** — a screen-tour of AA Performance
+  4. **«تمرین»** — coaching clips, drills
+- **Pinned posts (3 slots):** ① explainer reel (cover «روشِ کار») ② System reel
+  (cover «فرقش چیه؟») ③ the best proof/result post available.
+
+### Practical gotchas
+
+- **Line breaks:** type the bio in Notes and paste it. The in-app bio field has
+  historically eaten Enter presses.
+- **Latin inside RTL:** keep `START` at the end of its line with only an emoji
+  after it — a Latin run mid-sentence in RTL text can reorder visually.
+- **Highlight covers:** the circles are tiny — a two-syllable Farsi word reads,
+  a sentence doesn't. That's why «سؤالا» beats «سؤال‌های پرتکرار».
+- **Auto-reply:** professional accounts can auto-answer a DM keyword. If it's
+  available on the account, set `START` to reply with the `links.html` URL — the
+  CTA then works while he sleeps, which is the whole point of pinning the reel.
