@@ -408,3 +408,60 @@ spent on the differentiator that makes the price make sense.
 - **Auto-reply:** professional accounts can auto-answer a DM keyword. If it's
   available on the account, set `START` to reply with the `links.html` URL — the
   CTA then works while he sleeps, which is the whole point of pinning the reel.
+
+---
+
+## ASSET 5 — Which beats show the app (and how)
+
+Added 2026-08-14, after Amir asked which parts would be better shown as app
+animation. Full build specs: **`Content/APP-CLIPS.md`**.
+
+**The rule.** *Record the app for real when the proof IS that it's real* — tapping
+an exercise, a video playing, a set being logged; a viewer has to believe the app
+exists, and only a real recording proves it. *Animate when the idea is abstract or
+spans time* — six months of linked cycles, a weekly adjustment loop, your data
+reaching the coach. Those can't be recorded because they never happen on one
+screen in one moment. Third reason to animate: **`coach.html` shows real athletes'
+names, so it must never be screen-recorded** — `clip-watch` tells that story with
+nobody real on screen.
+
+### Explainer reel
+
+| Beat | Visual | What |
+|---|---|---|
+| 1 · Hook | 🎥 Camera | Talking head, no app |
+| 2 · Problem | 🎥 Camera | Court B-roll on the three demands |
+| 3 · Process, step 2 | ✨ **Animate** | `clip-map` (cut at 4.35s) or `clip-delivery` |
+| 3 · Process, step 3 | 📱 Record | Logging a set |
+| 4 · «هر حرکت ویدیوی دمو داره» | 📱 Record | Today screen → exercise card → **video playing** |
+| 4 · «قبل از این‌که آسیب ببینی، بهت پیام می‌دم» | ✨ **Animate** | `clip-watch` — the emotional peak, and privacy-safe |
+| 4 · «۲۴ تا ۴۸ ساعت» | ✨ **Animate** | `clip-delivery` |
+| 5 · Price | 🎥 Camera | Static talking head, no cuts |
+| 6 · CTA | 🎥 Camera | Talking head + end card |
+
+### System reel
+
+| Beat | Visual | What |
+|---|---|---|
+| 1 · Contrast hook | 🎥 Camera | Talking head |
+| 2 · Needs analysis | 🎥 Camera | Court B-roll (`clip-needs` optional, needs a rewrite first) |
+| 3 · The linked map | ✨ **Animate** | `clip-map` — **the money shot**, then `clip-why` for depth |
+| 4 · Programmed in detail | ✨ **Animate** | `clip-prescription` — closes the whole 9s beat |
+| 5 · A living system | ✨ **Animate** | `clip-loop` — cannot be recorded, it spans weeks |
+| 6 · App + CTA | 📱 Record | Fast montage of real screens → talking head |
+
+### Stories
+
+| Slide | Visual | What |
+|---|---|---|
+| 1 هزینه · 2 فرم · 9 پرداخت | 🎥 Camera | Talking head |
+| 3 قدم ۲: برنامه | ✨ **Animate** | `clip-delivery` or `clip-why` |
+| 4 قدم ۳: مربی‌گری | ✨ **Animate** | `clip-watch` — never record `coach.html` here |
+| 5 باشگاه · 6 سطح | 🎥 Camera | Gym / court footage |
+| 7 طول برنامه | ✨ **Animate** | `clip-map`, reused whole |
+| 8 وزنه نزدم | 📱 Record | A real demo video playing — the proof is that it's real |
+| 10 کی می‌نویسه | ✨ **Animate** | `clip-human` |
+
+**Build order:** `clip-prescription` → `clip-map` → `clip-loop` (those three make
+the whole System reel cuttable) → `clip-delivery` → `clip-watch` → `clip-why` →
+`clip-human` (as a remix of prescription) → `clip-needs` (optional).
