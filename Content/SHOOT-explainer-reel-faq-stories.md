@@ -561,3 +561,119 @@ A long spoken outro tanks completion rate, and completion drives reach. So:
 Roughly **4 : 1** — four educational (follow-CTA) to one sales (START-CTA). The
 pinned explainer and System reels do the permanent selling, which is exactly what
 frees the feed to teach. A feed that only sells has nothing to be followed for.
+
+---
+
+## ASSET 7 — The philosophy closes (supplies the bridge that ASSET 6 calls for)
+
+Added 2026-08-14 from Amir's own statement of his philosophy, checked against
+`.claude/COACHING-PRINCIPLES.md` — his real, codified programming rules.
+
+### The strategic read
+
+**The distinctive thing is not "less training." It's that everything earns its
+place.** Every other account on the internet *adds* — one more exercise, one more
+finisher. Only a coach can *subtract*, because subtraction needs to know your
+situation. So "I decide what you don't need" is the one thing that cannot be got
+for free, and it justifies the premium price better than any feature list.
+
+⚠ **Correction against his own principles — do NOT brand this as minimalism.**
+`COACHING-PRINCIPLES.md` explicitly programs the other way:
+
+- *"Check for unused session-time budget before calling a day 'done' … that's free
+  volume, not a reason to stop. A session with room to spare and nothing added in
+  it is an under-dosed session."*
+- *"every major muscle in lower body should get at least 10 [sets], this is a hard
+  rule, unless you have a very good reason not to"*
+
+He is a **precisionist, not a minimalist** — he fills the time budget, he just
+fills it with work that earns its place. If the content promises "short, minimal
+training" and the programme then arrives full and dose-driven, the athlete feels
+misled on day one. The honest and stronger frame: **no waste — not less.**
+
+### The three pillars, stated accurately
+
+1. **THE FILTER** — every exercise must improve a performance factor that matters;
+   if it can't name which one, it's out. *(Not: "train less.")*
+2. **THE REASON** — every prescription answers "what exactly does this improve?"
+   This is the mantra, «هیچی بی‌دلیل نیست».
+3. **THE SOURCE** — evidence-led, not personally invented. The anti-guru position,
+   and what gives him standing to bust a myth: he isn't offering his opinion
+   against theirs, he's offering evidence against opinion.
+
+### ⚠ The one claim to soften — "everything is science-backed"
+
+Amir's phrasing was *"based on science, tested and approved."* As an absolute this
+is the one line a hostile commenter can break, because no coach has an RCT for
+"this athlete, 4×6 RDL at RPE 7, week 3" — and his own principles are full of
+judgment calls (*"trust the bar over the résumé"*, *"unless you have a very good
+reason not to"*). Overclaiming is itself a BS-marker, and he holds two master's
+degrees; the accurate version is more credible, not less.
+
+**Use:** the principles are proven, the application is coached.
+
+| | Line |
+|---|---|
+| FA | «اصول ثابت‌شده‌ست؛ این‌که برای بدنِ تو چطور اجرا بشه، کارِ مربیه.» |
+| EN | "The principles are proven; how they're applied to your body is coaching." |
+
+**Ready-made reply to "where's the study for that?":**
+FA: «اصلش ثابت‌شده؛ نسخه‌ی تو رو من می‌چینم. من چیزی از خودم در نمیارم.»
+EN: "The principle is proven; your version is what I build. I don't invent anything."
+
+### The philosophy closes — rotate by video type, mantra stays fixed
+
+The philosophy line rotates (so the outro never feels copy-pasted); **the mantra
+never changes** and always lands last.
+
+**① THE FILTER** — for myth-busters and "do this instead" videos
+> FA: «تو برنامه‌ی من هر حرکت باید یه چیزی رو تو بازیت بهتر کنه. اگه نتونه بگه چی، جاش اونجا نیست. هیچی بی‌دلیل نیست.»
+> EN: "In my programs every exercise has to make something in your game better. If it can't name what — it isn't in there. Nothing without a reason."
+
+> *Sharper alt:* FA: «کم‌کردنِ چیزای اضافه سخت‌تر از اضافه‌کردنه. کارِ من همونه.» ·
+> EN: "Taking things out is harder than adding them. That's the job."
+
+**② THE REASON** — for instructional / "why I do it this way" videos
+> FA: «هر چی تو برنامه‌ت می‌نویسم جوابِ یه سؤاله: این دقیقاً چی رو بهتر می‌کنه؟ هیچی بی‌دلیل نیست.»
+> EN: "Everything I write into your program answers one question: what exactly does this improve? Nothing without a reason."
+
+**③ THE SOURCE** — for trend / hype-reaction videos
+> FA: «من روشِ جدید اختراع نمی‌کنم؛ چیزی که ثابت شده رو میارم سرِ تمرینِ تو. هیچی بی‌دلیل نیست.»
+> EN: "I don't invent new methods. I bring what's already proven to your training. Nothing without a reason."
+
+### The follow-CTAs, derived from the philosophy
+
+The counter-position is the strongest ask he has — stronger than "training
+science," because it promises relief rather than naming a method.
+
+| # | FA | EN |
+|---|---|---|
+| **A** *(strongest)* | «بقیه بهت اضافه می‌کنن. کارِ من اینه که بگم چی لازم نداری. فالو کن.» | "Everyone else adds. My job is telling you what you don't need. Follow." |
+| B | «اینترنت پُرِ سر و صداست؛ من فیلترش می‌کنم. فالو کن.» | "The internet is noise. I filter it. Follow." |
+| C | «اگه می‌خوای بدونی پشتِ هر تمرین چه دلیلی هست، فالو کن.» | "If you want the reason behind every exercise, follow." |
+| D | «من روشِ جدید اختراع نمی‌کنم — چیزی که کار می‌کنه رو نشونت می‌دم. فالو کن.» | "I don't invent new methods — I show you what works. Follow." |
+
+### Which video gets which
+
+| Video type | Close | Follow-CTA |
+|---|---|---|
+| Myth-buster — "X is overrated / wrong" | ① FILTER | A or B |
+| "Do this instead" / exercise swap | ① FILTER | A |
+| Instructional — "how / why this way" | ② REASON | C |
+| Trend reaction — "saw this online…" | ③ SOURCE | D |
+| "What I care about in my programming" | ② REASON | C |
+| Results / proof post | — (bridge to the offer) | soft START |
+
+### Content angles straight out of his real principles
+
+These are unfakeable — they're his actual practice, so no competitor can copy the
+authority behind them:
+
+- **"A removed exercise stays removed unless re-earned."** Why a thing that hurt
+  you doesn't quietly reappear next cycle. → FILTER close.
+- **"The pattern is deferred; the effort never is."** An injury doesn't mean easy
+  training — it means training hard inside what's safe. → REASON close.
+- **"Trust the bar over the résumé."** The "4-year lifter" with a 40 kg squat —
+  program for what's shown, not what's claimed. → myth-buster, FILTER close.
+- **"An RPE on a warm-up is noise."** A tiny, concrete example of noise-cutting
+  that proves the philosophy in ten seconds. → FILTER close.
