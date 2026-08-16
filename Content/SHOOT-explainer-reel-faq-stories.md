@@ -465,3 +465,99 @@ nobody real on screen.
 **Build order:** `clip-prescription` → `clip-map` → `clip-loop` (those three make
 the whole System reel cuttable) → `clip-delivery` → `clip-watch` → `clip-why` →
 `clip-human` (as a remix of prescription) → `clip-needs` (optional).
+
+---
+
+## ASSET 6 — CTAs for educational / myth-buster content
+
+Added 2026-08-14, after Amir asked whether "I apply these principles in my
+programmes" is a CTA or an explanation. **It is neither — it's a bridge.** See
+below. Lines are given in Farsi and English; the framework is the same either way.
+
+### The problem being fixed
+
+One CTA («دایرکت بده START») was doing three different jobs. It is a *conversion*
+ask, and myth-busters are *reach* content. A sales ask on an educational video
+suppresses the shares and saves that give it reach, and converts almost nobody
+who wouldn't have converted from the pinned reel anyway.
+
+### The discriminator — apply this to every educational video
+
+> **If the video makes them CAPABLE → ask for a follow.
+> If the video makes them AWARE THEY NEED HELP → you've earned the DM.**
+
+- *"How to warm up your shoulder"* → they can do it alone → **follow only**.
+- *"How I decide when to deload an athlete"* → they cannot do it alone → **soft
+  sales ask is legitimate**.
+
+Most myth-busters are the first kind.
+
+### The bridge — the answer to Amir's actual question
+
+The instinct ("tell them I use these principles in my programmes") is right; the
+placement is what matters. It is **not** the CTA. It is one sentence, said as an
+aside, sitting between the teaching and the follow-ask. Its job is to make the
+follow worth something: *if he programmes like that, his next video is worth
+watching.* Sell the coaching by proving the thinking, never by mentioning the
+product.
+
+Keep it a subordinate clause. The video is about the principle; the fact that it
+is in the programming is **evidence**, not an advert.
+
+| | Line |
+|---|---|
+| FA (default) | «همین اصل رو تو برنامه‌ی شاگردام هم پیاده می‌کنم — هیچی بی‌دلیل نیست.» |
+| FA (when the video explained a programming decision) | «تو برنامه‌هایی که می‌نویسم، همین‌قدر رو دلیلش حساسم. هیچی بی‌دلیل نیست.» |
+| EN (default) | "I program this way for every athlete I coach. Nothing without a reason." |
+| EN (alt) | "That's the same call I make writing someone's cycle. Nothing without a reason." |
+
+⚠ **The mantra is the signature close.** «هیچی بی‌دلیل نیست» / *Nothing without a
+reason.* — same words, same position, every single video. Consistency is what
+turns a line into a brand asset; changing it each time throws away the compounding.
+
+### The follow-CTA — rules
+
+A follow-ask must answer **"what do I get next time?"** — either a *cadence
+promise* or an *outcome*. Two failure modes to avoid:
+
+- **"Follow me"** asks for a favour. Never phrase the ask as something done *for
+  Amir* ("follow for me" is the weakest possible form).
+- **Naming a method, not an outcome.** "Train scientifically" is a method — nobody
+  wakes up wanting it. They want to not get injured and to still have legs in the
+  third set. Keep the conditional structure (it self-selects, which is good), and
+  swap the method for the outcome.
+
+| # | FA | EN | When |
+|---|---|---|---|
+| A | «من مربیِ بدنسازیِ تنیس و پدلم. اگه می‌خوای پشتِ هر تمرین دلیلش رو هم بدونی، فالو کن.» | "I'm a tennis and padel performance coach. If you want the reason behind every session, follow." | Default identity line |
+| B | «هر هفته یه باورِ غلطِ تمرینی رو باز می‌کنم. فالو کن که از دستش ندی.» | "Every week I take one training myth apart. Follow so you don't miss it." | Cadence promise — strongest for a myth-buster series |
+| C | «کارِ من علمِ تمرینه. اگه دوست داری تمرینت دلیل داشته باشه — نه از رو حدس — فالو کن.» | "Training science is my job. If you'd rather train on reasons than guesses — follow." | Amir's own draft #2, fixed |
+| D | «اگه می‌خوای تو ستِ سوم هنوز پا داشته باشی، فالو کن.» | "If you want to still have legs in the third set, follow." | Outcome-led, tennis-specific |
+
+**Soft sales ask** — only on "you need a coach for this" videos, never as a default:
+«اگه می‌خوای این‌جوری برات چیده بشه، دایرکت بده START.» /
+"If you want it built like this for you, DM me START."
+
+### The myth-buster reel structure (~30–40s)
+
+1. **Hook — state the myth flat** (0–3s). No preamble.
+2. **Bust it** (3–12s) — why it's wrong.
+3. **What to do instead** (12–25s) — the actionable part. This is what earns the save.
+4. **Bridge** (25–32s) — the principle → programming line → **mantra**.
+5. **Follow-ask** (32–38s) — short.
+
+### Placement mechanics — don't let the CTA cost you reach
+
+A long spoken outro tanks completion rate, and completion drives reach. So:
+
+- The **last spoken line is the mantra**, not the follow-ask — it's punchy, it
+  loops cleanly, and it's the line worth being recognised for.
+- The **follow-ask is burned-in text** plus at most a half-sentence spoken over
+  the final beat. Don't spend five seconds asking.
+- Never stack both asks. One video, one ask.
+
+### The ratio
+
+Roughly **4 : 1** — four educational (follow-CTA) to one sales (START-CTA). The
+pinned explainer and System reels do the permanent selling, which is exactly what
+frees the feed to teach. A feed that only sells has nothing to be followed for.
