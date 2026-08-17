@@ -23,12 +23,16 @@ never drift from the plan.
   (lenses picked to fit the athlete) → a head-coach judge scoring against the brief +
   principles → Claude synthesizes the final roadmap from the winner + best grafts.
   Never skip it to save time; Amir asked for it on every program.
-- **EVERY athlete gets 5 cycles of 5 weeks — 25 weeks. Hard business rule, no exceptions**
-  (Amir, 2026-08-17: *"for each athlete i plan for 5 cycles of 5 weeks"*). Do not vary the
-  cycle count or a cycle's length to suit the goal, and do not let a design panel talk you
-  out of it — a panel may argue for 4 cycles or a 6-week block on the science, and it is
-  overruled. Fit the arc to 5×5; the *content* of the cycles is where the goal and the
-  science get expressed.
+- **THE HOUSE SHAPE IS 5 CYCLES OF 5 WEEKS — 25 weeks.** *(Amir, 2026-08-17: "the rule is
+  5 cycles of 5 weeks and you need to remember that.")* This is the default and you do not
+  re-derive it from the goal each time. Cycle 1's length must match the first program
+  /program-design will build, so it is 5 weeks too.
+- Deviate from 5×5 only when Amir says so for that athlete — and say plainly that you are
+  deviating and why. Do not quietly return a 4/5/5/4/6/5-style arc because a panel argued
+  for one; the panel proposes the CONTENT of the cycles, never their number or length.
+  ⚠️ A panel *will* argue for one: on Alireza N.'s roadmap the head-coach judge issued
+  "do not add a fifth cycle" as a binding directive. It is overruled. Fit the arc to 5×5 and
+  make the extra block do real work rather than padding it with a retest or a maintenance phase.
 - **Each cycle is 4 loading weeks + 1 back-off week.** The back-off is the 5th week of every
   cycle, which is what satisfies "never program past a fatigue wall" without a mid-cycle
   deload. ⚠️ The back-off week is **NOT authored into the exercise cards** — see the rule

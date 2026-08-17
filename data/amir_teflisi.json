@@ -1,0 +1,1437 @@
+{
+  "athlete": {
+    "id": "amir_teflisi",
+    "key": "424bcb5ca18044b3ba7b473d027e6c0f",
+    "firstName": "Amir",
+    "lastName": "Teflisi"
+  },
+  "sport": {
+    "badge": "🏋️ Strength & Fat Loss"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Bare Metal",
+      "tagline": "Strip it to numbers",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-08-17",
+      "endDate": "2026-09-20",
+      "focuses": [
+        "Effort calibration on the patterns he already owns: three hard axial-free days plus two walking days, and the first real numbers of his training life.",
+        "Daily epicondyle isometrics with grip engineered out of the pull volume, scap-first shoulder work below shoulder height, a measured step baseline, and 3-4 kg off."
+      ],
+      "message": {
+        "paragraphs": [
+          "Welcome in, Amir. You've trained for three years and nobody has ever shown you what your real numbers are, so that's where we start. Five weeks of clean, honest work on machines and supported lifts, where your back is never under a bar and your shoulder never goes overhead.",
+          "Three of your five days are lifting. The other two are walking, and they're not filler. The walking is where most of the weight comes off, and your elbow work happens every single day, at home, whether you train or not.",
+          "By the end of this block you should be a few kilos lighter, moving more weight than you are now, and your elbow should be quieter than it is today. That's the whole job for month one."
+        ],
+        "outcomes": [
+          "Down 3-4 kg",
+          "Every lift moving up from week 1 to week 5",
+          "Elbow pain lower at the desk",
+          "Steps logged daily in Proof, then climbing",
+          "Weekly weigh-in, same day, same conditions",
+          "All 5 days logged, every week"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Rebar",
+      "tagline": "Steel goes in",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-09-21",
+      "endDate": "2026-10-25",
+      "focuses": [
+        "First true accumulation, with the weekly dose sized off Cycle 1's own logged data rather than the intake claim.",
+        "Free-weight upper enters on cleared technique; the elbow moves to heavy slow resistance, and the dated clinician gate falls on this cycle's opening day."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Cycle two is where the volume goes up and free weights start coming in. You'll have earned that by then, because you'll have five weeks of clean numbers behind you and a back that's been quiet under load.",
+          "Your elbow work steps up too. Not more of the same, harder.",
+          "Right now you're finding out what you can do. Next you find out how much more there is."
+        ],
+        "hook": "Bare metal first. Then we build on it."
+      }
+    },
+    {
+      "num": 3,
+      "name": "Keystone",
+      "tagline": "Earn the load",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-10-26",
+      "endDate": "2026-11-29",
+      "focuses": [
+        "Axial loading earns its way back, gated on two consecutive back-symptom-free cycles plus filmed technique.",
+        "Overhead pressing enters only after a fully pain-free cycle below shoulder height. Heaviest upper top sets so far, volume held."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Ballast",
+      "tagline": "Hold, and recover",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-11-30",
+      "endDate": "2027-01-03",
+      "focuses": [
+        "Mandatory back-off: systemic load down about 40%, effort ceilings capped, movement pool refreshed so it reads as a new programme rather than a punishment.",
+        "Calories to maintenance, taken before it's needed. The elbow does not deload, it completes its protocol and comes off into ordinary training."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Foundry",
+      "tagline": "Where strength gets poured",
+      "weeks": "Weeks 21–25",
+      "startDate": "2027-01-04",
+      "endDate": "2027-02-07",
+      "focuses": [
+        "The strength block: lowest reps, highest loads, run at a shallow deficit so the scale keeps moving while the loads climb.",
+        "Everything re-tested against week-1 numbers, every standing restriction re-stamped or referred, and the week he can run without a coach installed."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Bare Metal",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Built From The Legs Up",
+        "completionTitle": "Foundation Down",
+        "completionMessage": "That's your heaviest pressing and pushing of the week done, with your back out of harm's way the whole time. Get some protein in and get to bed early tonight.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Legs only, hands resting and never gripping the handles",
+                    "Blood into the legs, ankles and knees loosening"
+                  ],
+                  "bad": [
+                    "Don't race it"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Cat-Cow",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×6",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Move slow and small, stay in the easy middle of the range",
+                    "The spine warming up, nothing stretching"
+                  ],
+                  "bad": [
+                    "Don't push to the end of either direction, this is oiling the joint not stretching it"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Hips & Shoulders Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Drive through the heels",
+                        "Glutes doing the lifting, not the low back"
+                      ],
+                      "bad": [
+                        "Don't arch the back at the top"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Banded Dead Bug",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach the heel long and low",
+                        "Low back glued to the floor"
+                      ],
+                      "bad": [
+                        "Don't let the ribs flare"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": [
+                        "Pull the band apart to your chest line",
+                        "Shoulder blades sliding together"
+                      ],
+                      "bad": [
+                        "No shrugging"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away, arms stay straight",
+                        "Blades spreading and squeezing"
+                      ],
+                      "bad": [
+                        "Don't bend the elbows"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 150,
+                "cues": {
+                  "good": [
+                    "Push the platform away through mid-foot",
+                    "Thighs loading, back flat and quiet"
+                  ],
+                  "bad": [
+                    "Never let the low back round off the pad at the bottom"
+                  ]
+                },
+                "note": "Set the seat so your lower back stays flat against the pad the whole time. Stop coming down before your hips start to tuck under. Rest your hands on the handles, don't squeeze them, that grip is what winds your elbow up."
+              },
+              {
+                "type": "standard",
+                "name": "Machine Chest Press",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Drive the handles straight forward",
+                    "Chest doing the work, shoulders staying down"
+                  ],
+                  "bad": [
+                    "Don't let the elbows travel behind your body"
+                  ]
+                },
+                "note": "Set the seat so the handles are at mid chest. The rep finishes when your elbows reach your body, never behind it. Week one do 3 sets, go to 4 from week two."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Single-Arm Cable Row",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Row the handle to the bottom of your ribs",
+                    "Lat under the armpit pulling"
+                  ],
+                  "bad": [
+                    "Stop when the elbow reaches your torso, don't drive it past your body"
+                  ]
+                },
+                "note": "Straps on so your hand is not gripping hard. Row the handle to the bottom of your ribs and stop when your elbow reaches your body. One arm at a time lets your left side work at its own level."
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Curl the heels under the seat",
+                    "Back of the thigh squeezing"
+                  ],
+                  "bad": [
+                    "Don't let the hips lift off the pad"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Leg Extension",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "1s top hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Kick the pad to straight",
+                    "Front of the thigh burning"
+                  ],
+                  "bad": [
+                    "Don't swing or bounce the weight up"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Half-Kneeling Pallof Press",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "1s hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Press the handle straight out from the chest",
+                    "Trunk locked, resisting the twist"
+                  ],
+                  "bad": [
+                    "The set ends when the trunk starts turning, not when you run out of reps"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Build The Engine, Mile By Mile",
+        "completionTitle": "Quiet Miles",
+        "completionMessage": "This is the one people skip and it's the one doing most of the fat loss. Don't forget your elbow holds tonight.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Cat-Cow",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×6",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Move slow and small, stay in the easy middle of the range",
+                    "The spine warming up, nothing stretching"
+                  ],
+                  "bad": [
+                    "Don't push to the end of either direction, this is oiling the joint not stretching it"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "90/90 Hip Switch",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×8 Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Knees lead the switch",
+                    "Hips opening"
+                  ],
+                  "bad": [
+                    "Don't shove past what moves easily"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Kneeling Hip Flexor Stretch",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×30s Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Tuck the pelvis, then lean",
+                    "Stretch at the front of the hip"
+                  ],
+                  "bad": [
+                    "Don't arch the low back to feel more"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Glute Bridge",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×12",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive through the heels",
+                    "Glutes doing the lifting, not the low back"
+                  ],
+                  "bad": [
+                    "Don't arch the back at the top"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Banded Lateral Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×12 Each Way",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Step wide, feet pointing forward",
+                    "Side of the hip working"
+                  ],
+                  "bad": [
+                    "Don't let the knees cave in"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Ankle Dorsiflexion Rocks",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×10 Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the knee over the toes",
+                    "Stretch in the back of the ankle"
+                  ],
+                  "bad": [
+                    "Don't let the heel lift"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Conditioning",
+            "icon": "🚶",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Incline Treadmill Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "50 min",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Walk tall, long stride",
+                    "Breathing easy enough to hold a conversation"
+                  ],
+                  "bad": [
+                    "Don't hold the handrails"
+                  ]
+                },
+                "note": "Let the incline do the work, not the speed. You should be able to hold a conversation the whole way. Hands off the handrails, that changes everything about what the walk is worth."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "Press, Pull, Repeat",
+        "completionTitle": "Back And Shoulders Built",
+        "completionMessage": "Every pull today was set up to keep your elbow out of it, and your shoulder stayed where it's safe. That's how those two get better while you still train hard.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Legs only, hands resting and never gripping the handles",
+                    "Blood into the legs, ankles and knees loosening"
+                  ],
+                  "bad": [
+                    "Don't race it"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Cat-Cow",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×6",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Move slow and small, stay in the easy middle of the range",
+                    "The spine warming up, nothing stretching"
+                  ],
+                  "bad": [
+                    "Don't push to the end of either direction, this is oiling the joint not stretching it"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Upper Back Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Quadruped Thoracic Rotation",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach the elbow to the ceiling",
+                        "Rotation coming from the upper back"
+                      ],
+                      "bad": [
+                        "Don't rotate through the low back"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away, arms stay straight",
+                        "Blades spreading and squeezing"
+                      ],
+                      "bad": [
+                        "Don't bend the elbows"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Drive through the heels",
+                        "Glutes doing the lifting, not the low back"
+                      ],
+                      "bad": [
+                        "Don't arch the back at the top"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Row the handles to the bottom of your ribs",
+                    "Mid-back squeezing the blades together"
+                  ],
+                  "bad": [
+                    "Stop when the elbow reaches your torso, don't drive it past your body"
+                  ]
+                },
+                "note": "Straps on. Chest stays flat on the pad the whole set, don't peel off it to lift more. Row to the bottom of your ribs, and stop when the elbow is level with your body."
+              },
+              {
+                "type": "standard",
+                "name": "Machine Incline Chest Press",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Press up and slightly in",
+                    "Upper chest working"
+                  ],
+                  "bad": [
+                    "Don't let the elbows drop behind your body"
+                  ]
+                },
+                "note": "Use the lowest incline the machine has. Stop before your elbows travel past your body. If the top of the rep pinches your shoulder, lower the incline rather than the weight. If it has no low setting, use the flat chest press instead."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Hip Thrust",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "1s top hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Drive the hips to the ceiling",
+                    "Glutes squeezing hard at the top"
+                  ],
+                  "bad": [
+                    "Don't finish the rep by arching the low back"
+                  ]
+                },
+                "note": "Drive with your heels and squeeze your glutes hard at the top. Finish the rep with your hips, not by arching your lower back."
+              },
+              {
+                "type": "standard",
+                "name": "Cable Lateral Raise",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Lead with the elbow, out and slightly forward",
+                    "Side of the shoulder working"
+                  ],
+                  "bad": [
+                    "Don't let the hand go above the bottom of your ribs"
+                  ]
+                },
+                "note": "Stop when your hand is about level with the bottom of your ribs, not shoulder height. Shoulder height is where it pinches. Lead with the elbow, slightly out in front of you rather than straight out to the side."
+              },
+              {
+                "type": "standard",
+                "name": "Band Pull-Apart",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "1s hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 45,
+                "cues": {
+                  "good": [
+                    "Pull the band apart to the chest line",
+                    "Back of the shoulders and mid-back working"
+                  ],
+                  "bad": [
+                    "No shrugging, shoulders stay down"
+                  ]
+                },
+                "note": "Loop the band over your wrists instead of gripping it, that keeps your elbow out of it. Pull apart to chest level and keep your shoulders down."
+              },
+              {
+                "type": "standard",
+                "name": "Single-Arm Eccentric Wrist Extension",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "4s lower",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Reps"
+                  },
+                  {
+                    "label": "Tempo 1-0-4-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Lower the dumbbell as slowly as you can, four full seconds",
+                    "The top of the forearm resisting the whole way down"
+                  ],
+                  "bad": [
+                    "Don't rush the lowering, the slow part is the exercise"
+                  ]
+                },
+                "note": "This starts in week two, not week one, and only once the daily holds are sitting at 3 out of 10 or less. Sore arm only. Lower it over a full four seconds, that slow part is the whole exercise. Same rule as the holds, pain picks the weight."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "focusTag": "Long Road, Aerobic Base",
+        "completionTitle": "Steps Banked",
+        "completionMessage": "Two walking days a week adds up to more than any single session you do. Same again tomorrow with the elbow work.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Cat-Cow",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×6",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Move slow and small, stay in the easy middle of the range",
+                    "The spine warming up, nothing stretching"
+                  ],
+                  "bad": [
+                    "Don't push to the end of either direction, this is oiling the joint not stretching it"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Thoracic Windmill",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×8 Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Reach the top hand away",
+                    "Opening through the ribs"
+                  ],
+                  "bad": [
+                    "Don't force the knee off the floor"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "90/90 Hip Switch",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×8 Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Knees lead the switch",
+                    "Hips opening"
+                  ],
+                  "bad": [
+                    "Don't shove past what moves easily"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Kneeling Hip Flexor Stretch",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×30s Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Tuck the pelvis, then lean",
+                    "Stretch at the front of the hip"
+                  ],
+                  "bad": [
+                    "Don't arch the low back to feel more"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Banded Lateral Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×12 Each Way",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Step wide, feet pointing forward",
+                    "Side of the hip working"
+                  ],
+                  "bad": [
+                    "Don't let the knees cave in"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Ankle Dorsiflexion Rocks",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×10 Each Side",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive the knee over the toes",
+                    "Stretch in the back of the ankle"
+                  ],
+                  "bad": [
+                    "Don't let the heel lift"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Conditioning",
+            "icon": "🚶",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Incline Treadmill Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "50 min",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Walk tall, long stride",
+                    "Breathing easy enough to hold a conversation"
+                  ],
+                  "bad": [
+                    "Don't hold the handrails"
+                  ]
+                },
+                "note": "Second step block of the week. Let the incline do the work, not the speed, and keep it conversational the whole way."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "focusTag": "Hinge Hard, Stand Tall",
+        "completionTitle": "Strong Back Earned",
+        "completionMessage": "That back extension is the lift that earns you the bar back in a couple of months. Take the weekend properly, you've trained five days.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Assault Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Legs only, hands resting and never gripping the handles",
+                    "Blood into the legs, ankles and knees loosening"
+                  ],
+                  "bad": [
+                    "Don't race it"
+                  ]
+                }
+              },
+              {
+                "type": "simple",
+                "name": "Cat-Cow",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "×6",
+                    "style": "dark"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Move slow and small, stay in the easy middle of the range",
+                    "The spine warming up, nothing stretching"
+                  ],
+                  "bad": [
+                    "Don't push to the end of either direction, this is oiling the joint not stretching it"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Posterior Chain Prep Circuit",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 30,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Banded Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Drive through the heels, knees pushing out",
+                        "Glutes lifting"
+                      ],
+                      "bad": [
+                        "Don't arch at the top"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Bird Dog",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach the opposite hand and heel long",
+                        "Trunk staying completely still"
+                      ],
+                      "bad": [
+                        "Don't let the hips tip as the leg goes back"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×15",
+                    "cues": {
+                      "good": [
+                        "Pull the band apart to your chest line",
+                        "Shoulder blades sliding together"
+                      ],
+                      "bad": [
+                        "No shrugging"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Single-Leg Machine Leg Press",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Leg"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 150,
+                "cues": {
+                  "good": [
+                    "Push the platform away through mid-foot",
+                    "One thigh loading, back flat and quiet"
+                  ],
+                  "bad": [
+                    "Never let the low back round off the pad"
+                  ]
+                },
+                "note": "This goes first on the day, before the back extension, so your back is fresh for it. Start with your weaker leg and match it with the other. Same seat and depth rules as Day 1."
+              },
+              {
+                "type": "standard",
+                "name": "45° Back Extension",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "1s top hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Push the hips into the pad to come up",
+                    "Glutes and hamstrings doing the lifting"
+                  ],
+                  "bad": [
+                    "Don't arch past straight at the top"
+                  ]
+                },
+                "note": "Week one is bodyweight only, arms crossed on your chest. Add weight only once 12 reps feel easy and you're still finishing in a straight line. Stop at straight, never arch past it."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Lying Leg Curl",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Curl the heels to the backside",
+                    "Back of the thigh squeezing"
+                  ],
+                  "bad": [
+                    "Don't let the hips lift off the pad"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Plate-Loaded Row",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Row the handles to the bottom of your ribs",
+                    "Mid-back squeezing"
+                  ],
+                  "bad": [
+                    "Stop when the elbows reach your torso, don't drive them past your body"
+                  ]
+                },
+                "note": "Straps on, neutral handle. Your chest stays on the pad. This is the supported row on purpose, because this day already has the back extension in it."
+              },
+              {
+                "type": "standard",
+                "name": "Cable Curl",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Curl the handle up, elbows pinned to your sides",
+                    "Front of the upper arm working"
+                  ],
+                  "bad": [
+                    "Don't swing the elbows forward to help"
+                  ]
+                },
+                "note": "Wrist straps on so your forearm barely has to grip. Keep your elbows pinned to your sides. If your elbow starts complaining on this one, tell me and it comes out."
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-0-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Reach the heel long and low",
+                    "Low back pinned to the floor"
+                  ],
+                  "bad": [
+                    "The set ends the moment your low back lifts off the floor, even if that's rep 4"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Amir",
+    "cards": [
+      {
+        "icon": "🎯",
+        "title": "Week one is your calibration",
+        "body": "<p>The app never tells you what weight to lift. You find it yourself, every time, against the effort number on the card. <strong>RPE 8 means you finish the set with about two reps left in you.</strong> Not crawling, not easy.</p><p>On a movement you've never done, go lighter than you think. Do the first set, see how hard it was, then adjust. Getting it wrong on set one is the point of set one.</p><ul><li><strong>Week to week:</strong> if you hit all the reps and it felt easier than the target, put a little more on next time.</li><li><strong>If the reps were a grind</strong> or you missed some, stay on the same weight and repeat the week.</li><li><strong>Going lighter is not failing.</strong> Bad sleep, long day, something feels off, drop the weight. That's you reading yourself properly.</li></ul><p>Two things are lighter on purpose in week one. <strong>Do 3 sets on the chest press instead of 4</strong>, and do the back extension with <strong>no weight at all</strong>, arms crossed on your chest. Add from week two.</p>"
+      },
+      {
+        "icon": "🛑",
+        "title": "When to stop, and when to see someone",
+        "body": "<p>You've got three things we're working around. Your left elbow, your left shoulder, and your lower back. Here's exactly what to do when one of them talks to you.</p><p><strong>Normal and fine:</strong> muscles burning, being stiff the next day, feeling tired. Keep going. That's training.</p><ul><li><strong>Mild and fading during the set</strong> — finish it, write it in your log.</li><li><strong>Building through the set, or changing how you move</strong> — stop that exercise, use the swap on the card, message me.</li><li><strong>Sharp, shooting, numb, tingling, or just new and strange</strong> — stop the session. Message me before your next one.</li></ul><p>And a date for you. <strong>Around 21 September I'm reviewing your elbow and shoulder.</strong> If they're not measurably better by then, you're going to a physio. Not because anything went wrong, but because six weeks is long enough to find out and I'm not letting this sit for months. Before then, anything that wakes you at night, goes numb, or starts earlier each session, tell me straight away.</p>"
+      },
+      {
+        "icon": "🤝",
+        "title": "Telling me it hurts costs you nothing",
+        "body": "<p>Most people hide pain from their coach because they think they'll get told to stop training. I want to be clear with you before it ever comes up. <strong>Telling me something hurts gets you a change, never a ban.</strong></p><ul><li>Elbow sore on a pull? Straps go on and we change the handle. You still train your back.</li><li>Shoulder pinching on a press? We drop the incline or change the machine. You still press.</li><li>Back tight on the leg press? We change the seat and the depth. You still train legs.</li><li>Everything sore and you slept four hours? We shorten the session. You still turn up.</li></ul><p><strong>The only thing that actually costs you progress is not telling me.</strong> If I don't know, I can't change anything, and you end up training around it on your own and making it worse. Say it early and it stays small.</p>"
+      },
+      {
+        "icon": "💪",
+        "title": "Your elbow, and the real reason it hurts",
+        "body": "<p>Your elbow isn't sore because of the gym. It's sore because of your desk and your phone. That's roughly fifty hours a week of load on it, against three hours of training. <strong>Most of the fix isn't in the gym.</strong></p><p><strong>Every day, training or not:</strong> rest your forearm on your thigh, palm down, arm straight, and hold a light weight up against gravity. <strong>Five holds of 45 seconds, two minutes rest between.</strong> Sore arm only.</p><p><strong>Pain picks the weight, not effort.</strong> It should sit at 3 out of 10 or less while you hold, and be no worse the next morning. If the pain climbs while you're holding, the weight is too heavy. Halve it.</p><ul><li>Keep your forearm supported on the desk, don't hold it in the air.</li><li>Bring the mouse in close so your wrist isn't bent back all day.</li><li>Hold your phone in the other hand, or prop it up.</li><li>Get off the keyboard for a minute every half hour.</li><li>Carry your bag and your laptop in the other hand for now.</li></ul>"
+      },
+      {
+        "icon": "🚶",
+        "title": "Where the weight actually comes off",
+        "body": "<p>Here's the honest version. <strong>All three of your lifting sessions put together burn less than adding a few thousand steps a day.</strong> Training is what keeps your muscle while you lose fat. The walking and the food are what actually take the weight off.</p><p><strong>Week one, don't change anything.</strong> Just let Proof count your steps so we see your real number. From week two you get a target built off that, and it climbs.</p><p>Same with food. I'm not giving you a meal plan this month. <strong>Get protein into every meal and be consistent</strong>, and log it in Proof so we can both see it. You told me your eating is up and down. That one thing is worth more than anything I could add to your programme.</p>"
+      },
+      {
+        "icon": "🛏️",
+        "title": "About those five hours",
+        "body": "<p>You rated your sleep 9 out of 10 and then told me you get five to six hours. Those two things don't go together. <strong>The quality might be great, there just isn't enough of it.</strong></p><p>This matters more than usual right now because you're eating less. <strong>When you're short on sleep and in a deficit, more of what you lose comes off your muscle instead of your fat.</strong> Same effort, worse result.</p><p>I'm not asking you to fix it overnight. <strong>Log it in Proof every day</strong> so we can put your sleep next to your training and your weight and see it properly. If we get you to seven hours, everything else in this programme works better.</p>"
+      },
+      {
+        "icon": "🦴",
+        "title": "Why there is no squat",
+        "body": "<p>You told me squats put pressure on your lower back, and you were right to stop doing them. <strong>Nothing this month puts a bar on your back or a pad on your shoulders.</strong> The leg press and the back extension do the same job with your spine out of it.</p><p>That's not forever. <strong>A quiet, pain free month is what earns the bar back</strong>, and that's month three in your plan. The back extension is the one that gets you there. It teaches your back to hold a strong position instead of just avoiding load.</p><p>One rule on it. <strong>Stop at a straight line, never past it.</strong> If you arch back at the top you're doing the exact thing we're protecting you from.</p>"
+      }
+    ]
+  }
+}
