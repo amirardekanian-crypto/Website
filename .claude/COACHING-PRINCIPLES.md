@@ -133,6 +133,26 @@ publish it. No athlete health/chat detail goes here — principles only.
   re-admit the free pattern the cycle deferred. *(2026-07-30, Amir, on Faraz C1: "leg press as
   its safer a bit for his lower back, if he was pain free the whole cycle then we can progress
   to a back squat")*
+- **A RANGE OR HEIGHT RESTRICTION MUST BE AUDITED AGAINST EVERY EXERCISE IN THE CYCLE, INCLUDING
+  WARM-UP AND PREP — not just the ones it obviously names.** A rule like "nothing above shoulder
+  height" or "no end-range lumbar flexion" is written once against one lift and then silently
+  broken by movements nobody thought to re-check: a lat pulldown and an overhead Y-raise both
+  START in the banned position, a lateral raise "capped at shoulder height" stops the athlete
+  dead in the middle of the painful arc rather than below it, and a Cat-Cow in the prep circuit
+  cues the exact end-range flexion the primary's own note forbids. Two lines of a programme must
+  never give opposite instructions for the same joint. Sweep the restriction across every
+  movement, every cue and every prep item before the spec is final; if no exercise in a pattern
+  can satisfy it, the PATTERN leaves the cycle rather than the rule bending. *(2026-08-17,
+  amir_teflisi C1 — the clinical audit lens caught four separate breaches of the cycle's own
+  shoulder rule plus a prep-circuit flexion leak on a chronic back)*
+- **The fallback rule above generalises: EVERY fallback is checked against EVERY deferral the
+  cycle makes, not just the free hinge.** A fallback is written as an afterthought ("if the
+  station is busy") and is the easiest place for a banned pattern to walk back in — the athlete
+  follows it unsupervised, on a busy day, with no coach present. Machine Hack Squat shipped as
+  the leg-press fallback in a cycle that had removed axial loading entirely: shoulder pads are
+  axial load, so a full gym sent a chronic-back athlete straight onto the thing the cycle
+  existed to avoid. Read the fallback list last, against the contraindication list, every time.
+  *(2026-08-17, amir_teflisi C1)*
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
 - **No corrective/postural drills without an indication.** Postural or scap-control
