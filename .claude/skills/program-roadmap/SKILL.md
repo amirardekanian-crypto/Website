@@ -30,6 +30,20 @@ never drift from the plan.
 - Deviate from 5×5 only when Amir says so for that athlete — and say plainly that you are
   deviating and why. Do not quietly return a 4/5/5/4/6/5-style arc because a panel argued
   for one; the panel proposes the CONTENT of the cycles, never their number or length.
+  ⚠️ A panel *will* argue for one: on Alireza N.'s roadmap the head-coach judge issued
+  "do not add a fifth cycle" as a binding directive. It is overruled. Fit the arc to 5×5 and
+  make the extra block do real work rather than padding it with a retest or a maintenance phase.
+- **Each cycle is 4 loading weeks + 1 back-off week.** The back-off is the 5th week of every
+  cycle, which is what satisfies "never program past a fatigue wall" without a mid-cycle
+  deload. ⚠️ The back-off week is **NOT authored into the exercise cards** — see the rule
+  below.
+- ⚠️ **The cards carry the athlete's NORMAL prescription; temporary weeks live in the NOTES.**
+  A week-1 calibration week, a week-5 back-off, a low-readiness stretch — none of these are
+  ever written as a lower RPE/volume on the exercise itself. Amir does not change a program
+  mid-cycle, so the card is a stable reference all cycle and the temporary instruction is a
+  notes card written by /program-engage. Full rule: `.claude/COACHING-PRINCIPLES.md` →
+  Progression → "The RPE printed on a card is the athlete's NORMAL working target". Write
+  roadmap focus lines the same way — describe how he trains *normally*, not how week 1 runs.
 - **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
   the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /
   combat imagery, and still hint at the phase's job. House library to draw on or extend:
