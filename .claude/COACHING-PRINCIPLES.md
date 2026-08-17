@@ -658,6 +658,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   athlete, and say out loud that you are deviating. *(Written after a roadmap shipped as
   6 cycles of 4/5/5/4/6/5 because the multi-lens panel argued the arc from the science and
   nobody checked it against the house rule.)*
+  A second, independent hit the same day: on Alireza N.'s roadmap the head-coach judge issued
+  *"do not add a fifth cycle"* as a binding directive, on the science. It is overruled — fit the
+  arc to 5×5 and make the extra block do real work rather than padding it with a retest or a
+  maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**, which is what
+  satisfies "never program past a fatigue wall" without a mid-cycle deload.
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + coach reports (volume, progression, e1RM) to the coach-only
