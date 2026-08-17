@@ -649,6 +649,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
   trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
   deliberate re-read even when nothing visibly broke. *(2026-06-28)*
+- **THE ROADMAP IS 5 CYCLES OF 5 WEEKS. 25 weeks. That is the house shape.** *(Amir,
+  2026-08-17, verbatim: "the rule is 5 cycles of 5 weeks and you need to remember that.")*
+  Cycle count and cycle length are NOT things to re-derive from the athlete's goal, and not
+  things a design panel gets a vote on — a panel proposes what each cycle CONTAINS, never how
+  many there are or how long they run. Cycle 1 is 5 weeks like every other, so the first
+  program /program-design builds is a 5-week program. Deviate only when Amir says so for that
+  athlete, and say out loud that you are deviating. *(Written after a roadmap shipped as
+  6 cycles of 4/5/5/4/6/5 because the multi-lens panel argued the arc from the science and
+  nobody checked it against the house rule.)*
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + coach reports (volume, progression, e1RM) to the coach-only

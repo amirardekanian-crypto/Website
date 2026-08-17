@@ -23,10 +23,13 @@ never drift from the plan.
   (lenses picked to fit the athlete) → a head-coach judge scoring against the brief +
   principles → Claude synthesizes the final roadmap from the winner + best grafts.
   Never skip it to save time; Amir asked for it on every program.
-- Each cycle **4–6 weeks**. Cycle 1's length must match the first program
-  /program-design will build.
-- **Cycle count is dictated by the goal and the science** — not a fixed number. A
-  general-fitness client and a competitive athlete need different arcs.
+- **THE HOUSE SHAPE IS 5 CYCLES OF 5 WEEKS — 25 weeks.** *(Amir, 2026-08-17: "the rule is
+  5 cycles of 5 weeks and you need to remember that.")* This is the default and you do not
+  re-derive it from the goal each time. Cycle 1's length must match the first program
+  /program-design will build, so it is 5 weeks too.
+- Deviate from 5×5 only when Amir says so for that athlete — and say plainly that you are
+  deviating and why. Do not quietly return a 4/5/5/4/6/5-style arc because a panel argued
+  for one; the panel proposes the CONTENT of the cycles, never their number or length.
 - **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
   the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /
   combat imagery, and still hint at the phase's job. House library to draw on or extend:
