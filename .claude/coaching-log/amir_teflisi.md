@@ -31,6 +31,16 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 
 ## Cycle 01 — Bare Metal · 2026-08-17 · NEW
 
+**⚠️ Roadmap corrected 2026-08-17.** This first shipped as 6 cycles of 4/5/5/4/6/5 (29 weeks)
+because the multi-lens panel argued the arc from the science and nobody checked it against the
+house rule. Amir: *"the rule is 5 cycles of 5 weeks and you need to remember that."* Now
+**5 × 5 = 25 weeks**: Bare Metal · Rebar · Keystone · Ballast · Foundry, ending 2027-02-07.
+Foundry absorbs the old Load Bearing's job (re-test, restrictions re-stamped, the landing).
+C1 gained a week, which is a clinical gain — five weeks of isometric plus eccentric on the
+elbow before C2's heavy slow resistance, rather than four. The week-6 clinician gate now falls
+exactly on C2's opening day, 2026-09-21. Rule written into COACHING-PRINCIPLES.md → Process
+and into program-roadmap/SKILL.md so it is not re-derived next time.
+
 **The read**
 Recovery is the gate and sleep is the whole of it: 5–6 h against a self-rating of 9/10, so he
 doesn't perceive the deficit and it can't be fixed by conversation — only tracked as a number

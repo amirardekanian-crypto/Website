@@ -14,22 +14,22 @@
       "num": 1,
       "name": "Bare Metal",
       "tagline": "Strip it to numbers",
-      "weeks": "Weeks 1–4",
+      "weeks": "Weeks 1–5",
       "startDate": "2026-08-17",
-      "endDate": "2026-09-13",
+      "endDate": "2026-09-20",
       "focuses": [
         "Effort calibration on the patterns he already owns: three hard axial-free days plus two walking days, and the first real numbers of his training life.",
         "Daily epicondyle isometrics with grip engineered out of the pull volume, scap-first shoulder work below shoulder height, a measured step baseline, and 3-4 kg off."
       ],
       "message": {
         "paragraphs": [
-          "Welcome in, Amir. You've trained for three years and nobody has ever shown you what your real numbers are, so that's where we start. Four weeks of clean, honest work on machines and supported lifts, where your back is never under a bar and your shoulder never goes overhead.",
+          "Welcome in, Amir. You've trained for three years and nobody has ever shown you what your real numbers are, so that's where we start. Five weeks of clean, honest work on machines and supported lifts, where your back is never under a bar and your shoulder never goes overhead.",
           "Three of your five days are lifting. The other two are walking, and they're not filler. The walking is where most of the weight comes off, and your elbow work happens every single day, at home, whether you train or not.",
           "By the end of this block you should be a few kilos lighter, moving more weight than you are now, and your elbow should be quieter than it is today. That's the whole job for month one."
         ],
         "outcomes": [
           "Down 3-4 kg",
-          "Every lift moving up from week 1 to week 4",
+          "Every lift moving up from week 1 to week 5",
           "Elbow pain lower at the desk",
           "Steps logged daily in Proof, then climbing",
           "Weekly weigh-in, same day, same conditions",
@@ -41,16 +41,16 @@
       "num": 2,
       "name": "Rebar",
       "tagline": "Steel goes in",
-      "weeks": "Weeks 5–9",
-      "startDate": "2026-09-14",
-      "endDate": "2026-10-18",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-09-21",
+      "endDate": "2026-10-25",
       "focuses": [
         "First true accumulation, with the weekly dose sized off Cycle 1's own logged data rather than the intake claim.",
-        "Free-weight upper enters on cleared technique; the elbow moves to heavy slow resistance and the dated clinician gate falls at the closing boundary."
+        "Free-weight upper enters on cleared technique; the elbow moves to heavy slow resistance, and the dated clinician gate falls on this cycle's opening day."
       ],
       "teaser": {
         "paragraphs": [
-          "Month two is where the volume goes up and free weights start coming in. You'll have earned that by then, because you'll have four weeks of clean numbers behind you and a back that's been quiet under load.",
+          "Cycle two is where the volume goes up and free weights start coming in. You'll have earned that by then, because you'll have five weeks of clean numbers behind you and a back that's been quiet under load.",
           "Your elbow work steps up too. Not more of the same, harder.",
           "Right now you're finding out what you can do. Next you find out how much more there is."
         ],
@@ -61,9 +61,9 @@
       "num": 3,
       "name": "Keystone",
       "tagline": "Earn the load",
-      "weeks": "Weeks 10–14",
-      "startDate": "2026-10-19",
-      "endDate": "2026-11-22",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-10-26",
+      "endDate": "2026-11-29",
       "focuses": [
         "Axial loading earns its way back, gated on two consecutive back-symptom-free cycles plus filmed technique.",
         "Overhead pressing enters only after a fully pain-free cycle below shoulder height. Heaviest upper top sets so far, volume held."
@@ -73,36 +73,24 @@
       "num": 4,
       "name": "Ballast",
       "tagline": "Hold, and recover",
-      "weeks": "Weeks 15–18",
-      "startDate": "2026-11-23",
-      "endDate": "2026-12-20",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-11-30",
+      "endDate": "2027-01-03",
       "focuses": [
-        "Mandatory back-off: systemic load down about 40%, effort ceilings capped, movement pool refreshed.",
-        "Calories to maintenance, taken before it's needed. The elbow does not deload, it comes off protocol into ordinary training."
+        "Mandatory back-off: systemic load down about 40%, effort ceilings capped, movement pool refreshed so it reads as a new programme rather than a punishment.",
+        "Calories to maintenance, taken before it's needed. The elbow does not deload, it completes its protocol and comes off into ordinary training."
       ]
     },
     {
       "num": 5,
       "name": "Foundry",
       "tagline": "Where strength gets poured",
-      "weeks": "Weeks 19–24",
-      "startDate": "2026-12-21",
-      "endDate": "2027-01-31",
+      "weeks": "Weeks 21–25",
+      "startDate": "2027-01-04",
+      "endDate": "2027-02-07",
       "focuses": [
-        "The strength block: lowest reps, highest loads, six weeks because expression needs a longer runway than accumulation.",
-        "Run at a shallow deficit, not maintenance. Accessories cut to minimum effective dose so the recovery budget goes to the bar."
-      ]
-    },
-    {
-      "num": 6,
-      "name": "Load Bearing",
-      "tagline": "Built to stand alone",
-      "weeks": "Weeks 25–29",
-      "startDate": "2027-02-01",
-      "endDate": "2027-03-07",
-      "focuses": [
-        "Sharpest deficit of the roadmap, run against a real engine, strength defended on low-dose heavy anchors.",
-        "Everything re-tested, every standing restriction re-stamped or referred, and the week he can run without a coach installed."
+        "The strength block: lowest reps, highest loads, run at a shallow deficit so the scale keeps moving while the loads climb.",
+        "Everything re-tested against week-1 numbers, every standing restriction re-stamped or referred, and the week he can run without a coach installed."
       ]
     }
   ],
