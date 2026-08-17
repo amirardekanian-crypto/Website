@@ -23,10 +23,23 @@ never drift from the plan.
   (lenses picked to fit the athlete) → a head-coach judge scoring against the brief +
   principles → Claude synthesizes the final roadmap from the winner + best grafts.
   Never skip it to save time; Amir asked for it on every program.
-- Each cycle **4–6 weeks**. Cycle 1's length must match the first program
-  /program-design will build.
-- **Cycle count is dictated by the goal and the science** — not a fixed number. A
-  general-fitness client and a competitive athlete need different arcs.
+- **EVERY athlete gets 5 cycles of 5 weeks — 25 weeks. Hard business rule, no exceptions**
+  (Amir, 2026-08-17: *"for each athlete i plan for 5 cycles of 5 weeks"*). Do not vary the
+  cycle count or a cycle's length to suit the goal, and do not let a design panel talk you
+  out of it — a panel may argue for 4 cycles or a 6-week block on the science, and it is
+  overruled. Fit the arc to 5×5; the *content* of the cycles is where the goal and the
+  science get expressed.
+- **Each cycle is 4 loading weeks + 1 back-off week.** The back-off is the 5th week of every
+  cycle, which is what satisfies "never program past a fatigue wall" without a mid-cycle
+  deload. ⚠️ The back-off week is **NOT authored into the exercise cards** — see the rule
+  below.
+- ⚠️ **The cards carry the athlete's NORMAL prescription; temporary weeks live in the NOTES.**
+  A week-1 calibration week, a week-5 back-off, a low-readiness stretch — none of these are
+  ever written as a lower RPE/volume on the exercise itself. Amir does not change a program
+  mid-cycle, so the card is a stable reference all cycle and the temporary instruction is a
+  notes card written by /program-engage. Full rule: `.claude/COACHING-PRINCIPLES.md` →
+  Progression → "The RPE printed on a card is the athlete's NORMAL working target". Write
+  roadmap focus lines the same way — describe how he trains *normally*, not how week 1 runs.
 - **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
   the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /
   combat imagery, and still hint at the phase's job. House library to draw on or extend:

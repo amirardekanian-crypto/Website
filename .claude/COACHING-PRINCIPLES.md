@@ -630,6 +630,17 @@ publish it. No athlete health/chat detail goes here — principles only.
   trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
   deliberate re-read even when nothing visibly broke. *(2026-06-28)*
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
+- **Every athlete's roadmap is 5 cycles of 5 weeks — 25 weeks. A hard business rule, not a
+  coaching judgement.** *(Amir, 2026-08-17, verbatim: "for each athlete i plan for 5 cycles of
+  5 weeks.")* Cycle count and cycle length are fixed inputs, not outputs of the design — the
+  goal and the science decide what goes *inside* the cycles, never how many there are or how
+  long they run. This **overrules a design panel**: the multi-lens panel will sometimes argue
+  on the science for a 4-cycle arc or a 6-week strength block (it did on Alireza N.'s roadmap,
+  where the head-coach judge explicitly directed "do not add a fifth cycle"), and the business
+  rule wins — fit the arc to 5×5 and let the extra block do real work rather than padding it
+  with a retest or a maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**,
+  which is what satisfies "never program past a fatigue wall" without a mid-cycle deload.
+  *(2026-08-17)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + coach reports (volume, progression, e1RM) to the coach-only
   `.claude/coaching-log/<id>.md` as its last step — append-only, git-tracked but unpublished,
