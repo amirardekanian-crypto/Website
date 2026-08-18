@@ -28,18 +28,41 @@ safe to open anywhere — handy for screenshots or design work.
 
 ---
 
-## 2. The four tabs
+## 2. The five tabs
 
 | Tab | What it's for |
 |---|---|
 | **Today** | The day's play: who's on court, what's on the wall, who needs you, the quest lever |
+| **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
 | **Athletes** | The whole roster — coached and Proof-only — with a full file per person |
 | **Proof** | The board, the season, the signup funnel, titles minted |
 | **Links** | Copyable deep links to every published article and workout |
 
-The URL carries the view (`#today`, `#athletes`, `#proof`, `#links`,
+The URL carries the view (`#today`, `#intake`, `#athletes`, `#proof`, `#links`,
 `#a/<athlete_id>`), so any screen can be bookmarked or reloaded in place.
 **↻ Refresh** re-pulls everything.
+
+### Intake — where the apply form lands
+
+`form.html` and `form-fa.html` used to depend entirely on **Web3Forms**: the form
+turned into an email, and when that relay was unreachable the submission was lost —
+the athlete saw an error and nobody found out. Now each form **also** writes straight
+to Amir's own Supabase (`submit_intake` → the `hab_intake` table), and counts as sent
+if *either* path succeeds. The email still fires as a notification; **this tab is the
+durable record**, so a Web3Forms outage can no longer swallow a lead.
+
+Each submission is a card: name, an **EN/FA** flag, the programme they picked, when it
+arrived, their email and contact (with copy buttons; a WhatsApp number becomes a
+`wa.me` link), and the whole questionnaire underneath. Three states drive the workflow
+and the **badge on the tab counts the new ones**:
+
+- **Mark handled** — you've replied or converted them (they move to *Handled*).
+- **Archive** — spam or not a fit (collapsed at the bottom; **Reopen** brings it back).
+- **Reopen** — send a handled/archived lead back to *New*.
+
+Nothing here joins anyone to Proof or writes a programme — it's an inbox. When you take
+a lead on, onboard them the usual way (`/athlete-intake`). Backend, and the coach-only
+guard on every read/write: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
 
 ---
 
