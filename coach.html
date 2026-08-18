@@ -164,6 +164,26 @@
   .psub { font-size: 12.5px; color: var(--muted); margin: -8px 0 12px; }
 
   .empty { color: var(--muted); font-size: 13.5px; padding: 10px 0 4px; }
+  /* ── Intake (coaching apply-form submissions) ── */
+  .intake-card { border: 1px solid var(--line); border-radius: 16px; margin-bottom: 10px; background: var(--card); overflow: hidden; }
+  .intake-card[open] { border-color: var(--court); }
+  .intake-card.archived { opacity: .7; }
+  .intake-card > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .intake-card > summary::-webkit-details-marker { display: none; }
+  .intake-card > summary:hover { background: var(--court-100); }
+  .intake-card .ava { width: 30px; height: 30px; border-radius: 999px; background: var(--court); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex: none; }
+  .intake-card .i-name { font-weight: 700; font-size: 15px; }
+  .intake-card .i-when { margin-left: auto; font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+  .ipill { font-size: 10px; font-weight: 700; letter-spacing: .04em; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; }
+  .ipill.en { background: var(--court-100); color: var(--court); }
+  .ipill.fa { background: var(--clay-100); color: var(--clay); }
+  .ipill.prog { background: var(--court); color: #fff; text-transform: none; letter-spacing: 0; font-weight: 600; }
+  .i-body { padding: 12px 14px 14px; border-top: 1px solid var(--rule); }
+  .i-contact { font-size: 13px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .i-contact a { color: var(--court); border-bottom: 1px solid var(--court-100); }
+  .i-contact .dot { color: var(--muted-soft); }
+  .i-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .arch-toggle { cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); }
 
   /* ── Needs you ── */
   .need { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
@@ -569,6 +589,7 @@ const S = {
   msgs: [],        // messages rows
   notes: [],       // hab_notes rows, last 7 days, hidden included
   contacts: [],    // contact_list() rows
+  intake: [],      // intake_list() rows — coaching apply-form submissions
   rules: null,     // xp_rules.rules jsonb
   seasons: [],     // seasons rows, newest first
   titles: [],      // hab_titles recent
@@ -582,7 +603,7 @@ const S = {
 
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
-  const [prog, hist, keys, msgs, notes, contacts, rules, seasons, titles, optin] = await Promise.all([
+  const [prog, hist, keys, msgs, notes, contacts, rules, seasons, titles, optin, intake] = await Promise.all([
     sb.from('athlete_progress').select('athlete_id, athlete_name, data, updated_at'),
     sb.from('session_history').select('*'),
     sb.from('athlete_keys').select('athlete_id, secret_key'),
@@ -593,6 +614,7 @@ async function loadAll() {
     sb.from('seasons').select('*').order('starts_on', { ascending: false }),
     sb.from('hab_titles').select('*').order('earned_on', { ascending: false }).limit(30),
     sb.from('leaderboard_optin').select('athlete_id, display_name, title'),
+    sb.rpc('intake_list'),
   ]);
   const firstErr = [prog, hist, keys, msgs, notes, rules, seasons, titles, optin].find(r => r && r.error);
   if (firstErr) throw new Error(firstErr.error.message);
@@ -606,6 +628,7 @@ async function loadAll() {
   S.seasons = seasons.data || [];
   S.titles = titles.data || [];
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
+  S.intake = (intake && intake.data) || [];   // RPC may be missing pre-stage27; degrade quietly
   await loadPrograms();
   assemble();
   S.ready = true;
@@ -618,6 +641,7 @@ async function refetch(parts) {
   if (parts.includes('notes')) jobs.push(sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)).then(r => { if (!r.error) S.notes = r.data || []; }));
   if (parts.includes('rules')) jobs.push(sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle().then(r => { if (!r.error) S.rules = (r.data && r.data.rules) || null; }));
   if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
+  if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
   if (parts.includes('hist')) jobs.push(sb.from('session_history').select('*').then(r => { if (!r.error) { S.hist = r.data || []; assemble(); } }));
   if (parts.includes('msgs')) jobs.push(sb.from('messages').select('*').order('created_at', { ascending: true }).then(r => { if (!r.error) { S.msgs = r.data || []; assemble(); } }));
   await Promise.all(jobs);
@@ -773,6 +797,7 @@ function nameOf(id) { return S.ath[id] ? S.ath[id].name : (S.optin[id] && S.opti
 // --- router -----------------------------------------------------------------
 const TABS = [
   { id: 'today', label: 'Today' },
+  { id: 'intake', label: 'Intake' },
   { id: 'athletes', label: 'Athletes' },
   { id: 'proof', label: 'Proof' },
   { id: 'links', label: 'Links' },
@@ -786,8 +811,10 @@ function renderRail() {
   const r = route();
   const active = r.view === 'detail' ? 'athletes' : r.view;
   const waiting = Object.values(S.ath).reduce((n, a) => n + a.toReply, 0);
+  const newIntake = (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
   $('rail').innerHTML = TABS.map(t => {
-    const badge = t.id === 'athletes' && waiting > 0 ? `<span class="n">${waiting}</span>` : '';
+    const badge = (t.id === 'athletes' && waiting > 0) ? `<span class="n">${waiting}</span>`
+                : (t.id === 'intake' && newIntake > 0) ? `<span class="n">${newIntake}</span>` : '';
     return `<a class="tab ${active === t.id ? 'active' : ''}" href="#${t.id}">${t.label}${badge}</a>`;
   }).join('') + `<span class="rail-spacer"></span><button class="refresh" onclick="hardRefresh()">↻ Refresh</button>`;
 }
@@ -802,6 +829,7 @@ function render() {
   renderRail();
   const r = route();
   if (r.view === 'today') renderToday();
+  else if (r.view === 'intake') renderIntake();
   else if (r.view === 'athletes') renderAthletes();
   else if (r.view === 'detail') renderDetail(r.id);
   else if (r.view === 'proof') renderProof();
@@ -2168,6 +2196,80 @@ function linkRow(title, url, meta) {
   </div>`;
 }
 
+// --- INTAKE (coaching apply-form submissions) -------------------------------
+// form.html / form-fa.html write here via submit_intake(); Amir reads them here.
+// The Web3Forms email still fires too — this table is the durable copy so a
+// relay outage can't lose a lead. Backend: supabase/stage27_intake.sql.
+const INTAKE_SKIP = new Set(['First Name', 'Last Name', 'Email', 'Contact (Instagram/WhatsApp)', 'Programme',
+                             'botcheck', 'access_key', 'from_name', 'subject', 'redirect']);
+function intakeName(i) {
+  const p = i.payload || {};
+  return (i.name && i.name.trim()) || [p['First Name'], p['Last Name']].filter(Boolean).join(' ').trim() || 'Unnamed';
+}
+function intakeVal(v) { return Array.isArray(v) ? v.join(', ') : String(v == null ? '' : v); }
+function waLink(num) { const d = String(num || '').replace(/[^0-9]/g, ''); return d ? 'https://wa.me/' + d : ''; }
+
+function intakeCard(i) {
+  const name = intakeName(i);
+  const st = i.status || 'new';
+  const langPill = `<span class="ipill ${i.lang === 'fa' ? 'fa' : 'en'}">${i.lang === 'fa' ? 'FA' : 'EN'}</span>`;
+  const progPill = i.programme ? `<span class="ipill prog">${esc(i.programme)}</span>` : '';
+
+  const rows = [];
+  const p = i.payload || {};
+  Object.keys(p).forEach(k => {
+    if (INTAKE_SKIP.has(k)) return;
+    const val = intakeVal(p[k]);
+    if (!val.trim()) return;
+    rows.push(`<tr><td class="k">${esc(k)}</td><td class="v">${esc(val)}</td></tr>`);
+  });
+  const qa = rows.length ? `<table class="meta-table">${rows.join('')}</table>` : '<p class="empty">No further answers.</p>';
+
+  const contact = i.contact || '', email = i.email || '', wa = waLink(contact);
+  const cbits = [];
+  if (email) cbits.push(`<a href="mailto:${esc(email)}">${esc(email)}</a> <button class="btn sm copy-btn-js" data-url="${esc(email)}">Copy</button>`);
+  if (contact) cbits.push((wa ? `<a href="${esc(wa)}" target="_blank" rel="noopener">${esc(contact)}</a>` : esc(contact)) + ` <button class="btn sm copy-btn-js" data-url="${esc(contact)}">Copy</button>`);
+  const contactLine = cbits.join('<span class="dot">·</span>') || '<span class="muted">No contact given</span>';
+
+  let acts;
+  if (st === 'new')      acts = `<button class="btn sm primary intake-act" data-id="${esc(i.id)}" data-to="handled">Mark handled</button><button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="archived">Archive</button>`;
+  else if (st === 'handled') acts = `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="new">Reopen</button><button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="archived">Archive</button>`;
+  else                   acts = `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="new">Reopen</button>`;
+
+  return `<details class="intake-card ${st}"${st === 'new' ? ' open' : ''}>
+    <summary><span class="ava">${esc(initials(name))}</span><span class="i-name">${esc(name)}</span>${langPill}${progPill}<span class="i-when">${esc(timeAgo(i.created_at))}</span></summary>
+    <div class="i-body"><div class="i-contact">${contactLine}</div>${qa}<div class="i-actions">${acts}</div></div>
+  </details>`;
+}
+
+async function intakeSetStatus(id, to, btn) {
+  if (btn) btn.disabled = true;
+  if (!DEMO) {
+    const { error } = await sb.rpc('set_intake_status', { p_id: id, p_status: to });
+    if (error) { if (btn) btn.disabled = false; toast('Could not update — try Refresh'); return; }
+  }
+  const row = (S.intake || []).find(x => String(x.id) === String(id));
+  if (row) row.status = to;
+  renderIntake(); renderRail();
+}
+
+function renderIntake() {
+  const all = (S.intake || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const g = { new: [], handled: [], archived: [] };
+  all.forEach(i => (g[i.status] || g.new).push(i));
+
+  let html = `<section class="panel"><div class="phead"><span class="t hd">New applications</span><span class="r">${g.new.length} waiting</span></div>`;
+  html += g.new.length ? g.new.map(intakeCard).join('')
+    : '<p class="empty">No new applications. When someone submits the apply form (English or Farsi), it lands here — and Amir still gets the Web3Forms email.</p>';
+  html += `</section>`;
+  if (g.handled.length) html += `<section class="panel" style="margin-top:16px"><div class="phead"><span class="t hd">Handled</span><span class="r">${g.handled.length}</span></div>${g.handled.map(intakeCard).join('')}</section>`;
+  if (g.archived.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Archived · ${g.archived.length}</summary><div style="margin-top:12px">${g.archived.map(intakeCard).join('')}</div></details></section>`;
+
+  $('content').innerHTML = html;
+  $('content').querySelectorAll('.copy-btn-js').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); copyText(btn.dataset.url, btn); }));
+  $('content').querySelectorAll('.intake-act').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSetStatus(btn.dataset.id, btn.dataset.to, btn); }));
+}
+
 // --- demo fixtures (?demo=1) — layout preview only, nothing is real ----------
 function demoStore() {
   const t = todayKey();
@@ -2221,6 +2323,16 @@ function demoStore() {
     { athlete_id: 'sara_free', email: 'sara@example.com', whatsapp: '+44 7000 000000', source: 'proof.html', tier: 'free', shown_as: 'Sara', on_board: true, days_logged: 17, signed_up: new Date(Date.now() - 18 * 86400000).toISOString() },
     { athlete_id: 'reza_jamal', email: 'reza@example.com', whatsapp: '+98 912 000 0000', source: 'proof.html', tier: 'free', shown_as: 'Reza', on_board: false, days_logged: 3, signed_up: new Date(Date.now() - 2 * 86400000).toISOString() },
     { athlete_id: 'nadia_k', email: 'nadia@example.com', whatsapp: '+98 912 111 1111', source: 'proof.html', tier: 'free', shown_as: 'Nadia', on_board: false, days_logged: 0, signed_up: new Date(Date.now() - 5 * 86400000).toISOString() },
+  ];
+  S.intake = [
+    { id: 'demo-i1', created_at: new Date(Date.now() - 3 * 3600000).toISOString(), lang: 'en', name: 'Marcus Vale', email: 'marcus@example.com', contact: '@marcus.plays', programme: 'Match — $300 / 6 months', status: 'new',
+      payload: { 'First Name': 'Marcus', 'Last Name': 'Vale', 'Email': 'marcus@example.com', 'Programme': 'Match — $300 / 6 months', 'Age': '28', 'Biological Sex': 'Male', 'Activity Type': 'Tennis', 'Competitive Level': 'National', 'Goals': ['Serve power', 'On-court endurance'], 'Environment': 'Full gym', 'Available Days': '5', 'Session Length': '60–75 min', 'Current Injury': 'No', 'Sleep Hours': '7' } },
+    { id: 'demo-i2', created_at: new Date(Date.now() - 26 * 3600000).toISOString(), lang: 'fa', name: 'Negar Mousavi', email: 'negar@example.com', contact: '+98 912 345 6789', programme: null, status: 'new',
+      payload: { 'First Name': 'Negar', 'Last Name': 'Mousavi', 'Email': 'negar@example.com', 'Location': 'Tehran', 'Age': '34', 'Activity Level': 'Intermediate', 'Goals': ['Weight loss', 'Strength'], 'Available Days': '4', 'Session Length': '45 min' } },
+    { id: 'demo-i3', created_at: new Date(Date.now() - 5 * 86400000).toISOString(), lang: 'en', name: 'Dana Reid', email: 'dana@example.com', contact: '@dana.padel', programme: 'Set — $180 / 3 months', status: 'handled',
+      payload: { 'First Name': 'Dana', 'Last Name': 'Reid', 'Email': 'dana@example.com', 'Programme': 'Set — $180 / 3 months', 'Activity Type': 'Padel', 'Goals': ['Agility'], 'Available Days': '3' } },
+    { id: 'demo-i4', created_at: new Date(Date.now() - 9 * 86400000).toISOString(), lang: 'en', name: 'No Reply', email: 'noreply@x.com', contact: '', programme: null, status: 'archived',
+      payload: { 'First Name': 'No', 'Last Name': 'Reply', 'Email': 'noreply@x.com', 'Goals': ['—'] } },
   ];
   S.rules = {
     quests: [
