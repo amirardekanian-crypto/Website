@@ -1072,6 +1072,48 @@
   (function () {
     'use strict';
 
+    // ── Durable intake → Supabase (Amir's own backend) ───────────────────
+    // The form used to depend entirely on Web3Forms; when that relay was
+    // unreachable, the submission was lost. Now we ALSO write straight to the
+    // same Supabase project the app already runs on, via the submit_intake
+    // RPC over PostgREST (no library needed). Amir reads these in
+    // coach.html → Intake. See supabase/stage27_intake.sql.
+    const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+    const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+    // Web3Forms plumbing — never stored as an intake answer.
+    const SKIP_KEYS = new Set(['access_key', 'from_name', 'subject', 'redirect', 'botcheck']);
+    const asText = (x) => Array.isArray(x) ? x.join(', ') : (x == null ? '' : String(x));
+
+    function intakePayload(formEl) {
+      const out = {};
+      for (const [k, v] of new FormData(formEl).entries()) {
+        if (SKIP_KEYS.has(k)) continue;
+        const val = typeof v === 'string' ? v.trim() : v;
+        if (val === '') continue;
+        out[k] = (k in out) ? [].concat(out[k], val) : val;
+      }
+      return out;
+    }
+
+    async function sendToSupabase(formEl, lang) {
+      const p = intakePayload(formEl);
+      const name = [asText(p['First Name']), asText(p['Last Name'])].filter(Boolean).join(' ').trim();
+      const res = await fetch(SB_URL + '/rest/v1/rpc/submit_intake', {
+        method: 'POST',
+        headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          p_payload: p,
+          p_lang: lang,
+          p_name: name || null,
+          p_email: asText(p['Email']) || null,
+          p_contact: asText(p['Contact (Instagram/WhatsApp)']) || null,
+          p_programme: asText(p['Programme']) || null
+        })
+      });
+      if (!res.ok) throw new Error('supabase ' + res.status);
+      return true;
+    }
+
     // ── Conditional section visibility (activity type) ───────────────────
     const activitySelect = document.getElementById('activityType');
     const generalValues = ['General Fitness', 'Weight Loss', 'Strength & Muscle', 'Active Lifestyle'];
@@ -1319,12 +1361,16 @@
       btn.innerHTML = 'Sending…';
 
       try {
-        const res = await fetch(this.action, {
-          method: 'POST',
-          body: new FormData(this)
-        });
+        // Land the submission in Amir's own database first (durable — shows
+        // in coach.html → Intake), and fire the Web3Forms email in parallel.
+        // Counts as sent if EITHER succeeds, so a Web3Forms outage can no
+        // longer silently swallow a lead.
+        const [supaR, webR] = await Promise.allSettled([
+          sendToSupabase(this, 'en'),
+          fetch(this.action, { method: 'POST', body: new FormData(this) })
+        ]);
 
-        if (res.ok) {
+        if (supaR.status === 'fulfilled' || (webR.status === 'fulfilled' && webR.value && webR.value.ok)) {
           const overlay = document.getElementById('successOverlay');
           overlay.classList.add('is-open');
           document.body.style.overflow = 'hidden';

@@ -560,6 +560,43 @@
   function clearOnAnswer(e){if(e.target&&e.target.name)clearErr(e.target);}
   form.addEventListener('input',clearOnAnswer);form.addEventListener('change',clearOnAnswer);
 
+  // ── ثبتِ پایدار در Supabase (سرورِ خودِ امیر) ─────────────────────────
+  // قبلاً فقط Web3Forms بود؛ وقتی در دسترس نبود، فرم گم می‌شد. حالا هم‌زمان
+  // مستقیم در همون پروژه‌ی Supabase اپ هم ذخیره می‌کنیم (RPC: submit_intake).
+  // امیر این‌ها رو در coach.html → Intake می‌بینه. supabase/stage27_intake.sql
+  const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+  const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+  const SKIP_KEYS = new Set(['access_key','from_name','subject','redirect','botcheck']);
+  var asText = function(x){ return Array.isArray(x) ? x.join(', ') : (x==null ? '' : String(x)); };
+  function intakePayload(formEl){
+    var out={};
+    new FormData(formEl).forEach(function(v,k){
+      if(SKIP_KEYS.has(k))return;
+      var val = typeof v==='string' ? v.trim() : v;
+      if(val==='')return;
+      out[k]=(k in out)?[].concat(out[k],val):val;
+    });
+    return out;
+  }
+  async function sendToSupabase(formEl,lang){
+    var p=intakePayload(formEl);
+    var name=[asText(p['First Name']),asText(p['Last Name'])].filter(Boolean).join(' ').trim();
+    var res=await fetch(SB_URL+'/rest/v1/rpc/submit_intake',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        p_payload:p,
+        p_lang:lang,
+        p_name:name||null,
+        p_email:asText(p['Email'])||null,
+        p_contact:asText(p['Contact (Instagram/WhatsApp)'])||null,
+        p_programme:asText(p['Programme'])||null
+      })
+    });
+    if(!res.ok)throw new Error('supabase '+res.status);
+    return true;
+  }
+
   // submit
   form.addEventListener('submit',async function(e){
     e.preventDefault();
@@ -577,8 +614,11 @@
 
     var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
     try{
-      var r=await fetch(this.action,{method:'POST',body:new FormData(this)});
-      if(r.ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});if(window.plausible)window.plausible('Form Submitted FA');}
+      // ثبتِ پایدار در Supabase اول، و ارسال ایمیلِ Web3Forms هم‌زمان. اگر یکی
+      // موفق بشه کافی‌ست — پس قطعیِ Web3Forms دیگه فرم رو گم نمی‌کنه.
+      var rs=await Promise.allSettled([sendToSupabase(this,'fa'),fetch(this.action,{method:'POST',body:new FormData(this)})]);
+      var ok=rs[0].status==='fulfilled'||(rs[1].status==='fulfilled'&&rs[1].value&&rs[1].value.ok);
+      if(ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});if(window.plausible)window.plausible('Form Submitted FA');}
       else throw new Error('fail');
     }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
   });

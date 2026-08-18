@@ -43,7 +43,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Page | EN | FA | What it is |
 |---|---|---|---|
 | Home | [`index.html`](index.html) | [`index-fa.html`](index-fa.html) | Front door: hero, proof, FAQ, CTAs → form |
-| Apply form | [`form.html`](form.html) | [`form-fa.html`](form-fa.html) | Intake questionnaire → emails Amir (Web3Forms) |
+| Apply form | [`form.html`](form.html) | [`form-fa.html`](form-fa.html) | Intake questionnaire → **saved to Supabase** (`hab_intake`, read in `coach.html` → Intake) **and** emails Amir (Web3Forms) |
 | Terms | [`terms.html`](terms.html) | [`terms-fa.html`](terms-fa.html) | Legal / training disclaimers |
 | Privacy | [`privacy.html`](privacy.html) | — | GDPR privacy notice |
 | Proof signup | [`proof.html`](proof.html) | — | Public landing page for the **free habit tracker** — what it is, then name + email + WhatsApp → emails Amir (Web3Forms). **Not linked from nav** on purpose: it's the Instagram bio link. Sign people up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill |
@@ -61,7 +61,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 |---|---|---|
 | [`program.html`](program.html) | The athlete PWA — Home · My Plan · Coach · Library [Read \| Train] · Habits (→ `habits.html`). Loads `data/<id>.json`. Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
 | [`habits.html`](habits.html) | **AA Proof** — habit tracker. Three tabs: Today · Progress · Crew (no chat; Settings sits behind the initials button in the header). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), **The long game** (a 14-reward track of titles + shareable-card looks, kept for good across season resets), full-screen level-up celebration, 5-tier consistency ladders, opt-in server-scored **leaderboard**, **Roll Call** (one sentence a day, shared), a **3-day backfill window** on the log, offline-durable saving. **Installs to the home screen** (own manifest, `start_url` carries the athlete's link; offered once after their first log, plus a permanent Settings row). Reached from `program.html` (Home card + Habits tab). Same `?client=<id>&key=<key>` link as the program. **Also runs standalone for free (non-coached) users** — `"tier": "free"` in `data/<id>.json` locks WORKOUT and swaps the programme links for coaching CTAs; they sign up at [`proof.html`](proof.html). Demo: `?client=demo` | [`HABITS.md`](HABITS.md) · [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
-| [`coach.html`](coach.html) | **The Coach's Box** — mission control for coaching *and* Proof, four tabs: **Today** (on-court count, the roll-call wall with the coach-line composer + hide/show moderation, a needs-you queue, the quest-week lever, a 7-day Proof pulse) · **Athletes** (one roster across both systems, one file per person: links, Proof strip, ACWR/readiness/adherence charts, messages, call logs, prescribed program, session logs) · **Proof** (server-scored board, season, signup funnel with upgrade flags, titles minted) · **Links**. Google sign-in. Preview the layout with `?demo=1`. ⚠ Never scores Proof itself — presence facts + server RPCs only | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
+| [`coach.html`](coach.html) | **The Coach's Box** — mission control for coaching *and* Proof, five tabs: **Today** (on-court count, the roll-call wall with the coach-line composer + hide/show moderation, a needs-you queue, the quest-week lever, a 7-day Proof pulse) · **Intake** (coaching apply-form submissions landed straight in the database — new/handled/archived) · **Athletes** (one roster across both systems, one file per person: links, Proof strip, ACWR/readiness/adherence charts, messages, call logs, prescribed program, session logs) · **Proof** (server-scored board, season, signup funnel with upgrade flags, titles minted) · **Links**. Google sign-in. Preview the layout with `?demo=1`. ⚠ Never scores Proof itself — presence facts + server RPCs only | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
 
 ---
@@ -154,7 +154,9 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`stage17_titles`](supabase/stage17_titles.sql) (titles on the board — the minted
   `hab_titles` record, `claim_titles` / `set_title`, and `passTrack` on `xp_rules`) ·
   [`stage18_day_rosters`](supabase/stage18_day_rosters.sql) (a day is scored against the
-  habits that were on **that** day — the current `hab_bonus_xp`).
+  habits that were on **that** day — the current `hab_bonus_xp`) ·
+  [`stage27_intake`](supabase/stage27_intake.sql) (the apply form lands in the DB —
+  anon `submit_intake`, coach-only `intake_list` / `set_intake_status` / `delete_intake`).
 - **Notion sync (exercise videos):** [`sync_notion.py`](sync_notion.py) +
   [`NOTION_SYNC.md`](NOTION_SYNC.md) → regenerates `exercise_library.json`.
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
