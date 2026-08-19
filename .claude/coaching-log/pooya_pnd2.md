@@ -25,7 +25,8 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Machine Reverse Fly | Active | C4 | rotated out C3, back C4 (replaces Prone DB Reverse Fly) |
 | EZ Bar Curl | Active | C4 | new C4 |
 | Cable Overhead Tricep Extension | Active | C4 | rotated out C3, back C4 |
-| Standing Machine Calf Raise | Active | C4 | new C4 (rotates Seated) |
+| Standing Smith Machine Calf Raise | Active | C4 | new C4 (rotates Seated); smith + step — his gym has no standing calf machine |
+| Standing Machine Calf Raise | Banned | C4 | equipment — not in his gym; shipped in error, swapped out day 1 |
 | Single-Leg Calf Raise | Active | C4 | new C4 — added to clear the 6-set calf floor |
 | Ab Wheel Rollout | Active | C4 | new C4 — rung up from Body Saw |
 | Hanging Leg Raise | Active | C4 | new C4 — rung up from Hanging Knee Raise |
@@ -174,3 +175,5 @@ Total volume is well down on C3 despite similar set counts: 6–8 reps versus 12
 - Deload call: none scheduled — week 5 is the back-off week per the 4+1 house shape. If readiness <3 for two consecutive sessions → RPE −1 cycle-wide and drop the walk that week.
 
 **e1RM** (Epley, from heaviest logged sets) — Lat Pulldown **72.8 kg** (60.2 at C3 start; C2 was flat at 62.7, so +16% against the plateau) · Machine Shoulder Press **57.4 kg** (+27% vs C2's 45.3) · Machine Hack Squat **70 kg** (+50% vs C2's 46.7) · Machine Leg Press **117 kg** (96 at C3 start, +22% in-cycle; no C2 comparison, promoted mid-July) · Dumbbell Bench **29.3 kg/DB** (+10% vs C2's 26.7) — this becomes the barbell bench's starting baseline. "Surpass Cycle 1" is not verifiable: logged history starts in C2, and he is already far past that.
+
+**In-cycle edit (2026-08-19, day 1)** — Amir caught that Day 1 shipped with **Standing Machine Calf Raise**, which his gym does not have. Swapped to **Standing Smith Machine Calf Raise** with the balls of the feet on a step for full stretch, same 3×15 @RPE 8. No change to weekly volume or day structure. This constraint was already on record and was missed at design time: the Cycle 1 note on the Notion exercise page reads "Barbell calf raise (when no machine — Pooya programming note)", and the Cycle 3 log carries "No calf machine available — substitute barbell or leg press calf raise from Cycle 2." He has a *seated* calf machine (logged 20–25 kg through C3) but no standing one, and rotating Seated → Standing read as a clean rotation without anyone re-checking the equipment note. Ledger now carries Standing Machine Calf Raise as **Banned (equipment)** so it cannot be picked again. Day 3's Single-Leg Calf Raise is unaffected — bodyweight, needs no machine.

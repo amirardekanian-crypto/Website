@@ -289,9 +289,13 @@
               },
               {
                 "type": "standard",
-                "name": "Standing Machine Calf Raise",
+                "name": "Standing Smith Machine Calf Raise",
                 "videoUrl": null,
                 "chips": [
+                  {
+                    "label": "full stretch",
+                    "style": "dark"
+                  },
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -309,13 +313,14 @@
                 "restSec": 45,
                 "cues": {
                   "good": [
-                    "Push all the way up onto your toes",
-                    "Feel a full stretch at the bottom and a hard squeeze at the top"
+                    "Drive the bar straight up through the balls of your feet",
+                    "Feel the calf pull long at the bottom, then squeeze hard at the top"
                   ],
                   "bad": [
-                    "Don't bounce out of the bottom"
+                    "Don't bounce out of the bottom or cut the range short"
                   ]
-                }
+                },
+                "note": "Your gym has no standing calf machine, so use the smith. Put a step or a plate under the balls of your feet and let your heels drop all the way down before you press up. That stretch at the bottom is where the growth is, so take your time on it."
               }
             ]
           },
