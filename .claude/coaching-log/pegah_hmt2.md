@@ -290,3 +290,30 @@ body-composition request gets the training she asked for AND the honest mechanis
 promise of spot reduction.**
 
 Period-week card updated to skip both core circuits, not just the two original pieces.
+
+**Post-ship revision (2026-08-19b) — Day 4 disambiguated: continuous run, walking is the
+fallback.** Amir spotted that the card was named "Long Run" and cued as a continuous effort
+("settle into a pace you could hold a conversation at and stay there") while its coach's note
+said walk breaks were "part of the plan" — two lines giving opposite instructions for the same
+session, and the athlete left to guess which one was meant. My error: I intended walking as the
+autoregulation escape hatch (the C3 framing) and wrote it as the protocol.
+
+Offered him three coherent resolutions: structured run-walk intervals (my recommendation),
+continuous with walking as a stated fallback, or run-walk through C4 then continuous in C5.
+**Amir chose continuous with walking as the fallback.** Note and notes card both rewritten so the
+instruction is "run it continuously; if you can't get a full sentence out, walk until you can,
+then start running again — that's the rule, not a failure."
+
+**Risk he has knowingly accepted, flagged once and not re-litigated:** week 4 is 10 km, which at
+her logged 9:38/km is ~96 minutes, against a demonstrated continuous best of ~27–30 minutes of
+running (and a 5.17 km that took "49 min in total", phrasing which suggests it was not all
+running). The fallback rule is what carries that gap. **Watch item for C5:** the same question
+returns at 13–16 km, where continuous is a much bigger ask again — decide the race-day strategy
+explicitly there rather than letting the card imply one.
+
+**Voice compliance sweep, same pass:** 20 athlete-facing strings carried em-dashes (19 cues plus
+one note) against COACHING-PRINCIPLES → Communication ("Ban the AI tells: em-dashes, semicolons
+…"). All rewritten to full stops or clauses. Worth knowing these came from the design pass's own
+cue-writing habit, not from any prior cycle — the rule post-dates C3, so C3's copy was never
+swept. Future builds should run this check before shipping, not after.
+
