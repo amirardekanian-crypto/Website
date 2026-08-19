@@ -73,11 +73,11 @@
       "message": {
         "paragraphs": [
           "Your race is on the 19th of October. That's nine weeks away, and everything in this cycle points straight at it.",
-          "Day 4 is the long run, and it's the session that decides your race, so it isn't the optional one any more. It grows a little every week and it's supposed to feel easy the whole way. Walk whenever you need to. Walking is in the plan, it isn't you failing.",
+          "Day 4 is the long run, and it's the session that decides your race, so it isn't the optional one any more. You'll run five minutes and walk one, the whole way through. That's not a backup for when you're tired, it's the method, and it's how you'll run the race itself.",
           "Your leg press went from 41 to 54 kilos last cycle and you never once had to grind a set to do it. Same idea here, just with real running on top. By the 20th of September you'll be covering 10km in one go and your legs will be handling it properly."
         ],
         "outcomes": [
-          "10km long run, start to finish",
+          "10km long run done, 5-and-1 the whole way",
           "Bulgarian split squat loaded and moving",
           "Your first real hinge since the barbell stalled",
           "Calves trained on kit your gym actually has",
@@ -509,7 +509,7 @@
       },
       {
         "id": 3,
-        "focusTag": "Recovery Miles, Nothing Heroic",
+        "focusTag": "Optional Recovery Miles, Nothing Heroic",
         "completionTitle": "Free Miles.",
         "completionMessage": "You didn't have to do this one. Your legs will feel looser tomorrow because you did.",
         "blocks": [
@@ -646,9 +646,13 @@
               {
                 "type": "simple",
                 "name": "Long Run",
-                "note": "Run this one continuously, at a pace where you could still hold a conversation. If you can't get a full sentence out, walk until you can and then start running again. That's the rule, not a failure. It grows every week: 6km, 7km, 8.5km, 10km, then an easier 6.5km in week 5. Week 1, run it by feel and send me your average heart rate.",
+                "note": "Five minutes running, one minute walking, all the way through. Take that first walk break at 5 minutes even though you'll feel fine, because taking them early is what makes the whole thing work. It grows every week: 6km, 7km, 8.5km, 10km, then an easier 6.5km in week 5. Week 1, run it by feel and send me your average heart rate.",
                 "videoUrl": null,
                 "chips": [
+                  {
+                    "label": "run 5 / walk 1",
+                    "style": "dark"
+                  },
                   {
                     "label": "6→10 km",
                     "style": "dark"
@@ -663,11 +667,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Settle into a pace you could hold a conversation at and stay there",
-                    "Feel your effort stay flat from start to finish rather than fading at the end"
+                    "Start your walk break at 5 minutes, before you feel like you need one",
+                    "Feel the walk bring your breathing back down so the next running block starts fresh"
                   ],
                   "bad": [
-                    "Starting quicker than you can finish. The last kilometre should feel like the first"
+                    "Skipping the early walk breaks because you feel good. They only work if you take them from the start"
                   ]
                 }
               }
@@ -1387,6 +1391,11 @@
         "body": "<p>Your leg press went <strong>41 to 54 kilos</strong> last cycle and you never once ground out a set to get there. Every session landed right on target. That's the cleanest run of progress in your whole file.</p><p>Something else worth saying. Back in July I asked you to actually rate your soreness instead of leaving it on \"none\". <strong>You did, and it's been honest ever since.</strong> That's the reason I can read your weeks properly now.</p><p>You also came back from a month off and never disappeared again. Hold onto that when the long runs start getting long.</p>"
       },
       {
+        "icon": "🗓️",
+        "title": "Your Week, And The Optional One",
+        "body": "<p>There are five days in here and <strong>four of them are the real program</strong>: Day 1 in the gym, Day 2's run, Day 4's long run, and Day 5's legs.</p><p><strong>Day 3 is the only optional one.</strong> Take it if your legs want moving, skip it if the week is busy. Missing it costs you nothing.</p><p>If a week falls apart and you can only fit two sessions, make them <strong>Day 4 and Day 5</strong>. One protects your race, the other protects you from getting hurt on the way to it.</p><p>One rule about the order: <strong>Day 4 shouldn't land the day after Day 5.</strong> Your long run wants fresh legs. Everything else you can shuffle around your week.</p>"
+      },
+      {
         "icon": "🧱",
         "title": "More Core, Like You Asked",
         "body": "<p>You asked for more and you've got <strong>three times as much</strong>. It's on Day 2 straight after your run and on Day 5, because those are the two days you never miss. All of it is simple stuff you can do tired.</p><p>One honest thing, because I'd rather say it now than have you wonder in five weeks. <strong>Crunches build the muscle underneath, they don't change what's over it.</strong> The shape of your middle comes from the running and from what you eat, and both of those are already moving in the right direction.</p><p>What this core work genuinely does is hold you together in the last few kilometres of your race, when form falls apart and everything starts to hurt. That's worth doing on its own.</p><p>So do it because you said you would, and let the running do the other job. <strong>You've never broken a promise to me yet.</strong></p>"
@@ -1394,7 +1403,7 @@
       {
         "icon": "🏃",
         "title": "Day 4 Is The Whole Cycle",
-        "body": "<p>Everything else in this program exists to keep you healthy enough for <strong>Day 4</strong>. It's the session that decides your race, so it isn't the optional one any more.</p><p>Here's how it grows:</p><ul><li><strong>Week 1</strong> · 6km</li><li><strong>Week 2</strong> · 7km</li><li><strong>Week 3</strong> · 8.5km</li><li><strong>Week 4</strong> · 10km</li><li><strong>Week 5</strong> · 6.5km, an easier week on purpose</li></ul><p>Run it continuously. <strong>If you can't talk, walk until you can, then start running again.</strong> That's the rule for this session, and using it isn't failing. What matters is finishing the distance feeling like you had a bit more in you.</p>"
+        "body": "<p>Everything else in this program exists to keep you healthy enough for <strong>Day 4</strong>. It's the session that decides your race.</p><p>You'll run it <strong>five minutes running, one minute walking</strong>, the whole way through. This isn't a backup plan for when you get tired. It's how people cover distances like this without breaking, and it's how you'll run the race itself.</p><p><strong>Take the first walk break at 5 minutes, while you still feel great.</strong> That's the bit everyone gets wrong. Walk before you need it and the last few kilometres stay strong.</p><p>Here's how it grows:</p><ul><li><strong>Week 1</strong> · 6km</li><li><strong>Week 2</strong> · 7km</li><li><strong>Week 3</strong> · 8.5km</li><li><strong>Week 4</strong> · 10km</li><li><strong>Week 5</strong> · 6.5km, an easier week on purpose</li></ul><p>Day 2's run is different, that one you run straight through. Two different jobs.</p>"
       },
       {
         "icon": "❤️",

@@ -317,3 +317,39 @@ one note) against COACHING-PRINCIPLES → Communication ("Ban the AI tells: em-d
 cue-writing habit, not from any prior cycle — the rule post-dates C3, so C3's copy was never
 swept. Future builds should run this check before shipping, not after.
 
+**Post-ship revision (2026-08-19c) — optional day made visible, and Day 4 switched to a
+prescribed run-walk.** Two things Amir raised together.
+
+**(1) The athlete could not tell which day was optional.** C3 carried the word in the day name
+("Optional — Recovery Miles"); the C4 rename dropped it, and the only surviving trace was a
+passing "your optional day" inside a coach's note. Worse, the Day 4 card's line "it isn't the
+optional one any more" could be read as Day 4 *being* the optional one. Fixed at the source:
+Day 3's focusTag is now "Optional Recovery Miles, Nothing Heroic" (banner still resolves to
+`recovery`), plus a new notes card, **"Your Week, And The Optional One"**, that states the four
+mandatory days, names Day 3 as the only optional one, gives the two-session short-week minimum
+(Day 4 + Day 5), and states the one ordering invariant (Day 4 must not follow Day 5).
+**Standing lesson: when a day's optionality lives only in prose, it is invisible. It belongs in
+the day NAME, and the week's shape belongs in a card of its own whenever the structure changes.**
+
+**(2) Day 4 is now a prescribed run-walk at 5:1.** Earlier the same day Amir chose continuous
+with walking as a fallback (revision 19b); he then reopened it and delegated the call back
+("if you think a prescribed run-walk ladder fits her better, change it to what you think is
+best"). Changed, because the fallback framing was carrying a gap it could not carry: week 4 is
+10 km, ~96 min at her pace, against a demonstrated continuous best of ~27–30 min.
+
+Design: **run 5 min / walk 1 min, fixed for the whole cycle** — the *distance* progresses
+(6/7/8.5/10/6.5 km), not the ratio, so the week-to-week read stays clean and there is only one
+thing for her to learn. Ratio progression is deferred to C5. Cues and note both lead on the
+mechanism most people get wrong: **take the first walk break at 5 minutes, before it is needed** —
+run-walk works as fatigue management taken early, not as recovery from failure. Chip
+`run 5 / walk 1` carries it on the card so the prescription is never implied.
+
+**Day 2 deliberately stays continuous** (35→50 min, talk-test fallback). The two run days now
+have two clearly different jobs: Day 2 builds continuous capacity inside reach of her ~30 min
+best, Day 4 builds distance and time on feet safely. Both cards say so, so there is no repeat of
+the 19b contradiction.
+
+Race-day consequence: she will run 21.1 km at 5:1, which is what makes the finish realistic off
+a 16 km peak in C5. **C5 decision to make deliberately: hold 5:1, or progress the ratio toward
+8:1 or 10:1 once the volume is in her legs.**
+
