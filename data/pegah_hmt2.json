@@ -424,11 +424,11 @@
               {
                 "type": "simple",
                 "name": "Zone 2 Run",
-                "note": "Talk test first, heart rate second. Your duration climbs 35, 40, 45 then 50 minutes across the cycle, then drops back in week 5.",
+                "note": "Your time climbs through the cycle: 35 minutes in week 1, then 40, 45 and 50, then back down to 35 in week 5. Talk test first, heart rate second.",
                 "videoUrl": null,
                 "chips": [
                   {
-                    "label": "45 min",
+                    "label": "35→50 min",
                     "style": "dark"
                   },
                   {
@@ -646,11 +646,11 @@
               {
                 "type": "simple",
                 "name": "Long Run",
-                "note": "Walk breaks are part of the plan, not a failure. Week 1 is 6km, then 7, 8.5 and 10, with an easier 6.5km in week 5. Run week 1 purely by feel and send me your average heart rate afterwards.",
+                "note": "This one grows every week: 6km, 7km, 8.5km, 10km, then an easier 6.5km in week 5. Walk breaks are part of the plan, not a failure. In week 1 run it purely by feel and send me your average heart rate afterwards.",
                 "videoUrl": null,
                 "chips": [
                   {
-                    "label": "8 km",
+                    "label": "6→10 km",
                     "style": "dark"
                   },
                   {
