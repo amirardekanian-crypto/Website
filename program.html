@@ -3234,17 +3234,37 @@ function staleCloudPlan(data, prefix) {
   // Per-exercise keys carry no date, so map them back through the program. An
   // exercise is only treated as finished when EVERY day it appears in is over —
   // shared names must never cost a live day its data.
+  //
+  // A day with NO completed stamp is not automatically live: one the athlete has
+  // never finished never gets a stamp, so counting it live pinned every exercise
+  // name it shares with other days and their ticks never cleared. Mirrors the
+  // same fix in autoResetStaleDays() — no stamp is only live while a session is
+  // actually running on that day (timer/readiness stamped today).
+  const hasStamp = {}, startedToday = {};
+  Object.keys(data).forEach(k => {
+    if (k.indexOf(prefix) !== 0) return;
+    const rel = k.slice(prefix.length);
+    const cm = rel.match(/^completed_d(\d+)$/);
+    if (cm) { hasStamp[cm[1]] = true; return; }
+    const tm = rel.match(/^(?:timer|readiness)_(\d+)$/);
+    if (!tm) return;
+    let stamp = null;
+    try { const o = JSON.parse(data[k]); stamp = o && (o.sessionStart || o.timestamp); } catch (e) {}
+    if (stamp && sameDay(stamp)) startedToday[tm[1]] = true;
+  });
+
   const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
   const seen = {};                                    // exercise key -> {any, live}
   days.forEach(day => {
-    const finished = !!over[String(day.id)];
+    const id   = String(day.id);
+    const live = hasStamp[id] ? !over[id] : !!startedToday[id];
     (day.blocks || []).forEach(block => {
       (block.exercises || []).forEach(ex => {
         const k = String(ex.name || '').replace(/\s+/g, '_');
         if (!k) return;
         const s = seen[k] || (seen[k] = { any: false, live: false });
         s.any = true;
-        if (!finished) s.live = true;
+        if (live) s.live = true;
       });
     });
   });
@@ -5931,6 +5951,18 @@ function adoptRenamedExercises() {
   if (adopted.length) console.info('[program] carried history across rename:', adopted.join(', '));
 }
 
+// Was this day's session actually STARTED today? A day carries no completed stamp
+// both while it is in progress and when the athlete has simply never finished it,
+// and those two need telling apart (see liveNames in autoResetStaleDays). The
+// timer and the readiness check are the two things a started session always
+// leaves behind, and both carry their own date.
+function sessionStartedToday(dayId, today) {
+  const t = loadTimer(dayId), r = loadReadiness(dayId);
+  if (t && t.sessionStart && new Date(t.sessionStart).toDateString() === today) return true;
+  if (r && r.timestamp   && new Date(r.timestamp).toDateString()   === today) return true;
+  return false;
+}
+
 // Wipes per-session data for any day completed on a previous calendar date.
 // Preserves: weight log inputs, per-exercise notes (personal context).
 // Clears: exercise checks, per-exercise RPE, day note, session RPE, sent timestamp.
@@ -5948,13 +5980,27 @@ function autoResetStaleDays() {
   // live programmes reuse a name across days — "Stationary Bike" sits in all four
   // of Pooya's. Clearing a finished day by name therefore reaches sideways into a
   // day that is NOT over and blanks the RPE and done-ticks the athlete logged
-  // there today. Collect the names that still belong to a live day (finished
-  // today, or not finished at all — which is what a session in progress looks
-  // like) and leave those exercises alone.
+  // there today. Collect the names that still belong to a live day and leave
+  // those exercises alone.
+  //
+  // "Live" must mean finished TODAY or genuinely underway today — NOT merely
+  // "has no completed stamp". A day the athlete has never once finished has no
+  // stamp and never will, so treating that as live pinned its exercise names
+  // forever: Pooya's Day 4 was sent but never finished in-app, so Stationary
+  // Bike (all four of his days) was protected on every boot and its done-tick
+  // never cleared — he opened Day 1 with the bike already ticked, permanently.
+  // Three other athletes had a day stuck the same way. A day with no stamp is only
+  // protective while a session is actually running on it (timer or readiness
+  // stamped today), which is the same pair the abandoned-session sweep below
+  // already uses to decide a session was started.
   const liveNames = new Set();
   days.forEach(d => {
     const on = localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id);
-    if (on && on !== today) return;                 // this day is stale — not protective
+    if (on) {
+      if (on !== today) return;                     // finished on an earlier day — stale
+    } else if (!sessionStartedToday(d.id, today)) {
+      return;                                       // never finished, not underway — not protective
+    }
     (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
       liveNames.add(String(ex.name || '').replace(/\s+/g, '_'));
     }));
