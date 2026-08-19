@@ -29,7 +29,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Bird Dog | Active | C1-home | core — extensor endurance; covers what 45° Back Ext did |
 | RKC Plank | Active | C1-home | core |
 | Walk | Active | C1-home | conditioning — DAILY, targets a 500–6,000 step/day baseline |
-| Cat-Cow | Active | C1-home | prep — quadruped restored (Amir, 2026-08-17) |
+| Cat-Cow | Active | C1-home | prep — quadruped restored (Amir, 2026-08-19) |
 | Machine Leg Press | Retired-equipment | C1-gym | no longer available (home) |
 | Cable Pull Through | Retired-equipment | C1-gym | replaced by Banded Pull Through |
 | Chest-Supported Dumbbell Row | Retired-equipment | C1-gym | no bench at home; TRX Row took the slot |
@@ -160,7 +160,7 @@ Three changes from Amir after Faraz's first live session, all report-driven per 
 
 ---
 
-## Cycle 01 — Bedrock (HOME REWRITE) · 2026-08-17 · RETURNING (rewrite in place)
+## Cycle 01 — Bedrock (HOME REWRITE) · 2026-08-19 · RETURNING (rewrite in place)
 
 **Amir's decisions at the STEP 1 checkpoint:** rewrite C1 in place (`currentCycleIndex` stays 0,
 cycle dates unchanged 2026-08-01→08-28, no `programHistory` advance) · design defensively rather
@@ -222,7 +222,7 @@ HOLD: the loaded free hinge stays gated to C2. Banded Pull Through is the contin
   hardened to **nothing attaches to the bar at all**; the pulldown moved to the door anchor and
   became **Seated** (kneeling leaves ~15cm of band travel under a doorway anchor; seated gives ~55).
 - RFESS was 4×10/leg = 80 reps of the highest-DOMS lower-body movement as his first-ever unilateral
-  primary. For an athlete whose failure mode is vanishing, a week of DOMS inside an 11-day block IS
+  primary. For an athlete whose failure mode is vanishing, a week of DOMS inside a 10-day block IS
   the block ending. Cut to **3×8**, with the 2-set first exposure in the notes, not on the card.
 - **Three avoid cues were commanding the compensation.** "Don't let the hips drop as you tire"
   (TRX Ham Curl) instructs a fatiguing 98kg man to extend his lumbar spine. The Pull Through cue
