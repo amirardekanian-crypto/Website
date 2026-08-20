@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clip — The Living System (System reel, Beat 5)</title>
+<!--
+  CUTAWAY CLIP for System-reel Beat 5 ("A living system", 16s) — the beat that
+  previously had no real asset. Full spec: Content/APP-CLIPS.md -> clip-loop.
+  Cut in on «هر هفته چک‌این داریم», out on «تنظیم می‌شه», so Amir's face returns
+  for «هیچ‌وقت رو یه برنامه‌ی کهنه تمرین نمی‌کنی.»
+
+  THE IDEA: the week is a CLOSED CIRCUIT. You log -> the check-in reads it ->
+  next week's session is visibly rewritten -> back to the top. This cannot be
+  screen-recorded because it spans weeks, which is exactly why it is animated.
+
+  VERIFIED against data/demo.json + program.html (not assumed from the spec):
+    - Barbell Back Squat = Day 1, Strength block, exercise #6, GREEN stripe,
+      chips 4 Sets/x6 Reps/Tempo 3-1-1/RPE 7.
+    - Box Jump = Day 1, Plyometrics, #4, CLAY stripe. Lateral Bound is a real
+      Day 3 exercise (NOT Single-Leg Box Jump, which is already #5 in that
+      same block and would render a duplicate).
+    - "stick landing" renders GREEN: .ex-summary-pill.modifier uses --yellow,
+      and --yellow is green #0E4A36. The chip's own style:"dark" only decides
+      whether .priority is added, not the colour.
+    - Chat bubbles: .cmsg.coach = green, left, 3px bottom-left notch;
+      .cmsg.mine = #EDE8E0, right, 3px bottom-right notch. RPE scale is 6-10.
+
+  INVENTED-BUT-CONSISTENT (flagged honestly): the logged weights, the two chat
+  lines, and next week's adjusted numbers are illustrative — no athlete's real
+  data is shown. They are locked to each other as ONE unit: rows 3-4 log RPE 8,
+  the athlete says the last two sets felt like an 8, and the coach's reply
+  (4x5 at 8/10, box jump -> lateral bound) is exactly what card C then shows.
+  Edit any one of those and all three must move together.
+
+  NO WEEK PILLS ON THE CARDS. demo.json has no cycle start/end dates, so the
+  app renders no week chip at all — and Persian numerals must never sit inside
+  the English app UI. The week-to-week idea is carried by a Farsi note on the
+  dark ground instead, outside every card boundary.
+
+  URL modes: default (autoplay+loop) - ?beat=0 (empty stage: ghost track only)
+  - ?beat=1 (loop closed, all three cards, card A cleared for the new week —
+  the clip's true end state) - ?capture=1 (chrome-free export).
+
+  LOOP-SAFE BY CONSTRUCTION: every persistent reveal declares its `transition:`
+  ONLY on `.scene.on X`, never the base rule (Content/APP-CLIPS.md gotcha 3).
+  Anything that must appear AND disappear within one pass is a bounded
+  @keyframes lifecycle instead, since a transition can only travel to one end
+  state. Verified with a computed-style sampler across two full loops.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0E4A36; --clay:#C7552F; --clay2:#E06B43;
+    --paper:#FAF7F2; --ink:#1A1A1A; --ink2:#5C5C5C;
+    --line:#D8D1C5; --card-line:#EDE8E0;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#111;font-family:'Barlow',sans-serif;overflow:hidden;height:100vh;}
+  .viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  .fitwrap{width:1080px;height:1920px;transform-origin:center;}
+  .reel{width:1080px;height:1920px;position:relative;overflow:hidden;
+    background:radial-gradient(125% 80% at 50% 6%,#1b2a23 0%,#11160f 52%,#070905 100%);}
+  .reel::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:radial-gradient(120% 80% at 50% 42%,transparent 52%,rgba(0,0,0,.55) 100%);}
+
+  .orb{position:absolute;width:820px;height:820px;border-radius:50%;pointer-events:none;z-index:0;
+    filter:blur(90px);opacity:.5;top:-240px;right:-280px;
+    background:radial-gradient(circle,rgba(199,85,47,.35),transparent 70%);
+    animation:orbdrift 9s ease-in-out infinite alternate;}
+  @keyframes orbdrift{from{transform:translate(0,0) scale(1);}to{transform:translate(-60px,70px) scale(1.15);}}
+
+  /* ── the circuit ── */
+  .track{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:visible;}
+  .ghost{fill:none;stroke:rgba(255,255,255,.13);stroke-width:3;stroke-linecap:round;}
+  .march{fill:none;stroke:rgba(199,85,47,.55);stroke-width:3;stroke-dasharray:2 26;stroke-linecap:round;
+    animation:march 6s linear infinite;}
+  @keyframes march{to{stroke-dashoffset:-336;}}   /* 12 x 28px period — never jumps */
+  .live{fill:none;stroke:var(--clay);stroke-width:6;stroke-linecap:round;}
+  #seg1{stroke-dasharray:var(--l1);stroke-dashoffset:var(--l1);}
+  .scene.on #seg1{stroke-dashoffset:0;transition:stroke-dashoffset .8s var(--ease) 1.30s;}
+  #seg2{stroke-dasharray:var(--l2);stroke-dashoffset:var(--l2);}
+  .scene.on #seg2{stroke-dashoffset:0;transition:stroke-dashoffset .7s var(--ease) 2.60s;}
+  #ret{stroke-dasharray:var(--l3);stroke-dashoffset:var(--l3);}
+  /* deliberately NOT the house ease — it over-decelerates on a run this long
+     and kills the sweep that makes the circuit read as closing */
+  .scene.on #ret{stroke-dashoffset:0;transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1) 4.30s;}
+  /* comet: opacity 0 in its BASE state and raised inside the keyframes, so a
+     frozen ?beat=N still never shows a stray clay blob parked at the origin */
+  .comet{fill:var(--clay2);opacity:0;filter:drop-shadow(0 0 14px rgba(224,107,67,.9));}
+  .scene.on .comet{animation:cometRun 1.1s cubic-bezier(.4,0,.2,1) 4.30s both;}
+  @keyframes cometRun{0%{opacity:0;}6%{opacity:1;}88%{opacity:1;}100%{opacity:0;}}
+
+  .disc{position:absolute;width:64px;height:64px;border-radius:50%;background:var(--paper);
+    border:3px solid var(--clay);display:flex;align-items:center;justify-content:center;z-index:8;
+    font-family:'Vazirmatn',sans-serif;font-weight:800;font-size:30px;color:var(--clay);
+    opacity:0;transform:scale(.4);}
+  .scene.on .d1{opacity:1;transform:scale(1);transition:opacity .3s var(--ease) .15s;animation:discPop .45s var(--ease) .15s both;}
+  .scene.on .d2{opacity:1;transform:scale(1);transition:opacity .3s var(--ease) 2.05s;animation:discPop .45s var(--ease) 2.05s both;}
+  .scene.on .d3{opacity:1;transform:scale(1);transition:opacity .3s var(--ease) 3.25s;animation:discPop .45s var(--ease) 3.25s both;}
+  @keyframes discPop{0%{opacity:0;transform:scale(.4);}62%{transform:scale(1.16);}100%{opacity:1;transform:scale(1);}}
+
+  /* ── app cards ── */
+  .card{position:absolute;left:174px;width:768px;background:#fff;border-radius:24.5px;
+    box-shadow:0 22px 54px rgba(0,0,0,.5);overflow:hidden;padding:28px;
+    opacity:0;transform:translateY(26px) scale(.99);}
+  .stripe{position:absolute;left:0;top:0;bottom:0;width:7.0px;}
+  .stripe.green{background:var(--green);} .stripe.clay{background:var(--clay);}
+
+  .scene.on .cardA{opacity:1;transform:none;transition:opacity .55s var(--ease) .15s,transform .55s var(--ease) .15s;}
+  .scene.on .cardB{opacity:1;transform:none;transition:opacity .55s var(--ease) 1.55s,transform .55s var(--ease) 1.55s;}
+  .scene.on .cardC{opacity:1;transform:none;transition:opacity .55s var(--ease) 2.85s,transform .55s var(--ease) 2.85s;}
+  /* hand-off dim: B and C recede while the return leg draws, A comes back up */
+  .scene.on .cardB, .scene.on .cardC{filter:brightness(1);}
+  .scene.on .cardB{animation:recede 1.0s var(--ease) 4.35s both;}
+  .scene.on .cardC{animation:recede 1.0s var(--ease) 4.45s both;}
+  @keyframes recede{to{filter:brightness(.66) saturate(.9);}}
+
+  .ex-head{display:flex;align-items:center;gap:17.5px;}
+  .ex-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:52.5px;color:#999;line-height:1;letter-spacing:-1px;}
+  .ex-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:36.8px;color:var(--ink);letter-spacing:.3px;}
+  .pills{display:flex;gap:10.5px;margin-top:14.0px;flex-wrap:wrap;}
+  .pill{font-family:'Space Mono',monospace;font-size:18.4px;font-weight:600;padding:5.2px 15.8px;
+    border-radius:99px;background:var(--card-line);color:var(--ink);letter-spacing:.3px;white-space:nowrap;}
+  .pill.mod{background:var(--green);color:#fff;}   /* .ex-summary-pill.modifier — --yellow IS green */
+
+  .sec-label{font-family:'Space Mono',monospace;font-size:17.5px;letter-spacing:2.4px;
+    text-transform:uppercase;color:var(--ink2);margin:28.0px 0 15.8px;}
+  .logbox{border:1px solid var(--line);border-radius:14.0px;background:#fff;overflow:hidden;}
+  .log-head,.set-row{display:grid;grid-template-columns:49.0px 1fr auto 56.0px;gap:17.5px;align-items:center;}
+  .log-head{padding:17.5px 24.5px 14.0px;font-family:'Space Mono',monospace;font-size:16.6px;
+    letter-spacing:2.3px;text-transform:uppercase;color:var(--ink2);}
+  .set-row{padding:14.0px 24.5px;border-top:1px solid var(--card-line);opacity:0;transform:translateY(10px);}
+  .scene.on .sr-1{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.35s,transform .4s var(--ease) 0.35s;}
+  .scene.on .sr-2{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.45s,transform .4s var(--ease) 0.45s;}
+  .scene.on .sr-3{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.55s,transform .4s var(--ease) 0.55s;}
+  .scene.on .sr-4{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.65s,transform .4s var(--ease) 0.65s;}
+  .set-num{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:31.5px;text-align:center;color:var(--ink);}
+  .set-w{position:relative;background:var(--card-line);border:1px solid transparent;border-radius:8.8px;
+    padding:12.2px 17.5px;font-size:22.8px;font-family:'Barlow',sans-serif;color:var(--ink);min-height:52.5px;}
+  .w-ph{color:#bbb;}
+  .w-val{position:absolute;left:17.5px;top:12.2px;color:var(--ink);opacity:0;}
+  .set-rpe{display:flex;gap:5.2px;}
+  .rpe-btn{width:45.5px;height:45.5px;font-size:21.0px;border-radius:7.0px;border:1px solid var(--line);
+    background:transparent;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--ink2);
+    display:flex;align-items:center;justify-content:center;}
+  .set-check{width:49.0px;height:49.0px;border-radius:50%;border:2px solid var(--line);position:relative;}
+  .set-check::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:24.5px;font-weight:700;color:#fff;opacity:0;}
+
+  /* TRANSIENT: the logged week fills in, then clears as the loop closes, so the
+     final frame equals the opening frame and the restart is invisible. Bounded
+     @keyframes, not transitions — a transition cannot travel to two end states. */
+  .scene.on .w-val{animation:valLife 6400ms linear both;}
+  @keyframes valLife{0%,7.81%{opacity:0;}13.28%,85.94%{opacity:1;}91.41%,100%{opacity:0;}}
+  .scene.on .w-ph{animation:phLife 6400ms linear both;}
+  @keyframes phLife{0%,7.81%{opacity:1;}13.28%,85.94%{opacity:0;}91.41%,100%{opacity:1;}}
+  .scene.on .rpe-btn.sel{animation:rpeLife 6400ms linear both;}
+  @keyframes rpeLife{
+    0%,14.84%{background:transparent;color:var(--ink2);border-color:var(--line);}
+    20.31%,85.94%{background:var(--green);color:#fff;border-color:var(--green);}
+    91.41%,100%{background:transparent;color:var(--ink2);border-color:var(--line);}}
+  .scene.on .set-check{animation:chkLife 6400ms linear both;}
+  @keyframes chkLife{
+    0%,17.19%{background:transparent;border-color:var(--line);}
+    22.66%,85.94%{background:var(--green);border-color:var(--green);}
+    91.41%,100%{background:transparent;border-color:var(--line);}}
+  .scene.on .set-check::after{animation:chkTick 6400ms linear both;}
+  @keyframes chkTick{0%,17.19%{opacity:0;}22.66%,85.94%{opacity:1;}90.62%,100%{opacity:0;}}
+
+  /* ── coach thread ── */
+  .thread{display:flex;flex-direction:column;gap:17.5px;}
+  .cmsg{display:flex;flex-direction:column;max-width:84%;opacity:0;transform:translateY(14px);}
+  .cmsg.mine{align-self:flex-end;align-items:flex-end;}
+  .cmsg.coach{align-self:flex-start;align-items:flex-start;}
+  .bub{font-family:'Barlow',sans-serif;font-size:24.5px;line-height:1.45;padding:15.8px 21.0px;border-radius:22.8px;}
+  .cmsg.mine .bub{background:var(--card-line);color:var(--ink);border-bottom-right-radius:5.2px;}
+  .cmsg.coach .bub{background:var(--green);color:#fff;border-bottom-left-radius:5.2px;}
+  .scene.on .m-mine{opacity:1;transform:none;transition:opacity .45s var(--ease) 1.75s,transform .45s var(--ease) 1.75s;}
+  .scene.on .m-coach{opacity:1;transform:none;transition:opacity .5s var(--ease) 2.20s,transform .5s var(--ease) 2.20s;
+    animation:msgIn .5s var(--ease) 2.20s both;}
+  @keyframes msgIn{0%{transform:translateY(14px) scale(.96);}66%{transform:translateY(-3px) scale(1.02);}100%{transform:none;}}
+
+  /* ── the swap on card C ── */
+  .row2{margin-top:28.0px;}
+  .nameswap{position:relative;height:42.0px;overflow:hidden;}
+  .nm{position:absolute;left:0;top:0;white-space:nowrap;
+    font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:36.8px;color:var(--ink);letter-spacing:.3px;}
+  .nm-old{transform:translateY(0);opacity:1;}
+  .nm-new{transform:translateY(31.5px);opacity:0;}
+  .scene.on .nm-old{transform:translateY(-31.5px);opacity:0;transition:opacity .42s var(--ease) 3.30s,transform .42s var(--ease) 3.30s;}
+  .scene.on .nm-new{transform:translateY(0);opacity:1;transition:opacity .42s var(--ease) 3.30s,transform .42s var(--ease) 3.30s;}
+  .roll{display:inline-block;height:1em;overflow:hidden;vertical-align:bottom;}
+  .roll-track{display:block;transform:translateY(0);}
+  .roll-track span{display:block;height:1em;line-height:1;}
+  .scene.on .roll-track{transform:translateY(-1em);transition:transform .4s var(--ease) 3.45s;}
+  .scene.on .stripe.flash{animation:stripeFlash 1s ease-out 3.30s;}
+  @keyframes stripeFlash{0%{box-shadow:0 0 0 0 rgba(199,85,47,0);}35%{box-shadow:0 0 22px 5px rgba(199,85,47,.55);}100%{box-shadow:0 0 0 0 rgba(199,85,47,0);}}
+
+  /* ── Farsi layer (all Persian numerals live HERE, never inside app UI) ── */
+  .weeknote{position:absolute;left:0;right:0;top:0;text-align:center;
+    direction:rtl;font-family:'Vazirmatn',sans-serif;font-weight:700;font-size:30px;color:rgba(255,255,255,.72);opacity:0;}
+  .scene.on .weeknote{opacity:1;transition:opacity .45s var(--ease) 4.50s;}
+  .weeknote .arrow{color:var(--clay2);}
+
+  /* bottom:320 keeps the whole block above y=1600 — IG's UI covers the last
+     ~320px of a 1920 frame, and a caption under it is a caption nobody reads. */
+  .capwrap{position:absolute;left:70px;right:70px;bottom:320px;z-index:25;text-align:center;height:132px;}
+  .cap{position:absolute;left:0;right:0;bottom:0;direction:rtl;font-family:'Vazirmatn',sans-serif;
+    font-weight:700;font-size:46px;line-height:1.5;color:var(--paper);opacity:0;}
+  .cap .acc{color:var(--clay2);}
+  /* caps 1 and 2 are TRANSIENT (each hands off to the next) */
+  .scene.on .cap1{animation:cap1 6400ms linear both;}
+  @keyframes cap1{0%,21.88%{opacity:0;}27.34%,38.28%{opacity:1;}42.19%,100%{opacity:0;}}
+  .scene.on .cap2{animation:cap2 6400ms linear both;}
+  @keyframes cap2{0%,42.97%{opacity:0;}48.44%,81.25%{opacity:1;}85.16%,100%{opacity:0;}}
+  /* cap 3 PERSISTS — a transition, so ?beat=1 freezes on it */
+  .cap3{font-weight:800;font-size:50px;}
+  .scene.on .cap3{opacity:1;transition:opacity .5s var(--ease) 5.60s;}
+
+  /* ── URL modes ── */
+  .stillmode .controls{display:none;}
+  .stillmode .viewport{display:block;}
+  .stillmode .fitwrap{transform:none!important;}
+  .stillmode *{transition:none!important;animation:none!important;}
+  .capturemode .controls{display:none!important;}
+  .capturemode .fitwrap{transform:none!important;}
+  .controls{position:fixed;left:0;right:0;bottom:0;background:#000;color:#fff;padding:14px 22px;
+    display:flex;align-items:center;gap:18px;font-family:'Barlow',sans-serif;font-size:14px;z-index:999;}
+  .controls button{background:var(--clay);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer;}
+  .controls .hint{opacity:.6;}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="fitwrap" id="fitwrap">
+    <div class="reel" id="reel">
+      <div class="scene" data-dur="6400">
+        <div class="orb"></div>
+
+        <svg class="track" viewBox="0 0 1080 1920" preserveAspectRatio="none">
+          <path class="ghost" id="ghost"/>
+          <path class="march" id="marchp"/>
+          <path class="live" id="seg1"/>
+          <path class="live" id="seg2"/>
+          <path class="live" id="ret"/>
+          <circle class="comet" id="comet" r="11" cx="0" cy="0"/>
+        </svg>
+
+        <div class="disc d1" style="left:52px">۱</div>
+        <div class="disc d2" style="left:52px">۲</div>
+        <div class="disc d3" style="left:52px">۳</div>
+
+        <!-- A · you log the week -->
+        <article class="card cardA">
+          <div class="stripe green"></div>
+          <div class="ex-head"><span class="ex-num">6</span><span class="ex-name">Barbell Back Squat</span></div>
+          <div class="sec-label">Log Sets</div>
+          <div class="logbox">
+            <div class="log-head"><div>SET</div><div>WEIGHT</div><div>RPE</div><div></div></div>
+            
+            <div class="set-row sr-1">
+              <div class="set-num">1</div>
+              <div class="set-w"><span class="w-ph">kg</span><span class="w-val">80</span></div>
+              <div class="set-rpe"><span class="rpe-btn">6</span><span class="rpe-btn sel">7</span><span class="rpe-btn">8</span><span class="rpe-btn">9</span><span class="rpe-btn">10</span></div>
+              <div class="set-check"></div>
+            </div>
+            <div class="set-row sr-2">
+              <div class="set-num">2</div>
+              <div class="set-w"><span class="w-ph">kg</span><span class="w-val">80</span></div>
+              <div class="set-rpe"><span class="rpe-btn">6</span><span class="rpe-btn sel">7</span><span class="rpe-btn">8</span><span class="rpe-btn">9</span><span class="rpe-btn">10</span></div>
+              <div class="set-check"></div>
+            </div>
+            <div class="set-row sr-3">
+              <div class="set-num">3</div>
+              <div class="set-w"><span class="w-ph">kg</span><span class="w-val">82.5</span></div>
+              <div class="set-rpe"><span class="rpe-btn">6</span><span class="rpe-btn">7</span><span class="rpe-btn sel">8</span><span class="rpe-btn">9</span><span class="rpe-btn">10</span></div>
+              <div class="set-check"></div>
+            </div>
+            <div class="set-row sr-4">
+              <div class="set-num">4</div>
+              <div class="set-w"><span class="w-ph">kg</span><span class="w-val">82.5</span></div>
+              <div class="set-rpe"><span class="rpe-btn">6</span><span class="rpe-btn">7</span><span class="rpe-btn sel">8</span><span class="rpe-btn">9</span><span class="rpe-btn">10</span></div>
+              <div class="set-check"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- B · the weekly check-in reads it -->
+        <article class="card cardB">
+          <div class="stripe clay"></div>
+          <div class="sec-label" style="margin-top:0">Coach</div>
+          <div class="thread">
+            <div class="cmsg mine m-mine"><div class="bub">Last two squat sets felt like an 8.</div></div>
+            <div class="cmsg coach m-coach"><div class="bub">Then we don't add reps. 4&times;5 at 8/10 this week, and the box jump becomes a lateral bound.</div></div>
+          </div>
+        </article>
+
+        <!-- C · next week is rewritten -->
+        <article class="card cardC">
+          <div class="stripe clay flash"></div>
+          <div class="ex-head">
+            <span class="ex-num">4</span>
+            <span class="nameswap" style="flex:1">
+              <span class="nm nm-old">Box Jump</span>
+              <span class="nm nm-new">Lateral Bound</span>
+            </span>
+          </div>
+          <div class="pills">
+            <span class="pill mod">stick landing</span>
+            <span class="pill">4&times;<span class="roll"><span class="roll-track"><span>4</span><span>4/side</span></span></span></span>
+            <span class="pill">&#9201; 2m</span>
+          </div>
+          <div class="ex-head row2"><span class="ex-num">6</span><span class="ex-name">Barbell Back Squat</span></div>
+          <div class="pills">
+            <span class="pill">4&times;<span class="roll"><span class="roll-track"><span>6</span><span>5</span></span></span></span>
+            <span class="pill"><span class="roll"><span class="roll-track"><span>7</span><span>8</span></span></span>/10</span>
+            <span class="pill">&#9201; 2m</span>
+          </div>
+        </article>
+
+        <div class="capwrap">
+          <div class="weeknote">هفته‌ی ۶ <span class="arrow">←</span> هفته‌ی ۷</div>
+          <div class="cap cap1">هر هفته چک‌این داریم</div>
+          <div class="cap cap2">برنامه همون‌جا تنظیم می‌شه</div>
+          <div class="cap cap3">برنامه‌ی زنده — <span class="acc">هر هفته تنظیم می‌شه</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="CLIP.play()">&#9654; Replay</button>
+  <span class="hint">To record: hit replay and screen-capture the 1080&times;1920 frame — controls sit outside it. Use ?capture=1 for a clean programmatic export.</span>
+</div>
+
+<script>
+  const CLIP = (function(){
+    const reel  = document.getElementById('reel');
+    const scene = document.querySelector('.scene');
+    const DUR   = +scene.dataset.dur;
+    let timers = [];
+
+    // ── LAYOUT: measure, don't guess ──────────────────────────────────────
+    // Card heights depend on how the coach's message wraps, which depends on
+    // the webfont. So we stack the cards from their REAL measured heights and
+    // derive every disc position and every path from those same numbers. A
+    // hand-typed height here would silently clip the bubble the day the copy
+    // changes by one word.
+    const TRACK_L=84, TRACK_R=1032, TRACK_T=150, TRACK_B=1652, TOP=250, GAP=20;
+    function layout(){
+      const els = ['cardA','cardB','cardC'].map(c => reel.querySelector('.'+c));
+      let y = TOP; const cy = [];
+      els.forEach(el => {
+        el.style.top = y + 'px';
+        const h = el.offsetHeight;
+        cy.push(y + h/2);
+        y += h + GAP;
+      });
+      const [ya, yb, yc] = cy;
+      reel.querySelector('.d1').style.top = (ya-32)+'px';
+      reel.querySelector('.d2').style.top = (yb-32)+'px';
+      reel.querySelector('.d3').style.top = (yc-32)+'px';
+
+      const seg1 = `M${TRACK_L},${ya} L${TRACK_L},${yb}`;
+      const seg2 = `M${TRACK_L},${yb} L${TRACK_L},${yc}`;
+      const ret  = `M${TRACK_L},${yc} L${TRACK_L},${TRACK_B-90} Q${TRACK_L},${TRACK_B} ${TRACK_L+90},${TRACK_B}`
+                 + ` L${TRACK_R-90},${TRACK_B} Q${TRACK_R},${TRACK_B} ${TRACK_R},${TRACK_B-90}`
+                 + ` L${TRACK_R},${TRACK_T+90} Q${TRACK_R},${TRACK_T} ${TRACK_R-90},${TRACK_T}`
+                 + ` L${TRACK_L+90},${TRACK_T} Q${TRACK_L},${TRACK_T} ${TRACK_L},${TRACK_T+90} L${TRACK_L},${ya}`;
+      document.getElementById('seg1').setAttribute('d', seg1);
+      document.getElementById('seg2').setAttribute('d', seg2);
+      document.getElementById('ret').setAttribute('d', ret);
+      const whole = seg1 + ' ' + seg2 + ' ' + ret;
+      document.getElementById('ghost').setAttribute('d', whole);
+      document.getElementById('marchp').setAttribute('d', whole);
+
+      ['seg1','seg2','ret'].forEach((id,i) => {
+        const L = document.getElementById(id).getTotalLength();
+        reel.style.setProperty('--l'+(i+1), L);
+      });
+      return document.getElementById('ret').getTotalLength();
+    }
+    let RET_L = 0;
+
+    // Comet rides the return path by sampling it — offset-path support is
+    // uneven, and this also guarantees it tracks the SAME geometry as the line.
+    const retPath = document.getElementById('ret');
+    const comet   = document.getElementById('comet');
+    let raf = null;
+    function runComet(){
+      const t0 = performance.now(), D = 1100;
+      cancelAnimationFrame(raf);
+      (function step(now){
+        const p = Math.min(1, (now - t0) / D);
+        const e = p < .5 ? 2*p*p : 1 - Math.pow(-2*p + 2, 2) / 2;   // matches the line's ease
+        const pt = retPath.getPointAtLength(e * RET_L);
+        comet.setAttribute('cx', pt.x); comet.setAttribute('cy', pt.y);
+        if (p < 1) raf = requestAnimationFrame(step);
+      })(performance.now());
+    }
+
+    function fit(){
+      if(document.body.classList.contains('stillmode')||document.body.classList.contains('capturemode')){
+        document.getElementById('fitwrap').style.transform='none'; return;
+      }
+      const s=Math.min(window.innerWidth/1080,(window.innerHeight-70)/1920);
+      document.getElementById('fitwrap').style.transform='scale('+s+')';
+    }
+    window.addEventListener('resize', fit);
+    function clear(){ timers.forEach(clearTimeout); timers=[]; cancelAnimationFrame(raf); }
+    function play(){
+      clear();
+      scene.classList.remove('on');
+      void scene.offsetWidth;
+      timers.push(setTimeout(()=>scene.classList.add('on'), 60));
+      timers.push(setTimeout(runComet, 4360));
+      timers.push(setTimeout(play, DUR+400));
+    }
+    // ?beat=0 = empty stage (ghost track only). ?beat=1 = the clip's true end
+    // state: circuit closed, three cards, card A cleared for the new week.
+    window.__show = n => {
+      clear();
+      if (n >= 1) { void scene.offsetWidth; scene.classList.add('on'); }
+      else { scene.classList.remove('on'); }
+    };
+    const q = new URLSearchParams(location.search);
+    if (q.has('beat')) {
+      document.body.classList.add('stillmode'); fit();
+      document.fonts.ready.then(()=>{ RET_L = layout(); __show(+q.get('beat')); });
+    } else {
+      if (q.has('capture')) document.body.classList.add('capturemode');
+      fit(); document.fonts.ready.then(()=>{ RET_L = layout(); play(); });
+    }
+    return { play };
+  })();
+</script>
+</body>
+</html>
