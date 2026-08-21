@@ -237,8 +237,8 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Recovery capacity gates everything** — set the weekly volume ceiling *before*
   choosing session count. *(2026-06-15)*
 - **High-/chronic-stress clients:** embed an autoregulation rule (drop every RPE by 1 on
-  low-readiness days) + a minimum effective dose (first power move + first primary lift)
-  + flexible session order. *(2026-06-15)*
+  low-readiness days, **never below 6**) + a minimum effective dose (first power move +
+  first primary lift) + flexible session order. *(2026-06-15, floor added 2026-08-21)*
 - **Separate training fatigue from life load** in every review — a readiness dip from
   poor sleep/stress is not the same as training fatigue (Mehraneh's end-cycle dip was
   life, not load). *(2026-06-15)*
@@ -558,6 +558,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   select in the logger is a mismatch, not a nuance. *(2026-07-24, Setareh C1 — shipped with
   RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
   mismatch and all three were raised to 6.)*
+- **The 6 floor binds INSTRUCTIONS as well as chips — any note telling the athlete to take
+  RPE off must name the floor in the same sentence.** Auditing only the RPE chips passes a
+  program that still sends her below 6, because the autoregulation card does the subtracting
+  at runtime: "drop every RPE by 1 on a low-readiness day" lands on **RPE 5** for every
+  exercise authored at 6, and she cannot log it. Write it as *"take 1 off every RPE, but
+  never go below 6 — anything already at 6 stays at 6."* Same for a period-week card, a
+  deload note, a double-day rule, or a Coach's Note. Sweep every athlete-facing string for
+  sub-6 RPE, not just `chips[]`. *(2026-08-21, Amir, on Ghazal C2: "Again you prescribed rpe
+  5 but my app minumum is 6. That is a hard rule." The chip lint was clean; the notes card
+  was the leak.)*
 
 ## Naming
 - **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
