@@ -237,7 +237,7 @@
                 "name": "Barbell Back Squat",
                 "videoUrl": null,
                 "restSec": 180,
-                "note": "You finished Cycle 1 at 80lb for 10 reps and you’ve had time off since, so don’t start there. Begin around 60lb and let the first set tell you where RPE 8 sits for sets of 6. Depth is whatever your knee is happy with, not a fixed target.",
+                "note": "You finished Cycle 1 at 80lb for 10 reps and you've had four months off, so don't start there. Begin around 60lb and keep week 1 at RPE 6, building to the RPE 8 on this card by week 3. Depth is whatever your knee is happy with, not a fixed target.",
                 "chips": [
                   {
                     "label": "3s eccentric",
@@ -1389,8 +1389,8 @@
       },
       {
         "icon": "🎯",
-        "title": "Week One Is For Finding Your Weights",
-        "body": "<p>You've had time away from the gym, so week one isn't about pushing. <strong>It's about finding what RPE 8 feels like again.</strong></p><p>On a movement you know, start under what you think you can do and let the first set tell you. Comes up easy, add weight. Grinds, stay there or come down. On the new movements just start light. There's no prize for guessing right on set one.</p><p>After that it's simple. <strong>Hit the reps at or under the target RPE and you go up a small step next time.</strong> Miss reps, or the set feels harder than the number on the card, and you repeat that weight until it doesn't.</p><p>Dropping weight on a bad day isn't going backwards. It's the system working.</p>"
+        "title": "Start Lower Than The Card Says",
+        "body": "<p>You've been out of the gym about four months, so the numbers on your cards are where you're going, not where you start. <strong>Week 1, cap every main lift at RPE 6. Week 2, RPE 7. From week 3, run the number printed on the card.</strong></p><p>That applies to your back squat, dumbbell bench press, Romanian deadlift, Bulgarian split squat and the landmine press. Everything else you can run as written from day one.</p><p>Picking the weight is simple. Start under what you think you can do and let the first set tell you. Comes up easy, add weight. Grinds, stay there or come down. On a movement that's new to you start light, there's no prize for guessing right on set one.</p><p>Once you're past that ramp, <strong>hit the reps at or under the target RPE and you go up a small step next week.</strong> Miss reps, or it feels harder than the number on the card, and you repeat that weight until it doesn't. Dropping weight on a bad day isn't going backwards, it's the system working.</p>"
       },
       {
         "icon": "💪",
@@ -1420,7 +1420,7 @@
       {
         "icon": "🩸",
         "title": "Period Week",
-        "body": "<p>Nothing here changes how I plan your training. This is just so you never have to work out what to do on a bad day.</p><p>On those days, here's the version of each session:</p><ul><li><strong>Full as written:</strong> Day 3 and Day 5. The sled, ropes, bike and the walk all tend to help with cramping, so don't skip them.</li><li><strong>Cut to 2 sets and go lighter:</strong> back squat, dumbbell bench press, Romanian deadlift, Bulgarian split squat. Move the pattern, don't grind it.</li><li><strong>Skip for those days:</strong> the Pallof press, side plank and Copenhagen plank. Hard bracing through the middle is what tends to feel worst.</li></ul><p><strong>Log it as done.</strong> A modified session is still a session.</p>"
+        "body": "<p>Nothing here changes how I plan your training. This is just so you never have to work out what to do on a bad day.</p><p>On those days, here's the version of each session:</p><ul><li><strong>Full as written:</strong> Day 3 and Day 5. The sled, ropes, bike and the walk all tend to help with cramping, so don't skip them.</li><li><strong>Cut to 2 sets at RPE 6:</strong> back squat, dumbbell bench press, Romanian deadlift, Bulgarian split squat. Move the pattern, don't grind it.</li><li><strong>Skip for those days:</strong> the Pallof press, side plank and Copenhagen plank. Hard bracing through the middle is what tends to feel worst.</li></ul><p><strong>Log it as done.</strong> A modified session is still a session.</p>"
       },
       {
         "icon": "🏆",

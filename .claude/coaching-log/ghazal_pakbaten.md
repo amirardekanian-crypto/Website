@@ -79,8 +79,12 @@ DB rather than barbell and partnered with a trunk-supported 45° Back Extension 
 session. Flagged to Amir in the handoff.
 
 *Capacity.* Hold session count at 4, increase intensity (RPE 7→8 on primaries), decrease reps
-(10 → 6–8), increase unilateral share. Week 1 is explicitly a recalibration week after 16
-weeks off — carried in the notes, not baked into a lower card RPE.
+(10 → 6–8), increase unilateral share. **Re-entry ramp after 16 weeks off: week 1 caps the five
+main lifts at RPE 6, week 2 at RPE 7, week 3 onward runs the card.** Carried in the notes card
+"Start Lower Than The Card Says", never baked into a lower card RPE — the card holds her normal
+working target all cycle (COACHING-PRINCIPLES → Progression). First draft shipped only a
+load-finding card with no stated week-1 ceiling; Amir caught it (2026-08-21) and the obligation
+to name the reduced number is now a principle.
 
 *Roadmap.* Cycle 2 = Strength Engine, weeks 6–10, "moderate loads RPE 7–8, unilateral emphasis,
 tempo-controlled plyometrics." Fits as written. No deviation.

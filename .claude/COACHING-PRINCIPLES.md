@@ -366,6 +366,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   supposed to need. A genuinely light day in the design — an undulation choice, a low-CNS
   accessory — is different: that IS its normal target and belongs on the card.
   *(2026-08-07)*
+- **The other half of that rule: if the athlete has to START lower, the notes MUST SAY SO —
+  and say the number.** The card carrying the normal target is only safe when something
+  actually tells her to hold back; otherwise a returning, detrained, deloading, injured or
+  brand-new athlete reads RPE 8 on day one and takes it literally. Silence is the failure
+  mode, and a card that merely teaches load-finding ("start under what you think and let the
+  first set tell you") is NOT that instruction — it explains *how* to pick a weight, never
+  that this week's effort ceiling is lower. Whenever the design read says start lower, write
+  a notes card that names: **the reduced RPE as an actual number** (≥6 — see the RPE-floor
+  rules in "Chips & modifiers"), **which exercises it applies to**, and **what moves her back
+  to the number on the card**. Triggers: a layoff or detraining, week-1 recalibration, a
+  deload/back-off week, a movement new to the client, a staged return from injury, a period
+  week. *(2026-08-21, Amir, verbatim: "Remember if some one has to start with lower rpe, you
+  mention that in notes." Ghazal C2 shipped RPE 8 primaries to an athlete 16 weeks detrained
+  with only a load-finding card and no stated week-1 ceiling.)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
   When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
