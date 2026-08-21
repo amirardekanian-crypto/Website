@@ -299,8 +299,10 @@ numbers + the coaching intent:
 Calibrate to training age.
 
 **AUTOREGULATION (required output):** include the standard note — drop every RPE by 1 on
-low-readiness days; minimum effective dose = first power move + first primary; sessions may
-be reordered. Leans on the app's readiness check + ACWR.
+low-readiness days **but never below 6** (the app's selector floor — state the floor in the
+same sentence, or the note prescribes an RPE 5 she cannot log on every exercise authored at
+6); minimum effective dose = first power move + first primary; sessions may be reordered.
+Leans on the app's readiness check + ACWR.
 
 **Do NOT output:** videoUrl · completionTitle/Message · currentCycleIndex · cycles[] ·
 programHistory. /program-engage and /program-assemble own those.
