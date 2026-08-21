@@ -1430,7 +1430,7 @@
       {
         "icon": "⚙️",
         "title": "Adjusting On A Rough Day",
-        "body": "<p>Some weeks your sleep and stress will make the numbers on the card look silly. <strong>On a low-readiness day, take 1 off every RPE in the session</strong> and run it as written otherwise.</p><p>If you're short on time or energy, the minimum that still counts is <strong>the first power move plus the first main lift</strong>. Do those two and log it. That's a session.</p><p>You can move the days around your padel and your work. If you train padel and gym on the same day, do the gym after padel, or leave 4 to 6 hours between them. If neither works, run the minimum above and keep the main lift at RPE 6.</p>"
+        "body": "<p>Some weeks your sleep and stress will make the numbers on the card look silly. <strong>On a low-readiness day, take 1 off every RPE in the session, but never go below 6.</strong> Six is the lowest the app lets you log, so anything already sitting at 6 just stays at 6.</p><p>If you're short on time or energy, the minimum that still counts is <strong>the first power move plus the first main lift</strong>. Do those two and log it. That's a session.</p><p>You can move the days around your padel and your work. If you train padel and gym on the same day, do the gym after padel, or leave 4 to 6 hours between them. If neither works, run the minimum above and keep the main lift at RPE 6.</p>"
       }
     ]
   },
