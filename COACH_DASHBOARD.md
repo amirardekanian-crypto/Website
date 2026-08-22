@@ -34,12 +34,13 @@ safe to open anywhere — handy for screenshots or design work.
 |---|---|
 | **Today** | The day's play: who's on court, what's on the wall, who needs you, the quest lever |
 | **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
-| **Athletes** | The whole roster — coached and Proof-only — with a full file per person |
+| **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done |
 | **Proof** | The board, the season, the signup funnel, titles minted |
 | **Links** | Copyable deep links to every published article and workout |
 
 The URL carries the view (`#today`, `#intake`, `#athletes`, `#proof`, `#links`,
-`#a/<athlete_id>`), so any screen can be bookmarked or reloaded in place.
+`#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any screen can be bookmarked or
+reloaded in place.
 **↻ Refresh** re-pulls everything.
 
 ### Intake — where the apply form lands
@@ -132,14 +133,19 @@ screen — a row of grey dots is someone drifting before they churn.
 
 ## 4. ATHLETES
 
-One row per person across **both** systems, sorted by who needs attention
-(waiting replies first, then quiet coached athletes, then silent Proof
-athletes). Search by name or id; re-sort by recent activity or name.
+One row per person across **both** systems, split under two headings — **Needs you** and
+**All quiet** — so the line between "waiting on me" and "fine" is drawn rather than implied.
+Filter chips across the top (Everyone · Needs you · Coached · Free · Proof only) each carry
+their count. Search by name or id; re-sort by recent activity or name.
 
 Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
-habits but have no program file) or **No file** — their level, anything waiting
-a reply, an ACWR pill *only when it's amber or red*, their session count, their
-Proof week (`n/7`) and seven presence dots.
+habits but have no program file) or **No file** — their level, an ACWR pill *only when it's amber
+or red*, their session count, their Proof week (`n/7`) and seven presence dots.
+
+**A flagged row says why, in words:** *1 note to reply* · *2 unread messages* · *no session for 9
+days* · *silent on Proof — 4 days* · *ready to upgrade?*. The reasons are the same triggers as the
+Needs-you list on Today; before, they were folded into one dot-separated line and a row that needed
+a reply looked like a row that didn't.
 
 **+ New secure link** mints a per-athlete key and copies the program link.
 
@@ -147,38 +153,70 @@ Proof week (`n/7`) and seven presence dots.
 
 ## 5. The athlete file (`#a/<id>`)
 
-Everything about one person, in the order you'd actually want it.
+**Rebuilt 2026-08-22.** It used to be eight sections on one scroll, three of which drew the same
+program days three different ways — *Prescribed program*, *Training logs by day* and *Live activity* —
+hundreds of pixels apart. Answering "did she do what I asked?" meant reading the chips in one section,
+scrolling to another, and holding the numbers in your head. Now it's **five sub-tabs**, and the first
+one answers that question directly.
 
-**Links** — the program link and, for anyone on Proof, the Proof link, both
-one-tap copyable. **Rotate key** issues a new one (the old link stops syncing
-immediately, so only do it when you'll send the new one).
+The sub-tab lives in the URL (`#a/<id>/work`, `/proof`, `/chat`, `/calls`, `/file`), so any screen
+can be bookmarked. Plain `#a/<id>` opens **The work**.
 
-**Proof strip** (anyone with habit logs or a contact record) — server-scored
-level, 14 presence dots, their week, their board name and worn title, WhatsApp
-and email buttons, and their wall lines this week with hide/show on each.
+### The work — prescribed vs done, on one line
 
-**The three charts** — training load, readiness, adherence. Unchanged from the
-old dashboard; §6 explains them.
+**One card per program day**, in program order, whether or not it has ever been trained. The header
+carries the day, the focus name, when it was last done, sRPE · duration · AU · readiness, and a
+verdict — *"1 not done · 2 off plan"* with *"5/8 exactly as prescribed"* under it. Only the most
+recently trained day opens by itself; the rest are one tap.
 
-**Messages** — the full thread, with a composer.
+Inside, every prescribed exercise is a row with three columns:
 
-**Weekly check-in calls** — every `call_logs` row, plus **Copy cycle prompt**,
-which bundles a cycle's check-ins and sessions into a ready-to-paste report
-prompt. **+ New call log** opens `call-log.html` for that athlete.
+| | |
+|---|---|
+| **Prescribed** | what you wrote — `4 × 10`, `RPE 7`, tempo and any extra chips underneath |
+| **Done** | sets completed against sets asked for, the load they actually used (`10 → 12 kg` when it moved within the session), and their **average RPE** — with the per-set RPEs under it |
+| **Flag** | the gap, named: `2 sets short` · `not done` · `2.5 over target RPE` · `not in the plan` |
 
-**Prescribed program** — the current cycle from `data/<id>.json`, day → block →
-exercise with chips, video links and a "Last logged" line under anything they've
-logged. Works before their first session.
+A row is bordered clay when work was skipped, ochre when it was done at the wrong dose, and plain
+when it landed on plan. Your exercise note and anything the athlete wrote against that exercise sit
+under its name. Anything they logged that you never prescribed appears at the bottom under
+*Logged, not prescribed*.
 
-**Training logs by day** — each program day collapsed, showing its most recent
-session in full: meta, athlete note, reply buttons, a **prescribed-vs-done**
-comparison, and the exercise log as sent. Earlier runs of the same day nest
-beneath. **+ Add past session from email** backfills a session from a report
-email.
+**The RPE flag is the point of the rebuild.** The old comparison table read the log but kept only
+"was this set ticked", so a session logged three RPE above target showed as `✓ 4/4 sets` in green.
+The bar is `RPE_OVER` / `RPE_UNDER` in `coach.html`, both **1.5** — a set logged at 8 against a
+target of 7 is a good set and doesn't need a flag; a point and a half out does.
 
-**Live activity** — the rolling snapshot, per day.
+**Reps are not compared, deliberately.** The athlete's app records weight, RPE and a tick per set —
+it never asks for reps. So the dashboard compares sets, load and RPE, and says nothing about reps
+rather than inventing a number you might train off.
 
----
+Other things on this tab: the **day's session picker** when a day has been trained more than once
+(tap a date to compare against that run instead), the athlete's note with **Reply** / **Mark read**,
+the **raw log exactly as sent** behind a toggle on every day, **+ Add past session from email**, and
+a collapsed **live app snapshot** — what is on their phone right now, which is a different question
+from what they finished.
+
+⚠ **Plan and log are matched by exercise name.** A session done before you rewrote the program won't
+line up with the current plan — every prescribed row reads *not logged* and their real work shows
+under *Logged, not prescribed*. When a whole day comes back that way the card says so in as many
+words. That is the honest reading, not a bug: they really did train something else.
+
+### The three numbers, and the charts
+
+Training load, readiness and adherence sit as a strip of three above the day cards; the full charts
+are behind **Charts**. §6 explains all three. They used to be three full-width cards above
+everything, which pushed the actual work below the fold on every athlete.
+
+### Proof · Chat · Calls · File
+
+- **Proof** (only for people who log habits) — server-scored level, 14 presence dots, their week,
+  board name and worn title, WhatsApp and email, and their wall lines with hide/show on each.
+- **Chat** — the full message thread and a composer. Opening the file marks their chat read.
+- **Calls** — every `call_logs` row, **+ New call log**, and **Copy cycle prompt** (bundles a cycle's
+  check-ins and sessions into a ready-to-paste report prompt).
+- **File** — the program and Proof links with **Rotate key**, what the data file says (id, tier,
+  days/week, which cycle of the roadmap), and the delete-everything button.
 
 ## 6. The three metrics
 
@@ -271,6 +309,13 @@ it in this file.
 | `seasons` | Which season, and what day of it |
 | `call_logs` | Weekly check-ins (loaded per athlete, on open) |
 | `data/<id>.json` | Names, tier, prescribed program, sessions/week |
+
+The **prescribed-vs-done** comparison joins the last two: the plan comes from
+`data/<id>.json`'s chips, what happened comes from parsing the plain-text `summary`
+that `program.html` wrote into `session_history`. Both readers live in `coach.html`
+(`parseChips()` / `parseSessionLog()`) and both mirror code in `program.html` —
+change the grammar there and they have to follow. `node scripts/test_coach_compare.js`
+runs 44 assertions over real logs and catches it if they don't.
 
 Coach writes go through the guarded RPCs — `set_coach_note`, `hide_note`,
 `set_quests`, `clear_quests`, `forget_contact`, `save_session` — each of which

@@ -313,6 +313,156 @@
          justify-content: space-between; gap: 10px; flex-wrap: wrap; }
   .sec .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+  /* ── Athlete file: identity + sub-tabs ── */
+  .det-id { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .det-ava { flex: none; width: 54px; height: 54px; border-radius: 999px; background: var(--court); color: #fff;
+             display: flex; align-items: center; justify-content: center;
+             font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; }
+  .subrail { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line);
+             margin-bottom: 18px; padding-bottom: 0; }
+  .subrail::-webkit-scrollbar { display: none; }
+  .stab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+          font-size: 15px; color: var(--muted); padding: 9px 15px; text-decoration: none; white-space: nowrap;
+          border-bottom: 3px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 7px; }
+  .stab:hover { color: var(--ink); }
+  .stab.active { color: var(--court); border-bottom-color: var(--clay); }
+  .stab .n { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; background: var(--clay); color: #fff;
+             min-width: 18px; text-align: center; padding: 1px 6px; border-radius: 999px; }
+  .stab .n.quiet { background: var(--track); color: var(--muted); }
+
+  /* ── Metric strip (the three numbers, charts behind one tap) ── */
+  .mstrip { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 10px; margin-bottom: 16px; align-items: stretch; }
+  .mp { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 11px 14px; min-width: 0; text-align: left; }
+  .mp-l { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .mp-v { font-family: 'Space Mono', monospace; font-size: 23px; font-weight: 700; line-height: 1.15; margin-top: 2px; }
+  .mp-v small { font-size: 12px; color: var(--muted); }
+  .mp-s { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .mp.green .mp-v { color: var(--court); } .mp.amber .mp-v { color: var(--ochre); } .mp.red .mp-v { color: var(--clay); }
+  .mp-more { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .mp-more:hover { border-color: var(--court); color: var(--court); }
+  .chartbox { margin-bottom: 16px; }
+  @media (max-width: 760px) { .mstrip { grid-template-columns: repeat(3, 1fr); } .mp-more { grid-column: 1 / -1; justify-content: center; } }
+
+  .cycbar { background: var(--court); color: #fff; border-radius: 18px; padding: 13px 18px; margin-bottom: 14px; }
+  .cyc-nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 19px; letter-spacing: .02em; }
+  .cyc-fo { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+  .cyc-fo span { font-size: 11.5px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2);
+                 padding: 3px 10px; border-radius: 999px; }
+
+  /* ── A day of work: prescribed and done on one line ── */
+  .wday { background: var(--card); border: 1px solid var(--line); border-radius: 20px; margin-bottom: 12px; overflow: hidden;
+          box-shadow: var(--shadow); }
+  .wday.warn { border-left: 3px solid var(--ochre); }
+  .wday.idle { box-shadow: none; background: transparent; }
+  .wday-top { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px 18px; }
+  .wday-top:hover { background: rgba(0,0,0,.02); }
+  .wday-n { flex: none; width: 34px; height: 34px; border-radius: 11px; background: var(--court-100); color: var(--court);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Space Mono', monospace; font-weight: 700; font-size: 14px; }
+  .wday.idle .wday-n { background: var(--track); color: var(--muted); }
+  .wday-main { flex: 1; min-width: 0; }
+  .wday-title { display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px;
+                text-transform: uppercase; letter-spacing: .01em; line-height: 1.15; }
+  .wday-meta { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .wday-right { flex: none; display: flex; align-items: center; gap: 10px; text-align: right; }
+  .dv { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 15px; letter-spacing: .03em; }
+  .dv.ok { color: var(--court); } .dv.warn { color: var(--ochre); } .dv.miss { color: var(--clay); }
+  .dv-sub { display: block; font-size: 10.5px; color: var(--muted-soft); font-family: 'Space Mono', monospace; }
+  .wday-body { display: none; padding: 0 18px 18px; }
+  .wday.open .wday-body { display: block; }
+  .wday.open .day-c-chev { transform: rotate(180deg); }
+  /* Narrow: the verdict is nowrap and would squeeze the title down to one word
+     per line, so give it its own row under the day name instead. */
+  @media (max-width: 720px) {
+    .wday-top { flex-wrap: wrap; row-gap: 9px; }
+    .wday-n { order: 1; }
+    .wday-main { order: 2; flex: 1 1 auto; min-width: 0; }
+    .wday-top .day-c-chev { order: 3; }   /* stays on row one, not stranded below */
+    .wday-right { order: 4; flex: 1 1 100%; flex-wrap: wrap; justify-content: flex-start; text-align: left; }
+    .wday-right .dv-sub { display: none; }
+    .wday-title { font-size: 18px; }
+  }
+
+  .sesspick { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 0 4px; border-top: 1px solid var(--rule); }
+  .sp { font-family: 'Space Mono', monospace; font-size: 11px; padding: 4px 10px; border-radius: 999px;
+        border: 1px solid var(--line); color: var(--muted); }
+  .sp:hover { border-color: var(--court); color: var(--court); }
+  .sp.on { background: var(--court); border-color: var(--court); color: #fff; }
+  .sp-lbl { font-size: 11px; color: var(--muted-soft); margin-left: auto; }
+
+  .stalewarn { background: var(--ochre-100); border-left: 3px solid var(--ochre); border-radius: 10px;
+               padding: 10px 14px; margin-top: 12px; font-size: 13px; line-height: 1.5; }
+  .daynote { background: var(--paper); border-left: 3px solid var(--clay); border-radius: 10px; padding: 11px 14px; margin-top: 12px; }
+  .daynote .dn-txt { font-size: 14.5px; line-height: 1.5; }
+  .daynote .dn-read { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-soft); margin-top: 6px; }
+
+  .cmp-grp { margin-top: 16px; }
+  .cmp-grp-t { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700;
+               border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+  .cmp-head, .cmp-row { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.15fr) minmax(0, 1.5fr) minmax(0, .95fr);
+                        gap: 12px; align-items: start; }
+  .cmp-head { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-soft);
+              padding: 14px 0 0; position: sticky; top: 112px; background: var(--card); z-index: 2; }
+  .cmp-row { padding: 10px 0; border-bottom: 1px solid var(--rule); position: relative; }
+  .cmp-row:last-child { border-bottom: 0; }
+  .cmp-row::before { content: ''; position: absolute; left: -12px; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; }
+  .cmp-row.warn::before { background: var(--ochre); }
+  .cmp-row.miss::before { background: var(--clay); }
+  .cmp-nm { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+  .cmp-vid { text-decoration: none; color: var(--court); font-size: 12px; }
+  .cmp-items { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .cmp-cnote, .cmp-anote { font-size: 12px; line-height: 1.45; margin-top: 5px; padding: 5px 9px; border-radius: 7px; background: var(--paper); }
+  .cmp-cnote { border-left: 2px solid var(--court); }
+  .cmp-anote { border-left: 2px solid var(--clay); }
+  .cmp-rx { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
+  .rx-dose { display: inline-block; }
+  .rx-rpe { display: inline-block; margin-left: 7px; color: var(--court); }
+  .rx-sub { font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--muted-soft); margin-top: 2px; line-height: 1.4; }
+  .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
+  .cmp-did > span { display: inline-block; margin-right: 8px; }
+  .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay); }
+  .did-load { color: var(--ink); }
+  .did-rpe.ok { color: var(--muted); } .did-rpe.warn { color: var(--clay); font-weight: 700; } .did-rpe.note { color: var(--ochre); }
+  .did-none { color: var(--muted-soft); }
+  .did-detail { font-size: 10.5px; color: var(--muted-soft); margin-top: 3px; line-height: 1.45; }
+  .cmp-flags { display: flex; flex-wrap: wrap; gap: 4px; align-content: start; }
+  .fl { font-size: 10px; font-weight: 700; letter-spacing: .03em; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .fl.warn { background: var(--clay-100); color: var(--clay); }
+  .fl.miss { background: var(--clay); color: #fff; }
+  .fl.note { background: var(--ochre-100); color: var(--ochre); }
+  @media (max-width: 820px) {
+    .cmp-head { display: none; }
+    .cmp-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 0; }
+    .cmp-rx::before { content: 'Asked: '; font-family: 'Barlow', sans-serif; font-size: 10px; letter-spacing: .1em;
+                      text-transform: uppercase; color: var(--muted-soft); }
+    .cmp-did::before { content: 'Did: '; font-family: 'Barlow', sans-serif; font-size: 10px; letter-spacing: .1em;
+                       text-transform: uppercase; color: var(--muted-soft); }
+  }
+
+  .rawlog { margin-top: 16px; border-top: 1px solid var(--rule); padding-top: 10px; }
+  .rawlog > summary { cursor: pointer; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+                      color: var(--muted-soft); list-style: none; }
+  .rawlog > summary::-webkit-details-marker { display: none; }
+  .rawlog > summary::before { content: '▸ '; }
+  .rawlog[open] > summary::before { content: '▾ '; }
+  .rawlog > summary:hover { color: var(--court); }
+  .livesnap { border: 1px solid var(--line); border-radius: 16px; padding: 13px 16px; background: var(--card); margin-top: 18px; }
+  .ls-day { margin-top: 8px; font-size: 13.5px; }
+
+  /* ── Roster ── */
+  .rfilters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rf { font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line);
+        background: var(--card); color: var(--muted); white-space: nowrap; }
+  .rf:hover { border-color: var(--court); color: var(--court); }
+  .rf.on { background: var(--court); border-color: var(--court); color: #fff; }
+  .rf .c { font-family: 'Space Mono', monospace; font-size: 10px; opacity: .7; margin-left: 5px; }
+  .ath .why { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .rgroup { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+            font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; margin: 18px 0 4px; }
+  .rgroup:first-child { margin-top: 0; }
+  .rgroup::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .rgroup .c { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted-soft); }
+
   /* Proof strip on detail */
   .proofstrip { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .proofstrip .big { font-family: 'Space Mono', monospace; font-size: 30px; font-weight: 700; color: var(--court); line-height: 1; }
@@ -599,6 +749,10 @@ const S = {
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
   callLogs: {},    // athlete_id -> rows (fetched on detail)
+  // Bumped by every assemble(). The athlete file caches its own context so that
+  // switching sub-tabs costs nothing; this is what tells it the cache is stale
+  // after a refetch, instead of it quietly showing pre-write data for ever.
+  stamp: 0,
 };
 
 async function loadAll() {
@@ -735,6 +889,7 @@ function assemble() {
     a.habGap = a.isHab ? daysBetween(a.habLast, t) : null;
   });
   S.ath = map;
+  S.stamp++;
 }
 
 // Server-scored season level per Proof athlete (cached; never computed here).
@@ -802,9 +957,17 @@ const TABS = [
   { id: 'proof', label: 'Proof' },
   { id: 'links', label: 'Links' },
 ];
+// #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its five
+// screens, so any of them can be bookmarked or reloaded in place.
 function route() {
   const h = (location.hash || '#today').slice(1);
-  if (h.startsWith('a/')) return { view: 'detail', id: decodeURIComponent(h.slice(2)) };
+  if (h.startsWith('a/')) {
+    const rest = h.slice(2);
+    const cut = rest.lastIndexOf('/');
+    const maybeSub = cut > 0 ? rest.slice(cut + 1) : '';
+    const isSub = SUBTABS.some(t => t.id === maybeSub);
+    return { view: 'detail', id: decodeURIComponent(isSub ? rest.slice(0, cut) : rest), sub: isSub ? maybeSub : 'work' };
+  }
   return { view: TABS.some(t => t.id === h) ? h : 'today' };
 }
 function renderRail() {
@@ -831,7 +994,7 @@ function render() {
   if (r.view === 'today') renderToday();
   else if (r.view === 'intake') renderIntake();
   else if (r.view === 'athletes') renderAthletes();
-  else if (r.view === 'detail') renderDetail(r.id);
+  else if (r.view === 'detail') renderDetail(r.id, r.sub);
   else if (r.view === 'proof') renderProof();
   else if (r.view === 'links') renderLinks();
 }
@@ -1290,11 +1453,39 @@ function tierChip(a) {
   if (a.tier === 'proof') return '<span class="chip">Proof only</span>';
   return '<span class="chip">No file</span>';
 }
+let _rFilter = 'all';
+const R_FILTERS = [
+  { id: 'all',     label: 'Everyone', test: () => true },
+  { id: 'needs',   label: 'Needs you', test: a => rosterReasons(a).length > 0 },
+  { id: 'coached', label: 'Coached',  test: a => a.tier === 'coached' },
+  { id: 'free',    label: 'Free',     test: a => a.tier === 'free' },
+  { id: 'proof',   label: 'Proof only', test: a => a.tier === 'proof' },
+];
+function setRosterFilter(id) { _rFilter = id; renderAthletes(); }
+window.setRosterFilter = setRosterFilter;
+
+// Why this person is in front of you, in plain words. The roster used to fold
+// everything into one dot-separated sub-line, so a row that needed a reply
+// looked exactly like a row that didn't.
+function rosterReasons(a) {
+  const out = [];
+  if (a.needReplyRecent && a.needReplyRecent.length) out.push({ tone: 'warn', text: a.needReplyRecent.length + ' note' + (a.needReplyRecent.length === 1 ? '' : 's') + ' to reply' });
+  if (a.unreadMsgs) out.push({ tone: 'warn', text: a.unreadMsgs + ' unread message' + (a.unreadMsgs === 1 ? '' : 's') });
+  if (a.tier === 'coached' && a.finished > 0) {
+    const gap = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
+    if (gap > QUIET_SESSION_DAYS) out.push({ tone: 'note', text: 'no session for ' + gap + ' days' });
+  }
+  if (a.isHab && a.habGap >= QUIET_HABIT_DAYS) out.push({ tone: 'note', text: 'silent on Proof — ' + a.habGap + ' days' });
+  if (a.tier === 'free' && a.contact && a.contact.days_logged >= UPGRADE_DAYS) out.push({ tone: 'good', text: 'ready to upgrade?' });
+  return out;
+}
 function renderAthletes() {
   const list = Object.values(S.ath);
+  const counts = {};
+  R_FILTERS.forEach(f => counts[f.id] = list.filter(f.test).length);
   $('content').innerHTML = `
     <div class="controls">
-      <input type="search" id="searchBox" placeholder="Search the roster…" oninput="renderRoster()">
+      <input type="search" id="searchBox" placeholder="Search the roster…" oninput="renderRoster()" value="${esc((($('searchBox')||{}).value)||'')}">
       <select id="sortSel" onchange="renderRoster()">
         <option value="attention">Sort: needs attention</option>
         <option value="recent">Sort: recently active</option>
@@ -1302,6 +1493,8 @@ function renderAthletes() {
       </select>
       <button class="btn primary sm" onclick="newAthleteLink()">+ New secure link</button>
     </div>
+    <div class="controls rfilters">${R_FILTERS.map(f =>
+      `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
     <div class="roster" id="rosterBox"></div>
     <p class="empty" style="margin-top:14px">${list.length} people across coaching and Proof · tap anyone to open their file.</p>`;
   renderRoster();
@@ -1315,17 +1508,19 @@ function rosterAttention(a) {
 function renderRoster() {
   const q = (($('searchBox') || {}).value || '').toLowerCase();
   const sort = (($('sortSel') || {}).value) || 'attention';
-  let list = Object.values(S.ath).filter(a => a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q));
+  const filt = R_FILTERS.find(f => f.id === _rFilter) || R_FILTERS[0];
+  let list = Object.values(S.ath)
+    .filter(filt.test)
+    .filter(a => a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q));
   if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
   else if (sort === 'recent') list.sort((a, b) => String(b.lastActive || '').localeCompare(String(a.lastActive || '')));
   else list.sort((a, b) => (rosterAttention(b) - rosterAttention(a)) || String(b.lastActive || '').localeCompare(String(a.lastActive || '')));
   const t = todayKey();
-  $('rosterBox').innerHTML = list.map(a => {
+  const rowHtml = (a) => {
     const m = athleteMetrics(a.sessions, a.lastActive, a.tier === 'coached' ? a.perWeek : 0);
     const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
     const acwrPill = (m.acwr.enough && (az.cls === 'red' || az.cls === 'amber'))
       ? `<span class="zpill ${az.cls}">ACWR ${round1(m.acwr.ratio)}</span>` : '';
-    const reply = a.toReply ? `<span class="zpill reply">${a.toReply} to reply</span>` : '';
     const lv = S.levels[a.id] ? `<span class="lvchip">LV ${S.levels[a.id]}</span>` : '';
     let dots = '';
     if (a.isHab) { dots = '<span class="dots">'; for (let i = 6; i >= 0; i--) { const d = addDays(t, -i);
@@ -1335,19 +1530,35 @@ function renderRoster() {
     else if (a.tier === 'coached') subBits.push('no sessions yet');
     if (a.isHab) subBits.push(`Proof ${a.hab7}/7 this week`);
     if (!a.finished && !a.isHab) subBits.push('not started');
+    const reasons = rosterReasons(a);
     const silent = a.isHab && a.habGap >= QUIET_HABIT_DAYS;
     const gapTag = !a.isHab ? '' : a.habToday ? 'on court ✓' : a.habGap + 'd off';
     return `<button class="ath ${a.toReply ? 'flag' : ''} ${a.tier === 'free' ? 'freeath' : ''}" onclick="location.hash='a/${encodeURIComponent(a.id)}'">
       <span class="ava">${esc(initials(a.name))}</span>
       <span class="main">
-        <span class="nm">${esc(a.name)} ${tierChip(a)} ${lv} ${reply} ${acwrPill}</span>
+        <span class="nm">${esc(a.name)} ${tierChip(a)} ${lv} ${acwrPill}</span>
         <span class="sub">${esc(subBits.join(' · '))}</span>
+        ${reasons.length ? `<span class="why">${reasons.map(r => `<span class="fl ${r.tone === 'warn' ? 'warn' : r.tone === 'good' ? 'note' : 'note'}">${esc(r.text)}</span>`).join('')}</span>` : ''}
       </span>
       <span class="side">${dots}<span class="tag ${silent ? 'warn' : ''}">${gapTag}</span></span>
     </button>`;
-  }).join('') || `<p class="empty">No one matches “${esc(q)}”.</p>`;
+  };
+  // On the attention sort, split the list where the reasons run out — the point
+  // of the screen is "who is waiting on me", and a hard line says it plainly.
+  if (sort === 'attention' && _rFilter === 'all') {
+    const needs = list.filter(a => rosterReasons(a).length);
+    const rest = list.filter(a => !rosterReasons(a).length);
+    $('rosterBox').innerHTML = (needs.length
+        ? `<div class="rgroup">Needs you <span class="c">${needs.length}</span></div>` + needs.map(rowHtml).join('') : '')
+      + (rest.length
+        ? `<div class="rgroup">All quiet <span class="c">${rest.length}</span></div>` + rest.map(rowHtml).join('') : '')
+      || `<p class="empty">No one matches “${esc(q)}”.</p>`;
+    return;
+  }
+  $('rosterBox').innerHTML = list.map(rowHtml).join('') || `<p class="empty">No one matches “${esc(q)}”.</p>`;
 }
 window.renderRoster = renderRoster;
+window.renderAthletes = renderAthletes;
 
 // --- secure links (ported) ---------------------------------------------------
 function genKey() {
@@ -1424,326 +1635,610 @@ async function exLib() {
   return _exlib;
 }
 function vidUrl(ex, lib) { return (ex && ex.videoUrl) || (lib && lib[(ex.name || '').trim()]) || ''; }
-function chipsHtml(chips) {
-  if (!chips || !chips.length) return '';
-  return '<span class="chips">' + chips.map(c =>
-    `<span class="chip ${c.style === 'yellow' ? 'chip-y' : c.style === 'dark' ? 'chip-d' : ''}">${esc(c.label)}</span>`).join('') + '</span>';
-}
-
-// --- finished-session cards (ported) ----------------------------------------
+// Everything after the "Exercise log:" header, verbatim — what the athlete's
+// app actually sent, kept as the last word when a parse looks wrong.
 function exerciseLogPart(summary) {
   if (!summary) return '';
   const i = summary.indexOf('Exercise log:');
   const body = i >= 0 ? summary.slice(i + 'Exercise log:'.length) : summary;
   return body.replace(/^\s+/, '');
 }
-function parseExerciseLog(summary) {
+
+// ── READING WHAT ACTUALLY HAPPENED ──────────────────────────────────────────
+// program.html writes every finished session as one plain-text summary with a
+// fixed grammar (buildSessionData() there). Every number a coach needs is in
+// it — the weight on the bar, the RPE of each set, the athlete's own note:
+//
+//   [Primary]
+//   • Goblet Squat (✓)        ← or (skipped) / (2/4 sets)
+//       Set 1: 24 @7 ✓        ← kg · @RPE · ticked
+//       Set 2: @8 ✓           ← RPE only (bodyweight)
+//       Set 3: skipped
+//       Note: knee felt fine
+//      · Cat-Cow (×6 Reps)    ← circuit items
+//       RPE: R1 7 · R2 8      ← circuit round RPEs
+//
+// ⚠ The parser this replaced kept ONLY "was this set ticked" and threw the
+// weight and the RPE away — which is why the prescribed-vs-done table could
+// say "✓ 4/4 sets" in green about a session logged three RPE above target.
+// Anything added to the grammar in program.html has to be read here too, or
+// it silently vanishes from the dashboard.
+function parseSetLine(rest) {
+  const s = { w: '', rpe: '', done: false, skipped: false };
+  let t = String(rest || '').trim();
+  if (!t || /^skipped$/i.test(t)) { s.skipped = true; return s; }
+  if (t.indexOf('✓') >= 0) s.done = true;
+  t = t.replace(/[✓·]/g, ' ');
+  const m = t.match(/@\s*([\d.]+)/);
+  if (m) { s.rpe = m[1]; t = t.replace(m[0], ' '); }
+  s.w = t.trim();                       // free text: "24", "24kg", "red band"
+  if (!s.done && !s.w && !s.rpe) s.skipped = true;
+  return s;
+}
+function parseSessionLog(summary) {
   const i = String(summary || '').indexOf('Exercise log:');
   if (i < 0) return [];
-  const exs = [];
-  let cur = null;
+  const blocks = [];
+  let blk = null, cur = null, inNote = false;
+  const openBlock = (title) => { blk = { title, exercises: [] }; blocks.push(blk); return blk; };
   String(summary).slice(i + 'Exercise log:'.length).split('\n').forEach(raw => {
     const line = raw.trim();
-    if (!line || /^\[.*\]$/.test(line) || line.startsWith('·')) return;
+    if (!line) return;
     let m;
-    if ((m = line.match(/^•\s*(.+?)\s*\(([^)]*)\)\s*$/))) {
-      cur = { name: m[1].trim(), tag: m[2].trim(), done: m[2].trim() === '✓', sets: [] };
-      exs.push(cur);
-    } else if ((m = line.match(/^•\s*(.+)$/))) {
-      cur = { name: m[1].trim(), tag: '', done: true, sets: [] };
-      exs.push(cur);
-    } else if (/^Set\s+\d+:/i.test(line)) {
-      if (cur) cur.sets.push({ done: /✓/.test(line) });
+    if ((m = line.match(/^\[(.*)\]$/))) { openBlock(m[1].trim()); cur = null; inNote = false; return; }
+    if ((m = line.match(/^•\s*(.+?)(?:\s*\(([^)]*)\))?\s*$/))) {
+      if (!blk) openBlock('');
+      const label = (m[2] || '✓').trim();
+      cur = { name: m[1].trim(), label, done: label === '✓', sets: [], items: [], note: '', rounds: '', gear: '' };
+      inNote = false;
+      blk.exercises.push(cur);
+      return;
     }
+    if (!cur) return;
+    if ((m = line.match(/^Set\s+\d+:\s*(.*)$/i))) { inNote = false; cur.sets.push(parseSetLine(m[1])); return; }
+    if ((m = line.match(/^Note:\s*(.*)$/i)))      { inNote = true;  cur.note = m[1].trim(); return; }
+    if ((m = line.match(/^RPE:\s*(.*)$/i)))       { inNote = false; cur.rounds = m[1].trim(); return; }
+    if ((m = line.match(/^·\s*(.*)$/)))           { inNote = false; cur.items.push(m[1].trim()); return; }
+    // An unprefixed line is one of two things, and the order program.html
+    // writes them in is what tells them apart: circuit loads come BEFORE the
+    // note, and everything after a "Note:" is the rest of a multi-line note.
+    // Filing "14kg on lunges" as equipment loses most of what they wrote.
+    if (inNote) cur.note += '\n' + line;
+    else cur.gear = line;               // e.g. "Kettlebell Swing 16 · Medicine Ball Slam 4"
   });
-  return exs;
+  return blocks;
 }
-function comparisonTableHtml(s, programDays) {
-  const parsed = parseExerciseLog(s.summary);
-  if (!parsed.length) return '';
-  const norm = n => String(n || '').toLowerCase().replace(/\s+/g, ' ').trim();
-  const logByName = {};
-  parsed.forEach(e => { logByName[norm(e.name)] = e; });
-  const pd = (programDays || []).find(p => Number(p.id) === Number(s.day));
-  const prescribed = [];
-  if (pd) (pd.blocks || []).forEach(b => (b.exercises || []).forEach(ex => prescribed.push(ex)));
-  const loggedCell = e => {
-    if (!e) return '<span style="color:var(--clay)">— not logged</span>';
-    const done = e.sets.filter(x => x.done).length, tot = e.sets.length;
-    const lbl = e.tag && e.tag !== '✓' ? ' (' + esc(e.tag) + ')' : '';
-    if (!e.done) {
-      return done > 0
-        ? `<span style="color:var(--ochre)">partial${tot ? ' ' + done + '/' + tot + ' sets' : ''}${lbl}</span>`
-        : `<span style="color:var(--clay)">skipped${lbl}</span>`;
-    }
-    if (tot && done < tot) return `<span style="color:var(--ochre)">${done}/${tot} sets</span>`;
-    return `<span style="color:var(--court)">✓${tot ? ' ' + done + '/' + tot + ' sets' : ''}</span>`;
+function normEx(n) { return String(n || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+function logIndex(blocks) {             // flat name → logged exercise, for matching against the plan
+  const byName = {};
+  (blocks || []).forEach(b => b.exercises.forEach(e => { byName[normEx(e.name)] = e; }));
+  return byName;
+}
+
+// ── READING WHAT WAS PRESCRIBED ─────────────────────────────────────────────
+// Ported from parseChips() in program.html so the dashboard splits a chip row
+// exactly the way the athlete's own screen does. ⚠ Two copies — change both.
+function parseDurationToSec(text) {
+  const t = String(text || '').trim().toLowerCase();
+  let m;
+  if ((m = t.match(/^(\d+):(\d{1,2})$/)))           return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  if ((m = t.match(/^(\d+)\s*m(?:in|inutes?)?\b/))) return parseInt(m[1], 10) * 60;
+  if ((m = t.match(/^(\d+)\s*s(?:ec|econds?)?\b/))) return parseInt(m[1], 10);
+  if ((m = t.match(/^(\d+)$/)))                     return parseInt(m[1], 10);
+  return 0;
+}
+function isPureDuration(label) {
+  const t = String(label || '').trim();
+  if (/^\d+:\d+$/.test(t)) return true;
+  return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?(?:side|leg|each(?:\s+\w+)?))?$/i.test(t);
+}
+function parseChips(chips) {
+  const out = { sets: '', reps: '', target: '', tempo: '', rest: 0, extras: [] };
+  (chips || []).forEach(c => {
+    const label = (c.label || '').trim();
+    let m;
+    if ((m = label.match(/^rest\s+(.+)/i))) { const s = parseDurationToSec(m[1]); if (s > 0) { out.rest = s; return; } }
+    if ((m = label.match(/^(\d+)\s*sets?\b/i)))  { out.sets = m[1]; return; }
+    if ((m = label.match(/^tempo\s+(.+)/i)))     { out.tempo = m[1].trim(); return; }
+    if ((m = label.match(/^rpe\s+(.+)/i)))       { out.target = '@' + m[1].trim(); return; }
+    if (/^@/.test(label))                        { out.target = label; return; }
+    if (/^×/.test(label))      { out.reps = label.replace(/^×/, '').replace(/\s*reps?$/i, '').trim(); return; }
+    if (/reps?$/i.test(label)) { out.reps = label.replace(/\s*reps?$/i, '').trim(); return; }
+    if (/^\d+(?:\s*[-–]\s*\d+)?\s+each\s+(?:side|leg|arm|hand)s?$/i.test(label)) { out.reps = label; return; }
+    if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(label))   { out.reps = label; return; }
+    out.extras.push({ label, style: c.style || '' });
+  });
+  if (!out.reps) for (let i = 0; i < out.extras.length; i++) {
+    if (isPureDuration(out.extras[i].label)) { out.reps = out.extras[i].label; out.extras.splice(i, 1); break; }
+  }
+  return out;
+}
+function rxLine(rx) {                   // "4 × 10" — the dose, without the RPE
+  if (rx.sets && rx.reps) return `${rx.sets} × ${rx.reps}`;
+  if (rx.reps) return rx.reps;
+  if (rx.sets) return `${rx.sets} sets`;
+  return '';
+}
+
+// ── COMPARING THE TWO ───────────────────────────────────────────────────────
+// How far off target an average RPE has to land before it is worth a coach's
+// eye. Under a full point is noise — athletes round, and a set logged at 8
+// against a target of 7 is a good set. Retune here, in one place.
+const RPE_OVER = 1.5;    // mean this far ABOVE the top of the target range
+const RPE_UNDER = 1.5;   // …or this far BELOW the bottom of it
+function rpeTarget(target) {
+  const t = String(target || '').replace(/^@/, '').replace(/[–—]/g, '-').trim();
+  const m = t.match(/^([\d.]+)\s*(?:-\s*([\d.]+))?/);
+  if (!m) return null;
+  const lo = parseFloat(m[1]);
+  if (isNaN(lo)) return null;
+  const hi = m[2] ? parseFloat(m[2]) : lo;
+  return { lo, hi, label: m[2] ? `${m[1]}–${m[2]}` : m[1] };
+}
+// Weights are free text, so only compare the ones that read as numbers and
+// show anything else verbatim rather than guessing at it.
+function loadSummary(sets) {
+  const raw = sets.map(s => s.w).filter(Boolean);
+  if (!raw.length) return '';
+  const nums = raw.map(w => parseFloat(String(w).replace(',', '.')));
+  if (nums.some(n => isNaN(n))) return raw.join(' · ');
+  // Bodyweight work gets logged as a row of zeros; "0 kg" is not a load.
+  if (nums.every(n => n === 0)) return '';
+  const lo = Math.min(...nums), hi = Math.max(...nums);
+  if (lo === hi) return String(lo);
+  return (nums[0] <= nums[nums.length - 1]) ? `${lo} → ${hi}` : `${hi} → ${lo}`;
+}
+// One prescribed exercise against its log line. Returns only what is actually
+// known — reps are never logged per set (the athlete enters weight and RPE and
+// ticks the set off), so nothing here claims a rep count that was never recorded.
+function compareExercise(pex, logged) {
+  const rx = parseChips(pex && pex.chips);
+  const want = rx.sets ? parseInt(rx.sets, 10) : null;
+  const tgt = rpeTarget(rx.target);
+  const c = {
+    name: (pex && pex.name) || (logged && logged.name) || '', pex, rx, tgt, logged,
+    state: 'none', doneSets: 0, allSets: 0, load: '', rpeMean: null, rpePer: '',
+    flags: [], extra: !pex, want,
   };
-  const rows = [];
-  let skipped = 0;
+  if (!logged) return c;                // prescribed but nothing logged against it
+  const sets = logged.sets || [];
+  c.allSets = sets.length;
+  c.doneSets = sets.filter(s => s.done).length;
+  c.load = loadSummary(sets);
+  const rpes = sets.map(s => parseFloat(s.rpe)).filter(n => !isNaN(n));
+  if (rpes.length) {
+    c.rpeMean = Math.round((rpes.reduce((a, b) => a + b, 0) / rpes.length) * 10) / 10;
+    c.rpePer = rpes.join(' · ');
+  }
+  const touched = c.doneSets > 0 || rpes.length > 0 || sets.some(s => s.w) || logged.rounds || logged.gear;
+  c.state = logged.done ? 'done' : (touched ? 'part' : 'skip');
+  if (c.state === 'skip') c.flags.push({ tone: 'miss', text: 'not done' });
+  else if (want && c.doneSets && c.doneSets < want)
+    c.flags.push({ tone: 'miss', text: (want - c.doneSets) + ' set' + (want - c.doneSets === 1 ? '' : 's') + ' short' });
+  else if (want && c.doneSets > want)
+    c.flags.push({ tone: 'note', text: (c.doneSets - want) + ' extra set' + (c.doneSets - want === 1 ? '' : 's') });
+  if (tgt && c.rpeMean != null && c.state !== 'skip') {
+    if (c.rpeMean - tgt.hi >= RPE_OVER)       c.flags.push({ tone: 'warn', text: round1(c.rpeMean - tgt.hi) + ' over target RPE' });
+    else if (tgt.lo - c.rpeMean >= RPE_UNDER) c.flags.push({ tone: 'note', text: round1(tgt.lo - c.rpeMean) + ' under target RPE' });
+  }
+  if (c.extra) c.flags.push({ tone: 'note', text: 'not in the plan' });
+  return c;
+}
+// A whole day: every prescribed exercise, in program order and grouped by
+// block, plus anything logged that was never prescribed.
+function compareDay(programDay, session) {
+  const blocks = parseSessionLog(session && session.summary);
+  const byName = logIndex(blocks);
   const seen = new Set();
-  if (prescribed.length) {
-    prescribed.forEach(ex => {
-      const e = logByName[norm(ex.name)];
-      seen.add(norm(ex.name));
-      if (!e || !e.done) skipped++;
-      const presc = (ex.chips || []).map(c => c.label).join(' · ') || '—';
-      rows.push(`<tr><td>${esc(ex.name)}</td><td class="muted">${esc(presc)}</td><td>${loggedCell(e)}</td></tr>`);
+  const groups = [];
+  ((programDay && programDay.blocks) || []).forEach(b => {
+    const rows = (b.exercises || []).map(pex => {
+      seen.add(normEx(pex.name));
+      return compareExercise(pex, byName[normEx(pex.name)]);
     });
-    parsed.forEach(e => {
-      if (!seen.has(norm(e.name)))
-        rows.push(`<tr><td>${esc(e.name)} <span class="muted">· not in plan</span></td><td class="muted">—</td><td>${loggedCell(e)}</td></tr>`);
-    });
-  } else {
-    parsed.forEach(e => { if (!e.done) skipped++; rows.push(`<tr><td>${esc(e.name)}</td><td class="muted">—</td><td>${loggedCell(e)}</td></tr>`); });
-  }
-  const tag = skipped
-    ? `<span style="color:var(--clay)">${skipped} skipped/partial</span>`
-    : `<span style="color:var(--court)">all prescribed work done</span>`;
-  const note = prescribed.length ? '' : ' <span class="muted">(no program file — showing what was logged)</span>';
-  return `<div class="elog-title" style="margin-top:18px">Prescribed vs done · ${tag}${note}</div>
-    <div class="tablewrap"><table><tr><th>Exercise</th><th>Prescribed</th><th>Logged</th></tr>${rows.join('')}</table></div>`;
+    if (rows.length) groups.push({ title: b.title || '', icon: b.icon || '', rows });
+  });
+  const extras = [];
+  blocks.forEach(b => b.exercises.forEach(e => {
+    if (!seen.has(normEx(e.name))) extras.push(compareExercise(null, e));
+  }));
+  if (extras.length) groups.push({ title: 'Logged, not prescribed', icon: '', rows: extras });
+  return { groups, hasLog: blocks.length > 0, extras: extras.length };
 }
-function sessionBodyHtml(athleteId, s, programDays) {
-  const rd = jparse(s.readiness);
-  const auLoad = (s.session_rpe != null && s.duration_min != null) ? s.session_rpe * s.duration_min : null;
-  let readinessRow = '';
-  if (rd) {
-    if (rd.skipped) readinessRow = `<tr><td class="k">Readiness</td><td class="v">skipped</td></tr>`;
-    else {
-      const parts = ['sleep','energy','soreness','stress','overall']
-        .filter(k => rd[k] != null).map(k => `${k} ${rd[k]}`).join(' · ');
-      readinessRow = `<tr><td class="k">Readiness</td><td class="v">${rd.composite != null ? esc(rd.composite) + '/5' : ''}${parts ? ' · ' + esc(parts) : ''}</td></tr>`;
-    }
+function dayVerdict(groups) {
+  let total = 0, clean = 0, off = 0, missing = 0;
+  groups.forEach(g => g.rows.forEach(r => {
+    if (r.extra) return;
+    total++;
+    if (r.state === 'skip' || r.state === 'none') missing++;
+    else if (r.flags.length) off++;
+    else clean++;
+  }));
+  return { total, clean, off, missing };
+}
+
+// ── THE WORK TAB ────────────────────────────────────────────────────────────
+// One card per program day, prescribed and done on the same line. This replaces
+// three separate sections that each rendered the same days a different way
+// (Prescribed program · Training logs by day · Live activity), hundreds of
+// pixels apart, so answering "did she do what I asked?" meant scrolling
+// between them and holding the chips in your head.
+let _workSel = {};        // day number → completed_on of the session being compared
+let _workOpen = {};       // day number → is the card expanded
+
+function setWorkSession(day, on) { _workSel[day] = on; renderDetailBody(); }
+function toggleWorkDay(day) { _workOpen[day] = !_workOpen[day]; renderDetailBody(); }
+window.setWorkSession = setWorkSession;
+window.toggleWorkDay = toggleWorkDay;
+
+function cmpCell(c) {
+  if (!c.logged) return '<span class="did-none">— not logged</span>';
+  const bits = [];
+  // Circuits and timed pieces carry no set rows at all — "0 sets" would read as
+  // a miss on work that was actually done, so those just say "done".
+  const setTxt = c.state === 'skip' ? 'skipped'
+    : c.want ? `${c.doneSets}/${c.want} sets`
+    : c.allSets > 1 ? `${c.doneSets} sets`
+    : 'done';
+  const tone = c.state === 'done' ? 'ok' : c.state === 'part' ? 'warn' : 'miss';
+  bits.push(`<span class="did-sets ${tone}">${esc(setTxt)}</span>`);
+  if (c.load) bits.push(`<span class="did-load">${esc(c.load)} kg</span>`);
+  if (c.rpeMean != null) {
+    const over = c.tgt && c.rpeMean - c.tgt.hi >= RPE_OVER;
+    const under = c.tgt && c.tgt.lo - c.rpeMean >= RPE_UNDER;
+    bits.push(`<span class="did-rpe ${over ? 'warn' : under ? 'note' : 'ok'}">RPE ${esc(c.rpeMean)}</span>`);
   }
-  const meta = `<table class="meta-table">
-    <tr><td class="k">Status</td><td class="v">${esc(s.status || 'sent')}</td></tr>
-    ${s.session_rpe != null ? `<tr><td class="k">Session RPE</td><td class="v">${esc(s.session_rpe)}/10</td></tr>` : ''}
-    ${s.duration_min != null ? `<tr><td class="k">Duration</td><td class="v">${esc(s.duration_min)} min</td></tr>` : ''}
-    ${auLoad != null ? `<tr><td class="k">Session load</td><td class="v">${esc(auLoad)} AU <span class="muted">(RPE ${esc(s.session_rpe)} × ${esc(s.duration_min)} min)</span></td></tr>` : ''}
-    ${readinessRow}
-  </table>`;
-  const elog = exerciseLogPart(s.summary);
-  const uid = (athleteId + '_' + s.day + '_' + s.completed_on).replace(/[^a-z0-9]/gi, '_');
-  const actions = sessionNeedsReply(s) ? `
-    <div class="note-actions">
-      <button class="btn sm primary" onclick="openSessionReply('${uid}')">Reply to note</button>
-      <button class="btn sm" onclick="markNoteRead('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Mark read</button>
+  const detail = [];
+  if (c.rpePer && c.allSets > 1) detail.push('per set: ' + esc(c.rpePer));
+  if (c.logged.rounds) detail.push(esc(c.logged.rounds));
+  if (c.logged.gear) detail.push(esc(c.logged.gear));
+  return bits.join('') + (detail.length ? `<div class="did-detail">${detail.join(' · ')}</div>` : '');
+}
+function cmpRowHtml(c, lib) {
+  const rx = c.rx;
+  const dose = rxLine(rx);
+  const rxBits = [];
+  if (dose) rxBits.push(`<span class="rx-dose">${esc(dose)}</span>`);
+  if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}</span>`);
+  const rxSub = [];
+  if (rx.tempo) rxSub.push('tempo ' + esc(rx.tempo));
+  (rx.extras || []).forEach(x => rxSub.push(esc(x.label)));
+  const v = c.pex ? vidUrl(c.pex, lib) : '';
+  const items = (c.pex && c.pex.items && c.pex.items.length)
+    ? c.pex.items.map(it => esc(it.name) + (it.detail ? ' (' + esc(it.detail) + ')' : '')).join(' · ')
+    : (c.logged && c.logged.items.length ? c.logged.items.map(esc).join(' · ') : '');
+  const tone = !c.logged ? 'miss' : c.state === 'skip' ? 'miss' : c.flags.some(f => f.tone === 'miss' || f.tone === 'warn') ? 'warn' : 'ok';
+  return `<div class="cmp-row ${tone}">
+    <div class="cmp-ex">
+      <div class="cmp-nm">${esc(c.name)}${v ? ` <a class="cmp-vid" href="${esc(v)}" target="_blank" rel="noopener" title="Video">▶</a>` : ''}</div>
+      ${items ? `<div class="cmp-items">${items}</div>` : ''}
+      ${c.pex && c.pex.note ? `<div class="cmp-cnote"><b>Your note:</b> ${esc(c.pex.note)}</div>` : ''}
+      ${c.logged && c.logged.note ? `<div class="cmp-anote"><b>They wrote:</b> ${esc(c.logged.note)}</div>` : ''}
     </div>
-    <div class="session-reply" id="sr-${uid}" style="display:none">
-      <textarea id="srinput-${uid}" placeholder="Reply…"></textarea>
-      <button class="btn sm primary" onclick="sendSessionReply('${uid}', '${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Send reply</button>
-    </div>` : '';
-  return `${meta}
-    ${s.day_note ? `<div class="note"><b>Athlete note:</b> ${esc(s.day_note)}</div>` : ''}
-    ${actions}
-    ${comparisonTableHtml(s, programDays)}
-    ${elog ? `<div class="elog-title">Exercise log (as sent)</div><div class="elog-body">${esc(elog)}</div>` : ''}
-    <div class="note-actions"><button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete this log</button></div>`;
+    <div class="cmp-rx">${rxBits.join('') || '<span class="did-none">—</span>'}
+      ${rxSub.length ? `<div class="rx-sub">${rxSub.join(' · ')}</div>` : ''}</div>
+    <div class="cmp-did">${cmpCell(c)}</div>
+    <div class="cmp-flags">${c.flags.map(f => `<span class="fl ${f.tone}">${esc(f.text)}</span>`).join('')}</div>
+  </div>`;
 }
-function renderLogsByDay(athleteId, history, programDays) {
-  if (!history.length) return '<p class="empty">No finished sessions yet — these appear the moment an athlete taps Finish on a day (full or partial).</p>';
+function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
+  const chosen = _workSel[dayNum];
+  const s = (chosen && sessions.find(x => x.completed_on === chosen)) || sessions[0] || null;
+  const cmp = compareDay(pd, s);
+  const groups = cmp.groups;
+  const v = dayVerdict(groups);
+  // Nothing prescribed today appears in the log, yet the log is full: this
+  // session was done against an older version of the program. Say so — the
+  // alternative is a screen of "not logged" rows that reads like they quit.
+  const stale = !!(s && v.total && v.missing === v.total && cmp.extras > 0);
+  const focus = (s && s.focus) || (pd && pd.focusTag) || '';
+  const open = _workOpen[dayNum] !== undefined ? _workOpen[dayNum] : !!defaultOpen;
+  const needsReply = sessions.some(sessionNeedsReply);
+
+  // Status line — only facts the session actually carries.
+  let status, statusTone;
+  if (!s) { status = sessions.length ? 'never finished' : 'not logged yet'; statusTone = 'idle'; }
+  else if (isPartialStatus(s.status)) { status = 'Partial'; statusTone = 'warn'; }
+  else { status = 'Complete'; statusTone = 'ok'; }
+  const meta = [];
+  if (s) {
+    meta.push(prettyDate(s.completed_on));
+    if (s.session_rpe != null) meta.push('sRPE ' + s.session_rpe + '/10');
+    if (s.duration_min != null) meta.push(s.duration_min + ' min');
+    if (s.session_rpe != null && s.duration_min != null) meta.push((s.session_rpe * s.duration_min) + ' AU');
+    const rd = jparse(s.readiness);
+    if (rd && !rd.skipped && rd.composite != null) meta.push('readiness ' + rd.composite + '/5');
+    else if (rd && rd.skipped) meta.push('readiness skipped');
+  }
+  // Say both when both are true — a day can have work skipped AND work done at
+  // the wrong dose, and only naming the worse of the two hides half the story.
+  const verdictBits = [];
+  if (v.missing) verdictBits.push(v.missing + ' not done');
+  if (v.off) verdictBits.push(v.off + ' off plan');
+  const scoreline = !s ? '' : v.total
+    ? `<span class="dv ${v.missing ? 'miss' : v.off ? 'warn' : 'ok'}">${esc(verdictBits.join(' · ')) || 'all on plan'}</span>
+       <span class="dv-sub">${v.clean}/${v.total} exactly as prescribed</span>`
+    : '';
+
+  const picker = sessions.length > 1 ? `<div class="sesspick">${sessions.map(x =>
+      `<button class="sp ${x.completed_on === (s && s.completed_on) ? 'on' : ''}" onclick="event.stopPropagation();setWorkSession(${dayNum}, '${esc(x.completed_on)}')">${esc(prettyDate(x.completed_on))}${isPartialStatus(x.status) ? ' ·partial' : ''}</button>`
+    ).join('')}<span class="sp-lbl">${sessions.length} logged</span></div>` : '';
+
+  const uid = (athleteId + '_' + dayNum + '_' + (s ? s.completed_on : 'none')).replace(/[^a-z0-9]/gi, '_');
+  const noteBox = (s && s.day_note) ? `<div class="daynote">
+      <div class="dn-txt">“${esc(s.day_note)}”</div>
+      ${sessionNeedsReply(s) ? `<div class="note-actions">
+        <button class="btn sm primary" onclick="openSessionReply('${uid}')">Reply</button>
+        <button class="btn sm" onclick="markNoteRead('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Mark read</button>
+      </div>
+      <div class="session-reply" id="sr-${uid}" style="display:none">
+        <textarea id="srinput-${uid}" placeholder="Reply…"></textarea>
+        <button class="btn sm primary" onclick="sendSessionReply('${uid}', '${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Send</button>
+      </div>` : '<div class="dn-read">answered</div>'}
+    </div>` : '';
+
+  // The column header belongs to the day, not to every block inside it —
+  // repeating "PRESCRIBED / DONE" above each block just adds noise to scan past.
+  const body = groups.length
+    ? `<div class="cmp-head"><span></span><span>Prescribed</span><span>Done</span><span></span></div>`
+      + groups.map(g => `
+      <div class="cmp-grp">
+        <div class="cmp-grp-t">${g.icon ? esc(g.icon) + ' ' : ''}${esc(g.title)}</div>
+        ${g.rows.map(r => cmpRowHtml(r, lib)).join('')}
+      </div>`).join('')
+    : `<p class="empty">No prescribed exercises on this day${s ? ' and nothing readable in the log' : ''}.</p>`;
+
+  return `<div class="wday ${open ? 'open' : ''} ${statusTone}">
+    <button class="wday-top" onclick="toggleWorkDay(${dayNum})">
+      <span class="wday-n">${esc(dayNum)}</span>
+      <span class="wday-main">
+        <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${needsReply ? ' <span class="zpill reply">note to reply</span>' : ''}</span>
+        <span class="wday-meta">${esc(meta.join(' · ')) || 'nothing logged against this day yet'}</span>
+      </span>
+      <span class="wday-right">${scoreline}<span class="tag ${statusTone === 'ok' ? 'done' : statusTone === 'warn' ? 'partial' : ''}">${esc(status)}</span></span>
+      <span class="day-c-chev">▾</span>
+    </button>
+    <div class="wday-body">
+      ${picker}
+      ${stale ? `<div class="stalewarn">This session was done against an <b>earlier version of the program</b> — none of the current day’s exercises appear in it. What they actually did is under <i>Logged, not prescribed</i>.</div>` : ''}
+      ${noteBox}
+      ${body}
+      ${s ? `<details class="rawlog"><summary>Raw log, exactly as sent</summary>
+        <div class="elog-body">${esc(exerciseLogPart(s.summary))}</div>
+        <div class="note-actions"><button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete this log</button></div>
+      </details>` : ''}
+    </div>
+  </div>`;
+}
+function workTabHtml(D) {
+  const { athleteId, programDays, history, lib, metrics } = D;
   const byDay = {};
   history.forEach(s => { (byDay[s.day] = byDay[s.day] || []).push(s); });
   Object.values(byDay).forEach(arr => arr.sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on))));
-  const order = (programDays || []).map(d => Number(d.id));
-  const dayNums = Object.keys(byDay).map(Number).sort((a, b) => {
-    const ia = order.indexOf(a), ib = order.indexOf(b);
-    if (ia !== -1 && ib !== -1) return ia - ib;
-    if (ia !== -1) return -1;
-    if (ib !== -1) return 1;
-    return a - b;
-  });
-  return dayNums.map(d => {
-    const sessions = byDay[d];
-    const latest = sessions[0];
-    const pd = (programDays || []).find(p => Number(p.id) === d);
-    const focus = latest.focus || (pd && pd.focusTag) || '';
-    const partial = isPartialStatus(latest.status);
-    const earlier = sessions.slice(1);
-    const needsReply = sessions.some(sessionNeedsReply);
-    return `<details class="day-c">
-      <summary>
-        <div class="day-c-main">
-          <h3>Day ${esc(d)}${focus ? ' — ' + esc(focus) : ''}${needsReply ? ' <span class="zpill reply" style="vertical-align:middle">note to reply</span>' : ''}</h3>
-          <div class="day-date">Last done ${esc(prettyDate(latest.completed_on))} · ${partial ? 'Partial' : 'Complete'}${latest.session_rpe != null ? ' · RPE ' + esc(latest.session_rpe) + '/10' : ''}${sessions.length > 1 ? ' · ' + sessions.length + ' logged' : ''}</div>
-        </div>
-        <span class="day-c-chev">▾</span>
-      </summary>
-      <div class="day-c-body">
-        ${sessionBodyHtml(athleteId, latest, programDays)}
-        ${earlier.length ? `<div class="elog-title" style="margin-top:20px">Earlier sessions of this day</div>
-          ${earlier.map(s => `<details class="day-c" style="margin-bottom:8px">
-            <summary><div class="day-c-main"><h3 style="font-size:14px">${esc(prettyDate(s.completed_on))} · ${isPartialStatus(s.status) ? 'Partial' : 'Complete'}${s.session_rpe != null ? ' · RPE ' + esc(s.session_rpe) + '/10' : ''}</h3></div><span class="day-c-chev">▾</span></summary>
-            <div class="day-c-body">${sessionBodyHtml(athleteId, s, programDays)}</div>
-          </details>`).join('')}` : ''}
+  const order = programDays.map(d => Number(d.id));
+  const loggedOnly = Object.keys(byDay).map(Number).filter(d => order.indexOf(d) === -1).sort((a, b) => a - b);
+  // Only the most recently trained day opens by itself. Every card expanded at
+  // once is how the old page got to four thousand pixels.
+  const freshest = history.length ? Number(history[0].day) : null;
+  const cards = order.map(d => workDayCard(athleteId, programDays.find(p => Number(p.id) === d), d, byDay[d] || [], lib, d === freshest))
+    .concat(loggedOnly.map(d => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest)));
+
+  const cyc = (D.program && D.program.cycles || [])[(D.program && Number.isInteger(D.program.currentCycleIndex)) ? D.program.currentCycleIndex : 0];
+  const cycHead = cyc ? `<div class="cycbar">
+      <div class="cyc-nm">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>
+      ${cyc.focuses && cyc.focuses.length ? `<div class="cyc-fo">${cyc.focuses.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
+    </div>` : '';
+
+  const live = liveSnapshotHtml(D);
+  return `${cycHead}
+    ${metricStripHtml(metrics)}
+    ${cards.length ? cards.join('') : `<p class="empty">No program file found (looked for data/${esc(athleteId)}.json) and no finished sessions yet.</p>`}
+    <div class="sec"><span>Backfill</span>
+      <span class="acts"><button class="btn sm" onclick="toggleAddSession()">+ Add past session from email</button></span></div>
+    <div id="add-session" class="add-session" style="display:none">
+      <p class="empty" style="padding:0 0 10px">Paste a session-report email, set the date it was done, then save. It's written exactly like a live finish.</p>
+      <textarea id="as-paste" placeholder="Paste the whole email here…"></textarea>
+      <div class="add-session-row">
+        <label>Date done <input type="date" id="as-date" value="${todayKey()}"></label>
+        <button class="btn sm" onclick="parseAndFillSession()">Read email</button>
+        <button class="btn sm primary" id="as-save" onclick="submitPastSession('${esc(athleteId)}')" disabled>Save to logs</button>
       </div>
-    </details>`;
-  }).join('');
+      <div id="as-preview" class="add-session-preview"></div>
+    </div>
+    ${live}`;
 }
+// The three numbers, always visible; the charts behind one tap. They used to be
+// three full-width cards above everything, which pushed the actual work below
+// the fold on every single athlete.
+function metricStripHtml(m) {
+  const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
+  const r = m.readiness, adh = m.adherence;
+  const rTone = !r ? '' : r.delta <= -1 ? 'red' : r.delta <= -0.5 ? 'amber' : 'green';
+  const aTone = !adh || adh.pct == null ? '' : adh.pct >= 85 ? 'green' : adh.pct >= 60 ? 'amber' : 'red';
+  const pill = (label, val, sub, tone) =>
+    `<div class="mp ${tone || ''}"><div class="mp-l">${label}</div><div class="mp-v">${val}</div><div class="mp-s">${sub}</div></div>`;
+  return `<div class="mstrip">
+    ${pill('Training load', m.acwr.enough && m.acwr.ratio != null ? round1(m.acwr.ratio) : '—',
+           m.acwr.enough && m.acwr.ratio != null ? 'ACWR · ' + az.label : 'building baseline', az.cls)}
+    ${pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
+           r ? (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual' : 'no check-ins yet', rTone)}
+    ${pill('Adherence', adh && adh.pct != null ? adh.pct + '<small>%</small>' : '—',
+           adh && adh.pct != null ? 'last ' + adh.weeks + ' wk' + (adh.weeks === 1 ? '' : 's') : 'needs a program + a session', aTone)}
+    <button class="mp mp-more" onclick="toggleCharts()">Charts<span>▾</span></button>
+  </div>
+  <div id="chartbox" class="chartbox" style="display:none">${renderCharts(m)}</div>`;
+}
+function toggleCharts() {
+  const b = $('chartbox');
+  if (b) b.style.display = b.style.display === 'none' ? 'block' : 'none';
+}
+window.toggleCharts = toggleCharts;
 
-// --- athlete detail ----------------------------------------------------------
-let _detailName = '', _detailHistory = [], _detailCallLogs = [];
-async function renderDetail(athleteId) {
-  const a = S.ath[athleteId];
-  if (!a) { $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a><p class="empty">No athlete “${esc(athleteId)}” in the store. Refresh?</p>`; return; }
-  $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Opening…</div>';
-
-  // Call logs are the only slice not loaded up front (tiny table, per-athlete).
-  if (!(athleteId in S.callLogs)) {
-    if (DEMO) S.callLogs[athleteId] = [];
-    else {
-      const r = await sb.from('call_logs').select('*').eq('athlete_id', athleteId).order('call_date', { ascending: false });
-      S.callLogs[athleteId] = (r && r.data) || [];
-    }
-  }
-  const callLogs = S.callLogs[athleteId];
-  const program = S.programs[athleteId] || null;
+// What is sitting in their app right now — a different question from "what did
+// they finish", so it keeps its own place instead of being a third copy of the
+// day list. Collapsed: most days there is nothing to see.
+function liveSnapshotHtml(D) {
+  const { athleteId, programDays } = D;
   const progRow = S.prog.find(r => r.athlete_id === athleteId) || null;
-  const history = a.sessions.slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || (x.day - y.day));
-  const messages = S.msgs.filter(m => m.athlete_id === athleteId);
-  const key = S.keys[athleteId];
-  const lib = await exLib();
-  const programDays = (program && program.workouts && program.workouts.days) || [];
-  const name = a.name;
-  _detailName = name; _detailHistory = history; _detailCallLogs = callLogs;
-  const metrics = athleteMetrics(history, a.lastActive, programDays.length);
-
-  // Mark this athlete's chat read the moment the coach opens their file.
-  if (!DEMO && a.unreadMsgs > 0) {
-    sb.from('messages').update({ read_by_coach: true })
-      .eq('athlete_id', athleteId).eq('sender', 'athlete').eq('read_by_coach', false)
-      .then(() => { S.msgs.forEach(m => { if (m.athlete_id === athleteId && m.sender === 'athlete') m.read_by_coach = true; }); assemble(); renderRail(); });
-  }
-
-  // ── Links panel ──
-  const linkHtml = key
-    ? `<div class="keyline">
-         <input readonly value="${esc(secureLink(athleteId, key))}" onclick="this.select()">
-         <button class="btn sm" onclick="copyText('${esc(secureLink(athleteId, key))}', this)">Copy program link</button>
-         ${a.isHab || a.contact ? `<button class="btn sm" onclick="copyText('${esc(proofLink(athleteId, key))}', this)">Copy Proof link</button>` : ''}
-         <button class="btn sm danger" onclick="if(confirm('Rotate the key? The OLD link stops syncing immediately and you must send the new one.')) protectAthlete('${esc(athleteId)}')">Rotate key</button>
-       </div>`
-    : `<div class="note"><b>⚠ No secure key</b> — anyone with the plain link can write to this record.
-         <button class="btn sm primary" style="margin-left:8px" onclick="protectAthlete('${esc(athleteId)}')">Generate secure link</button></div>`;
-
-  // ── Proof strip (presence facts + server level only) ──
-  let proofStrip = '';
-  if (a.isHab || a.contact) {
-    const t = todayKey();
-    let dots = '<span class="dots">';
-    for (let i = 13; i >= 0; i--) { const d = addDays(t, -i); dots += `<span class="dt ${a.habDays[d] ? 'on' : ''} ${i === 0 ? 'today' : ''}"></span>`; }
-    dots += '</span>';
-    const lv = S.levels[athleteId];
-    const o = S.optin[athleteId];
-    const myLines = S.notes.filter(n => n.athlete_id === athleteId).sort((x, y) => y.day.localeCompare(x.day));
-    const c = a.contact;
-    proofStrip = `<section class="panel" style="margin-bottom:16px">
-      <div class="phead"><span class="t hd">Proof</span>
-        <span class="r">${a.onBoard ? 'on the board as “' + esc((o && o.display_name) || '') + '”' : 'not on the board'}</span></div>
-      <div class="proofstrip">
-        ${lv ? `<div class="big">LV ${lv}<br><small>season level (server)</small></div>` : ''}
-        <div>
-          ${dots}
-          <div class="meta" style="margin-top:6px">last 14 days · ${a.hab7}/7 this week · ${a.habToday ? 'logged today' : a.habLast ? 'last log ' + timeAgo(a.habLast + 'T12:00:00') : 'never logged'}</div>
-        </div>
-        ${o && o.title ? `<div class="meta">Wears <b>${esc(o.title)}</b></div>` : ''}
-      </div>
-      ${c ? `<div class="note-actions" style="margin-top:12px">
-        ${c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : ''}
-        ${c.email ? `<button class="abtn" onclick="copyText('${esc(c.email)}', this)">${esc(c.email)}</button>` : ''}
-        <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '')}</span>
-      </div>` : ''}
-      ${myLines.length ? `<div class="elog-title">Their wall lines this week</div>
-        ${myLines.map(n => `<div class="wline ${n.hidden ? 'hid' : ''}" style="padding:6px 0">
-            <div class="bd"><div class="wtop"><span class="nm">${esc(wallDayLabel(n.day))}</span>${n.pct != null ? `<span class="pct">${esc(n.pct)}%</span>` : ''}${n.hidden ? '<span class="hidetag">hidden</span>' : ''}</div>
-            <div class="txt">${esc(n.body)}</div></div>
-            <button class="modbtn" onclick="toggleHide('${esc(athleteId)}','${esc(n.day)}',${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>
-          </div>`).join('')}` : ''}
-    </section>`;
-  }
-
-  // ── Live activity (rolling snapshot) ──
   const { days, ex } = progRow ? decode(athleteId, progRow.data) : { days: {}, ex: {} };
-  const exForName = (nm) => ex[String(nm).replace(/\s+/g, '_')];
   const setStr = (e) => (e.sets || []).map(s => {
     const bits = [s.w, s.r ? '@' + s.r : ''].filter(Boolean).join(' ');
     return (bits || '·') + (s.d ? ' ✓' : '');
   }).join(' · ');
   const hasData = (e) => e && ((e.sets && e.sets.some(s => s.w || s.r || s.d)) || e.note || e.rpe);
-
-  let daysHtml = '';
-  if (programDays.length) {
-    daysHtml = programDays.map(pd => {
+  const rows = [];
+  Object.keys(ex).forEach(k => { if (hasData(ex[k])) rows.push({ name: unslug(k), sets: setStr(ex[k]), note: ex[k].note, rpe: ex[k].rpe }); });
+  const touchedDays = programDays.filter(pd => {
+    const d = days[pd.id] || {};
+    return d.completed || d.srpe || d.note || d.readiness;
+  });
+  if (!rows.length && !touchedDays.length) return '';
+  return `<details class="rawlog livesnap"><summary>Live app snapshot — what's on their phone right now</summary>
+    ${touchedDays.map(pd => {
       const d = days[pd.id] || {};
-      const rd = d.readiness;
-      let readinessHtml = '';
-      if (rd) {
-        if (rd.skipped) readinessHtml = '<div class="readiness"><span class="r">Readiness: <b>skipped</b></span></div>';
-        else readinessHtml = `<div class="readiness">
-          ${rd.composite != null ? `<span class="r">Readiness <b>${esc(rd.composite)}/5</b></span>` : ''}
-          ${['sleep','energy','soreness','stress','overall'].filter(k=>rd[k]!=null).map(k=>`<span class="r">${k} <b>${esc(rd[k])}</b></span>`).join('')}
-        </div>`;
+      return `<div class="ls-day"><b>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</b>
+        ${d.completed ? '<span class="tag done">✓ completed</span>' : '<span class="tag">in progress</span>'}
+        ${d.completedOn ? '<span class="muted"> · ' + esc(d.completedOn) + '</span>' : ''}
+        ${d.srpe ? '<span class="muted"> · sRPE ' + esc(d.srpe) + '/10</span>' : ''}
+        ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}</div>`;
+    }).join('')}
+    ${rows.length ? `<div class="tablewrap"><table>
+      <tr><th>Exercise</th><th>Sets in the app (kg @ RPE)</th><th>Note</th></tr>
+      ${rows.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${esc(r.sets) || (r.rpe ? 'RPE ' + esc(r.rpe) : '—')}</td><td>${esc(r.note || '')}</td></tr>`).join('')}
+    </table></div>` : ''}
+  </details>`;
+}
+
+// --- athlete file ------------------------------------------------------------
+// One person, five screens. It used to be eight sections on a single scroll —
+// three of which rendered the same program days three different ways — so the
+// page opened at four thousand pixels and buried the only thing worth reading.
+let _detailName = '', _detailHistory = [], _detailCallLogs = [], _D = null;
+const SUBTABS = [
+  { id: 'work',  label: 'The work' },
+  { id: 'proof', label: 'Proof' },
+  { id: 'chat',  label: 'Chat' },
+  { id: 'calls', label: 'Calls' },
+  { id: 'file',  label: 'File' },
+];
+
+async function renderDetail(athleteId, sub) {
+  const a = S.ath[athleteId];
+  if (!a) { $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a><p class="empty">No athlete “${esc(athleteId)}” in the store. Refresh?</p>`; return; }
+  // Rebuild the context only when the athlete changes — switching sub-tabs must
+  // not refetch, or every tap costs a round trip and the page flashes.
+  if (!_D || _D.athleteId !== athleteId || _D.stamp !== S.stamp) {
+    $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Opening…</div>';
+    if (!(athleteId in S.callLogs)) {
+      if (DEMO) S.callLogs[athleteId] = [];
+      else {
+        const r = await sb.from('call_logs').select('*').eq('athlete_id', athleteId).order('call_date', { ascending: false });
+        S.callLogs[athleteId] = (r && r.data) || [];
       }
-      const rows = [];
-      (pd.blocks || []).forEach(block => (block.exercises || []).forEach(exr => {
-        const e = exForName(exr.name);
-        if (hasData(e)) rows.push({ name: exr.name, sets: setStr(e), rpe: e.rpe, note: e.note });
-      }));
-      const exTable = rows.length ? `<div class="tablewrap"><table>
-        <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
-        ${rows.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${esc(r.sets) || (r.rpe ? 'RPE ' + esc(r.rpe) : '—')}</td><td>${esc(r.note || '')}</td></tr>`).join('')}
-      </table></div>` : '<p class="empty">No exercise logs recorded for this day yet.</p>';
-      const touched = d.completed || d.srpe || d.note || rd || rows.length;
-      return `<div class="panel" style="margin-bottom:12px;box-shadow:none">
-        <h3 class="hd" style="font-size:17px">Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}
-          ${d.completed ? '<span class="tag done">✓ Completed</span>' : (touched ? '<span class="tag">In progress</span>' : '<span class="tag" style="opacity:.6">Not started</span>')}
-          <span class="muted" style="font-family:'Barlow',sans-serif;font-weight:400;font-size:12px;text-transform:none">${d.completedOn ? '· ' + esc(d.completedOn) : ''}${d.srpe ? ' · session RPE ' + esc(d.srpe) + '/10' : ''}</span></h3>
-        ${readinessHtml}
-        ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}
-        ${exTable}
-      </div>`;
-    }).join('');
-  } else {
-    const exNames = Object.keys(ex).filter(k => hasData(ex[k]));
-    daysHtml = exNames.length ? `<div class="panel" style="box-shadow:none"><div class="tablewrap"><table>
-      <tr><th>Exercise</th><th>Sets logged (wt @ RPE)</th><th>Note</th></tr>
-      ${exNames.map(k => `<tr><td>${esc(unslug(k))}</td><td class="num">${esc(setStr(ex[k])) || (ex[k].rpe ? 'RPE ' + esc(ex[k].rpe) : '—')}</td><td>${esc(ex[k].note || '')}</td></tr>`).join('')}
-    </table></div></div>` : '<p class="empty">No live day data.</p>';
+    }
+    const program = S.programs[athleteId] || null;
+    const history = a.sessions.slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || (x.day - y.day));
+    const programDays = (program && program.workouts && program.workouts.days) || [];
+    _D = {
+      athleteId, a, program, programDays, history,
+      callLogs: S.callLogs[athleteId],
+      key: S.keys[athleteId],
+      lib: await exLib(),
+      metrics: athleteMetrics(history, a.lastActive, programDays.length),
+      stamp: S.stamp,
+    };
+    _workSel = {}; _workOpen = {};
+    _detailName = a.name; _detailHistory = history; _detailCallLogs = _D.callLogs;
+
+    // Mark this athlete's chat read the moment the coach opens their file.
+    if (!DEMO && a.unreadMsgs > 0) {
+      sb.from('messages').update({ read_by_coach: true })
+        .eq('athlete_id', athleteId).eq('sender', 'athlete').eq('read_by_coach', false)
+        .then(() => { S.msgs.forEach(m => { if (m.athlete_id === athleteId && m.sender === 'athlete') m.read_by_coach = true; }); assemble(); renderRail(); });
+    }
   }
+  _D.sub = SUBTABS.some(t => t.id === sub) ? sub : 'work';
+  const has = { proof: !!(a.isHab || a.contact), calls: true, chat: true, work: true, file: true };
+  const lv = S.levels[athleteId];
+  const sub2 = [];
+  if (_D.history.length) sub2.push(_D.history.length + ' session' + (_D.history.length === 1 ? '' : 's'));
+  if (a.isHab) sub2.push('Proof ' + a.hab7 + '/7');
+  sub2.push('last active ' + timeAgo(a.lastActive));
 
-  // ── Prescribed program ──
-  const cycles = (program && program.cycles) || [];
-  const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
-  const cyc = cycles[ci];
-  const cycleHead = cyc ? `<div style="margin-bottom:14px">
-      <div class="prog-cycle-name">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>
-      ${cyc.focuses && cyc.focuses.length ? `<ul class="prog-focus">${cyc.focuses.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
-    </div>` : '';
-  const progBody = programDays.length ? programDays.map(pd => {
-    const blocks = (pd.blocks || []).map(b => {
-      const exs = (b.exercises || []).map(pex => {
-        const lg = exForName(pex.name);
-        const logged = hasData(lg)
-          ? `<div class="logline">Last logged: ${esc(setStr(lg)) || (lg.rpe ? 'RPE ' + esc(lg.rpe) : '—')}${lg.note ? ' · ' + esc(lg.note) : ''}</div>` : '';
-        const v = vidUrl(pex, lib);
-        const items = (pex.items && pex.items.length)
-          ? `<div class="pex-items">${pex.items.map(it => `· ${esc(it.name)}${it.detail ? ' (' + esc(it.detail) + ')' : ''}`).join('<br>')}</div>` : '';
-        return `<div class="pex">
-            <div class="pex-top"><span class="pex-name">${esc(pex.name)}</span>${v ? `<a class="pex-vid" href="${esc(v)}" target="_blank" rel="noopener">▶ video</a>` : ''}</div>
-            ${chipsHtml(pex.chips)}${items}${logged}
-          </div>`;
-      }).join('');
-      return `<div class="pblock"><div class="pblock-title">${b.icon ? esc(b.icon) + ' ' : ''}${esc(b.title || '')}</div>${exs}</div>`;
-    }).join('');
-    return `<details class="day-c"><summary><div class="day-c-main"><h3>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</h3></div><span class="day-c-chev">▾</span></summary><div class="day-c-body">${blocks}</div></details>`;
-  }).join('') : `<p class="empty">No program file found (looked for data/${esc(athleteId)}.json).</p>`;
+  $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a>
+    <div class="dethead">
+      <div class="det-id">
+        <span class="det-ava">${esc(initials(a.name))}</span>
+        <div>
+          <h2 class="hd">${esc(a.name)}</h2>
+          <div class="sub">${tierChip(a)}${lv ? ` <span class="lvchip">LV ${lv}</span>` : ''} <span>${esc(sub2.join(' · '))}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
+        const n = t.id === 'chat' ? a.unreadMsgs
+                : t.id === 'work' ? a.needReplySessions.length
+                : t.id === 'calls' ? _D.callLogs.length : 0;
+        return `<a class="stab ${_D.sub === t.id ? 'active' : ''}" href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n ${t.id === 'calls' ? 'quiet' : ''}">${n}</span>` : ''}</a>`;
+      }).join('')}</div>
+    <div id="tabbody"></div>`;
+  renderDetailBody();
+}
+function renderDetailBody() {
+  if (!_D) return;
+  const box = $('tabbody');
+  if (!box) return;
+  const D = _D;
+  if (D.sub === 'work') box.innerHTML = workTabHtml(D);
+  else if (D.sub === 'proof') box.innerHTML = proofTabHtml(D);
+  else if (D.sub === 'chat') box.innerHTML = chatTabHtml(D);
+  else if (D.sub === 'calls') box.innerHTML = callsTabHtml(D);
+  else box.innerHTML = fileTabHtml(D);
+}
+window.renderDetailBody = renderDetailBody;
 
-  // ── Weekly check-in calls ──
+function proofTabHtml(D) {
+  const { athleteId, a } = D;
+  const t = todayKey();
+  let dots = '<span class="dots">';
+  for (let i = 13; i >= 0; i--) { const d = addDays(t, -i); dots += `<span class="dt ${a.habDays[d] ? 'on' : ''} ${i === 0 ? 'today' : ''}"></span>`; }
+  dots += '</span>';
+  const lv = S.levels[athleteId];
+  const o = S.optin[athleteId];
+  const c = a.contact;
+  const myLines = S.notes.filter(n => n.athlete_id === athleteId).sort((x, y) => y.day.localeCompare(x.day));
+  return `<section class="panel">
+    <div class="phead"><span class="t hd">Habit tracking</span>
+      <span class="r">${a.onBoard ? 'on the board as “' + esc((o && o.display_name) || '') + '”' : 'not on the board'}</span></div>
+    <div class="proofstrip">
+      ${lv ? `<div class="big">LV ${lv}<br><small>season level (server)</small></div>` : ''}
+      <div>
+        ${dots}
+        <div class="meta" style="margin-top:6px">last 14 days · ${a.hab7}/7 this week · ${a.habToday ? 'logged today' : a.habLast ? 'last log ' + timeAgo(a.habLast + 'T12:00:00') : 'never logged'}</div>
+      </div>
+      ${o && o.title ? `<div class="meta">Wears <b>${esc(o.title)}</b></div>` : ''}
+    </div>
+    ${c ? `<div class="note-actions" style="margin-top:12px">
+      ${c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : ''}
+      ${c.email ? `<button class="abtn" onclick="copyText('${esc(c.email)}', this)">${esc(c.email)}</button>` : ''}
+      <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '')}</span>
+    </div>` : ''}
+  </section>
+  <div class="sec"><span>Their wall lines this week</span></div>
+  ${myLines.length ? `<section class="panel">${myLines.map(n => `<div class="wline ${n.hidden ? 'hid' : ''}">
+      <div class="bd"><div class="wtop"><span class="nm">${esc(wallDayLabel(n.day))}</span>${n.pct != null ? `<span class="pct">${esc(n.pct)}%</span>` : ''}${n.hidden ? '<span class="hidetag">hidden</span>' : ''}</div>
+      <div class="txt">${esc(n.body)}</div></div>
+      <button class="modbtn" onclick="toggleHide('${esc(athleteId)}','${esc(n.day)}',${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>
+    </div>`).join('')}</section>` : '<p class="empty">Nothing on the wall this week.</p>'}`;
+}
+function chatTabHtml(D) {
+  return sessionMsgPanel(D.athleteId, S.msgs.filter(m => m.athlete_id === D.athleteId));
+}
+function callsTabHtml(D) {
+  const { athleteId, callLogs } = D;
   const stars = n => n ? '★'.repeat(n) : '—';
-  const callLogsBody = callLogs.length ? callLogs.map(l => {
-    const s = l.scores || {};
-    const ans = l.answers || {};
+  const body = callLogs.length ? callLogs.map(l => {
+    const s = l.scores || {}, ans = l.answers || {};
     const meta = [l.week, l.tier, l.duration].filter(Boolean).join(' · ');
     const scoreBits = [['Well',s.well],['Sleep',s.sleep],['Energy',s.energy],['Sore',s.sore],['RPE',s.rpe],['Court',s.court]]
       .filter(([,v]) => v != null).map(([k,v]) => `${k} <b>${esc(v)}</b>`).join(' · ');
@@ -1763,40 +2258,41 @@ async function renderDetail(athleteId) {
       <select id="dashCycleSel" style="background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:13px;padding:5px 10px">${cycleNums.map(n=>`<option value="${esc(n)}">Cycle ${esc(n)}</option>`).join('')}</select>
       <button class="btn sm" onclick="copyDashCyclePrompt()">📋 Copy cycle prompt</button>
     </span>` : '';
-
-  $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a>
-    <div class="dethead">
-      <div>
-        <h2 class="hd">${esc(name)}</h2>
-        <div class="sub">${tierChip(a)} <span>last active ${timeAgo(a.lastActive)}</span> · <span>${history.length} finished session${history.length === 1 ? '' : 's'}</span></div>
-      </div>
-      <div class="detacts"><button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}')">Delete all data</button></div>
-    </div>
-    ${linkHtml}
-    ${proofStrip}
-    ${renderCharts(metrics)}
-    <div class="sec"><span>Messages</span></div>
-    ${sessionMsgPanel(athleteId, messages)}
-    <div class="sec"><span>Weekly check-in calls</span>
+  return `<div class="sec"><span>Weekly check-in calls</span>
       <span class="acts">${cycleCtl}<a class="btn sm primary" href="call-log.html?athlete=${encodeURIComponent(athleteId)}" style="text-decoration:none">+ New call log</a></span></div>
-    ${callLogsBody}
-    <div class="sec"><span>Prescribed program — current cycle</span></div>
-    ${cycleHead}${progBody}
-    <div class="sec"><span>Training logs by day</span>
-      <span class="acts"><button class="btn sm" onclick="toggleAddSession()">+ Add past session from email</button></span></div>
-    <div id="add-session" class="add-session" style="display:none">
-      <p class="empty" style="padding:0 0 10px">Paste a session-report email, set the date it was done, then save. It's written exactly like a live finish.</p>
-      <textarea id="as-paste" placeholder="Paste the whole email here…"></textarea>
-      <div class="add-session-row">
-        <label>Date done <input type="date" id="as-date" value="${todayKey()}"></label>
-        <button class="btn sm" onclick="parseAndFillSession()">Read email</button>
-        <button class="btn sm primary" id="as-save" onclick="submitPastSession('${esc(athleteId)}')" disabled>Save to logs</button>
-      </div>
-      <div id="as-preview" class="add-session-preview"></div>
-    </div>
-    ${renderLogsByDay(athleteId, history, programDays)}
-    <div class="sec"><span>Live activity — current snapshot</span></div>
-    ${daysHtml}`;
+    ${body}`;
+}
+function fileTabHtml(D) {
+  const { athleteId, a, key, program, programDays } = D;
+  const linkHtml = key
+    ? `<div class="keyline">
+         <input readonly value="${esc(secureLink(athleteId, key))}" onclick="this.select()">
+         <button class="btn sm" onclick="copyText('${esc(secureLink(athleteId, key))}', this)">Copy program link</button>
+         ${a.isHab || a.contact ? `<button class="btn sm" onclick="copyText('${esc(proofLink(athleteId, key))}', this)">Copy Proof link</button>` : ''}
+         <button class="btn sm danger" onclick="if(confirm('Rotate the key? The OLD link stops syncing immediately and you must send the new one.')) protectAthlete('${esc(athleteId)}')">Rotate key</button>
+       </div>`
+    : `<div class="note"><b>⚠ No secure key</b> — anyone with the plain link can write to this record.
+         <button class="btn sm primary" style="margin-left:8px" onclick="protectAthlete('${esc(athleteId)}')">Generate secure link</button></div>`;
+  const cycles = (program && program.cycles) || [];
+  const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
+  return `<div class="sec"><span>Links</span></div>
+    ${linkHtml}
+    <div class="sec"><span>Program file</span></div>
+    <section class="panel">
+      <table class="meta-table">
+        <tr><td class="k">Athlete id</td><td class="v">${esc(athleteId)}</td></tr>
+        <tr><td class="k">Data file</td><td class="v">${program ? `data/${esc(athleteId)}.json` : '<span style="color:var(--clay)">none found</span>'}</td></tr>
+        <tr><td class="k">Tier</td><td class="v">${esc(a.tier)}</td></tr>
+        <tr><td class="k">Days / week</td><td class="v">${programDays.length || '—'}</td></tr>
+        <tr><td class="k">Cycle</td><td class="v">${cycles[ci] ? esc(cycles[ci].name || '') + (cycles[ci].weeks ? ' · ' + esc(cycles[ci].weeks) : '') : '—'}</td></tr>
+        <tr><td class="k">Roadmap</td><td class="v">${cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'}</td></tr>
+      </table>
+    </section>
+    <div class="sec"><span>Danger zone</span></div>
+    <section class="panel">
+      <p class="empty" style="padding:0 0 10px">Deletes every session, message and progress row for this athlete. The data file on disk is not touched.</p>
+      <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}')">Delete all data</button>
+    </section>`;
 }
 
 // --- coach messaging (ported) -----------------------------------------------
@@ -1916,7 +2412,7 @@ function parseAndFillSession() {
         <tr><td class="k">Session RPE</td><td class="v">${esc(p.session_rpe || '—')}</td></tr>
         <tr><td class="k">Duration</td><td class="v">${esc(p.duration_min || '—')}${p.duration_min ? ' min' : ''}</td></tr>
         <tr><td class="k">Readiness</td><td class="v">${esc(rTxt)}</td></tr>
-        <tr><td class="k">Exercises</td><td class="v">${parseExerciseLog(p.summary).length} logged</td></tr>
+        <tr><td class="k">Exercises</td><td class="v">${Object.keys(logIndex(parseSessionLog(p.summary))).length} logged</td></tr>
       </table>`;
   $('as-save').disabled = !p.day;
 }
@@ -2280,6 +2776,124 @@ function demoStore() {
     return log;
   };
   const blob = (id, pattern) => ({ [id + '_hab_log']: JSON.stringify(mkLog(pattern)), [id + '_hab_cfg']: '{}' });
+  // A realistic plan and a realistic log against it — chips in the shape a real
+  // data/<id>.json uses, and summaries in the grammar program.html writes — so
+  // ?demo=1 exercises the comparison properly instead of flattering it.
+  const chip = (...labels) => labels.map(label => ({ label }));
+  const PEGAH_DAYS = [
+    { id: 1, focusTag: 'Built From The Legs Up', blocks: [
+      { icon: '🔥', title: 'Activation & Prep', exercises: [
+        { name: 'Assault Bike', type: 'simple', chips: chip('4 min') },
+        { name: 'Movement Prep Circuit', type: 'circuit', chips: [], items: [
+          { name: 'Cat-Cow', detail: '×6 Reps' }, { name: 'Leg Swings', detail: '×10 Each Side' },
+          { name: 'Glute Bridge', detail: '×12 Reps' }] },
+      ] },
+      { icon: '💪', title: 'Primary', exercises: [
+        { name: 'Goblet Squat', type: 'standard', chips: chip('4 Sets', '×10 Reps', 'Tempo 3-0-1-0', 'RPE 7'),
+          note: 'Start with a bell you can do ten clean reps with and leave two in the tank.' },
+        { name: 'Chest-Supported Dumbbell Row', type: 'standard', chips: chip('3 Sets', '×12 Reps', 'RPE 8') },
+      ] },
+      { icon: '⚙️', title: 'Accessory', exercises: [
+        { name: 'Machine Leg Press', type: 'standard', chips: chip('3 Sets', '×12 Reps', 'RPE 7') },
+        { name: '45° Back Extension', type: 'standard', chips: chip('3 Sets', '×15 Reps', 'RPE 7') },
+        { name: 'Dumbbell Bicep Curl', type: 'standard', chips: chip('3 Sets', '×12 Reps', 'RPE 8') },
+      ] },
+      { icon: '🎯', title: 'Core', exercises: [
+        { name: 'Dead Bug', type: 'standard', chips: chip('3 Sets', '×10 Each Side', 'RPE 7') },
+      ] },
+    ] },
+    { id: 2, focusTag: 'Push It Sideways', blocks: [
+      { icon: '💪', title: 'Primary', exercises: [
+        { name: 'Dumbbell Bench Press', type: 'standard', chips: chip('4 Sets', '×8 Reps', 'RPE 8') },
+        { name: 'Lateral Bound', type: 'standard', chips: chip('3 Sets', '×6 Each Side', 'RPE 6') },
+      ] },
+      { icon: '⚙️', title: 'Accessory', exercises: [
+        { name: 'Half-Kneeling Cable Press', type: 'standard', chips: chip('3 Sets', '×10 Each Side', 'RPE 7') },
+      ] },
+    ] },
+    { id: 3, focusTag: 'Everything At Once', blocks: [
+      { icon: '💪', title: 'Primary', exercises: [
+        { name: 'Trap Bar Deadlift', type: 'standard', chips: chip('4 Sets', '×6 Reps', 'RPE 7-8') },
+        { name: 'Pull-Up', type: 'standard', chips: chip('4 Sets', '×6 Reps', 'RPE 8') },
+      ] },
+    ] },
+  ];
+  // Day 1, done Friday. Goblet Squat three RPE over target, the leg press two
+  // sets short, curls skipped, and a set of calf raises nobody asked for.
+  const PEGAH_D1 = [
+    'Day 1 — Built From The Legs Up',
+    'Status: Complete',
+    'Session RPE: 7/10',
+    'Duration: 60 min',
+    'Session Load: 420 AU (sRPE 7 × 60 min)',
+    '',
+    'Readiness (at start) — composite 3.5/5:',
+    '  How well did you sleep last night: 3/5 (OK)',
+    '',
+    'Notes from athlete:',
+    'Squats felt way heavier than last week. Shoulder fine though.',
+    '',
+    'Exercise log:',
+    '',
+    '[Activation & Prep]',
+    '• Assault Bike (✓)',
+    '    Set 1: ✓',
+    '• Movement Prep Circuit (✓)',
+    '   · Cat-Cow (×6 Reps)',
+    '   · Leg Swings (×10 Each Side)',
+    '   · Glute Bridge (×12 Reps)',
+    '',
+    '[Primary]',
+    '• Goblet Squat (✓)',
+    '    Set 1: 10 @10 ✓',
+    '    Set 2: 12 @10 ✓',
+    '    Set 3: 12 @9 ✓',
+    '    Set 4: 12 @9 ✓',
+    '    Note: had to drop the last two, was cooked',
+    '• Chest-Supported Dumbbell Row (✓)',
+    '    Set 1: 12 @8 ✓',
+    '    Set 2: 12 @8 ✓',
+    '    Set 3: 12 @8 ✓',
+    '',
+    '[Accessory]',
+    '• Machine Leg Press (1/3 sets)',
+    '    Set 1: 40 @7 ✓',
+    '    Set 2: skipped',
+    '    Set 3: skipped',
+    '• 45° Back Extension (✓)',
+    '    Set 1: @7 ✓',
+    '    Set 2: @7 ✓',
+    '    Set 3: @8 ✓',
+    '• Dumbbell Bicep Curl (skipped)',
+    '    Set 1: skipped',
+    '    Set 2: skipped',
+    '    Set 3: skipped',
+    '',
+    '[Core]',
+    '• Dead Bug (✓)',
+    '    Set 1: @6 ✓',
+    '    Set 2: @6 ✓',
+    '    Set 3: @7 ✓',
+    '• Standing Calf Raise (✓)',
+    '    Set 1: 20 @6 ✓',
+    '    Set 2: 20 @7 ✓',
+  ].join('\n');
+  const PEGAH_D1_OLD = PEGAH_D1
+    .replace('Set 1: 10 @10 ✓', 'Set 1: 10 @7 ✓').replace('Set 2: 12 @10 ✓', 'Set 2: 10 @7 ✓')
+    .replace('Set 3: 12 @9 ✓', 'Set 3: 10 @8 ✓').replace('Set 4: 12 @9 ✓', 'Set 4: 10 @8 ✓')
+    .replace('Note: had to drop the last two, was cooked\n', '');
+  const PEGAH_D2 = [
+    'Day 2 — Push It Sideways', 'Status: Partial — ran out of time', 'Session RPE: 8/10',
+    'Duration: 35 min', 'Session Load: 280 AU (sRPE 8 × 35 min)', '', 'Exercise log:', '',
+    '[Primary]',
+    '• Dumbbell Bench Press (✓)',
+    '    Set 1: 14 @8 ✓', '    Set 2: 14 @8 ✓', '    Set 3: 14 @9 ✓', '    Set 4: 14 @9 ✓',
+    '• Lateral Bound (2/3 sets)',
+    '    Set 1: @6 ✓', '    Set 2: @6 ✓', '    Set 3: skipped',
+    '', '[Accessory]',
+    '• Half-Kneeling Cable Press (skipped)',
+    '    Set 1: skipped', '    Set 2: skipped', '    Set 3: skipped',
+  ].join('\n');
   S.prog = [
     { athlete_id: 'pegah_hmt2', athlete_name: 'Pegah', data: blob('pegah_hmt2', [0,1,2,3,4,5,6,7,9,10]), updated_at: new Date().toISOString() },
     { athlete_id: 'elmira_askari', athlete_name: 'Elmira', data: blob('elmira_askari', [0,1,3,4,6,8]), updated_at: new Date().toISOString() },
@@ -2289,16 +2903,16 @@ function demoStore() {
     { athlete_id: 'sara_free', athlete_name: 'Sara', data: blob('sara_free', [0,1,2,3,4,5,6,7,8,9,10,11,12,13]), updated_at: new Date().toISOString() },
     { athlete_id: 'reza_jamal', athlete_name: 'Reza', data: blob('reza_jamal', [4,5,7]), updated_at: new Date(Date.now() - 4 * 86400000).toISOString() },
   ];
-  const mkSession = (id, name, day, off, rpe, dur, status, note) => ({
+  const mkSession = (id, name, day, off, rpe, dur, status, note, summary) => ({
     athlete_id: id, athlete_name: name, day, completed_on: d(off), status,
     session_rpe: rpe, duration_min: dur, readiness: { composite: 3.8, sleep: 4, energy: 4, soreness: 3, stress: 4, overall: 4 },
     day_note: note || '', coach_status: note ? 'new' : 'read', updated_at: new Date(Date.now() - off * 86400000).toISOString(),
-    summary: 'Day ' + day + ' — Demo\n\nExercise log:\n[Primary]\n• Goblet Squat (✓)\n    Set 1: 24 @7 ✓\n    Set 2: 24 @8 ✓\n• Bench Press (✓)\n    Set 1: 40 @7 ✓',
+    summary: summary || ('Day ' + day + ' — Demo\n\nExercise log:\n[Primary]\n• Goblet Squat (✓)\n    Set 1: 24 @7 ✓\n    Set 2: 24 @8 ✓\n• Bench Press (✓)\n    Set 1: 40 @7 ✓'),
   });
   S.hist = [
-    mkSession('pegah_hmt2', 'Pegah', 1, 0, 7, 55, 'Complete', 'Shoulder felt tight on the last set'),
-    mkSession('pegah_hmt2', 'Pegah', 2, 2, 8, 60, 'Complete'),
-    mkSession('pegah_hmt2', 'Pegah', 3, 4, 6, 50, 'Complete'),
+    mkSession('pegah_hmt2', 'Pegah', 1, 0, 7, 60, 'Complete', 'Squats felt way heavier than last week. Shoulder fine though.', PEGAH_D1),
+    mkSession('pegah_hmt2', 'Pegah', 1, 7, 7, 58, 'Complete', '', PEGAH_D1_OLD),
+    mkSession('pegah_hmt2', 'Pegah', 2, 2, 8, 35, 'Partial — ran out of time', '', PEGAH_D2),
     mkSession('elmira_askari', 'Elmira', 1, 1, 7, 45, 'Complete'),
     mkSession('elmira_askari', 'Elmira', 2, 3, 9, 65, 'Partial — ran out of time'),
     mkSession('dela_yazdani', 'Dela', 1, 1, 6, 40, 'Complete'),
@@ -2356,7 +2970,7 @@ function demoStore() {
     sara_free: { athlete_id: 'sara_free', display_name: 'Sara', title: null },
   };
   S.programs = {
-    pegah_hmt2: { athlete: { firstName: 'Pegah' }, workouts: { days: [{ id: 1, focusTag: 'Lower', blocks: [{ title: 'Primary', exercises: [{ name: 'Goblet Squat', chips: [{ label: '4 × 8' }, { label: 'RPE 7' }] }] }] }, { id: 2, focusTag: 'Upper', blocks: [] }, { id: 3, focusTag: 'Full body', blocks: [] }] }, cycles: [{ name: 'Cycle 3 — Foundations', weeks: '4 weeks', focuses: ['Strength base', 'Shoulder care'] }], currentCycleIndex: 0 },
+    pegah_hmt2: { athlete: { firstName: 'Pegah' }, workouts: { days: PEGAH_DAYS }, cycles: [{ name: 'Cycle 3 — Foundations', weeks: '4 weeks', focuses: ['Strength base', 'Shoulder care'] }], currentCycleIndex: 0 },
     elmira_askari: { athlete: { firstName: 'Elmira' }, workouts: { days: [{ id: 1 }, { id: 2 }, { id: 3 }] }, cycles: [], currentCycleIndex: 0 },
     dela_yazdani: { athlete: { firstName: 'Dela' }, workouts: { days: [{ id: 1 }, { id: 2 }] }, cycles: [], currentCycleIndex: 0 },
     faraz_etminan: { athlete: { firstName: 'Faraz' }, workouts: { days: [{ id: 1 }, { id: 2 }, { id: 3 }] }, cycles: [], currentCycleIndex: 0 },
