@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>نگار مرادی — مربی تنیس و پدل</title>
+<meta name="description" content="کلاس خصوصی و گروهی تنیس و پدل در تهران. برای تازه‌کارها و بازیکن‌هایی که می‌خوان جدی‌تر بازی کنن.">
+<meta name="robots" content="noindex,nofollow">   <!-- DRAFT: remove when it moves to her own domain -->
+<meta name="theme-color" content="#17123A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D6F84C'/%3E%3Cpath d='M3 8a16 16 0 0 1 0 16M29 8a16 16 0 0 0 0 16' stroke='%2317123A' stroke-width='2.4' fill='none'/%3E%3C/svg%3E">
+<meta property="og:title" content="نگار مرادی — مربی تنیس و پدل">
+<meta property="og:description" content="کلاس خصوصی و گروهی تنیس و پدل در تهران.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!--
+================================================================
+  نسخه‌ی نمونه / DRAFT — چیزهایی که باید عوض بشه
+  ---------------------------------------------------------------
+  همه‌ی این‌ها متن نمونه‌ست. قبل از انتشار عوضشون کن:
+
+  1.  WHATSAPP        → شماره‌ی واقعی واتساپ (پایین، توی بخش اسکریپت)
+  2.  INSTAGRAM       → آیدی واقعی اینستاگرام (پایین، توی بخش اسکریپت)
+  3.  «نگار مرادی»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
+  4.  قیمت‌ها          → همه‌ی قیمت‌های بخش «کلاس‌ها» ساختگی‌ان
+  5.  آمارها           → ۸ سال / ۲۰۰ شاگرد / مدرک‌ها — همه نمونه‌ان
+  6.  متن «درباره‌ی من» → با متن خودش عوض بشه
+  7.  نظر شاگردها      → اسم‌ها و متن‌ها ساختگی‌ان
+  8.  باشگاه و آدرس    → بخش «تماس» و فوتر
+  9.  کادرهای عکس      → هر جا نوشته «عکس اینجا»، عکس واقعی بذار
+  10. نشان «نسخه‌ی نمونه» → تگ <a class="draft-badge"> رو کلاً پاک کن
+  11. تگ robots noindex → موقع انتشار نهایی روی دامنه‌ی خودش پاکش کن
+
+  کل سایت یک فایله. باز کردنش سرور نمی‌خواد.
+================================================================
+-->
+
+<style>
+/* ============ tokens ============ */
+:root{
+  --font-display:Lalezar,Vazirmatn,Tahoma,sans-serif;   /* Tehran signage lettering */
+  --font-body:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
+  --ink:#17123A;        /* deep violet-ink */
+  --ink-2:#221B4E;
+  --ink-3:#2E2662;
+  --ball:#D6F84C;       /* tennis-ball chartreuse — the one loud accent */
+  --ball-soft:#EAFF9B;
+  --blush:#FFC9A8;      /* quiet warm secondary */
+  --paper:#FAF6F2;      /* warm off-white, rose-biased not yellow-cream */
+  --mist:#F5E9E1;       /* the apricot, drained down to a neutral */
+  --muted:#6B6480;
+  --muted-on-dark:rgba(255,255,255,.68);
+  --line:rgba(255,255,255,.13);
+  --line-dark:rgba(23,18,58,.12);
+  --r:22px;
+  --r-lg:30px;
+  --wrap:1120px;
+  --shadow:0 22px 60px -28px rgba(23,18,58,.45);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.95;           /* فارسی به فضا نیاز داره */
+  font-weight:400;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{margin:0;line-height:1.4;font-weight:800;letter-spacing:0;text-wrap:balance}
+.hero h1,.h-sec,.cta h2,.stat b,.step .num,.float-card .n,.mark{
+  font-family:var(--font-display);font-weight:400;
+}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.wrap{width:min(var(--wrap),calc(100% - 40px));margin-inline:auto}
+section{position:relative}
+:focus-visible{outline:3px solid var(--ball);outline-offset:3px;border-radius:6px}
+.dark :focus-visible,.hero :focus-visible,.cta :focus-visible,.foot :focus-visible,.nav :focus-visible{outline-color:var(--ball)}
+
+/* ============ reveal ============ */
+.rv{opacity:1;transform:none}
+.js .rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+.js .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .js .rv{opacity:1!important;transform:none!important;transition:none}
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important}
+  html{scroll-behavior:auto}
+}
+
+/* ============ bits ============ */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:13.5px;font-weight:600;
+  padding:8px 16px;border-radius:999px;
+  background:rgba(214,248,76,.12);border:1px solid rgba(214,248,76,.32);
+  color:var(--ball-soft);
+}
+.eyebrow.on-light{background:rgba(23,18,58,.05);border-color:var(--line-dark);color:var(--ink)}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--ball);flex:none}
+.eyebrow.on-light .dot{background:var(--ink)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px 28px;border-radius:999px;
+  font-weight:700;font-size:16.5px;
+  transition:transform .25s cubic-bezier(.2,.7,.3,1),box-shadow .25s,background .25s,color .25s;
+  white-space:nowrap;
+}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--ball);color:var(--ink);box-shadow:0 14px 34px -14px rgba(214,248,76,.7)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 20px 42px -14px rgba(214,248,76,.85)}
+.btn-ghost{border:1.5px solid var(--line);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.08);transform:translateY(-3px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.btn-outline{border:1.5px solid var(--line-dark);color:var(--ink)}
+.btn-outline:hover{background:rgba(23,18,58,.05);transform:translateY(-3px)}
+
+.h-sec{font-size:clamp(32px,4.8vw,50px);line-height:1.4}
+.lead{font-size:clamp(16.5px,2vw,19px);color:var(--muted)}
+.lead.on-dark{color:var(--muted-on-dark)}
+.sec-head{max-width:640px;margin-bottom:52px}
+.sec-head .eyebrow{margin-bottom:20px}
+.sec-head .h-sec{margin-bottom:16px}
+
+/* photo slot */
+.shot{
+  position:relative;border-radius:var(--r);
+  border:2px dashed rgba(23,18,58,.22);
+  background:
+    linear-gradient(135deg,rgba(255,201,168,.30),rgba(214,248,76,.22)),
+    var(--mist);
+  display:grid;place-content:center;gap:8px;justify-items:center;
+  text-align:center;padding:26px;color:rgba(23,18,58,.6);
+  overflow:hidden;
+}
+.shot::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(45deg,rgba(23,18,58,.05) 0 2px,transparent 2px 12px);
+}
+.shot svg{width:34px;height:34px;opacity:.5}
+.shot b{font-size:15px;font-weight:700;position:relative;z-index:1}
+.shot em{font-style:normal;font-size:12.5px;opacity:.72;position:relative;z-index:1}
+.shot.on-dark{
+  border-color:rgba(255,255,255,.26);color:rgba(255,255,255,.72);
+  background:linear-gradient(135deg,rgba(214,248,76,.16),rgba(255,201,168,.12)),var(--ink-2);
+}
+.shot.on-dark::after{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 12px)}
+
+/* ============ draft badge — DELETE THIS TAG BEFORE LAUNCH ============ */
+.draft-badge{
+  position:fixed;inset-block-start:auto;inset-block-end:96px;inset-inline-start:16px;
+  z-index:80;
+  background:var(--blush);color:var(--ink);
+  font-size:12.5px;font-weight:700;
+  padding:7px 14px;border-radius:999px;
+  box-shadow:0 10px 26px -10px rgba(23,18,58,.55);
+}
+@media(min-width:900px){.draft-badge{inset-block-end:24px}}
+
+/* ============ nav ============ */
+.nav{
+  position:fixed;inset-block-start:0;inset-inline:0;z-index:70;
+  padding:16px 0;transition:background .35s,backdrop-filter .35s,padding .35s,box-shadow .35s;
+}
+.nav.stuck{
+  background:rgba(23,18,58,.86);backdrop-filter:blur(16px) saturate(1.4);
+  padding:10px 0;box-shadow:0 10px 40px -22px rgba(0,0,0,.8);
+}
+.nav-in{display:flex;align-items:center;gap:22px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:17px;color:#fff}
+.mark{
+  width:38px;height:38px;border-radius:12px;background:var(--ball);color:var(--ink);
+  display:grid;place-content:center;font-size:19px;flex:none;
+  box-shadow:0 8px 22px -10px rgba(214,248,76,.8);
+}
+.nav-links{display:none;gap:26px;margin-inline-start:auto;font-size:15.5px;font-weight:500}
+.nav-links a{color:rgba(255,255,255,.8);transition:color .2s;position:relative;padding-block:4px}
+.nav-links a::after{
+  content:"";position:absolute;inset-block-end:0;inset-inline:0;height:2px;
+  background:var(--ball);transform:scaleX(0);transform-origin:right;transition:transform .3s;
+}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav .btn{padding:11px 20px;font-size:15px}
+.nav-cta{margin-inline-start:auto}
+.burger{margin-inline-start:auto;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);display:grid;place-content:center;gap:5px}
+.burger span{display:block;width:18px;height:2px;background:#fff;border-radius:2px;transition:transform .3s,opacity .3s}
+.nav.open .burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav.open .burger span:nth-child(2){opacity:0}
+.nav.open .burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.menu{
+  display:grid;gap:2px;overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.2,.7,.3,1);
+  background:rgba(23,18,58,.96);backdrop-filter:blur(14px);
+  border-radius:var(--r);margin-block-start:0;
+}
+.nav.open .menu{max-height:400px;margin-block-start:14px}
+.menu a{padding:14px 20px;color:rgba(255,255,255,.85);font-weight:600;border-block-end:1px solid var(--line)}
+.menu a:last-child{border:0}
+@media(min-width:900px){
+  .nav-links{display:flex}
+  .burger,.menu{display:none}
+  .nav-cta{margin-inline-start:0}
+}
+
+/* ============ hero ============ */
+.hero{
+  background:var(--ink);color:#fff;position:relative;overflow:hidden;
+  padding-block:130px 90px;
+}
+.hero::before{ /* glow */
+  content:"";position:absolute;inset-block-start:-30%;inset-inline-start:-10%;
+  width:70vw;height:70vw;max-width:820px;max-height:820px;border-radius:50%;
+  background:radial-gradient(circle,rgba(214,248,76,.20),transparent 62%);
+  pointer-events:none;
+}
+.hero::after{
+  content:"";position:absolute;inset-block-end:-20%;inset-inline-end:-15%;
+  width:56vw;height:56vw;max-width:620px;max-height:620px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,201,168,.16),transparent 65%);
+  pointer-events:none;
+}
+.hero-in{position:relative;z-index:2;display:grid;gap:56px}
+.hero h1{
+  font-size:clamp(38px,7.4vw,68px);line-height:1.46;
+  margin-block:22px 20px;
+}
+.hero h1 .hl{position:relative;white-space:nowrap}
+.hero h1 .hl::after{
+  content:"";position:absolute;inset-inline:-2px;inset-block-end:.42em;height:.075em;
+  background:var(--ball);border-radius:99px;z-index:-1;   /* solid stroke: .3 alpha over violet went muddy */
+  transform:scaleX(0);transform-origin:right;
+  animation:swipe 1s cubic-bezier(.2,.7,.3,1) .7s forwards;
+}
+@keyframes swipe{to{transform:scaleX(1)}}
+.hero .lead{max-width:520px;margin-block-end:32px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:14px;margin-block-end:22px}
+.hero-note{display:flex;align-items:center;gap:9px;font-size:14.5px;color:var(--muted-on-dark)}
+.pulse{width:9px;height:9px;border-radius:50%;background:var(--ball);flex:none;position:relative}
+.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--ball);animation:ping 2s ease-out infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+
+/* hero visual */
+.hero-art{position:relative;min-height:380px}
+.court{position:absolute;inset:0;width:100%;height:100%;opacity:.72}
+.court .ln{fill:none;stroke:var(--ball);stroke-width:1.6;opacity:.7}
+.court .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 2.4s cubic-bezier(.4,0,.2,1) .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.arc{fill:none;stroke:var(--blush);stroke-width:2;stroke-dasharray:7 9;opacity:.7}
+.hero-shot{position:relative;z-index:2;aspect-ratio:4/5;max-width:340px;margin-inline:auto;transform:rotate(-2.5deg)}
+.float-card{
+  position:absolute;z-index:3;
+  background:rgba(255,255,255,.09);backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:18px;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;
+  animation:bob 6s ease-in-out infinite;
+}
+.float-card.a{inset-block-start:8%;inset-inline-start:0}
+.float-card.b{inset-block-end:6%;inset-inline-end:2%;animation-delay:-3s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.float-card .n{font-size:26px;color:var(--ball);line-height:1.3}
+.float-card .t{font-size:12.5px;color:var(--muted-on-dark);line-height:1.5}
+@media(min-width:960px){
+  .hero{padding-block:170px 110px}
+  .hero-in{grid-template-columns:1.05fr .95fr;align-items:center;gap:70px}
+  .hero-art{min-height:520px}
+}
+
+/* ============ stats ============ */
+.stats{background:var(--ball);color:var(--ink);padding-block:34px}
+.stats-in{display:grid;grid-template-columns:repeat(2,1fr);gap:26px 18px;text-align:center}
+.stat b{display:block;font-size:clamp(30px,4.8vw,44px);line-height:1.35}
+.stat span{font-size:14px;font-weight:600;opacity:.72}
+@media(min-width:760px){.stats-in{grid-template-columns:repeat(4,1fr)}}
+
+/* ============ generic section ============ */
+.pad{padding-block:88px}
+.pad-lg{padding-block:104px}
+.dark{background:var(--ink);color:#fff}
+.dark .h-sec{color:#fff}
+.tint{background:var(--mist)}
+
+/* ============ about ============ */
+.about-grid{display:grid;gap:44px}
+.about-shots{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.about-shots .shot:first-child{aspect-ratio:3/4;grid-row:span 2}
+.about-shots .shot:nth-child(2){aspect-ratio:1}
+.about-shots .shot:nth-child(3){aspect-ratio:1}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-block-start:28px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:999px;font-size:14.5px;font-weight:600;
+  background:#fff;border:1px solid var(--line-dark);
+}
+.chip .tick{width:16px;height:16px;border-radius:50%;background:var(--ball);display:grid;place-content:center;flex:none}
+.chip .tick svg{width:9px;height:9px;stroke:var(--ink);stroke-width:3.4}
+.about-p{margin-block-end:18px}
+@media(min-width:900px){
+  .about-grid{grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center}
+}
+
+/* ============ classes ============ */
+.cards{display:grid;gap:20px}
+@media(min-width:680px){.cards{grid-template-columns:1fr 1fr}}
+@media(min-width:1020px){.cards{grid-template-columns:repeat(3,1fr)}}
+.card{
+  background:#fff;border:1px solid var(--line-dark);border-radius:var(--r);
+  padding:30px 26px;display:flex;flex-direction:column;gap:12px;
+  transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s,border-color .35s;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;inset-block-start:0;inset-inline:0;height:3px;
+  background:var(--ball);transform:scaleX(0);transform-origin:right;transition:transform .4s;
+}
+.card:hover{transform:translateY(-7px);box-shadow:var(--shadow);border-color:transparent}
+.card:hover::before{transform:scaleX(1)}
+.card .ic{
+  width:48px;height:48px;border-radius:14px;background:var(--mist);
+  display:grid;place-content:center;margin-block-end:6px;
+}
+.card .ic svg{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card h3{font-size:20px}
+.card .meta{font-size:13.5px;font-weight:600;color:var(--muted)}
+.card p{font-size:15.5px;color:var(--muted);line-height:1.85}
+.card .price{
+  margin-block-start:auto;padding-block-start:18px;border-block-start:1px solid var(--line-dark);
+  display:flex;align-items:baseline;gap:7px;font-weight:800;font-size:20px;
+}
+.card .price small{font-size:13px;font-weight:500;color:var(--muted)}
+.card.feat{background:var(--ink);color:#fff;border-color:transparent}
+.card.feat .ic{background:rgba(214,248,76,.16)}
+.card.feat .ic svg{stroke:var(--ball)}
+.card.feat p,.card.feat .meta{color:var(--muted-on-dark)}
+.card.feat .price{border-block-start-color:var(--line)}
+.card.feat .price small{color:var(--muted-on-dark)}
+.tag{
+  position:absolute;inset-block-start:18px;inset-inline-end:18px;   /* opposite corner from .ic */
+  background:var(--blush);color:var(--ink);
+  font-size:11.5px;font-weight:800;padding:5px 12px;border-radius:999px;
+}
+.price-note{margin-block-start:26px;font-size:14.5px;color:var(--muted);text-align:center}
+
+/* ============ steps ============ */
+.steps{display:grid;gap:22px;counter-reset:s}
+@media(min-width:860px){.steps{grid-template-columns:repeat(3,1fr);gap:26px}}
+.step{position:relative;padding:34px 28px;border-radius:var(--r);background:var(--ink-2);border:1px solid var(--line)}
+.step .num{
+  width:46px;height:46px;border-radius:14px;background:var(--ball);color:var(--ink);
+  display:grid;place-content:center;font-size:23px;margin-block-end:18px;
+}
+.step h3{font-size:19px;margin-block-end:10px}
+.step p{color:var(--muted-on-dark);font-size:15.5px;line-height:1.85}
+
+/* ============ testimonials ============ */
+.quotes{display:grid;gap:20px}
+@media(min-width:820px){.quotes{grid-template-columns:repeat(3,1fr)}}
+.quote{
+  background:#fff;border:1px solid var(--line-dark);border-radius:var(--r);padding:30px 26px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.stars{display:flex;gap:3px}
+.stars svg{width:16px;height:16px;fill:var(--ink);opacity:.85}
+.quote p{font-size:16px;line-height:1.9;flex:1}
+.who{display:flex;align-items:center;gap:12px;padding-block-start:16px;border-block-start:1px solid var(--line-dark)}
+.av{
+  width:42px;height:42px;border-radius:50%;flex:none;
+  background:linear-gradient(135deg,var(--blush),var(--ball));
+  display:grid;place-content:center;font-weight:800;font-size:15px;color:var(--ink);
+}
+.who b{display:block;font-size:15px;font-weight:700;line-height:1.5}
+.who span{font-size:13px;color:var(--muted)}
+
+/* ============ gallery ============ */
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gal .shot{aspect-ratio:1}
+.gal .shot:first-child{grid-column:span 2;aspect-ratio:16/10}
+@media(min-width:820px){
+  .gal{grid-template-columns:repeat(4,1fr)}
+  .gal .shot:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
+}
+
+/* ============ faq ============ */
+.faq{max-width:780px;margin-inline:auto;display:grid;gap:12px}
+.qa{background:#fff;border:1px solid var(--line-dark);border-radius:18px;overflow:hidden;transition:box-shadow .3s}
+.qa[open]{box-shadow:var(--shadow)}
+.qa summary{
+  list-style:none;cursor:pointer;padding:22px 24px;
+  display:flex;align-items:center;gap:16px;font-weight:700;font-size:16.5px;
+}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::after{
+  content:"";width:11px;height:11px;flex:none;margin-inline-start:auto;
+  border-right:2.4px solid var(--ink);border-bottom:2.4px solid var(--ink);  /* physical: down when shut, up when open */
+  transform:rotate(45deg);transition:transform .3s;
+}
+.qa[open] summary::after{transform:rotate(-135deg)}
+.qa .ans{padding:0 24px 24px;color:var(--muted);font-size:15.5px;line-height:1.9}
+
+/* ============ cta ============ */
+.cta{background:var(--ink);color:#fff;position:relative;overflow:hidden}
+.cta::before{
+  content:"";position:absolute;inset-block-start:50%;inset-inline-start:50%;
+  width:120%;padding-block-end:120%;transform:translate(50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(214,248,76,.17),transparent 58%);pointer-events:none;
+}
+.cta-in{position:relative;z-index:2;text-align:center;max-width:640px;margin-inline:auto}
+.cta h2{font-size:clamp(32px,5.2vw,52px);margin-block:20px 18px;line-height:1.42}
+.cta .lead{margin-block-end:34px}
+.cta-btns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+
+/* ============ footer ============ */
+.foot{background:#100C2A;color:rgba(255,255,255,.72);padding-block:56px 110px;font-size:15px}
+@media(min-width:900px){.foot{padding-block:56px 40px}}
+.foot-grid{display:grid;gap:34px}
+@media(min-width:760px){.foot-grid{grid-template-columns:1.4fr 1fr 1fr}}
+.foot h4{color:#fff;font-size:15px;font-weight:700;margin-block-end:14px}
+.foot a:hover{color:var(--ball)}
+.foot li{margin-block-end:9px}
+.foot .brand{margin-block-end:14px}
+.socials{display:flex;gap:10px;margin-block-start:16px}
+.socials a{
+  width:42px;height:42px;border-radius:12px;border:1px solid var(--line);
+  display:grid;place-content:center;transition:background .25s,transform .25s,border-color .25s;
+}
+.socials a:hover{background:var(--ball);border-color:var(--ball);transform:translateY(-3px)}
+.socials svg{width:19px;height:19px;fill:currentColor}
+.socials a:hover svg{fill:var(--ink)}
+.copy{margin-block-start:38px;padding-block-start:22px;border-block-start:1px solid var(--line);font-size:13.5px;opacity:.6;text-align:center}
+
+/* ============ sticky mobile bar ============ */
+.bar{
+  position:fixed;inset-block-end:0;inset-inline:0;z-index:75;
+  background:rgba(23,18,58,.94);backdrop-filter:blur(16px);
+  border-block-start:1px solid var(--line);
+  padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:12px;
+  transform:translateY(120%);transition:transform .45s cubic-bezier(.2,.7,.3,1);
+}
+.bar.show{transform:none}
+.bar .txt{color:#fff;font-size:13.5px;line-height:1.5;flex:1}
+.bar .txt b{display:block;font-size:15px;font-weight:700}
+.bar .btn{padding:12px 20px;font-size:15px}
+@media(min-width:900px){.bar{display:none}}
+
+/* ══════════════════════ MOTION LAYER ══════════════════════ */
+
+/* Headline reveal, WORD by word.
+   Persian letters JOIN to their neighbours — splitting to letters would break
+   every word into isolated forms. Words only, always.
+   The mask is padded past the glyph box, or ascenders/descenders get clipped. */
+.wm{display:inline-block;overflow:hidden;padding:.18em .05em .26em;margin:-.18em -.05em -.26em}
+.wi{display:inline-block;transform:translateY(118%);transition:transform .85s cubic-bezier(.16,.84,.28,1)}
+.wm.lit .wi{transform:none}
+
+/* The rally rail — the whole page read as one long rally */
+.rail{position:fixed;inset-block:0;left:26px;width:2px;z-index:60;display:none;pointer-events:none}
+@media(min-width:1120px){.js .rail{display:block}}
+.rail-track{position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.16) 0 5px,transparent 5px 13px)}
+.rail-fill{position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(to bottom,transparent,var(--ball))}
+.rail-ball{position:absolute;top:0;left:1px;width:13px;height:13px;margin:-6px 0 0 -6px;border-radius:50%;
+  background:var(--ball);box-shadow:0 0 18px 5px rgba(214,248,76,.45);will-change:transform}
+
+/* same idea laid flat, for phones */
+.tbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:78;pointer-events:none}
+.tbar i{display:block;height:100%;width:0;background:var(--ball);box-shadow:0 0 12px 2px rgba(214,248,76,.55)}
+@media(min-width:1120px){.tbar{display:none}}
+
+/* hero: a live rally on canvas */
+.rally{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+
+/* nav scroll-spy pill */
+.nav-links{position:relative}
+.nav-links a{z-index:1}
+.nav-ind{position:absolute;top:50%;left:0;width:0;height:34px;border-radius:999px;
+  background:rgba(214,248,76,.14);border:1px solid rgba(214,248,76,.34);
+  transform:translateY(-50%);opacity:0;pointer-events:none;
+  transition:left .5s cubic-bezier(.2,.7,.3,1),width .5s cubic-bezier(.2,.7,.3,1),opacity .3s}
+.nav-links a.on{color:#fff}
+
+/* ticker. Track forced LTR so the -50% loop works; each word stays RTL. */
+.ticker{background:var(--ink);overflow:hidden;padding-block:16px;border-block:1px solid var(--line);direction:ltr}
+.ticker-track{display:flex;width:max-content;direction:ltr;animation:roll 30s linear infinite}
+.ticker-track span{direction:rtl;font-family:var(--font-display);font-size:clamp(21px,3.2vw,32px);
+  color:#fff;padding-inline:20px;display:inline-flex;align-items:center;gap:20px;white-space:nowrap;opacity:.9}
+.ticker-track span::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--ball);flex:none}
+.ticker-track span:nth-child(even){color:var(--ball)}
+.ticker-track span:nth-child(even)::after{background:#fff;opacity:.45}
+@keyframes roll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker:hover .ticker-track{animation-play-state:paused}
+
+/* card tilt + cursor sheen */
+.card .sheen{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.55),transparent 60%);
+  mix-blend-mode:overlay}
+.card.lift .sheen{opacity:1}
+.card.feat .sheen{mix-blend-mode:screen;
+  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(214,248,76,.22),transparent 60%)}
+
+/* testimonials on a slow rail */
+.qrail{overflow:hidden;direction:ltr;-webkit-mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent)}
+.qtrack{display:flex;gap:20px;width:max-content;direction:ltr;animation:roll 46s linear infinite}
+.qtrack .quote{direction:rtl;width:min(370px,78vw);flex:none}
+.qrail:hover .qtrack{animation-play-state:paused}
+
+/* faq opens by height instead of snapping */
+.ans-wrap{height:0;overflow:hidden;transition:height .42s cubic-bezier(.2,.7,.3,1)}
+
+/* gallery */
+.gal .shot{transition:transform .55s cubic-bezier(.2,.7,.3,1),filter .55s}
+.gal .shot:hover{transform:scale(1.03) rotate(-.7deg);filter:saturate(1.3)}
+
+/* ambient drift behind the closing call to action */
+.cta .drift{position:absolute;top:-35%;left:-18%;width:75%;padding-block-end:75%;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,201,168,.16),transparent 62%);
+  animation:drift 24s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(22%,14%)}}
+
+.btn.mag{will-change:transform}
+.hero-shot,.court{will-change:transform}
+
+@media (prefers-reduced-motion:reduce){
+  .wi{transform:none!important}
+  .ticker-track,.qtrack,.cta .drift{animation:none!important}
+  .qrail,.qtrack{direction:rtl}
+  .qtrack{flex-wrap:wrap;width:auto;justify-content:center}
+  .rail,.tbar{display:none!important}
+  .gal .shot:hover{transform:none}
+}
+</style>
+<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+
+<!-- ⚠ نشان نسخه‌ی نمونه — قبل از انتشار این تگ رو پاک کن -->
+<a class="draft-badge" href="#" onclick="return false">نسخه‌ی نمونه</a>
+
+<div class="rail" aria-hidden="true"><span class="rail-track"></span><span class="rail-fill"></span><span class="rail-ball"></span></div>
+<div class="tbar" aria-hidden="true"><i></i></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <div class="nav-in">
+      <a class="brand" href="#home">
+        <span class="mark">ن</span>
+        <span>نگار مرادی</span>
+      </a>
+      <nav class="nav-links">
+        <span class="nav-ind" aria-hidden="true"></span>
+        <a href="#about">درباره‌ی من</a>
+        <a href="#classes">کلاس‌ها</a>
+        <a href="#how">چطور شروع کنیم</a>
+        <a href="#words">نظر شاگردها</a>
+        <a href="#faq">سوال‌ها</a>
+      </nav>
+      <a class="btn btn-primary nav-cta" data-wa href="#">رزرو جلسه</a>
+      <button class="burger" id="burger" aria-label="منو"><span></span><span></span><span></span></button>
+    </div>
+    <nav class="menu" id="menu">
+      <a href="#about">درباره‌ی من</a>
+      <a href="#classes">کلاس‌ها</a>
+      <a href="#how">چطور شروع کنیم</a>
+      <a href="#words">نظر شاگردها</a>
+      <a href="#faq">سوال‌ها</a>
+      <a href="#contact">تماس</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="home">
+  <div class="wrap hero-in">
+    <div>
+      <span class="eyebrow rv"><span class="dot"></span>مربی تنیس و پدل · تهران</span>
+      <h1 class="rv">از همون جلسه‌ی اول، <span class="hl">فرق رو حس می‌کنی</span></h1>
+      <p class="lead on-dark rv">
+        سلام، من نگار‌ام. کمکت می‌کنم تکنیک درست رو یاد بگیری، بازیت روون‌تر بشه
+        و توی زمین با اعتمادبه‌نفس بازی کنی. چه تازه راکت دست گرفتی،
+        چه چند ساله بازی می‌کنی و می‌خوای جدی‌تر بشی.
+      </p>
+      <div class="hero-btns rv">
+        <a class="btn btn-primary" data-wa href="#">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>
+          رزرو جلسه
+        </a>
+        <a class="btn btn-ghost" href="#classes">کلاس‌ها و قیمت‌ها</a>
+      </div>
+      <p class="hero-note rv"><span class="pulse"></span>معمولاً کمتر از یک ساعت جواب می‌دم.</p>
+    </div>
+
+    <div class="hero-art rv">
+      <svg class="court" viewBox="0 0 400 520" preserveAspectRatio="none" aria-hidden="true">
+        <rect class="ln draw" style="--len:1800" x="10" y="16" width="380" height="488" rx="14"/>
+        <line class="ln draw" style="--len:400" x1="10" y1="140" x2="390" y2="140"/>
+        <line class="ln draw" style="--len:400" x1="10" y1="260" x2="390" y2="260"/>
+        <line class="ln draw" style="--len:400" x1="10" y1="380" x2="390" y2="380"/>
+        <line class="ln draw" style="--len:250" x1="200" y1="140" x2="200" y2="380"/>
+        <path class="arc" d="M 26 430 Q 200 40 374 330"/>
+      </svg>
+      <canvas class="rally" aria-hidden="true"></canvas>
+
+      <div class="shot on-dark hero-shot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h1.6a2 2 0 0 0 1.7-.9l.7-1.1a2 2 0 0 1 1.7-.9h2.6a2 2 0 0 1 1.7.9l.7 1.1a2 2 0 0 0 1.7.9H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="13" r="3.4"/></svg>
+        <b>عکس اصلی اینجا</b>
+        <em>عکس عمودی، توی زمین، ۴:۵</em>
+      </div>
+
+      <div class="float-card a">
+        <div><span class="n">۸</span></div>
+        <div class="t">سال<br>مربیگری</div>
+      </div>
+      <div class="float-card b">
+        <div><span class="n">۲</span></div>
+        <div class="t">رشته:<br>تنیس و پدل</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats">
+  <div class="wrap stats-in">
+    <div class="stat rv"><b data-count="200" data-pre="+">+۲۰۰</b><span>شاگرد</span></div>
+    <div class="stat rv"><b data-count="8">۸</b><span>سال تجربه</span></div>
+    <div class="stat rv"><b data-count="4">۴</b><span>روز در هفته کلاس</span></div>
+    <div class="stat rv"><b data-count="100" data-post="٪">۱۰۰٪</b><span>برنامه‌ی شخصی</span></div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="pad-lg" id="about">
+  <div class="wrap about-grid">
+    <div class="about-shots rv">
+      <div class="shot">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/></svg>
+        <b>عکس عمودی</b><em>۳:۴</em>
+      </div>
+      <div class="shot"><b>عکس</b><em>مربع</em></div>
+      <div class="shot"><b>عکس</b><em>مربع</em></div>
+    </div>
+    <div>
+      <div class="sec-head" style="margin-bottom:0">
+        <span class="eyebrow on-light rv"><span class="dot"></span>درباره‌ی من</span>
+        <h2 class="h-sec rv" style="margin-block:20px 16px">من کی‌ام و چطور کار می‌کنم</h2>
+      </div>
+      <p class="lead about-p rv">
+        هشت ساله که تنیس و پدل درس می‌دم. توی این مدت با آدم‌های خیلی مختلفی کار کردم؛
+        از کسی که اولین بار راکت دستش گرفته تا بازیکنی که سال‌هاست بازی می‌کنه
+        ولی یه جایی گیر کرده و نمی‌دونه چرا.
+      </p>
+      <p class="lead about-p rv">
+        روش من ساده‌ست: اول نگاه می‌کنم چطور بازی می‌کنی، بعد یکی دو تا چیز رو
+        درست می‌کنیم که بیشترین اثر رو داره. نه ده تا نکته با هم، نه تمرین‌های
+        بی‌ربط. هر جلسه یه هدف مشخص داره و آخرش می‌دونی دقیقاً روی چی کار کنی.
+      </p>
+      <p class="lead about-p rv">
+        کلاس‌ها آروم و بدون فشارن. قرار نیست خجالت بکشی یا حس کنی عقبی.
+        قرار‌ه بازی کردن برات لذت‌بخش بشه.
+      </p>
+      <div class="chips rv">
+        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>مدرک مربیگری تنیس</span>
+        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>دوره‌ی تخصصی پدل</span>
+        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>کمک‌های اولیه‌ی ورزشی</span>
+        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>سابقه‌ی بازی در لیگ</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TICKER ============ -->
+<div class="ticker" aria-hidden="true"><div class="ticker-track"><span>تنیس</span><span>پدل</span><span>فورهند</span><span>بک‌هند</span><span>سرویس</span><span>والی</span><span>اسمش</span><span>حرکت پا</span><span>تکنیک</span><span>تعادل</span><span>اعتمادبه‌نفس</span><span>بازی</span></div></div>
+
+<!-- ============ CLASSES ============ -->
+<section class="pad-lg tint" id="classes">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow on-light"><span class="dot"></span>کلاس‌ها</span>
+      <h2 class="h-sec">یه کلاس برای هر سطحی</h2>
+      <p class="lead">هر کدوم رو که انتخاب کنی، برنامه‌ش برای خودت چیده می‌شه. قبل از شروع با هم حرف می‌زنیم تا ببینیم کدوم به دردت می‌خوره.</p>
+    </div>
+
+    <div class="cards">
+      <article class="card feat rv">
+        <span class="tag">محبوب‌ترین</span>
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M4.2 8.5c3.6 1.2 6 4.6 6.2 8.4M19.8 8.5c-3.6 1.2-6 4.6-6.2 8.4"/></svg></div>
+        <h3>کلاس خصوصی</h3>
+        <span class="meta">یک به یک · ۶۰ دقیقه</span>
+        <p>تمام وقت جلسه مال خودته. سریع‌ترین راه برای درست کردن تکنیک، چون هر ضربه‌ات دیده و اصلاح می‌شه.</p>
+        <div class="price">۴۵۰٬۰۰۰ <small>تومان / جلسه</small></div>
+      </article>
+
+      <article class="card rv">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.6"/><path d="M3 19.5c0-3.1 2.7-5.2 6-5.2s6 2.1 6 5.2M16.4 14.6c2.6.4 4.6 2.3 4.6 4.9"/></svg></div>
+        <h3>کلاس دونفره</h3>
+        <span class="meta">با دوست یا همسرت · ۷۵ دقیقه</span>
+        <p>هزینه‌ش کمتره و چون با هم تمرین می‌کنین، تمرین‌های امتیازی و بازی واقعی هم می‌تونیم بذاریم.</p>
+        <div class="price">۳۰۰٬۰۰۰ <small>تومان / نفر</small></div>
+      </article>
+
+      <article class="card rv">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 12h18M12 4.5v15"/></svg></div>
+        <h3>پدل از صفر</h3>
+        <span class="meta">مخصوص تازه‌کارها · ۶۰ دقیقه</span>
+        <p>اگه پدل بازی نکردی ولی دوستات می‌کنن، این کلاس برای توئه. توی چند جلسه می‌تونی بیای تو زمین و بازی کنی.</p>
+        <div class="price">۴۰۰٬۰۰۰ <small>تومان / جلسه</small></div>
+      </article>
+
+      <article class="card rv">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 20.5c0-3.6 2.7-6 6-6s6 2.4 6 6"/><path d="M9 11.5 7 15M15 11.5 17 15"/></svg></div>
+        <h3>کلاس گروهی</h3>
+        <span class="meta">۳ تا ۵ نفر · ۹۰ دقیقه</span>
+        <p>پرانرژی‌ترین کلاس. تمرین، بازی و کمی رقابت دوستانه. برای کسی که می‌خواد آدم‌های جدید هم پیدا کنه.</p>
+        <div class="price">۲۰۰٬۰۰۰ <small>تومان / نفر</small></div>
+      </article>
+
+      <article class="card rv">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3.5 14.6 9l6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.8 9.4 9Z"/></svg></div>
+        <h3>کلاس بچه‌ها</h3>
+        <span class="meta">۷ تا ۱۴ سال · ۵۰ دقیقه</span>
+        <p>بازی‌محور و پر از حرکت. اول عاشق ورزش می‌شن، بعد تکنیک یاد می‌گیرن. با راکت و توپ مناسب سن.</p>
+        <div class="price">۳۵۰٬۰۰۰ <small>تومان / جلسه</small></div>
+      </article>
+
+      <article class="card rv">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="2"/><path d="M15.5 10.5 21.5 7.5v9l-6-3Z"/></svg></div>
+        <h3>آنالیز ویدیویی</h3>
+        <span class="meta">آنلاین · بدون نیاز به حضور</span>
+        <p>فیلم بازیت رو بفرست. با علامت‌گذاری روی ویدیو بهت می‌گم چی درسته، چی نه و از کجا شروع کنی.</p>
+        <div class="price">۲۵۰٬۰۰۰ <small>تومان / آنالیز</small></div>
+      </article>
+    </div>
+
+    <p class="price-note rv">قیمت‌ها شامل اجاره‌ی زمین نیست. برای بسته‌های ۴ و ۸ جلسه‌ای تخفیف داریم — تو واتساپ بپرس.</p>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section class="pad-lg dark" id="how">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow"><span class="dot"></span>چطور شروع کنیم</span>
+      <h2 class="h-sec">سه قدم، همین امروز</h2>
+      <p class="lead on-dark">لازم نیست فرم پر کنی یا منتظر بمونی. یه پیام بده، بقیه‌ش با من.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv">
+        <div class="num">۱</div>
+        <h3>یه پیام بده</h3>
+        <p>تو واتساپ بنویس چقدر بازی کردی، چه روزهایی وقت داری و دنبال چی هستی. همین کافیه.</p>
+      </div>
+      <div class="step rv">
+        <div class="num">۲</div>
+        <h3>جلسه‌ی آشنایی</h3>
+        <p>اولین جلسه بیشتر برای دیدن سطحته. با هم بازی می‌کنیم، من نگاه می‌کنم و آخرش می‌گم از کجا شروع کنیم.</p>
+      </div>
+      <div class="step rv">
+        <div class="num">۳</div>
+        <h3>شروع کن</h3>
+        <p>هفته‌ای یک یا دو جلسه، با یه برنامه‌ی مشخص. هر چند هفته یه بار می‌بینیم کجا بهتر شدی و بعدش چی.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORDS ============ -->
+<section class="pad-lg" id="words">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow on-light"><span class="dot"></span>نظر شاگردها</span>
+      <h2 class="h-sec">حرف خودشون</h2>
+    </div>
+    <div class="qrail rv"><div class="qtrack">
+      <article class="quote">
+        <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
+        <p>«سه ساله بازی می‌کردم و فورهندم همیشه تو تور می‌خورد. نگار توی دو جلسه فهمید مشکل از پاهامه، نه از دستم. الان بازی کردن برام کلاً فرق کرده.»</p>
+        <div class="who"><span class="av">س</span><div><b>سارا ک.</b><span>۳۲ ساله · تنیس</span></div></div>
+      </article>
+
+      <article class="quote">
+        <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
+        <p>«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»</p>
+        <div class="who"><span class="av">ر</span><div><b>رضا م.</b><span>۴۱ ساله · پدل</span></div></div>
+      </article>
+
+      <article class="quote">
+        <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
+        <p>«دخترم ۹ سالشه و قبلاً هیچ ورزشی رو ادامه نمی‌داد. حالا خودش روزشماری می‌کنه که کی کلاس داره. همین برام کافیه.»</p>
+        <div class="who"><span class="av">م</span><div><b>مریم ط.</b><span>مادر شاگرد</span></div></div>
+      </article>
+    </div></div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="pad tint">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow on-light"><span class="dot"></span>تو زمین</span>
+      <h2 class="h-sec">یه نگاه به کلاس‌ها</h2>
+    </div>
+    <div class="gal rv">
+      <div class="shot"><b>عکس بزرگ</b><em>افقی</em></div>
+      <div class="shot"><b>عکس</b><em>مربع</em></div>
+      <div class="shot"><b>عکس</b><em>مربع</em></div>
+      <div class="shot"><b>عکس</b><em>مربع</em></div>
+      <div class="shot"><b>عکس</b><em>مربع</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="pad-lg" id="faq">
+  <div class="wrap">
+    <div class="sec-head rv" style="margin-inline:auto;text-align:center">
+      <span class="eyebrow on-light"><span class="dot"></span>سوال‌های پرتکرار</span>
+      <h2 class="h-sec" style="margin-block:20px 0">چیزهایی که معمولاً می‌پرسن</h2>
+    </div>
+    <div class="faq">
+      <details class="qa rv" open>
+        <summary>راکت و وسیله لازم دارم؟</summary>
+        <div class="ans-wrap"><div class="ans">برای جلسه‌ی اول نه. راکت و توپ با منه. اگه خواستی ادامه بدی، با هم می‌ریم راکت مناسب خودت رو انتخاب می‌کنیم — لازم نیست گرون باشه.</div></div>
+      </details>
+      <details class="qa rv">
+        <summary>کلاس‌ها کجا برگزار می‌شه؟</summary>
+        <div class="ans-wrap"><div class="ans">توی چند تا مجموعه‌ی ورزشی در تهران. بسته به اینکه کجا زندگی می‌کنی و چه ساعتی وقت داری، نزدیک‌ترین گزینه رو پیدا می‌کنیم.</div></div>
+      </details>
+      <details class="qa rv">
+        <summary>تا حالا اصلاً راکت دست نگرفتم. مشکلی نیست؟</summary>
+        <div class="ans-wrap"><div class="ans">اصلاً. بیشتر شاگردهام دقیقاً از همین‌جا شروع کردن. جلسه‌ی اول فقط آشنایی با توپ و راکته، بدون هیچ فشاری.</div></div>
+      </details>
+      <details class="qa rv">
+        <summary>هفته‌ای چند جلسه خوبه؟</summary>
+        <div class="ans-wrap"><div class="ans">برای شروع هفته‌ای یک جلسه هم کافیه، ولی دو جلسه خیلی سریع‌تر نتیجه می‌ده چون بین دو جلسه چیزی که یاد گرفتی یادت نمی‌ره.</div></div>
+      </details>
+      <details class="qa rv">
+        <summary>اگه نتونم بیام چی؟</summary>
+        <div class="ans-wrap"><div class="ans">تا ۲۴ ساعت قبل خبر بده، جلسه رو بدون هزینه جابه‌جا می‌کنیم. کمتر از ۲۴ ساعت، نصف هزینه حساب می‌شه.</div></div>
+      </details>
+      <details class="qa rv">
+        <summary>هوا بد باشه تکلیف چیه؟</summary>
+        <div class="ans-wrap"><div class="ans">اگه بارون باشه یا زمین خیس باشه، جلسه رو به یه روز دیگه منتقل می‌کنیم. هیچ هزینه‌ای هم حساب نمی‌شه.</div></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="pad-lg cta" id="contact">
+  <span class="drift" aria-hidden="true"></span>
+  <div class="wrap cta-in">
+    <span class="eyebrow rv"><span class="dot"></span>شروع کن</span>
+    <h2 class="rv">آماده‌ای اولین جلسه رو بذاریم؟</h2>
+    <p class="lead on-dark rv">یه پیام کوتاه بده. بگو چقدر بازی کردی و چه روزهایی وقت داری — بقیه‌ش با من.</p>
+    <div class="cta-btns rv">
+      <a class="btn btn-primary" data-wa href="#">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>
+        پیام تو واتساپ
+      </a>
+      <a class="btn btn-ghost" data-ig href="#">اینستاگرام</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#home" style="color:#fff">
+          <span class="mark">ن</span><span>نگار مرادی</span>
+        </a>
+        <p>مربی تنیس و پدل در تهران. کلاس خصوصی، دونفره، گروهی و بچه‌ها.</p>
+        <div class="socials">
+          <a data-ig href="#" aria-label="اینستاگرام"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.8.07-1.1.05-1.7.24-2.1.4-.5.2-.9.44-1.3.83-.4.4-.63.8-.83 1.3-.16.4-.35 1-.4 2.1C2.5 9.9 2.5 10.3 2.5 12s0 2.1.07 3.3c.05 1.1.24 1.7.4 2.1.2.5.43.9.83 1.3.4.4.8.63 1.3.83.4.16 1 .35 2.1.4 1.3.07 1.7.07 4.8.07s3.5 0 4.8-.07c1.1-.05 1.7-.24 2.1-.4.5-.2.9-.43 1.3-.83.4-.4.63-.8.83-1.3.16-.4.35-1 .4-2.1.07-1.2.07-1.6.07-3.3s0-2.1-.07-3.3c-.05-1.1-.24-1.7-.4-2.1-.2-.5-.43-.9-.83-1.3-.4-.4-.8-.63-1.3-.83-.4-.16-1-.35-2.1-.4C15.5 4 15.1 4 12 4Zm0 3.05a4.95 4.95 0 1 1 0 9.9 4.95 4.95 0 0 1 0-9.9Zm0 1.8a3.15 3.15 0 1 0 0 6.3 3.15 3.15 0 0 0 0-6.3Zm5.15-3.2a1.16 1.16 0 1 1 0 2.32 1.16 1.16 0 0 1 0-2.32Z"/></svg></a>
+          <a data-wa href="#" aria-label="واتساپ"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h4>صفحه‌ها</h4>
+        <ul>
+          <li><a href="#about">درباره‌ی من</a></li>
+          <li><a href="#classes">کلاس‌ها و قیمت‌ها</a></li>
+          <li><a href="#how">چطور شروع کنیم</a></li>
+          <li><a href="#faq">سوال‌های پرتکرار</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس</h4>
+        <ul>
+          <li><a data-wa href="#">واتساپ · <span data-phone>۰۹۱۲ ۰۰۰ ۰۰۰۰</span></a></li>
+          <li><a data-ig href="#">اینستاگرام</a></li>
+          <li>تهران · چند مجموعه‌ی ورزشی</li>
+          <li>شنبه تا چهارشنبه · ۸ صبح تا ۸ شب</li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">© ۱۴۰۵ — همه‌ی حقوق محفوظ است.</div>
+  </div>
+</footer>
+
+<!-- ============ STICKY MOBILE BAR ============ -->
+<div class="bar" id="bar">
+  <div class="txt"><b>جلسه‌ی اولت رو بذار</b>یه پیام کوتاه کافیه</div>
+  <a class="btn btn-primary" data-wa href="#">واتساپ</a>
+</div>
+
+<script>
+document.documentElement.classList.add("js");   // must stay first — gates every hidden state
+
+/* ================================================================
+   ⚠ این دو خط رو با اطلاعات واقعی عوض کن
+   ================================================================ */
+const WHATSAPP  = "989120000000";                 // شماره‌ی واتساپ، بدون + و بدون صفر اول (۹۸ + شماره)
+const INSTAGRAM = "your_instagram_handle";        // فقط آیدی، بدون @
+const WA_TEXT   = "سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌ها بپرسم.";
+/* ================================================================ */
+
+const waURL = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(WA_TEXT);
+const igURL = "https://instagram.com/" + INSTAGRAM;
+document.querySelectorAll("[data-wa]").forEach(function(a){
+  a.href = waURL; a.target = "_blank"; a.rel = "noopener";
+});
+document.querySelectorAll("[data-ig]").forEach(function(a){
+  a.href = igURL; a.target = "_blank"; a.rel = "noopener";
+});
+
+var REDUCED   = matchMedia("(prefers-reduced-motion: reduce)").matches;
+var CAN_HOVER = matchMedia("(hover: hover) and (pointer: fine)").matches;
+var FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+function toFa(n){ return String(n).replace(/[0-9]/g, function(d){ return FA[+d]; }); }
+
+/* ─────────── headlines split into WORDS ───────────
+   Persian letters join to their neighbours, so a per-letter split would render
+   every glyph in its isolated form and destroy the word. Words only.
+   The walker recurses instead of using innerHTML so inline children
+   (the .hl underline span) survive intact. */
+function splitWords(root){
+  Array.prototype.slice.call(root.childNodes).forEach(function(child){
+    if(child.nodeType === 3){
+      if(!child.textContent.trim()) return;
+      var frag = document.createDocumentFragment();
+      child.textContent.split(/(\s+)/).forEach(function(tok){
+        if(!tok) return;
+        if(!tok.trim()){ frag.appendChild(document.createTextNode(tok)); return; }
+        var m = document.createElement("span"); m.className = "wm";
+        var i = document.createElement("span"); i.className = "wi"; i.textContent = tok;
+        m.appendChild(i); frag.appendChild(m);
+      });
+      child.parentNode.replaceChild(frag, child);
+    } else if(child.nodeType === 1 && child.className !== "wm"){
+      splitWords(child);
+    }
+  });
+}
+document.querySelectorAll(".hero h1, .h-sec, .cta h2").forEach(function(h){
+  splitWords(h);
+  h.querySelectorAll(".wm").forEach(function(m, i){
+    m.firstChild.style.transitionDelay = (i * 55) + "ms";
+  });
+});
+
+/* ─────────── count-up, in Persian numerals ─────────── */
+function countUp(el){
+  var target = +el.getAttribute("data-count"),
+      pre = el.getAttribute("data-pre") || "",
+      post = el.getAttribute("data-post") || "";
+  if(REDUCED){ el.textContent = pre + toFa(target) + post; return; }
+  var dur = 1500, t0 = performance.now();
+  (function tick(now){
+    var pr = Math.min(1, (now - t0) / dur);
+    var e = 1 - Math.pow(1 - pr, 4);
+    el.textContent = pre + toFa(Math.round(target * e)) + post;
+    if(pr < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+/* ─────────── reveal: position-based, survives anchor jumps ─────────── */
+var pending = [];
+document.querySelectorAll(".rv").forEach(function(el){
+  var sibs = el.parentElement
+    ? Array.prototype.filter.call(el.parentElement.children,function(c){return c.classList.contains("rv");})
+    : [el];
+  el.style.transitionDelay = (Math.min(sibs.indexOf(el), 7) * 80) + "ms";
+  pending.push(el);
+});
+
+function light(el){
+  el.classList.add("in");
+  el.querySelectorAll(".wm").forEach(function(m){ m.classList.add("lit"); });
+  el.querySelectorAll("[data-count]").forEach(countUp);
+  if(el.hasAttribute && el.hasAttribute("data-count")) countUp(el);
+}
+function sweep(){
+  var vh = window.innerHeight || 800;
+  for(var i = pending.length - 1; i >= 0; i--){
+    var el = pending[i], r = el.getBoundingClientRect();
+    if(r.bottom <= 0){ el.style.transitionDelay = "0ms"; light(el); pending.splice(i,1); }
+    else if(r.top < vh - 40){ light(el); pending.splice(i,1); }
+  }
+}
+
+/* ─────────── the rally rail: page progress as a bouncing ball ─────────── */
+var railBall = document.querySelector(".rail-ball"),
+    railFill = document.querySelector(".rail-fill"),
+    tbar     = document.querySelector(".tbar i");
+function progress(){
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  return h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
+}
+function rail(){
+  var pr = progress(), vh = window.innerHeight;
+  if(tbar) tbar.style.width = (pr * 100) + "%";
+  if(railBall){
+    var top = pr * vh;
+    var phase = pr * Math.PI * 9;
+    var wob = Math.sin(phase) * 8;                 // trajectory, not a straight drop
+    var sq  = Math.abs(Math.cos(phase));           // squash near each turn
+    railBall.style.transform =
+      "translate(" + wob + "px," + top + "px) scale(" + (1 + sq * .2) + "," + (1 - sq * .16) + ")";
+    railFill.style.height = top + "px";
+  }
+}
+
+/* ─────────── nav: sticky state, sticky bar, scroll-spy pill ─────────── */
+var nav = document.getElementById("nav"), bar = document.getElementById("bar");
+var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+var ind = document.querySelector(".nav-ind");
+var secs = navLinks.map(function(a){ return document.querySelector(a.getAttribute("href")); });
+function spy(){
+  var y = window.scrollY + window.innerHeight * .35, active = -1;
+  secs.forEach(function(sec, i){ if(sec && sec.offsetTop <= y) active = i; });
+  navLinks.forEach(function(a, i){ a.classList.toggle("on", i === active); });
+  if(!ind) return;
+  if(active < 0){ ind.style.opacity = 0; return; }
+  var a = navLinks[active];
+  var ar = a.getBoundingClientRect(), pr = a.parentElement.getBoundingClientRect();
+  ind.style.opacity = 1;
+  ind.style.left  = (ar.left - pr.left - 13) + "px";
+  ind.style.width = (ar.width + 26) + "px";
+}
+function onScroll(){
+  var y = window.scrollY;
+  nav.classList.toggle("stuck", y > 30);
+  bar.classList.toggle("show", y > 640);
+}
+
+var ticking = false;
+function frame(){
+  if(ticking) return;
+  ticking = true;
+  requestAnimationFrame(function(){
+    sweep(); onScroll(); rail(); spy();
+    ticking = false;
+  });
+}
+["scroll","resize","hashchange","load"].forEach(function(ev){
+  window.addEventListener(ev, frame, {passive:true});
+});
+frame();
+setTimeout(frame, 400);    // smooth-scroll from a deep link settles after paint
+setTimeout(frame, 1200);
+
+/* ─────────── mobile menu ─────────── */
+var burger = document.getElementById("burger");
+burger.addEventListener("click", function(){ nav.classList.toggle("open"); });
+document.querySelectorAll("#menu a").forEach(function(a){
+  a.addEventListener("click", function(){ nav.classList.remove("open"); });
+});
+
+/* ─────────── FAQ: animate height instead of snapping ─────────── */
+/* Animating height needs a forced reflow between the two values. Setting them in
+   consecutive rAF callbacks lets the browser collapse both into one style pass,
+   so auto -> 0 never transitions and transitionend never fires — which left
+   panels stuck open. The token guards rapid clicks; the timeout is a fallback
+   for any case where transitionend still does not arrive. */
+function animH(w, from, to, done){
+  w._tok = (w._tok || 0) + 1;
+  var tok = w._tok;
+  w.style.height = from;
+  void w.offsetHeight;                       /* force layout — do not remove */
+  w.style.height = to;
+  function fin(e){
+    if(e && e.propertyName !== "height") return;
+    if(w._tok !== tok) return;                /* a newer click superseded this one */
+    w.removeEventListener("transitionend", fin);
+    clearTimeout(w._fb);
+    done();
+  }
+  w.addEventListener("transitionend", fin);
+  clearTimeout(w._fb);
+  w._fb = setTimeout(fin, 620);
+}
+function faqOpen(d){
+  var w = d.querySelector(".ans-wrap");
+  d.open = true;
+  animH(w, "0px", w.scrollHeight + "px", function(){ w.style.height = "auto"; });
+}
+function faqShut(d){
+  var w = d.querySelector(".ans-wrap");
+  animH(w, w.scrollHeight + "px", "0px", function(){ d.open = false; });
+}
+document.querySelectorAll(".qa").forEach(function(d){
+  var wrap = d.querySelector(".ans-wrap");
+  if(d.open) wrap.style.height = "auto";
+  if(REDUCED){                       /* no transitions fire, so keep it native */
+    d.addEventListener("toggle", function(){
+      if(d.open) document.querySelectorAll(".qa[open]").forEach(function(o){ if(o !== d) o.open = false; });
+    });
+    return;
+  }
+  d.querySelector("summary").addEventListener("click", function(e){
+    e.preventDefault();
+    if(d.open){ faqShut(d); return; }
+    document.querySelectorAll(".qa[open]").forEach(function(o){ if(o !== d) faqShut(o); });
+    faqOpen(d);
+  });
+});
+
+/* ─────────── marquee tracks: repeat one set until it outruns the viewport,
+   then mirror the whole thing so the -50% loop has no seam ─────────── */
+function loopTrack(track){
+  if(!track || REDUCED) return;
+  var base = Array.prototype.slice.call(track.children);
+  if(!base.length) return;
+  var setW = track.scrollWidth;
+  var reps = setW > 0 ? Math.max(1, Math.ceil((window.innerWidth + 240) / setW)) : 1;
+  for(var k = 1; k < reps; k++){
+    base.forEach(function(n){
+      var c = n.cloneNode(true); c.classList.remove("rv"); c.style.transitionDelay = "";
+      track.appendChild(c);
+    });
+  }
+  Array.prototype.slice.call(track.children).forEach(function(n){
+    var c = n.cloneNode(true);
+    c.setAttribute("aria-hidden", "true");
+    c.classList.remove("rv");        /* clones are not in the reveal queue */
+    c.style.transitionDelay = "";
+    track.appendChild(c);
+  });
+}
+loopTrack(document.querySelector(".ticker-track"));
+loopTrack(document.querySelector(".qtrack"));
+
+/* ─────────── pointer play: magnetic buttons, tilting cards, hero parallax ─────────── */
+if(CAN_HOVER && !REDUCED){
+  document.querySelectorAll(".btn-primary").forEach(function(b){
+    b.classList.add("mag");
+    b.addEventListener("pointermove", function(e){
+      var r = b.getBoundingClientRect();
+      var dx = (e.clientX - (r.left + r.width/2)) / (r.width/2);
+      var dy = (e.clientY - (r.top + r.height/2)) / (r.height/2);
+      b.style.transform = "translate(" + (dx*7) + "px," + (dy*5 - 3) + "px)";
+    });
+    b.addEventListener("pointerleave", function(){ b.style.transform = ""; });
+  });
+
+  document.querySelectorAll(".card").forEach(function(c){
+    var sh = document.createElement("span"); sh.className = "sheen"; c.appendChild(sh);
+    c.addEventListener("pointermove", function(e){
+      var r = c.getBoundingClientRect();
+      var px = (e.clientX - r.left)/r.width, py = (e.clientY - r.top)/r.height;
+      c.style.setProperty("--mx", (px*100) + "%");
+      c.style.setProperty("--my", (py*100) + "%");
+      c.style.transform = "perspective(900px) rotateX(" + ((.5-py)*6) + "deg) rotateY(" + ((px-.5)*6) + "deg) translateY(-8px)";
+      c.classList.add("lift");
+    });
+    c.addEventListener("pointerleave", function(){
+      c.style.transform = ""; c.classList.remove("lift");
+    });
+  });
+
+  var heroEl = document.querySelector(".hero"),
+      shotEl = document.querySelector(".hero-shot"),
+      courtEl = document.querySelector(".court");
+  heroEl.addEventListener("pointermove", function(e){
+    var r = heroEl.getBoundingClientRect();
+    var px = (e.clientX - r.left)/r.width - .5, py = (e.clientY - r.top)/r.height - .5;
+    if(shotEl)  shotEl.style.transform  = "rotate(-2.5deg) translate(" + (px*20) + "px," + (py*15) + "px)";
+    if(courtEl) courtEl.style.transform = "translate(" + (px*-28) + "px," + (py*-19) + "px)";
+  });
+  heroEl.addEventListener("pointerleave", function(){
+    if(shotEl)  shotEl.style.transform  = "rotate(-2.5deg)";
+    if(courtEl) courtEl.style.transform = "";
+  });
+}
+
+/* ─────────── the hero rally: a ball that never stops ───────────
+   Trail comes from fading the previous frame with destination-out, which keeps
+   the canvas transparent so the court lines behind stay visible. */
+(function(){
+  var cv = document.querySelector(".rally");
+  if(!cv || REDUCED) return;
+  var ctx = cv.getContext("2d");
+  var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), running = false, started = false;
+  var ball = {x:0, y:0, vx:0, vy:0, r:9, sx:1, sy:1};
+  var dots = [], t = 0, mx = -999, my = -999;
+  for(var i = 0; i < 14; i++){
+    dots.push({x:Math.random(), y:Math.random(), r:Math.random()*1.7+.6,
+               s:Math.random()*.3+.1, p:Math.random()*6.28});
+  }
+  function size(){
+    var r = cv.getBoundingClientRect();
+    if(!r.width || !r.height) return;
+    W = r.width; H = r.height;
+    cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if(!started){ ball.x = W*.3; ball.y = H*.28; ball.vx = 2.4; ball.vy = 0; started = true; }
+    ball.x = Math.min(Math.max(ball.x, ball.r), W - ball.r);
+    ball.y = Math.min(Math.max(ball.y, ball.r), H - ball.r);
+  }
+  var host = cv.parentElement;
+  host.addEventListener("pointermove", function(e){
+    var r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top;
+  });
+  host.addEventListener("pointerleave", function(){ mx = my = -999; });
+
+  function draw(){
+    if(!running) return;
+    t += 0.016;
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "rgba(0,0,0,.17)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "source-over";
+
+    dots.forEach(function(d){
+      var x = d.x*W + Math.sin(t*d.s + d.p)*15;
+      var y = ((d.y + t*d.s*.02) % 1) * H;
+      ctx.beginPath(); ctx.arc(x, y, d.r, 0, 6.283);
+      ctx.fillStyle = "rgba(214,248,76,.32)"; ctx.fill();
+    });
+
+    ball.vy += .16;
+    var dx = ball.x - mx, dy = ball.y - my, d2 = dx*dx + dy*dy;
+    if(d2 < 16900){ var dd = Math.sqrt(d2) || 1; ball.vx += (dx/dd)*1.15; ball.vy += (dy/dd)*1.15; }
+    ball.x += ball.vx; ball.y += ball.vy;
+    ball.sx += (1-ball.sx)*.16; ball.sy += (1-ball.sy)*.16;
+
+    var pad = ball.r;
+    if(ball.x < pad){ ball.x = pad; ball.vx = Math.abs(ball.vx)*.87; ball.sx = .68; ball.sy = 1.3; }
+    if(ball.x > W-pad){ ball.x = W-pad; ball.vx = -Math.abs(ball.vx)*.87; ball.sx = .68; ball.sy = 1.3; }
+    if(ball.y < pad){ ball.y = pad; ball.vy = Math.abs(ball.vy)*.87; ball.sx = 1.3; ball.sy = .68; }
+    if(ball.y > H-pad){
+      ball.y = H-pad; ball.vy = -Math.abs(ball.vy)*.9; ball.sx = 1.32; ball.sy = .7;
+      if(Math.abs(ball.vy) < 4.5) ball.vy = -(4.8 + Math.random()*2.6);   // keep the rally alive
+      ball.vx += (Math.random()-.5)*1.3;
+    }
+    ball.vx = Math.max(-6, Math.min(6, ball.vx));
+
+    ctx.save();
+    ctx.translate(ball.x, ball.y); ctx.scale(ball.sx, ball.sy);
+    var g = ctx.createRadialGradient(0,0,1,0,0,ball.r*2.7);
+    g.addColorStop(0,"rgba(214,248,76,.5)"); g.addColorStop(1,"rgba(214,248,76,0)");
+    ctx.beginPath(); ctx.arc(0,0,ball.r*2.7,0,6.283); ctx.fillStyle = g; ctx.fill();
+    ctx.beginPath(); ctx.arc(0,0,ball.r,0,6.283); ctx.fillStyle = "#D6F84C"; ctx.fill();
+    ctx.strokeStyle = "rgba(23,18,58,.45)"; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.arc(-ball.r*1.15,0,ball.r*1.3,-.85,.85); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ball.r*1.15,0,ball.r*1.3,Math.PI-.85,Math.PI+.85); ctx.stroke();
+    ctx.restore();
+
+    requestAnimationFrame(draw);
+  }
+  size();
+  window.addEventListener("resize", size, {passive:true});
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting && !running){ running = true; size(); requestAnimationFrame(draw); }
+      else if(!e.isIntersecting){ running = false; }
+    });
+  }, {threshold:0}).observe(cv);
+})();
+</script>
+</body>
+</html>
