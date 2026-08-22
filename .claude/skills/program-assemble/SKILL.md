@@ -113,6 +113,12 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
   entry (shared `name`/`rounds`/`restSec`, both exercises as `items[]`) before shipping — see
   SCHEMA.md → `"circuit"` type, "Common mistake." (Shipped once, Pooya C3 — this check exists
   because of it.)
+- **RPE floor 6 — sweep EVERY athlete-facing string, not just `chips[]`.** Grep the whole
+  JSON for `RPE [1-5]`, and separately for any note/card that tells the athlete to subtract
+  from an RPE without naming the floor ("take 1 off every RPE", "drop the RPE by one") — that
+  instruction lands on RPE 5 for every exercise authored at 6 and the app's selector cannot
+  record it. Hard reject: rewrite to "…but never go below 6." A chip-only pass is what let
+  this ship once (Ghazal C2). See COACHING-PRINCIPLES.md → "Chips & modifiers".
 - **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
   `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
   and SCHEMA "notes". A body that is one plain-text paragraph is a hard reject: rewrite it

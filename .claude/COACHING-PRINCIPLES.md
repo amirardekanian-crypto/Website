@@ -133,6 +133,26 @@ publish it. No athlete health/chat detail goes here — principles only.
   re-admit the free pattern the cycle deferred. *(2026-07-30, Amir, on Faraz C1: "leg press as
   its safer a bit for his lower back, if he was pain free the whole cycle then we can progress
   to a back squat")*
+- **A RANGE OR HEIGHT RESTRICTION MUST BE AUDITED AGAINST EVERY EXERCISE IN THE CYCLE, INCLUDING
+  WARM-UP AND PREP — not just the ones it obviously names.** A rule like "nothing above shoulder
+  height" or "no end-range lumbar flexion" is written once against one lift and then silently
+  broken by movements nobody thought to re-check: a lat pulldown and an overhead Y-raise both
+  START in the banned position, a lateral raise "capped at shoulder height" stops the athlete
+  dead in the middle of the painful arc rather than below it, and a Cat-Cow in the prep circuit
+  cues the exact end-range flexion the primary's own note forbids. Two lines of a programme must
+  never give opposite instructions for the same joint. Sweep the restriction across every
+  movement, every cue and every prep item before the spec is final; if no exercise in a pattern
+  can satisfy it, the PATTERN leaves the cycle rather than the rule bending. *(2026-08-17,
+  amir_teflisi C1 — the clinical audit lens caught four separate breaches of the cycle's own
+  shoulder rule plus a prep-circuit flexion leak on a chronic back)*
+- **The fallback rule above generalises: EVERY fallback is checked against EVERY deferral the
+  cycle makes, not just the free hinge.** A fallback is written as an afterthought ("if the
+  station is busy") and is the easiest place for a banned pattern to walk back in — the athlete
+  follows it unsupervised, on a busy day, with no coach present. Machine Hack Squat shipped as
+  the leg-press fallback in a cycle that had removed axial loading entirely: shoulder pads are
+  axial load, so a full gym sent a chronic-back athlete straight onto the thing the cycle
+  existed to avoid. Read the fallback list last, against the contraindication list, every time.
+  *(2026-08-17, amir_teflisi C1)*
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
 - **No corrective/postural drills without an indication.** Postural or scap-control
@@ -217,8 +237,8 @@ publish it. No athlete health/chat detail goes here — principles only.
 - **Recovery capacity gates everything** — set the weekly volume ceiling *before*
   choosing session count. *(2026-06-15)*
 - **High-/chronic-stress clients:** embed an autoregulation rule (drop every RPE by 1 on
-  low-readiness days) + a minimum effective dose (first power move + first primary lift)
-  + flexible session order. *(2026-06-15)*
+  low-readiness days, **never below 6**) + a minimum effective dose (first power move +
+  first primary lift) + flexible session order. *(2026-06-15, floor added 2026-08-21)*
 - **Separate training fatigue from life load** in every review — a readiness dip from
   poor sleep/stress is not the same as training fatigue (Mehraneh's end-cycle dip was
   life, not load). *(2026-06-15)*
@@ -346,6 +366,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   supposed to need. A genuinely light day in the design — an undulation choice, a low-CNS
   accessory — is different: that IS its normal target and belongs on the card.
   *(2026-08-07)*
+- **The other half of that rule: if the athlete has to START lower, the notes MUST SAY SO —
+  and say the number.** The card carrying the normal target is only safe when something
+  actually tells her to hold back; otherwise a returning, detrained, deloading, injured or
+  brand-new athlete reads RPE 8 on day one and takes it literally. Silence is the failure
+  mode, and a card that merely teaches load-finding ("start under what you think and let the
+  first set tell you") is NOT that instruction — it explains *how* to pick a weight, never
+  that this week's effort ceiling is lower. Whenever the design read says start lower, write
+  a notes card that names: **the reduced RPE as an actual number** (≥6 — see the RPE-floor
+  rules in "Chips & modifiers"), **which exercises it applies to**, and **what moves her back
+  to the number on the card**. Triggers: a layoff or detraining, week-1 recalibration, a
+  deload/back-off week, a movement new to the client, a staged return from injury, a period
+  week. *(2026-08-21, Amir, verbatim: "Remember if some one has to start with lower rpe, you
+  mention that in notes." Ghazal C2 shipped RPE 8 primaries to an athlete 16 weeks detrained
+  with only a load-finding card and no stated week-1 ceiling.)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
   When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
@@ -538,6 +572,16 @@ publish it. No athlete health/chat detail goes here — principles only.
   select in the logger is a mismatch, not a nuance. *(2026-07-24, Setareh C1 — shipped with
   RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
   mismatch and all three were raised to 6.)*
+- **The 6 floor binds INSTRUCTIONS as well as chips — any note telling the athlete to take
+  RPE off must name the floor in the same sentence.** Auditing only the RPE chips passes a
+  program that still sends her below 6, because the autoregulation card does the subtracting
+  at runtime: "drop every RPE by 1 on a low-readiness day" lands on **RPE 5** for every
+  exercise authored at 6, and she cannot log it. Write it as *"take 1 off every RPE, but
+  never go below 6 — anything already at 6 stays at 6."* Same for a period-week card, a
+  deload note, a double-day rule, or a Coach's Note. Sweep every athlete-facing string for
+  sub-6 RPE, not just `chips[]`. *(2026-08-21, Amir, on Ghazal C2: "Again you prescribed rpe
+  5 but my app minumum is 6. That is a hard rule." The chip lint was clean; the notes card
+  was the leak.)*
 
 ## Naming
 - **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
@@ -629,6 +673,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   (pain, dislike, readiness), but each cycle also has a defined length and a reassessment
   trigger (e.g. a primary lift stalls ~2 weeks → revisit) — the cycle boundary forces a
   deliberate re-read even when nothing visibly broke. *(2026-06-28)*
+- **THE ROADMAP IS 5 CYCLES OF 5 WEEKS. 25 weeks. That is the house shape.** *(Amir,
+  2026-08-17, verbatim: "the rule is 5 cycles of 5 weeks and you need to remember that.")*
+  Cycle count and cycle length are NOT things to re-derive from the athlete's goal, and not
+  things a design panel gets a vote on — a panel proposes what each cycle CONTAINS, never how
+  many there are or how long they run. Cycle 1 is 5 weeks like every other, so the first
+  program /program-design builds is a 5-week program. Deviate only when Amir says so for that
+  athlete, and say out loud that you are deviating. *(Written after a roadmap shipped as
+  6 cycles of 4/5/5/4/6/5 because the multi-lens panel argued the arc from the science and
+  nobody checked it against the house rule.)*
+  A second, independent hit the same day: on Alireza N.'s roadmap the head-coach judge issued
+  *"do not add a fifth cycle"* as a binding directive, on the science. It is overruled — fit the
+  arc to 5×5 and make the extra block do real work rather than padding it with a retest or a
+  maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**, which is what
+  satisfies "never program past a fatigue wall" without a mid-cycle deload.
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + coach reports (volume, progression, e1RM) to the coach-only
