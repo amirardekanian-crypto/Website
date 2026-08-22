@@ -238,7 +238,7 @@ Build `Content/clip-delivery.html` — a self-contained, silent 6.4-second loopi
 
 ---
 
-## ⑤ — `Content/clip-watch.html` · 7.8s
+## ⑤ BUILT — `Content/clip-watch.html` · 7.8s
 
 **He rates how he feels before a session, that reading joins a trend that has been sliding for three sessions, and a message from his coach comes back down into the phone — before anything tears.**
 
@@ -267,6 +267,33 @@ Build `Content/clip-delivery.html` — a self-contained, silent 6.4-second loopi
 - Lift only the **first four** readiness tiles out of the phone — the clip currently spotlights `overall`, the one answer the app throws away.
 - Three answers from one session cannot become three points of a multi-session trend — one session contributes **one** point.
 - Keep the anonymity disc (three white dots, no name) — it is invented chrome, but invented in the safe direction. Don't let a later pass 'correct' it into a real avatar.
+
+### ✅ BUILT — what the numbers actually are now
+
+All four corrections were applied and the chart was re-derived from scratch. The
+built file computes every displayed figure in its generator, so nothing here can
+be edited in isolation:
+
+| | |
+|---|---|
+| Sheet picks | sleep **2** · energy **3** · soreness **3** · stress **3** · overall **2** |
+| Composite | `(2+3+3+3)/4` = **2.75** — `overall` answered, shown, correctly discarded |
+| Series (8 sessions) | 4.25 · 4.00 · 4.50 · 4.25 · 4.50 · **3.75 · 3.25 · 2.75** |
+| Card reads | `2.8 /5 · usual 3.9` · `-1.2 vs their 8-session average` |
+| Why the big number is clay | `readinessStats()` delta is −1.156, and `renderCharts()` picks `var(--clay)` at delta ≤ −1 |
+
+The **last three** values are the three-session slide the coach's bubble names —
+«سه جلسه‌ست آمادگی‌ت اومده پایین». Change the series and the bubble is a lie.
+
+Two things the build resolved that the spec left open:
+- **The lift is now a merge.** Four clay discs carrying 2·3·3·3 leave the phone and
+  converge into ONE disc, which travels the connector into the card. That fixes
+  "one session = one point" and animates the composite formula in the same gesture.
+  The fifth answer visibly does not lift.
+- **The day view behind the sheet is real** — Day 1's banner (`assets/days/lower.webp`),
+  its D1/D2/D3 tabs, the `Click Start to begin · 00:00 · Start ▶` bar and the first
+  three blocks (Rowing · Dynamic Mobility · Glute & Core Prep). It stays on screen
+  for two beats after the sheet leaves, so an empty screen there reads as a mock.
 
 ### Build prompt (paste into Claude Code)
 
