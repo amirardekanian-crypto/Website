@@ -41,6 +41,62 @@ elbow before C2's heavy slow resistance, rather than four. The week-6 clinician 
 exactly on C2's opening day, 2026-09-21. Rule written into COACHING-PRINCIPLES.md → Process
 and into program-roadmap/SKILL.md so it is not re-derived next time.
 
+### Rebuild 2026-08-17b — 3 gym + 2 walk days → 5 GYM DAYS
+
+The athlete came back: he wants **five gym days**, he **already does a 30-minute incline walk
+every day** on his own, and he wants the programme to be an **addition** to that walking.
+
+**The observation that matters more than the request:** he already walks daily and is still
+103 kg. The walk is already priced into his current weight, so walking was never the missing
+lever. The two programmed walking days were a fourth and fifth helping of something he does
+seven times a week anyway — deleting them cost literally zero real load. Amir's ruling: keep
+the −3 to −4 kg target and say plainly in the notes that the gym cannot deliver it alone and
+the food is the deciding factor. The notes card was rewritten to lead with exactly that.
+
+**Shape.** 5 gym days, sessions deliberately SHORT (~45–55 min, not filled to the 75-min cap).
+With 5 days the binding constraint is weekly volume, not session length — filling five days
+would put every mover at 16–18 sets/week on unchanged sleep. The audit ran the counterfactual
+and agreed: quads 11, chest 10, back 11, hams 10, glutes 10 is correct for a 5–6 h sleeper
+carrying a deficit and three injury sites. Per-session density fell ~30% while total systemic
+load rose ~10.7% — on the ~10%/week guideline. Undulation: D3 16.5 PEAK · D1 13.0 · D2 12.0 ·
+D5 10.5 · D4 10.0.
+
+**Audit corrections (3 lenses again, 19 must-fixes across them).** The rebuild reintroduced
+FOUR breaches of the cycle's own shoulder rule, two of them in warm-ups: Thoracic Windmill
+(full overhead arc → replaced with Open Book capped at chest line), Quadruped Thoracic Rotation
+cued "reach the elbow to the ceiling" (→ arms-crossed), and Machine Incline Chest Press, whose
+note told him to titrate the incline by pain INTO a banned zone (→ Pec Deck). Also:
+- **My own D3 ordering was backwards.** I put the single-leg leg press before the back extension
+  "so your back is fresh". Wrong direction — the leg press fatigues the glutes and hamstrings
+  that have to DO the back extension, so the lumbar erectors substitute and he cannot feel it
+  happening. Back extension now goes first, on fresh hip extensors.
+- **45° Back Extension tempo `2-1-2-0`** prescribed a 1-second loaded pause at the BOTTOM, i.e.
+  hanging in lumbar flexion, on a chronic back. Now `2-0-2-1` so the hold lands at the top.
+- **Wrist eccentric tempo `1-0-4-0` was inverted** — it instructed a 1s lower and a 4s lift, the
+  opposite of an eccentric protocol. Now `4-0-1-0`.
+- **Single-Arm Cable Row had no body position**, so the default a machines-only lifter copies is
+  standing bent-over — an unsupported flexed trunk under load, 80 reps/week, on this back. Now
+  **Seated** Single-Arm Cable Row with the position written into the note.
+- **Scapular Push-Up** put ~60 kg through two wrists in full extension, 40 reps/week, on the
+  managed epicondyle. Now cued hands-elevated on a bench.
+- **No fallbacks existed** while the pain card told him to "use the swap on the card". A 103 kg
+  near-novice improvising in a commercial gym picks the hack squat or the standing calf machine,
+  both axial. Named, restriction-cleared swaps now sit in every at-risk exercise's note.
+- **Nothing said which days to train.** Run top-to-bottom he stacks the two heaviest days. A
+  scheduling card now fixes Mon/Tue/rest/Thu/Fri/rest/Sun with two hard rules.
+- **No autoregulation, no bad-night rule, no back-off** anywhere in the file. Card added.
+- **The C2 free-weight gate had no film instruction** — a gate living only in the coach's head.
+  Film card added naming three lifts, and it is in `message.outcomes` so it appears in the plan.
+- **All five cycles' `focuses` were coach-facing third person** ("scap-first", "the week he can
+  run without a coach") and render to the athlete under "The Aims". All rewritten in second
+  person, plain words. Cycle 1's still said "three hard days plus two walking days" — it
+  contradicted its own message on the same screen.
+- Em-dashes purged from every athlete-facing string (house rule, AI tell).
+
+**Standing gaps carried forward:** triceps still 0 direct (grip/shoulder constrained — revisit
+C2 when free-weight upper enters); side delts 5 (shoulder-capped, C2 target 10); erectors 4
+sets at 1×/week, which is thin for the pattern the whole roadmap is built to earn back.
+
 **The read**
 Recovery is the gate and sleep is the whole of it: 5–6 h against a self-rating of 9/10, so he
 doesn't perceive the deficit and it can't be fixed by conversation — only tracked as a number
