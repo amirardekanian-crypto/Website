@@ -32,9 +32,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The `<script type="application/ld+json">` block near the top (Google reads this) unless you know what it does. The `<meta>` tags at the top (these are SEO).
 
 #### `form.html` — Application form
-- **What it does:** The intake questionnaire new athletes fill in. Seven sections, a progress bar, and a success screen. Submissions go to your email via Web3Forms.
+- **What it does:** The intake questionnaire new athletes fill in. Seven sections, a progress bar, and a success screen. On submit it writes **straight to Supabase** (the `submit_intake` RPC → the `hab_intake` table, read in `coach.html` → Intake) **and** fires Web3Forms for the email — in parallel, counting as sent if *either* succeeds, so a Web3Forms outage no longer loses the submission. `form-fa.html` is the Farsi twin and does the same. Backend: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
 - **If deleted:** No one can apply. Every "Apply Now" button on the site breaks.
-- **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, `partials/nav.html`, `partials/footer.html`, Web3Forms (external service).
+- **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, `partials/nav.html`, `partials/footer.html`, **Supabase** (`submit_intake` RPC, via a plain `fetch` — no library), and Web3Forms (external, for the email).
 - **Edit this when:** Adding, removing, or rewording form questions. Changing which options appear in dropdowns.
 - **Don't touch:** The Web3Forms `access_key` value (breaks submissions). The `<script>` at the bottom that runs the progress bar, unless you're ready to test it carefully.
 
@@ -86,14 +86,26 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The Supabase URL/key and the key-resolution block. The `migrateOld()` fold-forward (it rescues data from earlier shipped versions). The sync/dirty-flag logic. `noindex` on purpose.
 
 #### `coach.html` — The Coach's Box (private)
-- **What it does:** Your private mission control, covering **both** the coached athletes (`program.html` / `session_history`) and the free Proof crew (`habits.html`). Sign in with Google (locked to your coach email). Four tabs, routed on the URL hash so any screen can be bookmarked: **Today** (`#today`) — on-court count, the roll-call wall with the coach-line composer and hide/show moderation, a needs-you queue, the quest-week lever, and a 7-day Proof pulse; **Athletes** (`#athletes`, `#a/<id>`) — one roster across both systems plus a full per-athlete file (secure links, Proof strip, ACWR/readiness/adherence charts, messages, call logs, prescribed program, session logs, email import); **Proof** (`#proof`) — the server-scored board, the season, the signup funnel with upgrade flags, and titles minted; **Links** (`#links`) — copyable article/workout deep links.
+- **What it does:** Your private mission control, covering **both** the coached athletes (`program.html` / `session_history`) and the free Proof crew (`habits.html`). Sign in with Google (locked to your coach email). Four tabs, routed on the URL hash so any screen can be bookmarked: **Today** (`#today`) — on-court count, the roll-call wall with the coach-line composer and hide/show moderation, a needs-you queue, the quest-week lever, and a 7-day Proof pulse; **Athletes** (`#athletes`, `#a/<id>`, `#a/<id>/<sub>`) — one roster across both systems, grouped into *needs you* / *all quiet* with each row stating its reason, plus a per-athlete file split into five sub-tabs: **The work** (one card per program day, prescribed and done side by side), **Proof**, **Chat**, **Calls**, **File** (links, key rotation, danger zone); **Intake** (`#intake`) — coaching applications from the apply form, landed in `hab_intake` (new/handled/archived, the whole questionnaire per card); **Proof** (`#proof`) — the server-scored board, the season, the signup funnel with upgrade flags, and titles minted; **Links** (`#links`) — copyable article/workout deep links.
+- **The athlete file is a comparison, not an archive.** Its centrepiece is `compareDay()`: for each
+  prescribed exercise it puts the plan (`parseChips()` — the same chip grammar `program.html` renders
+  from) next to what was logged (`parseSessionLog()` — the plain-text summary `buildSessionData()`
+  writes), and flags the gaps: sets short, work skipped, work that wasn't prescribed, and an average
+  RPE that lands `RPE_OVER` / `RPE_UNDER` outside the target. ⚠ **`parseSessionLog()` is a second
+  reader of a grammar `program.html` owns** — add a line shape there and it has to be read here too or
+  it silently vanishes. `scripts/test_coach_compare.js` pins both halves against real logs; run
+  `node scripts/test_coach_compare.js` after touching either.
+- **Reps are never compared, on purpose.** The athlete logs weight, RPE and a tick per set — not reps
+  (see `ex-set-weight` / `loadSetLog` in `program.html`). The dashboard shows sets, load and RPE
+  against the plan and says nothing about reps, because inventing a rep count would be a lie in a
+  tool used to make training decisions.
 - **⚠ It never scores Proof itself.** XP/levels/streaks/day scores are already computed twice (the client in `habits.html` and plpgsql in Supabase) and those two must agree — a third scorer here would be the first to drift. Every Proof number on this page is either a **presence fact** (a day's `hab_log` entry is a non-empty object — the same test `contact_list()` uses) or a value the server returned (`hab_season_level`, `leaderboard_top`, `contact_list`). To show a new Proof number, teach the server to return it.
 - **Preview mode:** `coach.html?demo=1` renders the whole layout against synthetic fixtures — no network, every write a no-op. Use it for design work and screenshots.
 - **If deleted:** You lose the dashboard. Athletes are unaffected — their apps keep working — but you can no longer view progress, mint links, message anyone, post the day's coach line, moderate the wall, or start a quest week from a UI (the SQL editor still does all of the last three).
 - **Depends on:** Supabase (`supabase-js` from a CDN, plus the tables/RPCs in the `supabase/` folder), Google sign-in, `data/<id>.json`, `exercise_library.json`, `articles/index.json`, `workouts/index.json`, `favicon.ico`. It does **not** use the shared CSS/JS partials — it's self-contained.
 - **Edit this when:** You want to change what the dashboard shows, add a panel, or change a coach workflow.
 - **Don't touch:** The Supabase URL/key and the sign-in email check unless you know what they do. `AMIR_ATHLETE_ID` — the board is fetched through Amir's own athlete identity, so `leaderboard_top()` gets a valid key. This page is `noindex` on purpose — keep it that way.
-- **Watch for:** CSS class collisions. The topbar's `.who` (white, nowrap) once painted the wall's athlete names white-on-white; grid children need `min-width: 0` or one nowrap label scrolls the page sideways on a phone.
+- **Watch for:** Plan-vs-log matching is by **exercise name**, so a session logged before the program was rewritten shows every prescribed row as *not logged* and the real work under *Logged, not prescribed*. That is honest, and the card says so in as many words when a whole day comes back empty — don't "fix" it by fuzzy-matching names. CSS class collisions. The topbar's `.who` (white, nowrap) once painted the wall's athlete names white-on-white; grid children need `min-width: 0` or one nowrap label scrolls the page sideways on a phone.
 - **See also:** `COACH_DASHBOARD.md` — the full user manual for this page.
 
 #### `call-log.html` — Weekly check-in log (private)

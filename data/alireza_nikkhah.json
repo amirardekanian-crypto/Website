@@ -1,0 +1,1011 @@
+{
+  "athlete": {
+    "id": "alireza_nikkhah",
+    "firstName": "Alireza",
+    "lastName": "Nikkhah",
+    "key": "8530f6b2ad06416eb0be25eba60a31ec"
+  },
+  "sport": {
+    "badge": "🎾 Tennis Performance"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Hard Stop",
+      "tagline": "Own the deceleration",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-08-24",
+      "endDate": "2026-09-27",
+      "focuses": [
+        "Build eccentric braking control and single-leg quality. Learn to absorb force before we ask you to produce it.",
+        "Posterior chain and loaded pulling as real working volume. No horizontal pressing this cycle.",
+        "Film your top set on the back squat and the RDL every week, and log sleep quality and bodyweight."
+      ],
+      "message": {
+        "paragraphs": [
+          "You already spend 10 to 15 hours a week on court. Your body knows how to move fast. What it almost never gets is heavy, slow, controlled work, and that gap is what we're filling here.",
+          "This cycle is about stopping. Every ball you chase ends with you putting the brakes on, and the leg that absorbs that is the leg that keeps you on court. So the tempo is slow on purpose. Three seconds down on the big lifts. If you're used to just moving the weight up and down, this will feel strange for a week.",
+          "Your job in week one is simple. Find your weights, film your top sets, and don't chase numbers. We build the brakes first. Cycle two is where we spend it."
+        ],
+        "outcomes": [
+          "Real working weights logged on all three main lifts",
+          "Three seconds of control on every squat and RDL rep",
+          "Cleared technique film on both barbell lifts",
+          "Sleep quality and bodyweight logged every week",
+          "Single-leg strength that holds when you push off wide",
+          "A base that's ready for real load in Force Bank"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Force Bank",
+      "tagline": "Build what you'll spend",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-09-28",
+      "endDate": "2026-11-01",
+      "focuses": [
+        "Maximal force in free-standing bilateral and split-stance patterns. The deepest strength window of the arc.",
+        "Low-dose rotational throws and jumps every week so you never go a block without a fast rep."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Cycle two is where we cash this in.",
+          "Once you can control the weight on the way down, we start loading it properly. This is the deepest strength block of your year, and it's the one that changes how much force your legs can put into the ground. That's your serve and your first step.",
+          "You might feel a bit slow before you feel fast. That's normal and it passes.",
+          "Earn it in these five weeks."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Whip Crack",
+      "tagline": "Force becomes racket speed",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-11-02",
+      "endDate": "2026-12-06",
+      "focuses": [
+        "Rate of force development and kinetic-chain sequencing. Moderate loads moved with maximal intent.",
+        "One heavy exposure a week so the force base doesn't drain. Lateral push-off and first-step work."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Third Set",
+      "tagline": "Power that survives fatigue",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-12-07",
+      "endDate": "2027-01-10",
+      "focuses": [
+        "Repeat-power quality. Short clusters at full intent with full recovery, so the ceiling still exists on the fortieth hard ball.",
+        "Reactive multi-directional work, plus one maintenance exposure each of force and rate of force development."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Anvil",
+      "tagline": "Heavier than you started",
+      "weeks": "Weeks 21–25",
+      "startDate": "2027-01-11",
+      "endDate": "2027-02-14",
+      "focuses": [
+        "Back to maximal force in the same patterns, now against materially higher numbers.",
+        "Hold the power built in cycles three and four with one throw session and one reactive exposure a week."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Hard Stop",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Squat Hard, Stop Harder",
+        "completionTitle": "Brakes Installed",
+        "completionMessage": "That's the heaviest day of your week done, and the squat is the lift the whole plan is built on. Get some food in within the hour.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "name": "Assault Bike",
+                "type": "simple",
+                "chips": [
+                  {
+                    "label": "×4 min",
+                    "style": "grey"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Spin smooth and just get warm",
+                    "Feel the legs wake up"
+                  ],
+                  "bad": [
+                    "Don't race it"
+                  ]
+                },
+                "videoUrl": null
+              },
+              {
+                "name": "Hip & Shoulder Prep",
+                "type": "circuit",
+                "warmup": true,
+                "rounds": 2,
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Turn both knees side to side",
+                        "Feel the hips open up"
+                      ],
+                      "bad": [
+                        "Don't force the range"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away with your heels",
+                        "Feel the glutes squeeze at the top"
+                      ],
+                      "bad": [
+                        "Don't arch your lower back"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Pull the band out to arm's length",
+                        "Feel it between your shoulder blades"
+                      ],
+                      "bad": [
+                        "Don't shrug your shoulders up"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Ankle Dorsiflexion Rocks",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Drive your knee forward past your toes",
+                        "Feel the stretch in your ankle"
+                      ],
+                      "bad": [
+                        "Don't let your heel lift"
+                      ]
+                    },
+                    "videoUrl": null
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Landing Skills",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "name": "Snap Down",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "stick the landing",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Drop your hips fast and freeze, like the floor turned to ice",
+                    "Feel your quads and glutes catch you, not your knees"
+                  ],
+                  "bad": [
+                    "Don't let your knees cave in or your chest drop toward the floor"
+                  ]
+                },
+                "videoUrl": null
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "name": "Barbell Back Squat",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×5",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 8",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Push the floor apart with your feet as you stand up",
+                    "Feel your whole trunk lock tight before you go down"
+                  ],
+                  "bad": [
+                    "Don't let your heels lift, your knees fall in, or your lower back round at the bottom"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Always ramp up first: empty bar for 8, then two lighter sets before your working weight. Set the rack safeties one inch below your lowest point, every single set, no exceptions. Go only as deep as your lower back stays flat, and that is your depth for now."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "name": "Single-Arm Dumbbell Row",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Drive your elbow back toward your hip",
+                    "Feel the squeeze between your shoulder blades"
+                  ],
+                  "bad": [
+                    "Don't twist your torso to help the weight up"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Hand and knee on the bench so your lower back is fully supported. You've already loaded it under the squat today, so this one has to stay strict."
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "name": "Half-Kneeling Pallof Press",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Each Side",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Press straight out and hold. The band wants to twist you, don't let it",
+                    "Feel your side abs fighting the pull"
+                  ],
+                  "bad": [
+                    "Don't let your hips rotate or your ribs flare out"
+                  ]
+                },
+                "videoUrl": null
+              },
+              {
+                "name": "Suitcase Carry",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30m Each Side",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Walk tall, like a string is pulling the top of your head up",
+                    "Feel the side away from the weight working to keep you straight"
+                  ],
+                  "bad": [
+                    "Don't lean away from the weight or let your shoulder hike up"
+                  ]
+                },
+                "videoUrl": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Hinge Slow, Pull Hard",
+        "completionTitle": "Hamstrings Earned",
+        "completionMessage": "Your hamstrings are the reason you can stop hard and not tear something, and you just spent three seconds under load on every single rep. Expect them to talk to you tomorrow.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "name": "Rowing",
+                "type": "simple",
+                "chips": [
+                  {
+                    "label": "×4 min",
+                    "style": "grey"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Long smooth strokes",
+                    "Feel your back and legs warm up"
+                  ],
+                  "bad": [
+                    "Don't pull hard"
+                  ]
+                },
+                "videoUrl": null
+              },
+              {
+                "name": "Spine & Scap Prep",
+                "type": "circuit",
+                "warmup": true,
+                "rounds": 2,
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×8",
+                    "cues": {
+                      "good": [
+                        "Move one bit of your spine at a time",
+                        "Feel your back segment out"
+                      ],
+                      "bad": [
+                        "Don't rush it"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Turn both knees side to side",
+                        "Feel the hips open up"
+                      ],
+                      "bad": [
+                        "Don't force the range"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away with your heels",
+                        "Feel the glutes squeeze"
+                      ],
+                      "bad": [
+                        "Don't arch your lower back"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Scapular Push-Up",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Push the floor away, then let your chest sink between your shoulder blades",
+                        "Feel the blades slide"
+                      ],
+                      "bad": [
+                        "Don't bend your elbows"
+                      ]
+                    },
+                    "videoUrl": null
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Landing Skills",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "name": "Pogo Jump",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "stiff ankles",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 45,
+                "cues": {
+                  "good": [
+                    "Bounce off the floor like it's hot. Least time on the ground you can manage",
+                    "Feel it in your calves and ankles, springy"
+                  ],
+                  "bad": [
+                    "Don't bend your knees deep, this is ankles"
+                  ]
+                },
+                "videoUrl": null
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "name": "Barbell Romanian Deadlift",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Push your hips back toward the wall behind you",
+                    "Feel the stretch build in your hamstrings on the way down"
+                  ],
+                  "bad": [
+                    "Don't round your back or turn it into a squat"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Double overhand grip, and use straps once your grip gives out before your hamstrings do. End the set the rep your back rounds, not when you run out of reps. That rounding rep is the only one that can hurt you."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "name": "Scapular Pull-Up",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Hang, then pull your shoulders down away from your ears without bending your arms",
+                    "Feel your lats switch on at the bottom"
+                  ],
+                  "bad": [
+                    "Don't bend your elbows, this is shoulders only"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Arms stay completely straight. This is only your shoulder blades pulling your body up an inch or two. It's the step that earns you a proper pull-up in cycle two, so don't rush past it."
+              },
+              {
+                "name": "TRX Row",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 8",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Pull your chest all the way to the handles",
+                    "Feel your upper back doing the work, not your arms"
+                  ],
+                  "bad": [
+                    "Don't let your hips sag toward the floor"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Make it harder or easier by walking your feet forward or back. Don't change anything else."
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "name": "Dead Bug",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Each Side",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Reach your opposite arm and leg long and slow",
+                    "Feel your lower back stay glued to the floor"
+                  ],
+                  "bad": [
+                    "Don't let your back arch up off the floor as you reach"
+                  ]
+                },
+                "videoUrl": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "focusTag": "One Leg Holds The Line",
+        "completionTitle": "One Leg At A Time",
+        "completionMessage": "Tennis is played on one leg and today you trained it that way. Quality work, not heavy work, and that's exactly what it was meant to be.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "name": "Assault Bike",
+                "type": "simple",
+                "chips": [
+                  {
+                    "label": "×3 min",
+                    "style": "grey"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Spin smooth",
+                    "Feel the legs warm"
+                  ],
+                  "bad": [
+                    "Don't race it"
+                  ]
+                },
+                "videoUrl": null
+              },
+              {
+                "name": "Hip & Balance Prep",
+                "type": "circuit",
+                "warmup": true,
+                "rounds": 2,
+                "restSec": 45,
+                "items": [
+                  {
+                    "name": "Spiderman Lunge with Reach",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": [
+                        "Step long and reach for the ceiling",
+                        "Feel your hip and mid-back open"
+                      ],
+                      "bad": [
+                        "Don't let your back knee drop"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Turn both knees side to side",
+                        "Feel the hips open up"
+                      ],
+                      "bad": [
+                        "Don't force the range"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Pull the band out to arm's length",
+                        "Feel it between your shoulder blades"
+                      ],
+                      "bad": [
+                        "Don't shrug"
+                      ]
+                    },
+                    "videoUrl": null
+                  },
+                  {
+                    "name": "Single-Leg Balance",
+                    "detail": "×20s Each Side",
+                    "cues": {
+                      "good": [
+                        "Fix your eyes on one spot",
+                        "Feel your foot gripping the floor"
+                      ],
+                      "bad": [
+                        "Don't hold your breath"
+                      ]
+                    },
+                    "videoUrl": null
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Landing Skills",
+            "icon": "⚡",
+            "exercises": [
+              {
+                "name": "Box Jump",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "max intent",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×4",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 75,
+                "cues": {
+                  "good": [
+                    "Jump up and land soft on top. Step back down, never jump down",
+                    "Feel your hips load like a spring before you go"
+                  ],
+                  "bad": [
+                    "Don't crash onto the box with straight legs"
+                  ]
+                },
+                "videoUrl": null
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "name": "Dumbbell Split Squat",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8 Each Leg",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Lower straight down, back knee toward the floor",
+                    "Feel the front leg taking the weight"
+                  ],
+                  "bad": [
+                    "Don't let the front knee drift inward, and don't push off the back foot"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Take one light set first to find the weight, this one's new. Straight sets with full rest, don't pair it with anything. Front knee tracks over your foot and doesn't drift inward."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "name": "45° Back Extension",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 2-1-1-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Lead with your chest coming up and stop level",
+                    "Feel your glutes and hamstrings pull you up"
+                  ],
+                  "bad": [
+                    "Don't arch past level at the top or bounce out of the bottom"
+                  ]
+                },
+                "videoUrl": null
+              },
+              {
+                "name": "Side Lying Dumbbell External Rotation",
+                "type": "standard",
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo 2-0-2-0",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 6",
+                    "style": "grey"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Rotate your forearm up like a gate opening, elbow glued to your side",
+                    "Feel the back of your shoulder working"
+                  ],
+                  "bad": [
+                    "Don't let your elbow slide away from your body"
+                  ]
+                },
+                "videoUrl": null,
+                "note": "Light weight, this isn't meant to be hard. You serve for hours a week, which trains the front of the shoulder and never the back. This trains the part that slows your arm down."
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "name": "Side Plank",
+                "type": "standard",
+                "restSec": 45,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30s Each Side",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "Tempo Iso",
+                    "style": "grey"
+                  },
+                  {
+                    "label": "RPE 7",
+                    "style": "grey"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor away with your forearm and hold one straight line",
+                    "Feel the side of your trunk holding you up"
+                  ],
+                  "bad": [
+                    "Don't let your hips drop or roll forward"
+                  ]
+                },
+                "videoUrl": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "programHistory": [],
+  "notes": {
+    "greeting": "For You, Alireza",
+    "cards": [
+      {
+        "icon": "🎥",
+        "title": "Film your top sets",
+        "body": "<p>I'm not standing next to you, so <strong>video is how I coach you</strong>. Every week, film your heaviest set of the back squat and the RDL and send it to me on WhatsApp. Phone on the floor, from the side, whole body in frame.</p><p>These two lifts are the ones that carry real load, and they're the two I've never seen you do. <strong>The weight on those two doesn't go up until I've watched the film and cleared it.</strong> That's not me being difficult. It's how I make sure you're 38 and still playing at 45.</p><p>If the videos stop coming, the weight stops moving. Everything else in the program you can just get on with.</p>"
+      },
+      {
+        "icon": "🎯",
+        "title": "Week one is for finding your weights",
+        "body": "<p>The app never tells you what weight to lift, and that's on purpose. <strong>You find it against the effort target</strong>, and the RPE number on each card is what you're aiming for. RPE 8 means you finish the set knowing you had about two more reps in you. RPE 7 is about three.</p><p>On a movement that's new to you, <strong>start lighter than you think</strong>. Do the first set, see where it landed, then adjust. Being 10 kg light on set one costs you nothing. Being 10 kg heavy costs you the session.</p><p>After that, week to week it's simple:</p><ul><li>Hit all the reps at or under the target effort, go up a small amount next week.</li><li>Effort was already at the ceiling, or you missed reps, stay at the same weight and do it again.</li><li>Bad sleep, heavy court week, body feels flat, <strong>drop the weight</strong>. That's you reading yourself correctly, not you failing.</li></ul><p>In week one specifically, stay well short of the targets while I'm checking your film. Nothing is lost. We have 25 weeks.</p>"
+      },
+      {
+        "icon": "📊",
+        "title": "Two numbers every week",
+        "body": "<p>Two things I want from you weekly, and they take one minute. <strong>Both are numbers, not feelings</strong>, because feelings drift and numbers don't.</p><p><strong>Sleep quality, out of 10.</strong> You told me 5, and that's the one soft spot in your whole file. Everything else about your recovery looks good. If that 5 turns into a 3 for a week, I'd rather change your program than have you grind through it.</p><p><strong>Bodyweight, same day, same time, before breakfast.</strong> We are not trying to change it. 88 kg is your playing weight and I want it to stay there. I'm watching it because heavy leg work stacked on 15 hours of tennis burns a lot, and if the scale starts sliding down it usually means you're not eating enough for the work. That looks like getting lean and it's actually losing force.</p>"
+      },
+      {
+        "icon": "🩹",
+        "title": "Tell me what talks to you",
+        "body": "<p>Your form says no injuries and no history, which is great. But before session one I want one honest answer from you.</p><p><strong>What talks to you the morning after a hard court block?</strong> Heel, knee, elbow, low back, shoulder. Anything that you notice and then just play through. Most players who've been on court as long as you have something, and it's normal.</p><p>Telling me doesn't cost you anything. <strong>It never means I take training away from you.</strong> It means I pick a slightly different version of a movement so the thing doesn't get worse. That's it.</p>"
+      },
+      {
+        "icon": "🔄",
+        "title": "When to change the plan",
+        "body": "<p>The program is written for a normal week. Here's what to do when the week isn't normal.</p><ul><li><strong>Feeling rough?</strong> Take one point off every RPE that day.</li><li><strong>Short on time or really flat?</strong> Do the first jumping movement and the first main lift, then go home. But run the main lift at its easier version or just two sets. A bad day never carries a heavy barbell.</li><li><strong>Two bad nights in a row before a heavy day?</strong> Same thing, short version only.</li><li><strong>Playing the same day?</strong> Gym after tennis, or leave 4 to 6 hours between them.</li></ul><p>You can move the days around your court schedule, with three rules that don't move:</p><ul><li>Day 1 and Day 3 never land on back to back days. They both hammer the same part of your legs.</li><li>Leave at least 48 hours between any two gym sessions.</li><li><strong>Day 2 is never the day before a match or a heavy court block.</strong> The RDL will make your hamstrings sore and you'll feel it when you push off.</li></ul>"
+      },
+      {
+        "icon": "📉",
+        "title": "Week five you back off",
+        "body": "<p>Weeks one to four you build. <strong>Week five you cut the work roughly in half</strong> and keep the weight and the intent exactly the same.</p><p>So on the big lifts, do about half the sets you normally would, and do them properly. Don't make them lighter and don't slow down the intent. Easy weeks that drop the effort blunt the very thing we spent four weeks building.</p><p>This is also the week I read your logs and write cycle two. <strong>The better your logging, the better that program is.</strong></p>"
+      },
+      {
+        "icon": "🎾",
+        "title": "What this cycle will and won't do",
+        "body": "<p>Being straight with you, because there's no tournament date to point at and I'd rather you know the plan than guess at it.</p><p><strong>Several things in this cycle are just being maintained, on purpose.</strong> Your conditioning, your rotation work, your fast footwork. You get all of that from 10 to 15 hours of tennis a week. If I put it in the gym as well I'd just be making you tired for no gain.</p><p>What you should get across the next few months is <strong>roughly 10 to 20 percent more strength in your legs</strong> and something like 8 to 15 cm on a standing broad jump. That's a real change in what you can put into the ground. Anyone promising you more than that is selling something.</p><p>What you'll notice first, probably around week three, is that you stop feeling wobbly when you have to stop hard and change direction. That's the whole point of this block.</p>"
+      }
+    ]
+  }
+}
