@@ -307,7 +307,7 @@ OVERCLAIM. The verified claim is "the coach sees the data and messages before in
 
 ---
 
-## ⑥ — `Content/clip-why.html` · 6.8s
+## ⑥ BUILT — `Content/clip-why.html` · 6.8s
 
 **A viewer sees that one training cycle in the app is not a list of exercises but an argument — it names its mission, states four aims, explains why it exists, and promises four specific outcomes, all written down before the athlete trains a single day.**
 
@@ -335,6 +335,63 @@ OVERCLAIM. The verified claim is "the coach sees the data and messages before in
 - Done pill is **clay `#C7552F`**, not brown — same fix as clip-map.
 - **Measure before building:** serve `program.html?client=demo`, expand the Cycle 2 card and read its `scrollHeight`. The spec claims the opened card is ≈1052px against 1050px of usable screen; with three real paragraphs plus four aims and four outcomes it is likely well over. If so, pull the camera back to ~1.35 scale or accept a cropped card.
 - Note for later: the Read more/Read less toggle exists on **My Plan only** — the Home cycle card is `noDetail` and shows a green View Plan pill instead.
+
+### ✅ BUILT — and the approach changed
+
+**The app inside the phone is not a rebuild.** `scrape3.mjs` drives the real
+`program.html?client=demo`, walks the live stylesheet for every rule matching
+anything inside `#screen-plan` / `#global-tabs`, and serialises both the markup
+and that CSS into the clip. Nothing is retyped, so nothing can drift from the
+product: a computed-style diff against the running app matches on all 14 probes
+(label colours, Barlow **300** at 14.5px, the check-box fill, both pills, both
+meter segments). **Do this for any future clip that shows a whole app screen** —
+it is faster than rebuilding and it cannot be subtly wrong. Only hook classes are
+added (`cy2`, `aim-1..4`, `out-1..4`, `kb`) plus a two-state Read more/Read less
+label, because CSS cannot swap `textContent` the way `toggleCycleCard()` does.
+
+**The measurement settled the open question — the card fits.** Driving the real
+app at 528px and expanding Cycle 2 gives **collapsed 264px · open 973px** against
+**1050px** of screen (992px between the status bar and the tab bar). So the final
+beat holds the *entire* open card inside the bezel as one object; no pull-back to
+1.35 and no crop. The push-in stays at the full `1080/528 = 2.045455`.
+
+| | |
+|---|---|
+| Push | `scale(2.045455) translateY(-167.8px)`, origin `50% 0` → screen maps to canvas x 0…1080 exactly, rounded corners land off-frame at y −119 |
+| Beat 1 scroll | 320px → banner top at canvas 419 |
+| Beat 3 scroll | 821px → outcomes label 1000, last outcome 1332 |
+| Beat 4 scroll | 515px → the 973px card centred in 992px |
+
+Live offsets it was derived from: card/banner 525 · collapse 785 · The Aims 801 ·
+aims 826/866/906/945 · Why 989 · paragraphs 1014–1292 · outcomes label 1310 ·
+outcomes 1335/1369/1403/1438 · card bottom 1498. **Re-measure before moving one.**
+
+⚠ **Three traps that only appear once you lift real app CSS.** All three cost a
+render each; none is visible by reading the file.
+1. **`@keyframes` cannot be split with a regex.** A non-greedy `.*?\}` stops at
+   the first *inner* `}` and orphans the outer one. Twelve keyframes did that,
+   left the stylesheet 12 braces short, and the parser dropped everything after
+   the first rule — the app rendered as unstyled block flow. Split by brace depth.
+2. **The app's own screen-entrance animations blank every still.**
+   `.athlete-header`, `.cycle-meter` and `.current-message` sit at `opacity:0` and
+   are raised by `fadeInUp … forwards`. `?beat=N` adds `*{animation:none!important}`,
+   so the fade never runs and the frame comes back as blank paper with perfect
+   layout. Pin them (`opacity:1;transform:none;animation:none`) — but by name, so
+   the app's live loops `cmPillPulse` and `cycleSegGlow` keep running.
+3. **`min-height:100vh` on `.screen` means the browser window, not the phone.**
+   Inert in the real app (content is 2637px); 1920px of forced height inside a
+   1050px screen here. Set it to 0.
+
+Two things the build found that the spec did not plan:
+- **Beat 1 shows the whole chain.** At scroll 320 the frame carries Cycle 1
+  `DONE`, Cycle 2 `ACTIVE`, Cycle 3 `UP NEXT!` and Cycle 4 `LOCKED` — which is
+  literally the sentence the clip sits under. It is a stronger beat than the
+  banner-only frame the spec described.
+- **Cycles 3–5 ship no banner file.** `cycleImgError()`'s real end state is to
+  hide the img and add `.no-img`, dropping to the app's green gradient over
+  `court-sessions.jpg` — reproduced here, with the `<img>` removed rather than
+  hidden so a self-contained file never fires a request that can 404. That photo
+  is base64'd into the CSS.
 
 ### Build prompt (paste into Claude Code)
 
