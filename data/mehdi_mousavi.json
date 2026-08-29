@@ -122,13 +122,13 @@
                 "type": "circuit",
                 "name": "Neck & Shoulder Primer",
                 "videoUrl": null,
-                "rounds": "×2 Rounds",
+                "rounds": "×1 Round",
                 "restSec": 30,
                 "warmup": true,
                 "items": [
                   {
                     "name": "Chin Tuck",
-                    "detail": "×8 · 2s hold",
+                    "detail": "×16 · 2s hold",
                     "cues": {
                       "good": [
                         "Slide your head straight back over your shoulders",
@@ -153,19 +153,6 @@
                     }
                   },
                   {
-                    "name": "Quadruped Thoracic Rotation",
-                    "detail": "×6 Each Side",
-                    "cues": {
-                      "good": [
-                        "Open your chest and let your eyes follow your hand",
-                        "Feel the turn in your mid-back"
-                      ],
-                      "bad": [
-                        "Don't crank your neck past where your hand goes"
-                      ]
-                    }
-                  },
-                  {
                     "name": "Band Pull-Apart",
                     "detail": "×15",
                     "cues": {
@@ -175,6 +162,42 @@
                       ],
                       "bad": [
                         "Don't shrug up toward your ears"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "circuit",
+                "name": "Loaded Pull Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "note": "Light weight on both of these. This is still your warm-up, you're just doing it with something in your hands instead of on the floor. Pick a load you could double the reps with. Nothing here should feel like a working set.",
+                "items": [
+                  {
+                    "name": "Cable Straight-Arm Pulldown",
+                    "detail": "×12 · RPE 6",
+                    "cues": {
+                      "good": [
+                        "Keep your arms long and sweep the bar down to your thighs",
+                        "Feel your lats switch on before you row"
+                      ],
+                      "bad": [
+                        "Don't bend forward at the waist to push it down"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Chest-Supported Dumbbell Row",
+                    "detail": "×10 · RPE 6",
+                    "cues": {
+                      "good": [
+                        "Same chest-on-the-pad setup as your working sets",
+                        "Feel the groove before the weight matters"
+                      ],
+                      "bad": [
+                        "Don't turn this into a heavy set, it's a rehearsal"
                       ]
                     }
                   }
@@ -343,13 +366,13 @@
                 "type": "circuit",
                 "name": "Hip & Hinge Primer",
                 "videoUrl": null,
-                "rounds": "×2 Rounds",
+                "rounds": "×1 Round",
                 "restSec": 30,
                 "warmup": true,
                 "items": [
                   {
                     "name": "Chin Tuck",
-                    "detail": "×8 · 2s hold",
+                    "detail": "×16 · 2s hold",
                     "cues": {
                       "good": [
                         "Slide your head straight back over your shoulders",
@@ -385,17 +408,40 @@
                         "Don't force the range, go where it's comfortable"
                       ]
                     }
-                  },
+                  }
+                ]
+              },
+              {
+                "type": "circuit",
+                "name": "Loaded Leg Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "note": "Light on both. The leg press rounds are where you set the seat and find your depth stop for the day, so get that right while the weight is still easy. Then two easy sets of the pull-through to groove the hinge before you load it properly later.",
+                "items": [
                   {
-                    "name": "Dowel Hip Hinge",
-                    "detail": "×8",
+                    "name": "Machine Leg Press",
+                    "detail": "×10 · RPE 6",
                     "cues": {
                       "good": [
-                        "Push your hips back and keep three points of the dowel touching",
-                        "Feel the stretch come into your hamstrings"
+                        "Set the seat and find your depth stop with a light load",
+                        "Feel your low back stay flat on the pad the whole way"
                       ],
                       "bad": [
-                        "Don't let the dowel come off your low back"
+                        "Don't chase depth here, this is where you practise stopping"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Cable Pull Through",
+                    "detail": "×10 · RPE 6",
+                    "cues": {
+                      "good": [
+                        "Push your hips straight back and keep your back flat",
+                        "Feel your hamstrings load before you go heavier later"
+                      ],
+                      "bad": [
+                        "Don't round your low back to reach further"
                       ]
                     }
                   }
@@ -480,24 +526,24 @@
               },
               {
                 "type": "standard",
-                "name": "Machine Hip Thrust",
+                "name": "Cable Pull Through",
                 "videoUrl": null,
                 "restSec": 75,
-                "note": "Your finish position will look shorter than you expect and that's correct. Go up until your glutes are as tight as they can get and stop there. Ribs stay down. Chin tucked with your eyes on your knees the whole set, and never push your head back into the pad.",
+                "note": "This one takes the hip thrust's place and it does the job better for you. Face away from a low pulley, rope between your legs, push your hips straight back until you feel your hamstrings pull, then stand up by squeezing your glutes. The weight pulls you backwards instead of pressing down on you, so your spine gets nothing out of it. Learn this pattern properly now, because it's what earns you a real Romanian deadlift later in the plan.",
                 "chips": [
-                  { "label": "1s top hold", "style": "dark" },
+                  { "label": "1s squeeze", "style": "dark" },
                   { "label": "3 Sets", "style": "yellow" },
                   { "label": "×12 Reps" },
-                  { "label": "Tempo 2-1-1-0" },
+                  { "label": "Tempo 3-0-1-1" },
                   { "label": "RPE 8" }
                 ],
                 "cues": {
                   "good": [
-                    "Push your hips up until your glutes are as tight as they get, then stop",
-                    "Squeeze your glutes hard at the top"
+                    "Push your hips straight back and keep your back flat",
+                    "Feel your hamstrings stretch, then squeeze your glutes to stand tall"
                   ],
                   "bad": [
-                    "Don't arch your low back to go higher"
+                    "Don't round your low back to reach further down"
                   ]
                 }
               }
@@ -564,13 +610,13 @@
                 "type": "circuit",
                 "name": "Shoulder & Scap Primer",
                 "videoUrl": null,
-                "rounds": "×2 Rounds",
+                "rounds": "×1 Round",
                 "restSec": 30,
                 "warmup": true,
                 "items": [
                   {
                     "name": "Chin Tuck",
-                    "detail": "×8 · 2s hold",
+                    "detail": "×16 · 2s hold",
                     "cues": {
                       "good": [
                         "Slide your head straight back over your shoulders",
@@ -606,17 +652,40 @@
                         "Don't let your elbow drift away from your body"
                       ]
                     }
-                  },
+                  }
+                ]
+              },
+              {
+                "type": "circuit",
+                "name": "Loaded Press Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "note": "Light weight on both. Face pulls first so your shoulder blades are switched on before anything presses, then two easy rounds on the dumbbells to find the groove. Pulley at eye height or below, same as always.",
+                "items": [
                   {
-                    "name": "Scapular Push-Up",
-                    "detail": "×10",
+                    "name": "Cable Face Pull",
+                    "detail": "×15 · RPE 6",
                     "cues": {
                       "good": [
-                        "Push the floor away and let your shoulder blades spread",
-                        "Feel the blades slide apart and back together"
+                        "Pull the rope apart toward your forehead",
+                        "Keep your shoulders down away from your ears"
                       ],
                       "bad": [
-                        "Don't bend your elbows, this is shoulder blades only"
+                        "Don't set the pulley above your head"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Incline Dumbbell Press",
+                    "detail": "×10 · RPE 6",
+                    "cues": {
+                      "good": [
+                        "Kick the dumbbells up one at a time, same as your working sets",
+                        "Feel the upper chest and shoulder warm through"
+                      ],
+                      "bad": [
+                        "Don't go heavy here, you've got three real sets coming"
                       ]
                     }
                   }
@@ -759,7 +828,12 @@
       {
         "icon": "⚖️",
         "title": "How To Pick Your Weight",
-        "body": "<p>I don't give you a weight. You find it. Every exercise gives you the reps and an RPE number, and RPE just means how hard the set should feel. <strong>RPE 8 means you finish the set with about two good reps left in you.</strong> RPE 7 means about three left.</p><p>For anything you've never done before, and the leg press, the landmine press and the hip thrust are all new to you, start lighter than you think. Do the first set, see how it felt, then go up. Wasting one light set is much better than picking too heavy and grinding.</p><p>Week to week it's simple:</p><ul><li>You hit all your reps and it felt at or under the target RPE, put a small jump on next week.</li><li>You were at the RPE ceiling or you missed reps, keep the same weight and do it again.</li></ul><p><strong>Going lighter is not failing.</strong> If you slept badly or a set is grinding harder than the number says it should, drop the weight. That's you reading your body correctly, which is exactly what I want.</p>"
+        "body": "<p>I don't give you a weight. You find it. Every exercise gives you the reps and an RPE number, and RPE just means how hard the set should feel. <strong>RPE 8 means you finish the set with about two good reps left in you.</strong> RPE 7 means about three left.</p><p>For anything you've never done before, and the leg press, the landmine press and the pull-through are all new to you, start lighter than you think. Do the first set, see how it felt, then go up. Wasting one light set is much better than picking too heavy and grinding.</p><p>Week to week it's simple:</p><ul><li>You hit all your reps and it felt at or under the target RPE, put a small jump on next week.</li><li>You were at the RPE ceiling or you missed reps, keep the same weight and do it again.</li></ul><p><strong>Going lighter is not failing.</strong> If you slept badly or a set is grinding harder than the number says it should, drop the weight. That's you reading your body correctly, which is exactly what I want.</p>"
+      },
+      {
+        "icon": "⏱️",
+        "title": "Your Warm-Up, Rebuilt",
+        "body": "<p>You told me you don't enjoy the floor drills, so I've cut them back to the ones that are actually doing something and given you weight in your hands about four minutes in.</p><p>Every day now runs the same way. <strong>Bike, one short round of prep, then a loaded primer you log like any other set.</strong> Two easy rounds at RPE 6 of the movements you're about to train properly. That primer is not filler, it's how you find your leg press depth and your row groove before the weight is heavy enough to punish a bad one.</p><p><strong>The chin tucks stayed and they went up to 16.</strong> One round instead of two, same total either way, because those are for your neck and your neck is the whole point of this block.</p><p>One thing I won't move: <strong>don't skip the primer to save time.</strong> It is the warm-up. Going straight into a heavy chest-supported row cold is how a quiet disc stops being quiet.</p>"
       },
       {
         "icon": "📅",

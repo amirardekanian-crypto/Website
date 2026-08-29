@@ -9,6 +9,13 @@ one before checking, and it was correctly refused by `ON CONFLICT DO NOTHING`. A
 - **C5-C6 cervical disc herniation** — settled, no radicular signs.
 - **L4-L5 lumbar** — currently quiet, managed.
 
+**Standing preference (Amir, 2026-08-29): he dislikes warming up, and dislikes unweighted
+movements generally.** Not a one-off note about one drill — it shapes how every future cycle's
+prep is built. Keep the prep dose where the house rule puts it (10–15 min) and buy the time
+back by making most of it *loaded*: a short unloaded primer for the things that genuinely
+need it, then light logged sets of the day's own patterns. Do not solve this by cutting the
+warm-up — he has two disc levels and prep is the cheapest insurance in the programme.
+
 ## Exercise Ledger
 
 | Exercise | Status | Cycle | Why |
@@ -21,7 +28,9 @@ one before checking, and it was correctly refused by `ON CONFLICT DO NOTHING`. A
 | Machine Leg Press | Active | C1 | primary — axial deferred; HARD depth cap before posterior pelvic tilt; FILM-GATED |
 | 45° Back Extension | Active | C1 | THE back lift — the brace that earns the free hinge later; ROM capped at neutral BOTH ends |
 | Machine Seated Leg Curl | Active | C1 | hamstring capacity against padel's quad/decel bias; zero spinal load |
-| Machine Hip Thrust | Active | C1 | trunk-supported hinge (house rule pairs it with the back extension) |
+| Machine Hip Thrust | **Disliked** | C1 | he doesn't like it (Amir, 2026-08-29). **Not banned** — no clinical reason, it was a sound pick. Replaced by Cable Pull Through |
+| Cable Pull Through | Active | C1 | replaced the hip thrust — same glute/hamstring hinge, load vector horizontal so the spine gets nothing. The on-ramp to C3's free hinge |
+| Cable Straight-Arm Pulldown | Active | C1 | Day 1 loaded prep — lat primer with an upright torso, no neck involvement |
 | Dead Bug | Active | C1 | anti-extension; back holds ONE position, never flattened (flattening = lumbar flexion) |
 | Incline Dumbbell Press | Active | C1 | horizontal press volume deliberately low (tennis/posture rule) |
 | Half-Kneeling Single-Arm Landmine Press | Active | C1 | the overhead substitute — bar path in front of the face, head never travels back |
@@ -135,3 +144,71 @@ settled disc, and swapping the incline press for a machine.
 Ten `Banned` rows recorded for movements deliberately excluded with a clinical reason, so no future
 cycle reintroduces them by accident. Two `Available` rows (Hip Adductor Machine, Seated Machine Calf
 Raise) cut for time, both dated C2 targets.
+
+---
+
+### Mid-cycle amendment — 2026-08-29 (Amir, preference-driven)
+
+Two changes, both from Mehdi's stated preferences rather than a training signal. No rewrite —
+targeted swaps only, and no set, rep or RPE moved anywhere in the cycle.
+
+**1. Cable Pull Through replaces Machine Hip Thrust** (Day 2 Accessory). Amir: *"he doesn't
+like it, maybe rdl or 45 extension."* Both named options were unavailable, and saying so was
+the useful part of the reply:
+- **45° Back Extension is already in the programme**, sitting directly above the hip thrust in
+  the same block — it is the other half of the house trunk-supported-hinge pair.
+- **The RDL is gated to C3** by the locked roadmap (*"The free hinge finally enters, pattern
+  first before any load"*), and C1's whole premise is that the brace gets built before the free
+  hinge is loaded. Pulling it into week 1 on an L4-L5, unfilmed, would undo the cycle's own logic.
+
+Cable Pull Through is the hinge Amir was reaching for with the constraint intact: the resistance
+vector is horizontal, so it trains the same glutes and hamstrings with no spinal compression, and
+it grooves the exact pattern the RDL needs later. **Direct house precedent** — Faraz Etminan,
+2026-08-02, where Amir's *"another hinge movement… DB RDL or Cable RDL"* landed on the same
+exercise for the same reason (cable's vector is more forgiving on lumbar shear than a free DB RDL).
+Dosed identically to the lift it replaced (3×12, RPE 8, 75s), tempo 3-0-1-1 so the `1s squeeze`
+chip and the tempo agree — the hip thrust's `1s top hold` chip contradicted its own `2-1-1-0`.
+Week 1's global RPE-6 cap already handles new-pattern calibration, so no extra gate was added.
+
+⚠️ **Volume is unchanged** — 3 glute-dominant sets in, 3 out. Hamstring volume rises slightly
+(the pull-through is more hamstring than the hip thrust was), which moves it toward its 10-set
+goal rather than away.
+
+**2. Prep restructured — same minutes, most of them now loaded.** Amir: *"he doesnt really
+like doing warm up or movements without any weight."* The 10–15 min rule holds (2026-06-19), so
+the time did not move; what fills it did. Per day:
+- The unloaded primer drops **×2 Rounds → ×1 Round** and loses its one pure floor drill
+  (Quadruped Thoracic Rotation / Dowel Hip Hinge / Scapular Push-Up). Unloaded drill time falls
+  from ~9 min to ~2.
+- A new **loaded primer circuit** (×2 rounds, 45s, RPE 6) takes the freed time: light sets of the
+  day's own movements — *Cable Straight-Arm Pulldown + Chest-Supported Dumbbell Row* (D1),
+  *Machine Leg Press + Cable Pull Through* (D2), *Cable Face Pull + Incline Dumbbell Press* (D3).
+  It **logs weight and RPE like any other set**, which is the point: he sees a kg box, not a drill.
+- Total prep lands at ~10 min, at the floor of the rule rather than through it.
+
+⚠️ **This is a deliberate, narrow deviation from "warm-up / prep logs nothing — and carries no
+RPE."** These are not warm-up items in the logging sense; they are light working sets that happen
+to sit in the prep block, and the logging is what makes them read as training to this athlete.
+The unloaded primer above them still carries `warmup: true` and logs nothing, exactly as before.
+
+**The chin tucks are held at 48/week** — the cycle's headline neck dose — by going ×8 → **×16**
+in the single remaining round. Halving the rounds without this would have quietly halved the one
+thing the whole block is built around. The Day 2 leg-press primer rounds also do real work the
+old prep didn't: they are where he sets the seat and rehearses the depth stop while the load is
+still trivial.
+
+**Notes cards** — *How To Pick Your Weight* named the hip thrust as one of his three new
+movements; now names the pull-through. New card **⏱️ Your Warm-Up, Rebuilt** explains the change,
+tells him the chin tucks went up rather than down, and closes the obvious loophole (*"don't skip
+the primer to save time — it IS the warm-up"*).
+
+**Videos — resolved same day (2026-08-29).** Amir supplied demos for the two exercises whose
+setup carries the safety case, both written into Notion (the source of truth) and then synced
+into `exercise_library.json`:
+- `Cable Pull Through` → `f2rO8ZCMan8` — the new pattern, previously blank.
+- `Hand-Resisted Neck Hold` → `tkvVyTqDyr0` — **the row did not exist in Notion at all**, so this
+  lift had never had a demo despite being the cycle's headline. Created and filled.
+
+`Cable Straight-Arm Pulldown` (the Day 1 loaded primer) is **still blank** — the one remaining
+gap in this athlete's programme. Low risk: it is a light primer with an upright torso, and its
+cues carry the setup. Worth filming when convenient, not urgent.
