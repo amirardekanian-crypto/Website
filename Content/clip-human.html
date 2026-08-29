@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>clip-human — who writes it (B-roll, 6.5s loop)</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  clip-human · 1080×1920 · 6.5s · loops · silent B-roll (VO plays over)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  WHERE IT CUTS IN
+    Primary — FAQ story 10 «برنامه رو کی می‌نویسه؟», in on the second sentence
+    and out after the fourth: «تک‌تکِ جلسه‌هات رو خودم می‌چینم — برای بدنِ تو،
+    هدفِ تو، وسایلِ تو. اپ فقط راهِ رسوندنشه.» The payoff burn-in lands exactly
+    on «اپ فقط راهِ رسوندنشه», then cut back to camera for «دوتا ارشد برای همین
+    خوندم». Secondary — System reel Beat 6 tail, under «... و مربی‌گریِ دوطرفه
+    — تمرینت دیده می‌شه، نه فقط فرستاده.»
+
+  ── A REMIX, WHICH IS WHY THE TWO CLIPS AGREE ──────────────────────────────
+  Every dimension of the coach card is clip-prescription.html's own value times
+  a factor, so "scaled as a system" is arithmetic rather than taste and a change
+  to one clip's card carries to the other by changing the factor. There are TWO
+  factors, and the second one is the part worth remembering:
+
+    TYPE and padding  × S = 1.8   radius 14→25 · label 9→16 · value 18→32
+                                cue 14→25 · name 21→38 · section 20→36
+    HAIRLINES         × H = 2.77  stripe 3→8 · grid border 1→3 · rule 3→8
+                                cue bar 3→8 · check border 2→6
+
+  S is the most the card can take and still fit a 576px column. It is WRONG for
+  structural lines: a reel plays back at about phone width, so 1080 canvas px
+  land on ~390 device px. The app's 3px stripe is 3 device px in the athlete's
+  hand; at S it becomes 5px here, which lands at 1.8 — thinner on screen than
+  the real thing — and a 1px grid border sub-pixels into a shimmer. H is exactly
+  the ratio that preserves a line's weight AS SEEN, so the stripe reads at 3
+  device px again, like the app. The phone is gone on purpose:
+  two phone mock-ups on a 1080 canvas leave ~380px of screen each, and the
+  5-cell grid and the 14px cue line — the only things this clip has to say —
+  would be mush after Instagram's compression.
+
+  ── THE DATA IS REAL ───────────────────────────────────────────────────────
+  data/demo.json, Day 1 «Acceleration & Squat Strength», block Strength:
+    #6 Barbell Back Squat — chips 4 Sets / ×6 Reps / Tempo 3-1-1 / RPE 7, which
+       renderExStats() lays into SETS 4 · REPS 6 · RPE 7/10 · TEMPO 3-1-1 ·
+       REST 2m (the app's 120s default; demo.json sets no restSec).
+       cues.good[0] verbatim: “Three seconds down, one second pause, drive up” — which is
+       exactly why the TEMPO cell reads 3-1-1. That pairing is the clip's point;
+       change one and the other is a lie.
+    #7 Dumbbell Bulgarian Split Squat — chips 3 Sets / ×8/side / RPE 7,
+       which renderExSummary() collapses to 3×8/side · 7/10 · ⏱ 2m.
+
+  ── THE MOTION IS THE ARGUMENT: STAMP vs DRAW ──────────────────────────────
+  The five AUTO rows carry `transition-duration:0s` with per-row delays 70ms
+  apart, so they SNAP into existence metronomically with no easing. Every COACH
+  element arrives on a .35–.75s eased draw: the divider scales down from its
+  top, the section rule scales out from its left, the green stripe paints down
+  the card, the five values reveal left to right, and the cue text writes itself
+  across on a LINEAR clip-path — linear because eased would read as a UI wipe
+  rather than handwriting speed.
+
+  ── TONE, WHICH IS THE ONE THING THAT CAN SINK IT ──────────────────────────
+  It must never read as a dig. No brand, no logo, no product name, no
+  screenshot on the auto side. No red X, no crossed-out card, no sneering label
+  — «خودکار» and nothing more. The contrast is STRUCTURAL: the same five slots,
+  three of them left as em-dashes, the same row repeated for five athletes. The
+  close is a RACK-FOCUS (dim + soften), never a rejection, and the burn-in
+  claims AUTHORSHIP, never quality: «برنامه رو آدم می‌نویسه» says who wrote it.
+
+  ── LOOP SAFETY ────────────────────────────────────────────────────────────
+  Classes accumulate on #stage (s1…s5); every reveal is written as
+  `#stage.sN .thing{…}` with the transition ON THAT RULE ONLY. play() clears
+  the class string and forces a reflow, so the base rules apply with no
+  transition and everything snaps back. Pure @keyframes are reserved for the
+  transient loops — orb, arc, conveyor, card idle, stamp flash, rpe glow — none
+  of which anything needs to be READ.
+
+  No @handle topbar and no beat counter: this is B-roll cut under a voice-over,
+  like every other clip in the set, not a standalone reel.
+
+  URL MODES
+    (none)      autoplay + loop, scaled to fit the window
+    ?beat=N     freeze micro-beat N at native 1:1 (N = 0…4)
+    ?capture=1  chrome-free 1080×1920 for a clean programmatic export
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@500;700;800&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0E4A36; --clay:#C7552F; --clay2:#E06B43;
+    --paper:#FAF7F2; --ink:#1A1A1A; --ink2:#5C5C5C;
+    --line:#D8D1C5; --card-line:#EDE8E0;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#111;font-family:'Barlow',sans-serif;overflow:hidden;height:100vh;}
+  .viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  .fitwrap{width:1080px;height:1920px;transform-origin:center;}
+  .reel{width:1080px;height:1920px;position:relative;overflow:hidden;
+    background:radial-gradient(125% 80% at 50% 6%,#1b2a23 0%,#11160f 52%,#070905 100%);}
+  .reel::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:40;
+    background:radial-gradient(120% 80% at 50% 42%,transparent 52%,rgba(0,0,0,.55) 100%);}
+
+  /* ambient — transient by definition */
+  .orb{position:absolute;width:820px;height:820px;border-radius:50%;pointer-events:none;z-index:0;
+    filter:blur(90px);opacity:.55;top:-220px;right:-260px;
+    background:radial-gradient(circle,rgba(199,85,47,.35),transparent 70%);
+    animation:orbdrift 9s ease-in-out infinite alternate;}
+  @keyframes orbdrift{from{transform:translate(0,0) scale(1);}to{transform:translate(-60px,70px) scale(1.15);}}
+  .arcline{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.4;}
+  .arcline path{fill:none;stroke:var(--clay);stroke-width:5;stroke-dasharray:2 30;stroke-linecap:round;
+    animation:arcmarch 6s linear infinite;}
+  @keyframes arcmarch{to{stroke-dashoffset:-320;}}
+
+  /* ── the two columns ─────────────────────────────────────────────────────
+     AUTO sits RIGHT because a Farsi viewer's eye lands right-first, so the
+     thing being contrasted is read before the thing doing the contrasting. */
+  .divider{position:absolute;left:662px;top:372px;width:4px;height:908px;z-index:2;
+    background:rgba(255,255,255,.12);transform:scaleY(0);transform-origin:top;}
+  #stage.s1 .divider{transform:scaleY(1);transition:transform .6s var(--ease) .05s;}
+
+  .collab{position:absolute;top:352px;font-family:'Vazirmatn',sans-serif;font-weight:700;
+    font-size:34px;direction:rtl;z-index:3;opacity:0;transform:translateY(26px);}
+  #stage.s1 .collab{opacity:1;transform:none;
+    transition:opacity .5s var(--ease) .15s,transform .5s var(--ease) .15s;}
+  .collab-auto{left:696px;width:328px;color:rgba(255,255,255,.42);}
+  .collab-coach{left:56px;width:576px;color:var(--clay2);}
+
+  /* ── AUTO: one row, stamped out five times, then again ───────────────── */
+  .auto{position:absolute;left:696px;top:428px;width:328px;height:908px;z-index:2;
+    -webkit-mask-image:linear-gradient(#000 62%,transparent);
+    mask-image:linear-gradient(#000 62%,transparent);}
+  .auhead{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:0 10px 14px;
+    font-family:'Space Mono',monospace;font-size:15px;letter-spacing:.6px;
+    color:rgba(255,255,255,.32);text-align:center;opacity:0;}
+  #stage.s1 .auhead{opacity:1;transition:opacity .35s ease .22s;}
+  .aubelt{position:relative;}
+  #stage.s1 .aubelt{animation:conveyor 9s linear infinite;}
+  @keyframes conveyor{to{transform:translateY(-50%);}}
+  .aurow{border:5px solid rgba(255,255,255,.12);border-radius:24px;padding:16px 10px 18px;
+    margin-bottom:18px;background:transparent;opacity:0;}
+  .aurow.ghost{opacity:1;}
+  .aulab{font-family:'Vazirmatn',sans-serif;font-weight:500;font-size:22px;direction:rtl;
+    text-align:right;color:rgba(255,255,255,.34);margin-bottom:12px;padding:0 6px;}
+  .aucells{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;text-align:center;}
+  .aucells i{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:32px;
+    font-style:normal;color:rgba(255,255,255,.62);line-height:1;}
+  .aucells i.em{color:rgba(255,255,255,.20);}
+  #stage.s1 .au-1{opacity:1;transition:opacity 0s linear .32s;animation:stampHit .2s linear .32s both;}
+  #stage.s1 .au-2{opacity:1;transition:opacity 0s linear .39s;animation:stampHit .2s linear .39s both;}
+  #stage.s1 .au-3{opacity:1;transition:opacity 0s linear .46s;animation:stampHit .2s linear .46s both;}
+  #stage.s1 .au-4{opacity:1;transition:opacity 0s linear .53s;animation:stampHit .2s linear .53s both;}
+  #stage.s1 .au-5{opacity:1;transition:opacity 0s linear .60s;animation:stampHit .2s linear .60s both;}
+  @keyframes stampHit{0%{border-color:rgba(255,255,255,.45);}100%{border-color:rgba(255,255,255,.12);}}
+
+  /* ── COACH: the real card, scaled as one system ─────────────────────── */
+  .coach{position:absolute;left:56px;top:428px;width:576px;z-index:3;}
+  #stage.s5 .coach{transform:translateY(-10px);transition:transform .6s var(--ease);}
+
+  .sechead{display:flex;align-items:center;gap:25px;margin-bottom:25px;}
+  .sectitle{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;
+    letter-spacing:3.6px;text-transform:uppercase;color:var(--green);flex-shrink:0;line-height:1;
+    opacity:0;}
+  #stage.s2 .sectitle{opacity:1;transition:opacity .4s var(--ease);}
+  .secrule{flex:1;height:8px;border-radius:4px;background:var(--green);
+    transform:scaleX(0);transform-origin:left;}
+  #stage.s2 .secrule{transform:scaleX(1);transition:transform .5s var(--ease) .05s;}
+
+  .excard{position:relative;background:#fff;border-radius:25px;overflow:hidden;
+    box-shadow:0 4px 11px rgba(0,0,0,.06);
+    opacity:0;transform:translateY(44px);}
+  #stage.s2 .excard{opacity:1;transform:none;
+    transition:opacity .55s var(--ease) .10s,transform .55s var(--ease) .10s;
+    animation:cardPop .55s var(--ease) .10s both;}
+  @keyframes cardPop{0%{transform:scale(.97)}62%{transform:scale(1.012)}100%{transform:scale(1)}}
+  #stage.s5 .excard{box-shadow:0 30px 90px rgba(14,74,54,.35);transition:box-shadow .6s var(--ease);}
+  /* the stripe is its own child so it can paint DOWN the card like a pen mark */
+  .stripe{position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--green);
+    transform:scaleY(0);transform-origin:top;z-index:2;}
+  #stage.s2 .stripe{transform:scaleY(1);transition:transform .45s var(--ease) .30s;}
+
+  .itemmain{display:flex;align-items:center;padding:29px 32px;gap:25px;}
+  .checkbox{width:65px;height:65px;border-radius:50%;border:6px solid var(--line);flex-shrink:0;}
+  .itembody{flex:1;min-width:0;}
+  .itemrow{display:flex;align-items:baseline;gap:18px;}
+  .exnum{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:65px;color:#999;
+    line-height:1;letter-spacing:-1.8px;}
+  .itemname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:38px;
+    color:var(--ink);letter-spacing:.5px;line-height:1.1;}
+  .chev{font-size:32px;color:#999;}
+  .chev.up{transform:rotate(180deg);}
+  .exhead{opacity:0;transform:translateY(14px);}
+  #stage.s2 .exhead{opacity:1;transform:none;
+    transition:opacity .45s var(--ease) .34s,transform .45s var(--ease) .34s;}
+
+  .exdetail{padding:7px 32px 29px;border-top:3px solid var(--card-line);
+    background:rgba(0,0,0,.015);}
+  .statsgrid{display:grid;grid-template-columns:repeat(5,1fr);border:3px solid var(--line);
+    border-radius:14px;margin-top:7px;background:#fff;opacity:0;transform:scale(.96);}
+  #stage.s3 .statsgrid{opacity:1;transform:none;
+    transition:opacity .4s var(--ease) .05s,transform .4s var(--ease) .05s;}
+  .stat{padding:22px 7px;text-align:center;border-left:3px solid var(--line);
+    opacity:0;transform:translateY(10px);}
+  .stat:first-child{border-left:none;}
+  .statlabel{font-family:'Space Mono',monospace;font-size:16px;letter-spacing:2.3px;
+    color:var(--ink2);margin-bottom:11px;text-transform:uppercase;line-height:1.25;}
+  .statval{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:700;
+    color:var(--ink);line-height:1;clip-path:inset(0 100% 0 0);}
+  .statval b{font-weight:700;}
+  .stat.target .statval{color:var(--green);}
+  .stat.tempo .statval{font-size:25px;}
+  #stage.s3 .cell-1{opacity:1;transform:none;transition:opacity .45s var(--ease) .25s,transform .45s var(--ease) .25s;}
+  #stage.s3 .cell-1 .statval{clip-path:inset(0 0 0 0);transition:clip-path .5s var(--ease) .25s;}
+  #stage.s3 .cell-2{opacity:1;transform:none;transition:opacity .45s var(--ease) .37s,transform .45s var(--ease) .37s;}
+  #stage.s3 .cell-2 .statval{clip-path:inset(0 0 0 0);transition:clip-path .5s var(--ease) .37s;}
+  #stage.s3 .cell-3{opacity:1;transform:none;transition:opacity .45s var(--ease) .49s,transform .45s var(--ease) .49s;}
+  #stage.s3 .cell-3 .statval{clip-path:inset(0 0 0 0);transition:clip-path .5s var(--ease) .49s;}
+  #stage.s3 .cell-4{opacity:1;transform:none;transition:opacity .45s var(--ease) .61s,transform .45s var(--ease) .61s;}
+  #stage.s3 .cell-4 .statval{clip-path:inset(0 0 0 0);transition:clip-path .5s var(--ease) .61s;}
+  #stage.s3 .cell-5{opacity:1;transform:none;transition:opacity .45s var(--ease) .73s,transform .45s var(--ease) .73s;}
+  #stage.s3 .cell-5 .statval{clip-path:inset(0 0 0 0);transition:clip-path .5s var(--ease) .73s;}
+  #stage.s3 .cell-3{animation:rpeGlow .9s var(--ease) .49s both;}
+  @keyframes rpeGlow{0%{box-shadow:inset 0 0 0 0 rgba(14,74,54,0)}
+    45%{box-shadow:inset 0 0 0 9px rgba(14,74,54,.28)}
+    100%{box-shadow:inset 0 0 0 0 rgba(14,74,54,0)}}
+
+  .cuelabel{font-family:'Space Mono',monospace;font-size:18px;letter-spacing:2.5px;
+    text-transform:uppercase;color:var(--ink2);margin:32px 0 18px;opacity:0;}
+  #stage.s4 .cuelabel{opacity:1;transition:opacity .35s var(--ease);}
+  .cue{position:relative;display:flex;padding:22px 0 22px 27px;
+    font-size:25px;line-height:1.5;color:var(--ink);}
+  .cue::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:8px;
+    background:var(--green);border-radius:4px;transform:scaleY(0);transform-origin:top;}
+  #stage.s4 .cue::before{transform:scaleY(1);transition:transform .35s var(--ease) .05s;}
+  .cuetext{clip-path:inset(0 100% 0 0);}
+  /* LINEAR on purpose — eased reads as a UI wipe, linear reads as writing speed */
+  #stage.s4 .cuetext{clip-path:inset(0 0 0 0);transition:clip-path .75s linear .30s;}
+
+  .nextrow{margin-top:25px;background:#fff;border-radius:25px;overflow:hidden;position:relative;
+    box-shadow:0 4px 11px rgba(0,0,0,.06);opacity:0;transform:translateY(38px);}
+  #stage.s4 .nextrow{opacity:1;transform:none;
+    transition:opacity .45s var(--ease) .70s,transform .45s var(--ease) .70s;}
+  .pillrow{display:flex;flex-wrap:wrap;gap:11px;margin-top:14px;}
+  .pill{font-family:'Space Mono',monospace;font-size:18.9px;font-weight:600;
+    padding:5px 16px;border-radius:36px;background:var(--card-line);
+    color:var(--ink);letter-spacing:.3px;white-space:nowrap;}
+
+  /* the coach card breathes so the held frames are never dead */
+  #stage.s2 .coach{animation:lift 5s ease-in-out infinite;}
+  @keyframes lift{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  /* …but not while it is being lifted deliberately on the last beat */
+  #stage.s5 .coach{animation:none;}
+
+  /* ── the rack-focus: dim and soften, never reject ────────────────────── */
+  #stage.s5 .auto,#stage.s5 .collab-auto{opacity:.48;filter:blur(1.3px) saturate(.5);
+    transition:opacity .6s var(--ease),filter .6s var(--ease);}
+
+  /* ── the burn-in ─────────────────────────────────────────────────────── */
+  .cap{position:absolute;left:70px;right:70px;top:1312px;text-align:center;z-index:30;
+    direction:rtl;font-family:'Vazirmatn',sans-serif;}
+  .cap-eyebrow{font-weight:700;font-size:34px;color:var(--clay2);margin-bottom:20px;
+    opacity:0;transform:translateY(34px);}
+  .cap-line{font-weight:700;font-size:60px;line-height:1.45;color:#fff;
+    opacity:0;transform:translateY(34px);}
+  .cap-line .acc{color:var(--clay2);}
+  #stage.s5 .cap-eyebrow{opacity:1;transform:none;
+    transition:opacity .55s var(--ease) .15s,transform .55s var(--ease) .15s;}
+  #stage.s5 .cap-line{opacity:1;transform:none;
+    transition:opacity .55s var(--ease) .28s,transform .55s var(--ease) .28s;}
+
+  /* ── URL modes ───────────────────────────────────────────────────────── */
+  .progress{position:absolute;left:0;right:0;bottom:0;height:8px;background:rgba(255,255,255,.10);z-index:60;}
+  .progress i{display:block;height:100%;width:0;background:var(--clay);}
+  .controls{position:fixed;left:0;right:0;bottom:0;background:#000;color:#fff;padding:14px 22px;
+    display:flex;align-items:center;gap:18px;font-family:'Barlow',sans-serif;font-size:14px;z-index:999;}
+  .controls button{background:var(--clay);color:#fff;border:none;border-radius:8px;padding:8px 16px;
+    font-weight:700;cursor:pointer;}
+  .controls .hint{opacity:.6;}
+  .stillmode .controls{display:none;}
+  .stillmode .viewport{display:block;}
+  .stillmode .fitwrap{transform:none!important;}
+  .stillmode *{transition:none!important;animation:none!important;}
+  .capturemode .controls,.capturemode .progress{display:none!important;}
+  .capturemode .fitwrap{transform:none!important;}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="fitwrap" id="fitwrap">
+    <div class="reel">
+      <div id="stage">
+        <div class="orb"></div>
+        <svg class="arcline" viewBox="0 0 1080 1920" preserveAspectRatio="none">
+          <path d="M-60 1500 C 220 1180, 520 1320, 760 980 S 1020 520, 1160 300"/>
+        </svg>
+
+        <div class="divider"></div>
+        <div class="collab collab-coach">من نوشتم</div>
+        <div class="collab collab-auto">خودکار</div>
+
+        <!-- ═══ AUTO — the same row, for athlete after athlete ═══ -->
+        <div class="auto">
+          <div class="auhead"><span>SETS</span><span>REPS</span><span>RPE</span><span>TEMPO</span><span>REST</span></div>
+          <div class="aubelt">
+          <div class="aurow au-1" style="--d:.32s"><div class="aulab">ورزشکار ۱</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow au-2" style="--d:.39s"><div class="aulab">ورزشکار ۲</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow au-3" style="--d:.46s"><div class="aulab">ورزشکار ۳</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow au-4" style="--d:.53s"><div class="aulab">ورزشکار ۴</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow au-5" style="--d:.60s"><div class="aulab">ورزشکار ۵</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow ghost"><div class="aulab">ورزشکار ۱</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow ghost"><div class="aulab">ورزشکار ۲</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow ghost"><div class="aulab">ورزشکار ۳</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow ghost"><div class="aulab">ورزشکار ۴</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          <div class="aurow ghost"><div class="aulab">ورزشکار ۵</div><div class="aucells"><i>3</i><i>10</i><i class="em">—</i><i class="em">—</i><i class="em">—</i></div></div>
+          </div>
+        </div>
+
+        <!-- ═══ COACH — the real card out of the app ═══ -->
+        <div class="coach">
+          <div class="sechead">
+            <div class="sectitle">Strength</div>
+            <div class="secrule"></div>
+          </div>
+
+          <div class="excard">
+            <i class="stripe"></i>
+            <div class="itemmain exhead">
+              <div class="checkbox"></div>
+              <div class="itembody"><div class="itemrow">
+                <span class="exnum">6</span>
+                <span class="itemname">Barbell Back Squat</span>
+              </div></div>
+              <div class="chev up">⌄</div>
+            </div>
+            <div class="exdetail">
+              <div class="statsgrid">
+            <div class="stat  cell-1"><div class="statlabel">SETS</div><div class="statval"><b data-count="4">4</b></div></div>
+            <div class="stat  cell-2"><div class="statlabel">REPS</div><div class="statval"><b data-count="6">6</b></div></div>
+            <div class="stat target cell-3"><div class="statlabel">RPE</div><div class="statval">7/10</div></div>
+            <div class="stat tempo cell-4"><div class="statlabel">TEMPO</div><div class="statval">3-1-1</div></div>
+            <div class="stat  cell-5"><div class="statlabel">REST</div><div class="statval">2m</div></div>
+              </div>
+              <div class="cuelabel">Coaching Cues</div>
+              <div class="cue"><span class="cuetext">Three seconds down, one second pause, drive up</span></div>
+            </div>
+          </div>
+
+          <div class="nextrow">
+            <i class="stripe" style="transform:scaleY(1);"></i>
+            <div class="itemmain">
+              <div class="checkbox"></div>
+              <div class="itembody">
+                <div class="itemrow">
+                  <span class="exnum">7</span>
+                  <span class="itemname">Dumbbell Bulgarian Split Squat</span>
+                </div>
+                <div class="pillrow"><span class="pill">3×8/side</span><span class="pill">7/10</span><span class="pill">⏱ 2m</span></div>
+              </div>
+              <div class="chev">⌄</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cap">
+          <div class="cap-eyebrow">فرقش اینجاست</div>
+          <div class="cap-line">برنامه رو <span class="acc">آدم</span> می‌نویسه —<br>اپ فقط می‌رسونتش</div>
+        </div>
+      </div>
+      <div class="progress"><i id="pfill"></i></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="REEL.play()">Replay</button>
+  <span id="beatn">1 / 5</span>
+  <span class="hint">To record: hit replay and screen-capture the 1080&times;1920 frame &mdash; controls sit outside it. Use ?capture=1 for a clean programmatic export.</span>
+</div>
+
+<script>
+  const REEL = (function(){
+    const stage = document.getElementById('stage');
+    const pfill = document.getElementById('pfill');
+    const beatn = document.getElementById('beatn');
+    const STARTS = [0, 1200, 2400, 3800, 5000];
+    const TOTAL  = 6500;
+    let timers = [], raf = null;
+
+    function fit(){
+      if(document.body.classList.contains('stillmode')||document.body.classList.contains('capturemode')){
+        document.getElementById('fitwrap').style.transform='none'; return;
+      }
+      const s=Math.min(window.innerWidth/1080,(window.innerHeight-70)/1920);
+      document.getElementById('fitwrap').style.transform='scale('+s+')';
+    }
+    window.addEventListener('resize', fit);
+
+    /* The counters read 4 and 6 in the markup, so a stillmode frame is correct
+       with no JS having run; countUp only borrows them during playback. */
+    function countUp(el, to, ms){
+      const t0 = performance.now();
+      (function step(now){
+        const p = Math.min(1, (now - t0) / ms);
+        el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+        if(p < 1) raf = requestAnimationFrame(step);
+      })(performance.now());
+    }
+
+    function setBeat(n){
+      stage.className = '';
+      void stage.offsetWidth;               /* forced reflow re-arms every keyframe */
+      for(let i=1;i<=n+1;i++) stage.classList.add('s'+i);
+      beatn.textContent = (n+1)+' / '+STARTS.length;
+    }
+    function clear(){ timers.forEach(clearTimeout); timers=[]; if(raf) cancelAnimationFrame(raf); }
+
+    function play(){
+      clear();
+      stage.className = '';                 /* no state classes → base rules, no transitions */
+      document.querySelectorAll('.statval b').forEach(b => b.textContent = b.dataset.count);
+      void stage.offsetWidth;
+      STARTS.forEach((t,i)=>{
+        timers.push(setTimeout(()=>{
+          /* classes ACCUMULATE — the coach column keeps everything it has drawn
+             while the next beat draws on top of it. Nothing ever leaves. */
+          stage.classList.add('s'+(i+1));
+          beatn.textContent = (i+1)+' / '+STARTS.length;
+          if(i === 2 && !document.body.classList.contains('stillmode')){
+            document.querySelectorAll('.statval b').forEach((b,k) => {
+              b.textContent = '0';
+              timers.push(setTimeout(()=>countUp(b, +b.dataset.count, 600), 250 + k*120));
+            });
+          }
+        }, t + 150));
+      });
+      const t0 = performance.now();
+      (function prog(now){ const p=Math.min(1,(now-t0)/(TOTAL+150)); pfill.style.width=(p*100)+'%';
+        if(p<1 && timers.length) requestAnimationFrame(prog); })(performance.now());
+      timers.push(setTimeout(play, TOTAL + 150 + 400));
+    }
+
+    window.__show = n => { clear();
+      document.querySelectorAll('.statval b').forEach(b => b.textContent = b.dataset.count);
+      setBeat(n); };
+
+    const q = new URLSearchParams(location.search);
+    if(q.has('beat')){
+      document.body.classList.add('stillmode'); fit();
+      document.fonts.ready.then(()=>__show(+q.get('beat')));
+    } else {
+      if(q.has('capture')) document.body.classList.add('capturemode');
+      fit(); document.fonts.ready.then(play);
+    }
+    return { play };
+  })();
+</script>
+</body>
+</html>

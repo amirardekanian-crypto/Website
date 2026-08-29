@@ -403,7 +403,7 @@ Build `Content/clip-why.html` — a self-contained 1080×1920 looping HTML clip,
 
 ---
 
-## ⑦ — build as a REMIX, not a new file — `Content/clip-human.html` · 6.5s
+## ⑦ BUILT — as a REMIX of clip-prescription — `Content/clip-human.html` · 6.5s
 
 **A viewer sees the same five prescription slots — SETS · REPS · RPE · TEMPO · REST — filled two ways: one side stamps out the identical half-empty row for athlete after athlete, the other gets built cell by cell on one real exercise and has a reason attached to it, so "the app only delivers it, the thinking is a person" lands as something watched rather than claimed.**
 
@@ -430,6 +430,55 @@ Build `Content/clip-why.html` — a self-contained 1080×1920 looping HTML clip,
 ### ⚠ Corrections — these override the build prompt below
 - **Do not build this from scratch.** Build clip-prescription first, then copy that file, drop its camera, reposition the finished coach card into the right column, and spend the whole build on the AUTO conveyor, the divider, the stamp timing and the closing rack-focus. Halves the work and guarantees the two clips agree.
 - Typo in the prompt: `rrAF countUp()` → **`rAF countUp()`**.
+
+### ✅ BUILT — the remix worked, and it produced one general rule
+
+The correction was right: the card is clip-prescription's, and every dimension of
+it is that file's own value times a factor, so the two clips cannot drift. But
+**one factor turned out to be wrong**, and this is the part to carry forward to
+any future full-bleed app-card clip:
+
+> **Type scales by S. Hairlines scale by H. They are different numbers.**
+>
+> `S = 1.8` is the most the card can take and still fit a 576px column — it
+> governs type, padding and radii (radius 14→25 · label 9→16 · value 18→32 ·
+> cue 14→25 · name 21→38).
+>
+> `H = 1080/390 = 2.77` governs every structural LINE — stripe 3→8, grid border
+> 1→3, section rule 3→8, cue bar 3→8, check border 2→6. A reel plays back at
+> about phone width, so 1080 canvas px land on ~390 device px. The app's 3px
+> block stripe is **3 device px in the athlete's hand**; scaled by S it becomes
+> 5px here, which lands at **1.8** — thinner on screen than the real thing — and
+> a 1px grid border sub-pixels into a shimmer. H is the ratio that preserves a
+> line's weight *as seen*. Verified by rendering: at S the stripe was present in
+> the DOM (5px, `#0E4A36`, `scaleY(1)`) and simply did not read.
+
+Everything else landed as specified. Layout: divider 4px at x=662 running
+372→1280; COACH `left:56 width:576 top:428`; AUTO `left:696 width:328 top:428`
+with a 908px window and `mask-image:linear-gradient(#000 62%,transparent)`;
+caption at y=1312, ending 1559 — the whole clip sits inside Instagram's
+250–1600 band, which is why the columns moved down from the spec's y=364.
+
+Beats `1200 / 1200 / 1400 / 1200 / 1500 = 6500`, classes accumulating `s1…s5`.
+Stamp vs draw is intact: the five AUTO rows carry `transition-duration:0s` with
+delays 70ms apart (`.32/.39/.46/.53/.60`) so they snap with no easing, while the
+coach side draws — rule `scaleX`, stripe `scaleY` down the card, five values on
+`.cell-1…5` at `.25/.37/.49/.61/.73`, and the cue on a **linear** `clip-path`
+wipe. Two small calls made while rendering: the caption breaks explicitly at the
+em-dash (the natural wrap orphaned «می‌رسونتش»), and the rack-focus settled at
+`opacity:.48 / blur(1.3px)` rather than `.42 / 1.5px`, which had dimmed the auto
+column almost out of existence — it has to stay legible or the contrast is gone.
+
+**No @handle topbar and no beat counter**, contrary to the build prompt: this is
+B-roll cut under a voice-over, like every other clip in the set. The prompt was
+inherited from the standalone-reel template.
+
+Data confirmed against `data/demo.json` before building — Day 1, Strength block,
+#6 `Barbell Back Squat` (4 Sets / ×6 Reps / Tempo 3-1-1 / RPE 7 → SETS 4 · REPS 6
+· RPE 7/10 · TEMPO 3-1-1 · REST 2m from the 120s default) with `cues.good[0]`
+verbatim, and #7 `Dumbbell Bulgarian Split Squat`, whose 3 Sets / ×8/side / RPE 7
+`renderExSummary()` collapses to exactly the `3×8/side · 7/10 · ⏱ 2m` the spec
+claimed.
 
 ### Build prompt (paste into Claude Code)
 
