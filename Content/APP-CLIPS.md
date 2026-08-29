@@ -10,6 +10,30 @@ motion + the three URL modes).
 B-roll. Every file still ships the three URL modes: default (autoplay + loop),
 `?beat=N` (frozen still), `?capture=1` (chrome-free 1080×1920 for recording).
 
+## ✅ ALL EIGHT ARE BUILT
+
+Each `## ⑦ BUILT` section carries a **BUILT** block recording what actually
+shipped and what the spec got wrong. Read those before editing a clip — several
+of them override the build prompt underneath. Four lessons generalise:
+
+1. **Lift the app, don't rebuild it.** For any clip showing a whole app screen,
+   drive the live `program.html`, walk its stylesheet for the rules that match,
+   and serialise both. ⑥ does this; a computed-style diff matched the running
+   app on all 14 probes. It is faster than rebuilding and it cannot be subtly
+   wrong. Three traps come with it — a regex cannot split `@keyframes`, the
+   app's own entrance animations blank every `?beat=N` still, and
+   `min-height:100vh` means the browser window. All three are written up in ⑥.
+2. **Type and hairlines need different scales.** A reel plays back at about
+   phone width, so 1080 canvas px land on ~390 device px. Scaling a card's type
+   by 1.8 is right; scaling its 3px block stripe by 1.8 puts it at 1.8 device px
+   — thinner than the app. Hairlines scale by `1080/390`. Written up in ⑦.
+3. **Never set a measured value as an inline style when a class is supposed to
+   change it.** `p.style.strokeDashoffset = L` outranks every stylesheet rule and
+   silently kills the draw-on. Set a variable. Written up in ⑧.
+4. **Transitions go on the state rule, never the base rule** — the loop-safety
+   pattern every clip uses. And every clip should be sampled across **two full
+   loops**, not one: a stuck element looks perfect on pass one.
+
 ## The rule for when to animate
 
 **Record the app for real when the proof IS that it's real** — tapping an exercise,
@@ -75,7 +99,7 @@ that flatlines at the shown value after loop 1 has the bug above.
 
 ---
 
-## ① BUILD FIRST — `Content/clip-prescription.html` · 7.2s
+## ① BUILT — `Content/clip-prescription.html` · 7.2s
 
 **One exercise in the real app carries five deliberate numbers — sets, reps, target RPE, tempo, rest — plus the cues that make them work, so the viewer understands nothing in the programme is generic.**
 
@@ -116,7 +140,7 @@ Build `Content/clip-prescription.html` — a 7.2-second silent, self-looping cut
 
 ---
 
-## ② BUILD SECOND — `Content/clip-map.html` · 6.4s
+## ② BUILT — `Content/clip-map.html` · 6.4s
 
 **In one continuous build the viewer sees the whole six months at once — five named cycles, each with its own mission, weeks and status, physically wired to the one before it, with the app's own C1–C5 meter showing the athlete standing in Cycle 2.**
 
@@ -158,7 +182,7 @@ Build `Content/clip-map.html` — a single self-contained 1080×1920 looping HTM
 
 ---
 
-## ③ BUILD THIRD — `Content/clip-loop.html` · 6.4s
+## ③ BUILT — `Content/clip-loop.html` · 6.4s
 
 **The week is a closed circuit: what you log feeds a weekly check-in, and that check-in visibly rewrites next week's session — so the plan is a living thing, not a file you were sent once.**
 
@@ -200,7 +224,7 @@ Build `Content/clip-loop.html` — a self-contained, silent, looping 6.4s cutawa
 
 ---
 
-## ④ — `Content/clip-delivery.html` · 6.4s
+## ④ BUILT — `Content/clip-delivery.html` · 6.4s
 
 **You fill a short Farsi form, Amir builds the plan, and within 24–48 hours your own programme — Cycle 2, Load & Build, Day 1 — is sitting inside your own app, ready for session one.**
 
@@ -492,7 +516,7 @@ LANGUAGE — the app card stays English and `direction:ltr`, with Western digits
 
 ---
 
-## ⑧ OPTIONAL — rewrite before building — `Content/clip-needs.html` · 7s
+## ⑧ BUILT — rewritten first — `Content/clip-needs.html` · 7s
 
 **A viewer sees that the programme's aims are not picked off a shelf — four physical demands of tennis are read off the court and everything fans backwards into what one cycle of training has to deliver.**
 
@@ -523,6 +547,60 @@ LANGUAGE — the app card stays English and `direction:ltr`, with Western digits
 - Rewrite the four rows to the four demands **in the order you actually say them**: ۱ اسپرینت · ۲ تغییرِ مسیر · ۳ قدرتِ چرخشی · ۴ نفسِ ستِ سوم.
 - Use the approved burn-in «تحلیلِ نیاز: زمین چی می‌خواد؟» — not the invented «۴ چیزی که تنیس ازت می‌خواد».
 - Drop the fake green header strip carrying `Cycle 2 of 5 · Load & Build` — the app never renders that on a cycle card. Use the card's real header (C2 badge + LOAD & BUILD + Weeks 6–10 + italic tagline), or make the panel obviously diagrammatic instead of a fake app card.
+
+### ✅ BUILT — rewritten first, and one more correction was needed
+
+All four corrections applied. The VO line is now the real one from
+`SHOOT-explainer-reel-faq-stories.md` Beat 2; the four rows are his four demands
+verbatim and in his order (**۱ اسپرینت · ۲ تغییرِ مسیر · ۳ قدرتِ چرخشی ·
+۴ نفسِ ستِ سوم**); the burn-in is the beat's approved «تحلیلِ نیاز: زمین چی
+می‌خواد؟»; and the lower panel is deliberately **diagrammatic** — paper, a drawn
+corner bracket, a Space Mono caption — carrying the app's real strings without
+pretending to be a screenshot. What the card really looks like is ⑥'s job, and
+⑥ does it with the live markup, so a second differently-fake rendering here
+would have contradicted it.
+
+⚠ **A FIFTH CORRECTION THE LIST MISSED, AND IT IS THE IMPORTANT ONE.** There is
+no one-to-one mapping between the four demands and the four aims:
+
+| demand | aim | |
+|---|---|---|
+| تغییرِ مسیر | 04 Sharpen change of direction | ✓ exact |
+| قدرتِ چرخشی | 02 Build the rotational power | ✓ exact |
+| اسپرینت | 01 squat and hinge with trackable load | ~ indirect but real |
+| نفسِ ستِ سوم | 03 Armour the shoulder… | ✗ **nothing** |
+
+Aim 03 is shoulder durability; third-set lungs are conditioning. So the diagram
+**must never draw demand-N → aim-N**. Every connector converges into ONE junction
+and ONE stem feeds the panel as a whole — a many-to-one, which is true: the four
+demands inform the aim *set*. If a later pass "improves" this into four lines
+into four aims, it will be stating something false on screen.
+
+**No leader lines from the court nodes to the rows**, for a related reason: row
+order is fixed by his script, the court positions that are actually true for
+those four demands are not in that vertical order, and straightening the lines
+would mean moving the nodes to places the demands do not happen. Each node
+instead lights *in step with its own row* — same delay, same clay — which pairs
+them unambiguously and claims no geometry it cannot back.
+
+**Placement note:** the shoot doc already specifies court B-roll synced to those
+four demands for this beat. So this clip is the **alternative** to that footage,
+not an addition — the rows land in his spoken order either way.
+
+Two bugs worth remembering, both found by rendering:
+1. **`p.style.strokeDashoffset = L` in a measure pass silently kills every
+   draw-on.** An inline declaration outranks the stylesheet, so the
+   `.reel.pN … {stroke-dashoffset:0}` that is supposed to draw the line never
+   wins. Every path sat undrawn through all six phases with nothing erroring.
+   Set a **variable** instead (`--len`) and let the base rule consume it.
+2. **`document.fonts.ready` can resolve before the new metrics are laid out.**
+   Measure inside a `requestAnimationFrame` after it, or a payoff positioned
+   from a panel's height gets a stale number.
+
+Layout, all inside Instagram's 250–1600 band: eyebrow 264, title 306, court
+277×400 at (105,410) — real singles proportions, 8.23m × 11.885m — rows at
+x540 on a 100px pitch, junction (540,850), panel 920→1342, payoff 1382→1460.
+Phases `1100/1500/1300/1200/1200/700 = 7000`, accumulating `p1…p6`.
 
 ### Build prompt (paste into Claude Code)
 
