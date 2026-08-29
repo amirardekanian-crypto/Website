@@ -202,7 +202,13 @@ movements; now names the pull-through. New card **⏱️ Your Warm-Up, Rebuilt**
 tells him the chin tucks went up rather than down, and closes the obvious loophole (*"don't skip
 the primer to save time — it IS the warm-up"*).
 
-**Open item for Amir** — `Cable Pull Through` and `Cable Straight-Arm Pulldown` are both in
-`exercise_library.json` with **empty video URLs**. The pull-through is a brand-new pattern on a
-disc athlete and its setup carries the whole safety case, so it is the one worth filming first.
-(Half-Kneeling Pallof Press and 90/90 Hip Rotation are in the same state — pre-existing.)
+**Videos — resolved same day (2026-08-29).** Amir supplied demos for the two exercises whose
+setup carries the safety case, both written into Notion (the source of truth) and then synced
+into `exercise_library.json`:
+- `Cable Pull Through` → `f2rO8ZCMan8` — the new pattern, previously blank.
+- `Hand-Resisted Neck Hold` → `tkvVyTqDyr0` — **the row did not exist in Notion at all**, so this
+  lift had never had a demo despite being the cycle's headline. Created and filled.
+
+`Cable Straight-Arm Pulldown` (the Day 1 loaded primer) is **still blank** — the one remaining
+gap in this athlete's programme. Low risk: it is a light primer with an upright torso, and its
+cues carry the setup. Worth filming when convenient, not urgent.
