@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>clip-needs — تحلیلِ نیاز (B-roll, 7.0s loop)</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  clip-needs · 1080×1920 · 7.0s · loops · silent B-roll (VO plays over)
+  ═══════════════════════════════════════════════════════════════════════════
+
+  WHERE IT CUTS IN
+    System reel, Beat 2 — "Needs analysis" (۱۶ ثانیه). Under the FIRST sentence:
+    «قبل از هر حرکتی، تحلیلِ نیاز: ورزشِ تو از بدنت چی می‌خواد، و بازیکنِ
+     حرفه‌ای چی داره که تو هنوز نداری — اسپرینت، تغییرِ مسیر، قدرتِ چرخشی،
+     نفسِ ستِ سوم.»
+    The shoot doc already specifies court B-roll synced to those four demands
+    for this beat, and camera for the second sentence — so this clip is the
+    ALTERNATIVE to that B-roll, not an addition to it. Use whichever you have.
+    The four rows land in the order he says them, so either one cuts to the
+    same VO.
+
+  ── FOUR THINGS WERE REWRITTEN BEFORE BUILDING ─────────────────────────────
+  1. The spec's build prompt quoted a VO line that does not exist and invented a
+     five-step "Discovery → Analysis → …" structure. The real line is above.
+  2. Its four rows («اسپرینت و تغییر جهت» · «سلامت شونه و لگن» · …) were not
+     his four demands. They are now, verbatim and in his order:
+     ۱ اسپرینت · ۲ تغییرِ مسیر · ۳ قدرتِ چرخشی · ۴ نفسِ ستِ سوم.
+  3. The burn-in is the beat's APPROVED on-screen line «تحلیلِ نیاز: زمین چی می‌خواد؟»,
+     not the invented «۴ چیزی که تنیس ازت می‌خواد».
+  4. No fake green `Cycle 2 of 5 · Load & Build` header strip: the app never
+     renders that on a cycle card. The lower panel is deliberately DIAGRAMMATIC
+     — paper, a square corner bracket, a Space Mono caption — carrying the app's
+     real strings without pretending to be a screenshot of it. What the card
+     really looks like is clip-why's job, and it does it with the live markup.
+
+  ⚠ A FIFTH CORRECTION THE SPEC MISSED, AND IT IS THE IMPORTANT ONE.
+    There is NO one-to-one mapping between the four demands and the four aims,
+    so the diagram must never draw demand-N → aim-N. Check it:
+      تغییرِ مسیر  → 04 Sharpen change of direction        ✓ exact
+      قدرتِ چرخشی  → 02 Build the rotational power          ✓ exact
+      اسپرینت      → 01 squat and hinge with trackable load ~ indirect but real
+      نفسِ ستِ سوم → 03 Armour the shoulder …               ✗ NOTHING
+    Aim 03 is shoulder durability; third-set lungs are conditioning. They are
+    not the same claim. So every connector converges into ONE junction and ONE
+    stem feeds the panel as a whole — a many-to-one, which is true: the four
+    demands inform the aim SET. If a later pass "improves" this by drawing four
+    lines into four aims, it will be stating something false on screen.
+
+  ── WHY THE NODES HAVE NO LEADER LINES ─────────────────────────────────────
+  The spec wanted a leader line from each court node to its row. Row order is
+  fixed by his script, and the court positions that are actually true for those
+  four demands are not in that vertical order, so the lines would cross — and
+  straightening them would mean moving the nodes to places the demands do not
+  happen. Instead each node lights in step with its own row (same delay, same
+  clay), which pairs them unambiguously and claims no geometry it cannot back.
+
+  ── LOOP SAFETY ────────────────────────────────────────────────────────────
+  Phases ACCUMULATE on .reel (p1…p6) — a screen swap would reset the diagram.
+  Every reveal is written as `.reel.pN .thing{…}` with the transition on that
+  rule ONLY; play() clears the class string and forces a reflow, so base rules
+  apply with no transition and everything snaps back. @keyframes are reserved
+  for the continuous life — orbs, radar sweep, node pulses, marching dashes,
+  the counter pops and the closing breathe — none of which has to be READ.
+
+  URL MODES
+    (none)      autoplay + loop, scaled to fit the window
+    ?beat=N     freeze phases p1…p(N+1) at native 1:1 (N = 0…5)
+    ?capture=1  chrome-free 1080×1920 for a clean programmatic export
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700;900&family=Barlow:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0E4A36; --clay:#C7552F; --clay2:#E06B43;
+    --paper:#FAF7F2; --ink:#1A1A1A; --ink2:#5C5C5C; --line:#D8D1C5;
+    --ease:cubic-bezier(.16,1,.3,1); --pop:cubic-bezier(.34,1.36,.5,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#111;font-family:'Vazirmatn',sans-serif;overflow:hidden;height:100vh;}
+  .viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+  .fitwrap{width:1080px;height:1920px;transform-origin:center;}
+  .reel{width:1080px;height:1920px;position:relative;overflow:hidden;
+    background:radial-gradient(125% 80% at 50% 6%,#1b2a23 0%,#11160f 52%,#070905 100%);}
+  .reel::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:40;
+    background:radial-gradient(120% 80% at 50% 42%,transparent 52%,rgba(0,0,0,.55) 100%);}
+
+  /* two drift orbs — green behind the court, clay behind the panel */
+  .orb{position:absolute;width:820px;height:820px;border-radius:50%;pointer-events:none;z-index:0;
+    filter:blur(90px);animation:orbdrift 9s ease-in-out infinite alternate;}
+  .orb-g{top:180px;left:-280px;opacity:.5;
+    background:radial-gradient(circle,rgba(14,74,54,.55),transparent 70%);}
+  .orb-c{top:900px;right:-300px;opacity:.5;animation-delay:-4s;
+    background:radial-gradient(circle,rgba(199,85,47,.32),transparent 70%);}
+  @keyframes orbdrift{from{transform:translate(0,0) scale(1);}to{transform:translate(120px,-90px) scale(1.16);}}
+
+  /* ── titles ─────────────────────────────────────────────────────────── */
+  .eyebrow{position:absolute;left:0;right:0;top:264px;text-align:center;z-index:5;
+    font-family:'Space Mono',monospace;font-weight:700;font-size:26px;letter-spacing:5px;
+    color:var(--clay2);direction:ltr;opacity:0;}
+  .reel.p1 .eyebrow{opacity:1;transition:opacity .5s var(--ease) .05s;}
+  .title{position:absolute;left:70px;right:70px;top:306px;text-align:center;z-index:5;
+    font-family:'Vazirmatn',sans-serif;font-weight:700;font-size:52px;line-height:1.4;
+    color:#fff;direction:rtl;opacity:0;transform:translateY(24px);}
+  .reel.p1 .title{opacity:1;transform:none;
+    transition:opacity .55s var(--ease) .12s,transform .55s var(--ease) .12s;}
+
+  /* ── the court ──────────────────────────────────────────────────────── */
+  .courtwrap{position:absolute;left:105px;top:410px;width:277px;height:400px;
+    overflow:hidden;z-index:2;}
+  .radar{position:absolute;left:50%;top:50%;width:1200px;height:1200px;margin:-600px 0 0 -600px;
+    background:conic-gradient(from 0deg,rgba(224,107,67,.16),rgba(224,107,67,0) 22%);
+    animation:radar 4s linear infinite;}
+  @keyframes radar{to{transform:rotate(360deg);}}
+  .court{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:visible;}
+  .court .cl{fill:none;stroke:rgba(255,255,255,.24);stroke-width:3;stroke-linecap:square;
+    stroke-dasharray:var(--len,600);stroke-dashoffset:var(--len,600);}
+  .reel.p1 .cl-net{stroke-dashoffset:0;transition:stroke-dashoffset .95s var(--ease) 0.00s;}
+  .reel.p1 .cl-sideL{stroke-dashoffset:0;transition:stroke-dashoffset .95s var(--ease) 0.06s;}
+  .reel.p1 .cl-sideR{stroke-dashoffset:0;transition:stroke-dashoffset .95s var(--ease) 0.12s;}
+  .reel.p1 .cl-base{stroke-dashoffset:0;transition:stroke-dashoffset .95s var(--ease) 0.18s;}
+  .reel.p1 .cl-service{stroke-dashoffset:0;transition:stroke-dashoffset .95s var(--ease) 0.24s;}
+  .reel.p1 .cl-centre{stroke-dashoffset:0;transition:stroke-dashoffset .95s var(--ease) 0.30s;}
+
+  .node{position:absolute;width:30px;height:30px;z-index:6;opacity:0;transform:scale(.4);}
+  .node i{position:absolute;inset:0;border-radius:50%;background:var(--clay2);display:block;
+    box-shadow:0 0 22px rgba(224,107,67,.65);}
+  .node i::after{content:'';position:absolute;inset:0;border-radius:50%;
+    border:3px solid var(--clay2);}
+  @keyframes nodePulse{0%{box-shadow:0 0 0 0 rgba(224,107,67,.55),0 0 22px rgba(224,107,67,.65);}
+    70%{box-shadow:0 0 0 26px rgba(224,107,67,0),0 0 22px rgba(224,107,67,.65);}
+    100%{box-shadow:0 0 0 0 rgba(224,107,67,0),0 0 22px rgba(224,107,67,.65);}}
+  .reel.p2 .node-1{opacity:1;transform:none;transition:opacity .35s var(--ease) 0.10s,transform .4s var(--pop) 0.10s;}
+  .reel.p2 .node-1 i{animation:nodePulse 1.8s ease-out 0.10s infinite;}
+  .reel.p2 .node-2{opacity:1;transform:none;transition:opacity .35s var(--ease) 0.32s,transform .4s var(--pop) 0.32s;}
+  .reel.p2 .node-2 i{animation:nodePulse 1.8s ease-out 0.32s infinite;}
+  .reel.p2 .node-3{opacity:1;transform:none;transition:opacity .35s var(--ease) 0.54s,transform .4s var(--pop) 0.54s;}
+  .reel.p2 .node-3 i{animation:nodePulse 1.8s ease-out 0.54s infinite;}
+  .reel.p2 .node-4{opacity:1;transform:none;transition:opacity .35s var(--ease) 0.76s,transform .4s var(--pop) 0.76s;}
+  .reel.p2 .node-4 i{animation:nodePulse 1.8s ease-out 0.76s infinite;}
+
+  /* ── the four demands ───────────────────────────────────────────────── */
+  .drow{position:absolute;left:540px;width:470px;height:88px;z-index:5;
+    display:flex;align-items:center;gap:24px;direction:rtl;
+    opacity:0;transform:translateX(-30px);}
+  .chip{width:56px;height:56px;flex-shrink:0;border-radius:50%;background:var(--clay2);
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    font-family:'Vazirmatn',sans-serif;font-weight:700;font-size:30px;
+    box-shadow:0 0 26px rgba(224,107,67,.35);}
+  .dlab{font-family:'Vazirmatn',sans-serif;font-weight:600;font-size:38px;color:#fff;
+    line-height:1.25;}
+  /* the connector's origin. Without it the wires appear to start in mid-air:
+     an RTL row's text hugs its RIGHT edge, so the row's left edge is blank. */
+  .dtail{position:absolute;left:-7px;top:50%;margin-top:-7px;width:14px;height:14px;
+    border-radius:50%;background:var(--clay2);box-shadow:0 0 16px rgba(224,107,67,.7);}
+  .reel.p2 .drow-1{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.10s,transform .45s var(--pop) 0.10s;}
+  .reel.p2 .drow-2{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.32s,transform .45s var(--pop) 0.32s;}
+  .reel.p2 .drow-3{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.54s,transform .45s var(--pop) 0.54s;}
+  .reel.p2 .drow-4{opacity:1;transform:none;transition:opacity .4s var(--ease) 0.76s,transform .45s var(--pop) 0.76s;}
+
+  /* ── the convergence: MANY to ONE, never demand-N to aim-N ──────────── */
+  .wires{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:visible;}
+  .wires .conn,.wires .stem{fill:none;stroke:var(--clay2);stroke-width:4;stroke-linecap:round;
+    stroke-dasharray:var(--len,600);stroke-dashoffset:var(--len,600);}
+  .wires .march{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;
+    stroke-dasharray:2 30;opacity:0;animation:arcmarch 6s linear infinite;}
+  @keyframes arcmarch{to{stroke-dashoffset:-320;}}
+  .reel.p3 .conn-1{stroke-dashoffset:0;transition:stroke-dashoffset .55s var(--ease) 0.00s;}
+  .reel.p3 .march-1{opacity:1;transition:opacity .3s ease 0.55s;}
+  .reel.p3 .conn-2{stroke-dashoffset:0;transition:stroke-dashoffset .55s var(--ease) 0.08s;}
+  .reel.p3 .march-2{opacity:1;transition:opacity .3s ease 0.63s;}
+  .reel.p3 .conn-3{stroke-dashoffset:0;transition:stroke-dashoffset .55s var(--ease) 0.16s;}
+  .reel.p3 .march-3{opacity:1;transition:opacity .3s ease 0.71s;}
+  .reel.p3 .conn-4{stroke-dashoffset:0;transition:stroke-dashoffset .55s var(--ease) 0.24s;}
+  .reel.p3 .march-4{opacity:1;transition:opacity .3s ease 0.79s;}
+  .reel.p3 .stem{stroke-dashoffset:0;transition:stroke-dashoffset .5s var(--ease) .40s;}
+  .junction{position:absolute;left:523px;top:833px;width:34px;height:34px;z-index:6;
+    background:var(--clay2);transform:rotate(45deg) scale(0);
+    box-shadow:0 0 30px rgba(224,107,67,.6);}
+  .reel.p3 .junction{transform:rotate(45deg) scale(1);
+    transition:transform .45s var(--pop) .34s;}
+
+  /* ── the panel: diagrammatic on purpose, not a fake app card ────────── */
+  .panel{position:absolute;left:80px;top:920px;width:920px;background:var(--paper);
+    padding:32px 44px 36px;z-index:5;direction:ltr;
+    box-shadow:0 24px 70px rgba(0,0,0,.45);
+    opacity:0;transform:translateY(54px);}
+  .reel.p4 .panel{opacity:1;transform:none;
+    transition:opacity .65s var(--ease),transform .7s var(--ease);
+    animation:cardland .9s ease .35s both;}
+  @keyframes cardland{0%,100%{box-shadow:0 24px 70px rgba(0,0,0,.45);}
+    38%{box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 34px 8px rgba(14,74,54,.34);}}
+  /* a drawn corner bracket, so the panel reads as diagram output rather than
+     as a screenshot of a screen that does not look like this */
+  .panel::before,.panel::after{content:'';position:absolute;width:56px;height:56px;
+    border:4px solid var(--green);}
+  .panel::before{left:-4px;top:-4px;border-right:none;border-bottom:none;}
+  .panel::after{right:-4px;bottom:-4px;border-left:none;border-top:none;}
+  .pcap{font-family:'Space Mono',monospace;font-weight:700;font-size:24px;letter-spacing:4px;
+    text-transform:uppercase;color:var(--green);margin-bottom:10px;}
+  .plabel{font-family:'Space Mono',monospace;font-weight:700;font-size:24px;letter-spacing:4px;
+    text-transform:uppercase;color:var(--clay);margin-bottom:20px;}
+  .aim{position:relative;display:flex;align-items:baseline;gap:22px;padding-bottom:13px;
+    margin-bottom:11px;opacity:0;transform:translateY(20px);}
+  .anum{font-family:'Space Mono',monospace;font-weight:700;font-size:30px;color:var(--clay);
+    flex-shrink:0;display:inline-block;}
+  @keyframes pillpop{0%{transform:scale(.6);}60%{transform:scale(1.14);}100%{transform:scale(1);}}
+  .atext{font-family:'Barlow',sans-serif;font-weight:300;font-size:32px;line-height:1.3;
+    color:var(--ink);}
+  .arule{position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(199,85,47,.35);
+    transform:scaleX(0);transform-origin:left;}
+  .aim:last-child{padding-bottom:0;margin-bottom:0;}
+  .aim:last-child .arule{display:none;}
+  .reel.p5 .aim-1{opacity:1;transform:none;transition:opacity .5s var(--ease) 0.00s,transform .5s var(--ease) 0.00s;}
+  .reel.p5 .aim-1 .arule{transform:scaleX(1);transition:transform .35s var(--ease) 0.12s;}
+  .reel.p5 .aim-1 .anum{animation:pillpop .42s var(--pop) 0.00s both;}
+  .reel.p5 .aim-2{opacity:1;transform:none;transition:opacity .5s var(--ease) 0.16s,transform .5s var(--ease) 0.16s;}
+  .reel.p5 .aim-2 .arule{transform:scaleX(1);transition:transform .35s var(--ease) 0.28s;}
+  .reel.p5 .aim-2 .anum{animation:pillpop .42s var(--pop) 0.16s both;}
+  .reel.p5 .aim-3{opacity:1;transform:none;transition:opacity .5s var(--ease) 0.32s,transform .5s var(--ease) 0.32s;}
+  .reel.p5 .aim-3 .arule{transform:scaleX(1);transition:transform .35s var(--ease) 0.44s;}
+  .reel.p5 .aim-3 .anum{animation:pillpop .42s var(--pop) 0.32s both;}
+  .reel.p5 .aim-4{opacity:1;transform:none;transition:opacity .5s var(--ease) 0.48s,transform .5s var(--ease) 0.48s;}
+  .reel.p5 .aim-4 .arule{transform:scaleX(1);transition:transform .35s var(--ease) 0.60s;}
+  .reel.p5 .aim-4 .anum{animation:pillpop .42s var(--pop) 0.48s both;}
+
+  /* ── the payoff ─────────────────────────────────────────────────────── */
+  .payoff{position:absolute;left:70px;right:70px;text-align:center;z-index:6;direction:rtl;
+    font-family:'Vazirmatn',sans-serif;font-weight:800;font-size:50px;color:#fff;
+    opacity:0;transform:translateY(28px);}
+  .payoff .acc{color:var(--clay2);}
+  .payoff span.inner{display:inline-block;}
+  .reel.p6 .payoff{opacity:1;transform:none;
+    transition:opacity .55s var(--ease),transform .55s var(--ease);}
+  .reel.p6 .payoff span.inner{animation:breathe 2.6s ease-in-out .55s infinite;}
+  @keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.018);}}
+
+  /* ── chrome outside the recorded frame ──────────────────────────────── */
+  .progress{position:absolute;left:0;right:0;bottom:0;height:8px;background:rgba(255,255,255,.10);z-index:60;}
+  .progress i{display:block;height:100%;width:0;background:var(--clay);}
+  .controls{position:fixed;left:0;right:0;bottom:0;background:#000;color:#fff;padding:14px 22px;
+    display:flex;align-items:center;gap:18px;font-family:'Barlow',sans-serif;font-size:14px;
+    z-index:999;direction:ltr;}
+  .controls button{background:var(--clay);color:#fff;border:none;border-radius:8px;padding:8px 16px;
+    font-weight:700;cursor:pointer;}
+  .controls .hint{opacity:.6;}
+  .stillmode .controls{display:none;}
+  .stillmode .viewport{display:block;}
+  .stillmode .fitwrap{transform:none!important;}
+  .stillmode *{transition:none!important;animation:none!important;}
+  .capturemode .controls,.capturemode .progress{display:none!important;}
+  .capturemode .fitwrap{transform:none!important;}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="fitwrap" id="fitwrap">
+    <div class="reel" id="reel">
+
+      <div class="orb orb-g"></div>
+      <div class="orb orb-c"></div>
+
+      <div class="eyebrow">TENNIS PERFORMANCE</div>
+      <div class="title">تحلیلِ نیاز: زمین چی می‌خواد؟</div>
+
+      <div class="courtwrap"><div class="radar"></div></div>
+      <svg class="court" viewBox="0 0 1080 1920" preserveAspectRatio="none">
+        <path class="cl cl-net" style="--d:0.00s" d="M105 410 L382 410"/>
+        <path class="cl cl-sideL" style="--d:0.06s" d="M105 410 L105 810"/>
+        <path class="cl cl-sideR" style="--d:0.12s" d="M382 410 L382 810"/>
+        <path class="cl cl-base" style="--d:0.18s" d="M105 810 L382 810"/>
+        <path class="cl cl-service" style="--d:0.24s" d="M105 625 L382 625"/>
+        <path class="cl cl-centre" style="--d:0.30s" d="M243 410 L243 625"/>
+      </svg>
+      <div class="node node-1" style="left:228px;top:769px;--d:0.10s"><i></i></div>
+        <div class="node node-2" style="left:112px;top:755px;--d:0.32s"><i></i></div>
+        <div class="node node-3" style="left:345px;top:707px;--d:0.54s"><i></i></div>
+        <div class="node node-4" style="left:274px;top:653px;--d:0.76s"><i></i></div>
+
+      <div class="drow drow-1" style="top:410px"><span class="chip">۱</span><span class="dlab">اسپرینت</span><i class="dtail"></i></div>
+        <div class="drow drow-2" style="top:510px"><span class="chip">۲</span><span class="dlab">تغییرِ مسیر</span><i class="dtail"></i></div>
+        <div class="drow drow-3" style="top:610px"><span class="chip">۳</span><span class="dlab">قدرتِ چرخشی</span><i class="dtail"></i></div>
+        <div class="drow drow-4" style="top:710px"><span class="chip">۴</span><span class="dlab">نفسِ ستِ سوم</span><i class="dtail"></i></div>
+
+      <svg class="wires" viewBox="0 0 1080 1920" preserveAspectRatio="none">
+        <path class="conn conn-1" d="M540 454 C455 560, 455 730, 540 850"/>
+        <path class="conn conn-2" d="M540 554 C480 640, 480 760, 540 850"/>
+        <path class="conn conn-3" d="M540 654 C505 700, 505 790, 540 850"/>
+        <path class="conn conn-4" d="M540 754 C525 780, 525 815, 540 850"/>
+        <path class="stem" d="M540 850 L540 915"/>
+        <path class="march march-1" d="M540 454 C455 560, 455 730, 540 850"/>
+        <path class="march march-2" d="M540 554 C480 640, 480 760, 540 850"/>
+        <path class="march march-3" d="M540 654 C505 700, 505 790, 540 850"/>
+        <path class="march march-4" d="M540 754 C525 780, 525 815, 540 850"/>
+      </svg>
+      <div class="junction"></div>
+
+      <div class="panel" id="panel">
+        <div class="pcap">Load & Build &middot; Weeks 6–10</div>
+        <div class="plabel">The Aims</div>
+          <div class="aim aim-1"><span class="anum">01</span><span class="atext">Progress the squat and hinge with real, trackable load.</span><i class="arule"></i></div>
+          <div class="aim aim-2"><span class="anum">02</span><span class="atext">Build the rotational power that sits behind every shot.</span><i class="arule"></i></div>
+          <div class="aim aim-3"><span class="anum">03</span><span class="atext">Armour the shoulder so the serve holds up all season.</span><i class="arule"></i></div>
+          <div class="aim aim-4"><span class="anum">04</span><span class="atext">Sharpen change of direction — the first step to the ball.</span><i class="arule"></i></div>
+      </div>
+
+      <div class="payoff" id="payoff"><span class="inner">برنامه از <span class="acc">همین‌جا</span> نوشته می‌شه</span></div>
+
+      <div class="progress"><i id="pfill"></i></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="REEL.play()">Replay</button>
+  <span id="beatn">1 / 6</span>
+  <span class="hint">To record: hit replay and screen-capture the 1080&times;1920 frame &mdash; controls sit outside it. Use ?capture=1 for a clean programmatic export.</span>
+</div>
+
+<script>
+  const REEL = (function(){
+    const reel  = document.getElementById('reel');
+    const pfill = document.getElementById('pfill');
+    const beatn = document.getElementById('beatn');
+    const STARTS = [0, 1100, 2600, 3900, 5100, 6300];
+    const TOTAL  = 7000;
+    const BASE = 'reel';
+    let timers = [];
+
+    function fit(){
+      if(document.body.classList.contains('stillmode')||document.body.classList.contains('capturemode')){
+        document.getElementById('fitwrap').style.transform='none'; return;
+      }
+      const s=Math.min(window.innerWidth/1080,(window.innerHeight-70)/1920);
+      document.getElementById('fitwrap').style.transform='scale('+s+')';
+    }
+    window.addEventListener('resize', fit);
+
+    /* Path lengths are MEASURED, never typed. Every court line, connector and
+       stem is drawn by stroke-dashoffset, and a hand-guessed length either
+       leaves a stub visible at rest or never finishes drawing — with nothing
+       on screen to say which. The payoff line is likewise placed from the
+       panel's real rendered height, because the aims wrap differently once the
+       webfont lands. */
+    function layout(){
+      reel.querySelectorAll('path.cl, path.conn, path.stem').forEach(p => {
+        /* Set a VARIABLE, never the property. Writing p.style.strokeDashoffset
+           here makes it an inline declaration, which outranks every stylesheet
+           rule — including the `.reel.pN … {stroke-dashoffset:0}` that is
+           supposed to draw the line. The first build did exactly that and every
+           path sat undrawn through all six phases with nothing erroring. */
+        p.style.setProperty('--len', p.getTotalLength().toFixed(1));
+      });
+      const panel  = document.getElementById('panel');
+      const payoff = document.getElementById('payoff');
+      payoff.style.top = (panel.offsetTop + panel.offsetHeight + 40) + 'px';
+      window.__metrics = { panelTop: panel.offsetTop, panelH: panel.offsetHeight,
+        panelBottom: panel.offsetTop + panel.offsetHeight,
+        payoffTop: parseFloat(payoff.style.top),
+        payoffBottom: parseFloat(payoff.style.top) + payoff.offsetHeight };
+    }
+
+    /* Phases ACCUMULATE: the court stays drawn while the rows land, the rows
+       stay while the wires converge. A scene swap would reset the diagram. */
+    function setPhase(n){
+      reel.className = BASE;
+      void reel.offsetWidth;                 /* forced reflow re-arms every keyframe */
+      for(let i=1;i<=n+1;i++) reel.classList.add('p'+i);
+      beatn.textContent = (n+1)+' / '+STARTS.length;
+    }
+    function clear(){ timers.forEach(clearTimeout); timers=[]; }
+
+    function play(){
+      clear();
+      reel.className = BASE;                 /* no phase classes → base rules, no transitions */
+      void reel.offsetWidth;
+      STARTS.forEach((t,i)=>{
+        timers.push(setTimeout(()=>{
+          reel.classList.add('p'+(i+1));
+          beatn.textContent = (i+1)+' / '+STARTS.length;
+        }, t + 150));
+      });
+      const t0 = performance.now();
+      (function prog(now){ const p=Math.min(1,(now-t0)/(TOTAL+150)); pfill.style.width=(p*100)+'%';
+        if(p<1 && timers.length) requestAnimationFrame(prog); })(performance.now());
+      timers.push(setTimeout(play, TOTAL + 150 + 400));
+    }
+
+    window.__show = n => { clear(); setPhase(n); };
+
+    const q = new URLSearchParams(location.search);
+    if(q.has('beat')){
+      document.body.classList.add('stillmode'); fit();
+      /* one frame after fonts.ready: the promise can resolve before the new
+         metrics have been laid out, and every measurement here feeds a position */
+      document.fonts.ready.then(()=>requestAnimationFrame(()=>{ layout(); __show(+q.get('beat')); }));
+    } else {
+      if(q.has('capture')) document.body.classList.add('capturemode');
+      fit(); document.fonts.ready.then(()=>requestAnimationFrame(()=>{ layout(); play(); }));
+    }
+    return { play, layout };
+  })();
+</script>
+</body>
+</html>
