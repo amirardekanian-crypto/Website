@@ -205,3 +205,47 @@ cycles, so these are directional, not comparable maxes. Her barbell entries are 
 about total vs per-side: the trap bar is logged as "30" with a note reading *"15 kg each side"*.
 One squat entry reads `٫20` (Persian decimal separator) and one RDL entry `12..5`. Confirm the
 logging convention with her before acting on any of these figures.
+
+## Observation — 2026-08-29 · C4 SHIPPED BUT NOT STARTED
+*(not a cycle design pass — no programming changed. Recorded so the next design pass does not
+re-derive the wrong picture from a `currentCycleIndex` that says 3.)*
+
+**C4 has zero logged sessions.** Power Reload went live 2026-08-24. As of today, five days
+later, `session_history` holds nothing against it and no Web3Forms report has arrived. Verified
+independently from both sources — the server (`select ... where completed_on >= '2026-08-13'`
+returns 0 rows) and Gmail (last report 2026-08-12). Her last session of any kind was
+**2026-08-12**, so the app has been idle 17 days.
+
+⚠️ **Consequence for the next design pass: there are no C4 logs.** Any "review the last cycle"
+step still has to read C3 (2026-06-15 → 2026-08-12, 13 sessions) — the same data the C4 pass
+above already consumed. Do not treat C4 as trained. Designing C5 *Performance Peak* off this
+state would repeat, one level up, the exact error the C4 entry corrected: peaking a block that
+was never received. Performance Peak stays queued behind a C4 that actually happens.
+
+**Gap cause — RESOLVED, and it closes an open fork.** Amir, 2026-08-29: the layoff is
+**non-training — travel/work/life**. No injury, no pain, no availability change to programme
+around. This is the second such gap (26 days in C3, cause never confirmed; 17 days here, cause
+now known), and the pattern is life load, not adherence: she trains hard when she is present.
+That retires open fork #3 from the C4 entry for this gap, but the C3 one stays unconfirmed.
+
+**Decision — Amir, 2026-08-29: leave C4 exactly as designed.** A re-entry ramp (reduced week 1,
+capped session length) was offered and **declined**. C4's prescriptions are unchanged and still
+correct: nothing in the logs since 24 Aug argues against them, because there are no logs since
+24 Aug.
+
+⚠️ **Therefore the re-entry guardrail lives only in the athlete-facing report, not in the
+programme.** This is the one thing to check first if her first C4 session comes back long and
+hot. Her documented pattern after the C3 layoff was to return with a **142-minute RPE-9 session
+(1,278 AU — 2× her cycle average and 2× the designed length)** as session one. The Farsi report
+sent today therefore carries an explicit first-session rule — warm-up, reactive circuit, squat,
+stop; one increment lighter; under 40 minutes — with full volume from session two. If she
+overshoots anyway, the ramp becomes a programming problem rather than a messaging one.
+
+**Athlete-facing report sent 2026-08-29 (Farsi).** Covers C3 only, since that is the only block
+with logs. Wins led with the closed knees/shoulders (13 sessions, zero pain reports) and the
+four real load progressions (landmine press 2.5→5 kg, reverse lunge 10→15, B-stance RDL
+10→12.5, KB press 6→10 reps at 4 kg); cautions led with the squat stall framed as the
+programme's fault rather than hers, the trap bar regression, the 142-minute session, sleep at
+2.67/5, and the never-attempted Day 4. It also asks her the **total-vs-per-side logging
+question** (open fork #4, still unresolved) — the answer governs every increment in the C4
+progression-levers table, so it is worth chasing if she does not volunteer it.
