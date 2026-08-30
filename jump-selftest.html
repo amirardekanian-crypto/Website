@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--
+  JUMP SELF TEST — jump-selftest.html
+
+  Dev page. Not linked from anywhere, noindex. Open it after changing anything
+  in assets/js/jump/ to check you have not broken the measurement.
+
+  It builds jumps in memory where the true height is known exactly, runs them
+  through the real tracker and the real formulas, and reports the error.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jump engine self test</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E4A36">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#0E4A36; --clay:#C7552F; --red:#C0392B; --green:#1F7A4D;
+  --bg:#FAF7F2; --band:#F1ECE3; --card:#FFFFFF; --border:#E7E2D9;
+  --ink:#1A1A1A; --ink2:#5C5C5C; --ink3:#8A8A8A;
+  --mono:'Space Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Barlow',system-ui,sans-serif;line-height:1.55}
+.wrap{max-width:940px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:900;text-transform:uppercase;margin:0;line-height:1.05}
+h1{font-size:40px}
+h2{font-size:24px;margin:34px 0 12px}
+h3{font-size:16px;font-weight:700}
+.hero{background:radial-gradient(120% 100% at 80% 0%,#155B43 0%,#0E4A36 55%,#0B3B2B 100%);color:#fff;padding:34px 0}
+.hero p{color:rgba(255,255,255,.82);max-width:60ch;margin:12px 0 0}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.62);margin:0 0 8px}
+.sec{padding:26px 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px;margin-bottom:12px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.btn{appearance:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.12em;text-transform:uppercase;padding:14px 26px;border-radius:3px;border:0;
+  background:var(--accent);color:#fff}
+.btn:hover{background:#155B43}
+.summary{border-radius:6px;padding:18px;margin-bottom:18px;border:1px solid;font-family:var(--mono)}
+.summary.ok{background:rgba(31,122,77,.10);border-color:rgba(31,122,77,.3);color:#14532d}
+.summary.bad{background:rgba(192,57,43,.10);border-color:rgba(192,57,43,.3);color:#7f1d1d}
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal;min-width:220px}
+thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);background:var(--band)}
+tbody td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+tbody td:first-child{font-family:'Barlow',sans-serif}
+tr.pass td:last-child{color:var(--green);font-weight:700}
+tr.fail td:last-child{color:var(--red);font-weight:700}
+tr.fail{background:rgba(192,57,43,.06)}
+.note{font-size:13px;color:var(--ink2);margin-top:10px;max-width:75ch}
+.tiny{font-size:12.5px;color:var(--ink3);line-height:1.5}
+code{font-family:var(--mono);font-size:12.5px;background:var(--band);padding:1px 5px;border-radius:2px}
+.footer{padding:30px 0 50px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Developer page</p>
+    <h1>Jump engine self test</h1>
+    <p>Builds jumps in memory where the true height is known exactly, runs them through the real tracker and the real formulas, and reports the error. Run this after changing anything under <code style="background:rgba(255,255,255,.14);color:#fff">assets/js/jump/</code>.</p>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="wrap">
+    <button class="btn" id="run">Run the tests</button>
+    <p class="note" id="status">Takes a few seconds. It decodes nothing, it only exercises the tracking and the maths, which are the parts that can be wrong without looking wrong.</p>
+    <div id="out"></div>
+  </div>
+</div>
+
+<div class="footer wrap">
+  <p class="tiny">Not linked from the site and marked noindex. Cases live in <code>assets/js/jump/selftest.js</code>.</p>
+</div>
+
+<script src="/assets/js/jump/kit.js"></script>
+<script src="/assets/js/jump/physics.js"></script>
+<script src="/assets/js/jump/filming.js"></script>
+<script src="/assets/js/jump/video.js"></script>
+<script src="/assets/js/jump/tracking.js"></script>
+<script src="/assets/js/jump/tests/cmj.js"></script>
+<script src="/assets/js/jump/tests/sj.js"></script>
+<script src="/assets/js/jump/tests/dj.js"></script>
+<script src="/assets/js/jump/tests/hop-10-5.js"></script>
+<script src="/assets/js/jump/selftest.js"></script>
+
+<script>
+(function () {
+  "use strict";
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function n(v, d) { return v == null ? "—" : (typeof v === "number" ? v.toFixed(d == null ? 2 : d) : v); }
+
+  $("run").addEventListener("click", function () {
+    $("status").textContent = "Running…";
+    $("out").innerHTML = "";
+
+    setTimeout(function () {
+      var t0 = performance.now();
+      var r = JumpKit.selftest.runAll();
+      var ms = Math.round(performance.now() - t0);
+      $("status").textContent = "Finished in " + ms + " ms.";
+
+      var h = "";
+
+      h += '<div class="summary ' + (r.allPass ? "ok" : "bad") + '">' +
+           (r.allPass ? "ALL PASS" : "FAILURES") + " — " + r.passed + " of " + r.total + " cases" +
+           (r.physicsSelfTest.length ? "<br>physics self test: " + esc(r.physicsSelfTest.join(" | ")) : "<br>physics self test: clean") +
+           "</div>";
+
+      /* --- single jumps ------------------------------------------------ */
+      h += "<h2>Single jumps</h2>";
+      h += '<div class="tablewrap"><table><thead><tr>' +
+           "<th>Case</th><th>Truth</th><th>Measured</th><th>Error</th><th>Sub frame</th>" +
+           "<th>Confidence</th><th>Physics</th><th>Verdict</th></tr></thead><tbody>";
+      r.cases.forEach(function (c) {
+        h += '<tr class="' + (c.pass ? "pass" : "fail") + '">' +
+             "<td>" + esc(c.name) + "<br><span style='font-size:11px;color:#8A8A8A'>expects " + esc(c.expectation) + "</span></td>" +
+             "<td>" + n(c.truth_cm, 1) + " cm</td>" +
+             "<td>" + (c.got_cm == null ? "no number" : n(c.got_cm, 2) + " cm") + "</td>" +
+             "<td>" + (c.error_cm == null ? "—" : (c.error_cm > 0 ? "+" : "") + n(c.error_cm, 2) + " cm") + "</td>" +
+             "<td>" + (c.refined ? "yes" : "no") + "</td>" +
+             "<td>" + n(c.confidence, 2) + "</td>" +
+             "<td>" + esc(c.gravityBand || "—") + "</td>" +
+             "<td>" + (c.pass ? "PASS" : "FAIL") + "</td></tr>";
+      });
+      h += "</tbody></table></div>";
+      h += '<p class="note"><strong>Accurate</strong> cases must land within tolerance. <strong>Caught</strong> cases are deliberately hard, and they pass by being refused: no number, or confidence under 0.80, or the physics check going red. A hard shadow genuinely cannot be measured, so the only correct behaviour is to say so.</p>';
+
+      /* --- hops -------------------------------------------------------- */
+      var hop = r.hop;
+      h += "<h2>10-5 repeated hops</h2>";
+      h += '<div class="summary ' + (hop.pass ? "ok" : "bad") + '">' +
+           (hop.pass ? "PASS" : "FAIL") + " — found " + hop.detectedHops + " of " + hop.expectedHops +
+           " hops, score " + esc(hop.score || "none") +
+           "<br>worst contact error " + n(hop.worstContactError_ms, 0) + " ms, worst height error " +
+           n(hop.worstHeightError_cm, 2) + " cm</div>";
+      h += '<div class="tablewrap"><table><thead><tr><th>Hop</th>' +
+           "<th>Contact</th><th>Truth</th><th>Height</th><th>Truth</th><th>RSI</th><th>Truth</th><th>Counted</th>" +
+           "</tr></thead><tbody>";
+      hop.rows.forEach(function (row) {
+        h += "<tr><td>#" + row.n + "</td>" +
+             "<td>" + row.gct_ms + " ms</td><td>" + (row.gct_truth_ms == null ? "—" : row.gct_truth_ms + " ms") + "</td>" +
+             "<td>" + n(row.height_cm, 1) + " cm</td><td>" + (row.height_truth_cm == null ? "—" : n(row.height_truth_cm, 1) + " cm") + "</td>" +
+             "<td>" + n(row.rsi, 2) + "</td><td>" + (row.rsi_truth == null ? "—" : n(row.rsi_truth, 2)) + "</td>" +
+             "<td>" + (row.excluded ? "dropped" : (row.counted ? "yes" : "no")) + "</td></tr>";
+      });
+      h += "</tbody></table></div>";
+      h += '<p class="note">A hop pairs a ground contact with the flight that contact <strong>produces</strong>, so hop 1 is the first scored contact and the jump that comes out of it. Getting that off by one would be silent and would make every RSI wrong, which is why it is tested against known values rather than eyeballed.</p>';
+
+      /* --- timebase ------------------------------------------------------ */
+      var tb = r.timebase;
+      h += "<h2>Baked slow motion</h2>";
+      h += '<div class="summary ' + (tb.pass ? "ok" : "bad") + '">' + (tb.pass ? "PASS" : "FAIL") +
+           " — a 240 fps jump with 30 fps timestamps" +
+           "<br>naive answer would be <strong>" + n(tb.naiveHeight_cm, 0) + " cm</strong> from a " +
+           n(tb.flightTime_s, 2) + " s flight" +
+           "<br>blocked by the physical guard: " + (tb.blockedByPhysicsGuard ? "yes" : "NO") +
+           "<br>gravity check: " + esc(tb.gravityBand || "none") +
+           ", implies the athlete is " + n(tb.impliedHeight_m, 0) + " m tall, divisor " + n(tb.impliedDivisor, 1) +
+           "</div>";
+      h += '<p class="note">This is the highest consequence failure the tool can have, so <strong>two independent nets must both catch it</strong>. One alone is not enough: a smaller divisor can produce a physically possible but still wrong answer, which the plain guard would let through and only the gravity cross check would spot.</p>';
+
+      $("out").innerHTML = h;
+    }, 30);
+  });
+})();
+</script>
+</body>
+</html>

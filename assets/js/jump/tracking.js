@@ -235,7 +235,8 @@
      Per frame segmentation and measurement
      ==================================================================== */
 
-  function trackFrame(buf, bg, W, H, roi, widthLimit) {
+  function trackFrame(buf, bg, W, H, roi, widthLimit, scratch) {
+    var sc = scratch || makeScratch(W, H);
     var B = bg.B, sn = bg.sn;
     var N = W * H;
     var thresh = Math.max(9, 3 * sn);
@@ -263,7 +264,8 @@
 
     /* --- foreground mask --------------------------------------------- */
 
-    var mask = new Uint8Array(N);
+    var mask = sc.mask;
+    mask.fill(0);
     for (var y = y0; y <= y1; y++) {
       var rowOff = y * W;
       for (var x = x0; x <= x1; x++) {
@@ -277,14 +279,14 @@
     // Despeckle first, then fill codec holes. This order matters: closing
     // first could bridge the body back to its own shadow after the opening
     // had just separated them.
-    erode(mask, W, H, roi);
-    dilate(mask, W, H, roi);
-    dilate(mask, W, H, roi);
-    erode(mask, W, H, roi);
+    erode(mask, sc.copy, W, H, roi);
+    dilate(mask, sc.copy, W, H, roi);
+    dilate(mask, sc.copy, W, H, roi);
+    erode(mask, sc.copy, W, H, roi);
 
     /* --- connected components, keep the biggest ------------------------ */
 
-    var blob = largestBlob(mask, W, H, roi);
+    var blob = largestBlob(mask, W, H, roi, sc);
     if (!blob || blob.area < 40) {
       return { ok: false, area: blob ? blob.area : 0 };
     }
@@ -364,10 +366,13 @@
     }
     footX = footCount ? footX / footCount : (blob.left + blob.right) / 2;
 
-    // Bottom width used to calibrate the width limit on the next pass, and
-    // to score confidence. Take the median of the lowest few rows.
+    // Width used to calibrate the limit on the next pass. Measure it at the
+    // FOOT, not at the bottom of the blob. When a shadow is attached those
+    // are different rows, and calibrating on the shadow would teach the next
+    // pass that a shadow-width row is a normal foot, which defeats the whole
+    // two pass design.
     var bottomRows = [];
-    for (var br = Math.max(blob.top, blob.bottom - 4); br <= blob.bottom; br++) bottomRows.push(rowW[br]);
+    for (var br = Math.max(blob.top, footY - 4); br <= footY; br++) bottomRows.push(rowW[br]);
 
     return {
       ok: true,
@@ -381,18 +386,48 @@
       bottom: blob.bottom,
       left: blob.left,
       right: blob.right,
-      bboxHeight: blob.bottom - blob.top,
+      bboxHeight: footY - blob.top,
       bottomWidth: median(bottomRows),
       widthAtFoot: rowW[footY],
+      shadowRows: shadowRows,
+      blobBottom: blob.bottom,
       touchesEdge: blob.top <= y0 || blob.bottom >= y1 || blob.left <= x0 || blob.right >= x1,
       secondBlobFrac: blob.secondFrac
     };
   }
 
-  /* --- morphology, 4 neighbour, in place over the ROI ----------------- */
+  /* --- morphology and connected components -----------------------------
 
-  function erode(mask, W, H, roi) {
-    var copy = mask.slice();
+     PERFORMANCE NOTE, AND IT IS NOT A MICRO OPTIMISATION.
+     These run once per frame, and a clip is hundreds of frames. The first
+     version of this file allocated a fresh mask copy and a fresh label array
+     per frame, plus a four element neighbour array PER PIXEL. That is roughly
+     a quarter of a megabyte and sixty thousand short lived arrays per frame,
+     and it made a ten second clip lock the main thread for the best part of a
+     minute on a phone. Everything below reuses buffers handed in by the
+     caller and unrolls the neighbour loop. Keep it that way.
+     ------------------------------------------------------------------- */
+
+  function makeScratch(W, H) {
+    var N = W * H;
+    return {
+      N: N,
+      mask: new Uint8Array(N),
+      copy: new Uint8Array(N),
+      labels: new Int32Array(N),
+      parent: new Int32Array(Math.max(1024, (N >> 2) + 16)),
+      area: new Int32Array(Math.max(1024, (N >> 2) + 16)),
+      sx: new Float64Array(Math.max(1024, (N >> 2) + 16)),
+      sy: new Float64Array(Math.max(1024, (N >> 2) + 16)),
+      top: new Int32Array(Math.max(1024, (N >> 2) + 16)),
+      bottom: new Int32Array(Math.max(1024, (N >> 2) + 16)),
+      left: new Int32Array(Math.max(1024, (N >> 2) + 16)),
+      right: new Int32Array(Math.max(1024, (N >> 2) + 16))
+    };
+  }
+
+  function erode(mask, copy, W, H, roi) {
+    copy.set(mask);
     for (var y = roi.y0 + 1; y < roi.y1; y++) {
       var o = y * W;
       for (var x = roi.x0 + 1; x < roi.x1; x++) {
@@ -402,8 +437,8 @@
     }
   }
 
-  function dilate(mask, W, H, roi) {
-    var copy = mask.slice();
+  function dilate(mask, copy, W, H, roi) {
+    copy.set(mask);
     for (var y = roi.y0 + 1; y < roi.y1; y++) {
       var o = y * W;
       for (var x = roi.x0 + 1; x < roi.x1; x++) {
@@ -415,75 +450,100 @@
 
   /* --- connected components, two pass union find, 8 connectivity ------ */
 
-  function largestBlob(mask, W, H, roi) {
-    var N = W * H;
-    var labels = new Int32Array(N);
-    var parent = [0];
+  function largestBlob(mask, W, H, roi, sc) {
+    var labels = sc.labels, parent = sc.parent;
+    var maxLabels = parent.length;
     var next = 1;
 
-    function find(a) { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; }
-    function union(a, b) { a = find(a); b = find(b); if (a !== b) parent[b] = a; }
+    // Only the region we are about to write needs clearing.
+    for (var cy = roi.y0; cy <= roi.y1; cy++) {
+      labels.fill(0, cy * W + roi.x0, cy * W + roi.x1 + 1);
+    }
+
+    function find(a) {
+      while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; }
+      return a;
+    }
+    function union(a, b) {
+      a = find(a); b = find(b);
+      if (a !== b) parent[b] = a;
+    }
 
     for (var y = roi.y0; y <= roi.y1; y++) {
       var o = y * W;
+      var hasUp = y > roi.y0;
       for (var x = roi.x0; x <= roi.x1; x++) {
         var i = o + x;
         if (!mask[i]) continue;
-        var best = 0;
-        var nb = [i - 1, i - W, i - W - 1, i - W + 1];
-        for (var k = 0; k < 4; k++) {
-          var j = nb[k];
-          if (j < 0 || j >= N) continue;
-          if (!labels[j]) continue;
-          if (!best) best = labels[j]; else union(best, labels[j]);
+
+        // Neighbour loop unrolled. An array literal here would allocate once
+        // per foreground pixel.
+        var best = 0, lb;
+        if (x > roi.x0) { lb = labels[i - 1]; if (lb) best = lb; }
+        if (hasUp) {
+          lb = labels[i - W];
+          if (lb) { if (!best) best = lb; else union(best, lb); }
+          if (x > roi.x0) { lb = labels[i - W - 1]; if (lb) { if (!best) best = lb; else union(best, lb); } }
+          if (x < roi.x1) { lb = labels[i - W + 1]; if (lb) { if (!best) best = lb; else union(best, lb); } }
         }
-        if (!best) { best = next; parent[next] = next; next++; }
+        if (!best) {
+          if (next >= maxLabels) continue;   // pathological noise, stop labelling
+          best = next; parent[next] = next; next++;
+        }
         labels[i] = best;
       }
     }
 
-    var stats = {};
+    if (next <= 1) return null;
+
+    var area = sc.area, sx = sc.sx, sy = sc.sy;
+    var top = sc.top, bottom = sc.bottom, left = sc.left, right = sc.right;
+    area.fill(0, 0, next); sx.fill(0, 0, next); sy.fill(0, 0, next);
+    top.fill(2147483647, 0, next); bottom.fill(-1, 0, next);
+    left.fill(2147483647, 0, next); right.fill(-1, 0, next);
+
     var totalFg = 0;
     for (var y2 = roi.y0; y2 <= roi.y1; y2++) {
       var o2 = y2 * W;
       for (var x2 = roi.x0; x2 <= roi.x1; x2++) {
         var i2 = o2 + x2;
-        if (!labels[i2]) continue;
+        var l = labels[i2];
+        if (!l) continue;
         totalFg++;
-        var r = find(labels[i2]);
-        var s = stats[r] || (stats[r] = { area: 0, sx: 0, sy: 0, top: 1e9, bottom: -1, left: 1e9, right: -1, root: r });
-        s.area++; s.sx += x2; s.sy += y2;
-        if (y2 < s.top) s.top = y2;
-        if (y2 > s.bottom) s.bottom = y2;
-        if (x2 < s.left) s.left = x2;
-        if (x2 > s.right) s.right = x2;
+        var r = find(l);
+        labels[i2] = r;                 // flatten, so the marking pass is cheap
+        area[r]++; sx[r] += x2; sy[r] += y2;
+        if (y2 < top[r]) top[r] = y2;
+        if (y2 > bottom[r]) bottom[r] = y2;
+        if (x2 < left[r]) left[r] = x2;
+        if (x2 > right[r]) right[r] = x2;
       }
     }
 
-    var list = Object.keys(stats).map(function (k) { return stats[k]; })
-      .sort(function (a, b) { return b.area - a.area; });
-    if (!list.length) return null;
-
-    var main = list[0];
-    var second = list[1];
+    var mainL = 0, mainA = 0, secondA = 0;
+    for (var q = 1; q < next; q++) {
+      if (area[q] > mainA) { secondA = mainA; mainA = area[q]; mainL = q; }
+      else if (area[q] > secondA) { secondA = area[q]; }
+    }
+    if (!mainL) return null;
 
     // Mark the winning blob as 2 so the caller can measure row widths on it
     // alone. Everything else stays 1 and is ignored.
-    for (var y3 = main.top; y3 <= main.bottom; y3++) {
+    for (var y3 = top[mainL]; y3 <= bottom[mainL]; y3++) {
       var o3 = y3 * W;
-      for (var x3 = main.left; x3 <= main.right; x3++) {
+      for (var x3 = left[mainL]; x3 <= right[mainL]; x3++) {
         var i3 = o3 + x3;
-        if (labels[i3] && find(labels[i3]) === main.root) mask[i3] = 2;
+        if (labels[i3] === mainL) mask[i3] = 2;
       }
     }
 
     return {
-      area: main.area,
-      cx: main.sx / main.area,
-      cy: main.sy / main.area,
-      top: main.top, bottom: main.bottom, left: main.left, right: main.right,
+      area: mainA,
+      cx: sx[mainL] / mainA,
+      cy: sy[mainL] / mainA,
+      top: top[mainL], bottom: bottom[mainL], left: left[mainL], right: right[mainL],
       totalFg: totalFg,
-      secondFrac: second ? second.area / main.area : 0
+      secondFrac: mainA ? secondA / mainA : 0
     };
   }
 
@@ -835,7 +895,9 @@
 
     /* ---- pass A, uncalibrated, just to find the flight -------------- */
 
-    var passA = frames.map(function (f) { return trackFrame(f.buf, bg, W, H, roi, 0); });
+    // ONE scratch buffer for the whole clip, shared by both passes.
+    var sc = makeScratch(W, H);
+    var passA = frames.map(function (f) { return trackFrame(f.buf, bg, W, H, roi, 0, sc); });
     var gl0 = groundLine(passA);
     var heights0 = passA.map(function (t) { return t.ok ? gl0.y - t.footY : 0; });
 
@@ -863,7 +925,7 @@
 
     /* ---- pass B, calibrated ------------------------------------------ */
 
-    var track = frames.map(function (f) { return trackFrame(f.buf, bg, W, H, roi, widthLimit); });
+    var track = frames.map(function (f) { return trackFrame(f.buf, bg, W, H, roi, widthLimit, sc); });
     var gl = groundLine(track);
     var h = track.map(function (t) { return t.ok ? gl.y - t.footY : 0; });
 
@@ -1028,6 +1090,7 @@
 
   JumpKit.tracking = {
     analyse: analyse,
+    makeScratch: makeScratch,
     buildBackground: buildBackground,
     trackFrame: trackFrame,
     groundLine: groundLine,
