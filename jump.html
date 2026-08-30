@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<!--
+  JUMP TEST — jump.html
+
+  Measures countermovement jump height, squat jump height, drop jump RSI and
+  the 10-5 repeated hop test from a phone video. Everything runs in the
+  browser. No video is uploaded anywhere, no account, no backend.
+
+  ARCHITECTURE
+  This page is the UI only. It knows how to render a test, not what a test is.
+  Everything that could ever need changing lives in assets/js/jump/:
+
+    kit.js        the registry and the shape a test file must follow
+    physics.js    every formula, with its derivation and its units
+    filming.js    the shared camera guide
+    video.js      container parsing for exact frame timing, frame extraction
+    tracking.js   background subtraction, foot tracking, sub frame refinement
+    tests/*.js    one file per test, all the coaching content and its maths
+
+  To change a protocol, a cue, a threshold or a formula, edit the test file.
+  Nothing in here needs to know.
+
+  NO BACKTICKS ANYWHERE IN THIS FILE. A backtick inside a comment inside a
+  template literal has taken the live app down twice.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Jump test</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E4A36">
+<meta name="description" content="Measure your jump height and reactive strength from a phone video. Everything runs on your device.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS — copied from assets/css/tokens.css. This page is
+   self contained like program.html and habits.html, so it does
+   not link the shared stylesheets.
+
+   Brand rules that are not negotiable:
+   - clay #C7552F is the only accent
+   - no yellow or gold in any shade, anywhere. Caution is clay.
+   - buttons are rectangular at 3px, primary is green
+   ============================================================ */
+:root{
+  --accent:#0E4A36;
+  --accent-deep:#0B3B2B;
+  --accent-lift:#155B43;
+  --accent-ink:#FFFFFF;
+  --accent-dim:rgba(14,74,54,.08);
+  --accent-mid:rgba(14,74,54,.18);
+
+  --clay:#C7552F;
+  --clay-lift:#E06B43;
+  --clay-dim:rgba(199,85,47,.10);
+  --clay-mid:rgba(199,85,47,.22);
+
+  --red:#C0392B;
+  --red-dim:rgba(192,57,43,.10);
+  --green:#1F7A4D;
+  --green-dim:rgba(31,122,77,.10);
+
+  --bg:#FAF7F2;
+  --bg-band:#F1ECE3;
+  --bg-card:#FFFFFF;
+  --border:#E7E2D9;
+  --border-strong:#D8D1C5;
+
+  --ink:#1A1A1A;
+  --ink-2:#5C5C5C;
+  --ink-3:#8A8A8A;
+  --ink-4:#B0A99E;
+
+  --font-display:'Barlow Condensed',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'Space Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --r-sm:3px; --r-md:6px; --r-lg:12px; --r-pill:100px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --dur:.25s; --dur-fast:.15s;
+  --shadow:0 8px 32px rgba(40,30,20,.10);
+
+  --pad:20px;
+  --max:720px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+img,canvas,video{max-width:100%;display:block}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:900;margin:0;line-height:1.02;text-wrap:balance}
+h1{font-size:clamp(30px,8vw,46px);text-transform:uppercase;letter-spacing:-.01em}
+h2{font-size:clamp(23px,5.5vw,32px);text-transform:uppercase}
+h3{font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+h4{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+p{margin:0 0 .85em}
+p:last-child{margin-bottom:0}
+strong{font-weight:600;color:var(--ink)}
+em{font-style:normal;color:var(--clay)}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+
+.eyebrow{
+  font-family:var(--font-mono);font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 8px;
+}
+.lead{font-size:17px;color:var(--ink-2)}
+.small{font-size:14px;color:var(--ink-2)}
+.tiny{font-size:12.5px;color:var(--ink-3);line-height:1.5}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- shell ---------- */
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+.wrap-wide{max-width:940px;margin:0 auto;padding:0 var(--pad)}
+
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,247,242,.94);
+  backdrop-filter:saturate(1.4) blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-in{
+  max-width:940px;margin:0 auto;padding:10px var(--pad);
+  display:flex;align-items:center;gap:12px;min-height:56px;
+}
+.brand{
+  font-family:var(--font-display);font-weight:900;text-transform:uppercase;
+  font-size:17px;letter-spacing:.02em;color:var(--accent);
+  text-decoration:none;white-space:nowrap;
+}
+.brand span{color:var(--clay)}
+.topbar-spacer{flex:1}
+
+.iconbtn{
+  appearance:none;border:1px solid var(--border-strong);background:var(--bg-card);
+  color:var(--ink-2);font-family:var(--font-display);font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;font-size:12px;
+  padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;
+  transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);
+}
+.iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+.iconbtn[hidden]{display:none}
+
+/* ---------- sections ---------- */
+.sec{padding:34px 0}
+.sec--band{background:var(--bg-band)}
+.sec--dark{
+  background:radial-gradient(120% 100% at 80% 0%, var(--accent-lift) 0%, var(--accent) 55%, var(--accent-deep) 100%);
+  color:#fff;
+}
+.sec--dark h1,.sec--dark h2,.sec--dark h3,.sec--dark h4{color:#fff}
+.sec--dark .eyebrow{color:rgba(255,255,255,.62)}
+.sec--dark .lead,.sec--dark .small{color:rgba(255,255,255,.82)}
+.sec--dark .tiny{color:rgba(255,255,255,.66)}
+.sec--dark em{color:var(--clay-lift)}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:20px;
+}
+.card + .card{margin-top:14px}
+.card-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.card-h h3,.card-h h4{margin:0}
+
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-sm{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- buttons ---------- */
+.btn{
+  appearance:none;cursor:pointer;font-family:var(--font-display);
+  font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;
+  padding:15px 26px;border-radius:var(--r-sm);border:1px solid transparent;
+  background:var(--accent);color:var(--accent-ink);
+  transition:transform var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease);
+  text-align:center;text-decoration:none;display:inline-block;
+}
+.btn:hover{transform:translateY(-1px);background:var(--accent-lift)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn--ghost{background:transparent;color:var(--accent);border-color:var(--border-strong)}
+.btn--ghost:hover{background:var(--accent-dim);border-color:var(--accent)}
+.btn--clay{background:var(--clay);color:#fff}
+.btn--clay:hover{background:var(--clay-lift)}
+.btn--sm{padding:9px 14px;font-size:12px;letter-spacing:.09em}
+.btn--full{display:block;width:100%}
+.btn--onDark{background:#fff;color:var(--accent)}
+.btn--onDark:hover{background:#fff}
+.btn--ghostDark{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.btn--ghostDark:hover{background:rgba(255,255,255,.10)}
+
+:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+
+/* ---------- forms ---------- */
+label.fl{display:block;font-family:var(--font-mono);font-size:10px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+input[type=text],input[type=number],select{
+  width:100%;font-family:var(--font-body);font-size:16px;color:var(--ink);
+  background:var(--bg-card);border:1px solid var(--border-strong);
+  border-radius:var(--r-md);padding:12px 13px;
+}
+input:focus,select:focus{border-color:var(--accent);outline:none}
+.field{margin-bottom:14px}
+.field-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:12.5px;color:var(--ink-3);margin-top:5px;line-height:1.45}
+
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{
+  appearance:none;cursor:pointer;background:var(--bg-card);
+  border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  padding:10px 13px;font-family:var(--font-body);font-size:14px;color:var(--ink-2);
+}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+
+/* ---------- test picker ---------- */
+.tests{display:grid;gap:12px}
+@media(min-width:620px){.tests{grid-template-columns:1fr 1fr}}
+.test-card{
+  text-align:left;width:100%;cursor:pointer;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-left:3px solid var(--clay);
+  border-radius:var(--r-md);padding:18px;
+  font-family:var(--font-body);color:inherit;
+  transition:border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
+}
+.test-card:hover{transform:translateY(-2px);border-color:var(--border-strong);border-left-color:var(--clay)}
+.test-card .tn{font-family:var(--font-display);font-weight:900;text-transform:uppercase;font-size:20px;line-height:1.05}
+.test-card .ts{font-size:14px;color:var(--ink-2);margin-top:5px}
+.test-card .tk{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:7px}
+
+/* ---------- steps ---------- */
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
+.steps li{counter-increment:s;position:relative;padding-left:38px}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:0;
+  width:26px;height:26px;border-radius:var(--r-sm);
+  background:var(--accent);color:#fff;
+  font-family:var(--font-mono);font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px}
+.bullets li{padding-left:15px;position:relative}
+.bullets li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:1px;background:var(--clay)}
+.bullets b{font-weight:600}
+
+.checks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+.checks li{padding-left:26px;position:relative;font-size:15px}
+.checks li::before{
+  content:"";position:absolute;left:0;top:.35em;width:13px;height:13px;
+  border:1.5px solid var(--accent);border-radius:2px;
+}
+
+/* ---------- cue block ---------- */
+.cue{
+  background:var(--accent);color:#fff;border-radius:var(--r-md);
+  padding:17px 19px;margin:14px 0;
+}
+.cue .eyebrow{color:rgba(255,255,255,.62);margin-bottom:6px}
+.cue q{font-family:var(--font-display);font-weight:700;font-size:20px;line-height:1.2;quotes:none;display:block}
+.cue .note{font-size:13.5px;color:rgba(255,255,255,.78);margin-top:10px;line-height:1.5}
+
+/* ---------- faults ---------- */
+.fault{border-top:1px solid var(--border);padding:14px 0}
+.fault:first-child{border-top:none;padding-top:0}
+.fault .fn{font-weight:600;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.fault .fx{font-size:14px;color:var(--ink-2);margin-top:5px}
+.fault .ff{font-size:14px;margin-top:5px}
+.fault .ff b{color:var(--accent);font-weight:600}
+.tagauto{
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--accent-dim);color:var(--accent);padding:3px 6px;border-radius:2px;white-space:nowrap;
+}
+
+/* ---------- notices ---------- */
+.notice{border-radius:var(--r-md);padding:14px 16px;font-size:14.5px;line-height:1.5;border:1px solid}
+.notice + .notice{margin-top:10px}
+.notice--info{background:var(--accent-dim);border-color:var(--accent-mid);color:var(--ink)}
+.notice--warn{background:var(--clay-dim);border-color:var(--clay-mid);color:var(--ink)}
+.notice--stop{background:var(--red-dim);border-color:rgba(192,57,43,.28);color:var(--ink)}
+.notice--ok{background:var(--green-dim);border-color:rgba(31,122,77,.25);color:var(--ink)}
+.notice .nt{font-family:var(--font-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;display:block;margin-bottom:5px}
+.notice--warn .nt{color:var(--clay)}
+.notice--stop .nt{color:var(--red)}
+.notice--ok .nt{color:var(--green)}
+.notice--info .nt{color:var(--accent)}
+
+/* ---------- result ---------- */
+.result-hero{text-align:center;padding:8px 0 4px}
+.result-hero .rv{
+  font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(54px,17vw,88px);line-height:1;letter-spacing:-.03em;
+}
+.result-hero .ru{font-family:var(--font-display);font-weight:700;font-size:20px;text-transform:uppercase;margin-left:6px;letter-spacing:.04em}
+.result-hero .rl{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:rgba(255,255,255,.7);margin-bottom:8px}
+.result-hero .rs{font-size:13.5px;color:rgba(255,255,255,.72);margin-top:8px}
+.result-hero .rp{font-family:var(--font-mono);font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px}
+
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.metric{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:13px 14px}
+.metric .ml{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.metric .mv{font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;font-size:24px;line-height:1.15;margin-top:4px}
+.metric .mu{font-size:13px;color:var(--ink-3);font-family:var(--font-body);font-weight:400;margin-left:3px}
+.metric .ms{font-size:12px;color:var(--ink-3);margin-top:3px;line-height:1.4}
+.metric--pin{border-left:3px solid var(--clay)}
+
+/* ---------- timebase ---------- */
+.tb{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
+.tb-h{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.tb-h .tt{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);flex:1}
+.badge{
+  font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:5px 9px;border-radius:2px;white-space:nowrap;
+}
+.badge--ok{background:var(--green-dim);color:var(--green)}
+.badge--unv{background:var(--clay-dim);color:var(--clay)}
+.badge--cor{background:var(--clay);color:#fff}
+.badge--bad{background:var(--red);color:#fff}
+.tb-rows{padding:6px 16px 14px}
+.tb-row{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13.5px}
+.tb-row:last-child{border-bottom:none}
+.tb-row .k{color:var(--ink-3);flex-shrink:0}
+.tb-row .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-card)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:700;background:var(--bg-band);
+}
+tbody td{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+tbody td:first-child{font-family:var(--font-body)}
+tr.is-out td{color:var(--red)}
+tr.is-std td{background:var(--green-dim)}
+tr.is-off td{opacity:.5}
+
+/* ---------- video workspace ---------- */
+.stage{background:#0B3B2B;border-radius:var(--r-md);overflow:hidden;position:relative}
+.stage canvas{width:100%;height:auto;display:block;background:#000}
+#srcVideo{position:absolute;width:1px;height:1px;opacity:.01;pointer-events:none;left:0;top:0}
+
+.scrub{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.scrub .fbtn{
+  appearance:none;cursor:pointer;background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.28);color:#fff;
+  font-family:var(--font-mono);font-size:13px;font-weight:700;
+  padding:11px 14px;border-radius:var(--r-sm);min-width:52px;
+}
+.scrub .fbtn:hover{background:rgba(255,255,255,.18)}
+.frameno{font-family:var(--font-mono);font-size:13px;color:rgba(255,255,255,.8);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--clay-lift)}
+
+.progress{height:5px;background:rgba(255,255,255,.16);border-radius:var(--r-pill);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--clay-lift);width:0;transition:width .18s linear}
+
+/* ---------- history ---------- */
+.hist-row{display:flex;align-items:baseline;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.hist-row:last-child{border-bottom:none}
+.hist-row .hd{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);width:78px;flex-shrink:0}
+.hist-row .hv{font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;font-size:19px;width:82px;text-align:right}
+.hist-row .hm{font-size:13px;color:var(--ink-2);flex:1}
+.pb{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:var(--clay);color:#fff;padding:2px 6px;border-radius:2px}
+
+/* ---------- misc ---------- */
+.divider{height:1px;background:var(--border);margin:26px 0}
+details{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg-card);overflow:hidden}
+details + details{margin-top:10px}
+summary{
+  cursor:pointer;padding:14px 16px;font-family:var(--font-display);font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;font-size:14px;list-style:none;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--font-mono);color:var(--clay);font-size:17px}
+details[open] summary::after{content:"–"}
+details .dbody{padding:0 16px 16px}
+
+.view{display:none}
+.view.is-on{display:block}
+.footer{padding:32px 0 46px;color:var(--ink-3);font-size:13px;text-align:center}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="/" aria-label="Home">AA<span>.</span></a>
+    <button class="iconbtn" id="btnBack" hidden>Back</button>
+    <div class="topbar-spacer"></div>
+    <button class="iconbtn" id="btnGuide">Guide</button>
+    <button class="iconbtn" id="btnHistory">History</button>
+  </div>
+</div>
+
+<video id="srcVideo" playsinline muted preload="auto"></video>
+
+<main>
+
+<!-- ============================================================ HOME -->
+<section class="view is-on" id="view-home">
+  <div class="sec sec--dark">
+    <div class="wrap">
+      <p class="eyebrow">Jump testing</p>
+      <h1>Film a jump.<br>Get a number<br>you can <em>trust</em>.</h1>
+      <p class="lead" style="margin-top:14px;max-width:36em">
+        Record yourself on your phone, load the clip here, and this works out how high you jumped and how fast you got off the floor. The video never leaves your device.
+      </p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="wrap">
+      <p class="eyebrow">Pick a test</p>
+      <div class="tests" id="testList"></div>
+
+      <div class="notice notice--info" style="margin-top:22px">
+        <span class="nt">Before your first test</span>
+        Read the recording guide once, all the way through. Most bad results here aren't bad jumping, they're a clip filmed at the wrong frame rate or sent through WhatsApp. Ten minutes now saves you every session after.
+        <div style="margin-top:12px"><button class="btn btn--ghost btn--sm" data-go="guide">Open the recording guide</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ LEARN -->
+<section class="view" id="view-learn">
+  <div class="sec sec--dark" style="padding-bottom:26px">
+    <div class="wrap">
+      <p class="eyebrow" id="learnKicker">Test</p>
+      <h1 id="learnTitle">Test</h1>
+      <p class="lead" id="learnStrap" style="margin-top:10px"></p>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="wrap stack" id="learnBody"></div>
+    <div class="wrap" style="margin-top:26px">
+      <button class="btn btn--full" id="btnLearnNext">I've read this, set me up</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SETUP -->
+<section class="view" id="view-setup">
+  <div class="sec">
+    <div class="wrap">
+      <p class="eyebrow">Step 1 of 3</p>
+      <h2>Who's jumping</h2>
+      <p class="lead" style="margin:10px 0 22px">Your height is doing real work here. We use it to check the video's timing against gravity, which is how we catch a clip that's secretly running slow.</p>
+
+      <div class="card">
+        <div class="field">
+          <label class="fl" for="inName">Name</label>
+          <input type="text" id="inName" placeholder="Who is this" autocomplete="off">
+          <p class="hint">Only used to keep results separate on this device. It stays on your phone.</p>
+        </div>
+        <div class="field-2">
+          <div class="field">
+            <label class="fl" for="inHeight">Standing height, cm</label>
+            <input type="number" id="inHeight" min="120" max="220" step="1" inputmode="numeric" placeholder="178">
+          </div>
+          <div class="field">
+            <label class="fl" for="inMass">Body mass, kg</label>
+            <input type="number" id="inMass" min="25" max="200" step="0.5" inputmode="decimal" placeholder="optional">
+          </div>
+        </div>
+        <p class="hint" style="margin-top:-4px">Mass is optional. It only adds a rough power estimate, and that estimate isn't sensitive enough to track your own progress with.</p>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h4 style="margin-bottom:12px">Conditions</h4>
+        <p class="tiny" style="margin-bottom:14px">These get stored with every result. If any of them change, the app won't put the two sessions on the same line, because they wouldn't be comparable.</p>
+
+        <div class="field">
+          <label class="fl">Arms</label>
+          <div class="seg" id="segArms">
+            <button type="button" data-v="hands_on_hips" aria-pressed="true">Hands on hips</button>
+            <button type="button" data-v="free_swing" aria-pressed="false">Free arm swing</button>
+          </div>
+          <p class="hint">Hands on hips is the standard. An arm swing is worth 10 to 30%, so it's a different test, not a better score.</p>
+        </div>
+
+        <div class="field">
+          <label class="fl">Surface</label>
+          <div class="seg" id="segSurface">
+            <button type="button" data-v="rigid_floor" aria-pressed="true">Rigid floor</button>
+            <button type="button" data-v="rubber_over_concrete" aria-pressed="false">Rubber on concrete</button>
+            <button type="button" data-v="sprung_floor" aria-pressed="false">Sprung floor</button>
+            <button type="button" data-v="mat" aria-pressed="false">Mat</button>
+          </div>
+        </div>
+
+        <div class="field" id="fieldDrop" hidden>
+          <label class="fl" for="inDrop">Box height, cm</label>
+          <input type="number" id="inDrop" min="10" max="80" step="1" inputmode="numeric" value="30">
+          <p class="hint">30 cm is the default. Use 20 to 30 if you're new to this or under about 16.</p>
+        </div>
+      </div>
+
+      <div id="setupWarn"></div>
+
+      <button class="btn btn--full" id="btnSetupNext" style="margin-top:18px">Next, load the video</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ RECORD -->
+<section class="view" id="view-record">
+  <div class="sec">
+    <div class="wrap">
+      <p class="eyebrow">Step 2 of 3</p>
+      <h2>Load your clip</h2>
+      <p class="lead" style="margin:10px 0 20px">Slow motion, 240 fps. The clip only needs the jump itself plus a second either side.</p>
+
+      <div class="notice notice--warn">
+        <span class="nt">The one that catches people</span>
+        <strong>On iPhone, take the slow motion out before you upload.</strong> Photos, open the clip, Edit, tap the speedometer icon, drag the left slider fully right so it reads 100% at 240 FPS, save. Otherwise iOS bakes the slow motion in and the clip arrives here eight times too slow.
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <label class="fl" for="fileIn">Video file</label>
+        <input type="file" id="fileIn" accept="video/*" style="width:100%;font-size:15px">
+        <p class="hint">Nothing is uploaded. The file is read in your browser and stays there.</p>
+      </div>
+
+      <div id="probeOut" style="margin-top:16px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ ANALYSE -->
+<section class="view" id="view-analyse">
+  <div class="sec sec--dark">
+    <div class="wrap-wide">
+      <p class="eyebrow">Step 3 of 3</p>
+      <h2 style="margin-bottom:6px">Find the jump</h2>
+      <p class="lead" style="margin-bottom:18px" id="analyseHint">Drag to the moment just before you leave the floor.</p>
+
+      <div class="stage">
+        <canvas id="stageCanvas" width="640" height="360"></canvas>
+      </div>
+
+      <div style="margin-top:14px">
+        <input type="range" id="scrubRange" min="0" max="100" value="0" step="1" aria-label="Scrub through the clip">
+      </div>
+
+      <div class="scrub">
+        <button class="fbtn" id="btnPrev10">&#8810;</button>
+        <button class="fbtn" id="btnPrev">&#8249;</button>
+        <span class="frameno" id="frameLabel">frame 0</span>
+        <button class="fbtn" id="btnNext">&#8250;</button>
+        <button class="fbtn" id="btnNext10">&#8811;</button>
+      </div>
+
+      <div id="analyseControls" style="margin-top:16px"></div>
+      <div id="analyseProgress" hidden style="margin-top:16px">
+        <div class="progress"><i id="progBar"></i></div>
+        <p class="tiny" id="progText" style="margin-top:8px">Working</p>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="wrap-wide" id="analyseNotes"></div>
+  </div>
+</section>
+
+<!-- ============================================================ RESULT -->
+<section class="view" id="view-result">
+  <div class="sec sec--dark" style="padding-bottom:28px">
+    <div class="wrap">
+      <div class="result-hero" id="resultHero"></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="wrap stack" id="resultBody"></div>
+  </div>
+</section>
+
+<!-- ============================================================ HISTORY -->
+<section class="view" id="view-history">
+  <div class="sec">
+    <div class="wrap">
+      <p class="eyebrow">On this device</p>
+      <h2>History</h2>
+      <div id="historyBody" style="margin-top:18px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ GUIDE -->
+<section class="view" id="view-guide">
+  <div class="sec sec--dark" style="padding-bottom:26px">
+    <div class="wrap">
+      <p class="eyebrow">Read this once</p>
+      <h1 id="guideTitle">Recording guide</h1>
+      <div class="lead" id="guideIntro" style="margin-top:12px"></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="wrap stack" id="guideBody"></div>
+  </div>
+</section>
+
+</main>
+
+<div class="footer wrap">
+  <p class="tiny">Everything on this page runs on your device. No video is uploaded and there is no account.</p>
+</div>
+
+<!-- the knowledge, one file per thing that might change -->
+<script src="/assets/js/jump/kit.js"></script>
+<script src="/assets/js/jump/physics.js"></script>
+<script src="/assets/js/jump/filming.js"></script>
+<script src="/assets/js/jump/video.js"></script>
+<script src="/assets/js/jump/tracking.js"></script>
+<script src="/assets/js/jump/tests/cmj.js"></script>
+<script src="/assets/js/jump/tests/sj.js"></script>
+<script src="/assets/js/jump/tests/dj.js"></script>
+<script src="/assets/js/jump/tests/hop-10-5.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  var K = window.JumpKit;
+  var P = K.physics;
+
+  /* ==================================================================
+     Storage
+     ================================================================== */
+
+  var LS = {
+    cfg: "aa_jump_cfg",
+    log: "aa_jump_log",
+    meta: "aa_jump_meta"
+  };
+
+  function load(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  var App = {
+    view: "home",
+    testId: null,
+    test: null,
+    cfg: load(LS.cfg, { name: "", height_cm: null, mass_kg: null, arms: "hands_on_hips", surface: "rigid_floor", drop_cm: 30, seenGuide: false }),
+    log: load(LS.log, []),
+    file: null,
+    probe: null,
+    T: null,
+    cross: null,
+    frameIndex: 0,
+    windowFrom: 0,
+    windowTo: 0,
+    frames: null,
+    analysis: null,
+    mode: "pick",         // pick | window | confirm
+    marks: {},
+    lambda: 1,
+    timebaseState: "unverified"
+  };
+
+  /* ==================================================================
+     Tiny helpers
+     ================================================================== */
+
+  function $(id) { return document.getElementById(id); }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // The only inline markup the content files use.
+  function md(s) {
+    return esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  }
+
+  function el(html) {
+    var d = document.createElement("div");
+    d.innerHTML = html;
+    return d.firstElementChild;
+  }
+
+  function show(view) {
+    App.view = view;
+    var all = document.querySelectorAll(".view");
+    for (var i = 0; i < all.length; i++) all[i].classList.remove("is-on");
+    var target = $("view-" + view);
+    if (target) target.classList.add("is-on");
+    $("btnBack").hidden = (view === "home");
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+
+  /* ==================================================================
+     Home: the test picker
+     ================================================================== */
+
+  function renderTests() {
+    var host = $("testList");
+    host.innerHTML = "";
+    K.tests.forEach(function (t) {
+      var b = el(
+        '<button class="test-card" type="button" data-test="' + esc(t.id) + '">' +
+          '<div class="tk">' + esc(t.shortName) + '</div>' +
+          '<div class="tn">' + esc(t.name) + '</div>' +
+          '<div class="ts">' + esc(t.strapline) + '</div>' +
+        '</button>'
+      );
+      b.addEventListener("click", function () { openTest(t.id); });
+      host.appendChild(b);
+    });
+  }
+
+  function openTest(id) {
+    App.testId = id;
+    App.test = K.getTest(id);
+    if (!App.test) return;
+    renderLearn();
+    show("learn");
+  }
+
+  /* ==================================================================
+     Learn: everything the athlete needs before they record
+     ================================================================== */
+
+  function renderLearn() {
+    var t = App.test;
+    $("learnKicker").textContent = t.shortName;
+    $("learnTitle").textContent = t.name;
+    $("learnStrap").textContent = t.strapline;
+
+    var host = $("learnBody");
+    host.innerHTML = "";
+
+    // What it's for. This comes first, always.
+    var why = '<div class="card"><p class="eyebrow">What this tells you</p>';
+    t.whyItMatters.forEach(function (p) { why += "<p>" + md(p) + "</p>"; });
+    why += '<div class="notice notice--info" style="margin-top:14px"><span class="nt">What it changes</span>' + md(t.decisionItFeeds) + '</div>';
+    why += "</div>";
+    host.appendChild(el(why));
+
+    // How to do it.
+    var hp = t.howToPerform;
+    var how = '<div class="card"><p class="eyebrow">How to do it</p>';
+    (hp.setUp || []).forEach(function (p) { how += "<p>" + md(p) + "</p>"; });
+    how += '<div class="cue"><p class="eyebrow">Say this, every rep</p><q>' + esc(hp.cue) + "</q>";
+    if (hp.cueNote) how += '<p class="note">' + md(hp.cueNote) + "</p>";
+    how += "</div>";
+    how += '<ol class="steps">';
+    (hp.steps || []).forEach(function (s) { how += "<li>" + md(s.text) + "</li>"; });
+    how += "</ol></div>";
+    host.appendChild(el(how));
+
+    // Landing, or whatever the test calls its most-broken rule.
+    if (hp.landing) {
+      var la = '<div class="card" style="border-left:3px solid var(--clay)"><h3>' + esc(hp.landing.title) + "</h3><div style='margin-top:10px'>";
+      hp.landing.body.forEach(function (p) { la += "<p>" + md(p) + "</p>"; });
+      la += "</div></div>";
+      host.appendChild(el(la));
+    }
+    if (hp.whyTheHold) {
+      var wh = '<div class="card"><h3>' + esc(hp.whyTheHold.title) + "</h3><div style='margin-top:10px'>";
+      hp.whyTheHold.body.forEach(function (p) { wh += "<p>" + md(p) + "</p>"; });
+      wh += "</div></div>";
+      host.appendChild(el(wh));
+    }
+
+    // Faults.
+    var fa = '<details><summary>What goes wrong, and what it does to your number</summary><div class="dbody">';
+    t.faults.forEach(function (f) {
+      fa += '<div class="fault"><div class="fn">' + esc(f.fault) +
+            (f.autoDetected ? '<span class="tagauto">App checks this</span>' : "") + "</div>" +
+            '<div class="fx">' + md(f.whatItDoesToTheNumber) + "</div>" +
+            '<div class="ff"><b>Fix:</b> ' + md(f.fix) + "</div></div>";
+    });
+    fa += "</div></details>";
+    host.appendChild(el(fa));
+
+    // Standardising and accuracy.
+    var st = '<details><summary>Making it repeatable</summary><div class="dbody"><ul class="bullets">';
+    t.standardise.forEach(function (s) { st += "<li>" + md(s) + "</li>"; });
+    st += "</ul>";
+    st += '<h4 style="margin:18px 0 10px">Getting the error down</h4><ul class="bullets">';
+    t.reduceError.forEach(function (s) { st += "<li>" + md(s) + "</li>"; });
+    st += "</ul>";
+    st += '<div class="notice notice--info" style="margin-top:16px"><span class="nt">Reps and scoring</span>' +
+          esc(t.scoring.trials) + " rep" + (t.scoring.trials === 1 ? "" : "s") + ", " +
+          esc(t.scoring.restSeconds) + " seconds rest. " + md(t.scoring.note) + "</div>";
+    st += "</div></details>";
+    host.appendChild(el(st));
+
+    // Filming, shared.
+    var fl = '<details><summary>How to film it</summary><div class="dbody">' +
+             '<p class="small">The full guide is worth reading once. The short version:</p><ul class="bullets">' +
+             '<li><b>Slow motion, 240 fps.</b> Not normal video.</li>' +
+             '<li><b>Side on, phone about 50 cm off the floor,</b> about 3.5 m back, turned sideways.</li>' +
+             '<li><b>Whole body in frame</b> with room above your head at the top of the jump.</li>' +
+             '<li><b>Bright even light,</b> nothing bright behind you, no hard shadow under your feet.</li>' +
+             '<li><b>iPhone: take the slow motion out before uploading.</b> Photos, Edit, speedometer icon, 100% at 240 FPS.</li>' +
+             '</ul><div style="margin-top:14px"><button class="btn btn--ghost btn--sm" data-go="guide">Read the full guide</button></div></div></details>';
+    host.appendChild(el(fl));
+
+    // Sources.
+    var so = '<details><summary>Where this comes from</summary><div class="dbody"><ul class="bullets">';
+    t.sources.forEach(function (s) { so += '<li class="small">' + esc(s) + "</li>"; });
+    so += "</ul></div></details>";
+    host.appendChild(el(so));
+  }
+
+  /* ==================================================================
+     Setup
+     ================================================================== */
+
+  function renderSetup() {
+    var c = App.cfg;
+    $("inName").value = c.name || "";
+    $("inHeight").value = c.height_cm || "";
+    $("inMass").value = c.mass_kg || "";
+    $("inDrop").value = c.drop_cm || 30;
+    setSeg("segArms", c.arms);
+    setSeg("segSurface", c.surface);
+    $("fieldDrop").hidden = !(App.test && App.test.requires.needsDropHeight);
+
+    var warn = $("setupWarn");
+    warn.innerHTML = "";
+    if (c.surface === "sprung_floor" || c.surface === "mat") {
+      warn.appendChild(el('<div class="notice notice--warn" style="margin-top:14px"><span class="nt">Soft surface</span>' +
+        "A sprung floor or a mat lengthens your time on the ground and lets your foot sink, so the floor line moves while you're on it. Drop jumps and the 10-5 are hit hardest. It'll still record, but only compare it against other sessions on the same surface.</div>"));
+    }
+  }
+
+  function setSeg(id, value) {
+    var wrap = $(id);
+    var bs = wrap.querySelectorAll("button");
+    for (var i = 0; i < bs.length; i++) {
+      bs[i].setAttribute("aria-pressed", bs[i].getAttribute("data-v") === value ? "true" : "false");
+    }
+  }
+  function getSeg(id) {
+    var b = $(id).querySelector('button[aria-pressed="true"]');
+    return b ? b.getAttribute("data-v") : null;
+  }
+  function wireSeg(id, key) {
+    $(id).addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-v]");
+      if (!b) return;
+      setSeg(id, b.getAttribute("data-v"));
+      App.cfg[key] = b.getAttribute("data-v");
+      save(LS.cfg, App.cfg);
+      renderSetup();
+    });
+  }
+
+  /* ==================================================================
+     Load a file, probe its timing
+     ================================================================== */
+
+  var video = $("srcVideo");
+
+  function onFile(file) {
+    App.file = file;
+    var out = $("probeOut");
+    out.innerHTML = '<div class="notice notice--info"><span class="nt">Reading</span>Checking the clip’s timing.</div>';
+
+    var url = URL.createObjectURL(file);
+    video.src = url;
+
+    var metaReady = new Promise(function (res) {
+      video.onloadedmetadata = function () { res(); };
+    });
+
+    Promise.all([K.video.probe(file), metaReady]).then(function (r) {
+      var probe = r[0];
+      App.probe = probe;
+
+      if (!probe.ok) {
+        out.innerHTML = "";
+        out.appendChild(el('<div class="notice notice--stop"><span class="nt">Can’t read this file</span>' +
+          probeFailCopy(probe.reason) + "</div>"));
+        return;
+      }
+
+      App.T = probe.T;
+      App.cross = K.video.crossCheck(probe, video);
+
+      renderTimebase(out);
+
+      if (!App.cross.ok) return;
+
+      var gate = frameRateGate(probe.fps || App.cross.effectiveFps);
+      if (gate.block) {
+        out.appendChild(el('<div class="notice notice--stop" style="margin-top:12px"><span class="nt">Not enough frames</span>' + gate.text + "</div>"));
+        return;
+      }
+      if (gate.warn) {
+        out.appendChild(el('<div class="notice notice--warn" style="margin-top:12px"><span class="nt">Heads up</span>' + gate.text + "</div>"));
+      }
+
+      var btn = el('<button class="btn btn--full" style="margin-top:16px">Find the jump</button>');
+      btn.addEventListener("click", startWindowing);
+      out.appendChild(btn);
+    }).catch(function (err) {
+      out.innerHTML = "";
+      out.appendChild(el('<div class="notice notice--stop"><span class="nt">Something went wrong</span>' +
+        "We couldn’t read that file. " + esc(String(err && err.message || err)) + "</div>"));
+    });
+  }
+
+  function probeFailCopy(reason) {
+    if (reason === "FRAGMENTED") {
+      return "This is a fragmented video file, which usually means it came from a browser recorder rather than a phone camera. The timing is stored differently and we can’t verify it. Record with your phone’s own camera app instead.";
+    }
+    if (reason === "NO_VIDEO_TRACK") return "There’s no video track in this file.";
+    if (reason === "STZ2_UNSUPPORTED" || reason === "NO_TIMING_BOXES" || reason === "EMPTY_STTS") {
+      return "We can’t find reliable frame timing in this file. Try the original clip straight off the phone that filmed it, not a copy that’s been through an app.";
+    }
+    if (reason === "MALFORMED" || reason === "PARSE_FAILED") {
+      return "This file looks damaged or it isn’t an MP4 or MOV. Record it again, and upload the original.";
+    }
+    return "We couldn’t read the timing information out of this file.";
+  }
+
+  function frameRateGate(fps) {
+    var need = App.test.requires.minFps;
+    if (!fps) return { warn: true, text: "We couldn’t pin down a single frame rate for this clip, so we’re timing from each frame’s own timestamp. That’s the right thing to do, but precision is reduced." };
+    if (fps < 60) {
+      return { block: true, text: "This clip is about " + Math.round(fps) + " frames per second. One frame is " + Math.round(1000 / fps) + " milliseconds, which is around 4 cm on a jump, more than most athletes improve in a season. We won’t produce a number from it. Record in your phone’s slow motion mode." };
+    }
+    if (fps < need) {
+      return { block: true, text: "This clip is about " + Math.round(fps) + " fps, and this test needs at least " + need + ". Time on the ground is far shorter than time in the air, so it needs a faster camera. Record at 240 fps." };
+    }
+    if (fps < 120) {
+      return { warn: true, text: "About " + Math.round(fps) + " fps. Expect roughly plus or minus 2 cm. Fine for a look, but don’t track progress with it and don’t compare it against a 240 fps result." };
+    }
+    if (fps < 240) {
+      return { warn: true, text: "About " + Math.round(fps) + " fps. Usable, but 240 is the standard for this and it roughly halves the error." };
+    }
+    return {};
+  }
+
+  function renderTimebase(host) {
+    var p = App.probe, c = App.cross;
+    var fps = p.fps || (c && c.effectiveFps);
+    var state = "unverified", badge = "UNVERIFIED", cls = "badge--unv";
+
+    if (c && !c.ok) { state = "suspect"; badge = "SUSPECT"; cls = "badge--bad"; }
+    else if (App.lambda !== 1) { state = "corrected"; badge = "CORRECTED ÷" + App.lambda; cls = "badge--cor"; }
+    else if (p.rateClass === "CFR" || p.rateClass === "COARSE_CFR") { state = "verified"; badge = "VERIFIED"; cls = "badge--ok"; }
+    App.timebaseState = state;
+
+    var rows = "";
+    function row(k, v) { rows += '<div class="tb-row"><span class="k">' + esc(k) + '</span><span class="v">' + esc(v) + "</span></div>"; }
+
+    row("Container", (p.fps ? p.fps.toFixed(2) + " fps" : "no single rate") + ", " + rateWord(p.rateClass));
+    if (c && c.effectiveFps) row("Browser check", c.effectiveFps.toFixed(2) + " fps" + (c.delta != null ? "  (" + (c.delta * 100).toFixed(2) + "% apart)" : ""));
+    row("Frames", p.nSamples);
+    if (fps) row("Frame period", (1000 / fps).toFixed(2) + " ms");
+    if (fps) {
+      var te = P.timingError_s(1 / fps);
+      var sig = P.heightSensitivity_m_per_s(0.5) * Math.sqrt(2) * te * 100;
+      row("Expected precision", "plus or minus " + sig.toFixed(2) + " cm on height");
+    }
+    if (p.captureFpsHint) row("Phone says captured at", p.captureFpsHint.toFixed(0) + " fps");
+
+    host.innerHTML = "";
+    host.appendChild(el(
+      '<div class="tb"><div class="tb-h"><span class="tt">Timebase</span><span class="badge ' + cls + '">' + badge + "</span></div>" +
+      '<div class="tb-rows">' + rows + "</div></div>"
+    ));
+
+    (p.warnings || []).forEach(function (w) {
+      host.appendChild(el('<div class="notice notice--warn" style="margin-top:12px"><span class="nt">Note</span>' + esc(w.text) + "</div>"));
+    });
+    if (c && !c.ok) {
+      c.warnings.forEach(function (w) {
+        host.appendChild(el('<div class="notice notice--stop" style="margin-top:12px"><span class="nt">Stop</span>' + esc(w.text) + "</div>"));
+      });
+    }
+
+    // Android tells us exactly what it captured at, which is the one case we
+    // can un-bake with certainty.
+    if (p.captureFpsHint && p.fps && p.captureFpsHint > p.fps * 1.5) {
+      var k = Math.round(p.captureFpsHint / p.fps);
+      var n = el('<div class="notice notice--warn" style="margin-top:12px"><span class="nt">Slow motion detected</span>' +
+        "This file says it was captured at " + Math.round(p.captureFpsHint) + " fps and saved at " + p.fps.toFixed(0) +
+        ". That means the slow motion is baked in and we can correct it exactly, by dividing the time by " + k +
+        '.<div style="margin-top:12px"><button class="btn btn--clay btn--sm" id="btnApplyLambda">Apply ÷' + k + "</button></div></div>");
+      host.appendChild(n);
+      $("btnApplyLambda").addEventListener("click", function () {
+        applyLambda(k);
+      });
+    }
+  }
+
+  function rateWord(k) {
+    if (k === "CFR") return "constant";
+    if (k === "COARSE_CFR") return "constant";
+    if (k === "VFR") return "variable";
+    if (k === "RAMPED") return "speed ramped";
+    return "unknown";
+  }
+
+  function applyLambda(k) {
+    App.lambda = k;
+    App.T = App.probe.T.map(function (t) { return t / k; });
+    renderTimebase($("probeOut"));
+    var btn = el('<button class="btn btn--full" style="margin-top:16px">Find the jump</button>');
+    btn.addEventListener("click", startWindowing);
+    $("probeOut").appendChild(btn);
+  }
+
+  /* ==================================================================
+     Frame stepping on the stage canvas
+     ================================================================== */
+
+  var stage = $("stageCanvas");
+  var sctx = stage.getContext("2d");
+
+  function drawFrame(index) {
+    var T = App.T;
+    index = Math.max(0, Math.min(T.length - 1, index));
+    App.frameIndex = index;
+
+    var t = (index + 1 < T.length) ? (T[index] + T[index + 1]) / 2 : T[index];
+    var seekTarget = App.lambda !== 1 ? t * App.lambda : t;
+
+    video.currentTime = seekTarget;
+    video.onseeked = function () {
+      var vw = video.videoWidth || 640, vh = video.videoHeight || 360;
+      stage.width = Math.min(900, vw);
+      stage.height = Math.round(stage.width * vh / vw);
+      sctx.drawImage(video, 0, 0, stage.width, stage.height);
+      drawOverlay(index);
+    };
+
+    $("frameLabel").textContent = "frame " + index + " · " + (T[index]).toFixed(3) + "s";
+    $("scrubRange").value = index;
+  }
+
+  function drawOverlay(index) {
+    var a = App.analysis;
+    if (!a || !a.track || !a.track[index] || !a.track[index].ok) return;
+    var sx = stage.width / a.width, sy = stage.height / a.height;
+    var t = a.track[index];
+
+    // Ground line
+    sctx.strokeStyle = "rgba(224,107,67,.85)";
+    sctx.lineWidth = 1.5;
+    sctx.beginPath();
+    sctx.moveTo(0, a.groundY * sy);
+    sctx.lineTo(stage.width, a.groundY * sy);
+    sctx.stroke();
+
+    // Foot
+    sctx.fillStyle = "rgba(224,107,67,.95)";
+    sctx.beginPath();
+    sctx.arc(t.footX * sx, t.footY * sy, 5, 0, Math.PI * 2);
+    sctx.fill();
+
+    // Centroid
+    sctx.strokeStyle = "rgba(255,255,255,.9)";
+    sctx.lineWidth = 1.5;
+    sctx.beginPath();
+    sctx.arc(t.centroidX * sx, t.centroidY * sy, 7, 0, Math.PI * 2);
+    sctx.stroke();
+
+    // Height above floor
+    var hpx = a.groundY - t.footY;
+    if (hpx > 1) {
+      sctx.fillStyle = "rgba(255,255,255,.92)";
+      sctx.font = "600 13px 'Space Mono', monospace";
+      sctx.fillText((hpx / a.standingHeightPx * (App.cfg.height_cm || 175)).toFixed(1) + " cm", 10, 22);
+    }
+  }
+
+  /* ==================================================================
+     Windowing, then analysis
+     ================================================================== */
+
+  function startWindowing() {
+    App.mode = "window";
+    App.windowFrom = 0;
+    App.windowTo = App.T.length - 1;
+    $("scrubRange").max = App.T.length - 1;
+    $("analyseHint").textContent = "Scrub to just before you leave the floor, then mark the start. Keep the window tight, it makes the analysis faster and more reliable.";
+    renderWindowControls();
+    show("analyse");
+    drawFrame(0);
+  }
+
+  function renderWindowControls() {
+    var host = $("analyseControls");
+    host.innerHTML = "";
+    var startBtn = el('<button class="btn btn--onDark btn--sm">Start of window</button>');
+    var endBtn = el('<button class="btn btn--onDark btn--sm">End of window</button>');
+    var goBtn = el('<button class="btn btn--clay">Analyse this window</button>');
+    var label = el('<p class="tiny" style="margin-top:10px" id="winLabel"></p>');
+
+    startBtn.addEventListener("click", function () { App.windowFrom = App.frameIndex; updateWinLabel(); });
+    endBtn.addEventListener("click", function () { App.windowTo = App.frameIndex; updateWinLabel(); });
+    goBtn.addEventListener("click", runAnalysis);
+
+    var row = el('<div class="row"></div>');
+    row.appendChild(startBtn); row.appendChild(endBtn); row.appendChild(goBtn);
+    host.appendChild(row);
+    host.appendChild(label);
+    updateWinLabel();
+  }
+
+  function updateWinLabel() {
+    var lbl = $("winLabel");
+    if (!lbl) return;
+    var n = App.windowTo - App.windowFrom + 1;
+    var secs = (App.T[App.windowTo] - App.T[App.windowFrom]);
+    lbl.textContent = "Window: frames " + App.windowFrom + " to " + App.windowTo +
+      "  (" + n + " frames, " + secs.toFixed(2) + " s)" +
+      (n > K.video.MAX_FRAMES ? "  — too long, tighten it" : "");
+  }
+
+  function runAnalysis() {
+    var from = App.windowFrom, to = App.windowTo;
+    if (to <= from + 8) {
+      alert("That window is too short. Give it at least the whole jump plus a moment either side.");
+      return;
+    }
+    if (to - from + 1 > K.video.MAX_FRAMES) {
+      alert("That window is too long. Trim it closer to the jump.");
+      return;
+    }
+
+    $("analyseProgress").hidden = false;
+    $("analyseControls").innerHTML = "";
+    setProgress(0, "Reading frames");
+
+    var w = K.video.pickAnalysisWidth(to - from + 1);
+
+    K.video.extractFrames(video, App.T, from, to, {
+      width: w,
+      onProgress: function (p) { setProgress(p * 0.75, "Reading frames"); }
+    }).then(function (res) {
+      setProgress(0.78, "Finding you in the frame");
+      App.frames = res;
+
+      // Give the browser a tick so the progress bar paints before the CV
+      // work blocks the main thread.
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          var roi = { x0: 1, y0: 1, x1: res.width - 2, y1: res.height - 2 };
+          var a = K.tracking.analyse(res.frames, roi, (App.cfg.height_cm || 175) / 100, {
+            width: res.width, height: res.height
+          });
+          a.width = res.width;
+          a.height = res.height;
+          a.extract = res;
+          resolve(a);
+        }, 30);
+      });
+    }).then(function (a) {
+      setProgress(1, "Done");
+      App.analysis = a;
+      $("analyseProgress").hidden = true;
+      finishAnalysis();
+    }).catch(function (err) {
+      $("analyseProgress").hidden = true;
+      $("analyseNotes").innerHTML = "";
+      $("analyseNotes").appendChild(el('<div class="notice notice--stop"><span class="nt">Analysis failed</span>' +
+        esc(String(err && err.message || err)) + "</div>"));
+    });
+  }
+
+  function setProgress(frac, text) {
+    $("progBar").style.width = Math.round(frac * 100) + "%";
+    $("progText").textContent = text;
+  }
+
+  /* ==================================================================
+     After analysis: check the ramp guard, then either confirm or report
+     ================================================================== */
+
+  function finishAnalysis() {
+    var a = App.analysis;
+    var notes = $("analyseNotes");
+    notes.innerHTML = "";
+
+    // A speed ramp running through the jump cannot be fixed by any single
+    // divisor, so this is a hard stop rather than a warning.
+    if (a.ramp && a.ramp.ok === false) {
+      notes.appendChild(el('<div class="notice notice--stop"><span class="nt">Stop, the clip changes speed</span>' +
+        "The speed of this clip changes during the jump itself. That’s an iPhone slow motion export where the ramp in and out of slow motion is crossing your jump. No single correction can fix it, so we won’t guess. Re-record, or take the ramp out in Photos: Edit, speedometer icon, set it to 100% at 240 FPS.</div>"));
+      return;
+    }
+
+    // Physics says the timebase is wrong. Offer the candidates, never pick.
+    if (a.gravity && a.gravity.band === "red") {
+      notes.appendChild(buildDisambiguation(a));
+      return;
+    }
+
+    if (a.confidence < 0.60) {
+      notes.appendChild(el('<div class="notice notice--warn"><span class="nt">Check this yourself</span>' +
+        "We couldn’t confidently find your takeoff and landing, usually because of the lighting, the background, or your shoes being close in colour to the floor. Step through and mark them yourself, it only takes a moment and it’s the method the research validated.</div>"));
+      enterManualMode();
+      return;
+    }
+
+    if (a.confidence < 0.80) {
+      notes.appendChild(el('<div class="notice notice--warn"><span class="nt">Worth a check</span>' +
+        "We think we’ve found it, but have a look at the two frames before you trust the number.</div>"));
+      enterManualMode();
+      return;
+    }
+
+    buildResult();
+  }
+
+  function buildDisambiguation(a) {
+    var wrap = el('<div class="notice notice--stop"></div>');
+    var ftRaw = a.mainFlight ? (a.mainFlight.end - a.mainFlight.start) : 0;
+    var html = '<span class="nt">This clip’s timing does not add up</span>' +
+      "<p>On the file’s own clock you were in the air for <strong>" + ftRaw.toFixed(2) +
+      " seconds</strong>. That isn’t possible, the longest human jump flight is about 0.95 seconds.</p>" +
+      "<p>This is almost always a clip recorded in slow motion and saved with the slow motion baked in. Pick what your phone actually recorded at. <strong>We can’t tell these apart from the video alone</strong>, which is why we’re asking rather than guessing.</p>" +
+      '<div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Recorded at</th><th>Divide by</th><th>Real flight</th><th>Jump height</th></tr></thead><tbody>';
+
+    var candidates = [2, 4, 8, 16, 32];
+    var rows = [];
+    candidates.forEach(function (k) {
+      var ft = ftRaw / k;
+      var h = P.jumpHeightFromFlightTime(ft);
+      var plausible = h >= 0.05 && h <= 0.75;
+      rows.push({ k: k, ft: ft, h: h, plausible: plausible });
+    });
+
+    rows.forEach(function (r) {
+      html += '<tr class="' + (r.plausible ? "" : "is-off") + '"><td>' + (30 * r.k) + " fps</td><td>÷" + r.k +
+        "</td><td>" + r.ft.toFixed(3) + " s</td><td>" + (r.h * 100).toFixed(1) + " cm" +
+        (r.plausible ? "" : " (not possible)") + "</td></tr>";
+    });
+    html += "</tbody></table></div>";
+
+    var live = rows.filter(function (r) { return r.plausible; });
+    if (live.length > 1) {
+      html += "<p style='margin-top:12px'><strong>More than one of these gives a believable answer</strong>, and they are far apart. Pick the setting you actually used, or re-record following the guide.</p>";
+    }
+    html += '<div class="row" style="margin-top:12px" id="lamRow"></div>';
+    wrap.innerHTML = html;
+
+    var row = wrap.querySelector("#lamRow");
+    live.forEach(function (r) {
+      var b = el('<button class="btn btn--clay btn--sm">Use ÷' + r.k + "</button>");
+      b.addEventListener("click", function () {
+        App.lambda = App.lambda * r.k;
+        App.T = App.T.map(function (t) { return t / r.k; });
+        // The analysis timestamps came from the extracted frames, so rescale
+        // those too rather than re-decoding the whole window.
+        rescaleAnalysis(r.k);
+        $("analyseNotes").innerHTML = "";
+        finishAnalysis();
+      });
+      row.appendChild(b);
+    });
+    return wrap;
+  }
+
+  function rescaleAnalysis(k) {
+    var a = App.analysis;
+    a.T = a.T.map(function (t) { return t / k; });
+    a.flights.forEach(function (f) { f.start /= k; f.end /= k; });
+    a.contacts.forEach(function (c) { c.start /= k; c.end /= k; });
+    if (a.mainFlight) { /* mainFlight is a reference into flights, already scaled */ }
+    if (a.parabola) a.parabola.a *= k * k;
+    a.gravity = K.tracking.gravityCheck(a.parabola, a.standingHeightPx, (App.cfg.height_cm || 175) / 100);
+  }
+
+  /* ==================================================================
+     Manual confirmation
+     ================================================================== */
+
+  function enterManualMode() {
+    App.mode = "confirm";
+    var a = App.analysis;
+    var f = a.mainFlight;
+    App.marks = {
+      takeoff: f ? f.startIndex + App.windowFrom : App.windowFrom,
+      landing: f ? f.endIndex + App.windowFrom : App.windowTo
+    };
+
+    $("analyseHint").textContent = "Step to the exact frames and confirm them. Takeoff is the first frame where both feet are clear. Landing is the first frame where either foot is back down.";
+
+    var host = $("analyseControls");
+    host.innerHTML = "";
+
+    var wrap = el('<div class="stack-sm"></div>');
+    var mk = el('<div class="row"></div>');
+    ["takeoff", "landing"].forEach(function (key) {
+      var b = el('<button class="btn btn--onDark btn--sm">Set ' + key + "</button>");
+      b.addEventListener("click", function () {
+        App.marks[key] = App.frameIndex;
+        updateMarkLabel();
+      });
+      mk.appendChild(b);
+    });
+    var goTo = el('<div class="row"></div>');
+    ["takeoff", "landing"].forEach(function (key) {
+      var b = el('<button class="btn btn--ghostDark btn--sm">Go to ' + key + "</button>");
+      b.addEventListener("click", function () { drawFrame(App.marks[key]); });
+      goTo.appendChild(b);
+    });
+
+    var lbl = el('<p class="tiny" id="markLabel"></p>');
+    var done = el('<button class="btn btn--clay btn--full" style="margin-top:6px">These are right, show me the number</button>');
+    done.addEventListener("click", applyManualMarks);
+
+    wrap.appendChild(mk);
+    wrap.appendChild(goTo);
+    wrap.appendChild(lbl);
+    wrap.appendChild(done);
+    host.appendChild(wrap);
+
+    updateMarkLabel();
+    drawFrame(App.marks.takeoff);
+  }
+
+  function updateMarkLabel() {
+    var lbl = $("markLabel");
+    if (!lbl) return;
+    var ft = App.T[App.marks.landing] - App.T[App.marks.takeoff];
+    lbl.textContent = "Takeoff frame " + App.marks.takeoff + ", landing frame " + App.marks.landing +
+      "  ·  " + ft.toFixed(3) + " s in the air  ·  " + (P.jumpHeightFromFlightTime(ft) * 100).toFixed(1) + " cm";
+  }
+
+  function applyManualMarks() {
+    var a = App.analysis;
+    // Manual marks replace the detected boundaries wholesale. Mixing a hand
+    // picked takeoff with a refined landing would reintroduce half a frame
+    // of bias, so it is both or neither.
+    var f = {
+      start: App.T[App.marks.takeoff],
+      end: App.T[App.marks.landing],
+      startIndex: App.marks.takeoff - App.windowFrom,
+      endIndex: App.marks.landing - App.windowFrom,
+      refined: false,
+      ok: true
+    };
+    a.flights = [f];
+    a.mainFlight = f;
+    a.detector = "manual";
+    buildResult();
+  }
+
+  /* ==================================================================
+     Result
+     ================================================================== */
+
+  function buildResult() {
+    var a = App.analysis;
+    var t = App.test;
+    var fps = 1 / medianDiff(a.T);
+
+    var trial = {
+      flights: a.flights,
+      contacts: a.contacts,
+      fpsLocal: fps,
+      timingError_s: P.timingError_s(1 / fps),
+      confidence: a.confidence,
+      posture: a.posture,
+      parabola: a.gravity ? {
+        a: a.parabola ? a.parabola.a : null,
+        r2: a.parabola ? a.parabola.r2 : null,
+        impliedHeight_m: a.gravity.impliedHeight_m,
+        rho: a.gravity.rho,
+        band: a.gravity.band
+      } : null,
+      firstMovement_s: null,
+      contactsMerged: false
+    };
+
+    var ctx = {
+      athlete: { height_m: (App.cfg.height_cm || 175) / 100, bodyMass_kg: App.cfg.mass_kg || null },
+      session: { arms: App.cfg.arms, surface: App.cfg.surface, dropHeight_cm: App.cfg.drop_cm, cue: t.howToPerform.cue },
+      P: P,
+      sessionCmjHeight_m: lastSessionCmjHeight()
+    };
+
+    var res;
+    try {
+      res = t.compute(trial, ctx);
+    } catch (err) {
+      res = { primary: null, secondary: [], warnings: [{ id: "COMPUTE", severity: "block", text: "Something went wrong working this out: " + String(err && err.message || err) }], working: [] };
+    }
+
+    renderResult(res, trial, ctx);
+    show("result");
+  }
+
+  function medianDiff(T) {
+    var d = [];
+    for (var i = 1; i < T.length; i++) d.push(T[i] - T[i - 1]);
+    d.sort(function (a, b) { return a - b; });
+    return d[Math.floor(d.length / 2)] || (1 / 240);
+  }
+
+  function lastSessionCmjHeight() {
+    var today = new Date().toISOString().slice(0, 10);
+    for (var i = App.log.length - 1; i >= 0; i--) {
+      var r = App.log[i];
+      if (r.testId === "cmj" && r.date === today && r.athlete === (App.cfg.name || "you")) return r.value;
+    }
+    return null;
+  }
+
+  function renderResult(res, trial, ctx) {
+    var hero = $("resultHero");
+    var body = $("resultBody");
+    hero.innerHTML = "";
+    body.innerHTML = "";
+
+    var blocked = res.warnings.filter(function (w) { return w.severity === "block"; });
+
+    if (!res.primary || blocked.length) {
+      hero.appendChild(el('<div class="rl">No number</div><div class="rv" style="font-size:44px">—</div>'));
+      blocked.forEach(function (w) {
+        body.appendChild(el('<div class="notice notice--stop"><span class="nt">Why there’s no number</span>' + esc(w.text) + "</div>"));
+      });
+      body.appendChild(evidenceCard());
+      body.appendChild(actionsCard(false));
+      return;
+    }
+
+    var p = res.primary;
+    hero.appendChild(el(
+      '<div class="rl">' + esc(p.label) + "</div>" +
+      '<div><span class="rv">' + esc(p.display) + '</span><span class="ru">' + esc(p.unit) + "</span></div>" +
+      '<div class="rs">' + esc(p.sublabel) + "</div>" +
+      (p.precision ? '<div class="rp">' + esc(p.precision) + "</div>" : "") +
+      (p.band ? '<div class="rs" style="margin-top:10px">' + esc(p.band) + "</div>" : "")
+    ));
+
+    // Secondary metrics. Pinned ones always show, the rest fold away.
+    var pinned = res.secondary.filter(function (m) { return m.pinned; });
+    var rest = res.secondary.filter(function (m) { return !m.pinned; });
+
+    if (pinned.length) body.appendChild(metricGrid(pinned));
+
+    var warnAmber = res.warnings.filter(function (w) { return w.severity !== "block"; });
+    warnAmber.forEach(function (w) {
+      var n = el('<div class="notice notice--warn"><span class="nt">Worth knowing</span>' + esc(w.text) +
+        (w.voidOption ? '<div style="margin-top:12px"><button class="btn btn--ghost btn--sm" data-void="' + esc(w.voidOption) + '">Void this rep: ' + esc(w.voidOption) + "</button></div>" : "") + "</div>");
+      body.appendChild(n);
+    });
+
+    if (!warnAmber.length) {
+      body.appendChild(el('<div class="notice notice--ok"><span class="nt">Clean rep</span>Nothing looked wrong with this one. The landing matched the takeoff and the body followed a clean arc through the air.</div>'));
+    }
+
+    if (rest.length) {
+      var d = el('<details><summary>The rest of the numbers</summary><div class="dbody"></div></details>');
+      d.querySelector(".dbody").appendChild(metricGrid(rest));
+      rest.forEach(function (m) {
+        if (m.note) d.querySelector(".dbody").appendChild(el('<p class="tiny" style="margin-top:10px"><strong>' + esc(m.label) + ".</strong> " + esc(m.note) + "</p>"));
+      });
+      body.appendChild(d);
+    }
+
+    // Hop table, when the test produced one.
+    if (res.hops && res.hops.length) body.appendChild(hopTable(res.hops));
+
+    body.appendChild(evidenceCard());
+
+    // Show the working.
+    if (res.working && res.working.length) {
+      var w = el('<details><summary>Show the working</summary><div class="dbody"></div></details>');
+      var tbl = '<div class="tablewrap"><table><thead><tr><th>Step</th><th>How</th><th>Result</th></tr></thead><tbody>';
+      res.working.forEach(function (row) {
+        tbl += "<tr><td>" + esc(row.step) + "</td><td>" + esc(row.expression) + "</td><td>" + esc(row.result) + "</td></tr>";
+      });
+      tbl += "</tbody></table></div>";
+      w.querySelector(".dbody").innerHTML = tbl;
+      w.querySelector(".dbody").appendChild(el('<p class="tiny" style="margin-top:12px">Every one of these comes from assets/js/jump/physics.js, where each formula is written out with where it came from and what it assumes.</p>'));
+      body.appendChild(w);
+    }
+
+    body.appendChild(actionsCard(true, res));
+
+    body.addEventListener("click", function (e) {
+      var vb = e.target.closest("[data-void]");
+      if (vb) {
+        vb.disabled = true;
+        vb.textContent = "Voided";
+      }
+    });
+  }
+
+  function metricGrid(list) {
+    var g = el('<div class="metrics"></div>');
+    list.forEach(function (m) {
+      g.appendChild(el('<div class="metric ' + (m.pinned ? "metric--pin" : "") + '">' +
+        '<div class="ml">' + esc(m.label) + "</div>" +
+        '<div class="mv">' + esc(m.display) + (m.unit ? '<span class="mu">' + esc(m.unit) + "</span>" : "") + "</div>" +
+        '<div class="ms">' + esc(m.sublabel || "") + "</div></div>"));
+    });
+    return g;
+  }
+
+  function hopTable(hops) {
+    var d = el('<details open><summary>Hop by hop</summary><div class="dbody"></div></details>');
+    var t = '<div class="tablewrap"><table><thead><tr><th>Hop</th><th>Ground</th><th>Air</th><th>Height</th><th>RSI</th></tr></thead><tbody>';
+    hops.forEach(function (h) {
+      var cls = h.excluded ? "is-out" : (h.counted ? "is-std" : "");
+      t += '<tr class="' + cls + '"><td>' + h.index + "</td><td>" + P.fmt.ms(h.contactTime_s) + " ms</td><td>" +
+        P.fmt.ms(h.flightTime_s) + " ms</td><td>" + P.fmt.heightCm(h.height_m) + " cm</td><td>" +
+        (h.excluded ? "—" : P.fmt.rsi(h.rsi)) + "</td></tr>";
+    });
+    t += "</tbody></table></div>";
+    d.querySelector(".dbody").innerHTML = t;
+    d.querySelector(".dbody").appendChild(el('<p class="tiny" style="margin-top:12px">Green rows are the ones that made your score. Red rows couldn’t be measured and were dropped.</p>'));
+    return d;
+  }
+
+  function evidenceCard() {
+    var a = App.analysis;
+    var d = el('<details open><summary>What we actually saw</summary><div class="dbody"></div></details>');
+    var body = d.querySelector(".dbody");
+    body.appendChild(el('<p class="small">This is the height of your feet above the floor, frame by frame. The shaded part is where you were in the air. If that shape looks wrong, the number is wrong, and you should mark the frames yourself.</p>'));
+
+    var c = document.createElement("canvas");
+    c.width = 640; c.height = 200;
+    c.style.width = "100%"; c.style.height = "auto";
+    c.style.border = "1px solid var(--border)";
+    c.style.borderRadius = "3px";
+    c.style.marginTop = "12px";
+    body.appendChild(c);
+    drawHeightPlot(c, a);
+
+    var extra = "";
+    if (a.gravity) {
+      extra += "<p class='tiny' style='margin-top:12px'><strong>Gravity check.</strong> From your body's arc through the air, the video implies you're " +
+        a.gravity.impliedHeight_m.toFixed(2) + " m tall. You entered " + ((App.cfg.height_cm || 175) / 100).toFixed(2) +
+        " m. Those agreeing is what tells us the frame rate is right.</p>";
+    }
+    extra += "<p class='tiny'><strong>Confidence.</strong> " + Math.round(a.confidence * 100) +
+      "%. Below 80% we ask you to check the frames, below 60% we insist.</p>";
+    body.appendChild(el("<div>" + extra + "</div>"));
+
+    var redo = el('<button class="btn btn--ghost btn--sm" style="margin-top:12px">Mark the frames myself</button>');
+    redo.addEventListener("click", function () { show("analyse"); enterManualMode(); });
+    body.appendChild(redo);
+    return d;
+  }
+
+  function drawHeightPlot(canvas, a) {
+    var ctx = canvas.getContext("2d");
+    var W = canvas.width, H = canvas.height, pad = 22;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, W, H);
+
+    var h = a.h;
+    if (!h || !h.length) return;
+    var maxH = Math.max.apply(null, h) || 1;
+    var n = h.length;
+
+    function px(i) { return pad + (i / (n - 1)) * (W - pad * 2); }
+    function py(v) { return H - pad - (v / maxH) * (H - pad * 2); }
+
+    // flight shading
+    (a.flights || []).forEach(function (f) {
+      if (!f.ok) return;
+      ctx.fillStyle = "rgba(199,85,47,.10)";
+      ctx.fillRect(px(f.startIndex), pad, Math.max(2, px(f.endIndex) - px(f.startIndex)), H - pad * 2);
+    });
+
+    // ground line
+    ctx.strokeStyle = "#D8D1C5";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad, py(0)); ctx.lineTo(W - pad, py(0)); ctx.stroke();
+
+    // the trace
+    ctx.strokeStyle = "#0E4A36";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var x = px(i), y = py(Math.max(0, h[i]));
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // boundaries
+    (a.flights || []).forEach(function (f) {
+      if (!f.ok) return;
+      ctx.strokeStyle = "#C7552F";
+      ctx.lineWidth = 1.5;
+      [f.startIndex, f.endIndex].forEach(function (idx) {
+        ctx.beginPath(); ctx.moveTo(px(idx), pad); ctx.lineTo(px(idx), H - pad); ctx.stroke();
+      });
+    });
+
+    ctx.fillStyle = "#8A8A8A";
+    ctx.font = "10px 'Space Mono', monospace";
+    ctx.fillText("feet above floor", pad, 14);
+    ctx.fillText("floor", pad, py(0) + 13);
+  }
+
+  function actionsCard(canSave, res) {
+    var c = el('<div class="card"><h4>Next</h4><div class="row" style="margin-top:12px" id="actRow"></div></div>');
+    var row = c.querySelector("#actRow");
+
+    if (canSave) {
+      var saveBtn = el('<button class="btn btn--sm">Save this rep</button>');
+      saveBtn.addEventListener("click", function () {
+        saveResult(res);
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saved";
+      });
+      row.appendChild(saveBtn);
+    }
+
+    var again = el('<button class="btn btn--ghost btn--sm">Another rep</button>');
+    again.addEventListener("click", function () {
+      $("probeOut").innerHTML = "";
+      $("fileIn").value = "";
+      show("record");
+    });
+    row.appendChild(again);
+
+    var home = el('<button class="btn btn--ghost btn--sm">Different test</button>');
+    home.addEventListener("click", function () { show("home"); });
+    row.appendChild(home);
+
+    c.appendChild(el('<p class="tiny" style="margin-top:14px">' +
+      esc(App.test.scoring.note) + "</p>"));
+    return c;
+  }
+
+  /* ==================================================================
+     Saving and history
+     ================================================================== */
+
+  function saveResult(res) {
+    var a = App.analysis;
+    var fps = 1 / medianDiff(a.T);
+    var f = a.mainFlight;
+
+    // The record carries everything that makes two results comparable or not.
+    // Charts refuse to join points where any of these differ.
+    App.log.push({
+      id: Date.now() + "-" + Math.round(Math.random() * 1e6),
+      date: new Date().toISOString().slice(0, 10),
+      time: new Date().toISOString(),
+      athlete: App.cfg.name || "you",
+      testId: App.test.id,
+      metric: res.primary.key,
+      value: res.primary.value,
+      unit: res.primary.unit,
+      display: res.primary.display,
+      heightMethod: "flight_time",
+      rsiConvention: "JH_over_GCT_ms",
+      arms: App.cfg.arms,
+      surface: App.cfg.surface,
+      dropHeight_cm: App.test.requires.needsDropHeight ? App.cfg.drop_cm : null,
+      cue: App.test.howToPerform.cue,
+      fps_used: fps,
+      fps_source: App.probe.rateClass === "CFR" ? "container_stts" : "container_timestamps",
+      timebase: App.timebaseState,
+      lambda: App.lambda,
+      flightTime_s: f ? (f.end - f.start) : null,
+      confidence: a.confidence,
+      detector: a.detector === "manual" ? "manual" : "auto",
+      scoreType: App.test.scoring.score
+    });
+    save(LS.log, App.log);
+  }
+
+  function renderHistory() {
+    var host = $("historyBody");
+    host.innerHTML = "";
+
+    if (!App.log.length) {
+      host.appendChild(el('<div class="notice notice--info"><span class="nt">Nothing yet</span>Once you save a rep it shows up here, along with your best. Everything stays on this device.</div>'));
+      return;
+    }
+
+    var byTest = {};
+    App.log.forEach(function (r) { (byTest[r.testId] = byTest[r.testId] || []).push(r); });
+
+    Object.keys(byTest).forEach(function (id) {
+      var t = K.getTest(id);
+      var rows = byTest[id].slice().reverse();
+      var best = rows.reduce(function (b, r) { return (!b || r.value > b.value) ? r : b; }, null);
+
+      var card = el('<div class="card" style="margin-bottom:14px"><div class="card-h"><h3>' +
+        esc(t ? t.name : id) + "</h3></div></div>");
+
+      // Anything that changes the meaning of the number breaks the line.
+      var conditions = {};
+      rows.forEach(function (r) { conditions[r.arms + "|" + r.surface + "|" + r.dropHeight_cm + "|" + r.cue] = true; });
+      if (Object.keys(conditions).length > 1) {
+        card.appendChild(el('<div class="notice notice--warn" style="margin-bottom:12px"><span class="nt">Not one line</span>' +
+          "These weren’t all done under the same conditions, so they can’t be read as one trend. Arms, surface, box height or the cue changed somewhere in here.</div>"));
+      }
+
+      rows.forEach(function (r) {
+        card.appendChild(el('<div class="hist-row"><span class="hd">' + esc(r.date) + "</span>" +
+          '<span class="hv">' + esc(r.display) + "</span>" +
+          '<span class="hm">' + esc(r.unit) + (r === best ? ' <span class="pb">Best</span>' : "") +
+          (r.detector === "manual" ? " · marked by hand" : "") +
+          (r.lambda !== 1 ? ' · <span style="color:var(--clay)">corrected ÷' + r.lambda + "</span>" : "") +
+          "</span></div>"));
+      });
+
+      // The change gate. Below the minimum detectable change we say nothing
+      // moved, and we do not draw an arrow.
+      if (rows.length >= 2 && t) {
+        var cv = id === "cmj" || id === "sj" ? P.CV.cmjHeight_240fps : P.CV.djRsi_betweenDays;
+        var mdc = P.mdc95(cv, Math.max(1, t.scoring.trials));
+        var delta = (rows[0].value - rows[1].value) / rows[1].value;
+        var real = Math.abs(delta) > mdc;
+        card.appendChild(el('<p class="tiny" style="margin-top:12px">' +
+          (real
+            ? "Latest is " + (delta > 0 ? "up" : "down") + " " + Math.abs(delta * 100).toFixed(1) + "% on the one before. That's past the noise floor of " + (mdc * 100).toFixed(1) + "%, so it's a real change."
+            : "No change detected. The difference is " + Math.abs(delta * 100).toFixed(1) + "%, and anything under " + (mdc * 100).toFixed(1) + "% is noise for this test. Nothing to act on.") +
+          "</p>"));
+      }
+
+      host.appendChild(card);
+    });
+
+    var clear = el('<button class="btn btn--ghost btn--sm" style="margin-top:10px">Clear all jump data on this device</button>');
+    clear.addEventListener("click", function () {
+      if (confirm("This wipes every saved result on this device. There is no copy anywhere else. Are you sure?")) {
+        App.log = [];
+        save(LS.log, App.log);
+        renderHistory();
+      }
+    });
+    host.appendChild(clear);
+  }
+
+  /* ==================================================================
+     Guide
+     ================================================================== */
+
+  function renderGuide() {
+    var F = K.filming;
+    $("guideTitle").textContent = F.title;
+    var intro = $("guideIntro");
+    intro.innerHTML = "";
+    F.intro.forEach(function (p) { intro.appendChild(el("<p>" + md(p) + "</p>")); });
+
+    var host = $("guideBody");
+    host.innerHTML = "";
+
+    F.sections.forEach(function (s) {
+      var card = el('<div class="card' + (s.priority ? '" style="border-left:3px solid var(--clay)' : "") + '"></div>');
+      card.appendChild(el("<h3>" + esc(s.title) + "</h3>"));
+      if (s.why) card.appendChild(el('<p class="tiny" style="margin:6px 0 12px">' + esc(s.why) + "</p>"));
+      (s.body || []).forEach(function (p) { card.appendChild(el("<p>" + md(p) + "</p>")); });
+      if (s.bullets && s.bullets.length) {
+        var ul = el('<ul class="bullets" style="margin-top:12px"></ul>');
+        s.bullets.forEach(function (b) {
+          ul.appendChild(el("<li><b>" + esc(b.label) + ".</b> " + md(b.text) + "</li>"));
+        });
+        card.appendChild(ul);
+      }
+      host.appendChild(card);
+    });
+
+    // Pre-flight
+    var pf = el('<div class="card" style="background:var(--bg-band)"></div>');
+    pf.appendChild(el("<h3>" + esc(F.preflight.title) + "</h3>"));
+    var ul = el('<ul class="checks" style="margin-top:12px"></ul>');
+    F.preflight.items.forEach(function (i) { ul.appendChild(el("<li>" + esc(i) + "</li>")); });
+    pf.appendChild(ul);
+    host.appendChild(pf);
+
+    // The accuracy table, computed rather than typed.
+    var acc = el('<div class="card"><h3>How accurate is this?</h3></div>');
+    acc.appendChild(el('<p class="small" style="margin:10px 0 14px">Worked out for a 30.7 cm jump, half a second in the air, with a fifth of a second on the ground.</p>'));
+    var rows = P.frameRateErrorTable();
+    var tbl = '<div class="tablewrap"><table><thead><tr><th>Frame rate</th><th>One frame</th><th>Frames in the air</th><th>Typical error</th><th>Worst case</th><th>RSI error</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      var cls = r.fps < 60 ? "is-out" : (r.fps === 240 ? "is-std" : "");
+      tbl += '<tr class="' + cls + '"><td>' + r.fps + " fps</td><td>" + r.framePeriod_ms.toFixed(2) + " ms</td><td>" +
+        r.framesInFlight + "</td><td>" + (r.heightErrorTypical_m * 100).toFixed(2) + " cm</td><td>" +
+        (r.heightErrorOneFrame_m * 100).toFixed(2) + " cm</td><td>" + (r.rsiErrorTypical_frac * 100).toFixed(1) + "%</td></tr>";
+    });
+    tbl += "</tbody></table></div>";
+    acc.appendChild(el(tbl));
+    acc.appendChild(el('<p class="tiny" style="margin-top:10px">Red is refused. Green is the standard we want.</p>'));
+    var notes = el('<ul class="bullets" style="margin-top:14px"></ul>');
+    F.accuracyNotes.forEach(function (n) { notes.appendChild(el("<li>" + md(n) + "</li>")); });
+    acc.appendChild(notes);
+    host.appendChild(acc);
+
+    // Where the maths comes from.
+    var src = el('<details><summary>Where the maths comes from</summary><div class="dbody"><ul class="bullets"></ul></div></details>');
+    var sul = src.querySelector("ul");
+    P.sources.forEach(function (s) { sul.appendChild(el('<li class="small">' + esc(s.text) + "</li>")); });
+    src.querySelector(".dbody").appendChild(el('<p class="tiny" style="margin-top:12px">Every formula lives in assets/js/jump/physics.js with its derivation written next to it. Each test’s protocol lives in its own file under assets/js/jump/tests/.</p>'));
+    host.appendChild(src);
+  }
+
+  /* ==================================================================
+     Wiring
+     ================================================================== */
+
+  function init() {
+    renderTests();
+    renderGuide();
+
+    $("btnBack").addEventListener("click", function () {
+      if (App.view === "learn") show("home");
+      else if (App.view === "setup") show("learn");
+      else if (App.view === "record") show("setup");
+      else if (App.view === "analyse") show("record");
+      else if (App.view === "result") show("analyse");
+      else show("home");
+    });
+    $("btnGuide").addEventListener("click", function () { show("guide"); });
+    $("btnHistory").addEventListener("click", function () { renderHistory(); show("history"); });
+
+    document.addEventListener("click", function (e) {
+      var g = e.target.closest("[data-go]");
+      if (g) {
+        var v = g.getAttribute("data-go");
+        if (v === "guide") show("guide");
+      }
+    });
+
+    $("btnLearnNext").addEventListener("click", function () { renderSetup(); show("setup"); });
+
+    wireSeg("segArms", "arms");
+    wireSeg("segSurface", "surface");
+
+    $("btnSetupNext").addEventListener("click", function () {
+      App.cfg.name = $("inName").value.trim();
+      App.cfg.height_cm = parseFloat($("inHeight").value) || null;
+      App.cfg.mass_kg = parseFloat($("inMass").value) || null;
+      App.cfg.drop_cm = parseFloat($("inDrop").value) || 30;
+      if (!App.cfg.height_cm || App.cfg.height_cm < 120 || App.cfg.height_cm > 220) {
+        alert("We need your standing height in centimetres. It's how we check the video's timing against gravity, which is what catches a clip that's secretly running slow.");
+        return;
+      }
+      save(LS.cfg, App.cfg);
+      $("probeOut").innerHTML = "";
+      show("record");
+    });
+
+    $("fileIn").addEventListener("change", function (e) {
+      if (e.target.files && e.target.files[0]) onFile(e.target.files[0]);
+    });
+
+    $("scrubRange").addEventListener("input", function (e) { drawFrame(parseInt(e.target.value, 10)); });
+    $("btnPrev").addEventListener("click", function () { drawFrame(App.frameIndex - 1); });
+    $("btnNext").addEventListener("click", function () { drawFrame(App.frameIndex + 1); });
+    $("btnPrev10").addEventListener("click", function () { drawFrame(App.frameIndex - 10); });
+    $("btnNext10").addEventListener("click", function () { drawFrame(App.frameIndex + 10); });
+
+    document.addEventListener("keydown", function (e) {
+      if (App.view !== "analyse") return;
+      if (e.key === "ArrowLeft") { drawFrame(App.frameIndex - 1); e.preventDefault(); }
+      if (e.key === "ArrowRight") { drawFrame(App.frameIndex + 1); e.preventDefault(); }
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+
+})();
+</script>
+
+</body>
+</html>
