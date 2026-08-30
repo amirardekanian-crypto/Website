@@ -26,8 +26,44 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <title>Jump test</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AA Jump">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Dynamic manifest, same pattern as program.html and habits.html. This is
+     what makes it install to the home screen and open without browser chrome,
+     which is most of what separates an app from a web page. iOS labels the
+     home screen icon from the apple-mobile-web-app-title meta above and
+     ignores the manifest name, so those two must always say the same thing. -->
+<script>
+  (function () {
+    var manifest = {
+      name: "AA Jump",
+      short_name: "AA Jump",
+      description: "Measure your jump height and reactive strength from a phone video.",
+      start_url: "/jump.html",
+      scope: "/",
+      display: "standalone",
+      orientation: "portrait",
+      background_color: "#FAF7F2",
+      theme_color: "#FAF7F2",
+      lang: "en-GB",
+      categories: ["fitness", "health", "sports"],
+      icons: [
+        { src: "/assets/img/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+        { src: "/assets/img/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      ]
+    };
+    var blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+    var link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  })();
+</script>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0E4A36">
 <meta name="description" content="Measure your jump height and reactive strength from a phone video. Everything runs on your device.">
@@ -125,40 +161,65 @@ a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
 .tiny{font-size:12.5px;color:var(--ink-3);line-height:1.5}
 .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
 
-/* ---------- shell ---------- */
-.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
-.wrap-wide{max-width:940px;margin:0 auto;padding:0 var(--pad)}
+/* ---------- app shell ----------
+   No top nav. A bottom tab bar, screens that fill the viewport, and a
+   sticky action bar carrying the one thing you are meant to do next.
+   This is the same chrome as program.html, which is the app look on
+   this site: green icons, active gets a glow and a thicker stroke.
+   ------------------------------------------------------------------- */
 
-.topbar{
-  position:sticky;top:0;z-index:50;
-  background:rgba(250,247,242,.94);
-  backdrop-filter:saturate(1.4) blur(10px);
-  border-bottom:1px solid var(--border);
+:root{
+  --tabbar-h:60px;
+  --safe-b:env(safe-area-inset-bottom, 0px);
+  --safe-t:env(safe-area-inset-top, 0px);
 }
-.topbar-in{
-  max-width:940px;margin:0 auto;padding:10px var(--pad);
-  display:flex;align-items:center;gap:12px;min-height:56px;
-}
-.brand{
-  font-family:var(--font-display);font-weight:900;text-transform:uppercase;
-  font-size:17px;letter-spacing:.02em;color:var(--accent);
-  text-decoration:none;white-space:nowrap;
-}
-.brand span{color:var(--clay)}
-.topbar-spacer{flex:1}
 
-.iconbtn{
-  appearance:none;border:1px solid var(--border-strong);background:var(--bg-card);
-  color:var(--ink-2);font-family:var(--font-display);font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;font-size:12px;
-  padding:8px 12px;border-radius:var(--r-sm);cursor:pointer;
-  transition:border-color var(--dur-fast) var(--ease),color var(--dur-fast) var(--ease);
+body{
+  min-height:100dvh;
+  overscroll-behavior-y:none;
+  -webkit-tap-highlight-color:transparent;
 }
-.iconbtn:hover{border-color:var(--accent);color:var(--accent)}
-.iconbtn[hidden]{display:none}
 
-/* ---------- sections ---------- */
-.sec{padding:34px 0}
+.app{
+  min-height:100dvh;
+  padding-bottom:calc(var(--tabbar-h) + var(--safe-b));
+}
+
+.wrap{max-width:620px;margin:0 auto;padding:0 var(--pad)}
+.wrap-wide{max-width:820px;margin:0 auto;padding:0 var(--pad)}
+
+@keyframes screen-in{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:none}
+}
+
+/* Screen header: Space Mono clay eyebrow over giant Barlow Condensed 900,
+   which is the signature the rest of the app already uses. */
+.shead{padding:calc(16px + var(--safe-t)) 0 12px}
+.shead .eyebrow{color:var(--clay);margin-bottom:6px}
+.shead h1{font-size:clamp(29px,8.5vw,38px)}
+.shead .sub{font-size:15px;color:var(--ink-2);margin-top:8px;max-width:34em}
+.shead--dark{
+  background:radial-gradient(120% 110% at 80% 0%, var(--accent-lift) 0%, var(--accent) 55%, var(--accent-deep) 100%);
+  color:#fff;padding-bottom:18px;
+}
+.shead--dark h1{color:#fff}
+.shead--dark .eyebrow{color:var(--clay-lift)}
+.shead--dark .sub{color:rgba(255,255,255,.82)}
+
+.backbtn{
+  appearance:none;border:0;background:transparent;cursor:pointer;
+  color:var(--ink-3);font-family:var(--font-mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:6px 10px 6px 0;margin-bottom:2px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.backbtn::before{content:"\2039";font-size:19px;line-height:1;margin-top:-2px}
+.backbtn:active{transform:scale(.96)}
+.shead--dark .backbtn{color:rgba(255,255,255,.75)}
+
+.sbody{padding:0 0 24px}
+.sec{padding:16px 0}
 .sec--band{background:var(--bg-band)}
 .sec--dark{
   background:radial-gradient(120% 100% at 80% 0%, var(--accent-lift) 0%, var(--accent) 55%, var(--accent-deep) 100%);
@@ -169,6 +230,54 @@ a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
 .sec--dark .lead,.sec--dark .small{color:rgba(255,255,255,.82)}
 .sec--dark .tiny{color:rgba(255,255,255,.66)}
 .sec--dark em{color:var(--clay-lift)}
+
+/* Sticky action bar. The primary action sits above the tab bar, always in
+   thumb reach, rather than at the bottom of a long scroll. */
+.actionbar{
+  position:fixed;left:0;right:0;
+  bottom:calc(var(--tabbar-h) + var(--safe-b));
+  z-index:55;
+  padding:26px var(--pad) 12px;
+  /* A long fade, so text scrolling under the button dissolves rather than
+     being sliced through it. */
+  background:linear-gradient(to top,
+    var(--bg) 0%, var(--bg) 58%,
+    rgba(250,247,242,.94) 74%,
+    rgba(250,247,242,0) 100%);
+  display:none;
+}
+.actionbar.is-on{display:block}
+.actionbar-in{max-width:620px;margin:0 auto}
+body.has-action .app{padding-bottom:calc(var(--tabbar-h) + var(--safe-b) + 80px)}
+
+/* Bottom tab bar */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:var(--bg-card);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding-bottom:var(--safe-b);
+}
+.tabbar button{
+  position:relative;flex:1;padding:9px 6px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;border:0;background:transparent;
+  opacity:.5;transition:opacity var(--dur-fast) var(--ease);
+}
+.tabbar button.active{opacity:1}
+.tabbar .ti{
+  width:22px;height:22px;color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  transition:filter var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
+}
+.tabbar .ti svg{width:100%;height:100%;display:block}
+.tabbar button.active .ti{filter:drop-shadow(0 0 4px rgba(14,74,54,.45))}
+.tabbar button.active .ti svg{stroke-width:2}
+.tabbar .tl{
+  font-family:var(--font-display);font-weight:700;font-size:9px;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);
+}
+.tabbar button:active .ti{transform:scale(.9)}
 
 /* ---------- cards ---------- */
 .card{
@@ -230,20 +339,40 @@ input:focus,select:focus{border-color:var(--accent);outline:none}
 .seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 
 /* ---------- test picker ---------- */
-.tests{display:grid;gap:12px}
-@media(min-width:620px){.tests{grid-template-columns:1fr 1fr}}
+.tests{display:flex;flex-direction:column;gap:8px}
 .test-card{
-  text-align:left;width:100%;cursor:pointer;
+  position:relative;text-align:left;width:100%;cursor:pointer;
   background:var(--bg-card);border:1px solid var(--border);
   border-left:3px solid var(--clay);
-  border-radius:var(--r-md);padding:18px;
+  border-radius:var(--r-md);padding:14px 34px 14px 15px;
   font-family:var(--font-body);color:inherit;
-  transition:border-color var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
+  transition:background var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);
 }
-.test-card:hover{transform:translateY(-2px);border-color:var(--border-strong);border-left-color:var(--clay)}
-.test-card .tn{font-family:var(--font-display);font-weight:900;text-transform:uppercase;font-size:20px;line-height:1.05}
-.test-card .ts{font-size:14px;color:var(--ink-2);margin-top:5px}
-.test-card .tk{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:7px}
+/* Reads as a row you tap, not a panel you read. */
+.test-card::after{
+  content:"\203A";position:absolute;right:14px;top:50%;transform:translateY(-52%);
+  font-size:22px;color:var(--ink-4);line-height:1;
+}
+.test-card:active{transform:scale(.99);background:var(--bg-band)}
+.test-card .tn{font-family:var(--font-display);font-weight:900;text-transform:uppercase;font-size:19px;line-height:1.05}
+.test-card .ts{font-size:13.5px;color:var(--ink-2);margin-top:3px}
+.test-card .tk{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--clay);text-transform:uppercase;margin-bottom:5px}
+
+/* A compact tappable row, used for the guide prompt and anywhere else that
+   is a door rather than a message. */
+.rowlink{
+  position:relative;display:block;width:100%;text-align:left;cursor:pointer;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:13px 34px 13px 15px;font-family:var(--font-body);color:inherit;margin-top:14px;
+}
+.rowlink::after{
+  content:"\203A";position:absolute;right:14px;top:50%;transform:translateY(-52%);
+  font-size:22px;color:var(--ink-4);line-height:1;
+}
+.rowlink:active{background:var(--bg-band)}
+.rowlink .rt{font-family:var(--font-display);font-weight:700;text-transform:uppercase;
+  letter-spacing:.04em;font-size:15px}
+.rowlink .rs{font-size:13px;color:var(--ink-2);margin-top:2px}
 
 /* ---------- steps ---------- */
 .steps{counter-reset:s;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
@@ -396,8 +525,7 @@ details[open] summary::after{content:"–"}
 details .dbody{padding:0 16px 16px}
 
 .view{display:none}
-.view.is-on{display:block}
-.footer{padding:32px 0 46px;color:var(--ink-3);font-size:13px;text-align:center}
+.view.is-on{display:block;animation:screen-in var(--dur) var(--ease)}
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
@@ -406,70 +534,53 @@ details .dbody{padding:0 16px 16px}
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-in">
-    <a class="brand" href="/" aria-label="Home">AA<span>.</span></a>
-    <button class="iconbtn" id="btnBack" hidden>Back</button>
-    <div class="topbar-spacer"></div>
-    <button class="iconbtn" id="btnGuide">Guide</button>
-    <button class="iconbtn" id="btnHistory">History</button>
-  </div>
-</div>
-
 <video id="srcVideo" playsinline muted preload="auto"></video>
 
-<main>
+<div class="app" id="app">
 
 <!-- ============================================================ HOME -->
 <section class="view is-on" id="view-home">
-  <div class="sec sec--dark">
-    <div class="wrap">
-      <p class="eyebrow">Jump testing</p>
-      <h1>Film a jump.<br>Get a number<br>you can <em>trust</em>.</h1>
-      <p class="lead" style="margin-top:14px;max-width:36em">
-        Record yourself on your phone, load the clip here, and this works out how high you jumped and how fast you got off the floor. The video never leaves your device.
-      </p>
-    </div>
-  </div>
+  <header class="shead wrap">
+    <p class="eyebrow" id="homeEyebrow">Jump testing</p>
+    <h1 id="homeTitle">Pick a test</h1>
+  </header>
 
-  <div class="sec">
+  <div class="sbody">
     <div class="wrap">
-      <p class="eyebrow">Pick a test</p>
       <div class="tests" id="testList"></div>
 
-      <div class="notice notice--info" style="margin-top:22px">
-        <span class="nt">Before your first test</span>
-        Read the recording guide once, all the way through. Most bad results here aren't bad jumping, they're a clip filmed at the wrong frame rate or sent through WhatsApp. Ten minutes now saves you every session after.
-        <div style="margin-top:12px"><button class="btn btn--ghost btn--sm" data-go="guide">Open the recording guide</button></div>
-      </div>
+      <button class="rowlink" type="button" data-go="guide">
+        <div class="rt">How to record it</div>
+        <div class="rs">Read this once before your first test. Most bad results are a clip filmed wrong, not bad jumping.</div>
+      </button>
     </div>
   </div>
 </section>
 
 <!-- ============================================================ LEARN -->
 <section class="view" id="view-learn">
-  <div class="sec sec--dark" style="padding-bottom:26px">
-    <div class="wrap">
-      <p class="eyebrow" id="learnKicker">Test</p>
-      <h1 id="learnTitle">Test</h1>
-      <p class="lead" id="learnStrap" style="margin-top:10px"></p>
-    </div>
-  </div>
-  <div class="sec">
+  <header class="shead wrap">
+    <div class="backslot"></div>
+    <p class="eyebrow" id="learnKicker">Test</p>
+    <h1 id="learnTitle">Test</h1>
+    <p class="sub" id="learnStrap"></p>
+  </header>
+  <div class="sbody">
     <div class="wrap stack" id="learnBody"></div>
-    <div class="wrap" style="margin-top:26px">
-      <button class="btn btn--full" id="btnLearnNext">I've read this, set me up</button>
-    </div>
+
   </div>
 </section>
 
 <!-- ============================================================ SETUP -->
 <section class="view" id="view-setup">
-  <div class="sec">
+  <header class="shead wrap">
+    <div class="backslot"></div>
+    <p class="eyebrow">About you</p>
+    <h1>Who's jumping</h1>
+    <p class="sub">Your height is doing real work here. We use it to check the video's timing against gravity, which is how we catch a clip that's secretly running slow.</p>
+  </header>
+  <div class="sbody">
     <div class="wrap">
-      <p class="eyebrow">Step 1 of 3</p>
-      <h2>Who's jumping</h2>
-      <p class="lead" style="margin:10px 0 22px">Your height is doing real work here. We use it to check the video's timing against gravity, which is how we catch a clip that's secretly running slow.</p>
 
       <div id="setupFields"></div>
 
@@ -505,18 +616,21 @@ details .dbody{padding:0 16px 16px}
 
       <div id="setupWarn"></div>
 
-      <button class="btn btn--full" id="btnSetupNext" style="margin-top:18px">Next, load the video</button>
+
     </div>
   </div>
 </section>
 
 <!-- ============================================================ RECORD -->
 <section class="view" id="view-record">
-  <div class="sec">
+  <header class="shead wrap">
+    <div class="backslot"></div>
+    <p class="eyebrow">Step 2 of 3</p>
+    <h1>Load your clip</h1>
+    <p class="sub">Slow motion, 240 fps. The clip only needs the jump itself plus a second either side.</p>
+  </header>
+  <div class="sbody">
     <div class="wrap">
-      <p class="eyebrow">Step 2 of 3</p>
-      <h2>Load your clip</h2>
-      <p class="lead" style="margin:10px 0 20px">Slow motion, 240 fps. The clip only needs the jump itself plus a second either side.</p>
 
       <div class="notice notice--warn">
         <span class="nt">The one that catches people</span>
@@ -536,11 +650,16 @@ details .dbody{padding:0 16px 16px}
 
 <!-- ============================================================ ANALYSE -->
 <section class="view" id="view-analyse">
-  <div class="sec sec--dark">
+  <header class="shead shead--dark">
     <div class="wrap-wide">
+      <div class="backslot"></div>
       <p class="eyebrow">Step 3 of 3</p>
-      <h2 style="margin-bottom:6px">Find the jump</h2>
-      <p class="lead" style="margin-bottom:18px" id="analyseHint">Drag to the moment just before you leave the floor.</p>
+      <h1>Find the jump</h1>
+      <p class="sub" id="analyseHint">Drag to the moment just before you leave the floor.</p>
+    </div>
+  </header>
+  <div class="sec sec--dark" style="padding-top:6px">
+    <div class="wrap-wide">
 
       <div class="stage">
         <canvas id="stageCanvas" width="640" height="360"></canvas>
@@ -584,34 +703,54 @@ details .dbody{padding:0 16px 16px}
 
 <!-- ============================================================ HISTORY -->
 <section class="view" id="view-history">
-  <div class="sec">
+  <header class="shead wrap">
+    <p class="eyebrow">On this device</p>
+    <h1>History</h1>
+  </header>
+  <div class="sbody">
     <div class="wrap">
-      <p class="eyebrow">On this device</p>
-      <h2>History</h2>
-      <div id="historyBody" style="margin-top:18px"></div>
+      <div id="historyBody"></div>
     </div>
   </div>
 </section>
 
 <!-- ============================================================ GUIDE -->
 <section class="view" id="view-guide">
-  <div class="sec sec--dark" style="padding-bottom:26px">
-    <div class="wrap">
-      <p class="eyebrow">Read this once</p>
-      <h1 id="guideTitle">Recording guide</h1>
-      <div class="lead" id="guideIntro" style="margin-top:12px"></div>
-    </div>
-  </div>
-  <div class="sec">
+  <header class="shead wrap">
+    <p class="eyebrow">Read this once</p>
+    <h1 id="guideTitle">Recording guide</h1>
+    <div class="sub" id="guideIntro"></div>
+  </header>
+  <div class="sbody">
     <div class="wrap stack" id="guideBody"></div>
   </div>
 </section>
 
-</main>
+</div><!-- /.app -->
 
-<div class="footer wrap">
-  <p class="tiny">Everything on this page runs on your device. No video is uploaded and there is no account.</p>
-</div>
+<!-- Sticky primary action: whatever you are meant to do next on this screen,
+     always within thumb reach instead of at the end of a scroll. -->
+<div class="actionbar" id="actionbar"><div class="actionbar-in" id="actionbarIn"></div></div>
+
+<nav class="tabbar" id="tabbar" aria-label="Main">
+  <button type="button" data-tab="test" aria-label="Test">
+    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9"/><path d="m7 13 5-5 5 5"/><path d="M4 21h16"/></svg></span>
+    <span class="tl">Test</span>
+  </button>
+  <button type="button" data-tab="guide" aria-label="Guide">
+    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M8 7h7M8 11h7"/></svg></span>
+    <span class="tl">Guide</span>
+  </button>
+  <button type="button" data-tab="history" aria-label="History">
+    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+    <span class="tl">History</span>
+  </button>
+  <button type="button" data-tab="you" aria-label="You">
+    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></span>
+    <span class="tl">You</span>
+  </button>
+</nav>
+
 
 <!-- the knowledge, one file per thing that might change -->
 <script src="/assets/js/jump/kit.js"></script>
@@ -654,6 +793,7 @@ details .dbody{padding:0 16px 16px}
 
   var App = {
     view: "home",
+    inFlow: false,      // true once a test is open, so setup knows it is a step
     testId: null,
     test: null,
     cfg: load(LS.cfg, {
@@ -699,14 +839,123 @@ details .dbody{padding:0 16px 16px}
     return d.firstElementChild;
   }
 
+  /* ------------------------------------------------------------------
+     Navigation.
+
+     Four tabs, with the test flow living inside the Test tab. Each screen
+     knows which tab it belongs to and which screen it came from, so Back
+     walks the flow while the tabs stay put. That is most of the difference
+     between an app and a set of linked pages.
+     ------------------------------------------------------------------ */
+
+  var TAB_OF = {
+    home: "test", learn: "test", record: "test", analyse: "test", result: "test",
+    setup: "you", guide: "guide", history: "history"
+  };
+  var TAB_ROOT = { test: "home", guide: "guide", history: "history", you: "setup" };
+
+  // Where Back goes from each screen inside the flow. A screen with no entry
+  // here is a tab root and shows no Back at all.
+  var BACK_TO = {
+    learn: "home", setup: "learn", record: "setup", analyse: "record", result: "analyse"
+  };
+
+  // The one thing you are meant to do next, pinned above the tab bar.
+  // The setup screen is reachable two ways, so its action depends on which:
+  // mid-flow it moves you on, opened as the You tab it just saves.
+  var ACTIONS = {
+    learn: {
+      label: function () { return "I have read this, set me up"; },
+      go: function () { renderSetup(); show("setup"); }
+    },
+    setup: {
+      label: function () { return App.inFlow ? "Next, load the video" : "Save"; },
+      go: function () { submitSetup(); }
+    }
+  };
+
   function show(view) {
     App.view = view;
+
     var all = document.querySelectorAll(".view");
     for (var i = 0; i < all.length; i++) all[i].classList.remove("is-on");
     var target = $("view-" + view);
     if (target) target.classList.add("is-on");
-    $("btnBack").hidden = (view === "home");
-    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+
+    var tab = TAB_OF[view] || "test";
+    var btns = document.querySelectorAll("#tabbar button");
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].classList.toggle("active", btns[b].getAttribute("data-tab") === tab);
+    }
+
+    renderBack(view);
+    renderAction(view);
+    window.scrollTo(0, 0);
+  }
+
+  function renderBack(view) {
+    var slots = document.querySelectorAll(".backslot");
+    for (var i = 0; i < slots.length; i++) slots[i].innerHTML = "";
+    // Setup as the You tab is a tab root, so it gets no Back at all.
+    if (view === "setup" && !App.inFlow) return;
+    var to = BACK_TO[view];
+    if (!to) return;
+    var host = $("view-" + view).querySelector(".backslot");
+    if (!host) return;
+    var b = el('<button class="backbtn" type="button">' + esc(backLabel(to)) + "</button>");
+    b.addEventListener("click", function () {
+      if (to === "setup") renderSetup();
+      show(to);
+    });
+    host.appendChild(b);
+  }
+
+  function backLabel(view) {
+    if (view === "home") return "Tests";
+    if (view === "learn") return App.test ? App.test.shortName : "Back";
+    /* falls through to the table below */
+    if (view === "setup") return "You";
+    if (view === "record") return "Clip";
+    if (view === "analyse") return "Frames";
+    return "Back";
+  }
+
+  function renderAction(view) {
+    var bar = $("actionbar");
+    var host = $("actionbarIn");
+    host.innerHTML = "";
+    var a = ACTIONS[view];
+    if (!a) {
+      bar.classList.remove("is-on");
+      document.body.classList.remove("has-action");
+      return;
+    }
+    var btn = el('<button class="btn btn--full" type="button">' + esc(a.label()) + "</button>");
+    btn.addEventListener("click", a.go);
+    host.appendChild(btn);
+    bar.classList.add("is-on");
+    document.body.classList.add("has-action");
+  }
+
+  function goTab(tab) {
+    // Tapping Test while mid-flow keeps you where you are, rather than
+    // throwing away the clip you just loaded.
+    if (tab === "test" && TAB_OF[App.view] === "test") return;
+    if (tab !== "test") App.inFlow = false;
+    var root = TAB_ROOT[tab];
+    if (root === "history") renderHistory();
+    if (root === "setup") renderSetup();
+    show(root);
+  }
+
+  /* A greeting on the home screen, the same signature the rest of the app
+     uses: eyebrow over a big name. */
+  function renderHomeHead() {
+    var h = new Date().getHours();
+    var greet = h < 12 ? "Good morning" : (h < 18 ? "Good afternoon" : "Good evening");
+    var name = (App.cfg.name || "").trim().split(/\s+/)[0];
+    $("homeEyebrow").textContent = name ? greet : "Jump testing";
+    $("homeTitle").textContent = name || "Pick a test";
   }
 
   /* ==================================================================
@@ -733,6 +982,7 @@ details .dbody{padding:0 16px 16px}
     App.testId = id;
     App.test = K.getTest(id);
     if (!App.test) return;
+    App.inFlow = true;
     renderLearn();
     show("learn");
   }
@@ -959,6 +1209,37 @@ details .dbody{padding:0 16px 16px}
       warn.appendChild(el('<div class="notice notice--warn" style="margin-top:14px"><span class="nt">Soft surface</span>' +
         "A sprung floor or a mat lengthens your time on the ground and lets your foot sink, so the floor line moves while you're on it. Drop jumps and the 10-5 are hit hardest. It'll still record, but only compare it against other sessions on the same surface.</div>"));
     }
+  }
+
+  // Called by the sticky action bar on the setup screen.
+  function submitSetup() {
+    readAthleteFields();
+    App.cfg.drop_cm = parseFloat($("inDrop").value) || App.cfg.drop_cm || 30;
+
+    // Refuse only on the field we genuinely cannot work without, and say what
+    // it is for rather than just saying no.
+    var missing = JumpKit.athlete.missingRequired(App.cfg, App.test ? App.test.id : null);
+    var badHeight = !App.cfg.height_cm || App.cfg.height_cm < 120 || App.cfg.height_cm > 220;
+    if (missing.length || badHeight) {
+      var f = missing[0] || JumpKit.athlete.byId("height_cm");
+      var warn = $("setupWarn");
+      warn.innerHTML = "";
+      warn.appendChild(el('<div class="notice notice--stop" style="margin-top:14px">' +
+        '<span class="nt">We need your ' + esc(f.label.toLowerCase()) + '</span>' +
+        md(f.whatItBuys) + '<p style="margin-top:10px">' + md(f.withoutIt) + "</p></div>"));
+      warn.scrollIntoView({ block: "center", behavior: "smooth" });
+      return;
+    }
+
+    save(LS.cfg, App.cfg);
+    renderHomeHead();          // the greeting picks up a newly entered name
+
+    // Reached from the You tab rather than mid-flow? Then there is no test
+    // chosen yet, so send them to pick one instead of to the camera.
+    if (!App.test) { show("home"); return; }
+
+    $("probeOut").innerHTML = "";
+    show("record");
   }
 
   function setSeg(id, value) {
@@ -2014,16 +2295,12 @@ details .dbody{padding:0 16px 16px}
     renderTests();
     renderGuide();
 
-    $("btnBack").addEventListener("click", function () {
-      if (App.view === "learn") show("home");
-      else if (App.view === "setup") show("learn");
-      else if (App.view === "record") show("setup");
-      else if (App.view === "analyse") show("record");
-      else if (App.view === "result") show("analyse");
-      else show("home");
+    renderHomeHead();
+
+    $("tabbar").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-tab]");
+      if (b) goTab(b.getAttribute("data-tab"));
     });
-    $("btnGuide").addEventListener("click", function () { show("guide"); });
-    $("btnHistory").addEventListener("click", function () { renderHistory(); show("history"); });
 
     document.addEventListener("click", function (e) {
       var g = e.target.closest("[data-go]");
@@ -2033,36 +2310,10 @@ details .dbody{padding:0 16px 16px}
       }
     });
 
-    $("btnLearnNext").addEventListener("click", function () { renderSetup(); show("setup"); });
-
     wireSeg("segArms", "arms");
     wireSeg("segSurface", "surface");
 
     $("inDrop").addEventListener("input", function () { App.cfg.dropTouched = true; });
-
-    $("btnSetupNext").addEventListener("click", function () {
-      readAthleteFields();
-      App.cfg.drop_cm = parseFloat($("inDrop").value) || App.cfg.drop_cm || 30;
-
-      // Refuse only on the field we genuinely cannot work without, and say
-      // what it is for rather than just saying no.
-      var missing = JumpKit.athlete.missingRequired(App.cfg, App.test ? App.test.id : null);
-      var badHeight = !App.cfg.height_cm || App.cfg.height_cm < 120 || App.cfg.height_cm > 220;
-      if (missing.length || badHeight) {
-        var f = missing[0] || JumpKit.athlete.byId("height_cm");
-        var warn = $("setupWarn");
-        warn.innerHTML = "";
-        warn.appendChild(el('<div class="notice notice--stop" style="margin-top:14px">' +
-          '<span class="nt">We need your ' + esc(f.label.toLowerCase()) + '</span>' +
-          md(f.whatItBuys) + '<p style="margin-top:10px">' + md(f.withoutIt) + "</p></div>"));
-        warn.scrollIntoView({ block: "center" });
-        return;
-      }
-
-      save(LS.cfg, App.cfg);
-      $("probeOut").innerHTML = "";
-      show("record");
-    });
 
     $("fileIn").addEventListener("change", function (e) {
       if (e.target.files && e.target.files[0]) onFile(e.target.files[0]);
@@ -2073,6 +2324,10 @@ details .dbody{padding:0 16px 16px}
     $("btnNext").addEventListener("click", function () { drawFrame(App.frameIndex + 1); });
     $("btnPrev10").addEventListener("click", function () { drawFrame(App.frameIndex - 10); });
     $("btnNext10").addEventListener("click", function () { drawFrame(App.frameIndex + 10); });
+
+    // Boot the shell so the tab bar, the back slot and the action bar all
+    // reflect the screen we actually start on.
+    show("home");
 
     document.addEventListener("keydown", function (e) {
       if (App.view !== "analyse") return;
