@@ -471,24 +471,7 @@ details .dbody{padding:0 16px 16px}
       <h2>Who's jumping</h2>
       <p class="lead" style="margin:10px 0 22px">Your height is doing real work here. We use it to check the video's timing against gravity, which is how we catch a clip that's secretly running slow.</p>
 
-      <div class="card">
-        <div class="field">
-          <label class="fl" for="inName">Name</label>
-          <input type="text" id="inName" placeholder="Who is this" autocomplete="off">
-          <p class="hint">Only used to keep results separate on this device. It stays on your phone.</p>
-        </div>
-        <div class="field-2">
-          <div class="field">
-            <label class="fl" for="inHeight">Standing height, cm</label>
-            <input type="number" id="inHeight" min="120" max="220" step="1" inputmode="numeric" placeholder="178">
-          </div>
-          <div class="field">
-            <label class="fl" for="inMass">Body mass, kg</label>
-            <input type="number" id="inMass" min="25" max="200" step="0.5" inputmode="decimal" placeholder="optional">
-          </div>
-        </div>
-        <p class="hint" style="margin-top:-4px">Mass is optional. It only adds a rough power estimate, and that estimate isn't sensitive enough to track your own progress with.</p>
-      </div>
+      <div id="setupFields"></div>
 
       <div class="card" style="margin-top:14px">
         <h4 style="margin-bottom:12px">Conditions</h4>
@@ -516,7 +499,7 @@ details .dbody{padding:0 16px 16px}
         <div class="field" id="fieldDrop" hidden>
           <label class="fl" for="inDrop">Box height, cm</label>
           <input type="number" id="inDrop" min="10" max="80" step="1" inputmode="numeric" value="30">
-          <p class="hint">30 cm is the default. Use 20 to 30 if you're new to this or under about 16.</p>
+          <p class="hint" id="dropHint"></p>
         </div>
       </div>
 
@@ -633,6 +616,7 @@ details .dbody{padding:0 16px 16px}
 <!-- the knowledge, one file per thing that might change -->
 <script src="/assets/js/jump/kit.js"></script>
 <script src="/assets/js/jump/physics.js"></script>
+<script src="/assets/js/jump/athlete.js"></script>
 <script src="/assets/js/jump/filming.js"></script>
 <script src="/assets/js/jump/video.js"></script>
 <script src="/assets/js/jump/tracking.js"></script>
@@ -672,7 +656,10 @@ details .dbody{padding:0 16px 16px}
     view: "home",
     testId: null,
     test: null,
-    cfg: load(LS.cfg, { name: "", height_cm: null, mass_kg: null, arms: "hands_on_hips", surface: "rigid_floor", drop_cm: 30, seenGuide: false }),
+    cfg: load(LS.cfg, {
+      name: "", height_cm: null, bodyMass_kg: null, sex: "", age: null, footwear: "",
+      arms: "hands_on_hips", surface: "rigid_floor", drop_cm: null, seenGuide: false
+    }),
     log: load(LS.log, []),
     file: null,
     probe: null,
@@ -842,15 +829,129 @@ details .dbody{padding:0 16px 16px}
      Setup
      ================================================================== */
 
+  // Every field says what it buys, right where it is asked. If a field cannot
+  // honestly claim to change a number, a warning or a piece of advice, it is
+  // not on the form. The definitions live in assets/js/jump/athlete.js.
+  function renderAthleteFields() {
+    var A = JumpKit.athlete;
+    var host = $("setupFields");
+    var testId = App.test ? App.test.id : null;
+    host.innerHTML = "";
+
+    var fields = A.fieldsFor(testId);
+    var required = fields.filter(function (f) { return f.required; });
+    var optional = fields.filter(function (f) { return !f.required; });
+
+    function inputFor(f) {
+      var v = App.cfg[f.id];
+      var id = "af_" + f.id;
+      var h = '<div class="field" data-field="' + esc(f.id) + '">' +
+              '<label class="fl" for="' + id + '">' + esc(f.label) +
+              (f.unit ? ", " + esc(f.unit) : "") + "</label>";
+
+      if (f.type === "choice") {
+        h += '<div class="seg" id="' + id + '" role="group">';
+        f.choices.forEach(function (ch) {
+          h += '<button type="button" data-v="' + esc(ch.value) + '" aria-pressed="' +
+               ((v || "") === ch.value ? "true" : "false") + '">' + esc(ch.label) + "</button>";
+        });
+        h += "</div>";
+      } else if (f.type === "number") {
+        h += '<input type="number" id="' + id + '" inputmode="decimal"' +
+             ' min="' + f.min + '" max="' + f.max + '" step="' + (f.step || 1) + '"' +
+             ' placeholder="' + esc(f.placeholder || "") + '"' +
+             ' value="' + (v == null ? "" : esc(v)) + '">';
+      } else {
+        h += '<input type="text" id="' + id + '" autocomplete="off"' +
+             ' placeholder="' + esc(f.placeholder || "") + '"' +
+             ' value="' + (v == null ? "" : esc(v)) + '">';
+      }
+
+      h += '<p class="hint">' + md(f.whatItBuys) + "</p>";
+      if (f.honesty) h += '<p class="hint" style="color:var(--clay)">' + md(f.honesty) + "</p>";
+      h += "</div>";
+      return h;
+    }
+
+    /* --- required ---------------------------------------------------- */
+    var reqCard = el('<div class="card"></div>');
+    reqCard.innerHTML = '<p class="eyebrow">We need this</p>' +
+      required.map(inputFor).join("");
+    host.appendChild(reqCard);
+
+    /* --- optional, with the honest pitch ------------------------------ */
+    var optCard = el('<div class="card" style="margin-top:14px"></div>');
+    optCard.innerHTML =
+      '<p class="eyebrow">Optional, and what each one adds</p>' +
+      '<p class="small" style="margin-bottom:16px">None of these change your jump height. They make the app better at telling you when a result is worth a second look, and at giving you advice that fits you. Skip any of them.</p>' +
+      optional.map(inputFor).join("");
+    host.appendChild(optCard);
+
+    // Segmented controls inside the generated form.
+    host.addEventListener("click", function (e) {
+      var b = e.target.closest(".seg button[data-v]");
+      if (!b) return;
+      var seg = b.parentNode;
+      var bs = seg.querySelectorAll("button");
+      for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", "false");
+      b.setAttribute("aria-pressed", "true");
+      readAthleteFields();
+      refreshDependentHints();
+    });
+
+    // Anything that changes what we can advise should change the advice
+    // immediately, not on the next screen. Telling someone their age lets us
+    // pick a box height, so pick it in front of them.
+    host.addEventListener("input", function (e) {
+      if (!e.target.id || e.target.id.indexOf("af_") !== 0) return;
+      readAthleteFields();
+      refreshDependentHints();
+    });
+  }
+
+  // Re-render everything that depends on the optional athlete fields.
+  function refreshDependentHints() {
+    var hint = $("dropHint");
+    if (hint && App.test && App.test.requires.needsDropHeight) {
+      var rec = JumpKit.athlete.recommendedDropHeight(App.cfg);
+      hint.innerHTML = md(rec.why) +
+        (App.cfg.age ? "" : " Tell us your age above and we'll pick this for you rather than guessing.");
+      // Only move the box if the athlete has not set it themselves.
+      if (!App.cfg.dropTouched) {
+        App.cfg.drop_cm = rec.cm;
+        $("inDrop").value = rec.cm;
+      }
+    }
+  }
+
+  // Read the generated form back into App.cfg.
+  function readAthleteFields() {
+    var A = JumpKit.athlete;
+    A.FIELDS.forEach(function (f) {
+      var node = document.getElementById("af_" + f.id);
+      if (!node) return;
+      if (f.type === "choice") {
+        var on = node.querySelector('button[aria-pressed="true"]');
+        App.cfg[f.id] = on ? on.getAttribute("data-v") : "";
+      } else if (f.type === "number") {
+        var n = parseFloat(node.value);
+        App.cfg[f.id] = isFinite(n) ? n : null;
+      } else {
+        App.cfg[f.id] = node.value.trim();
+      }
+    });
+  }
+
   function renderSetup() {
     var c = App.cfg;
-    $("inName").value = c.name || "";
-    $("inHeight").value = c.height_cm || "";
-    $("inMass").value = c.mass_kg || "";
+    renderAthleteFields();
     $("inDrop").value = c.drop_cm || 30;
     setSeg("segArms", c.arms);
     setSeg("segSurface", c.surface);
     $("fieldDrop").hidden = !(App.test && App.test.requires.needsDropHeight);
+
+    // Recommend a box height rather than leaving 30 as a silent default.
+    refreshDependentHints();
 
     var warn = $("setupWarn");
     warn.innerHTML = "";
@@ -1407,7 +1508,7 @@ details .dbody{padding:0 16px 16px}
     };
 
     var ctx = {
-      athlete: { height_m: (App.cfg.height_cm || 175) / 100, bodyMass_kg: App.cfg.mass_kg || null },
+      athlete: { height_m: (App.cfg.height_cm || 175) / 100, bodyMass_kg: App.cfg.bodyMass_kg || null },
       session: { arms: App.cfg.arms, surface: App.cfg.surface, dropHeight_cm: App.cfg.drop_cm, cue: t.howToPerform.cue },
       P: P,
       sessionCmjHeight_m: lastSessionCmjHeight()
@@ -1484,6 +1585,17 @@ details .dbody{padding:0 16px 16px}
       body.appendChild(el('<div class="notice notice--ok"><span class="nt">Clean rep</span>Nothing looked wrong with this one. The landing matched the takeoff and the body followed a clean arc through the air.</div>'));
     }
 
+    // Context for the number, but only as much as we have actually earned.
+    // If they have not told us who they are, we say the band is wide and why,
+    // rather than pretending a one-size band means something.
+    var band = typicalContext(res, ctx);
+    if (band) body.appendChild(band);
+
+    // Offer the upgrade once, on the result screen, where the athlete can see
+    // exactly what it would have added. Never before they have a number.
+    var offer = upgradeCard();
+    if (offer) body.appendChild(offer);
+
     if (rest.length) {
       var d = el('<details><summary>The rest of the numbers</summary><div class="dbody"></div></details>');
       d.querySelector(".dbody").appendChild(metricGrid(rest));
@@ -1520,6 +1632,67 @@ details .dbody{padding:0 16px 16px}
         vb.textContent = "Voided";
       }
     });
+  }
+
+
+  /* ------------------------------------------------------------------
+     Context and upgrade offers.
+
+     The rule from the coaching principles: name what a number is FOR, and
+     never present a normal range as a target. A first number is a starting
+     line, not a verdict.
+     ------------------------------------------------------------------ */
+
+  function typicalContext(res, ctx) {
+    if (!res.primary) return null;
+    var A = JumpKit.athlete;
+    var r = A.typicalRange(App.test.id, App.cfg);
+    if (!r) return null;
+
+    var isHeight = res.primary.key === "height";
+    var v = res.primary.value;
+    var lo = isHeight ? r.low : r.low;
+    var hi = isHeight ? r.high : r.high;
+    var fmtV = isHeight
+      ? function (x) { return (x * 100).toFixed(0) + " cm"; }
+      : function (x) { return x.toFixed(1); };
+
+    var where = v < lo ? "below" : (v > hi ? "above" : "inside");
+    var line = "Most people doing this test land between <strong>" + fmtV(lo) + "</strong> and <strong>" +
+               fmtV(hi) + "</strong>. You are " + where + " that.";
+
+    if (!r.specific) {
+      line += " That band is deliberately wide, because we do not know your sex or age. Tell us and it gets a lot more useful.";
+    } else if (r.adjusted.indexOf("age") !== -1) {
+      line += " Adjusted for your age.";
+    }
+
+    line += " <strong>This is context, not a target.</strong> What matters is your own number moving, and the app will tell you when a change is real rather than noise.";
+
+    return el('<div class="notice notice--info"><span class="nt">Where this sits</span>' + line + "</div>");
+  }
+
+  function upgradeCard() {
+    var A = JumpKit.athlete;
+    var offer = A.upgradeOffer(App.cfg, App.test.id);
+    if (!offer) return null;
+
+    var c = el('<div class="card" style="border-left:3px solid var(--clay)"></div>');
+    var h = "<h3>" + esc(offer.headline) + "</h3>" +
+            '<p class="small" style="margin:10px 0 14px">' + esc(offer.body) + "</p>" +
+            '<ul class="bullets">';
+    offer.fields.forEach(function (f) {
+      h += "<li><b>" + esc(f.label) + ".</b> " + md(f.whatItBuys) +
+           ' <span style="color:var(--ink-3)">' + md(f.withoutIt) + "</span></li>";
+    });
+    h += '</ul><div class="row" style="margin-top:14px"><button class="btn btn--ghost btn--sm" id="btnAddInfo">Add these</button></div>' +
+         '<p class="tiny" style="margin-top:10px">Nothing here changes the number you just got. It only changes how well the app can talk to you about it.</p>';
+    c.innerHTML = h;
+    c.querySelector("#btnAddInfo").addEventListener("click", function () {
+      renderSetup();
+      show("setup");
+    });
+    return c;
   }
 
   function metricGrid(list) {
@@ -1687,6 +1860,7 @@ details .dbody{padding:0 16px 16px}
       rsiConvention: "JH_over_GCT_ms",
       arms: App.cfg.arms,
       surface: App.cfg.surface,
+      footwear: App.cfg.footwear || null,
       dropHeight_cm: App.test.requires.needsDropHeight ? App.cfg.drop_cm : null,
       cue: App.test.howToPerform.cue,
       fps_used: fps,
@@ -1723,10 +1897,12 @@ details .dbody{padding:0 16px 16px}
 
       // Anything that changes the meaning of the number breaks the line.
       var conditions = {};
-      rows.forEach(function (r) { conditions[r.arms + "|" + r.surface + "|" + r.dropHeight_cm + "|" + r.cue] = true; });
+      rows.forEach(function (r) {
+        conditions[[r.arms, r.surface, r.dropHeight_cm, r.cue, r.footwear || ""].join("|")] = true;
+      });
       if (Object.keys(conditions).length > 1) {
         card.appendChild(el('<div class="notice notice--warn" style="margin-bottom:12px"><span class="nt">Not one line</span>' +
-          "These weren’t all done under the same conditions, so they can’t be read as one trend. Arms, surface, box height or the cue changed somewhere in here.</div>"));
+          "These weren’t all done under the same conditions, so they can’t be read as one trend. Arms, surface, shoes, box height or the cue changed somewhere in here, and any one of those moves the number on its own.</div>"));
       }
 
       rows.forEach(function (r) {
@@ -1862,15 +2038,27 @@ details .dbody{padding:0 16px 16px}
     wireSeg("segArms", "arms");
     wireSeg("segSurface", "surface");
 
+    $("inDrop").addEventListener("input", function () { App.cfg.dropTouched = true; });
+
     $("btnSetupNext").addEventListener("click", function () {
-      App.cfg.name = $("inName").value.trim();
-      App.cfg.height_cm = parseFloat($("inHeight").value) || null;
-      App.cfg.mass_kg = parseFloat($("inMass").value) || null;
-      App.cfg.drop_cm = parseFloat($("inDrop").value) || 30;
-      if (!App.cfg.height_cm || App.cfg.height_cm < 120 || App.cfg.height_cm > 220) {
-        alert("We need your standing height in centimetres. It's how we check the video's timing against gravity, which is what catches a clip that's secretly running slow.");
+      readAthleteFields();
+      App.cfg.drop_cm = parseFloat($("inDrop").value) || App.cfg.drop_cm || 30;
+
+      // Refuse only on the field we genuinely cannot work without, and say
+      // what it is for rather than just saying no.
+      var missing = JumpKit.athlete.missingRequired(App.cfg, App.test ? App.test.id : null);
+      var badHeight = !App.cfg.height_cm || App.cfg.height_cm < 120 || App.cfg.height_cm > 220;
+      if (missing.length || badHeight) {
+        var f = missing[0] || JumpKit.athlete.byId("height_cm");
+        var warn = $("setupWarn");
+        warn.innerHTML = "";
+        warn.appendChild(el('<div class="notice notice--stop" style="margin-top:14px">' +
+          '<span class="nt">We need your ' + esc(f.label.toLowerCase()) + '</span>' +
+          md(f.whatItBuys) + '<p style="margin-top:10px">' + md(f.withoutIt) + "</p></div>"));
+        warn.scrollIntoView({ block: "center" });
         return;
       }
+
       save(LS.cfg, App.cfg);
       $("probeOut").innerHTML = "";
       show("record");
