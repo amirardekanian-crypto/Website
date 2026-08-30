@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-skin="spruce">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>نگار مرادی — مربی تنیس و پدل</title>
+<title>مهرانه ظهوریان — مربی تنیس و پدل</title>
 <meta name="description" content="کلاس خصوصی و گروهی تنیس و پدل در تهران. برای تازه‌کارها و بازیکن‌هایی که می‌خوان جدی‌تر بازی کنن.">
 <meta name="robots" content="noindex,nofollow">   <!-- DRAFT: remove when it moves to her own domain -->
-<meta name="theme-color" content="#17123A">
+<meta name="theme-color" content="#003320">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D6F84C'/%3E%3Cpath d='M3 8a16 16 0 0 1 0 16M29 8a16 16 0 0 0 0 16' stroke='%2317123A' stroke-width='2.4' fill='none'/%3E%3C/svg%3E">
-<meta property="og:title" content="نگار مرادی — مربی تنیس و پدل">
+<meta property="og:title" content="مهرانه ظهوریان — مربی تنیس و پدل">
 <meta property="og:description" content="کلاس خصوصی و گروهی تنیس و پدل در تهران.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
 
   1.  WHATSAPP        → شماره‌ی واقعی واتساپ (پایین، توی بخش اسکریپت)
   2.  INSTAGRAM       → آیدی واقعی اینستاگرام (پایین، توی بخش اسکریپت)
-  3.  «نگار مرادی»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
+  3.  «مهرانه ظهوریان»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
   4.  قیمت‌ها          → همه‌ی قیمت‌های بخش «کلاس‌ها» ساختگی‌ان
   5.  آمارها           → ۸ سال / ۲۰۰ شاگرد / مدرک‌ها — همه نمونه‌ان
   6.  متن «درباره‌ی من» → با متن خودش عوض بشه
@@ -42,22 +42,28 @@
 :root{
   --font-display:Lalezar,Vazirmatn,Tahoma,sans-serif;   /* Tehran signage lettering */
   --font-body:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
-  --ink:#17123A;        /* deep violet-ink */
+  /* ── SKIN: violet (original) ── */
+  --ink:#17123A;        --ink-rgb:23 18 58;
   --ink-2:#221B4E;
   --ink-3:#2E2662;
-  --ball:#D6F84C;       /* tennis-ball chartreuse — the one loud accent */
+  --ink-deep:#100C2A;
+  --ball:#D6F84C;       --ball-rgb:214 248 76;
   --ball-soft:#EAFF9B;
-  --blush:#FFC9A8;      /* quiet warm secondary */
-  --paper:#FAF6F2;      /* warm off-white, rose-biased not yellow-cream */
-  --mist:#F5E9E1;       /* the apricot, drained down to a neutral */
+  --on-ball:var(--ink);
+  --ball-obj:var(--ball); --ball-obj-rgb:var(--ball-rgb);
+  --ball-card:var(--ball); --ball-card-rgb:var(--ball-rgb);   /* light-context accent; defaults to mirror --ball */
+  --on-ball-card:var(--on-ball);
+  --cloud:#FFC9A8;      --cloud-rgb:255 201 168;
+  --paper:#FAF6F2;
+  --mist:#F5E9E1;
   --muted:#6B6480;
   --muted-on-dark:rgba(255,255,255,.68);
   --line:rgba(255,255,255,.13);
-  --line-dark:rgba(23,18,58,.12);
+  --line-dark:rgb(var(--ink-rgb) / .12);
   --r:22px;
   --r-lg:30px;
   --wrap:1120px;
-  --shadow:0 22px 60px -28px rgba(23,18,58,.45);
+  --shadow:0 22px 60px -28px rgb(var(--ink-rgb) / .45);
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -100,10 +106,10 @@ section{position:relative}
   display:inline-flex;align-items:center;gap:9px;
   font-size:13.5px;font-weight:600;
   padding:8px 16px;border-radius:999px;
-  background:rgba(214,248,76,.12);border:1px solid rgba(214,248,76,.32);
+  background:rgb(var(--ball-rgb) / .12);border:1px solid rgb(var(--ball-rgb) / .32);
   color:var(--ball-soft);
 }
-.eyebrow.on-light{background:rgba(23,18,58,.05);border-color:var(--line-dark);color:var(--ink)}
+.eyebrow.on-light{background:rgb(var(--ink-rgb) / .05);border-color:var(--line-dark);color:var(--ink)}
 .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--ball);flex:none}
 .eyebrow.on-light .dot{background:var(--ink)}
 
@@ -115,14 +121,14 @@ section{position:relative}
   white-space:nowrap;
 }
 .btn svg{width:20px;height:20px;flex:none}
-.btn-primary{background:var(--ball);color:var(--ink);box-shadow:0 14px 34px -14px rgba(214,248,76,.7)}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 20px 42px -14px rgba(214,248,76,.85)}
+.btn-primary{background:var(--ball);color:var(--on-ball);box-shadow:0 14px 34px -14px rgb(var(--ball-rgb) / .7)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 20px 42px -14px rgb(var(--ball-rgb) / .85)}
 .btn-ghost{border:1.5px solid var(--line);color:#fff}
 .btn-ghost:hover{background:rgba(255,255,255,.08);transform:translateY(-3px)}
 .btn-dark{background:var(--ink);color:#fff}
 .btn-dark:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .btn-outline{border:1.5px solid var(--line-dark);color:var(--ink)}
-.btn-outline:hover{background:rgba(23,18,58,.05);transform:translateY(-3px)}
+.btn-outline:hover{background:rgb(var(--ink-rgb) / .05);transform:translateY(-3px)}
 
 .h-sec{font-size:clamp(32px,4.8vw,50px);line-height:1.4}
 .lead{font-size:clamp(16.5px,2vw,19px);color:var(--muted)}
@@ -134,24 +140,24 @@ section{position:relative}
 /* photo slot */
 .shot{
   position:relative;border-radius:var(--r);
-  border:2px dashed rgba(23,18,58,.22);
+  border:2px dashed rgb(var(--ink-rgb) / .22);
   background:
-    linear-gradient(135deg,rgba(255,201,168,.30),rgba(214,248,76,.22)),
+    linear-gradient(135deg,rgb(var(--cloud-rgb) / .30),rgb(var(--ball-card-rgb) / .22)),
     var(--mist);
   display:grid;place-content:center;gap:8px;justify-items:center;
-  text-align:center;padding:26px;color:rgba(23,18,58,.6);
+  text-align:center;padding:26px;color:rgb(var(--ink-rgb) / .6);
   overflow:hidden;
 }
 .shot::after{
   content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:repeating-linear-gradient(45deg,rgba(23,18,58,.05) 0 2px,transparent 2px 12px);
+  background-image:repeating-linear-gradient(45deg,rgb(var(--ink-rgb) / .05) 0 2px,transparent 2px 12px);
 }
 .shot svg{width:34px;height:34px;opacity:.5}
 .shot b{font-size:15px;font-weight:700;position:relative;z-index:1}
 .shot em{font-style:normal;font-size:12.5px;opacity:.72;position:relative;z-index:1}
 .shot.on-dark{
   border-color:rgba(255,255,255,.26);color:rgba(255,255,255,.72);
-  background:linear-gradient(135deg,rgba(214,248,76,.16),rgba(255,201,168,.12)),var(--ink-2);
+  background:linear-gradient(135deg,rgb(var(--ball-rgb) / .16),rgb(var(--cloud-rgb) / .12)),var(--ink-2);
 }
 .shot.on-dark::after{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 12px)}
 
@@ -159,10 +165,10 @@ section{position:relative}
 .draft-badge{
   position:fixed;inset-block-start:auto;inset-block-end:96px;inset-inline-start:16px;
   z-index:80;
-  background:var(--blush);color:var(--ink);
+  background:var(--cloud);color:var(--ink);
   font-size:12.5px;font-weight:700;
   padding:7px 14px;border-radius:999px;
-  box-shadow:0 10px 26px -10px rgba(23,18,58,.55);
+  box-shadow:0 10px 26px -10px rgb(var(--ink-rgb) / .55);
 }
 @media(min-width:900px){.draft-badge{inset-block-end:24px}}
 
@@ -172,15 +178,15 @@ section{position:relative}
   padding:16px 0;transition:background .35s,backdrop-filter .35s,padding .35s,box-shadow .35s;
 }
 .nav.stuck{
-  background:rgba(23,18,58,.86);backdrop-filter:blur(16px) saturate(1.4);
+  background:rgb(var(--ink-rgb) / .86);backdrop-filter:blur(16px) saturate(1.4);
   padding:10px 0;box-shadow:0 10px 40px -22px rgba(0,0,0,.8);
 }
 .nav-in{display:flex;align-items:center;gap:22px}
 .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:17px;color:#fff}
 .mark{
-  width:38px;height:38px;border-radius:12px;background:var(--ball);color:var(--ink);
+  width:38px;height:38px;border-radius:12px;background:var(--ball);color:var(--on-ball);
   display:grid;place-content:center;font-size:19px;flex:none;
-  box-shadow:0 8px 22px -10px rgba(214,248,76,.8);
+  box-shadow:0 8px 22px -10px rgb(var(--ball-rgb) / .8);
 }
 .nav-links{display:none;gap:26px;margin-inline-start:auto;font-size:15.5px;font-weight:500}
 .nav-links a{color:rgba(255,255,255,.8);transition:color .2s;position:relative;padding-block:4px}
@@ -199,7 +205,7 @@ section{position:relative}
 .nav.open .burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 .menu{
   display:grid;gap:2px;overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.2,.7,.3,1);
-  background:rgba(23,18,58,.96);backdrop-filter:blur(14px);
+  background:rgb(var(--ink-rgb) / .96);backdrop-filter:blur(14px);
   border-radius:var(--r);margin-block-start:0;
 }
 .nav.open .menu{max-height:400px;margin-block-start:14px}
@@ -219,13 +225,13 @@ section{position:relative}
 .hero::before{ /* glow */
   content:"";position:absolute;inset-block-start:-30%;inset-inline-start:-10%;
   width:70vw;height:70vw;max-width:820px;max-height:820px;border-radius:50%;
-  background:radial-gradient(circle,rgba(214,248,76,.20),transparent 62%);
+  background:radial-gradient(circle,rgb(var(--ball-rgb) / .20),transparent 62%);
   pointer-events:none;
 }
 .hero::after{
   content:"";position:absolute;inset-block-end:-20%;inset-inline-end:-15%;
   width:56vw;height:56vw;max-width:620px;max-height:620px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,201,168,.16),transparent 65%);
+  background:radial-gradient(circle,rgb(var(--cloud-rgb) / .16),transparent 65%);
   pointer-events:none;
 }
 .hero-in{position:relative;z-index:2;display:grid;gap:56px}
@@ -254,7 +260,7 @@ section{position:relative}
 .court .ln{fill:none;stroke:var(--ball);stroke-width:1.6;opacity:.7}
 .court .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 2.4s cubic-bezier(.4,0,.2,1) .3s forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
-.arc{fill:none;stroke:var(--blush);stroke-width:2;stroke-dasharray:7 9;opacity:.7}
+.arc{fill:none;stroke:var(--cloud);stroke-width:2;stroke-dasharray:7 9;opacity:.7}
 .hero-shot{position:relative;z-index:2;aspect-ratio:4/5;max-width:340px;margin-inline:auto;transform:rotate(-2.5deg)}
 .float-card{
   position:absolute;z-index:3;
@@ -275,7 +281,7 @@ section{position:relative}
 }
 
 /* ============ stats ============ */
-.stats{background:var(--ball);color:var(--ink);padding-block:34px}
+.stats{background:var(--ball-card);color:var(--on-ball-card);padding-block:34px}
 .stats-in{display:grid;grid-template-columns:repeat(2,1fr);gap:26px 18px;text-align:center}
 .stat b{display:block;font-size:clamp(30px,4.8vw,44px);line-height:1.35}
 .stat span{font-size:14px;font-weight:600;opacity:.72}
@@ -300,8 +306,8 @@ section{position:relative}
   padding:9px 16px;border-radius:999px;font-size:14.5px;font-weight:600;
   background:#fff;border:1px solid var(--line-dark);
 }
-.chip .tick{width:16px;height:16px;border-radius:50%;background:var(--ball);display:grid;place-content:center;flex:none}
-.chip .tick svg{width:9px;height:9px;stroke:var(--ink);stroke-width:3.4}
+.chip .tick{width:16px;height:16px;border-radius:50%;background:var(--ball-card);display:grid;place-content:center;flex:none}
+.chip .tick svg{width:9px;height:9px;stroke:var(--on-ball);stroke-width:3.4}
 .about-p{margin-block-end:18px}
 @media(min-width:900px){
   .about-grid{grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center}
@@ -319,7 +325,7 @@ section{position:relative}
 }
 .card::before{
   content:"";position:absolute;inset-block-start:0;inset-inline:0;height:3px;
-  background:var(--ball);transform:scaleX(0);transform-origin:right;transition:transform .4s;
+  background:var(--ball-card);transform:scaleX(0);transform-origin:right;transition:transform .4s;
 }
 .card:hover{transform:translateY(-7px);box-shadow:var(--shadow);border-color:transparent}
 .card:hover::before{transform:scaleX(1)}
@@ -337,14 +343,14 @@ section{position:relative}
 }
 .card .price small{font-size:13px;font-weight:500;color:var(--muted)}
 .card.feat{background:var(--ink);color:#fff;border-color:transparent}
-.card.feat .ic{background:rgba(214,248,76,.16)}
+.card.feat .ic{background:rgb(var(--ball-rgb) / .16)}
 .card.feat .ic svg{stroke:var(--ball)}
 .card.feat p,.card.feat .meta{color:var(--muted-on-dark)}
 .card.feat .price{border-block-start-color:var(--line)}
 .card.feat .price small{color:var(--muted-on-dark)}
 .tag{
   position:absolute;inset-block-start:18px;inset-inline-end:18px;   /* opposite corner from .ic */
-  background:var(--blush);color:var(--ink);
+  background:var(--cloud);color:var(--ink);
   font-size:11.5px;font-weight:800;padding:5px 12px;border-radius:999px;
 }
 .price-note{margin-block-start:26px;font-size:14.5px;color:var(--muted);text-align:center}
@@ -354,7 +360,7 @@ section{position:relative}
 @media(min-width:860px){.steps{grid-template-columns:repeat(3,1fr);gap:26px}}
 .step{position:relative;padding:34px 28px;border-radius:var(--r);background:var(--ink-2);border:1px solid var(--line)}
 .step .num{
-  width:46px;height:46px;border-radius:14px;background:var(--ball);color:var(--ink);
+  width:46px;height:46px;border-radius:14px;background:var(--ball);color:var(--on-ball);
   display:grid;place-content:center;font-size:23px;margin-block-end:18px;
 }
 .step h3{font-size:19px;margin-block-end:10px}
@@ -373,7 +379,7 @@ section{position:relative}
 .who{display:flex;align-items:center;gap:12px;padding-block-start:16px;border-block-start:1px solid var(--line-dark)}
 .av{
   width:42px;height:42px;border-radius:50%;flex:none;
-  background:linear-gradient(135deg,var(--blush),var(--ball));
+  background:linear-gradient(135deg,var(--cloud),var(--ball-card));
   display:grid;place-content:center;font-weight:800;font-size:15px;color:var(--ink);
 }
 .who b{display:block;font-size:15px;font-weight:700;line-height:1.5}
@@ -410,7 +416,7 @@ section{position:relative}
 .cta::before{
   content:"";position:absolute;inset-block-start:50%;inset-inline-start:50%;
   width:120%;padding-block-end:120%;transform:translate(50%,-50%);border-radius:50%;
-  background:radial-gradient(circle,rgba(214,248,76,.17),transparent 58%);pointer-events:none;
+  background:radial-gradient(circle,rgb(var(--ball-rgb) / .17),transparent 58%);pointer-events:none;
 }
 .cta-in{position:relative;z-index:2;text-align:center;max-width:640px;margin-inline:auto}
 .cta h2{font-size:clamp(32px,5.2vw,52px);margin-block:20px 18px;line-height:1.42}
@@ -418,7 +424,7 @@ section{position:relative}
 .cta-btns{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
 
 /* ============ footer ============ */
-.foot{background:#100C2A;color:rgba(255,255,255,.72);padding-block:56px 110px;font-size:15px}
+.foot{background:var(--ink-deep);color:rgba(255,255,255,.72);padding-block:56px 110px;font-size:15px}
 @media(min-width:900px){.foot{padding-block:56px 40px}}
 .foot-grid{display:grid;gap:34px}
 @media(min-width:760px){.foot-grid{grid-template-columns:1.4fr 1fr 1fr}}
@@ -433,13 +439,13 @@ section{position:relative}
 }
 .socials a:hover{background:var(--ball);border-color:var(--ball);transform:translateY(-3px)}
 .socials svg{width:19px;height:19px;fill:currentColor}
-.socials a:hover svg{fill:var(--ink)}
+.socials a:hover svg{fill:var(--on-ball)}
 .copy{margin-block-start:38px;padding-block-start:22px;border-block-start:1px solid var(--line);font-size:13.5px;opacity:.6;text-align:center}
 
 /* ============ sticky mobile bar ============ */
 .bar{
   position:fixed;inset-block-end:0;inset-inline:0;z-index:75;
-  background:rgba(23,18,58,.94);backdrop-filter:blur(16px);
+  background:rgb(var(--ink-rgb) / .94);backdrop-filter:blur(16px);
   border-block-start:1px solid var(--line);
   padding:11px 16px calc(11px + env(safe-area-inset-bottom));
   display:flex;align-items:center;gap:12px;
@@ -450,6 +456,19 @@ section{position:relative}
 .bar .txt b{display:block;font-size:15px;font-weight:700}
 .bar .btn{padding:12px 20px;font-size:15px}
 @media(min-width:900px){.bar{display:none}}
+
+/* ── a .shot that holds real media instead of a placeholder ── */
+.shot.filled{
+  display:block;padding:0;border:0;
+  background:var(--ink-2);          /* shows while the image decodes */
+}
+.shot.filled::after{display:none}   /* kill the diagonal placeholder hatching */
+.shot.filled>img,.shot.filled>video{
+  width:100%;height:100%;display:block;
+  object-fit:cover;border-radius:inherit;
+}
+.hero-shot.filled{box-shadow:0 30px 70px -30px rgba(0,0,0,.65)}
+.hero-shot.filled>video{object-position:center 42%}   /* keep the player, crop roof + empty foreground */
 
 /* ══════════════════════ MOTION LAYER ══════════════════════ */
 
@@ -467,11 +486,11 @@ section{position:relative}
 .rail-track{position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.16) 0 5px,transparent 5px 13px)}
 .rail-fill{position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(to bottom,transparent,var(--ball))}
 .rail-ball{position:absolute;top:0;left:1px;width:13px;height:13px;margin:-6px 0 0 -6px;border-radius:50%;
-  background:var(--ball);box-shadow:0 0 18px 5px rgba(214,248,76,.45);will-change:transform}
+  background:var(--ball);box-shadow:0 0 18px 5px rgb(var(--ball-rgb) / .45);will-change:transform}
 
 /* same idea laid flat, for phones */
 .tbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:78;pointer-events:none}
-.tbar i{display:block;height:100%;width:0;background:var(--ball);box-shadow:0 0 12px 2px rgba(214,248,76,.55)}
+.tbar i{display:block;height:100%;width:0;background:var(--ball);box-shadow:0 0 12px 2px rgb(var(--ball-rgb) / .55)}
 @media(min-width:1120px){.tbar{display:none}}
 
 /* hero: a live rally on canvas */
@@ -481,7 +500,7 @@ section{position:relative}
 .nav-links{position:relative}
 .nav-links a{z-index:1}
 .nav-ind{position:absolute;top:50%;left:0;width:0;height:34px;border-radius:999px;
-  background:rgba(214,248,76,.14);border:1px solid rgba(214,248,76,.34);
+  background:rgb(var(--ball-rgb) / .14);border:1px solid rgb(var(--ball-rgb) / .34);
   transform:translateY(-50%);opacity:0;pointer-events:none;
   transition:left .5s cubic-bezier(.2,.7,.3,1),width .5s cubic-bezier(.2,.7,.3,1),opacity .3s}
 .nav-links a.on{color:#fff}
@@ -503,7 +522,7 @@ section{position:relative}
   mix-blend-mode:overlay}
 .card.lift .sheen{opacity:1}
 .card.feat .sheen{mix-blend-mode:screen;
-  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(214,248,76,.22),transparent 60%)}
+  background:radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgb(var(--ball-rgb) / .22),transparent 60%)}
 
 /* testimonials on a slow rail */
 .qrail{overflow:hidden;direction:ltr;-webkit-mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent);
@@ -521,7 +540,7 @@ section{position:relative}
 
 /* ambient drift behind the closing call to action */
 .cta .drift{position:absolute;top:-35%;left:-18%;width:75%;padding-block-end:75%;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,201,168,.16),transparent 62%);
+  background:radial-gradient(circle,rgb(var(--cloud-rgb) / .16),transparent 62%);
   animation:drift 24s ease-in-out infinite;pointer-events:none;z-index:1}
 @keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(22%,14%)}}
 
@@ -535,6 +554,255 @@ section{position:relative}
   .qtrack{flex-wrap:wrap;width:auto;justify-content:center}
   .rail,.tbar{display:none!important}
   .gal .shot:hover{transform:none}
+}
+
+/* ══════ ALTERNATE SKINS — from Mehraneh's palette ══════
+   ELITE BLUE #0250B0 · VOLT LIME #D0FF41 · SILVER CLOUD #C6D0DD
+   Palette only. Layout, type and motion are identical in every skin. */
+
+/* COURT — Elite Blue is the ground. Loudest, closest to her reference. */
+html[data-skin="court"]{
+  --ink:#0250B0;        --ink-rgb:2 80 176;
+  --ink-2:#023E8C;      /* on a ground this bright, panels must sit IN, not on top */
+  --ink-3:#2E86F0;
+  --ink-deep:#013C86;
+  --ball:#D0FF41;       --ball-rgb:208 255 65;
+  --ball-soft:#E9FF9E;
+  --cloud:#C6D0DD;      --cloud-rgb:198 208 221;
+  --paper:#FFFFFF;
+  --mist:#E9EEF6;
+  --muted:#4A5D77;
+}
+
+/* COURT + CLAY — same Court structure, accent swapped from Volt Lime to a
+   clay/terracotta tone. Clay only reaches 1.6-2.3:1 contrast against this
+   blue directly (measured) — nowhere near lime's 6.5:1 — so clay is the
+   BRAND accent (buttons, badges, underline: mostly sit on white cards,
+   where it holds 3.3-4.8:1) while the physical ball KEEPS lime. Same
+   split a real clay court has: red surface, yellow ball — two different
+   things, not one recoloured. */
+html[data-skin="courtclay"]{
+  --ink:#0250B0;        --ink-rgb:2 80 176;
+  --ink-2:#023E8C;
+  --ink-3:#2E86F0;
+  --ink-deep:#013C86;
+  --ball:#C9784F;       --ball-rgb:201 120 79;
+  --ball-soft:#E1B59E;
+  --on-ball:#041A3D;     /* 5.15:1 vs clay — white text only hit 3.34:1 */
+  --ball-obj:#D0FF41;    --ball-obj-rgb:208 255 65;   /* the ball itself stays a real tennis-ball colour */
+  --cloud:#EDD1C3;       --cloud-rgb:237 209 195;    /* a softer, dustier clay — was Silver Cloud */
+  --paper:#FCF8F5;       /* very light clay wash — was pure white */
+  --mist:#F8EDE8;        /* a touch more clay, for banded sections — was cool blue-grey */
+  --muted:#69412C;       /* warm clay-taupe body text — 8.3:1 on the new paper */
+}
+
+/* FLOODLIGHT — deep navy night, Elite Blue kept for glow and lifted panels. */
+html[data-skin="floodlight"]{
+  --ink:#041A3D;        --ink-rgb:4 26 61;
+  --ink-2:#0B2C5E;
+  --ink-3:#0250B0;
+  --ink-deep:#020F26;
+  --ball:#D0FF41;       --ball-rgb:208 255 65;
+  --ball-soft:#E9FF9E;
+  --cloud:#C6D0DD;      --cloud-rgb:198 208 221;
+  --paper:#F6F9FC;
+  --mist:#E6EDF6;
+  --muted:#56677E;
+}
+
+/* SILVER — light dominant, soft slate bands, the lime used more sparingly. */
+html[data-skin="silver"]{
+  --ink:#1D2B44;        --ink-rgb:29 43 68;
+  --ink-2:#2A3B58;
+  --ink-3:#0250B0;
+  --ink-deep:#141F33;
+  --ball:#D0FF41;       --ball-rgb:208 255 65;
+  --ball-soft:#E9FF9E;
+  --cloud:#C6D0DD;      --cloud-rgb:198 208 221;
+  --paper:#FFFFFF;
+  --mist:#DFE6EF;
+  --muted:#5A6980;
+}
+
+/* ══════ Second board: TENNIS COURT · DARK SPRUCE TREE · BABY BLUSH ·
+   PINKY PROMISE · WHIMSICAL EVENING ══════
+   The five named colours are used exactly as given throughout. Only
+   ink-2/ink-3/mist/muted are derived — each is a MIX of two named colours,
+   never an invented hue. */
+
+/* SPRUCE — dark spruce ground, pink glowing accent. Mirrors "pink ball on
+   dark court" most directly: the accent is the only warm note in the frame. */
+html[data-skin="spruce"]{
+  --ink:#003320;        --ink-rgb:0 51 32;
+  --ink-2:#2B5646;
+  --ink-3:#4C7063;
+  --ink-deep:#002115;
+  --ball:#EC99AF;        --ball-rgb:236 153 175;
+  --ball-soft:#FFE9E8;
+  --on-ball:#003320;   /* Dark Spruce Tree — measured 6.52:1, white only hit 2.16:1 */
+  --ball-obj:#EC99AF;    --ball-obj-rgb:236 153 175;
+  --cloud:#53885E;--cloud-rgb:83 136 94;
+  --paper:#FFFBFA;
+  --mist:#EEF3EF;
+  --muted:#3B4E55;
+}
+
+/* SAGE — Tennis Court green is the ground itself, bright and literal.
+   Panels blend toward Dark Spruce Tree so they sit IN the green, not on it
+   (a flat mid-bright ground needs its panels to recede, not lift). */
+html[data-skin="sage"]{
+  --ink:#53885E;  --ink-rgb:83 136 94;
+  --ink-2:#2B5F40;
+  --ink-3:#164930;
+  --ink-deep:#003320;
+  --ball:#EC99AF;        --ball-rgb:236 153 175;
+  --ball-soft:#FFE9E8;
+  --on-ball:#003320;   /* Dark Spruce Tree — measured 6.52:1, white only hit 2.16:1 */
+  --ball-obj:#EC99AF;    --ball-obj-rgb:236 153 175;
+  --cloud:#CD83A8;   --cloud-rgb:205 131 168;
+  --paper:#FFFAF9;
+  --mist:#EEF3EF;
+  --muted:#3B4E55;
+}
+
+/* BLUSH — Baby Blush IS the paper. Softest, most romantic of the three;
+   spruce green anchors headings and the dark sections so it stays legible. */
+html[data-skin="blush"]{
+  --ink:#003320;        --ink-rgb:0 51 32;
+  --ink-2:#2B5646;
+  --ink-3:#4C7063;
+  --ink-deep:#002115;
+  --ball:#EC99AF;        --ball-rgb:236 153 175;
+  --ball-soft:#F6C1CC;
+  --on-ball:#003320;   /* Dark Spruce Tree — measured 6.52:1, white only hit 2.16:1 */
+  --ball-obj:#EC99AF;    --ball-obj-rgb:236 153 175;
+  --cloud:#CD83A8;   --cloud-rgb:205 131 168;
+  --paper:#FFE9E8;
+  --mist:#F9DDE0;
+  --muted:#3B4E55;
+}
+
+
+/* ══════ HERITAGE — US Open navy + Rolex-banner racing green + white ══════
+   Measured before building: green sits at only 1.19:1 against this navy —
+   essentially the same lightness, it would vanish as a floating accent (same
+   class of problem clay had on Elite Blue). The reference image itself never
+   actually puts green ON the navy either — it is its own solid banner,
+   sandwiched between navy above and white below. So the split here is real,
+   not just decorative: --ball (white) covers the ~20 places an accent floats
+   on a dark ground (buttons, badges, the nav, the underline); --ball-card
+   (true racing green) covers the handful of light-context spots — the stats
+   band (the one place this echoes that Rolex banner directly), chip ticks,
+   the card top-bar, the testimonial avatars — where it measures 12.2:1 and
+   is gorgeous. */
+html[data-skin="heritage"]{
+  --ink:#14284F;          --ink-rgb:20 40 79;
+  --ink-2:#3A4A6B;
+  --ink-3:#5A6884;
+  --ink-deep:#0E1D39;
+  --ball:#FFFFFF;         --ball-rgb:255 255 255;
+  --ball-soft:#BBC9C4;    /* soft mint-green — eyebrow TEXT only, 8.5:1 on navy */
+  --on-ball:#14284F;      /* navy text/icons on the white hero-safe elements */
+  --ball-obj:#FFFFFF;     --ball-obj-rgb:255 255 255;   /* the ball itself, white against navy */
+  --ball-card:#0C3D2B;    --ball-card-rgb:12 61 43;     /* true racing green — 12.2:1 on white */
+  --on-ball-card:#FFFFFF;
+  --cloud:#728E84;        --cloud-rgb:114 142 132;      /* softer secondary green */
+  --paper:#FFFFFF;
+  --mist:#ECEFEE;         /* barely-there green wash for banded sections */
+  --muted:#2D3D5B;
+}
+
+
+/* ══════ COURT + GREEN — Elite Blue ground, racing green instead of neon ══════
+   Same measurement, same fix as Heritage: green only reaches 1.62:1 against
+   this Elite Blue (brighter than Heritage's navy, but still nowhere near
+   neon lime's 6.5:1) — it would vanish as a floating accent. Same two-role
+   split: --ball (white, 7.56:1 here) covers the dark-context spots neon used
+   to own; --ball-card (true racing green, 12.2:1 on white) covers the stats
+   band + the light-context spots. Cloud/paper/mist/muted are untouched —
+   this is the same Court as before, only the accent moved. */
+html[data-skin="courtgreen"]{
+  --ink:#0250B0;          --ink-rgb:2 80 176;
+  --ink-2:#023E8C;
+  --ink-3:#2E86F0;
+  --ink-deep:#013C86;
+  --ball:#FFFFFF;         --ball-rgb:255 255 255;
+  --ball-soft:#BBC9C4;    /* soft mint — 4.4:1 on Elite Blue */
+  --on-ball:#013C86;      /* this skin's own darkest ink — 10.5:1 on the new white button */
+  --ball-obj:#FFFFFF;     --ball-obj-rgb:255 255 255;
+  --ball-card:#0C3D2B;    --ball-card-rgb:12 61 43;
+  --on-ball-card:#FFFFFF;
+  --cloud:#C6D0DD;        --cloud-rgb:198 208 221;
+  --paper:#FFFFFF;
+  --mist:#E9EEF6;
+  --muted:#4A5D77;
+}
+
+
+/* ══════ QUIET GREEN — soft sage, muted — the accent itself is green, not white ══════
+   Lightened off the true racing green (#0C3D2B, which measured only 1.62:1
+   on this Elite Blue) until it separates enough to float on the blue —
+   3.39:1 here, half lime's 6.5:1. --ball-card keeps the deep, true
+   racing green untouched for the stats band; only the floating accent moved. */
+html[data-skin="quietgreen"]{
+  --ink:#0250B0;          --ink-rgb:2 80 176;
+  --ink-2:#023E8C;
+  --ink-3:#2E86F0;
+  --ink-deep:#013C86;
+  --ball:#6BBD9F;        --ball-rgb:107 189 159;
+  --ball-soft:#9FD4C1;
+  --on-ball:#013C86;
+  --ball-obj:#6BBD9F;    --ball-obj-rgb:107 189 159;
+  --ball-card:#0C3D2B;    --ball-card-rgb:12 61 43;
+  --on-ball-card:#FFFFFF;
+  --cloud:#C6D0DD;        --cloud-rgb:198 208 221;
+  --paper:#FFFFFF;
+  --mist:#E9EEF6;
+  --muted:#4A5D77;
+}
+
+/* ══════ VIVID GREEN — saturated, kelly — the accent itself is green, not white ══════
+   Lightened off the true racing green (#0C3D2B, which measured only 1.62:1
+   on this Elite Blue) until it separates enough to float on the blue —
+   2.95:1 here, under half lime's 6.5:1. --ball-card keeps the deep, true
+   racing green untouched for the stats band; only the floating accent moved. */
+html[data-skin="vividgreen"]{
+  --ink:#0250B0;          --ink-rgb:2 80 176;
+  --ink-2:#023E8C;
+  --ink-3:#2E86F0;
+  --ink-deep:#013C86;
+  --ball:#35B687;        --ball-rgb:53 182 135;
+  --ball-soft:#7CD0B1;
+  --on-ball:#013C86;
+  --ball-obj:#35B687;    --ball-obj-rgb:53 182 135;
+  --ball-card:#0C3D2B;    --ball-card-rgb:12 61 43;
+  --on-ball-card:#FFFFFF;
+  --cloud:#C6D0DD;        --cloud-rgb:198 208 221;
+  --paper:#FFFFFF;
+  --mist:#E9EEF6;
+  --muted:#4A5D77;
+}
+
+/* ══════ BRIGHT GREEN — light mint, most energy — the accent itself is green, not white ══════
+   Lightened off the true racing green (#0C3D2B, which measured only 1.62:1
+   on this Elite Blue) until it separates enough to float on the blue —
+   4.65:1 here, close to two-thirds lime's 6.5:1. --ball-card keeps the deep, true
+   racing green untouched for the stats band; only the floating accent moved. */
+html[data-skin="brightgreen"]{
+  --ink:#0250B0;          --ink-rgb:2 80 176;
+  --ink-2:#023E8C;
+  --ink-3:#2E86F0;
+  --ink-deep:#013C86;
+  --ball:#7CDEAD;        --ball-rgb:124 222 173;
+  --ball-soft:#AAEACA;
+  --on-ball:#013C86;
+  --ball-obj:#7CDEAD;    --ball-obj-rgb:124 222 173;
+  --ball-card:#0C3D2B;    --ball-card-rgb:12 61 43;
+  --on-ball-card:#FFFFFF;
+  --cloud:#C6D0DD;        --cloud-rgb:198 208 221;
+  --paper:#FFFFFF;
+  --mist:#E9EEF6;
+  --muted:#4A5D77;
 }
 </style>
 <noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
@@ -552,8 +820,8 @@ section{position:relative}
   <div class="wrap">
     <div class="nav-in">
       <a class="brand" href="#home">
-        <span class="mark">ن</span>
-        <span>نگار مرادی</span>
+        <span class="mark">م</span>
+        <span>مهرانه ظهوریان</span>
       </a>
       <nav class="nav-links">
         <span class="nav-ind" aria-hidden="true"></span>
@@ -584,7 +852,7 @@ section{position:relative}
       <span class="eyebrow rv"><span class="dot"></span>مربی تنیس و پدل · تهران</span>
       <h1 class="rv">از همون جلسه‌ی اول، <span class="hl">فرق رو حس می‌کنی</span></h1>
       <p class="lead on-dark rv">
-        سلام، من نگار‌ام. کمکت می‌کنم تکنیک درست رو یاد بگیری، بازیت روون‌تر بشه
+        سلام، من مهرانه‌ام. کمکت می‌کنم تکنیک درست رو یاد بگیری، بازیت روون‌تر بشه
         و توی زمین با اعتمادبه‌نفس بازی کنی. چه تازه راکت دست گرفتی،
         چه چند ساله بازی می‌کنی و می‌خوای جدی‌تر بشی.
       </p>
@@ -609,10 +877,10 @@ section{position:relative}
       </svg>
       <canvas class="rally" aria-hidden="true"></canvas>
 
-      <div class="shot on-dark hero-shot">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h1.6a2 2 0 0 0 1.7-.9l.7-1.1a2 2 0 0 1 1.7-.9h2.6a2 2 0 0 1 1.7.9l.7 1.1a2 2 0 0 0 1.7.9H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="13" r="3.4"/></svg>
-        <b>عکس اصلی اینجا</b>
-        <em>عکس عمودی، توی زمین، ۴:۵</em>
+      <div class="shot on-dark hero-shot filled">
+        <video src="media/court.mp4" poster="media/court-poster.jpg"
+               autoplay muted loop playsinline preload="metadata"
+               aria-label="تمرین روی زمین خاک"></video>
       </div>
 
       <div class="float-card a">
@@ -641,12 +909,9 @@ section{position:relative}
 <section class="pad-lg" id="about">
   <div class="wrap about-grid">
     <div class="about-shots rv">
-      <div class="shot">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/></svg>
-        <b>عکس عمودی</b><em>۳:۴</em>
-      </div>
-      <div class="shot"><b>عکس</b><em>مربع</em></div>
-      <div class="shot"><b>عکس</b><em>مربع</em></div>
+      <div class="shot filled"><img src="media/serve.jpg" width="719" height="959" loading="lazy" decoding="async" alt="سرویس روی زمین خاک"></div>
+      <div class="shot filled"><img src="media/trophy.jpg" width="720" height="720" loading="lazy" decoding="async" alt="اهدای جام مسابقات ITF World Tennis Tour Junior"></div>
+      <div class="shot filled"><img src="media/coach.jpg" width="720" height="720" loading="lazy" decoding="async" alt="روی زمین تمرین، کنار مربی"></div>
     </div>
     <div>
       <div class="sec-head" style="margin-bottom:0">
@@ -782,7 +1047,7 @@ section{position:relative}
     <div class="qrail rv"><div class="qtrack">
       <article class="quote">
         <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
-        <p>«سه ساله بازی می‌کردم و فورهندم همیشه تو تور می‌خورد. نگار توی دو جلسه فهمید مشکل از پاهامه، نه از دستم. الان بازی کردن برام کلاً فرق کرده.»</p>
+        <p>«سه ساله بازی می‌کردم و فورهندم همیشه تو تور می‌خورد. مهرانه توی دو جلسه فهمید مشکل از پاهامه، نه از دستم. الان بازی کردن برام کلاً فرق کرده.»</p>
         <div class="who"><span class="av">س</span><div><b>سارا ک.</b><span>۳۲ ساله · تنیس</span></div></div>
       </article>
 
@@ -801,7 +1066,9 @@ section{position:relative}
   </div>
 </section>
 
-<!-- ============ GALLERY ============ -->
+<!-- ============ GALLERY — hidden until there are ~5 real photos.
+     Uncomment and swap the .shot placeholders for <div class="shot filled"><img …></div>.
+<!–– ============ GALLERY ============ ––>
 <section class="pad tint">
   <div class="wrap">
     <div class="sec-head rv">
@@ -817,6 +1084,8 @@ section{position:relative}
     </div>
   </div>
 </section>
+
+============================================================ -->
 
 <!-- ============ FAQ ============ -->
 <section class="pad-lg" id="faq">
@@ -877,7 +1146,7 @@ section{position:relative}
     <div class="foot-grid">
       <div>
         <a class="brand" href="#home" style="color:#fff">
-          <span class="mark">ن</span><span>نگار مرادی</span>
+          <span class="mark">م</span><span>مهرانه ظهوریان</span>
         </a>
         <p>مربی تنیس و پدل در تهران. کلاس خصوصی، دونفره، گروهی و بچه‌ها.</p>
         <div class="socials">
@@ -1197,9 +1466,21 @@ if(CAN_HOVER && !REDUCED){
 /* ─────────── the hero rally: a ball that never stops ───────────
    Trail comes from fading the previous frame with destination-out, which keeps
    the canvas transparent so the court lines behind stay visible. */
+function skinPaint(){
+  var cs = getComputedStyle(document.documentElement);
+  function trip(n){ return cs.getPropertyValue(n).trim().split(/\s+/).map(Number); }
+  var b = trip("--ball-obj-rgb"), k = trip("--ink-rgb");
+  return {
+    ball: cs.getPropertyValue("--ball-obj").trim(),
+    ballA: function(a){ return "rgba(" + b.join(",") + "," + a + ")"; },
+    inkA:  function(a){ return "rgba(" + k.join(",") + "," + a + ")"; }
+  };
+}
 (function(){
   var cv = document.querySelector(".rally");
   if(!cv || REDUCED) return;
+  var C = skinPaint();
+  window.addEventListener("skinchange", function(){ C = skinPaint(); });
   var ctx = cv.getContext("2d");
   var W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), running = false, started = false;
   var ball = {x:0, y:0, vx:0, vy:0, r:9, sx:1, sy:1};
@@ -1236,7 +1517,7 @@ if(CAN_HOVER && !REDUCED){
       var x = d.x*W + Math.sin(t*d.s + d.p)*15;
       var y = ((d.y + t*d.s*.02) % 1) * H;
       ctx.beginPath(); ctx.arc(x, y, d.r, 0, 6.283);
-      ctx.fillStyle = "rgba(214,248,76,.32)"; ctx.fill();
+      ctx.fillStyle = C.ballA(.32); ctx.fill();
     });
 
     ball.vy += .16;
@@ -1259,10 +1540,10 @@ if(CAN_HOVER && !REDUCED){
     ctx.save();
     ctx.translate(ball.x, ball.y); ctx.scale(ball.sx, ball.sy);
     var g = ctx.createRadialGradient(0,0,1,0,0,ball.r*2.7);
-    g.addColorStop(0,"rgba(214,248,76,.5)"); g.addColorStop(1,"rgba(214,248,76,0)");
+    g.addColorStop(0,C.ballA(.5)); g.addColorStop(1,C.ballA(0));
     ctx.beginPath(); ctx.arc(0,0,ball.r*2.7,0,6.283); ctx.fillStyle = g; ctx.fill();
-    ctx.beginPath(); ctx.arc(0,0,ball.r,0,6.283); ctx.fillStyle = "#D6F84C"; ctx.fill();
-    ctx.strokeStyle = "rgba(23,18,58,.45)"; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.arc(0,0,ball.r,0,6.283); ctx.fillStyle = C.ball; ctx.fill();
+    ctx.strokeStyle = C.inkA(.45); ctx.lineWidth = 1.3;
     ctx.beginPath(); ctx.arc(-ball.r*1.15,0,ball.r*1.3,-.85,.85); ctx.stroke();
     ctx.beginPath(); ctx.arc(ball.r*1.15,0,ball.r*1.3,Math.PI-.85,Math.PI+.85); ctx.stroke();
     ctx.restore();
