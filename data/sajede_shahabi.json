@@ -1,0 +1,677 @@
+{
+  "athlete": {
+    "id": "sajede_shahabi",
+    "key": "e5026a2f270d4fabb716a0cc8c1bb7a1",
+    "firstName": "Sajede",
+    "lastName": "Shahabi"
+  },
+  "sport": {
+    "badge": "💪 Posture & Physique"
+  },
+  "currentCycleIndex": 0,
+  "cycles": [
+    {
+      "num": 1,
+      "name": "Plumb Line",
+      "tagline": "Find your upright.",
+      "weeks": "Weeks 1–5",
+      "startDate": "2026-09-07",
+      "endDate": "2026-10-11",
+      "focuses": [
+        "Get two full body sessions a week to actually happen, and learn what a hard set really feels like.",
+        "Start the short home mobility routine and get your daily walking off zero."
+      ],
+      "message": {
+        "paragraphs": [
+          "You told me you slouch, your shoulders sit forward, and your lower back arches. This first block is built around that. Most of your pulling work is for your upper back, because those are the muscles that hold you upright all day.",
+          "The rest of it is simpler than it sounds. You have five weeks to learn the machines and find out what a hard set actually feels like. That sounds small. Everything after this gets built on it.",
+          "Two sessions a week is the whole ask. Show up twice, log every set, and by the end you will know your own working weight on every lift."
+        ],
+        "outcomes": [
+          "Two sessions a week, five weeks running",
+          "A known working weight on all ten lifts",
+          "Upper back and shoulder blades doing real work",
+          "Home mobility and daily walking running on their own",
+          "Top sets filmed in weeks 2 and 4",
+          "Tape measurements at week 1 and week 5"
+        ]
+      }
+    },
+    {
+      "num": 2,
+      "name": "Steel Ladder",
+      "tagline": "Climb on what you own.",
+      "weeks": "Weeks 6–10",
+      "startDate": "2026-10-12",
+      "endDate": "2026-11-15",
+      "focuses": [
+        "Get stronger on the lifts you already know, and start proper work for your upper back and shoulder blades.",
+        "Your daily step target becomes a real number now we know where you started."
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Once you know the machines, the weight starts moving. Cycle two keeps the same lifts on purpose, because you get stronger fastest on movements you already know how to do.",
+          "Your upper back and the back of your shoulders get their own work then too. That is the part that changes how you look standing still.",
+          "Learn it first. Then load it."
+        ]
+      }
+    },
+    {
+      "num": 3,
+      "name": "Tension Cable",
+      "tagline": "Every part carries load.",
+      "weeks": "Weeks 11–15",
+      "startDate": "2026-11-16",
+      "endDate": "2026-12-20",
+      "focuses": [
+        "More work fits into the same 45 minutes now, so every leg muscle gets a full week of it.",
+        "Protein becomes a daily habit. Posture stops being a separate drill and becomes how you lift."
+      ]
+    },
+    {
+      "num": 4,
+      "name": "Keystone",
+      "tagline": "The heaviest you'll lift.",
+      "weeks": "Weeks 16–20",
+      "startDate": "2026-12-21",
+      "endDate": "2027-01-24",
+      "focuses": [
+        "The heaviest lifting of the whole plan, done through your full range. That is what makes the flexibility stick.",
+        "Hold your walking and your protein through the holidays. That is the whole job outside the gym."
+      ]
+    },
+    {
+      "num": 5,
+      "name": "Iron Frame",
+      "tagline": "The shape you came for.",
+      "weeks": "Weeks 21–25",
+      "startDate": "2027-01-25",
+      "endDate": "2027-02-28",
+      "focuses": [
+        "The biggest training weeks of the plan, with direct work for the muscles that change how your frame looks.",
+        "Your walking, your protein and the home routine all run together now. This is the part that keeps working after the six months are done."
+      ]
+    }
+  ],
+  "workouts": {
+    "label": "Program 01 · Plumb Line",
+    "days": [
+      {
+        "id": 1,
+        "focusTag": "Legs First, Everything Follows",
+        "completionTitle": "Upright And Loaded",
+        "completionMessage": "Legs and upper back both done. That row is the one quietly changing how you stand, so every set of it counts.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Bike",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Keep the pedals turning smooth and even",
+                    "Legs warming up, breathing picking up"
+                  ],
+                  "bad": [
+                    "Don't start hard, this is a warm-up not a workout"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Posture & Hip Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Cat-Cow",
+                    "detail": "×6",
+                    "cues": {
+                      "good": [
+                        "Round up through your upper back, then come back down and stop when your back is flat",
+                        "Upper back moving, lower back staying quiet"
+                      ],
+                      "bad": [
+                        "Don't let your belly drop toward the floor at the bottom"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pull-Apart",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Pull the band apart until your hands are level with your shoulders",
+                        "Working between your shoulder blades"
+                      ],
+                      "bad": [
+                        "Don't shrug your shoulders up"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Half-Kneeling Hip Flexor Rock",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Tuck your tailbone under, then rock forward from the hip",
+                        "Stretch at the front of your back hip"
+                      ],
+                      "bad": [
+                        "Don't arch your lower back to get further forward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Serratus Wall Slide",
+                    "detail": "×8",
+                    "cues": {
+                      "good": [
+                        "Slide your forearms up the wall and keep them touching",
+                        "Shoulder blades travelling up and around your ribs"
+                      ],
+                      "bad": [
+                        "Don't let your lower back come off the wall"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Leg Press",
+                "videoUrl": null,
+                "restSec": 120,
+                "note": "Before any weight goes on, set the safety stops one notch below your lowest point and find the release handle. You train alone, so get that right first. The sled has its own weight before you add a plate, so start with the machine empty and keep your knees slightly soft at the top. If the leg press is taken, use the Machine Hack Squat instead.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the platform away through your whole foot, mid-foot and heel",
+                    "Thighs and glutes doing the work, not your knees"
+                  ],
+                  "bad": [
+                    "Don't let your lower back round off the pad at the bottom"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Chest-Supported Dumbbell Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "This is your posture lift, so treat it as the important one. Point your elbows out at about 45 degrees instead of tucking them into your sides, because that angle is what makes this work the back of your shoulders and not just your lats. If the bench is taken, do it one arm at a time.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-1"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Drive your elbows out at about 45 degrees and back past your ribs",
+                    "Working across the back of your shoulders and between your blades"
+                  ],
+                  "bad": [
+                    "Don't shrug your shoulders up toward your ears"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "restSec": 75,
+                "note": "If the seated machine is taken, use the lying leg curl instead.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull your heels down and under the seat",
+                    "Back of your thighs working the whole way"
+                  ],
+                  "bad": [
+                    "Don't let your hips lift off the seat to help"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Machine Hip Thrust",
+                "videoUrl": null,
+                "restSec": 75,
+                "note": "The height at the top comes from your glutes squeezing, never from arching your lower back. Keep your ribs pulled down the whole set. If you have to arch to get higher, you have already gone far enough. If the machine is taken, do a Dumbbell Glute Bridge on the floor instead.",
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-1"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the pad up with your heels until your hips are level",
+                    "Glutes doing the lifting at the top"
+                  ],
+                  "bad": [
+                    "Don't arch your lower back to get higher, ribs stay down"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dead Bug",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Your lower back staying flat on the floor is the exercise. When it starts to lift off, that rep is the last one, even if you had more planned. Reach slower rather than further.",
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×6 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Reach your opposite arm and leg away from each other, long and slow",
+                    "Stomach staying tight and flat the whole time"
+                  ],
+                  "bad": [
+                    "Don't let your lower back lift off the floor"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "focusTag": "Every Pull Stands You Taller",
+        "completionTitle": "Two For Two",
+        "completionMessage": "That is the week finished, and a finished week is the whole game right now. Get your walk in tomorrow and let the legs settle.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Incline Treadmill Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Walk tall with the belt on a gentle incline",
+                    "Breathing picking up without getting out of breath"
+                  ],
+                  "bad": [
+                    "Don't hold the handrails, walk unsupported"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Upper Back & Hip Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Quadruped Thoracic Rotation",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach your hand to the ceiling and follow it with your eyes",
+                        "The turn coming from your upper back"
+                      ],
+                      "bad": [
+                        "Don't let your hips twist with you"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Face Pull",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Pull the band to your forehead and open your hands out",
+                        "Back of your shoulders working"
+                      ],
+                      "bad": [
+                        "Don't let your elbows drop below your shoulders"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Bird Dog",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach the opposite hand and heel away from each other",
+                        "Stomach and glute holding you steady"
+                      ],
+                      "bad": [
+                        "Don't let your hips rock side to side"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": [
+                        "Turn both knees to the other side and sit tall",
+                        "Opening through your hips"
+                      ],
+                      "bad": [
+                        "Don't force it, go where it moves easily"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Machine Hack Squat",
+                "videoUrl": null,
+                "restSec": 120,
+                "note": "Find the handles that turn the hooks before you load the machine, so you can never get stuck under the pads. Like the leg press, the sled weighs something before you add a plate. Go down to where your lower back still stays flat on the pad and stop there for now. If the hack squat is taken, use the Machine Leg Press with your feet higher and wider.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Sit straight down between your feet, along the machine",
+                    "Thighs loading up as you come down"
+                  ],
+                  "bad": [
+                    "Don't let your knees cave in toward each other"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Lat Pulldown",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "Set the thigh pad tight against your legs before your first rep so you stay in the seat. The bar comes down to the top of your chest, never behind your head. If you are lifting off the seat to move it, the weight is too heavy. If the bar is taken, use the neutral grip handle on the same machine.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull the bar to the top of your chest, elbows down toward the floor",
+                    "Back and armpits pulling, not your hands"
+                  ],
+                  "bad": [
+                    "Don't lean back and swing to move the bar"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "45° Back Extension",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "At the top your body should be one straight line from head to heels. Don't go past that. You already have some arch in your lower back and this lift is not the place to add more. If the bench is taken, use the seated back extension machine.",
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push your hips into the pad to come up",
+                    "Glutes and hamstrings, not your lower back"
+                  ],
+                  "bad": [
+                    "Don't crank past straight at the top"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Cable Seated Row",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "If the station is taken, do it one arm at a time on any cable.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-1"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Pull your elbows back to your ribs and hold for a beat there",
+                    "Shoulder blades pulling together at the end"
+                  ],
+                  "bad": [
+                    "Don't let your shoulders roll forward when the weight goes back"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Kneeling Side Plank",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "This is one long hold on each side, not reps. If your hips drop before the time is up, that is the end of the set. Log the seconds you actually got, because that number is what we improve.",
+                "chips": [
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×30s Each Side"
+                  },
+                  {
+                    "label": "Tempo Iso"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Push the floor away with your bottom elbow and lift your hips high",
+                    "Side of your waist holding you up"
+                  ],
+                  "bad": [
+                    "Don't let your hips sag toward the floor"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "greeting": "For You, Sajede",
+    "cards": [
+      {
+        "icon": "📅",
+        "title": "Week One Runs Lighter",
+        "body": "<p>Week one is not the real programme yet. You are learning where the machines are and how they fit you. That takes longer than you think and that is fine.</p><p><strong>For week one only, change three things:</strong></p><ul><li>Stop every set at <strong>RPE 6</strong>. That means you could do about four more reps. It will feel too easy. Do it anyway.</li><li>Do <strong>2 sets</strong> of everything instead of 3.</li><li>Lower the weight in <strong>2 seconds</strong>, not 3.</li></ul><p>That last one matters more than it looks. Slow lowering is what makes you sore, and I don't want your first week to wreck your second session. From week two you go back to the numbers on the cards.</p><p><strong>If the lightest weight on a machine is still too heavy, or the seat and pads won't adjust small enough for you, don't force it.</strong> Every card has a backup exercise. Use that one and tell me which machine it was.</p>"
+      },
+      {
+        "icon": "⚖️",
+        "title": "How To Find Your Weights",
+        "body": "<p>I don't put a weight on your card. You find it every time, using the RPE number. <strong>RPE is just how hard the set felt.</strong> RPE 7 means you could have done about three more reps. RPE 8 means about two more.</p><p><strong>On a machine you have never used, start lighter than you think.</strong> Do the first set, then compare how it felt to the RPE on the card. Too easy means go up. Too hard means come down. You will have it right by set two or three.</p><p><strong>Week to week on the same machine:</strong></p><ul><li>You hit all the reps and it felt at or below the card's RPE. Go up a small amount next week.</li><li>You missed reps, or it felt harder than the card says. Stay on the same weight and do it again.</li></ul><p><strong>Going down is not failing.</strong> Bad sleep, a hard week, a set that feels heavier than it should. Drop the weight and finish the session properly. That is the right call.</p>"
+      },
+      {
+        "icon": "📹",
+        "title": "What To Send Me",
+        "body": "<p>You train alone and I am not in the room, so film is how I actually coach you.</p><p><strong>Week 2 and week 4:</strong> film one working set of the Machine Leg Press and one of the Machine Hack Squat. Phone on the floor, from the side, your whole body in frame. Send them to me on WhatsApp.</p><p>I am looking at one thing. Does your lower back stay flat on the pad for every rep. <strong>The weight on those two machines goes up when I have seen that, and not before.</strong> If the videos stop coming, the weight stops moving.</p><p><strong>Week 1 and week 5:</strong> measure your waist, hips, thigh and arm with a tape and send me the numbers. Five weeks is not long enough for the mirror to show you anything, but the tape will. Numbers, not feelings.</p>"
+      },
+      {
+        "icon": "🔋",
+        "title": "On A Rough Day",
+        "body": "<p>Your stress is high and some weeks will be worse than others. This programme is built to bend on those days instead of breaking.</p><p><strong>Take 1 off every RPE, but never go below 6.</strong> Anything already at 6 stays at 6. That is the lowest number the app lets you log.</p><p><strong>If you only have twenty minutes, do these:</strong></p><ul><li>Day 1: Machine Leg Press and Chest-Supported Dumbbell Row</li><li>Day 2: Machine Hack Squat and Lat Pulldown</li></ul><p>Two exercises done beats a session skipped. You can swap the days around or move them in the week. <strong>Just keep three or four days between them.</strong></p>"
+      },
+      {
+        "icon": "🌙",
+        "title": "Period Week",
+        "body": "<p>You don't have to work this out on the day. Here it is, already decided.</p><ul><li><strong>Keep as normal:</strong> your walking and the home mobility work. Moving actually helps with cramps.</li><li><strong>Cut:</strong> Machine Leg Press and Machine Hack Squat drop to 2 sets at RPE 6. Move the weight, don't grind it.</li><li><strong>Skip:</strong> Dead Bug and Kneeling Side Plank. Those two brace hard through your stomach and there is no point on those days.</li><li><strong>Everything else:</strong> take 1 off the RPE, same as a rough day. Never go below 6.</li></ul><p><strong>If the pad on the hip thrust or the back extension is uncomfortable on those days, use the backup exercise or skip it.</strong> You lose nothing by missing it once.</p>"
+      },
+      {
+        "icon": "🚶",
+        "title": "Outside The Gym",
+        "body": "<p>Two gym sessions a week is the only thing I need you to protect. <strong>Everything else builds up slowly and none of it starts at full size.</strong></p><p><strong>Home mobility:</strong> 3 times a week for the first two weeks, then 4 or 5 times from week three. It is 10 to 12 minutes, not half an hour. If it starts taking half an hour you will stop doing it.</p><p><strong>Walking:</strong> week one, just walk how you normally do and let Proof record it. I want to see your real number first. From week two we add a small amount and hold it there. <strong>No big step target yet.</strong></p><p>You are going from zero to a lot of new things at once. That is the real risk here, not the training.</p>"
+      },
+      {
+        "icon": "🪞",
+        "title": "What Five Weeks Changes",
+        "body": "<p>You came to me about your posture, so let me be straight with you about what this does and what it doesn't.</p><p><strong>What changes:</strong> the muscles across your upper back and between your shoulder blades get stronger, and those are what hold you upright when you are not thinking about it. You will also notice yourself sitting and standing taller fairly early on.</p><p><strong>What doesn't change in five weeks:</strong> the shape of your skeleton, or how your back looks standing still in the mirror. Some of that is just how you are built, and I am not going to promise you a flat lower back because nobody can.</p><p><strong>Five weeks is short.</strong> The posture work runs across all six months, not this block. Right now your job is smaller. Show up twice a week and learn how to train.</p>"
+      }
+    ]
+  }
+}
