@@ -804,8 +804,80 @@ html[data-skin="brightgreen"]{
   --mist:#E9EEF6;
   --muted:#4A5D77;
 }
+
+/* ══════════════════════ SPORT GATE ══════════════════════
+   Shows both palettes at once, so its colours are literal rather than
+   token-driven — the gate belongs to neither sport. */
+.gate{
+  position:fixed;inset:0;z-index:200;display:flex;
+  background:#07130E;
+  opacity:1;transition:opacity .5s ease, visibility .5s;
+}
+html:not(.gated) .gate{opacity:0;visibility:hidden;pointer-events:none}
+html.gated{overflow:hidden}
+html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .draft-badge{display:none!important}
+
+.gate-brand{
+  position:absolute;inset-block-start:26px;inset-inline:0;z-index:3;
+  display:flex;align-items:center;justify-content:center;gap:11px;
+  font-weight:800;font-size:17px;color:#fff;pointer-events:none;
+}
+.gate-brand .mark{width:38px;height:38px;border-radius:12px;background:#fff;color:#07130E;
+  display:grid;place-content:center;font-family:var(--font-display);font-size:19px}
+
+.gate-half{
+  position:relative;flex:1;overflow:hidden;cursor:pointer;
+  border:0;padding:0;color:#fff;text-align:center;
+  transition:flex-grow .55s cubic-bezier(.2,.7,.3,1), filter .45s;
+  display:grid;place-content:center;
+}
+.gh-tennis{background:#003320}
+.gh-padel {background:#0250B0}
+.gate-half::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% 100%,rgba(0,0,0,.42),transparent 70%)}
+.gh-court{position:absolute;inset:6% 12%;width:76%;height:88%;opacity:.22;
+  fill:none;stroke-width:2;stroke-linecap:round}
+.gh-tennis .gh-court{stroke:#EC99AF}
+.gh-padel  .gh-court{stroke:#D0FF41}
+
+.gh-in{position:relative;z-index:2;display:grid;gap:12px;justify-items:center;padding:24px}
+.gh-kicker{font-size:14px;font-weight:600;letter-spacing:0;opacity:.82}
+.gh-name{font-family:var(--font-display);font-weight:400;font-size:clamp(52px,9vw,104px);line-height:1.25}
+.gh-cta{
+  display:inline-flex;align-items:center;gap:8px;margin-block-start:6px;
+  padding:12px 26px;border-radius:999px;font-weight:700;font-size:16px;
+  transition:transform .3s, box-shadow .3s;
+}
+.gh-cta svg{width:17px;height:17px}
+.gh-tennis .gh-cta{background:#EC99AF;color:#003320}
+.gh-padel  .gh-cta{background:#D0FF41;color:#0250B0}
+
+@media (hover:hover) and (pointer:fine){
+  .gate:hover .gate-half{filter:brightness(.62) saturate(.85)}
+  .gate .gate-half:hover{flex-grow:1.45;filter:none}
+  .gate-half:hover .gh-cta{transform:translateY(-3px);box-shadow:0 14px 30px -12px rgba(0,0,0,.6)}
+}
+.gate-half:focus-visible{outline:3px solid #fff;outline-offset:-6px}
+@media (max-width:760px){ .gate{flex-direction:column} }
+@media (prefers-reduced-motion:reduce){
+  .gate,.gate-half,.gh-cta{transition:none}
+  .gate:hover .gate-half{filter:none}
+  .gate .gate-half:hover{flex-grow:1}
+}
+
+/* nav switcher to the other sport */
+.swap{
+  display:none;align-items:center;gap:7px;
+  font-size:14.5px;font-weight:600;color:rgba(255,255,255,.82);
+  padding:9px 16px;border-radius:999px;border:1px solid var(--line);
+  transition:background .25s,color .25s,border-color .25s;white-space:nowrap;
+}
+.swap::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ball);flex:none}
+.swap:hover{background:rgba(255,255,255,.08);color:#fff}
+@media(min-width:900px){.swap{display:inline-flex}}
+.menu .swap{display:flex;border:0;border-radius:0;padding:14px 20px;color:rgba(255,255,255,.85)}
 </style>
-<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>.rv{opacity:1!important;transform:none!important}#gate{display:none!important}</style></noscript>
 </head>
 <body>
 
@@ -814,6 +886,35 @@ html[data-skin="brightgreen"]{
 
 <div class="rail" aria-hidden="true"><span class="rail-track"></span><span class="rail-fill"></span><span class="rail-ball"></span></div>
 <div class="tbar" aria-hidden="true"><i></i></div>
+
+<!-- ============ SPORT GATE ============ -->
+<div id="gate" class="gate" role="dialog" aria-label="انتخاب رشته">
+  <div class="gate-brand"><span class="mark">م</span><span>مهرانه ظهوریان</span></div>
+  <button class="gate-half gh-tennis" data-go="tennis">
+    <svg class="gh-court" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true">
+      <rect x="10" y="10" width="180" height="280" rx="8"/><line x1="10" y1="150" x2="190" y2="150"/>
+      <line x1="10" y1="80" x2="190" y2="80"/><line x1="10" y1="220" x2="190" y2="220"/>
+      <line x1="100" y1="80" x2="100" y2="220"/>
+    </svg>
+    <span class="gh-in">
+      <span class="gh-kicker">کلاس خصوصی · گروهی · بچه‌ها</span>
+      <span class="gh-name">تنیس</span>
+      <span class="gh-cta">وارد شو<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></span>
+    </span>
+  </button>
+  <button class="gate-half gh-padel" data-go="padel">
+    <svg class="gh-court" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true">
+      <rect x="10" y="10" width="180" height="280" rx="8"/><line x1="10" y1="150" x2="190" y2="150"/>
+      <line x1="10" y1="95" x2="190" y2="95"/><line x1="10" y1="205" x2="190" y2="205"/>
+      <line x1="100" y1="95" x2="100" y2="205"/>
+    </svg>
+    <span class="gh-in">
+      <span class="gh-kicker">از صفر تا بازی توی زمین</span>
+      <span class="gh-name">پدل</span>
+      <span class="gh-cta">وارد شو<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></span>
+    </span>
+  </button>
+</div>
 
 <!-- ============ NAV ============ -->
 <header class="nav" id="nav">
@@ -831,6 +932,7 @@ html[data-skin="brightgreen"]{
         <a href="#words">نظر شاگردها</a>
         <a href="#faq">سوال‌ها</a>
       </nav>
+      <a class="swap" href="#" data-swap></a>
       <a class="btn btn-primary nav-cta" data-wa href="#">رزرو جلسه</a>
       <button class="burger" id="burger" aria-label="منو"><span></span><span></span><span></span></button>
     </div>
@@ -849,13 +951,9 @@ html[data-skin="brightgreen"]{
 <section class="hero" id="home">
   <div class="wrap hero-in">
     <div>
-      <span class="eyebrow rv"><span class="dot"></span>مربی تنیس و پدل · تهران</span>
+      <span class="eyebrow rv"><span class="dot"></span><span data-t="eyebrow">مربی تنیس · تهران</span></span>
       <h1 class="rv">از همون جلسه‌ی اول، <span class="hl">فرق رو حس می‌کنی</span></h1>
-      <p class="lead on-dark rv">
-        سلام، من مهرانه‌ام. کمکت می‌کنم تکنیک درست رو یاد بگیری، بازیت روون‌تر بشه
-        و توی زمین با اعتمادبه‌نفس بازی کنی. چه تازه راکت دست گرفتی،
-        چه چند ساله بازی می‌کنی و می‌خوای جدی‌تر بشی.
-      </p>
+      <p class="lead on-dark rv" data-t="heroLead"></p>
       <div class="hero-btns rv">
         <a class="btn btn-primary" data-wa href="#">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>
@@ -877,11 +975,7 @@ html[data-skin="brightgreen"]{
       </svg>
       <canvas class="rally" aria-hidden="true"></canvas>
 
-      <div class="shot on-dark hero-shot filled">
-        <video src="media/court.mp4" poster="media/court-poster.jpg"
-               autoplay muted loop playsinline preload="metadata"
-               aria-label="تمرین روی زمین خاک"></video>
-      </div>
+      <div class="shot on-dark hero-shot filled" data-slot="hero" data-ph="ویدیو یا عکس اصلی|عمودی، توی زمین"></div>
 
       <div class="float-card a">
         <div><span class="n">۸</span></div>
@@ -889,7 +983,7 @@ html[data-skin="brightgreen"]{
       </div>
       <div class="float-card b">
         <div><span class="n">۲</span></div>
-        <div class="t">رشته:<br>تنیس و پدل</div>
+        <div class="t" data-t="floatB"></div>
       </div>
     </div>
   </div>
@@ -909,20 +1003,16 @@ html[data-skin="brightgreen"]{
 <section class="pad-lg" id="about">
   <div class="wrap about-grid">
     <div class="about-shots rv">
-      <div class="shot filled"><img src="media/serve.jpg" width="719" height="959" loading="lazy" decoding="async" alt="سرویس روی زمین خاک"></div>
-      <div class="shot filled"><img src="media/trophy.jpg" width="720" height="720" loading="lazy" decoding="async" alt="اهدای جام مسابقات ITF World Tennis Tour Junior"></div>
-      <div class="shot filled"><img src="media/coach.jpg" width="720" height="720" loading="lazy" decoding="async" alt="روی زمین تمرین، کنار مربی"></div>
+      <div class="shot filled" data-slot="s0" data-ph="عکس عمودی|۳:۴"></div>
+      <div class="shot filled" data-slot="s1" data-ph="عکس|مربع"></div>
+      <div class="shot filled" data-slot="s2" data-ph="عکس|مربع"></div>
     </div>
     <div>
       <div class="sec-head" style="margin-bottom:0">
         <span class="eyebrow on-light rv"><span class="dot"></span>درباره‌ی من</span>
         <h2 class="h-sec rv" style="margin-block:20px 16px">من کی‌ام و چطور کار می‌کنم</h2>
       </div>
-      <p class="lead about-p rv">
-        هشت ساله که تنیس و پدل درس می‌دم. توی این مدت با آدم‌های خیلی مختلفی کار کردم؛
-        از کسی که اولین بار راکت دستش گرفته تا بازیکنی که سال‌هاست بازی می‌کنه
-        ولی یه جایی گیر کرده و نمی‌دونه چرا.
-      </p>
+      <p class="lead about-p rv" data-t="aboutP1"></p>
       <p class="lead about-p rv">
         روش من ساده‌ست: اول نگاه می‌کنم چطور بازی می‌کنی، بعد یکی دو تا چیز رو
         درست می‌کنیم که بیشترین اثر رو داره. نه ده تا نکته با هم، نه تمرین‌های
@@ -933,8 +1023,8 @@ html[data-skin="brightgreen"]{
         قرار‌ه بازی کردن برات لذت‌بخش بشه.
       </p>
       <div class="chips rv">
-        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>مدرک مربیگری تنیس</span>
-        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>دوره‌ی تخصصی پدل</span>
+        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span><span data-t="chip1"></span></span>
+        <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span><span data-t="chip2"></span></span>
         <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>کمک‌های اولیه‌ی ورزشی</span>
         <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span>سابقه‌ی بازی در لیگ</span>
       </div>
@@ -974,9 +1064,9 @@ html[data-skin="brightgreen"]{
 
       <article class="card rv">
         <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 12h18M12 4.5v15"/></svg></div>
-        <h3>پدل از صفر</h3>
+        <h3 data-t="card3Title"></h3>
         <span class="meta">مخصوص تازه‌کارها · ۶۰ دقیقه</span>
-        <p>اگه پدل بازی نکردی ولی دوستات می‌کنن، این کلاس برای توئه. توی چند جلسه می‌تونی بیای تو زمین و بازی کنی.</p>
+        <p data-t="card3Body"></p>
         <div class="price">۴۰۰٬۰۰۰ <small>تومان / جلسه</small></div>
       </article>
 
@@ -1048,13 +1138,13 @@ html[data-skin="brightgreen"]{
       <article class="quote">
         <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
         <p>«سه ساله بازی می‌کردم و فورهندم همیشه تو تور می‌خورد. مهرانه توی دو جلسه فهمید مشکل از پاهامه، نه از دستم. الان بازی کردن برام کلاً فرق کرده.»</p>
-        <div class="who"><span class="av">س</span><div><b>سارا ک.</b><span>۳۲ ساله · تنیس</span></div></div>
+        <div class="who"><span class="av">س</span><div><b>سارا ک.</b><span data-t="q1tag"></span></div></div>
       </article>
 
       <article class="quote">
         <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
-        <p>«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»</p>
-        <div class="who"><span class="av">ر</span><div><b>رضا م.</b><span>۴۱ ساله · پدل</span></div></div>
+        <p data-t="q2body"></p>
+        <div class="who"><span class="av">ر</span><div><b>رضا م.</b><span data-t="q2tag"></span></div></div>
       </article>
 
       <article class="quote">
@@ -1148,7 +1238,7 @@ html[data-skin="brightgreen"]{
         <a class="brand" href="#home" style="color:#fff">
           <span class="mark">م</span><span>مهرانه ظهوریان</span>
         </a>
-        <p>مربی تنیس و پدل در تهران. کلاس خصوصی، دونفره، گروهی و بچه‌ها.</p>
+        <p data-t="footTag"></p>
         <div class="socials">
           <a data-ig href="#" aria-label="اینستاگرام"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.8.07-1.1.05-1.7.24-2.1.4-.5.2-.9.44-1.3.83-.4.4-.63.8-.83 1.3-.16.4-.35 1-.4 2.1C2.5 9.9 2.5 10.3 2.5 12s0 2.1.07 3.3c.05 1.1.24 1.7.4 2.1.2.5.43.9.83 1.3.4.4.8.63 1.3.83.4.16 1 .35 2.1.4 1.3.07 1.7.07 4.8.07s3.5 0 4.8-.07c1.1-.05 1.7-.24 2.1-.4.5-.2.9-.43 1.3-.83.4-.4.63-.8.83-1.3.16-.4.35-1 .4-2.1.07-1.2.07-1.6.07-3.3s0-2.1-.07-3.3c-.05-1.1-.24-1.7-.4-2.1-.2-.5-.43-.9-.83-1.3-.4-.4-.8-.63-1.3-.83-.4-.16-1-.35-2.1-.4C15.5 4 15.1 4 12 4Zm0 3.05a4.95 4.95 0 1 1 0 9.9 4.95 4.95 0 0 1 0-9.9Zm0 1.8a3.15 3.15 0 1 0 0 6.3 3.15 3.15 0 0 0 0-6.3Zm5.15-3.2a1.16 1.16 0 1 1 0 2.32 1.16 1.16 0 0 1 0-2.32Z"/></svg></a>
           <a data-wa href="#" aria-label="واتساپ"><svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg></a>
@@ -1399,13 +1489,16 @@ document.querySelectorAll(".qa").forEach(function(d){
    then mirror the whole thing so the -50% loop has no seam ─────────── */
 function loopTrack(track){
   if(!track || REDUCED) return;
+  /* re-runnable: a sport switch rebuilds content, so drop the previous clones */
+  Array.prototype.slice.call(track.querySelectorAll(".mq-clone")).forEach(function(n){ n.remove(); });
   var base = Array.prototype.slice.call(track.children);
   if(!base.length) return;
   var setW = track.scrollWidth;
   var reps = setW > 0 ? Math.max(1, Math.ceil((window.innerWidth + 240) / setW)) : 1;
   for(var k = 1; k < reps; k++){
     base.forEach(function(n){
-      var c = n.cloneNode(true); c.classList.remove("rv"); c.style.transitionDelay = "";
+      var c = n.cloneNode(true); c.classList.remove("rv"); c.classList.add("mq-clone");
+      c.style.transitionDelay = "";
       track.appendChild(c);
     });
   }
@@ -1413,12 +1506,158 @@ function loopTrack(track){
     var c = n.cloneNode(true);
     c.setAttribute("aria-hidden", "true");
     c.classList.remove("rv");        /* clones are not in the reveal queue */
+    c.classList.add("mq-clone");
     c.style.transitionDelay = "";
     track.appendChild(c);
   });
 }
-loopTrack(document.querySelector(".ticker-track"));
-loopTrack(document.querySelector(".qtrack"));
+/* ══════════════════════ TWO SPORTS, ONE LAYOUT ══════════════════════
+   Everything structural is shared; only these strings, the media and the
+   palette differ. Adding a third discipline later = one more entry here. */
+var SPORTS = {
+  tennis: {
+    skin:"spruce", label:"تنیس", other:"پدل", otherKey:"padel",
+    title:"مهرانه ظهوریان — مربی تنیس",
+    desc:"کلاس خصوصی و گروهی تنیس در تهران. برای تازه‌کارها و بازیکن‌هایی که می‌خوان جدی‌تر بازی کنن.",
+    theme:"#003320",
+    wa:"سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌های تنیس بپرسم.",
+    ticker:["تنیس","فورهند","بک‌هند","سرویس","والی","اسمش","حرکت پا","تکنیک","تعادل","اعتمادبه‌نفس","تمرین","بازی"],
+    t:{
+      eyebrow:"مربی تنیس · تهران",
+      heroLead:"سلام، من مهرانه‌ام. کمکت می‌کنم تکنیک درست رو یاد بگیری، بازیت روون‌تر بشه و توی زمین با اعتمادبه‌نفس بازی کنی. چه تازه راکت دست گرفتی، چه چند ساله بازی می‌کنی و می‌خوای جدی‌تر بشی.",
+      floatB:"رشته:<br>تنیس",
+      aboutP1:"هشت ساله که تنیس درس می‌دم. توی این مدت با آدم‌های خیلی مختلفی کار کردم؛ از کسی که اولین بار راکت دستش گرفته تا بازیکنی که سال‌هاست بازی می‌کنه ولی یه جایی گیر کرده و نمی‌دونه چرا.",
+      chip1:"مدرک مربیگری تنیس",
+      chip2:"سابقه‌ی مسابقات ITF",
+      card3Title:"تنیس از صفر",
+      card3Body:"اگه تا حالا راکت دست نگرفتی، از همین‌جا شروع می‌کنیم. توی چند جلسه توپ رو تمیز می‌زنی و می‌تونی رالی کنی.",
+      q1tag:"۳۲ ساله · تنیس",
+      q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام بازی می‌کنم و کم نمیارم.»",
+      q2tag:"۴۱ ساله · تنیس",
+      footTag:"مربی تنیس در تهران. کلاس خصوصی، دونفره، گروهی و بچه‌ها."
+    },
+    media:{
+      hero:{video:"media/court.mp4", poster:"media/court-poster.jpg", alt:"تمرین روی زمین خاک"},
+      s0:{img:"media/serve.jpg",  w:719, h:959, alt:"سرویس روی زمین خاک"},
+      s1:{img:"media/trophy.jpg", w:720, h:720, alt:"اهدای جام مسابقات ITF World Tennis Tour Junior"},
+      s2:{img:"media/coach.jpg",  w:720, h:720, alt:"روی زمین تمرین، کنار مربی"}
+    }
+  },
+  padel: {
+    skin:"court", label:"پدل", other:"تنیس", otherKey:"tennis",
+    title:"مهرانه ظهوریان — مربی پدل",
+    desc:"کلاس خصوصی و گروهی پدل در تهران. از صفر تا بازی کردن توی زمین.",
+    theme:"#0250B0",
+    wa:"سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌های پدل بپرسم.",
+    ticker:["پدل","سرویس","والی","بانداخا","ویبورا","اسمش","دیوار شیشه‌ای","حرکت پا","جفت","تاکتیک","دفاع","بازی"],
+    t:{
+      eyebrow:"مربی پدل · تهران",
+      heroLead:"سلام، من مهرانه‌ام. پدل رو از صفر یادت می‌دم — سرویس، والی، کار با دیوار شیشه‌ای و اینکه کجای زمین وایسی. توی چند جلسه می‌تونی با دوستات بازی کنی و کم نیاری.",
+      floatB:"رشته:<br>پدل",
+      aboutP1:"پدل درس می‌دم و خودمم بازی می‌کنم. با آدم‌های خیلی مختلفی کار کردم؛ از کسی که اولین بار راکت پدل دستش گرفته تا کسایی که هفته‌ای چند بار بازی می‌کنن ولی یه جایی گیر کردن.",
+      chip1:"دوره‌ی تخصصی پدل",
+      chip2:"مربیگری تنیس",
+      card3Title:"پدل از صفر",
+      card3Body:"اگه پدل بازی نکردی ولی دوستات می‌کنن، این کلاس برای توئه. توی چند جلسه می‌تونی بیای تو زمین و بازی کنی.",
+      q1tag:"۳۲ ساله · پدل",
+      q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»",
+      q2tag:"۴۱ ساله · پدل",
+      footTag:"مربی پدل در تهران. کلاس خصوصی، دونفره، گروهی و بچه‌ها."
+    },
+    media:{}   /* no padel photos yet — slots fall back to placeholders */
+  }
+};
+
+function setMeta(sel, val){
+  var m = document.querySelector(sel);
+  if(m) m.setAttribute("content", val);
+}
+function fillSlot(el, def){
+  if(!el) return;
+  if(!def){                                   /* no media for this sport yet */
+    var ph = (el.getAttribute("data-ph") || "عکس|").split("|");
+    el.classList.remove("filled");
+    el.innerHTML = "<b>" + ph[0] + "</b>" + (ph[1] ? "<em>" + ph[1] + "</em>" : "");
+    return;
+  }
+  el.classList.add("filled");
+  if(def.video){
+    el.innerHTML = '<video src="' + def.video + '" poster="' + def.poster + '"'
+      + ' autoplay muted loop playsinline preload="metadata" aria-label="' + def.alt + '"></video>';
+  } else {
+    el.innerHTML = '<img src="' + def.img + '" width="' + def.w + '" height="' + def.h + '"'
+      + ' loading="lazy" decoding="async" alt="' + def.alt + '">';
+  }
+}
+
+var CURRENT = null;
+function applySport(key){
+  var S = SPORTS[key];
+  if(!S || CURRENT === key) return;
+  CURRENT = key;
+
+  document.documentElement.dataset.skin = S.skin;
+  document.title = S.title;
+  setMeta('meta[name="description"]', S.desc);
+  setMeta('meta[property="og:title"]', S.title);
+  setMeta('meta[property="og:description"]', S.desc);
+  setMeta('meta[name="theme-color"]', S.theme);
+
+  Object.keys(S.t).forEach(function(k){
+    document.querySelectorAll('[data-t="' + k + '"]').forEach(function(el){
+      if(S.t[k].indexOf("<") >= 0) el.innerHTML = S.t[k]; else el.textContent = S.t[k];
+    });
+  });
+
+  var tt = document.querySelector(".ticker-track");
+  if(tt){
+    tt.innerHTML = S.ticker.map(function(w){ return "<span>" + w + "</span>"; }).join("");
+    loopTrack(tt);
+  }
+  loopTrack(document.querySelector(".qtrack"));
+
+  fillSlot(document.querySelector('[data-slot="hero"]'), S.media.hero);
+  ["s0","s1","s2"].forEach(function(id){
+    fillSlot(document.querySelector('[data-slot="' + id + '"]'), S.media[id]);
+  });
+
+  var waLink = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(S.wa);
+  document.querySelectorAll("[data-wa]").forEach(function(a){ a.href = waLink; });
+
+  document.querySelectorAll("[data-swap]").forEach(function(a){
+    a.href = "#" + S.otherKey;
+    a.textContent = S.other;
+  });
+
+  window.dispatchEvent(new Event("skinchange"));
+  frame();
+}
+
+/* ── the gate ── */
+var gate = document.getElementById("gate");
+function showGate(){
+  document.documentElement.classList.add("gated");
+  if(gate) gate.removeAttribute("aria-hidden");
+}
+function hideGate(){
+  document.documentElement.classList.remove("gated");
+  if(gate) gate.setAttribute("aria-hidden", "true");
+}
+function route(){
+  var key = (location.hash || "").replace("#", "");
+  if(SPORTS[key]){ applySport(key); hideGate(); }
+  else { showGate(); }
+}
+if(gate){
+  gate.querySelectorAll("[data-go]").forEach(function(b){
+    b.addEventListener("click", function(){ location.hash = b.getAttribute("data-go"); });
+  });
+}
+window.addEventListener("hashchange", route);
+
+/* a bare URL always shows the gate; a direct #tennis / #padel link goes straight in */
+applySport(SPORTS[(location.hash || "").replace("#", "")] ? (location.hash || "").replace("#", "") : "tennis");
+route();
 
 /* ─────────── pointer play: magnetic buttons, tilting cards, hero parallax ─────────── */
 if(CAN_HOVER && !REDUCED){
