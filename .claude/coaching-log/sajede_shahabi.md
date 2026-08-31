@@ -18,6 +18,11 @@
 | 45° Back Extension | Active | C1 | accessory — scored as a hip hinge (glutes/hams), not trunk extension |
 | Cable Seated Row | Active | C1 | accessory, 2nd horizontal pull |
 | Kneeling Side Plank | Active | C1 | core — full-lever Side Plank is the progression |
+| Machine Leg Extension | Active | C1 | Day 3 — quad isolation, held at RPE 7 (first open-chain knee loading) |
+| Machine Lying Leg Curl | Active | C1 | Day 3 — 2nd hamstring movement; RPE 7, hams are the most DOMS-prone group |
+| Seated Machine Hip Abduction | Active | C1 | Day 3 — glute medius; replaced Cable Glute Kickback on clinical audit |
+| Machine Reverse Fly | Active | C1 | Day 3, **first exercise** — the only direct rear-delt work, her headline complaint |
+| Cable Glute Kickback | Banned | — | Never shipped. Rejected by all three audit lenses: only unsupported/unilateral lift in a machines-only cycle, and hip extension past ~15° comes from lumbar extension — the exact pattern this athlete is coached out of everywhere else. Do not reintroduce for her without a stated reason. |
 
 ---
 
@@ -154,3 +159,101 @@ reps, RPE 8, no lean-back and no lift off the seat. Clearing both opens Cycle 2'
 
 **e1RM** — none. No logged sets exist; this is her first cycle. First e1RM read comes at the
 Cycle 1 review, from her heaviest logged set on each primary.
+
+---
+
+## Cycle 01 — Plumb Line · REVISED 2026-08-31 · 2 days → 3 days
+
+> Appended, not edited. The section above is the original 2-day reasoning and stays as written.
+> This records what the constraint change did to it, before the cycle ever started.
+
+**What changed and why**
+
+The athlete told Amir she can train **3 days a week, not 2**, before week 1 began. That moves
+the only number the whole design was derived from: 45 min − ~11 min prep ÷ ~2.5 min/set was
+13 sets × 2 days = **26 sets/week**; at three days it is **41**. Amir's three calls: 3 × full
+body with a trimmed third day · third day **mandatory** from week 1 · roadmap revised directly
+rather than re-running the roadmap panel.
+
+**The declared weeks 1-10 lower-body floor deviation is GONE.** It was justified on arithmetic
+— 26 sets could not cover the ≥10 floor for quads/hams/glutes *and* the upper back she led her
+intake with. At 41 it can. All three now sit at exactly **10.0** from week 2. There is no
+margin: any week Day 3 is missed, quads and hams fall back to 6.0 and the deviation returns.
+That is why Day 3 is mandatory and why the notes card refuses to nominate it as droppable.
+
+Week 1 is a **one-week stated deviation** (2 sets of everything → quads 6.0, hams 6.0,
+glutes 8.0). Deliberate calibration, not a design gap.
+
+**What survived untouched:** the postural thesis. Posture is a hypertrophy and
+strength-through-range outcome, zero working sets to corrective drills, horizontal pull over
+vertical, machines-only. None of that was a function of day count.
+
+**Roadmap revision (Amir's call, direct rather than re-panelled)**
+- C1: 2 → 3 days; lower-body floor now clears here rather than at week 11.
+- C2: dropped "first real upper-back dose" — direct rear-delt work moved into C1.
+- C3: job changed from "pairing buys the lower-body floor" (floor now clears in C1) to
+  **pairing for density only**. Tagline → "More work, same clock".
+- C4: **absorbed the free-weight transition** from C3. The audit was right that C3 would
+  otherwise stack her first superset and her first free weight into one block, immediately
+  after a C2 teaser promising "nothing new to learn".
+- C5: unchanged. Still 5 × 5.
+
+**Day 3 (new) — the low day.** Machine Reverse Fly 3 · Machine Leg Extension 4 · Machine Lying
+Leg Curl 4 · Seated Machine Hip Abduction 3. 14 sets, cost-weighted 7.0 against 12.5 / 13.5,
+and the **shortest** session of the week (~40 min vs ~41.5 / ~41). Reverse Fly sits **first**
+deliberately: it is her headline complaint, it is the only direct rear-delt work in the cycle,
+and last position is where things get skipped.
+
+**Second adversarial panel — 8 must-fix applied**
+1. **Cable Glute Kickback removed** (all three lenses). Only unsupported/unilateral working lift
+   in a machines-only cycle; hip extension past ~15° comes from lumbar extension, the exact
+   pattern four other cards coach her out of; its own cue said "back **and up**"; its fallback
+   was a different muscle. → Seated Machine Hip Abduction (seated, bilateral, glute medius —
+   a different glute function from the two glute-max lifts already in the week).
+2. **Leg extension fallback reopened the safety-stop hole** the first audit closed, and
+   prescribed "feet low and close" — the riskiest leg-press foot position. Rewritten.
+3. **"Press until your legs are straight"** contradicted Day 1's "knees slightly soft at the
+   top" for the same joint. → "stop just short of locking your knees". Leg extension also
+   dropped to RPE 7 (first open-chain knee loading).
+4. **Lying leg curl note said "stays at RPE 7 all cycle"** — an override against three
+   autoregulation cards, using a mechanism she has never been taught. Deleted.
+5. **"Every leg muscle on a full week of work from week one"** was false (week 1 is 2 sets).
+   → "from week two".
+6. **"If a week falls apart, Day 3 is the one to lose"** contradicted the mandatory decision
+   AND the entire floor claim rests on Day 3. → short version, never dropped.
+7. **The 20-minute promise computed to ~28 min.** → "2 sets of each and one warm-up round".
+8. **Week 1 → week 2 was a single jump** from 2 sets/RPE 6/2s to 4 sets/RPE 8/3s across 41
+   sets. → middle rung: week 2 runs full sets but keeps the 2s lowering and caps RPE 7.
+
+Also applied: hard "never two gym days back to back" (all three days are leg days now, and the
+old rule only guarded the D1/D2 pair); Day 3 prep reworked to actually prime the day (bodyweight
+Squat in, Cat-Cow out — 8 of 14 sets are knee work and nothing prepped the knee); a new
+**"Being Sore Is Normal"** card (sedentary athlete, 41 sets, 3s eccentrics, alone, abroad, and
+nothing in the file answered the question she is most likely to ask in week 2); leg-curl
+cross-fallbacks capped at 3 sets so a busy machine cannot produce 8 sets of one movement; prep
+circuits levelled to ~11 min and compound rest 120 → 105s to buy back the clock.
+
+**Declined:** running the week D1 → D3 → D2 (the dose lens wanted the light day in the middle;
+the clinical lens showed that puts 4 sets of lying curl 48h before the back extension and 4 sets
+of leg extension 48h before the hack squat — the gap is the lever, not the order).
+
+**Volume & Dose — revised**
+
+| Muscle | Sets/wk | Goal | Verdict |
+|---|---|---|---|
+| Quads | 10.0 | ≥10 | **Floor cleared** (all direct sets, no secondary credit) |
+| Hamstrings | 10.0 | ≥10 | **Floor cleared** — 8 direct + 2.0 secondary |
+| Glutes | 10.0 | ≥10 | **Floor cleared** — 7 direct + 3.0 secondary |
+| Mid-back | 9.0 | 10-20 | Developing, her priority |
+| Lats | 6.0 | 10-20 | Developing |
+| Rear delts | 6.0 | — | Doubled from 3.0 — direct work pulled forward from C2 |
+| Core | 4.0 | — | Appropriate |
+| Erectors | 1.0 | — | Incidental |
+
+Sets/day 14 / 13 / 14 = 41. Cost-weighted 12.5 / 13.5 / 7.0. Session time ~41.5 / ~41 / ~40 min
+prescribed, which is what leaves room for ramp sets and a queue against the 45-minute ceiling.
+
+⚠️ **The three 10.0s have zero margin and lean on the convention.** Quads are 10 direct sets and
+genuinely clean. Hamstrings carry 2.0 of 0.5-credit (hip thrust, back extension) and glutes carry
+3.0 (leg press, hack squat) — under a direct-sets-only reading, only quads clear. Stated here
+rather than smoothed over. Buying real margin costs session time that does not exist at 45 min.
