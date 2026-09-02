@@ -88,9 +88,9 @@ slides.append(f'''<div class="post-canvas tpl-big fa light" id="s4">
   {ballimg(-16, 700, 66, 12)}
   {HEADER}
   <div class="body-wrap">
-    <h1>تو کارِ خودت رو کردی.</h1>
+    <h1>تو کارِ خودت رو کردی.</h1>
   </div>
-  <div class="footnote">ولی <span class="acc">نتیجه</span> هیچ‌وقت دستِ تو نبود.</div>
+  <div class="footnote">ولی <span class="acc">نتیجه</span> هیچ‌وقت دستِ تو نبود.</div>
 </div>''')
 
 # 05 — light
@@ -101,7 +101,7 @@ slides.append(f'''<div class="post-canvas tpl-big fa light" id="s5">
   <div class="body-wrap">
     <h1>فکر می‌کنیم اگه تلاش کنیم، به چیزی که می‌خوایم <span class="hl">می‌رسیم</span>.</h1>
   </div>
-  <div class="footnote">ولی این‌طوری نیست. و پذیرفتنش، سخت‌ترین قسمتشه.</div>
+  <div class="footnote">ولی این‌طوری نیست.<br>و پذیرفتنش سخته.</div>
 </div>''')
 
 # 06 — light
@@ -112,7 +112,7 @@ slides.append(f'''<div class="post-canvas tpl-big fa light" id="s6">
   <div class="body-wrap">
     <h1>فکر می‌کنیم فقط <span class="hl">نتیجه</span> مهمه.</h1>
   </div>
-  <div class="footnote">ولی نتیجه دستِ تو نیست؛ فقط کاری که می‌کنی دستِ توئه.</div>
+  <div class="footnote">ولی نتیجه دستِ تو نیست؛<br>فقط کاری که می‌کنی دستِ توئه.</div>
 </div>''')
 
 # 07 — dark, the resolution
@@ -129,7 +129,7 @@ slides.append(f'''<div class="post-canvas tpl-big fa dark" id="s7">
 # 08 — CTA (dark)
 slides.append(f'''<div class="post-canvas tpl-cta fa dark" id="s8">
   {ghost('۰۸', 640, 30, 620)}
-  {ballimg(102, 778, 62, -10)}
+  {ballimg(102, 781, 62, -10)}
   {HEADER}
   <div class="body-wrap">
     <div class="stamp-tag">نوبتِ توئه</div>
@@ -240,16 +240,16 @@ html,body{{background:#16161a;color:var(--paper);font-family:var(--fa);}}
 /* ===== TPL-BIG ===== */
 .tpl-big .body-wrap{{position:absolute;left:var(--pad-edge);right:var(--pad-edge);top:240px;z-index:2;}}
 .tpl-big h1{{font-weight:800;letter-spacing:-0.01em;}}
-.tpl-big .footnote{{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:190px;z-index:2;
-  font-size:50px;font-weight:600;color:rgba(244,244,240,.82);line-height:1.5;}}
-.light .footnote{{color:rgba(26,26,26,.74);}}
+.tpl-big .footnote{{position:absolute;left:var(--pad-edge);right:var(--pad-edge);bottom:170px;z-index:2;
+  font-size:72px;font-weight:700;color:rgba(244,244,240,.90);line-height:1.4;letter-spacing:-0.01em;}}
+.light .footnote{{color:rgba(26,26,26,.86);}}
 
 /* ===== TPL-CTA ===== fixed top, never translateY — html2canvas ignores transforms */
 .tpl-cta .body-wrap{{position:absolute;left:var(--pad-edge);right:var(--pad-edge);top:330px;z-index:2;}}
 .tpl-cta .stamp-tag{{margin-bottom:28px;}}
 .tpl-cta .cta-setup{{font-size:46px;font-weight:600;color:rgba(244,244,240,.85);margin-bottom:14px;}}
 .tpl-cta h1{{font-weight:800;letter-spacing:-0.01em;}}
-.tpl-cta .cta-prompt{{font-size:44px;font-weight:500;color:rgba(244,244,240,.80);margin-top:38px;line-height:1.55;max-width:840px;}}
+.tpl-cta .cta-prompt{{font-size:54px;font-weight:600;color:rgba(244,244,240,.88);margin-top:36px;line-height:1.45;max-width:880px;}}
 .tpl-cta .actions{{display:flex;gap:16px;margin-top:96px;flex-wrap:wrap;}}
 .cta-btn{{display:inline-flex;align-items:center;gap:12px;padding:22px 32px;border-radius:999px;
   font-size:26px;font-weight:600;}}
