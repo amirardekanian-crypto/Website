@@ -13,8 +13,9 @@ recorded.
 | `fast-feet-overlay-alpha.webm` | VP9 + alpha, 60fps. True transparency. |
 | `fast-feet-overlay-black-screenblend.mp4` | H.264 on pure black, 60fps. For **Screen** blend mode — the path that works in every version of CapCut, mobile included. |
 
-A ProRes 4444 `.mov` (also true alpha, ~34MB) is **not committed** — re-render it from the
-HTML with the pipeline below when it's needed.
+A ProRes 4444 `.mov` (also true alpha, ~30MB — ProRes is near its bitrate floor on this
+content, so `-bits_per_mb` barely moves it) is **not committed** — re-render it from the HTML
+with the pipeline below when it's needed.
 
 ## Using them in CapCut
 
@@ -38,7 +39,7 @@ ffmpeg -y -framerate 60 -i frames/f%04d.png -c:v libvpx-vp9 -pix_fmt yuva420p \
 
 # true alpha, ProRes 4444
 ffmpeg -y -framerate 60 -i frames/f%04d.png -c:v prores_ks -profile:v 4444 \
-  -pix_fmt yuva444p10le -vendor apl0 -alpha_bits 8 -bits_per_mb 500 out.mov
+  -pix_fmt yuva444p10le -vendor apl0 -alpha_bits 8 -bits_per_mb 190 out.mov
 
 # black plate for Screen blend
 ffmpeg -y -f lavfi -i color=c=black:s=1080x1920:r=60 -framerate 60 -i frames/f%04d.png \
