@@ -134,6 +134,27 @@ is just the quick-reference.
 - **Delivery — the deliverable is the HTML file itself**, sent directly so Amir can open/preview/screen-record it himself. **No MP4 unless explicitly asked**; no per-beat screenshot walls; no audit workflow for a routine draft. The `/reel` skill's Step 9 covers the Playwright+ffmpeg export pipeline for when an MP4 *is* requested.
 - ⚠ Reels 1–3 (and reel-5, Farsi) predate the current rules or the language directive — copy mechanics only, not styling/language, from those files. Never retro-edit shipped reels; start a new numbered file.
 
+## Recipe: transparent video overlay (9:16, 1080×1920) — for CapCut
+
+A motion graphic that sits **over Amir's own talking-head footage**, not a standalone post.
+Built like a reel (animated self-contained HTML canvas) but **rendered frame-by-frame with a
+real alpha channel** instead of screen-recorded. Full how-to, the ffmpeg commands and the two
+pipeline invariants: [`overlays/README.md`](overlays/README.md). Reference build:
+[`overlays/overlay-fast-feet.html`](overlays/overlay-fast-feet.html) (FAST FEET ≠ FAST, 4.00s).
+
+- **Ship three files**: the HTML source, a VP9+alpha `.webm`, and an H.264-on-black `.mp4`
+  for **Screen** blend mode. The MP4 is the headline deliverable — it is the only route that
+  works in *every* CapCut, mobile included; alpha video only imports on desktop.
+- **Therefore: design light-on-transparent** — paper white + clay-2 `#E06B43`, no dark fills
+  or scrims, because Screen blend erases anything dark. (A text drop-shadow is fine; it just
+  disappears on that route.)
+- **Keep clear of Instagram's chrome**: content inside roughly y 640–1400, x < 920.
+- **Every animation on one `animation-delay` timeline, no class-gated reveals** — the renderer
+  scrubs `currentTime` on `document.getAnimations()`, so a reveal that only exists after a
+  class toggle is invisible to it. Same family of trap as the reel `?beat=N` gotcha.
+- Render with [`../scripts/render_overlay_frames.js`](../scripts/render_overlay_frames.js)
+  (Playwright + `omitBackground:true`), then encode. `ffmpeg` needs installing in the sandbox.
+
 ## Recipe: result cards & app mockups
 
 - [`card-preview.html`](card-preview.html) = the **app-card library**: every program.html/coach.html card rebuilt with real class names (cycle card, day card, cycle meter, exercise checklist, readiness, session complete, chat, coach triage, charts). Use it when a design must mirror the product.
