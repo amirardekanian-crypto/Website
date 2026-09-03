@@ -192,6 +192,35 @@ Beyond scoring, three more things live in more than one place:
 - **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
   server (`public.hab_titles`). Both are append-only; neither may ever subtract.
 
+### ⚖️ Body weight is NOT a habit and is NOT scored — keep it that way
+
+Added 2026-09-03 (Amir: *"add a weight tracker, with history … push my clients to open the
+habit tracker"*). Kilograms, **opt-in** (`CFG.wt.on`, off by default, toggled in
+Settings → Body weight), and **deliberately outside the whole scoring system**: no XP on
+either side, no `xp_rules` key, not in `HABITS`/`live()`/`rosterOn()`, never written to
+`LOG`. It is the one feature that is *not* on the scored-twice table above, and the reason
+it was cheap and safe to ship. Full account in `HABITS.md`; the "don't make it pay"
+argument in `XP_SYSTEM.md` §6.4.
+
+⚠️ **It has its own payload key — `<id>_hab_wt` — and three real bugs are why.** In
+`LOG[day]` the server's `hab_xp()` would pay `customXp` for it as an unrecognised numeric
+key (scoring on the **board** and nowhere else), and the log merge's `max()` would make a
+loss unrecordable and let a stale phone overwrite a correction for ever. On `CFG` the
+wholesale config adoption would delete it exactly as it once deleted earned rewards. Its
+merge is its own: **union by date, newest `t` wins**. **Zero SQL** — `save_progress`
+merges payload keys at the top level and whitelists nothing, `get_progress` returns the
+whole blob, and `coach.html` already selects `data` entire.
+
+UI: `renderWtRow()` is the only thing above the habit list on Today and earns it by
+deleting itself once answered (a **Weigh in** button before, number-and-trend after);
+`renderWeight()` is an overlay screen in the `renderDetail()` idiom with **7 day / 1 month
+/ 3 month** ranges; `renderSettingsWeight()` holds the switch and **never deletes readings
+when switched off**; `weightPanel()` in `coach.html` → Proof shows Amir the trend. The
+chart is the app's **first and only chart** — line is a 7-day rolling average, dots are the
+raw readings, every quoted change compares average to average, because daily weight swings
+a kilo on water alone. Never put it on the board, the wall, or `data/<id>.json`.
+`privacy.html` §2.3 names it and rests on **explicit consent (GDPR Art. 9(2)(a))**.
+
 ### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
 
 (Amir, 2026-07-30: *"lets say for example 5 habits are mandatory for everyone … then someone

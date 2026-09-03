@@ -774,6 +774,71 @@ like every one else."*
 The streak and the seven-day count were never lost — both are on Today and Progress, where
 they are the point. The rank was nowhere on Crew at all.
 
+## Body weight — the one thing here that is not a habit
+
+Added 2026-09-03 (Amir: *"my aim is to add a weight tracker, with history … the aim is to
+push my clients to open the habit tracker so they start using it"*). **Kilograms only,
+opt-in, and deliberately outside the entire scoring system.**
+
+**It is not a habit and must never become one.** A habit has a target you either hit or
+miss; body weight has neither, and wiring it into `dayParts()`/`dayPct()`/`isPerfect()`
+would mean *not weighing* drags a day score down. It pays **no XP on either side**, which
+is what keeps it off the "scored twice" table in `CLAUDE.md` entirely — there is no
+`xp_rules` key to mirror, because there is no rule.
+
+**⚠️ It has its own storage key, and that is not a style choice.** `<id>_hab_wt`, a
+sibling of `_hab_cfg`/`_hab_log` in the same `save_progress` payload. Three separate bugs
+are avoided by keeping it out of the other two:
+
+| If it lived in… | What breaks |
+|---|---|
+| `LOG[day]` | `hab_xp()` pays `customXp` for any numeric key it does not recognise (stage24, capped at `maxCustom`). Weight would score on the **leaderboard** and nowhere else — the silent two-scorer drift this app fears most. |
+| `LOG[day]` | The cloud log merge takes **`max()` per key**. Right for "did you do it", fatal for "what is it": a stale phone holding 80.0 beats a corrected 78.4 for ever and a loss can never be recorded. |
+| `CFG` | The config merge **adopts a newer cloud copy wholesale**. That is exactly the bug that deleted earned rewards until `CFG.pass.owned` was special-cased into a union. |
+
+Its merge rule is therefore its own: **union by date, newest `t` wins that date.** Every
+entry carries the timestamp it was written at, which is what makes "newest" mean *recorded
+later* rather than *synced later*. See `syncFromCloud()`.
+
+**No SQL was needed, and none is needed to extend it.** `save_progress` merges payload
+keys at the top level (`data || excluded.data`) and whitelists nothing; `get_progress`
+returns the whole blob; `coach.html` already selects `data` entire. A fourth key would be
+just as free.
+
+**Where it lives in the UI**
+- **Today** — `renderWtRow()`, the *only* thing allowed above the habit list. It earns
+  that spot by removing itself: before you weigh it is a **Weigh in** button, after you
+  weigh it is one line of number-plus-trend that links to the history. Same
+  self-deleting pattern as the tour prompt and the roll-call pointer further down. Hidden
+  entirely when the feature is off or a past day is being backfilled.
+- **The weight screen** (`renderWeight()`, `UI.screen === 'weight'`) — an OVERLAY, not a
+  tab: no tab lights up, and it gets the same back chevron as Settings and the manual.
+  Built in the `renderDetail()` idiom on purpose (hero figure, stat triptych, history
+  list) so it reads as a screen this app already had.
+- **Settings → Body weight** (`renderSettingsWeight()`, `UI.sub === 'weight'`) — the
+  on/off switch and the explanation. **Switching it off never deletes a reading**; a
+  feature that bins three months of history on a toggle is one nobody can safely try.
+- **`coach.html` → an athlete → Proof** — `weightPanel()`, which is *absent* rather than
+  empty when there is nothing to show.
+
+**The chart is the app's first and only chart** (every other `<svg>` in `habits.html` is
+an icon). Inline SVG, `.wtchart`, points placed **by date** across the window so a week
+nobody weighed reads as a gap rather than being closed up. **The line is a
+`WT_AVG_WINDOW`-day (7) rolling average and the dots are the raw readings behind it** —
+and `wtChange()` compares an average against an average, never one morning against
+another. Daily weight swings a kilo on water and food alone; anything else would report
+noise as progress, which is the single thing a weight chart must not do. Ranges are
+**7 days / 1 month / 3 months** (`WT_RANGES`).
+
+Edge cases are handled and proven: a single reading draws a dot and no line, a perfectly
+flat series is given a kilo of vertical room rather than dividing by zero, an empty series
+renders copy instead of a chart, and readings are clamped to `WT_MIN`–`WT_MAX` (25–350 kg)
+and rounded to one decimal so a fat-fingered 784 cannot flatten the chart.
+
+**Privacy.** It never reaches the leaderboard, the wall, or `data/<id>.json`. `privacy.html`
+§2.3 now names it explicitly and relies on **explicit consent** (GDPR Art. 9(2)(a)) —
+switching the feature on *is* that consent — because body weight is health information.
+
 ### Settings — behind the initials button, and it is a LIST OF DOORS
 Redesigned 2026-08-01 (Amir, with a reference screen: *"i want the habits to be modified
 in its own tab like this … plus a back button needs to be added everywhere that you go
