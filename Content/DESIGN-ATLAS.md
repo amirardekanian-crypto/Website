@@ -137,23 +137,34 @@ is just the quick-reference.
 ## Recipe: transparent video overlay (9:16, 1080×1920) — for CapCut
 
 A motion graphic that sits **over Amir's own talking-head footage**, not a standalone post.
-Built like a reel (animated self-contained HTML canvas) but **rendered frame-by-frame with a
-real alpha channel** instead of screen-recorded. Full how-to, the ffmpeg commands and the two
+Built like a reel (animated self-contained HTML canvas) but **rendered frame-by-frame** instead
+of screen-recorded. Full how-to, the ffmpeg commands, the CapCut steps for each path, and the
 pipeline invariants: [`overlays/README.md`](overlays/README.md). Reference build:
 [`overlays/overlay-fast-feet.html`](overlays/overlay-fast-feet.html) (FAST FEET ≠ FAST, 4.00s).
 
-- **Ship three files**: the HTML source, a VP9+alpha `.webm`, and an H.264-on-black `.mp4`
-  for **Screen** blend mode. The MP4 is the headline deliverable — it is the only route that
-  works in *every* CapCut, mobile included; alpha video only imports on desktop.
-- **Therefore: design light-on-transparent** — paper white + clay-2 `#E06B43`, no dark fills
-  or scrims, because Screen blend erases anything dark. (A text drop-shadow is fine; it just
-  disappears on that route.)
+- **There's no one universal CapCut path — ship for all three, in this priority order**:
+  Blend mode (**Screen**, on an H.264-on-black `.mp4`) → Chroma Key (on an H.264-on-solid-
+  green `.mp4`) → true alpha import (`.webm`/ProRes `.mov`, desktop only). Which one a given
+  install of CapCut has varies — the black+Screen `.mp4` is *not* universal, some builds have
+  Chroma Key but no blend modes at all.
+- **Therefore: design light-on-transparent** in the alpha source — paper white + clay-2
+  `#E06B43`, no dark fills or scrims, because Screen blend erases anything dark. (A text
+  drop-shadow is fine there; it just disappears on that route.)
+- **A green-screen build is a reworked source, never a recolor.** A hard chroma keyer can't
+  hold partial transparency — anything held at a fixed low opacity for more than an instant
+  (a "resting" state drawn via `opacity`, a translucent guide line) bakes into a near-green
+  color and comes back as a smear, not a clean removal. Swap those to `filter:brightness()`
+  or a solid opaque tone instead; leave brief, moving soft edges (motion-blur trails, a quick
+  glow flash) alone — read the full reasoning and the exact fixes in `overlays/README.md`.
+  **Verify by simulating a key over a test frame**, not by eyeballing the raw green render —
+  that's the only way the footprint/hairline bug above was actually caught.
 - **Keep clear of Instagram's chrome**: content inside roughly y 640–1400, x < 920.
 - **Every animation on one `animation-delay` timeline, no class-gated reveals** — the renderer
   scrubs `currentTime` on `document.getAnimations()`, so a reveal that only exists after a
   class toggle is invisible to it. Same family of trap as the reel `?beat=N` gotcha.
 - Render with [`../scripts/render_overlay_frames.js`](../scripts/render_overlay_frames.js)
-  (Playwright + `omitBackground:true`), then encode. `ffmpeg` needs installing in the sandbox.
+  (Playwright; `omitBackground:true` for alpha, an `opaque` flag for a baked-color build),
+  then encode. `ffmpeg` needs installing in the sandbox.
 
 ## Recipe: result cards & app mockups
 
