@@ -800,6 +800,18 @@ Its merge rule is therefore its own: **union by date, newest `t` wins that date.
 entry carries the timestamp it was written at, which is what makes "newest" mean *recorded
 later* rather than *synced later*. See `syncFromCloud()`.
 
+⚠️ **A deletion is a tombstone — `{ kg: null, t }` — never `delete WT[day]`.** The union
+loop only walks the keys the **cloud** has, so removing a key outright is invisible to the
+other device: it still holds the reading, keeps it through the merge, and re-uploads it on
+its next push. The reading returns and nothing the athlete does removes it — the same class
+of bug `_dirtyDays` exists to stop on the habit log, arriving through a different door.
+Recording the delete instead lets the merge compare it like any other write, so a newer
+tombstone deletes everywhere and a newer reading revives a day that was deleted and then
+weighed again. Every reader goes through `wtKg()`, which returns null for a non-numeric
+`kg`, so tombstones are invisible to the chart, stats, list and count without any of them
+knowing they exist. They are **not pruned**: a prune on one device is itself a silent
+delete the other would undo.
+
 **No SQL was needed, and none is needed to extend it.** `save_progress` merges payload
 keys at the top level (`data || excluded.data`) and whitelists nothing; `get_progress`
 returns the whole blob; `coach.html` already selects `data` entire. A fourth key would be
