@@ -840,6 +840,21 @@ just as free.
 - **`coach.html` → an athlete → Proof** — `weightPanel()`, which is *absent* rather than
   empty when there is nothing to show.
 
+**What the history screen answers, and why each number is there** (Amir, 2026-09-04:
+*"there should be a way to check their progress"*):
+
+| Number | Scope | Why |
+|---|---|---|
+| The 76px hero | latest reading | What you are now. |
+| **Change** | the selected chip | What moved inside the window you are looking at. |
+| **Per week** | the selected chip | `wtRate()` — normalised to a week, so a stall is visible while a total is still creeping. Divided by the span the readings **actually cover**, never the nominal range: ten days of history on the 90-day chip is not twelve weeks, and dividing by twelve would report a real half-kilo week as a rounding error. Returns null under 5 days rather than guessing. |
+| **Since you started** | all history | `wtSince()` — first reading, total change, weeks elapsed. This is the one that answers *is it working*, and until it existed the screen genuinely could not: `wtChange()` only ever measures inside the chip, so an athlete twelve weeks in reading the 7-day view saw −0.2 and had no idea they were down 3.1. |
+| **Your readings** | last 8, or all | Collapsed by default to keep the screen short; the header doubles as the toggle (`CFG.wt.allReads`, the same CFG-not-UI memory the milestone tiers use) and shows `LAST 8 OF 58`. Nothing is hidden — the record exists so someone six months in can still see week one. |
+
+`WT_RANGES` carries **four** forms of each span (`label`, `phrase`, `span`, `ago`) because
+English needs all four and none can be derived by chopping words off another — a first
+attempt built the hero's line by stripping "the last " and printed *"−1.0 kg in month"*.
+
 **Reuse the app's vocabulary — do not invent components here.** The range switcher is
 `.chip`/`.chip-on` pills (what Crew uses for Roll call ↔ Leaderboard); the screen is
 `renderDetail()`'s furniture (76px `.figure`, `.block` sections, the three-up `.statnum`

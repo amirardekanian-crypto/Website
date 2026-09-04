@@ -3141,10 +3141,14 @@ const WT_MIN = 25, WT_MAX = 350;
 // `label` is the chip. `phrase` is the same span inside a sentence, because
 // "nothing in the last 1 month" is not English and the chip cannot be reworded
 // without making the three of them stop lining up.
+// Four forms of the same span, because English needs all four and none of them
+// can be derived from another by chopping words off the front: `label` is the
+// chip, `phrase` goes after "nothing in", `span` goes after "in", and `ago`
+// labels the far end of the chart.
 const WT_RANGES = [
-  { key: '7',  days: 7,   label: '7 days',   phrase: 'the last 7 days',  ago: '7 days ago'  },
-  { key: '30', days: 30,  label: '1 month',  phrase: 'the last month',   ago: 'a month ago' },
-  { key: '90', days: 90,  label: '3 months', phrase: 'the last 3 months', ago: '3 months ago' }
+  { key: '7',  days: 7,   label: '7 days',   phrase: 'the last 7 days',   span: '7 days',   ago: '7 days ago'   },
+  { key: '30', days: 30,  label: '1 month',  phrase: 'the last month',    span: 'a month',  ago: 'a month ago'  },
+  { key: '90', days: 90,  label: '3 months', phrase: 'the last 3 months', span: '3 months', ago: '3 months ago' }
 ];
 // Daily bodyweight swings on water, food and time of day — a kilo either way is
 // normal and means nothing. The LINE is a 7-day rolling average, the raw
@@ -3193,7 +3197,7 @@ function defaultCfg() {
            // habits"). Weight earns no XP, sits in no roster, and cannot move a
            // day score — switching it on or off costs a point either way.
            // `range` is just which tab of the chart they last looked at.
-           wt:{ on:false, range:'30' },
+           wt:{ on:false, range:'30', allReads:false },
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().
            msOpen:null };
@@ -3475,6 +3479,36 @@ function wtChange(days) {
   if (s.length < 2) return null;
   return { from: s[0].kg, to: s[s.length - 1].kg, delta: s[s.length - 1].kg - s[0].kg, n: s.length };
 }
+// The whole record, not a window. THIS is the answer to "is it working" —
+// `wtChange(range)` only ever measures inside the range you happen to be
+// looking at, so an athlete twelve weeks in reading the 7-day view sees −0.2
+// and has no idea they are down 3.1 overall.
+function wtSince() {
+  const d = wtDays();
+  if (d.length < 2) return null;
+  const first = d[0], last = d[d.length - 1];
+  const days = Math.max(1, Math.round((parseKey(last) - parseKey(first)) / 86400000));
+  return {
+    from: wtKg(first), to: wtKg(last), day: first,
+    delta: wtKg(last) - wtKg(first),
+    days, weeks: days / 7, reads: d.length
+  };
+}
+// kg per week, over the span the readings ACTUALLY cover — not over the nominal
+// range. Someone with ten days of history looking at the 90-day view has not
+// been at it for twelve weeks, and dividing by twelve would report a real
+// half-kilo week as a rounding error.
+function wtRate(days) {
+  const ser = wtAvgSeries(days);
+  if (ser.length < 2) return null;
+  const span = Math.max(1, Math.round((parseKey(ser[ser.length - 1].day) - parseKey(ser[0].day)) / 86400000));
+  // Five days, not seven. A 7-day window whose first and last readings are
+  // Monday and Saturday spans six — demanding a full seven left the 7-day view
+  // permanently showing a dash for a week that plainly happened. Under five is
+  // still refused: that is not a weekly rate, it is two mornings and a guess.
+  if (span < 5) return null;
+  return (ser[ser.length - 1].kg - ser[0].kg) / (span / 7);
+}
 // One reading per DATE, replacing whatever that date held. `t` is what the
 // multi-device union sorts on, so it has to move every time the number does.
 function setWeight(dayKey, kg) {
@@ -3502,7 +3536,7 @@ function loadLocal() {
   try { WT = JSON.parse(localStorage.getItem(K_WT()) || '{}') || {}; } catch (e) { WT = {}; }
   // A config written before this build has no `wt` at all, and Object.assign
   // above would have left it undefined rather than at the default.
-  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30' };
+  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30', allReads:false };
   try {
     const m = JSON.parse(localStorage.getItem(K_META()) || '{}');
     SYNC.dirty = !!m.dirty; SYNC.lastOk = m.lastOk || null;
@@ -3848,7 +3882,7 @@ async function syncFromCloud() {
         // A preference, not a possession, so the newer config wins it like dark
         // mode does — but a config written before weight existed carries no `wt`
         // at all, and every reader below assumes the object is there.
-        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30' };
+        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30', allReads:false };
         const mineOwned = keepPass.owned || [], theirsOwned = CFG.pass.owned || [];
         CFG.pass.owned = theirsOwned.concat(mineOwned.filter(id => theirsOwned.indexOf(id) < 0));
         // What they were WEARING is a preference, not a possession, so the newer
@@ -7826,12 +7860,24 @@ function renderWeight() {
   const r = wtRange();
   const latest = wtLatest(), c = wtChange(r.days);
   const inRange = wtSeries(r.days);
-  const rows = wtDays().slice(-8).reverse();
+  // Last eight by default so the screen stays short, but nothing is hidden — the
+  // record exists precisely so an athlete six months in can still see week one.
+  // Kept on CFG rather than UI, like the milestone tiers: a choice that survives
+  // a reload is a memory, one that does not is a nuisance.
+  const allDays = wtDays();
+  const showAll = !!(CFG.wt && CFG.wt.allReads);
+  const rows = (showAll ? allDays : allDays.slice(-8)).reverse();
   const unit = (n, u) => n + '<span class="su">' + u + '</span>';
+  const rate = wtRate(r.days);
+  const since = wtSince();
+  // The count moved into the "since you started" block below — a raw tally of
+  // readings is context for the record, not one of the three numbers that
+  // answer how it is going. The rate took its place because a rate is the thing
+  // a coach reads: it makes a stall visible while a total is still climbing.
   const stats = latest ? [
     { v: unit(fmtKg(latest.kg), 'kg'), k: 'Latest' },
     { v: c ? unit(fmtDelta(c.delta), 'kg') : '&mdash;', k: 'Change' },
-    { v: unit(wtCount(), wtCount() === 1 ? 'read' : 'reads'), k: 'All time' }
+    { v: rate !== null ? unit(fmtDelta(rate), 'kg/wk') : '&mdash;', k: 'Per week' }
   ] : [];
   return `
     <div data-k="screen:weight" style="${screenAnim()}">
@@ -7842,7 +7888,7 @@ function renderWeight() {
           <div class="figure" data-hero style="font-size:76px;line-height:.8">${esc(fmtKg(latest.kg))}</div>
           <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
             <div class="hd" style="font-size:16px;line-height:1">KILOGRAMS</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(wtDayLabel(latest.day))}${c ? ' &middot; ' + esc(fmtDelta(c.delta)) + ' kg in ' + esc(r.phrase.replace('the last ', '')) : ''}</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(wtDayLabel(latest.day))}${c ? ' &middot; ' + esc(fmtDelta(c.delta)) + ' kg in ' + esc(r.span) : ''}</div>
           </div>
         </div>` : `<div class="hd" style="font-size:26px;line-height:1">Nothing yet</div>`}
         <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">Not a habit, not scored, and nobody else can see it. Weigh at the same time of day and let the line do the talking.</p>
@@ -7879,7 +7925,27 @@ function renderWeight() {
         </div>`).join('')}
       </div>` : ''}
 
-      ${rows.length ? rows.map(k => {
+      ${since ? `<div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Since you started</span><span>${since.reads} READING${since.reads === 1 ? '' : 'S'}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div class="hd" style="font-size:34px;line-height:1;color:var(--accent)">${esc(fmtDelta(since.delta))}<span class="su" style="font-size:15px">kg</span></div>
+          <div style="font-size:12.5px;line-height:1.35;color:var(--muted)">
+            ${esc(fmtKg(since.from))} kg on ${esc(parseKey(since.day).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }))}<br>
+            ${since.weeks < 2 ? esc(since.days) + ' days ago' : esc(String(Math.round(since.weeks))) + ' weeks ago'}
+          </div>
+        </div>
+      </div>` : ''}
+
+      ${rows.length ? (allDays.length > 8
+        ? `<button class="eyebrow sectlbl msth${showAll ? ' open' : ''}" data-k="wtall" ${on(() => {
+            CFG.wt.allReads = !showAll; saveCfg(); render();
+          })}>
+            <span>Your readings</span>
+            <span class="msth-r"><span>${showAll ? 'ALL ' + allDays.length : 'LAST 8 OF ' + allDays.length}</span><svg class="chev" viewBox="0 0 12 8"><path d="M1 1.5 6 6.5 11 1.5"/></svg></span>
+          </button>`
+        : sectionLabel('Your readings', 'Tap to correct')) + rows.map(k => {
         const kg = wtKg(k), prev = wtDays().filter(d => d < k).pop();
         const d = prev !== undefined ? kg - wtKg(prev) : null;
         return `<button class="row-rule" data-k="wtr:${k}" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:13px 20px"
@@ -8416,6 +8482,7 @@ function renderManual() {
         p(`Optional, and <strong style="color:var(--ink)">off until you switch it on</strong> — Settings, then Body weight. It is the one thing in this app that is not a habit: it earns <strong style="color:var(--ink)">no XP</strong>, it is in no streak, it cannot make a day perfect and it cannot spoil one. Switching it on or off costs you nothing either way, and switching it off keeps every reading you have taken.`) +
         p(`When it is on, a <strong style="color:var(--ink)">Body weight</strong> card sits under your habits on Today, with your number, the month's direction and a small trend line on it. It says <strong style="color:var(--ink)">Weigh in</strong> until you have, and opens the full history either way: seven days, a month, or three.`) +
         p(`The chart draws a <strong style="color:var(--ink)">${WT_AVG_WINDOW}-day average</strong> as the line and your actual readings as dots behind it, and every change it quotes compares one average against another. That is deliberate. Weight moves a kilo either way on water, food and sleep, so a single morning tells you nothing and two mornings compared tell you less than nothing. The line is the part worth reading.`) +
+        p(`Under the chart are the numbers that answer whether it is actually working. <strong style="color:var(--ink)">Per week</strong> is your rate across whichever span you picked — a rate shows a stall while a total is still creeping. <strong style="color:var(--ink)">Since you started</strong> ignores the span entirely and compares today with your very first reading, which is the only honest answer to "am I getting anywhere". Your readings sit underneath — the last eight, or all of them if you tap the heading.`) +
         p(`Weigh at the same time of day, ideally first thing. Consistency of method beats frequency — <strong style="color:var(--ink)">once a week done properly</strong> is worth more than seven rushed readings, and the app never asks you for one you did not offer.`) +
         p(`It is <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone.</strong> It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`))}
 
