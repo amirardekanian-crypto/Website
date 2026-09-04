@@ -82,7 +82,7 @@
         ],
         "outcomes": [
           "Squat moving again after ten weeks stuck",
-          "Trap bar back past where it was in May",
+          "Trap bar pulled clean and controlled every week, heavy rebuild deferred",
           "Three sessions a week, every week",
           "An upper back that survives a heavy playing week",
           "Your first unassisted pull-up in sight",
@@ -253,7 +253,7 @@
                     }
                   }
                 ],
-                "note": "Your knees handled bounding all last cycle with no complaints, so this is the next step up. One rule: every landing has to be silent and still before the next rep. If a landing gets noisy, you're done with that round."
+                "note": "Staying exactly as it was. Your jumps are not the problem here and I am not taking them off you. Same rule as before, every landing silent and still before the next rep. Land soft through the hips, do not catch it in the low back."
               }
             ]
           },
@@ -293,7 +293,7 @@
                     "Don't let the knees cave in as you stand up"
                   ]
                 },
-                "note": "Your squat has been on the same weight since June, at five reps with a slow lowering. That's why it never moved. Three reps and a normal speed down means the same effort now lands on a heavier bar. Start where you were and expect set one to feel easy."
+                "note": "Stay on the weight you did last session. No jump this week or next while your back settles, and that is not the program stalling, it is one deliberate pause. Brace before you unrack and keep the ribs down out of the hole. If the low back talks on a set, that is the end of the exercise, not the end of the session."
               }
             ]
           },
@@ -307,10 +307,6 @@
                 "videoUrl": null,
                 "chips": [
                   {
-                    "label": "1s top squeeze",
-                    "style": "dark"
-                  },
-                  {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
@@ -318,7 +314,7 @@
                     "label": "×8 Reps"
                   },
                   {
-                    "label": "Tempo 2-1-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
                     "label": "RPE 8"
@@ -334,9 +330,11 @@
                     "Feel the glutes doing all the work at the top"
                   ],
                   "bad": [
-                    "Don't arch the low back to finish the rep"
+                    "Don't arch the low back to finish the rep",
+                    "Don't hold the squeeze at the top, come straight back down"
                   ]
-                }
+                },
+                "note": "The hold at the top is gone while your back settles. Come up to a straight line from knee to shoulder and come straight back down. Ribs stay down, chin stays tucked. If you feel it in your low back instead of your glutes, you have gone too high."
               },
               {
                 "type": "standard",
@@ -391,7 +389,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×20s Each Side"
+                    "label": "×15s Each Side"
                   },
                   {
                     "label": "Tempo Iso"
@@ -413,7 +411,7 @@
                     "Don't let the hips sag toward the floor"
                   ]
                 },
-                "note": "New one for you. Rest the bottom knee on the bench, not the ankle, that's the easier version and it's the right place to start. Build the hold before you think about going longer."
+                "note": "You logged this at a 10 when the card said 7, so the hold comes down to fifteen seconds. Same three sets. Keep the bottom knee on the bench, not the ankle. When the hips start to sag the set is over, even if there is time left on the clock."
               }
             ]
           }
@@ -421,7 +419,7 @@
       },
       {
         "id": 2,
-        "focusTag": "Every Pull Protects Your Back",
+        "focusTag": "Every Pull Protects Your Shoulders",
         "completionTitle": "Back Built",
         "completionMessage": "Every one of those pulls is what keeps your upper back quiet after a long week on court. Get your shoulders out of the forward position for the rest of the day.",
         "blocks": [
@@ -533,7 +531,8 @@
                     "Feel the legs start it and the shoulder finish it"
                   ],
                   "bad": [
-                    "Don't press with the arm alone, no leg drive"
+                    "Don't press with the arm alone, no leg drive",
+                    "Don't lean back and arch to finish the rep"
                   ]
                 },
                 "note": "You went from 2.5 kg to 5 kg on this last cycle without a word from your shoulder. Fewer reps and a harder target this time, so 5 kg should be your floor here, not your ceiling."
@@ -686,7 +685,7 @@
               },
               {
                 "type": "standard",
-                "name": "Prone Y Raise",
+                "name": "Chest-Supported Incline Y Raise",
                 "videoUrl": null,
                 "chips": [
                   {
@@ -713,13 +712,15 @@
                 "restSec": 60,
                 "cues": {
                   "good": [
-                    "Reach the arms up into a Y shape",
-                    "Feel it low, between the shoulder blades"
+                    "Chest stays flat on the pad the whole set",
+                    "Reach the arms up into a Y and feel it low between the shoulder blades"
                   ],
                   "bad": [
-                    "Don't shrug the shoulders toward your ears"
+                    "Don't shrug the shoulders toward your ears",
+                    "Don't lift the chest off the pad to get the arms higher"
                   ]
-                }
+                },
+                "note": "This is the one you stopped before on Wednesday, and you were right to. Set the bench to about 30 or 45 degrees and lie chest down on it so the pad holds you up instead of your low back. Same job, same weight, same twelve reps. If there is no adjustable bench, do it seated leaning onto your thighs with light cables or a band."
               }
             ]
           }
@@ -727,9 +728,9 @@
       },
       {
         "id": 3,
-        "focusTag": "Throw Hard, Pull Heavy, Finish Empty",
-        "completionTitle": "Court Power Banked",
-        "completionMessage": "Rotation, a heavy pull and the engine, all in one. That bike finish is the part that shows up in the third set.",
+        "focusTag": "Nothing To Prove Today",
+        "completionTitle": "Groundwork Done",
+        "completionMessage": "Rotation, a controlled pull and the engine, all in one. You did the patient version today and that is exactly what it was meant to be. The bike finish is still the part that shows up in the third set.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -816,18 +817,14 @@
                 "videoUrl": null,
                 "chips": [
                   {
-                    "label": "max intent",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "5 Sets",
+                    "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
                     "label": "×6+6 Reps"
                   },
                   {
-                    "label": "RPE 8"
+                    "label": "RPE 7"
                   },
                   {
                     "label": "Rest 90 sec"
@@ -840,10 +837,11 @@
                     "Feel the back hip drive the turn"
                   ],
                   "bad": [
-                    "Don't throw with the arms and leave the hips behind"
+                    "Don't throw with the arms and leave the hips behind",
+                    "Don't hunt for a bigger throw by arching back on the wind-up"
                   ]
                 },
-                "note": "You used the same ball at the same effort every session last cycle. Go up one ball this time. If the throw slows down, drop back a ball and keep the five sets."
+                "note": "Stay on the ball you have been using. No heavier ball this block. Three sets instead of five, and the turn comes from the back hip and the feet, never from the low back. You already rotate all day at work, so this is quality only."
               }
             ]
           },
@@ -857,37 +855,34 @@
                 "videoUrl": null,
                 "chips": [
                   {
-                    "label": "max intent",
-                    "style": "dark"
-                  },
-                  {
-                    "label": "4 Sets",
+                    "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×4 Reps"
+                    "label": "×5 Reps"
                   },
                   {
-                    "label": "Tempo 1-0-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 8"
+                    "label": "RPE 7"
                   },
                   {
-                    "label": "Rest 2.5 min"
+                    "label": "Rest 2 min"
                   }
                 ],
-                "restSec": 150,
+                "restSec": 120,
                 "cues": {
                   "good": [
-                    "Stand up fast and push the floor away",
+                    "Set the chest and take the slack out of the bar before every rep",
                     "Feel the legs and glutes start the lift"
                   ],
                   "bad": [
-                    "Don't let the hips shoot up before the bar moves"
+                    "Don't let the hips shoot up before the bar moves",
+                    "Don't lean back and lock out hard at the top, just stand tall"
                   ]
                 },
-                "note": "This is the lift that went backwards. It was 30 kg in May and 20 kg by August. Rebuilding it is the main job of this cycle. Set your chest before every single rep, that's what keeps your upper back out of it."
+                "note": "I have changed this one. Rebuilding it was the main job of this cycle and that job is now on hold, on purpose. Three sets of five at a 7, controlled up and controlled down, and stay on 20 kg. Stand tall at the top and stop, no leaning back. The heavy version comes back when you have had a clean block, not when your back has a good day. If your back starts talking mid-set, stop this one there and move on to the next exercise. It is not coming off your program."
               }
             ]
           },
@@ -926,7 +921,8 @@
                   "bad": [
                     "Don't let the hips curl up off the seat at the bottom"
                   ]
-                }
+                },
+                "note": "Set your depth by your back, not by the machine. The rep ends the moment your hips start to curl up off the seat, and that is your bottom from now on even if the sled has further to go. Short and clean beats deep and rounded."
               },
               {
                 "type": "standard",
@@ -964,6 +960,47 @@
             ]
           },
           {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Banded Dead Bug",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×8+8 Reps"
+                  },
+                  {
+                    "label": "Tempo 2-1-2-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  },
+                  {
+                    "label": "Rest 60 sec"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Press the low back flat into the floor and keep it there the whole set",
+                    "Feel the deep abs holding while the arm and leg reach away"
+                  ],
+                  "bad": [
+                    "Don't let the low back lift off the floor as the leg goes down",
+                    "Don't hold your breath, breathe out as you reach"
+                  ]
+                },
+                "note": "This one is back, and it is back for your low back. You did every single set of it last cycle without being asked twice. It teaches your ribs and hips to stay stacked so your back stops taking the load your hips should. Only go as far as you can while the low back stays flat on the floor. That range is the exercise."
+              }
+            ]
+          },
+          {
             "title": "Conditioning",
             "icon": "🫀",
             "exercises": [
@@ -997,10 +1034,11 @@
                     "Legs and lungs both maxing out"
                   ],
                   "bad": [
-                    "Don't pace it like a steady ride, this is on and off"
+                    "Don't pace it like a steady ride, this is on and off",
+                    "Don't round over the handles when it gets hard, sit tall"
                   ]
                 },
-                "note": "This replaces the whole recovery day you never once did last cycle. Eight rounds, ten minutes, and it's the last thing you do. Any bike works if there's no air bike, and the rower is fine too if you'd rather."
+                "note": "This replaces the whole recovery day you never once did last cycle. Eight rounds, ten minutes, and it is the last thing you do. Any bike works if the air bike is taken. Not the rower though, and not now. Rowing hard when you are already tired is exactly when your back rounds. If every bike is busy, a steep treadmill walk or the stair machine does the same job."
               }
             ]
           }
@@ -1549,6 +1587,11 @@
     "greeting": "For You, Mehraneh",
     "cards": [
       {
+        "icon": "🩹",
+        "title": "Your Low Back, And What To Do With It",
+        "body": "<p>You told me about it, and you also told the app on Wednesday when you stopped before the last exercise. <strong>That was the right call and I want more of it, not less.</strong> Stopping something and writing it down never costs you training with me. It buys you a change, and you just saw one.</p><p>Here is what I have changed this week. Nothing has been taken away for good.</p><ul><li><strong>Day 3 trap bar</strong> comes down to three sets of five at a 7, same weight. The heavy rebuild is on hold</li><li><strong>Throws</strong> drop to three sets on the ball you already use</li><li><strong>Hip thrust</strong> loses the squeeze at the top, and the squat holds its weight</li><li><strong>That last Y raise</strong> now happens chest down on a bench instead of on the floor</li><li><strong>Dead bugs are back</strong> on Day 3, because your back likes being braced more than it likes being stretched</li></ul><p>You said you want to bend forward and stretch it out. That tells me your back is not enjoying being arched backwards, so everything that finishes in an arch has come off or come down. <strong>Keep training. Backs like this get better with movement, not with rest.</strong> Walking is good for it. Sitting still all evening is not.</p><p>What is normal, and you keep going:</p><ul><li>Stiffness in the morning that loosens up once you move</li><li>An ache after a long day on court that has gone by the next morning</li><li>Normal muscle soreness after a session</li></ul><p>What is not, and exactly what to do:</p><ul><li><strong>Mild and fading</strong>: finish the set and write it in the note box that night</li><li><strong>Building through the set, or changing how you move</strong>: stop that exercise. If the card has a smaller version, do that one. If it does not, move on to the next exercise. Write it in the note box either way. Do not wait to ask me first</li><li><strong>Sharp, or anything going down your leg, or pins and needles</strong>: stop the session and message me before the next one</li></ul><p>And the hard line, which is not up for discussion. <strong>Numbness or pins and needles in either leg, numbness anywhere you sit down on, any change in your bladder or bowel, or a leg suddenly feeling weak. Any one of those and you get seen the same day. Do not message me first.</strong> Same if pain starts waking you at night.</p><p>You are getting it looked at anyway. <strong>Book it by Friday 11 September and send me the date.</strong> Booking it is in your hands, being seen quickly might not be. And whatever they say, we are reviewing this together in mid October either way, even if it has been quiet for weeks by then.</p>"
+      },
+      {
         "icon": "🏆",
         "title": "Both Of Them Are Closed",
         "body": "<p>In your very first session of the last block you logged <strong>both knees at 5 out of 10</strong>. Two days later it was your right shoulder at 6 and your left at 5. Since then, thirteen sessions, and not one word about either.</p><p>That didn't happen by accident. You did the jumps every single Day 1, six for six. You did the shoulder work every single Day 2, four for four, including on the two days you rated the session a 9 out of 10. <strong>You never skipped the boring stuff, and that's exactly why it worked.</strong></p><p>So they're both signed off. The bounding in this cycle and the pressing on Day 2 are things you've earned back, not things I'm hoping you get away with.</p>"
@@ -1556,17 +1599,17 @@
       {
         "icon": "🔧",
         "title": "Why Your Squat Never Moved",
-        "body": "<p>Ten weeks, same weight, every session. And your effort rating on it climbed from a 7 to an 8 to a 10 on the last heavy set, and then you dropped the weight. <strong>That's not you stalling, that's the program stalling you.</strong></p><p>Five reps with a three second lowering is brutal. You were hitting the effort target long before the bar was ever heavy enough to grow on. So all three barbell lifts change shape this cycle:</p><ul><li><strong>Squat</strong> goes to 3 reps at normal speed, so the weight has room to climb</li><li><strong>Trap bar</strong> goes to 4 reps at a harder target, to rebuild what it lost</li><li><strong>Landmine press</strong> goes to 5 each side, one point harder</li></ul><p>Your job doesn't change. Hit the reps at the effort on the card and log it honestly. If a set lands under the target, the next one goes up. If it grinds above it, stay there another week. <strong>Dropping the weight on a bad day isn't failing, it's reading the room.</strong></p>"
+        "body": "<p>Ten weeks, same weight, every session. And your effort rating on it climbed from a 7 to an 8 to a 10 on the last heavy set, and then you dropped the weight. <strong>That's not you stalling, that's the program stalling you.</strong></p><p>Five reps with a three second lowering is brutal. You were hitting the effort target long before the bar was ever heavy enough to grow on. So all three barbell lifts change shape this cycle:</p><ul><li><strong>Squat</strong> goes to 3 reps at normal speed, so the weight has room to climb</li><li><strong>Trap bar</strong> was going to 4 reps to rebuild what it lost, and that is now on hold while your back settles. Five controlled reps at a 7 instead</li><li><strong>Landmine press</strong> goes to 5 each side, one point harder</li></ul><p>Your job doesn't change. Hit the reps at the effort on the card and log it honestly. If a set lands under the target, the next one goes up. If it grinds above it, stay there another week. <strong>Dropping the weight on a bad day isn't failing, it's reading the room.</strong></p>"
       },
       {
         "icon": "🎾",
         "title": "Your Upper Back On Heavy Weeks",
-        "body": "<p>This one never shows up in your session logs because it isn't a gym problem, it's a court problem. Hours of serving and overheads and your upper back gives out. So Day 2 is built around it now. <strong>Pulling volume has doubled and pressing is deliberately low.</strong> Face pulls, rows, Y raises. That work is the treatment, not the cause.</p><p>What's normal: a burn between the shoulder blades during the pulls, and stiffness the next day. Tightness after a long day of playing that's gone by morning. Keep training through all of that.</p><p>What isn't normal, and what to do about it:</p><ul><li><strong>Mild and fading</strong>: finish the set, write it in your log</li><li><strong>Building through the set, or changing how you move</strong>: stop that exercise, use the swap on the card, message me</li><li><strong>Sharp, or going down your arm, or pins and needles</strong>: stop the session and message me before the next one</li></ul><p>And a hard line: if you get <strong>night pain, lose rotation range, get any numbness, or the ache starts arriving earlier week to week</strong>, you're seeing a physio, no matter how you feel about it. We review this together at the end of the cycle either way.</p>"
+        "body": "<p>This one is your <strong>upper</strong> back, between the shoulder blades, and it is a separate thing from your low back. It never shows up in your session logs because it isn't a gym problem, it's a court problem. Hours of serving and overheads and your upper back gives out. So Day 2 is built around it now. <strong>Pulling volume has doubled and pressing is deliberately low.</strong> Face pulls, rows, Y raises. That work is the treatment, not the cause.</p><p>What's normal: a burn between the shoulder blades during the pulls, and stiffness the next day. Tightness after a long day of playing that's gone by morning. Keep training through all of that.</p><p>What isn't normal, and what to do about it:</p><ul><li><strong>Mild and fading</strong>: finish the set, write it in your log</li><li><strong>Building through the set, or changing how you move</strong>: stop that exercise. Do the smaller version if the card has one, otherwise move on to the next one, and message me</li><li><strong>Sharp, or going down your arm, or pins and needles</strong>: stop the session and message me before the next one</li></ul><p>And a hard line: if you get <strong>night pain, lose rotation range, get any numbness, or the ache starts arriving earlier week to week</strong>, you're seeing a physio, no matter how you feel about it. We review this together at the end of the cycle either way.</p>"
       },
       {
         "icon": "📆",
         "title": "Three Days, And Why",
-        "body": "<p>Four days hasn't happened once. You did 13 sessions out of 20 last block, and Day 4 you never opened, not a single time. That's not a discipline problem, it's a diary problem. <strong>So the fourth day is gone and the conditioning moved onto the end of Day 3.</strong></p><p>Three days you actually do beats four you don't. Nothing has been thrown away, it's just packed tighter, and every session now finishes inside an hour instead of the 80 or 90 minutes some of yours were running.</p><p>On a bad day, the rule stands: <strong>drop every effort target by one point and cut the last exercise.</strong> And if you've only got half an hour, do the first power move and the first main lift. That counts as the session, and I'd much rather have that than nothing.</p><p>You can also move the days around your week. Just keep at least one day between Day 1 and Day 3, they both hammer your legs. On a heavy week on court, take it out of Day 1 or Day 3, never Day 2. <strong>Day 2 is the one protecting your back.</strong></p>"
+        "body": "<p>Four days hasn't happened once. You did 13 sessions out of 20 last block, and Day 4 you never opened, not a single time. That's not a discipline problem, it's a diary problem. <strong>So the fourth day is gone and the conditioning moved onto the end of Day 3.</strong></p><p>Three days you actually do beats four you don't. Nothing has been thrown away, it's just packed tighter, and every session now finishes inside an hour instead of the 80 or 90 minutes some of yours were running.</p><p>On a bad day, the rule stands: <strong>drop every effort target by one point and cut the last exercise.</strong> And if you've only got half an hour, do the first power move and the first main lift. That counts as the session, and I'd much rather have that than nothing.</p><p>You can also move the days around your week. Just keep at least one day between Day 1 and Day 3, they both hammer your legs. On a heavy week on court, take it out of Day 1 or Day 3, never Day 2. <strong>Day 2 is the one protecting your upper back.</strong></p>"
       },
       {
         "icon": "😴",
