@@ -216,7 +216,10 @@ UI: `renderWtRow()` is a **white rounded card below the habit list and below its
 rejected it as inconsistent: this app is white rounded cards on lavender, and the hint
 must stay attached to the rows it explains). The card carries the number, the month delta
 and an inline sparkline, so it is the only thing on Today that shows a trend without being
-tapped. `renderWeight()` is an overlay screen built on `renderDetail()`'s own furniture —
+tapped. Its **body opens the history and its button logs** — the habit row's own law (name
+vs box); one button doing both by turns left the history unreachable before weighing.
+`renderWtProgressRow()` puts the same fact on **PROGRESS**, after the habits and before
+the quests, because that is the tab an athlete opens to check progress. `renderWeight()` is an overlay screen built on `renderDetail()`'s own furniture —
 76px figure, `.block` sections, the three-up `.statnum` triptych — with **`.chip`/`.chip-on`
 pills** for the **7 day / 1 month / 3 month** ranges, the same control Crew uses to swap
 Roll call for the Leaderboard. **Invent no new component here**: every earlier attempt to

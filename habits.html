@@ -517,8 +517,10 @@
     margin: 4px 16px 14px; padding: 16px;
     display: flex; flex-direction: column; gap: 13px;
   }
-  #app .wtp-top { display: flex; align-items: center; gap: 14px; }
+  #app .wtp-top { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; }
   #app .wtp-l { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  #app .wtp-go { flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+                 font-size: 19px; color: var(--accent); }
   #app .wtp-n {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px;
     line-height: .9; color: var(--accent); letter-spacing: -.04em;
@@ -527,7 +529,7 @@
   #app .wtp-d { font-size: 11.5px; line-height: 1.3; color: var(--muted); }
   /* preserveAspectRatio none + non-scaling-stroke: the sparkline stretches to
      whatever width is left beside the number without the stroke going with it. */
-  #app .wtp-r { width: 148px; height: 54px; flex: none; }
+  #app .wtp-r { flex: none; display: block; }
   #app .wtp-r path {
     fill: none; stroke: var(--accent); stroke-width: 2.4;
     stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke;
@@ -7458,6 +7460,16 @@ function renderProgress(LI, earned, totalAch) {
            the one nearest to falling. -->
       <!-- Quests keep their own section: they are the only thing here with a
            clock on it, and the one with least time left is the one to act on. -->
+      <!-- Weight belongs on the tab called PROGRESS. It was missing entirely
+           until Amir asked where an athlete checks their progress (2026-09-04)
+           and the honest answer was "the card on Today, or two doors deep in
+           Settings" — neither of which is where anyone looks for a trend. It
+           sits AFTER the habits and BEFORE the quests: it is a personal
+           measurement, so it groups with the personal half of the screen rather
+           than with the game half. Not a habit row — no ring, no level, no pips,
+           because it has none of those things. -->
+      ${wtOn() ? sectionLabel('Body weight', 'Tap for history') + renderWtProgressRow() : ''}
+
       ${sectionLabel('Quests', 'Seven days')}
       ${renderQuestBlock()}
 
@@ -7732,17 +7744,27 @@ function renderWtRow() {
   if (!wtOn() || editingPast()) return '';
   const t = wtToday(), l = wtLatest(), c = wtChange(30);
   const shown = t !== null ? t : (l ? l.kg : null);
+  // ⚠️ THE BODY IS ITS OWN TAP TARGET, and it is how you reach the history.
+  // The first build made the single button do both jobs by turns — "Weigh in"
+  // before you had, "See your history" after — which meant that on any morning
+  // BEFORE weighing there was no route to the history from Today at all, and
+  // the only way in was two doors deep in Settings. That is the wrong way round:
+  // the trend is exactly what someone wants to look at before they step on.
+  // The fix is the law the habit rows already teach and this card now obeys:
+  // the BODY opens the history, the BUTTON logs. Same as tapping a habit's name
+  // versus its box.
   return `<div class="wtpanel" data-k="wtpanel">
-    <div class="wtp-top">
-      <div class="wtp-l">
-        <div class="eyebrow" style="letter-spacing:.12em">Body weight</div>
-        <div class="wtp-n">${shown === null ? '&mdash;' : esc(fmtKg(shown)) + '<span class="u">kg</span>'}</div>
-        <div class="wtp-d">${esc(wtCardLine(t, l, c))}</div>
-      </div>
+    <button class="wtp-top" ${on(() => goWeight('today'))} aria-label="See your weight history">
+      <span class="wtp-l">
+        <span class="eyebrow" style="letter-spacing:.12em">Body weight</span>
+        <span class="wtp-n">${shown === null ? '&mdash;' : esc(fmtKg(shown)) + '<span class="u">kg</span>'}</span>
+        <span class="wtp-d">${esc(wtCardLine(t, l, c))}</span>
+      </span>
       ${wtSpark(30)}
-    </div>
+      <span class="wtp-go">&rarr;</span>
+    </button>
     <button class="btn ${t === null ? 'btn-primary' : 'btn-secondary'} btn-block"
-      ${on(() => (t === null ? openWtSheet(TKEY()) : goWeight('today')))}>${t === null ? 'Weigh in' : 'See your history'}</button>
+      ${on(() => openWtSheet(TKEY()))}>${t === null ? 'Weigh in' : "Correct today's weight"}</button>
   </div>`;
 }
 // Deliberately flat. Nothing here congratulates a fall or frets about a rise —
@@ -7758,16 +7780,41 @@ function wtCardLine(t, l, c) {
 }
 // The inline trend beside the number — the rolling average only, no dots and no
 // axis. It is a glance, not a chart; the chart is one tap away and says the rest.
-function wtSpark(days) {
+function wtSpark(days, width, height) {
   const ser = wtAvgSeries(days);
-  if (ser.length < 2) return '<div class="wtp-r"></div>';
-  const w = 148, h = 54;
+  const w = width || 148, h = height || 54;
+  if (ser.length < 2) return `<span class="wtp-r" style="width:${w}px;height:${h}px"></span>`;
   const vals = ser.map(p => p.kg);
   let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
   if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
   const d = ser.map((p, i) =>
     (i ? 'L' : 'M') + (i / (ser.length - 1) * w).toFixed(1) + ' ' + (h - (p.kg - lo) / (hi - lo) * h).toFixed(1)).join(' ');
-  return `<svg class="wtp-r" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+  return `<svg class="wtp-r" style="width:${w}px;height:${h}px" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+
+// The Progress row. Wears the same shape as the habit rows above it — full
+// width, a rule under it, name on its own line with the facts beneath — but
+// carries a sparkline where a habit carries its consistency pips, because a
+// trend is what this thing has instead of tiers.
+function renderWtProgressRow() {
+  const l = wtLatest(), c = wtChange(30);
+  return `<button class="row-rule" data-k="wtprow" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px"
+    ${on(() => goWeight('progress'))}>
+    <span style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+      <!-- The section label above already says "Body weight"; the row saying it
+           again is the same fact printed twice in 40px. The NUMBER is what the
+           row is for, so the number takes the line a habit gives its name. -->
+      <span class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">
+        <span style="flex:none">&#9878;</span><span>${l ? esc(fmtKg(l.kg)) + ' kg' : 'Not started'}</span>
+      </span>
+      <span style="font-size:11.5px;line-height:1.3;color:var(--muted)">${l
+        ? (c ? esc(fmtDelta(c.delta)) + ' kg this month' : 'building a line')
+          + ' &middot; ' + wtCount() + ' reading' + (wtCount() === 1 ? '' : 's')
+        : 'Weigh in from Today and this fills up'}</span>
+    </span>
+    ${wtSpark(30, 96, 34)}
+    <span class="hd" style="flex:none;font-size:19px;color:var(--accent)">&rsaquo;</span>
+  </button>`;
 }
 
 function goWeight(from) {

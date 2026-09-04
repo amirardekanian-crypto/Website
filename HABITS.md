@@ -810,6 +810,10 @@ just as free.
   `.rowhint`**. Two states: *Weigh in* before you have, *See your history* after, with the
   number, the month delta and an inline sparkline (`wtSpark()`) either way. Hidden
   entirely when the feature is off or a past day is being backfilled.
+  ⚠️ **The BODY opens the history, the BUTTON logs** — the same law the habit rows teach
+  (name vs box). The first build let one button do both jobs by turns, which meant that
+  before weighing there was *no route to the history from Today at all*. That is backwards:
+  the trend is exactly what someone wants to see before stepping on the scale.
   ⚠️ **It goes below, not above.** The first build put a square-cornered, full-bleed
   tinted band *above* the habit rows; Amir rejected it (2026-09-04: *"i dont like where
   you put it, i dont like the design, its not consistent with others"*) and he was right
@@ -818,6 +822,14 @@ just as free.
   placements were built and rendered for him to choose from (in the list wearing the
   habit-row shape; a tile in the hero beside the streak; this card; Progress-only); he
   picked this one because it is the only one that shows the payoff without a tap.
+- **Progress** — `renderWtProgressRow()`, under a `sectionLabel('Body weight', 'Tap for
+  history')`, sitting after the habits and before the quests (a personal measurement
+  groups with the personal half of the screen, not the game half). It wears the habit
+  row's shape but carries a **sparkline where a habit carries its pips**, and leads with
+  the NUMBER rather than repeating the section label above it.
+  ⚠️ **Progress had nothing at all until 2026-09-04**, when Amir asked where an athlete
+  checks their weight progress and the honest answer was "the Today card, or two doors
+  deep in Settings". The tab is called Progress; a trend belongs on it.
 - **The weight screen** (`renderWeight()`, `UI.screen === 'weight'`) — an OVERLAY, not a
   tab: no tab lights up, and it gets the same back chevron as Settings and the manual.
   Built in the `renderDetail()` idiom on purpose (hero figure, stat triptych, history
