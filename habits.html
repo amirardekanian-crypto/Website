@@ -3518,9 +3518,23 @@ function setWeight(dayKey, kg) {
   saveWt();
   return v;
 }
+// ⚠️ A DELETE IS A TOMBSTONE, NOT A `delete`. Removing the key outright is
+// invisible to the union merge below — that loop only ever walks the keys the
+// CLOUD has, so the other phone, which still holds the reading, keeps it and
+// re-uploads it on its next push. The reading comes back, and nothing the
+// athlete can do removes it. That is precisely the bug `_dirtyDays` exists to
+// stop on the habit log, arriving by a different door.
+//
+// So a deletion is recorded rather than performed: `kg: null` with a fresh `t`,
+// which the merge can compare like any other write. Every reader already goes
+// through wtKg(), and that returns null for a non-numeric kg, so a tombstone is
+// invisible to the chart, the stats, the list and the count without any of them
+// needing to know it exists. They are left in place rather than pruned: a prune
+// on one device is itself a silent delete the other device would undo, and a
+// tombstone is forty bytes against a deletion nobody does twice.
 function clearWeight(dayKey) {
   if (!WT[dayKey]) return;
-  delete WT[dayKey];
+  WT[dayKey] = { kg: null, t: Date.now() };
   saveWt();
 }
 
@@ -3841,9 +3855,18 @@ async function syncFromCloud() {
       const cloudWt = JSON.parse(data[K_WT()] || '{}') || {};
       Object.keys(cloudWt).forEach(day => {
         const theirs = cloudWt[day];
-        if (!theirs || typeof theirs.kg !== 'number' || !isFinite(theirs.kg)) return;
+        if (!theirs || typeof theirs !== 'object') return;
+        // A reading, or a tombstone (kg:null) — both are real writes with a
+        // timestamp and both must be able to win. Anything else is junk from a
+        // hand-edited blob and is ignored rather than trusted.
+        const isRead = typeof theirs.kg === 'number' && isFinite(theirs.kg);
+        const isTomb = theirs.kg === null;
+        if (!isRead && !isTomb) return;
         const mine = WT[day];
-        if (!mine || typeof mine.kg !== 'number') { WT[day] = theirs; return; }
+        if (!mine) { WT[day] = theirs; return; }
+        // Newest write wins outright, whichever kind it is: a newer tombstone
+        // deletes a reading this device still holds, and a newer reading
+        // revives a day the athlete deleted and then weighed again.
         if ((theirs.t || 0) > (mine.t || 0)) WT[day] = theirs;
       });
       localStorage.setItem(K_WT(), JSON.stringify(WT));

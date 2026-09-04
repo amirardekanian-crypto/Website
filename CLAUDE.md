@@ -207,7 +207,10 @@ argument in `XP_SYSTEM.md` §6.4.
 key (scoring on the **board** and nowhere else), and the log merge's `max()` would make a
 loss unrecordable and let a stale phone overwrite a correction for ever. On `CFG` the
 wholesale config adoption would delete it exactly as it once deleted earned rewards. Its
-merge is its own: **union by date, newest `t` wins**. **Zero SQL** — `save_progress`
+merge is its own: **union by date, newest `t` wins** — and a **delete is a tombstone**
+(`kg: null` with a fresh `t`), never a `delete` of the key: the union only ever walks the
+keys the *cloud* has, so dropping a key outright left the other phone holding the reading
+and re-uploading it, and the deletion undid itself with nothing the athlete could do. **Zero SQL** — `save_progress`
 merges payload keys at the top level and whitelists nothing, `get_progress` returns the
 whole blob, and `coach.html` already selects `data` entire.
 
