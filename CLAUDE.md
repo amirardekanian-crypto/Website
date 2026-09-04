@@ -211,10 +211,16 @@ merge is its own: **union by date, newest `t` wins**. **Zero SQL** — `save_pro
 merges payload keys at the top level and whitelists nothing, `get_progress` returns the
 whole blob, and `coach.html` already selects `data` entire.
 
-UI: `renderWtRow()` is the only thing above the habit list on Today and earns it by
-deleting itself once answered (a **Weigh in** button before, number-and-trend after);
-`renderWeight()` is an overlay screen in the `renderDetail()` idiom with **7 day / 1 month
-/ 3 month** ranges; `renderSettingsWeight()` holds the switch and **never deletes readings
+UI: `renderWtRow()` is a **white rounded card below the habit list and below its hint**
+(Amir, 2026-09-04 — an earlier build put a square full-bleed band *above* the list and he
+rejected it as inconsistent: this app is white rounded cards on lavender, and the hint
+must stay attached to the rows it explains). The card carries the number, the month delta
+and an inline sparkline, so it is the only thing on Today that shows a trend without being
+tapped. `renderWeight()` is an overlay screen built on `renderDetail()`'s own furniture —
+76px figure, `.block` sections, the three-up `.statnum` triptych — with **`.chip`/`.chip-on`
+pills** for the **7 day / 1 month / 3 month** ranges, the same control Crew uses to swap
+Roll call for the Leaderboard. **Invent no new component here**: every earlier attempt to
+(a tinted band, a segmented tab box, a bespoke input) was the thing that read as foreign. `renderSettingsWeight()` holds the switch and **never deletes readings
 when switched off**; `weightPanel()` in `coach.html` → Proof shows Amir the trend. The
 chart is the app's **first and only chart** — line is a 7-day rolling average, dots are the
 raw readings, every quoted change compares average to average, because daily weight swings

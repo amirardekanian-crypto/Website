@@ -806,11 +806,18 @@ returns the whole blob; `coach.html` already selects `data` entire. A fourth key
 just as free.
 
 **Where it lives in the UI**
-- **Today** — `renderWtRow()`, the *only* thing allowed above the habit list. It earns
-  that spot by removing itself: before you weigh it is a **Weigh in** button, after you
-  weigh it is one line of number-plus-trend that links to the history. Same
-  self-deleting pattern as the tour prompt and the roll-call pointer further down. Hidden
+- **Today** — `renderWtRow()`, a **white rounded card below the habit list and below the
+  `.rowhint`**. Two states: *Weigh in* before you have, *See your history* after, with the
+  number, the month delta and an inline sparkline (`wtSpark()`) either way. Hidden
   entirely when the feature is off or a past day is being backfilled.
+  ⚠️ **It goes below, not above.** The first build put a square-cornered, full-bleed
+  tinted band *above* the habit rows; Amir rejected it (2026-09-04: *"i dont like where
+  you put it, i dont like the design, its not consistent with others"*) and he was right
+  twice over — the habit list is what the screen is for and was deliberately moved to the
+  top, and the `.rowhint` explaining the rows must not be cut off from them. Four
+  placements were built and rendered for him to choose from (in the list wearing the
+  habit-row shape; a tile in the hero beside the streak; this card; Progress-only); he
+  picked this one because it is the only one that shows the payoff without a tap.
 - **The weight screen** (`renderWeight()`, `UI.screen === 'weight'`) — an OVERLAY, not a
   tab: no tab lights up, and it gets the same back chevron as Settings and the manual.
   Built in the `renderDetail()` idiom on purpose (hero figure, stat triptych, history
@@ -820,6 +827,14 @@ just as free.
   feature that bins three months of history on a toggle is one nobody can safely try.
 - **`coach.html` → an athlete → Proof** — `weightPanel()`, which is *absent* rather than
   empty when there is nothing to show.
+
+**Reuse the app's vocabulary — do not invent components here.** The range switcher is
+`.chip`/`.chip-on` pills (what Crew uses for Roll call ↔ Leaderboard); the screen is
+`renderDetail()`'s furniture (76px `.figure`, `.block` sections, the three-up `.statnum`
+triptych, `.row-rule` list rows); the entry field sits inside the same `.stepper` the
+habit log sheet uses. An earlier build shipped a bespoke tinted band, a segmented tab box
+and a custom input, and all three read as foreign the moment they sat next to the real
+screens.
 
 **The chart is the app's first and only chart** (every other `<svg>` in `habits.html` is
 an icon). Inline SVG, `.wtchart`, points placed **by date** across the window so a week

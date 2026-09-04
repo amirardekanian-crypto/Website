@@ -506,55 +506,49 @@
   .grid35 .c.pre { border-style: dotted; opacity: .4; }
 
   /* ── Body weight ──
-     The app's first chart. Everything else here draws with divs and borders,
-     but a trend genuinely needs a line, and a line needs SVG. Colours come from
-     the tokens rather than being hard-coded so the whole thing inverts with
-     dark mode for free. */
-  .wtrow {
-    width: 100%; display: flex; align-items: center; gap: 12px;
-    padding: 14px 20px; text-align: left;
-    border-bottom: 2px solid var(--divider); background: var(--accent-100);
+     No new species of component. The card on Today is the same white rounded
+     card every other block on that screen is; the range switcher is the .chip
+     pills Crew already uses to swap Roll call for the Leaderboard; the history
+     screen is the habit-detail screen's own furniture. The ONLY genuinely new
+     thing in here is the trend line itself, because the app has never drawn
+     one — and even that takes its colour from the same token as every bar. */
+  #app .wtpanel {
+    background: var(--card); border-radius: 18px; box-shadow: var(--shadow);
+    margin: 4px 16px 14px; padding: 16px;
+    display: flex; flex-direction: column; gap: 13px;
   }
-  .wtrow .wtmid { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-  .wtrow .wtq {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 17px; line-height: 1.1; text-transform: uppercase; letter-spacing: .01em;
+  #app .wtp-top { display: flex; align-items: center; gap: 14px; }
+  #app .wtp-l { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  #app .wtp-n {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px;
+    line-height: .9; color: var(--accent); letter-spacing: -.04em;
   }
-  .wtrow .wtsub { font-size: 11.5px; line-height: 1.3; color: var(--muted); }
-  .wtrow .wtcta {
-    flex: none; padding: 9px 14px; background: var(--accent); color: var(--bg);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 13px; letter-spacing: .05em; text-transform: uppercase;
+  #app .wtp-n .u { font-size: 15px; color: var(--muted-soft); margin-left: 3px; letter-spacing: 0; }
+  #app .wtp-d { font-size: 11.5px; line-height: 1.3; color: var(--muted); }
+  /* preserveAspectRatio none + non-scaling-stroke: the sparkline stretches to
+     whatever width is left beside the number without the stroke going with it. */
+  #app .wtp-r { width: 148px; height: 54px; flex: none; }
+  #app .wtp-r path {
+    fill: none; stroke: var(--accent); stroke-width: 2.4;
+    stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke;
   }
-  .wtrow .wtgo { flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 19px; color: var(--accent); }
 
   .wtchart { width: 100%; height: auto; display: block; overflow: visible; }
   .wtchart .wtline { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
-  .wtchart .wtdot { fill: var(--accent); opacity: .32; }
-  .wtchart .wtnow { fill: var(--clay-deep); }
+  .wtchart .wtdot { fill: var(--accent); opacity: .3; }
+  .wtchart .wtnow { fill: var(--clay-deep); opacity: 1; }
   .wtchart .wtgrid { stroke: var(--rule); stroke-width: 1; }
   .wtchart .wtlbl { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; fill: var(--muted-soft); }
-  .wtaxis { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace;
-            font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
 
-  /* The range picker. Same shape as the milestone tier headers, so it reads as
-     a control this app already has rather than a new species of tab. */
-  .wttabs { display: flex; gap: 0; border: 2px solid var(--ink); }
-  .wttabs button {
-    flex: 1; padding: 10px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
-  }
-  .wttabs button + button { border-left: 2px solid var(--ink); }
-  .wttabs button.on { background: var(--ink); color: var(--bg); }
-
-  .wtbig { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-           font-size: 62px; line-height: .85; letter-spacing: -.04em; color: var(--accent); }
-  .wtbig .u { font-size: 20px; letter-spacing: 0; color: var(--muted-soft); margin-left: 4px; }
-  .wtdelta { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px; letter-spacing: .02em; }
+  /* The weigh-in field. Sits inside the SAME .stepper the habit log sheet uses,
+     so the -/+ buttons either side are the app's, not new ones; only the middle
+     is an input rather than a printed number, because 78 kg from zero is 780
+     taps and typing has to be possible. Styled as .figure so it reads as the
+     same number the stepper always shows. */
   .wtinput {
-    width: 100%; text-align: center; border: none; background: transparent;
+    width: 100%; min-width: 0; text-align: center; border: none; background: transparent;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 40px; line-height: 1; color: var(--accent); letter-spacing: -.03em;
+    font-size: 36px; line-height: 1; color: var(--accent); letter-spacing: -.04em;
     -moz-appearance: textfield;
   }
   .wtinput::-webkit-outer-spin-button, .wtinput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -3142,10 +3136,13 @@ const WT_STEP = 0.1;         // the granularity of a bathroom scale
 const WT_MIN = 25, WT_MAX = 350;
 // Sanity rails on a single reading. Not a judgement about anybody's body — they
 // exist so a fat-fingered 784 cannot flatten three months of chart into a line.
+// `label` is the chip. `phrase` is the same span inside a sentence, because
+// "nothing in the last 1 month" is not English and the chip cannot be reworded
+// without making the three of them stop lining up.
 const WT_RANGES = [
-  { key: '7',  days: 7,   label: '7 days'   },
-  { key: '30', days: 30,  label: '1 month'  },
-  { key: '90', days: 90,  label: '3 months' }
+  { key: '7',  days: 7,   label: '7 days',   phrase: 'the last 7 days',  ago: '7 days ago'  },
+  { key: '30', days: 30,  label: '1 month',  phrase: 'the last month',   ago: 'a month ago' },
+  { key: '90', days: 90,  label: '3 months', phrase: 'the last 3 months', ago: '3 months ago' }
 ];
 // Daily bodyweight swings on water, food and time of day — a kilo either way is
 // normal and means nothing. The LINE is a 7-day rolling average, the raw
@@ -7146,14 +7143,6 @@ function renderToday(LI, doneCount, pct) {
            number, and the smaller one is the true one. -->
       ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
 
-      <!-- ABOVE THE HABIT LIST, and the only thing that is. The list is what
-           this screen is for and it was deliberately moved up to the top; the
-           one thing that earns a place in front of it is a row that removes
-           itself the moment it is answered, which is exactly what the tour
-           prompt and the roll-call pointer already do further down. Off by
-           default, so for most athletes this is not here at all. -->
-      ${renderWtRow()}
-
       ${(() => { const lead = leadStreak(); return rows.map(h => habitRow(h, 'today', lead, past && CFG.on[h.id] === false)).join(''); })()}
 
       <!-- DIRECTLY UNDER THE LIST IT DESCRIBES. This line used to be the very
@@ -7167,6 +7156,14 @@ function renderToday(LI, doneCount, pct) {
         Three taps per row: the <strong>box</strong> logs it, the <strong>name</strong> opens its
         history, <strong>+</strong> adds one${live().some(h => h.kind === 'count' && !h.locked) ? ' (hold it to go faster)' : ''}.
       </div>
+
+      <!-- BELOW the list, and below the hint that explains the list — the hint
+           belongs to the rows it describes and must not be cut off from them.
+           Weight is not one of the day's jobs so it does not sit among them; it
+           reports, and it is the only thing on this screen that shows a trend
+           without being tapped. Off by default: for most athletes it is not
+           here at all. -->
+      ${renderWtRow()}
 
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
@@ -7722,41 +7719,55 @@ function wtChart(days) {
        + grid + labels + line + dots + '</svg>';
 }
 
-// The row on Today. Two states and one job each: before you have weighed it is
-// the prompt, after you have weighed it is the way to the history. It is the
-// only thing allowed above the habit list, and only because it earns the space
-// by changing shape the moment it is answered.
+// The card on Today. It is the same white rounded card as everything else on
+// that screen — hero, day strip, habit rows — because it is not a special kind
+// of thing and should not look like one.
+//
+// It sits BELOW the habit list and its hint, never above: the list is what the
+// screen is for, and it was deliberately moved to the top so that opening the
+// app to log does not mean scrolling to log. Two states, one job each — before
+// you have weighed it asks, after you have weighed it reports and points at the
+// history. Absent entirely when the feature is off or a past day is open.
 function renderWtRow() {
   if (!wtOn() || editingPast()) return '';
-  const t = wtToday();
-  if (t === null) {
-    return `<button class="wtrow" data-k="wtrow" ${on(() => openWtSheet(TKEY()))}>
-      <span class="wtmid">
-        <span class="wtq">Weigh in</span>
-        <span class="wtsub">${wtCount() ? esc(pickWtSub()) : 'Kilograms. Once a day, same time, is plenty.'}</span>
-      </span>
-      <span class="wtcta">Weigh in</span>
-    </button>`;
-  }
-  const c = wtChange(30);
-  return `<button class="wtrow" data-k="wtrow" ${on(() => goWeight('today'))}>
-    <span class="wtmid">
-      <span class="wtq">${esc(fmtKg(t))} kg today</span>
-      <span class="wtsub">${c ? esc(fmtDelta(c.delta) + ' kg over the last month') : 'Keep going — a month of these makes a line worth reading.'}</span>
-    </span>
-    <span class="wtgo">&rarr;</span>
-  </button>`;
+  const t = wtToday(), l = wtLatest(), c = wtChange(30);
+  const shown = t !== null ? t : (l ? l.kg : null);
+  return `<div class="wtpanel" data-k="wtpanel">
+    <div class="wtp-top">
+      <div class="wtp-l">
+        <div class="eyebrow" style="letter-spacing:.12em">Body weight</div>
+        <div class="wtp-n">${shown === null ? '&mdash;' : esc(fmtKg(shown)) + '<span class="u">kg</span>'}</div>
+        <div class="wtp-d">${esc(wtCardLine(t, l, c))}</div>
+      </div>
+      ${wtSpark(30)}
+    </div>
+    <button class="btn ${t === null ? 'btn-primary' : 'btn-secondary'} btn-block"
+      ${on(() => (t === null ? openWtSheet(TKEY()) : goWeight('today')))}>${t === null ? 'Weigh in' : 'See your history'}</button>
+  </div>`;
 }
-// Deliberately flat. Nothing in here congratulates a fall or frets about a
-// rise: the app does not know what this athlete is training for, and a scale
-// that has opinions is the thing everybody already hates.
-function pickWtSub() {
-  const l = wtLatest();
-  if (!l) return 'Kilograms. Once a day, same time, is plenty.';
+// Deliberately flat. Nothing here congratulates a fall or frets about a rise —
+// the app does not know what this athlete is training for, and a scale with
+// opinions is the thing everybody already hates about weighing themselves.
+function wtCardLine(t, l, c) {
+  if (t !== null) return c ? fmtDelta(c.delta) + ' kg over the last month' : 'Keep going — a month of these makes a line worth reading.';
+  if (!l) return 'Kilograms. Same time of day, whenever you weigh.';
   const gap = Math.round((today() - parseKey(l.day)) / 86400000);
   if (gap <= 1) return 'Yesterday you were ' + fmtKg(l.kg) + ' kg.';
   if (gap <= 7) return 'Last read ' + gap + ' days ago, at ' + fmtKg(l.kg) + ' kg.';
   return 'It has been ' + gap + ' days. Pick it back up where you left it.';
+}
+// The inline trend beside the number — the rolling average only, no dots and no
+// axis. It is a glance, not a chart; the chart is one tap away and says the rest.
+function wtSpark(days) {
+  const ser = wtAvgSeries(days);
+  if (ser.length < 2) return '<div class="wtp-r"></div>';
+  const w = 148, h = 54;
+  const vals = ser.map(p => p.kg);
+  let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
+  const d = ser.map((p, i) =>
+    (i ? 'L' : 'M') + (i / (ser.length - 1) * w).toFixed(1) + ' ' + (h - (p.kg - lo) / (hi - lo) * h).toFixed(1)).join(' ');
+  return `<svg class="wtp-r" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
 }
 
 function goWeight(from) {
@@ -7766,51 +7777,62 @@ function goWeight(from) {
 
 function renderWeight() {
   const r = wtRange();
-  const latest = wtLatest();
-  const c = wtChange(r.days);
+  const latest = wtLatest(), c = wtChange(r.days);
   const inRange = wtSeries(r.days);
   const rows = wtDays().slice(-8).reverse();
-  const tabs = `<div class="wttabs" data-k="wttabs">
-    ${WT_RANGES.map(x => `<button class="${x.key === r.key ? 'on' : ''}" data-k="wtt:${x.key}"
-      ${on(() => { CFG.wt.range = x.key; saveCfg(); render(); })}>${esc(x.label)}</button>`).join('')}
-  </div>`;
+  const unit = (n, u) => n + '<span class="su">' + u + '</span>';
+  const stats = latest ? [
+    { v: unit(fmtKg(latest.kg), 'kg'), k: 'Latest' },
+    { v: c ? unit(fmtDelta(c.delta), 'kg') : '&mdash;', k: 'Change' },
+    { v: unit(wtCount(), wtCount() === 1 ? 'read' : 'reads'), k: 'All time' }
+  ] : [];
   return `
     <div data-k="screen:weight" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:14px">
+      <!-- The same opening block a habit's history screen has: the number that
+           matters at 76px, what it is beside it, and the sentence under both. -->
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
         ${latest ? `<div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="wtbig">${esc(fmtKg(latest.kg))}<span class="u">kg</span></div>
-          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:8px">
-            <div class="eyebrow" style="letter-spacing:.12em">${esc(wtDayLabel(latest.day))}</div>
-            ${c ? `<div class="wtdelta" style="color:var(--muted)">${esc(fmtDelta(c.delta))} kg in ${esc(r.label)}</div>` : ''}
+          <div class="figure" data-hero style="font-size:76px;line-height:.8">${esc(fmtKg(latest.kg))}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
+            <div class="hd" style="font-size:16px;line-height:1">KILOGRAMS</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(wtDayLabel(latest.day))}${c ? ' &middot; ' + esc(fmtDelta(c.delta)) + ' kg in ' + esc(r.phrase.replace('the last ', '')) : ''}</div>
           </div>
-        </div>` : `<div class="wtbig" style="font-size:34px;color:var(--muted)">No readings yet</div>`}
-        <button class="btn btn-primary btn-block" ${on(() => openWtSheet(TKEY()))}>${wtToday() === null ? 'Weigh in' : "Correct today's weight"}</button>
+        </div>` : `<div class="hd" style="font-size:26px;line-height:1">Nothing yet</div>`}
+        <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">Not a habit, not scored, and nobody else can see it. Weigh at the same time of day and let the line do the talking.</p>
       </div>
 
-      ${tabs}
-
-      ${inRange.length ? `<div class="block" style="display:flex;flex-direction:column;gap:8px">
-        ${wtChart(r.days)}
-        <div class="wtaxis"><span>${esc(r.label === '7 days' ? '7 DAYS AGO' : r.label.toUpperCase() + ' AGO')}</span><span>TODAY</span></div>
-        <div style="font-size:11.5px;line-height:1.5;color:var(--muted-soft)">
-          The line is your ${WT_AVG_WINDOW}-day average; the dots are what the scale actually said. Day to day it moves on water and food — the line is the part that means anything.
+      <div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Today</span><span>${wtToday() === null ? 'NOT WEIGHED' : esc(fmtKg(wtToday())) + ' KG'}</span>
         </div>
-      </div>` : `<div class="block" style="font-size:13px;line-height:1.5;color:var(--muted)">
-        Nothing in the last ${esc(r.label)}. Weigh in and this fills up.
-      </div>`}
+        <button class="btn ${wtToday() === null ? 'btn-primary' : 'btn-secondary'} btn-block"
+          ${on(() => openWtSheet(TKEY()))}>${wtToday() === null ? 'Weigh in' : "Correct today's weight"}</button>
+      </div>
 
-      ${latest && wtCount() > 1 ? `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
-        ${[
-          { v: fmtKg(latest.kg) + '<span class="su">kg</span>', k: 'Latest' },
-          { v: (c ? esc(fmtDelta(c.delta)) : '&mdash;') + '<span class="su">kg</span>', k: 'Change' },
-          { v: wtCount() + '<span class="su">' + (wtCount() === 1 ? 'read' : 'reads') + '</span>', k: 'All time' }
-        ].map((s, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
-          <div class="hd statnum">${s.v}</div>
-          <div class="eyebrow" style="letter-spacing:.1em">${esc(s.k)}</div>
+      <!-- The .chip pills Crew uses to swap Roll call for the Leaderboard. The
+           app has exactly one way to switch between views of a screen; this is it. -->
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
+        <div class="chips" data-k="wtchips">
+          ${WT_RANGES.map(x => `<button class="chip ${x.key === r.key ? 'chip-on' : ''}" data-k="wtt:${x.key}"
+            ${on(() => { CFG.wt.range = x.key; saveCfg(); render(); })}>${esc(x.label)}</button>`).join('')}
+        </div>
+        ${inRange.length ? wtChart(r.days) + `
+          <div class="gridkey">
+            <span>${esc(r.ago)}</span>
+            <span class="gk">the line is your ${WT_AVG_WINDOW}-day average</span>
+            <span>Today</span>
+          </div>`
+        : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">Nothing in ${esc(r.phrase)}. Weigh in and this fills up.</div>`}
+      </div>
+
+      ${stats.length ? `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
+        ${stats.map((x, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
+          <div class="hd statnum">${x.v}</div>
+          <div class="eyebrow" style="letter-spacing:.1em">${esc(x.k)}</div>
         </div>`).join('')}
       </div>` : ''}
 
-      ${rows.length ? sectionLabel('Your readings', 'Tap to correct') + rows.map(k => {
+      ${rows.length ? rows.map(k => {
         const kg = wtKg(k), prev = wtDays().filter(d => d < k).pop();
         const d = prev !== undefined ? kg - wtKg(prev) : null;
         return `<button class="row-rule" data-k="wtr:${k}" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:13px 20px"
@@ -7820,11 +7842,13 @@ function renderWeight() {
             <span style="font-size:11px;line-height:1;color:var(--muted)">${WT_AVG_WINDOW}-day avg ${esc(fmtKg(wtAvgAt(k)))} kg</span>
           </span>
           <span style="text-align:right">
-            <span class="hd" style="display:block;font-size:16px;color:var(--accent)">${esc(fmtKg(kg))} kg</span>
+            <span class="hd" style="display:block;font-size:15px;color:var(--accent)">${esc(fmtKg(kg))} kg</span>
             ${d !== null ? `<span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">${esc(fmtDelta(d))} kg</span>` : ''}
           </span>
         </button>`;
-      }).join('') : ''}
+      }).join('') : `<div style="padding:16px 20px;font-size:12.5px;line-height:1.5;color:var(--muted)">
+          No readings behind you yet. Once there are, the last eight sit here.
+        </div>`}
 
       <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:12px">
         <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
@@ -7888,7 +7912,7 @@ function renderWtSheet() {
         UI.wtSheet = null;
         haptic('done');
         render();
-        toast(fmtKg(saved) + ' kg logged' + (day === TKEY() ? '' : ' for ' + dayShort(day)) + '. Noted.');
+        toast(fmtKg(saved) + ' kg logged' + (day === TKEY() ? '' : ' for ' + wtDayLabel(day)) + '. Noted.');
       })}>Save it</button>
       ${existing !== null ? `<button class="btn btn-secondary btn-block" ${on(() => {
         clearWeight(day);
@@ -8343,7 +8367,7 @@ function renderManual() {
 
       ${block(h2('Body weight') +
         p(`Optional, and <strong style="color:var(--ink)">off until you switch it on</strong> — Settings, then Body weight. It is the one thing in this app that is not a habit: it earns <strong style="color:var(--ink)">no XP</strong>, it is in no streak, it cannot make a day perfect and it cannot spoil one. Switching it on or off costs you nothing either way, and switching it off keeps every reading you have taken.`) +
-        p(`When it is on, a <strong style="color:var(--ink)">Weigh in</strong> row sits at the top of Today until you have used it, then turns into your number and the direction it is going. Tap it for the history: seven days, a month, or three.`) +
+        p(`When it is on, a <strong style="color:var(--ink)">Body weight</strong> card sits under your habits on Today, with your number, the month's direction and a small trend line on it. It says <strong style="color:var(--ink)">Weigh in</strong> until you have, and opens the full history either way: seven days, a month, or three.`) +
         p(`The chart draws a <strong style="color:var(--ink)">${WT_AVG_WINDOW}-day average</strong> as the line and your actual readings as dots behind it, and every change it quotes compares one average against another. That is deliberate. Weight moves a kilo either way on water, food and sleep, so a single morning tells you nothing and two mornings compared tell you less than nothing. The line is the part worth reading.`) +
         p(`Weigh at the same time of day, ideally first thing. Consistency of method beats frequency — <strong style="color:var(--ink)">once a week done properly</strong> is worth more than seven rushed readings, and the app never asks you for one you did not offer.`) +
         p(`It is <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone.</strong> It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`))}
@@ -9517,7 +9541,7 @@ function renderSettingsWeight() {
           <span class="navtile" aria-hidden="true">⚖️</span>
           <span class="navmid">
             <span class="navnm">Track my weight</span>
-            <span class="navsub">A weigh-in row on Today, and the history behind it.</span>
+            <span class="navsub">A card under your habits on Today, and the history behind it.</span>
           </span>
           <span class="sw ${wtOn() ? 'on' : ''}"><i></i></span>
         </button>
