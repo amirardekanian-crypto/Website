@@ -8,33 +8,34 @@ cycle's design pass only, not reconstructed from the earlier cycles' reasoning.)
 | Exercise | Status | Last cycle | Note |
 |---|---|---|---|
 | Barbell Back Squat | Active | C4 | primary — doesn't rotate; C4 changed the rep scheme (5×3, eccentric removed) to break a 10-week load stall |
-| Trap Bar Deadlift | Active | C4 | primary — doesn't rotate; regressed 30→20 kg through C3, C4's priority rebuild at 4×4 |
+| Trap Bar Deadlift | Active | C4 | primary — doesn't rotate. C4's priority rebuild at 4×4 **suspended mid-cycle 2026-09-04** (acute LBP) → 3×5 @RPE7, load held at 20 kg |
 | Single-Arm Landmine Push Press | Active | C4 | primary — the week's only press slot (posture/tennis principle); 2.5→5 kg in C3, pain-free |
-| Medicine Ball Rotational Throw | Active | C4 | sport transfer; C3 shipped identical prescription 3× — C4 forces ball + set progression |
+| Medicine Ball Rotational Throw | Active | C4 | sport transfer. C4's ball progression **suspended 2026-09-04** (acute LBP) → 3×6+6 @RPE7, same ball |
 | Half-Kneeling Bottoms-Up Kettlebell Press | Active | C4 | cuff armour, best-in-class — kept, dose progressed 6→8 reps. C3 prescribed RPE 5 (below app floor); corrected to 6 |
 | Pogo Jump | Active | C4 | reactive circuit anchor; ×20 → ×25 |
 | Broad Jump | Active | C4 | new C4 — horizontal force / first-step acceleration |
 | Single-Leg Bound | Active | C4 | new C4 — progression of Lateral Bound, stuck-landing standard |
-| Barbell Hip Thrust | Active | C4 | new C4 — posterior chain gets a barbell with a real progression path |
+| Barbell Hip Thrust | Active | C4 | new C4 — posterior chain gets a barbell with a real progression path. **1s top squeeze removed 2026-09-04** — top of the rep is peak lumbar extension, and she is extension-provoked |
 | Front-Foot-Elevated Split Squat | Active | C4 | new C4 — unilateral quad, rotated in from Reverse Lunge |
-| Copenhagen Plank | Active | C4 | new C4 — short-lever (knee support); adductor/groin insurance for the bounding work |
+| Copenhagen Plank | Active | C4 | new C4 — short-lever (knee support); adductor/groin insurance for the bounding work. **20s → 15s 2026-09-04**, logged RPE 10 vs prescribed 7 |
 | Machine Assisted Pull-Up | Active | C4 | new C4 — replaces Lat Pulldown after 3 cycles; unassisted is the named goal |
 | Cable Seated Row | Active | C4 | new C4 — 4 sets, the main volume driver for the upper-back complaint |
 | Cable Face Pull | Active | C4 | **re-earned** from C2 — deliberately reinstated as the best fit for play-volume upper back pain |
-| Prone Y Raise | Active | C4 | new C4 — lower-trap bias; replaces the two C3 cuff isolation slots |
+| Prone Y Raise | **Removed — do not re-propose** | C4 | loaded prone lumbar extension. She refused it herself on 2026-09-02 (cut all 3 sets, wrote the low-back note). Replaced same-slot 2026-09-04. Only reconsider if a clinician confirms she is flexion-provoked, not extension-provoked |
 | Machine Leg Press | Active | C4 | new C4 — quad volume at low CNS cost after the trap bar |
 | Machine Seated Leg Curl | Active | C4 | new C4 — hamstring floor top-up |
 | Assault Bike | Active | C4 | new C4 — conditioning finisher inside an attended day. Chosen over Rowing on purpose (see C4 entry) |
 | Cossack Squat | Active | C4 | prep — lateral hip prep for the bounding work |
-| Bird Dog | Active | C4 | prep — anti-rotation, replaces Banded Dead Bug |
+| Bird Dog | Active | C4 | prep — anti-rotation, replaces Banded Dead Bug. Rejoined by Dead Bug as a loaded slot 2026-09-04; not duplicates (prep dose vs trained dose) |
 | Thoracic Windmill | Active | C4 | prep — thoracic opener, aimed at the upper back |
 | Lat Pulldown | Available | C3 | rotated out after 3 straight cycles; now the Assisted Pull-Up fallback |
+| Chest-Supported Incline Y Raise | Active | C4 | new 2026-09-04 — same lower-trap dose as the Prone Y Raise with the chest supported, so the low back is not holding the position |
 | Chest-Supported Dumbbell Row | Available | C3 | rotated for freshness |
 | Single-Arm Dumbbell Row | Available | C3 | rotated; she logged 8 reps against a prescribed 10 all cycle |
 | Dumbbell Reverse Lunge | Available | C3 | progressed well (10→15 kg); rotated purely for novelty |
 | Dumbbell B-Stance Romanian Deadlift | Available | C3 | progressed 10→12.5 kg; rotated for freshness |
 | Dumbbell Lateral Lunge | Available | C3 | never progressed off 7.5 kg across 3 sessions |
-| Banded Dead Bug | Available | C3 | rotated |
+| Banded Dead Bug | **re-earned** | C4 | back 2026-09-04 as Day 3's Core slot — anti-extension, her exact direction, and **5 of 5 sets completed across C3** while she skipped the Pallof in the same sessions. Same precedent as the Cable Face Pull |
 | Side Lying Dumbbell External Rotation | Available | C3 | shoulder resolved; block graduated 3 exercises → 2 |
 | Prone Dumbbell Reverse Fly | Available | C3 | folded into Cable Face Pull |
 | Box Jump | Available | C3 | reactive circuit rotation |
@@ -191,6 +192,9 @@ posterior-chain/thoracic slot (45° Back Extension), **not** more pressing.
 | Cable Seated Row | 3→4 sets, then load | 4×10 ≤RPE 8 | +1 plate | hold sets, drop load |
 | Medicine Ball Rotational Throw | ball weight | throw speed holds at RPE 8 | next ball up | back a ball, keep the 5 sets |
 
+⚠️ **The Trap Bar and MB Throw levers above are SUSPENDED as of 2026-09-04** — see the
+mid-cycle entry below. Do not run either again until the low back has had a clean block.
+
 **e1RM** (Epley, from the heaviest logged set)
 
 | Lift | C2 | C3 | Change |
@@ -205,3 +209,122 @@ cycles, so these are directional, not comparable maxes. Her barbell entries are 
 about total vs per-side: the trap bar is logged as "30" with a note reading *"15 kg each side"*.
 One squat entry reads `٫20` (Persian decimal separator) and one RDL entry `12..5`. Confirm the
 logging convention with her before acting on any of these figures.
+
+---
+
+## Cycle 04 — MID-CYCLE ADJUSTMENT · 2026-09-04 · acute low back
+*(week 2 of 5. The cycle is not re-designed. This is a targeted edit to a live block.)*
+
+**Why**
+
+Amir raised it: discomfort while coaching on court, plus an acute episode ~10–15 days ago
+(≈2026-08-20 to 08-25, after a tennis session) with two days of severe pain and limited movement.
+He had already advised her to be seen.
+
+Three things the file already knew, which the conversation did not:
+
+1. **She had reported it herself, in the app, two days earlier.** 2026-09-02, Day 2, Partial 20/23,
+   `day_note` «کمرمممممم تو حرکت اخر میمرد اگر میزدم» — *"my lower back would have died in the last
+   exercise if I'd done it."* The three missing sets are exactly the three sets of **Prone Y Raise**,
+   the last exercise on Day 2 and a loaded prone lumbar-extension position. She self-modified and
+   logged it. **Her only available modification was deletion** — no exercise in her file carried a
+   written alternative except the Assault Bike, whose alternative was the rower.
+2. **Cycle 4's Day 3 had never been performed.** Rotation was D1 (08-30) → D2 (09-02) → D3 next.
+   The heaviest hinge exposure of the block — Trap Bar Deadlift 4×4 @RPE8 chipped *max intent*,
+   behind a card note reading "rebuilding it is the main job of this cycle" — was still ahead of
+   her. That made Day 3 the one part of the week editable at **zero cost to her log**.
+3. **The pain-management note she had could not fire on a lumbar spine.** Card "Your Upper Back On
+   Heavy Weeks" screens for pain "going down your **arm**" and loss of rotation range, and its
+   rung 2 told her to "use the swap on the card" — swaps that did not exist anywhere in her file.
+
+**The clinical read (Amir, 2026-09-04)**
+
+FIRST episode, not chronic. Nothing radiates. **Relief in flexion — "the urge to bend forward and
+stretch it"** — therefore treated as **extension-provoked**.
+
+Consequence: the chronic-back principles (2026-06-15 free-hinge deferral, 2026-07-30 axial
+deferral) were **deliberately NOT applied**. She does not meet them on one acute episode, and for
+acute non-specific LBP graded loading beats offloading. The Back Squat stays, the reactive circuit
+stays at three rounds. What changed is one rule, swept across every day, block, circuit item, cue
+and note:
+
+> **No loaded end-range lumbar extension. No max intent under fatigue. Keep everything else loading.**
+
+**Decisions**
+
+```
+DAY 1
+  Barbell Hip Thrust        removed the "1s top squeeze" chip, tempo 2-1-1-0 -> 2-0-1-0
+                            (top of the rep is the peak lumbosacral extension moment, larger than
+                             the back squat's; the exercise's own bad-cue already named the fault)
+  Copenhagen Plank          x20s -> x15s each side, 3 sets kept (logged RPE 10 vs prescribed 7)
+  Barbell Back Squat        UNCHANGED 5x3 @RPE8. Load held flat two sessions, stop-rule on the note
+  Reactive Circuit          UNCHANGED at x3 rounds - deliberate, see below
+
+DAY 2
+  Prone Y Raise           -> Chest-Supported Incline Y Raise, same 3x12 @RPE6
+  Landmine Push Press       anti-arch bad cue added
+  focusTag                  "Every Pull Protects Your Back" -> "...Your Shoulders"
+
+DAY 3
+  Trap Bar Deadlift         4x4 @RPE8 "max intent" -> 3x5 @RPE7, tempo 2-0-1-0, load held at 20 kg,
+                            "don't lean back and lock out hard" cue, rest 2.5 -> 2 min
+  MB Rotational Throw       5x6+6 @RPE8 "max intent" + heavier ball -> 3x6+6 @RPE7, same ball
+  Machine Leg Press         hard depth rule: the rep ends before the hips curl off the seat
+  Assault Bike              rower alternative REMOVED (contradicted her own card, and is the worst
+                            option for a low back under fatigue); bike/stair/steep treadmill given
+  + Core block              Banded Dead Bug 3x8+8 @RPE7, inserted before Conditioning
+  focusTag                  "Throw Hard, Pull Heavy, Finish Empty" -> "Nothing To Prove Today"
+
+CARDS
+  + "Your Low Back, And What To Do With It" at index 0 - what changed and why, the three-rung
+    ladder, the same-day red flags, keep-training message, booked-by 2026-09-11, mid-October review
+  "Why Your Squat Never Moved"      trap-bar bullet no longer promises the heavy rebuild
+  "Your Upper Back On Heavy Weeks"  now opens by separating upper from low back; dead "use the swap
+                                    on the card" wording fixed
+  "Three Days, And Why"             "protecting your back" -> "your upper back"
+  cycles[3].outcomes[1]             "Trap bar back past where it was in May" -> no longer promised
+```
+
+**What was deliberately NOT done, and why** — each of these was Amir's stated instinct:
+
+- **No RDL or cable pull-through cut.** Neither is in C4. The DB B-Stance RDL became the Barbell Hip
+  Thrust in this cycle's own REPLACE table. The instinct was right and a cycle out of date.
+- **No hip thrust or 45° back extension added.** The hip thrust was already Day 1, and it is not the
+  spine-offload it gets used as. The 45° Back Extension is loaded lumbar extension — the one
+  direction she has actually refused — so it is held for C5 *as the trap bar's replacement*, never
+  as an addition, and only if the direction read holds.
+- **Plyometrics NOT cut.** Day 1 carries every jump in the week and produced no back note; Day 2 has
+  no jumps, no hinge and no axial load, and Day 2 is where she wrote it. She completed the reactive
+  circuit 6/6 last cycle and it was re-earned for her in writing. Cutting one round buys ~2.5 min,
+  so it fixes neither the back nor the 135-minute problem, and it would take away the one category
+  she reliably completes for a reason that cannot be defended to her.
+- **No T-spine block added.** Thoracic Windmill ×8+8 is already in Day 2 prep, put there this cycle
+  for exactly this reason, and its bad-cue already reads *"don't twist from the low back."*
+  "She has always lacked t-spine mobility" is an impression, not a measurement, and the
+  stiff-thorax-causes-lumbar-pain model is much weaker in the literature than its popularity.
+- **No core BLOCK added — one exercise, chosen on her own completion data.** Her ledger says she
+  sheds core (Pallof 3/6 skipped, carries 4/9 sets, both Disliked). Banded Dead Bug is the exception:
+  **5 of 5 sets completed across C3, in the same sessions where she skipped the Pallof.** It is also
+  anti-extension, which is her direction. Day 3 lost 3 high-intent sets and gained 3 low-intent ones,
+  so session time is flat.
+
+**Still open — these gate the next decision, not this one**
+
+1. **Has she actually been seen, by whom, and what was she told?** The card gives a booked-by date of
+   2026-09-11 and a mid-October review regardless. *(principle 2026-08-08: programming around pain
+   needs a date and named triggers or it stands forever by silence.)*
+2. **Was the 26-day layoff (6 Jul → 1 Aug) this same back?** Still cause-unconfirmed. If yes, this is
+   a second episode and the chronic-back rules bind for C5. Treat a soft "maybe" as unknown —
+   five-week-old recall is exactly the stale evidence principle 2026-07-12 warns about.
+3. **Barbell load convention, total or per-side.** Open since 2026-08-19. Her squat is either 25 kg
+   or 50 kg and the trap bar either 20 or 40. It now gates a safety call, not just a progression.
+4. **The 135 minutes.** Day 1 ran 17 sets in 135 min (7.9 min/set); Day 2 ran 20 sets in 63 min
+   (3.15 min/set) three days later. Whatever eats the difference is Day 1-specific and invisible in
+   every field of her file. Ask before cutting a single set — this wants a clock rule, not a scalpel.
+5. **Court-coaching hours.** Her largest spinal exposure appears in no log, no AU figure and no field
+   of her file. Same blind spot the upper-back complaint had, which Amir had to supply himself.
+
+**C5 implications** — the Trap Bar's rebuild carries forward, unstarted. It returns after a clean
+block, **not** after a good day and **not** because an appointment happened. If the direction read
+holds, the 45° Back Extension enters C5 *in its place* with a written range rule, not alongside it.
