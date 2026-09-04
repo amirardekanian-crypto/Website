@@ -23,8 +23,9 @@
 
   1.  WHATSAPP        → شماره‌ی واقعی واتساپ (پایین، توی بخش اسکریپت)
   2.  INSTAGRAM       → آیدی واقعی اینستاگرام (پایین، توی بخش اسکریپت)
+  2b. PHONE           → شماره‌ی تماس؛ ثبت‌نام استعدادیابی فقط تلفنیه
   3.  «مهرانه ظهوریان»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
-  4.  قیمت‌ها          → همه‌ی قیمت‌های بخش «کلاس‌ها» ساختگی‌ان
+  4.  قیمت‌ها          → هنوز خالی‌ان؛ دنبال «TODO: قیمت واقعی» بگرد (۴ تا کلاس پولی)
   5.  آمارها           → ✅ واقعی‌ان حالا: ۱۳ سال سابقه، تیم ملی، بازی حرفه‌ای، مسابقات کشوری
   6.  متن «درباره‌ی من» → ✅ از متن خودش نوشته شده
   7.  نظر شاگردها      → اسم‌ها و متن‌ها ساختگی‌ان
@@ -66,6 +67,7 @@
   --shadow:0 22px 60px -28px rgb(var(--ink-rgb) / .45);
 }
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   margin:0;
@@ -342,6 +344,7 @@ section{position:relative}
   display:flex;align-items:baseline;gap:7px;font-weight:800;font-size:20px;
 }
 .card .price small{font-size:13px;font-weight:500;color:var(--muted)}
+.card .price small a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 .card.feat{background:var(--ink);color:#fff;border-color:transparent}
 .card.feat .ic{background:rgb(var(--ball-rgb) / .16)}
 .card.feat .ic svg{stroke:var(--ball)}
@@ -1049,53 +1052,56 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <span class="tag">محبوب‌ترین</span>
         <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M4.2 8.5c3.6 1.2 6 4.6 6.2 8.4M19.8 8.5c-3.6 1.2-6 4.6-6.2 8.4"/></svg></div>
         <h3>کلاس خصوصی</h3>
-        <span class="meta">یک به یک · ۶۰ دقیقه</span>
+        <span class="meta">یک به یک</span>
         <p>تمام وقت جلسه مال خودته. سریع‌ترین راه برای درست کردن تکنیک، چون هر ضربه‌ات دیده و اصلاح می‌شه.</p>
-        <div class="price">۴۵۰٬۰۰۰ <small>تومان / جلسه</small></div>
+        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
       </article>
 
       <article class="card rv">
         <div class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.6"/><path d="M3 19.5c0-3.1 2.7-5.2 6-5.2s6 2.1 6 5.2M16.4 14.6c2.6.4 4.6 2.3 4.6 4.9"/></svg></div>
-        <h3>کلاس دونفره</h3>
-        <span class="meta">با دوست یا همسرت · ۷۵ دقیقه</span>
-        <p>هزینه‌ش کمتره و چون با هم تمرین می‌کنین، تمرین‌های امتیازی و بازی واقعی هم می‌تونیم بذاریم.</p>
-        <div class="price">۳۰۰٬۰۰۰ <small>تومان / نفر</small></div>
-      </article>
-
-      <article class="card rv">
-        <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 12h18M12 4.5v15"/></svg></div>
-        <h3 data-t="card3Title"></h3>
-        <span class="meta">مخصوص تازه‌کارها · ۶۰ دقیقه</span>
-        <p data-t="card3Body"></p>
-        <div class="price">۴۰۰٬۰۰۰ <small>تومان / جلسه</small></div>
+        <h3>کلاس نیمه‌خصوصی</h3>
+        <span class="meta">دو نفر، یک مربی</span>
+        <p>با دوست، همسر یا هم‌بازیت. هزینه‌ش کمتر از خصوصیه و چون یه نفر روبه‌روته، تمرین امتیازی و بازی واقعی هم می‌شه گذاشت.</p>
+        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
       </article>
 
       <article class="card rv">
         <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 20.5c0-3.6 2.7-6 6-6s6 2.4 6 6"/><path d="M9 11.5 7 15M15 11.5 17 15"/></svg></div>
         <h3>کلاس گروهی</h3>
-        <span class="meta">۳ تا ۵ نفر · ۹۰ دقیقه</span>
-        <p>پرانرژی‌ترین کلاس. تمرین، بازی و کمی رقابت دوستانه. برای کسی که می‌خواد آدم‌های جدید هم پیدا کنه.</p>
-        <div class="price">۲۰۰٬۰۰۰ <small>تومان / نفر</small></div>
+        <span class="meta">۳ تا ۴ نفر</span>
+        <p>پرانرژی‌ترین کلاس. تمرین، بازی و کمی رقابت دوستانه — برای کسی که می‌خواد کنار یاد گرفتن، آدم‌های جدید هم پیدا کنه.</p>
+        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
       </article>
 
       <article class="card rv">
+        <div class="ic"><svg viewBox="0 0 24 24"><ellipse cx="9.5" cy="9" rx="5.5" ry="6"/><path d="M12.6 14 19.5 20.5"/><circle cx="18.6" cy="7.2" r="1.9"/></svg></div>
+        <h3>هیتینگ پارتنر</h3>
+        <span class="meta">بدون درس · فقط بازی</span>
+        <p>وقتی درس نمی‌خوای، توپ خوب می‌خوای. با سابقه‌ی بازی حرفه‌ای و تیم ملی می‌تونم توپ رو با عمق و سرعت ثابت بهت بدم: رالی طولانی، کار روی یه ضربه‌ی خاص، یا ست بازی کردن. هر جا خواستی فشار رو می‌برم بالاتر.</p>
+        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
+      </article>
+
+      <article class="card rv" data-only="tennis">
+        <span class="tag">رایگان</span>
         <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3.5 14.6 9l6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.8 9.4 9Z"/></svg></div>
-        <h3>کلاس بچه‌ها</h3>
-        <span class="meta">۷ تا ۱۴ سال · ۵۰ دقیقه</span>
-        <p>بازی‌محور و پر از حرکت. اول عاشق ورزش می‌شن، بعد تکنیک یاد می‌گیرن. با راکت و توپ مناسب سن.</p>
-        <div class="price">۳۵۰٬۰۰۰ <small>تومان / جلسه</small></div>
+        <h3>استعدادیابی خردسال</h3>
+        <span class="meta">۶ تا ۱۰ سال · تنیس</span>
+        <p>جلسه‌ی استعدادیابی برای بچه‌هایی که تازه با تنیس آشنا می‌شن — بازی‌محور، بدون فشار و بدون هزینه. آخرش بهت می‌گم بچه از کجا می‌تونه شروع کنه.</p>
+        <div class="price">رایگان <small><a data-tel href="#">ثبت‌نام تلفنی</a></small></div>
       </article>
 
-      <article class="card rv">
-        <div class="ic"><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="2"/><path d="M15.5 10.5 21.5 7.5v9l-6-3Z"/></svg></div>
-        <h3>آنالیز ویدیویی</h3>
-        <span class="meta">آنلاین · بدون نیاز به حضور</span>
-        <p>فیلم بازیت رو بفرست. با علامت‌گذاری روی ویدیو بهت می‌گم چی درسته، چی نه و از کجا شروع کنی.</p>
-        <div class="price">۲۵۰٬۰۰۰ <small>تومان / آنالیز</small></div>
+      <article class="card rv" data-only="tennis">
+        <span class="tag">رایگان</span>
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1"/></svg></div>
+        <h3>استعدادیابی نوجوان</h3>
+        <span class="meta">۱۰ تا ۱۴ سال · تنیس</span>
+        <p>برای بچه‌هایی که یه مدت بازی کردن و می‌خوان ببینن تا کجا می‌تونن جلو برن. سطح‌سنجی و مسیر پیشنهادی، باز هم بدون هزینه.</p>
+        <div class="price">رایگان <small><a data-tel href="#">ثبت‌نام تلفنی</a></small></div>
       </article>
+
     </div>
 
-    <p class="price-note rv">قیمت‌ها شامل اجاره‌ی زمین نیست. برای بسته‌های ۴ و ۸ جلسه‌ای تخفیف داریم — تو واتساپ بپرس.</p>
+    <p class="price-note rv">قیمت‌ها و پکیج‌ها رو تو واتساپ بپرس. کلاس‌های استعدادیابی رایگانن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</p>
   </div>
 </section>
 
@@ -1260,7 +1266,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
       <div>
         <h4>تماس</h4>
         <ul>
-          <li><a data-wa href="#">واتساپ · <span data-phone>۰۹۱۲ ۰۰۰ ۰۰۰۰</span></a></li>
+          <li><a data-tel href="#">تماس · <span data-phone>۰۹۱۲ ۰۰۰ ۰۰۰۰</span></a></li>
+          <li><a data-wa href="#">واتساپ</a></li>
           <li><a data-ig href="#">اینستاگرام</a></li>
           <li>تهران · چند مجموعه‌ی ورزشی</li>
           <li>شنبه تا چهارشنبه · ۸ صبح تا ۸ شب</li>
@@ -1285,6 +1292,7 @@ document.documentElement.classList.add("js");   // must stay first — gates eve
    ================================================================ */
 const WHATSAPP  = "989120000000";                 // شماره‌ی واتساپ، بدون + و بدون صفر اول (۹۸ + شماره)
 const INSTAGRAM = "your_instagram_handle";        // فقط آیدی، بدون @
+const PHONE     = "09120000000";                  // شماره‌ی تماس، همون‌طور که گرفته می‌شه (ثبت‌نام استعدادیابی)
 const WA_TEXT   = "سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌ها بپرسم.";
 /* ================================================================ */
 
@@ -1301,6 +1309,10 @@ var REDUCED   = matchMedia("(prefers-reduced-motion: reduce)").matches;
 var CAN_HOVER = matchMedia("(hover: hover) and (pointer: fine)").matches;
 var FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
 function toFa(n){ return String(n).replace(/[0-9]/g, function(d){ return FA[+d]; }); }
+
+/* تماس تلفنی — ثبت‌نام کلاس‌های استعدادیابی فقط از این راهه */
+document.querySelectorAll("[data-tel]").forEach(function(a){ a.href = "tel:" + PHONE; });
+document.querySelectorAll("[data-phone]").forEach(function(el){ el.textContent = toFa(PHONE); });
 
 /* ─────────── headlines split into WORDS ───────────
    Persian letters join to their neighbours, so a per-letter split would render
@@ -1535,12 +1547,10 @@ var SPORTS = {
       chip2:"بازی برای لذت و سلامتی",
       chip3:"پیشرفت حرفه‌ای",
       chip4:"آماده‌سازی مسابقه",
-      card3Title:"تنیس از صفر",
-      card3Body:"اگه تا حالا راکت دست نگرفتی، از همین‌جا شروع می‌کنیم. توی چند جلسه توپ رو تمیز می‌زنی و می‌تونی رالی کنی.",
       q1tag:"۳۲ ساله · تنیس",
       q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام بازی می‌کنم و کم نمیارم.»",
       q2tag:"۴۱ ساله · تنیس",
-      footTag:"مربی تنیس در تهران — ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. کلاس خصوصی، دونفره، گروهی و بچه‌ها."
+      footTag:"مربی تنیس در تهران — ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی، هیتینگ پارتنر و استعدادیابی رایگان."
     },
     media:{
       hero:{video:"media/court.mp4", poster:"media/court-poster.jpg", alt:"تمرین روی زمین خاک"},
@@ -1565,12 +1575,10 @@ var SPORTS = {
       chip2:"بازی برای لذت و سلامتی",
       chip3:"پیشرفت تکنیک",
       chip4:"بازی جدی‌تر",
-      card3Title:"پدل از صفر",
-      card3Body:"اگه پدل بازی نکردی ولی دوستات می‌کنن، این کلاس برای توئه. توی چند جلسه می‌تونی بیای تو زمین و بازی کنی.",
       q1tag:"۳۲ ساله · پدل",
       q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»",
       q2tag:"۴۱ ساله · پدل",
-      footTag:"مربی پدل در تهران — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، دونفره، گروهی و بچه‌ها."
+      footTag:"مربی پدل در تهران — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی و هیتینگ پارتنر."
     },
     media:{}   /* no padel photos yet — slots fall back to placeholders */
   }
@@ -1615,6 +1623,10 @@ function applySport(key){
     document.querySelectorAll('[data-t="' + k + '"]').forEach(function(el){
       if(S.t[k].indexOf("<") >= 0) el.innerHTML = S.t[k]; else el.textContent = S.t[k];
     });
+  });
+
+  document.querySelectorAll("[data-only]").forEach(function(el){
+    el.hidden = el.getAttribute("data-only") !== key;
   });
 
   var tt = document.querySelector(".ticker-track");
