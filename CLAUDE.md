@@ -251,6 +251,23 @@ interests (GDPR Art. 6(1)(f))** rather than explicit consent — a default-on fe
 honestly claim consent as its basis, and the one-tap toggle to object is what makes
 legitimate interests defensible instead. Full reasoning in `HABITS.md`.
 
+⚠️ **The disclosure has to be SEEN, not just true in a policy doc — `renderWtNotice()`,
+added 2026-09-05 (Amir has no lawyer or compliance person of his own to catch a mistake
+here).** A **standing banner** — `.rcprompt`, unchanged, the same component the tour prompt
+and roll-call pointer already use — sits above the weigh-in card until `CFG.wt.seenNotice`
+flips, which happens the moment the athlete taps it (straight to Settings → Body weight, the
+switch itself, not just the read-only history), opens the history any other way, or logs a
+reading. The OLD copy (`wtCardLine()`'s empty-state sentence) technically disclosed this too,
+but lived inside the card and vanished the instant there was a first reading — an athlete
+who tapped *Weigh in* fast enough could act before ever reading it. That was not real
+disclosure. **Also added the same pass: self-service erasure** — *Delete all my weight
+history* in Settings → Body weight, next to the on/off switch, same double-tap-confirm as
+*Reset today's log*. `clearAllWeight()` tombstones every day in one pass, never a raw
+`WT = {}` — a bare wipe is invisible to the union merge and a device that has not pulled it
+would resurrect every reading on its next push, the identical failure mode the single-day
+tombstone fix (above) already exists to prevent. Proven across a simulated second device
+that still holds real readings: it ends up with every reading tombstoned too.
+
 ### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
 
 (Amir, 2026-07-30: *"lets say for example 5 habits are mandatory for everyone … then someone
