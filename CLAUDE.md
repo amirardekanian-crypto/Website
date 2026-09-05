@@ -192,6 +192,47 @@ Beyond scoring, three more things live in more than one place:
 - **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
   server (`public.hab_titles`). Both are append-only; neither may ever subtract.
 
+### ⚖️ Body weight is NOT a habit and is NOT scored — keep it that way
+
+Added 2026-09-03 (Amir: *"add a weight tracker, with history … push my clients to open the
+habit tracker"*). Kilograms, **opt-in** (`CFG.wt.on`, off by default, toggled in
+Settings → Body weight), and **deliberately outside the whole scoring system**: no XP on
+either side, no `xp_rules` key, not in `HABITS`/`live()`/`rosterOn()`, never written to
+`LOG`. It is the one feature that is *not* on the scored-twice table above, and the reason
+it was cheap and safe to ship. Full account in `HABITS.md`; the "don't make it pay"
+argument in `XP_SYSTEM.md` §6.4.
+
+⚠️ **It has its own payload key — `<id>_hab_wt` — and three real bugs are why.** In
+`LOG[day]` the server's `hab_xp()` would pay `customXp` for it as an unrecognised numeric
+key (scoring on the **board** and nowhere else), and the log merge's `max()` would make a
+loss unrecordable and let a stale phone overwrite a correction for ever. On `CFG` the
+wholesale config adoption would delete it exactly as it once deleted earned rewards. Its
+merge is its own: **union by date, newest `t` wins** — and a **delete is a tombstone**
+(`kg: null` with a fresh `t`), never a `delete` of the key: the union only ever walks the
+keys the *cloud* has, so dropping a key outright left the other phone holding the reading
+and re-uploading it, and the deletion undid itself with nothing the athlete could do. **Zero SQL** — `save_progress`
+merges payload keys at the top level and whitelists nothing, `get_progress` returns the
+whole blob, and `coach.html` already selects `data` entire.
+
+UI: `renderWtRow()` is a **white rounded card below the habit list and below its hint**
+(Amir, 2026-09-04 — an earlier build put a square full-bleed band *above* the list and he
+rejected it as inconsistent: this app is white rounded cards on lavender, and the hint
+must stay attached to the rows it explains). The card carries the number, the month delta
+and an inline sparkline, so it is the only thing on Today that shows a trend without being
+tapped. Its **body opens the history and its button logs** — the habit row's own law (name
+vs box); one button doing both by turns left the history unreachable before weighing.
+`renderWtProgressRow()` puts the same fact on **PROGRESS**, after the habits and before
+the quests, because that is the tab an athlete opens to check progress. `renderWeight()` is an overlay screen built on `renderDetail()`'s own furniture —
+76px figure, `.block` sections, the three-up `.statnum` triptych — with **`.chip`/`.chip-on`
+pills** for the **7 day / 1 month / 3 month** ranges, the same control Crew uses to swap
+Roll call for the Leaderboard. **Invent no new component here**: every earlier attempt to
+(a tinted band, a segmented tab box, a bespoke input) was the thing that read as foreign. `renderSettingsWeight()` holds the switch and **never deletes readings
+when switched off**; `weightPanel()` in `coach.html` → Proof shows Amir the trend. The
+chart is the app's **first and only chart** — line is a 7-day rolling average, dots are the
+raw readings, every quoted change compares average to average, because daily weight swings
+a kilo on water alone. Never put it on the board, the wall, or `data/<id>.json`.
+`privacy.html` §2.3 names it and rests on **explicit consent (GDPR Art. 9(2)(a))**.
+
 ### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
 
 (Amir, 2026-07-30: *"lets say for example 5 habits are mandatory for everyone … then someone

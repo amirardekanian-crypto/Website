@@ -819,6 +819,43 @@ async function loadPrograms() {
 
 // The same "counts as a logged day" test contact_list() uses server-side: the
 // day's value is an object with at least one key. Presence, not score.
+// ── Body weight ───────────────────────────────────────────────────────────
+// Proof writes weight to its OWN key in the same progress blob — never into the
+// habit log, because the server pays XP for unrecognised keys in a day object
+// and a weight in there would score on the leaderboard and nowhere else. It is
+// read-only here: the coach watches the trend, the athlete owns the record.
+// Shape: { '2026-09-01': { kg: 78.4, t: 1756... } }
+const WT_AVG_WINDOW = 7;
+function wtOf(blob, id) {
+  const wt = jparse(blob ? blob[id + '_hab_wt'] : null);
+  const out = {};
+  if (wt && typeof wt === 'object') {
+    Object.keys(wt).forEach(k => {
+      const e = wt[k];
+      if (e && typeof e.kg === 'number' && isFinite(e.kg)) out[k] = e.kg;
+    });
+  }
+  return out;
+}
+function wtDaysOf(wt) { return Object.keys(wt).sort(); }
+// The same trailing-average the app draws, so the coach and the athlete are
+// never looking at two different lines for the same body.
+function wtAvgSeriesOf(wt, days) {
+  const from = addDays(todayKey(), -(days - 1));
+  const keys = wtDaysOf(wt);
+  return keys.filter(k => k >= from).map(k => {
+    const lo = addDays(k, -(WT_AVG_WINDOW - 1));
+    const win = keys.filter(x => x <= k && x >= lo).map(x => wt[x]);
+    return { day: k, v: win.reduce((s, v) => s + v, 0) / win.length };
+  });
+}
+function wtChangeOf(wt, days) {
+  const s = wtAvgSeriesOf(wt, days);
+  if (s.length < 2) return null;
+  return { delta: s[s.length - 1].v - s[0].v, n: s.length };
+}
+function fmtDeltaKg(v) { return (v > 0 ? '+' : v < 0 ? '−' : '±') + round1(Math.abs(v)).toFixed(1); }
+
 function habDaysOf(blob, id) {
   const raw = blob ? blob[id + '_hab_log'] : null;
   const log = jparse(raw);
@@ -844,6 +881,7 @@ function assemble() {
     if (r.athlete_name) a.name = r.athlete_name;
     if (r.updated_at && (!a.lastActive || r.updated_at > a.lastActive)) a.lastActive = r.updated_at;
     a.habDays = habDaysOf(r.data, r.athlete_id);
+    a.wt = wtOf(r.data, r.athlete_id);
     const dk = Object.keys(a.habDays).sort();
     a.isHab = dk.length > 0;
     a.habLast = dk.length ? dk[dk.length - 1] : null;
@@ -1400,7 +1438,11 @@ function lineSVG(series, opts) {
   const X = i => series.length > 1 ? left + (i / (series.length - 1)) * (right - left) : (left + right) / 2;
   const Y = v => bot - ((v - yMin) / ((yMax - yMin) || 1)) * (bot - top);
   const d = series.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p.v).toFixed(1)).join(' ');
-  const dots = series.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.2" fill="${opts.color}"/>`).join('');
+  // Dots by default — the readiness chart plots a handful of sessions and each
+  // one is a real event worth marking. A long daily series (body weight, 90
+  // points) turns that into a caterpillar, so it can ask for the line alone.
+  const dots = opts.dots === false ? ''
+    : series.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.2" fill="${opts.color}"/>`).join('');
   let baseLine = '';
   if (opts.baseline != null) { const by = Y(opts.baseline).toFixed(1); baseLine = `<line x1="${left}" y1="${by}" x2="${right}" y2="${by}" stroke="${C.grey}" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>`; }
   return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${baseLine}<path d="${d}" fill="none" stroke="${opts.color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
@@ -2224,12 +2266,39 @@ function proofTabHtml(D) {
       <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '')}</span>
     </div>` : ''}
   </section>
+  ${weightPanel(a)}
   <div class="sec"><span>Their wall lines this week</span></div>
   ${myLines.length ? `<section class="panel">${myLines.map(n => `<div class="wline ${n.hidden ? 'hid' : ''}">
       <div class="bd"><div class="wtop"><span class="nm">${esc(wallDayLabel(n.day))}</span>${n.pct != null ? `<span class="pct">${esc(n.pct)}%</span>` : ''}${n.hidden ? '<span class="hidetag">hidden</span>' : ''}</div>
       <div class="txt">${esc(n.body)}</div></div>
       <button class="modbtn" onclick="toggleHide('${esc(athleteId)}','${esc(n.day)}',${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>
     </div>`).join('')}</section>` : '<p class="empty">Nothing on the wall this week.</p>'}`;
+}
+// Weight is opt-in in the app and most athletes will never switch it on, so
+// this panel is absent rather than empty when there is nothing to show — an
+// empty chart on every athlete's page trains you to scroll past the one that
+// has something in it.
+function weightPanel(a) {
+  const wt = a.wt || {};
+  const keys = wtDaysOf(wt);
+  if (!keys.length) return '';
+  const last = keys[keys.length - 1], kg = wt[last];
+  const gap = daysSince(last + 'T12:00:00');
+  const c30 = wtChangeOf(wt, 30), c90 = wtChangeOf(wt, 90);
+  const ser = wtAvgSeriesOf(wt, 90);
+  const vals = ser.map(p => p.v);
+  const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  const pad = Math.max(0.5, (hi - lo) * 0.18);
+  return `<div class="sec"><span>Body weight</span></div>
+  <section class="panel"><div class="chart-card">
+    <h4>Trend</h4>
+    <div class="chart-big">${round1(kg).toFixed(1)}<span style="font-size:13px;color:var(--muted);margin-left:6px">kg · ${gap === 0 ? 'today' : gap === 1 ? 'yesterday' : gap + ' days ago'}</span></div>
+    <div class="chart-sub">${c30 ? fmtDeltaKg(c30.delta) + ' kg over 30 days' : 'not enough readings for a 30-day change'}${c90 ? ' · ' + fmtDeltaKg(c90.delta) + ' kg over 90' : ''}</div>
+    ${ser.length > 1
+      ? lineSVG(ser, { color: C.green, yMin: lo - pad, yMax: hi + pad, dots: false })
+        + `<div class="chart-legend">${WT_AVG_WINDOW}-day rolling average, last 90 days · ${keys.length} reading${keys.length === 1 ? '' : 's'} all time</div>`
+      : `<p class="empty">One reading so far — a line needs a few more.</p>`}
+  </div></section>`;
 }
 function chatTabHtml(D) {
   return sessionMsgPanel(D.athleteId, S.msgs.filter(m => m.athlete_id === D.athleteId));
@@ -2775,7 +2844,22 @@ function demoStore() {
     pattern.forEach(off => log[d(off)] = { train: 1, steps: 9000 + off * 500, water: 8, sleep: 7.5 });
     return log;
   };
-  const blob = (id, pattern) => ({ [id + '_hab_log']: JSON.stringify(mkLog(pattern)), [id + '_hab_cfg']: '{}' });
+  // A slow, noisy 12-week weight series on the first demo athlete only —
+  // weight is opt-in, so a demo where everyone has it would misrepresent what
+  // this dashboard usually looks like.
+  const mkWt = (start, weeks) => {
+    const out = {};
+    for (let i = weeks * 7 - 1; i >= 0; i--) {
+      if (i % 5 === 2) continue;                       // they miss a couple a week
+      const drift = start - (weeks * 7 - 1 - i) * 0.035;
+      const noise = ((i * 37) % 11 - 5) * 0.16;
+      out[addDays(todayKey(), -i)] = { kg: Math.round((drift + noise) * 10) / 10, t: Date.now() - i * 86400000 };
+    }
+    return out;
+  };
+  const blob = (id, pattern, wtStart) => Object.assign(
+    { [id + '_hab_log']: JSON.stringify(mkLog(pattern)), [id + '_hab_cfg']: '{}' },
+    wtStart ? { [id + '_hab_wt']: JSON.stringify(mkWt(wtStart, 12)) } : {});
   // A realistic plan and a realistic log against it — chips in the shape a real
   // data/<id>.json uses, and summaries in the grammar program.html writes — so
   // ?demo=1 exercises the comparison properly instead of flattering it.
@@ -2895,12 +2979,12 @@ function demoStore() {
     '    Set 1: skipped', '    Set 2: skipped', '    Set 3: skipped',
   ].join('\n');
   S.prog = [
-    { athlete_id: 'pegah_hmt2', athlete_name: 'Pegah', data: blob('pegah_hmt2', [0,1,2,3,4,5,6,7,9,10]), updated_at: new Date().toISOString() },
+    { athlete_id: 'pegah_hmt2', athlete_name: 'Pegah', data: blob('pegah_hmt2', [0,1,2,3,4,5,6,7,9,10], 68.4), updated_at: new Date().toISOString() },
     { athlete_id: 'elmira_askari', athlete_name: 'Elmira', data: blob('elmira_askari', [0,1,3,4,6,8]), updated_at: new Date().toISOString() },
     { athlete_id: 'dela_yazdani', athlete_name: 'Dela', data: blob('dela_yazdani', [1,2,3,5,6]), updated_at: new Date(Date.now() - 86400000).toISOString() },
     { athlete_id: 'amir_ardekani', athlete_name: 'Amir', data: blob('amir_ardekani', [0,1,2,4,5]), updated_at: new Date().toISOString() },
     { athlete_id: 'faraz_etminan', athlete_name: 'Faraz', data: blob('faraz_etminan', [2,3,6,8,11]), updated_at: new Date(Date.now() - 2 * 86400000).toISOString() },
-    { athlete_id: 'sara_free', athlete_name: 'Sara', data: blob('sara_free', [0,1,2,3,4,5,6,7,8,9,10,11,12,13]), updated_at: new Date().toISOString() },
+    { athlete_id: 'sara_free', athlete_name: 'Sara', data: blob('sara_free', [0,1,2,3,4,5,6,7,8,9,10,11,12,13], 81.2), updated_at: new Date().toISOString() },
     { athlete_id: 'reza_jamal', athlete_name: 'Reza', data: blob('reza_jamal', [4,5,7]), updated_at: new Date(Date.now() - 4 * 86400000).toISOString() },
   ];
   const mkSession = (id, name, day, off, rpe, dur, status, note, summary) => ({
