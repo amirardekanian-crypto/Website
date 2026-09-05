@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-skin="spruce">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>فرم رزرو — مهرانه ظهوریان</title>
+<meta name="description" content="فرم رزرو کلاس تنیس و پدل با مهرانه ظهوریان در مشهد. پر کن، خودش باهات تماس می‌گیره.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#003320">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D6F84C'/%3E%3Cpath d='M3 8a16 16 0 0 1 0 16M29 8a16 16 0 0 0 0 16' stroke='%2317123A' stroke-width='2.4' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!--
+================================================================
+  فرم رزرو — چیزهایی که باید بدونی
+
+  ۱. جواب فرم به واتساپِ مهرانه می‌ره (PHONE پایین). هیچ سروری وسط نیست،
+     پس نه ایمیلی لازمه نه کلیدی. اگه یه نسخه‌ی ایمیلی هم خواستی،
+     بلوکِ WEB3FORMS پایینِ اسکریپت رو ببین.
+  ۲. PHONE باید همونی باشه که تو index.html هست.
+  ۳. زمین‌ها از index.html کپی شدن — اگه اونجا عوض شد، اینجا هم عوض کن.
+  ۴. تگ robots noindex → موقع انتشار نهایی روی دامنه‌ی خودش پاکش کن.
+================================================================
+-->
+
+<style>
+:root{
+  --font-display:Lalezar,Vazirmatn,Tahoma,sans-serif;
+  --font-body:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
+  --ink:#17123A;        --ink-rgb:23 18 58;
+  --ink-deep:#100C2A;
+  --ball:#D6F84C;       --ball-rgb:214 248 76;
+  --ball-soft:#EAFF9B;
+  --on-ball:var(--ink);
+  --cloud:#FFC9A8;
+  --paper:#FAF6F2;
+  --mist:#F5E9E1;
+  --muted:#6B6480;
+  --muted-on-dark:rgba(255,255,255,.68);
+  --line:rgba(255,255,255,.13);
+  --line-dark:rgb(var(--ink-rgb) / .12);
+  --bad:#C0392B;
+  --r:22px;
+  --wrap:820px;
+  --shadow:0 22px 60px -28px rgb(var(--ink-rgb) / .45);
+}
+/* SPRUCE — tennis (matches index.html) */
+html[data-skin="spruce"]{
+  --ink:#003320;        --ink-rgb:0 51 32;
+  --ink-deep:#002115;
+  --ball:#EC99AF;       --ball-rgb:236 153 175;
+  --ball-soft:#FFE9E8;
+  --on-ball:#003320;
+  --cloud:#53885E;
+  --paper:#FFFBFA;
+  --mist:#EEF3EF;
+  --muted:#3B4E55;
+}
+/* COURT — padel (matches index.html) */
+html[data-skin="court"]{
+  --ink:#0250B0;        --ink-rgb:2 80 176;
+  --ink-deep:#013C86;
+  --ball:#D0FF41;       --ball-rgb:208 255 65;
+  --ball-soft:#E9FF9E;
+  --on-ball:var(--ink);
+  --cloud:#C6D0DD;
+  --paper:#FFFFFF;
+  --mist:#E9EEF6;
+  --muted:#4A5D77;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font-body);font-size:17px;line-height:1.95;
+  overflow-x:hidden;
+}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;margin:0;letter-spacing:0}
+.wrap{width:min(var(--wrap),calc(100% - 40px));margin-inline:auto}
+:focus-visible{outline:3px solid var(--ball);outline-offset:3px;border-radius:8px}
+
+/* ============ top bar ============ */
+.top{background:var(--ink-deep);color:#fff;padding-block:16px}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:inline-flex;align-items:center;gap:11px;font-weight:700;font-size:17px;color:#fff;text-decoration:none}
+.brand .mark{
+  width:34px;height:34px;border-radius:11px;background:var(--ball);color:var(--on-ball);
+  display:grid;place-content:center;font-family:var(--font-display);font-size:19px;flex:none;
+}
+.back{font-size:14.5px;color:var(--muted-on-dark);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.back:hover{color:#fff}
+.back svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============ hero ============ */
+.head{background:var(--ink);color:#fff;padding-block:52px 60px;position:relative;overflow:hidden}
+.head::before{
+  content:"";position:absolute;inset-block-start:-40%;inset-inline-start:-10%;
+  width:60vw;height:60vw;max-width:640px;max-height:640px;border-radius:50%;
+  background:radial-gradient(circle,rgb(var(--ball-rgb) / .18),transparent 62%);pointer-events:none;
+}
+.head .wrap{position:relative}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;
+  padding:8px 16px;border-radius:999px;
+  background:rgb(var(--ball-rgb) / .12);border:1px solid rgb(var(--ball-rgb) / .32);
+  color:var(--ball-soft);margin-block-end:20px;
+}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--ball);flex:none}
+.head h1{font-size:clamp(30px,5.4vw,46px);line-height:1.4;margin-block-end:14px}
+.head p{color:var(--muted-on-dark);font-size:clamp(16px,2vw,18px);max-width:56ch}
+.promise{
+  margin-block-start:24px;display:inline-flex;align-items:flex-start;gap:11px;
+  background:rgba(255,255,255,.07);border:1px solid var(--line);
+  border-radius:16px;padding:14px 18px;font-size:15px;line-height:1.8;max-width:56ch;
+}
+.promise svg{width:19px;height:19px;stroke:var(--ball);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;margin-block-start:5px}
+
+/* ============ form ============ */
+form{padding-block:44px 70px}
+.card{
+  background:#fff;border:1px solid var(--line-dark);border-radius:var(--r);
+  padding:28px 24px;margin-block-end:20px;
+}
+@media(min-width:640px){.card{padding:32px 30px}}
+.card > h2{
+  font-size:23px;line-height:1.5;margin-block-end:6px;
+  display:flex;align-items:center;gap:12px;
+}
+.card > h2 .n{
+  width:31px;height:31px;border-radius:10px;background:var(--mist);color:var(--ink);
+  display:grid;place-content:center;font-size:16px;flex:none;
+}
+.card > .hint{color:var(--muted);font-size:14.5px;margin-block-end:24px;padding-inline-start:43px}
+
+.fld{margin-block-end:26px}
+.fld:last-child{margin-block-end:0}
+.lbl{display:block;font-weight:600;font-size:15.5px;margin-block-end:11px}
+.lbl em{color:var(--ball);font-style:normal}
+html[data-skin="spruce"] .lbl em,html[data-skin="court"] .lbl em{color:#C0392B}
+.lbl .sub{font-weight:400;color:var(--muted);font-size:13.5px}
+.inp,textarea{
+  width:100%;font:inherit;font-size:16.5px;color:var(--ink);
+  background:var(--paper);border:1.5px solid var(--line-dark);border-radius:14px;
+  padding:13px 16px;transition:border-color .2s,background .2s;
+}
+.inp:focus,textarea:focus{outline:none;border-color:var(--ink);background:#fff}
+textarea{resize:vertical;min-height:92px;line-height:1.8}
+.inp[type=tel],.inp[type=number]{direction:ltr;text-align:right}
+
+/* pill options — radio & checkbox share the look */
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{position:relative;display:inline-flex}
+.opt input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%}
+.opt span{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 18px;border-radius:999px;font-size:15px;font-weight:600;
+  background:var(--paper);border:1.5px solid var(--line-dark);color:var(--ink);
+  transition:background .2s,border-color .2s,transform .2s,color .2s;
+}
+.opt input:hover + span{border-color:rgb(var(--ink-rgb) / .35)}
+.opt input:checked + span{background:var(--ink);border-color:var(--ink);color:#fff;transform:translateY(-2px)}
+.opt input:focus-visible + span{outline:3px solid var(--ball);outline-offset:3px}
+.opt .tick{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  border:1.5px solid rgb(var(--ink-rgb) / .3);display:grid;place-content:center;
+}
+.opt input:checked + span .tick{background:var(--ball);border-color:var(--ball)}
+.opt .tick svg{width:9px;height:9px;stroke:var(--on-ball);fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.opt input:checked + span .tick svg{opacity:1}
+
+.err{color:var(--bad);font-size:14px;margin-block-start:9px;font-weight:600}
+.fld.bad .inp,.fld.bad textarea{border-color:var(--bad);background:#FFF6F5}
+.fld.bad .opts{outline:2px solid rgb(192 57 43 / .3);outline-offset:8px;border-radius:12px}
+
+/* ============ submit ============ */
+.send{margin-block-start:32px;text-align:center}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:16px 34px;border-radius:999px;font-weight:700;font-size:17px;
+  text-decoration:none;
+  transition:transform .25s cubic-bezier(.2,.7,.3,1),box-shadow .25s,background .25s;
+}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--ball);color:var(--on-ball);box-shadow:0 14px 34px -14px rgb(var(--ball-rgb) / .7)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 20px 42px -14px rgb(var(--ball-rgb) / .85)}
+.btn-outline{border:1.5px solid var(--line-dark);color:var(--ink)}
+.btn-outline:hover{background:rgb(var(--ink-rgb) / .05);transform:translateY(-3px)}
+.send .note{color:var(--muted);font-size:14.5px;margin-block-start:16px}
+.formerr{
+  background:#FFF6F5;border:1.5px solid rgb(192 57 43 / .35);color:var(--bad);
+  border-radius:14px;padding:14px 18px;font-size:15px;font-weight:600;margin-block-end:20px;
+}
+
+/* ============ done panel ============ */
+.done{background:#fff;border:1px solid var(--line-dark);border-radius:var(--r);padding:30px 26px;text-align:center}
+.done .ic{
+  width:58px;height:58px;border-radius:50%;background:var(--ball);color:var(--on-ball);
+  display:grid;place-content:center;margin:0 auto 18px;
+}
+.done .ic svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.done h2{font-size:26px;margin-block-end:10px}
+.done p{color:var(--muted);font-size:15.5px;max-width:46ch;margin-inline:auto}
+.done .msg{
+  margin-block:22px;text-align:start;white-space:pre-wrap;
+  background:var(--paper);border:1px solid var(--line-dark);border-radius:14px;
+  padding:18px;font-size:14.5px;line-height:1.9;max-height:270px;overflow:auto;
+}
+.done .row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+
+.foot{background:var(--ink-deep);color:var(--muted-on-dark);padding-block:26px;font-size:14.5px;text-align:center}
+.foot a{color:#fff;text-decoration:none}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="index.html"><span class="mark">م</span><span>مهرانه ظهوریان</span></a>
+    <a class="back" href="index.html">
+      <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      برگرد به سایت
+    </a>
+  </div>
+</header>
+
+<section class="head">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>فرم رزرو</span>
+    <h1>چند تا سوال، بعد خودم زنگ می‌زنم</h1>
+    <p>این فرم رزرو قطعی نیست — فقط بهم می‌گه دنبال چی هستی تا وقتی تماس می‌گیرم، حرفمون سر جزئیات باشه نه از اول.</p>
+    <div class="promise">
+      <svg viewBox="0 0 24 24"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      <span>پرش کردی؟ می‌ره روی واتساپ من. معمولاً کمتر از یک ساعت جواب می‌دم و برای قطعی کردن وقت و زمین، خودم باهات تماس می‌گیرم.</span>
+    </div>
+  </div>
+</section>
+
+<form class="wrap" id="frm" novalidate>
+  <div class="formerr" id="formerr" hidden></div>
+
+  <!-- ═══ ۱ ═══ -->
+  <section class="card">
+    <h2><span class="n">۱</span>تو کی هستی</h2>
+    <p class="hint">برای اینکه بتونم بهت زنگ بزنم.</p>
+
+    <div class="fld" id="f-name">
+      <label class="lbl" for="name">نام و نام خانوادگی <em>*</em></label>
+      <input class="inp" id="name" name="name" type="text" autocomplete="name" placeholder="مثلاً مریم رضایی">
+      <p class="err" hidden>اسمت رو بنویس.</p>
+    </div>
+
+    <div class="fld" id="f-phone">
+      <label class="lbl" for="phone">شماره تماس <em>*</em> <span class="sub">— همون شماره‌ای که واتساپ داری</span></label>
+      <input class="inp" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="۰۹۱۲۳۴۵۶۷۸۹">
+      <p class="err" hidden>یه شماره‌ی موبایل درست بنویس (۱۱ رقم، با ۰۹ شروع بشه).</p>
+    </div>
+
+    <div class="fld" id="f-who">
+      <label class="lbl">کلاس برای کیه؟ <em>*</em></label>
+      <div class="opts" data-req="who">
+        <label class="opt"><input type="radio" name="who" value="خودم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>خودم</span></label>
+        <label class="opt"><input type="radio" name="who" value="فرزندم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>فرزندم</span></label>
+      </div>
+      <p class="err" hidden>یکی رو انتخاب کن.</p>
+    </div>
+
+    <div class="fld" id="f-age" hidden>
+      <label class="lbl" for="age">سنش چنده؟</label>
+      <input class="inp" id="age" name="age" type="number" min="4" max="80" placeholder="مثلاً ۹">
+    </div>
+  </section>
+
+  <!-- ═══ ۲ ═══ -->
+  <section class="card">
+    <h2><span class="n">۲</span>دنبال چی هستی</h2>
+    <p class="hint">هر کدوم رو انتخاب کنی، تمرین‌ها متناسب با سطح و هدف خودت چیده می‌شه.</p>
+
+    <div class="fld" id="f-sport">
+      <label class="lbl">رشته <em>*</em></label>
+      <div class="opts" data-req="sport">
+        <label class="opt"><input type="radio" name="sport" value="تنیس" checked><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>تنیس</span></label>
+        <label class="opt"><input type="radio" name="sport" value="پدل"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>پدل</span></label>
+      </div>
+    </div>
+
+    <div class="fld" id="f-kind">
+      <label class="lbl">چه کلاسی می‌خوای؟ <em>*</em></label>
+      <div class="opts" data-req="kind" id="kinds">
+        <label class="opt"><input type="radio" name="kind" value="کلاس خصوصی (یک به یک)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>خصوصی</span></label>
+        <label class="opt"><input type="radio" name="kind" value="کلاس نیمه‌خصوصی (دو نفر)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>نیمه‌خصوصی</span></label>
+        <label class="opt"><input type="radio" name="kind" value="کلاس گروهی (۳ تا ۴ نفر)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>گروهی</span></label>
+        <label class="opt"><input type="radio" name="kind" value="هیتینگ پارتنر"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>هیتینگ پارتنر</span></label>
+        <label class="opt" data-only="تنیس"><input type="radio" name="kind" value="استعدادیابی رایگان"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>استعدادیابی رایگان</span></label>
+        <label class="opt"><input type="radio" name="kind" value="هنوز نمی‌دونم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>هنوز نمی‌دونم</span></label>
+      </div>
+      <p class="err" hidden>یکی رو انتخاب کن.</p>
+    </div>
+
+    <div class="fld" id="f-level">
+      <label class="lbl">سطحت چیه؟ <em>*</em></label>
+      <div class="opts" data-req="level">
+        <label class="opt"><input type="radio" name="level" value="تا حالا راکت دست نگرفتم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>تا حالا راکت دست نگرفتم</span></label>
+        <label class="opt"><input type="radio" name="level" value="تازه‌کار — چند جلسه بازی کردم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>تازه‌کار</span></label>
+        <label class="opt"><input type="radio" name="level" value="متوسط — رالی می‌کنم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>متوسط، رالی می‌کنم</span></label>
+        <label class="opt"><input type="radio" name="level" value="پیشرفته / مسابقاتی"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>پیشرفته یا مسابقاتی</span></label>
+      </div>
+      <p class="err" hidden>یکی رو انتخاب کن.</p>
+    </div>
+
+    <div class="fld" id="f-goal">
+      <label class="lbl">هدفت چیه؟ <span class="sub">— می‌تونی چند تا انتخاب کنی</span></label>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="goal" value="تفریح و سلامتی"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>تفریح و سلامتی</span></label>
+        <label class="opt"><input type="checkbox" name="goal" value="یاد گرفتن از پایه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>یاد گرفتن از پایه</span></label>
+        <label class="opt"><input type="checkbox" name="goal" value="بهتر کردن تکنیک"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>بهتر کردن تکنیک</span></label>
+        <label class="opt"><input type="checkbox" name="goal" value="آمادگی مسابقه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>آمادگی مسابقه</span></label>
+        <label class="opt"><input type="checkbox" name="goal" value="بازی کردن با دوستان"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>بازی با دوستان</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ۳ ═══ -->
+  <section class="card">
+    <h2><span class="n">۳</span>کِی و کجا</h2>
+    <p class="hint">هر چی گزینه‌هات بازتر باشه، زودتر یه وقت مشترک پیدا می‌کنیم.</p>
+
+    <div class="fld" id="f-freq">
+      <label class="lbl">هفته‌ای چند جلسه؟ <em>*</em></label>
+      <div class="opts" data-req="freq">
+        <label class="opt"><input type="radio" name="freq" value="۱ جلسه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>۱ جلسه</span></label>
+        <label class="opt"><input type="radio" name="freq" value="۲ جلسه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>۲ جلسه</span></label>
+        <label class="opt"><input type="radio" name="freq" value="۳ جلسه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>۳ جلسه</span></label>
+        <label class="opt"><input type="radio" name="freq" value="بیشتر از ۳ جلسه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>بیشتر از ۳</span></label>
+        <label class="opt"><input type="radio" name="freq" value="هنوز مطمئن نیستم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>مطمئن نیستم</span></label>
+      </div>
+      <p class="err" hidden>یکی رو انتخاب کن.</p>
+    </div>
+
+    <div class="fld" id="f-time">
+      <label class="lbl">چه ساعتی از روز؟ <em>*</em> <span class="sub">— هر چند تا که برات ممکنه</span></label>
+      <div class="opts" data-req="time">
+        <label class="opt"><input type="checkbox" name="time" value="صبح (۷ تا ۱۱)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>صبح ۷ تا ۱۱</span></label>
+        <label class="opt"><input type="checkbox" name="time" value="ظهر (۱۱ تا ۱۵)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>ظهر ۱۱ تا ۱۵</span></label>
+        <label class="opt"><input type="checkbox" name="time" value="عصر (۱۵ تا ۱۹)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>عصر ۱۵ تا ۱۹</span></label>
+        <label class="opt"><input type="checkbox" name="time" value="شب (۱۹ تا ۲۲)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>شب ۱۹ تا ۲۲</span></label>
+      </div>
+      <p class="err" hidden>حداقل یه بازه‌ی ساعتی انتخاب کن.</p>
+    </div>
+
+    <div class="fld" id="f-days">
+      <label class="lbl">کدوم روزها وقت داری؟ <span class="sub">— هر چند تا که می‌تونی</span></label>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="days" value="شنبه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>شنبه</span></label>
+        <label class="opt"><input type="checkbox" name="days" value="یک‌شنبه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>یک‌شنبه</span></label>
+        <label class="opt"><input type="checkbox" name="days" value="دوشنبه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>دوشنبه</span></label>
+        <label class="opt"><input type="checkbox" name="days" value="سه‌شنبه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>سه‌شنبه</span></label>
+        <label class="opt"><input type="checkbox" name="days" value="چهارشنبه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>چهارشنبه</span></label>
+        <label class="opt"><input type="checkbox" name="days" value="پنجشنبه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>پنجشنبه</span></label>
+        <label class="opt"><input type="checkbox" name="days" value="جمعه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>جمعه</span></label>
+      </div>
+    </div>
+
+    <div class="fld" id="f-court">
+      <label class="lbl">کدوم زمین برات راحت‌تره؟ <em>*</em> <span class="sub">— هر چند تا که برات ممکنه</span></label>
+      <div class="opts" data-req="court">
+        <label class="opt"><input type="checkbox" name="court" value="زمین تنیس سران (بولوار نمایشگاه)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>زمین تنیس سران · بولوار نمایشگاه</span></label>
+        <label class="opt"><input type="checkbox" name="court" value="هتل پارس مشهد (وکیل‌آباد)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>هتل پارس مشهد · وکیل‌آباد</span></label>
+        <label class="opt"><input type="checkbox" name="court" value="مجموعه‌ی ورزشی ارشاد (دوراهی طرقبه و شاندیز)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>مجموعه‌ی ورزشی ارشاد · طرقبه و شاندیز</span></label>
+        <label class="opt"><input type="checkbox" name="court" value="مجموعه‌ی ورزشی سجاد (حامد شمالی)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>مجموعه‌ی ورزشی سجاد · حامد شمالی</span></label>
+        <label class="opt"><input type="checkbox" name="court" value="فرقی نمی‌کنه"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>فرقی نمی‌کنه</span></label>
+      </div>
+      <p class="err" hidden>حداقل یه زمین انتخاب کن.</p>
+    </div>
+  </section>
+
+  <!-- ═══ ۴ ═══ -->
+  <section class="card">
+    <h2><span class="n">۴</span>چیز دیگه‌ای هست که باید بدونم؟</h2>
+    <p class="hint">اختیاریه، ولی کمک می‌کنه جلسه‌ی اول رو درست بچینم.</p>
+
+    <div class="fld">
+      <label class="lbl">راکت داری؟</label>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="racket" value="دارم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>دارم</span></label>
+        <label class="opt"><input type="radio" name="racket" value="ندارم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>ندارم</span></label>
+      </div>
+    </div>
+
+    <div class="fld">
+      <label class="lbl" for="injury">آسیب‌دیدگی یا محدودیت جسمی</label>
+      <textarea id="injury" name="injury" placeholder="مثلاً زانوی راستم قبلاً آسیب دیده، یا کمردرد دارم."></textarea>
+    </div>
+
+    <div class="fld">
+      <label class="lbl" for="note">حرف دیگه‌ای هست؟</label>
+      <textarea id="note" name="note" placeholder="هر چیزی که فکر می‌کنی باید بدونم."></textarea>
+    </div>
+  </section>
+
+  <div class="send">
+    <button class="btn btn-primary" type="submit">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>
+      بفرست به واتساپ مهرانه
+    </button>
+    <p class="note">با فرستادن فرم، واتساپ باز می‌شه و جواب‌هات آماده‌ی ارسال توشه.</p>
+  </div>
+</form>
+
+<!-- ═══ after send ═══ -->
+<div class="wrap" id="done" hidden style="padding-block:44px 70px">
+  <div class="done">
+    <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6.5"/></svg></div>
+    <h2>واتساپ باز شد</h2>
+    <p>اگه باز نشد، متن پایین رو کپی کن و برای مهرانه بفرست — یا مستقیم بهش زنگ بزن.</p>
+    <div class="msg" id="msgout"></div>
+    <div class="row">
+      <button class="btn btn-primary" id="copy" type="button">کپی کن</button>
+      <a class="btn btn-outline" id="waAgain" href="#">دوباره باز کن</a>
+      <a class="btn btn-outline" id="telLink" href="#">تماس تلفنی</a>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <a href="index.html">مهرانه ظهوریان</a> · مربی تنیس و پدل در مشهد
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   شماره باید با index.html یکی باشه
+   ================================================================ */
+const PHONE    = "09155985068";
+const WHATSAPP = "98" + PHONE.slice(1);
+const TEL      = "+" + WHATSAPP;
+
+const FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+function toFa(s){ return String(s).replace(/[0-9]/g, function(d){ return FA[+d]; }); }
+function toEn(s){                       /* فارسی/عربی → لاتین، برای اعتبارسنجی */
+  return String(s)
+    .replace(/[۰-۹]/g, function(d){ return d.charCodeAt(0) - 0x06F0; })
+    .replace(/[٠-٩]/g, function(d){ return d.charCodeAt(0) - 0x0660; });
+}
+
+const frm = document.getElementById("frm");
+const $   = function(s, r){ return (r || document).querySelector(s); };
+const $$  = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+/* ── skin follows the sport, same tokens as index.html ── */
+const SKIN = { "تنیس":"spruce", "پدل":"court" };
+function sport(){ var el = $('input[name=sport]:checked'); return el ? el.value : "تنیس"; }
+function applySport(){
+  var s = sport();
+  document.documentElement.dataset.skin = SKIN[s];
+  document.querySelector('meta[name=theme-color]').setAttribute("content", s === "پدل" ? "#0250B0" : "#003320");
+  /* استعدادیابی فقط تنیسه — مثل خود سایت */
+  $$("[data-only]").forEach(function(el){
+    var on = el.getAttribute("data-only") === s;
+    el.hidden = !on;
+    if(!on){ var i = $("input", el); if(i) i.checked = false; }
+  });
+}
+$$('input[name=sport]').forEach(function(i){ i.addEventListener("change", applySport); });
+
+/* a #padel / ?s=padel link lands on the right sport */
+(function(){
+  var q = (new URLSearchParams(location.search).get("s") || location.hash.replace("#","")).toLowerCase();
+  if(q === "padel" || q === "پدل"){ var p = $('input[name=sport][value="پدل"]'); if(p) p.checked = true; }
+  applySport();
+})();
+
+/* ── "فرزندم" reveals the age question ── */
+$$('input[name=who]').forEach(function(i){
+  i.addEventListener("change", function(){
+    $("#f-age").hidden = $('input[name=who]:checked').value !== "فرزندم";
+  });
+});
+
+/* ── validation ── */
+function vals(name){ return $$('input[name="' + name + '"]:checked').map(function(i){ return i.value; }); }
+function setBad(id, bad){
+  if(!id) return;                       /* section 4's .fld blocks carry no id */
+  var f = document.getElementById(id); if(!f) return;
+  f.classList.toggle("bad", bad);
+  var e = $(".err", f); if(e) e.hidden = !bad;
+}
+function phoneOK(v){
+  var d = toEn(v).replace(/\D/g, "");
+  if(d.length === 10 && d[0] === "9") return true;      /* ۹۱۵… */
+  return d.length === 11 && d.slice(0,2) === "09";       /* ۰۹۱۵… */
+}
+function validate(){
+  var bad = [];
+  var name = $("#name").value.trim();
+  setBad("f-name", !name);            if(!name) bad.push("f-name");
+
+  var ph = $("#phone").value.trim();
+  var pOK = ph && phoneOK(ph);
+  setBad("f-phone", !pOK);            if(!pOK) bad.push("f-phone");
+
+  [["who","f-who"],["kind","f-kind"],["level","f-level"],["freq","f-freq"],
+   ["time","f-time"],["court","f-court"]].forEach(function(p){
+    var empty = vals(p[0]).length === 0;
+    setBad(p[1], empty);
+    if(empty) bad.push(p[1]);
+  });
+  return bad;
+}
+
+/* ── the message that lands on her phone ── */
+function buildMsg(){
+  var L = [];
+  L.push("سلام مهرانه! از سایت فرم پر کردم 🎾");
+  L.push("");
+  L.push("👤 " + $("#name").value.trim());
+  L.push("📞 " + toFa(toEn($("#phone").value.trim()).replace(/\D/g, "")));
+  var who = vals("who")[0] || "";
+  var age = $("#age").value.trim();
+  L.push("کلاس برای: " + who + (who === "فرزندم" && age ? " (" + toFa(age) + " ساله)" : ""));
+  L.push("");
+  L.push("🎾 رشته: " + sport());
+  L.push("نوع کلاس: " + (vals("kind")[0] || "—"));
+  L.push("سطح: " + (vals("level")[0] || "—"));
+  var g = vals("goal"); if(g.length) L.push("هدف: " + g.join("، "));
+  L.push("");
+  L.push("📅 هفته‌ای: " + (vals("freq")[0] || "—"));
+  L.push("⏰ ساعت: " + (vals("time").join("، ") || "—"));
+  var d = vals("days"); if(d.length) L.push("روزها: " + d.join("، "));
+  L.push("📍 زمین: " + (vals("court").join("، ") || "—"));
+  var r = vals("racket")[0]; if(r) { L.push(""); L.push("🎾 راکت: " + r); }
+  var inj = $("#injury").value.trim(); if(inj) L.push("🩹 آسیب/محدودیت: " + inj);
+  var nte = $("#note").value.trim();  if(nte) L.push("📝 " + nte);
+  return L.join("\n");
+}
+
+frm.addEventListener("submit", function(e){
+  e.preventDefault();
+  var bad = validate();
+  var box = $("#formerr");
+  if(bad.length){
+    box.hidden = false;
+    box.textContent = "چند تا جای خالی مونده — علامت‌شون زدم.";
+    var first = $("#" + bad[0]);
+    if(first) first.scrollIntoView({ behavior:"smooth", block:"center" });
+    return;
+  }
+  box.hidden = true;
+
+  var msg = buildMsg();
+  var url = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(msg);
+
+  $("#msgout").textContent = msg;
+  $("#waAgain").href = url;
+  $("#telLink").href = "tel:" + TEL;
+  frm.hidden = true;
+  $("#done").hidden = false;
+  window.scrollTo({ top:0, behavior:"smooth" });
+
+  window.open(url, "_blank", "noopener");
+});
+
+$("#copy").addEventListener("click", function(){
+  var btn = this, txt = $("#msgout").textContent;
+  function ok(){ btn.textContent = "کپی شد ✓"; setTimeout(function(){ btn.textContent = "کپی کن"; }, 2000); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok, fallback);
+  } else fallback();
+  function fallback(){
+    var t = document.createElement("textarea");
+    t.value = txt; t.style.position = "fixed"; t.style.opacity = "0";
+    document.body.appendChild(t); t.select();
+    try { document.execCommand("copy"); ok(); } catch(_){ btn.textContent = "دستی کپی کن"; }
+    document.body.removeChild(t);
+  }
+});
+
+/* clear a field's error as soon as it is filled */
+$$("input,textarea").forEach(function(i){
+  i.addEventListener("input",  function(){ var f = i.closest(".fld"); if(f) setBad(f.id, false); });
+  i.addEventListener("change", function(){ var f = i.closest(".fld"); if(f) setBad(f.id, false); });
+});
+
+/* ================================================================
+   اگه یه نسخه‌ی ایمیلی هم خواستی (اختیاری):
+   یه کلید رایگان از web3forms.com با ایمیلِ خودِ مهرانه بگیر و اینجا بذار.
+   بدون کلیدِ خودش، جواب فرم می‌ره به ایمیلِ یکی دیگه — پس خالی بمون بهتره.
+
+   const W3F_KEY = "";
+   if(W3F_KEY){
+     fetch("https://api.web3forms.com/submit", {
+       method:"POST",
+       headers:{ "Content-Type":"application/json", Accept:"application/json" },
+       body: JSON.stringify({
+         access_key: W3F_KEY,
+         subject: "رزرو جدید از سایت — " + $("#name").value.trim(),
+         from_name: "فرم رزرو مهرانه",
+         message: msg
+       })
+     }).catch(function(){});
+   }
+   ================================================================ */
+</script>
+</body>
+</html>
