@@ -3192,12 +3192,18 @@ function defaultCfg() {
            seenComeback:null,
            questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
-           // OFF until the athlete turns it on, and unrelated to everything else
-           // in here (Amir, 2026-09-03: "this is not in any way related to other
-           // habits"). Weight earns no XP, sits in no roster, and cannot move a
-           // day score — switching it on or off costs a point either way.
+           // ON by default (Amir, 2026-09-05: "should be on for everyone
+           // automatically ... they can turn it off") — and still unrelated to
+           // everything else in here (Amir, 2026-09-03: "this is not in any way
+           // related to other habits"). Weight earns no XP, sits in no roster,
+           // and cannot move a day score — switching it on or off costs a point
+           // either way, which is what makes defaulting it on safe.
            // `range` is just which tab of the chart they last looked at.
-           wt:{ on:false, range:'30', allReads:false },
+           // `touched` is true the moment the athlete taps the Settings switch
+           // themselves, in EITHER direction — see migrateOld(), which uses it
+           // to tell "never decided" from "decided", so a future default flip
+           // can only ever move a stale default, never overwrite a real choice.
+           wt:{ on:true, range:'30', allReads:false, touched:false },
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().
            msOpen:null };
@@ -3549,8 +3555,10 @@ function loadLocal() {
   try { LOG = JSON.parse(localStorage.getItem(K_LOG()) || '{}') || {}; } catch (e) {}
   try { WT = JSON.parse(localStorage.getItem(K_WT()) || '{}') || {}; } catch (e) { WT = {}; }
   // A config written before this build has no `wt` at all, and Object.assign
-  // above would have left it undefined rather than at the default.
-  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30', allReads:false };
+  // above would have left it undefined rather than at the default. These are
+  // athletes who never had the feature at all — same as a brand-new install —
+  // so they get the current default (on), same as defaultCfg().
+  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:true, range:'30', allReads:false, touched:false };
   try {
     const m = JSON.parse(localStorage.getItem(K_META()) || '{}');
     SYNC.dirty = !!m.dirty; SYNC.lastOk = m.lastOk || null;
@@ -3564,7 +3572,35 @@ function loadLocal() {
 // different habit set, and v2 carried coach/motivation settings this build no
 // longer has. Runs once, then never again.
 function migrateOld() {
-  if (CFG.v === 3 && CFG.migrated3) return;
+  // ── Weight tracking defaults ON for everyone (2026-09-05, Amir: "should be
+  // on for everyone automatically ... they can turn it off"). One-shot, and
+  // deliberately its OWN flag rather than folded into the v3 migration below —
+  // that gate (`CFG.v === 3 && CFG.migrated3`) already returns early for every
+  // athlete who has opened the app even once since v3 shipped weeks ago, i.e.
+  // everyone this needs to reach.
+  //
+  // `touched` — set the instant an athlete taps the Settings switch themselves,
+  // in EITHER direction (see renderSettingsWeight()) — is what tells "never
+  // decided" from "decided", so this can flip a stale default but can never
+  // clobber a real choice, including one made in the few hours this shipped
+  // with the opposite default.
+  //
+  // `wtTouched` only turns true when the value actually MOVES. That matters:
+  // a genuinely brand-new device already starts at `on:true` from
+  // defaultCfg() (or the two repair guards in loadLocal()/syncFromCloud(),
+  // same default), so this block is a no-op there — and it must be a no-op
+  // there, or it would force the loud saveCfg() below on a device that has
+  // never pulled the cloud copy, exactly the race the big warning under this
+  // function guards against. It only fires — and only there does forcing a
+  // real, propagating save make sense — for a device that already held a
+  // real, previously-synced `on:false`, i.e. one that has been used before.
+  let wtTouched = false;
+  if (!CFG.wtOnMigrated) {
+    if (!CFG.wt.touched && CFG.wt.on !== true) { CFG.wt.on = true; wtTouched = true; }
+    CFG.wtOnMigrated = true;
+  }
+
+  if (CFG.v === 3 && CFG.migrated3 && !wtTouched) return;
   const MAP = { train:'strength', mobility:'mobility', sleep:'sleep', unwind:'breathe',
                 protein:'fuel', water:'water', steps:'steps', vitd:'supps', creatine:'supps', omega3:'supps' };
   let touched = false;
@@ -3593,7 +3629,7 @@ function migrateOld() {
   // device that has nothing of its own to lose — and the factory defaults are
   // pushed up for every other device to inherit. A migration that migrated
   // nothing has nothing to announce.
-  if (touched || hadRetired || wasV !== 3) saveCfg(); else saveCfgQuiet();
+  if (touched || wtTouched || hadRetired || wasV !== 3) saveCfg(); else saveCfgQuiet();
 }
 // Both of these drop the bonus cache: the log obviously moves it, and so does
 // the config, because which habits are TRACKED decides what counts as a perfect
@@ -3904,8 +3940,10 @@ async function syncFromCloud() {
         CFG.pass = CFG.pass || { owned:[], title:null, card:null };
         // A preference, not a possession, so the newer config wins it like dark
         // mode does — but a config written before weight existed carries no `wt`
-        // at all, and every reader below assumes the object is there.
-        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30', allReads:false };
+        // at all, and every reader below assumes the object is there. Same
+        // default as a brand-new install, for the same reason as loadLocal()'s
+        // repair above.
+        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:true, range:'30', allReads:false, touched:false };
         const mineOwned = keepPass.owned || [], theirsOwned = CFG.pass.owned || [];
         CFG.pass.owned = theirsOwned.concat(mineOwned.filter(id => theirsOwned.indexOf(id) < 0));
         // What they were WEARING is a preference, not a possession, so the newer
@@ -7829,7 +7867,12 @@ function renderWtRow() {
 // opinions is the thing everybody already hates about weighing themselves.
 function wtCardLine(t, l, c) {
   if (t !== null) return c ? fmtDelta(c.delta) + ' kg over the last month' : 'Keep going — a month of these makes a line worth reading.';
-  if (!l) return 'Kilograms. Same time of day, whenever you weigh.';
+  // The one line that has to explain itself: this card is on by default, so for
+  // most athletes it just appeared, unasked. It only shows here — before the
+  // very first reading — because it disappears for good the moment there is
+  // one; nobody sees "you can turn this off" every day, only the first time
+  // they meet the card at all.
+  if (!l) return 'Kilograms. On by default — turn it off in Settings if it is not for you.';
   const gap = Math.round((today() - parseKey(l.day)) / 86400000);
   if (gap <= 1) return 'Yesterday you were ' + fmtKg(l.kg) + ' kg.';
   if (gap <= 7) return 'Last read ' + gap + ' days ago, at ' + fmtKg(l.kg) + ' kg.';
@@ -8502,7 +8545,7 @@ function renderManual() {
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
       ${block(h2('Body weight') +
-        p(`Optional, and <strong style="color:var(--ink)">off until you switch it on</strong> — Settings, then Body weight. It is the one thing in this app that is not a habit: it earns <strong style="color:var(--ink)">no XP</strong>, it is in no streak, it cannot make a day perfect and it cannot spoil one. Switching it on or off costs you nothing either way, and switching it off keeps every reading you have taken.`) +
+        p(`<strong style="color:var(--ink)">On by default</strong>, and easy to turn off — Settings, then Body weight. It is the one thing in this app that is not a habit: it earns <strong style="color:var(--ink)">no XP</strong>, it is in no streak, it cannot make a day perfect and it cannot spoil one. Switching it on or off costs you nothing either way, and switching it off keeps every reading you have taken.`) +
         p(`When it is on, a <strong style="color:var(--ink)">Body weight</strong> card sits under your habits on Today, with your number, the month's direction and a small trend line on it. It says <strong style="color:var(--ink)">Weigh in</strong> until you have, and opens the full history either way: seven days, a month, or three.`) +
         p(`The chart draws a <strong style="color:var(--ink)">${WT_AVG_WINDOW}-day average</strong> as the line and your actual readings as dots behind it, and every change it quotes compares one average against another. That is deliberate. Weight moves a kilo either way on water, food and sleep, so a single morning tells you nothing and two mornings compared tell you less than nothing. The line is the part worth reading.`) +
         p(`Under the chart are the numbers that answer whether it is actually working. <strong style="color:var(--ink)">Per week</strong> is your rate across whichever span you picked — a rate shows a stall while a total is still creeping. <strong style="color:var(--ink)">Since you started</strong> ignores the span entirely and compares today with your very first reading, which is the only honest answer to "am I getting anywhere". Your readings sit underneath — the last eight, or all of them if you tap the heading.`) +
@@ -9662,17 +9705,23 @@ function renderSettingsAppearance() {
 }
 
 // ── Settings → Body weight ────────────────────────────────────────────────
-// Opt-in, and the switch is the whole screen (Amir, 2026-09-03). Switching it
-// OFF is not a delete: readings stay exactly where they are, because a feature
-// that quietly bins three months of history the moment you tick a box is a
-// feature nobody can safely try. Switching it back on finds everything intact.
+// On by default (Amir, 2026-09-05), and the switch is the whole screen (Amir,
+// 2026-09-03). Switching it OFF is not a delete: readings stay exactly where
+// they are, because a feature that quietly bins three months of history the
+// moment you tick a box is a feature nobody can safely try. Switching it back
+// on finds everything intact.
 function renderSettingsWeight() {
   const n = wtCount();
   return `
     <div data-k="screen:settings:weight" style="${screenAnim()}">
       <div class="cardgrp" style="margin-top:4px">
         <button class="navrow" ${on(() => {
-          CFG.wt.on = !CFG.wt.on; saveCfg(); render();
+          CFG.wt.on = !CFG.wt.on;
+          // The one-time default-flip in migrateOld() must never fight a real
+          // choice the athlete just made, in either direction — this is what
+          // it checks.
+          CFG.wt.touched = true;
+          saveCfg(); render();
           toast(CFG.wt.on ? 'Weight tracking on. It appears at the top of Today.' : 'Weight tracking off. Your readings are kept.');
         })}>
           <span class="navtile" aria-hidden="true">⚖️</span>
@@ -9692,11 +9741,12 @@ function renderSettingsWeight() {
         </button>` : ''}
       </div>
       <div class="setnote">
+        <strong>On by default</strong> for everyone — turn it off any time, right here.
         Kilograms. It earns <strong>no XP</strong>, it is in no streak and it cannot move your
         day score — it is not a habit and it is not scored against you. Only you and
         ${isFree() ? 'Amir' : 'your coach'} ever see it: it never goes on the board, never on
         the wall, and no other athlete can reach it.
-        ${n ? `You have ${n} reading${n === 1 ? '' : 's'} saved. Switching this off keeps every one of them.` : ''}
+        ${n ? ` You have ${n} reading${n === 1 ? '' : 's'} saved. Switching this off keeps every one of them.` : ''}
       </div>
       <div class="setnote" style="padding-top:0">
         Weigh at the same time of day, ideally first thing. Day to day it swings on water,

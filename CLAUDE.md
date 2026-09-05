@@ -195,12 +195,27 @@ Beyond scoring, three more things live in more than one place:
 ### ⚖️ Body weight is NOT a habit and is NOT scored — keep it that way
 
 Added 2026-09-03 (Amir: *"add a weight tracker, with history … push my clients to open the
-habit tracker"*). Kilograms, **opt-in** (`CFG.wt.on`, off by default, toggled in
-Settings → Body weight), and **deliberately outside the whole scoring system**: no XP on
-either side, no `xp_rules` key, not in `HABITS`/`live()`/`rosterOn()`, never written to
-`LOG`. It is the one feature that is *not* on the scored-twice table above, and the reason
-it was cheap and safe to ship. Full account in `HABITS.md`; the "don't make it pay"
-argument in `XP_SYSTEM.md` §6.4.
+habit tracker"*). Kilograms, **on by default for everyone, toggled off** in
+Settings → Body weight (`CFG.wt.on`; flipped from off-by-default 2026-09-05, Amir:
+*"should be on for everyone automatically ... they can turn it off"*), and **deliberately
+outside the whole scoring system**: no XP on either side, no `xp_rules` key, not in
+`HABITS`/`live()`/`rosterOn()`, never written to `LOG`. It is the one feature that is *not*
+on the scored-twice table above, and the reason it was cheap and safe to ship. Full account
+in `HABITS.md`; the "don't make it pay" argument in `XP_SYSTEM.md` §6.4.
+
+⚠️ **The on-by-default flip is a one-shot migration, not just a new `defaultCfg()` value —
+`defaultCfg()` alone only reaches a genuinely brand-new install.** `migrateOld()` carries a
+second, independent one-shot flag (`CFG.wtOnMigrated`) that forces `CFG.wt.on = true` for
+every athlete who has not decided for themselves — which the app tells apart from "just
+inherited whatever default happened to be in force" via `CFG.wt.touched`, set the instant
+the Settings switch is tapped, in **either** direction. That is what lets this safely
+retro-flip athletes who already had an explicit `on:false` stored from the few hours this
+shipped with the opposite default, while never overwriting a real choice. It only forces
+the **loud** `saveCfg()` (the one that stamps `updatedAt` and propagates to the cloud) when
+the value actually moves — a brand-new device already starts at `on:true` and must stay a
+quiet `saveCfgQuiet()`, or it would race ahead of its first cloud pull exactly the way the
+`saveCfg()`-vs-`saveCfgQuiet()` warning a few hundred lines below (`migrateOld()`'s own
+comment) already guards against.
 
 ⚠️ **It has its own payload key — `<id>_hab_wt` — and three real bugs are why.** In
 `LOG[day]` the server's `hab_xp()` would pay `customXp` for it as an unrecognised numeric
@@ -231,7 +246,10 @@ when switched off**; `weightPanel()` in `coach.html` → Proof shows Amir the tr
 chart is the app's **first and only chart** — line is a 7-day rolling average, dots are the
 raw readings, every quoted change compares average to average, because daily weight swings
 a kilo on water alone. Never put it on the board, the wall, or `data/<id>.json`.
-`privacy.html` §2.3 names it and rests on **explicit consent (GDPR Art. 9(2)(a))**.
+`privacy.html` §2.3 names it and, since it went on-by-default, rests on **legitimate
+interests (GDPR Art. 6(1)(f))** rather than explicit consent — a default-on feature cannot
+honestly claim consent as its basis, and the one-tap toggle to object is what makes
+legitimate interests defensible instead. Full reasoning in `HABITS.md`.
 
 ### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
 

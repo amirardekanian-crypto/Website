@@ -777,8 +777,15 @@ they are the point. The rank was nowhere on Crew at all.
 ## Body weight — the one thing here that is not a habit
 
 Added 2026-09-03 (Amir: *"my aim is to add a weight tracker, with history … the aim is to
-push my clients to open the habit tracker so they start using it"*). **Kilograms only,
-opt-in, and deliberately outside the entire scoring system.**
+push my clients to open the habit tracker so they start using it"*). **Kilograms only, on
+by default for everyone (flipped 2026-09-05 — see below), and deliberately outside the
+entire scoring system.**
+
+⚠️ **On by default since 2026-09-05** (Amir: *"Weight tracking should be on for everyone
+automatically. And then they can turn it iff [off]"*). Shipped opt-in, flipped to
+opt-**out** two days later once it was live and working. See *The default-on migration*
+further down for exactly how that reached every athlete — new and existing — without a
+single SQL statement and without ever overwriting an athlete's own explicit choice.
 
 **It is not a habit and must never become one.** A habit has a target you either hit or
 miss; body weight has neither, and wiring it into `dayParts()`/`dayPct()`/`isPerfect()`
@@ -816,6 +823,48 @@ delete the other would undo.
 keys at the top level (`data || excluded.data`) and whitelists nothing; `get_progress`
 returns the whole blob; `coach.html` already selects `data` entire. A fourth key would be
 just as free.
+
+**The default-on migration.** Reaching every athlete — new sign-ups and the ones already
+running the app — with a changed default took two mechanisms, not one:
+
+- **`defaultCfg()`, and the two `!CFG.wt || typeof CFG.wt !== 'object'` repair guards** in
+  `loadLocal()` and `syncFromCloud()` all now seed `on:true`. Between them these cover
+  every athlete who has **never had a `wt` key at all** — a brand-new install, or an
+  existing athlete who has not opened the app since the feature first shipped. That is
+  most of the current athlete base, since the feature is only two days old.
+- **A one-shot block inside `migrateOld()`, gated on its own flag (`CFG.wtOnMigrated`) —
+  not the `CFG.v === 3 && CFG.migrated3` gate the rest of the function uses**, because that
+  gate returns early for every athlete already on v3, which is everyone. This is what
+  reaches the remaining population: anyone who opened the app in the few hours the feature
+  ran with the *old* default and so already has a real, previously-synced `CFG.wt.on:false`
+  on this device.
+
+⚠️ **The line between "flip it" and "leave it alone" is `CFG.wt.touched`** — set to `true`
+the instant an athlete taps the Settings switch themselves, in **either** direction (see
+`renderSettingsWeight()`). The migration checks it first: untouched means "whatever default
+happened to be in force when this device last saved", which is fair game to update; touched
+means the athlete decided, and the migration must never look at the value again. This is
+what lets the same one-line flip retro-enable athletes who never chose anything while never
+re-enabling someone who deliberately turned it off — including someone who turns it off
+during the very short window before this doc update lands.
+
+⚠️ **The migration must only claim a "loud" `saveCfg()` — one that stamps `updatedAt` and
+propagates to the cloud — when the value actually changes**, never merely because the block
+ran. A brand-new device already starts at `on:true` from `defaultCfg()`, so for it the
+migration is a true no-op; forcing a loud save there anyway would be the exact race
+`migrateOld()`'s own big warning comment describes for the v3 migration — a device that has
+never pulled the cloud copy marking itself "newest" and refusing the real cloud config when
+it finally arrives. `wtTouched` (a local variable, not to be confused with `CFG.wt.touched`)
+tracks whether this run's flip was real, and only `wtTouched` feeds the final
+`saveCfg()`-vs-`saveCfgQuiet()` decision alongside the pre-existing `touched`/`hadRetired`/
+`wasV !== 3` conditions.
+
+Proven in the browser across every combination: a brand-new device lands on `on:true` with
+a **quiet** save; an existing athlete with a real stored `on:false` gets flipped to `true`
+with a **loud** save, and does not re-flip or re-save on a second boot; an athlete who
+explicitly turned it off (or on) keeps that value through the migration, with **no** save
+at all; and forcing the one-shot flag back off and re-running `migrateOld()` by hand still
+respects an explicit choice — the `touched` check, not the one-shot flag, is the real guard.
 
 **Where it lives in the UI**
 - **Today** — `renderWtRow()`, a **white rounded card below the habit list and below the
@@ -890,8 +939,15 @@ renders copy instead of a chart, and readings are clamped to `WT_MIN`–`WT_MAX`
 and rounded to one decimal so a fat-fingered 784 cannot flatten the chart.
 
 **Privacy.** It never reaches the leaderboard, the wall, or `data/<id>.json`. `privacy.html`
-§2.3 now names it explicitly and relies on **explicit consent** (GDPR Art. 9(2)(a)) —
-switching the feature on *is* that consent — because body weight is health information.
+§2.3 names it explicitly and, since it went on-by-default (2026-09-05), rests on
+**legitimate interests (GDPR Art. 6(1)(f))** rather than explicit consent — a default-on
+feature cannot honestly claim consent as its basis, since consent has to be an affirmative
+act and a pre-set default is the opposite of one. The one-tap-to-object toggle in Settings
+is what makes legitimate interests defensible here rather than merely convenient. ⚠️ This
+was a judgement call about whether a bare weight number counts as Article 9 "special
+category" health data at all (genuinely ambiguous — plenty of consumer fitness apps treat
+it as ordinary personal data), made once, in the privacy copy, not re-litigated per athlete;
+flagged to Amir at the time, not decided silently.
 
 ### Settings — behind the initials button, and it is a LIST OF DOORS
 Redesigned 2026-08-01 (Amir, with a reference screen: *"i want the habits to be modified
