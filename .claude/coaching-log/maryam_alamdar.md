@@ -222,6 +222,15 @@ second one: Day 4 was ticked once in four weeks, and Day 2 was ticked four times
 the same day as a lifting session. Her walking happens *inside* her gym days. C2 is
 therefore **4 loaded + 1 restoration card**, with the walks moved onto the loaded days.
 
+*Start date moved to Sat 12 Sep* (Amir, 2026-09-05). C2 was authored to start Sat 5 Sep, the
+day it was designed. Cycles 2–5 all shifted +7 days; C1 keeps its real dates and the "Weeks
+5–9" style labels are unchanged, because the intervening week is a rest week and not a
+programme week. That leaves a deliberate **7-day gap, 5–11 Sep**: walking and the Day 3
+mobility card only, which also buys her back a full quiet week before the free hinge starts.
+Every cycle stays Saturday-aligned. New range: **12 Sep → 16 Oct 2026**; the cycle-boundary
+physio checkpoint moves with it to **2026-10-16**, and the week-1 weigh-in deadline to
+**2026-09-18**.
+
 *Roadmap check.* C2 "Slow Burn", weeks 5–9, 5 weeks (4 loading + 1 back-off). Matches the
 locked roadmap exactly — fourth day back, free hinge returns as a skill, first fat-loss
 phase. No deviation.
