@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>مهرانه ظهوریان — مربی تنیس و پدل</title>
-<meta name="description" content="کلاس خصوصی و گروهی تنیس و پدل در تهران، با ۱۳ سال سابقه در تنیس و عضویت در تیم ملی. آموزش متناسب با مسیر و هدف تو.">
+<meta name="description" content="کلاس خصوصی و گروهی تنیس و پدل در مشهد، با ۱۳ سال سابقه در تنیس و عضویت در تیم ملی. آموزش متناسب با مسیر و هدف تو.">
 <meta name="robots" content="noindex,nofollow">   <!-- DRAFT: remove when it moves to her own domain -->
 <meta name="theme-color" content="#003320">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D6F84C'/%3E%3Cpath d='M3 8a16 16 0 0 1 0 16M29 8a16 16 0 0 0 0 16' stroke='%2317123A' stroke-width='2.4' fill='none'/%3E%3C/svg%3E">
 <meta property="og:title" content="مهرانه ظهوریان — مربی تنیس و پدل">
-<meta property="og:description" content="کلاس خصوصی و گروهی تنیس و پدل در تهران. آموزش متناسب با مسیر و هدف تو.">
+<meta property="og:description" content="کلاس خصوصی و گروهی تنیس و پدل در مشهد. آموزش متناسب با مسیر و هدف تو.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -356,6 +356,21 @@ section{position:relative}
   font-size:11.5px;font-weight:800;padding:5px 12px;border-radius:999px;
 }
 .price-note{margin-block-start:26px;font-size:14.5px;color:var(--muted);text-align:center}
+
+/* ============ venues ============ */
+.venues{display:grid;gap:14px;margin-block-start:28px}
+@media(min-width:640px){.venues{grid-template-columns:1fr 1fr}}
+@media(min-width:1020px){.venues{grid-template-columns:repeat(4,1fr)}}
+.venue{
+  background:#fff;border:1px solid var(--line-dark);border-radius:16px;padding:20px;
+  display:flex;gap:13px;align-items:flex-start;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s;
+}
+.venue:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.venue .pin{width:26px;height:26px;border-radius:9px;background:var(--mist);display:grid;place-content:center;flex:none;margin-block-start:2px}
+.venue .pin svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.venue b{display:block;font-size:16px;line-height:1.5}
+.venue span{font-size:13.5px;color:var(--muted)}
 
 /* ============ steps ============ */
 .steps{display:grid;gap:22px;counter-reset:s}
@@ -930,8 +945,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <span class="nav-ind" aria-hidden="true"></span>
         <a href="#about">درباره‌ی من</a>
         <a href="#classes">کلاس‌ها</a>
+        <a href="#venues">زمین‌ها</a>
         <a href="#how">چطور شروع کنیم</a>
-        <a href="#words">نظر شاگردها</a>
         <a href="#faq">سوال‌ها</a>
       </nav>
       <a class="swap" href="#" data-swap></a>
@@ -941,6 +956,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
     <nav class="menu" id="menu">
       <a href="#about">درباره‌ی من</a>
       <a href="#classes">کلاس‌ها</a>
+      <a href="#venues">زمین‌ها</a>
       <a href="#how">چطور شروع کنیم</a>
       <a href="#words">نظر شاگردها</a>
       <a href="#faq">سوال‌ها</a>
@@ -953,7 +969,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
 <section class="hero" id="home">
   <div class="wrap hero-in">
     <div>
-      <span class="eyebrow rv"><span class="dot"></span><span data-t="eyebrow">مربی تنیس · تهران</span></span>
+      <span class="eyebrow rv"><span class="dot"></span><span data-t="eyebrow">مربی تنیس · مشهد</span></span>
       <h1 class="rv">هر بازیکن، <span class="hl">مسیر خودش</span></h1>
       <p class="lead on-dark rv" data-t="heroLead"></p>
       <div class="hero-btns rv">
@@ -1084,8 +1100,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <span class="tag">رایگان</span>
         <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3.5 14.6 9l6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.8 9.4 9Z"/></svg></div>
         <h3>استعدادیابی خردسال</h3>
-        <span class="meta">۶ تا ۱۰ سال · تنیس</span>
-        <p>جلسه‌ی استعدادیابی برای بچه‌هایی که تازه با تنیس آشنا می‌شن — بازی‌محور، بدون فشار و بدون هزینه. آخرش بهت می‌گم بچه از کجا می‌تونه شروع کنه.</p>
+        <span class="meta">۶ تا ۱۰ سال · پنجشنبه و جمعه</span>
+        <p>جلسه‌ی استعدادیابی برای بچه‌هایی که تازه با تنیس آشنا می‌شن — بازی‌محور، بدون فشار و بدون هزینه. معمولاً پنجشنبه و جمعه‌ست و وقتش رو با یه تماس هماهنگ می‌کنیم.</p>
         <div class="price">رایگان <small><a data-tel href="#">ثبت‌نام تلفنی</a></small></div>
       </article>
 
@@ -1093,14 +1109,31 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <span class="tag">رایگان</span>
         <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1"/></svg></div>
         <h3>استعدادیابی نوجوان</h3>
-        <span class="meta">۱۰ تا ۱۴ سال · تنیس</span>
-        <p>برای بچه‌هایی که یه مدت بازی کردن و می‌خوان ببینن تا کجا می‌تونن جلو برن. سطح‌سنجی و مسیر پیشنهادی، باز هم بدون هزینه.</p>
+        <span class="meta">۱۰ تا ۱۴ سال · پنجشنبه و جمعه</span>
+        <p>برای بچه‌هایی که یه مدت بازی کردن و می‌خوان ببینن تا کجا می‌تونن جلو برن. سطح‌سنجی و مسیر پیشنهادی، باز هم بدون هزینه. معمولاً پنجشنبه و جمعه‌ست و وقتش با تماس هماهنگ می‌شه.</p>
         <div class="price">رایگان <small><a data-tel href="#">ثبت‌نام تلفنی</a></small></div>
       </article>
 
     </div>
 
-    <p class="price-note rv">قیمت‌ها و پکیج‌ها رو تو واتساپ بپرس. کلاس‌های استعدادیابی رایگانن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</p>
+    <p class="price-note rv">قیمت‌ها و پکیج‌ها رو تو واتساپ بپرس. کلاس‌های استعدادیابی رایگانن و معمولاً پنجشنبه و جمعه برگزار می‌شن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</p>
+  </div>
+</section>
+
+<!-- ============ VENUES ============ -->
+<section class="pad tint" id="venues">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow on-light"><span class="dot"></span>زمین‌ها</span>
+      <h2 class="h-sec">کجا تمرین می‌کنیم</h2>
+      <p class="lead">توی چند مجموعه‌ی ورزشی در مشهد کلاس دارم. بگو کجای شهری تا نزدیک‌ترین زمین و ساعتی که آزاده رو با هم پیدا کنیم.</p>
+    </div>
+    <div class="venues rv">
+      <div class="venue"><span class="pin"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></span><div><b>زمین تنیس سران</b><span>بولوار نمایشگاه</span></div></div>
+      <div class="venue"><span class="pin"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></span><div><b>هتل پارس مشهد</b><span>وکیل‌آباد</span></div></div>
+      <div class="venue"><span class="pin"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></span><div><b>مجموعه‌ی ورزشی ارشاد</b><span>دوراهی طرقبه و شاندیز</span></div></div>
+      <div class="venue"><span class="pin"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></span><div><b>مجموعه‌ی ورزشی سجاد</b><span>حامد شمالی</span></div></div>
+    </div>
   </div>
 </section>
 
@@ -1116,7 +1149,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
       <div class="step rv">
         <div class="num">۱</div>
         <h3>یه پیام بده</h3>
-        <p>تو واتساپ بنویس چقدر بازی کردی، چه روزهایی وقت داری و دنبال چی هستی. همین کافیه.</p>
+        <p>تو واتساپ بنویس چقدر بازی کردی، کجای شهری، چه روزهایی وقت داری و دنبال چی هستی. همین کافیه.</p>
       </div>
       <div class="step rv">
         <div class="num">۲</div>
@@ -1196,7 +1229,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
       </details>
       <details class="qa rv">
         <summary>کلاس‌ها کجا برگزار می‌شه؟</summary>
-        <div class="ans-wrap"><div class="ans">توی چند تا مجموعه‌ی ورزشی در تهران. بسته به اینکه کجا زندگی می‌کنی و چه ساعتی وقت داری، نزدیک‌ترین گزینه رو پیدا می‌کنیم.</div></div>
+        <div class="ans-wrap"><div class="ans">توی چند مجموعه‌ی ورزشی در مشهد: زمین تنیس سران (بولوار نمایشگاه)، هتل پارس مشهد (وکیل‌آباد)، مجموعه‌ی ورزشی ارشاد (دوراهی طرقبه و شاندیز) و مجموعه‌ی ورزشی سجاد (حامد شمالی). بگو کجای شهری و چه ساعتی وقت داری تا نزدیک‌ترینش رو انتخاب کنیم.</div></div>
       </details>
       <details class="qa rv">
         <summary>تا حالا اصلاً راکت دست نگرفتم. مشکلی نیست؟</summary>
@@ -1268,8 +1301,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
           <li><a data-tel href="#">تماس · <span data-phone>۰۹۱۲ ۰۰۰ ۰۰۰۰</span></a></li>
           <li><a data-wa href="#">واتساپ</a></li>
           <li><a data-ig href="#">اینستاگرام</a></li>
-          <li>تهران · چند مجموعه‌ی ورزشی</li>
-          <li>شنبه تا چهارشنبه · ۸ صبح تا ۸ شب</li>
+          <li><a href="#venues">مشهد · چهار مجموعه‌ی ورزشی</a></li>
+          <li>استعدادیابی رایگان · پنجشنبه و جمعه</li>
         </ul>
       </div>
     </div>
@@ -1535,12 +1568,12 @@ var SPORTS = {
   tennis: {
     skin:"spruce", label:"تنیس", other:"پدل", otherKey:"padel",
     title:"مهرانه ظهوریان — مربی تنیس",
-    desc:"کلاس خصوصی و گروهی تنیس در تهران، با ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. از تازه‌کار تا آماده‌سازی مسابقه.",
+    desc:"کلاس خصوصی و گروهی تنیس در مشهد، با ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. از تازه‌کار تا آماده‌سازی مسابقه.",
     theme:"#003320",
     wa:"سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌های تنیس بپرسم.",
     ticker:["تنیس","فورهند","بک‌هند","سرویس","والی","اسمش","حرکت پا","تکنیک","تعادل","اعتمادبه‌نفس","تمرین","بازی"],
     t:{
-      eyebrow:"مربی تنیس · تهران",
+      eyebrow:"مربی تنیس · مشهد",
       heroLead:"سلام، من مهرانه‌ام. فرقی نمی‌کنه تازه می‌خوای تنیس رو شروع کنی، برای لذت و سلامتی بازی می‌کنی یا هدفت پیشرفت حرفه‌ای و حضور در مسابقاته — آموزش باید متناسب با مسیر و هدف تو باشه.",
       floatB:"رشته:<br>تنیس",
       aboutP1:"۱۳ ساله که توی تنیسم: بازی حرفه‌ای، عضویت در تیم ملی و حضور در مسابقات کشوری. تلاش می‌کنم همین تجربه رو متناسب با سطح و هدف هر بازیکن به کار بگیرم — از کسی که اولین بار راکت دستش گرفته تا بازیکنی که سال‌هاست بازی می‌کنه و می‌خواد جدی‌تر بشه.",
@@ -1551,7 +1584,7 @@ var SPORTS = {
       q1tag:"۳۲ ساله · تنیس",
       q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام بازی می‌کنم و کم نمیارم.»",
       q2tag:"۴۱ ساله · تنیس",
-      footTag:"مربی تنیس در تهران — ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی، هیتینگ پارتنر و استعدادیابی رایگان."
+      footTag:"مربی تنیس در مشهد — ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی، هیتینگ پارتنر و استعدادیابی رایگان."
     },
     media:{
       hero:{video:"media/court.mp4", poster:"media/court-poster.jpg", alt:"تمرین روی زمین خاک"},
@@ -1563,12 +1596,12 @@ var SPORTS = {
   padel: {
     skin:"court", label:"پدل", other:"تنیس", otherKey:"tennis",
     title:"مهرانه ظهوریان — مربی پدل",
-    desc:"کلاس خصوصی و گروهی پدل در تهران، از صفر تا بازی کردن توی زمین — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی.",
+    desc:"کلاس خصوصی و گروهی پدل در مشهد، از صفر تا بازی کردن توی زمین — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی.",
     theme:"#0250B0",
     wa:"سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌های پدل بپرسم.",
     ticker:["پدل","سرویس","والی","بانداخا","ویبورا","اسمش","دیوار شیشه‌ای","حرکت پا","جفت","تاکتیک","دفاع","بازی"],
     t:{
-      eyebrow:"مربی پدل · تهران",
+      eyebrow:"مربی پدل · مشهد",
       heroLead:"سلام، من مهرانه‌ام. فرقی نمی‌کنه تازه می‌خوای پدل رو شروع کنی، برای لذت و سلامتی بازی می‌کنی یا می‌خوای جدی‌تر بشی — آموزش باید متناسب با مسیر و هدف تو باشه.",
       floatB:"رشته:<br>پدل",
       aboutP1:"۱۳ ساله که توی تنیسم — بازی حرفه‌ای، عضویت در تیم ملی و حضور در مسابقات کشوری — و همون پایه رو توی پدل به کار می‌گیرم: خوندن توپ، حرکت پا و تصمیم درست سر هر ضربه. از کسی که اولین بار راکت پدل دستش گرفته تا کسی که هفته‌ای چند بار بازی می‌کنه و یه جایی گیر کرده.",
@@ -1579,7 +1612,7 @@ var SPORTS = {
       q1tag:"۳۲ ساله · پدل",
       q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»",
       q2tag:"۴۱ ساله · پدل",
-      footTag:"مربی پدل در تهران — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی و هیتینگ پارتنر."
+      footTag:"مربی پدل در مشهد — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی و هیتینگ پارتنر."
     },
     media:{}   /* no padel photos yet — slots fall back to placeholders */
   }
