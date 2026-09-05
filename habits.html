@@ -505,6 +505,56 @@
      and a new athlete was being shown five weeks of them. */
   .grid35 .c.pre { border-style: dotted; opacity: .4; }
 
+  /* ── Body weight ──
+     No new species of component. The card on Today is the same white rounded
+     card every other block on that screen is; the range switcher is the .chip
+     pills Crew already uses to swap Roll call for the Leaderboard; the history
+     screen is the habit-detail screen's own furniture. The ONLY genuinely new
+     thing in here is the trend line itself, because the app has never drawn
+     one — and even that takes its colour from the same token as every bar. */
+  #app .wtpanel {
+    background: var(--card); border-radius: 18px; box-shadow: var(--shadow);
+    margin: 4px 16px 14px; padding: 16px;
+    display: flex; flex-direction: column; gap: 13px;
+  }
+  #app .wtp-top { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; }
+  #app .wtp-l { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  #app .wtp-go { flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+                 font-size: 19px; color: var(--accent); }
+  #app .wtp-n {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px;
+    line-height: .9; color: var(--accent); letter-spacing: -.04em;
+  }
+  #app .wtp-n .u { font-size: 15px; color: var(--muted-soft); margin-left: 3px; letter-spacing: 0; }
+  #app .wtp-d { font-size: 11.5px; line-height: 1.3; color: var(--muted); }
+  /* preserveAspectRatio none + non-scaling-stroke: the sparkline stretches to
+     whatever width is left beside the number without the stroke going with it. */
+  #app .wtp-r { flex: none; display: block; }
+  #app .wtp-r path {
+    fill: none; stroke: var(--accent); stroke-width: 2.4;
+    stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke;
+  }
+
+  .wtchart { width: 100%; height: auto; display: block; overflow: visible; }
+  .wtchart .wtline { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+  .wtchart .wtdot { fill: var(--accent); opacity: .3; }
+  .wtchart .wtnow { fill: var(--clay-deep); opacity: 1; }
+  .wtchart .wtgrid { stroke: var(--rule); stroke-width: 1; }
+  .wtchart .wtlbl { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; fill: var(--muted-soft); }
+
+  /* The weigh-in field. Sits inside the SAME .stepper the habit log sheet uses,
+     so the -/+ buttons either side are the app's, not new ones; only the middle
+     is an input rather than a printed number, because 78 kg from zero is 780
+     taps and typing has to be possible. Styled as .figure so it reads as the
+     same number the stepper always shows. */
+  .wtinput {
+    width: 100%; min-width: 0; text-align: center; border: none; background: transparent;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 36px; line-height: 1; color: var(--accent); letter-spacing: -.04em;
+    -moz-appearance: textfield;
+  }
+  .wtinput::-webkit-outer-spin-button, .wtinput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
   /* ── Sheet & toast ── */
   .scrim { position: absolute; inset: 0; z-index: 80; background: var(--scrim); animation: fadeIn .2s ease; }
   .sheet {
@@ -3056,13 +3106,68 @@ const K_CFG  = () => ATHLETE_ID + '_hab_cfg';
 const K_LOG  = () => ATHLETE_ID + '_hab_log';
 const K_META = () => ATHLETE_ID + '_hab_meta';
 
+// ── BODY WEIGHT ───────────────────────────────────────────────────────────
+// Its OWN payload key, deliberately — not a habit, not a field on CFG, and
+// never inside LOG. Three reasons, each of which is a real bug avoided:
+//
+//  1. THE SERVER PAYS FOR UNRECOGNISED KEYS. hab_xp() treats any numeric key in
+//     a day object that has no entry in rules.weights as a custom habit and
+//     pays customXp for it (stage24, capped at maxCustom). A weight in the log
+//     would earn XP on the LEADERBOARD and nothing on the phone — the silent
+//     two-scorer drift this app fears most. Out of LOG, out of both scorers.
+//  2. THE LOG MERGE TAKES max(). That is the right defence for "did you do it"
+//     and exactly wrong for "what is it": a stale phone holding 80.0 would beat
+//     a corrected 78.4 for ever, and a loss could never be recorded at all.
+//  3. THE CONFIG MERGE ADOPTS WHOLESALE. A newer cloud config replaces the
+//     local one outright, which is why CFG.pass.owned had to be special-cased
+//     into a union — a history on CFG would be deleted by the other device the
+//     same way.
+//
+// So: a third key, unioned by DATE with the newest reading winning per date,
+// which is why every entry carries its own `t`. save_progress merges payload
+// keys at the top level and get_progress returns the whole blob, so this cost
+// no SQL at all — see syncFromCloud() and pushNow().
+//
+// Shape: { '2026-09-01': { kg: 78.4, t: 1756... } }
+const K_WT = () => ATHLETE_ID + '_hab_wt';
+let WT = {};
+// Kilograms, everywhere, with no unit switch (Amir, 2026-09-03). One unit means
+// the number on the chart, the number in the coach dashboard and the number the
+// athlete says out loud are the same number.
+const WT_STEP = 0.1;         // the granularity of a bathroom scale
+const WT_MIN = 25, WT_MAX = 350;
+// Sanity rails on a single reading. Not a judgement about anybody's body — they
+// exist so a fat-fingered 784 cannot flatten three months of chart into a line.
+// `label` is the chip. `phrase` is the same span inside a sentence, because
+// "nothing in the last 1 month" is not English and the chip cannot be reworded
+// without making the three of them stop lining up.
+// Four forms of the same span, because English needs all four and none of them
+// can be derived from another by chopping words off the front: `label` is the
+// chip, `phrase` goes after "nothing in", `span` goes after "in", and `ago`
+// labels the far end of the chart.
+const WT_RANGES = [
+  { key: '7',  days: 7,   label: '7 days',   phrase: 'the last 7 days',   span: '7 days',   ago: '7 days ago'   },
+  { key: '30', days: 30,  label: '1 month',  phrase: 'the last month',    span: 'a month',  ago: 'a month ago'  },
+  { key: '90', days: 90,  label: '3 months', phrase: 'the last 3 months', span: '3 months', ago: '3 months ago' }
+];
+// Daily bodyweight swings on water, food and time of day — a kilo either way is
+// normal and means nothing. The LINE is a 7-day rolling average, the raw
+// readings are drawn as dots behind it, and every stated change compares
+// averages rather than two single mornings. Anything else reports noise as
+// progress, which is the one thing a weight chart must never do.
+const WT_AVG_WINDOW = 7;
+
 // `sub` is the Settings sub-screen — null (the root list), 'habits' or
 // 'appearance'. Settings is a list of doors now rather than one long scroll, so
 // the screen needs to know which door is open. go() clears it on the way out.
 const UI = { screen:'today', open:null, from:'today', sheet:null, sheetVal:0, toast:null,
              celebrate: [], flash: {}, _newName:'', _tapRect:null, _navDir:0, idle:null,
              day:null, note:null, noteBusy:false, backTo:'today', install:false, share:null,
-             confirmOnId: null, sub: null };
+             confirmOnId: null, sub: null,
+             // The weigh-in sheet: the day being weighed (null = closed), and the
+             // number as a STRING, because it is bound to a real input and a
+             // half-typed "7" must survive until the second digit arrives.
+             wtSheet: null, wtVal: '' };
 let _toastTimer = null, _flashTimer = null, _confirmOnTimer = null;
 
 function defaultCfg() {
@@ -3087,6 +3192,12 @@ function defaultCfg() {
            seenComeback:null,
            questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
+           // OFF until the athlete turns it on, and unrelated to everything else
+           // in here (Amir, 2026-09-03: "this is not in any way related to other
+           // habits"). Weight earns no XP, sits in no roster, and cannot move a
+           // day score — switching it on or off costs a point either way.
+           // `range` is just which tab of the chart they last looked at.
+           wt:{ on:false, range:'30', allReads:false },
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().
            msOpen:null };
@@ -3305,6 +3416,128 @@ function valOf(dayKey, id) { const d = LOG[dayKey]; return (d && typeof d[id] ==
 function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
 function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
 
+// ── Body weight ───────────────────────────────────────────────────────────
+// Nothing in this block is read by any scoring function, on either side. It is
+// a separate record that happens to live in the same app.
+function wtOn()    { return !!(CFG && CFG.wt && CFG.wt.on); }
+function wtRange() {
+  const k = CFG && CFG.wt && CFG.wt.range;
+  return WT_RANGES.find(r => r.key === k) || WT_RANGES[1];
+}
+function wtKg(dayKey) {
+  const e = WT[dayKey];
+  return (e && typeof e.kg === 'number' && isFinite(e.kg)) ? e.kg : null;
+}
+function wtDays() { return Object.keys(WT).filter(k => wtKg(k) !== null).sort(); }
+function wtCount() { return wtDays().length; }
+function wtLatest() {
+  const d = wtDays();
+  if (!d.length) return null;
+  const day = d[d.length - 1];
+  return { day, kg: wtKg(day) };
+}
+function wtToday() { return wtKg(TKEY()); }
+function fmtKg(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+// ⚠️ NOT dayShort()/dayLong(). Those were written for the 3-day backfill window,
+// where a bare weekday is unambiguous because there is only one Monday in it.
+// This history runs to 90 days — twelve Mondays — so anything older than
+// yesterday has to carry its date or it is not a label, it is a guess.
+function wtDayLabel(k) {
+  if (k === TKEY()) return 'Today';
+  if (k === fmtKey(addDays(today(), -1))) return 'Yesterday';
+  const d = parseKey(k);
+  return d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+// Signed, and always to one decimal — "0.0" is a real answer and must not
+// render as a bare 0 beside numbers that carry a decimal.
+function fmtDelta(v) { return (v > 0 ? '+' : v < 0 ? '−' : '±') + fmtKg(Math.abs(v)); }
+
+// Every reading in the window, oldest first. The window is inclusive of today.
+function wtSeries(days) {
+  const from = fmtKey(addDays(today(), -(days - 1)));
+  return wtDays().filter(k => k >= from).map(k => ({ day: k, kg: wtKg(k) }));
+}
+// The 7-day rolling average, evaluated ON each day that has a reading. Sparse
+// history is the normal case here — somebody who weighs twice a week is not
+// doing it wrong — so this averages whatever readings fall inside the trailing
+// window rather than demanding one per day, and a lone reading averages to
+// itself. That keeps the line continuous without inventing days.
+function wtAvgAt(dayKey) {
+  const from = fmtKey(addDays(parseKey(dayKey), -(WT_AVG_WINDOW - 1)));
+  const vals = wtDays().filter(k => k <= dayKey && k >= from).map(wtKg);
+  if (!vals.length) return null;
+  return vals.reduce((s, v) => s + v, 0) / vals.length;
+}
+function wtAvgSeries(days) {
+  return wtSeries(days).map(p => ({ day: p.day, kg: wtAvgAt(p.day) }));
+}
+// AVERAGE against AVERAGE, never first-reading against last. Two single
+// mornings can differ by a kilo of water and say nothing at all; this is the
+// only comparison that survives a Sunday roast.
+function wtChange(days) {
+  const s = wtAvgSeries(days);
+  if (s.length < 2) return null;
+  return { from: s[0].kg, to: s[s.length - 1].kg, delta: s[s.length - 1].kg - s[0].kg, n: s.length };
+}
+// The whole record, not a window. THIS is the answer to "is it working" —
+// `wtChange(range)` only ever measures inside the range you happen to be
+// looking at, so an athlete twelve weeks in reading the 7-day view sees −0.2
+// and has no idea they are down 3.1 overall.
+function wtSince() {
+  const d = wtDays();
+  if (d.length < 2) return null;
+  const first = d[0], last = d[d.length - 1];
+  const days = Math.max(1, Math.round((parseKey(last) - parseKey(first)) / 86400000));
+  return {
+    from: wtKg(first), to: wtKg(last), day: first,
+    delta: wtKg(last) - wtKg(first),
+    days, weeks: days / 7, reads: d.length
+  };
+}
+// kg per week, over the span the readings ACTUALLY cover — not over the nominal
+// range. Someone with ten days of history looking at the 90-day view has not
+// been at it for twelve weeks, and dividing by twelve would report a real
+// half-kilo week as a rounding error.
+function wtRate(days) {
+  const ser = wtAvgSeries(days);
+  if (ser.length < 2) return null;
+  const span = Math.max(1, Math.round((parseKey(ser[ser.length - 1].day) - parseKey(ser[0].day)) / 86400000));
+  // Five days, not seven. A 7-day window whose first and last readings are
+  // Monday and Saturday spans six — demanding a full seven left the 7-day view
+  // permanently showing a dash for a week that plainly happened. Under five is
+  // still refused: that is not a weekly rate, it is two mornings and a guess.
+  if (span < 5) return null;
+  return (ser[ser.length - 1].kg - ser[0].kg) / (span / 7);
+}
+// One reading per DATE, replacing whatever that date held. `t` is what the
+// multi-device union sorts on, so it has to move every time the number does.
+function setWeight(dayKey, kg) {
+  const v = Math.min(WT_MAX, Math.max(WT_MIN, Math.round(Number(kg) * 10) / 10));
+  if (!isFinite(v)) return null;
+  WT[dayKey] = { kg: v, t: Date.now() };
+  saveWt();
+  return v;
+}
+// ⚠️ A DELETE IS A TOMBSTONE, NOT A `delete`. Removing the key outright is
+// invisible to the union merge below — that loop only ever walks the keys the
+// CLOUD has, so the other phone, which still holds the reading, keeps it and
+// re-uploads it on its next push. The reading comes back, and nothing the
+// athlete can do removes it. That is precisely the bug `_dirtyDays` exists to
+// stop on the habit log, arriving by a different door.
+//
+// So a deletion is recorded rather than performed: `kg: null` with a fresh `t`,
+// which the merge can compare like any other write. Every reader already goes
+// through wtKg(), and that returns null for a non-numeric kg, so a tombstone is
+// invisible to the chart, the stats, the list and the count without any of them
+// needing to know it exists. They are left in place rather than pruned: a prune
+// on one device is itself a silent delete the other device would undo, and a
+// tombstone is forty bytes against a deletion nobody does twice.
+function clearWeight(dayKey) {
+  if (!WT[dayKey]) return;
+  WT[dayKey] = { kg: null, t: Date.now() };
+  saveWt();
+}
+
 // ── Persistence ───────────────────────────────────────────────────────────
 function loadLocal() {
   CFG = defaultCfg();
@@ -3314,6 +3547,10 @@ function loadLocal() {
     CFG.on = Object.assign(defaultCfg().on, raw.on || {});
   } catch (e) {}
   try { LOG = JSON.parse(localStorage.getItem(K_LOG()) || '{}') || {}; } catch (e) {}
+  try { WT = JSON.parse(localStorage.getItem(K_WT()) || '{}') || {}; } catch (e) { WT = {}; }
+  // A config written before this build has no `wt` at all, and Object.assign
+  // above would have left it undefined rather than at the default.
+  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30', allReads:false };
   try {
     const m = JSON.parse(localStorage.getItem(K_META()) || '{}');
     SYNC.dirty = !!m.dirty; SYNC.lastOk = m.lastOk || null;
@@ -3399,6 +3636,14 @@ function saveLog() {
   try { localStorage.setItem(K_LOG(), JSON.stringify(LOG)); } catch (e) {}
   markDirty();
   refreshNotePct();
+}
+// No invalidateBonus() and no stampRoster(): a weight reading is not part of any
+// score, so nothing cached off the log or the roster can have gone stale. It
+// still marks dirty, because it does have to reach the other phone and the
+// coach's dashboard.
+function saveWt() {
+  try { localStorage.setItem(K_WT(), JSON.stringify(WT)); } catch (e) {}
+  markDirty();
 }
 // ── The WORKOUT habit is fed by the training app, via the server ───────────
 // These are two separate apps and neither writes into the other's storage. The
@@ -3514,6 +3759,11 @@ async function pushNow() {
     const payload = {};
     payload[K_CFG()] = JSON.stringify(CFG || {});
     payload[K_LOG()] = JSON.stringify(LOG || {});
+    // A third key alongside the other two. save_progress merges the payload into
+    // the stored blob at the TOP LEVEL (data || excluded.data, stage1) and
+    // whitelists nothing, so this needed no migration — and the coach dashboard
+    // already selects the whole blob, so it needed none there either.
+    payload[K_WT()] = JSON.stringify(WT || {});
     const { error } = await sb.rpc('save_progress', {
       p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME, p_data: payload, p_key: KEY
     });
@@ -3589,6 +3839,38 @@ async function syncFromCloud() {
       });
       localStorage.setItem(K_LOG(), JSON.stringify(LOG));
     } catch (e) {}
+    // ── Weight: UNION BY DATE, NEWEST READING WINS THAT DATE ────────────────
+    // Neither of the other two merge rules is usable here, and both would lose
+    // real data:
+    //   · max() per key — the rule immediately above — cannot record a loss. A
+    //     phone still holding 80.0 would overwrite a corrected 78.4 every time
+    //     it synced, and the number could only ever climb.
+    //   · wholesale adoption — the rule immediately below — deletes any date the
+    //     other device has not heard about yet. That is precisely the bug that
+    //     ate earned rewards until CFG.pass.owned was special-cased into a union.
+    // So: take every date we do not have, and on a date we both hold, keep the
+    // reading that was actually recorded later. `t` is stamped at entry, which
+    // is what makes "later" mean later rather than "synced more recently".
+    try {
+      const cloudWt = JSON.parse(data[K_WT()] || '{}') || {};
+      Object.keys(cloudWt).forEach(day => {
+        const theirs = cloudWt[day];
+        if (!theirs || typeof theirs !== 'object') return;
+        // A reading, or a tombstone (kg:null) — both are real writes with a
+        // timestamp and both must be able to win. Anything else is junk from a
+        // hand-edited blob and is ignored rather than trusted.
+        const isRead = typeof theirs.kg === 'number' && isFinite(theirs.kg);
+        const isTomb = theirs.kg === null;
+        if (!isRead && !isTomb) return;
+        const mine = WT[day];
+        if (!mine) { WT[day] = theirs; return; }
+        // Newest write wins outright, whichever kind it is: a newer tombstone
+        // deletes a reading this device still holds, and a newer reading
+        // revives a day the athlete deleted and then weighed again.
+        if ((theirs.t || 0) > (mine.t || 0)) WT[day] = theirs;
+      });
+      localStorage.setItem(K_WT(), JSON.stringify(WT));
+    } catch (e) {}
     // Config: newest wins wholesale, but never clobber unsent local settings.
     try {
       const cloudCfg = JSON.parse(data[K_CFG()] || '{}');
@@ -3620,6 +3902,10 @@ async function syncFromCloud() {
         // reaches, so once a season reset drops the level a lost card is gone
         // for good. Both sides only ever append, so the union is the truth.
         CFG.pass = CFG.pass || { owned:[], title:null, card:null };
+        // A preference, not a possession, so the newer config wins it like dark
+        // mode does — but a config written before weight existed carries no `wt`
+        // at all, and every reader below assumes the object is there.
+        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:false, range:'30', allReads:false };
         const mineOwned = keepPass.owned || [], theirsOwned = CFG.pass.owned || [];
         CFG.pass.owned = theirsOwned.concat(mineOwned.filter(id => theirsOwned.indexOf(id) < 0));
         // What they were WEARING is a preference, not a possession, so the newer
@@ -4762,8 +5048,8 @@ const TAB_ORDER = ['today', 'progress', 'crew', 'pass'];
 function navDir(from, to) {
   // Settings joins the list of screens that push in from the right and pop
   // back out to the left — it is no longer a tab you slide sideways into.
-  if (to === 'detail' || to === 'manual' || to === 'settings') return 1;
-  if (from === 'detail' || from === 'manual' || from === 'settings') return -1;
+  if (to === 'detail' || to === 'manual' || to === 'settings' || to === 'weight') return 1;
+  if (from === 'detail' || from === 'manual' || from === 'settings' || from === 'weight') return -1;
   const a = TAB_ORDER.indexOf(from), b = TAB_ORDER.indexOf(to);
   if (a < 0 || b < 0 || a === b) return 0;
   return b > a ? 1 : -1;
@@ -5226,6 +5512,9 @@ function installDelegates(app) {
     if (!t || !t.id) return;
     if (t.id === 'newhabit') UI._newName = t.value;
     else if (t.id === 'boardname') LB.nameDraft = t.value;
+    // No render(): re-rendering per keystroke here would fight a numeric field
+    // mid-entry. The ± buttons render, and Save reads this value.
+    else if (t.id === 'wtinput') UI.wtVal = t.value;
     // Re-rendered per keystroke so the counter and the button state stay true.
     // Safe: morphAttrs never writes `value` onto a live field, so the caret and
     // any selection belong to whoever is typing, not to the last render.
@@ -6208,9 +6497,13 @@ function renderApp() {
     // at "How this works" made two screens feel like four.
     manual:   ['Everything, explained', 'The manual'],
     pass:     ['Rewards a season cannot take back', 'Locker'],
+    // No XP, no rank, no streak in this header on purpose — it is the one
+    // screen in the app that is not scoring anything.
+    weight:   ['Yours and your coach only', 'Body weight'],
     // Settings is a list of doors, so its header names the door you are behind.
     settings: UI.sub === 'habits'     ? ['Settings', 'Habits & targets']
             : UI.sub === 'appearance' ? ['Settings', 'Appearance']
+            : UI.sub === 'weight'     ? ['Settings', 'Body weight']
             : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
   };
   const rights = {
@@ -6227,6 +6520,7 @@ function renderApp() {
       return LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '';
     })(),
     pass: (() => { const o = passOwned().length; return o ? o + '/' + PASS_TRACK.length : ''; })(),
+    weight: (() => { const n = wtCount(); return n ? n + (n === 1 ? ' READING' : ' READINGS') : ''; })(),
     settings: ''
   };
   const head = heads[UI.screen] || heads.today;
@@ -6238,6 +6532,7 @@ function renderApp() {
   else if (UI.screen === 'crew') screenHtml = renderCrew();
   else if (UI.screen === 'manual') screenHtml = renderManual();
   else if (UI.screen === 'pass') screenHtml = renderPass();
+  else if (UI.screen === 'weight') screenHtml = renderWeight();
   else screenHtml = renderSettings();
 
   // Three tabs: do it, see where you stand, see everyone else. Habits and
@@ -6249,7 +6544,9 @@ function renderApp() {
   // bar, so no tab lights up while you are in them and the initials button
   // becomes the way out. The Locker IS a tab now — it is the battle pass, and
   // battle passes live on the main bar.
-  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual');
+  // Weight joins these: it is not a tab, so no tab may light up while it is
+  // open, and it needs the same back chevron every other overlay screen has.
+  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' || UI.screen === 'weight');
   const activeTab = UI.screen === 'detail' ? 'progress' : (OVERLAY ? '' : UI.screen);
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
@@ -6304,6 +6601,7 @@ function renderApp() {
     </div>
     <div id="fx" data-k="fx" data-static></div>
     ${UI.sheet ? renderSheet() : ''}
+    ${UI.wtSheet ? renderWtSheet() : ''}
     ${UI.share ? renderShareSheet() : ''}
     ${UI.install ? renderInstall() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast" data-k="toast">${esc(UI.toast)}</div>` : ''}
@@ -6918,6 +7216,14 @@ function renderToday(LI, doneCount, pct) {
         history, <strong>+</strong> adds one${live().some(h => h.kind === 'count' && !h.locked) ? ' (hold it to go faster)' : ''}.
       </div>
 
+      <!-- BELOW the list, and below the hint that explains the list — the hint
+           belongs to the rows it describes and must not be cut off from them.
+           Weight is not one of the day's jobs so it does not sit among them; it
+           reports, and it is the only thing on this screen that shows a trend
+           without being tapped. Off by default: for most athletes it is not
+           here at all. -->
+      ${renderWtRow()}
+
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
         <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
@@ -7211,6 +7517,16 @@ function renderProgress(LI, earned, totalAch) {
            the one nearest to falling. -->
       <!-- Quests keep their own section: they are the only thing here with a
            clock on it, and the one with least time left is the one to act on. -->
+      <!-- Weight belongs on the tab called PROGRESS. It was missing entirely
+           until Amir asked where an athlete checks their progress (2026-09-04)
+           and the honest answer was "the card on Today, or two doors deep in
+           Settings" — neither of which is where anyone looks for a trend. It
+           sits AFTER the habits and BEFORE the quests: it is a personal
+           measurement, so it groups with the personal half of the screen rather
+           than with the game half. Not a habit row — no ring, no level, no pips,
+           because it has none of those things. -->
+      ${wtOn() ? sectionLabel('Body weight', 'Tap for history') + renderWtProgressRow() : ''}
+
       ${sectionLabel('Quests', 'Seven days')}
       ${renderQuestBlock()}
 
@@ -7430,6 +7746,316 @@ function renderDetail(h) {
       <div style="padding:18px 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => go(UI.from === 'today' ? 'today' : 'progress'))}>Back to ${UI.from === 'today' ? 'today' : 'progress'}</button>
       </div>
+    </div>`;
+}
+
+// ── Body weight ───────────────────────────────────────────────────────────
+// The app's only chart. The LINE is the 7-day rolling average and the DOTS are
+// the raw readings behind it, drawn faint — which is the honest way round: the
+// average is the thing worth reading and the scatter shows why. Points are
+// placed by DATE across the window rather than by index, so a week nobody
+// weighed reads as a gap rather than being quietly closed up.
+function wtChart(days) {
+  const raw = wtSeries(days);
+  if (!raw.length) return '';
+  const avg = wtAvgSeries(days);
+  const w = 320, h = 132, top = 14, bot = h - 24, left = 8, right = w - 8;
+  const start = addDays(today(), -(days - 1));
+  const pos = k => {
+    const off = Math.round((parseKey(k) - start) / 86400000);
+    return days > 1 ? left + (Math.max(0, off) / (days - 1)) * (right - left) : (left + right) / 2;
+  };
+  const vals = raw.map(p => p.kg).concat(avg.map(p => p.kg));
+  let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  const span = hi - lo;
+  // A flat month is a real result, and left alone it would divide by zero and
+  // then draw the line along the floor. Give it a kilo of room and centre it.
+  if (span < 1) { const mid = (hi + lo) / 2; lo = mid - 0.5; hi = mid + 0.5; }
+  else { lo -= span * 0.18; hi += span * 0.18; }
+  const Y = v => bot - ((v - lo) / ((hi - lo) || 1)) * (bot - top);
+  const line = avg.length > 1
+    ? '<path class="wtline" d="' + avg.map((p, i) => (i ? 'L' : 'M') + pos(p.day).toFixed(1) + ' ' + Y(p.kg).toFixed(1)).join(' ') + '"/>'
+    : '';
+  const last = raw[raw.length - 1];
+  const dots = raw.map(p =>
+    '<circle class="wtdot' + (p.day === last.day ? ' wtnow' : '') + '" cx="' + pos(p.day).toFixed(1)
+    + '" cy="' + Y(p.kg).toFixed(1) + '" r="' + (p.day === last.day ? 3.4 : 2.4) + '"/>').join('');
+  const grid = '<line class="wtgrid" x1="' + left + '" y1="' + top + '" x2="' + right + '" y2="' + top + '"/>'
+             + '<line class="wtgrid" x1="' + left + '" y1="' + bot + '" x2="' + right + '" y2="' + bot + '"/>';
+  const labels = '<text class="wtlbl" x="' + left + '" y="' + (top - 4) + '">' + fmtKg(hi) + '</text>'
+               + '<text class="wtlbl" x="' + left + '" y="' + (bot + 12) + '">' + fmtKg(lo) + '</text>';
+  return '<svg class="wtchart" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Body weight trend">'
+       + grid + labels + line + dots + '</svg>';
+}
+
+// The card on Today. It is the same white rounded card as everything else on
+// that screen — hero, day strip, habit rows — because it is not a special kind
+// of thing and should not look like one.
+//
+// It sits BELOW the habit list and its hint, never above: the list is what the
+// screen is for, and it was deliberately moved to the top so that opening the
+// app to log does not mean scrolling to log. Two states, one job each — before
+// you have weighed it asks, after you have weighed it reports and points at the
+// history. Absent entirely when the feature is off or a past day is open.
+function renderWtRow() {
+  if (!wtOn() || editingPast()) return '';
+  const t = wtToday(), l = wtLatest(), c = wtChange(30);
+  const shown = t !== null ? t : (l ? l.kg : null);
+  // ⚠️ THE BODY IS ITS OWN TAP TARGET, and it is how you reach the history.
+  // The first build made the single button do both jobs by turns — "Weigh in"
+  // before you had, "See your history" after — which meant that on any morning
+  // BEFORE weighing there was no route to the history from Today at all, and
+  // the only way in was two doors deep in Settings. That is the wrong way round:
+  // the trend is exactly what someone wants to look at before they step on.
+  // The fix is the law the habit rows already teach and this card now obeys:
+  // the BODY opens the history, the BUTTON logs. Same as tapping a habit's name
+  // versus its box.
+  return `<div class="wtpanel" data-k="wtpanel">
+    <button class="wtp-top" ${on(() => goWeight('today'))} aria-label="See your weight history">
+      <span class="wtp-l">
+        <span class="eyebrow" style="letter-spacing:.12em">Body weight</span>
+        <span class="wtp-n">${shown === null ? '&mdash;' : esc(fmtKg(shown)) + '<span class="u">kg</span>'}</span>
+        <span class="wtp-d">${esc(wtCardLine(t, l, c))}</span>
+      </span>
+      ${wtSpark(30)}
+      <span class="wtp-go">&rarr;</span>
+    </button>
+    <button class="btn ${t === null ? 'btn-primary' : 'btn-secondary'} btn-block"
+      ${on(() => openWtSheet(TKEY()))}>${t === null ? 'Weigh in' : "Correct today's weight"}</button>
+  </div>`;
+}
+// Deliberately flat. Nothing here congratulates a fall or frets about a rise —
+// the app does not know what this athlete is training for, and a scale with
+// opinions is the thing everybody already hates about weighing themselves.
+function wtCardLine(t, l, c) {
+  if (t !== null) return c ? fmtDelta(c.delta) + ' kg over the last month' : 'Keep going — a month of these makes a line worth reading.';
+  if (!l) return 'Kilograms. Same time of day, whenever you weigh.';
+  const gap = Math.round((today() - parseKey(l.day)) / 86400000);
+  if (gap <= 1) return 'Yesterday you were ' + fmtKg(l.kg) + ' kg.';
+  if (gap <= 7) return 'Last read ' + gap + ' days ago, at ' + fmtKg(l.kg) + ' kg.';
+  return 'It has been ' + gap + ' days. Pick it back up where you left it.';
+}
+// The inline trend beside the number — the rolling average only, no dots and no
+// axis. It is a glance, not a chart; the chart is one tap away and says the rest.
+function wtSpark(days, width, height) {
+  const ser = wtAvgSeries(days);
+  const w = width || 148, h = height || 54;
+  if (ser.length < 2) return `<span class="wtp-r" style="width:${w}px;height:${h}px"></span>`;
+  const vals = ser.map(p => p.kg);
+  let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
+  const d = ser.map((p, i) =>
+    (i ? 'L' : 'M') + (i / (ser.length - 1) * w).toFixed(1) + ' ' + (h - (p.kg - lo) / (hi - lo) * h).toFixed(1)).join(' ');
+  return `<svg class="wtp-r" style="width:${w}px;height:${h}px" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+
+// The Progress row. Wears the same shape as the habit rows above it — full
+// width, a rule under it, name on its own line with the facts beneath — but
+// carries a sparkline where a habit carries its consistency pips, because a
+// trend is what this thing has instead of tiers.
+function renderWtProgressRow() {
+  const l = wtLatest(), c = wtChange(30);
+  return `<button class="row-rule" data-k="wtprow" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px"
+    ${on(() => goWeight('progress'))}>
+    <span style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+      <!-- The section label above already says "Body weight"; the row saying it
+           again is the same fact printed twice in 40px. The NUMBER is what the
+           row is for, so the number takes the line a habit gives its name. -->
+      <span class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">
+        <span style="flex:none">&#9878;</span><span>${l ? esc(fmtKg(l.kg)) + ' kg' : 'Not started'}</span>
+      </span>
+      <span style="font-size:11.5px;line-height:1.3;color:var(--muted)">${l
+        ? (c ? esc(fmtDelta(c.delta)) + ' kg this month' : 'building a line')
+          + ' &middot; ' + wtCount() + ' reading' + (wtCount() === 1 ? '' : 's')
+        : 'Weigh in from Today and this fills up'}</span>
+    </span>
+    ${wtSpark(30, 96, 34)}
+    <span class="hd" style="flex:none;font-size:19px;color:var(--accent)">&rsaquo;</span>
+  </button>`;
+}
+
+function goWeight(from) {
+  UI.backTo = from || UI.screen;
+  go('weight');
+}
+
+function renderWeight() {
+  const r = wtRange();
+  const latest = wtLatest(), c = wtChange(r.days);
+  const inRange = wtSeries(r.days);
+  // Last eight by default so the screen stays short, but nothing is hidden — the
+  // record exists precisely so an athlete six months in can still see week one.
+  // Kept on CFG rather than UI, like the milestone tiers: a choice that survives
+  // a reload is a memory, one that does not is a nuisance.
+  const allDays = wtDays();
+  const showAll = !!(CFG.wt && CFG.wt.allReads);
+  const rows = (showAll ? allDays : allDays.slice(-8)).reverse();
+  const unit = (n, u) => n + '<span class="su">' + u + '</span>';
+  const rate = wtRate(r.days);
+  const since = wtSince();
+  // The count moved into the "since you started" block below — a raw tally of
+  // readings is context for the record, not one of the three numbers that
+  // answer how it is going. The rate took its place because a rate is the thing
+  // a coach reads: it makes a stall visible while a total is still climbing.
+  const stats = latest ? [
+    { v: unit(fmtKg(latest.kg), 'kg'), k: 'Latest' },
+    { v: c ? unit(fmtDelta(c.delta), 'kg') : '&mdash;', k: 'Change' },
+    { v: rate !== null ? unit(fmtDelta(rate), 'kg/wk') : '&mdash;', k: 'Per week' }
+  ] : [];
+  return `
+    <div data-k="screen:weight" style="${screenAnim()}">
+      <!-- The same opening block a habit's history screen has: the number that
+           matters at 76px, what it is beside it, and the sentence under both. -->
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
+        ${latest ? `<div style="display:flex;align-items:flex-end;gap:14px">
+          <div class="figure" data-hero style="font-size:76px;line-height:.8">${esc(fmtKg(latest.kg))}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
+            <div class="hd" style="font-size:16px;line-height:1">KILOGRAMS</div>
+            <div style="font-size:12px;line-height:1.3;color:var(--muted)">${esc(wtDayLabel(latest.day))}${c ? ' &middot; ' + esc(fmtDelta(c.delta)) + ' kg in ' + esc(r.span) : ''}</div>
+          </div>
+        </div>` : `<div class="hd" style="font-size:26px;line-height:1">Nothing yet</div>`}
+        <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">Not a habit, not scored, and nobody else can see it. Weigh at the same time of day and let the line do the talking.</p>
+      </div>
+
+      <div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Today</span><span>${wtToday() === null ? 'NOT WEIGHED' : esc(fmtKg(wtToday())) + ' KG'}</span>
+        </div>
+        <button class="btn ${wtToday() === null ? 'btn-primary' : 'btn-secondary'} btn-block"
+          ${on(() => openWtSheet(TKEY()))}>${wtToday() === null ? 'Weigh in' : "Correct today's weight"}</button>
+      </div>
+
+      <!-- The .chip pills Crew uses to swap Roll call for the Leaderboard. The
+           app has exactly one way to switch between views of a screen; this is it. -->
+      <div class="block" style="display:flex;flex-direction:column;gap:12px">
+        <div class="chips" data-k="wtchips">
+          ${WT_RANGES.map(x => `<button class="chip ${x.key === r.key ? 'chip-on' : ''}" data-k="wtt:${x.key}"
+            ${on(() => { CFG.wt.range = x.key; saveCfg(); render(); })}>${esc(x.label)}</button>`).join('')}
+        </div>
+        ${inRange.length ? wtChart(r.days) + `
+          <div class="gridkey">
+            <span>${esc(r.ago)}</span>
+            <span class="gk">the line is your ${WT_AVG_WINDOW}-day average</span>
+            <span>Today</span>
+          </div>`
+        : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">Nothing in ${esc(r.phrase)}. Weigh in and this fills up.</div>`}
+      </div>
+
+      ${stats.length ? `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--divider)">
+        ${stats.map((x, i) => `<div style="padding:14px 12px;${i < 2 ? 'border-right:1px solid var(--rule);' : ''}display:flex;flex-direction:column;gap:5px">
+          <div class="hd statnum">${x.v}</div>
+          <div class="eyebrow" style="letter-spacing:.1em">${esc(x.k)}</div>
+        </div>`).join('')}
+      </div>` : ''}
+
+      ${since ? `<div class="block" style="display:flex;flex-direction:column;gap:10px">
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Since you started</span><span>${since.reads} READING${since.reads === 1 ? '' : 'S'}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div class="hd" style="font-size:34px;line-height:1;color:var(--accent)">${esc(fmtDelta(since.delta))}<span class="su" style="font-size:15px">kg</span></div>
+          <div style="font-size:12.5px;line-height:1.35;color:var(--muted)">
+            ${esc(fmtKg(since.from))} kg on ${esc(parseKey(since.day).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }))}<br>
+            ${since.weeks < 2 ? esc(since.days) + ' days ago' : esc(String(Math.round(since.weeks))) + ' weeks ago'}
+          </div>
+        </div>
+      </div>` : ''}
+
+      ${rows.length ? (allDays.length > 8
+        ? `<button class="eyebrow sectlbl msth${showAll ? ' open' : ''}" data-k="wtall" ${on(() => {
+            CFG.wt.allReads = !showAll; saveCfg(); render();
+          })}>
+            <span>Your readings</span>
+            <span class="msth-r"><span>${showAll ? 'ALL ' + allDays.length : 'LAST 8 OF ' + allDays.length}</span><svg class="chev" viewBox="0 0 12 8"><path d="M1 1.5 6 6.5 11 1.5"/></svg></span>
+          </button>`
+        : sectionLabel('Your readings', 'Tap to correct')) + rows.map(k => {
+        const kg = wtKg(k), prev = wtDays().filter(d => d < k).pop();
+        const d = prev !== undefined ? kg - wtKg(prev) : null;
+        return `<button class="row-rule" data-k="wtr:${k}" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:13px 20px"
+          ${on(() => openWtSheet(k))}>
+          <span style="display:flex;flex-direction:column;gap:3px">
+            <span class="hd" style="font-size:14px;line-height:1">${esc(wtDayLabel(k).toUpperCase())}</span>
+            <span style="font-size:11px;line-height:1;color:var(--muted)">${WT_AVG_WINDOW}-day avg ${esc(fmtKg(wtAvgAt(k)))} kg</span>
+          </span>
+          <span style="text-align:right">
+            <span class="hd" style="display:block;font-size:15px;color:var(--accent)">${esc(fmtKg(kg))} kg</span>
+            ${d !== null ? `<span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">${esc(fmtDelta(d))} kg</span>` : ''}
+          </span>
+        </button>`;
+      }).join('') : `<div style="padding:16px 20px;font-size:12.5px;line-height:1.5;color:var(--muted)">
+          No readings behind you yet. Once there are, the last eight sit here.
+        </div>`}
+
+      <div style="padding:18px 20px 34px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:11px;line-height:1.5;color:var(--muted-soft)">
+          This is yours and your coach's. It never reaches the board, the wall or another athlete, it earns no XP, and it counts for nothing in your day score. Switch it off any time in Settings and every reading stays where it is.
+        </div>
+        <button class="btn btn-secondary btn-block" ${on(() => go(UI.backTo || 'today'))}>Back</button>
+      </div>
+    </div>`;
+}
+
+// The weigh-in itself. A stepper that started at zero would be 780 taps to
+// reach 78 kg, so it opens on the last known reading and nudges from there —
+// and the number is a real input as well, because somebody arriving 4 kg from
+// where they left off should be able to just type it.
+function openWtSheet(dayKey) {
+  const seed = wtKg(dayKey);
+  const last = wtLatest();
+  UI.wtSheet = dayKey || TKEY();
+  UI.wtVal = fmtKg(seed !== null ? seed : (last ? last.kg : 70));
+  render();
+}
+function wtValNum() {
+  const n = parseFloat(String(UI.wtVal).replace(',', '.'));
+  return isFinite(n) ? n : null;
+}
+function wtNudge(by) {
+  const n = wtValNum();
+  UI.wtVal = fmtKg(Math.min(WT_MAX, Math.max(WT_MIN, (n === null ? 70 : n) + by)));
+  render();
+}
+function renderWtSheet() {
+  const day = UI.wtSheet;
+  const n = wtValNum();
+  const bad = n === null || n < WT_MIN || n > WT_MAX;
+  const existing = wtKg(day);
+  return `
+    <div class="scrim" data-k="scrim" ${on(() => { UI.wtSheet = null; render(); })}></div>
+    <div class="sheet" data-k="wtsheet:${day}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div class="hd" style="font-size:21px;line-height:1">Weigh in${day === TKEY() ? '' : ' &middot; ' + esc(wtDayLabel(day))}</div>
+        <button class="hd" style="font-size:13px;color:var(--clay-deep)" ${on(() => { UI.wtSheet = null; render(); })}>Close</button>
+      </div>
+      <div style="font-size:13px;line-height:1.4;color:var(--muted)">Kilograms, one decimal. First thing, after the loo, before you eat — the same way every time matters more than the number.</div>
+      <div class="stepper">
+        <button class="minus" ${on(() => wtNudge(-WT_STEP))}>&ndash;</button>
+        <div class="val" style="flex:1">
+          <input class="wtinput" id="wtinput" type="number" inputmode="decimal" step="${WT_STEP}"
+                 min="${WT_MIN}" max="${WT_MAX}" value="${esc(String(UI.wtVal))}" aria-label="Weight in kilograms">
+          <span class="eyebrow">kilograms</span>
+        </div>
+        <button class="plus" ${on(() => wtNudge(WT_STEP))}>+</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" style="flex:1" ${on(() => wtNudge(-1))}>&minus;1 kg</button>
+        <button class="btn btn-secondary" style="flex:1" ${on(() => wtNudge(1))}>+1 kg</button>
+      </div>
+      <button class="btn btn-primary btn-block" ${bad ? 'disabled style="opacity:.4"' : ''} ${on(() => {
+        const v = wtValNum();
+        if (v === null || v < WT_MIN || v > WT_MAX) { toast('That is not a weight. ' + WT_MIN + ' to ' + WT_MAX + ' kg.'); return; }
+        const saved = setWeight(day, v);
+        UI.wtSheet = null;
+        haptic('done');
+        render();
+        toast(fmtKg(saved) + ' kg logged' + (day === TKEY() ? '' : ' for ' + wtDayLabel(day)) + '. Noted.');
+      })}>Save it</button>
+      ${existing !== null ? `<button class="btn btn-secondary btn-block" ${on(() => {
+        clearWeight(day);
+        UI.wtSheet = null;
+        render();
+        toast('Reading removed.');
+      })}>Delete this reading</button>` : ''}
     </div>`;
 }
 
@@ -7700,7 +8326,7 @@ function renderManual() {
   })}>${esc(t)}</button>`;
   const CONTENTS = ['Start here', 'The daily loop', 'Forgot to log a day?', 'Roll call', 'What each habit is worth',
                     'How to earn more', 'Levels and ranks', 'The long game', 'Consistency', 'Quests',
-                    'Seasons', 'The leaderboard', 'Your data'];
+                    'Seasons', 'The leaderboard', 'Body weight', 'Your data'];
 
   return `
     <div data-k="screen:manual" style="${screenAnim()}">
@@ -7875,10 +8501,18 @@ function renderManual() {
         p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.`) +
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
+      ${block(h2('Body weight') +
+        p(`Optional, and <strong style="color:var(--ink)">off until you switch it on</strong> — Settings, then Body weight. It is the one thing in this app that is not a habit: it earns <strong style="color:var(--ink)">no XP</strong>, it is in no streak, it cannot make a day perfect and it cannot spoil one. Switching it on or off costs you nothing either way, and switching it off keeps every reading you have taken.`) +
+        p(`When it is on, a <strong style="color:var(--ink)">Body weight</strong> card sits under your habits on Today, with your number, the month's direction and a small trend line on it. It says <strong style="color:var(--ink)">Weigh in</strong> until you have, and opens the full history either way: seven days, a month, or three.`) +
+        p(`The chart draws a <strong style="color:var(--ink)">${WT_AVG_WINDOW}-day average</strong> as the line and your actual readings as dots behind it, and every change it quotes compares one average against another. That is deliberate. Weight moves a kilo either way on water, food and sleep, so a single morning tells you nothing and two mornings compared tell you less than nothing. The line is the part worth reading.`) +
+        p(`Under the chart are the numbers that answer whether it is actually working. <strong style="color:var(--ink)">Per week</strong> is your rate across whichever span you picked — a rate shows a stall while a total is still creeping. <strong style="color:var(--ink)">Since you started</strong> ignores the span entirely and compares today with your very first reading, which is the only honest answer to "am I getting anywhere". Your readings sit underneath — the last eight, or all of them if you tap the heading.`) +
+        p(`Weigh at the same time of day, ideally first thing. Consistency of method beats frequency — <strong style="color:var(--ink)">once a week done properly</strong> is worth more than seven rushed readings, and the app never asks you for one you did not offer.`) +
+        p(`It is <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone.</strong> It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`))}
+
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
         p(`<strong style="color:var(--ink)">There is no password, and no sign-in — your link is your account.</strong> Put it on your home screen or keep the message it came in. Losing the link is the only way to lose your way back in, and even then nothing is deleted: ask me for a fresh one and your whole history is still there.`) +
-        p(`Your coach can see your habits as part of coaching you. Other athletes cannot — unless you join the leaderboard, and even then only your chosen name and points.`) +
+        p(`Your coach can see your habits — and your weight, if you switched that on — as part of coaching you. Other athletes cannot see either, unless you join the leaderboard, and even then only your chosen name and points.`) +
         (isFree()
           ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong> — used to send you this link and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
           : ''))}
@@ -8905,6 +9539,7 @@ function navVal(text) { return `<span class="navval">${esc(text)}</span>`; }
 function renderSettings() {
   if (UI.sub === 'habits')     return renderSettingsHabits();
   if (UI.sub === 'appearance') return renderSettingsAppearance();
+  if (UI.sub === 'weight')     return renderSettingsWeight();
 
   const LI = overallLevel();
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -8930,6 +9565,10 @@ function renderSettings() {
                  'The five, your add-ons and anything you invent',
                  navVal(onCount + ' of ' + addTotal + ' add-ons on'),
                  () => goSub('habits'))}
+        ${navRow('⚖️', 'Body weight',
+                 'Optional, and nothing to do with your habits or your XP',
+                 navVal(wtOn() ? 'On' : 'Off'),
+                 () => goSub('weight'))}
         ${navRow('🎨', 'Appearance', 'Dark mode and the tick sound',
                  navVal(CFG.dark ? 'Dark' : 'Light'),
                  () => goSub('appearance'))}
@@ -9017,6 +9656,52 @@ function renderSettingsAppearance() {
           </span>
           <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
         </button>
+      </div>
+      <div style="height:20px"></div>
+    </div>`;
+}
+
+// ── Settings → Body weight ────────────────────────────────────────────────
+// Opt-in, and the switch is the whole screen (Amir, 2026-09-03). Switching it
+// OFF is not a delete: readings stay exactly where they are, because a feature
+// that quietly bins three months of history the moment you tick a box is a
+// feature nobody can safely try. Switching it back on finds everything intact.
+function renderSettingsWeight() {
+  const n = wtCount();
+  return `
+    <div data-k="screen:settings:weight" style="${screenAnim()}">
+      <div class="cardgrp" style="margin-top:4px">
+        <button class="navrow" ${on(() => {
+          CFG.wt.on = !CFG.wt.on; saveCfg(); render();
+          toast(CFG.wt.on ? 'Weight tracking on. It appears at the top of Today.' : 'Weight tracking off. Your readings are kept.');
+        })}>
+          <span class="navtile" aria-hidden="true">⚖️</span>
+          <span class="navmid">
+            <span class="navnm">Track my weight</span>
+            <span class="navsub">A card under your habits on Today, and the history behind it.</span>
+          </span>
+          <span class="sw ${wtOn() ? 'on' : ''}"><i></i></span>
+        </button>
+        ${wtOn() ? `<button class="navrow" ${on(() => { UI.backTo = 'settings'; go('weight'); })}>
+          <span class="navtile" aria-hidden="true">📈</span>
+          <span class="navmid">
+            <span class="navnm">See the history</span>
+            <span class="navsub">Seven days, a month, three months.</span>
+          </span>
+          <span class="navgo">&#8250;</span>
+        </button>` : ''}
+      </div>
+      <div class="setnote">
+        Kilograms. It earns <strong>no XP</strong>, it is in no streak and it cannot move your
+        day score — it is not a habit and it is not scored against you. Only you and
+        ${isFree() ? 'Amir' : 'your coach'} ever see it: it never goes on the board, never on
+        the wall, and no other athlete can reach it.
+        ${n ? `You have ${n} reading${n === 1 ? '' : 's'} saved. Switching this off keeps every one of them.` : ''}
+      </div>
+      <div class="setnote" style="padding-top:0">
+        Weigh at the same time of day, ideally first thing. Day to day it swings on water,
+        food and sleep, so the app shows you a ${WT_AVG_WINDOW}-day average and not the
+        raw number — one morning tells you nothing, a fortnight tells you plenty.
       </div>
       <div style="height:20px"></div>
     </div>`;
