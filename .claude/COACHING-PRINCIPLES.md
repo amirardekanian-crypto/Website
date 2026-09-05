@@ -454,6 +454,26 @@ publish it. No athlete health/chat detail goes here — principles only.
   has to hit in the patterns they DO own. Without one, "train them hard inside what's safe" stays
   a sentence in the rationale and quietly doesn't happen — and the programming itself tells the
   athlete you think they are breakable. *(2026-08-08)*
+- **The SHOULDER is ONE muscle group, scored on the normal 10-20 range — press, side delt and rear
+  delt all count against the same total.** Rear delt is not a separate budget. The line that makes
+  this workable: **rear-delt work counts as shoulder, scapular retractors count as back** (rows,
+  Y-T-W, face-pull-style retraction into the mid-back), so a posture cycle can push back volume up
+  without inflating the shoulder number. *(2026-09-05, Amir, verbatim: "The whole shoulder total
+  load should be 10 sets total. So if she is doing rear delt, it counts" and, when the rewrite
+  landed at exactly 10, "10 is not a cap, 10-20 is good." Elmira C3 first drafted at 26 shoulder
+  sets/week by scoring each head against its own 10-20 range.)*
+- **Never more than 4 working sets on one exercise for an intermediate athlete. If a muscle needs
+  more volume, ADD AN EXERCISE.** *(2026-09-05, Amir, verbatim: "For an intermediate athele, never
+  go for more than 4 sets in an exercise. Always add a new exercise. This is a rule.")* This is the
+  hard-cap version of the 2026-07-27 movement-variety correction ("padding sets onto an existing
+  movement instead of adding a new one is itself a corner-cut") — that one banned set-padding as a
+  way to reach a number, this one caps the set count outright. Elmira C3 had a leg curl at 6 sets to
+  clear the hamstring floor; the fix was 4 sets plus a second, genuinely distinct curl variation.
+- **Do not load horizontal pressing to hit a volume range on a rounded-shoulder / forward-head
+  client.** The "every major muscle group clears its range" rule yields to the posture principle
+  here: chest volume stays low or omitted, the volume goes into pulling and scapular work instead,
+  and the exception is stated on the face of the design rather than silently resolved either way.
+  *(2026-09-05, Elmira C3 — chest held at 3 sets against a 10-20 range, deliberately.)*
 
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
