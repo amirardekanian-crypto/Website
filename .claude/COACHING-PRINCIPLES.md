@@ -533,6 +533,23 @@ publish it. No athlete health/chat detail goes here — principles only.
   protocol/stop-rule ladder once; the exercise note gives only the point-of-action specifics
   for that exercise (starting depth, load, cue) — it never re-explains the ladder. *(2026-07-12)*
 
+- **Body weight is logged in Proof now — when an athlete's goal actually turns on the scale,
+  point them at it in a notes card.** `habits.html` carries a weight tracker (added
+  2026-09-03, **on by default for everyone** since 2026-09-05, kilograms, and deliberately
+  worth **no XP either way**): a card on **Today** under the habit list (the *Weigh in* button
+  logs, tapping the card body opens the history), a **Body weight** row on **Progress**, and a
+  history screen whose chart is a **7-day rolling average** with the raw readings as dots — so
+  it reads a trend, never one morning. It never reaches the leaderboard, the wall or
+  `data/<id>.json`, and Amir reads it in **`coach.html` → athlete → Proof**. Any athlete whose
+  cycle genuinely depends on body mass (a fat-loss phase, a deficit, a medication-driven
+  change) gets a notes card telling them to weigh in and exactly where — it is the only route
+  to a real number, and it is what pulls a *coached* athlete into the habit tracker at all.
+  Two things the card must say: that nobody else sees it, and — for anyone previously told not
+  to trust the scale — why the rolling average is a different instrument from the number under
+  their feet. *(2026-09-05, Amir: "i have added weight logging in my habit tracker … if some
+  one like maryam need to monitor her weight, add a note in their app and point it to them so
+  they start using it")*
+
 ## Coaching cues
 - **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
   action/focus *outside* the body — where to push, what to move toward), one **internal**
