@@ -306,7 +306,7 @@
                     "label": "RPE 7"
                   }
                 ],
-                "note": "Alternate arms with no rest in between, one arm's set is the other arm's rest. Dumbbells sitting on the bench before you start. Hold it loose in your fingers and let your hand open at the bottom of every rep. Count out loud the whole way through.",
+                "note": "Alternate arms with no rest in between, one arm's set is the other arm's rest. Dumbbells sitting on the bench before you start. Hold it loose in your fingers and let your hand open at the bottom of every rep. Count out loud the whole way through. For now stay on the same dumbbell you used last time. We're not adding weight to this one until your elbow has been quiet three mornings in a row.",
                 "cues": {
                   "good": [
                     "Forearm flat on the bench, only the hand moves",
@@ -882,7 +882,7 @@
                     "style": "dark"
                   },
                   {
-                    "label": "3 Sets",
+                    "label": "2 Sets",
                     "style": "yellow"
                   },
                   {
@@ -929,7 +929,7 @@
                     "label": "RPE 6"
                   }
                 ],
-                "note": "Slow up and slow down, three seconds each way, not just lowering. Alternate arms with no rest between. A bit of stiffness the next day is normal. Soreness still there on the third day means go lighter, and tell me.",
+                "note": "Slow up and slow down, three seconds each way, not just the lowering. Hold it loose in your fingers, let your hand open at the bottom of every rep, and count out loud the whole way through. Alternate arms with no rest between. Stay on the same weight you used last time. If your elbow is worse the next morning, go down one dumbbell and tell me that day.",
                 "cues": {
                   "good": [
                     "Forearm flat, only the hand moves",
@@ -937,6 +937,41 @@
                   ],
                   "bad": [
                     "Don't let it drop, the slow lowering is the exercise"
+                  ]
+                }
+              },
+              {
+                "type": "standard",
+                "name": "Dumbbell Forearm Rotation",
+                "videoUrl": null,
+                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "hand stays loose",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "2 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Each Arm"
+                  },
+                  {
+                    "label": "Tempo 2-0-2-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "note": "Sit down and rest your forearm on your thigh with your hand hanging off the end of your knee. Hold a light dumbbell by one end only so the weight sits on one side, then turn your palm all the way up and all the way down, slow both ways. Start with the lightest one on the rack. This one isn't meant to feel hard.",
+                "cues": {
+                  "good": [
+                    "Turn the far end of the dumbbell over like a door handle, all the way both ways",
+                    "Top of the forearm working, not your grip"
+                  ],
+                  "bad": [
+                    "Don't let your elbow lift off your leg to help the turn"
                   ]
                 }
               }
@@ -957,7 +992,7 @@
       {
         "icon": "🩺",
         "title": "What I Need From Your Doctor",
-        "body": "<p>Right now I'm coaching you around a heart condition I only know one sentence about. That's not good enough for either of us, and it's the reason your program is careful in places it might not need to be.</p><p><strong>Get me four things in writing from your doctor.</strong> What the condition is called. Whether you're cleared for weight training. Any blood pressure or heart rate limit. Whether you're on medication.</p><p>I need this <strong>before 27 September</strong>. If it hasn't come by then, I'll write to your doctor myself. Ask about the leg press and the belt squat while you're there, both of those could open up a lot for you.</p>"
+        "body": "<p>Right now I'm coaching you around a heart condition I only know one sentence about. That's not good enough for either of us, and it's the reason your program is careful in places it might not need to be.</p><p><strong>Get me four things in writing from your doctor.</strong> What the condition is called. Whether you're cleared for weight training. Any blood pressure or heart rate limit. Whether you're on medication.</p><p>I need this <strong>before 27 September</strong>. If it hasn't come by then, I'll write to your doctor myself. Ask about the leg press and the belt squat while you're there, both of those could open up a lot for you.</p><p>One more thing now, about your elbow. Ask whoever treated it what they actually put on it, and whether it was a spray or an injection. If it was an injection I need to know what was in it. Ask them as well whether they think it's the tendon or a nerve. Write down what they say and send me a photo of it.</p>"
       },
       {
         "icon": "🛑",
@@ -982,7 +1017,7 @@
       {
         "icon": "📏",
         "title": "Week 2 Is Measuring Week",
-        "body": "<p>Week 1 you go light on everything. Treat it as learning the movements, nothing else. Keep every set easy.</p><p><strong>Week 2 we find your real numbers.</strong> On the hip thrust, the row, the lunge and the wrist work, you add a small amount each set until the set hits RPE 7, or until the first rep slows down. Then you stop. That set is your number.</p><p><strong>This is not a max and there's no last hard rep.</strong> Normally I'd have an athlete push a set to the limit to find this out. We're not doing that with you, and the reason is your heart. We get the same information by walking up to it instead of running into it.</p>"
+        "body": "<p>Week 1 you go light on everything. Treat it as learning the movements, nothing else. Keep every set easy.</p><p><strong>Week 2 we find your real numbers.</strong> On the hip thrust, the row and the lunge, you add a small amount each set until the set hits RPE 7, or until the first rep slows down. Then you stop. That set is your number.</p><p><strong>Not the wrist work.</strong> After what your elbow did at the competition we're leaving that weight alone for now. There's a card below about it.</p><p><strong>This is not a max and there's no last hard rep.</strong> Normally I'd have an athlete push a set to the limit to find this out. We're not doing that with you, and the reason is your heart. We get the same information by walking up to it instead of running into it.</p>"
       },
       {
         "icon": "🦵",
@@ -992,7 +1027,12 @@
       {
         "icon": "💪",
         "title": "The Forearm Work Is Not Optional",
-        "body": "<p>Your tennis elbow is gone. It comes back for a lot of players, and the best thing we know for stopping that is loading the muscles on top of your forearm slowly and regularly. That's the wrist work on Day 1 and Day 3.</p><p><strong>If a session runs long, that is the last thing you cut.</strong> Before the bike, before the core, before anything. Skip the last exercise instead.</p><p>Two things while you do it. <strong>Hold the dumbbell loose in your fingers, not squeezed in a fist</strong>, and let your hand open at the bottom of each rep. And count out loud through the set. If you can't count out loud, it's too heavy.</p><p>You'll also see straps on every pulling exercise. That's the same protection. Your back should be what stops the set, never your grip.</p>"
+        "body": "<p>Your elbow spoke up again at the competition, so this work matters more now than it did two weeks ago, not less. Loading the muscles on top of your forearm slowly and regularly is the best thing we know for keeping a tennis elbow away. That's the wrist work on Day 1 and Day 3.</p><p><strong>If a session runs long, the wrist work is the last thing you cut.</strong> Before the bike, before the core, before anything. On Day 3 there's a new forearm rotation at the very end, and that one you can drop if you're short. The wrist extension you don't.</p><p>Two things while you do it. <strong>Hold the dumbbell loose in your fingers, not squeezed in a fist</strong>, and let your hand open at the bottom of each rep. And count out loud through the set. If you can't count out loud, it's too heavy.</p><p>You'll also see straps on every pulling exercise. That's the same protection. Your back should be what stops the set, never your grip.</p>"
+      },
+      {
+        "icon": "🖐️",
+        "title": "Your Elbow, The Next Two Weeks",
+        "body": "<p>Your elbow went in your first match, then you got a spray on it and carried on. I want to say this plainly. That spray takes the pain away for an hour or two and it doesn't fix the tendon. So how the elbow felt for the rest of that day tells me nothing, and it tells you nothing either.</p><p><strong>The next morning is the bit that tells us something.</strong> Same as we do with your knee. For the next two weeks, the morning after you play and the morning after Day 1 and Day 3, send me these three:</p><ul><li><strong>How long you were hitting before it started.</strong> Minutes, or roughly how many balls. Not \"it was fine\"</li><li>Whether it's stiff first thing, and how long that takes to wear off</li><li>Whether it hurts picking up a kettle or opening a door</li></ul><p><strong>Your wrist work doesn't change.</strong> Same reps, same three seconds each way, and the RPE on the card stays exactly where it is. The only thing that changes is the weight. Stay on the dumbbell you used last time and don't add anything to it for two weeks. Some ache while you're doing it is fine as long as it's back to normal the next morning. If the morning is worse, go down one dumbbell and tell me the same day.</p><p>Stop and message me the same day if it starts earlier every time you play, or you get pins and needles in your forearm or hand, or it wakes you up at night. And if it's still talking to you at the end of this block on 27 September, you're seeing a physio, whatever it feels like by then.</p>"
       },
       {
         "icon": "🎾",
