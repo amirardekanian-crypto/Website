@@ -3204,6 +3204,36 @@ async function syncFromCloud(athleteId, key) {
 // older is left in the cloud but ignored here — inert instead of destructive.
 // Local's own stale copies are untouched: autoResetStaleDays() still cleans those,
 // which is the case this must NOT break (a device left closed overnight).
+// ── A completion stamp belongs to a PROGRAM, not just to a day number ─────────
+// `_completed_d<N>` used to hold a bare date string. Day ids restart at 1-2-3 in
+// every cycle and nothing clears these when a cycle advances, so publishing a new
+// cycle on a day the athlete had already trained left the NEW cycle's day wearing
+// a "Done" pill it never earned. Behnam, 2026-09-05: finished Bedrock Day 3 at
+// 14:32, First Iron shipped at ~19:15, First Iron Day 3 showed Done. It self-heals
+// at midnight, but the same hole also means a program swapped mid-session inherits
+// a running session's state.
+//
+// The stamp now carries the cycle it belongs to: "<date>|c<currentCycleIndex>".
+// Legacy bare-date values parse to an empty cycle, which matches no current
+// program and is therefore treated as somebody else's stamp — i.e. not Done here.
+// Only DISPLAY keys off the program; the midnight cleanup still keys off the date
+// alone, so a mismatch never destroys data that has not aged out on its own.
+function progToken() {
+  const i = DATA && DATA.currentCycleIndex;
+  return 'c' + (Number.isFinite(i) ? i : 0);
+}
+function stampCompleted() { return new Date().toDateString() + '|' + progToken(); }
+function parseCompleted(v) {
+  if (!v) return null;
+  const s = String(v), i = s.indexOf('|');
+  return i < 0 ? { date: s, prog: '' } : { date: s.slice(0, i), prog: s.slice(i + 1) };
+}
+// The date half only — what every "is this stamp from today?" check wants. Safe
+// before DATA has loaded, which staleCloudPlan needs.
+function completedDate(v) { const c = parseCompleted(v); return c ? c.date : null; }
+// Finished, and finished on the program that is on screen now.
+function completedHere(v) { const c = parseCompleted(v); return !!c && c.prog === progToken(); }
+
 function staleCloudPlan(data, prefix) {
   const plan = { skip: new Set(), weightsOnly: new Set() };
   const today = new Date().toDateString();
@@ -3211,7 +3241,7 @@ function staleCloudPlan(data, prefix) {
   Object.keys(data).forEach(k => {
     if (k.indexOf(prefix) !== 0) return;
     const m = k.slice(prefix.length).match(/^completed_d(\d+)$/);
-    if (m && String(data[k]) !== today) over[m[1]] = true;
+    if (m && completedDate(data[k]) !== today) over[m[1]] = true;
   });
 
   const sameDay = v => { const d = new Date(v); return !isNaN(d.getTime()) && d.toDateString() === today; };
@@ -3801,7 +3831,7 @@ function dayCardHTML(day, dayNum, total, opts) {
   const sub = `${plural(blockCount, 'block')} · ${plural(moveCount, 'movement')}`;
 
   // Completed days (the Finish-Session flow sets this key) get a brown Done pill.
-  const isDone = !opts.static && !!localStorage.getItem(ATHLETE_ID + '_completed_d' + id);
+  const isDone = !opts.static && completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id));
 
   const cls = 'current-message day-ov-card' + (opts.static ? '' : ' is-clickable');
   const attrs = opts.static ? '' : ` role="button" tabindex="0" onclick="openDayView('${idStr}')"`;
@@ -5773,7 +5803,7 @@ function confirmSession(day) {
   const completeEl = document.getElementById('complete-' + day);
   completeEl.classList.add('visible');
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  localStorage.setItem(ATHLETE_ID + '_completed_d' + day, new Date().toDateString());
+  localStorage.setItem(ATHLETE_ID + '_completed_d' + day, stampCompleted());
   // Record a permanent session to the coach dashboard the moment the day is
   // finished (full OR partial) — no "send to coach" tap required. Send/email is
   // unchanged; this just also captures completions the athlete doesn't send.
@@ -5795,7 +5825,7 @@ function markSuggestedDay() {
   const cards = document.querySelectorAll('.day-ov-card');
   const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
   for (let i = 0; i < dayIds.length; i++) {
-    if (!localStorage.getItem(ATHLETE_ID + '_completed_d' + dayIds[i])) {
+    if (!completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + dayIds[i]))) {
       tabs[i]?.classList.add('suggested');
       cards[i]?.classList.add('suggested');
       break;
@@ -5995,7 +6025,7 @@ function autoResetStaleDays() {
   // already uses to decide a session was started.
   const liveNames = new Set();
   days.forEach(d => {
-    const on = localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id);
+    const on = completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id));
     if (on) {
       if (on !== today) return;                     // finished on an earlier day — stale
     } else if (!sessionStartedToday(d.id, today)) {
@@ -6008,7 +6038,25 @@ function autoResetStaleDays() {
 
   days.forEach(day => {
     const completedKey = ATHLETE_ID + '_completed_d' + day.id;
-    const completedOn  = localStorage.getItem(completedKey);
+    const completedRaw = localStorage.getItem(completedKey);
+    // Date half only. A stamp from another program is deliberately NOT swept here
+    // — it stops showing as Done (completedHere) but its logged data still ages
+    // out on the normal midnight schedule, so a cycle published mid-day can never
+    // destroy a session the athlete has not finished sending.
+    const completedOn  = completedDate(completedRaw);
+
+    // One-time migration for stamps written before they carried a program token.
+    // Adopt them into the CURRENT program rather than treating them as foreign:
+    // back then a device only ever held one program at a time, so "this one" is
+    // the honest reading — and the alternative silently strips the Send panel
+    // (restoreState) from a session finished today that has not been sent yet,
+    // which would be a far worse bug than the pill it fixes. Runs before
+    // restoreState() and markSuggestedDay() on boot, so nothing reads a stamp
+    // mid-migration. Only same-day stamps are worth adopting; older ones are
+    // about to be swept anyway.
+    if (completedRaw && completedOn === today && parseCompleted(completedRaw).prog === '') {
+      localStorage.setItem(completedKey, today + '|' + progToken());
+    }
     // A session that was started but never finished leaves its timer + readiness
     // behind with NO completed stamp, so the completed-day branch below never
     // touches them — the timer keeps counting wall-clock for days and the stale
@@ -6090,7 +6138,7 @@ function restoreState() {
         items[idx].querySelectorAll('.rpe-row').forEach(r => r.classList.add('visible'));
       }
     });
-    if (localStorage.getItem(ATHLETE_ID + '_completed_d' + day)) {
+    if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day))) {
       const el = document.getElementById('complete-' + day);
       if (el) el.classList.add('visible');
     }
@@ -6414,7 +6462,23 @@ async function sendSession(day) {
 
     // Also refresh the permanent cloud record (coach dashboard). It was already
     // saved on finish; this re-saves with the final RPE/note at send time.
-    recordSessionToCloud(day);
+    //
+    // The email just went through, so the network is definitively up — which
+    // makes this the best moment in the whole app to heal a save_session that
+    // failed earlier. Without it a session can reach the coach's inbox while
+    // session_history never gets the row, and NOTHING surfaces that: the payload
+    // sits in a localStorage queue waiting for a future app open that may not
+    // come before the next cycle. That is exactly what happened to Behnam on
+    // 2026-09-05 — report emailed, dashboard row missing, found only because a
+    // "Done" pill looked wrong. Await both so a still-failing save re-queues
+    // before the button reports success — but never let a cloud hiccup surface
+    // as a failed SEND, because the email has already landed. Both swallow their
+    // own errors; this is belt-and-braces so the athlete's success message and
+    // the coach's record can never disagree about what happened.
+    try {
+      await recordSessionToCloud(day);
+      await _replayQueue();
+    } catch (e) { /* queued for the next load — the email is already out */ }
 
     status.className = 'send-session-status success';
     status.textContent = '✓ Sent — your coach will see it shortly.';

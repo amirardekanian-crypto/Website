@@ -44,6 +44,30 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Links to the habit tracker — and nothing more.** A **Daily Habits** shortcut card on Home and at the end of My Plan opens [`habits.html`](habits.html), handing over the client id and resolved key. Same origin and PWA scope, so from an installed app this stays inside the app shell instead of bouncing to the browser. The card is deliberately plain: **this app holds no habit state, no XP maths and no level formula** — duplicating those would be a third copy to keep in sync and weight it doesn't need.
 - **The two apps stay out of each other's storage.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those). Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
+- **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read one
+  localStorage key, `<id>_completed_d<N>`, holding **`"<toDateString()>|c<currentCycleIndex>"`**.
+  - **Done** (`isDone`, brown pill) shows only when the stamp's cycle matches the cycle on screen
+    (`completedHere`). **Suggested** (`markSuggestedDay`) highlights the *first day in `days[]`
+    order* with no such stamp — which is why day order in `workouts.days[]` is load-bearing, not
+    cosmetic.
+  - **The cycle half exists because day ids restart at 1-2-3 every cycle** and nothing clears these
+    on a cycle advance. Publishing a new cycle on a day the athlete had already trained used to
+    leave the new cycle's day wearing a Done pill it never earned (Behnam, 2026-09-05). Only
+    *display* keys off the cycle; the midnight sweep in `autoResetStaleDays()` still keys off the
+    **date alone** (`completedDate`), so a mismatch never destroys data that has not aged out.
+  - **Legacy bare-date stamps are adopted into the current cycle on boot**, not treated as foreign
+    — otherwise a session finished today but not yet sent loses its Send panel (`restoreState`).
+  - ⚠️ **It is a today-scoped flag, not history.** Every stamp is wiped at midnight, so the app
+    cannot answer "what did I do this week" and `markSuggestedDay()` points back at Day 1 every
+    morning. Real weekly history needs `session_history`, which the app writes but never reads.
+- **A finished session is recorded TWICE, over two independent calls** — `save_session` (the
+  `session_history` row the coach dashboard is built from) and a Web3Forms email. Either can fail
+  alone. A failed `save_session` queues in `<id>_csq` and retries on a later app open, which may
+  never come before the next cycle — so the coach's inbox can hold a session the dashboard has no
+  row for, silently (Behnam, 2026-09-05). Two guards now: `sendSession()` re-runs the cloud save
+  **and drains the queue** right after the email succeeds (proof the network is up), and
+  `coach.html`'s `syncGapsOf()` flags any athlete whose `<id>_sent_d<N>` has no matching
+  `session_history` row, as a *needs you* reason on the roster.
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
 - **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, `content/`, and `workouts/`, not here. Ask an AI assistant to guide you before structural edits.
 

@@ -869,6 +869,39 @@ function habDaysOf(blob, id) {
   return days;
 }
 
+// ── Sessions that reached the inbox but never reached the dashboard ───────────
+// The app writes session_history itself (save_session) AND emails the report.
+// Those are two independent calls, so one can succeed while the other fails —
+// and when save_session is the one that fails it is completely silent: the
+// payload goes into a localStorage retry queue that only drains on a future app
+// open. Behnam, 2026-09-05: report emailed at 17:16, session_history row never
+// written, found only because a "Done" pill looked wrong to Amir. Every athlete
+// carries `<id>_sent_d<N>` (an ISO timestamp of the last send for that day), so
+// a send with no matching history row is a session the dashboard is missing.
+// It is the athlete's own record, not a guess.
+function syncGapsOf(blob, id, sessions) {
+  const gaps = [];
+  if (!blob) return gaps;
+  // supabase-js hands `date` columns back as 'YYYY-MM-DD' strings today, but a
+  // Date here would silently stringify to "Mon Aug 10 2026" and mismatch EVERY
+  // row — turning this into a false "not synced" warning on the whole roster,
+  // which is worse than not having the check at all. Normalise both shapes.
+  const dkey = v => (v instanceof Date)
+    ? (isNaN(v.getTime()) ? '' : v.toISOString().slice(0, 10))
+    : String(v == null ? '' : v).slice(0, 10);
+  const have = new Set((sessions || []).map(s => Number(s.day) + '|' + dkey(s.completed_on)));
+  const pre = id + '_sent_d';
+  Object.keys(blob).forEach(k => {
+    if (k.indexOf(pre) !== 0) return;
+    const day = k.slice(pre.length);
+    if (!/^\d+$/.test(day)) return;
+    const on = String(blob[k] || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(on)) return;
+    if (!have.has(Number(day) + '|' + on)) gaps.push({ day: Number(day), on });
+  });
+  return gaps.sort((x, y) => String(y.on).localeCompare(String(x.on)));
+}
+
 function assemble() {
   const map = {};
   const get = (id) => (map[id] = map[id] || {
@@ -882,6 +915,7 @@ function assemble() {
     if (r.updated_at && (!a.lastActive || r.updated_at > a.lastActive)) a.lastActive = r.updated_at;
     a.habDays = habDaysOf(r.data, r.athlete_id);
     a.wt = wtOf(r.data, r.athlete_id);
+    a.blob = r.data;                       // kept for syncGapsOf below (a reference, not a copy)
     const dk = Object.keys(a.habDays).sort();
     a.isHab = dk.length > 0;
     a.habLast = dk.length ? dk[dk.length - 1] : null;
@@ -912,6 +946,8 @@ function assemble() {
     a.perWeek = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0;
     a.onBoard = !!S.optin[a.id];
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;
+    // Needs both halves, so it runs here rather than in either pass above.
+    a.syncGaps = syncGapsOf(a.blob, a.id, a.sessions);
     // Split unanswered notes at the window: `recent` is what "waiting" means
     // anywhere a count is shown; `stale` is backlog. Every note still keeps its
     // own reply buttons on the athlete's file regardless of age.
@@ -1519,6 +1555,15 @@ function rosterReasons(a) {
   }
   if (a.isHab && a.habGap >= QUIET_HABIT_DAYS) out.push({ tone: 'note', text: 'silent on Proof — ' + a.habGap + ' days' });
   if (a.tier === 'free' && a.contact && a.contact.days_logged >= UPGRADE_DAYS) out.push({ tone: 'good', text: 'ready to upgrade?' });
+  // A session they sent that never made it into session_history. Ranked as a warn
+  // because the dashboard is lying about their training until it is resolved —
+  // every other number on this screen is computed from session_history.
+  if (a.syncGaps && a.syncGaps.length) {
+    const g = a.syncGaps[0];
+    out.push({ tone: 'warn', text: a.syncGaps.length === 1
+      ? `session not synced — Day ${g.day}, ${g.on}`
+      : `${a.syncGaps.length} sessions not synced — latest Day ${g.day}, ${g.on}` });
+  }
   return out;
 }
 function renderAthletes() {
@@ -1545,6 +1590,9 @@ function rosterAttention(a) {
   let n = a.toReply * 100;
   if (a.tier === 'coached' && a.finished > 0 && daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null) > QUIET_SESSION_DAYS) n += 30;
   if (a.isHab && a.habGap >= QUIET_HABIT_DAYS) n += 20 + a.habGap;
+  // Below unanswered notes, above a quiet week: it is a data problem, not a
+  // person problem, but it silently corrupts every session-derived number here.
+  if (a.syncGaps && a.syncGaps.length) n += 50 + a.syncGaps.length;
   return n;
 }
 function renderRoster() {
