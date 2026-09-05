@@ -866,6 +866,48 @@ explicitly turned it off (or on) keeps that value through the migration, with **
 at all; and forcing the one-shot flag back off and re-running `migrateOld()` by hand still
 respects an explicit choice — the `touched` check, not the one-shot flag, is the real guard.
 
+**The disclosure has to be SEEN, not just true in a policy document.** Added the same day
+as the default flip, once Amir pointed out he has no lawyer or compliance person of his own
+to catch a mistake here (2026-09-05: *"protect me in your best knowledge, i dont have some
+one else"*). Being on by default means most athletes never chose this — the old empty-state
+copy in `wtCardLine()` ("Kilograms. On by default...") technically said so, but it lived
+inside the weigh-in CARD itself and vanished the instant there was a first reading, so an
+athlete who tapped *Weigh in* within their first five seconds could act on the feature
+before ever reading a word about it. That is not real disclosure, it is a sentence that
+happened to exist.
+
+`renderWtNotice()` fixes this with a **standing banner**, not a rewritten sentence — reusing
+`.rcprompt` completely unchanged, the exact component the tour prompt and the roll-call
+pointer already use for "explain once, then get out of the way for good," rather than
+inventing a new dismiss control this app has never had. It sits directly above the weigh-in
+card and is gated on its own flag, `CFG.wt.seenNotice` — independent of whether there is a
+reading yet, so it cannot disappear before it has done its job. `wtMarkSeen()` is the one
+place that flips it, called from three doors, any one of which counts as informed: tapping
+the banner itself (which goes straight to Settings → Body weight — the screen with both the
+explanation and the switch, not just the read-only history a tap short of it), opening the
+history via `goWeight()` from anywhere, or actually logging a reading through the weigh-in
+sheet. Nobody has to dismiss a banner they have already acted past.
+
+**Self-service erasure**, added the same pass. Turning the feature off deliberately keeps
+every reading (see above — the point is reversibility), so a separate control exists for an
+athlete who wants the *readings* gone, not just the tracking stopped: **Delete all my
+weight history**, in Settings → Body weight, only rendered when there is anything to
+delete. `clearAllWeight()` tombstones every day in one pass (`{kg:null, t:now}`, one shared
+timestamp, one `saveWt()`) — never a raw `WT = {}`, because that would be exactly the
+resurrecting-delete bug fixed earlier the same week: a device that has not yet pulled this
+wipe still holds real readings, and a bare wipe gives the union merge nothing to compare
+against, so that device's next push would bring every reading back. Tombstoning is what the
+merge already knows how to propagate correctly. The confirm is the same double-tap-then-
+auto-disarm pattern as *Reset today's log* (`UI.confirmWtWipe`, mirroring `UI.confirmReset`
+exactly) — destructive, so it asks once, but asks.
+
+Proven in the browser: the banner shows for a fresh athlete and is absent once the feature
+is off; each of the three `wtMarkSeen()` doors independently ends it; the delete control
+tombstones every reading, is gone once there is nothing left to delete (the switch row
+stays), and — the check that actually matters — a simulated second device that still holds
+real readings and pulls this device's wipe ends up with every reading tombstoned too, the
+same union-merge safety net that already protects a single deletion.
+
 **Where it lives in the UI**
 - **Today** — `renderWtRow()`, a **white rounded card below the habit list and below the
   `.rowhint`**. Two states: *Weigh in* before you have, *See your history* after, with the

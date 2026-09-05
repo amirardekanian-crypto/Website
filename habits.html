@@ -3203,7 +3203,11 @@ function defaultCfg() {
            // themselves, in EITHER direction — see migrateOld(), which uses it
            // to tell "never decided" from "decided", so a future default flip
            // can only ever move a stale default, never overwrite a real choice.
-           wt:{ on:true, range:'30', allReads:false, touched:false },
+           // `seenNotice` gates the one-time disclosure banner on Today — see
+           // renderWtNotice(). Being on by default means most athletes never
+           // chose this, so they are TOLD, once, in a banner that cannot
+           // vanish after a single tap the way the old sub-line copy could.
+           wt:{ on:true, range:'30', allReads:false, touched:false, seenNotice:false },
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().
            msOpen:null };
@@ -3543,6 +3547,17 @@ function clearWeight(dayKey) {
   WT[dayKey] = { kg: null, t: Date.now() };
   saveWt();
 }
+// Self-service erasure — the athlete does not have to ask Amir to delete their
+// own record. Tombstones EVERY day, exactly as clearWeight() does one, so the
+// same union-merge safety applies: a device that has not yet pulled this wipe
+// still holds real readings, and its own next push must not resurrect them,
+// which a raw `WT = {}` would risk — this only ever ADDS newer tombstones,
+// same shape and same rule as every other weight write.
+function clearAllWeight() {
+  const now = Date.now();
+  wtDays().forEach(k => { WT[k] = { kg: null, t: now }; });
+  saveWt();
+}
 
 // ── Persistence ───────────────────────────────────────────────────────────
 function loadLocal() {
@@ -3558,7 +3573,7 @@ function loadLocal() {
   // above would have left it undefined rather than at the default. These are
   // athletes who never had the feature at all — same as a brand-new install —
   // so they get the current default (on), same as defaultCfg().
-  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:true, range:'30', allReads:false, touched:false };
+  if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:true, range:'30', allReads:false, touched:false, seenNotice:false };
   try {
     const m = JSON.parse(localStorage.getItem(K_META()) || '{}');
     SYNC.dirty = !!m.dirty; SYNC.lastOk = m.lastOk || null;
@@ -3943,7 +3958,7 @@ async function syncFromCloud() {
         // at all, and every reader below assumes the object is there. Same
         // default as a brand-new install, for the same reason as loadLocal()'s
         // repair above.
-        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:true, range:'30', allReads:false, touched:false };
+        if (!CFG.wt || typeof CFG.wt !== 'object') CFG.wt = { on:true, range:'30', allReads:false, touched:false, seenNotice:false };
         const mineOwned = keepPass.owned || [], theirsOwned = CFG.pass.owned || [];
         CFG.pass.owned = theirsOwned.concat(mineOwned.filter(id => theirsOwned.indexOf(id) < 0));
         // What they were WEARING is a preference, not a possession, so the newer
@@ -7258,8 +7273,10 @@ function renderToday(LI, doneCount, pct) {
            belongs to the rows it describes and must not be cut off from them.
            Weight is not one of the day's jobs so it does not sit among them; it
            reports, and it is the only thing on this screen that shows a trend
-           without being tapped. Off by default: for most athletes it is not
-           here at all. -->
+           without being tapped. On by default: for most athletes it is here
+           whether they asked for it or not, which is exactly what the notice
+           directly below is for. -->
+      ${renderWtNotice()}
       ${renderWtRow()}
 
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
@@ -7826,6 +7843,36 @@ function wtChart(days) {
        + grid + labels + line + dots + '</svg>';
 }
 
+// ⚠️ THE DISCLOSURE, and it has to actually be SEEN — not just true somewhere
+// in a privacy policy nobody opens. Being on by default (2026-09-05) means
+// most athletes never chose this; the app owes every one of them a real,
+// standalone "this is here, here is how to stop it" moment, not a clause
+// buried in wtCardLine()'s empty-state copy that a fast tap on "Weigh in"
+// could skip past before it was ever read.
+//
+// Reuses `.rcprompt` unchanged — the exact component the tour prompt and the
+// roll-call pointer already use for "explain once, then get out of the way
+// for good" — rather than inventing a dismiss control this app has never had.
+// Tapping it opens Settings → Body weight DIRECTLY — the screen with the
+// explanation AND the off switch on it, not the read-only history a level
+// removed from either. wtMarkSeen() also fires from goWeight() and the
+// weigh-in sheet's Save button, so opening the history or logging a reading
+// ends this banner too — seeing the feature in use is as much "informed" as
+// reading a sentence about it, and nobody should have to dismiss a banner
+// they have already acted past.
+function renderWtNotice() {
+  if (!wtOn() || CFG.wt.seenNotice || editingPast()) return '';
+  return `<button class="rcprompt" data-k="wtnotice" ${on(() => {
+    wtMarkSeen(); UI.backTo = 'today'; go('settings'); goSub('weight');
+  })}>
+    <span>
+      <span class="eyebrow">Body weight tracking</span>
+      <span class="rcq">On for everyone by default. Turn it off any time in Settings.</span>
+    </span>
+    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">&rarr;</span>
+  </button>`;
+}
+
 // The card on Today. It is the same white rounded card as everything else on
 // that screen — hero, day strip, habit rows — because it is not a special kind
 // of thing and should not look like one.
@@ -7917,7 +7964,18 @@ function renderWtProgressRow() {
   </button>`;
 }
 
+// The one-time disclosure counts as SEEN the moment the athlete does anything
+// that means they have actually encountered the feature — opened its screen,
+// logged a real reading, or dismissed the banner itself — not just "a card
+// rendered on their phone once". Any one of these ends it for good; none of
+// them require all three.
+function wtMarkSeen() {
+  if (CFG.wt.seenNotice) return;
+  CFG.wt.seenNotice = true;
+  saveCfg();
+}
 function goWeight(from) {
+  wtMarkSeen();
   UI.backTo = from || UI.screen;
   go('weight');
 }
@@ -8088,6 +8146,7 @@ function renderWtSheet() {
         const v = wtValNum();
         if (v === null || v < WT_MIN || v > WT_MAX) { toast('That is not a weight. ' + WT_MIN + ' to ' + WT_MAX + ' kg.'); return; }
         const saved = setWeight(day, v);
+        wtMarkSeen();
         UI.wtSheet = null;
         haptic('done');
         render();
@@ -8550,7 +8609,8 @@ function renderManual() {
         p(`The chart draws a <strong style="color:var(--ink)">${WT_AVG_WINDOW}-day average</strong> as the line and your actual readings as dots behind it, and every change it quotes compares one average against another. That is deliberate. Weight moves a kilo either way on water, food and sleep, so a single morning tells you nothing and two mornings compared tell you less than nothing. The line is the part worth reading.`) +
         p(`Under the chart are the numbers that answer whether it is actually working. <strong style="color:var(--ink)">Per week</strong> is your rate across whichever span you picked — a rate shows a stall while a total is still creeping. <strong style="color:var(--ink)">Since you started</strong> ignores the span entirely and compares today with your very first reading, which is the only honest answer to "am I getting anywhere". Your readings sit underneath — the last eight, or all of them if you tap the heading.`) +
         p(`Weigh at the same time of day, ideally first thing. Consistency of method beats frequency — <strong style="color:var(--ink)">once a week done properly</strong> is worth more than seven rushed readings, and the app never asks you for one you did not offer.`) +
-        p(`It is <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone.</strong> It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`))}
+        p(`It is <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone.</strong> It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`) +
+        p(`You can delete <strong style="color:var(--ink)">any single reading</strong> from its row in the history, or <strong style="color:var(--ink)">every reading you have ever logged</strong> in one go from Settings → Body weight. Neither touches the rest of your account.`))}
 
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
@@ -9609,7 +9669,7 @@ function renderSettings() {
                  navVal(onCount + ' of ' + addTotal + ' add-ons on'),
                  () => goSub('habits'))}
         ${navRow('⚖️', 'Body weight',
-                 'Optional, and nothing to do with your habits or your XP',
+                 'On by default, and nothing to do with your habits or your XP',
                  navVal(wtOn() ? 'On' : 'Off'),
                  () => goSub('weight'))}
         ${navRow('🎨', 'Appearance', 'Dark mode and the tick sound',
@@ -9731,7 +9791,7 @@ function renderSettingsWeight() {
           </span>
           <span class="sw ${wtOn() ? 'on' : ''}"><i></i></span>
         </button>
-        ${wtOn() ? `<button class="navrow" ${on(() => { UI.backTo = 'settings'; go('weight'); })}>
+        ${wtOn() ? `<button class="navrow" ${on(() => goWeight('settings'))}>
           <span class="navtile" aria-hidden="true">📈</span>
           <span class="navmid">
             <span class="navnm">See the history</span>
@@ -9753,6 +9813,28 @@ function renderSettingsWeight() {
         food and sleep, so the app shows you a ${WT_AVG_WINDOW}-day average and not the
         raw number — one morning tells you nothing, a fortnight tells you plenty.
       </div>
+      ${n ? `<div class="cardgrp">
+        <!-- Self-service erasure — turning the feature off keeps every reading
+             on purpose (see above), so this is the SEPARATE control for anyone
+             who wants the readings themselves gone, not just the tracking
+             stopped. Destructive, so it asks once, the same pattern as "Reset
+             today's log": arm on the first tap, execute on the second, and
+             disarm itself after a few seconds if the second tap never comes. -->
+        ${navRow('🗑️', 'Delete all my weight history',
+                 `Every reading, gone from this phone and the cloud. Cannot be undone.`,
+                 `<span class="navpill">${UI.confirmWtWipe ? 'Sure?' : 'Delete'}</span>`,
+                 () => {
+                   if (!UI.confirmWtWipe) {
+                     UI.confirmWtWipe = true; render();
+                     setTimeout(() => { if (UI.confirmWtWipe) { UI.confirmWtWipe = false; render(); } }, 2600);
+                     return;
+                   }
+                   UI.confirmWtWipe = false;
+                   clearAllWeight(); render();
+                   toast('Every weight reading is gone.');
+                 },
+                 'danger' + (UI.confirmWtWipe ? ' armed' : ''))}
+      </div>` : ''}
       <div style="height:20px"></div>
     </div>`;
 }
