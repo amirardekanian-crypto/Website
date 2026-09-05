@@ -21,9 +21,8 @@
   ---------------------------------------------------------------
   همه‌ی این‌ها متن نمونه‌ست. قبل از انتشار عوضشون کن:
 
-  1.  WHATSAPP        → شماره‌ی واقعی واتساپ (پایین، توی بخش اسکریپت)
-  2.  INSTAGRAM       → آیدی واقعی اینستاگرام (پایین، توی بخش اسکریپت)
-  2b. PHONE           → شماره‌ی تماس؛ ثبت‌نام استعدادیابی فقط تلفنیه
+  1.  PHONE           → ✅ ۰۹۱۵۵۹۸۵۰۶۸ — واتساپ و تماس هر دو از روی همین ساخته می‌شن
+  2.  INSTAGRAM       → ✅ mehraneh_zohourian
   3.  «مهرانه ظهوریان»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
   4.  قیمت‌ها          → هنوز خالی‌ان؛ دنبال «TODO: قیمت واقعی» بگرد (۴ تا کلاس پولی)
   5.  آمارها           → ✅ واقعی‌ان حالا: ۱۳ سال سابقه، تیم ملی، بازی حرفه‌ای، مسابقات کشوری
@@ -1290,12 +1289,14 @@ document.documentElement.classList.add("js");   // must stay first — gates eve
 /* ================================================================
    ⚠ این دو خط رو با اطلاعات واقعی عوض کن
    ================================================================ */
-const WHATSAPP  = "989120000000";                 // شماره‌ی واتساپ، بدون + و بدون صفر اول (۹۸ + شماره)
-const INSTAGRAM = "your_instagram_handle";        // فقط آیدی، بدون @
-const PHONE     = "09120000000";                  // شماره‌ی تماس، همون‌طور که گرفته می‌شه (ثبت‌نام استعدادیابی)
+const PHONE     = "09155985068";                  // شماره‌ی کاری؛ واتساپش هم روی همینه
+const INSTAGRAM = "mehraneh_zohourian";           // فقط آیدی، بدون @
 const WA_TEXT   = "سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌ها بپرسم.";
 /* ================================================================ */
 
+/* یه شماره، دو تا شکل — از روی PHONE ساخته می‌شن تا هیچ‌وقت از هم جدا نیفتن */
+const WHATSAPP = "98" + PHONE.slice(1);           // بین‌المللی: ۹۸ + شماره بدون صفر اول
+const TEL      = "+" + WHATSAPP;
 const waURL = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(WA_TEXT);
 const igURL = "https://instagram.com/" + INSTAGRAM;
 document.querySelectorAll("[data-wa]").forEach(function(a){
@@ -1311,7 +1312,7 @@ var FA = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
 function toFa(n){ return String(n).replace(/[0-9]/g, function(d){ return FA[+d]; }); }
 
 /* تماس تلفنی — ثبت‌نام کلاس‌های استعدادیابی فقط از این راهه */
-document.querySelectorAll("[data-tel]").forEach(function(a){ a.href = "tel:" + PHONE; });
+document.querySelectorAll("[data-tel]").forEach(function(a){ a.href = "tel:" + TEL; });
 document.querySelectorAll("[data-phone]").forEach(function(el){ el.textContent = toFa(PHONE); });
 
 /* ─────────── headlines split into WORDS ───────────
