@@ -8,7 +8,7 @@
   "sport": {
     "badge": "🏋️ Strength & Fat Loss"
   },
-  "currentCycleIndex": 0,
+  "currentCycleIndex": 1,
   "cycles": [
     {
       "num": 1,
@@ -48,11 +48,18 @@
         "Your first real fat-loss phase, on a routine that finally holds.",
         "A fourth day comes back, and the free hinge returns as a skill."
       ],
-      "teaser": {
+      "message": {
         "paragraphs": [
-          "Cycle 2 is where the fat loss actually starts. A fourth day comes back, your food gets its first real change, and the walking turns into proper work.",
-          "But it only opens if your back stays quiet this month. That's the deal, and it's the whole reason we go slow now.",
-          "Keep the back quiet and the next one is yours."
+          "Last month you told me it was too easy, and your logs said the same thing. Almost no soreness, most sessions sitting around a 5 when we were aiming for 7, and you moving your own weights up because the program wasn't doing it fast enough. Your seated leg curl went from 10 to 24. You were right.",
+          "So this month gets harder on purpose. A fourth day comes back, your effort target moves from 7 to 8 on most things, and about a dozen movements are brand new. This is also where the fat loss actually starts, so your food gets its first real change and your walking keeps building.",
+          "One thing does not get harder, and that's your back work. The deadlift comes in light and stays light, because it's a skill this month, not a lift to push. Everything else you can attack."
+        ],
+        "outcomes": [
+          "14 of 20 gym sessions logged",
+          "Every new movement calibrated and logged by week 2",
+          "Weight logged in the app at least twice a week",
+          "Walks 2 to 3 minutes longer each week",
+          "Deadlift finished every session with a flat back"
         ]
       }
     },
@@ -66,7 +73,14 @@
       "focuses": [
         "Push the fat loss properly — this is where the mirror starts to change.",
         "First interval work, on a base you spent nine weeks building."
-      ]
+      ],
+      "teaser": {
+        "paragraphs": [
+          "Cycle 3 is where the mirror starts to change. Nine weeks of walking will have built something under you that most people never bother to build, and next month is where we finally get to spend it.",
+          "Your cardio stops being one speed. That's all I'll say.",
+          "Finish this month properly and the fun one is yours."
+        ]
+      }
     },
     {
       "num": 4,
@@ -94,13 +108,13 @@
     }
   ],
   "workouts": {
-    "label": "Program 01 · Bedrock",
+    "label": "Program 02 · Slow Burn",
     "days": [
       {
         "id": 1,
-        "focusTag": "Glutes First, Everything Follows",
-        "completionTitle": "Strongest Day Done",
-        "completionMessage": "That's your biggest day of the week finished and your best lift led it. Get some protein in and give your hips a night off.",
+        "focusTag": "Glute Day Just Got Heavier",
+        "completionTitle": "Biggest Day Done",
+        "completionMessage": "That's your heaviest session of the week finished and your two strongest lifts led it. Get some protein in and give your hips the night off.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -117,48 +131,22 @@
                 ],
                 "cues": {
                   "good": [
-                    "Easy pace, flat or very light incline",
+                    "Easy pace, flat or a very light incline",
                     "Body warming up, breathing still easy"
                   ],
                   "bad": [
-                    "Don't push this — it's a warm-up, not the session"
+                    "Don't push this, it's a raise not the session"
                   ]
                 }
               },
               {
                 "type": "circuit",
-                "name": "Hip & Hinge Primer",
+                "name": "Glute & Hip Primer",
                 "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "restSec": 45,
                 "warmup": true,
                 "items": [
-                  {
-                    "name": "Cat-Cow",
-                    "detail": "×8",
-                    "cues": {
-                      "good": [
-                        "Move one part of your spine at a time",
-                        "Back waking up, no strain anywhere"
-                      ],
-                      "bad": [
-                        "Don't rush it — slow is the point"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Dowel Hip Hinge",
-                    "detail": "×8",
-                    "cues": {
-                      "good": [
-                        "Push your hips back to touch a bench behind you, hold 2 seconds",
-                        "Hamstrings stretching, back stays flat against the dowel"
-                      ],
-                      "bad": [
-                        "Don't let the dowel lose contact with your head, upper back or tailbone"
-                      ]
-                    }
-                  },
                   {
                     "name": "Glute Bridge",
                     "detail": "×12",
@@ -174,7 +162,7 @@
                   },
                   {
                     "name": "Banded Lateral Walk",
-                    "detail": "×10 Each Side",
+                    "detail": "×12 Each Side",
                     "cues": {
                       "good": [
                         "Step wide against the band and stay low",
@@ -182,6 +170,32 @@
                       ],
                       "bad": [
                         "Don't let your knees fall inward"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "90/90 Hip Switch",
+                    "detail": "×6 Each Side",
+                    "cues": {
+                      "good": [
+                        "Turn both knees over to the other side and sit up tall",
+                        "Feel your hips open, not your lower back"
+                      ],
+                      "bad": [
+                        "Don't force the range, go where it stays easy"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Hip Airplane",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": [
+                        "Stand on one leg and rotate your hips open, then closed",
+                        "Feel your standing hip working to keep you steady"
+                      ],
+                      "bad": [
+                        "Don't rush it, control the wobble instead"
                       ]
                     }
                   }
@@ -197,11 +211,9 @@
                 "type": "standard",
                 "name": "Machine Hip Thrust",
                 "videoUrl": null,
-                "restSec": 120,
-                "note": "Switched you to the machine since the bar was bothering your hips. The numbers from the barbell version don't carry across, so treat this as a fresh start: go light on your first set and build up until it sits at a 7 out of 10.",
                 "chips": [
                   {
-                    "label": "1s top hold",
+                    "label": "2s top hold",
                     "style": "dark"
                   },
                   {
@@ -209,24 +221,26 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×10 Reps"
+                    "label": "×8 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 3-0-1-0"
                   },
                   {
-                    "label": "RPE 7"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 120,
                 "cues": {
                   "good": [
-                    "Drive the floor away through your mid-foot",
-                    "Squeeze the glutes to lift, ribs stay down"
+                    "Drive through your heels until your hips are level with your knees",
+                    "Squeeze your glutes hard at the top and hold them there"
                   ],
                   "bad": [
-                    "Don't arch the lower back at the top — finish with the hips, not the spine"
+                    "Don't finish the rep with your lower back, ribs stay down"
                   ]
-                }
+                },
+                "note": "You finished last month at 70 for 10, and your own note said 80 was your hard max. Eight reps at RPE 8 starts around the weight you called hard, not the one that felt comfortable."
               }
             ]
           },
@@ -238,71 +252,44 @@
                 "type": "standard",
                 "name": "Machine Leg Press",
                 "videoUrl": null,
-                "restSec": 90,
-                "note": "First set is your test set, so go lighter than you think. Set your depth so your lower back stays flat on the pad the whole time and stop before your tailbone tucks under.",
                 "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
                   {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×10 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 3-0-1-0"
                   },
                   {
-                    "label": "RPE 7"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 120,
                 "cues": {
                   "good": [
-                    "Push through your whole foot",
-                    "Quads take the load"
+                    "Push the platform away evenly through both feet",
+                    "Feel your thighs load on the way down, not your lower back"
                   ],
                   "bad": [
-                    "Stop the depth before your tailbone tucks off the pad"
+                    "Don't let your tailbone lift off the pad at the bottom"
                   ]
-                }
+                },
+                "note": "You held 90 for three sets last month at an easy effort. Ten reps at RPE 8 should start above that. Both your gyms have different machines, so let the first set tell you where you are."
               },
               {
                 "type": "standard",
-                "name": "Machine Seated Leg Curl",
+                "name": "Single-Leg Dumbbell Hip Thrust",
                 "videoUrl": null,
-                "restSec": 75,
                 "chips": [
                   {
-                    "label": "4 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Drag your heels down and under the seat",
-                    "Hamstrings doing all of it"
-                  ],
-                  "bad": [
-                    "Don't let your hips lift off the seat"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Chest-Supported Dumbbell Row",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  {
-                    "label": "1s squeeze",
+                    "label": "2s top hold",
                     "style": "dark"
                   },
                   {
@@ -310,7 +297,7 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×10 Each Side"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -319,15 +306,17 @@
                     "label": "RPE 7"
                   }
                 ],
+                "restSec": 90,
                 "cues": {
                   "good": [
-                    "Pull your elbows to your back pockets",
-                    "Shoulder blades pinch together"
+                    "Shoulders stay planted on the bench, hips travel straight up",
+                    "Keep the weight in the heel of the working leg"
                   ],
                   "bad": [
-                    "Don't shrug into your neck"
+                    "Don't let the free-side hip drop, keep them level"
                   ]
-                }
+                },
+                "note": "New one, and it replaces the cable kickback. Shoulders on the bench, dumbbell resting on your hip crease. Keep your hips level and don't let the free side drop."
               }
             ]
           },
@@ -337,61 +326,31 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Dead Bug",
+                "name": "Half-Kneeling Pallof Press",
                 "videoUrl": null,
-                "restSec": 45,
                 "chips": [
                   {
-                    "label": "2 Sets",
+                    "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×8 Each Side"
+                    "label": "×10 Each Side"
                   },
                   {
-                    "label": "Tempo 3-0-1-0"
+                    "label": "Tempo 2-2-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 7"
                   }
                 ],
+                "restSec": 60,
                 "cues": {
                   "good": [
-                    "Press your lower back flat into the floor",
-                    "Ribs down, belly braced"
+                    "Press straight out and stop the cable turning you",
+                    "Feel your whole trunk brace to stay square"
                   ],
                   "bad": [
-                    "Don't let the back arch as the leg lowers"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Side Plank",
-                "videoUrl": null,
-                "restSec": 45,
-                "chips": [
-                  {
-                    "label": "2 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×30s Each Side"
-                  },
-                  {
-                    "label": "Tempo Iso"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Push the floor away with your forearm",
-                    "One straight line, glute tight"
-                  ],
-                  "bad": [
-                    "Don't let the hips sag"
+                    "Don't lean away from the machine to make it easier"
                   ]
                 }
               }
@@ -405,10 +364,9 @@
                 "type": "simple",
                 "name": "Incline Treadmill Walk",
                 "videoUrl": null,
-                "note": "Talk test the whole way: if you can't say a full sentence, slow down. Add 2 to 3 minutes each week and then hold it there for week 4.",
                 "chips": [
                   {
-                    "label": "12 min"
+                    "label": "15 min"
                   },
                   {
                     "label": "RPE 6"
@@ -416,11 +374,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Set an incline you can hold while still talking",
-                    "Legs working, breathing steady"
+                    "Hold the incline you finished last cycle on",
+                    "You should be able to say a full sentence the whole way"
                   ],
                   "bad": [
-                    "Don't run or race it — this is the easy end on purpose"
+                    "Don't hold the handrails, it takes the work out of it"
                   ]
                 }
               }
@@ -430,127 +388,9 @@
       },
       {
         "id": 2,
-        "focusTag": "Optional · Walk It Out, Stretch It Loose",
-        "completionTitle": "This One Counts",
-        "completionMessage": "No weights, still a session. Days like this are why the loaded ones actually work.",
-        "blocks": [
-          {
-            "title": "Activation & Prep",
-            "icon": "🔥",
-            "exercises": [
-              {
-                "type": "circuit",
-                "name": "Back & Hip Reset Flow",
-                "videoUrl": null,
-                "rounds": "×1 Round",
-                "restSec": 45,
-                "warmup": true,
-                "items": [
-                  {
-                    "name": "Cat-Cow",
-                    "detail": "×10",
-                    "cues": {
-                      "good": [
-                        "Move slowly, one part of your spine at a time",
-                        "Back loosening off"
-                      ],
-                      "bad": [
-                        "Don't force the end of either position"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Child's Pose",
-                    "detail": "×45s",
-                    "cues": {
-                      "good": [
-                        "Sit your hips back toward your heels and breathe",
-                        "Lower back opening up"
-                      ],
-                      "bad": [
-                        "Don't hold your breath"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Child's Pose with Lateral Reach",
-                    "detail": "×30s Each Side",
-                    "cues": {
-                      "good": [
-                        "Walk your hands across to one side",
-                        "Stretch down the side of your back"
-                      ],
-                      "bad": [
-                        "Don't let your hips slide off your heels"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Supine Strap Hamstring Stretch",
-                    "detail": "×45s Each Side",
-                    "cues": {
-                      "good": [
-                        "Lie on your back, strap round the foot, leg as straight as it goes",
-                        "Hamstring stretching with your back flat on the floor"
-                      ],
-                      "bad": [
-                        "Don't lift your hips or round your back to get the leg higher"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Diaphragmatic Breathing",
-                    "detail": "×2 min",
-                    "cues": {
-                      "good": [
-                        "Hand on your belly, breathe so the hand rises",
-                        "Shoulders quiet, everything slowing down"
-                      ],
-                      "bad": [
-                        "Don't breathe up into your chest and neck"
-                      ]
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "title": "Conditioning",
-            "icon": "🫀",
-            "exercises": [
-              {
-                "type": "simple",
-                "name": "Incline Treadmill Walk",
-                "videoUrl": null,
-                "note": "This day is restoration, not a session to push. Talk test the whole way, and if it ever feels like work, drop the incline.",
-                "chips": [
-                  {
-                    "label": "30 min"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Easy incline you could hold for an hour",
-                    "Legs ticking over, breathing easy"
-                  ],
-                  "bad": [
-                    "Don't turn this into a hard session"
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "focusTag": "Own The Hinge",
-        "completionTitle": "Back Earned It",
-        "completionMessage": "Every clean rep of that back extension is you buying the barbell back next cycle. Tell me how it felt tomorrow.",
+        "focusTag": "Pull Hard, Press Light",
+        "completionTitle": "Balanced Out",
+        "completionMessage": "Your legs got a day off and your back and shoulders did the work instead. Days like this are why your leg days keep improving.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -567,71 +407,71 @@
                 ],
                 "cues": {
                   "good": [
-                    "Easy pace, flat or very light incline",
+                    "Easy pace, flat or a very light incline",
                     "Body warming up, breathing still easy"
                   ],
                   "bad": [
-                    "Don't push this — it's a warm-up, not the session"
+                    "Don't push this, it's a raise not the session"
                   ]
                 }
               },
               {
                 "type": "circuit",
-                "name": "Hinge Prep",
+                "name": "Shoulder & Upper Back Primer",
                 "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "restSec": 45,
                 "warmup": true,
                 "items": [
                   {
-                    "name": "Cat-Cow",
-                    "detail": "×8",
-                    "cues": {
-                      "good": [
-                        "Move one part of your spine at a time",
-                        "Back waking up, no strain anywhere"
-                      ],
-                      "bad": [
-                        "Don't rush it — slow is the point"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Dowel Hip Hinge",
-                    "detail": "×8",
-                    "cues": {
-                      "good": [
-                        "Push your hips back to touch a bench behind you, hold 2 seconds",
-                        "Hamstrings stretching, back stays flat against the dowel"
-                      ],
-                      "bad": [
-                        "Don't let the dowel lose contact with your head, upper back or tailbone"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Child's Pose",
-                    "detail": "×30s",
-                    "cues": {
-                      "good": [
-                        "Sit your hips back toward your heels and breathe",
-                        "Lower back opening up"
-                      ],
-                      "bad": [
-                        "Don't hold your breath"
-                      ]
-                    }
-                  },
-                  {
                     "name": "Band Pull-Apart",
-                    "detail": "×12",
+                    "detail": "×15",
                     "cues": {
                       "good": [
-                        "Pull the band apart to your chest, arms long",
-                        "Upper back switching on"
+                        "Pull the band apart until it touches your chest",
+                        "Feel your shoulder blades squeeze together"
                       ],
                       "bad": [
                         "Don't shrug your shoulders up to your ears"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Band Pass-Through",
+                    "detail": "×10",
+                    "cues": {
+                      "good": [
+                        "Take the band overhead and behind you with straight arms",
+                        "Feel your shoulders open, go as wide as you need to keep the arms straight"
+                      ],
+                      "bad": [
+                        "Don't bend your elbows to force a narrower grip"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Open Book",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Open your top arm across and follow it with your eyes",
+                        "Feel the turn come from your mid-back"
+                      ],
+                      "bad": [
+                        "Don't force the shoulder to the floor"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Scapular Pull-Up",
+                    "detail": "×8",
+                    "cues": {
+                      "good": [
+                        "Hang from the bar and pull your shoulders down away from your ears",
+                        "Feel your lats switch on with your arms still straight"
+                      ],
+                      "bad": [
+                        "Don't bend your elbows, this isn't a pull-up"
                       ]
                     }
                   }
@@ -645,34 +485,34 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "45° Back Extension",
+                "name": "Lat Pulldown",
                 "videoUrl": null,
-                "restSec": 90,
-                "note": "This is the most important lift in your program because it's how your back earns the barbell back next cycle. Week 1 is bodyweight with your arms crossed, and only add a plate once 3 sets of 12 feel clean. Come up on the count and stand up slowly after each set, because your medication can make you light headed from that position.",
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×10 Reps"
                   },
                   {
-                    "label": "Tempo 3-0-1-0"
+                    "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 90,
                 "cues": {
                   "good": [
-                    "Long spine, push the crown of your head away",
-                    "Hamstrings and glutes lift you, not your lower back"
+                    "Pull the bar to your collarbone, elbows down to your hips",
+                    "Feel it under your armpits, not in your hands"
                   ],
                   "bad": [
-                    "Don't round the back or whip past straight at the top"
+                    "Don't lean back and swing to move the weight"
                   ]
-                }
+                },
+                "note": "This is your main upper body lift now. You logged 18 in one gym and 25 in the other last month. Start from the 25, not the 18."
               }
             ]
           },
@@ -682,12 +522,11 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Leg Extension",
+                "name": "Single-Arm Chest-Supported Dumbbell Row",
                 "videoUrl": null,
-                "restSec": 60,
                 "chips": [
                   {
-                    "label": "1s squeeze at top",
+                    "label": "1s squeeze",
                     "style": "dark"
                   },
                   {
@@ -695,37 +534,72 @@
                     "style": "yellow"
                   },
                   {
-                    "label": "×15 Reps"
+                    "label": "×12 Each Side"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 7"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 90,
                 "cues": {
                   "good": [
-                    "Kick out to full lockout",
-                    "Quads squeeze hard at the top"
+                    "Drive your elbow back past your ribs",
+                    "Squeeze that shoulder blade in and hold for a beat"
                   ],
                   "bad": [
-                    "Don't swing or use momentum"
+                    "Don't let your chest come off the pad or your shoulders twist"
                   ]
                 }
               },
               {
                 "type": "standard",
-                "name": "Seated Machine Hip Abduction",
+                "name": "Incline Push-Up",
                 "videoUrl": null,
-                "restSec": 60,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Push the bar away until your elbows lock",
+                    "Feel your chest do the work, not your shoulders"
+                  ],
+                  "bad": [
+                    "Don't let your hips sag, one straight line from head to heels"
+                  ]
+                },
+                "note": "The bar height is your weight here. Set it so 10 reps land at an 8. As you get stronger, lower the bar. That's how this one progresses, not by adding anything."
+              },
+              {
+                "type": "standard",
+                "name": "Seated Dumbbell Overhead Press",
+                "videoUrl": null,
                 "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×15 Reps"
+                    "label": "×10 Reps"
                   },
                   {
                     "label": "Tempo 2-0-1-0"
@@ -734,73 +608,45 @@
                     "label": "RPE 7"
                   }
                 ],
+                "restSec": 90,
                 "cues": {
                   "good": [
-                    "Push your knees apart against the pads",
-                    "Side glutes burning"
+                    "Press the dumbbells straight up until your arms are locked",
+                    "Feel your shoulders working, ribs staying down"
                   ],
                   "bad": [
-                    "Don't rock the torso for extra reps"
+                    "Don't arch your lower back to get the weight up"
                   ]
-                }
+                },
+                "note": "You swapped the machine for a barbell at 5 a side last month, so dumbbells will suit you better and you'll find them in both gyms. Ribs stay down, don't arch to get the weight up."
               },
               {
                 "type": "standard",
-                "name": "Lat Pulldown",
+                "name": "Reverse Pec Deck",
                 "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 7"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Pull the bar to your collarbone",
-                    "Elbows drive down, lats do the work"
-                  ],
-                  "bad": [
-                    "Don't lean back and swing the weight"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Machine Chest Press",
-                "videoUrl": null,
-                "restSec": 90,
                 "chips": [
                   {
                     "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×12 Reps"
+                    "label": "×15 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 2-1-1-0"
                   },
                   {
-                    "label": "RPE 7"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 60,
                 "cues": {
                   "good": [
-                    "Press the handles away smoothly",
-                    "Chest does the pushing"
+                    "Open your arms wide and stop level with your shoulders",
+                    "Feel it at the back of your shoulders"
                   ],
                   "bad": [
-                    "Don't shrug your shoulders up"
+                    "Don't shrug or let your neck take over"
                   ]
                 }
               }
@@ -812,31 +658,28 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Bird Dog",
+                "name": "Suitcase Carry",
                 "videoUrl": null,
-                "restSec": 45,
                 "chips": [
                   {
-                    "label": "2 Sets",
+                    "label": "3 Sets",
                     "style": "yellow"
                   },
                   {
-                    "label": "×6 Each Side"
+                    "label": "×40m Each Side"
                   },
                   {
-                    "label": "Tempo 2-2-1-0"
-                  },
-                  {
-                    "label": "RPE 6"
+                    "label": "RPE 7"
                   }
                 ],
+                "restSec": 75,
                 "cues": {
                   "good": [
-                    "Reach long through the hand and the heel",
-                    "Hips level, trunk perfectly still"
+                    "Walk in a straight line, shoulders level",
+                    "Feel the opposite side of your waist working to keep you upright"
                   ],
                   "bad": [
-                    "Don't rotate or arch"
+                    "Don't lean away from the weight"
                   ]
                 }
               }
@@ -850,10 +693,9 @@
                 "type": "simple",
                 "name": "Incline Treadmill Walk",
                 "videoUrl": null,
-                "note": "Same rules as day 1. Talk test the whole way, add 2 to 3 minutes each week, then hold it there for week 4.",
                 "chips": [
                   {
-                    "label": "12 min"
+                    "label": "10 min"
                   },
                   {
                     "label": "RPE 6"
@@ -861,11 +703,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Set an incline you can hold while still talking",
-                    "Legs working, breathing steady"
+                    "Short one today, put the incline back on and walk it out",
+                    "Easy enough to talk the whole way, same as every other walk"
                   ],
                   "bad": [
-                    "Don't run or race it — this is the easy end on purpose"
+                    "Don't skip it because the session already felt long"
                   ]
                 }
               }
@@ -874,10 +716,10 @@
         ]
       },
       {
-        "id": 4,
-        "focusTag": "Optional · Long Walk, Slow Stretch",
+        "id": 3,
+        "focusTag": "Optional · Easy Miles, Long Stretch",
         "completionTitle": "Quiet Miles",
-        "completionMessage": "Your walking is getting longer every week and that's the thing quietly doing the fat loss. Well done for showing up on an easy day.",
+        "completionMessage": "No weights, still a session. This is the one quietly doing the fat loss while everything else gets the credit.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -885,74 +727,74 @@
             "exercises": [
               {
                 "type": "circuit",
-                "name": "Hips & Spine Reset",
+                "name": "Hip & Spine Reset Flow",
                 "videoUrl": null,
-                "rounds": "×1 Round",
-                "restSec": 45,
+                "rounds": "×1 Rounds",
+                "restSec": 30,
                 "warmup": true,
                 "items": [
-                  {
-                    "name": "Cat-Cow",
-                    "detail": "×10",
-                    "cues": {
-                      "good": [
-                        "Move slowly, one part of your spine at a time",
-                        "Back loosening off"
-                      ],
-                      "bad": [
-                        "Don't force the end of either position"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Child's Pose",
-                    "detail": "×45s",
-                    "cues": {
-                      "good": [
-                        "Sit your hips back toward your heels and breathe",
-                        "Lower back opening up"
-                      ],
-                      "bad": [
-                        "Don't hold your breath"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Child's Pose with Lateral Reach",
-                    "detail": "×30s Each Side",
-                    "cues": {
-                      "good": [
-                        "Walk your hands across to one side",
-                        "Stretch down the side of your back"
-                      ],
-                      "bad": [
-                        "Don't let your hips slide off your heels"
-                      ]
-                    }
-                  },
                   {
                     "name": "Supine Strap Hamstring Stretch",
                     "detail": "×45s Each Side",
                     "cues": {
                       "good": [
-                        "Lie on your back, strap round the foot, leg as straight as it goes",
-                        "Hamstring stretching with your back flat on the floor"
+                        "Lie on your back and pull the strap until you feel a stretch",
+                        "Feel the back of your thigh lengthen, keep your other leg down"
                       ],
                       "bad": [
-                        "Don't lift your hips or round your back to get the leg higher"
+                        "Don't pull so hard your hips lift off the floor"
                       ]
                     }
                   },
                   {
-                    "name": "Diaphragmatic Breathing",
-                    "detail": "×2 min",
+                    "name": "90/90 Hip Switch",
+                    "detail": "×8 Each Side",
                     "cues": {
                       "good": [
-                        "Hand on your belly, breathe so the hand rises",
-                        "Shoulders quiet, everything slowing down"
+                        "Turn both knees over to the other side and sit up tall",
+                        "Feel your hips open, not your lower back"
                       ],
                       "bad": [
-                        "Don't breathe up into your chest and neck"
+                        "Don't force the range, go where it stays easy"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Foam Roller Thoracic Extension",
+                    "detail": "×8",
+                    "cues": {
+                      "good": [
+                        "Roller under your mid-back, open backwards over it",
+                        "Feel your upper back open, not your lower back"
+                      ],
+                      "bad": [
+                        "Don't let the roller slide down onto your lower back"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Kneeling Hip Flexor Stretch",
+                    "detail": "×45s Each Side",
+                    "cues": {
+                      "good": [
+                        "Tuck your hips under and stand tall through the front of your hip",
+                        "Feel the stretch at the front of the back leg's hip"
+                      ],
+                      "bad": [
+                        "Don't arch your lower back to feel more"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Standing Calf Stretch",
+                    "detail": "×45s Each Side",
+                    "cues": {
+                      "good": [
+                        "Back heel down, front knee bent, lean into the wall",
+                        "Feel the stretch down the back of your lower leg"
+                      ],
+                      "bad": [
+                        "Don't let the back heel come up"
                       ]
                     }
                   }
@@ -968,10 +810,9 @@
                 "type": "simple",
                 "name": "Incline Treadmill Walk",
                 "videoUrl": null,
-                "note": "Restoration again, so keep it easy. If you only have twenty minutes, take twenty — it still counts as showing up.",
                 "chips": [
                   {
-                    "label": "30 min"
+                    "label": "35 min"
                   },
                   {
                     "label": "RPE 6"
@@ -979,11 +820,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Easy incline you could hold for an hour",
-                    "Legs ticking over, breathing easy"
+                    "Same incline as your session days, just longer",
+                    "Full sentences the whole way, if you can't then drop the incline"
                   ],
                   "bad": [
-                    "Don't turn this into a hard session"
+                    "Don't turn this into a hard day because it's the easy one"
                   ]
                 }
               }
@@ -992,10 +833,10 @@
         ]
       },
       {
-        "id": 5,
-        "focusTag": "One Leg At A Time",
-        "completionTitle": "Evened Out",
-        "completionMessage": "Light, sharp, and both sides did their own work. That's the week closed properly.",
+        "id": 4,
+        "focusTag": "The Hinge Returns",
+        "completionTitle": "Hinge Earned",
+        "completionMessage": "That's the deadlift done and your back held its shape. Tell me how it feels tomorrow, that's the one I want to hear about.",
         "blocks": [
           {
             "title": "Activation & Prep",
@@ -1012,48 +853,22 @@
                 ],
                 "cues": {
                   "good": [
-                    "Easy pace, flat or very light incline",
+                    "Easy pace, flat or a very light incline",
                     "Body warming up, breathing still easy"
                   ],
                   "bad": [
-                    "Don't push this — it's a warm-up, not the session"
+                    "Don't push this, it's a raise not the session"
                   ]
                 }
               },
               {
                 "type": "circuit",
-                "name": "Legs & Shoulders Primer",
+                "name": "Hinge Primer",
                 "videoUrl": null,
                 "rounds": "×2 Rounds",
                 "restSec": 45,
                 "warmup": true,
                 "items": [
-                  {
-                    "name": "Cat-Cow",
-                    "detail": "×8",
-                    "cues": {
-                      "good": [
-                        "Move one part of your spine at a time",
-                        "Back waking up, no strain anywhere"
-                      ],
-                      "bad": [
-                        "Don't rush it — slow is the point"
-                      ]
-                    }
-                  },
-                  {
-                    "name": "Dowel Hip Hinge",
-                    "detail": "×8",
-                    "cues": {
-                      "good": [
-                        "Push your hips back to touch a bench behind you, hold 2 seconds",
-                        "Hamstrings stretching, back stays flat against the dowel"
-                      ],
-                      "bad": [
-                        "Don't let the dowel lose contact with your head, upper back or tailbone"
-                      ]
-                    }
-                  },
                   {
                     "name": "Glute Bridge",
                     "detail": "×12",
@@ -1068,15 +883,41 @@
                     }
                   },
                   {
-                    "name": "Band Pull-Apart",
-                    "detail": "×12",
+                    "name": "Dowel Hip Hinge",
+                    "detail": "×10",
                     "cues": {
                       "good": [
-                        "Pull the band apart to your chest, arms long",
-                        "Upper back switching on"
+                        "Push your hips back to touch a bench behind you",
+                        "Hamstrings stretching, back stays flat against the dowel"
                       ],
                       "bad": [
-                        "Don't shrug your shoulders up to your ears"
+                        "Don't let the dowel lose contact with your head, upper back or tailbone"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Bird Dog",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Reach the opposite arm and leg long, then come back under control",
+                        "Feel your middle stay still while your limbs move"
+                      ],
+                      "bad": [
+                        "Don't let your hips tip to one side"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Leg Swings",
+                    "detail": "×10 Each Side",
+                    "cues": {
+                      "good": [
+                        "Swing the leg forward and back, stand tall",
+                        "Feel your hip loosen through the swing"
+                      ],
+                      "bad": [
+                        "Don't swing so hard your back moves with it"
                       ]
                     }
                   }
@@ -1090,10 +931,147 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Single-Leg Machine Leg Press",
+                "name": "Dumbbell Romanian Deadlift",
                 "videoUrl": null,
-                "restSec": 75,
-                "note": "Stay light on this one, it's here to even out your left and right side, not to be heavy. Keep your knee pointing over your middle toe and stop the depth before your hips roll off the pad.",
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Push your hips back and slide the dumbbells down the front of your legs",
+                    "Feel the stretch in the back of your thighs and stop there"
+                  ],
+                  "bad": [
+                    "Don't round your back at the bottom, stop where your back is still flat"
+                  ]
+                },
+                "note": "This is the new one and it's the whole point of the month. Start much lighter than you think. Push your hips back and slide the dumbbells down your legs, and stop where your back is still flat, not where the floor is. Do the dowel hinge in your warm-up first every time."
+              }
+            ]
+          },
+          {
+            "title": "Accessory",
+            "icon": "💪",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "45° Back Extension",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×12 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 6"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Come up until your body is one straight line and stop",
+                    "Feel your glutes and hamstrings, not your lower back"
+                  ],
+                  "bad": [
+                    "Don't arch past straight at the top"
+                  ]
+                },
+                "note": "This is the one that bothered you last month, so it's the one thing here that gets easier. Body weight only for weeks 1 and 2, then the weight you finished on comes back in week 3 if your back's been fine. That weight is your ceiling for the month. Also stand up slowly after each set, your medication can make you light headed from that position."
+              },
+              {
+                "type": "standard",
+                "name": "Machine Seated Leg Curl",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Pull your heels under the seat and control them back",
+                    "Feel the back of your thighs the whole way"
+                  ],
+                  "bad": [
+                    "Don't let your hips lift off the seat"
+                  ]
+                },
+                "note": "You started at 10 last month, wrote that it was too light, and finished at 24. Ten reps at RPE 8 starts above 24, not at it."
+              },
+              {
+                "type": "standard",
+                "name": "Cable Hip Abduction",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×15 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Lift your leg out to the side and keep your toes pointing forward",
+                    "Feel the side of your hip, high up"
+                  ],
+                  "bad": [
+                    "Don't lean your whole body away to swing the leg up"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Core",
+            "icon": "🧱",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Plank with Shoulder Taps",
+                "videoUrl": null,
                 "chips": [
                   {
                     "label": "3 Sets",
@@ -1106,18 +1084,179 @@
                     "label": "Tempo 2-0-1-0"
                   },
                   {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 60,
+                "cues": {
+                  "good": [
+                    "Tap your opposite shoulder without your hips turning",
+                    "Feel your whole middle brace to stop the rotation"
+                  ],
+                  "bad": [
+                    "Don't widen your feet to make it easier"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "title": "Conditioning",
+            "icon": "🫀",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Incline Treadmill Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "15 min"
+                  },
+                  {
                     "label": "RPE 6"
                   }
                 ],
                 "cues": {
                   "good": [
-                    "Push through your whole foot, knee tracking over your middle toe",
-                    "One quad working, pelvis square"
+                    "Back on the incline, same as your other session days",
+                    "Talk test the whole way, if a sentence is hard then drop the incline"
                   ],
                   "bad": [
-                    "Stop the depth before your pelvis rolls off the pad"
+                    "Don't push the pace because the lifting felt easy"
                   ]
                 }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "focusTag": "One Quad At A Time",
+        "completionTitle": "Week Closed",
+        "completionMessage": "One leg at a time, both sides doing their own work. That's four gym days in the bank this week.",
+        "blocks": [
+          {
+            "title": "Activation & Prep",
+            "icon": "🔥",
+            "exercises": [
+              {
+                "type": "simple",
+                "name": "Treadmill Walk",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "5 min"
+                  }
+                ],
+                "cues": {
+                  "good": [
+                    "Easy pace, flat or a very light incline",
+                    "Body warming up, breathing still easy"
+                  ],
+                  "bad": [
+                    "Don't push this, it's a raise not the session"
+                  ]
+                }
+              },
+              {
+                "type": "circuit",
+                "name": "Single-Leg Primer",
+                "videoUrl": null,
+                "rounds": "×2 Rounds",
+                "restSec": 45,
+                "warmup": true,
+                "items": [
+                  {
+                    "name": "Glute Bridge",
+                    "detail": "×12",
+                    "cues": {
+                      "good": [
+                        "Drive your hips to the ceiling",
+                        "Glutes squeezing, not your lower back"
+                      ],
+                      "bad": [
+                        "Don't push past straight at the top"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Single-Leg Balance",
+                    "detail": "×20s Each Side",
+                    "cues": {
+                      "good": [
+                        "Stand on one leg and pick a spot on the wall to look at",
+                        "Feel your foot and hip working to keep you steady"
+                      ],
+                      "bad": [
+                        "Don't hold onto anything unless you have to"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Hip Airplane",
+                    "detail": "×5 Each Side",
+                    "cues": {
+                      "good": [
+                        "Stand on one leg and rotate your hips open, then closed",
+                        "Feel your standing hip working to keep you steady"
+                      ],
+                      "bad": [
+                        "Don't rush it, control the wobble instead"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "Split Squat",
+                    "detail": "×8 Each Side",
+                    "cues": {
+                      "good": [
+                        "Drop straight down until your back knee is just off the floor",
+                        "Feel the front thigh and glute take the weight"
+                      ],
+                      "bad": [
+                        "Don't let your front knee cave inward"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "exercises": [
+              {
+                "type": "standard",
+                "name": "Dumbbell Split Squat",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Each Side"
+                  },
+                  {
+                    "label": "Tempo 2-0-1-0"
+                  },
+                  {
+                    "label": "RPE 7"
+                  }
+                ],
+                "restSec": 120,
+                "cues": {
+                  "good": [
+                    "Drop straight down until your back knee is just off the floor",
+                    "Keep the weight in the front heel"
+                  ],
+                  "bad": [
+                    "Don't let your front knee drift past your toes or cave inward"
+                  ]
+                },
+                "note": "Your first free weight single leg exercise, and it replaces the single leg press. Dumbbells at your sides, not on your back. Get the stance length right first, then add weight."
               }
             ]
           },
@@ -1127,12 +1266,15 @@
             "exercises": [
               {
                 "type": "standard",
-                "name": "Machine Lying Leg Curl",
+                "name": "Machine Leg Extension",
                 "videoUrl": null,
-                "restSec": 60,
                 "chips": [
                   {
-                    "label": "3 Sets",
+                    "label": "2s top hold",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
                     "style": "yellow"
                   },
                   {
@@ -1142,13 +1284,49 @@
                     "label": "Tempo 2-0-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 75,
                 "cues": {
                   "good": [
-                    "Curl your heels toward your glutes",
-                    "Hamstrings squeeze"
+                    "Straighten your legs fully and hold it there",
+                    "Feel the front of your thighs squeeze at the top"
+                  ],
+                  "bad": [
+                    "Don't swing your torso back to finish the rep"
+                  ]
+                },
+                "note": "You jumped from 42 to 57 last month, so start above 57. It's also got a fourth set now."
+              },
+              {
+                "type": "standard",
+                "name": "Machine Lying Leg Curl",
+                "videoUrl": null,
+                "chips": [
+                  {
+                    "label": "3s eccentric",
+                    "style": "dark"
+                  },
+                  {
+                    "label": "4 Sets",
+                    "style": "yellow"
+                  },
+                  {
+                    "label": "×10 Reps"
+                  },
+                  {
+                    "label": "Tempo 3-0-1-0"
+                  },
+                  {
+                    "label": "RPE 8"
+                  }
+                ],
+                "restSec": 90,
+                "cues": {
+                  "good": [
+                    "Curl your heels to your backside and lower them slowly",
+                    "Feel the back of your thighs resist on the way down"
                   ],
                   "bad": [
                     "Don't lift your hips off the pad"
@@ -1157,44 +1335,13 @@
               },
               {
                 "type": "standard",
-                "name": "Cable Glute Kickback",
+                "name": "Standing Machine Calf Raise",
                 "videoUrl": null,
-                "restSec": 60,
                 "chips": [
                   {
-                    "label": "1s squeeze at top",
+                    "label": "1s bottom stretch",
                     "style": "dark"
                   },
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Each Side"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Kick straight back, not up",
-                    "Glute squeezes with ribs down and the torso frozen"
-                  ],
-                  "bad": [
-                    "Don't arch your back to kick higher"
-                  ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Cable Face Pull",
-                "videoUrl": null,
-                "restSec": 60,
-                "chips": [
                   {
                     "label": "3 Sets",
                     "style": "yellow"
@@ -1203,73 +1350,37 @@
                     "label": "×15 Reps"
                   },
                   {
-                    "label": "Tempo 2-0-1-0"
+                    "label": "Tempo 2-1-1-0"
                   },
                   {
-                    "label": "RPE 6"
+                    "label": "RPE 8"
                   }
                 ],
+                "restSec": 60,
                 "cues": {
                   "good": [
-                    "Pull the rope to your forehead with the elbows high",
-                    "Rear delts and mid-back squeeze"
+                    "Push all the way up onto your toes, then lower until you feel the stretch",
+                    "Feel your calves stretch at the bottom and squeeze at the top"
                   ],
                   "bad": [
-                    "Don't lean back or arch to drag the weight in — keep the ribs down"
+                    "Don't bounce out of the bottom"
                   ]
-                }
-              },
-              {
-                "type": "standard",
-                "name": "Machine Shoulder Press",
-                "videoUrl": null,
-                "restSec": 90,
-                "chips": [
-                  {
-                    "label": "3 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×12 Reps"
-                  },
-                  {
-                    "label": "Tempo 2-0-1-0"
-                  },
-                  {
-                    "label": "RPE 6"
-                  }
-                ],
-                "cues": {
-                  "good": [
-                    "Press straight up",
-                    "Shoulders work, neck stays relaxed"
-                  ],
-                  "bad": [
-                    "Don't flare the ribs or arch the back"
-                  ]
-                }
+                },
+                "note": "Brand new for you. All the way up onto your toes, then all the way down until you feel the stretch. Don't bounce out of the bottom."
               }
             ]
           },
           {
-            "title": "Core",
-            "icon": "🧱",
+            "title": "Conditioning",
+            "icon": "🫀",
             "exercises": [
               {
-                "type": "standard",
-                "name": "Plank",
+                "type": "simple",
+                "name": "Incline Treadmill Walk",
                 "videoUrl": null,
-                "restSec": 45,
                 "chips": [
                   {
-                    "label": "2 Sets",
-                    "style": "yellow"
-                  },
-                  {
-                    "label": "×30s"
-                  },
-                  {
-                    "label": "Tempo Iso"
+                    "label": "20 min"
                   },
                   {
                     "label": "RPE 6"
@@ -1277,11 +1388,11 @@
                 ],
                 "cues": {
                   "good": [
-                    "Push the floor away, one long line",
-                    "Belly and glutes braced"
+                    "Longest walk of your gym days, settle in at your incline",
+                    "Still a talking pace, all twenty minutes of it"
                   ],
                   "bad": [
-                    "Don't let the hips sag or pike up"
+                    "Don't chase a distance or a calorie number on the screen"
                   ]
                 }
               }
@@ -1295,55 +1406,209 @@
     "greeting": "For You, Maryam",
     "cards": [
       {
-        "icon": "🧱",
-        "title": "Why Three Days, Not Five",
-        "body": "<p>You already train five days. Dropping to three loaded days is going to feel like going backwards. It isn't. <strong>Five hard days with no recovery is exactly why nothing changed.</strong></p><p>You've had a heavy month, and your body knows it even when your head is busy. Less load right now means your training finally gets used instead of just survived.</p><p>You still keep your five days if you want them. Day 2 and Day 4 are walk and stretch days and they count as showing up. <strong>Turning up is the win this month, not how hard you went.</strong></p>"
+        "icon": "💪",
+        "title": "What You Already Did",
+        "body": "<p>Before we talk about this month, look at what you just finished. <strong>You logged 11 gym sessions when the target was 10 out of 12.</strong> You hit it, in a month that took a lot out of you. Most people would have stopped completely.</p><p>Your numbers moved everywhere. Seated leg curl 10 to 24. Leg extension 42 to 57. Leg press 70 to 90 for three straight sets. And your walk went from incline 4 to incline 8, when you had never done any cardio in your life. <strong>That walk is the biggest thing that changed all month.</strong></p><p>One more, and I mean this. In your last session you told me your back was bothering you after the back extension. <strong>That was the best thing you did all cycle.</strong> With your back history, if you keep quiet and push through, I'm working blind. You told me, so I could fix it. Telling me never costs you your training. It just changes one thing.</p>"
       },
       {
-        "icon": "⚖️",
-        "title": "How To Pick Your Weight",
-        "body": "<p>I never put a number on your card. You find it every session against the RPE target. <strong>RPE 7 means you finish the set with about 3 good reps left in you.</strong></p><ul><li><strong>New exercise:</strong> go light on the first set. If it felt like a 6, add weight next set. If it was a real grind, take some off. That first set is information, not a wasted set.</li><li><strong>Next week, same exercise:</strong> hit all your reps at or under the target RPE, go up a small step. Missed reps or it felt way too hard, stay at the same weight and do it again.</li><li><strong>Bad day:</strong> drop the weight. That is the system working, not you failing.</li></ul><p>Week 1 is calibration. <strong>Keep everything at a 6 and just learn the machines.</strong> The RPE 7 target opens from week 2.</p>"
+        "icon": "🔥",
+        "title": "Why This Month Is Harder",
+        "body": "<p>You said the last one was too easy and your log agreed with you. You barely got sore, and most sessions came in around a 5 when we were aiming for 7. <strong>That was my call, not your fault.</strong> I didn't know yet how much your body could take, so I built month one careful. Now I know.</p><p>Three things change. <strong>A fourth gym day comes back.</strong> Your effort target goes from 7 to 8 on most exercises, so you should be finishing sets with about 2 good reps left instead of 4. And a lot of the exercises are new, so the whole thing should feel different when you open it.</p><p>Your walking keeps going the same way it has been. <strong>Add 2 to 3 minutes each week and leave the incline where you have it.</strong> Don't start running or doing sprints yet. That's next month's job and it only works if you keep building the base now.</p>"
+      },
+      {
+        "icon": "📊",
+        "title": "Week One, And What An 8 Feels Like",
+        "body": "<p>There are about a dozen movements in here you've never done. <strong>For week 1 only, work all the new ones at RPE 6 and just learn them.</strong> Pick a light weight, get the movement right, and don't chase anything. The number on the card opens from week 2.</p><p>Everything you already know goes straight to the number on the card from day one. That's your hip thrust, leg press, both leg curls, leg extension and lat pulldown. <strong>You have four weeks of logs on those and you've been going too easy, not too hard.</strong></p><p>About that 8, because it's new for you. <strong>RPE 8 means you finish the set with about 2 good reps left in you.</strong> Not 4. If the last rep still flies up, it was a 6 and the weight needs to go up next set. Your own note last month said 80 on the hip thrust was your hard max. That's the kind of weight an 8 lives at.</p>"
       },
       {
         "icon": "🩺",
-        "title": "Your Back, And When To Stop",
-        "body": "<p>You've had lower back trouble before, so this cycle takes the free deadlift and the squat off the table and gives you supported work instead. The 45° back extension on Day 3 is doing the same job with your hips held. <strong>A quiet month here is what earns the barbell back next cycle.</strong></p><p>Normal and fine: muscle burn, being tired, stiff either side of your spine the next day. Keep training through that.</p><ul><li><strong>Mild ache that fades:</strong> finish the set, write it in your log.</li><li><strong>Ache that builds through the set, or changes how you move:</strong> stop that exercise, carry on with the rest of the session without it, and message me.</li><li><strong>Sharp, one sided, or anything running down your leg:</strong> stop the session. Walk if you want. Message me before your next one.</li></ul><p><strong>Nothing on this list makes you a difficult client.</strong> I'd rather hear about it in week 1 than fix it in week 4.</p>"
+        "title": "Your Back, And The Plan For It",
+        "body": "<p>You told me the back extension bothered you at the end of last month. So here's exactly what happens to it. <strong>Weeks 1 and 2 you do it with just your body weight. In week 3 the weight you finished last month on comes back, as long as your back has been quiet.</strong> That weight is the ceiling for the whole month, not a target to beat. If it feels easy, good. That's the point.</p><p>The deadlift is your new one and it's the same idea. Light, slow, and you stop the movement where your back is still flat. Not where the floor is.</p><p>Normal and fine: muscle burn, being tired, stiff either side of your spine the next day. Keep training through that. Beyond that:</p><ul><li><strong>Mild ache that fades:</strong> finish the set and write it in your log.</li><li><strong>Ache that builds through the set, or changes how you move:</strong> stop that exercise, do the rest of the session without it, message me.</li><li><strong>Sharp, one sided, or anything running down your leg:</strong> stop the session. Message me before your next one.</li></ul><p><strong>If your back speaks up twice this month, the deadlift comes out and the back extension stays at body weight.</strong> And if it's still there when this month ends, I want you to see a physio before we load it any further. That's not a bad sign, it's just where the line is.</p>"
       },
       {
-        "icon": "🌙",
-        "title": "Your Period Week",
-        "body": "<p>You don't need to plan anything on those days. Come in and use this.</p><ul><li><strong>Keep all of it:</strong> your walks, Day 2 and Day 4, glute bridges, the stretching. Light movement usually helps the cramping.</li><li><strong>Cut to 2 sets and go visibly lighter:</strong> hip thrust, leg press, the back extension, single leg press. Move the pattern, don't grind it.</li><li><strong>Skip completely:</strong> dead bug, side plank, bird dog, plank. Hard bracing through your stomach on those days is not worth it.</li></ul><p><strong>A cut down day still counts as a session.</strong> Log it as normal so I can see the week properly.</p>"
+        "icon": "⚖️",
+        "title": "Start Weighing In",
+        "body": "<p>I've added weight tracking to your habit app and <strong>it's already switched on, so there's nothing for you to set up.</strong> Open Proof and it's the white card on your Today screen under your habits. The <strong>Weigh in</strong> button logs it. Tap the card itself and it opens your history.</p><p>Do it a few mornings a week, same routine each time. Not every day, and don't chase it.</p><p>Last month I told you the scale was the last thing I trusted, and <strong>that's still true for a single morning.</strong> Your weight moves a kilo on water and food alone, and your medication moves it too. This is different because the app doesn't show you one morning. It draws a 7 day average line, so what you see is the direction, not the noise. That's why logging a few is what makes it worth anything.</p><p><strong>Nobody sees this but me.</strong> It never goes on the leaderboard, never on the wall, never anywhere near the other athletes. And it is yours to take back whenever you want. You can delete one reading from its row, or wipe the whole history in one tap from Settings, and nothing else in your account changes.</p><p><strong>It is also the thing that lets me set your food numbers properly</strong>, which is the next step.</p>"
       },
       {
         "icon": "🍗",
-        "title": "Protein Without The Calories",
-        "body": "<p>You told me your calories jump every time you push your protein up. That's a food choice problem, not a discipline problem. <strong>You're adding protein on top of your meals instead of swapping it in.</strong></p><p>Same idea every time. Keep the meal, change the protein for a leaner version of itself.</p><ul><li>Chicken thigh becomes chicken breast. Same plate, a lot fewer calories.</li><li>Full fat yoghurt or cheese becomes low fat or Greek yoghurt.</li><li>Nuts and peanut butter are fat first, protein second. Nice food, bad protein source.</li><li>Eggs are great, but 3 whole eggs plus 2 whites beats 5 whole eggs.</li></ul><p>We're not cutting your food this month, so don't start counting anything yet. <strong>Just start swapping.</strong> We'll set real numbers together at the next check in once I can see how you actually eat.</p>"
-      },
-      {
-        "icon": "🚶‍♀️",
-        "title": "The Walk Is Training",
-        "body": "<p>You've never done cardio, and it's the one big thing missing. That's actually good news. <strong>It means we have a lever nobody has pulled yet.</strong></p><p>Pace matters more than speed here. You should be able to talk in full sentences the whole way. If you're breathing too hard to finish a sentence, slow it down or drop the incline.</p><p>It gets 2 to 3 minutes longer each week, and that's it. <strong>Don't jump ahead and don't add extra sessions.</strong> Going too hard too early is how we rebuild the exact tiredness we're trying to get rid of.</p>"
-      },
-      {
-        "icon": "📏",
-        "title": "What We Actually Measure",
-        "body": "<p>Your medication changed your weight, and it can hide what's really happening on the scale for weeks. <strong>So the scale is the last thing I trust this month, not the first.</strong></p><p>What I want instead: photos once a month in the same light, a tape measure round your waist and hips, how your clothes sit, and how long you can walk. Those tell the truth when the scale is being noisy.</p><p>And be honest with yourself about this cycle. <strong>Nothing dramatic happens in four weeks and it isn't supposed to.</strong> This month builds the thing that makes month 2 and month 3 work.</p>"
-      },
-      {
-        "icon": "🎯",
-        "title": "About Your Upper Body",
-        "body": "<p>You said your upper body feels too big, so let me be straight with you. <strong>You can't choose where fat comes off.</strong> There's no exercise, no machine and no diet that takes it from one place only. Anyone who tells you different is selling something.</p><p>What actually works is two things at once. Fat comes off everywhere as your food and your walking do their job. And we build your legs and glutes while your upper body just holds what it has.</p><p>That's why you've got a lot of leg work and only a few sets of pressing. <strong>Not training your upper body doesn't shrink it, it just makes it soft.</strong> Trust the plan and give it three months.</p>"
-      },
-      {
-        "icon": "💪",
-        "title": "You Already Brought Something",
-        "body": "<p>Before we change anything, look at what you walked in with. <strong>An 80kg hip thrust for 10 reps at your bodyweight is genuinely strong.</strong> That's not a beginner number.</p><p>You also kept showing up five days a week through a month most people would have stopped completely. <strong>The consistency is already there.</strong> That's the hard part and you have it.</p><p>What was missing was never effort. It was recovery and cardio, and both of those we can fix.</p>"
+        "title": "Food, Step Two",
+        "body": "<p>Keep doing the swaps from last month, because they're still the whole game. <strong>Change the protein for a leaner version of itself instead of adding protein on top of your meals.</strong> Chicken thigh becomes breast. Full fat yoghurt becomes Greek. Three whole eggs plus two whites beats five whole eggs.</p><p>Now for the numbers I promised you. <strong>I need a week of your weigh-ins first.</strong> Once I can see where you actually are, I'll send you a daily protein target and we'll set the rest around it. It'll come during your first week.</p><p>Until then don't start counting anything. <strong>Just keep swapping and keep weighing in.</strong></p>"
       },
       {
         "icon": "🔄",
         "title": "When A Day Feels Too Much",
-        "body": "<p>Some days this month will be harder than others, and that's expected. You don't cancel, you shrink. <strong>Every session has a short version.</strong></p><ul><li><strong>Rough day:</strong> take every RPE down by one. Six is the floor, never go under it.</li><li><strong>Really rough day:</strong> do the first main lift and the walk, then leave. That still counts as a session.</li><li><strong>Short on time:</strong> first main lift for 2 sets, the core work, and a 10 minute walk.</li></ul><p>You can also do the days in a different order to fit your week. <strong>Week 4 is a lighter week on purpose</strong> — same exercises and same sets, just take some weight off the bar and hold your walk where week 3 left it.</p>"
+        "body": "<p>Four gym days is more than last month, and some weeks it won't happen. <strong>You don't cancel, you shrink.</strong></p><ul><li><strong>Rough day:</strong> take 1 off every RPE, but never go below 6. Anything already at 6 stays at 6.</li><li><strong>Really rough day:</strong> do the first main lift and the walk, then go home. That still counts as a session.</li><li><strong>Short on time:</strong> first main lift for 2 sets, then the walk.</li></ul><p>You can also do the days in any order that fits your week. <strong>If you're only going to get three days in, drop Day 2.</strong> That's the upper body one and it's the one that costs you least to miss. Your leg days are where the work is.</p>"
+      },
+      {
+        "icon": "🌙",
+        "title": "Your Period Week",
+        "body": "<p>Same as last month. You don't plan anything, you just use this.</p><ul><li><strong>Keep all of it:</strong> your walks, Day 3, the stretching, the cable hip abduction, the glute bridges in your warm-ups. Light movement usually helps.</li><li><strong>Cut to 2 sets and work at RPE 6:</strong> hip thrust, leg press, the deadlift, the back extension, the split squat. Six is as low as the app goes, so that's your floor. Move the pattern, don't grind it.</li><li><strong>Skip completely:</strong> the pallof press, the suitcase carry, the plank with shoulder taps. Hard bracing through your stomach isn't worth it on those days.</li></ul><p><strong>A cut down day still counts as a session.</strong> Log it like normal so I can see your week properly. Back to the numbers on your cards once the week's done.</p>"
+      },
+      {
+        "icon": "📉",
+        "title": "Week 5 Is The Easy One",
+        "body": "<p>This month runs five weeks and <strong>the last one is deliberately lighter.</strong> Same exercises, same sets, less weight.</p><p>How to do it: <strong>take 1 off every RPE, and never go below 6.</strong> So your hip thrust, leg press, leg extension, both leg curls, lat pulldown, push up, pec deck and cable abduction all run at 7 that week. Everything else runs at 6. Take real weight off to get there, don't just pretend.</p><p>Hold your walks where week 4 left them. <strong>Don't drop sets to make it easier, drop weight.</strong> The numbers on your cards come back at the start of next month.</p>"
       }
     ]
-  }
+  },
+  "programHistory": [
+    {
+      "id": "cycle-1-bedrock",
+      "label": "Program 01 · Bedrock",
+      "subtitle": "Weeks 1–4 · 8 Aug – 4 Sep 2026 · Rhythm Before Fire",
+      "days": [
+        {
+          "label": "Day 1",
+          "focus": "Glutes First, Everything Follows",
+          "exercises": [
+            {
+              "name": "Treadmill Walk",
+              "detail": "5 min"
+            },
+            {
+              "name": "Hip & Hinge Primer",
+              "detail": "×2 Rounds"
+            },
+            {
+              "name": "Machine Hip Thrust",
+              "detail": "4×10 Reps"
+            },
+            {
+              "name": "Machine Leg Press",
+              "detail": "4×12 Reps"
+            },
+            {
+              "name": "Machine Seated Leg Curl",
+              "detail": "4×12 Reps"
+            },
+            {
+              "name": "Chest-Supported Dumbbell Row",
+              "detail": "3×12 Reps"
+            },
+            {
+              "name": "Dead Bug",
+              "detail": "2×8 Each Side"
+            },
+            {
+              "name": "Side Plank",
+              "detail": "2×30s Each Side"
+            },
+            {
+              "name": "Incline Treadmill Walk",
+              "detail": "12 min"
+            }
+          ]
+        },
+        {
+          "label": "Day 2",
+          "focus": "Optional · Walk It Out, Stretch It Loose",
+          "exercises": [
+            {
+              "name": "Back & Hip Reset Flow",
+              "detail": "×1 Round"
+            },
+            {
+              "name": "Incline Treadmill Walk",
+              "detail": "30 min"
+            }
+          ]
+        },
+        {
+          "label": "Day 3",
+          "focus": "Own The Hinge",
+          "exercises": [
+            {
+              "name": "Treadmill Walk",
+              "detail": "5 min"
+            },
+            {
+              "name": "Hinge Prep",
+              "detail": "×2 Rounds"
+            },
+            {
+              "name": "45° Back Extension",
+              "detail": "3×12 Reps"
+            },
+            {
+              "name": "Machine Leg Extension",
+              "detail": "3×15 Reps"
+            },
+            {
+              "name": "Seated Machine Hip Abduction",
+              "detail": "3×15 Reps"
+            },
+            {
+              "name": "Lat Pulldown",
+              "detail": "3×12 Reps"
+            },
+            {
+              "name": "Machine Chest Press",
+              "detail": "4×12 Reps"
+            },
+            {
+              "name": "Bird Dog",
+              "detail": "2×6 Each Side"
+            },
+            {
+              "name": "Incline Treadmill Walk",
+              "detail": "12 min"
+            }
+          ]
+        },
+        {
+          "label": "Day 4",
+          "focus": "Optional · Long Walk, Slow Stretch",
+          "exercises": [
+            {
+              "name": "Hips & Spine Reset",
+              "detail": "×1 Round"
+            },
+            {
+              "name": "Incline Treadmill Walk",
+              "detail": "30 min"
+            }
+          ]
+        },
+        {
+          "label": "Day 5",
+          "focus": "One Leg At A Time",
+          "exercises": [
+            {
+              "name": "Treadmill Walk",
+              "detail": "5 min"
+            },
+            {
+              "name": "Legs & Shoulders Primer",
+              "detail": "×2 Rounds"
+            },
+            {
+              "name": "Single-Leg Machine Leg Press",
+              "detail": "3×10 Each Side"
+            },
+            {
+              "name": "Machine Lying Leg Curl",
+              "detail": "3×12 Reps"
+            },
+            {
+              "name": "Cable Glute Kickback",
+              "detail": "3×12 Each Side"
+            },
+            {
+              "name": "Cable Face Pull",
+              "detail": "3×15 Reps"
+            },
+            {
+              "name": "Machine Shoulder Press",
+              "detail": "3×12 Reps"
+            },
+            {
+              "name": "Plank",
+              "detail": "2×30s"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
