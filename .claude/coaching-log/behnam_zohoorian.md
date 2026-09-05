@@ -36,7 +36,7 @@ Why each cycle looks the way it does. Never published; never read by the athlete
 | Medicine Ball Chest Pass | Active | C2 | power — non-overhead horizontal throw (see overhead ban above) |
 | Cossack Squat | Active | C2 | accessory — the low-AND-wide defending position. Bodyweight, half depth, no pause to start. Film-gated before load |
 | Wall Sit | Active | C2 | accessory — the leg-endurance ask, position-specific. 3×60s |
-| Front-Foot-Elevated Split Squat | Active | C2 | primary — DEPTH is the progression, not load (he sat at 10 kg all of C1) |
+| Front-Foot-Elevated Split Squat | Active | C2 | primary — DEPTH is the progression, not load (he hit 12.5 kg flat on 2026-09-05, the last C1 session) |
 | Stability Ball Leg Curl | Active | C2 | accessory — the only knee-flexion hamstring work; C1 had none |
 | Single-Arm Dumbbell Row | Active | C2 | accessory |
 | Standing Dumbbell Single Leg Calf Raise | Active | C2 | accessory — loaded, where C1's was bodyweight |
@@ -269,3 +269,18 @@ at a true 1RM and ~+10–13 kg for a hard 6. This is the only genuine strength n
 inherits and it is a good one for a 16-year-old. Goblet 14 kg × 6 and DB RDL 7.5 kg/hand × 7 are
 teaching loads, not near-maximal — no meaningful e1RM by design. C2 creates the first barbell
 numbers. Dip still has no baseline; week 1 fixes that.
+
+### Addendum — 2026-09-05, same day, after the cycle shipped
+
+Two corrections to the read above, found when Amir asked why Day 3 showed a "Done" pill.
+1. **He was NOT idle after 31 Aug.** He started D2 on 2 Sep (readiness + timer stamped, never
+   finished, never sent) and **completed D3 on 5 Sep** — 74 min, sRPE 7 — a few hours before C2
+   went live. Neither was in `session_history` at review time: the 2 Sep one because it was never
+   finished, the 5 Sep one because the app's `save_session` RPC did not land (the Web3Forms email
+   did). Imported by hand afterwards. ⚠️ **`session_history` is not a complete record of training
+   — cross-check `athlete_progress` readiness/timer stamps before calling an athlete inconsistent.**
+2. **DB Split Squat finished C1 at 12.5 kg, not 10.** The 5 Sep session moved it. The FFE
+   progression is unaffected (depth still leads), but the athlete-facing note was corrected.
+3. His 2 Sep readiness was 5/3/3/5/3 — genuinely varied, not a tap-through. The "log it properly"
+   notes card is slightly harsher than the current evidence supports; soften it next cycle if the
+   honest logging holds.
