@@ -167,3 +167,49 @@ data point and is what Cycle 2 will be written from.
 the front of the knee complain when he kneels on a hard floor. If hamstring autograft, add a
 second long-length hamstring exposure from Cycle 2. If BPTB, the kneeling caveat stands for
 the remaining 20 weeks.
+
+---
+
+**Addendum — 2026-09-06 (still Cycle 1, week 1, no logs yet):** his schedule changed —
+sessions can now run **60-70 min** (was ~60 including prep), and he asked for more exercises.
+Added, one per core day plus one on Day 4, all exact `exercise_library.json` names with video
+already on file:
+
+```
+Day 1 (Accessory) → Barbell Hip Thrust, 3×10 RPE8 rest90     [+3.0 cost units]
+Day 2 (Accessory) → 45° Back Extension, 3×10 RPE8 rest75      [+3.0 cost units]
+                     Ab Wheel Rollout restored 2→3 sets        [+0.5 — undoes the earlier
+                     time-forced cut from the original audit, now that the constraint is gone]
+Day 3 (Core)      → Suitcase Carry, 3×20m e/s RPE7 rest60      [+1.5 cost units]
+Day 4 (optional)  → Machine Reverse Fly, 3×12 RPE8 rest45; Incline Dumbbell Press 3→4 sets
+                     (outside the core-day cost budget — physique-only day, no gating concern)
+```
+
+**Why these four, not others.** All chosen from gaps already named in this cycle's own
+volume report or a prior audit finding, not invented fresh:
+- **Hip Thrust** — explosive hip extension, the exact action of pushing off / decelerating.
+  Complements the squat's knee-dominant pattern with a hip-dominant one.
+- **45° Back Extension** — hamstrings were the one deliberately-capped muscle in the original
+  report (8 direct sets, "by design, not an oversight... a second exposure costs a Day 3
+  set"). Now there's time to add it without trading anything away. This is the single tissue
+  his whole complaint is built on.
+- **Suitcase Carry** — the dose auditor flagged "no anti-lateral-flexion item... note for
+  Cycle 2 review" back at design time. Padel loads him hard to the side reaching wide balls;
+  this was always the right next addition, just earlier than planned.
+- **Reverse Fly** — Day 4 has zero recovery-ceiling concern (it's the optional physique day,
+  outside the 3-core-day cost budget), so this one is low-risk and purely in service of his
+  secondary "look better" goal, pairing with the Face Pull already there.
+
+**Judgment call, flagged rather than hidden:** a schedule change (more clock-minutes) is not
+the same signal as more recovery capacity — his sleep quality (5/10) and life load (heavy)
+haven't moved. I kept the additions modest specifically because of this (3 sets, not 4, on
+both new hamstring/glute exercises; no bump on Day 3's existing lifts) rather than maxing out
+every day to 70 minutes. New weekly cost-weighted load on the 3 core days: **54.5 units**,
+up from 46.5, against the original panel-set band of 44-50 (ceiling 52) — a real but small
+increase (~17%), openly above the old ceiling rather than silently redefining it.
+
+**Watch:** his RPE trend over the next 1-2 weeks. If he flags extra fatigue, the first things
+to cut are the two new additions (Hip Thrust, Back Extension) — not the three tracked
+primaries (Squat, RDL, Reverse Lunge). Told him this directly in-app (new notes card).
+
+Primaries, roadmap, week-2 film gate, and every existing prescription are unchanged.
