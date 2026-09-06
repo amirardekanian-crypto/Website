@@ -237,6 +237,24 @@
               },
               {
                 "type": "standard",
+                "name": "Barbell Hip Thrust",
+                "videoUrl": null,
+                "restSec": 90,
+                "note": "This is straight line hip drive, the exact muscle action you use to push off the ground hard. Push through your heels, not your toes.",
+                "chips": [
+                  { "label": "1s squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Drive your hips up hard, like you're punching the ceiling with your hips", "Feel the glutes squeeze hard at the top"],
+                  "bad": ["Don't let the lower back arch to finish the rep"]
+                }
+              },
+              {
+                "type": "standard",
                 "name": "Seated Machine Calf Raise",
                 "videoUrl": null,
                 "restSec": 60,
@@ -419,6 +437,24 @@
               },
               {
                 "type": "standard",
+                "name": "45° Back Extension",
+                "videoUrl": null,
+                "restSec": 75,
+                "note": "This one most helps you stop fast on court, same as the leg curl. Keep it controlled, don't swing up.",
+                "chips": [
+                  { "label": "1s squeeze", "style": "dark" },
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×10 Reps" },
+                  { "label": "Tempo 2-0-1-1" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Push your hips into the pad and stand tall", "Feel the hamstrings and glutes doing the work"],
+                  "bad": ["Don't round up higher than flat to get more range"]
+                }
+              },
+              {
+                "type": "standard",
                 "name": "Lat Pulldown",
                 "videoUrl": null,
                 "restSec": 90,
@@ -446,7 +482,7 @@
                 "restSec": 60,
                 "note": "Put a pad or a folded mat under your knees. Roll out only as far as you can keep a flat back, then come straight back. Short and clean beats long and sagging.",
                 "chips": [
-                  { "label": "2 Sets", "style": "yellow" },
+                  { "label": "3 Sets", "style": "yellow" },
                   { "label": "×8 Reps" },
                   { "label": "Tempo 3-0-1-0" },
                   { "label": "RPE 7" }
@@ -638,6 +674,22 @@
                   "good": ["Push the bench away with the top leg", "Feel the inside of the top thigh"],
                   "bad": ["Don't let the hips drop or roll backward"]
                 }
+              },
+              {
+                "type": "standard",
+                "name": "Suitcase Carry",
+                "videoUrl": null,
+                "restSec": 60,
+                "note": "Carry a dumbbell in one hand and walk. This is the muscle that keeps you upright when you're stretched wide for a ball on one side.",
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×20m Each Side" },
+                  { "label": "RPE 7" }
+                ],
+                "cues": {
+                  "good": ["Walk tall like the weight isn't there", "Feel the side of your trunk fighting to stay upright"],
+                  "bad": ["Don't let your shoulder or hip dip toward the weight"]
+                }
               }
             ]
           }
@@ -725,7 +777,7 @@
                 "videoUrl": null,
                 "restSec": 90,
                 "chips": [
-                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "4 Sets", "style": "yellow" },
                   { "label": "×10 Reps" },
                   { "label": "Tempo 2-0-1-0" },
                   { "label": "RPE 8" }
@@ -817,6 +869,22 @@
               },
               {
                 "type": "standard",
+                "name": "Machine Reverse Fly",
+                "videoUrl": null,
+                "restSec": 45,
+                "chips": [
+                  { "label": "3 Sets", "style": "yellow" },
+                  { "label": "×12 Reps" },
+                  { "label": "Tempo 2-0-1-0" },
+                  { "label": "RPE 8" }
+                ],
+                "cues": {
+                  "good": ["Pull your hands out and back like you're opening a heavy door", "Feel the back of the shoulders and upper back squeeze"],
+                  "bad": ["Don't yank with the arms, let the back do it"]
+                }
+              },
+              {
+                "type": "standard",
                 "name": "Dumbbell Hammer Curl",
                 "videoUrl": null,
                 "restSec": 45,
@@ -860,6 +928,11 @@
         "icon": "🎯",
         "title": "Week 1 is for finding your weights",
         "body": "<p>You left your lifts blank on the form, so I have not guessed them. The app never gives you a weight. <strong>You find it yourself using the RPE number</strong> on each exercise. RPE 6 means you could still do about 4 clean reps after the set. RPE 7 means about 3.</p><p><strong>For all of week 1, stay at RPE 6 on the Back Squat, the Romanian Deadlift and the Reverse Lunge</strong>, even though the card says 7. Start lighter than you think and let the first set tell you. From week 2 you work to the number on the card.</p><ul><li><strong>New exercise?</strong> Go too light on purpose. If it felt easy, add a little next set.</li><li><strong>Hit all your reps at or under the target RPE?</strong> Small jump next week.</li><li><strong>Missed reps, or it felt harder than the target?</strong> Keep the same weight and do it again next week.</li></ul><p>Dropping the weight on a bad day is not failure, it is you reading yourself properly. <strong>The target is the RPE, never the number on the bar.</strong></p>"
+      },
+      {
+        "icon": "🕒",
+        "title": "You've got more time, so I added a few things",
+        "body": "<p>You told me your sessions can run 60 to 70 minutes now, so I used it. Nothing you already had has changed, I just added a few exercises that earn their spot.</p><ul><li><strong>Day 1:</strong> Barbell Hip Thrust. Straight line hip drive, the exact muscle action that pushes you off the ground fast.</li><li><strong>Day 2:</strong> 45° Back Extension. More hamstring and glute, the muscle behind your whole goal here.</li><li><strong>Day 3:</strong> Suitcase Carry. Keeps your trunk upright when you're stretched wide for a ball on one side.</li><li><strong>Day 4:</strong> Machine Reverse Fly, and one more set on your chest press.</li></ul><p>Sessions should now sit somewhere between 60 and 70 minutes. <strong>If you're running short one day, drop the newest exercise first, never the squat, the deadlift or the lunge.</strong> Those three are what I'm tracking.</p>"
       },
       {
         "icon": "📹",
