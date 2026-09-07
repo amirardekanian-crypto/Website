@@ -782,6 +782,8 @@ const S = {
   programs: {},    // athlete_id -> programme JSON (from the database, else the legacy file)
   progSrc: {},     // athlete_id -> 'db' | 'file' | 'none'. Demo mode never calls
                    // loadPrograms(), so this has to start as an object, not undefined.
+  logins: {},      // athlete_id -> athlete_identities row, for athletes with a
+                   // username/password. Same reason as above: must not be undefined.
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
@@ -820,6 +822,7 @@ async function loadAll() {
   S.titles = titles.data || [];
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
   S.intake = (intake && intake.data) || [];   // RPC may be missing pre-stage27; degrade quietly
+  await loadLogins();
   await loadPrograms();
   assemble();
   S.ready = true;
@@ -870,6 +873,48 @@ async function loadPrograms() {
     S.programs[id] = files[i];
     S.progSrc[id]  = files[i] ? 'file' : 'none';
   });
+}
+
+// Which athletes have a username/password login. The identity row is the record —
+// there is no way to list auth users from the browser, and no need to.
+async function loadLogins() {
+  S.logins = {};
+  const r = await sb.from('athlete_identities').select('athlete_id, email, linked_at');
+  if (!r.error) (r.data || []).forEach(row => { S.logins[row.athlete_id] = row; });
+}
+
+// Create / reset / revoke an athlete's login. All three go through the
+// athlete-login Edge Function, because creating a user needs the service-role key
+// and that must never exist in a page anyone can view source on.
+async function athleteLoginAction(athleteId, action) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const { data, error } = await sb.functions.invoke('athlete-login', {
+    body: { action, athlete_id: athleteId },
+  });
+  if (error || (data && data.error)) {
+    alert('Could not ' + action + ' the login:\n\n' + ((data && data.error) || error.message));
+    return;
+  }
+  await loadLogins();
+  render();
+
+  if (action === 'revoke') { toast('Login removed'); return; }
+
+  // The password is shown once, here. It is not stored anywhere we can read back,
+  // so if this box is closed before sending it, the only way forward is a reset.
+  const msg =
+    `Your training app\n\n` +
+    `Open: ${SITE}/program.html\n` +
+    `Username: ${data.username}\n` +
+    `Password: ${data.password}\n\n` +
+    `Save it when your phone offers to — then you won't have to type it again.`;
+  copyText(msg);
+  alert(
+    (data.created ? 'Login created' : 'Password reset') + ' for ' + data.username + '\n\n' +
+    'Password: ' + data.password + '\n\n' +
+    'The full WhatsApp message is copied to your clipboard.\n\n' +
+    'This password is shown once and cannot be looked up again — send it now, or reset it later.'
+  );
 }
 
 // One-time move of the legacy JSON files into the programs table. Runs as the
@@ -2612,7 +2657,29 @@ function fileTabHtml(D) {
          <button class="btn sm primary" style="margin-left:8px" onclick="protectAthlete('${esc(athleteId)}')">Generate secure link</button></div>`;
   const cycles = (program && program.cycles) || [];
   const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
-  return `<div class="sec"><span>Links</span></div>
+  const login = (S.logins || {})[athleteId];
+  return `<div class="sec"><span>Login</span></div>
+    <section class="panel">
+      ${login ? `
+        <p class="empty" style="padding:0 0 10px">
+          <b>${esc(athleteId)}</b> has a username and password — created ${esc(prettyDate(String(login.linked_at).slice(0,10)))}.
+          They sign in at <code>${esc(SITE)}/program.html</code> with no link needed.
+        </p>
+        <div class="note-actions">
+          <button class="btn sm" onclick="athleteLoginAction('${esc(athleteId)}','reset')">Reset password</button>
+          <button class="btn sm danger" onclick="if(confirm('Remove ${esc(athleteId)}\\'s login? They will not be able to sign in until you make a new one.')) athleteLoginAction('${esc(athleteId)}','revoke')">Remove login</button>
+        </div>`
+      : `
+        <p class="empty" style="padding:0 0 10px">
+          No login yet — ${esc(athleteId)} still gets in through the secret link below.
+          Creating one gives them a username and password to sign in with instead, which their
+          phone can save.
+        </p>
+        <div class="note-actions">
+          <button class="btn sm primary" onclick="athleteLoginAction('${esc(athleteId)}','create')">Create login</button>
+        </div>`}
+    </section>
+    <div class="sec"><span>Links</span></div>
     ${linkHtml}
     <div class="sec"><span>Program file</span></div>
     <section class="panel">

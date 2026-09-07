@@ -141,6 +141,32 @@
     padding: 40px;
   }
   .error-screen.visible { display: flex; }
+
+  /* ── Sign in ─────────────────────────────────────────────────────────── */
+  .signin-screen { display: none; position: fixed; inset: 0; z-index: 900;
+    background: var(--court, #0E4A36); padding: 24px; overflow-y: auto;
+    align-items: center; justify-content: center; }
+  .signin-screen.visible { display: flex; }
+  .signin-card { width: 100%; max-width: 360px; background: #fff; border-radius: 18px;
+    padding: 30px 26px 24px; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+  .signin-mark { width: 44px; height: 44px; border-radius: 12px; background: var(--court, #0E4A36);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; letter-spacing: .04em; font-size: 15px; margin-bottom: 16px; }
+  .signin-title { margin: 0 0 5px; font-size: 24px; letter-spacing: -.01em; }
+  .signin-sub { margin: 0 0 20px; font-size: 13.5px; line-height: 1.5; color: #5c6a66; }
+  .signin-f { display: block; margin-bottom: 14px; }
+  .signin-f > span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: #5c6a66; margin-bottom: 6px; }
+  /* 16px keeps iOS from zooming the page when the field takes focus. */
+  .signin-f input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 12px 13px;
+    border: 1.5px solid #d9e0dd; border-radius: 11px; background: #fff; color: #1A1A1A; }
+  .signin-f input:focus { outline: none; border-color: var(--court, #0E4A36); }
+  .signin-go { width: 100%; padding: 14px; font-size: 15px; font-weight: 700; color: #fff;
+    background: var(--court, #0E4A36); border: 0; border-radius: 11px; cursor: pointer; margin-top: 4px; }
+  .signin-go[disabled] { opacity: .6; cursor: default; }
+  .signin-err { margin-top: 13px; padding: 10px 12px; border-radius: 9px; font-size: 13px;
+    background: rgba(199,85,47,.10); color: #C7552F; line-height: 1.45; }
+  .signin-help { margin: 16px 0 0; font-size: 12px; color: #7d8a86; text-align: center; }
   .error-icon { font-size: 48px; margin-bottom: 16px; }
   .error-title {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
@@ -2699,6 +2725,32 @@
   <div class="error-msg" id="error-msg">Could not load athlete data. Check the URL parameter.</div>
 </div>
 
+<!-- ═══ SIGN IN ═══
+     Shown when there is no session and no working secret link. The username is the
+     athlete id; the internal address is added on submit, so nobody ever sees or
+     types an email. Fields carry the autocomplete names phones look for, which is
+     what lets the password manager offer to save it — the whole point of using a
+     password here rather than a magic link. -->
+<div class="signin-screen" id="signin-screen">
+  <form class="signin-card" id="signin-form" autocomplete="on">
+    <div class="signin-mark">AA</div>
+    <h1 class="signin-title">Your training</h1>
+    <p class="signin-sub">Sign in with the username and password Amir sent you.</p>
+    <label class="signin-f">
+      <span>Username</span>
+      <input id="si-user" name="username" autocomplete="username" autocapitalize="none"
+             autocorrect="off" spellcheck="false" required>
+    </label>
+    <label class="signin-f">
+      <span>Password</span>
+      <input id="si-pass" name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button class="signin-go" id="si-go" type="submit">Sign in</button>
+    <div class="signin-err" id="si-err" hidden></div>
+    <p class="signin-help">Lost your details? Message Amir and he'll send new ones.</p>
+  </form>
+</div>
+
 <!-- ═══ HOME ═══ -->
 <div id="screen-plan" class="screen planlike">
 
@@ -3483,8 +3535,18 @@ function getVideoUrl(ex) {
   // Article/workout deep-links are public — fall back to demo when no client set.
   if (!clientId && (params.get('article') || params.get('workout'))) clientId = 'demo';
 
+  // A signed-in athlete needs no ?client= at all — their session says who they are.
+  // This runs before the secret-link path so that once someone has a login, the
+  // general link works and an old bookmark with a stale ?client= cannot override it.
+  if (!window.IS_DEMO) {
+    const signedInAs = await athleteFromSession();
+    if (signedInAs) clientId = signedInAs;
+  }
+
   if (!clientId) {
-    showError('No client specified. Use: program.html?client=athlete_id');
+    // No session, no link. Ask them to sign in rather than showing a URL error —
+    // this is now the front door for anyone who has been given a login.
+    showSignIn();
     return;
   }
 
@@ -3636,6 +3698,79 @@ function showError(msg) {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('error-msg').textContent = msg;
   document.getElementById('error-screen').classList.add('visible');
+}
+
+/* ═══ SIGN IN ══════════════════════════════════════════════════════════════
+   Athletes have no email, so an account is keyed on an internal address that
+   never receives mail (athlete.<id>@amirardekani.com). They type a username; the
+   domain is added here. Kept deliberately dumb: one form, no reset flow — a lost
+   password is a WhatsApp message to Amir, who reissues one from the dashboard.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const LOGIN_DOMAIN = 'amirardekani.com';
+const LOGIN_PREFIX = 'athlete.';
+
+// The athlete_id behind the current session, or '' if nobody is signed in.
+// Reads athlete_identities, which RLS limits to the caller's own row.
+async function athleteFromSession() {
+  try {
+    const sb = await _sbReady();
+    if (!sb) return '';
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return '';
+    const { data, error } = await sb.from('athlete_identities')
+      .select('athlete_id').eq('user_id', session.user.id).maybeSingle();
+    if (error || !data) return '';
+    return data.athlete_id || '';
+  } catch (e) { return ''; }
+}
+
+function showSignIn() {
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('signin-screen').classList.add('visible');
+  const form = document.getElementById('signin-form');
+  const errBox = document.getElementById('si-err');
+  const btn = document.getElementById('si-go');
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const user = (document.getElementById('si-user').value || '').trim().toLowerCase();
+    const pass = document.getElementById('si-pass').value || '';
+    if (!user || !pass) return;
+
+    errBox.hidden = true;
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    try {
+      const sb = await _sbReady();
+      if (!sb) throw new Error('offline');
+      const { error } = await sb.auth.signInWithPassword({
+        email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN,
+        password: pass,
+      });
+      if (error) throw error;
+      // Reload rather than booting in place: every later stage reads DATA and
+      // ATHLETE_ID as boot-time constants, and re-entering boot() would double
+      // up the cloud-sync and timer wiring.
+      location.replace('program.html');
+      return;
+    } catch (err) {
+      errBox.textContent = /invalid|credentials/i.test(err.message || '')
+        ? 'That username or password is not right. Check the message Amir sent you.'
+        : 'Could not sign in just now. Check your connection and try again.';
+      errBox.hidden = false;
+      btn.disabled = false;
+      btn.textContent = 'Sign in';
+    }
+  };
+}
+
+// Used by the app's own sign-out control.
+async function signOutAthlete() {
+  try {
+    const sb = await _sbReady();
+    if (sb) await sb.auth.signOut();
+  } catch (e) { /* signing out locally is enough */ }
+  location.replace('program.html');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -6905,9 +7040,14 @@ function esc(str) {
 
   // Offer Add-to-Home-Screen a few seconds after first paint.
   // Skipped in demo mode — don't nag marketing visitors to install.
+  // Also skipped while the sign-in screen is up: asking someone to install an app
+  // they have not got into yet is noise, and it covers the password field on a
+  // small phone.
   if (!window.IS_DEMO) {
     window.addEventListener('load', () => {
       setTimeout(() => {
+        const signin = document.getElementById('signin-screen');
+        if (signin && signin.classList.contains('visible')) return;
         if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
       }, 2500);
     });
