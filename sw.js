@@ -1,6 +1,9 @@
 // AA Performance — Service Worker
 // Bump CACHE version any time you push a breaking change to the app shell.
-const CACHE = 'aap-v2';
+// v3: program.html's app shell changed — it now links the real /manifest.json and
+// carries the apple-mobile-web-app-* meta tags, so the pre-cached v2 shell would
+// keep an installed athlete on a version that cannot be installed properly.
+const CACHE = 'aap-v3';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
