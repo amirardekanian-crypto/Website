@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Chips self-test</title>
+<!--
+  Verifies assets/js/chips.js against the real programme files in data/.
+  Run this after changing anything in chips.js, the same way jump-selftest.html
+  guards the jump maths. Not linked from the site and marked noindex.
+-->
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0e1116; color:#e8edf4; font:14px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:1040px; margin:0 auto; padding:28px 20px 80px; }
+  h1 { font-size:22px; margin:0 0 6px; letter-spacing:-.01em; }
+  h2 { font-size:15px; margin:32px 0 10px; text-transform:uppercase; letter-spacing:.08em; color:#8fa3bd; }
+  p.lede { color:#9fb0c7; margin:0 0 22px; max-width:70ch; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; font-weight:600; }
+  .ok   { background:rgba(56,180,120,.16); color:#5fd39b; }
+  .bad  { background:rgba(226,72,72,.16);  color:#ff8a8a; }
+  .warn { background:rgba(228,170,60,.16); color:#f0c060; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th,td { text-align:left; padding:7px 10px; border-bottom:1px solid rgba(255,255,255,.07); vertical-align:top; }
+  th { color:#8fa3bd; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+  code { background:rgba(255,255,255,.09); padding:1px 5px; border-radius:4px; font-size:12px; }
+  .big { font-size:34px; font-weight:700; letter-spacing:-.02em; }
+  .muted { color:#7f92a9; }
+  .card { background:#151a22; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:18px 20px; margin:0 0 14px; }
+  .row { display:flex; gap:26px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Chips self-test</h1>
+  <p class="lede">
+    Checks <code>assets/js/chips.js</code> — the parser the athlete app uses and the
+    formatter the coach editor will use — against every real programme in
+    <code>data/</code>. Section 3 is the one that matters day to day: it lists chips
+    already written in a way that renders wrong.
+  </p>
+
+  <div id="summary" class="card"><span class="muted">Running…</span></div>
+
+  <h2>1 · Unit cases</h2>
+  <div id="units"></div>
+
+  <h2>2 · Round-trip over every real exercise</h2>
+  <p class="muted" style="margin:0 0 12px">
+    Reading an exercise's stats and writing them straight back must not change what
+    the app displays. Any failure here means the editor would corrupt a programme.
+  </p>
+  <div id="roundtrip"></div>
+
+  <h2>3 · Audit of existing programmes</h2>
+  <div id="audit"></div>
+</div>
+
+<script src="/assets/js/chips.js"></script>
+<script>
+const IDS = [
+    "Mhrnz_khdm2","afsaneh_achi","ali_rahimzadeh","alireza_nikkhah","amir_ardekani",
+    "amir_hosseini","amir_teflisi","amirabbas_esh1","amirhossein_azizi","bardia_ahmadi",
+    "behnam_zohoorian","dela_yazdani","demo","ehsan_ardakanian","eli","ella",
+    "elmira_askari","fafa","faraz_etminan","fatemeh","ghazal_pakbaten","hossein_gorji",
+    "john_doe","juan_glbt","lem_cass1","maryam_alamdar","maryam_g","mehdi_mousavi",
+    "mehdi_rahmani","mhd_bhbd1","mhrn_zhr2","navid_asadi","nikan_omidvar",
+    "niloufar_tavasoli","niusha_zia","parham_kerdari","payam_sadr","pegah_hmt2",
+    "pooya_pnd2","reihan","reza_jamal","sajede_shahabi","sarvikh","setareh_rasouli",
+    "shadi_ak","siavash_shirdel","sina_razeghi","zahra_rasoulian"
+];
+const C = window.Chips;
+const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+/* ── 1 · unit cases ────────────────────────────────────────────────────── */
+const CASES = [
+  // [what, actual, expected]
+  ['parse "4 Sets" → sets',        C.parseChips([{label:'4 Sets'}]).sets,        '4'],
+  ['parse "×6 Reps" → reps',       C.parseChips([{label:'×6 Reps'}]).reps,       '6'],
+  ['parse "×10 Each Side"',        C.parseChips([{label:'×10 Each Side'}]).reps, '10 Each Side'],
+  ['parse "RPE 8" → target',       C.parseChips([{label:'RPE 8'}]).target,       '@8'],
+  ['parse "Tempo 3-0-1-0"',        C.parseChips([{label:'Tempo 3-0-1-0'}]).tempo,'3-0-1-0'],
+  ['parse "Rest 2 min" → 120s',    C.parseChips([{label:'Rest 2 min'}]).rest,    120],
+  ['bare "30s" promotes to reps',  C.parseChips([{label:'30s'}]).reps,           '30s'],
+  ['"max intent" stays a modifier',C.parseChips([{label:'max intent'}]).extras.length, 1],
+
+  ['format sets 4',                C.fmt.sets(4),        '4 Sets'],
+  ['format reps 6 (bare → Reps)',  C.fmt.reps(6),        '×6 Reps'],
+  ['format reps "10 Each Side"',   C.fmt.reps('10 Each Side'), '×10 Each Side'],
+  ['format rpe 8',                 C.fmt.target(8),      'RPE 8'],
+  ['format tempo',                 C.fmt.tempo('3-0-1-0'), 'Tempo 3-0-1-0'],
+  ['format rest 90s',              C.fmt.rest(90),       'Rest 90 sec'],
+  ['format rest 120s → min',       C.fmt.rest(120),      'Rest 2 min'],
+
+  ['slotOf "3 Sets"',              C.slotOf('3 Sets'),   'sets'],
+  ['slotOf "12 each" (the bug)',   C.slotOf('12 each'),  ''],
+];
+
+// Editing reps must change only reps, and must survive a re-parse.
+(function () {
+  const ex = { type:'standard', name:'Box Jump',
+               chips:[{label:'stick landing',style:'dark'},{label:'4 Sets'},{label:'×4 Reps'}] };
+  const out = C.applyStats(ex, { reps: 6 });
+  const p   = C.parseChips(out.chips);
+  CASES.push(['edit reps 4→6 gives reps 6',       p.reps, '6']);
+  CASES.push(['edit reps leaves sets alone',      p.sets, '4']);
+  CASES.push(['edit reps keeps the modifier',     p.extras.length, 1]);
+  CASES.push(['edit preserves modifier style',    p.extras[0].style, 'dark']);
+  CASES.push(['edit preserves chip order',        out.chips[0].label, 'stick landing']);
+  CASES.push(['original object not mutated',      ex.chips[2].label, '×4 Reps']);
+
+  const cleared = C.applyStats(ex, { rpe: '' });
+  CASES.push(['clearing an absent slot is a no-op', cleared.chips.length, 3]);
+
+  const added = C.applyStats(ex, { rpe: 8 });
+  CASES.push(['adding RPE appends one chip',      added.chips.length, 4]);
+  CASES.push(['added RPE parses back',            C.parseChips(added.chips).target, '@8']);
+
+  // Rest written when neither source exists → the explicit field wins.
+  const rested = C.applyStats(ex, { restSec: 90 });
+  CASES.push(['rest with no existing source → field', rested.restSec, 90]);
+
+  // Rest already in a chip → the chip is updated, field stays absent.
+  const chipRest = { type:'standard', chips:[{label:'Rest 60 sec'}] };
+  const cr = C.applyStats(chipRest, { restSec: 120 });
+  CASES.push(['rest already a chip → chip updated', cr.chips[0].label, 'Rest 2 min']);
+  CASES.push(['rest chip path sets no field',       cr.restSec, undefined]);
+
+  // A bare duration is promoted into REPS by parseChips even though it matches no
+  // reps pattern. Editing must rewrite that chip, not append a second one.
+  const dur = { type:'simple', chips:[{ label:'5 min', style:'dark' }] };
+  const d1 = C.applyStats(dur, C.readStats(dur));
+  CASES.push(['promoted duration stays one chip',   d1.chips.length, 1]);
+  CASES.push(['promoted duration keeps bare form',  d1.chips[0].label, '5 min']);
+  CASES.push(['promoted duration keeps its style',  d1.chips[0].style, 'dark']);
+  const d2 = C.applyStats(dur, { reps: '8' });
+  CASES.push(['duration → rep count is one chip',   d2.chips.length, 1]);
+  CASES.push(['duration → rep count reformats',     d2.chips[0].label, '×8 Reps']);
+
+  // The documented bug is caught.
+  const buggy = { type:'standard', chips:[{label:'4 Sets'},{label:'12 each'}] };
+  CASES.push(['audit flags dose-in-modifier',
+    C.audit(buggy).some(p => p.code === 'dose-in-modifier'), true]);
+
+  // …but a technique cue alongside real reps is not a finding.
+  const goodMod = { type:'standard',
+    chips:[{label:'4 Sets'},{label:'×6 Reps'},{label:'3s eccentric'}] };
+  CASES.push(['audit ignores "3s eccentric" when reps exist', C.audit(goodMod).length, 0]);
+})();
+
+let unitFails = 0;
+document.getElementById('units').innerHTML =
+  '<table><tr><th>Case</th><th>Got</th><th>Expected</th><th></th></tr>' +
+  CASES.map(([what, got, want]) => {
+    const ok = JSON.stringify(got) === JSON.stringify(want);
+    if (!ok) unitFails++;
+    return `<tr><td>${esc(what)}</td><td><code>${esc(JSON.stringify(got))}</code></td>` +
+           `<td><code>${esc(JSON.stringify(want))}</code></td>` +
+           `<td><span class="pill ${ok?'ok':'bad'}">${ok?'PASS':'FAIL'}</span></td></tr>`;
+  }).join('') + '</table>';
+
+/* ── 2 & 3 · against the real corpus ───────────────────────────────────── */
+// Live prescription only: $.workouts.days[].blocks[].exercises[].
+// programHistory[].days[].exercises[] is deliberately excluded — those archives
+// are read-only summaries carrying a `detail` string, not chips.
+// Circuits are excluded too: they render from `rounds`/`restSec`/`items[].detail`
+// and never go through the chip parser, so they need their own editor.
+function eachExercise(prog, fn) {
+  const days = (prog.workouts && prog.workouts.days) || [];
+  days.forEach(d => (d.blocks || []).forEach(b =>
+    (b.exercises || []).forEach(ex => { if (ex.type !== 'circuit') fn(ex, d, b); })));
+}
+
+(async function run() {
+  const loaded = [];
+  await Promise.all(IDS.map(async id => {
+    try {
+      const r = await fetch('data/' + id + '.json', { cache: 'no-cache' });
+      if (r.ok) loaded.push({ id, prog: await r.json() });
+    } catch (e) { /* skipped */ }
+  }));
+  loaded.sort((a, b) => a.id.localeCompare(b.id));
+
+  let exCount = 0, rtFails = [], findings = [];
+
+  loaded.forEach(({ id, prog }) => {
+    eachExercise(prog, (ex, d, b) => {
+      exCount++;
+      const before = C.parseChips(ex.chips);
+      const after  = C.parseChips(C.applyStats(ex, C.readStats(ex)).chips);
+      const same = ['sets','reps','target','tempo'].every(k => before[k] === after[k]) &&
+                   before.extras.length === after.extras.length;
+      if (!same && rtFails.length < 25) {
+        rtFails.push({ id, name: ex.name || '(unnamed)',
+          before: JSON.stringify(before), after: JSON.stringify(after) });
+      }
+      C.audit(ex).forEach(p => findings.push({
+        id, day: (d.label || d.focus || ''), block: (b.title || ''),
+        name: ex.name || '(unnamed)', ...p }));
+    });
+  });
+
+  document.getElementById('roundtrip').innerHTML = rtFails.length === 0
+    ? `<div class="card"><span class="pill ok">PASS</span> &nbsp;All <b>${exCount}</b> exercises across <b>${loaded.length}</b> programmes round-trip unchanged.</div>`
+    : `<div class="card"><span class="pill bad">FAIL</span> ${rtFails.length} exercise(s) changed.</div>` +
+      '<table><tr><th>Athlete</th><th>Exercise</th><th>Before</th><th>After</th></tr>' +
+      rtFails.map(f => `<tr><td>${esc(f.id)}</td><td>${esc(f.name)}</td>
+        <td><code>${esc(f.before)}</code></td><td><code>${esc(f.after)}</code></td></tr>`).join('') + '</table>';
+
+  const byCode = {};
+  findings.forEach(f => (byCode[f.code] = (byCode[f.code] || 0) + 1));
+  const affected = new Set(findings.map(f => f.id));
+
+  document.getElementById('audit').innerHTML = findings.length === 0
+    ? `<div class="card"><span class="pill ok">CLEAN</span> &nbsp;No malformed chips found.</div>`
+    : `<div class="card"><span class="pill warn">${findings.length} finding(s)</span>
+         across <b>${affected.size}</b> of ${loaded.length} programmes —
+         ${Object.entries(byCode).map(([k,v]) => `<code>${esc(k)}</code> ×${v}`).join(' · ')}
+       </div>` +
+      '<table><tr><th>Athlete</th><th>Block</th><th>Exercise</th><th>Chip</th><th>Problem</th></tr>' +
+      findings.map(f => `<tr><td>${esc(f.id)}</td><td class="muted">${esc(f.block)}</td>
+        <td>${esc(f.name)}</td><td><code>${esc(f.label || '—')}</code></td>
+        <td>${esc(f.msg)}</td></tr>`).join('') + '</table>';
+
+  const allOk = unitFails === 0 && rtFails.length === 0;
+  document.getElementById('summary').innerHTML =
+    `<div class="row">
+       <div><div class="big ${allOk?'':'bad'}">${allOk ? 'PASS' : 'FAIL'}</div>
+            <div class="muted">${unitFails} unit failure(s), ${rtFails.length} round-trip failure(s)</div></div>
+       <div><div class="big">${loaded.length}</div><div class="muted">programmes loaded</div></div>
+       <div><div class="big">${exCount}</div><div class="muted">exercises checked</div></div>
+       <div><div class="big">${findings.length}</div><div class="muted">chip findings</div></div>
+     </div>`;
+  window.__RESULT = { unitFails, rtFails, findings, exCount, programmes: loaded.length };
+})();
+</script>
+</body>
+</html>

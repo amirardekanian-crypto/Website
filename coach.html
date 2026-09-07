@@ -28,6 +28,9 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Chip semantics, shared with program.html so the editor and the athlete app
+     can never disagree about what a prescription says. See chips-selftest.html. -->
+<script src="/assets/js/chips.js"></script>
 <style>
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
@@ -418,6 +421,38 @@
   .rx-dose { display: inline-block; }
   .rx-rpe { display: inline-block; margin-left: 7px; color: var(--court); }
   .rx-sub { font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--muted-soft); margin-top: 2px; line-height: 1.4; }
+
+  /* ── Prescription editor ─────────────────────────────────────────────── */
+  /* The pencil stays quiet until the row is hovered — 800 exercises with a
+     permanent button on each reads as a form, not a comparison. */
+  .rx-edit { opacity: 0; transition: opacity .12s; background: none; border: 0; cursor: pointer;
+             color: var(--court); font-size: 13px; padding: 2px 5px; margin-top: 3px; border-radius: 5px; }
+  .cmp-row:hover .rx-edit, .rx-edit:focus { opacity: 1; }
+  .rx-edit:hover { background: var(--court-100); }
+  .rx-warn { font-family: 'Barlow', sans-serif; font-size: 10.5px; color: var(--clay);
+             margin-top: 3px; cursor: help; }
+  .rx-editor { grid-column: 1 / -1; margin: 10px 0 4px; padding: 14px 16px;
+               background: var(--court-100); border-radius: 10px; }
+  .exed-grid { display: flex; flex-wrap: wrap; gap: 14px 18px; }
+  .exf { display: flex; flex-direction: column; gap: 4px; font-family: 'Barlow', sans-serif; }
+  .exf > span { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+  .exf input, .exf textarea { font-family: 'Space Mono', monospace; font-size: 12.5px; padding: 7px 9px;
+    border: 1px solid var(--rule); border-radius: 7px; background: var(--card); color: var(--ink); }
+  .exf input:focus, .exf textarea:focus { outline: 2px solid var(--court); outline-offset: -1px; border-color: transparent; }
+  .exf-wide { margin-top: 12px; }
+  .exf-wide textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+  .exed-mods { margin-top: 11px; font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--muted); }
+  .exed-warn { margin-top: 11px; padding: 8px 11px; border-radius: 7px; background: var(--clay-100);
+               color: var(--clay); font-family: 'Barlow', sans-serif; font-size: 11.5px; line-height: 1.5; }
+  .exed-acts { margin-top: 13px; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .exed-hint { font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--muted-soft); }
+  .pvlist { margin-top: 4px; }
+  .pvrow { display: flex; align-items: center; gap: 12px; padding: 7px 0;
+           border-bottom: 1px solid var(--rule); font-family: 'Barlow', sans-serif; font-size: 12px; }
+  .pvrow:last-child { border-bottom: 0; }
+  .pvwhen { min-width: 150px; font-weight: 600; }
+  .pvtime { color: var(--muted-soft); font-weight: 400; margin-left: 5px; }
+  .pvwho { flex: 1; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
   .cmp-did > span { display: inline-block; margin-right: 8px; }
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay); }
@@ -744,7 +779,9 @@ const S = {
   seasons: [],     // seasons rows, newest first
   titles: [],      // hab_titles recent
   optin: {},       // athlete_id -> {display_name, title}
-  programs: {},    // athlete_id -> data/<id>.json (or null)
+  programs: {},    // athlete_id -> programme JSON (from the database, else the legacy file)
+  progSrc: {},     // athlete_id -> 'db' | 'file' | 'none'. Demo mode never calls
+                   // loadPrograms(), so this has to start as an object, not undefined.
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
@@ -811,10 +848,62 @@ async function loadPrograms() {
   Object.keys(S.keys).forEach(id => ids.add(id));
   S.contacts.forEach(c => ids.add(c.athlete_id));
   const list = [...ids];
-  const files = await Promise.all(list.map(id =>
+
+  // The database is the source of truth once an athlete has been imported.
+  // While the migration is part-done we fall back to the legacy data/<id>.json
+  // file, so an athlete who has not been moved yet still renders normally.
+  // S.progSrc records which one won — the editor only writes to imported rows.
+  const db = {};
+  const r = await sb.from('programs').select('athlete_id, data, updated_at, updated_by');
+  if (!r.error) (r.data || []).forEach(row => { db[row.athlete_id] = row; });
+
+  const needFile = list.filter(id => !db[id]);
+  const files = await Promise.all(needFile.map(id =>
     fetch(`data/${encodeURIComponent(id)}.json`).then(r => r.ok ? r.json() : null).catch(() => null)));
+
   S.programs = {};
-  list.forEach((id, i) => S.programs[id] = files[i]);
+  S.progSrc  = {};
+  list.forEach(id => {
+    if (db[id]) { S.programs[id] = db[id].data; S.progSrc[id] = 'db'; }
+  });
+  needFile.forEach((id, i) => {
+    S.programs[id] = files[i];
+    S.progSrc[id]  = files[i] ? 'file' : 'none';
+  });
+}
+
+// One-time move of the legacy JSON files into the programs table. Runs as the
+// coach's own session, so RLS applies — no service key anywhere. Safe to re-run:
+// it skips anyone already imported rather than overwriting edits with stale file
+// contents. Returns a short report for the caller to show.
+async function importProgramsToDb(overwrite) {
+  const ids = Object.keys(S.programs).filter(id => S.programs[id] &&
+    (overwrite || S.progSrc[id] === 'file'));
+  if (!ids.length) return { moved: 0, skipped: 0, failed: [], msg: 'Nothing to import — every programme is already in the database.' };
+
+  const rows = ids.map(id => ({ athlete_id: id, data: S.programs[id] }));
+  const failed = [];
+  // Chunked so one oversized payload can't take the whole batch down with it.
+  for (let i = 0; i < rows.length; i += 10) {
+    const slice = rows.slice(i, i + 10);
+    const { error } = await sb.from('programs').upsert(slice, { onConflict: 'athlete_id' });
+    if (error) slice.forEach(r => failed.push(r.athlete_id + ': ' + error.message));
+  }
+  return { moved: ids.length - failed.length, failed,
+           msg: `Imported ${ids.length - failed.length} of ${ids.length}.` };
+}
+
+async function runImport() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const pending = Object.keys(S.programs).filter(id => S.programs[id] && S.progSrc[id] === 'file');
+  if (!pending.length) { alert('Every programme is already in the database.'); return; }
+  if (!confirm(`Move ${pending.length} programme(s) from data/*.json into the database?\n\n` +
+               'Nothing is deleted — the files stay exactly where they are, and anyone ' +
+               'already imported is skipped.')) return;
+  const res = await importProgramsToDb(false);
+  await loadPrograms();
+  render();
+  alert(res.msg + (res.failed.length ? '\n\nFailed:\n' + res.failed.join('\n') : ''));
 }
 
 // The same "counts as a logged day" test contact_list() uses server-side: the
@@ -1579,6 +1668,14 @@ function renderAthletes() {
         <option value="name">Sort: name</option>
       </select>
       <button class="btn primary sm" onclick="newAthleteLink()">+ New secure link</button>
+      ${(() => {
+        // Only offer the move while something is still file-backed. Once every
+        // programme is in the database this control has nothing left to do.
+        const pending = Object.keys(S.programs || {}).filter(id => S.programs[id] && S.progSrc[id] === 'file');
+        return pending.length
+          ? `<button class="btn sm" onclick="runImport()" title="Copy data/*.json into the database so programmes become editable here">↑ Move ${pending.length} programme${pending.length === 1 ? '' : 's'} into the database</button>`
+          : '';
+      })()}
     </div>
     <div class="controls rfilters">${R_FILTERS.map(f =>
       `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
@@ -1808,41 +1905,10 @@ function logIndex(blocks) {             // flat name → logged exercise, for ma
 // ── READING WHAT WAS PRESCRIBED ─────────────────────────────────────────────
 // Ported from parseChips() in program.html so the dashboard splits a chip row
 // exactly the way the athlete's own screen does. ⚠ Two copies — change both.
-function parseDurationToSec(text) {
-  const t = String(text || '').trim().toLowerCase();
-  let m;
-  if ((m = t.match(/^(\d+):(\d{1,2})$/)))           return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-  if ((m = t.match(/^(\d+)\s*m(?:in|inutes?)?\b/))) return parseInt(m[1], 10) * 60;
-  if ((m = t.match(/^(\d+)\s*s(?:ec|econds?)?\b/))) return parseInt(m[1], 10);
-  if ((m = t.match(/^(\d+)$/)))                     return parseInt(m[1], 10);
-  return 0;
-}
-function isPureDuration(label) {
-  const t = String(label || '').trim();
-  if (/^\d+:\d+$/.test(t)) return true;
-  return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?(?:side|leg|each(?:\s+\w+)?))?$/i.test(t);
-}
-function parseChips(chips) {
-  const out = { sets: '', reps: '', target: '', tempo: '', rest: 0, extras: [] };
-  (chips || []).forEach(c => {
-    const label = (c.label || '').trim();
-    let m;
-    if ((m = label.match(/^rest\s+(.+)/i))) { const s = parseDurationToSec(m[1]); if (s > 0) { out.rest = s; return; } }
-    if ((m = label.match(/^(\d+)\s*sets?\b/i)))  { out.sets = m[1]; return; }
-    if ((m = label.match(/^tempo\s+(.+)/i)))     { out.tempo = m[1].trim(); return; }
-    if ((m = label.match(/^rpe\s+(.+)/i)))       { out.target = '@' + m[1].trim(); return; }
-    if (/^@/.test(label))                        { out.target = label; return; }
-    if (/^×/.test(label))      { out.reps = label.replace(/^×/, '').replace(/\s*reps?$/i, '').trim(); return; }
-    if (/reps?$/i.test(label)) { out.reps = label.replace(/\s*reps?$/i, '').trim(); return; }
-    if (/^\d+(?:\s*[-–]\s*\d+)?\s+each\s+(?:side|leg|arm|hand)s?$/i.test(label)) { out.reps = label; return; }
-    if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(label))   { out.reps = label; return; }
-    out.extras.push({ label, style: c.style || '' });
-  });
-  if (!out.reps) for (let i = 0; i < out.extras.length; i++) {
-    if (isPureDuration(out.extras[i].label)) { out.reps = out.extras[i].label; out.extras.splice(i, 1); break; }
-  }
-  return out;
-}
+// Chip parsing lives in assets/js/chips.js — one implementation shared with
+// program.html. These were duplicated here and drifted apart in formatting;
+// keeping local names means every existing call site is untouched.
+const { parseChips, parseDurationToSec, isPureDuration } = window.Chips;
 function rxLine(rx) {                   // "4 × 10" — the dose, without the RPE
   if (rx.sets && rx.reps) return `${rx.sets} × ${rx.reps}`;
   if (rx.reps) return rx.reps;
@@ -1921,10 +1987,15 @@ function compareDay(programDay, session) {
   const byName = logIndex(blocks);
   const seen = new Set();
   const groups = [];
-  ((programDay && programDay.blocks) || []).forEach(b => {
-    const rows = (b.exercises || []).map(pex => {
+  ((programDay && programDay.blocks) || []).forEach((b, bi) => {
+    const rows = (b.exercises || []).map((pex, ei) => {
       seen.add(normEx(pex.name));
-      return compareExercise(pex, byName[normEx(pex.name)]);
+      const row = compareExercise(pex, byName[normEx(pex.name)]);
+      // Where this exercise lives in the programme, so the editor can write it
+      // back. Index-based rather than name-based: two blocks can hold the same
+      // movement, and a rename would otherwise lose the row.
+      row.path = { day: programDay.id, block: bi, ex: ei };
+      return row;
     });
     if (rows.length) groups.push({ title: b.title || '', icon: b.icon || '', rows });
   });
@@ -1984,9 +2055,16 @@ function cmpCell(c) {
   if (c.logged.gear) detail.push(esc(c.logged.gear));
   return bits.join('') + (detail.length ? `<div class="did-detail">${detail.join(' · ')}</div>` : '');
 }
-function cmpRowHtml(c, lib) {
+function cmpRowHtml(c, lib, athleteId) {
   const rx = c.rx;
   const dose = rxLine(rx);
+  // Circuits render from rounds/items rather than chips, so the chip editor
+  // would have nothing to act on — they stay read-only until they get their own.
+  const editable = !!(athleteId && c.path && c.pex && c.pex.type !== 'circuit');
+  const eid = editable
+    ? (athleteId + '_' + c.path.day + '_' + c.path.block + '_' + c.path.ex).replace(/[^a-z0-9]/gi, '_')
+    : '';
+  const warn = c.pex ? Chips.audit(c.pex) : [];
   const rxBits = [];
   if (dose) rxBits.push(`<span class="rx-dose">${esc(dose)}</span>`);
   if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}</span>`);
@@ -2006,10 +2084,152 @@ function cmpRowHtml(c, lib) {
       ${c.logged && c.logged.note ? `<div class="cmp-anote"><b>They wrote:</b> ${esc(c.logged.note)}</div>` : ''}
     </div>
     <div class="cmp-rx">${rxBits.join('') || '<span class="did-none">—</span>'}
-      ${rxSub.length ? `<div class="rx-sub">${rxSub.join(' · ')}</div>` : ''}</div>
+      ${rxSub.length ? `<div class="rx-sub">${rxSub.join(' · ')}</div>` : ''}
+      ${editable ? `<button class="rx-edit" title="Edit this prescription"
+        onclick="openExEditor('${esc(athleteId)}',${Number(c.path.day)},${c.path.block},${c.path.ex},'${eid}')">✎</button>` : ''}
+      ${warn.length ? `<div class="rx-warn" title="${esc(warn.map(w => w.msg).join('\n'))}">⚠ ${esc(warn.length)} chip issue${warn.length > 1 ? 's' : ''}</div>` : ''}
+    </div>
     <div class="cmp-did">${cmpCell(c)}</div>
     <div class="cmp-flags">${c.flags.map(f => `<span class="fl ${f.tone}">${esc(f.text)}</span>`).join('')}</div>
+    ${editable ? `<div class="rx-editor" id="exed-${eid}" style="display:none"></div>` : ''}
   </div>`;
+}
+
+/* ═══ PRESCRIPTION EDITOR ═══════════════════════════════════════════════════
+   Edits go through real fields, and chips.js turns them back into correctly
+   formatted labels — so the "12 each" green-pill bug cannot be typed into
+   existence here. Saving writes the whole programme JSON to public.programs;
+   the table's trigger keeps the previous version, which is what replaces git
+   as the undo. Nothing here touches session_history: a past log records what
+   was actually done and never moves when the prescription changes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+// Locate an exercise from the path stamped on its comparison row.
+function exAt(athleteId, dayId, blockIdx, exIdx) {
+  const prog = S.programs[athleteId];
+  const days = (prog && prog.workouts && prog.workouts.days) || [];
+  const day  = days.find(d => Number(d.id) === Number(dayId));
+  const blk  = day && (day.blocks || [])[blockIdx];
+  const ex   = blk && (blk.exercises || [])[exIdx];
+  return ex ? { prog, day, blk, ex } : null;
+}
+
+function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
+  const box = document.getElementById('exed-' + eid);
+  if (!box) return;
+  if (box.style.display === 'block') { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+  const found = exAt(athleteId, dayId, blockIdx, exIdx);
+  if (!found) { toast('Could not find that exercise'); return; }
+  const st = Chips.readStats(found.ex);
+  const problems = Chips.audit(found.ex);
+  const f = (id, label, val, ph, w) =>
+    `<label class="exf"><span>${label}</span>
+       <input id="${id}-${eid}" value="${esc(val == null ? '' : val)}" placeholder="${esc(ph || '')}"
+              style="width:${w || 68}px" autocomplete="off"></label>`;
+
+  box.innerHTML = `
+    <div class="exed-grid">
+      ${f('exSets',  'Sets',  st.sets,  'e.g. 4')}
+      ${f('exReps',  'Reps',  st.reps,  'e.g. 6 or 10 Each Side', 150)}
+      ${f('exRpe',   'RPE',   st.rpe,   '6–10')}
+      ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0', 96)}
+      ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', '90s / 2 min', 92)}
+    </div>
+    <label class="exf exf-wide"><span>Your note to them</span>
+      <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(found.ex.note || '')}</textarea>
+    </label>
+    ${st.modifiers.length ? `<div class="exed-mods">Technique chips kept as-is:
+      ${st.modifiers.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
+    ${problems.length ? `<div class="exed-warn">${problems.map(p => '⚠ ' + esc(p.msg)).join('<br>')}</div>` : ''}
+    <div class="exed-acts">
+      <button class="btn sm primary" onclick="saveExEditor('${esc(athleteId)}',${Number(dayId)},${blockIdx},${exIdx},'${eid}')">Save</button>
+      <button class="btn sm" onclick="openExEditor('${esc(athleteId)}',${Number(dayId)},${blockIdx},${exIdx},'${eid}')">Cancel</button>
+      <span class="exed-hint">Changes what they see next. Past logs are untouched.</span>
+    </div>`;
+  box.style.display = 'block';
+}
+
+async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (S.progSrc[athleteId] !== 'db') {
+    alert('This programme is still a data/*.json file.\n\nRun "Move programmes into the database" on the roster first — editing writes to the database, and a file-backed athlete would keep showing the file.');
+    return;
+  }
+  const found = exAt(athleteId, dayId, blockIdx, exIdx);
+  if (!found) { toast('Could not find that exercise'); return; }
+
+  const val = id => (document.getElementById(id + '-' + eid) || {}).value;
+  const restRaw = (val('exRest') || '').trim();
+  const patch = {
+    sets:  (val('exSets')  || '').trim(),
+    reps:  (val('exReps')  || '').trim(),
+    rpe:   (val('exRpe')   || '').trim(),
+    tempo: (val('exTempo') || '').trim(),
+    restSec: restRaw ? Chips.parseDurationToSec(restRaw) : 0
+  };
+  if (restRaw && !patch.restSec) { alert('Rest "' + restRaw + '" is not a duration I understand. Try 90s, 2 min, or 1:30.'); return; }
+  if (patch.rpe && !(Number(patch.rpe) >= 6 && Number(patch.rpe) <= 10) && !/[-–]/.test(patch.rpe)) {
+    if (!confirm('RPE ' + patch.rpe + ' is outside the 6–10 selector the app shows.\n\nThe athlete will not be able to log against it. Save anyway?')) return;
+  }
+
+  const updated = Chips.applyStats(found.ex, patch);
+  const note = (val('exNote') || '').trim();
+  if (note) updated.note = note; else delete updated.note;
+
+  // Swap the edited exercise into the live programme object, then persist the
+  // whole blob — the table stores one row per athlete, not per exercise.
+  found.blk.exercises[exIdx] = updated;
+
+  const { error } = await sb.from('programs')
+    .update({ data: S.programs[athleteId] })
+    .eq('athlete_id', athleteId);
+
+  if (error) {
+    await loadPrograms();               // don't leave a failed edit sitting in memory
+    render();
+    alert('Could not save: ' + error.message);
+    return;
+  }
+  toast('Saved — they see it next time they open the app');
+  render();
+}
+
+// The last 20 saves for one athlete, newest first. Loaded on demand — the
+// history is only interesting when something has gone wrong.
+async function loadProgramVersions(athleteId) {
+  const box = $('pvlist');
+  if (!box) return;
+  const r = await sb.from('program_versions')
+    .select('id, saved_at, saved_by')
+    .eq('athlete_id', athleteId)
+    .order('id', { ascending: false })
+    .limit(20);
+  if (r.error) { box.innerHTML = `<p class="empty">Could not load history: ${esc(r.error.message)}</p>`; return; }
+  const rows = r.data || [];
+  box.innerHTML = rows.length
+    ? rows.map(v => `<div class="pvrow">
+        <span class="pvwhen">${esc(prettyDate(String(v.saved_at).slice(0, 10)))}
+          <span class="pvtime">${esc(String(v.saved_at).slice(11, 16))}</span></span>
+        <span class="pvwho">${esc(v.saved_by || '—')}</span>
+        <button class="btn sm" onclick="restoreProgramVersion('${esc(athleteId)}', ${Number(v.id)})">Restore this</button>
+      </div>`).join('')
+    : '<p class="empty">No earlier versions yet — history starts at the first edit.</p>';
+}
+
+// Roll one athlete's programme back to a stored version. The trigger snapshots
+// on every change, so restoring is itself an edit and is itself undoable.
+async function restoreProgramVersion(athleteId, versionId) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const v = await sb.from('program_versions').select('data, saved_at').eq('id', versionId).maybeSingle();
+  if (v.error || !v.data) { alert('Could not read that version.'); return; }
+  if (!confirm('Restore the version saved ' + prettyDate(String(v.data.saved_at).slice(0, 10)) +
+               '?\n\nThe current one is kept, so this is reversible.')) return;
+  const { error } = await sb.from('programs').update({ data: v.data.data }).eq('athlete_id', athleteId);
+  if (error) { alert('Could not restore: ' + error.message); return; }
+  await loadPrograms();
+  render();
+  toast('Restored');
 }
 function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const chosen = _workSel[dayNum];
@@ -2074,7 +2294,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       + groups.map(g => `
       <div class="cmp-grp">
         <div class="cmp-grp-t">${g.icon ? esc(g.icon) + ' ' : ''}${esc(g.title)}</div>
-        ${g.rows.map(r => cmpRowHtml(r, lib)).join('')}
+        ${g.rows.map(r => cmpRowHtml(r, lib, athleteId)).join('')}
       </div>`).join('')
     : `<p class="empty">No prescribed exercises on this day${s ? ' and nothing readable in the log' : ''}.</p>`;
 
@@ -2398,12 +2618,23 @@ function fileTabHtml(D) {
     <section class="panel">
       <table class="meta-table">
         <tr><td class="k">Athlete id</td><td class="v">${esc(athleteId)}</td></tr>
-        <tr><td class="k">Data file</td><td class="v">${program ? `data/${esc(athleteId)}.json` : '<span style="color:var(--clay)">none found</span>'}</td></tr>
+        <tr><td class="k">Stored in</td><td class="v">${((src) =>
+          src === 'db'
+            ? '<b>the database</b> — editable here, and only this athlete can read it'
+            : src === 'file'
+              ? `<span style="color:var(--clay)">data/${esc(athleteId)}.json</span> — a public file, and not editable here yet`
+              : '<span style="color:var(--clay)">nothing found</span>'
+        )(S.progSrc[athleteId] || (program ? 'file' : 'none'))}</td></tr>
         <tr><td class="k">Tier</td><td class="v">${esc(a.tier)}</td></tr>
         <tr><td class="k">Days / week</td><td class="v">${programDays.length || '—'}</td></tr>
         <tr><td class="k">Cycle</td><td class="v">${cycles[ci] ? esc(cycles[ci].name || '') + (cycles[ci].weeks ? ' · ' + esc(cycles[ci].weeks) : '') : '—'}</td></tr>
         <tr><td class="k">Roadmap</td><td class="v">${cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'}</td></tr>
       </table>
+      ${S.progSrc[athleteId] === 'db' ? `
+      <details class="rawlog" ontoggle="if(this.open)loadProgramVersions('${esc(athleteId)}')">
+        <summary>Version history — undo an edit</summary>
+        <div id="pvlist" class="pvlist">Loading…</div>
+      </details>` : ''}
     </section>
     <div class="sec"><span>Danger zone</span></div>
     <section class="panel">

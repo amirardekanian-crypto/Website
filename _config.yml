@@ -13,3 +13,4 @@ exclude:
   - MAP.md
   - NOTION_SYNC.md
   - SCHEMA.md
+  - chips-selftest.html   # dev harness — embeds athlete ids, and reads data/*.json; run it locally
