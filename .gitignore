@@ -1,5 +1,8 @@
 # Secrets — NEVER push
 .notion_token
+# Supabase service_role key, used by backup_supabase.py. It bypasses every row-level
+# policy, so a leak is full read/write on every athlete's data.
+.supabase_key
 
 # Patcher intermediate output and audit files — produced locally, not part of the site
 data/jsons_patched/
@@ -22,3 +25,9 @@ data/*.json
 # public.coaching_logs now - read and written from coach.html. Keep working copies here
 # if you like; they must never be committed again.
 .claude/coaching-log/
+
+# Local database backups (backup_supabase.py). Dated copies of every athlete's
+# programme, training history and coaching log — the whole point is that they live
+# on Amir's PC and nowhere else. The script writes to ~/AA-Backups by default, well
+# outside this repo; this entry only catches the case where --out is pointed inside.
+AA-Backups/
