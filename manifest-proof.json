@@ -1,0 +1,27 @@
+{
+  "name": "AA Proof",
+  "short_name": "AA Proof",
+  "description": "Daily health habits, tracked and coached.",
+  "start_url": "/habits.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F4FF",
+  "theme_color": "#F6F4FF",
+  "lang": "en-GB",
+  "categories": ["fitness", "health", "sports"],
+  "icons": [
+    {
+      "src": "/assets/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
