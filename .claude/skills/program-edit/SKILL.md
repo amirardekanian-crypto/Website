@@ -3,6 +3,25 @@ name: program-edit
 description: Review and edit an athlete's program JSON — apply Amir's coaching principles before touching any sets/reps. Use when Amir asks to review, change, or fix a program, or after /program-design produces a draft.
 ---
 
+> ## ⚠️ Programmes live on the SERVER, not in files
+> `data/*.json` is deleted, gitignored and 404 on the live site. The authoritative
+> copy of every programme is a row in `public.programs` on Supabase.
+>
+> **To read one:** query it through the Supabase MCP —
+> `select data from programs where athlete_id = '<id>';`
+> A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
+> Amir edits anything in the dashboard. Never trust it over the table.
+>
+> **To write one:** small changes (sets, reps, RPE, tempo, rest, an exercise note)
+> are Amir's job in the dashboard's inline editor, which versions every save. For a
+> whole new cycle, write the JSON locally and have him publish it with
+> coach.html → Athletes → **↑ Publish programme file**, or apply it directly with
+> `update programs set data = '<json>'::jsonb where athlete_id = '<id>';`
+>
+> **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
+> It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.
+
+
 # Program Edit — AA Performance
 
 Review a program JSON against Amir's coaching principles, flag issues, then apply agreed changes.
@@ -10,7 +29,7 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 ## Step 0 — Read principles, then the file
 
 1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it.
-2. Read `data/<athlete_id>.json`. Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim `.claude/coaching-log/<athlete_id>.md` (if it exists) for this cycle's rationale, so edits respect *why* each piece was chosen.
+2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim the coaching log (`select body from coaching_logs where athlete_id = '<athlete_id>';`) for this cycle's rationale, so edits respect *why* each piece was chosen.
 
 ## Step 1 — Apply the structural checklist
 
@@ -136,7 +155,7 @@ Wait for Amir's go-ahead before touching the file.
 
 ## Step 3 — Apply edits
 
-Edit `data/<athlete_id>.json` using precise string matches. Work block by block — never rewrite the whole file.
+Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then either hand it to Amir to publish from coach.html, or apply it with an `update programs set data = ...` through the Supabase MCP.
 
 After editing, re-tally the set counts to confirm the numbers match what was agreed.
 

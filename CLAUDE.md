@@ -26,7 +26,37 @@ Durable context for working in this repo. Read the linked docs before diving in.
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
-- `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). `.claude/coaching-log/` is the coach-only per-athlete rationale log.
+- `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
+  written from coach.html (it used to be `.claude/coaching-log/*.md`, in this public repo).
+
+## ⚠️ THE BIG ONE: programmes live on the SERVER now, not in files (2026-09-07)
+
+`data/*.json` is **deleted, gitignored and 404 on the live site.** Every programme is a
+row in `public.programs`, and `program.html`, `habits.html` and `coach.html` all read it
+through `get_program()`, which checks identity server-side. The 46 files that used to be
+served publicly are kept **only** as a local, gitignored copy in `data/` on Amir's PC,
+as a rainy-day fallback. Never commit one; the `.gitignore` entry explains why.
+
+**Athletes sign in with a username and password.** Every `?client=&key=` link is dead —
+`public.athlete_keys` is empty and the RPCs fail closed. Accounts are created from
+coach.html (Athletes → an athlete → Create login), keyed on an internal address
+`athlete.<id>@amirardekani.com` that never receives mail. `demo` is named explicitly as
+public inside `get_program()` so the marketing link still opens.
+
+**The coaching pipeline writes to the server.** It may still produce a local
+`data/<id>.json` as a working artifact, but that file is never published — it goes up via
+coach.html → Athletes → **↑ Publish programme file**. Day-to-day changes (sets, reps, RPE,
+tempo, rest, the coach's note) are made in the dashboard's inline editor, which writes
+straight to `programs` and keeps the previous version in `program_versions`.
+
+**Coaching logs are on the server too.** `.claude/coaching-log/*.md` were tracked in this
+PUBLIC repo — world-readable, despite each opening with "Never published". They now live
+in `public.coaching_logs`, coach-only, with no athlete arm at all.
+
+**⚠️ There are NO automatic backups.** The Supabase project is on the free plan. 378
+session logs and every progress blob exist in exactly one place. coach.html → Athletes →
+**⤓ Backup** downloads the whole database as one JSON file; do it weekly and keep a copy
+off the machine.
 
 ## Working on the habit app (`habits.html`) — keep four things in sync
 Whenever you change how Proof behaves, update **all** of these in the same PR, or the
@@ -245,7 +275,7 @@ Roll call for the Leaderboard. **Invent no new component here**: every earlier a
 when switched off**; `weightPanel()` in `coach.html` → Proof shows Amir the trend. The
 chart is the app's **first and only chart** — line is a 7-day rolling average, dots are the
 raw readings, every quoted change compares average to average, because daily weight swings
-a kilo on water alone. Never put it on the board, the wall, or `data/<id>.json`.
+a kilo on water alone. Never put it on the board, the wall, or the programme record.
 `privacy.html` §2.3 names it and, since it went on-by-default, rests on **legitimate
 interests (GDPR Art. 6(1)(f))** rather than explicit consent — a default-on feature cannot
 honestly claim consent as its basis, and the one-tap toggle to object is what makes
@@ -417,15 +447,14 @@ in `habits.html`, `streakQualifyPct` on the `xp_rules` row, and any quest `note`
 the number out (`w_qualify5` said "5 days at 75% or better" in *both* pools — it now says
 "5 days on target" so the text can never name a stale bar again).
 
-**Free tier.** `"tier": "free"` in `data/<id>.json` is the *only* switch — `isFree()` is
-the only test, and anything not `"free"` is coached, so no existing file needs editing.
-Free mode keeps WORKOUT locked (with a line saying coached athletes earn it) and points
-every `program.html` route at `/form.html`. **Scoring is identical and the board is
-shared** — that is deliberate, and it is what makes upgrading free: flip the field, the
-pipeline writes the programme into the same file, and the athlete's whole history, level
-and board place carry over on the same id, key and link.
-⚠️ **`data/<id>.json` is a public static file** — anyone who guesses an id can fetch it.
-**Never put an email address or phone number there.** Contact details live in
+**Free tier.** `"tier": "free"` inside the `athlete` object is the *only* switch —
+`isFree()` is the only test, and anything not `"free"` is coached. Free mode keeps
+WORKOUT locked (with a line saying coached athletes earn it) and points every
+`program.html` route at `/form.html`. **Scoring is identical and the board is shared** —
+that is deliberate, and it is what makes upgrading free: flip the field, the pipeline
+writes the programme into the same row, and the athlete's whole history, level and board
+place carry over on the same id and login.
+⚠️ **Contact details still never belong in a programme record.** Contact details live in
 `public.hab_contacts` (stage16), coach-only behind RLS: `add_contact()` signs someone up
 in one call, `contact_list()` shows who signed up **and how many days they have logged**
 (the qualifying signal), `forget_contact()` erases them. Full walkthrough:
@@ -434,8 +463,8 @@ in one call, `contact_list()` shows who signed up **and how many days they have 
 from Crew. `privacy.html` promises that; `CFG.onBoard` is a client flag never read back
 from the server, so an auto-joined athlete would appear on everyone else's board while
 their own app said *"Not on the board"*; and every signup would sit on the board at 0 XP.
-The name they typed on the form goes in `data/<id>.json` as `"boardName"`, which only
-pre-fills the join box.
+The name they typed on the form goes in the programme record as `athlete.boardName`,
+which only pre-fills the join box.
 
 **Quests are a lever Amir pulls, not a standing feature.** There are **none** unless he
 starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Pull the lever

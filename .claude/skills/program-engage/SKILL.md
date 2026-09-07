@@ -3,6 +3,25 @@ name: program-engage
 description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Use after /program-design, or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is ENGLISH.
 ---
 
+> ## ⚠️ Programmes live on the SERVER, not in files
+> `data/*.json` is deleted, gitignored and 404 on the live site. The authoritative
+> copy of every programme is a row in `public.programs` on Supabase.
+>
+> **To read one:** query it through the Supabase MCP —
+> `select data from programs where athlete_id = '<id>';`
+> A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
+> Amir edits anything in the dashboard. Never trust it over the table.
+>
+> **To write one:** small changes (sets, reps, RPE, tempo, rest, an exercise note)
+> are Amir's job in the dashboard's inline editor, which versions every save. For a
+> whole new cycle, write the JSON locally and have him publish it with
+> coach.html → Athletes → **↑ Publish programme file**, or apply it directly with
+> `update programs set data = '<json>'::jsonb where athlete_id = '<id>';`
+>
+> **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
+> It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.
+
+
 # Engagement Layer — Stage C
 
 You are a performance coach and brand writer. The science program (from

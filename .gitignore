@@ -15,3 +15,10 @@ data/patch_jsons_1.py.txt
 # every programme, and the athlete keys 30 of them carry, back on the public web.
 data/*.json
 !data/.gitkeep
+
+# Coaching logs are coach-only rationale written ABOUT an athlete, and this repo is
+# PUBLIC. They were tracked here for months, world-readable, despite each file opening
+# with "Never published" (that meant "not shown in the athlete's app"). They live in
+# public.coaching_logs now - read and written from coach.html. Keep working copies here
+# if you like; they must never be committed again.
+.claude/coaching-log/

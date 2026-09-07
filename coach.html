@@ -801,6 +801,8 @@ const S = {
                    // loadPrograms(), so this has to start as an object, not undefined.
   logins: {},      // athlete_id -> athlete_identities row, for athletes with a
                    // username/password. Same reason as above: must not be undefined.
+  clogs: {},       // athlete_id -> coaching_logs row (metadata only; the body is
+                   // fetched on demand, it is long prose).
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
@@ -838,6 +840,7 @@ async function loadAll() {
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
   S.intake = (intake && intake.data) || [];   // RPC may be missing pre-stage27; degrade quietly
   await loadLogins();
+  await loadCoachingLogs();
   await loadPrograms();
   assemble();
   S.ready = true;
@@ -988,6 +991,126 @@ async function athleteLoginAction(athleteId, action) {
     'The full WhatsApp message is copied to your clipboard. It also stays under ' +
     '"Logins to send" on the Athletes tab until you mark it sent.'
   );
+}
+
+/* ═══ BACKUP ════════════════════════════════════════════════════════════════
+   The Supabase project is on the free plan, which takes NO automatic backups.
+   378 session logs and every athlete's progress blob exist in exactly one place;
+   programmes at least also sit in git history and a local folder, but the training
+   record does not. If the project were deleted tomorrow, this file is the only
+   thing that would bring it back.
+
+   Runs entirely in Amir's signed-in session — RLS decides what it can read, so
+   there is no service key anywhere. Download it weekly and keep it off this PC too.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const BACKUP_TABLES = [
+  'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
+  'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
+  'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
+  'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
+];
+
+async function downloadBackup(btn) {
+  if (DEMO) { toast('Demo mode — nothing to back up'); return; }
+  const label = btn && btn.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Backing up…'; }
+
+  const out = {
+    exported_at: new Date().toISOString(),
+    project: SB_URL,
+    note: 'Full export of the AA coaching database, taken from the coach dashboard. ' +
+          'Restore by importing each array back into its table of the same name.',
+    tables: {},
+  };
+  const problems = [];
+
+  for (const t of BACKUP_TABLES) {
+    // Paged: a plain select caps at 1000 rows, and session_history will pass that.
+    // Silently truncating a backup is the worst possible failure for this feature.
+    let from = 0, rows = [];
+    for (;;) {
+      const { data, error } = await sb.from(t).select('*').range(from, from + 999);
+      if (error) { problems.push(t + ': ' + error.message); rows = null; break; }
+      rows = rows.concat(data || []);
+      if (!data || data.length < 1000) break;
+      from += 1000;
+    }
+    if (rows) out.tables[t] = rows;
+  }
+
+  const counts = Object.entries(out.tables).map(([t, r]) => `${t}: ${r.length}`);
+  out.row_counts = Object.fromEntries(Object.entries(out.tables).map(([t, r]) => [t, r.length]));
+  if (problems.length) out.could_not_read = problems;
+
+  const stamp = new Date().toISOString().slice(0, 10);
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `aa-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+
+  if (btn) { btn.disabled = false; btn.textContent = label; }
+  const total = Object.values(out.tables).reduce((s, r) => s + r.length, 0);
+  alert(`Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.\n\n` +
+        counts.join('\n') +
+        (problems.length ? '\n\nCould NOT read:\n' + problems.join('\n') : '') +
+        '\n\nKeep a copy somewhere that is not this computer.');
+}
+
+// Upload the coaching-log markdown files. Multi-select the whole folder at once;
+// the athlete id is taken from each filename, the way the pipeline names them.
+function pickCoachingLogs() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.md,text/markdown';
+  input.multiple = true;
+  input.onchange = async () => {
+    const files = [...(input.files || [])].filter(f => /\.md$/i.test(f.name) && !/^README/i.test(f.name));
+    if (!files.length) { alert('No .md files selected.'); return; }
+    if (!confirm(`Upload ${files.length} coaching log(s)?\n\nThey become coach-only ` +
+                 `records on the server. Anything already there for the same athlete is replaced.`)) return;
+
+    const rows = [], skipped = [];
+    for (const f of files) {
+      const id = f.name.replace(/\.md$/i, '');
+      if (!/^[A-Za-z0-9_]+$/.test(id)) { skipped.push(f.name); continue; }
+      rows.push({ athlete_id: id, body: await f.text() });
+    }
+    const failed = [];
+    for (let i = 0; i < rows.length; i += 10) {
+      const slice = rows.slice(i, i + 10);
+      const { error } = await sb.from('coaching_logs').upsert(slice, { onConflict: 'athlete_id' });
+      if (error) slice.forEach(r => failed.push(r.athlete_id + ': ' + error.message));
+    }
+    await loadCoachingLogs();
+    render();
+    alert(`Uploaded ${rows.length - failed.length} of ${rows.length}.` +
+          (skipped.length ? `\n\nSkipped (filename is not an athlete id):\n` + skipped.join('\n') : '') +
+          (failed.length ? `\n\nFailed:\n` + failed.join('\n') : ''));
+  };
+  input.click();
+}
+
+async function loadCoachingLogs() {
+  S.clogs = {};
+  const r = await sb.from('coaching_logs').select('athlete_id, updated_at');
+  if (!r.error) (r.data || []).forEach(row => { S.clogs[row.athlete_id] = row; });
+}
+
+// Loaded on demand — a coaching log is long prose and there is no reason to pull
+// 28 of them on every dashboard boot.
+async function openCoachingLog(athleteId) {
+  const box = $('clog-body');
+  if (!box) return;
+  box.textContent = 'Loading…';
+  const { data, error } = await sb.from('coaching_logs')
+    .select('body, updated_at').eq('athlete_id', athleteId).maybeSingle();
+  if (error) { box.textContent = 'Could not load: ' + error.message; return; }
+  box.textContent = data ? data.body : 'No coaching log for this athlete yet.';
 }
 
 // Publish a programme JSON straight from disk into the database.
@@ -1842,6 +1965,8 @@ function renderAthletes() {
         <option value="name">Sort: name</option>
       </select>
       <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
+      <button class="btn sm" onclick="pickCoachingLogs()" title="Upload .claude/coaching-log/*.md — coach-only, never shown to athletes">↑ Coaching logs</button>
+      <button class="btn sm" onclick="downloadBackup(this)" title="Download the whole database as one file. The free plan takes no automatic backups.">⤓ Backup</button>
       ${(() => {
         // Only offer the move while something is still file-backed. Once every
         // programme is in the database this control has nothing left to do.
@@ -2780,6 +2905,11 @@ function fileTabHtml(D) {
         <summary>Version history — undo an edit</summary>
         <div id="pvlist" class="pvlist">Loading…</div>
       </details>` : ''}
+      <details class="rawlog" ontoggle="if(this.open)openCoachingLog('${esc(athleteId)}')">
+        <summary>Coaching log${(S.clogs || {})[athleteId] ? '' : ' — none yet'}
+          &nbsp;<span class="muted" style="font-weight:400">coach only, never shown to the athlete</span></summary>
+        <div class="elog-body" id="clog-body">Loading…</div>
+      </details>
     </section>
     <div class="sec"><span>Danger zone</span></div>
     <section class="panel">
