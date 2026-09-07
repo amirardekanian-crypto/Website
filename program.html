@@ -22,6 +22,17 @@
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <!-- iPhone home-screen icon label (iOS ignores <title> if this is set) -->
 <meta name="apple-mobile-web-app-title" content="AA Performance">
+<!-- ⚠️ WITHOUT apple-mobile-web-app-capable, "Add to Home Screen" on iOS makes a
+     plain Safari bookmark — it opens with the browser chrome and is not an app.
+     habits.html has carried these three for ever; this page never did, which is
+     why the programme could not be installed properly on an iPhone. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- The real manifest. A legacy ?client=&key= link replaces this below with a
+     generated one that keeps the key in start_url; everyone else installs from
+     here, which is what Chrome's install criteria actually need. -->
+<link rel="manifest" href="/manifest.json">
 <!-- Dynamic manifest: saves the CURRENT client's URL when "Add to Home Screen"
      is used, and shows "AA Performance" as the app name. Replaces /manifest.json
      on this page only; other pages still use the static one. -->
@@ -43,10 +54,18 @@
     // key-checked cloud write (save_session / save_progress / messages) is
     // rejected server-side and silently dropped — the coach never sees their
     // finished logs even though the (key-less) Web3Forms email still arrives.
-    var startUrl = client
-      ? 'program.html?client=' + encodeURIComponent(client) +
-        (clientKey ? '&key=' + encodeURIComponent(clientKey) : '')
-      : 'program.html';
+    // A blob: manifest is invisible to iOS Safari and unreliable for Chrome's
+    // install criteria, so it is now used ONLY where it earns its keep: a legacy
+    // athlete opening a ?client=&key= link, whose installed app must keep the key
+    // in its start_url. Everyone else gets the real /manifest.json, which is what
+    // makes the general link installable.
+    //
+    // A signed-in athlete needs no key at all — the session identifies them — so
+    // once everyone is on a login this whole block can go.
+    if (!client || !clientKey) return;
+
+    var startUrl = 'program.html?client=' + encodeURIComponent(client) +
+                   '&key=' + encodeURIComponent(clientKey);
     var manifest = {
       name: "AA Performance",
       short_name: "AA Performance",
@@ -65,6 +84,10 @@
       ]
     };
     var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    // REPLACE the static link rather than adding a second one — a browser uses the
+    // first <link rel="manifest"> it finds, so appending would silently do nothing.
+    var existing = document.querySelector('link[rel="manifest"]');
+    if (existing) existing.parentNode.removeChild(existing);
     var link = document.createElement('link');
     link.rel = 'manifest';
     link.href = URL.createObjectURL(blob);
@@ -3739,6 +3762,39 @@ function showSignIn() {
   const form = document.getElementById('signin-form');
   const errBox = document.getElementById('si-err');
   const btn = document.getElementById('si-go');
+
+  // Sign in once and the app just opens after that — the Supabase session is kept
+  // on the device and refreshed in the background, so this screen is not shown
+  // again. When it IS shown and the phone's password manager has already filled
+  // both fields, submit for them rather than making them tap a button they did
+  // not ask for. Guarded by a one-shot flag: if those saved details are wrong the
+  // error shows once and it never retries.
+  let autoDone = false;
+  const userEl = document.getElementById('si-user');
+  const passEl = document.getElementById('si-pass');
+
+  // Poll rather than use fixed timers: a password manager fills at a moment of its
+  // own choosing — iOS after a Face ID prompt, Chrome after the page settles — and
+  // any single timeout either fires too early to see it or too late to feel
+  // automatic. Give up after 6s so a genuinely empty form never sits here waiting.
+  const stopAuto = () => { autoDone = true; clearInterval(poll); };
+  const poll = setInterval(() => {
+    if (autoDone) return;
+    if (userEl.value.trim() && passEl.value) {
+      stopAuto();
+      btn.textContent = 'Signing you in…';
+      form.requestSubmit ? form.requestSubmit()
+                         : form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+  }, 250);
+  setTimeout(stopAuto, 6000);
+
+  // If they start typing, they mean to enter something different — never submit
+  // half-typed credentials or override a deliberate change of username.
+  ['keydown', 'paste'].forEach(ev => {
+    userEl.addEventListener(ev, stopAuto, { once: true });
+    passEl.addEventListener(ev, stopAuto, { once: true });
+  });
 
   form.onsubmit = async (e) => {
     e.preventDefault();

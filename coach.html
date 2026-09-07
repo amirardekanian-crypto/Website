@@ -453,6 +453,23 @@
   .pvwhen { min-width: 150px; font-weight: 600; }
   .pvtime { color: var(--muted-soft); font-weight: 400; margin-left: 5px; }
   .pvwho { flex: 1; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ── Logins waiting to be sent ───────────────────────────────────────── */
+  .creds { margin-bottom: 14px; border-left: 3px solid var(--clay); }
+  .creds-top { display: flex; width: 100%; align-items: center; justify-content: space-between;
+    background: none; border: 0; padding: 2px 0; cursor: pointer; font: inherit; color: inherit; }
+  .creds-t { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; display: flex; align-items: center; gap: 9px; }
+  .creds-n { background: var(--clay); color: #fff; border-radius: 999px; font-size: 11px;
+    font-family: 'Barlow', sans-serif; letter-spacing: 0; padding: 1px 8px; font-weight: 700; }
+  .creds-chev { color: var(--muted); }
+  .credrow { display: flex; align-items: center; gap: 12px; padding: 8px 0;
+    border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+  .credrow:last-child { border-bottom: 0; }
+  .credname { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; min-width: 150px; }
+  .credpass { font-family: 'Space Mono', monospace; font-size: 12.5px; background: var(--court-100);
+    padding: 3px 9px; border-radius: 6px; flex: 1; min-width: 190px; }
+  .credrow .acts { display: flex; gap: 7px; }
   .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
   .cmp-did > span { display: inline-block; margin-right: 8px; }
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay); }
@@ -879,8 +896,103 @@ async function loadPrograms() {
 // there is no way to list auth users from the browser, and no need to.
 async function loadLogins() {
   S.logins = {};
-  const r = await sb.from('athlete_identities').select('athlete_id, email, linked_at');
+  const r = await sb.from('athlete_identities')
+    .select('athlete_id, email, linked_at, initial_password, password_set_at, sent_at');
   if (!r.error) (r.data || []).forEach(row => { S.logins[row.athlete_id] = row; });
+}
+
+// The message that actually goes to the athlete. One place, so the wording is the
+// same whether it came from a single create or the bulk run.
+function loginMessage(username, password) {
+  return `Your training app\n\n` +
+         `Open: ${SITE}/program.html\n` +
+         `Username: ${username}\n` +
+         `Password: ${password}\n\n` +
+         `Save it when your phone offers to — then it opens straight into your ` +
+         `programme next time, no typing.\n\n` +
+         `To keep it on your home screen: open the link, then Share → Add to Home Screen.`;
+}
+
+// Make logins for everyone who has a programme but no account yet.
+async function createLoginsForAll() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const ids = Object.keys(S.programs)
+    .filter(id => S.programs[id] && id !== 'demo' && !S.logins[id])
+    .sort();
+  if (!ids.length) { alert('Everyone already has a login.'); return; }
+  if (!confirm(`Create logins for ${ids.length} athlete(s)?\n\n` +
+               'Each gets a username and a password. Nothing is sent — the passwords ' +
+               'are listed for you to copy and send on WhatsApp in your own time.\n\n' +
+               'Anyone who already has a login is skipped.')) return;
+
+  toast('Creating ' + ids.length + ' logins…');
+  const { data, error } = await sb.functions.invoke('athlete-login', {
+    body: { action: 'create_many', athlete_ids: ids },
+  });
+  if (error || (data && data.error)) {
+    alert('Could not create the logins:\n\n' + ((data && data.error) || error.message));
+    return;
+  }
+  await loadLogins();
+  _credsOpen = true;
+  render();
+  const failed = (data.failed || []);
+  alert(`Created ${data.created} login(s).` +
+        (failed.length ? `\n\nFailed:\n` + failed.map(f => f.athlete_id + ': ' + f.error).join('\n') : '') +
+        `\n\nThey are listed under "Logins to send" — copy each one and send it.`);
+}
+
+// Clears the stored password once it has gone out. The account is unaffected;
+// this only drops the copy kept for distribution.
+async function markLoginSent(athleteId) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const { error } = await sb.from('athlete_identities')
+    .update({ initial_password: null, sent_at: new Date().toISOString() })
+    .eq('athlete_id', athleteId);
+  if (error) { alert('Could not update: ' + error.message); return; }
+  await loadLogins();
+  render();
+}
+
+function copyLoginFor(athleteId) {
+  const row = S.logins[athleteId];
+  if (!row || !row.initial_password) { toast('No password stored — reset it to get a new one'); return; }
+  copyText(loginMessage(athleteId, row.initial_password));
+  toast('Message copied — paste it into WhatsApp');
+}
+
+let _credsOpen = false;
+function toggleCreds() { _credsOpen = !_credsOpen; render(); }
+
+// The list of credentials still waiting to go out. Deliberately prominent while
+// it is non-empty: a created login that never reaches the athlete is worse than
+// no login, because their old secret link may already have been retired.
+function pendingCredsHtml() {
+  const pending = Object.values(S.logins || {})
+    .filter(r => r.initial_password)
+    .sort((a, b) => a.athlete_id.localeCompare(b.athlete_id));
+  if (!pending.length) return '';
+  return `<section class="panel creds">
+    <button class="creds-top" onclick="toggleCreds()">
+      <span class="creds-t">Logins to send<span class="creds-n">${pending.length}</span></span>
+      <span class="creds-chev">${_credsOpen ? '▴' : '▾'}</span>
+    </button>
+    ${_credsOpen ? `
+      <p class="empty" style="padding:6px 0 12px">
+        Copy each one and send it on WhatsApp, then mark it sent. Passwords are stored
+        here only until you do — after that the only way to see one again is a reset.
+      </p>
+      ${pending.map(r => `
+        <div class="credrow">
+          <span class="credname">${esc(r.athlete_id)}</span>
+          <code class="credpass">${esc(r.initial_password)}</code>
+          <span class="acts">
+            <button class="btn sm primary" onclick="copyLoginFor('${esc(r.athlete_id)}')">Copy message</button>
+            <button class="btn sm" onclick="markLoginSent('${esc(r.athlete_id)}')">Mark sent</button>
+          </span>
+        </div>`).join('')}
+    ` : ''}
+  </section>`;
 }
 
 // Create / reset / revoke an athlete's login. All three go through the
@@ -900,20 +1012,12 @@ async function athleteLoginAction(athleteId, action) {
 
   if (action === 'revoke') { toast('Login removed'); return; }
 
-  // The password is shown once, here. It is not stored anywhere we can read back,
-  // so if this box is closed before sending it, the only way forward is a reset.
-  const msg =
-    `Your training app\n\n` +
-    `Open: ${SITE}/program.html\n` +
-    `Username: ${data.username}\n` +
-    `Password: ${data.password}\n\n` +
-    `Save it when your phone offers to — then you won't have to type it again.`;
-  copyText(msg);
+  copyText(loginMessage(data.username, data.password));
   alert(
     (data.created ? 'Login created' : 'Password reset') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
-    'The full WhatsApp message is copied to your clipboard.\n\n' +
-    'This password is shown once and cannot be looked up again — send it now, or reset it later.'
+    'The full WhatsApp message is copied to your clipboard. It also stays under ' +
+    '"Logins to send" on the Athletes tab until you mark it sent.'
   );
 }
 
@@ -1768,6 +1872,13 @@ function renderAthletes() {
       <button class="btn primary sm" onclick="newAthleteLink()">+ New secure link</button>
       <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
       ${(() => {
+        const need = Object.keys(S.programs || {})
+          .filter(id => S.programs[id] && id !== 'demo' && !(S.logins || {})[id]);
+        return need.length
+          ? `<button class="btn sm" onclick="createLoginsForAll()" title="Give every athlete a username and password">+ Create ${need.length} login${need.length === 1 ? '' : 's'}</button>`
+          : '';
+      })()}
+      ${(() => {
         // Only offer the move while something is still file-backed. Once every
         // programme is in the database this control has nothing left to do.
         const pending = Object.keys(S.programs || {}).filter(id => S.programs[id] && S.progSrc[id] === 'file');
@@ -1776,6 +1887,7 @@ function renderAthletes() {
           : '';
       })()}
     </div>
+    ${pendingCredsHtml()}
     <div class="controls rfilters">${R_FILTERS.map(f =>
       `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
     <div class="roster" id="rosterBox"></div>
