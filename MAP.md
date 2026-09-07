@@ -47,6 +47,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Terms | [`terms.html`](terms.html) | [`terms-fa.html`](terms-fa.html) | Legal / training disclaimers |
 | Privacy | [`privacy.html`](privacy.html) | — | GDPR privacy notice |
 | Proof signup | [`proof.html`](proof.html) | — | Public landing page for the **free habit tracker** — what it is, then name + email + WhatsApp → emails Amir (Web3Forms). **Not linked from nav** on purpose: it's the Instagram bio link. Sign people up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill |
+| Coach affiliate | — | [`partner-fa.html`](partner-fa.html) | Referral partnership pitch for other coaches — the 10%/10% deal, plain-language terms, and an application form → emails Amir (Web3Forms). Codes issued here are added by hand to **both** apply forms; roster in [`AFFILIATES.md`](AFFILIATES.md) |
 | EN redirect | [`index-en.html`](index-en.html) | — | Permanent redirect to `/` |
 
 **Plumbing:** [`CNAME`](CNAME) (domain) · [`sitemap.xml`](sitemap.xml) ·
@@ -215,6 +216,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) | Customer-facing process explainer |
 | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) | `coach.html` manual |
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
+| [`AFFILIATES.md`](AFFILIATES.md) | **Affiliate coaches** — who holds which referral discount code, and how to add or retire one |
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
 | [`NOTION_SYNC.md`](NOTION_SYNC.md) · [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Sync / import how-tos |
 | [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |
