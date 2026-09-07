@@ -3070,6 +3070,15 @@ function _sb() {
   _sbClient = window.supabase.createClient(SB_URL, SB_KEY);
   return _sbClient;
 }
+// The Supabase library is loaded `defer`, so at boot it may not exist yet. Wait
+// up to ~3s for it, then hand back the client (or null if it never arrived —
+// callers must all degrade rather than throw).
+async function _sbReady() {
+  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return _sb();
+}
 function _snapshot() {
   const out = {}, prefix = _sbId + '_';
   for (let i = 0; i < localStorage.length; i++) {
@@ -3143,12 +3152,8 @@ function _pushSnapshot(immediate) {
 // storm) and BEFORE the UI renders, so the merged data shows immediately.
 async function syncFromCloud(athleteId, key) {
   if (window.IS_DEMO || !athleteId) return;
-  // The Supabase library is loaded `defer`, so it may not be ready yet at boot.
-  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
-    await new Promise(r => setTimeout(r, 100));
-  }
   try {
-    const sb = _sb();
+    const sb = await _sbReady();
     if (!sb) return;
     const { data, error } = await sb.rpc('get_progress', { p_athlete_id: athleteId, p_key: key || null });
     if (error || !data || typeof data !== 'object') return;   // offline / rejected → keep local
@@ -3491,14 +3496,42 @@ function getVideoUrl(ex) {
     if (db) db.hidden = false;
   }
 
+  // ── Where the programme comes from ────────────────────────────────────────
+  // The database first: get_program() checks the key server-side, so a programme
+  // is no longer a world-readable file. data/<id>.json stays as a fallback until
+  // every athlete has opened the app once — 30 of 48 files carry the athlete's
+  // key inside them, and that copy is what a key-less PWA relies on, so deleting
+  // the files before those keys are cached locally would lock people out.
+  //
+  // The key has to be resolved BEFORE the fetch now, not after: the call that
+  // returns the programme is the same call that needs authenticating. URL first,
+  // then this device's stored copy. The in-JSON copy still works for everything
+  // downstream — it just can't authenticate the fetch that would reveal it.
+  let preKey = clientKey;
+  if (!preKey && !window.IS_DEMO) {
+    try { preKey = localStorage.getItem(clientId + '_skey'); } catch (e) { /* storage blocked */ }
+  }
+
+  DATA = null;
   try {
-    // no-cache: always revalidate so an updated program (e.g. a newly embedded
-    // athlete key) reaches the athlete immediately instead of a stale cached copy.
-    const res = await fetch(`data/${clientId}.json`, { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    DATA = await res.json();
-  } catch (e) {
-    showError(`Could not load data for "${clientId}".\n\nMake sure data/${clientId}.json exists.`);
+    const sb = await _sbReady();
+    if (sb) {
+      const { data, error } = await sb.rpc('get_program', { p_athlete_id: clientId, p_key: preKey || null });
+      if (!error && data && typeof data === 'object') DATA = data;
+    }
+  } catch (e) { /* offline or rejected — the file fallback below covers it */ }
+
+  if (!DATA) {
+    try {
+      // no-cache: always revalidate so an updated program (e.g. a newly embedded
+      // athlete key) reaches the athlete immediately instead of a stale cached copy.
+      const res = await fetch(`data/${clientId}.json`, { cache: 'no-cache' });
+      if (res.ok) DATA = await res.json();
+    } catch (e) { /* fall through to the error below */ }
+  }
+
+  if (!DATA) {
+    showError(`Could not load your program.\n\nIf you opened this from an old link, ask Amir for a fresh one.`);
     return;
   }
 
