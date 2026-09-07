@@ -84,15 +84,14 @@ falls back to first name + last initial.
 
 ### 4. Ship it
 
-```
-git checkout -B claude/<branch> origin/main
-git add data/<athlete_id>.json
-git commit -m "Proof: add <name> to the habit tracker"
-git push -u origin claude/<branch>
-```
+⚠️ **Do not commit `data/<athlete_id>.json`.** It is gitignored and no longer served —
+athlete records live in the Supabase `programs` table now.
 
-Then PR → merge → confirm the Pages deploy. The link is dead until the file is
-live on `main`, so **do not send it before the deploy is green.**
+Write the file locally, then have Amir publish it:
+**coach.html → Athletes → ↑ Publish programme file**, and pick the file.
+
+It lands immediately — there is no Pages deploy to wait for any more, so the link works
+as soon as the upload confirms.
 
 ### 5. Hand Amir the message
 

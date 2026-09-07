@@ -3122,6 +3122,12 @@ function _sb() {
   _sbClient = window.supabase.createClient(SB_URL, SB_KEY);
   return _sbClient;
 }
+// Cap any promise so a stalled network cannot hold the first paint. The classic
+// failure is hotel wifi that completes the TCP handshake and then goes silent: the
+// fetch neither resolves nor rejects, and the loading screen becomes the whole app.
+function _withTimeout(p, ms) {
+  return Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
+}
 // The Supabase library is loaded `defer`, so at boot it may not exist yet. Wait
 // up to ~3s for it, then hand back the client (or null if it never arrived —
 // callers must all degrade rather than throw).
@@ -3578,8 +3584,11 @@ function getVideoUrl(ex) {
   try {
     const sb = await _sbReady();
     if (sb) {
-      const { data, error } = await sb.rpc('get_program', { p_athlete_id: clientId, p_key: preKey || null });
-      if (!error && data && typeof data === 'object') DATA = data;
+      // Timed, for the same reason habits.html times its copy: a stalled fetch
+      // before the first paint turns the loading screen into the whole app.
+      const res = await _withTimeout(
+        sb.rpc('get_program', { p_athlete_id: clientId, p_key: preKey || null }), 6000);
+      if (res && !res.error && res.data && typeof res.data === 'object') DATA = res.data;
     }
   } catch (e) { /* offline or rejected — the file fallback below covers it */ }
 

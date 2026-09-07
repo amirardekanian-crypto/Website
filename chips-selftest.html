@@ -201,6 +201,23 @@ function eachExercise(prog, fn) {
     });
   });
 
+  if (!loaded.length) {
+    const note = `<div class="card"><span class="pill warn">SKIPPED</span> &nbsp;
+      No <code>data/*.json</code> files found. Programmes now live in the database, and
+      these files are gitignored — the corpus check only runs on a machine where the
+      coaching pipeline has written some locally. The unit cases above still cover the
+      parser and formatter.</div>`;
+    document.getElementById('roundtrip').innerHTML = note;
+    document.getElementById('audit').innerHTML = note;
+    document.getElementById('summary').innerHTML =
+      `<div class="row">
+         <div><div class="big ${unitFails ? 'bad' : ''}">${unitFails ? 'FAIL' : 'PASS'}</div>
+              <div class="muted">${unitFails} unit failure(s) &middot; corpus skipped</div></div>
+       </div>`;
+    window.__RESULT = { unitFails, rtFails: [], findings: [], exCount: 0, programmes: 0 };
+    return;
+  }
+
   document.getElementById('roundtrip').innerHTML = rtFails.length === 0
     ? `<div class="card"><span class="pill ok">PASS</span> &nbsp;All <b>${exCount}</b> exercises across <b>${loaded.length}</b> programmes round-trip unchanged.</div>`
     : `<div class="card"><span class="pill bad">FAIL</span> ${rtFails.length} exercise(s) changed.</div>` +

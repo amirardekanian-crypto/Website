@@ -116,15 +116,38 @@ try {{
 </script>"""
 
 
+def _can_dump(browser) -> bool:
+    """Does this browser actually produce a DOM, or just exit quietly?
+
+    On at least one dev machine Edge is installed and launches but writes a
+    ZERO-BYTE dump. Picking it produced "browser launch itself failed" for every
+    script block of a perfectly healthy file — a permanently red check that
+    protects nothing. One about:blank probe separates a usable browser from an
+    installed one.
+    """
+    try:
+        r = subprocess.run(
+            [browser, "--headless=new", "--disable-gpu", "--no-sandbox",
+             "--dump-dom", "about:blank"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=30,
+        )
+        return bool(r.stdout.strip())
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 def find_browser():
-    for c in BROWSER_CANDIDATES:
-        if Path(c).is_file():
-            return c
+    candidates = [c for c in BROWSER_CANDIDATES if Path(c).is_file()]
     # PATH fallback, in case a future machine doesn't match the hardcoded list.
-    for name in ("msedge", "msedge.exe", "chrome", "chrome.exe", "google-chrome"):
+    # Chrome first: see _can_dump for why "installed" is not "usable".
+    for name in ("chrome", "chrome.exe", "google-chrome", "msedge", "msedge.exe"):
         p = shutil.which(name)
-        if p:
-            return p
+        if p and p not in candidates:
+            candidates.append(p)
+    for c in candidates:
+        if _can_dump(c):
+            return c
     return None
 
 

@@ -51,21 +51,65 @@ BROWSER_CANDIDATES += sorted(
     reverse=True,
 )
 
-# Only appears in the DOM once renderApp() has actually run and replaced
-# #app's initial empty markup — the single strongest "the whole script
-# executed" signal available without instrumenting the app's own source.
-BOOT_MARKER = 'data-k="apphd"'
+# Either only appears once the app has rendered into #app, replacing its initial
+# empty markup — the strongest "the whole script executed" signal available without
+# instrumenting the app's own source.
+#
+# Both are needed. "apphd" is the running app's header, but a first-run athlete lands
+# on the onboarding screen and never renders it — and the ?client=demo this check
+# loads is ALWAYS first-run, with no local log. Checking only for "apphd" failed a
+# perfectly healthy file.
+BOOT_MARKERS = ('data-k="apphd"', 'data-k="onboarding"')
 
 
-def find_browser():
+def find_browsers():
+    """Every installed browser worth trying, not just the first one found.
+
+    On at least one dev machine Edge is present and launches but writes a
+    ZERO-BYTE DOM. Stopping at the first hit therefore reported "habits.html did
+    not boot" for a completely healthy file. An empty dump cannot distinguish a
+    broken app from a broken harness, so the caller falls through to the next
+    candidate rather than trusting it. Chrome is tried before Edge on PATH for
+    the same reason.
+    """
+    found, seen = [], set()
     for c in BROWSER_CANDIDATES:
-        if Path(c).is_file():
-            return c
-    for name in ("msedge", "msedge.exe", "chrome", "chrome.exe", "google-chrome"):
+        if Path(c).is_file() and c not in seen:
+            found.append(c)
+            seen.add(c)
+    for name in ("chrome", "chrome.exe", "google-chrome", "msedge", "msedge.exe"):
         p = shutil.which(name)
-        if p:
-            return p
-    return None
+        if p and p not in seen:
+            found.append(p)
+            seen.add(p)
+    return found
+
+
+def _dump(browser, url):
+    """Headless DOM dump, or None if that browser could not produce one."""
+    try:
+        return subprocess.run(
+            [
+                browser,
+                "--headless=new",
+                "--disable-gpu",
+                "--no-sandbox",
+                # Generous: demo mode still runs every network call in boot()
+                # (they are all wrapped in a timeout and degrade gracefully),
+                # and a loaded CI box is slower than the dev machine this was
+                # tuned on.
+                "--virtual-time-budget=8000",
+                "--dump-dom",
+                url,
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
 
 
 def free_port():
@@ -91,8 +135,8 @@ def main(argv):
         )
         return 2
 
-    browser = find_browser()
-    if not browser:
+    browsers = find_browsers()
+    if not browsers:
         print("check_habits_boots: no Edge or Chrome found - cannot check.", file=sys.stderr)
         return 2
 
@@ -107,38 +151,36 @@ def main(argv):
         # loaded machine rather than polling a socket for one HTTP call.
         time.sleep(0.4)
         url = f"http://127.0.0.1:{port}/habits.html?client=demo"
-        result = subprocess.run(
-            [
-                browser,
-                "--headless=new",
-                "--disable-gpu",
-                "--no-sandbox",
-                # Generous: demo mode still runs every network call in boot()
-                # (they are all wrapped in a timeout and degrade gracefully),
-                # and a loaded CI box is slower than the dev machine this was
-                # tuned on.
-                "--virtual-time-budget=8000",
-                "--dump-dom",
-                url,
-            ],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=30,
-        )
+        result = browser = None
+        for candidate in browsers:
+            attempt = _dump(candidate, url)
+            if attempt is not None and attempt.stdout.strip():
+                result, browser = attempt, candidate
+                break
     finally:
         server.terminate()
         server.wait(timeout=5)
 
-    if BOOT_MARKER in result.stdout:
-        print("check_habits_boots: OK - app rendered real content into #app")
+    if result is None:
+        print(
+            "check_habits_boots: tried "
+            + ", ".join(Path(b).name for b in browsers)
+            + " and every one returned an empty DOM - the harness cannot run here, "
+              "so this proves NOTHING about habits.html. Verify it in a real browser "
+              "before shipping.",
+            file=sys.stderr,
+        )
+        return 2
+
+    hit = next((m for m in BOOT_MARKERS if m in result.stdout), None)
+    if hit:
+        print(f"check_habits_boots: OK - app rendered real content into #app ({hit})")
         return 0
 
     print("\nHABITS.HTML DID NOT BOOT\n" + "=" * 60, file=sys.stderr)
     print(
         f"Loaded {url} in headless {Path(browser).name}, waited, and #app "
-        f"never received real content ({BOOT_MARKER} not found in the DOM). "
+        f"never received real content (none of {BOOT_MARKERS} in the DOM). "
         "The script most likely parses without throwing but never reaches "
         "its own boot call - check_js_syntax.py alone would have said this "
         "file is fine. Look for a stray backtick inside an HTML comment "

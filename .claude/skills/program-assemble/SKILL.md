@@ -211,10 +211,18 @@ Cross-check before writing it: anything the athlete must do *repeatedly* to keep
 missing there, fix the JSON before shipping, don't just mention it in the brief.
 
 ## Step 7 — Ship
+
+⚠️ **`data/<id>.json` is no longer published.** Programmes live in the Supabase
+`programs` table; the file is a local working artifact and is gitignored. Committing
+it does nothing, and it must never be pushed — that is what made every athlete's
+programme world-readable in the first place.
+
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm the coaching-log entry was appended.
-- Commit + push **only if Amir asks** — include **both** `data/<id>.json` and
-  `.claude/coaching-log/<id>.md` in the commit. End commit messages with the project's
-  Co-Authored-By line.
+- **Tell Amir to publish it:** coach.html → Athletes → **↑ Publish programme file**, then
+  pick `data/<id>.json`. It validates the athlete block, shows what will change, keeps the
+  previous version in history, and writes as his own logged-in session (no keys anywhere).
+- Commit + push **only if Amir asks**, and then only `.claude/coaching-log/<id>.md`.
+  End commit messages with the project's Co-Authored-By line.
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.

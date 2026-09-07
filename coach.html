@@ -917,6 +917,59 @@ async function athleteLoginAction(athleteId, action) {
   );
 }
 
+// Publish a programme JSON straight from disk into the database.
+//
+// The coaching pipeline (/program-assemble and friends) still writes a local
+// data/<id>.json — that stays exactly as it was. What changed is where the file
+// goes afterwards: it used to be committed and served publicly; now it is
+// uploaded here and the file never leaves the machine. This is the only route
+// for a NEW athlete or a whole-cycle rewrite; day-to-day changes go through the
+// inline editor.
+function pickProgramFile() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    let data;
+    try {
+      data = JSON.parse(await file.text());
+    } catch (e) {
+      alert('That file is not valid JSON:\n\n' + e.message);
+      return;
+    }
+    // Guard against publishing a half-written or wrong-shaped file. The athlete
+    // block is the one thing every consumer reads — program.html and habits.html
+    // both take the name and tier from it.
+    if (!data || typeof data !== 'object' || !data.athlete || typeof data.athlete !== 'object') {
+      alert('That file has no "athlete" block, so it is not a programme file.');
+      return;
+    }
+    const id = String(data.athlete.id || '').trim();
+    if (!/^[A-Za-z0-9_]+$/.test(id)) {
+      alert('The athlete.id in that file is missing or has characters that are not allowed.\n\nFound: "' + id + '"');
+      return;
+    }
+    const existing = S.programs[id];
+    const days = (data.workouts && data.workouts.days || []).length;
+    const what = existing
+      ? `Replace ${id}'s programme?\n\nThe current version is kept in history, so this is reversible.`
+      : `Publish a NEW programme for "${id}"?\n\nNothing exists for that id yet — check the spelling, because a typo creates a second athlete.`;
+    if (!confirm(`${what}\n\n${file.name} · ${days} training day${days === 1 ? '' : 's'}`)) return;
+
+    const { error } = await sb.from('programs')
+      .upsert({ athlete_id: id, data }, { onConflict: 'athlete_id' });
+    if (error) { alert('Could not publish: ' + error.message); return; }
+
+    await loadPrograms();
+    render();
+    toast(existing ? 'Programme replaced' : 'Programme published');
+  };
+  input.click();
+}
+
 // One-time move of the legacy JSON files into the programs table. Runs as the
 // coach's own session, so RLS applies — no service key anywhere. Safe to re-run:
 // it skips anyone already imported rather than overwriting edits with stale file
@@ -1713,6 +1766,7 @@ function renderAthletes() {
         <option value="name">Sort: name</option>
       </select>
       <button class="btn primary sm" onclick="newAthleteLink()">+ New secure link</button>
+      <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
       ${(() => {
         // Only offer the move while something is still file-backed. Once every
         // programme is in the database this control has nothing left to do.
