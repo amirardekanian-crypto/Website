@@ -185,6 +185,26 @@ publish it. No athlete health/chat detail goes here — principles only.
   inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
   without a real reason and evidence the athlete has earned it back (pain resolved, capacity
   built). The log is what stops a bad fit silently reappearing months later. *(2026-06-28)*
+- **The Assault Bike is NOT a neutral warm-up — it is banned as the general raise for any
+  flexion-sensitive back.** It seats the lumbar in flexion and cycles it under reciprocal arm
+  drive, so five minutes of it at the top of every session is repeated low-load lumbar flexion
+  on exactly the athlete who must not have it — roughly 75 minutes of it across a cycle, before
+  a single working set. Low-load repeated flexion is the classic disc-symptom provocateur; the
+  mechanism does not need a heavy load to matter. Use an **incline treadmill walk** (or an
+  upright bike set high enough that the hips stay above the knees and the torso stays tall)
+  instead. Same failure shape as the Cat-Cow precedent (2026-08-17), one scale up: the warm-up
+  is where a cycle's own contraindication is most likely to be broken, because nobody re-reads
+  the prep block against it. *(2026-09-07, zahra_rasoulian C1 — the draft opened all three
+  sessions with it on a lumbar-disc athlete, having already dropped Cat-Cow for that very reason)*
+- **A loaded carry's PICK-UP is a free hinge — spec the pick-up, not just the carry.** Any cycle
+  deferring the free loaded hinge must say where the weight is lifted from: a bench or a rack pin
+  at hip height, never the floor. A 3-set suitcase carry is six loaded single-arm pick-ups and six
+  set-downs per session, at a grip-limiting load, usually in the last block when she is tired — an
+  offset free hinge, unsupervised, and typically the only rep in the program with no instruction
+  attached to it. The exercise's own cues describe the walk; nobody writes a cue for getting the
+  thing off the floor. Extends "audit the restriction against every exercise, including warm-up
+  and fallbacks" (2026-08-17) to the parts of an exercise nobody thinks to write down.
+  *(2026-09-07, zahra_rasoulian C1)*
 
 ## Exercise naming
 *(This is the single source of truth for exercise names — `/program-design`,
