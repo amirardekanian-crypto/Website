@@ -49,6 +49,11 @@
     // site. Disables the coach email, shows a demo banner, and skips the
     // install nag. Detected purely from the ?client=demo URL.
     window.IS_DEMO = (client === 'demo');
+    // Coach preview: Amir opening an athlete's app from coach.html to see exactly
+    // what they see. Loads their REAL programme (get_program lets the coach read
+    // any athlete) but must never write — without this, clicking a set or a note
+    // while looking around would land in that athlete's own logged data.
+    window.IS_PREVIEW = params.get('preview') === '1';
     // IMPORTANT: keep the &key= in the installed-app start_url. Without it, an
     // athlete who "Add to Home Screen" opens the app with no key, so every
     // key-checked cloud write (save_session / save_progress / messages) is
@@ -3587,6 +3592,16 @@ function getVideoUrl(ex) {
     if (db) db.hidden = false;
   }
 
+  if (window.IS_PREVIEW) {
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#C7552F;' +
+      'color:#fff;font:600 12px/1.5 system-ui,sans-serif;text-align:center;padding:7px 12px;' +
+      'letter-spacing:.03em';
+    bar.textContent = 'COACH PREVIEW — ' + clientId + '’s app, exactly as they see it. Nothing you do here is saved.';
+    document.addEventListener('DOMContentLoaded', () => document.body.appendChild(bar));
+    if (document.body) document.body.appendChild(bar);
+  }
+
   // ── Where the programme comes from ────────────────────────────────────────
   // The database first: get_program() checks the key server-side, so a programme
   // is no longer a world-readable file. data/<id>.json stays as a fallback until
@@ -3661,13 +3676,13 @@ function getVideoUrl(ex) {
   // Stage 4: pull the athlete's saved progress from the cloud and merge it in on
   // EVERY load (not just a fresh device), BEFORE wiring up backup or rendering —
   // so any returning device shows the latest data instead of a stale local copy.
-  if (!window.IS_DEMO) await syncFromCloud(ATHLETE_ID, effectiveKey);
+  if (!window.IS_DEMO && !window.IS_PREVIEW) await syncFromCloud(ATHLETE_ID, effectiveKey);
 
   // Stage 1: start mirroring progress to the cloud (skips the public demo).
   // Stage 2: pass the per-athlete key so keyed athletes can write.
-  if (!window.IS_DEMO) setupCloudBackup(ATHLETE_ID, DATA, effectiveKey);
-  if (!window.IS_DEMO) _replayQueue();   // replay any sessions that failed to save last time
-  if (!window.IS_DEMO) fetchMessages();   // load coach messages → sets the Coach-tab dot
+  if (!window.IS_DEMO && !window.IS_PREVIEW) setupCloudBackup(ATHLETE_ID, DATA, effectiveKey);
+  if (!window.IS_DEMO && !window.IS_PREVIEW) _replayQueue();   // replay any sessions that failed to save last time
+  if (!window.IS_DEMO && !window.IS_PREVIEW) fetchMessages();   // load coach messages → sets the Coach-tab dot
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
 
@@ -5225,7 +5240,44 @@ async function loadLibCounts() {
   _libCountsLoaded = true;
 }
 
+// Full item bodies, keyed by the same string the manifest used to put in `file`.
+// openWorkout()/openArticle() read this first, so a tap opens instantly and needs
+// no second request.
+const _libItems = {};
+
+// The Library comes from the database now: one get_library() call replaces two
+// manifest fetches plus one fetch per item. The old workouts/index.json and
+// articles/index.json duplicated every item's card details and had to be kept in
+// step by hand — that is gone; the card is read off the item itself.
+//
+// The shape handed to the renderers is deliberately unchanged, so every screen
+// below still works exactly as it did.
 async function ensureLibManifests() {
+  if (_trainManifest && _readManifest) return;
+
+  try {
+    const sb = await _sbReady();
+    if (sb) {
+      const res = await _withTimeout(sb.rpc('get_library'), 6000);
+      if (res && !res.error && res.data) {
+        const shape = (cats, itemKey) => ({
+          categories: (cats || []).map(c => ({
+            id: c.id, title: c.title, banner: c.banner, icon: c.icon,
+            [itemKey]: (c.items || []).map(it => {
+              const key = it.slug || (it.id ? c.id + '/' + it.id : '');
+              if (key) _libItems[key] = it;
+              return Object.assign({}, it, { file: key });
+            }),
+          })),
+        });
+        if (!_trainManifest) _trainManifest = shape(res.data.workout, 'workouts');
+        if (!_readManifest)  _readManifest  = shape(res.data.article, 'articles');
+        if (_trainManifest && _readManifest) return;
+      }
+    }
+  } catch (e) { /* fall through to the files */ }
+
+  // Fallback while the JSON files still exist. Remove once they are deleted.
   if (!_trainManifest) {
     try { const r = await fetch('workouts/index.json', { cache: 'no-cache' }); if (r.ok) _trainManifest = await r.json(); } catch (e) {}
   }
@@ -5419,11 +5471,16 @@ async function openArticle(file) {
   body.innerHTML = '<div class="wl-empty">Loading…</div>';
   goTo('article');
 
-  let article;
+  // Same as openWorkout: the cache get_library() filled, fetch only as fallback.
+  // Served from the cache get_library() filled; the fetch is only the fallback for a
+  // library still coming from files.
+  let article = _libItems[file] || null;
   try {
-    const res = await fetch(file, { cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    article = await res.json();
+    if (!article) {
+      const res = await fetch(file, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      article = await res.json();
+    }
   } catch (e) {
     body.innerHTML = `<div class="wl-empty">Couldn't load this article. Try again.</div>`;
     return;
@@ -5560,11 +5617,15 @@ async function openWorkout(file) {
   body.innerHTML = '';
   goTo('workout');
 
-  let wk;
+  // Served from the cache get_library() filled, so opening a workout costs nothing.
+  // The fetch is only the fallback for a library still coming from files.
+  let wk = _libItems[file] || null;
   try {
-    const res = await fetch(file, { cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    wk = await res.json();
+    if (!wk) {
+      const res = await fetch(file, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      wk = await res.json();
+    }
   } catch (e) {
     document.getElementById('ws-title').textContent = 'Couldn’t load workout';
     body.innerHTML = `<div class="wl-empty">Please check your connection and try again.</div>`;
@@ -7108,7 +7169,9 @@ function esc(str) {
   // Also skipped while the sign-in screen is up: asking someone to install an app
   // they have not got into yet is noise, and it covers the password field on a
   // small phone.
-  if (!window.IS_DEMO) {
+  // Also skipped in a coach preview: Amir is looking at someone else's app, not
+  // installing it.
+  if (!window.IS_DEMO && !window.IS_PREVIEW) {
     window.addEventListener('load', () => {
       setTimeout(() => {
         const signin = document.getElementById('signin-screen');

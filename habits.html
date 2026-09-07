@@ -27,6 +27,10 @@
     var client = params.get('client');
     var clientKey = params.get('key');
     window.IS_DEMO = (client === 'demo');
+    // Coach preview: Amir looking at an athlete's Proof from coach.html. Loads their
+    // REAL data (the athlete RPCs accept the coach) but must never write — a stray tick
+    // while looking around would otherwise land in that athlete's own habit log.
+    window.IS_PREVIEW = params.get('preview') === '1';
 
     // A signed-in athlete needs no key — the session identifies them — so the
     // generated manifest is only for a legacy keyed link. Once everyone is on a
@@ -3947,7 +3951,7 @@ async function athleteFromSession() {
   } catch (e) { return ''; }
 }
 function markDirty() {
-  if (window.IS_DEMO) return;
+  if (window.IS_DEMO || window.IS_PREVIEW) return;
   SYNC.dirty = true; _writeGen++; saveMeta();
   clearTimeout(_pushTimer);
   _pushTimer = setTimeout(pushNow, 1200);
@@ -4015,11 +4019,12 @@ async function pushNow() {
 }
 function scheduleRetry() {
   clearTimeout(_retryTimer);
-  if (!SYNC.dirty || window.IS_DEMO) return;
+  if (!SYNC.dirty || window.IS_DEMO || window.IS_PREVIEW) return;
   const delay = RETRY_MS[Math.min(SYNC.attempts, RETRY_MS.length - 1)];
   _retryTimer = setTimeout(pushNow, delay);
 }
 function syncLabel() {
+  if (window.IS_PREVIEW) return 'COACH PREVIEW — NOTHING IS SAVED';
   if (window.IS_DEMO) return 'DEMO — THIS DEVICE ONLY';
   if (SYNC.syncing) return 'SAVING…';
   if (SYNC.dirty) return navigator.onLine === false ? 'OFFLINE — SAVED ON THIS PHONE' : 'WAITING TO SYNC';
@@ -4040,7 +4045,7 @@ function refreshSyncBadge() {
 }
 
 async function syncFromCloud() {
-  if (window.IS_DEMO || !ATHLETE_ID) return;
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
   for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) await new Promise(r => setTimeout(r, 100));
   try {
     const sb = _sb();

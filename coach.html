@@ -799,6 +799,8 @@ const S = {
   programs: {},    // athlete_id -> programme JSON (from the database, else the legacy file)
   progSrc: {},     // athlete_id -> 'db' | 'file' | 'none'. Demo mode never calls
                    // loadPrograms(), so this has to start as an object, not undefined.
+  lib: [],         // public.library rows (workouts + articles)
+  libCats: [],     // public.library_categories rows
   logins: {},      // athlete_id -> athlete_identities row, for athletes with a
                    // username/password. Same reason as above: must not be undefined.
   clogs: {},       // athlete_id -> coaching_logs row (metadata only; the body is
@@ -841,6 +843,7 @@ async function loadAll() {
   S.intake = (intake && intake.data) || [];   // RPC may be missing pre-stage27; degrade quietly
   await loadLogins();
   await loadCoachingLogs();
+  await loadLibrary();
   await loadPrograms();
   assemble();
   S.ready = true;
@@ -1111,6 +1114,85 @@ async function openCoachingLog(athleteId) {
     .select('body, updated_at').eq('athlete_id', athleteId).maybeSingle();
   if (error) { box.textContent = 'Could not load: ' + error.message; return; }
   box.textContent = data ? data.body : 'No coaching log for this athlete yet.';
+}
+
+// Publish a workout or article into the Library.
+//
+// The /workout and /article skills still write the JSON; this is how it goes live.
+// There is no manifest to update any more — the category comes from the file's own
+// `category` field and the card details are read off the item itself, which is what
+// used to make adding a workout a two-file job.
+function pickLibraryFile(kind) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.multiple = true;
+  input.onchange = async () => {
+    const files = [...(input.files || [])];
+    if (!files.length) return;
+
+    const rows = [], bad = [];
+    for (const f of files) {
+      let d;
+      try { d = JSON.parse(await f.text()); }
+      catch (e) { bad.push(f.name + ': not valid JSON'); continue; }
+      const id  = String(d.id || '').trim();
+      const cat = String(d.category || '').trim();
+      if (!id)  { bad.push(f.name + ': no "id" field'); continue; }
+      if (!cat) { bad.push(f.name + ': no "category" field, which decides its shelf'); continue; }
+      if (!(S.libCats || []).some(c => c.kind === kind && c.id === cat)) {
+        bad.push(f.name + ': category "' + cat + '" does not exist yet'); continue;
+      }
+      rows.push({
+        slug: (kind === 'workout' ? 'workouts/' : 'articles/') + cat + '/' + id,
+        kind, category_id: cat, data: d, published: true,
+      });
+    }
+
+    const NL = String.fromCharCode(10);
+    if (bad.length && !rows.length) { alert('Nothing published:' + NL + NL + bad.join(NL)); return; }
+    const preview = rows.map(r => '· ' + (r.data.title || r.slug)).join(NL);
+    const skipped = bad.length ? NL + NL + 'Skipped:' + NL + bad.join(NL) : '';
+    if (!confirm('Publish ' + rows.length + ' ' + kind + '(s)?' + NL + NL + preview + skipped)) return;
+
+    const { error } = await sb.from('library').upsert(rows, { onConflict: 'slug' });
+    if (error) { alert('Could not publish: ' + error.message); return; }
+    await loadLibrary();
+    render();
+    alert('Published ' + rows.length + '.' + skipped);
+  };
+  input.click();
+}
+
+async function loadLibrary() {
+  S.libCats = [];
+  S.lib = [];
+  const [c, l] = await Promise.all([
+    sb.from('library_categories').select('*').order('sort_order'),
+    sb.from('library').select('slug, kind, category_id, published, updated_at, data').order('sort_order'),
+  ]);
+  if (!c.error) S.libCats = c.data || [];
+  if (!l.error) S.lib = l.data || [];
+}
+
+async function toggleLibraryItem(slug, publish) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const { error } = await sb.from('library').update({ published: publish }).eq('slug', slug);
+  if (error) { alert('Could not update: ' + error.message); return; }
+  await loadLibrary();
+  render();
+}
+
+// Open an athlete's own app in a new tab, read-only.
+//
+// No impersonation needed: get_program() and the athlete RPCs accept the coach, so
+// Amir's own session already resolves their programme. `preview=1` is what stops the
+// app writing — it loads their real data but skips every cloud write, so looking
+// around cannot land a stray tick or note in the athlete's logged record.
+function viewAsAthlete(athleteId, which) {
+  const page = which === 'habits' ? 'habits.html' : 'program.html';
+  window.open(`${SITE}/${page}?client=${encodeURIComponent(athleteId)}&preview=1`, '_blank', 'noopener');
 }
 
 // Publish a programme JSON straight from disk into the database.
@@ -2863,7 +2945,19 @@ function fileTabHtml(D) {
   const cycles = (program && program.cycles) || [];
   const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
   const login = (S.logins || {})[athleteId];
-  return `<div class="sec"><span>Login</span></div>
+  return `<div class="sec"><span>Their app</span></div>
+    <section class="panel">
+      <p class="empty" style="padding:0 0 10px">
+        Open ${esc(athleteId)}'s programme exactly as they see it on their phone — same
+        screens, same wording, their real data. It is read-only: nothing you tap is saved
+        to their record.
+      </p>
+      <div class="note-actions">
+        <button class="btn sm primary" onclick="viewAsAthlete('${esc(athleteId)}')">View their app</button>
+        <button class="btn sm" onclick="viewAsAthlete('${esc(athleteId)}', 'habits')">View their Proof</button>
+      </div>
+    </section>
+    <div class="sec"><span>Login</span></div>
     <section class="panel">
       ${login ? `
         <p class="empty" style="padding:0 0 10px">
@@ -3266,12 +3360,25 @@ async function renderLinks() {
   $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
   const BASE = SITE + '/program.html';
   try {
-    const [artData, wrkData] = await Promise.all([
-      fetch('articles/index.json').then(r => r.json()),
-      fetch('workouts/index.json').then(r => r.json()),
-    ]);
+    // Built from S.lib / S.libCats, which come from the database. The two index.json
+    // manifests this used to fetch no longer exist as the source of truth.
+    const shape = (kind, itemKey) => ({
+      categories: (S.libCats || []).filter(c => c.kind === kind).map(c => ({
+        id: c.id, title: c.title,
+        [itemKey]: (S.lib || [])
+          .filter(l => l.kind === kind && l.category_id === c.id && l.published)
+          .map(l => l.data),
+      })),
+    });
+    const artData = shape('article', 'articles');
+    const wrkData = shape('workout', 'workouts');
     if (route().view !== 'links') return;
-    let html = `<section class="panel"><div class="phead"><span class="t hd">Articles — Read library</span></div>`;
+    let html = `<div class="controls">
+        <button class="btn primary sm" onclick="pickLibraryFile('workout')" title="Publish a workout JSON written by the /workout skill">+ Publish workout</button>
+        <button class="btn primary sm" onclick="pickLibraryFile('article')" title="Publish an article JSON written by the /article skill">+ Publish article</button>
+        <span class="empty" style="align-self:center">The Library lives on the server now — publishing here puts it straight in front of every athlete, with no deploy.</span>
+      </div>`;
+    html += `<section class="panel"><div class="phead"><span class="t hd">Articles — Read library</span></div>`;
     let any = false;
     for (const cat of artData.categories) {
       if (!cat.articles || !cat.articles.length) continue;
