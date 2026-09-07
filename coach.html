@@ -813,10 +813,9 @@ const S = {
 
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
-  const [prog, hist, keys, msgs, notes, contacts, rules, seasons, titles, optin, intake] = await Promise.all([
+  const [prog, hist, msgs, notes, contacts, rules, seasons, titles, optin, intake] = await Promise.all([
     sb.from('athlete_progress').select('athlete_id, athlete_name, data, updated_at'),
     sb.from('session_history').select('*'),
-    sb.from('athlete_keys').select('athlete_id, secret_key'),
     sb.from('messages').select('*').order('created_at', { ascending: true }),
     sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)),
     sb.rpc('contact_list'),
@@ -826,11 +825,10 @@ async function loadAll() {
     sb.from('leaderboard_optin').select('athlete_id, display_name, title'),
     sb.rpc('intake_list'),
   ]);
-  const firstErr = [prog, hist, keys, msgs, notes, rules, seasons, titles, optin].find(r => r && r.error);
+  const firstErr = [prog, hist, msgs, notes, rules, seasons, titles, optin].find(r => r && r.error);
   if (firstErr) throw new Error(firstErr.error.message);
   S.prog = prog.data || [];
   S.hist = hist.data || [];
-  S.keys = {}; (keys.data || []).forEach(r => S.keys[r.athlete_id] = r.secret_key);
   S.msgs = msgs.data || [];
   S.notes = notes.data || [];
   S.contacts = (contacts && contacts.data) || [];   // RPC may be missing pre-stage16; degrade quietly
@@ -859,23 +857,22 @@ async function refetch(parts) {
   render();
 }
 
-// Pull each athlete's program file (data/<id>.json) in parallel — names, tier,
-// sessions/week for adherence, and the prescribed plan for the detail view.
+// Load every athlete's programme. Names, tier, sessions/week for adherence, and
+// the prescribed plan for the detail view.
 async function loadPrograms() {
-  const ids = new Set();
-  S.prog.forEach(r => ids.add(r.athlete_id));
-  S.hist.forEach(r => ids.add(r.athlete_id));
-  Object.keys(S.keys).forEach(id => ids.add(id));
-  S.contacts.forEach(c => ids.add(c.athlete_id));
-  const list = [...ids];
-
-  // The database is the source of truth once an athlete has been imported.
-  // While the migration is part-done we fall back to the legacy data/<id>.json
-  // file, so an athlete who has not been moved yet still renders normally.
-  // S.progSrc records which one won — the editor only writes to imported rows.
+  // The programs table IS the roster now. It used to be discovered partly from
+  // athlete_keys, which is empty since the old links were retired — without this
+  // an athlete with a programme but no logged session would vanish off the roster.
   const db = {};
   const r = await sb.from('programs').select('athlete_id, data, updated_at, updated_by');
   if (!r.error) (r.data || []).forEach(row => { db[row.athlete_id] = row; });
+
+  const ids = new Set(Object.keys(db));
+  S.prog.forEach(r => ids.add(r.athlete_id));
+  S.hist.forEach(r => ids.add(r.athlete_id));
+  S.contacts.forEach(c => ids.add(c.athlete_id));
+  Object.keys(S.logins || {}).forEach(id => ids.add(id));
+  const list = [...ids];
 
   const needFile = list.filter(id => !db[id]);
   const files = await Promise.all(needFile.map(id =>
@@ -913,34 +910,6 @@ function loginMessage(username, password) {
          `To keep it on your home screen: open the link, then Share → Add to Home Screen.`;
 }
 
-// Make logins for everyone who has a programme but no account yet.
-async function createLoginsForAll() {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const ids = Object.keys(S.programs)
-    .filter(id => S.programs[id] && id !== 'demo' && !S.logins[id])
-    .sort();
-  if (!ids.length) { alert('Everyone already has a login.'); return; }
-  if (!confirm(`Create logins for ${ids.length} athlete(s)?\n\n` +
-               'Each gets a username and a password. Nothing is sent — the passwords ' +
-               'are listed for you to copy and send on WhatsApp in your own time.\n\n' +
-               'Anyone who already has a login is skipped.')) return;
-
-  toast('Creating ' + ids.length + ' logins…');
-  const { data, error } = await sb.functions.invoke('athlete-login', {
-    body: { action: 'create_many', athlete_ids: ids },
-  });
-  if (error || (data && data.error)) {
-    alert('Could not create the logins:\n\n' + ((data && data.error) || error.message));
-    return;
-  }
-  await loadLogins();
-  _credsOpen = true;
-  render();
-  const failed = (data.failed || []);
-  alert(`Created ${data.created} login(s).` +
-        (failed.length ? `\n\nFailed:\n` + failed.map(f => f.athlete_id + ': ' + f.error).join('\n') : '') +
-        `\n\nThey are listed under "Logins to send" — copy each one and send it.`);
-}
 
 // Clears the stored password once it has gone out. The account is unaffected;
 // this only drops the copy kept for distribution.
@@ -1218,7 +1187,10 @@ function assemble() {
     a.finished++;
     a.sessions.push(r);
   });
-  Object.keys(S.keys).forEach(id => get(id));
+  // Everyone with a programme gets a roster row, even if they have never logged a
+  // session. This used to walk athlete_keys, which is empty now that the old
+  // links are retired.
+  Object.keys(S.programs || {}).forEach(id => get(id));
   S.contacts.forEach(c => { const a = get(c.athlete_id); a.contact = c; });
 
   Object.values(map).forEach(a => {
@@ -1869,15 +1841,7 @@ function renderAthletes() {
         <option value="recent">Sort: recently active</option>
         <option value="name">Sort: name</option>
       </select>
-      <button class="btn primary sm" onclick="newAthleteLink()">+ New secure link</button>
       <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
-      ${(() => {
-        const need = Object.keys(S.programs || {})
-          .filter(id => S.programs[id] && id !== 'demo' && !(S.logins || {})[id]);
-        return need.length
-          ? `<button class="btn sm" onclick="createLoginsForAll()" title="Give every athlete a username and password">+ Create ${need.length} login${need.length === 1 ? '' : 's'}</button>`
-          : '';
-      })()}
       ${(() => {
         // Only offer the move while something is still file-backed. Once every
         // programme is in the database this control has nothing left to do.
@@ -1959,47 +1923,7 @@ window.renderRoster = renderRoster;
 window.renderAthletes = renderAthletes;
 
 // --- secure links (ported) ---------------------------------------------------
-function genKey() {
-  const raw = (window.crypto && crypto.randomUUID)
-    ? crypto.randomUUID()
-    : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
-  return raw.replace(/-/g, '');
-}
-function secureLink(athleteId, key) { return `${SITE}/program.html?client=${encodeURIComponent(athleteId)}&key=${encodeURIComponent(key)}`; }
-function proofLink(athleteId, key) { return `${SITE}/habits.html?client=${encodeURIComponent(athleteId)}&key=${encodeURIComponent(key)}`; }
 function normalizeAthleteId(raw) { return (raw || '').trim().replace(/\s+/g, '_').replace(/[^A-Za-z0-9_]/g, ''); }
-async function protectAthlete(athleteId) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const key = genKey();
-  const { error } = await sb.from('athlete_keys')
-    .upsert({ athlete_id: athleteId, secret_key: key }, { onConflict: 'athlete_id' });
-  if (error) { alert('Could not save key: ' + error.message); return; }
-  S.keys[athleteId] = key;
-  render();
-}
-async function newAthleteLink() {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const raw = prompt('New athlete ID (must match their data/<id>.json file, e.g. john_doe):') || '';
-  const id = normalizeAthleteId(raw);
-  if (!id) { if (raw.trim()) alert('That ID had no usable characters. Use letters, numbers and underscores, e.g. john_doe.'); return; }
-  if (id !== raw.trim() && !confirm('Using normalised ID "' + id + '"\n(must match data/' + id + '.json). Continue?')) return;
-  const existing = await sb.from('athlete_keys').select('secret_key').eq('athlete_id', id).maybeSingle();
-  let key = existing.data && existing.data.secret_key;
-  if (!key) {
-    key = genKey();
-    const { error } = await sb.from('athlete_keys')
-      .upsert({ athlete_id: id, secret_key: key }, { onConflict: 'athlete_id' });
-    if (error) { alert('Could not save key: ' + error.message); return; }
-  }
-  const link = secureLink(id, key);
-  copyText(link);
-  alert((existing.data ? 'Existing secure link copied:' : 'Secure link created & copied:') +
-        '\n\n' + link + '\n\nMake sure data/' + id + '.json exists, then send this link to the athlete.');
-  S.keys[id] = key;
-  assemble(); render();
-}
-window.protectAthlete = protectAthlete;
-window.newAthleteLink = newAthleteLink;
 window.copyText = copyText;
 
 // --- live-activity decode (ported) ------------------------------------------
@@ -2663,7 +2587,6 @@ async function renderDetail(athleteId, sub) {
     _D = {
       athleteId, a, program, programDays, history,
       callLogs: S.callLogs[athleteId],
-      key: S.keys[athleteId],
       lib: await exLib(),
       metrics: athleteMetrics(history, a.lastActive, programDays.length),
       stamp: S.stamp,
@@ -2811,16 +2734,7 @@ function callsTabHtml(D) {
     ${body}`;
 }
 function fileTabHtml(D) {
-  const { athleteId, a, key, program, programDays } = D;
-  const linkHtml = key
-    ? `<div class="keyline">
-         <input readonly value="${esc(secureLink(athleteId, key))}" onclick="this.select()">
-         <button class="btn sm" onclick="copyText('${esc(secureLink(athleteId, key))}', this)">Copy program link</button>
-         ${a.isHab || a.contact ? `<button class="btn sm" onclick="copyText('${esc(proofLink(athleteId, key))}', this)">Copy Proof link</button>` : ''}
-         <button class="btn sm danger" onclick="if(confirm('Rotate the key? The OLD link stops syncing immediately and you must send the new one.')) protectAthlete('${esc(athleteId)}')">Rotate key</button>
-       </div>`
-    : `<div class="note"><b>⚠ No secure key</b> — anyone with the plain link can write to this record.
-         <button class="btn sm primary" style="margin-left:8px" onclick="protectAthlete('${esc(athleteId)}')">Generate secure link</button></div>`;
+  const { athleteId, a, program, programDays } = D;
   const cycles = (program && program.cycles) || [];
   const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
   const login = (S.logins || {})[athleteId];
@@ -2845,8 +2759,6 @@ function fileTabHtml(D) {
           <button class="btn sm primary" onclick="athleteLoginAction('${esc(athleteId)}','create')">Create login</button>
         </div>`}
     </section>
-    <div class="sec"><span>Links</span></div>
-    ${linkHtml}
     <div class="sec"><span>Program file</span></div>
     <section class="panel">
       <table class="meta-table">
@@ -3019,7 +2931,9 @@ async function submitPastSession(athleteId) {
       focus: p.focus || '',
       summary: p.summary
     },
-    p_key: S.keys[athleteId] || null
+    // The coach is authorised as the coach now, not by holding the athlete's
+    // secret. Every key was deleted when the old links were retired.
+    p_key: null
   });
   if (error) { alert('Could not save: ' + error.message); if (btn) { btn.disabled = false; btn.textContent = 'Save to logs'; } return; }
   _pendingImport = null;
@@ -3111,10 +3025,8 @@ window.deleteCallLog = deleteCallLog;
 async function loadBoard(scope) {
   if (S.board[scope]) return S.board[scope];
   if (DEMO) return S.board[scope] || [];
-  const key = S.keys[AMIR_ATHLETE_ID];
-  if (!key) return null;
   const { data, error } = await sb.rpc('leaderboard_top', {
-    p_athlete_id: AMIR_ATHLETE_ID, p_key: key, p_scope: scope, p_limit: 50 });
+    p_athlete_id: AMIR_ATHLETE_ID, p_key: null, p_scope: scope, p_limit: 50 });
   if (error) { console.warn('leaderboard_top:', error.message); return null; }
   S.board[scope] = data || [];
   return S.board[scope];
@@ -3128,7 +3040,7 @@ async function renderProof() {
   if (route().view !== 'proof') return;   // user navigated away mid-fetch
 
   const boardHtml = rows === null
-    ? `<p class="empty">Couldn't fetch the board${S.keys[AMIR_ATHLETE_ID] ? '' : ' — no key stored for ' + esc(AMIR_ATHLETE_ID)}.</p>`
+    ? `<p class="empty">Couldn't fetch the board.</p>`
     : rows.length
       ? rows.map(r => `
         <div class="lbrow ${r.pos <= 3 ? 'top' + r.pos : ''} ${r.is_me ? 'me' : ''}">
