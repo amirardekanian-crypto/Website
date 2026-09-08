@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF7F2">
+<meta name="robots" content="noindex, follow">
+<title>برنامه‌ی عملکرد — آکادمی تنیس اطمینان</title>
+<meta name="description" content="برنامه‌ی عملکردِ آکادمی تنیس اطمینان — تحلیلِ حرکتِ تو روی زمین و یک برنامه‌ی آمادگی جسمانی که دور همان ساخته می‌شود.">
+<link rel="canonical" href="https://www.amirardekani.com/etminan.html">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+
+<!-- Plausible (privacy-friendly, cookieless) -->
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
+<style>
+  :root{
+    /* ═══ ETA palette — lifted from the academy logo (lime → green gradient).
+       Their green leads: nav, headings, selected states, ticks. AA's clay is
+       held back for the CTA and the progress bar only, so on a page this green
+       the one thing to press is the one thing that isn't. ═══ */
+    --green:#1E9E38; --green-deep:#12662A; --lime:#86C81E;
+    --clay:#C7552F; --clay-2:#E06B43; --paper:#FAF7F2; --paper-2:#F1ECE3;
+    --card:#FFFFFF; --ink:#1A1A1A; --ink-2:#5C5C5C; --muted:#8A8A8A; --line:#E7E2D9; --line-2:#D8D1C5;
+    --accent:var(--green); --accent-dim:rgba(30,158,56,.10); --bad:#C0392B;
+    --red:#D64541; --amber:#E08A2E; --go:#4E9A51;
+    --disp:'Barlow Condensed',sans-serif; --fa:'Vazirmatn',sans-serif;
+    --ease:cubic-bezier(.16,1,.3,1); --r:10px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--fa);background:var(--paper);color:var(--ink);line-height:1.7;letter-spacing:0;-webkit-font-smoothing:antialiased;}
+  a{color:var(--clay);}
+
+  /* ═══ nav — the ACADEMY is the mark; AA Performance is the endorsement ═══ */
+  /* The logo sits on a lime→green sweep; the nav repeats it so the mark lands
+     on its own background instead of a rectangle of a different green. */
+  .nav{position:sticky;top:0;z-index:100;background:linear-gradient(-100deg,var(--green) 0%,var(--green) 45%,#4FB52B 78%,var(--lime) 100%);
+    backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.16);}
+  .nav-in{max-width:820px;margin:0 auto;padding:0 22px;height:68px;display:flex;align-items:center;justify-content:space-between;}
+  .nav a{color:#fff;text-decoration:none;}
+  .lockup{display:flex;align-items:center;gap:12px;}
+  /* ⬇ LOGO SLOT — swap this .mk block for <img src="/assets/img/etminan.png"> when Faraz sends artwork. */
+  .lockup .mk{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;
+    font-family:var(--disp);font-weight:900;font-size:17px;letter-spacing:.5px;flex:none;font-style:italic;}
+  .lockup .mk img{width:100%;height:100%;object-fit:contain;border-radius:50%;display:block;}
+  .lockup .txt{display:flex;flex-direction:column;line-height:1.25;}
+  .lockup .an{font-weight:800;font-size:16px;color:#fff;}
+  .lockup .pw{font-size:11.5px;color:rgba(255,255,255,.62);font-weight:600;letter-spacing:.2px;}
+
+  /* ═══ hero ═══ */
+  .hero{text-align:center;padding:56px 20px 30px;max-width:760px;margin:0 auto;}
+  .badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-dim);color:var(--green);font-weight:700;font-size:13px;padding:7px 16px;border-radius:100px;margin-bottom:20px;border:1px solid rgba(30,158,56,.24);}
+  .hero h1{font-weight:900;font-size:clamp(30px,5.6vw,48px);line-height:1.15;margin-bottom:16px;}
+  /* nowrap keeps "تنیسِ تو" whole — on a phone it was breaking after "تنیسِ"
+     and stranding "تو" on its own line. Short enough not to overflow at 320px. */
+  .hero h1 .acc{color:var(--clay);white-space:nowrap;}
+  .hero .lede{color:var(--ink-2);font-size:17px;max-width:580px;margin:0 auto;}
+
+  /* ═══ shared section furniture ═══ */
+  .band{max-width:820px;margin:0 auto;padding:0 20px;}
+  .blk{margin:44px 0;}
+  .eyebrow{font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:1.6px;color:var(--clay);text-transform:uppercase;margin-bottom:10px;}
+  .blk h2{font-weight:800;font-size:clamp(23px,4vw,30px);line-height:1.3;margin-bottom:12px;}
+  .blk p.body{color:var(--ink-2);font-size:16px;}
+  .blk p.body+p.body{margin-top:12px;}
+
+  /* partnership note — the academy speaking, not Amir */
+  .pnote{background:var(--card);border:1px solid var(--line);border-right:4px solid var(--green);border-radius:14px;padding:24px 24px;margin:34px 0;}
+  .pnote p{font-size:17px;font-weight:600;line-height:1.85;}
+  .pnote .sig{margin-top:12px;font-size:14px;font-weight:600;color:var(--muted);}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px;}
+  @media(max-width:680px){.steps{grid-template-columns:1fr;}}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 20px;position:relative;}
+  .step .n{font-family:var(--disp);font-weight:900;font-size:40px;line-height:1;color:var(--paper-2);position:absolute;top:14px;left:18px;}
+  .step h3{font-weight:800;font-size:17px;margin-bottom:7px;position:relative;}
+  .step p{color:var(--ink-2);font-size:14.5px;line-height:1.7;position:relative;}
+
+  /* what gets analysed */
+  .agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px;}
+  @media(max-width:680px){.agrid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:400px){.agrid{grid-template-columns:1fr;}}
+  .aitem{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:9px;}
+  .aitem .d{width:6px;height:6px;border-radius:50%;background:var(--clay);flex:none;}
+
+  /* sample profile card */
+  .profile{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:22px;box-shadow:0 12px 34px rgba(40,30,20,.06);}
+  .profile-hd{background:var(--green);color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .profile-hd .t{font-weight:800;font-size:16px;}
+  .profile-hd .s{font-size:12px;font-weight:700;background:rgba(255,255,255,.16);padding:4px 11px;border-radius:100px;}
+  .profile-bd{padding:20px 22px 24px;}
+  .profile-bd .who{font-size:14px;color:var(--muted);margin-bottom:16px;}
+  .profile-bd .who b{color:var(--ink);font-weight:700;}
+  .prow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .prow:last-child{border-bottom:none;}
+  .prow .rank{font-family:var(--disp);font-weight:900;font-size:19px;color:var(--muted);width:20px;flex:none;text-align:center;}
+  .prow .nm{font-weight:700;font-size:15.5px;flex:1;}
+  .prow .tag{font-size:12px;font-weight:800;padding:4px 12px;border-radius:100px;white-space:nowrap;}
+  .t-red{background:rgba(214,69,65,.11);color:var(--red);}
+  .t-amb{background:rgba(224,138,46,.13);color:var(--amber);}
+  .t-go{background:rgba(78,154,81,.13);color:var(--go);}
+  .pfoot{margin-top:16px;padding-top:15px;border-top:1px dashed var(--line-2);color:var(--muted);font-size:13.5px;line-height:1.7;}
+
+  /* two coaches */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+  @media(max-width:600px){.duo{grid-template-columns:1fr;}}
+  .dcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;border-top:3px solid var(--green);}
+  .dcard .who{display:block;font-weight:800;font-size:16.5px;}
+  .dcard .role{display:block;font-size:12.5px;font-weight:700;color:var(--green);margin:3px 0 11px;}
+  .dcard p{color:var(--ink-2);font-size:14.5px;line-height:1.7;}
+
+  /* habits */
+  .hchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+  .hchip{background:var(--card);border:1px solid var(--line);border-radius:100px;padding:9px 15px;font-size:14px;font-weight:600;}
+  .hstat{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:18px;}
+  .hstat .big{font-family:var(--disp);font-weight:900;font-size:44px;line-height:1;color:var(--green);}
+  .hstat .lbl{font-size:14.5px;color:var(--ink-2);line-height:1.6;}
+
+  /* get list */
+  .glist{list-style:none;margin-top:18px;}
+  .glist li{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;margin-bottom:9px;font-size:15px;display:flex;gap:11px;align-items:flex-start;}
+  .glist li .ck{color:var(--green);font-weight:800;flex:none;}
+  .glist li b{font-weight:700;}
+  .glist li span.sub{display:block;color:var(--muted);font-size:13.5px;margin-top:2px;}
+
+  /* CTA */
+  .ctaz{text-align:center;padding:14px 20px 60px;max-width:820px;margin:0 auto;}
+  .cta{display:inline-flex;align-items:center;gap:11px;background:var(--clay);color:#fff;font-family:var(--fa);font-weight:800;font-size:19px;padding:19px 46px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 12px 32px rgba(199,85,47,.3);transition:transform .15s;position:relative;overflow:hidden;}
+  .cta:hover{transform:translateY(-2px);}
+  .cta::before{content:'';position:absolute;top:0;bottom:0;left:0;width:40%;
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.3),transparent);
+    transform:translateX(-180%) skewX(-18deg);pointer-events:none;}
+  .cta:hover::before{animation:sheen .8s ease;}
+  @keyframes sheen{to{transform:translateX(340%) skewX(-18deg);}}
+  .ctaz .note{color:var(--muted);font-size:14px;margin-top:14px;}
+
+  /* ═══ sticky CTA ═══
+     The moment someone is convinced is rarely the moment they are at the
+     bottom of the page — the profile card sells this, and that sits halfway
+     up. The bar arrives once the hero is behind them and retires the instant
+     the form is open, so it never competes with the thing it opened. */
+  .scta{position:fixed;left:0;right:0;bottom:0;z-index:200;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:rgba(250,247,242,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);
+    box-shadow:0 -6px 24px rgba(40,30,20,.07);
+    transform:translateY(115%);transition:transform .35s var(--ease);pointer-events:none;}
+  .scta.on{transform:translateY(0);pointer-events:auto;}
+  .scta-in{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+  .scta .lbl{flex:1;font-size:13.5px;font-weight:600;color:var(--ink-2);line-height:1.5;}
+  .scta button{background:var(--clay);color:#fff;font-family:var(--fa);font-weight:800;font-size:16px;
+    padding:14px 28px;border:none;border-radius:100px;cursor:pointer;white-space:nowrap;
+    box-shadow:0 8px 22px rgba(199,85,47,.3);transition:transform .15s;}
+  .scta button:hover{transform:translateY(-2px);}
+  @media(max-width:430px){.scta .lbl{display:none;}.scta button{width:100%;}}
+
+  /* ═══ progress ═══ */
+  .progress{position:sticky;top:68px;z-index:50;background:rgba(250,247,242,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0;}
+  .progress-in{max-width:720px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:14px;}
+  .ptrack{flex:1;height:5px;background:var(--line);border-radius:3px;overflow:hidden;position:relative;}
+  .pfill{position:absolute;top:0;right:0;bottom:0;width:0%;background:linear-gradient(-90deg,var(--clay),var(--clay-2));transition:width .25s var(--ease);border-radius:3px;box-shadow:0 0 12px rgba(199,85,47,.45);}
+  .plabel{font-weight:700;font-size:13px;color:var(--muted);white-space:nowrap;}
+  .plabel strong{color:var(--clay);}
+
+  /* ═══ form ═══ */
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 80px;}
+  .fsec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px 26px;margin-bottom:18px;position:relative;}
+  .sbadge{position:absolute;top:-1px;right:26px;background:var(--green);color:#fff;font-weight:700;font-size:12px;padding:5px 13px;border-radius:0 0 8px 8px;}
+  .fsec h2{font-weight:800;font-size:24px;margin:18px 0 4px;}
+  .sdesc{color:var(--muted);font-size:14px;margin-bottom:22px;}
+  .f{margin-bottom:20px;}.f:last-child{margin-bottom:0;}
+  .f label{display:block;font-weight:600;font-size:15px;margin-bottom:8px;}
+  .f label .hint{display:block;margin-top:2px;font-weight:400;color:var(--muted);font-size:13px;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media(max-width:560px){.row-2,.row-3{grid-template-columns:1fr;}}
+
+  input[type=text],input[type=email],input[type=number],input[type=tel],select,textarea{
+    width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r);padding:13px 14px;
+    font-family:var(--fa);font-size:15px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-dim);}
+  select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:left 14px center;padding-left:36px;}
+  textarea{resize:vertical;min-height:74px;}
+  ::placeholder{color:var(--muted);}
+
+  .pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{position:relative;}
+  .pill input{position:absolute;opacity:0;pointer-events:none;}
+  .pill span{display:inline-block;padding:10px 17px;border:1px solid var(--line-2);border-radius:100px;font-size:14px;color:var(--ink-2);cursor:pointer;background:var(--paper);transition:border-color .2s,background .2s,color .2s,transform .2s var(--ease);user-select:none;}
+  .pill span:hover{border-color:var(--green);color:var(--ink);transform:translateY(-1px);}
+  .pill input:checked+span{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
+  .pill input:disabled+span{opacity:.35;cursor:not-allowed;}
+
+  .rcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;}
+  .rcard{position:relative;}
+  .rcard input{position:absolute;opacity:0;pointer-events:none;}
+  .rcard label{display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 12px;border:1px solid var(--line-2);border-radius:var(--r);cursor:pointer;
+    transition:border-color .2s,background .2s,color .2s,transform .25s var(--ease),box-shadow .25s var(--ease);font-size:14px;color:var(--ink-2);background:var(--paper);margin:0;font-weight:500;}
+  .rcard label .ic{font-size:24px;margin-bottom:7px;}
+  .rcard label:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:0 8px 20px rgba(40,30,20,.08);}
+  .rcard input:checked+label{border-color:var(--green);background:var(--accent-dim);color:var(--green);font-weight:700;}
+
+  .slider{display:flex;align-items:center;gap:14px;}
+  .slider input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:6px;background:var(--line-2);border-radius:3px;outline:none;}
+  .slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--clay);cursor:pointer;border:3px solid var(--paper);box-shadow:0 0 0 2px var(--clay);}
+  .slider input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--clay);cursor:pointer;border:3px solid var(--paper);box-shadow:0 0 0 2px var(--clay);}
+  .sedge{font-size:13px;color:var(--muted);white-space:nowrap;}
+  .sval{min-width:36px;text-align:center;font-family:var(--disp);font-weight:900;font-size:22px;color:var(--clay);}
+  .slider.is-unset input[type=range]::-webkit-slider-thumb{background:var(--muted);box-shadow:0 0 0 2px var(--muted);}
+  .slider.is-unset input[type=range]::-moz-range-thumb{background:var(--muted);box-shadow:0 0 0 2px var(--muted);}
+  .slider.is-unset .sval{color:var(--muted);}
+
+  .cond{display:none;}.cond.on{display:block;margin-top:14px;}
+
+  /* consent checkboxes — a tick that has to be read, not a pill */
+  .consent{display:flex;gap:12px;align-items:flex-start;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r);padding:15px 16px;cursor:pointer;transition:border-color .2s,background .2s;}
+  .consent:hover{border-color:var(--green);}
+  .consent input{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--green);cursor:pointer;}
+  .consent .ctxt{font-size:14.5px;line-height:1.75;font-weight:500;}
+  .consent .ctxt b{font-weight:700;}
+  .consent:has(input:checked){border-color:var(--green);background:var(--accent-dim);}
+  .f.has-error .consent{border-color:var(--bad);}
+
+  .f.has-error>label{color:var(--bad);}
+  .f.has-error input[type=text],.f.has-error input[type=email],.f.has-error input[type=number],
+  .f.has-error select,.f.has-error textarea{border-color:var(--bad);box-shadow:0 0 0 3px rgba(192,57,43,.10);}
+  .f.has-error .rcard label,.f.has-error .pill span{border-color:var(--bad);}
+  .ferr{display:flex;align-items:center;gap:6px;margin-top:9px;color:var(--bad);font-size:13px;font-weight:600;}
+
+  .submit{text-align:center;padding:22px 0 0;}
+  .sbtn{display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-family:var(--fa);font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;position:relative;overflow:hidden;}
+  .sbtn:hover{transform:translateY(-2px);}
+  .sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .sbtn::before{content:'';position:absolute;top:0;bottom:0;left:0;width:40%;
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.3),transparent);
+    transform:translateX(-180%) skewX(-18deg);pointer-events:none;}
+  .sbtn:hover::before{animation:sheen .8s ease;}
+  .snote{color:var(--muted);font-size:13px;margin-top:14px;line-height:1.6;}
+
+  .ok{display:none;position:fixed;inset:0;background:rgba(250,247,242,.97);backdrop-filter:blur(12px);z-index:1000;align-items:center;justify-content:center;padding:24px;}
+  .ok.on{display:flex;}
+  .ok-card{text-align:center;max-width:470px;}
+  .ok-check{width:78px;height:78px;margin:0 auto 22px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;animation:pop-in .6s var(--ease);}
+  @keyframes pop-in{0%{transform:scale(0);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+  .ok-card h2{font-weight:900;font-size:36px;margin-bottom:14px;}
+  .ok-card p{color:var(--ink-2);font-size:16px;line-height:1.8;}
+  .ok-card p+p{color:var(--muted);font-size:14px;margin-top:12px;}
+
+  .foot{background:var(--green-deep);color:rgba(255,255,255,.72);padding:30px 20px 110px;text-align:center;font-size:14.5px;line-height:1.9;}
+  .foot a{color:rgba(255,255,255,.85);}
+  .foot .fl{display:block;color:rgba(255,255,255,.45);font-size:12.5px;margin-top:6px;}
+
+  /* ═══ motion ═══ */
+  .scroll-progress{position:fixed;top:0;right:0;left:0;height:3px;z-index:300;pointer-events:none;
+    background:linear-gradient(-90deg,var(--clay),var(--clay-2));transform-origin:100% 50%;transform:scaleX(0);}
+  .hero h1{overflow:hidden;}
+  .hero h1>.hw{display:inline-block;transform:translateY(112%);animation:word-rise .9s var(--ease) .1s forwards;}
+  @keyframes word-rise{to{transform:translateY(0);}}
+  .hero h1 .acc{position:relative;}
+  .hero h1 .acc::after{content:'';position:absolute;right:-2px;left:-3px;bottom:8%;height:.14em;background:var(--clay);opacity:.18;
+    transform:scaleX(0);transform-origin:right center;animation:sweep-in .7s var(--ease) 1s forwards;}
+  @keyframes sweep-in{to{transform:scaleX(1);}}
+  .badge{animation:soft-pulse 2.8s ease-in-out infinite;}
+  @keyframes soft-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+  .blk,.fsec,.submit{transition:opacity .7s var(--ease),transform .7s var(--ease),box-shadow .3s var(--ease);}
+  .blk.rv,.fsec.rv,.submit.rv{opacity:0;transform:translateY(26px);}
+  .blk.rv.visible,.fsec.rv.visible,.submit.rv.visible{opacity:1;transform:translateY(0);}
+  .fsec:hover{box-shadow:0 14px 36px rgba(40,30,20,.07);}
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <div class="lockup">
+      <!-- ⬇ LOGO SLOT — save the academy's ball mark (ideally a transparent PNG
+           or SVG, cropped square to the ball, no green background) to
+           /assets/img/etminan.png and swap this whole <span> for:
+             <span class="mk"><img src="/assets/img/etminan.png" alt="ETA"></span>
+           Until then this stands in: white disc, green ETA — the same shape and
+           colour logic as the real mark, so the nav does not change when it lands. -->
+      <span class="mk">ETA</span>
+      <span class="txt">
+        <span class="an">آکادمی تنیس اطمینان</span>
+        <span class="pw">با همکاریِ AA Performance</span>
+      </span>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="badge">🎾 ویژه‌ی بازیکنانِ آکادمی</div>
+  <h1><span class="hw">آمادگی جسمانی، دورِ <span class="acc">تنیسِ تو</span></span></h1>
+  <p class="lede">نه یک برنامه‌ی عمومیِ باشگاه. مربی‌ات ده دقیقه از بازیِ تو فیلم می‌گیرد، حرکتت تحلیل می‌شود، و بعد <b>فراز و امیر با هم</b> برنامه‌ای برایت می‌بندند که دقیقاً همان چیزهایی را می‌سازد که تنیسِ تو به آن‌ها نیاز دارد.</p>
+</header>
+
+<div class="band">
+
+  <div class="pnote blk">
+    <p>«آکادمی تنیس اطمینان با AA Performance همکاری می‌کند تا برای بازیکنانِ ما برنامه‌ی اختصاصیِ قدرت و آمادگی جسمانی فراهم کند.»</p>
+    <p class="sig">— فراز اطمینان، آکادمی تنیس اطمینان</p>
+  </div>
+
+  <!-- ═══ HOW IT WORKS ═══ -->
+  <section class="blk">
+    <div class="eyebrow">چطور کار می‌کند</div>
+    <h2>سه قدم — و هیچ‌کدامش کارِ اضافه برای تو نیست</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="n">۱</span>
+        <h3>ده دقیقه فیلم</h3>
+        <p>مربی‌ات در یک تمرینِ معمولی از تو فیلم می‌گیرد. لازم نیست کارِ خاصی بکنی — فقط تنیسِ همیشگی‌ات را بازی کن.</p>
+      </div>
+      <div class="step">
+        <span class="n">۲</span>
+        <h3>تحلیلِ حرکت</h3>
+        <p>حرکتِ تو روی زمین بررسی می‌شود: شتاب‌گیری، توقف، تغییرِ جهت، تعادل — و اینکه بدنت کجا کم می‌آورد. فراز هم آنچه هفته‌ها روی زمین از تو دیده به این تحلیل اضافه می‌کند.</p>
+      </div>
+      <div class="step">
+        <span class="n">۳</span>
+        <h3>پروفایل و برنامه</h3>
+        <p>یک <b>پروفایلِ عملکردِ تنیس</b> می‌گیری که اولویت‌هایت را رتبه‌بندی می‌کند — و برنامه‌ات را <b>فراز و امیر با هم</b> می‌بندند، نه هرکدام جدا.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ WHAT GETS ANALYSED ═══ -->
+  <section class="blk">
+    <div class="eyebrow">ارزیابیِ حرکت و عملکردِ تنیس</div>
+    <h2>از آن ده دقیقه چه چیزهایی بیرون می‌آید</h2>
+    <p class="body">این تحلیل به این سؤال جواب می‌دهد: <b>کدام ویژگی‌های بدنی، بیشترین اثر را روی تنیسِ تو دارند؟</b></p>
+    <div class="agrid">
+      <div class="aitem"><span class="d"></span>شتاب‌گیری و توقف</div>
+      <div class="aitem"><span class="d"></span>حرکتِ جانبی</div>
+      <div class="aitem"><span class="d"></span>اسپلیت‌استپ</div>
+      <div class="aitem"><span class="d"></span>بازگشت به مرکز</div>
+      <div class="aitem"><span class="d"></span>تغییرِ جهت</div>
+      <div class="aitem"><span class="d"></span>کاراییِ حرکت</div>
+      <div class="aitem"><span class="d"></span>تعادل و کنترل</div>
+      <div class="aitem"><span class="d"></span>نیازهای قدرتیِ پایین‌تنه</div>
+      <div class="aitem"><span class="d"></span>نیازهای تنه و بالاتنه</div>
+      <div class="aitem"><span class="d"></span>تکرارِ تلاش‌های شدید</div>
+      <div class="aitem"><span class="d"></span>محدودیت‌های احتمالیِ بدنی</div>
+      <div class="aitem"><span class="d"></span>تفاوتِ چپ و راست</div>
+    </div>
+  </section>
+
+  <!-- ═══ SAMPLE PROFILE ═══ -->
+  <section class="blk">
+    <div class="eyebrow">خروجیِ کار</div>
+    <h2>پروفایلِ عملکردِ تنیس</h2>
+    <p class="body">به‌جای یک لیستِ بلند از حرکات، یک چیزِ ساده می‌گیری: بدنت کجا از تنیست عقب مانده، به ترتیبِ اهمیت.</p>
+
+    <div class="profile">
+      <div class="profile-hd">
+        <span class="t">پروفایلِ عملکردِ تنیس</span>
+        <span class="s">نمونه</span>
+      </div>
+      <div class="profile-bd">
+        <p class="who">بازیکن: <b>آرش</b> · ۱۵ ساله · آکادمی تنیس اطمینان</p>
+        <div class="prow"><span class="rank">۱</span><span class="nm">توقف و کنترلِ فرود</span><span class="tag t-red">اولویتِ اول</span></div>
+        <div class="prow"><span class="rank">۲</span><span class="nm">قدرتِ تک‌پا</span><span class="tag t-red">اولویتِ اول</span></div>
+        <div class="prow"><span class="rank">۳</span><span class="nm">توانِ جانبی</span><span class="tag t-amb">در حالِ کار</span></div>
+        <div class="prow"><span class="rank">۴</span><span class="nm">کنترلِ تنه</span><span class="tag t-amb">در حالِ کار</span></div>
+        <div class="prow"><span class="rank">۵</span><span class="nm">آمادگیِ عمومی</span><span class="tag t-go">خوب</span></div>
+        <p class="pfoot">این یک نمونه است، نه بازیکنِ واقعی. پروفایلِ تو از فیلمِ خودت ساخته می‌شود و هر دوره دوباره بررسی می‌شود تا ببینیم چه چیزی جابه‌جا شده.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TWO COACHES ═══ -->
+  <section class="blk">
+    <div class="eyebrow">دو مربی، یک برنامه</div>
+    <h2>مربیِ تنیس و مربیِ بدنی‌ات با هم کار می‌کنند</h2>
+    <p class="body">معمولاً این دو از هم بی‌خبرند: مربیِ بدنسازی نمی‌داند این هفته روی زمین چه گذشته، و مربیِ تنیس نمی‌داند چه باری روی بدنت آمده. نتیجه‌اش یا تمرینِ تکراری است، یا خستگیِ اضافه سرِ مسابقه. اینجا این‌طور نیست.</p>
+    <div class="duo">
+      <div class="dcard">
+        <span class="who">فراز اطمینان</span>
+        <span class="role">مربیِ تنیس</span>
+        <p>بازیِ تو را هفته‌به‌هفته می‌بیند، فیلم می‌گیرد، و می‌گوید روی زمین دقیقاً چه چیزی کم است.</p>
+      </div>
+      <div class="dcard">
+        <span class="who">امیر اردکانی</span>
+        <span class="role">مربیِ قدرت و آمادگی</span>
+        <p>حرکتت را تحلیل می‌کند، برنامه را می‌نویسد، و هر هفته گزارشِ تمرین و ریکاوری‌ات را برای فراز می‌فرستد.</p>
+      </div>
+    </div>
+    <p class="body" style="margin-top:16px;"><b>این دو دائم درباره‌ی بازیکن‌ها در ارتباط‌اند.</b> اگر مسابقه نزدیک باشد، اگر خسته باشی، اگر جایی درد بگیرد — برنامه‌ی بدنی‌ات همان هفته عوض می‌شود، نه دوره‌ی بعد.</p>
+  </section>
+
+  <!-- ═══ HABITS ═══ -->
+  <section class="blk">
+    <div class="eyebrow">AA Proof — بیرون از زمین</div>
+    <h2>تمرین یک ساعت است. بقیه‌ی روز هم حساب می‌شود.</h2>
+    <p class="body">در کنارِ برنامه، یک اپلیکیشنِ روزانه می‌گیری که چیزهایی را دنبال می‌کند که واقعاً روی تنیس اثر دارند — نه یک چک‌لیستِ تزئینی.</p>
+    <div class="hchips">
+      <span class="hchip">🏋 جلسه‌ی تمرین</span>
+      <span class="hchip">🛏 خواب</span>
+      <span class="hchip">💧 آب</span>
+      <span class="hchip">🍗 پروتئین</span>
+      <span class="hchip">🧘 تحرک و پیشگیری</span>
+      <span class="hchip">💨 ریکاوری و تنفس</span>
+      <span class="hchip">🚶 قدم</span>
+    </div>
+    <div class="hstat">
+      <span class="big">۸۲٪</span>
+      <span class="lbl">پایبندیِ هفتگی — عددی که هر هفته می‌بینی، و در طولِ فصل بالا و پایینش را دنبال می‌کنی.</span>
+    </div>
+    <p class="body" style="margin-top:16px;">هر هفته یک گزارشِ کوتاه از تمرین، تحرک و ریکاوریِ بازیکنانِ آکادمی برای مربی‌ات فرستاده می‌شود. یعنی کسی که کنارِ زمین ایستاده، می‌داند بیرون از زمین چه خبر است.</p>
+  </section>
+
+  <!-- ═══ WHAT YOU GET ═══ -->
+  <section class="blk">
+    <div class="eyebrow">چه چیزی می‌گیری</div>
+    <h2>در این برنامه</h2>
+    <ul class="glist">
+      <li><span class="ck">✓</span><span><b>پروفایلِ عملکردِ تنیس</b><span class="sub">از تحلیلِ فیلمِ بازیِ خودت، با نظرِ فراز</span></span></li>
+      <li><span class="ck">✓</span><span><b>برنامه‌ی اختصاصیِ آمادگی جسمانی</b><span class="sub">قابلِ اجرا روی زمینِ تنیس یا در خانه — با هر چیزی که در دسترست هست</span></span></li>
+      <li><span class="ck">✓</span><span><b>ویدیوی هر حرکت</b><span class="sub">تا مجبور نباشی حدس بزنی</span></span></li>
+      <li><span class="ck">✓</span><span><b>اپلیکیشنِ AA Proof</b><span class="sub">پیگیریِ روزانه، پایبندیِ هفتگی، و تابلوی امتیازِ آکادمی</span></span></li>
+      <li><span class="ck">✓</span><span><b>بازبینی در پایانِ دوره</b><span class="sub">فیلمِ دوباره، پروفایلِ دوباره — تا ببینی واقعاً چه چیزی عوض شده</span></span></li>
+    </ul>
+    <p class="body" style="margin-top:18px;color:var(--muted);font-size:14.5px;">هزینه و ثبت‌نام از طریقِ خودِ آکادمی انجام می‌شود — با فراز صحبت کن.</p>
+  </section>
+
+</div>
+
+<div class="ctaz" id="ctaBlock">
+  <button type="button" class="cta" id="openForm">فرمِ ثبت‌نام را باز کن ←</button>
+  <p class="note">حدودِ ۴ دقیقه · اگر زیرِ ۱۸ سال داری، یکی از والدینت هم باید بخشی از فرم را پر کند</p>
+</div>
+
+<!-- ═══════════ FORM (revealed by the button) ═══════════ -->
+<div id="formZone" hidden>
+
+<div class="progress" aria-hidden="true">
+  <div class="progress-in">
+    <div class="plabel"><strong id="pPct">۰٪</strong> تکمیل</div>
+    <div class="ptrack"><div class="pfill" id="pFill"></div></div>
+    <div class="plabel" id="pCount">۰ / ۰</div>
+  </div>
+</div>
+
+<div class="wrap">
+<form id="frm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+  <input type="hidden" name="access_key" value="efc57e0c-997d-4d71-b07a-71c8268ec668">
+  <input type="hidden" name="from_name" value="آکادمی تنیس اطمینان">
+  <input type="hidden" id="subj" name="subject" value="ثبت‌نامِ جدید — آکادمی اطمینان">
+  <!-- Tags the intake so it is filterable in coach.html → Intake. No schema change needed. -->
+  <input type="hidden" name="Academy" value="Etminan Tennis Academy">
+  <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+  <!-- 01 · PLAYER -->
+  <section class="fsec">
+    <div class="sbadge">۰۱ — بازیکن</div>
+    <h2>مشخصاتِ بازیکن</h2>
+    <p class="sdesc">تا بدانم کی هستی و چطور به تو برسم.</p>
+    <div class="row-2">
+      <div class="f"><label for="fn">نام</label><input type="text" id="fn" name="First Name" required placeholder="مثلاً آرش"></div>
+      <div class="f"><label for="ln">نام‌خانوادگی</label><input type="text" id="ln" name="Last Name" required placeholder="مثلاً کریمی"></div>
+    </div>
+    <div class="row-3">
+      <div class="f"><label for="age">سن</label><input type="number" id="age" name="Age" min="8" max="70" required placeholder="مثلاً ۱۵"></div>
+      <div class="f"><label for="sex">جنسیت</label><select id="sex" name="Biological Sex" required>
+        <option value="" disabled selected>انتخاب کن</option><option value="Male">پسر / مرد</option><option value="Female">دختر / زن</option></select></div>
+      <div class="f"><label for="ht">قد <span class="hint">سانتی‌متر</span></label><input type="text" id="ht" name="Height" placeholder="مثلاً ۱۷۲"></div>
+    </div>
+    <div class="row-2">
+      <div class="f"><label for="wt">وزن <span class="hint">کیلوگرم</span></label><input type="text" id="wt" name="Body Weight" placeholder="مثلاً ۶۲"></div>
+      <div class="f"><label for="contact">راهِ ارتباط <span class="hint">واتساپ یا اینستاگرام</span></label>
+        <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required placeholder="۰۹۱۲... یا @yourhandle"></div>
+    </div>
+    <div class="f"><label for="em">ایمیل <span class="hint">اختیاری</span></label><input type="email" id="em" name="Email" placeholder="you@email.com"></div>
+  </section>
+
+  <!-- 01b · PARENT / GUARDIAN — appears when Age < 18 -->
+  <section class="fsec cond" id="parentSec">
+    <div class="sbadge">۰۱ب — والدین</div>
+    <h2>اطلاعاتِ والد یا سرپرست</h2>
+    <p class="sdesc">چون بازیکن زیرِ ۱۸ سال است، این بخش را والد یا سرپرست پر می‌کند.</p>
+    <div class="row-2">
+      <div class="f"><label for="pn">نام و نام‌خانوادگیِ والد</label><input type="text" id="pn" name="Parent Name" required placeholder="نامِ کامل"></div>
+      <div class="f"><label for="pw">شماره‌ی واتساپِ والد</label><input type="text" id="pw" name="Parent WhatsApp" required placeholder="۰۹۱۲..."></div>
+    </div>
+    <div class="f"><label>رضایتِ فیلم‌برداری</label>
+      <label class="consent">
+        <input type="checkbox" name="Parent Consent — Filming" value="Yes" required>
+        <span class="ctxt">اجازه می‌دهم مربیِ آکادمی از بازیِ فرزندم <b>فیلمِ کوتاه</b> بگیرد و آن را فقط برای تحلیلِ حرکت در اختیارِ AA Performance بگذارد. این فیلم منتشر نمی‌شود، در شبکه‌های اجتماعی گذاشته نمی‌شود، و هر زمان بخواهم حذف می‌شود.</span>
+      </label>
+    </div>
+    <div class="f"><label>رضایتِ اطلاعات</label>
+      <label class="consent">
+        <input type="checkbox" name="Parent Consent — Data" value="Yes" required>
+        <span class="ctxt">می‌دانم که <b>گزارشِ هفتگیِ تمرین، تحرک و ریکاوریِ</b> فرزندم با مربیِ آکادمی به اشتراک گذاشته می‌شود.</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- 02 · TENNIS -->
+  <section class="fsec">
+    <div class="sbadge">۰۲ — تنیس</div>
+    <h2>تنیست</h2>
+    <p class="sdesc">تا برنامه با بازیِ واقعیِ تو جور باشد، نه با یک بازیکنِ فرضی.</p>
+    <div class="row-2">
+      <div class="f"><label for="yrs">چند سال است تنیس بازی می‌کنی؟</label>
+        <select id="yrs" name="Years Playing" required><option value="" disabled selected>انتخاب</option>
+          <option value="Under 1 year">زیرِ ۱ سال</option><option value="1-2 years">۱–۲ سال</option>
+          <option value="3-5 years">۳–۵ سال</option><option value="6+ years">۶ سال یا بیشتر</option></select></div>
+      <div class="f"><label for="hrs">هفته‌ای چند ساعت روی زمین هستی؟</label>
+        <select id="hrs" name="Court Hours / Week" required><option value="" disabled selected>انتخاب</option>
+          <option value="Under 3 hours">زیرِ ۳ ساعت</option><option value="3-5 hours">۳–۵ ساعت</option>
+          <option value="6-9 hours">۶–۹ ساعت</option><option value="10-14 hours">۱۰–۱۴ ساعت</option>
+          <option value="15+ hours">۱۵ ساعت یا بیشتر</option></select></div>
+    </div>
+    <div class="f"><label>دستِ برتر</label>
+      <div class="rcards" style="grid-template-columns:1fr 1fr;">
+        <div class="rcard"><input type="radio" id="h_r" name="Dominant Hand" value="Right" required><label for="h_r"><span class="ic">🤚</span>راست‌دست</label></div>
+        <div class="rcard"><input type="radio" id="h_l" name="Dominant Hand" value="Left"><label for="h_l"><span class="ic">✋</span>چپ‌دست</label></div>
+      </div>
+    </div>
+    <div class="f"><label>بک‌هند</label>
+      <div class="rcards" style="grid-template-columns:1fr 1fr;">
+        <div class="rcard"><input type="radio" id="b_1" name="Backhand" value="One-handed" required><label for="b_1"><span class="ic">🎾</span>تک‌دست</label></div>
+        <div class="rcard"><input type="radio" id="b_2" name="Backhand" value="Two-handed"><label for="b_2"><span class="ic">🙌</span>دو‌دست</label></div>
+      </div>
+    </div>
+    <div class="f"><label>سطحِ بازی</label>
+      <div class="rcards">
+        <div class="rcard"><input type="radio" id="tl1" name="Playing Level" value="Beginner" required><label for="tl1"><span class="ic">🟢</span>مبتدی</label></div>
+        <div class="rcard"><input type="radio" id="tl2" name="Playing Level" value="Club / Academy"><label for="tl2"><span class="ic">🔵</span>باشگاهی / آکادمی</label></div>
+        <div class="rcard"><input type="radio" id="tl3" name="Playing Level" value="Regional Competitor"><label for="tl3"><span class="ic">🟡</span>مسابقاتِ استانی</label></div>
+        <div class="rcard"><input type="radio" id="tl4" name="Playing Level" value="National Competitor"><label for="tl4"><span class="ic">🟠</span>مسابقاتِ کشوری</label></div>
+      </div>
+    </div>
+    <div class="f"><label for="comp">مسابقه‌ی بعدی‌ات کِی است؟ <span class="hint">اختیاری — کمک می‌کند برنامه را طوری بچینم که سرِ مسابقه خسته نباشی</span></label>
+      <input type="text" id="comp" name="Next Competition" placeholder="مثلاً اواخرِ آبان، مسابقاتِ استانی"></div>
+    <div class="f"><label for="tgoal">در تنیست دنبالِ چه چیزی هستی؟ <span class="hint">اختیاری — یکی‌دو جمله</span></label>
+      <textarea id="tgoal" name="Tennis Goal" rows="2" placeholder="مثلاً «توپ‌های عرضی رو دیر می‌رسم»، «ست سوم کم میارم»، «سرویسم قدرت نداره»"></textarea></div>
+  </section>
+
+  <!-- 03 · BODY -->
+  <section class="fsec">
+    <div class="sbadge">۰۳ — بدن</div>
+    <h2>وضعیتِ بدن</h2>
+    <p class="sdesc">این بخش امنیتت را حفظ می‌کند و کمک می‌کند برنامه را دورِ محدودیت‌هایت بچینم.</p>
+    <div class="f"><label>الان درد یا آسیبی داری؟</label>
+      <div class="rcards" style="grid-template-columns:1fr 1fr;">
+        <div class="rcard"><input type="radio" id="inj_no" name="Current Injury" value="No" required><label for="inj_no"><span class="ic">✅</span>نه</label></div>
+        <div class="rcard"><input type="radio" id="inj_yes" name="Current Injury" value="Yes"><label for="inj_yes"><span class="ic">⚠️</span>آره</label></div>
+      </div>
+    </div>
+    <div class="f cond" id="injWrap"><label for="injd">کوتاه توضیح بده <span class="hint">کدام عضو، چند وقت است، شدت ۱ تا ۱۰</span></label>
+      <textarea id="injd" name="Injury Details" rows="2" placeholder="مثلاً شانه‌ی راست — ۳ هفته — موقعِ سرویس — ۴ از ۱۰"></textarea></div>
+    <div class="f"><label>آسیب یا دردی که هنوز گاهی اذیتت می‌کند <span class="hint">هر چه هست انتخاب کن</span></label>
+      <div class="pills">
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>شانه</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>آرنج / مچِ دست</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>کمر</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Hip / Groin"><span>لگن / کشاله</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Knee"><span>زانو</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Ankle / Foot"><span>مچِ پا / پا</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="None"><span>هیچ‌کدام</span></label>
+      </div>
+    </div>
+    <div class="f"><label for="avoid">حرکتی هست که پزشک یا فیزیوتراپ گفته انجام ندهی؟ <span class="hint">اختیاری</span></label>
+      <input type="text" id="avoid" name="Avoid Movements" placeholder="مثلاً پرسِ بالای سر، پرش"></div>
+    <!-- Growth spurt — only asked of juniors; changes how much jumping/landing load is safe. -->
+    <div class="f cond" id="growWrap"><label>در ۶ ماهِ گذشته جهشِ قدی داشته‌ای؟ <span class="hint">اگر قدت سریع بلند شده، برنامه باید محتاط‌تر باشد</span></label>
+      <div class="rcards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="rcard"><input type="radio" id="gr_y" name="Recent Growth Spurt" value="Yes"><label for="gr_y"><span class="ic">📈</span>بله، زیاد</label></div>
+        <div class="rcard"><input type="radio" id="gr_s" name="Recent Growth Spurt" value="A little"><label for="gr_s"><span class="ic">➖</span>کمی</label></div>
+        <div class="rcard"><input type="radio" id="gr_n" name="Recent Growth Spurt" value="No"><label for="gr_n"><span class="ic">✅</span>نه</label></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · TRAINING & ACCESS -->
+  <section class="fsec">
+    <div class="sbadge">۰۴ — تمرین و دسترسی</div>
+    <h2>کجا و چقدر می‌توانی تمرین کنی</h2>
+    <p class="sdesc">تا فقط حرکاتی بنویسم که واقعاً می‌توانی انجام بدهی.</p>
+    <div class="f"><label>تا حالا تمرینِ قدرتی یا بدنسازی کرده‌ای؟</label>
+      <div class="rcards">
+        <div class="rcard"><input type="radio" id="g1" name="Gym Experience" value="Never" required><label for="g1"><span class="ic">🆕</span>هیچ‌وقت</label></div>
+        <div class="rcard"><input type="radio" id="g2" name="Gym Experience" value="A little" ><label for="g2"><span class="ic">📅</span>کمی</label></div>
+        <div class="rcard"><input type="radio" id="g3" name="Gym Experience" value="1-2 years"><label for="g3"><span class="ic">💪</span>۱–۲ سال</label></div>
+        <div class="rcard"><input type="radio" id="g4" name="Gym Experience" value="2+ years"><label for="g4"><span class="ic">🏋️</span>۲ سال یا بیشتر</label></div>
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="f"><label for="days">هفته‌ای چند روز برای تمرینِ بدنی وقت داری؟</label>
+        <select id="days" name="Available Days" required><option value="" disabled selected>انتخاب</option>
+          <option value="1 day">۱ روز</option><option value="2 days">۲ روز</option>
+          <option value="3 days">۳ روز</option><option value="4+ days">۴ روز یا بیشتر</option></select></div>
+      <div class="f"><label for="slen">هر جلسه چقدر وقت داری؟</label>
+        <select id="slen" name="Session Length" required><option value="" disabled selected>انتخاب</option>
+          <option value="~20 min">حدودِ ۲۰ دقیقه</option><option value="~30 min">حدودِ ۳۰ دقیقه</option>
+          <option value="~45 min">حدودِ ۴۵ دقیقه</option><option value="60+ min">۶۰ دقیقه یا بیشتر</option></select></div>
+    </div>
+    <div class="f"><label>کجا تمرین می‌کنی؟</label>
+      <div class="rcards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="rcard"><input type="radio" id="e1" name="Environment" value="Tennis Court" required><label for="e1"><span class="ic">🎾</span>زمینِ تنیس</label></div>
+        <div class="rcard"><input type="radio" id="e2" name="Environment" value="Home"><label for="e2"><span class="ic">🏠</span>خانه</label></div>
+        <div class="rcard"><input type="radio" id="e3" name="Environment" value="Gym"><label for="e3"><span class="ic">🏢</span>باشگاه</label></div>
+      </div>
+    </div>
+    <div class="f"><label>به چه وسایلی دسترسی داری؟ <span class="hint">هر چه هست انتخاب کن — اگر هیچی نداری هم مشکلی نیست</span></label>
+      <div class="pills">
+        <label class="pill"><input type="checkbox" name="Equipment" value="Resistance Bands"><span>کشِ مقاومتی</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Dumbbells"><span>دمبل</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Medicine Ball"><span>مدیسن‌بال</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Cones / Ladder"><span>مخروط / نردبان</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Skipping Rope"><span>طنابِ ورزشی</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Pull-Up Bar"><span>بارفیکس</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Barbell & Rack"><span>هالتر و رک</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Gym Machines"><span>دستگاه‌های باشگاه</span></label>
+        <label class="pill"><input type="checkbox" name="Equipment" value="Bodyweight only"><span>فقط وزنِ بدن</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · RECOVERY -->
+  <section class="fsec">
+    <div class="sbadge">۰۵ — ریکاوری</div>
+    <h2>خواب و فشارِ هفته</h2>
+    <p class="sdesc">اگر خوابت کم باشد، سنگین‌تر نوشتنِ برنامه فقط تو را خسته‌تر می‌کند.</p>
+    <div class="f"><label for="sleepH">میانگینِ ساعتِ خوابِ شبانه</label>
+      <select id="sleepH" name="Sleep Hours" required><option value="" disabled selected>انتخاب</option>
+        <option value="Under 6 hours">زیرِ ۶ ساعت</option><option value="6-7 hours">۶–۷ ساعت</option>
+        <option value="7-8 hours">۷–۸ ساعت</option><option value="9+ hours">۹ ساعت یا بیشتر</option></select></div>
+    <div class="f"><label for="sleepS">کیفیتِ خوابت معمولاً چطور است؟</label>
+      <div class="slider is-unset" id="sleepWrap"><span class="sedge">بد</span><input type="range" id="sleepS" min="1" max="10" value="7"><span class="sedge">عالی</span><span class="sval" id="sleepV">—</span></div>
+      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value="" data-count-progress required></div>
+    <div class="f"><label for="lifeLoad">بیرون از تنیس، هفته‌ات چقدر پرفشار است؟ <span class="hint">مدرسه، امتحان، کار، رفت‌وآمد</span></label>
+      <select id="lifeLoad" name="Weekly Life Load" required><option value="" disabled selected>انتخاب</option>
+        <option value="Light — plenty of downtime">سبک — وقتِ آزادِ زیاد</option>
+        <option value="Moderate — busy but manageable">متوسط — شلوغ ولی قابلِ مدیریت</option>
+        <option value="Heavy — long days, little downtime">سنگین — روزهای طولانی، وقتِ کم</option>
+        <option value="Very heavy — constantly stretched">خیلی سنگین — همیشه تحتِ فشار</option></select></div>
+  </section>
+
+  <!-- 06 · CONSENT (player / adult) -->
+  <section class="fsec">
+    <div class="sbadge">۰۶ — تأیید</div>
+    <h2>یک تأییدِ آخر</h2>
+    <p class="sdesc">تا همه بدانیم قرار است چه اتفاقی بیفتد.</p>
+    <div class="f" id="selfConsentWrap"><label>فیلم‌برداری و گزارش</label>
+      <label class="consent">
+        <input type="checkbox" name="Player Consent" value="Yes" required>
+        <span class="ctxt">می‌دانم که مربی‌ام از بازیِ من <b>فیلمِ کوتاه</b> می‌گیرد و آن را فقط برای تحلیلِ حرکت در اختیارِ AA Performance می‌گذارد — منتشر نمی‌شود — و اینکه <b>گزارشِ هفتگیِ تمرین و ریکاوری‌ام</b> با مربیِ آکادمی به اشتراک گذاشته می‌شود.</span>
+      </label>
+    </div>
+    <div class="f"><label for="anything">چیزِ دیگری هست که باید بدانم؟ <span class="hint">اختیاری</span></label>
+      <textarea id="anything" name="Anything Else" rows="2" placeholder="هر چیزی که فکر می‌کنی به درد می‌خورد"></textarea></div>
+  </section>
+
+  <div class="submit">
+    <button type="submit" id="sbtn" class="sbtn">ثبت‌نام ←</button>
+    <p class="snote">جواب‌هایت مستقیم برای امیر اردکانی ارسال می‌شود.<br>با ارسال، با <a href="privacy.html">حریمِ خصوصی</a> و <a href="terms-fa.html">قوانین</a> موافقت می‌کنی.</p>
+  </div>
+</form>
+</div>
+</div><!-- /#formZone -->
+
+<div id="ok" class="ok" role="dialog" aria-modal="true">
+  <div class="ok-card">
+    <div class="ok-check">✓</div>
+    <h2>ثبت شد!</h2>
+    <p>ثبت‌نامت رسید. قدمِ بعدی دستِ مربی‌ات است — در تمرینِ بعدی از بازیِ تو فیلم می‌گیرد و برای من می‌فرستد.</p>
+    <p>بعد از آن، من و فراز با هم پروفایل و برنامه‌ات را می‌بندیم و از طریقِ آکادمی به دستت می‌رسد.</p>
+  </div>
+</div>
+
+<div class="scta" id="stickyCta">
+  <div class="scta-in">
+    <span class="lbl">ویژه‌ی بازیکنانِ آکادمی تنیس اطمینان</span>
+    <button type="button" id="openForm2">ثبت‌نام ←</button>
+  </div>
+</div>
+
+<footer class="foot">
+  آکادمی تنیس اطمینان · با همکاریِ AA Performance
+  <span class="fl">© <span id="yr"></span> امیر اردکانی — مربیِ قدرت و آمادگی · <a href="/index-fa.html">amirardekani.com</a></span>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  var fa=function(s){return String(s).replace(/[0-9]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[d];});};
+
+  var form=document.getElementById('frm'),
+      formZone=document.getElementById('formZone'),
+      ctaBlock=document.getElementById('ctaBlock'),
+      pPct=document.getElementById('pPct'),pFill=document.getElementById('pFill'),pCount=document.getElementById('pCount');
+
+  // ── OPEN THE FORM ────────────────────────────────────────────────────────
+  // The form is hidden until asked for: a wall of questions under the pitch
+  // reads as work, the same questions after a deliberate tap read as a start.
+  // Reveal animations are wired up HERE, not at load — an element inside
+  // [hidden] has a zero-size bounding box, so observing it early would mark
+  // every section "visible" before it was ever on screen.
+  var stickyCta=document.getElementById('stickyCta'),
+      heroEl=document.querySelector('.hero');
+  function openTheForm(){
+    if(!formZone.hidden)return;            // both buttons open the same thing
+    formZone.hidden=false;
+    ctaBlock.style.display='none';
+    stickyCta.classList.remove('on');      // it has done its job
+    initReveal();
+    upd();
+    // The pitch is behind them now — show it outright. Without this, the long
+    // programmatic scroll below can outrun the observer and strand a section
+    // at opacity 0 for anyone who scrolls back up.
+    document.querySelectorAll('.band .blk').forEach(function(el){el.classList.add('visible');});
+    var first=formZone.querySelector('.fsec');
+    if(first)first.scrollIntoView({behavior:'smooth',block:'start'});
+    if(window.plausible)window.plausible('Etminan Form Opened');
+  }
+  document.getElementById('openForm').addEventListener('click',openTheForm);
+  document.getElementById('openForm2').addEventListener('click',openTheForm);
+
+  // ── PARENT / GUARDIAN BLOCK ─────────────────────────────────────────────
+  // Under 18 → parent details and the two consents become required. Over 18 →
+  // the player signs for themselves in section 06. firstMissing() skips any
+  // .cond that is not .on, so the switch also switches the requirements.
+  var ageEl=document.getElementById('age'),
+      parentSec=document.getElementById('parentSec'),
+      growWrap=document.getElementById('growWrap'),
+      selfWrap=document.getElementById('selfConsentWrap');
+  function ageGate(){
+    var n=parseInt(ageEl.value,10);
+    var minor=!isNaN(n)&&n>0&&n<18;
+    parentSec.classList.toggle('on',minor);
+    growWrap.classList.toggle('on',minor);
+    // A minor's parent has already consented in 01b — don't ask the child twice.
+    selfWrap.style.display=minor?'none':'';
+    var self=selfWrap.querySelector('input[type=checkbox]');
+    if(self){ self.required=!minor; if(minor)self.checked=false; }
+    if(!minor){
+      parentSec.querySelectorAll('input').forEach(function(el){
+        if(el.type==='checkbox')el.checked=false; else el.value='';
+      });
+      growWrap.querySelectorAll('input').forEach(function(r){r.checked=false;});
+    }
+    upd();
+  }
+  ageEl.addEventListener('input',ageGate);
+  ageEl.addEventListener('change',ageGate);
+
+  // injury detail
+  document.querySelectorAll('input[name="Current Injury"]').forEach(function(el){
+    el.addEventListener('change',function(){document.getElementById('injWrap').classList.toggle('on',this.value==='Yes');upd();});
+  });
+
+  // ── sliders ──
+  // The range has no nominal value: it only copies into the hidden field once
+  // the athlete actually touches it, so an untouched slider sends nothing
+  // rather than a default that looks like an answer.
+  [['sleepS','sleepV','sleepWrap','sleepValue']].forEach(function(p){
+    var s=document.getElementById(p[0]),v=document.getElementById(p[1]),
+        wrap=document.getElementById(p[2]),hid=document.getElementById(p[3]);
+    if(!s||!v||!wrap||!hid)return;
+    function commit(){hid.value=s.value;v.textContent=fa(s.value);wrap.classList.remove('is-unset');clearErr(hid);upd();}
+    s.addEventListener('input',commit);
+    s.addEventListener('pointerdown',commit);
+    s.addEventListener('keydown',commit);
+  });
+
+  // ── validation ──
+  // The form is novalidate, so nothing is enforced unless it is checked here.
+  function answered(el){
+    if(el.type==='radio'||el.type==='checkbox')return !!form.querySelector('[name="'+CSS.escape(el.name)+'"]:checked');
+    if(el.type==='hidden')return (el.value||'').trim().length>0; // hidden is exempt from browser validation
+    return el.checkValidity();
+  }
+  function fieldOf(el){return el.closest('.f')||el.closest('.fsec');}
+  function clearErr(el){var f=fieldOf(el);if(!f)return;f.classList.remove('has-error');
+    var m=f.querySelector('.ferr');if(m)m.remove();}
+  function showErr(el,txt){var f=fieldOf(el);if(!f)return;f.classList.add('has-error');
+    if(!f.querySelector('.ferr')){var m=document.createElement('p');m.className='ferr';
+      m.setAttribute('role','alert');m.textContent=txt;f.appendChild(m);}}
+  function hiddenByGate(el){
+    var c=el.closest('.cond'); if(c&&!c.classList.contains('on'))return true;
+    var f=el.closest('.f');    if(f&&f.style.display==='none')return true;
+    return false;
+  }
+  function firstMissing(){
+    var seen={},req=form.querySelectorAll('[required]');
+    for(var i=0;i<req.length;i++){var el=req[i];
+      if(!el.name||seen[el.name])continue;seen[el.name]=1;
+      if(hiddenByGate(el))continue; // never asked
+      if(!answered(el))return el;}
+    return null;
+  }
+
+  // dynamic subject — so the inbox shows who it is without opening it
+  function subj(){var n=[document.getElementById('fn').value.trim(),document.getElementById('ln').value.trim()].filter(Boolean).join(' ');
+    document.getElementById('subj').value=n?'ثبت‌نامِ جدید — آکادمی اطمینان — '+n:'ثبت‌نامِ جدید — آکادمی اطمینان';}
+  document.getElementById('fn').addEventListener('input',subj);
+  document.getElementById('ln').addEventListener('input',subj);
+
+  // progress
+  function filled(el){if(!el||el.disabled)return false;var t=(el.type||'').toLowerCase();
+    if(t==='radio'||t==='checkbox')return !!form.querySelector('[name="'+CSS.escape(el.name)+'"]:checked');
+    if(el.tagName==='SELECT')return el.value&&el.value!=='';return (el.value||'').trim().length>0;}
+  function collect(){var seen={},q=[];form.querySelectorAll('input,select,textarea').forEach(function(el){
+    if(el.type==='hidden'&&!el.hasAttribute('data-count-progress'))return;
+    if(el.name==='botcheck'||!el.name)return;
+    if(el.hasAttribute('data-skip-progress'))return;
+    if(hiddenByGate(el))return;
+    if(seen[el.name])return;seen[el.name]=1;q.push(el);});return q;}
+  function upd(){var f=collect(),tot=f.length,fl=f.filter(filled).length,p=tot?Math.round(fl/tot*100):0;
+    pPct.textContent=fa(p)+'٪';pFill.style.width=p+'%';pCount.textContent=fa(fl)+' / '+fa(tot);}
+  form.addEventListener('input',upd);form.addEventListener('change',upd);
+
+  // answering a field clears its error
+  form.addEventListener('input',function(e){if(e.target&&e.target.name)clearErr(e.target);});
+  form.addEventListener('change',function(e){if(e.target&&e.target.name)clearErr(e.target);});
+
+  // ── Durable capture in Supabase (Amir's own server) ──────────────────────
+  // Same dual-write as form-fa.html: Web3Forms for the email, submit_intake
+  // for the record that survives Web3Forms being down. p_programme carries the
+  // academy so these are filterable in coach.html → Intake with no migration.
+  const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+  const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
+  const SKIP_KEYS = new Set(['access_key','from_name','subject','redirect','botcheck']);
+  var asText = function(x){ return Array.isArray(x) ? x.join(', ') : (x==null ? '' : String(x)); };
+  function intakePayload(formEl){
+    var out={};
+    new FormData(formEl).forEach(function(v,k){
+      if(SKIP_KEYS.has(k))return;
+      var val = typeof v==='string' ? v.trim() : v;
+      if(val==='')return;
+      out[k]=(k in out)?[].concat(out[k],val):val;
+    });
+    return out;
+  }
+  async function sendToSupabase(formEl,lang){
+    var p=intakePayload(formEl);
+    var name=[asText(p['First Name']),asText(p['Last Name'])].filter(Boolean).join(' ').trim();
+    var res=await fetch(SB_URL+'/rest/v1/rpc/submit_intake',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        p_payload:p,
+        p_lang:lang,
+        p_name:name||null,
+        p_email:asText(p['Email'])||null,
+        p_contact:asText(p['Contact (Instagram/WhatsApp)'])||null,
+        p_programme:'Etminan Tennis Academy'
+      })
+    });
+    if(!res.ok)throw new Error('supabase '+res.status);
+    return true;
+  }
+
+  // submit
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();
+    if(form.querySelector('[name="botcheck"]').checked)return;
+
+    var miss=firstMissing();
+    if(miss){
+      var badEmail=miss.type==='email'&&(miss.value||'').trim();
+      showErr(miss,badEmail?'ایمیلِ معتبر وارد کن.':(miss.type==='checkbox'?'برای ادامه باید این را تأیید کنی.':'این سؤال را جواب بده.'));
+      var f=fieldOf(miss);
+      if(f)f.scrollIntoView({behavior:'smooth',block:'center'});
+      if(miss.offsetParent!==null){try{miss.focus({preventScroll:true});}catch(err){}}
+      return;
+    }
+
+    var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
+    try{
+      var rs=await Promise.allSettled([sendToSupabase(this,'fa'),fetch(this.action,{method:'POST',body:new FormData(this)})]);
+      var ok=rs[0].status==='fulfilled'||(rs[1].status==='fulfilled'&&rs[1].value&&rs[1].value.ok);
+      if(ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});if(window.plausible)window.plausible('Etminan Form Submitted');}
+      else throw new Error('fail');
+    }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
+  });
+
+  // ── reveal on scroll ──
+  var io=null;
+  function observe(els){
+    if(!('IntersectionObserver' in window)){els.forEach(function(el){el.classList.add('visible');});return;}
+    if(!io)io=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+    });},{threshold:.08});
+    els.forEach(function(el){el.classList.add('rv');io.observe(el);});
+    requestAnimationFrame(function(){els.forEach(function(el){
+      if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('visible');
+    });});
+  }
+  var revealed=false;
+  function initReveal(){
+    if(revealed)return;revealed=true;
+    observe(Array.prototype.slice.call(formZone.querySelectorAll('.fsec, .submit')));
+  }
+  // Safety net. Any fast scroll — the CTA's jump, a flung phone, an anchor —
+  // can carry the page past a section between observer samples, and a missed
+  // sample means opacity 0 forever. The fade is decoration; the content is
+  // not. Anything the page has already reached gets shown, observer or no.
+  function sweepReveal(){
+    document.querySelectorAll('.rv:not(.visible)').forEach(function(el){
+      if(el.getBoundingClientRect().top<window.innerHeight){
+        el.classList.add('visible');
+        if(io)io.unobserve(el);
+      }
+    });
+  }
+  observe(Array.prototype.slice.call(document.querySelectorAll('.band .blk')));
+
+  // scroll progress bar
+  var bar=document.createElement('div');bar.className='scroll-progress';bar.setAttribute('aria-hidden','true');
+  document.body.appendChild(bar);
+  var tick=false;
+  window.addEventListener('scroll',function(){
+    if(tick)return;tick=true;
+    requestAnimationFrame(function(){
+      var h=document.documentElement,m=h.scrollHeight-h.clientHeight;
+      bar.style.transform='scaleX('+(m>0?h.scrollTop/m:0)+')';
+      sweepReveal();
+      // Show the sticky bar once the hero is off screen — and only while the
+      // form is still shut.
+      stickyCta.classList.toggle('on', formZone.hidden && heroEl.getBoundingClientRect().bottom<0);
+      tick=false;
+    });
+  },{passive:true});
+
+  upd();
+})();
+</script>
+</body>
+</html>
