@@ -397,9 +397,20 @@ freshness, safe to reuse later) unless the brief/Amir flagged it as `Disliked`,
 exercise → `Active`. If nothing changed status this cycle beyond the normal rotate/keep,
 say so in one line rather than omitting the section.
 
-**Volume & Dose** — table: priority muscle → programmed sets/week → goal range → verdict
-(developing / maintaining / under-dosed / by-design). Frame a time-limited under-dose as
-"maintenance," and say where to invest if time allows.
+**Volume & Dose** — **TWO tables, both of them, every time.** See COACHING-PRINCIPLES.md →
+"Volume & dosing" → *Count every exercise that loads the muscle* for the counting convention;
+never score isolation-only.
+
+1. **Per-exercise contribution** — day · exercise · sets · what it counts toward, with the
+   fraction shown where it is not 1.0 (`Glutes 2 (×0.5)`). This is the working, and Amir reads it.
+2. **Per-muscle total** — muscle → sets/week → goal range → verdict (developing / maintaining /
+   under-dosed / over / by-design).
+
+Count **1.0** prime mover · **0.5** significant synergist or shortened-range only · **0**
+stabiliser. Warm-up and activation circuits don't count, except core, which counts wherever it
+sits. Frame a time-limited under-dose as "maintenance," and say where to invest if time allows.
+Flag an **over** as loudly as an under — the fractional count surfaces over-dosing the direct-only
+count used to hide.
 
 **Progression levers** — per primary: lever · add-trigger · increment · deload call. How
 Amir drives week-to-week progression from the logs.

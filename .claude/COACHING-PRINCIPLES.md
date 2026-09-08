@@ -494,6 +494,34 @@ publish it. No athlete health/chat detail goes here — principles only.
   here: chest volume stays low or omitted, the volume goes into pulling and scapular work instead,
   and the exception is stated on the face of the design rather than silently resolved either way.
   *(2026-09-05, Elmira C3 — chest held at 3 sets against a 10-20 range, deliberately.)*
+- **⚖️ COUNT EVERY EXERCISE THAT LOADS THE MUSCLE, NOT JUST THE ISOLATION WORK — and show the
+  working in the coaching log.** *(2026-09-08, Amir, verbatim: "why are you calculating hamstring
+  work just by isolated movements? she is getting them from rdls, hipthrusts and other stuff, all
+  the muscles are like this, why are you focusing too much on isolation movements? … when the
+  machine is not there, just being able to hit the minimum of 10 sets a week is good" and "i know
+  sometimes you count some exercises as 0.5 a set, which is ok".)* The convention:
+
+  | Weight | When | Example |
+  |---|---|---|
+  | **1.0** | the muscle is a prime mover, trained under load through a real range | RDL → hamstrings; lat pulldown → back; lateral raise → shoulder |
+  | **0.5** | significant synergist, OR a prime mover loaded only in a shortened / partial range | hip thrust → hamstrings; leg press → glutes; row → biceps; overhead press → triceps |
+  | **0** | stabiliser only, or trivial contribution | plank → glutes |
+
+  Warm-up and activation circuits do **not** count — they are priming, not dose. The one exception
+  is **core, which counts wherever it sits**, activation rounds included.
+
+  **Every volume tally is published as TWO tables in the athlete's coaching log**: a per-exercise
+  table (day · exercise · sets · what it counts toward, fractions shown) and the per-muscle total
+  against its goal range. Amir reads the working, not just the verdict — a bare "hamstrings 11"
+  hides which exercises produced it and whether the number is real.
+
+  **Why this is a rule and not a preference:** scored isolation-only, a muscle can read as
+  under-dosed when the athlete is training it hard through compounds, and the programme then gets
+  contorted around a number that was never true. Elmira C3 read hamstrings 11 direct-only and a
+  seated leg curl looked load-bearing; counted properly it was 14.5, and the same pass revealed
+  glutes at **22 — over the 10-20 ceiling** — which the old convention had scored 13. The error
+  runs in both directions. **A missing machine is not a reason to contort the programme:** clear
+  the 10-set floor with what the gym has and move on.
 
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle

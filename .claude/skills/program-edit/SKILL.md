@@ -101,10 +101,19 @@ Two tallies, both before touching any numbers and both shown to Amir for sign-of
 
 **4a. Weekly sets per muscle** — tally and present. Targets for a foundation/beginner cycle (adjust upward in later cycles):
 - Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
-- Small muscles (shoulders, biceps, triceps): 6–12 sets/week
+- Small muscles (biceps, triceps): 6–12 sets/week. **Shoulder is ONE muscle group on the 10–20 range** — see COACHING-PRINCIPLES.md
 - Core: count every set regardless of where it sits — activation circuit rounds count as sets just like Primary/Accessory block sets
 
-Flag anything very low (chest at 3 sets) or disproportionately high.
+**⚖️ COUNT EVERY EXERCISE THAT LOADS THE MUSCLE, NOT JUST THE ISOLATION WORK.** An RDL is
+hamstring volume; a row is back volume and half a set of biceps. Scoring isolation-only makes a
+well-trained muscle read under-dosed and then contorts the programme around a number that was
+never true. **1.0** prime mover · **0.5** significant synergist or prime mover in a shortened /
+partial range · **0** stabiliser. Warm-up and activation circuits don't count (except core).
+Full convention + the worked example: COACHING-PRINCIPLES.md → "Volume & dosing".
+
+Flag anything very low (chest at 3 sets) **or over the ceiling** — the fractional count surfaces
+over-dosing that a direct-only count hides. A missing machine is never a reason to bend the
+programme: clear the 10-set floor with what the gym has.
 
 **4b. Per-day load distribution** — raw set count lies, so weight each working set by systemic cost (**heavy compound ×1.5, moderate compound ×1.0, isolation ×0.5**) and tally the cost-weighted load per day. Then check:
 - Does each day have a deliberate **load identity**, and does the week **undulate** (one peak / one–two moderate / one low day) — or is it four flat "RPE 6, everything matters" days?
@@ -129,12 +138,19 @@ STRUCTURAL
 - Day 1 Movement Drills block: remove (forward skip, lateral step-touch — gym session)
 - Day 3 core exercises (dead bug, bird dog) in prep circuit: move to end
 
-VOLUME (per muscle / week)
-| Muscle    | Sets |
-|-----------|------|
-| Glutes    | 19   |
-| Quads     | 12   |
-| Chest     | 3 ← low |
+VOLUME — per-exercise contribution (the working)
+| Day | Exercise            | Sets | Counts toward                    |
+|-----|---------------------|------|----------------------------------|
+| D2  | Barbell Hip Thrust  | 4    | Glutes 4, Hamstrings 2 (x0.5)    |
+| D3  | DB Romanian Deadlift| 4    | Hamstrings 4, Glutes 2 (x0.5)    |
+...
+
+VOLUME — per muscle / week
+| Muscle     | Sets | Goal  | Verdict |
+|------------|------|-------|---------|
+| Glutes     | 22   | 10-20 | OVER    |
+| Hamstrings | 14.5 | 10-20 | in range|
+| Chest      | 3    | 10-20 | under (deliberate — posture) |
 ...
 
 PER-DAY LOAD (cost-weighted)
@@ -163,10 +179,23 @@ After editing, re-tally the set counts to confirm the numbers match what was agr
 
 Report what changed, the updated set tally, and flag anything left for a future session.
 
-**Then log the change.** Append a dated in-cycle note under the *current* cycle's section in
-`.claude/coaching-log/<athlete_id>.md` — what changed + why (e.g. *In-cycle edit (2026-06-28):
-Bulgarian Split Squat → Split Squat — R-knee pain on BSS*). This keeps the coaching log the
-complete running record (design rationale + in-cycle adaptations) that the next /program-design
-reads, so a swap-for-pain isn't silently reversed next cycle. **Append-only** — never edit a
-prior cycle's section. (No log yet? Note the change for Amir; the file is created at the next
-/program-assemble.)
+**Then log the change.** Append a dated in-cycle note under an `## In-cycle edits — Cycle N`
+heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split
+Squat — R-knee pain on BSS*). This keeps the coaching log the complete running record (design
+rationale + in-cycle adaptations) that the next /program-design reads, so a swap-for-pain isn't
+silently reversed next cycle. **Append-only** — never edit a prior cycle's section. The one
+living exception is the **Exercise Ledger** at the top: an exercise you added or removed must
+have its row updated (status, last cycle, and *why*), or the next cycle's design reads a roster
+that no longer exists.
+
+⚠️ **The log is `public.coaching_logs`, not a file** — see the banner at the top of this skill.
+Update the local `.claude/coaching-log/<id>.md` scratch copy too, then push and verify with
+`md5(body)`; both sides are plain text so a straight hash comparison IS valid here (normalise
+CRLF → LF first — the local file has Windows line endings and the row does not).
+
+**⚖️ If the edit changed ANY set count, the new tables go in the log** — both of them,
+per-exercise and per-muscle, per Rule 4a. Amir asked for this explicitly (2026-09-08: *"i want
+her set count table in her coaching log … whenever you calculate the sets, add that table to the
+athlete coaching log so i can see"*). A tally that only ever appears in chat is gone by the next
+session, and the next /program-design then re-derives it from scratch — which is exactly how a
+wrong counting convention survived three cycles.

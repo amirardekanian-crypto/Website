@@ -179,6 +179,12 @@ reasoning is allowed to live. See `.claude/coaching-log/README.md` for the conve
   lockstep with `programHistory` / `currentCycleIndex`.)
 - Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
 - Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
+- **⚖️ The Volume & Dose section must carry BOTH set-count tables** — the per-exercise
+  contribution table (day · exercise · sets · what it counts toward, fractions shown) *and* the
+  per-muscle total against its goal range. Standing order from Amir (2026-09-08): *"whenever you
+  calculate the sets, add that table to the athlete coaching log so i can see."* If /program-design
+  handed over only the summary table, build the per-exercise one here rather than shipping without
+  it. Counting convention: COACHING-PRINCIPLES.md → "Volume & dosing".
 - **Exercise Ledger — apply design's "Exercise Ledger Updates" deltas.** Unlike the cycle
   sections, this table (sitting right after the file header, before the first `## Cycle`
   section) is mutated in place every cycle — it's a current-state index, not a historical
