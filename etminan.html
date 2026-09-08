@@ -8,6 +8,15 @@
 <title>برنامه‌ی عملکرد — آکادمی تنیس اطمینان</title>
 <meta name="description" content="برنامه‌ی عملکردِ آکادمی تنیس اطمینان — تحلیلِ حرکتِ تو روی زمین و یک برنامه‌ی آمادگی جسمانی که دور همان ساخته می‌شود.">
 <link rel="canonical" href="https://www.amirardekani.com/etminan.html">
+<!-- This link gets shared in WhatsApp groups more than anywhere else, and a
+     link with no card looks broken. Amir's OG image stands in until there is a
+     co-branded one. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.amirardekani.com/etminan.html">
+<meta property="og:title" content="برنامه‌ی عملکرد — آکادمی تنیس اطمینان">
+<meta property="og:description" content="ده دقیقه از بازی‌ات فیلم گرفته می‌شود، و برنامه‌ی آمادگی جسمانی‌ات از روی همان نوشته می‌شود.">
+<meta property="og:image" content="https://www.amirardekani.com/assets/img/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,21 +90,12 @@
   .step h3{font-weight:800;font-size:17px;margin-bottom:7px;position:relative;}
   .step p{color:var(--ink-2);font-size:14.5px;line-height:1.7;position:relative;}
 
-  /* what gets analysed */
-  .agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px;}
-  @media(max-width:680px){.agrid{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:400px){.agrid{grid-template-columns:1fr;}}
-  .aitem{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:9px;}
-  .aitem .d{width:6px;height:6px;border-radius:50%;background:var(--clay);flex:none;}
-
   /* sample profile card */
   .profile{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:22px;box-shadow:0 12px 34px rgba(40,30,20,.06);}
   .profile-hd{background:var(--green);color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
   .profile-hd .t{font-weight:800;font-size:16px;}
   .profile-hd .s{font-size:12px;font-weight:700;background:rgba(255,255,255,.16);padding:4px 11px;border-radius:100px;}
   .profile-bd{padding:20px 22px 24px;}
-  .profile-bd .who{font-size:14px;color:var(--muted);margin-bottom:16px;}
-  .profile-bd .who b{color:var(--ink);font-weight:700;}
   .prow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
   .prow:last-child{border-bottom:none;}
   .prow .rank{font-family:var(--disp);font-weight:900;font-size:19px;color:var(--muted);width:20px;flex:none;text-align:center;}
@@ -282,13 +282,9 @@
 <nav class="nav">
   <div class="nav-in">
     <div class="lockup">
-      <!-- ⬇ LOGO SLOT — save the academy's ball mark (ideally a transparent PNG
-           or SVG, cropped square to the ball, no green background) to
-           /assets/img/etminan.png and swap this whole <span> for:
-             <span class="mk"><img src="/assets/img/etminan.png" alt="ETA"></span>
-           Until then this stands in: white disc, green ETA — the same shape and
-           colour logic as the real mark, so the nav does not change when it lands. -->
-      <span class="mk">ETA</span>
+      <!-- The mark is green art on a transparent ground, so it needs the white
+           disc under it — on the green nav it would otherwise disappear. -->
+      <span class="mk"><img src="/assets/img/etminan.png" alt="ETA"></span>
       <span class="txt">
         <span class="an">آکادمی تنیس اطمینان</span>
         <span class="pw">با همکاریِ AA Performance</span>
@@ -300,7 +296,7 @@
 <header class="hero">
   <div class="badge">🎾 ویژه‌ی بازیکنانِ آکادمی</div>
   <h1><span class="hw">آمادگی جسمانی، دورِ <span class="acc">تنیسِ تو</span></span></h1>
-  <p class="lede">نه یک برنامه‌ی عمومیِ باشگاه. مربی‌ات ده دقیقه از بازیِ تو فیلم می‌گیرد، حرکتت تحلیل می‌شود، و بعد <b>فراز و امیر با هم</b> برنامه‌ای برایت می‌بندند که دقیقاً همان چیزهایی را می‌سازد که تنیسِ تو به آن‌ها نیاز دارد.</p>
+  <p class="lede">بیشترِ برنامه‌های بدنسازیِ تنیسورها، برنامه‌ی بدنسازیِ معمولی‌اند با یک راکت کنارش. این یکی از روی بازیِ خودت نوشته می‌شود.</p>
 </header>
 
 <div class="band">
@@ -313,67 +309,63 @@
   <!-- ═══ HOW IT WORKS ═══ -->
   <section class="blk">
     <div class="eyebrow">چطور کار می‌کند</div>
-    <h2>سه قدم — و هیچ‌کدامش کارِ اضافه برای تو نیست</h2>
+    <h2>سه قدم — هیچ‌کدام کارِ اضافه برای تو</h2>
     <div class="steps">
       <div class="step">
         <span class="n">۱</span>
         <h3>ده دقیقه فیلم</h3>
-        <p>مربی‌ات در یک تمرینِ معمولی از تو فیلم می‌گیرد. لازم نیست کارِ خاصی بکنی — فقط تنیسِ همیشگی‌ات را بازی کن.</p>
+        <p>در یک تمرینِ معمولی، مربی‌ات ازت فیلم می‌گیرد. کارِ اضافه‌ای نداری — فقط بازی کن.</p>
       </div>
       <div class="step">
         <span class="n">۲</span>
         <h3>تحلیلِ حرکت</h3>
-        <p>حرکتِ تو روی زمین بررسی می‌شود: شتاب‌گیری، توقف، تغییرِ جهت، تعادل — و اینکه بدنت کجا کم می‌آورد. فراز هم آنچه هفته‌ها روی زمین از تو دیده به این تحلیل اضافه می‌کند.</p>
+        <p>شتاب‌گیری، توقف، تغییرِ جهت، تعادل — و اینکه بدنت کجا کم می‌آورد. آنچه فراز هفته‌ها از تو دیده هم به این اضافه می‌شود.</p>
       </div>
       <div class="step">
         <span class="n">۳</span>
         <h3>پروفایل و برنامه</h3>
-        <p>یک <b>پروفایلِ عملکردِ تنیس</b> می‌گیری که اولویت‌هایت را رتبه‌بندی می‌کند — و برنامه‌ات را <b>فراز و امیر با هم</b> می‌بندند، نه هرکدام جدا.</p>
+        <p>اولویت‌های بدنی‌ات رتبه‌بندی می‌شود، و برنامه دورِ همان‌ها نوشته می‌شود.</p>
       </div>
     </div>
   </section>
 
-  <!-- ═══ WHAT GETS ANALYSED ═══ -->
-  <section class="blk">
-    <div class="eyebrow">ارزیابیِ حرکت و عملکردِ تنیس</div>
-    <h2>از آن ده دقیقه چه چیزهایی بیرون می‌آید</h2>
-    <p class="body">این تحلیل به این سؤال جواب می‌دهد: <b>کدام ویژگی‌های بدنی، بیشترین اثر را روی تنیسِ تو دارند؟</b></p>
-    <div class="agrid">
-      <div class="aitem"><span class="d"></span>شتاب‌گیری و توقف</div>
-      <div class="aitem"><span class="d"></span>حرکتِ جانبی</div>
-      <div class="aitem"><span class="d"></span>اسپلیت‌استپ</div>
-      <div class="aitem"><span class="d"></span>بازگشت به مرکز</div>
-      <div class="aitem"><span class="d"></span>تغییرِ جهت</div>
-      <div class="aitem"><span class="d"></span>کاراییِ حرکت</div>
-      <div class="aitem"><span class="d"></span>تعادل و کنترل</div>
-      <div class="aitem"><span class="d"></span>نیازهای قدرتیِ پایین‌تنه</div>
-      <div class="aitem"><span class="d"></span>نیازهای تنه و بالاتنه</div>
-      <div class="aitem"><span class="d"></span>تکرارِ تلاش‌های شدید</div>
-      <div class="aitem"><span class="d"></span>محدودیت‌های احتمالیِ بدنی</div>
-      <div class="aitem"><span class="d"></span>تفاوتِ چپ و راست</div>
-    </div>
-  </section>
-
-  <!-- ═══ SAMPLE PROFILE ═══ -->
+  <!-- ═══ THE PROFILE — absorbs the old standalone "what gets analysed" block.
+       Both sections were answering the same question; the card is the stronger
+       half, so the twelve qualities now trail it as a strip instead of getting
+       their own heading, lede and grid. ═══ -->
   <section class="blk">
     <div class="eyebrow">خروجیِ کار</div>
     <h2>پروفایلِ عملکردِ تنیس</h2>
-    <p class="body">به‌جای یک لیستِ بلند از حرکات، یک چیزِ ساده می‌گیری: بدنت کجا از تنیست عقب مانده، به ترتیبِ اهمیت.</p>
+    <p class="body">نه یک لیستِ بلندِ حرکت. یک چیز: بدنت کجا از تنیست عقب مانده، به ترتیبِ اهمیت.</p>
 
     <div class="profile">
       <div class="profile-hd">
-        <span class="t">پروفایلِ عملکردِ تنیس</span>
+        <span class="t">آرش · ۱۵ ساله</span>
         <span class="s">نمونه</span>
       </div>
       <div class="profile-bd">
-        <p class="who">بازیکن: <b>آرش</b> · ۱۵ ساله · آکادمی تنیس اطمینان</p>
         <div class="prow"><span class="rank">۱</span><span class="nm">توقف و کنترلِ فرود</span><span class="tag t-red">اولویتِ اول</span></div>
         <div class="prow"><span class="rank">۲</span><span class="nm">قدرتِ تک‌پا</span><span class="tag t-red">اولویتِ اول</span></div>
         <div class="prow"><span class="rank">۳</span><span class="nm">توانِ جانبی</span><span class="tag t-amb">در حالِ کار</span></div>
         <div class="prow"><span class="rank">۴</span><span class="nm">کنترلِ تنه</span><span class="tag t-amb">در حالِ کار</span></div>
         <div class="prow"><span class="rank">۵</span><span class="nm">آمادگیِ عمومی</span><span class="tag t-go">خوب</span></div>
-        <p class="pfoot">این یک نمونه است، نه بازیکنِ واقعی. پروفایلِ تو از فیلمِ خودت ساخته می‌شود و هر دوره دوباره بررسی می‌شود تا ببینیم چه چیزی جابه‌جا شده.</p>
+        <p class="pfoot">نمونه است، نه بازیکنِ واقعی. پروفایلِ تو از فیلمِ خودت ساخته می‌شود و هر دوره دوباره بررسی می‌شود.</p>
       </div>
+    </div>
+    <p class="body" style="margin:22px 0 0;font-size:14.5px;color:var(--muted);">از روی فیلم این‌ها خوانده می‌شود:</p>
+    <div class="hchips">
+      <span class="hchip">شتاب‌گیری و توقف</span>
+      <span class="hchip">حرکتِ جانبی</span>
+      <span class="hchip">اسپلیت‌استپ</span>
+      <span class="hchip">بازگشت به مرکز</span>
+      <span class="hchip">تغییرِ جهت</span>
+      <span class="hchip">کاراییِ حرکت</span>
+      <span class="hchip">تعادل و کنترل</span>
+      <span class="hchip">قدرتِ پایین‌تنه</span>
+      <span class="hchip">تنه و بالاتنه</span>
+      <span class="hchip">تکرارِ تلاش‌های شدید</span>
+      <span class="hchip">محدودیت‌های بدنی</span>
+      <span class="hchip">تفاوتِ چپ و راست</span>
     </div>
   </section>
 
@@ -381,7 +373,7 @@
   <section class="blk">
     <div class="eyebrow">دو مربی، یک برنامه</div>
     <h2>مربیِ تنیس و مربیِ بدنی‌ات با هم کار می‌کنند</h2>
-    <p class="body">معمولاً این دو از هم بی‌خبرند: مربیِ بدنسازی نمی‌داند این هفته روی زمین چه گذشته، و مربیِ تنیس نمی‌داند چه باری روی بدنت آمده. نتیجه‌اش یا تمرینِ تکراری است، یا خستگیِ اضافه سرِ مسابقه. اینجا این‌طور نیست.</p>
+    <p class="body">معمولاً این دو از هم بی‌خبرند: یکی نمی‌داند روی زمین چه گذشته، آن یکی نمی‌داند چه باری روی بدن آمده. نتیجه یا کارِ تکراری است، یا خستگی سرِ مسابقه.</p>
     <div class="duo">
       <div class="dcard">
         <span class="who">فراز اطمینان</span>
@@ -391,17 +383,17 @@
       <div class="dcard">
         <span class="who">امیر اردکانی</span>
         <span class="role">مربیِ قدرت و آمادگی</span>
-        <p>حرکتت را تحلیل می‌کند، برنامه را می‌نویسد، و هر هفته گزارشِ تمرین و ریکاوری‌ات را برای فراز می‌فرستد.</p>
+        <p>حرکتت را تحلیل می‌کند، برنامه را می‌نویسد، و بار را با تقویمِ مسابقاتت جور می‌کند.</p>
       </div>
     </div>
-    <p class="body" style="margin-top:16px;"><b>این دو دائم درباره‌ی بازیکن‌ها در ارتباط‌اند.</b> اگر مسابقه نزدیک باشد، اگر خسته باشی، اگر جایی درد بگیرد — برنامه‌ی بدنی‌ات همان هفته عوض می‌شود، نه دوره‌ی بعد.</p>
+    <p class="body" style="margin-top:16px;"><b>این دو دائم درباره‌ی بازیکن‌ها در ارتباط‌اند</b>، و هر هفته گزارشِ تمرین و ریکاوریِ تو به دستِ فراز می‌رسد. مسابقه نزدیک است؟ خسته‌ای؟ جایی درد گرفته؟ برنامه همان هفته عوض می‌شود، نه دوره‌ی بعد.</p>
   </section>
 
   <!-- ═══ HABITS ═══ -->
   <section class="blk">
     <div class="eyebrow">AA Proof — بیرون از زمین</div>
     <h2>تمرین یک ساعت است. بقیه‌ی روز هم حساب می‌شود.</h2>
-    <p class="body">در کنارِ برنامه، یک اپلیکیشنِ روزانه می‌گیری که چیزهایی را دنبال می‌کند که واقعاً روی تنیس اثر دارند — نه یک چک‌لیستِ تزئینی.</p>
+    <p class="body">یک اپلیکیشنِ روزانه که فقط چیزهایی را دنبال می‌کند که واقعاً روی تنیس اثر دارند.</p>
     <div class="hchips">
       <span class="hchip">🏋 جلسه‌ی تمرین</span>
       <span class="hchip">🛏 خواب</span>
@@ -415,7 +407,6 @@
       <span class="big">۸۲٪</span>
       <span class="lbl">پایبندیِ هفتگی — عددی که هر هفته می‌بینی، و در طولِ فصل بالا و پایینش را دنبال می‌کنی.</span>
     </div>
-    <p class="body" style="margin-top:16px;">هر هفته یک گزارشِ کوتاه از تمرین، تحرک و ریکاوریِ بازیکنانِ آکادمی برای مربی‌ات فرستاده می‌شود. یعنی کسی که کنارِ زمین ایستاده، می‌داند بیرون از زمین چه خبر است.</p>
   </section>
 
   <!-- ═══ WHAT YOU GET ═══ -->
@@ -423,11 +414,10 @@
     <div class="eyebrow">چه چیزی می‌گیری</div>
     <h2>در این برنامه</h2>
     <ul class="glist">
-      <li><span class="ck">✓</span><span><b>پروفایلِ عملکردِ تنیس</b><span class="sub">از تحلیلِ فیلمِ بازیِ خودت، با نظرِ فراز</span></span></li>
-      <li><span class="ck">✓</span><span><b>برنامه‌ی اختصاصیِ آمادگی جسمانی</b><span class="sub">قابلِ اجرا روی زمینِ تنیس یا در خانه — با هر چیزی که در دسترست هست</span></span></li>
+      <li><span class="ck">✓</span><span><b>پروفایل و برنامه‌ی اختصاصی</b><span class="sub">روی زمینِ تنیس یا در خانه — با هر چیزی که داری</span></span></li>
       <li><span class="ck">✓</span><span><b>ویدیوی هر حرکت</b><span class="sub">تا مجبور نباشی حدس بزنی</span></span></li>
-      <li><span class="ck">✓</span><span><b>اپلیکیشنِ AA Proof</b><span class="sub">پیگیریِ روزانه، پایبندیِ هفتگی، و تابلوی امتیازِ آکادمی</span></span></li>
-      <li><span class="ck">✓</span><span><b>بازبینی در پایانِ دوره</b><span class="sub">فیلمِ دوباره، پروفایلِ دوباره — تا ببینی واقعاً چه چیزی عوض شده</span></span></li>
+      <li><span class="ck">✓</span><span><b>اپلیکیشنِ AA Proof</b><span class="sub">و تابلوی امتیازِ آکادمی</span></span></li>
+      <li><span class="ck">✓</span><span><b>بازبینی در پایانِ دوره</b><span class="sub">فیلمِ دوباره، پروفایلِ دوباره</span></span></li>
     </ul>
     <p class="body" style="margin-top:18px;color:var(--muted);font-size:14.5px;">هزینه و ثبت‌نام از طریقِ خودِ آکادمی انجام می‌شود — با فراز صحبت کن.</p>
   </section>
