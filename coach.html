@@ -996,6 +996,50 @@ async function athleteLoginAction(athleteId, action) {
   );
 }
 
+// Coached athletes with at least one completed session but no login row yet —
+// exactly the trap a migration-cutover athlete falls into: their old secret link
+// is dead and there is nothing to replace it, so the app looks empty even though
+// their history is intact server-side. (Someone who hasn't trained yet isn't at
+// risk of that scare, so they're left off this list — they still get a normal
+// single "Create login" from their own page whenever you're ready for them.)
+function athletesNeedingLogin() {
+  return Object.values(S.ath)
+    .filter(a => a.id !== 'demo' && a.tier === 'coached' && a.finished > 0 && !S.logins[a.id])
+    .map(a => a.id);
+}
+
+// Bulk version of athleteLoginAction — same Edge Function, action:'create_many'
+// instead of one 'create' per athlete. Nothing new to build for distribution:
+// every password lands in athlete_identities same as a single create, so the
+// existing "Logins to send" panel picks all of them up automatically.
+async function bulkCreateLogins() {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const ids = athletesNeedingLogin();
+  if (!ids.length) return;
+  if (!confirm(
+    `Create logins for ${ids.length} athlete${ids.length === 1 ? '' : 's'}?\n\n${ids.join(', ')}\n\n` +
+    'Each gets a new username/password, ready to copy under "Logins to send".'
+  )) return;
+  const { data, error } = await sb.functions.invoke('athlete-login', {
+    body: { action: 'create_many', athlete_ids: ids },
+  });
+  if (error || (data && data.error)) {
+    alert('Could not create logins:\n\n' + ((data && data.error) || error.message));
+    return;
+  }
+  await loadLogins();
+  const failed = data.failed || [];
+  _credsOpen = true;
+  render();
+  toast(
+    `${data.created} login${data.created === 1 ? '' : 's'} created` +
+    (failed.length ? ` — ${failed.length} failed, see console` : '') +
+    ' — copy & send from "Logins to send" below'
+  );
+  if (failed.length) console.error('athlete-login create_many failures:', failed);
+}
+window.bulkCreateLogins = bulkCreateLogins;
+
 /* ═══ BACKUP ════════════════════════════════════════════════════════════════
    The Supabase project is on the free plan, which takes NO automatic backups.
    378 session logs and every athlete's progress blob exist in exactly one place;
@@ -2055,6 +2099,12 @@ function renderAthletes() {
         const pending = Object.keys(S.programs || {}).filter(id => S.programs[id] && S.progSrc[id] === 'file');
         return pending.length
           ? `<button class="btn sm" onclick="runImport()" title="Copy data/*.json into the database so programmes become editable here">↑ Move ${pending.length} programme${pending.length === 1 ? '' : 's'} into the database</button>`
+          : '';
+      })()}
+      ${(() => {
+        const needLogin = athletesNeedingLogin();
+        return needLogin.length
+          ? `<button class="btn sm primary" onclick="bulkCreateLogins()" title="${esc(needLogin.join(', '))} — completed sessions, no login yet">Create ${needLogin.length} missing login${needLogin.length === 1 ? '' : 's'}</button>`
           : '';
       })()}
     </div>
