@@ -42,10 +42,13 @@ All grant **10% off**. Matched case-insensitively, so `nik10` works as well as
 | `MHRN10` | مهرانه ظهوریان — Mehraneh Zohourian | `@mehraneh_zhr` | 6 Jul 2026 | Left the code field blank; Amir generated it. New coach — 1 tennis, 1 padel athlete. |
 | `NAVAZI10` | **Unattributed — see §4** | — | — | Live on the site with no application on file. |
 | `NIK10` | علیرضا نیکخواه — Alireza Nikkhah | `Alireza.nikkhaah` | 7 Sep 2026 | Asked for `Alireza66`; issued as `NIK10` to match the `NAME10` convention. |
+| `RAHMANI10` | مهدی رحمانی — Mehdi Rahmani | `Mehdirahmaani` | 7 Sep 2026 | Requested `Mehdi77`; issued as `RAHMANI10` to match the `NAME10` convention. Applied but never actually added to either form until 8 Sep — this was the reported bug. |
+| `PROTRACK10` | Sina Nik | `@protrackprivatecoaching` | 7 Sep 2026 | Requested this exact code (his coaching brand). Not one of Amir's athletes. Same as `RAHMANI10` — applied 7 Sep, never added to the forms until 8 Sep. |
 
-All three named coaches are **also Amir's own athletes** — they have coaching
-logs at `.claude/coaching-log/siavash_shirdel.md`, `mhrn_zhr2.md` and
-`alireza_nikkhah.md`. They refer on top of training with him.
+Four of the five named coaches are **also Amir's own athletes** — they have coaching
+logs at `.claude/coaching-log/siavash_shirdel.md`, `mhrn_zhr2.md`, `alireza_nikkhah.md`
+and `mehdi_rahmani.md`. They refer on top of training with him. `PROTRACK10` (Sina Nik)
+is the one affiliate-only relationship — no coaching log.
 
 ---
 
