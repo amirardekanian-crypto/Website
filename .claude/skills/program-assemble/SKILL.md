@@ -210,19 +210,66 @@ Cross-check before writing it: anything the athlete must do *repeatedly* to keep
 `cycles[].focuses` line and/or a `message.outcomes` entry — not only in a notes card. If it is
 missing there, fix the JSON before shipping, don't just mention it in the brief.
 
-## Step 7 — Ship
+## Step 7 — Ship: PUBLISH TO THE SERVER YOURSELF
 
-⚠️ **`data/<id>.json` is no longer published.** Programmes live in the Supabase
-`programs` table; the file is a local working artifact and is gitignored. Committing
-it does nothing, and it must never be pushed — that is what made every athlete's
-programme world-readable in the first place.
+**Amir, 2026-09-07, verbatim: *"go live, we dont use json files anymore, upload to the
+servers."*** Do not build a file and hand it to him. Write it to `public.programs` through
+the Supabase MCP (`execute_sql`) and tell him it is live. `data/<id>.json` stays a local,
+gitignored scratch artifact — useful to lint and diff against, never the deliverable, and
+never committed.
 
-- Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm the coaching-log entry was appended.
-- **Tell Amir to publish it:** coach.html → Athletes → **↑ Publish programme file**, then
-  pick `data/<id>.json`. It validates the athlete block, shows what will change, keeps the
-  previous version in history, and writes as his own logged-in session (no keys anywhere).
-- Commit + push **only if Amir asks**, and then only `.claude/coaching-log/<id>.md`.
-  End commit messages with the project's Co-Authored-By line.
+**The payload is ~30 KB of JSON. One giant `update … set data = '<whole thing>'` is the
+wrong shape** — it is a wall of text to get exactly right in one shot and there is no way to
+localise a mistake. Publish in stages, one top-level key per statement, verifying between:
+
+1. **`programHistory` + `currentCycleIndex` — derive the archive SERVER-SIDE.** Do NOT emit
+   it. The live row still holds the OLD `workouts`, so build the history entry from it with
+   `jsonb_agg` over `days → blocks → exercises` (`detail` = chip labels joined with ` · `,
+   or `rounds` for a circuit), append it to `programHistory`, and bump `currentCycleIndex`
+   in the same statement. This is strictly better than sending your local copy: the archive
+   is then provably what the athlete actually had, not what your file says they had.
+2. **`jsonb_set(data,'{workouts}', $W$…$W$::jsonb)`** — the new cycle's days.
+3. **`jsonb_set(data,'{notes}', …)`**, plus `{cycles,N}` for the current cycle's
+   `message`/`focuses` and `{cycles,N+1,teaser}`. These three fit comfortably in one call.
+
+**Dollar-quote everything** (`$W$ … $W$`) and check the payload does not contain your tag.
+Apostrophes are everywhere in athlete-facing copy and single-quoting will shred it.
+
+**Never touch `athlete.key`.** Assert it is unchanged after every statement.
+
+**The version trigger does the backup for you.** `programs_version_trg` snapshots the row
+into `program_versions` on every update, so the pre-publish state is preserved automatically
+and a staged publish simply leaves a few extra versions behind. Harmless — do not try to
+avoid it, and do not hand-roll a backup.
+
+### Verify with a CONTENT FINGERPRINT, not `md5(data::text)`
+`jsonb` reorders keys (by length, then bytewise), so the server's text hash can never match
+your local file's. Instead compute the same canonical string on both sides and compare —
+walk days → blocks → exercises in array order and join `type · name · chip labels · rounds ·
+restSec · note · cues.good · cues.bad · circuit items`; do the same for `notes.cards` and the
+cycle `focuses`/`paragraphs`/`outcomes`. `jsonb_array_elements(...) with ordinality`
+preserves array order, so the SQL and the Python agree. Compare md5 AND length. Anything
+less than this is not verification — a `jsonb_set` that silently wrote a string where an
+object belonged still looks fine to a row-count check.
+
+**`get_program()` will fail for you with `invalid athlete key`. That is correct.** The RPC
+fails closed and the MCP connection is neither an athlete session nor a signed-in coach.
+It reads `public.programs`, so a verified row IS what the app serves. Confirm the row, not
+the RPC.
+
+### The coaching log goes to the server too
+`public.coaching_logs` (`athlete_id, body, updated_at`), coach-only, read from coach.html →
+athlete → File. Same problem, same trick: **splice, don't retype.** Replace the ledger block
+between the header rule and the first `\n---\n` with `substring(body from 1 for <pos>) || …
+|| substring(body from <pos>)`, then append the new `## Cycle NN` section with `body || $C2$…$C2$`.
+The C1 prose is never re-emitted, so it cannot be corrupted. Here the local file and the DB
+are both plain text, so a straight `md5(body)` comparison IS valid — use it.
+
+- Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm both the programme row
+  and the coaching-log row verified.
+- No node on this machine — validate JSON and compute fingerprints with **Python**.
+- Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
+  gitignored; there is normally nothing to commit at all.
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.

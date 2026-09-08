@@ -175,8 +175,11 @@ programme over, so they are written in **the athlete's own language** — Farsi 
 Farsi-speaking athletes, English otherwise. They are pipeline output now, not an on-request extra.
 They live in chat + a scratch file, **never** in `data/<id>.json`.
 
-**MESSAGE 1 — the introduction.** Welcome · the programme link (with `?client=` + `&key=`) · one
-line telling them to add it to their home screen · **why their programme looks the way it does**
+**MESSAGE 1 — the introduction.** Welcome · tell them to sign in with **their username and
+password** — ⚠️ **NEVER a `?client=`/`&key=` link. Every secret link was retired 2026-09-07
+and `athlete_keys` is empty, so any such URL is refused whatever key it carries.** If they do
+not have a login yet, create one first in coach.html → Athletes → Create login · one line telling
+them to add it to their home screen · **why their programme looks the way it does**
 (the actual diagnosis, in plain words they'll recognise from their own body) · the week's shape
 and which day is non-negotiable · what they should have by the end · and a pointer that the
 second message is coming and matters.
