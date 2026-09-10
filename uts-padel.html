@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1D1D1B">
+<meta name="robots" content="noindex, follow">
+<title>6-Week Padel Performance Course · The UTS</title>
+<meta name="description" content="A six-week, small-group strength and conditioning course for padel players at The UTS in Hoylake. Tested at the start and tested at the end.">
+<link rel="canonical" href="https://www.amirardekani.com/uts-padel.html">
+<!-- Shared by email and WhatsApp, so it needs a real card. The photo is the
+     painted wall at The UTS, the same image the club uses as its own share card. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.amirardekani.com/uts-padel.html">
+<meta property="og:title" content="6-Week Padel Performance Course · The UTS">
+<meta property="og:description" content="Five athletes. Six weeks. Tested at the start and tested at the end.">
+<meta property="og:image" content="https://www.amirardekani.com/assets/img/uts/uts-wall.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/assets/img/uts/uts-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Plausible (privacy-friendly, cookieless) -->
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
+<script>document.documentElement.className += ' js';</script>
+<style>
+  /* ═══ THE UTS — Underground Training Station ═══
+     Every colour here is lifted from the club's own logo (a Tube roundel held
+     by an athlete) and its website: roundel red, bar blue, station black.
+     Ubuntu + Poppins are the fonts theuts.co.uk itself uses.
+     The idea the whole page hangs on: the course is a Tube line. Red = the
+     coached sessions, blue = the app running alongside, interchanges = the
+     testing and the review. The form's step bar is the same line. */
+  :root{
+    --red:#E30613; --red-d:#B80510;
+    --blue:#0E4194; --blue-d:#0A3170; --blue-t:#EAF0FA;
+    --ink:#1D1D1B; --ink-2:#474C54; --muted:#5F656F;
+    --line:#D9DEE3; --line-2:#BFC6CE;
+    --ground:#F2F4F5; --band:#F2F4F5; --fill:#F3F5F7;
+    --err:#B42318;
+    --disp:'Ubuntu',system-ui,sans-serif; --body:'Poppins',system-ui,sans-serif; --mono:'Ubuntu Mono',ui-monospace,monospace;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+  body{font-family:var(--body);font-size:16px;line-height:1.6;color:var(--ink);background:var(--ground);-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  a{color:var(--blue);}
+  :focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  a.sr:focus{position:fixed;left:12px;top:12px;width:auto;height:auto;clip:auto;z-index:200;background:#fff;color:var(--ink);padding:10px 16px;font-weight:600;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px;}
+  .narrow{max-width:780px;}
+
+  /* ═══ header ═══ */
+  .top{background:var(--ink);color:#fff;border-bottom:4px solid var(--red);}
+  .top-in{max-width:1040px;margin:0 auto;padding:0 20px;height:68px;display:flex;align-items:center;gap:12px;}
+  .top img{width:46px;height:46px;flex:none;}
+  .top .t1{display:block;font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.03em;text-transform:uppercase;line-height:1.15;}
+  .top .t2{display:block;font-family:var(--mono);font-size:12.5px;color:#AEB3BA;letter-spacing:.08em;text-transform:uppercase;line-height:1.3;}
+  .top .go{margin-left:auto;min-height:40px;padding:0 16px;font-size:13px;}
+  @media(max-width:560px){.top .go{display:none;}}
+
+  /* ═══ buttons ═══ */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border:0;border-radius:2px;
+    font-family:var(--disp);font-weight:700;font-size:15.5px;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;cursor:pointer;
+    transition:background .2s,color .2s,transform .15s var(--ease);}
+  .btn:active{transform:translateY(1px);}
+  .btn-red{background:var(--red);color:#fff;}
+  .btn-red:hover{background:var(--red-d);}
+  .btn-red:disabled{opacity:.55;cursor:wait;}
+  .btn-line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink);}
+  .btn-line:hover{background:var(--ink);color:#fff;}
+
+  /* ═══ hero — the painted wall at The UTS ═══ */
+  .hero{position:relative;color:#fff;background:#141413 url('/assets/img/uts/uts-wall.jpg') 62% 42%/cover no-repeat;}
+  .hero::before{content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg,rgba(20,20,19,.94) 0%,rgba(20,20,19,.82) 42%,rgba(20,20,19,.42) 100%),linear-gradient(0deg,rgba(20,20,19,.8),rgba(20,20,19,0) 50%);}
+  .hero-in{position:relative;max-width:1040px;margin:0 auto;padding:clamp(52px,9vw,108px) 20px clamp(44px,7vw,80px);}
+  .sign{display:inline-block;background:var(--blue);color:#fff;font-family:var(--disp);font-weight:500;font-size:13px;letter-spacing:.16em;text-transform:uppercase;padding:7px 12px 6px;}
+  .hero h1{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(42px,8vw,84px);line-height:.98;letter-spacing:-.01em;margin:20px 0 20px;}
+  .hero h1 .r{color:var(--red);}
+  .lede{font-size:clamp(16px,2vw,18px);line-height:1.7;color:#E4E6E9;max-width:54ch;}
+  .facts{list-style:none;margin-top:26px;display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--mono);font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#D2D5DA;}
+  .facts li::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:9px;vertical-align:1px;}
+  .facts li.b::before{background:#fff;box-shadow:inset 0 0 0 2.5px var(--blue);}
+  .cta-row{margin-top:32px;display:flex;align-items:center;gap:14px 18px;flex-wrap:wrap;}
+  .cta-row .note{font-size:14px;color:#C9CDD3;}
+
+  /* ═══ sections ═══ */
+  .sec{padding:clamp(56px,8vw,92px) 0;background:#fff;}
+  .eyebrow{font-family:var(--mono);font-size:13.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);}
+  .sec h2,.formsec h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(28px,4.4vw,46px);line-height:1.04;margin:10px 0 14px;max-width:20ch;text-wrap:balance;}
+  .intro{color:var(--ink-2);font-size:16.5px;max-width:60ch;}
+
+  /* ═══ THE LINE — the six weeks as a Tube line ═══
+     Red line = the 12 coached sessions (one tick each, numbered). Blue line =
+     the app, with a check-in dot under every session. White capsules =
+     interchanges: baseline testing, the midpoint review, the retest.
+     Weeks are the shaded zones. Horizontal on wide screens, vertical on phones. */
+  .route{position:relative;display:flex;height:158px;margin-top:40px;counter-reset:s;}
+  /* paint order: week bands (auto) < both lines (1) < ticks + check-in dots (3) < interchanges (4) */
+  .route::before,.route::after{content:'';position:absolute;left:36px;right:36px;border-radius:6px;transform-origin:0 50%;z-index:1;}
+  .route::before{top:78px;height:10px;background:var(--red);}
+  .route::after{top:98px;height:6px;background:var(--blue);}
+  .ix{position:relative;flex:0 0 72px;z-index:4;}
+  .ix::before{content:'';position:absolute;top:68px;left:50%;margin-left:-14px;width:28px;height:46px;border-radius:14px;background:#fff;border:5px solid var(--ink);}
+  .ix b,.ix span{position:absolute;white-space:nowrap;}
+  .ix b{top:0;font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.05em;text-transform:uppercase;}
+  .ix span{top:23px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .ix.first b,.ix.first span{left:0;}
+  .ix.last b,.ix.last span{right:0;}
+  .ix.mid b,.ix.mid span{left:50%;transform:translateX(-50%);}
+  .wk{position:relative;flex:1;display:flex;justify-content:space-evenly;align-items:flex-start;}
+  .wk::before{content:'';position:absolute;top:50px;bottom:0;left:0;right:0;background:transparent;}
+  .wk.z::before{background:var(--band);}
+  .wk em{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-style:normal;font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+  .wk i{position:relative;width:4px;height:14px;margin-top:64px;background:var(--red);z-index:3;font-style:normal;}
+  .wk i::before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;top:50px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:12.5px;color:var(--ink-2);}
+  .wk i::after{content:'';position:absolute;top:31px;left:50%;margin-left:-6px;width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid var(--blue);box-sizing:border-box;}
+  .legend{list-style:none;display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:22px;font-size:14px;color:var(--ink-2);}
+  .legend li{display:flex;align-items:center;gap:10px;}
+  .legend i{flex:none;display:inline-block;width:30px;height:8px;border-radius:4px;background:var(--red);}
+  .legend .lb i{height:6px;background:var(--blue);}
+  .legend .lx i{width:16px;height:24px;border-radius:8px;background:#fff;border:4px solid var(--ink);}
+  @media(max-width:759px){
+    .route{flex-direction:column;height:auto;margin-top:30px;}
+    .route::before,.route::after{left:24px;right:auto;top:30px;bottom:30px;height:auto;transform-origin:50% 0;}
+    .route::before{width:10px;}
+    .route::after{left:42px;width:6px;}
+    .ix{flex:none;min-height:60px;padding:8px 0 8px 80px;}
+    .ix::before{top:50%;left:17px;margin:-14px 0 0;width:40px;height:28px;}
+    .ix b,.ix span,.ix.mid b,.ix.mid span,.ix.last b,.ix.last span{position:static;transform:none;display:block;}
+    .ix span{margin-top:2px;}
+    .wk{flex:none;display:block;min-height:84px;}
+    .wk::before{top:0;}
+    .wk em{position:absolute;top:50%;bottom:auto;left:80px;right:auto;transform:translateY(-50%);text-align:left;}
+    .wk i{position:absolute;left:10px;width:14px;height:4px;margin:0;}
+    .wk i:nth-of-type(1){top:30%;} .wk i:nth-of-type(2){top:70%;}
+    .wk i::before{content:none;}
+    .wk i::after{top:-4px;left:29px;margin:0;}
+  }
+  .js .route::before,.js .route::after{transform:scaleX(0);}
+  .js .route .ix,.js .route .wk i{opacity:0;}
+  .js .route.go::before{animation:drawx 1.5s var(--ease) forwards;}
+  .js .route.go::after{animation:drawx 1.5s var(--ease) .25s forwards;}
+  .js .route.go .ix,.js .route.go .wk i{animation:pop .5s var(--ease) var(--d,0s) forwards;}
+  .js .route.go .wk i:nth-of-type(2){animation-delay:calc(var(--d,0s) + .08s);}
+  @media(max-width:759px){
+    .js .route::before,.js .route::after{transform:scaleY(0);}
+    .js .route.go::before,.js .route.go::after{animation-name:drawy;}
+  }
+  @keyframes drawx{to{transform:scaleX(1);}}
+  @keyframes drawy{to{transform:scaleY(1);}}
+  @keyframes pop{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* ═══ the four phases — colour-keyed to the line ═══ */
+  .phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:44px;}
+  .ph{border:1px solid var(--line);border-top:5px solid var(--ink);padding:22px 20px 20px;background:#fff;}
+  .ph.pr{border-top-color:var(--red);}
+  .ph.pb{border-top-color:var(--blue);}
+  .ph-k{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .ph h3{font-family:var(--disp);font-weight:700;font-size:21px;line-height:1.15;text-transform:uppercase;margin:8px 0 10px;}
+  .ph p{font-size:15px;color:var(--ink-2);line-height:1.65;}
+  .ph ul{list-style:none;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-2);}
+  .ph li{font-size:14px;font-weight:500;padding:3px 0 3px 18px;position:relative;}
+  .ph li::before{content:'';position:absolute;left:0;top:11px;width:8px;height:8px;border-radius:50%;background:var(--ink);}
+  .ph.pr li::before{background:var(--red);}
+  .ph.pb li::before{background:var(--blue);}
+
+  /* ═══ coach ═══ */
+  .coach{display:flex;gap:22px;align-items:flex-start;margin-top:48px;padding-top:36px;border-top:1px solid var(--line);}
+  .coach img{width:104px;height:104px;object-fit:cover;flex:none;border-bottom:5px solid var(--red);}
+  .coach h3{font-family:var(--disp);font-weight:700;font-size:22px;text-transform:uppercase;margin:4px 0 2px;}
+  .coach .cred{font-family:var(--mono);font-size:13.5px;color:var(--muted);letter-spacing:.04em;margin-bottom:10px;}
+  .coach p{font-size:15px;color:var(--ink-2);max-width:62ch;}
+  .coach .cred{max-width:none;}
+  @media(max-width:520px){.coach{flex-direction:column;gap:16px;}}
+
+  /* ═══ the form ═══ */
+  .formsec{padding:clamp(56px,8vw,92px) 0 100px;background:var(--ground);}
+  .sheet{background:#fff;border:1px solid var(--line);border-top:5px solid var(--blue);margin-top:28px;scroll-margin-top:12px;}
+
+  /* step bar — the same line, one station per step. The blue fill is measured
+     in JS (circle centre to circle centre), so uneven label widths never let
+     it stop short of, or run past, the current station. */
+  .stops{--pad:clamp(16px,4.5vw,34px);list-style:none;display:flex;justify-content:space-between;position:relative;padding:22px var(--pad) 18px;border-bottom:1px solid var(--line);}
+  .stops::before,.stops::after{content:'';position:absolute;top:33px;height:5px;left:calc(var(--pad) + 13px);border-radius:3px;}
+  .stops::before{right:calc(var(--pad) + 13px);background:var(--line);}
+  .stops::after{width:var(--fill,0px);background:var(--blue);transition:width .6s var(--ease);}
+  .stops li{position:relative;z-index:1;}
+  .stops button{display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:0;padding:0;cursor:pointer;font:inherit;color:var(--muted);}
+  .stops li:first-child button{align-items:flex-start;}
+  .stops li:last-child button{align-items:flex-end;}
+  .stops button:disabled{cursor:default;}
+  .stops i{position:relative;display:block;width:27px;height:27px;border-radius:50%;background:#fff;border:4px solid var(--line-2);transition:border-color .3s,background .3s;}
+  .stops li.done i{background:var(--blue);border-color:var(--blue);}
+  .stops li.done i::after{content:'';position:absolute;left:6px;top:3px;width:6px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);}
+  .stops li.cur i{border:7px solid var(--red);background:#fff;}
+  .stops li.cur i::after{content:none;}
+  .stops span{font-family:var(--disp);font-weight:500;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;}
+  .stops li.cur span{color:var(--ink);font-weight:700;}
+  .stops button:not(:disabled):hover span{color:var(--blue);}
+  @media(max-width:640px){.stops span{display:none;}}
+
+  .step{padding:clamp(24px,5vw,38px) clamp(18px,5vw,40px) 6px;}
+  .js .step.enter{animation:stepin .45s var(--ease);}
+  @keyframes stepin{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .step-k{font-family:var(--mono);font-size:13.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);}
+  .step h3{font-family:var(--disp);font-weight:700;font-size:clamp(25px,3.6vw,31px);line-height:1.1;text-transform:uppercase;margin:6px 0 6px;outline:none;}
+  .step-hd p{color:var(--ink-2);font-size:15.5px;margin-bottom:28px;}
+  .sub-hd{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin:34px 0 14px;padding-top:24px;border-top:1px solid var(--line);}
+
+  .f{margin:0 0 24px;border:0;padding:0;min-width:0;}
+  .lab{display:block;font-weight:600;font-size:15px;line-height:1.45;margin-bottom:9px;color:var(--ink);padding:0;}
+  .hint{display:block;font-weight:400;font-size:13.5px;color:var(--muted);margin-top:2px;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+  .row.r3{grid-template-columns:1fr 1fr 1fr;}
+  @media(max-width:560px){.row{grid-template-columns:1fr;}.row.r3{grid-template-columns:1fr 1fr;}}
+
+  input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{
+    width:100%;min-height:50px;font:inherit;font-size:16px;color:var(--ink);background:var(--fill);
+    border:0;border-bottom:2px solid var(--line-2);border-radius:2px 2px 0 0;padding:12px 14px;
+    transition:border-color .2s,background .2s,box-shadow .2s;-webkit-appearance:none;appearance:none;}
+  input:hover,select:hover,textarea:hover{border-bottom-color:var(--ink-2);}
+  input:focus,select:focus,textarea:focus{outline:none;background:#fff;border-bottom-color:var(--blue);box-shadow:0 0 0 2px var(--blue);}
+  select{cursor:pointer;padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16'%3E%3Cpath fill='%231D1D1B' d='M8 11.4 2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center;}
+  textarea{min-height:100px;resize:vertical;line-height:1.55;}
+  input[type=number]{-moz-appearance:textfield;}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  ::placeholder{color:#8A9099;opacity:1;}
+
+  /* single choice — a chosen answer turns blue, like the bar on the roundel */
+  .opts{display:grid;gap:8px;}
+  .opts.c2{grid-template-columns:1fr 1fr;}
+  .opts.c3{grid-template-columns:repeat(3,1fr);}
+  .opts.c4{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:560px){.opts.c3,.opts.c4{grid-template-columns:1fr 1fr;}}
+  .opt,.chip{position:relative;display:block;cursor:pointer;}
+  .opt input,.chip input,.ynb input{position:absolute;opacity:0;width:1px;height:1px;}
+  .opt span{display:flex;flex-direction:column;justify-content:center;height:100%;min-height:52px;padding:10px 14px;border:1.5px solid var(--line-2);border-radius:2px;background:#fff;
+    font-size:15px;font-weight:500;line-height:1.3;transition:border-color .15s,background .15s,color .15s;}
+  .opt small{font-size:12.5px;font-weight:400;color:var(--muted);margin-top:3px;line-height:1.35;}
+  .opt:hover span,.chip:hover span{border-color:var(--ink);}
+  .opt input:checked+span,.chip input:checked+span{background:var(--blue);border-color:var(--blue);color:#fff;}
+  .opt input:checked+span small{color:#D6DFEF;}
+  .opt input:focus-visible+span,.chip input:focus-visible+span,.ynb input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px;}
+
+  /* multiple choice */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{display:inline-block;}
+  .chip span{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1.5px solid var(--line-2);border-radius:2px;background:#fff;font-size:14.5px;font-weight:500;line-height:1.3;transition:border-color .15s,background .15s,color .15s;}
+  .chip input:checked+span::before{content:'';flex:none;width:10px;height:6px;margin:-3px 9px 0 0;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:rotate(-45deg);}
+  .chip input:disabled+span{opacity:.4;cursor:not-allowed;}
+
+  /* health screen — a table of yes / no rows */
+  .screen{border:1px solid var(--line);margin-bottom:24px;}
+  .screen .f{margin:0;}
+  .yn{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:14px 16px;border-top:1px solid var(--line);}
+  .yn:first-child{border-top:0;}
+  .yn .q{flex:1 1 300px;font-size:15px;line-height:1.5;}
+  .ynb{display:flex;flex:none;}
+  .ynb label{position:relative;cursor:pointer;}
+  .ynb span{position:relative;display:inline-flex;align-items:center;justify-content:center;width:68px;min-height:44px;border:1.5px solid var(--line-2);background:#fff;font-weight:600;font-size:14.5px;transition:background .15s,border-color .15s,color .15s;}
+  .ynb label+label span{margin-left:-1.5px;}
+  .ynb label:hover span{border-color:var(--ink);z-index:1;}
+  .ynb input:checked+span{background:var(--blue);border-color:var(--blue);color:#fff;z-index:2;}
+  .yn.err{background:#FDF3F2;}
+  @media(max-width:560px){.yn{flex-direction:column;align-items:stretch;}.yn .q{flex-basis:auto;}.ynb label{flex:1;}.ynb span{width:100%;}}
+
+  /* consent */
+  .consent{display:flex;gap:14px;align-items:flex-start;padding:15px 16px;border:1.5px solid var(--line-2);background:#fff;cursor:pointer;margin-bottom:10px;font-size:14.5px;line-height:1.6;color:var(--ink-2);transition:border-color .15s,background .15s;}
+  .consent input{flex:none;width:22px;height:22px;margin-top:1px;accent-color:var(--blue);cursor:pointer;}
+  .consent b{color:var(--ink);font-weight:600;}
+  .consent:hover{border-color:var(--ink);}
+  .consent:has(input:checked){border-color:var(--blue);background:var(--blue-t);}
+  .consent .tag{display:block;font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+  .v-minor{display:none;}
+  .minor .v-minor{display:inline;}
+  .minor .v-adult{display:none;}
+  .signed{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin:22px 0 24px;}
+  .signed .f{flex:1 1 260px;margin-bottom:0;}
+  .signed .date{font-family:var(--mono);font-size:14px;color:var(--muted);padding-bottom:14px;white-space:nowrap;}
+  .flag,.notice{padding:14px 16px;background:var(--blue-t);border-left:4px solid var(--blue);font-size:14px;line-height:1.6;color:var(--ink-2);margin:0 0 24px;}
+  .notice{background:var(--ground);margin-top:26px;}
+  .notice b,.flag b{color:var(--ink);}
+
+  /* questions that only appear when they apply */
+  .cond{display:none;}
+  .cond.on{display:block;animation:stepin .4s var(--ease);}
+  .yn.cond.on{display:flex;}
+  .sub-p{font-size:14.5px;color:var(--ink-2);margin:-4px 0 18px;}
+  .step-hd+.sub-hd{margin-top:0;padding-top:0;border-top:0;}
+  .guardian{border:1px solid var(--line);border-left:5px solid var(--red);padding:18px 18px 2px;margin:0 0 24px;}
+  .guardian .gh{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;}
+  .guardian .gp{font-size:14px;color:var(--muted);margin-bottom:16px;}
+
+  /* errors */
+  .f.err>.lab,.f.err .q{color:var(--err);}
+  .f.err input[type=text],.f.err input[type=email],.f.err input[type=tel],.f.err input[type=number],.f.err select,.f.err textarea{border-bottom-color:var(--err);background:#FDF3F2;}
+  .f.err .opt span,.f.err .chip span,.f.err .ynb span,.f.err .consent{border-color:var(--err);}
+  .ferr{display:flex;align-items:center;gap:8px;margin-top:9px;color:var(--err);font-size:13.5px;font-weight:600;flex-basis:100%;}
+  .ferr::before{content:'!';flex:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--err);color:#fff;font-size:12px;font-weight:700;}
+
+  /* bottom bar */
+  .navbar{display:flex;align-items:center;gap:12px;padding:18px clamp(18px,5vw,40px) 26px;border-top:1px solid var(--line);margin-top:12px;}
+  .navbar .count{margin:0 auto;font-family:var(--mono);font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+  .navbar .is-off{visibility:hidden;}
+  @media(max-width:520px){.navbar{flex-wrap:wrap;}.navbar .count{order:-1;width:100%;text-align:center;margin:0 0 4px;}.navbar .btn{flex:1;padding:0 12px;}.navbar .is-off{display:none;}}
+
+  /* sent — a roundel, because that is the club's own mark */
+  .sent{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:var(--ink);color:#fff;}
+  .sent.on{display:flex;}
+  .sent-card{max-width:520px;}
+  .roundel{position:relative;width:112px;height:112px;margin-left:30px;border-radius:50%;border:15px solid var(--red);animation:spinin .7s var(--ease);}
+  .roundel b{position:absolute;left:-44px;right:-44px;top:50%;transform:translateY(-50%);background:var(--blue);color:#fff;font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.16em;text-align:center;padding:6px 0 5px;}
+  @keyframes spinin{from{transform:scale(.4) rotate(-40deg);opacity:0;}to{transform:none;opacity:1;}}
+  .sent h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(30px,6vw,46px);line-height:1.04;margin:30px 0 12px;outline:none;}
+  .sent p{color:#D9DCE0;font-size:16px;line-height:1.7;}
+  .sent p+p{margin-top:10px;font-size:14.5px;color:#AEB3BA;}
+
+  /* footer */
+  .foot{background:var(--ink);color:#B3B8BF;font-size:14px;line-height:1.75;padding:38px 0 44px;border-top:4px solid var(--red);}
+  .foot .wrap{display:flex;flex-wrap:wrap;gap:22px 48px;justify-content:space-between;}
+  .foot b{display:block;color:#fff;font-family:var(--disp);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px;}
+  .foot a{color:#fff;text-underline-offset:3px;}
+
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+<a class="sr" href="#form">Skip to the athlete form</a>
+
+<header class="top">
+  <div class="top-in">
+    <img src="/assets/img/uts/uts-mark.png" alt="The UTS" width="46" height="46">
+    <div>
+      <span class="t1">Padel Performance Course</span>
+      <span class="t2">The UTS · Hoylake</span>
+    </div>
+    <a class="btn btn-red go" href="#form">Start your form</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="hero-in">
+    <span class="sign">6-week padel course</span>
+    <h1>Six weeks.<br>Tested at <span class="r">both ends.</span></h1>
+    <p class="lede">A small-group strength and conditioning course for padel players at The UTS. We film your padel and test you first. Your training is built around what we find. After six weeks we test you again, so you can see what changed.</p>
+    <ul class="facts">
+      <li>Max 5 athletes</li>
+      <li>6 weeks</li>
+      <li>12 coached sessions</li>
+      <li class="b">Weekly programme in the app</li>
+    </ul>
+    <div class="cta-row">
+      <a class="btn btn-red" href="#form">Start your athlete form</a>
+      <span class="note">About 8 minutes</span>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="howH">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2 id="howH">Your six weeks, stop by stop</h2>
+    <p class="intro">Everyone in the group rides the same line. The plan inside it is built from your own testing.</p>
+
+    <!-- THE LINE. Decorative drawing, so it is one labelled image to a screen
+         reader. Every fact in it is also written out in the four cards below. -->
+    <div class="route" id="route" role="img" aria-label="The course as a line. Baseline testing first. Then two coached sessions a week for six weeks, with a review at the midpoint. Then retesting. The app runs alongside with a check-in before every session.">
+      <div class="ix first" style="--d:.1s"><b>Baseline</b><span>Film + test</span></div>
+      <div class="wk z" style="--d:.3s"><i></i><i></i><em>Week 1</em></div>
+      <div class="wk" style="--d:.42s"><i></i><i></i><em>Week 2</em></div>
+      <div class="wk z" style="--d:.54s"><i></i><i></i><em>Week 3</em></div>
+      <div class="ix mid" style="--d:.7s"><b>Midpoint</b><span>Review</span></div>
+      <div class="wk" style="--d:.84s"><i></i><i></i><em>Week 4</em></div>
+      <div class="wk z" style="--d:.96s"><i></i><i></i><em>Week 5</em></div>
+      <div class="wk" style="--d:1.08s"><i></i><i></i><em>Week 6</em></div>
+      <div class="ix last" style="--d:1.25s"><b>Retest</b><span>Test + report</span></div>
+    </div>
+    <ul class="legend" aria-hidden="true">
+      <li><i></i>Coached sessions at The UTS, two a week</li>
+      <li class="lb"><i></i>The app: your weekly programme and check-ins</li>
+      <li class="lx"><i></i>Testing and reviews</li>
+    </ul>
+
+    <div class="phases">
+      <article class="ph">
+        <div class="ph-k">01 · Assess</div>
+        <h3>Find your priorities</h3>
+        <p>Before training starts, we film five minutes of your padel and put you through a set of physical tests. From that we build your performance profile. It shows your main physical priorities, in order.</p>
+        <ul><li>5-minute padel video analysis</li><li>Physical testing</li><li>Your performance profile</li></ul>
+      </article>
+      <article class="ph pr">
+        <div class="ph-k">02 · Train</div>
+        <h3>Two coached sessions a week</h3>
+        <p>Twelve sessions at The UTS, in a group of five or fewer. Each session is built around what the group needs. Where your profile calls for it, your coach changes things for you.</p>
+        <ul><li>12 coached S&amp;C sessions</li><li>Changes for your own profile</li></ul>
+      </article>
+      <article class="ph pb">
+        <div class="ph-k">03 · Monitor</div>
+        <h3>One week at a time</h3>
+        <p>Your programme comes through the coaching app, one week at a time, with one or two sessions to do on your own. Before each session you do a short wellness check-in, and after it you log how it went. Halfway through, we look at it all and adjust the plan.</p>
+        <ul><li>Weekly programme in the app</li><li>Check-in before every session</li><li>Midpoint review</li></ul>
+      </article>
+      <article class="ph">
+        <div class="ph-k">04 · Retest</div>
+        <h3>See what changed</h3>
+        <p>After six weeks we run the same tests again. You get a performance report that shows your progress and what to work on in your next block.</p>
+        <ul><li>Final testing</li><li>Your performance report</li></ul>
+      </article>
+    </div>
+
+    <div class="coach">
+      <img src="/assets/img/coach.jpg" alt="Amir Ardekani" width="104" height="104" loading="lazy">
+      <div>
+        <div class="eyebrow">Your coach</div>
+        <h3>Amir Ardekani</h3>
+        <p class="cred">MSc Strength &amp; Conditioning · MSc Applied Exercise Physiology</p>
+        <p>Amir has coached more than 1,000 tennis and padel players. He runs your testing and coaches your sessions. Your programme comes through his coaching app, AA Performance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="formsec" id="form" aria-labelledby="formH">
+  <div class="wrap narrow">
+    <div class="eyebrow">Athlete form</div>
+    <h2 id="formH">Before you start</h2>
+    <p class="intro">This takes about 8 minutes. We use it to plan your testing and your first sessions. Only your coach and the UTS coaching team will see your answers.</p>
+
+    <div class="sheet" id="sheet">
+      <ol class="stops" id="stops" aria-label="Form steps">
+        <li><button type="button" data-go="0"><i></i><span>About you</span></button></li>
+        <li><button type="button" data-go="1" disabled><i></i><span>Padel</span></button></li>
+        <li><button type="button" data-go="2" disabled><i></i><span>Training</span></button></li>
+        <li><button type="button" data-go="3" disabled><i></i><span>Health</span></button></li>
+        <li><button type="button" data-go="4" disabled><i></i><span>Recovery</span></button></li>
+        <li><button type="button" data-go="5" disabled><i></i><span>Sign-off</span></button></li>
+      </ol>
+
+      <form id="frm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+        <input type="hidden" name="access_key" value="efc57e0c-997d-4d71-b07a-71c8268ec668">
+        <input type="hidden" name="from_name" value="UTS Padel Performance Course">
+        <input type="hidden" id="subj" name="subject" value="New athlete form · UTS Padel">
+        <!-- Tags the submission so it reads clearly in coach.html → Intake. No schema change. -->
+        <input type="hidden" name="Course" value="6-Week Padel Performance Course">
+        <input type="hidden" name="Partner" value="The UTS, Hoylake">
+        <input type="hidden" id="givenBy" name="Consent Given By" value="Athlete">
+        <input type="hidden" id="signedOn" name="Signed Date" value="">
+        <input type="hidden" id="screenSum" name="Health Screen" value="">
+        <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+
+        <!-- ── 1 · ABOUT YOU ── -->
+        <section class="step" data-name="About you" aria-labelledby="s1h">
+          <header class="step-hd"><div class="step-k">Step 1 of 6</div><h3 id="s1h">About you</h3><p>The basics, and how to reach you.</p></header>
+          <div class="row">
+            <div class="f"><label class="lab" for="fn">First name</label><input type="text" id="fn" name="First Name" required autocomplete="given-name"></div>
+            <div class="f"><label class="lab" for="ln">Last name</label><input type="text" id="ln" name="Last Name" required autocomplete="family-name"></div>
+          </div>
+          <div class="row">
+            <div class="f"><label class="lab" for="age">Age</label><input type="number" id="age" name="Age" required min="10" max="90" inputmode="numeric" placeholder="e.g. 34"></div>
+            <div class="f"><label class="lab" for="sex">Sex</label>
+              <select id="sex" name="Biological Sex" required><option value="" selected disabled>Choose</option><option>Male</option><option>Female</option></select></div>
+          </div>
+          <div class="row">
+            <div class="f"><label class="lab" for="ht">Height <span class="hint">In cm. Rough is fine.</span></label><input type="number" id="ht" name="Height (cm)" min="100" max="230" inputmode="numeric" placeholder="e.g. 178"></div>
+            <div class="f"><label class="lab" for="wt">Weight <span class="hint">In kg. Rough is fine.</span></label><input type="number" id="wt" name="Weight (kg)" min="25" max="250" step="0.1" inputmode="decimal" placeholder="e.g. 76"></div>
+          </div>
+          <div class="row">
+            <div class="f"><label class="lab" for="em">Email</label><input type="email" id="em" name="Email" required autocomplete="email" placeholder="you@email.com"></div>
+            <div class="f"><label class="lab" for="mob">Mobile</label><input type="tel" id="mob" name="Mobile" required autocomplete="tel" inputmode="tel" placeholder="07…"></div>
+          </div>
+          <fieldset class="f"><legend class="lab">Are you a member at The UTS?</legend>
+            <div class="opts c2">
+              <label class="opt"><input type="radio" name="UTS Member" value="Yes" required><span>Yes</span></label>
+              <label class="opt"><input type="radio" name="UTS Member" value="No"><span>No</span></label>
+            </div>
+          </fieldset>
+          <!-- Only for under-18s. The parent or guardian also signs the last step. -->
+          <div class="guardian cond" id="guardian">
+            <div class="gh">Parent or guardian</div>
+            <p class="gp">You're under 18, so we need a parent or guardian's details. They sign the last step too.</p>
+            <div class="row">
+              <div class="f"><label class="lab" for="gName">Their full name</label><input type="text" id="gName" name="Guardian Name" required autocomplete="off"></div>
+              <div class="f"><label class="lab" for="gRel">Relationship to you</label>
+                <select id="gRel" name="Guardian Relationship" required><option value="" selected disabled>Choose</option><option>Mum</option><option>Dad</option><option>Guardian</option><option>Other</option></select></div>
+            </div>
+            <div class="row">
+              <div class="f"><label class="lab" for="gMob">Their mobile</label><input type="tel" id="gMob" name="Guardian Mobile" required inputmode="tel"></div>
+              <div class="f"><label class="lab" for="gEm">Their email <span class="hint">Optional</span></label><input type="email" id="gEm" name="Guardian Email"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 2 · PADEL ── -->
+        <section class="step" data-name="Your padel" aria-labelledby="s2h" hidden>
+          <header class="step-hd"><div class="step-k">Step 2 of 6</div><h3 id="s2h">Your padel</h3><p>So we can build the course around how you actually play.</p></header>
+          <fieldset class="f"><legend class="lab">How long have you played padel?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="Padel Experience" value="Under 6 months" required><span>Under 6 months</span></label>
+              <label class="opt"><input type="radio" name="Padel Experience" value="6-12 months"><span>6 to 12 months</span></label>
+              <label class="opt"><input type="radio" name="Padel Experience" value="1-2 years"><span>1 to 2 years</span></label>
+              <label class="opt"><input type="radio" name="Padel Experience" value="3+ years"><span>3 years or more</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">How often do you play?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="Padel Frequency" value="Once a week or less" required><span>Once a week or less</span></label>
+              <label class="opt"><input type="radio" name="Padel Frequency" value="Twice a week"><span>Twice a week</span></label>
+              <label class="opt"><input type="radio" name="Padel Frequency" value="3-4 times a week"><span>3 to 4 times a week</span></label>
+              <label class="opt"><input type="radio" name="Padel Frequency" value="5+ times a week"><span>5 or more times</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">What's your level?</legend>
+            <div class="opts c2">
+              <label class="opt"><input type="radio" name="Padel Level" value="Beginner" required><span>Beginner<small>Still learning the basics</small></span></label>
+              <label class="opt"><input type="radio" name="Padel Level" value="Social"><span>Social<small>Regular games with friends</small></span></label>
+              <label class="opt"><input type="radio" name="Padel Level" value="Club"><span>Club<small>Leagues and club competitions</small></span></label>
+              <label class="opt"><input type="radio" name="Padel Level" value="Competitive"><span>Competitive<small>Tournaments</small></span></label>
+            </div>
+          </fieldset>
+          <div class="f"><label class="lab" for="ptl">Playtomic level <span class="hint">Optional. Leave it blank if you don't have one.</span></label>
+            <input type="text" id="ptl" name="Playtomic Level" inputmode="decimal" maxlength="6" placeholder="e.g. 3.2" style="max-width:200px"></div>
+          <div class="row">
+            <fieldset class="f"><legend class="lab">Which side do you play?</legend>
+              <div class="opts c3">
+                <label class="opt"><input type="radio" name="Court Side" value="Right (drive)" required><span>Right<small>Drive side</small></span></label>
+                <label class="opt"><input type="radio" name="Court Side" value="Left (revés)"><span>Left<small>Revés side</small></span></label>
+                <label class="opt"><input type="radio" name="Court Side" value="Both"><span>Both</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="f"><legend class="lab">Dominant hand</legend>
+              <div class="opts c2">
+                <label class="opt"><input type="radio" name="Dominant Hand" value="Right" required><span>Right</span></label>
+                <label class="opt"><input type="radio" name="Dominant Hand" value="Left"><span>Left</span></label>
+              </div>
+            </fieldset>
+          </div>
+          <fieldset class="f"><legend class="lab">Other racket sports you've played seriously <span class="hint">Pick any that apply</span></legend>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="Other Racket Sports" value="Tennis" required><span>Tennis</span></label>
+              <label class="chip"><input type="checkbox" name="Other Racket Sports" value="Squash"><span>Squash</span></label>
+              <label class="chip"><input type="checkbox" name="Other Racket Sports" value="Badminton"><span>Badminton</span></label>
+              <label class="chip"><input type="checkbox" name="Other Racket Sports" value="Table tennis"><span>Table tennis</span></label>
+              <label class="chip"><input type="checkbox" name="Other Racket Sports" value="None" data-only><span>None</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">Where does your body hold your padel back? <span class="hint">Pick up to 3</span></legend>
+            <div class="chips" data-max="3">
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Reacting fast at the net" required><span>Reacting fast at the net</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Getting back for lobs"><span>Getting back for lobs</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Moving side to side"><span>Moving side to side</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Getting low for low balls"><span>Getting low for low balls</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Power on the smash"><span>Power on the smash</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Lasting a long match"><span>Lasting a long match</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Balance when stretched"><span>Balance when you're stretched</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Aches or pain after playing"><span>Aches or pain after playing</span></label>
+              <label class="chip"><input type="checkbox" name="Physical Limiters" value="Not sure yet" data-only><span>Not sure yet</span></label>
+            </div>
+          </fieldset>
+          <div class="f"><label class="lab" for="upc">Any matches, leagues or tournaments in the next 6 weeks? <span class="hint">Optional. So we don't leave you tired for them.</span></label>
+            <input type="text" id="upc" name="Upcoming Matches" placeholder="e.g. League match most Thursdays, tournament on 18 October"></div>
+          <div class="f"><label class="lab" for="goal">What would make these six weeks a win for you?</label>
+            <textarea id="goal" name="Six-Week Goal" rows="3" required placeholder="e.g. Get back for lobs quicker. Stop my calves going in long matches."></textarea></div>
+        </section>
+
+        <!-- ── 3 · TRAINING ── -->
+        <section class="step" data-name="Training" aria-labelledby="s3h" hidden>
+          <header class="step-hd"><div class="step-k">Step 3 of 6</div><h3 id="s3h">Your training</h3><p>So your first sessions start at the right level.</p></header>
+          <fieldset class="f"><legend class="lab">How long have you done strength training?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="Strength Experience" value="Never" required><span>Never</span></label>
+              <label class="opt"><input type="radio" name="Strength Experience" value="Under 1 year"><span>Under 1 year</span></label>
+              <label class="opt"><input type="radio" name="Strength Experience" value="1-3 years"><span>1 to 3 years</span></label>
+              <label class="opt"><input type="radio" name="Strength Experience" value="3+ years"><span>3 years or more</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">How many strength sessions do you do a week right now?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="Strength Sessions / Week" value="None" required><span>None</span></label>
+              <label class="opt"><input type="radio" name="Strength Sessions / Week" value="1"><span>1</span></label>
+              <label class="opt"><input type="radio" name="Strength Sessions / Week" value="2"><span>2</span></label>
+              <label class="opt"><input type="radio" name="Strength Sessions / Week" value="3+"><span>3 or more</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">What other training do you do? <span class="hint">Pick any that apply</span></legend>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="Other Training" value="Classes at The UTS" required><span>Classes at The UTS</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Gym on my own"><span>Gym on my own</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Running"><span>Running</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Hyrox"><span>Hyrox</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Cycling"><span>Cycling</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Swimming"><span>Swimming</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Yoga or Pilates"><span>Yoga or Pilates</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Team sports"><span>Team sports</span></label>
+              <label class="chip"><input type="checkbox" name="Other Training" value="Nothing else" data-only><span>Nothing else</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">Which of these are you comfortable with? <span class="hint">Optional. Pick any that apply.</span></legend>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Squats"><span>Squats</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Deadlifts"><span>Deadlifts</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Lunges or split squats"><span>Lunges or split squats</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Bench press"><span>Bench press</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Pull-ups"><span>Pull-ups</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Jumping and landing"><span>Jumping and landing</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="Olympic lifts"><span>Olympic lifts</span></label>
+              <label class="chip"><input type="checkbox" name="Comfortable With" value="None of these yet" data-only><span>None of these yet</span></label>
+            </div>
+          </fieldset>
+          <div class="sub-hd">Your app sessions</div>
+          <p class="sub-p">On top of the coached sessions, the app gives you one or two sessions a week to do on your own.</p>
+          <fieldset class="f"><legend class="lab">Where will you do them?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="App Sessions Location" value="At The UTS" required><span>At The UTS</span></label>
+              <label class="opt"><input type="radio" name="App Sessions Location" value="Another gym"><span>Another gym</span></label>
+              <label class="opt"><input type="radio" name="App Sessions Location" value="At home"><span>At home</span></label>
+              <label class="opt"><input type="radio" name="App Sessions Location" value="On a padel court"><span>On a padel court</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f cond" id="equipWrap"><legend class="lab">What kit do you have there? <span class="hint">Pick any that apply</span></legend>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Dumbbells" required><span>Dumbbells</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Kettlebells"><span>Kettlebells</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Resistance bands"><span>Resistance bands</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Mini bands"><span>Mini bands</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Skipping rope"><span>Skipping rope</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Medicine ball"><span>Medicine ball</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Bench or step"><span>Bench or step</span></label>
+              <label class="chip"><input type="checkbox" name="Home Equipment" value="Nothing, just bodyweight" data-only><span>Nothing, just bodyweight</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">How many can you fit in each week?</legend>
+            <div class="opts c2">
+              <label class="opt"><input type="radio" name="Extra Sessions / Week" value="1" required><span>One</span></label>
+              <label class="opt"><input type="radio" name="Extra Sessions / Week" value="2"><span>Two</span></label>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- ── 4 · HEALTH ── our own plain-English pre-exercise screen, not a
+             copy of any published questionnaire. A single yes opens the
+             details box and the note about GP clearance. -->
+        <section class="step" data-name="Health check" aria-labelledby="s4h" hidden>
+          <header class="step-hd"><div class="step-k">Step 4 of 6</div><h3 id="s4h">Health check</h3><p>Please answer honestly. It keeps your testing and training safe.</p></header>
+          <div class="screen">
+            <div class="yn f"><p class="q" id="q1">Has a doctor ever said you have a heart condition, or that you should only exercise with medical supervision?</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q1"><label><input type="radio" name="Screen: Heart" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Heart" value="No"><span>No</span></label></div></div>
+            <div class="yn f"><p class="q" id="q2">Do you ever get chest pain, feel faint or get dizzy when you exercise?</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q2"><label><input type="radio" name="Screen: Chest Pain or Dizziness" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Chest Pain or Dizziness" value="No"><span>No</span></label></div></div>
+            <div class="yn f"><p class="q" id="q3">Do you have a medical condition we should know about? For example asthma, diabetes, epilepsy or high blood pressure.</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q3"><label><input type="radio" name="Screen: Medical Condition" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Medical Condition" value="No"><span>No</span></label></div></div>
+            <div class="yn f"><p class="q" id="q4">Do you take any medication that could affect how you train?</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q4"><label><input type="radio" name="Screen: Medication" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Medication" value="No"><span>No</span></label></div></div>
+            <div class="yn f"><p class="q" id="q5">Have you had surgery, a broken bone or a serious injury in the last 12 months?</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q5"><label><input type="radio" name="Screen: Surgery or Serious Injury" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Surgery or Serious Injury" value="No"><span>No</span></label></div></div>
+            <div class="yn f cond" id="pregRow"><p class="q" id="q6">Are you pregnant, or have you had a baby in the last 6 months?</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q6"><label><input type="radio" name="Screen: Pregnancy" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Pregnancy" value="No"><span>No</span></label></div></div>
+            <div class="yn f"><p class="q" id="q7">Is there any other reason you shouldn't do hard exercise like lifting, jumping or sprinting?</p>
+              <div class="ynb" role="radiogroup" aria-labelledby="q7"><label><input type="radio" name="Screen: Other Reason" value="Yes" required><span>Yes</span></label><label><input type="radio" name="Screen: Other Reason" value="No"><span>No</span></label></div></div>
+          </div>
+          <div class="cond" id="screenMore">
+            <p class="flag"><b>Thanks for telling us.</b> We may ask you to check with your GP before physical testing. That's normal, and it keeps you safe.</p>
+            <div class="f"><label class="lab" for="screenTxt">Tell us more about each yes</label>
+              <textarea id="screenTxt" name="Screen Details" rows="3" required placeholder="e.g. Asthma, well controlled. I use my inhaler before hard sessions."></textarea></div>
+          </div>
+          <fieldset class="f"><legend class="lab">Any pain or injury right now?</legend>
+            <div class="opts c2">
+              <label class="opt"><input type="radio" name="Current Injury" value="No" required><span>No</span></label>
+              <label class="opt"><input type="radio" name="Current Injury" value="Yes"><span>Yes</span></label>
+            </div>
+          </fieldset>
+          <div class="f cond" id="injWrap"><label class="lab" for="injTxt">Tell us about it <span class="hint">Where it is, how long you've had it, how bad it is out of 10, and what makes it worse.</span></label>
+            <textarea id="injTxt" name="Injury Details" rows="3" required placeholder="e.g. Right elbow, about 3 weeks, 4 out of 10. Worse on backhand volleys."></textarea></div>
+          <fieldset class="f"><legend class="lab">Old injuries that still bother you sometimes <span class="hint">Pick any that apply</span></legend>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Shoulder" required><span>Shoulder</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Elbow"><span>Elbow</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Wrist"><span>Wrist</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Lower back"><span>Lower back</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Hip or groin"><span>Hip or groin</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Knee"><span>Knee</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Calf or Achilles"><span>Calf or Achilles</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="Ankle or foot"><span>Ankle or foot</span></label>
+              <label class="chip"><input type="checkbox" name="Past Injuries" value="None" data-only><span>None</span></label>
+            </div>
+          </fieldset>
+          <div class="f"><label class="lab" for="avoid">Has a doctor or physio told you to avoid any movements? <span class="hint">Optional</span></label>
+            <input type="text" id="avoid" name="Avoid Movements" placeholder="e.g. No overhead pressing for now"></div>
+          <fieldset class="f cond" id="growWrap"><legend class="lab">Have you had a growth spurt in the last 6 months? <span class="hint">Growing fast changes how much jumping and landing is safe.</span></legend>
+            <div class="opts c3">
+              <label class="opt"><input type="radio" name="Recent Growth Spurt" value="Yes, a lot" required><span>Yes, a lot</span></label>
+              <label class="opt"><input type="radio" name="Recent Growth Spurt" value="A little"><span>A little</span></label>
+              <label class="opt"><input type="radio" name="Recent Growth Spurt" value="No"><span>No</span></label>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- ── 5 · RECOVERY ── -->
+        <section class="step" data-name="Recovery" aria-labelledby="s5h" hidden>
+          <header class="step-hd"><div class="step-k">Step 5 of 6</div><h3 id="s5h">Sleep and recovery</h3><p>Sleep and stress change how much training you can handle.</p></header>
+          <fieldset class="f"><legend class="lab">How many hours do you usually sleep?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="Sleep Hours" value="Under 6 hours" required><span>Under 6</span></label>
+              <label class="opt"><input type="radio" name="Sleep Hours" value="6-7 hours"><span>6 to 7</span></label>
+              <label class="opt"><input type="radio" name="Sleep Hours" value="7-8 hours"><span>7 to 8</span></label>
+              <label class="opt"><input type="radio" name="Sleep Hours" value="8+ hours"><span>8 or more</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">How well do you usually sleep?</legend>
+            <div class="opts c4">
+              <label class="opt"><input type="radio" name="Sleep Quality" value="Badly" required><span>Badly</span></label>
+              <label class="opt"><input type="radio" name="Sleep Quality" value="OK"><span>OK</span></label>
+              <label class="opt"><input type="radio" name="Sleep Quality" value="Well"><span>Well</span></label>
+              <label class="opt"><input type="radio" name="Sleep Quality" value="Very well"><span>Very well</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="f"><legend class="lab">Outside padel, how busy is a normal week? <span class="hint">Work, study, family, travel.</span></legend>
+            <div class="opts c2">
+              <label class="opt"><input type="radio" name="Weekly Life Load" value="Light" required><span>Light<small>Plenty of downtime</small></span></label>
+              <label class="opt"><input type="radio" name="Weekly Life Load" value="Moderate"><span>Moderate<small>Busy but fine</small></span></label>
+              <label class="opt"><input type="radio" name="Weekly Life Load" value="Heavy"><span>Heavy<small>Long days, not much downtime</small></span></label>
+              <label class="opt"><input type="radio" name="Weekly Life Load" value="Very heavy"><span>Very heavy<small>Stretched all the time</small></span></label>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- ── 6 · SIGN-OFF ── under 18, every line switches to the parent or
+             guardian's wording (.v-minor) and they sign. -->
+        <section class="step" data-name="Sign-off" aria-labelledby="s6h" hidden>
+          <header class="step-hd"><div class="step-k">Step 6 of 6</div><h3 id="s6h">Sign-off</h3><p>Last step. An emergency contact, then your consent.</p></header>
+          <div class="sub-hd">Emergency contact</div>
+          <p class="sub-p">Someone we can call if something happens during a session.<span class="v-minor"> This can be the same parent or guardian.</span></p>
+          <div class="row r3">
+            <div class="f"><label class="lab" for="ecName">Name</label><input type="text" id="ecName" name="Emergency Contact Name" required autocomplete="off"></div>
+            <div class="f"><label class="lab" for="ecRel">Relationship</label><input type="text" id="ecRel" name="Emergency Contact Relationship" required placeholder="e.g. Partner"></div>
+            <div class="f"><label class="lab" for="ecPh">Phone</label><input type="tel" id="ecPh" name="Emergency Contact Phone" required inputmode="tel"></div>
+          </div>
+
+          <div class="sub-hd">Consent</div>
+          <p class="sub-p"><span class="v-adult">Please read each one and tick it.</span><span class="v-minor">A parent or guardian needs to read and tick these.</span></p>
+          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Answers Accurate" value="Yes" required>
+            <span><span class="v-adult">My answers are true and complete. I'll tell my coach if anything about my health changes.</span><span class="v-minor">The answers on this form are true and complete. I'll tell the coach if anything about my child's health changes.</span></span></label></div>
+          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Health Information" value="Yes" required>
+            <span><span class="v-adult">I agree that <b>my coach and the UTS coaching team</b> can use my answers, including my health information, to plan and run my course safely.</span><span class="v-minor">I agree that <b>the coach and the UTS coaching team</b> can use these answers, including my child's health information, to plan and run the course safely.</span></span></label></div>
+          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Filming and Testing" value="Yes" required>
+            <span><span class="v-adult">I agree to be <b>filmed playing padel</b> and to do the <b>physical tests</b>. The video and results are only used for my analysis, profile and report.</span><span class="v-minor">I agree to my child being <b>filmed playing padel</b> and doing the <b>physical tests</b>. The video and results are only used for their analysis, profile and report.</span></span></label></div>
+          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Physical Risk" value="Yes" required>
+            <span><span class="v-adult">I understand that training and testing are hard physical work and carry some risk of injury. I'll work within my limits and tell my coach straight away if something hurts.</span><span class="v-minor">I understand that training and testing are hard physical work and carry some risk of injury. My child will work within their limits and tell the coach straight away if something hurts.</span></span></label></div>
+          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Social Media" value="Yes">
+            <span><span class="tag">Optional</span><span class="v-adult">The UTS and my coach can share photos or short clips of me from sessions on social media.</span><span class="v-minor">The UTS and the coach can share photos or short clips of my child from sessions on social media.</span> Leave this unticked and nothing changes.</span></label></div>
+
+          <div class="signed">
+            <div class="f"><label class="lab" for="sig"><span class="v-adult">Type your full name to sign</span><span class="v-minor">Parent or guardian, type your full name to sign</span></label>
+              <input type="text" id="sig" name="Signature" required autocomplete="off"></div>
+            <div class="date" id="sigDate"></div>
+          </div>
+          <div class="f"><label class="lab" for="anything">Anything else we should know? <span class="hint">Optional</span></label>
+            <textarea id="anything" name="Anything Else" rows="2"></textarea></div>
+          <p class="notice"><b>Who sees your answers.</b> Your coach, Amir Ardekani, and the UTS coaching team. They're stored securely and only used to run your course. You can ask for them to be deleted at any time. <a href="/privacy.html#partner-courses" target="_blank" rel="noopener">Read the privacy notice</a>.</p>
+        </section>
+
+        <div class="navbar">
+          <button type="button" class="btn btn-line is-off" id="back">Back</button>
+          <span class="count" id="count" aria-live="polite">Step 1 of 6</span>
+          <button type="submit" class="btn btn-red" id="next">Next: Your padel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="sent" id="sent" role="dialog" aria-modal="true" aria-labelledby="sentH">
+  <div class="sent-card">
+    <div class="roundel" aria-hidden="true"><b>SENT</b></div>
+    <h2 id="sentH" tabindex="-1">Form sent</h2>
+    <p><span id="sentName">Thanks.</span> Your coach will read every answer before your first session. If anything needs a quick chat, we'll get in touch.</p>
+    <p>You can close this page now.</p>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <div><b>The UTS</b>Newhall Lane, Hoylake, Wirral CH47 4BP<br><a href="tel:+441516326409">0151 632 6409</a> · <a href="https://theuts.co.uk/" rel="noopener">theuts.co.uk</a></div>
+    <div><b>Coaching &amp; app</b>Amir Ardekani, AA Performance<br><a href="/">amirardekani.com</a> · <a href="/privacy.html#partner-courses">Privacy notice</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var form=document.getElementById('frm'),
+      sheet=document.getElementById('sheet'),
+      stopsEl=document.getElementById('stops'),
+      steps=[].slice.call(form.querySelectorAll('.step')),
+      stops=[].slice.call(stopsEl.querySelectorAll('li')),
+      back=document.getElementById('back'),
+      next=document.getElementById('next'),
+      count=document.getElementById('count'),
+      screenRows=[].slice.call(form.querySelectorAll('.screen .yn')),
+      reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches),
+      cur=0, reached=0, started=false;
+  function byId(id){ return document.getElementById(id); }
+  function track(ev){ if(window.plausible) window.plausible(ev); }
+
+  // ── The line draws itself the first time it scrolls into view ──────────
+  var route=byId('route');
+  if(reduce||!('IntersectionObserver' in window)) route.classList.add('go');
+  else {
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ route.classList.add('go'); io.disconnect(); } });
+    },{threshold:.3});
+    io.observe(route);
+  }
+
+  // ── Today's date on the signature line ─────────────────────────────────
+  var d=new Date(), pad=function(n){ return (n<10?'0':'')+n; };
+  byId('signedOn').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  byId('sigDate').textContent=d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  // ── Errors ──────────────────────────────────────────────────────────────
+  function fieldOf(el){ return el.closest('.f'); }
+  function clearErr(el){
+    var f=fieldOf(el); if(!f) return;
+    f.classList.remove('err');
+    var m=f.querySelector('.ferr'); if(m) m.remove();
+    f.querySelectorAll('[aria-invalid]').forEach(function(x){ x.removeAttribute('aria-invalid'); });
+  }
+  function showErr(el,txt){
+    var f=fieldOf(el); if(!f) return;
+    f.classList.add('err');
+    var m=f.querySelector('.ferr');
+    if(!m){ m=document.createElement('p'); m.className='ferr'; m.setAttribute('role','alert'); f.appendChild(m); }
+    m.textContent=txt;
+    el.setAttribute('aria-invalid','true');
+  }
+  form.addEventListener('input',function(e){ if(e.target.name) clearErr(e.target); });
+  form.addEventListener('change',function(e){ if(e.target.name) clearErr(e.target); });
+
+  // ── Questions that only appear when they apply ─────────────────────────
+  // Hiding a block also empties it, so a question that is no longer being
+  // asked can never send a stale answer.
+  function setCond(el,on){
+    if(!el) return;
+    var was=el.classList.contains('on');
+    el.classList.toggle('on',on);
+    if(was&&!on){
+      el.querySelectorAll('input,select,textarea').forEach(function(x){
+        if(x.type==='radio'||x.type==='checkbox') x.checked=false; else x.value='';
+        x.disabled=false;
+      });
+      el.querySelectorAll('.err').forEach(function(f){ clearErr(f); });
+      if(el.classList.contains('err')) clearErr(el);
+    }
+  }
+  var ageEl=byId('age'), sexEl=byId('sex');
+  function isMinor(){ var n=parseInt(ageEl.value,10); return !isNaN(n)&&n>0&&n<18; }
+  function screenGate(){
+    var yes=screenRows.some(function(row){
+      if(row.classList.contains('cond')&&!row.classList.contains('on')) return false;
+      var r=row.querySelector('input:checked'); return !!r&&r.value==='Yes';
+    });
+    setCond(byId('screenMore'),yes);
+    return yes;
+  }
+  // Under 18: a parent or guardian gives their details, answers the growth
+  // question and signs the last step. The pregnancy row is adults only.
+  function gates(){
+    var minor=isMinor(), female=sexEl.value==='Female';
+    form.classList.toggle('minor',minor);
+    setCond(byId('guardian'),minor);
+    setCond(byId('growWrap'),minor);
+    setCond(byId('pregRow'),female&&!minor);
+    byId('givenBy').value=minor?'Parent or guardian':'Athlete';
+    screenGate();
+  }
+  ageEl.addEventListener('input',gates);
+  sexEl.addEventListener('change',gates);
+
+  // "None"-type chips clear the others, and the others clear them.
+  // A data-max group stops at its limit.
+  function chipRules(t){
+    var box=t.closest('.chips'), all=[].slice.call(box.querySelectorAll('input[type=checkbox]'));
+    if(t.checked){
+      all.forEach(function(x){
+        if(x!==t&&(t.hasAttribute('data-only')||x.hasAttribute('data-only'))) x.checked=false;
+      });
+    }
+    var max=parseInt(box.getAttribute('data-max')||'0',10);
+    if(max){
+      var n=all.filter(function(x){ return x.checked; }).length;
+      all.forEach(function(x){ x.disabled=!x.checked&&n>=max; });
+    }
+  }
+  form.addEventListener('change',function(e){
+    var t=e.target; if(!t.name) return;
+    if(t.name.indexOf('Screen: ')===0) screenGate();
+    else if(t.name==='Current Injury') setCond(byId('injWrap'),t.value==='Yes');
+    else if(t.name==='App Sessions Location') setCond(byId('equipWrap'),t.value==='At home'||t.value==='On a padel court');
+    if(t.type==='checkbox'&&t.closest('.chips')) chipRules(t);
+  });
+
+  // ── Validation ──────────────────────────────────────────────────────────
+  // The form is novalidate, so nothing is enforced unless it is checked here.
+  // `required` sits on the FIRST radio or chip of a group.
+  function gated(el){
+    for(var c=el.closest('.cond'); c; c=c.parentElement&&c.parentElement.closest('.cond'))
+      if(!c.classList.contains('on')) return true;
+    return false;
+  }
+  function answered(el){
+    if(el.type==='radio'||el.type==='checkbox')
+      return !!form.querySelector('[name="'+CSS.escape(el.name)+'"]:checked');
+    return (el.value||'').trim()!==''&&el.checkValidity();
+  }
+  function firstMissing(scope){
+    var seen={}, els=scope.querySelectorAll('input,select,textarea');
+    for(var i=0;i<els.length;i++){
+      var el=els[i];
+      if(!el.name||el.type==='hidden'||el.name==='botcheck'||seen[el.name]||gated(el)) continue;
+      seen[el.name]=1;
+      if(el.required&&!answered(el)) return el;
+      // an optional field is fine empty, but not filled in wrong
+      if(!el.required&&el.type!=='radio'&&el.type!=='checkbox'&&(el.value||'').trim()!==''&&!el.checkValidity()) return el;
+    }
+    return null;
+  }
+  function msgFor(el){
+    var v=(el.value||'').trim();
+    if(el.type==='checkbox'&&!el.closest('.chips')) return 'Please tick this box to continue.';
+    if(el.type==='checkbox') return 'Please pick at least one.';
+    if(el.type==='radio'||el.tagName==='SELECT') return 'Please choose one.';
+    if(el.type==='email'&&v) return 'That email address doesn’t look right. Please check it.';
+    if(el.type==='number'&&v) return 'Please enter a number between '+el.min+' and '+el.max+'.';
+    return 'Please fill this in.';
+  }
+  function flag(el){
+    showErr(el,msgFor(el));
+    (fieldOf(el)||el).scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+    try{ el.focus({preventScroll:true}); }catch(err){}
+  }
+
+  // ── Steps ───────────────────────────────────────────────────────────────
+  // The blue fill runs from the first station's centre to the current one's,
+  // measured, so label widths can never make it stop short.
+  function fillTo(i){
+    var a=stops[0].querySelector('i').getBoundingClientRect(),
+        b=stops[i].querySelector('i').getBoundingClientRect();
+    stopsEl.style.setProperty('--fill',Math.max(0,(b.left+b.width/2)-(a.left+a.width/2))+'px');
+  }
+  function show(i,move){
+    cur=i; if(i>reached) reached=i;
+    steps.forEach(function(s,k){
+      s.hidden=k!==i;
+      s.classList.remove('enter');
+      if(k===i&&move){ void s.offsetWidth; s.classList.add('enter'); }
+    });
+    stops.forEach(function(li,k){
+      var b=li.querySelector('button'), done=k<reached&&k!==i;
+      li.classList.toggle('cur',k===i);
+      li.classList.toggle('done',done);
+      b.disabled=k>reached;
+      b.setAttribute('aria-label','Step '+(k+1)+', '+steps[k].getAttribute('data-name')+(k===i?', current':done?', done':''));
+      if(k===i) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current');
+    });
+    fillTo(i);
+    back.classList.toggle('is-off',i===0);
+    var last=i===steps.length-1;
+    next.innerHTML=last?'Send my form':'Next: '+steps[i+1].getAttribute('data-name')+' <span aria-hidden="true">→</span>';
+    count.textContent='Step '+(i+1)+' of '+steps.length;
+    if(move){
+      sheet.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+      var h=steps[i].querySelector('h3');
+      if(h){ h.setAttribute('tabindex','-1'); try{ h.focus({preventScroll:true}); }catch(err){} }
+    }
+  }
+  function go(target){
+    if(target===cur) return;
+    if(target<cur){ show(target,true); return; }
+    for(var k=cur;k<target;k++){
+      var m=firstMissing(steps[k]);
+      if(m){ if(k!==cur) show(k,true); flag(m); return; }
+    }
+    show(target,true);
+  }
+  stops.forEach(function(li,k){ li.querySelector('button').addEventListener('click',function(){ go(k); }); });
+  back.addEventListener('click',function(){ if(cur>0) show(cur-1,true); });
+  window.addEventListener('resize',function(){ fillTo(cur); });
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ fillTo(cur); });
+
+  // ── Sending ─────────────────────────────────────────────────────────────
+  // Same dual-write as form.html: Supabase first (the durable record, shown in
+  // coach.html → Intake), Web3Forms for the email. Sent if EITHER lands.
+  var SB_URL='https://bvipfipbdcyqnbczjmaq.supabase.co',
+      SB_KEY='sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy',
+      SKIP=new Set(['access_key','from_name','subject','redirect','botcheck']);
+  function payload(){
+    var out={};
+    new FormData(form).forEach(function(v,k){
+      if(SKIP.has(k)) return;
+      var val=typeof v==='string'?v.trim():v;
+      if(val==='') return;
+      out[k]=(k in out)?[].concat(out[k],val):val;
+    });
+    return out;
+  }
+  async function toSupabase(p){
+    var name=[p['First Name'],p['Last Name']].filter(Boolean).join(' ');
+    var res=await fetch(SB_URL+'/rest/v1/rpc/submit_intake',{
+      method:'POST',
+      headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({p_payload:p,p_lang:'en',p_name:name||null,p_email:p['Email']||null,
+        p_contact:p['Mobile']||null,p_programme:'UTS Padel Performance Course'})
+    });
+    if(!res.ok) throw new Error('supabase '+res.status);
+    return true;
+  }
+  function sendErr(txt){
+    var e=byId('sendErr');
+    if(!txt){ if(e) e.remove(); return; }
+    if(!e){
+      e=document.createElement('p'); e.id='sendErr'; e.className='ferr'; e.setAttribute('role','alert');
+      e.style.margin='0 clamp(18px,5vw,40px) 6px';
+      form.querySelector('.navbar').before(e);
+    }
+    e.textContent=txt;
+  }
+  async function send(){
+    if(form.querySelector('[name="botcheck"]').checked) return;
+    for(var k=0;k<steps.length;k++){
+      var m=firstMissing(steps[k]);
+      if(m){ if(k!==cur) show(k,true); flag(m); return; }
+    }
+    var name=(byId('fn').value.trim()+' '+byId('ln').value.trim()).trim();
+    byId('subj').value='New athlete form · UTS Padel · '+name;
+    byId('screenSum').value=screenGate()?'At least one YES. See Screen Details.':'All no';
+    sendErr('');
+    var label=next.innerHTML; next.disabled=true; next.textContent='Sending…';
+    try{
+      var rs=await Promise.allSettled([toSupabase(payload()),fetch(form.action,{method:'POST',body:new FormData(form)})]);
+      var ok=rs[0].status==='fulfilled'||(rs[1].status==='fulfilled'&&rs[1].value&&rs[1].value.ok);
+      if(!ok) throw new Error('not sent');
+      var first=byId('fn').value.trim();
+      byId('sentName').textContent=first?'Thanks, '+first+'.':'Thanks.';
+      byId('sent').classList.add('on');
+      document.body.style.overflow='hidden';
+      try{ byId('sentH').focus(); }catch(err){}
+      track('UTS Padel Form Sent');
+    }catch(err){
+      next.disabled=false; next.innerHTML=label;
+      sendErr('Your form didn’t send. Check your connection and press Send my form again. If it keeps failing, email amirardekanian@gmail.com.');
+    }
+  }
+
+  // Enter in a text box, or the red button: next step, or send on the last.
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(cur<steps.length-1){
+      var m=firstMissing(steps[cur]);
+      if(m){ flag(m); return; }
+      if(!started){ started=true; track('UTS Padel Form Started'); }
+      show(cur+1,true);
+      return;
+    }
+    send();
+  });
+
+  gates();
+  show(0,false);
+})();
+</script>
+</body>
+</html>

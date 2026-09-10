@@ -48,6 +48,8 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Privacy | [`privacy.html`](privacy.html) | — | GDPR privacy notice |
 | Proof signup | [`proof.html`](proof.html) | — | Public landing page for the **free habit tracker** — what it is, then name + email + WhatsApp → emails Amir (Web3Forms). **Not linked from nav** on purpose: it's the Instagram bio link. Sign people up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill |
 | Coach affiliate | — | [`partner-fa.html`](partner-fa.html) | Referral partnership pitch for other coaches — the 10%/10% deal, plain-language terms, and an application form → emails Amir (Web3Forms). Codes issued here are added by hand to **both** apply forms; roster in [`AFFILIATES.md`](AFFILIATES.md) |
+| UTS padel course | [`uts-padel.html`](uts-padel.html) | — | Client-facing page + athlete form for the **6-Week Padel Performance Course at The UTS, Hoylake** (Amir's club course). UTS-branded (their logo + gym photo in [`assets/img/uts/`](assets/img/uts/)); the six weeks drawn as a Tube line; a 6-step form with a health screen, emergency contact, under-18 guardian consent. Saved to Supabase `hab_intake` (programme = `UTS Padel Performance Course`) **and** emails Amir. `noindex`, not linked from nav |
+| Etminan academy | [`etminan-en.html`](etminan-en.html) | [`etminan.html`](etminan.html) | Partner page + sign-up form for Etminan Tennis Academy players (also [`etminan-dv.html`](etminan-dv.html), Dhivehi). Intakes tagged `Etminan Tennis Academy`. `noindex` |
 | EN redirect | [`index-en.html`](index-en.html) | — | Permanent redirect to `/` |
 
 **Plumbing:** [`CNAME`](CNAME) (domain) · [`sitemap.xml`](sitemap.xml) ·
