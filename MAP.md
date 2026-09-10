@@ -203,9 +203,9 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).
 - **Club print — The UTS:** [`poster-uts-padel.html`](Content/poster-uts-padel.html) — A3 poster +
-  Instagram story for the 6-Week Padel Performance Course, in **the UTS brand, not ours** (their
+  two Instagram stories (the benefits, then how the course works) for the 6-Week Padel Performance Course, in **the UTS brand, not ours** (their
   black-and-white gym photo, heavy italics, red/white strips) plus "The Padel Line". Print the file
-  for the A3 PDF, open with `#story` for 1080×1920; exports in [`uts-padel/`](Content/uts-padel/).
+  for the A3 PDF, open with `#story` or `#story2` for the 1080×1920 stories; exports in [`uts-padel/`](Content/uts-padel/).
   No QR on purpose: people book and pay at the club, the form is only for booked athletes.
 - **Image kits:** [`tennis-players/`](Content/tennis-players/) (transparent player cutouts) ·
   [`recovery-run/`](Content/recovery-run/) (graded photo-story frames).
