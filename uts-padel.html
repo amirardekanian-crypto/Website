@@ -307,7 +307,7 @@
   .navbar{display:flex;align-items:center;gap:12px;padding:18px clamp(18px,5vw,40px) 26px;border-top:1px solid var(--line);margin-top:12px;}
   .navbar .count{margin:0 auto;font-family:var(--mono);font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
   .navbar .is-off{visibility:hidden;}
-  @media(max-width:520px){.navbar{flex-wrap:wrap;}.navbar .count{order:-1;width:100%;text-align:center;margin:0 0 4px;}.navbar .btn{flex:1;padding:0 12px;}.navbar .is-off{display:none;}}
+  @media(max-width:520px){.navbar{flex-wrap:wrap;}.navbar .count{order:-1;width:100%;text-align:center;margin:0 0 4px;}.navbar .btn{flex:1;padding:0 12px;}.navbar #back{flex:0 0 auto;padding:0 18px;}.navbar .is-off{display:none;}}
 
   /* sent — a roundel, because that is the club's own mark */
   .sent{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:var(--ink);color:#fff;}
@@ -319,6 +319,8 @@
   .sent h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(30px,6vw,46px);line-height:1.04;margin:30px 0 12px;outline:none;}
   .sent p{color:#D9DCE0;font-size:16px;line-height:1.7;}
   .sent p+p{margin-top:10px;font-size:14.5px;color:#AEB3BA;}
+  .sent #sentVid{font-size:16px;color:#fff;}
+  .sent a{color:#fff;text-underline-offset:3px;}
 
   /* footer */
   .foot{background:var(--ink);color:#B3B8BF;font-size:14px;line-height:1.75;padding:38px 0 44px;border-top:4px solid var(--red);}
@@ -351,7 +353,7 @@
   <div class="hero-in">
     <span class="sign">6-week padel course</span>
     <h1>Six weeks.<br>Tested at <span class="r">both ends.</span></h1>
-    <p class="lede">A small-group strength and conditioning course for padel players at The UTS. We film your padel and test you first. Your training is built around what we find. After six weeks we test you again, so you can see what changed.</p>
+    <p class="lede">A small-group strength and conditioning course for padel players at The UTS. First you send us a short video of you playing, and we test you. Your training is built around what we find. After six weeks we test you again, so you can see what changed.</p>
     <ul class="facts">
       <li>Max 5 athletes</li>
       <li>6 weeks</li>
@@ -373,8 +375,8 @@
 
     <!-- THE LINE. Decorative drawing, so it is one labelled image to a screen
          reader. Every fact in it is also written out in the four cards below. -->
-    <div class="route" id="route" role="img" aria-label="The course as a line. Baseline testing first. Then two coached sessions a week for six weeks, with a review at the midpoint. Then retesting. The app runs alongside with a check-in before every session.">
-      <div class="ix first" style="--d:.1s"><b>Baseline</b><span>Film + test</span></div>
+    <div class="route" id="route" role="img" aria-label="The course as a line. Your padel video and baseline testing first. Then two coached sessions a week for six weeks, with a review at the midpoint. Then retesting. The app runs alongside with a check-in before every session.">
+      <div class="ix first" style="--d:.1s"><b>Baseline</b><span>Video + test</span></div>
       <div class="wk z" style="--d:.3s"><i></i><i></i><em>Week 1</em></div>
       <div class="wk" style="--d:.42s"><i></i><i></i><em>Week 2</em></div>
       <div class="wk z" style="--d:.54s"><i></i><i></i><em>Week 3</em></div>
@@ -394,7 +396,7 @@
       <article class="ph">
         <div class="ph-k">01 · Assess</div>
         <h3>Find your priorities</h3>
-        <p>Before training starts, we film five minutes of your padel and put you through a set of physical tests. From that we build your performance profile. It shows your main physical priorities, in order.</p>
+        <p>Before training starts, you send your coach about five minutes of video of you playing padel. We also put you through a set of physical tests. From both we build your performance profile. It shows your main physical priorities, in order.</p>
         <ul><li>5-minute padel video analysis</li><li>Physical testing</li><li>Your performance profile</li></ul>
       </article>
       <article class="ph pr">
@@ -569,6 +571,21 @@
             <input type="text" id="upc" name="Upcoming Matches" placeholder="e.g. League match most Thursdays, tournament on 18 October"></div>
           <div class="f"><label class="lab" for="goal">What would make these six weeks a win for you?</label>
             <textarea id="goal" name="Six-Week Goal" rows="3" required placeholder="e.g. Get back for lobs quicker. Stop my calves going in long matches."></textarea></div>
+          <!-- Nobody films at The UTS: the athlete sends their own video, as a
+               link here or on WhatsApp. The choice is recorded so the coach
+               knows who still owes one. -->
+          <div class="sub-hd">Your padel video</div>
+          <p class="sub-p">Your coach uses about five minutes of you playing to see how you move on court. Film a normal game from behind the back glass, with the whole court in view. A phone is fine.</p>
+          <fieldset class="f"><legend class="lab">How will you send it?</legend>
+            <div class="opts c3">
+              <label class="opt"><input type="radio" name="Padel Video" value="Link in this form" required><span>Paste a link<small>Drive, Dropbox, WeTransfer or YouTube</small></span></label>
+              <label class="opt"><input type="radio" name="Padel Video" value="WhatsApp to coach"><span>WhatsApp it<small>Straight to your coach</small></span></label>
+              <label class="opt"><input type="radio" name="Padel Video" value="Still to film"><span>I need to film one<small>Send it before you start</small></span></label>
+            </div>
+          </fieldset>
+          <div class="f cond" id="videoLinkWrap"><label class="lab" for="videoLink">Link to your video <span class="hint">Make sure anyone with the link can watch it.</span></label>
+            <input type="text" id="videoLink" name="Padel Video Link" required inputmode="url" autocomplete="url" placeholder="Paste the link here"></div>
+          <p class="flag cond" id="videoWa"><b>Send it on WhatsApp to +44&nbsp;7435&nbsp;363461</b> before your first session. <a href="https://wa.me/447435363461" target="_blank" rel="noopener">Open WhatsApp</a></p>
         </section>
 
         <!-- ── 3 · TRAINING ── -->
@@ -750,8 +767,8 @@
             <span><span class="v-adult">My answers are true and complete. I'll tell my coach if anything about my health changes.</span><span class="v-minor">The answers on this form are true and complete. I'll tell the coach if anything about my child's health changes.</span></span></label></div>
           <div class="f"><label class="consent"><input type="checkbox" name="Consent: Health Information" value="Yes" required>
             <span><span class="v-adult">I agree that <b>my coach and the UTS coaching team</b> can use my answers, including my health information, to plan and run my course safely.</span><span class="v-minor">I agree that <b>the coach and the UTS coaching team</b> can use these answers, including my child's health information, to plan and run the course safely.</span></span></label></div>
-          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Filming and Testing" value="Yes" required>
-            <span><span class="v-adult">I agree to be <b>filmed playing padel</b> and to do the <b>physical tests</b>. The video and results are only used for my analysis, profile and report.</span><span class="v-minor">I agree to my child being <b>filmed playing padel</b> and doing the <b>physical tests</b>. The video and results are only used for their analysis, profile and report.</span></span></label></div>
+          <div class="f"><label class="consent"><input type="checkbox" name="Consent: Video and Testing" value="Yes" required>
+            <span><span class="v-adult">I agree to do the <b>physical tests</b>. The <b>padel video</b> I send and my test results are only used for my analysis, profile and report.</span><span class="v-minor">I agree to my child doing the <b>physical tests</b>. The <b>padel video</b> we send and their test results are only used for their analysis, profile and report.</span></span></label></div>
           <div class="f"><label class="consent"><input type="checkbox" name="Consent: Physical Risk" value="Yes" required>
             <span><span class="v-adult">I understand that training and testing are hard physical work and carry some risk of injury. I'll work within my limits and tell my coach straight away if something hurts.</span><span class="v-minor">I understand that training and testing are hard physical work and carry some risk of injury. My child will work within their limits and tell the coach straight away if something hurts.</span></span></label></div>
           <div class="f"><label class="consent"><input type="checkbox" name="Consent: Social Media" value="Yes">
@@ -783,6 +800,7 @@
     <div class="roundel" aria-hidden="true"><b>SENT</b></div>
     <h2 id="sentH" tabindex="-1">Form sent</h2>
     <p><span id="sentName">Thanks.</span> Your coach will read every answer before your first session. If anything needs a quick chat, we'll get in touch.</p>
+    <p id="sentVid" hidden><b>One more thing:</b> send your padel video on <a href="https://wa.me/447435363461" target="_blank" rel="noopener">WhatsApp</a> to +44&nbsp;7435&nbsp;363461 before your first session.</p>
     <p>You can close this page now.</p>
   </div>
 </div>
@@ -905,6 +923,10 @@
     if(t.name.indexOf('Screen: ')===0) screenGate();
     else if(t.name==='Current Injury') setCond(byId('injWrap'),t.value==='Yes');
     else if(t.name==='App Sessions Location') setCond(byId('equipWrap'),t.value==='At home'||t.value==='On a padel court');
+    else if(t.name==='Padel Video'){
+      setCond(byId('videoLinkWrap'),t.value==='Link in this form');
+      setCond(byId('videoWa'),t.value!=='Link in this form');
+    }
     if(t.type==='checkbox'&&t.closest('.chips')) chipRules(t);
   });
 
@@ -1050,6 +1072,8 @@
       if(!ok) throw new Error('not sent');
       var first=byId('fn').value.trim();
       byId('sentName').textContent=first?'Thanks, '+first+'.':'Thanks.';
+      var vid=form.querySelector('input[name="Padel Video"]:checked');
+      byId('sentVid').hidden=!vid||vid.value==='Link in this form';
       byId('sent').classList.add('on');
       document.body.style.overflow='hidden';
       try{ byId('sentH').focus(); }catch(err){}
