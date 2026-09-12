@@ -2516,6 +2516,49 @@
   .ceil-hero-p { font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,0.9);
     margin-top: 9px; }
 
+  /* ── Body weight screen ── */
+  .wt-chips { display: flex; gap: 7px; margin-top: 18px; }
+  .chip { flex: 1; padding: 9px 0; border: 1px solid var(--grey-mid); border-radius: 999px;
+    background: transparent; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey-text); }
+  .chip-on { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  body[data-dark] .chip { border-color: #3a3a3a; color: #999; }
+  body[data-dark] .chip-on { background: var(--yellow); color: var(--on-accent); }
+
+  .wt-row { display: flex; align-items: center; gap: 12px; padding: 11px 2px;
+    border-top: 1px solid var(--grey-card); font-size: 13px; color: var(--grey-text); }
+  body[data-dark] .wt-row { border-top-color: #2a2a2a; }
+  .wt-row-d { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; }
+  .wt-row b { margin-left: auto; font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+    font-size: 18px; color: var(--grey-dark); }
+  body[data-dark] .wt-row b { color: #eee; }
+  .wt-del { flex: none; width: 26px; height: 26px; border-radius: 7px; border: none;
+    background: transparent; color: var(--grey-text); cursor: pointer; font-size: 13px; }
+  .wt-del:active { background: var(--ice-dim); color: var(--ice); }
+
+  .wt-entry { margin-top: 20px; background: var(--white); border: 1px solid var(--grey-mid);
+    border-radius: 12px; padding: 15px; }
+  body[data-dark] .wt-entry { background: #1e1e1e; border-color: #333; }
+  .wt-entry-l { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-text); }
+  .wt-entry-row { display: flex; gap: 9px; margin-top: 10px; }
+  .wt-input { flex: 1; min-width: 0; background: var(--grey-card); border: 1px solid transparent;
+    border-radius: 8px; padding: 12px; font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 22px; color: var(--grey-dark); outline: none; }
+  .wt-input:focus { border-color: var(--yellow); }
+  body[data-dark] .wt-input { background: #2a2a2a; color: #eee; }
+  .wt-save { flex: none; padding: 0 18px; border: none; border-radius: 8px;
+    background: var(--yellow); color: var(--on-accent); cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.1px; text-transform: uppercase; }
+  .wt-clear { display: block; width: 100%; margin-top: 22px; padding: 12px;
+    background: transparent; border: 1px dashed var(--ice-mid); border-radius: 9px;
+    color: var(--ice); cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; }
+
   .ceil-empty { text-align: center; padding: 44px 16px; color: var(--grey-text);
     font-size: 13.5px; line-height: 1.65; }
   .ceil-empty-l { text-align: left; padding: 26px 0 8px; }
@@ -3428,6 +3471,18 @@
   <div id="ceil-body" style="padding: 0 18px 110px;"></div>
 </div>
 
+<!-- ═══ BODY WEIGHT ═══ moved here from AA Proof (Amir, 2026-09-12). This app
+     owns <id>_hab_wt now: it writes it, pushes it, and merges it. Reached from
+     the Body Weight card on Home. -->
+<div id="screen-weight" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('home')" aria-label="Back to Home">←</button>
+    <div class="ceil-kick">— Your numbers</div>
+    <div class="ceil-title">Body Weight</div>
+  </div>
+  <div id="wt-body" style="padding: 0 18px 110px;"></div>
+</div>
+
 <!-- ═══ LIBRARY ═══ shared, app-wide content. A "two doors" landing — Sessions
      (free workouts) and Playbook (blog articles) — each opening into its own
      world. data-tab stays 'workouts' so all goTo() routing is untouched. -->
@@ -3818,7 +3873,12 @@ function _snapshot() {
     // this origin's storage. It owns "<id>_hab_*" and syncs those itself, so
     // this app must never push them — a stale copy here would overwrite habit
     // progress the athlete logged on another device.
-    if (k && k.indexOf(prefix + 'hab_') === 0) continue;
+    // ⚠️ ONE exception to that rule, since 2026-09-12: body weight moved OUT of
+    // Proof and lives here now, so this app is its writer and must push it. The
+    // key name is unchanged deliberately — renaming it would mean migrating
+    // every athlete's history across devices, and coach.html already reads it
+    // at this name. habits.html no longer sends it.
+    if (k && k.indexOf(prefix + 'hab_') === 0 && k !== prefix + 'hab_wt') continue;
     // Local-only freshness stamp — pushed as the snapshot-level 'snapAt' below,
     // never as its own key (a cloud copy restored onto a fresh device would
     // masquerade as local edit history there).
@@ -4075,6 +4135,27 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
         }
         return JSON.stringify(out);
       }
+    } catch (e) { /* not parseable — fall through */ }
+  }
+  // Body weight: union by DATE, newest write wins that day — and a delete is a
+  // tombstone (kg:null), never a missing key. Carried over from Proof, which
+  // owned this key until 2026-09-12, and it matters for the same reason it did
+  // there: the union only walks the keys it can see, so dropping a key outright
+  // lets the other device hand the reading straight back. It also matters
+  // DURING the changeover — an athlete can be running the old Proof and this
+  // app at once for a day, and without this branch the scalar rule would take
+  // one side wholesale and lose whatever the other side logged.
+  if (key.slice(-7) === '_hab_wt') {
+    try {
+      const L = JSON.parse(localVal) || {}, C = JSON.parse(cloudVal) || {};
+      const out = {};
+      Object.keys(L).concat(Object.keys(C)).forEach(d => {
+        const a = L[d], b = C[d];
+        if (!a) { out[d] = b; return; }
+        if (!b) { out[d] = a; return; }
+        out[d] = ((b.t || 0) > (a.t || 0)) ? b : a;
+      });
+      return JSON.stringify(out);
     } catch (e) { /* not parseable — fall through */ }
   }
   // The Ceiling (estimated 1RM history): union by lift + date, newest write wins
@@ -5968,10 +6049,11 @@ function goTo(screen, historyId, keepContent) {
   // `keepContent` is set when renderCeilingLift() routes here itself; it has
   // already painted the per-lift view and must not be overwritten.
   if (screen === 'ceiling' && !keepContent) renderCeiling();
+  if (screen === 'weight') renderWeightScreen();
 
   // Update the global tab bar's active button. The Ceiling is reached from
   // Home, so that tab stays lit while you are inside it.
-  const litTab = (screen === 'ceiling') ? 'home' : screen;
+  const litTab = (screen === 'ceiling' || screen === 'weight') ? 'home' : screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
   });
@@ -8437,7 +8519,7 @@ function weightCardHtml() {
 
   if (!series.length) {
     return head + `
-      <button type="button" class="nc" onclick="goHabitsWeight()">
+      <button type="button" class="nc" onclick="goWeight()">
         <div class="nc-k"><span>Body weight</span></div>
         <div class="nc-big">Not tracked yet</div>
         <div class="nc-f">Add today's weight in AA Proof<span class="nc-a">→</span></div>
@@ -8457,7 +8539,7 @@ function weightCardHtml() {
     : `${diff > 0 ? '▲' : '▼'} ${Math.abs(diff)} kg since ${fmtCeilDate(older.d)}`;
 
   return head + `
-    <button type="button" class="nc" onclick="goHabitsWeight()">
+    <button type="button" class="nc" onclick="goWeight()">
       <div class="nc-k"><span>Body weight</span><span class="nc-r">${esc(fmtCeilDate(last.d))}</span></div>
       <div class="nc-row">
         <div class="nc-n">${last.kg}</div><div class="nc-u">KG</div>
@@ -8467,9 +8549,166 @@ function weightCardHtml() {
     </button>`;
 }
 
-// Straight to the body-weight screen in AA Proof, not its front page.
-function goHabitsWeight() { window.location.href = habitsUrl() + '&screen=weight'; }
-window.goHabitsWeight = goHabitsWeight;
+// ── Writing body weight ────────────────────────────────────────────────────
+// This app owns <id>_hab_wt since 2026-09-12 (it used to be Proof's). Two rules
+// carried over from there, and both exist because of real bugs:
+//   · A DELETE IS A TOMBSTONE — { kg: null, t: now } — never a removed key. The
+//     merge only walks keys it can see, so a removed key lets another device
+//     hand the reading straight back and the deletion undoes itself.
+//   · Every write carries a fresh `t`, because the merge resolves a same-day
+//     clash by newest write, not by value.
+function wtKey() { return ATHLETE_ID + '_hab_wt'; }
+function loadWt() {
+  try { const w = JSON.parse(localStorage.getItem(wtKey())); return (w && typeof w === 'object') ? w : {}; }
+  catch (e) { return {}; }
+}
+function saveWeight(dayKey, kg) {
+  const w = loadWt();
+  w[dayKey] = { kg: kg, t: Date.now() };     // kg === null is a tombstone
+  localStorage.setItem(wtKey(), JSON.stringify(w));
+}
+// Every reading tombstoned in one pass. Never a bare `= {}` — see above.
+function clearAllWeight() {
+  const w = loadWt(), now = Date.now();
+  Object.keys(w).forEach(d => { w[d] = { kg: null, t: now }; });
+  localStorage.setItem(wtKey(), JSON.stringify(w));
+}
+
+// The 7-day rolling average evaluated on each day that HAS a reading. Sparse
+// history is normal — someone weighing twice a week is not doing it wrong — so
+// this averages whatever falls in the trailing window rather than demanding one
+// reading a day, and a lone reading averages to itself.
+const WT_AVG_WINDOW = 7;
+function wtAvgSeries(series) {
+  return series.map((p, i) => {
+    const from = new Date(p.d + 'T00:00:00');
+    from.setDate(from.getDate() - (WT_AVG_WINDOW - 1));
+    const vals = series.slice(0, i + 1).filter(q => new Date(q.d + 'T00:00:00') >= from).map(q => q.kg);
+    return { d: p.d, kg: vals.reduce((s, v) => s + v, 0) / vals.length };
+  });
+}
+// AVERAGE against AVERAGE, never first reading against last. Two single
+// mornings can differ by a kilo of water and say nothing at all.
+function wtChange(series) {
+  const s = wtAvgSeries(series);
+  if (s.length < 2) return null;
+  return { delta: +(s[s.length - 1].kg - s[0].kg).toFixed(1), n: s.length };
+}
+
+let _wtRange = 30;   // 7 · 30 · 90 days
+function goWeight() { goTo('weight'); }
+window.goWeight = goWeight;
+window.setWtRange = function (d) { _wtRange = d; renderWeightScreen(); };
+
+function renderWeightScreen() {
+  const all = bodyWeightSeries();
+  const body = document.getElementById('wt-body');
+  if (!all.length) {
+    body.innerHTML = `
+      <div class="ceil-intro">Your weight over time. Weigh yourself at the same time of day,
+      ideally first thing, and the line means something.</div>
+      <div class="ceil-empty ceil-empty-l">
+        <p><strong>Nothing logged yet.</strong></p>
+        <p style="margin-top:10px">Add today's weight below. One reading is just a number —
+        a few over a few weeks is the trend, and the trend is the part worth having.</p>
+      </div>` + wtEntryHtml();
+    return;
+  }
+
+  const from = new Date(); from.setDate(from.getDate() - _wtRange);
+  const win  = all.filter(e => new Date(e.d + 'T00:00:00') >= from);
+  const use  = win.length >= 2 ? win : all;
+  const last = all[all.length - 1];
+  const ch   = wtChange(use);
+  const since = wtChange(all);
+
+  const chips = [[7, '7 days'], [30, '1 month'], [90, '3 months']].map(([d, l]) =>
+    `<button type="button" class="chip${_wtRange === d ? ' chip-on' : ''}" onclick="setWtRange(${d})">${l}</button>`
+  ).join('');
+
+  body.innerHTML = `
+    <div class="ceil-hero">
+      <div class="ceil-hero-v">${last.kg}<small>kg</small></div>
+      <div class="ceil-hero-l">Last weighed ${esc(fmtCeilDate(last.d))}</div>
+      ${ch ? `<div class="ceil-hero-p">${ch.delta === 0 ? 'Level' : (ch.delta > 0 ? 'Up' : 'Down') + ' ' + Math.abs(ch.delta) + ' kg'}
+        over this range, comparing average to average.</div>` : ''}
+      ${since && since.delta !== 0 ? `<div class="ceil-hero-s">${since.delta > 0 ? '▲' : '▼'}
+        ${Math.abs(since.delta)} kg since you started · ${all.length} readings</div>` : ''}
+    </div>
+    <div class="wt-chips">${chips}</div>
+    ${wtChartHtml(use)}
+    <div class="ceil-label">Every reading</div>
+    ${all.slice().reverse().map(e => `
+      <div class="wt-row">
+        <span class="wt-row-d">${esc(fmtCeilDate(e.d))}</span>
+        <b>${e.kg} kg</b>
+        <button type="button" class="wt-del" onclick="deleteWeight('${e.d}')" aria-label="Delete this reading">✕</button>
+      </div>`).join('')}
+    ${wtEntryHtml()}
+    <div class="ceil-note">The line is a 7-day average, the dots are what you actually weighed.<br>
+      Day to day a kilo is water. The line is the real answer.</div>
+    <button type="button" class="wt-clear" onclick="confirmClearWeight(this)">Delete all my weight history</button>`;
+}
+
+// Line = rolling average, dots = the raw readings. Never the other way round:
+// a line through raw readings implies a precision the bathroom scale does not have.
+function wtChartHtml(series) {
+  if (series.length < 2) return '';
+  const avg = wtAvgSeries(series);
+  const vals = series.map(e => e.kg).concat(avg.map(e => e.kg));
+  const lo = Math.min(...vals), hi = Math.max(...vals), span = (hi - lo) || 1;
+  const W = 300, H = 92;
+  const t0 = new Date(series[0].d + 'T00:00:00').getTime();
+  const t1 = new Date(series[series.length - 1].d + 'T00:00:00').getTime();
+  const x = d => (t1 === t0 ? W / 2 : ((new Date(d + 'T00:00:00').getTime() - t0) / (t1 - t0)) * (W - 16) + 8);
+  const y = v => H - 12 - ((v - lo) / span) * (H - 26);
+  return `<svg class="ceil-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <polyline points="${avg.map(e => `${x(e.d)},${y(e.kg)}`).join(' ')}" fill="none"
+      stroke="#0E4A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${series.map(e => `<circle cx="${x(e.d)}" cy="${y(e.kg)}" r="3" fill="#C7552F"/>`).join('')}
+  </svg>`;
+}
+
+function wtEntryHtml() {
+  return `
+    <div class="wt-entry">
+      <div class="wt-entry-l">Today's weight</div>
+      <div class="wt-entry-row">
+        <input class="wt-input" id="wt-input" type="text" inputmode="decimal" placeholder="kg"
+          aria-label="Today's weight in kilograms">
+        <button type="button" class="wt-save" onclick="logWeightToday()">Weigh in</button>
+      </div>
+    </div>`;
+}
+
+function logWeightToday() {
+  const el = document.getElementById('wt-input');
+  const kg = parseLoggedKg(el && el.value);
+  if (!kg) { if (el) { el.focus(); } return; }
+  saveWeight(ceilingToday(), kg);
+  renderWeightScreen();
+  const hw = document.getElementById('home-weight-wrap');
+  if (hw) hw.innerHTML = weightCardHtml();
+}
+window.logWeightToday = logWeightToday;
+
+function deleteWeight(day) { saveWeight(day, null); renderWeightScreen(); }
+window.deleteWeight = deleteWeight;
+
+// Two taps, like Reset Session — this erases everything and cannot be undone.
+function confirmClearWeight(btn) {
+  if (btn.dataset.armed !== '1') {
+    btn.dataset.armed = '1';
+    btn.textContent = 'Tap again to delete every reading';
+    setTimeout(() => { if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = 'Delete all my weight history'; } }, 4000);
+    return;
+  }
+  clearAllWeight();
+  renderWeightScreen();
+  const hw = document.getElementById('home-weight-wrap');
+  if (hw) hw.innerHTML = weightCardHtml();
+}
+window.confirmClearWeight = confirmClearWeight;
 
 function latestBodyWeight() {
   let wt = null;
