@@ -54,6 +54,34 @@
     // any athlete) but must never write — without this, clicking a set or a note
     // while looking around would land in that athlete's own logged data.
     window.IS_PREVIEW = params.get('preview') === '1';
+    // ── IS ANYBODY SIGNED IN ON THIS DEVICE? Answered HERE, synchronously, with
+    // no network and no SDK. ⚠️ This is what keeps the login screen fast.
+    // The only other way to ask is athleteFromSession(), which awaits the
+    // Supabase SDK — a third-party download that `defer` puts *after* the whole
+    // 360KB document has parsed. boot() awaited it before it would show the
+    // password box, so someone with no session (i.e. every athlete the login is
+    // actually for) paid the full SDK round trip to be told what localStorage
+    // already knew: nothing to find. ~10s on a cold phone, staring at "Loading
+    // Program" (Amir, 2026-09-12).
+    // supabase-js persists its session under `sb-<project-ref>-auth-token`, and
+    // chunks it as `…-auth-token.0`, `.1` when it is large — match the shape
+    // rather than the literal key so a project ref or storageKey change cannot
+    // silently turn this into "nobody is ever signed in".
+    window.HAS_SESSION = false;
+    try {
+      for (var si = 0; si < localStorage.length; si++) {
+        var sk = localStorage.key(si);
+        if (sk && /^sb-.+-auth-token(\.\d+)?$/.test(sk)) { window.HAS_SESSION = true; break; }
+      }
+    } catch (e) {
+      // Storage blocked (private mode, locked-down browser): we cannot know, so
+      // take the old slow path rather than guessing someone is signed out.
+      window.HAS_SESSION = true;
+    }
+    // No ?client=, no session → there is nothing to fetch and nothing to wait
+    // for. The sign-in markup is plain HTML sitting in the body; the script just
+    // below it reveals it the moment it parses.
+    window.NEEDS_SIGNIN = !client && !window.IS_DEMO && !window.HAS_SESSION;
     // IMPORTANT: keep the &key= in the installed-app start_url. Without it, an
     // athlete who "Add to Home Screen" opens the app with no key, so every
     // key-checked cloud write (save_session / save_progress / messages) is
@@ -99,10 +127,37 @@
     document.head.appendChild(link);
   })();
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
-<!-- Supabase: cloud backup of progress for the coach dashboard (Stage 1) -->
+<!-- ⚠️ THE FIRST PAINT OF THIS PAGE IS THE LOGIN SCREEN. Keep this block in
+     this order — every line of it used to sit on the critical path to the
+     password box, and between them they cost ~10s on a cold phone (2026-09-12).
+       · The Google Fonts stylesheet was RENDER-BLOCKING, so nothing painted at
+         all — not even the spinner — until a third-party origin answered. It is
+         also the single origin most likely to be slow or filtered for half of
+         the people who open this app.
+       · `defer` scripts execute in DOCUMENT ORDER, so listing plausible.io
+         first meant a slow analytics download held up the Supabase SDK behind
+         it — and the SDK is what boot() waits on before it can decide whether
+         to show the login form at all.
+     So: preconnect to every third-party origin, load the font CSS without
+     blocking paint, put the SDK ahead of analytics, and make analytics `async`
+     so it leaves the ordered queue entirely. `crossorigin` is on exactly the
+     two origins fetched with CORS (font files, Supabase RPCs) — putting it on
+     the other two would open a second connection nothing reuses. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://bvipfipbdcyqnbczjmaq.supabase.co" crossorigin>
+<!-- media="print" → the browser fetches it at low priority and does NOT wait for
+     it to paint; onload promotes it to the real stylesheet. The families already
+     carry display=swap, so the only cost is a brief flash of the system font. -->
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap"></noscript>
+<!-- Supabase: cloud backup of progress for the coach dashboard (Stage 1).
+     Deliberately ABOVE analytics — see the ordering note above. -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
+     on `defer` it shares one ordered execution queue with the SDK above. -->
+<script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <style>
   :root {
     /* Primary brand = Roland-Garros green; secondary = clay; tertiary = ochre.
@@ -2760,7 +2815,7 @@
      what lets the password manager offer to save it — the whole point of using a
      password here rather than a magic link. -->
 <div class="signin-screen" id="signin-screen">
-  <form class="signin-card" id="signin-form" autocomplete="on">
+  <form class="signin-card" id="signin-form" autocomplete="on" onsubmit="return false">
     <div class="signin-mark">AA</div>
     <h1 class="signin-title">Your training</h1>
     <p class="signin-sub">Sign in with the username and password Amir sent you.</p>
@@ -2778,6 +2833,28 @@
     <p class="signin-help">Lost your details? Message Amir and he'll send new ones.</p>
   </form>
 </div>
+<script>
+  // ⚠️ THE LOGIN FORM IS PAINTED FROM HERE, NOT FROM boot().
+  // boot() lives ~200KB further down this file and its first act is to await the
+  // Supabase SDK, so a visitor with no session watched "Loading Program" for as
+  // long as that third-party download took — about 10s on a cold phone. Nobody
+  // signed in means nothing to load: the markup above is parsed, so show it.
+  //
+  // This moves the PIXELS only. boot() still runs and showSignIn() still wires
+  // the form, the password-manager auto-submit and the error box; both calls are
+  // idempotent, so showSignIn() re-applying these two classes is a no-op.
+  //
+  // ⚠️ The `onsubmit="return false"` above is load-bearing for the few hundred
+  // milliseconds between this line and showSignIn(). The form has no `action`,
+  // so a native submit in that window would navigate to
+  // program.html?username=…&password=… — putting the athlete's password in the
+  // URL bar, in history and in the referrer. showSignIn() assigns
+  // `form.onsubmit`, which replaces this attribute handler outright.
+  if (window.NEEDS_SIGNIN) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('signin-screen').classList.add('visible');
+  }
+</script>
 
 <!-- ═══ HOME ═══ -->
 <div id="screen-plan" class="screen planlike">
@@ -3160,8 +3237,12 @@ function _withTimeout(p, ms) {
 // up to ~3s for it, then hand back the client (or null if it never arrived —
 // callers must all degrade rather than throw).
 async function _sbReady() {
-  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
-    await new Promise(r => setTimeout(r, 100));
+  // 25ms, not 100ms: the same ~3s ceiling, but a quarter of the slack between
+  // the SDK arriving and this noticing. That slack is dead time on the two calls
+  // a person actually waits through — the first programme fetch, and the tap on
+  // "Sign in" — for a handful of no-op timer wakeups.
+  for (let i = 0; i < 120 && !(window.supabase && window.supabase.createClient); i++) {
+    await new Promise(r => setTimeout(r, 25));
   }
   return _sb();
 }
@@ -3572,7 +3653,14 @@ function getVideoUrl(ex) {
   // A signed-in athlete needs no ?client= at all — their session says who they are.
   // This runs before the secret-link path so that once someone has a login, the
   // general link works and an old bookmark with a stale ?client= cannot override it.
-  if (!window.IS_DEMO) {
+  //
+  // ⚠️ Gated on window.HAS_SESSION (set in the head, synchronously, off
+  // localStorage). athleteFromSession() awaits the Supabase SDK, and with no
+  // session token on the device its answer can only ever be '' — so asking it
+  // bought nothing and cost the SDK's whole download before the password box
+  // could be drawn. With a token present the SDK still has to say whether it is
+  // valid and whose it is, so that case waits exactly as it always did.
+  if (!window.IS_DEMO && window.HAS_SESSION) {
     const signedInAs = await athleteFromSession();
     if (signedInAs) clientId = signedInAs;
   }
