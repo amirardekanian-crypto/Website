@@ -1,0 +1,199 @@
+{
+  "id": "trunk-and-rotation",
+  "title": "Torque",
+  "category": "strength",
+  "countsAs": "strength",
+  "duration": "20 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Trunk Control & Rotation",
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "March on the Spot",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Knee up, opposite arm back",
+              "Enough to get warm, no more"
+            ],
+            "bad": [
+              "Standing still between reps"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Cat-Cow",
+          "videoUrl": null,
+          "chips": [
+            { "label": "8 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Move one vertebra at a time, breathe with it",
+              "Find the range before you ask the trunk to hold still"
+            ],
+            "bad": [
+              "Rushing between the two shapes"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Open Book",
+          "videoUrl": null,
+          "chips": [
+            { "label": "8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "On your side, knees stacked, open the top arm and follow it with your eyes",
+              "Let the chest turn and keep the knees together — that is the whole point"
+            ],
+            "bad": [
+              "Letting the top knee lift so the hips do the rotating instead of the ribs"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "12 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Ribs down, squeeze the glutes to lift",
+              "Hips are where rotation gets its power from"
+            ],
+            "bad": [
+              "Arching the lower back at the top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Rotation",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Half-Kneeling Rotation",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Half-kneeling, hands at the chest, turn the ribs and keep the hips square",
+              "Squeeze the back glute — that is what stops the hips cheating",
+              "Slow. You are teaching the trunk to turn on a still base"
+            ],
+            "bad": [
+              "The hips turning with the shoulders",
+              "Rushing and swinging the arms for momentum"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Standing Chop",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×10 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Hands together, chop from high on one side to low on the other",
+              "Let the back heel turn — the shot starts at the ground",
+              "Build the speed across the set once the path feels clean",
+              "If you have a ball and a wall, throw it instead — same movement, more intent"
+            ],
+            "bad": [
+              "Arms only, feet glued to the floor",
+              "Going fast before the path is repeatable"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Core",
+      "icon": "🧱",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Plank with Shoulder Tap",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×10 Taps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Feet wide, tap the opposite shoulder without letting the hips rock",
+              "Slower taps are harder taps"
+            ],
+            "bad": [
+              "Hips swinging side to side with every tap"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Side Plank",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×30 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Straight line ankle to ear, hips stacked and lifted",
+              "Drop to the bottom knee if the hips start to sink"
+            ],
+            "bad": [
+              "Letting the top hip roll forward",
+              "Holding on past the point the position falls apart"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Bird Dog",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Opposite arm and leg, long and slow, back flat",
+              "Imagine a glass of water on your lower back that must not spill"
+            ],
+            "bad": [
+              "Lifting the leg higher than the hip and arching the back",
+              "Rushing so the trunk never has to hold anything"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "id": "bodyweight-intervals",
+  "title": "Floor Engine",
+  "category": "conditioning",
+  "countsAs": "strength",
+  "duration": "20 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Repeat-Effort Conditioning",
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "March on the Spot",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee up and the opposite arm back",
+              "Build the pace across the two minutes"
+            ],
+            "bad": [
+              "Starting at full speed"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Bodyweight Squat",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Sit between your hips, chest tall",
+              "Go as deep as you can hold the position"
+            ],
+            "bad": [
+              "Heels lifting off the floor"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Reverse Lunge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "6 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Step back, drop the back knee softly, push through the front heel",
+              "Stay tall the whole way"
+            ],
+            "bad": [
+              "Crashing the back knee into the floor"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Inchworm",
+          "videoUrl": null,
+          "chips": [
+            { "label": "6 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Walk the hands out to a plank, then walk the feet back in",
+              "Keep the ribs down when you are long"
+            ],
+            "bad": [
+              "Letting the hips sag at the top of the walk-out"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Conditioning",
+      "icon": "🫀",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Repeat-Effort Circuit",
+          "rounds": "4 Rounds",
+          "restSec": 90,
+          "items": [
+            {
+              "name": "Squat Jump",
+              "detail": "20 seconds",
+              "cues": {
+                "good": [
+                  "Land soft and go straight into the next one",
+                  "Height matters less than landing well"
+                ],
+                "bad": ["Landing stiff and loud once you get tired"]
+              }
+            },
+            {
+              "name": "Mountain Climber",
+              "detail": "20 seconds",
+              "cues": {
+                "good": [
+                  "Hips level, drive the knees fast",
+                  "Hands under the shoulders, do not let the hips ride up"
+                ],
+                "bad": ["Bouncing the hips up and down"]
+              }
+            },
+            {
+              "name": "Reverse Lunge",
+              "detail": "20 seconds, alternating",
+              "cues": {
+                "good": ["Keep it controlled — this is the one that pays you back next round"],
+                "bad": ["Rushing and losing the back-knee control"]
+              }
+            },
+            {
+              "name": "Fast Feet on the Spot",
+              "detail": "20 seconds",
+              "cues": {
+                "good": ["Tiny, quick contacts on the balls of the feet"],
+                "bad": ["Big heavy steps"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Cool-Down",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Keep moving until your breathing settles"
+            ],
+            "bad": [
+              "Sitting straight down on the floor"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Nasal Breathing",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "In through the nose for four, out for six",
+              "Let the shoulders drop on every exhale"
+            ],
+            "bad": [
+              "Forcing big breaths"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

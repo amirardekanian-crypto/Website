@@ -26,6 +26,20 @@
           "duration": "40 min",
           "equipment": "Bands",
           "file": "workouts/strength/bodyweight-band-strength.json"
+        },
+        {
+          "id": "bodyweight-strength",
+          "title": "Ground Work",
+          "duration": "30 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/strength/bodyweight-strength.json"
+        },
+        {
+          "id": "trunk-and-rotation",
+          "title": "Torque",
+          "duration": "20 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/strength/trunk-and-rotation.json"
         }
       ]
     },
@@ -47,6 +61,13 @@
           "duration": "15 min",
           "equipment": "Bodyweight",
           "file": "workouts/conditioning/run-warm-up.json"
+        },
+        {
+          "id": "bodyweight-intervals",
+          "title": "Floor Engine",
+          "duration": "20 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/conditioning/bodyweight-intervals.json"
         }
       ]
     },
@@ -68,6 +89,20 @@
           "duration": "25 min",
           "equipment": "Court",
           "file": "workouts/on-court/first-step-speed.json"
+        },
+        {
+          "id": "change-of-direction",
+          "title": "Cut & Recover",
+          "duration": "25 min",
+          "equipment": "Court",
+          "file": "workouts/on-court/change-of-direction.json"
+        },
+        {
+          "id": "reactive-agility",
+          "title": "Split Second",
+          "duration": "20 min",
+          "equipment": "Court",
+          "file": "workouts/on-court/reactive-agility.json"
         }
       ]
     },
@@ -103,6 +138,13 @@
           "duration": "12 min",
           "equipment": "Foam Roller",
           "file": "workouts/recovery/reset-roll.json"
+        },
+        {
+          "id": "wind-down",
+          "title": "Wind Down",
+          "duration": "10 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/recovery/wind-down.json"
         }
       ]
     }

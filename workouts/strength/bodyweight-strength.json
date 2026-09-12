@@ -1,0 +1,222 @@
+{
+  "id": "bodyweight-strength",
+  "title": "Ground Work",
+  "category": "strength",
+  "countsAs": "strength",
+  "duration": "30 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Full-Body Strength, No Kit",
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "March on the Spot",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Knee up, opposite arm back, build the pace"
+            ],
+            "bad": [
+              "Shuffling on the spot without really driving the knee"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×12 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Squeeze the glutes to lift, ribs stay down",
+              "Pause a second at the top of every rep"
+            ],
+            "bad": [
+              "Arching the lower back to get higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Bodyweight Squat",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×10 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Slow down, sit between the hips, chest tall",
+              "Use these to find today's depth"
+            ],
+            "bad": [
+              "Rushing them like a warm-up you want to be over"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Arm Circles",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps / direction" }
+          ],
+          "cues": {
+            "good": [
+              "Start small and grow the circle as the shoulder loosens",
+              "Both directions — the backward ones matter more"
+            ],
+            "bad": [
+              "Going straight to the biggest circle you can make"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Inchworm",
+          "videoUrl": null,
+          "chips": [
+            { "label": "5 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Walk the hands out to a plank, hold a second, walk the feet in",
+              "This is the position you are about to press from — set it here"
+            ],
+            "bad": [
+              "Letting the hips sag at the top of the walk-out"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Primary",
+      "icon": "🎯",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Split Squat",
+          "videoUrl": null,
+          "restSec": 90,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×10 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Feet in a long stance, drop straight down, push through the front heel",
+              "Torso tall — do not lean forward to make it easier",
+              "Slow on the way down, three seconds if you want it harder"
+            ],
+            "bad": [
+              "A short stance that turns it into a knee-only movement",
+              "Bouncing the back knee off the floor"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Single-Leg Hip Bridge",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×10 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "One foot planted, other knee hugged in, drive the hips up level",
+              "Hold the top for a second and feel the glute, not the hamstring cramping"
+            ],
+            "bad": [
+              "Letting the hips twist towards the working side",
+              "Pushing through the toes instead of the heel"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Accessory",
+      "icon": "💪",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Push-Up",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "One straight line from ear to heel, elbows about 45° from the body",
+              "Hands on a step or a wall if you cannot hold the line for all eight"
+            ],
+            "bad": [
+              "Hips sagging or riding up",
+              "Head poking forward to touch the floor first"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Prone Y-T Raise",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 each shape" }
+          ],
+          "cues": {
+            "good": [
+              "Face down, lift the arms a few inches — a Y, then a T",
+              "Thumbs up, lead with the hands, keep the neck long",
+              "This is the one that balances out all the pressing your shoulder does"
+            ],
+            "bad": [
+              "Shrugging the shoulders up to the ears",
+              "Lifting the chest off the floor to cheat the arms higher"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Core",
+      "icon": "🧱",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Dead Bug",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Lower back glued to the floor the whole set",
+              "Opposite arm and leg, slow, breathe out as you reach"
+            ],
+            "bad": [
+              "The lower back lifting away from the floor — shorten the reach instead"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "id": "change-of-direction",
+  "title": "Cut & Recover",
+  "category": "on-court",
+  "countsAs": "strength",
+  "duration": "25 min",
+  "equipment": "Court",
+  "focusTag": "Deceleration & Change of Direction",
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            { "label": "3 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Easy pace, just enough to break a sweat",
+              "Baseline to baseline, turn on both feet"
+            ],
+            "bad": [
+              "Starting hard — this is the raise, not the session"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps / side" },
+            { "label": "Front-back, then side-side" }
+          ],
+          "cues": {
+            "good": [
+              "Hold the fence and let the leg swing from a tall hip",
+              "Build the range over the ten, do not force the first one"
+            ],
+            "bad": [
+              "Throwing the leg and letting the back arch to get height"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "6 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Sit into the bent hip and keep the other leg straight",
+              "Chest tall, push back out through the heel"
+            ],
+            "bad": [
+              "Letting the knee roll in over the toe"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "4 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Drive the back hip to the floor before you rotate",
+              "Reach the top hand at the sky and follow it with your eyes"
+            ],
+            "bad": [
+              "Rushing the rotation before the hip has opened"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "A-Skip",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×15 m" }
+          ],
+          "cues": {
+            "good": [
+              "Tall through the hips, strike the ground underneath you",
+              "Quiet, rhythmic contacts"
+            ],
+            "bad": [
+              "Reaching the foot out in front of the body"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Pogo",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×10 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Bounce off stiff ankles, knees almost locked",
+              "Off the ground as fast as you land"
+            ],
+            "bad": [
+              "Bending the knees and turning it into a squat jump"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Deceleration",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Snap Down",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×5 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "From tall on the toes, snap down into an athletic stance and freeze",
+              "Feel your hips go back and your knees bend to soak it up",
+              "Land quiet — you should hear almost nothing"
+            ],
+            "bad": [
+              "Landing stiff-legged and taking it through the knees",
+              "Wobbling out of the position instead of sticking it"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Sprint to Two-Step Stop",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            { "label": "5 Sets", "style": "yellow" },
+            { "label": "×10 m" }
+          ],
+          "cues": {
+            "good": [
+              "Accelerate hard, then kill it in two steps and hold the stance",
+              "Drop the hips on the stop — the last two steps get wider and lower",
+              "Own the stop before you make it faster"
+            ],
+            "bad": [
+              "Slowing down gradually over five or six steps",
+              "Stopping upright with straight legs"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Change of Direction",
+      "icon": "👟",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Shuffle to Sprint",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            { "label": "6 Sets", "style": "yellow" },
+            { "label": "3 each way" }
+          ],
+          "cues": {
+            "good": [
+              "Shuffle 3 m low, plant the outside foot, then sprint 5 m off it",
+              "The plant foot lands outside your hip — that is what turns you",
+              "Get the shoulders pointing where you are going before the second step"
+            ],
+            "bad": [
+              "Standing up tall to change direction",
+              "Taking a little stutter step before the plant"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Turn and Go",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            { "label": "6 Sets", "style": "yellow" },
+            { "label": "3 each side" }
+          ],
+          "cues": {
+            "good": [
+              "Run 8 m out, plant one foot, turn 180° and sprint 5 m back",
+              "Brake over two steps, then push — do not drift the turn wide",
+              "Turn off the same foot for a whole set, then swap"
+            ],
+            "bad": [
+              "Rounding the turn like a running track",
+              "Always turning off your strong side and never training the other"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
