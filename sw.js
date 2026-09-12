@@ -11,12 +11,16 @@
 // v5: navigations and the exercise library are stale-while-revalidate rather
 // than network-first, and the library joins the pre-cache. The shell keys also
 // moved from the full URL to the pathname, so a v4 cache would miss every one.
-const CACHE = 'aap-v5';
+// v6: the login screen is the Baseline design now — it loads court-sessions.jpg,
+// which joins the pre-cache so the second open never waits for it.
+const CACHE = 'aap-v6';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
   '/program.html',
   '/exercise_library.json',
+  // On the login screen since 2026-09-12 — the first image an athlete ever loads.
+  '/court-sessions.jpg',
   '/manifest.json',
   '/assets/css/tokens.css',
   '/assets/css/base.css',

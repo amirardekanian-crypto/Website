@@ -249,24 +249,62 @@
   }
   .error-screen.visible { display: flex; }
 
-  /* ── Sign in ─────────────────────────────────────────────────────────── */
+  /* ── Sign in — "Baseline" (Amir picked it 2026-09-12) ──────────────────
+     The real court under a green scrim, with the form rising over it as a paper
+     sheet. The mark sits above the headline rather than in a top bar, and the
+     headline is the EN mantra — both lifted from the "Floodlight" direction he
+     liked in Content/login-directions.html.
+     ⚠️ The hero is a background COLOUR with an <img> over it, not a background
+     image: the form paints from markup in ~47ms and must not wait on a photo, so
+     the green stands in until the court fades up. Never give this a white or
+     unset background — that is the one thing that would read as broken. */
   .signin-screen { display: none; position: fixed; inset: 0; z-index: 900;
-    background: var(--court, #0E4A36); padding: 24px; overflow-y: auto;
-    align-items: center; justify-content: center; }
-  .signin-screen.visible { display: flex; }
-  .signin-card { width: 100%; max-width: 360px; background: #fff; border-radius: 18px;
-    padding: 30px 26px 24px; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
-  .signin-mark { width: 44px; height: 44px; border-radius: 12px; background: var(--court, #0E4A36);
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 800; letter-spacing: .04em; font-size: 15px; margin-bottom: 16px; }
-  .signin-title { margin: 0 0 5px; font-size: 24px; letter-spacing: -.01em; }
-  .signin-sub { margin: 0 0 20px; font-size: 13.5px; line-height: 1.5; color: #5c6a66; }
-  .signin-f { display: block; margin-bottom: 14px; }
-  .signin-f > span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em;
-    text-transform: uppercase; color: #5c6a66; margin-bottom: 6px; }
+    background: var(--court, #0E4A36); overflow-y: auto; }
+  .signin-screen.visible { display: block; }
+  .signin-card { width: 100%; max-width: 460px; min-height: 100%; margin: 0 auto;
+    background: #FAF7F2; display: flex; flex-direction: column; }
+
+  /* ⚠️ The copy is pushed down by margin-top:auto inside a padded flex column, NOT
+     anchored with `bottom`. Anchoring it put the logo 22px from the top of a 667px
+     phone — under the status bar — because a short screen makes a short hero and a
+     bottom-anchored block then starts wherever it lands. The padding is the floor:
+     it cannot be crossed however short the screen gets. env() is 0 today (the
+     viewport meta has no viewport-fit=cover) and is here so a notch is handled if
+     that ever changes. The 264px minimum is what the block actually needs. */
+  .si-hero { position: relative; flex: 0 0 auto; overflow: hidden;
+    height: clamp(264px, 40vh, 360px); background: var(--court, #0E4A36);
+    display: flex; flex-direction: column;
+    padding: calc(env(safe-area-inset-top, 0px) + 44px) 26px 52px; }
+  .si-hero-img { position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; opacity: 0; transition: opacity .55s cubic-bezier(.16,1,.3,1); }
+  .si-hero-img.in { opacity: 1; }
+  .si-hero-scrim { position: absolute; inset: 0; background: linear-gradient(to top,
+    rgba(8,38,27,.96) 6%, rgba(8,38,27,.40) 56%, rgba(10,10,10,.52)); }
+  .si-hero-copy { position: relative; z-index: 2; margin-top: auto; }
+  /* Real logo tile, not an "AA" square. 24% radius is the house treatment, and
+     icon-192.png is already in the service worker's pre-cache, so it costs nothing. */
+  .signin-mark { display: block; width: 52px; height: 52px; border-radius: 13px;
+    margin: 0 0 16px; box-shadow: 0 8px 24px rgba(0,0,0,.34); }
+  .si-eyebrow { font-family: 'Space Mono', monospace; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .17em; text-transform: uppercase; color: #E06B43; margin-bottom: 9px; }
+  /* clay-2 #E06B43, not clay — accent text on dark takes the lighter one. */
+  .signin-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    text-transform: uppercase; font-size: 40px; line-height: .92; letter-spacing: .005em;
+    color: #fff; margin: 0; }
+  .signin-title em { font-style: normal; color: #E06B43; }
+
+  .si-sheet { flex: 1 1 auto; position: relative; z-index: 2; margin-top: -30px;
+    background: #FAF7F2; border-radius: 30px 30px 0 0;
+    padding: 28px 26px 26px; display: flex; flex-direction: column; }
+  .signin-sub { margin: 0 0 22px; font-size: 14.5px; line-height: 1.5; color: #5c6a66; }
+  .signin-f { display: block; margin-bottom: 15px; }
+  .signin-f > span { display: block; font-family: 'Space Mono', monospace; font-size: 10px;
+    font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: #5c6a66;
+    margin-bottom: 7px; }
   /* 16px keeps iOS from zooming the page when the field takes focus. */
-  .signin-f input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 12px 13px;
-    border: 1.5px solid #d9e0dd; border-radius: 11px; background: #fff; color: #1A1A1A; }
+  .signin-f input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 14px 15px;
+    border: 1.5px solid #d9e0dd; border-radius: 13px; background: #fff; color: #1A1A1A;
+    transition: border-color .35s cubic-bezier(.16,1,.3,1); }
   .signin-f input:focus { outline: none; border-color: var(--court, #0E4A36); }
   /* Reveal toggle. The input gains room on the right so revealed text never
      runs under the button, and the button sits over that gap, not over the text. */
@@ -277,17 +315,27 @@
     background: none; border: 0; cursor: pointer; color: #7d8a86;
     -webkit-tap-highlight-color: transparent; }
   .si-eye:focus-visible { outline: 2px solid var(--court, #0E4A36); outline-offset: -4px;
-    border-radius: 0 11px 11px 0; }
+    border-radius: 0 13px 13px 0; }
   .si-eye svg { width: 20px; height: 20px; display: block; }
   .si-eye .si-eye-slash { display: none; }
   .si-eye.on { color: var(--court, #0E4A36); }
   .si-eye.on .si-eye-slash { display: block; }
-  .signin-go { width: 100%; padding: 14px; font-size: 15px; font-weight: 700; color: #fff;
-    background: var(--court, #0E4A36); border: 0; border-radius: 11px; cursor: pointer; margin-top: 4px; }
-  .signin-go[disabled] { opacity: .6; cursor: default; }
+  /* Clay is THE accent, and a solid clay block always takes white text. */
+  .signin-go { width: 100%; padding: 16px; font-size: 15.5px; font-weight: 700; color: #fff;
+    background: #C7552F; border: 0; border-radius: 13px; cursor: pointer; margin-top: 6px;
+    letter-spacing: .02em; box-shadow: 0 10px 26px rgba(199,85,47,.28);
+    transition: transform .35s cubic-bezier(.16,1,.3,1); }
+  .signin-go:active { transform: translateY(1px); }
+  .signin-go[disabled] { opacity: .6; cursor: default; box-shadow: none; }
   .signin-err { margin-top: 13px; padding: 10px 12px; border-radius: 9px; font-size: 13px;
     background: rgba(199,85,47,.10); color: #C7552F; line-height: 1.45; }
-  .signin-help { margin: 16px 0 0; font-size: 12px; color: #7d8a86; text-align: center; }
+  .signin-help { margin: 16px 0 0; font-size: 12.5px; color: #7d8a86; text-align: center;
+    line-height: 1.5; }
+  /* Anchors the bottom of the sheet. Without it a tall phone leaves ~200px of bare
+     paper under the help line, which reads as unfinished rather than as space. */
+  .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; color: #bdb5a8; }
   .error-icon { font-size: 48px; margin-bottom: 16px; }
   .error-title {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
@@ -2854,9 +2902,23 @@
      password here rather than a magic link. -->
 <div class="signin-screen" id="signin-screen">
   <form class="signin-card" id="signin-form" autocomplete="on" onsubmit="return false">
-    <div class="signin-mark">AA</div>
-    <h1 class="signin-title">Your training</h1>
-    <p class="signin-sub">Sign in with the username and password Amir sent you.</p>
+    <div class="si-hero">
+      <!-- Fades up over the green so a slow photo never holds the form back, and
+           never shows a blank frame. fetchpriority high: it is the only image on
+           this screen and it is above the fold. -->
+      <img class="si-hero-img" src="court-sessions.jpg" alt="" aria-hidden="true"
+           fetchpriority="high" decoding="async"
+           onload="this.classList.add('in')" onerror="this.remove()">
+      <div class="si-hero-scrim"></div>
+      <div class="si-hero-copy">
+        <img class="signin-mark" src="assets/img/icon-192.png" alt="AA Performance"
+             width="52" height="52" decoding="async">
+        <div class="si-eyebrow">AA Performance</div>
+        <h1 class="signin-title">A <em>coach</em> in<br>your pocket.</h1>
+      </div>
+    </div>
+    <div class="si-sheet">
+    <p class="signin-sub">A path to your target. Sign in to pick it up.</p>
     <label class="signin-f">
       <span>Username</span>
       <input id="si-user" name="username" autocomplete="username" autocapitalize="none"
@@ -2885,6 +2947,8 @@
     <button class="signin-go" id="si-go" type="submit">Sign in</button>
     <div class="signin-err" id="si-err" hidden></div>
     <p class="signin-help">Lost your details? Message Amir and he'll send new ones.</p>
+    <div class="signin-foot">amirardekani.com</div>
+    </div>
   </form>
 </div>
 <script>
