@@ -39,11 +39,30 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The Web3Forms `access_key` value (breaks submissions). The `<script>` at the bottom that runs the progress bar, unless you're ready to test it carefully.
 
 #### `program.html` — The athlete app
-- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **My Plan** (daily workouts, videos, timers, weight logs, RPE scoring), **Coach** (messaging + notes), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads an athlete's programme from `/data/`. Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
+- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **My Plan** (daily workouts, videos, timers, weight logs, RPE scoring, and **The Ceiling** — estimated 1RM per lift), **Coach** (messaging + notes), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads an athlete's programme from `/data/`. Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
 - **If deleted:** All athletes lose access to their programme.
 - **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Links to the habit tracker — and nothing more.** A **Daily Habits** shortcut card on Home and at the end of My Plan opens [`habits.html`](habits.html), handing over the client id and resolved key. Same origin and PWA scope, so from an installed app this stays inside the app shell instead of bouncing to the browser. The card is deliberately plain: **this app holds no habit state, no XP maths and no level formula** — duplicating those would be a third copy to keep in sync and weight it doesn't need.
-- **The two apps stay out of each other's storage.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those). Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
+- **The two apps stay out of each other's *writes*.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those), so this app can never push habit data back. It does **read** one of them: The Ceiling takes the latest body weight out of `<id>_hab_wt` to show relative strength (see the bullet below). Read-only, and it degrades to a prompt when there is nothing there. Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
+- **⚠️ The Ceiling (estimated 1RM) — one storage key with a hand-written merge rule.**
+  The line at the bottom of an exercise's set log is **pure derivation** — nothing stored, no
+  payload, no merge. Only *Save to The Ceiling* writes, and it writes to **`<id>_1rm`**: an
+  append-only array of `{ lift, kg, w, r, rpe, d, t }`, one entry per lift per day.
+  - **That key has its own branch in `mergeStoredValue()` — union by `lift|date`, newest `t`
+    wins.** Do not remove it. Without it the key falls through to the scalar rule, which takes
+    one side of the merge wholesale, and a phone that had not synced would silently delete every
+    estimate saved on the other. Same class of bug as the body-weight tombstone in Proof.
+  - **The maths lives in `estimateOneRM()`** — Epley run on *effective* reps (`reps + (10 − RPE)`),
+    so an honest RPE is what makes the number good. A true single at RPE 10 returns itself rather
+    than Epley's +3%. Refuses above `ONE_RM_MAX_EFFECTIVE` (10) and rounds to 2.5 kg.
+    Both constants are tunable at the top of that block; the *why* behind each is in
+    `.claude/skills/program-design/SKILL.md` → **The Ceiling**, which is also where the
+    coach-side rules live (no %1RM prescription; the monthly under-5RM refresh).
+  - **It only appears where it can be honest:** no rep count (holds, carries, intervals) → no
+    line; nothing logged yet → hidden entirely, which is also what keeps a max estimate off
+    unloaded work like a box jump without needing a flag in the programme JSON.
+  - Athlete-facing explanation is the **"Your estimated max (The Ceiling)"** card in `APP_GUIDE`;
+    the data handling is `privacy.html` §2.2. Keep all three in step.
 - **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read one
   localStorage key, `<id>_completed_d<N>`, holding **`"<toDateString()>|c<currentCycleIndex>"`**.
   - **Done** (`isDone`, brown pill) shows only when the stamp's cycle matches the cycle on screen
