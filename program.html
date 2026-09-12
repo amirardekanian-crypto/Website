@@ -2063,13 +2063,24 @@
   /* Force RPE row visible inside the log (old default was hidden until checked). */
   .ex-log .rpe-row { display: flex; }
 
-  /* ── Per-set log table (standard exercises) ────────────────────── */
+  /* ── Per-set log table (standard exercises) ──────────────────────
+     The header and the rows below are two separate grids that MUST stay on the
+     same template, or SET / WEIGHT / RPE stop sitting above the things they
+     label. Every track is explicit so both grids resolve to identical widths:
+       26px   set number (the header's SET label needs all of it)
+       1fr    weight input, floored at 64px so a 3-4 character load stays readable
+       142px  RPE strip, shrinkable to 0, the buttons flex down with it
+       28px   check circle (exactly the button's own size)
+     A 375px phone gives this row 255px of content. The old
+     `28px 1fr auto 32px` on a 10px gap spent 232px of that on the fixed columns
+     and the five 26px RPE squares, leaving the weight input 23px: about one
+     and a half characters. Floor the weight; let RPE take what is left. */
   .ex-set-header {
     display: grid;
-    grid-template-columns: 28px 1fr auto 32px;
-    gap: 10px;
+    grid-template-columns: 26px minmax(64px, 1fr) minmax(0, 142px) 28px;
+    gap: 6px;
     align-items: center;
-    padding: 10px 14px 8px;
+    padding: 10px 10px 8px;
     font-family: 'Space Mono', monospace;
     font-size: 9.5px;
     letter-spacing: 1.3px;
@@ -2079,10 +2090,10 @@
   body[data-dark] .ex-set-header { color: #777; }
   .ex-set-row {
     display: grid;
-    grid-template-columns: 28px 1fr auto 32px;
-    gap: 10px;
+    grid-template-columns: 26px minmax(64px, 1fr) minmax(0, 142px) 28px;
+    gap: 6px;
     align-items: center;
-    padding: 8px 14px;
+    padding: 8px 10px;
     border-top: 1px solid var(--grey-card);
     transition: opacity 0.2s;
   }
@@ -2119,10 +2130,19 @@
   .ex-set-rpe {
     display: flex;
     gap: 3px;
+    min-width: 0;
   }
-  /* Smaller RPE buttons inside the per-set row so 5 of them fit on mobile */
+  /* Smaller RPE buttons inside the per-set row so 5 of them fit on mobile. They
+     share whatever the row has left once the weight field has its floor: about
+     24px on a 375px phone, up to 26px on a wider screen. They must stay
+     shrinkable (`flex: 1 1 0`, never a fixed width): .ex-log clips its overflow,
+     so a strip that refuses to shrink cuts the check circle off the right edge
+     on anything narrower than this. */
   .ex-set-rpe .rpe-btn {
-    width: 26px; height: 26px;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 26px;
+    height: 26px;
     font-size: 12px;
     border-radius: 4px;
     border: 1px solid var(--grey-mid);
@@ -2131,7 +2151,6 @@
     font-weight: 700;
     color: var(--grey-text);
     cursor: pointer;
-    flex-shrink: 0;
     padding: 0;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
