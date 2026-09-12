@@ -190,13 +190,43 @@ Create **`workouts/<category-id>/<slug>.json`**:
   "id": "<slug>",
   "title": "<Title>",
   "category": "<category-id>",
-  "countsAs": "strength | mobility | none",
+  "countsAs": "strength | mobility | breathe | none",
   "duration": "<N min>",
   "equipment": "<Primary equipment>",
   "focusTag": "<Short focus descriptor>",
+  "intro": ["<why this session exists>", "<how it runs>"],
   "blocks": [ … ]
 }
 ```
+
+### ⚠️ Three places to coach, and they must not repeat each other
+
+Amir's correction, 2026-09-12, after every AI-written session in the library got
+this wrong: *"you are coaching in the Coach's Note and on the cues, that's too
+much."*
+
+| | Job | Length |
+|---|---|---|
+| **`intro`** | Why this session exists and how it runs | **1–2 paragraphs** |
+| **`note`** | One thing about *this exercise* the cues cannot carry | **ONE SENTENCE** |
+| **`cues`** | How to do the rep | **EXACTLY 3** |
+
+**Cues: exactly three. One external, one internal, one avoid.** External +
+internal go in `cues.good[]`, the avoid cue in `cues.bad[]` — so `good` has 2
+entries and `bad` has 1, on every exercise, **including every item inside a
+circuit**. This is `COACHING-PRINCIPLES.md` → **Coaching cues**, not a
+library-only rule. Go past three only when something is genuinely important
+enough to earn it.
+
+**Do not write a `note` on most exercises.** Neither workout Amir authored
+himself uses one at all. A note is for a caveat the cues cannot hold — a
+regression ("start on your knees"), a timing rule ("leave this one for an hour
+after you wake up"), a safety line. It is **not** where you explain why the
+session is built the way it is. That is `intro`, and giving the reasoning its own
+home is exactly what lets a note stay to one sentence.
+
+**Check before publishing:** every exercise `good: [2], bad: [1]`, every note one
+sentence, `intro` present.
 
 ### ⚠️ `countsAs` is required — decide it, don't omit it
 

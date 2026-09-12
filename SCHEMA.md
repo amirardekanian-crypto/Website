@@ -835,6 +835,10 @@ stat cells, so leaving them out breaks nothing.
   "category": "strength", "duration": "45 min", "equipment": "Barbell",
   // Which habit "Mark as done" ticks in AA Proof. REQUIRED — see below.
   "countsAs": "strength",
+  // 1-2 short paragraphs: why this session exists and how it runs. Renders in
+  // the green header under the duration line, open by default. REQUIRED — see
+  // "Where the coaching goes" below.
+  "intro": ["…", "…"],
   "focusTag": "Full-Body Strength",
   "blocks": [
     { "title": "Strength", "icon": "🎯", "exercises": [
@@ -861,6 +865,33 @@ screen. It writes a single row to `public.library_sessions` — athlete, workout
 date, and nothing else — which feeds the athlete's habits and the coach's report.
 The button is hidden for a signed-out visitor, in demo mode, and in coach preview.
 Its own done-state is stored under `wkdone_<id>` and resets daily the same way.
+
+#### Where the coaching goes — three places, three jobs
+
+Amir's rule, 2026-09-12, after every AI-written session in the library broke it.
+The three carry different weight and **must not repeat each other** — the failure
+he named was "you are coaching in the Coach's Note *and* in the cues, that's too
+much."
+
+| | What it is | Length |
+|---|---|---|
+| **`intro`** | Why this session exists and how it runs | **1–2 paragraphs**, per workout |
+| **`note`** | One thing about *this exercise* the cues cannot carry | **one sentence**, and only where it earns its place |
+| **`cues`** | How to do the rep | **exactly 3** — see below |
+
+**Cues are exactly three, never more, never fewer** — one **external** (where to
+push, what to move toward), one **internal** (what to feel), one **avoid** (the
+single mistake that most risks injury). External + internal go in `cues.good[]`,
+the avoid cue in `cues.bad[]`, so every exercise is `good: [2], bad: [1]`. This
+is not a library rule, it is `COACHING-PRINCIPLES.md` → **Coaching cues**, and it
+applies to programmes too. Amir's own Front-Rack Rescue holds it on every
+exercise; it is the reference.
+
+**Most exercises need no `note` at all.** Neither workout Amir wrote himself uses
+one. Reach for it when there is a genuine caveat the cues cannot hold — a
+regression ("start on your knees"), a timing rule ("leave this one for an hour
+after you wake up"), a safety line — and never to explain *why the session is
+built this way*. That is what `intro` is for now.
 
 #### `countsAs` — which habit a library workout ticks
 
