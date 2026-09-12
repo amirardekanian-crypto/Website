@@ -8772,16 +8772,25 @@ function attachCeiling(card) {
   // Recompute from whatever is in the three fields and paint both the panel and
   // the closed line, so the card never shows two different numbers.
   function paintFromFields(source) {
-    const est = estimateOneRM(parseLoggedKg(fKg.value), fRp.value, fRpe.value);
+    const kgV = parseLoggedKg(fKg.value), rpV = Number(fRp.value), rpeV = Number(fRpe.value);
+    const est = estimateOneRM(kgV, rpV, rpeV);
     if (est == null) {
       out.innerHTML = `<b>&mdash;</b>`;
       grade.textContent = '';
       grade.className = 'ex-1rm-grade';
-      from.innerHTML = 'Put in a weight, the reps and your RPE.<br>'
-        + 'If the set is much longer than ' + ONE_RM_MAX_EFFECTIVE
-        + ' reps, the number would only be a guess.';
-      txt.textContent = 'What could you lift for one rep?';
       save.hidden = true;
+      // Two different failures, and telling them apart matters: saying "put in
+      // a weight" to somebody who just put one in is how this read as broken.
+      if (kgV > 0 && rpV > 0 && rpeV > 0) {
+        const rir = Math.max(0, 10 - rpeV), eff = rpV + rir;
+        from.innerHTML = `${rpV} reps with ${rir} left in you is <b>${eff} to failure</b>.<br>`
+          + `Past ${ONE_RM_MAX_EFFECTIVE} the maths is a guess, not an estimate. `
+          + `Try a heavier set of 5 or fewer.`;
+        txt.textContent = 'Too many reps to work out a one-rep max';
+      } else {
+        from.innerHTML = 'Put in a weight, the reps and your RPE.';
+        txt.textContent = 'What could you lift for one rep?';
+      }
       return;
     }
     save.hidden = false;
@@ -8818,9 +8827,21 @@ function attachCeiling(card) {
       // far from a single to be honest about, the line appears and says so
       // rather than silently doing nothing.
       box.classList.toggle('is-empty', !anyLogged);
-      box.classList.remove('open');
-      line.disabled = true;
+      // ⚠️ NOT disabled. It used to be, and that made the feature look broken:
+      // an athlete logged a real set, got "too many reps", tapped the line and
+      // nothing happened at all — no panel, no explanation, no way to try
+      // different numbers. Refusing to estimate is right; refusing to open is
+      // not. The panel explains itself and the three fields stay editable.
+      line.disabled = false;
       txt.textContent = 'Too many reps to work out a one-rep max';
+      // Seed the fields from the set anyway, so opening it shows the athlete
+      // their own numbers and what is wrong with them.
+      const s = (log || []).find(x => parseLoggedKg(x.w) != null && Number(x.r) > 0);
+      if (s && !touched) {
+        fKg.value = parseLoggedKg(s.w); fRp.value = reps; fRpe.value = Number(s.r);
+        paintFromFields(`From your set · ${parseLoggedKg(s.w)} kg × ${reps} @ RPE ${Number(s.r)}`);
+        txt.textContent = 'Too many reps to work out a one-rep max';
+      }
       return;
     }
     box.classList.remove('is-empty');
