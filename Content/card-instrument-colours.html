@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instrument — 5 colourways</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --green:#0E4A36; --green-d:#0a3527; --night:#122A22;
+    --clay:#C7552F; --clay-2:#E06B43; --clay-d:#6E2E17;
+    --paper:#FAF7F2; --paper-2:#F1ECE3;
+    --ink:#1A1A1A; --grey:#5C5C5C; --line:#D8D1C5; --card:#EDE8E0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper-2);font-family:'Barlow',sans-serif;color:var(--ink);padding:34px 18px 90px}
+  .pg{max-width:1180px;margin:0 auto}
+  .pg-kick{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--clay)}
+  .pg-h{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(38px,6vw,58px);line-height:.95;text-transform:uppercase;letter-spacing:-1px;margin-top:6px}
+  .pg-s{font-size:15.5px;line-height:1.65;color:var(--grey);max-width:66ch;margin-top:12px}
+  .pg-s b{color:var(--ink);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:26px;margin-top:38px}
+  .dir{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .dir-h{padding:18px 20px 15px;border-bottom:1px solid var(--card)}
+  .dir-n{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--clay)}
+  .dir-t{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:29px;line-height:1;text-transform:uppercase;margin-top:4px}
+  .dir-d{font-size:13.5px;line-height:1.6;color:var(--grey);margin-top:8px}
+  .dir-d b{color:var(--ink);font-weight:600}
+  .sw{display:flex;gap:6px;margin-top:11px;align-items:center}
+  .sw i{width:19px;height:19px;border-radius:5px;display:block;border:1px solid rgba(0,0,0,.12)}
+  .sw span{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;color:var(--grey)}
+
+  .ph{background:var(--paper);padding:16px 15px 22px;flex:1}
+  .ph-ctx{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#b3ada2;margin-bottom:8px}
+  .daycard{border-radius:12px;height:88px;background:#9db3a8;margin-bottom:20px;position:relative;overflow:hidden}
+  .daycard .tx{position:absolute;left:14px;bottom:11px;color:#fff}
+  .daycard .tx b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;line-height:1;text-transform:uppercase}
+  .daycard .tx i{font-style:normal;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+  .sect{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;text-transform:uppercase;letter-spacing:.3px;margin:0 2px 10px}
+
+  /* ═══ the Instrument card — every colour is a CSS variable on the card ═══ */
+  .ins{
+    --bg:#141414; --rule:#C7552F; --fig:#ffffff; --lab:rgba(255,255,255,.55);
+    --acc:#E06B43; --div:rgba(255,255,255,.13); --pip-off:rgba(255,255,255,.2);
+    background:var(--bg);border-radius:14px;padding:16px;margin-bottom:12px;
+    color:var(--fig);position:relative;overflow:hidden
+  }
+  .ins::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--rule)}
+  .ins-k{font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--lab);display:flex;align-items:center}
+  .ins-k span{margin-left:auto;color:var(--acc)}
+  .ins-row{display:flex;align-items:flex-end;gap:9px;margin-top:9px}
+  .ins-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:50px;line-height:.82;letter-spacing:-1.8px;color:var(--fig)}
+  .ins-u{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--lab);padding-bottom:5px}
+  .ins-sp{margin-left:auto;padding-bottom:2px}
+  .ins-f{display:flex;align-items:center;gap:7px;margin-top:12px;padding-top:10px;border-top:1px solid var(--div);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--lab)}
+  .ins-f b{color:var(--fig);font-weight:700}
+  .ins-f .a{margin-left:auto;color:var(--acc);font-size:15px}
+  .pips{display:flex;gap:3px}
+  .pips i{width:12px;height:5px;border-radius:3px;background:var(--acc);display:block}
+  .pips i.off{background:var(--pip-off)}
+
+  /* ── the five colourways ── */
+  /* 1 INK — neutral near-black (what you saw) */
+  .c1{}
+  /* 2 WARM INK — the same black, warmed so it sits on paper */
+  .c2{--bg:#17120F}
+  /* 3 DEEP COURT — the darkest brand green, no neutral black anywhere */
+  .c3{--bg:#0a3527;--lab:rgba(255,255,255,.5);--div:rgba(255,255,255,.15)}
+  /* 4 NIGHT COURT — dark green, paper rule, and the FIGURE goes clay */
+  .c4{--bg:#122A22;--rule:#FAF7F2;--fig:#E06B43;--acc:#FAF7F2;--lab:rgba(255,255,255,.58);--div:rgba(255,255,255,.15)}
+  /* 5 SPLIT — one green card, one burnt-clay card; colour tells them apart */
+  .c5a{--bg:#0a3527;--lab:rgba(255,255,255,.5);--div:rgba(255,255,255,.15)}
+  .c5b{--bg:#6E2E17;--rule:#FAF7F2;--acc:#F0A88A;--lab:rgba(255,255,255,.58);--div:rgba(255,255,255,.16);--pip-off:rgba(255,255,255,.22)}
+
+  .foot{margin-top:44px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:14px;font-size:14.5px;line-height:1.7;color:var(--grey)}
+  .foot b{color:var(--ink);font-weight:600}
+  .foot h3{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="pg">
+  <div class="pg-kick">— Instrument · colourways</div>
+  <h1 class="pg-h">Same layout,<br>five colours</h1>
+  <p class="pg-s">Layout, type and spacing are identical in all five — only the surface, the edge rule and the
+  figure colour change. Everything stays inside <b>green · clay · paper</b>; no gold anywhere.
+  The whole card is driven by five CSS variables, so switching is a one-line change once you pick.</p>
+
+  <div class="grid">
+
+    <!-- 1 · INK -->
+    <div class="dir">
+      <div class="dir-h">
+        <div class="dir-n">Colourway 1</div>
+        <div class="dir-t">Ink</div>
+        <div class="dir-d">Neutral near-black, clay edge, white figures. <b>What you saw in the directions file.</b> Maximum contrast against the paper — the cards hit hardest here.</div>
+        <div class="sw"><i style="background:#141414"></i><i style="background:#C7552F"></i><i style="background:#fff"></i><span>#141414 · clay rule · white</span></div>
+      </div>
+      <div class="ph">
+        <div class="ph-ctx">↓ day cards above</div>
+        <div class="daycard"><div class="tx"><i>6 blocks · 9 movements</i><b>Day 2</b></div></div>
+        <div class="sect">Personal Records</div>
+        <div class="ins c1">
+          <div class="ins-k">The Ceiling <span>▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="64" height="26" viewBox="0 0 64 26"><polyline points="3,21 18,17 34,11 49,6 61,3" fill="none" stroke="#E06B43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="61" cy="3" r="3" fill="#fff"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+        <div class="sect" style="margin-top:18px">Daily Habits</div>
+        <div class="ins c1">
+          <div class="ins-k">AA Proof <span>Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp"><div class="pips"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div></div>
+          <div class="ins-f">6-day streak · <b>4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · WARM INK -->
+    <div class="dir">
+      <div class="dir-h">
+        <div class="dir-n">Colourway 2</div>
+        <div class="dir-t">Warm Ink</div>
+        <div class="dir-d">The same black, warmed. A neutral black on warm paper reads slightly <b>cold and foreign</b>; a hint of brown in the surface makes it belong without losing the contrast.</div>
+        <div class="sw"><i style="background:#17120F"></i><i style="background:#C7552F"></i><i style="background:#FAF7F2"></i><span>#17120F · clay rule · paper</span></div>
+      </div>
+      <div class="ph">
+        <div class="ph-ctx">↓ day cards above</div>
+        <div class="daycard"><div class="tx"><i>6 blocks · 9 movements</i><b>Day 2</b></div></div>
+        <div class="sect">Personal Records</div>
+        <div class="ins c2">
+          <div class="ins-k">The Ceiling <span>▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="64" height="26" viewBox="0 0 64 26"><polyline points="3,21 18,17 34,11 49,6 61,3" fill="none" stroke="#E06B43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="61" cy="3" r="3" fill="#FAF7F2"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+        <div class="sect" style="margin-top:18px">Daily Habits</div>
+        <div class="ins c2">
+          <div class="ins-k">AA Proof <span>Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp"><div class="pips"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div></div>
+          <div class="ins-f">6-day streak · <b>4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · DEEP COURT -->
+    <div class="dir">
+      <div class="dir-h">
+        <div class="dir-n">Colourway 3</div>
+        <div class="dir-t">Deep Court</div>
+        <div class="dir-d">No neutral black at all — the surface is the <b>darkest brand green</b>, the one the Farsi site uses for its footer. Every pixel on Home is then green, clay or paper.</div>
+        <div class="sw"><i style="background:#0a3527"></i><i style="background:#C7552F"></i><i style="background:#fff"></i><span>#0a3527 · clay rule · white</span></div>
+      </div>
+      <div class="ph">
+        <div class="ph-ctx">↓ day cards above</div>
+        <div class="daycard"><div class="tx"><i>6 blocks · 9 movements</i><b>Day 2</b></div></div>
+        <div class="sect">Personal Records</div>
+        <div class="ins c3">
+          <div class="ins-k">The Ceiling <span>▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="64" height="26" viewBox="0 0 64 26"><polyline points="3,21 18,17 34,11 49,6 61,3" fill="none" stroke="#E06B43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="61" cy="3" r="3" fill="#fff"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+        <div class="sect" style="margin-top:18px">Daily Habits</div>
+        <div class="ins c3">
+          <div class="ins-k">AA Proof <span>Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp"><div class="pips"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div></div>
+          <div class="ins-f">6-day streak · <b>4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 · NIGHT COURT -->
+    <div class="dir">
+      <div class="dir-h">
+        <div class="dir-n">Colourway 4</div>
+        <div class="dir-t">Night Court</div>
+        <div class="dir-d">Dark green surface, <b>paper</b> edge rule, and the accent inverts — the figure itself goes clay. The number becomes the hottest thing on the screen instead of the rule.</div>
+        <div class="sw"><i style="background:#122A22"></i><i style="background:#FAF7F2"></i><i style="background:#E06B43"></i><span>#122A22 · paper rule · clay figure</span></div>
+      </div>
+      <div class="ph">
+        <div class="ph-ctx">↓ day cards above</div>
+        <div class="daycard"><div class="tx"><i>6 blocks · 9 movements</i><b>Day 2</b></div></div>
+        <div class="sect">Personal Records</div>
+        <div class="ins c4">
+          <div class="ins-k">The Ceiling <span>▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="64" height="26" viewBox="0 0 64 26"><polyline points="3,21 18,17 34,11 49,6 61,3" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="61" cy="3" r="3" fill="#E06B43"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+        <div class="sect" style="margin-top:18px">Daily Habits</div>
+        <div class="ins c4">
+          <div class="ins-k">AA Proof <span>Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp"><div class="pips"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div></div>
+          <div class="ins-f">6-day streak · <b>4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 · SPLIT -->
+    <div class="dir">
+      <div class="dir-h">
+        <div class="dir-n">Colourway 5</div>
+        <div class="dir-t">Split</div>
+        <div class="dir-d">Two surfaces instead of one: <b>green for the lifting, burnt clay for the daily.</b> Colour does the work of telling them apart, so you know which card you are looking at before you read a word.</div>
+        <div class="sw"><i style="background:#0a3527"></i><i style="background:#6E2E17"></i><i style="background:#fff"></i><span>green + burnt clay</span></div>
+      </div>
+      <div class="ph">
+        <div class="ph-ctx">↓ day cards above</div>
+        <div class="daycard"><div class="tx"><i>6 blocks · 9 movements</i><b>Day 2</b></div></div>
+        <div class="sect">Personal Records</div>
+        <div class="ins c5a">
+          <div class="ins-k">The Ceiling <span>▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="64" height="26" viewBox="0 0 64 26"><polyline points="3,21 18,17 34,11 49,6 61,3" fill="none" stroke="#E06B43" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="61" cy="3" r="3" fill="#fff"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+        <div class="sect" style="margin-top:18px">Daily Habits</div>
+        <div class="ins c5b">
+          <div class="ins-k">AA Proof <span>Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp"><div class="pips"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div></div>
+          <div class="ins-f">6-day streak · <b>4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <h3>Two notes</h3>
+    <p><b>Dark mode.</b> Four of these are dark surfaces on a light page. In dark mode the app's own
+    cards are <code>#202020</code>, so Ink and Warm Ink would nearly vanish into the background — they
+    need a lighter surface or a visible border when <code>body[data-dark]</code> is on. The three green
+    and clay ones stay legible in both without changing anything, which is a real point in their favour.</p>
+    <p style="margin-top:10px"><b>The habit number is still a decision.</b> All five show a live level and
+    streak. This app deliberately holds no habit state today — reading AA Proof's own keys is cheap and
+    I already do it for body weight, but say the word either way and I will build the card to match.</p>
+  </div>
+</div>
+</body>
+</html>

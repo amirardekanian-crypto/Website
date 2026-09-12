@@ -1474,6 +1474,30 @@ habit has to do the same.
 > the number daily, or a paid aggregator (Terra/Vital) — see the open question at the
 > foot of this file. Until then, they are manual and unlocked.
 
+### Proof publishes a card snapshot the programme app draws — its ANSWERS, never its rules
+
+`publishCardSnapshot()` runs at the end of every `render()` and writes
+**`<id>_hab_card`**: `{ lv, rank, streak, done, total, qualified, week[7], t }`.
+`program.html` reads it to draw the **Daily Habits** card at the bottom of its Home tab —
+a level, a rank, a day streak, today's done-of-total, and a seven-pip week.
+
+⚠️ **This key exists so the programme app never re-derives any of it.** The XP curve, the
+rank ladder and the weighted day gate already live in two places (this file and the
+`xp_rules` row); computing them in a third would be exactly the class of bug this repo
+warns about hardest — two screens quietly disagreeing, with nothing erroring. Proof owns
+the formulas and exports only the numbers it has already worked out for that render.
+`qualified` is `dayQualifies(today)`, the same gate a day streak uses, so the card and the
+streak can never disagree about whether today counts.
+
+It is **device-local on purpose**: the sync payload is built explicitly from `cfg`/`log`/`wt`,
+so this never travels, and re-deriving it on another device costs exactly one render. A
+phone that has never opened Proof simply has no snapshot, and the programme app falls back
+to a card with no numbers rather than showing wrong ones. The write is wrapped in a
+`try`/`catch` that swallows everything — a card must never be able to break the tracker.
+
+Add a field here and nothing breaks; the reader treats every field as optional apart from
+`lv`, which is what it tests to decide the snapshot is real.
+
 ### The WORKOUT habit is LOCKED and fed by the training programme — through the server
 
 **Athletes cannot tick it by hand.** The row shows a padlock and the line *"Complete any

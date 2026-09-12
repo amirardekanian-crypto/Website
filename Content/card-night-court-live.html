@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night Court — live ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --night:#122A22; --clay:#C7552F; --clay-2:#E06B43; --clay-soft:#F0A88A;
+    --paper:#FAF7F2; --paper-2:#F1ECE3; --ink:#1A1A1A; --grey:#5C5C5C;
+    --line:#D8D1C5; --card:#EDE8E0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper-2);font-family:'Barlow',sans-serif;color:var(--ink);padding:34px 18px 90px}
+  .pg{max-width:1180px;margin:0 auto}
+  .pg-kick{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--clay)}
+  .pg-h{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(38px,6vw,58px);line-height:.95;text-transform:uppercase;letter-spacing:-1px;margin-top:6px}
+  .pg-s{font-size:15.5px;line-height:1.65;color:var(--grey);max-width:70ch;margin-top:12px}
+  .pg-s b{color:var(--ink);font-weight:600}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;max-width:760px}
+  .key{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 17px}
+  .key h4{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:19px;text-transform:uppercase;letter-spacing:.3px}
+  .key h4 em{font-style:normal;color:var(--clay)}
+  .key p{font-size:13px;line-height:1.6;color:var(--grey);margin-top:5px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(325px,1fr));gap:24px;margin-top:34px}
+  .idea{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .idea-h{padding:17px 19px 14px;border-bottom:1px solid var(--card)}
+  .tagrow{display:flex;align-items:center;gap:8px}
+  .tag{font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:20px}
+  .tag.ev{background:rgba(199,85,47,.12);color:var(--clay)}
+  .tag.amb{background:rgba(14,74,54,.1);color:#0E4A36}
+  .idea-t{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:27px;line-height:1;text-transform:uppercase;margin-top:7px}
+  .idea-d{font-size:13.5px;line-height:1.6;color:var(--grey);margin-top:7px}
+  .idea-d b{color:var(--ink);font-weight:600}
+  .go{margin-top:12px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;background:var(--clay);color:#fff;border:0;border-radius:7px;padding:9px 14px;cursor:pointer}
+  .go:active{transform:scale(.98)}
+
+  .ph{background:var(--paper);padding:18px 15px 22px;flex:1}
+
+  /* ═══ NIGHT COURT — no edge rule ═══ */
+  .ins{background:var(--night);border-radius:14px;padding:17px;color:#fff;position:relative;overflow:hidden}
+  .ins + .ins{margin-top:12px}
+  .ins-k{font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.58);display:flex;align-items:center;gap:7px}
+  .ins-k .r{margin-left:auto;color:var(--paper)}
+  .ins-row{display:flex;align-items:flex-end;gap:9px;margin-top:10px}
+  .ins-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:50px;line-height:.82;letter-spacing:-1.8px;color:var(--clay-2);font-variant-numeric:tabular-nums}
+  .ins-u{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.58);padding-bottom:5px}
+  .ins-sp{margin-left:auto;padding-bottom:2px}
+  .ins-f{display:flex;align-items:center;gap:7px;margin-top:13px;padding-top:11px;border-top:1px solid rgba(255,255,255,.15);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.58);min-height:15px}
+  .ins-f b{color:#fff;font-weight:700}
+  .ins-f .a{margin-left:auto;color:var(--paper);font-size:15px}
+  .pips{display:flex;gap:3px}
+  .pips i{width:12px;height:5px;border-radius:3px;background:var(--clay-2);display:block}
+  .pips i.off{background:rgba(255,255,255,.22)}
+
+  /* ── 1 · pulse dot ── */
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--clay-2);flex-shrink:0}
+  .dot.live{animation:breathe 2.4s ease-in-out infinite}
+  @keyframes breathe{
+    0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(224,107,67,.55)}
+    50%{opacity:.55;box-shadow:0 0 0 5px rgba(224,107,67,0)}
+  }
+  .dot.done{background:#6fb495;animation:none;box-shadow:none}
+
+  /* ── 2 · sparkline draws ── */
+  .draw{stroke-dasharray:120;stroke-dashoffset:120;animation:draw 1.1s .15s cubic-bezier(.4,0,.2,1) forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .dotend{opacity:0;animation:pop .3s 1.1s forwards}
+  @keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+
+  /* ── 4 · pips stagger ── */
+  .pips.seq i{transform:scaleX(0);transform-origin:left;animation:fill .32s cubic-bezier(.4,0,.2,1) forwards}
+  @keyframes fill{to{transform:scaleX(1)}}
+  .pips i.today{animation:todayPulse 1.7s ease-in-out infinite}
+  @keyframes todayPulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+  /* ── 5 · new best flash ── */
+  .ins.flash{animation:flashCard 1.5s ease-out}
+  @keyframes flashCard{
+    0%{background:var(--night)}
+    12%{background:#2f1a12}
+    100%{background:var(--night)}
+  }
+  .badge{position:absolute;top:0;right:0;background:var(--clay);color:#fff;
+    font-family:'Space Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.14em;
+    padding:5px 10px;border-radius:0 14px 0 10px;opacity:0;transform:translateY(-100%)}
+  .badge.on{animation:badgeIn .45s cubic-bezier(.2,.9,.3,1.4) forwards}
+  @keyframes badgeIn{to{opacity:1;transform:translateY(0)}}
+
+  /* ── 6 · ticker ── */
+  .tick{display:inline-block}
+  .tick.sw{animation:tickSwap .5s ease}
+  @keyframes tickSwap{0%{opacity:1;transform:translateY(0)}40%{opacity:0;transform:translateY(-5px)}41%{transform:translateY(5px)}100%{opacity:1;transform:translateY(0)}}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+
+  .foot{margin-top:44px;padding:22px;background:#fff;border:1px solid var(--line);border-radius:14px;font-size:14.5px;line-height:1.7;color:var(--grey)}
+  .foot b{color:var(--ink);font-weight:600}
+  .foot h3{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+  code{font-family:'Space Mono',monospace;font-size:12.5px;background:var(--card);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="pg">
+  <div class="pg-kick">— Night Court · no edge rule</div>
+  <h1 class="pg-h">Six ways to make<br>the cards feel alive</h1>
+  <p class="pg-s">All six are on the Night Court card you picked, with the clay edge rule removed.
+  The split that matters is not <i>how much</i> moves but <b>why</b> it moves.</p>
+
+  <div class="split">
+    <div class="key">
+      <h4><em>Event</em> — motion that means something</h4>
+      <p>Fires only when something actually happened: a record was beaten, a number changed since you last looked. Rare, so it still lands after six months.</p>
+    </div>
+    <div class="key">
+      <h4><em>Ambient</em> — motion that decorates</h4>
+      <p>Always running. Reads as premium for about a week, then as noise on a screen athletes open every day. Use sparingly, and never more than one at a time.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <div class="idea">
+      <div class="idea-h">
+        <div class="tagrow"><span class="tag amb">Ambient</span><span class="tag ev">Status-driven</span></div>
+        <div class="idea-t">1 · Status light</div>
+        <div class="idea-d">A clay dot that breathes while today is <b>still open</b>, and goes solid green the moment you finish. The only thing moving, and it stops on its own — so the movement is information, not decoration.</div>
+        <button class="go" onclick="toggleStatus(this)">Finish the day →</button>
+      </div>
+      <div class="ph">
+        <div class="ins">
+          <div class="ins-k"><span class="dot live" id="d1"></span><span id="l1">Logging today</span><span class="r">Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp"><div class="pips"><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i></div></div></div>
+          <div class="ins-f">6-day streak · <b id="f1">4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="idea">
+      <div class="idea-h">
+        <div class="tagrow"><span class="tag ev">Event</span></div>
+        <div class="idea-t">2 · The line draws itself</div>
+        <div class="idea-d">The sparkline draws left to right the first time the card comes into view, then sits still. <b>Like an instrument booting up.</b> Once per screen visit, never on a loop.</div>
+        <button class="go" onclick="replay('sp2')">Replay →</button>
+      </div>
+      <div class="ph">
+        <div class="ins">
+          <div class="ins-k">The Ceiling<span class="r">▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp" id="sp2"><svg width="70" height="28" viewBox="0 0 70 28"><polyline class="draw" points="3,23 20,19 37,12 54,6 66,3" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="dotend" cx="66" cy="3" r="3.2" fill="#E06B43"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="idea">
+      <div class="idea-h">
+        <div class="tagrow"><span class="tag ev">Event</span></div>
+        <div class="idea-t">3 · Count to the new number</div>
+        <div class="idea-d">The figure counts up from your <b>previous</b> best to the new one — but only when it has actually changed since you last opened the app. Unchanged, it just sits there. That restraint is what stops it being a gimmick.</div>
+        <button class="go" onclick="countUp()">New estimate came in →</button>
+      </div>
+      <div class="ph">
+        <div class="ins">
+          <div class="ins-k">The Ceiling<span class="r" id="r3">▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n" id="n3">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="70" height="28" viewBox="0 0 70 28"><polyline points="3,23 20,19 37,12 54,6 66,3" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="66" cy="3" r="3.2" fill="#E06B43"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="idea">
+      <div class="idea-h">
+        <div class="tagrow"><span class="tag ev">Event</span><span class="tag amb">Ambient</span></div>
+        <div class="idea-t">4 · Streak fills in</div>
+        <div class="idea-d">The week's pips fill one after another, left to right, when the card appears. <b>Today's pip keeps pulsing until you have logged</b> — so an unfinished day is visible from across the room.</div>
+        <button class="go" onclick="replay('p4')">Replay →</button>
+      </div>
+      <div class="ph">
+        <div class="ins">
+          <div class="ins-k">AA Proof<span class="r">Rookie III</span></div>
+          <div class="ins-row"><div class="ins-n">12</div><div class="ins-u">LEVEL</div>
+            <div class="ins-sp" id="p4"><div class="pips seq">
+              <i style="animation-delay:.05s"></i><i style="animation-delay:.11s"></i><i style="animation-delay:.17s"></i>
+              <i style="animation-delay:.23s"></i><i style="animation-delay:.29s"></i><i style="animation-delay:.35s"></i>
+              <i class="off today" style="animation-delay:.41s"></i>
+            </div></div></div>
+          <div class="ins-f">6-day streak · <b>4 of 5 today</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="idea">
+      <div class="idea-h">
+        <div class="tagrow"><span class="tag ev">Event</span></div>
+        <div class="idea-t">5 · New best</div>
+        <div class="idea-d">Beat a record and the card <b>warms once</b>, a corner badge drops in, and the number climbs to it. This is the one worth building first — it is the only moment in the whole feature that deserves a celebration.</div>
+        <button class="go" onclick="newBest()">Beat your record →</button>
+      </div>
+      <div class="ph">
+        <div class="ins" id="c5">
+          <div class="badge" id="b5">New best</div>
+          <div class="ins-k">The Ceiling<span class="r" id="r5">▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n" id="n5">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="70" height="28" viewBox="0 0 70 28"><polyline points="3,23 20,19 37,12 54,6 66,3" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="66" cy="3" r="3.2" fill="#E06B43"/></svg></div></div>
+          <div class="ins-f">Back squat · <b>1.82× bodyweight</b><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="idea">
+      <div class="idea-h">
+        <div class="tagrow"><span class="tag amb">Ambient</span></div>
+        <div class="idea-t">6 · The footer ticks</div>
+        <div class="idea-d">The bottom line cycles through two or three facts every few seconds — bodyweight ratio, gain since you started, when you last set it. <b>Fits more in without a taller card.</b></div>
+        <div class="idea-d" style="color:#C7552F"><b>My least favourite of the six.</b> Text that moves on its own is the one kind of motion people find genuinely irritating, and it hides facts behind a wait.</div>
+      </div>
+      <div class="ph">
+        <div class="ins">
+          <div class="ins-k">The Ceiling<span class="r">▲ 15 KG</span></div>
+          <div class="ins-row"><div class="ins-n">142.5</div><div class="ins-u">KG</div>
+            <div class="ins-sp"><svg width="70" height="28" viewBox="0 0 70 28"><polyline points="3,23 20,19 37,12 54,6 66,3" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="66" cy="3" r="3.2" fill="#E06B43"/></svg></div></div>
+          <div class="ins-f"><span class="tick" id="t6">Back squat · <b>1.82× bodyweight</b></span><span class="a">→</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <h3>What I'd actually ship</h3>
+    <p><b>5 (New best) and 1 (Status light), and nothing else.</b> Between them you get a real celebration
+    when a record falls, and a quiet dot that tells you the day is not finished yet — and the dot
+    <i>stops</i> when you finish it, which is the whole point. Add 2 (line draws itself) if you want the
+    screen to feel like it boots. Everything beyond that is motion competing with motion.</p>
+    <p style="margin-top:10px"><b>Two things that come free either way.</b> All of this respects
+    <code>prefers-reduced-motion</code> — an athlete with motion sensitivity set on their phone sees
+    the cards perfectly still, which is already wired into this file. And every animation here is CSS
+    transform and opacity only, so none of it costs battery or causes the card to re-layout.</p>
+    <p style="margin-top:10px"><b>Still need from you:</b> whether the habit card carries a live level
+    and streak at all. Ideas 1 and 4 are both built on it — without live habit data that card has
+    nothing to animate, and only the two Ceiling ideas survive.</p>
+  </div>
+</div>
+
+<script>
+  function replay(id){
+    const host = document.getElementById(id);
+    const clone = host.cloneNode(true);
+    host.replaceWith(clone);
+    clone.id = id;
+  }
+  function toggleStatus(btn){
+    const d = document.getElementById('d1'), l = document.getElementById('l1'), f = document.getElementById('f1');
+    const done = d.classList.toggle('done');
+    d.classList.toggle('live', !done);
+    l.textContent = done ? 'Day complete' : 'Logging today';
+    f.textContent = done ? '5 of 5 today' : '4 of 5 today';
+    btn.textContent = done ? 'Reopen the day →' : 'Finish the day →';
+  }
+  function ease(t){ return 1 - Math.pow(1 - t, 3); }
+  function animateTo(el, from, to, ms){
+    const t0 = performance.now();
+    (function step(now){
+      const p = Math.min(1, (now - t0) / ms);
+      el.textContent = (from + (to - from) * ease(p)).toFixed(1);
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+  function countUp(){
+    const n = document.getElementById('n3');
+    document.getElementById('r3').textContent = '▲ 7.5 KG';
+    animateTo(n, 142.5, 150, 900);
+    setTimeout(()=>{ document.getElementById('r3').textContent = '▲ 15 KG'; n.textContent='142.5'; }, 3200);
+  }
+  function newBest(){
+    const card = document.getElementById('c5'), badge = document.getElementById('b5'), n = document.getElementById('n5');
+    card.classList.remove('flash'); badge.classList.remove('on');
+    void card.offsetWidth;
+    card.classList.add('flash'); badge.classList.add('on');
+    document.getElementById('r5').textContent = '▲ 7.5 KG';
+    animateTo(n, 142.5, 150, 1000);
+    setTimeout(()=>{ badge.classList.remove('on'); card.classList.remove('flash');
+      document.getElementById('r5').textContent='▲ 15 KG'; n.textContent='142.5'; }, 3600);
+  }
+  // 6 · ticker
+  const facts = ['Back squat · <b>1.82× bodyweight</b>', 'Up <b>15 kg</b> since July', 'Last set <b>10 Sep</b>'];
+  let fi = 0;
+  setInterval(()=>{
+    const t = document.getElementById('t6');
+    if (!t) return;
+    t.classList.add('sw');
+    setTimeout(()=>{ fi = (fi+1)%facts.length; t.innerHTML = facts[fi]; }, 220);
+    setTimeout(()=> t.classList.remove('sw'), 520);
+  }, 3200);
+</script>
+</body>
+</html>

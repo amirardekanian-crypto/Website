@@ -5984,6 +5984,45 @@ function render() {
   document.body.setAttribute('data-daypart', _dp);
   document.querySelector('meta[name="theme-color"]').setAttribute('content',
     CFG.dark ? '#17142B' : ({ morning: '#FAF0E9', afternoon: '#F6F4FF', evening: '#EDEAF9' })[_dp]);
+  publishCardSnapshot();
+}
+
+// ── What program.html draws on its Daily Habits card ──────────────────────
+// Proof owns every formula in this file — the XP curve, the rank ladder, the
+// weighted day gate. The programme app must never re-derive any of them: the
+// rules already live in two places (here and the `xp_rules` row), and a third
+// copy is the exact failure CLAUDE.md warns about, where two screens quietly
+// disagree and nothing errors.
+//
+// So Proof does not export its rules. It exports its ANSWERS — numbers it has
+// already worked out for this very render — and the programme app just draws
+// them.
+//
+// Deliberately DEVICE-LOCAL. It is not added to the sync payload (built
+// explicitly from cfg/log/wt above), because this is a cache of a derived
+// value, not data: re-deriving it on the next device costs one render. A phone
+// that has never opened Proof simply has no snapshot, and the programme app
+// falls back to a card with no numbers rather than showing wrong ones.
+function publishCardSnapshot() {
+  try {
+    const t = TKEY();
+    const li = overallLevel();
+    const roster = rosterOn(t);
+    const week = [];
+    for (let i = 6; i >= 0; i--) week.push(dayQualifies(fmtKey(addDays(parseKey(t), -i))));
+    localStorage.setItem(ATHLETE_ID + '_hab_card', JSON.stringify({
+      lv:     li.lv,
+      rank:   li.label || '',
+      streak: currentDayStreak(),
+      done:   roster.filter(h => isDone(h, t)).length,
+      total:  roster.length,
+      // The same gate a day streak uses, so the card and the streak can never
+      // disagree about whether today counts.
+      qualified: dayQualifies(t),
+      week:   week,
+      t:      Date.now()
+    }));
+  } catch (e) { /* a card must never be able to break the tracker */ }
 }
 
 // ── Numbers that count ────────────────────────────────────────────────────
