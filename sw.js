@@ -3,7 +3,12 @@
 // v3: program.html's app shell changed — it now links the real /manifest.json and
 // carries the apple-mobile-web-app-* meta tags, so the pre-cached v2 shell would
 // keep an installed athlete on a version that cannot be installed properly.
-const CACHE = 'aap-v3';
+// v4: program.html's <head> changed — the font stylesheet no longer blocks paint,
+// the Supabase SDK now loads ahead of analytics, and the login screen is painted
+// from the body instead of from boot(). An installed athlete sitting on the
+// pre-cached v3 shell would keep the slow first load offline-first opens are
+// most likely to suffer from.
+const CACHE = 'aap-v4';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
