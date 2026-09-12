@@ -2068,6 +2068,20 @@
   .signin-f input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 13px 14px;
     border: 1.5px solid var(--rule); border-radius: 13px; background: var(--card); color: var(--ink); }
   .signin-f input:focus { outline: none; border-color: var(--accent); }
+  /* Reveal toggle. The input gains room on the right so revealed text never
+     runs under the button, and the button sits over that gap, not over the text. */
+  .signin-f .si-wrap { position: relative; }
+  .signin-f .si-wrap input { padding-right: 52px; }
+  .si-eye { position: absolute; top: 0; right: 0; width: 48px; height: 100%;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+    background: none; border: 0; cursor: pointer; color: var(--muted-soft);
+    -webkit-tap-highlight-color: transparent; }
+  .si-eye:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px;
+    border-radius: 0 13px 13px 0; }
+  .si-eye svg { width: 20px; height: 20px; display: block; }
+  .si-eye .si-eye-slash { display: none; }
+  .si-eye.on { color: var(--accent); }
+  .si-eye.on .si-eye-slash { display: block; }
   .signin-go { width: 100%; padding: 15px; font-size: 15px; font-weight: 700; color: #fff;
     background: var(--accent); border: 0; border-radius: 13px; cursor: pointer; margin-top: 4px; }
   .signin-go[disabled] { opacity: .6; cursor: default; }
@@ -2097,7 +2111,21 @@
     </label>
     <label class="signin-f">
       <span>Password</span>
-      <input id="si-pass" name="password" type="password" autocomplete="current-password" required>
+      <!-- Reveal toggle. type="button" or every tap submits the form. The input
+           keeps autocomplete="current-password" in BOTH states - strip it and the
+           password manager stops offering to fill the field at all. 48px of
+           target, because this is read off a WhatsApp message on a phone. -->
+      <div class="si-wrap">
+        <input id="si-pass" name="password" type="password" autocomplete="current-password" required>
+        <button type="button" class="si-eye" id="si-eye" aria-label="Show password" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M1.8 12S5.6 5.4 12 5.4 22.2 12 22.2 12 18.4 18.6 12 18.6 1.8 12 1.8 12Z"/>
+            <circle cx="12" cy="12" r="3.1"/>
+            <line class="si-eye-slash" x1="3.6" y1="20.4" x2="20.4" y2="3.6"/>
+          </svg>
+        </button>
+      </div>
     </label>
     <button class="signin-go" id="si-go" type="submit">Sign in</button>
     <div class="signin-err" id="si-err" hidden></div>
@@ -3863,6 +3891,31 @@ async function _sbReady() {
 const LOGIN_DOMAIN = 'amirardekani.com';
 const LOGIN_PREFIX = 'athlete.';
 
+// Who last signed in on this device. Deliberately NOT athlete-prefixed: it is a
+// property of the phone, not of an athlete, and both apps share this origin's
+// storage - so signing in to one prefills the username in the other.
+const LAST_USER_KEY = 'aa_last_user';
+
+// Is there a Supabase session on this device at all? Answered from localStorage
+// alone: no network, and no waiting on the Supabase library, which is loaded
+// `defer` from a CDN and polled for up to 3s by _sbReady(). supabase-js keeps its
+// session under an "sb-<project-ref>-auth-token" key, so the ABSENCE of one is
+// proof that nobody is signed in here. Matched loosely rather than on the exact
+// key so a change of project ref or of storage-key format cannot quietly break
+// it. Only ever used to take a fast path TO the sign-in screen, so a false "yes"
+// costs nothing but the old wait - which is why a blocked store answers yes.
+function hasStoredSession() {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.indexOf('sb-') === 0 && k.indexOf('auth-token') !== -1) return true;
+    }
+    return false;
+  } catch (e) {
+    return true;   // storage blocked: take the slow, certain path rather than guess
+  }
+}
+
 function showSignIn() {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('signin-screen').classList.add('visible');
@@ -3896,8 +3949,41 @@ function showSignIn() {
     passEl.addEventListener(ev, stopAuto, { once: true });
   });
 
+  // Remembered username. The username ONLY: a page cannot save a password - that
+  // prompt belongs to the browser and the OS (see the submit handler) - but it can
+  // spare the athlete one of the two fields. Kept across sign-out on purpose;
+  // someone signing back in on their own phone wants it waiting for them. Never
+  // overwrites a value the password manager has already filled.
+  try {
+    const lastUser = localStorage.getItem(LAST_USER_KEY);
+    if (lastUser && !userEl.value) userEl.value = lastUser;
+  } catch (e) { /* storage blocked - they type it, exactly as before */ }
+
+  // Reveal toggle. Flips the input's type and nothing else, so the autocomplete
+  // name stays put in both states.
+  const eye = document.getElementById('si-eye');
+  function setReveal(show) {
+    passEl.type = show ? 'text' : 'password';
+    if (!eye) return;
+    eye.classList.toggle('on', show);
+    eye.setAttribute('aria-pressed', show ? 'true' : 'false');
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  }
+  if (eye) eye.addEventListener('click', (e) => {
+    e.preventDefault();            // the button sits inside the field's <label>
+    setReveal(passEl.type === 'password');
+    // Tapping reveal means "let me read this before it goes", so the auto-submit
+    // above must not fire the form out from under them.
+    stopAuto();
+    try { passEl.focus(); } catch (err) { /* focus is a nicety, not a requirement */ }
+  });
+
   form.onsubmit = async (e) => {
     e.preventDefault();
+    // Back to a real password field before anything else. A revealed field is a
+    // text field, and a form that submits without a password field in it is not a
+    // login form as far as the browser's save prompt is concerned.
+    setReveal(false);
     const user = (userEl.value || '').trim().toLowerCase();
     const pass = passEl.value || '';
     if (!user || !pass) return;
@@ -3913,9 +3999,34 @@ function showSignIn() {
         password: pass,
       });
       if (error) throw error;
+
+      // One field fewer next time, here and in the other app.
+      try { localStorage.setItem(LAST_USER_KEY, user); } catch (e) { /* storage blocked */ }
+
+      // Nothing here can *make* the phone save the password. That prompt belongs
+      // to the browser and the OS, and it fires on its own once they recognise a
+      // login form - which is what the autocomplete names on the fields are for.
+      // All we can do is stop getting in its way:
+      //   - Chromium keeps a credential store we are allowed to write to, and
+      //     writing to it is what raises its save bubble. Absent on iOS Safari,
+      //     so treat it as a bonus and never as the mechanism.
+      //   - The prompt is raised once the submit has been registered, so leaving
+      //     the page the instant the request resolves can outrun it. Hence the
+      //     short beat below, with the button saying why it is waiting.
+      // Timed and swallowed: a store that is declined, absent, or simply slow
+      // must never be the reason an athlete cannot get into their programme.
+      try {
+        if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+          await _withTimeout(
+            navigator.credentials.store(new PasswordCredential({ id: user, password: pass })), 1200);
+        }
+      } catch (e) { /* unsupported or refused - carry on regardless */ }
+
       // Reload rather than booting in place: everything downstream reads ATHLETE
-      // and ATHLETE_ID as boot-time constants.
-      location.replace('habits.html');
+      // and ATHLETE_ID as boot-time constants. replace() rather than assign() is
+      // kept on purpose - it stops Back landing on the sign-in card again.
+      btn.textContent = 'Signed in';
+      setTimeout(() => location.replace('habits.html'), 400);
       return;
     } catch (err) {
       errBox.textContent = /invalid|credentials/i.test(err.message || '')
@@ -10168,6 +10279,18 @@ function showError(msg) {
   const params = new URLSearchParams(window.location.search);
   let clientId = params.get('client');
   const clientKey = params.get('key');
+
+  // A visitor with no session AND no link is going to end up at the sign-in card
+  // whatever happens next, and localStorage can say so with no network at all.
+  // Worth asking first: athleteFromSession() waits on the Supabase library, which
+  // is polled for up to 3s - three seconds of the loading screen for someone who
+  // only ever needed the sign-in card, every single time they open the app.
+  // Requires clientId to be empty too, so a secret link still boots on a device
+  // that has never signed in.
+  if (!window.IS_DEMO && !clientId && !hasStoredSession()) {
+    showSignIn();
+    return;
+  }
 
   // A signed-in athlete needs no ?client= — their session says who they are.
   if (!window.IS_DEMO) {
