@@ -152,11 +152,15 @@ begin
     raise exception 'no published workout at that slug';
   end if;
 
-  -- Whitelist, not a cast. Anything else — 'none', a typo, or the field missing
-  -- entirely on a workout published before this shipped — counts for nothing.
+  -- Whitelist, not a cast. One entry per habit a library workout may tick, and
+  -- every id here must exist in HABITS in habits.html. 'breathe' joined the list
+  -- with the Breath section (2026-09-12). Anything else — 'none', a typo, or the
+  -- field missing entirely on a workout published before this shipped — counts
+  -- for nothing.
   v_counts := case v_item ->> 'countsAs'
                 when 'strength' then 'strength'
                 when 'mobility' then 'mobility'
+                when 'breathe'  then 'breathe'
                 else null
               end;
   v_title  := v_item ->> 'title';

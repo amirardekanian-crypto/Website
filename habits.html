@@ -3857,14 +3857,38 @@ async function fetchLibraryDays() {
   } catch (e) { return []; }   // offline, or stage28 is not applied yet
 }
 
+// Every habit a library workout is allowed to tick. Must match the server's
+// whitelist in log_library_session() — if they drift, the server records a habit
+// the client then silently drops.
+const LIB_TICKABLE = ['strength', 'mobility', 'breathe'];
+
+// Habits the athlete EARNED from a library workout but is not tracking, so the
+// tick was skipped. Drives the one-line offer on Today — see renderLibOffer().
+// Rebuilt from the server on every boot, never stored.
+let LIB_OFFER = [];
+
+// How recently they must have done one for the offer to show. This is what
+// makes the banner self-limiting: there is no dismiss button and none is
+// needed, because ignoring it for three days makes it go away on its own.
+// Do it again and it comes back, which is the correct amount of nagging for
+// something that is only ever offering to pay them for work already done.
+const LIB_OFFER_DAYS = 3;
+
+// Eyebrow line per habit. Only add-ons ever reach this, so STRENGTH is absent.
+const LIB_OFFER_EYEBROW = {
+  breathe:  'You did breath work',
+  mobility: 'You did mobility work',
+};
+
 function importLibraryDays(src) {
+  LIB_OFFER = [];
   if (!Array.isArray(src) || !src.length) return false;
   invalidateBonus();          // same reason as importWorkoutDays above
   let changed = false;
   src.forEach(row => {
     const d  = row && typeof row.completed_on === 'string' ? row.completed_on.slice(0, 10) : '';
     const id = row && row.counts_as;
-    if (!d || (id !== 'strength' && id !== 'mobility')) return;
+    if (!d || LIB_TICKABLE.indexOf(id) < 0) return;
     // ⚠️ MOBILITY is an add-on habit, so plenty of athletes do not track it.
     // Ticking a habit the day's roster does not contain would add XP that the
     // day's DENOMINATOR never counted: dayPct() takes its denominator from
@@ -3873,7 +3897,18 @@ function importLibraryDays(src) {
     // disagreeing, which is the one failure this app cannot afford.
     // STRENGTH is core:true and therefore always in the roster, so it never
     // trips this; the session is still recorded for the coach either way.
-    if (!rosterOn(d).some(h => h.id === id)) return;
+    //
+    // Before dropping it, remember it. Add-ons start OFF for everyone, and in
+    // September 2026 not one athlete had MOBILITY or BREATHE switched on — so
+    // without this, an athlete could do breath work off the shelf every night
+    // and never once be told why it paid nothing. renderLibOffer() makes the
+    // offer; only the athlete can accept it.
+    if (!rosterOn(d).some(h => h.id === id)) {
+      if (d >= fmtKey(addDays(today(), -LIB_OFFER_DAYS)) && !LIB_OFFER.some(o => o.id === id)) {
+        LIB_OFFER.push({ id: id, day: d });
+      }
+      return;
+    }
     const h = habitById(id);
     if (!h) return;
     if (!LOG[d]) LOG[d] = {};
@@ -7620,6 +7655,7 @@ function renderToday(LI, doneCount, pct) {
            without being tapped. On by default: for most athletes it is here
            whether they asked for it or not, which is exactly what the notice
            directly below is for. -->
+      ${renderLibOffer()}
       ${renderWtNotice()}
       ${renderWtRow()}
 
@@ -8204,6 +8240,48 @@ function wtChart(days) {
 // ends this banner too — seeing the feature in use is as much "informed" as
 // reading a sentence about it, and nobody should have to dismiss a banner
 // they have already acted past.
+// "You did the work. Want it to count?"
+//
+// A library workout ticks the habit it maps to, but the two it most often maps
+// to — MOBILITY and BREATHE — are add-ons, and add-ons start OFF. In September
+// 2026 not one of 39 athletes had either switched on, so every mobility flow,
+// recovery session and breath session on the shelf paid exactly nothing and
+// said nothing about why.
+//
+// This is the honest fix, and it is an OFFER rather than a correction: nobody
+// is opted into a scored habit behind their back (the reason add-ons default
+// off in the first place — see defaultCfg()), and the athlete asking for it is
+// what makes the roster entry legitimate. Accepting lands TODAY, same as the
+// Settings switch, because saveCfg() stamps the roster for us.
+//
+// No dismiss button on purpose: it only appears within LIB_OFFER_DAYS of a
+// session that earned it, so ignoring it is the dismissal.
+function renderLibOffer() {
+  if (editingPast()) return '';
+  const offer = (LIB_OFFER || []).find(o => !live().some(h => h.id === o.id));
+  if (!offer) return '';
+  const h = habitById(offer.id);
+  if (!h || h.core || h.locked) return '';
+  // Written out per habit rather than lowercasing h.short, which produced
+  // "You did breathe work". The habit is named for the instruction you give an
+  // athlete ("Breathe 10 minutes"); the noun for the thing they did is different.
+  const did = LIB_OFFER_EYEBROW[h.id] || ('You did ' + (h.short || '').toLowerCase() + ' work');
+  return `<button class="rcprompt" data-k="liboffer" ${on(() => {
+    CFG.on[h.id] = true;
+    saveCfg();
+    invalidateBonus();
+    LIB_OFFER = LIB_OFFER.filter(o => o.id !== h.id);
+    toast(h.short + ' is on. It counts from today.');
+    render();
+  })}>
+    <span>
+      <span class="eyebrow">${esc(did)}</span>
+      <span class="rcq">A workout you finished counts towards this habit, but you are not tracking it yet. Turn it on and it pays.</span>
+    </span>
+    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">&rarr;</span>
+  </button>`;
+}
+
 function renderWtNotice() {
   if (!wtOn() || CFG.wt.seenNotice || editingPast()) return '';
   return `<button class="rcprompt" data-k="wtnotice" ${on(() => {
@@ -8836,7 +8914,7 @@ function renderManual() {
           <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here — ${isFree()
             ? `it unlocks when you are on a coaching programme, and then it ticks itself every time you finish a session.`
             : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
-          ${isFree() ? '' : `<div>▸ <strong style="color:var(--ink)">Use the Library.</strong> Open a workout in your programme app and mark it done. A strength, conditioning or on-court session ticks your session. A mobility flow or a recovery session ticks Mobility. A warm-up ticks nothing, because a warm-up is part of a session rather than a session of its own.</div>`}
+          ${isFree() ? '' : `<div>▸ <strong style="color:var(--ink)">Use the Library.</strong> Open a workout in your programme app and mark it done. A strength, conditioning or on-court session ticks your session. A mobility flow or a recovery session ticks Mobility. Anything in Breath ticks Breathe. A warm-up ticks nothing, because a warm-up is part of a session rather than a session of its own. If the habit it counts towards is one you are not tracking, this screen will offer to switch it on.</div>`}
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Habits &amp; targets</strong>.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken streaks.</div>

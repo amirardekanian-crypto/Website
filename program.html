@@ -6095,7 +6095,9 @@ function _wsSaveChecks() {
 // and ignores whatever the client thinks, so a tampered page cannot claim a
 // 12-minute foam roll was a session. See the stage28 header for why that
 // matters: WORKOUT is 28.6% of the day score.
-const WS_COUNTS_AS_LABEL = { strength: 'Session', mobility: 'Mobility' };
+// Keys must match the server's whitelist in log_library_session() and the habit
+// ids in habits.html. Values are the habit's athlete-facing short name.
+const WS_COUNTS_AS_LABEL = { strength: 'Session', mobility: 'Mobility', breathe: 'Breathe' };
 
 // Same daily-reset rule as the exercise ticks above: a Done belongs to the day
 // it was pressed on. Device-local, so a Done pressed on a phone shows as

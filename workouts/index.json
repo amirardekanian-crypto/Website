@@ -138,13 +138,34 @@
           "duration": "15 min",
           "equipment": "Foam Roller",
           "file": "workouts/recovery/reset-roll.json"
+        }
+      ]
+    },
+    {
+      "id": "breath",
+      "title": "Breath",
+      "banner": "assets/img/workouts/recovery.webp",
+      "workouts": [
+        {
+          "id": "post-competition",
+          "title": "Final Whistle",
+          "duration": "18 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/breath/post-competition.json"
         },
         {
-          "id": "wind-down",
-          "title": "Wind Down",
+          "id": "stress-reset",
+          "title": "Switch Off",
+          "duration": "12 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/breath/stress-reset.json"
+        },
+        {
+          "id": "pre-sleep",
+          "title": "Lights Out",
           "duration": "10 min",
           "equipment": "Bodyweight",
-          "file": "workouts/recovery/wind-down.json"
+          "file": "workouts/breath/pre-sleep.json"
         }
       ]
     }

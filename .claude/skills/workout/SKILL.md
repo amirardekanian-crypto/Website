@@ -206,8 +206,15 @@ field is the only thing that decides which habit that ticks in AA Proof:
 | `countsAs` | Ticks | Use it for |
 |---|---|---|
 | `"strength"` | the **WORKOUT** habit | a real session — strength, conditioning, on-court speed. Roughly 25 min and up |
-| `"mobility"` | the **MOBILITY** habit | a mobility flow or a recovery session. Roughly 10–20 min |
+| `"mobility"` | the **MOBILITY** habit | a mobility flow or a physical recovery session. Roughly 10–20 min |
+| `"breathe"` | the **BREATHE** habit | anything in the **Breath** category — breath work with easy movement around it |
 | `"none"` | nothing | a **warm-up**. It is part of a session, not a session |
+
+⚠️ MOBILITY and BREATHE are **add-on** habits and add-ons start OFF, so for most
+athletes these tick nothing until they opt in. That is handled — `renderLibOffer()`
+in `habits.html` offers to switch the habit on for three days after a session that
+earned it. Nothing for you to do here, but do not "fix" it by marking a breath
+session `"strength"` to make it pay.
 
 **Leave it out and the workout counts for nothing.** The server whitelists this
 value and falls through to "counts for nothing" on anything it does not

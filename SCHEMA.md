@@ -867,8 +867,13 @@ Its own done-state is stored under `wkdone_<id>` and resets daily the same way.
 | Value | Ticks in AA Proof | For |
 |---|---|---|
 | `"strength"` | the **WORKOUT** habit | a real session: strength, conditioning, on-court speed (~25 min and up) |
-| `"mobility"` | the **MOBILITY** habit | a mobility flow or a recovery session (~10–20 min) |
+| `"mobility"` | the **MOBILITY** habit | a mobility flow or a physical recovery session (~10–20 min) |
+| `"breathe"` | the **BREATHE** habit | anything in the **Breath** category — breath work with easy movement |
 | `"none"` | nothing | a **warm-up** — part of a session, not a session |
+
+Every value here must exist in three places at once: this table, the whitelist in
+`log_library_session()`, and `LIB_TICKABLE` in `habits.html`. Add one to fewer than
+all three and the server records a habit the client silently drops.
 
 **Required.** The server whitelists the value and falls through to "counts for
 nothing" on anything it does not recognise, so omitting it is safe but silent.
