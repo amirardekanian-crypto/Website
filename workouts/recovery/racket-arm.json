@@ -1,0 +1,151 @@
+{
+  "id": "racket-arm",
+  "title": "Racket Arm",
+  "category": "recovery",
+  "countsAs": "mobility",
+  "duration": "12 min",
+  "equipment": "Foam Roller",
+  "focusTag": "Forearm, Elbow & Shoulder",
+  "blocks": [
+    {
+      "title": "Forearm & Elbow",
+      "icon": "🌀",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Forearm Roll",
+          "videoUrl": null,
+          "note": "Tennis elbow almost never starts at the elbow. It starts in the forearm muscles that grip the racket and brake the wrist on every shot, and the elbow is just where they attach and complain. Five minutes a week on the forearm itself is worth more than any brace you can buy.",
+          "chips": [
+            { "label": "60 sec / side" },
+            { "label": "Top and underside" }
+          ],
+          "cues": {
+            "good": [
+              "Forearm across the roller on a table or the floor, roll slowly from elbow to wrist",
+              "Do the top of the forearm first. That is the side that gives you tennis elbow",
+              "Stop on a sore spot and slowly open and close your fist a few times"
+            ],
+            "bad": [
+              "Rolling fast",
+              "Rolling straight over the bony point of the elbow"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Wrist Extensor Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "30 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Arm straight out, palm down, gently bend the wrist so the fingers point at the floor",
+              "Pull with the other hand, softly. You should feel the top of the forearm"
+            ],
+            "bad": [
+              "Bending the elbow to make it easier",
+              "Pulling hard. This one is easy to overdo and it bites back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Wrist Flexor Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "30 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Arm straight out, palm up, gently bend the wrist so the fingers point at the floor",
+              "Now you should feel the underside of the forearm"
+            ],
+            "bad": [
+              "Letting the elbow bend"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Shoulder & Lat",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Lat Roll",
+          "videoUrl": null,
+          "note": "The lat is the biggest muscle in your serve and the one that goes quietly tight. It is also the reason a stiff shoulder sometimes will not free up no matter how much you stretch the shoulder itself. Your serving side will be the worse one. Give it the extra time.",
+          "chips": [
+            { "label": "60 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "On your side, arm overhead, roller under the armpit and down the side of the back",
+              "Small movements. Pause where it bites and breathe"
+            ],
+            "bad": [
+              "Rolling onto the ribs themselves"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Upper Back Roll",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60 sec", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Roller across the upper back, hands behind the head, ribs down",
+              "Pause and breathe at each level before moving up",
+              "Stay above the bottom of the ribcage. The lower back does not get rolled"
+            ],
+            "bad": [
+              "Rolling the lower back",
+              "Arching over the roller and letting the ribs flare"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Cross-Body Shoulder Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "45 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Arm straight across the chest, pull it in with the other forearm",
+              "Shoulder stays down, not shrugged towards the ear"
+            ],
+            "bad": [
+              "Pulling at the elbow joint",
+              "Pushing into a pinch at the front of the shoulder. Back off if you feel one"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Doorway Pec Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "45 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Forearm on the door frame, elbow at shoulder height, step through and turn away",
+              "Chest open, ribs down"
+            ],
+            "bad": [
+              "Letting the shoulder roll forward into it"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

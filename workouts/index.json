@@ -124,6 +124,13 @@
           "duration": "15 min",
           "equipment": "Foam Roller",
           "file": "workouts/mobility/front-rack-rescue.json"
+        },
+        {
+          "id": "hips-and-groin",
+          "title": "Low and Wide",
+          "duration": "15 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/mobility/hips-and-groin.json"
         }
       ]
     },
@@ -138,6 +145,20 @@
           "duration": "15 min",
           "equipment": "Foam Roller",
           "file": "workouts/recovery/reset-roll.json"
+        },
+        {
+          "id": "static-stretch",
+          "title": "Long Holds",
+          "duration": "15 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/recovery/static-stretch.json"
+        },
+        {
+          "id": "racket-arm",
+          "title": "Racket Arm",
+          "duration": "12 min",
+          "equipment": "Foam Roller",
+          "file": "workouts/recovery/racket-arm.json"
         }
       ]
     },
