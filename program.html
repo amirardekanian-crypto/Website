@@ -2244,6 +2244,104 @@
   }
   body[data-dark] .ex-1rm-from { color: #888; }
 
+  .ex-1rm-save {
+    display: block; width: 100%; margin-top: 12px; padding: 11px;
+    background: var(--ice); color: var(--on-accent);
+    border: none; border-radius: 7px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    transition: opacity 0.15s;
+  }
+  .ex-1rm-save:disabled { background: var(--yellow); cursor: default; }
+
+  /* ── THE CEILING (screen) ─────────────────────────────────────── */
+  .ceil-head { position: relative; padding: 46px 18px 18px; background: var(--yellow); color: var(--on-accent); }
+  .ceil-kick { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.78); }
+  .ceil-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 44px;
+    line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; margin-top: 5px; }
+
+  /* Relative-strength hero — the headline for a racket-sport athlete */
+  .ceil-hero { background: var(--yellow); color: var(--on-accent); border-radius: 12px;
+    padding: 20px 18px; margin-top: 16px; }
+  .ceil-hero-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 54px;
+    line-height: 0.86; letter-spacing: -2px; }
+  .ceil-hero-v small { font-size: 22px; letter-spacing: 0; }
+  .ceil-hero-l { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; margin-top: 10px; }
+  .ceil-hero-s { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 6px; line-height: 1.6; }
+
+  /* Prompt shown when AA Proof has no body weight to borrow */
+  .ceil-ask { background: var(--ice-dim); border: 1px dashed var(--ice-mid); border-radius: 12px;
+    padding: 16px; margin-top: 16px; }
+  .ceil-ask-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px;
+    text-transform: uppercase; color: var(--ink, var(--grey-dark)); letter-spacing: 0.3px; }
+  .ceil-ask-d { font-size: 13px; color: var(--grey-text); line-height: 1.55; margin-top: 6px; }
+  .ceil-ask-b { display: inline-block; margin-top: 12px; padding: 10px 16px; background: var(--ice);
+    color: var(--on-accent); border: none; border-radius: 7px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; }
+
+  /* Three-up numbers under the My Plan card, so it is never an empty promise */
+  .ceil-mini { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 9px 24px 0; }
+  .ceil-mini > div { background: var(--grey-card); border-radius: 8px; padding: 10px 6px; text-align: center; }
+  body[data-dark] .ceil-mini > div { background: #242424; }
+  .ceil-mini-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px;
+    line-height: 1; color: var(--yellow); }
+  body[data-dark] .ceil-mini-n { color: #4e9d7e; }
+  .ceil-mini-l { font-family: 'Space Mono', monospace; font-size: 7.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--grey-text); margin-top: 5px; }
+
+  .ceil-label { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey-text);
+    margin: 26px 0 10px; }
+
+  .ceil-lift { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    background: var(--white); border: 1px solid var(--grey-mid); border-radius: 10px;
+    padding: 13px 14px; margin-bottom: 9px; cursor: pointer; }
+  body[data-dark] .ceil-lift { background: #1e1e1e; border-color: #333; }
+  .ceil-lift-m { flex: 1; min-width: 0; }
+  .ceil-lift-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px;
+    line-height: 1.05; text-transform: uppercase; color: var(--grey-dark); letter-spacing: 0.2px; }
+  body[data-dark] .ceil-lift-n { color: #eee; }
+  .ceil-lift-d { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+  .ceil-lift-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px;
+    line-height: 1; color: var(--yellow); text-align: right; }
+  body[data-dark] .ceil-lift-v { color: #4e9d7e; }
+  .ceil-lift-u { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.12em;
+    color: var(--grey-text); text-align: right; margin-top: 3px; }
+  .ceil-spark { width: 46px; height: 20px; flex-shrink: 0; }
+  .ceil-up { color: var(--yellow); }
+  body[data-dark] .ceil-up { color: #4e9d7e; }
+  .ceil-down { color: var(--ice); }
+
+  /* Per-lift history */
+  .ceil-card { background: var(--white); border: 1px solid var(--grey-mid); border-radius: 12px;
+    padding: 18px 16px; margin-top: 16px; }
+  body[data-dark] .ceil-card { background: #1e1e1e; border-color: #333; }
+  .ceil-big { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 46px;
+    line-height: 0.9; letter-spacing: -1.5px; color: var(--yellow); }
+  body[data-dark] .ceil-big { color: #4e9d7e; }
+  .ceil-big span { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; color: var(--grey-text); margin-left: 6px; }
+  .ceil-chart { width: 100%; height: 96px; margin: 16px 0 6px; overflow: visible; }
+  .ceil-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 9px 0; border-top: 1px solid var(--grey-card); font-size: 12.5px; color: var(--grey-text); }
+  body[data-dark] .ceil-row { border-top-color: #2a2a2a; }
+  .ceil-row b { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px;
+    color: var(--grey-dark); }
+  body[data-dark] .ceil-row b { color: #eee; }
+  .ceil-row-s { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.06em;
+    text-transform: uppercase; }
+
+  .ceil-empty { text-align: center; padding: 44px 16px; color: var(--grey-text);
+    font-size: 13.5px; line-height: 1.65; }
+  .ceil-note { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--grey-text); line-height: 1.75;
+    margin-top: 18px; text-align: center; }
+
   /* ── Inline per-exercise weight field on round-format circuits / supersets ──
      A small box folded into each round row (one weight per exercise). Per-round
      RPE lives below in the standard .rpe-row rows. */
@@ -3108,9 +3206,26 @@
   <!-- All future cycles (next + upcoming), unified layout -->
   <div id="upcoming-wrap"></div>
 
+  <!-- The Ceiling (estimated 1RM) — summary card; opens #screen-ceiling -->
+  <div id="plan-ceiling-wrap"></div>
+
   <!-- Daily habits (Proof) — the companion tracker, opened from here too -->
   <div id="plan-habits-wrap"></div>
 
+</div>
+
+<!-- ═══ THE CEILING ═══ the athlete's estimated 1RM per lift, built from the
+     sets they already log. A sub-screen of My Plan (reached from the card
+     above, never from the tab bar), with its own per-lift history view.
+     Everything here reads from "<id>_1rm"; body weight is borrowed read-only
+     from AA Proof so relative strength can be shown. -->
+<div id="screen-ceiling" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to My Plan">←</button>
+    <div class="ceil-kick">— Your numbers</div>
+    <div class="ceil-title" id="ceil-title">The Ceiling</div>
+  </div>
+  <div id="ceil-body" style="padding: 0 18px 110px;"></div>
 </div>
 
 <!-- ═══ LIBRARY ═══ shared, app-wide content. A "two doors" landing — Sessions
@@ -3745,6 +3860,26 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
           out.push({ w: pick(a.w, b.w), r: pick(a.r, b.r), d: !!(a.d || b.d) });
         }
         return JSON.stringify(out);
+      }
+    } catch (e) { /* not parseable — fall through */ }
+  }
+  // The Ceiling (estimated 1RM history): union by lift + date, newest write wins
+  // that slot. It MUST have its own branch — the scalar rule below takes one
+  // side wholesale, so a phone that had not synced would silently delete every
+  // estimate saved on the other one. This history only ever grows.
+  if (key.slice(-4) === '_1rm') {
+    try {
+      const L = JSON.parse(localVal), C = JSON.parse(cloudVal);
+      if (Array.isArray(L) && Array.isArray(C)) {
+        const byKey = {};
+        L.concat(C).forEach(e => {
+          if (!e || !e.lift || !e.d) return;
+          const k = e.lift + '|' + e.d;
+          const seen = byKey[k];
+          if (!seen || (e.t || 0) > (seen.t || 0)) byKey[k] = e;
+        });
+        return JSON.stringify(Object.keys(byKey).map(k => byKey[k])
+          .sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0)));
       }
     } catch (e) { /* not parseable — fall through */ }
   }
@@ -4722,6 +4857,11 @@ function renderPlan() {
     document.getElementById('upcoming-wrap').innerHTML = html;
   }
 
+  // The Ceiling (estimated maxes) sits above the habit card — both are
+  // companions to the programme, reachable from the plan that produced them.
+  const planCeil = document.getElementById('plan-ceiling-wrap');
+  if (planCeil) planCeil.innerHTML = ceilingCardHtml();
+
   // The habit tracker sits at the end of My Plan too — the programme and the
   // daily habits are the two halves of the plan, so both are reachable here.
   const planHab = document.getElementById('plan-habits-wrap');
@@ -5533,7 +5673,7 @@ async function markCoachRead() {
 }
 window.sendCoachReply = sendCoachReply;
 
-function goTo(screen, historyId) {
+function goTo(screen, historyId, keepContent) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   document.getElementById('v-progress').classList.toggle('active', screen === 'home');
@@ -5553,9 +5693,16 @@ function goTo(screen, historyId) {
   // Library tab — Read + Train sections. Both built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
-  // Update the global tab bar's active button
+  // The Ceiling — rebuilt on every visit so a max saved mid-session shows.
+  // `keepContent` is set when renderCeilingLift() routes here itself; it has
+  // already painted the per-lift view and must not be overwritten.
+  if (screen === 'ceiling' && !keepContent) renderCeiling();
+
+  // Update the global tab bar's active button. The Ceiling is a sub-screen of
+  // My Plan, so that tab stays lit while you are inside it.
+  const litTab = (screen === 'ceiling') ? 'plan' : screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
-    n.classList.toggle('active', n.dataset.tab === screen);
+    n.classList.toggle('active', n.dataset.tab === litTab);
   });
 
   // Every nav screen shows the global tab bar + dark-mode toggle (the Home tab
@@ -5642,6 +5789,160 @@ function habitCardHtml() {
       <div class="habit-card-go">→</div>
     </button>`;
 }
+
+// ── THE CEILING — the My Plan card + its own screen ────────────────────
+// Same grammar as the habit card above: a section head, one tappable card, and
+// the depth one tap in. The three numbers show on the card so it is never an
+// empty promise.
+function ceilingCardHtml() {
+  const lifts = ceilingLifts();
+  const top = lifts.slice(0, 3);
+  const mini = top.length ? `
+    <div class="ceil-mini">${top.map(l => `
+      <div><div class="ceil-mini-n">${l.latest.kg}</div><div class="ceil-mini-l">${esc(shortLift(l.lift))}</div></div>`).join('')}
+    </div>` : '';
+  return `
+    <div class="home-section-head">
+      <div class="home-section-title">Strength</div>
+    </div>
+    <button type="button" class="habit-card" onclick="goTo('ceiling')">
+      <div class="habit-card-lv" style="background: var(--ice)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg>
+      </div>
+      <div class="habit-card-body">
+        <div class="habit-card-title">The Ceiling</div>
+        <div class="habit-card-sub">${top.length
+          ? 'Your estimated maxes, built from the sets you log.'
+          : 'Log a weight and an RPE on any lift and your estimated max appears here.'}</div>
+      </div>
+      <div class="habit-card-go">→</div>
+    </button>${mini}`;
+}
+// "Barbell Back Squat" → "Back Squat" for the tight three-up on the card.
+function shortLift(name) {
+  const t = String(name || '').replace(/^(barbell|dumbbell|machine|cable|smith machine)\s+/i, '');
+  return t.length > 13 ? t.slice(0, 12).trim() + '…' : t;
+}
+
+// A tiny sparkline for a lift's estimates. Flat when there is only one point.
+function ceilSpark(entries) {
+  const v = entries.map(e => e.kg);
+  if (v.length < 2) return `<svg class="ceil-spark" viewBox="0 0 46 20"><circle cx="43" cy="10" r="2.5" fill="currentColor"/></svg>`;
+  const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
+  const pts = v.map((n, i) => `${(i / (v.length - 1)) * 42 + 2},${16 - ((n - lo) / span) * 12}`).join(' ');
+  return `<svg class="ceil-spark" viewBox="0 0 46 20"><polyline points="${pts}" fill="none"
+    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function fmtCeilDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + m[d.getMonth()];
+}
+
+// The Ceiling screen — relative strength on top, then one row per lift.
+function renderCeiling() {
+  document.getElementById('ceil-title').textContent = 'The Ceiling';
+  const lifts = ceilingLifts();
+  const body  = document.getElementById('ceil-body');
+
+  if (!lifts.length) {
+    body.innerHTML = `
+      <div class="ceil-empty">
+        <p><strong>Nothing here yet.</strong></p>
+        <p style="margin-top:10px">Open any lift in your programme, log the weight you used and
+        your RPE for the set, then tap <em>Save to The Ceiling</em>. Your estimated max lands here.</p>
+        <p style="margin-top:10px">You never have to test a one-rep max for this to work.</p>
+      </div>`;
+    return;
+  }
+
+  // Relative strength leads — kilos per kilo of the athlete beats absolute
+  // kilos for a racket-sport player. Body weight is borrowed from AA Proof; if
+  // there is none, ask for it rather than quietly dropping the headline.
+  const bw  = latestBodyWeight();
+  const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
+  let hero;
+  if (bw) {
+    const ratio = (best.latest.kg / bw.kg).toFixed(2);
+    hero = `
+      <div class="ceil-hero">
+        <div class="ceil-hero-v">${ratio}<small>×</small></div>
+        <div class="ceil-hero-l">Body weight · ${esc(best.lift)}</div>
+        <div class="ceil-hero-s">${best.latest.kg} kg ÷ ${bw.kg} kg
+          · weighed ${fmtCeilDate(bw.d)} in AA Proof</div>
+      </div>`;
+  } else {
+    hero = `
+      <div class="ceil-ask">
+        <div class="ceil-ask-t">Add your body weight</div>
+        <div class="ceil-ask-d">Lifting ${best.latest.kg} kg means something different at 65 kg than
+          at 95 kg. For tennis and padel, strength <em>per kilo of you</em> is the number that counts.
+          Log your weight in AA Proof and it shows up here.</div>
+        <button type="button" class="ceil-ask-b" onclick="goHabits()">Open AA Proof →</button>
+      </div>`;
+  }
+
+  const rows = lifts.map(l => {
+    const up = l.delta > 0, flat = l.delta === 0;
+    const trend = l.entries.length < 2 ? 'First estimate'
+      : (up ? '▲ ' : flat ? '' : '▼ ') + (flat ? 'No change yet' : Math.abs(l.delta) + ' kg since you started');
+    return `
+      <button type="button" class="ceil-lift" onclick="renderCeilingLift('${esc(l.lift).replace(/'/g, "\\'")}')">
+        <div class="ceil-lift-m">
+          <div class="ceil-lift-n">${esc(l.lift)}</div>
+          <div class="ceil-lift-d ${up ? 'ceil-up' : (!flat && l.entries.length > 1) ? 'ceil-down' : ''}">${trend}</div>
+        </div>
+        <span class="${up ? 'ceil-up' : 'ceil-down'}">${ceilSpark(l.entries)}</span>
+        <div><div class="ceil-lift-v">${l.latest.kg}</div><div class="ceil-lift-u">KG</div></div>
+      </button>`;
+  }).join('');
+
+  body.innerHTML = hero
+    + `<div class="ceil-label">Your lifts</div>${rows}`
+    + `<div class="ceil-note">Estimates, not tested maxes.<br>
+        One is a snapshot — the line across several is the real answer.</div>`;
+}
+
+// One lift's history: the number, a chart of every estimate, and the set each
+// one came from so nothing is ever a mystery number.
+function renderCeilingLift(lift) {
+  const l = ceilingLifts().find(x => x.lift === lift);
+  if (!l) return;
+  goTo('ceiling', null, true);
+  document.getElementById('ceil-title').textContent = lift;
+
+  const v = l.entries.map(e => e.kg);
+  const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
+  const W = 300, H = 80;
+  const x = i => (v.length < 2 ? W / 2 : (i / (v.length - 1)) * (W - 16) + 8);
+  const y = n => H - 10 - ((n - lo) / span) * (H - 24);
+  const line = v.length > 1
+    ? `<polyline points="${v.map((n, i) => `${x(i)},${y(n)}`).join(' ')}" fill="none"
+        stroke="#0E4A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : '';
+  const dots = v.map((n, i) => `<circle cx="${x(i)}" cy="${y(n)}" r="4" fill="#C7552F"/>`).join('');
+
+  const rows = l.entries.slice().reverse().map(e => `
+    <div class="ceil-row">
+      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}</span>
+      <b>${e.kg} kg</b>
+    </div>`).join('');
+
+  document.getElementById('ceil-body').innerHTML = `
+    <div class="ceil-card">
+      <div class="ceil-big">${l.latest.kg}<span>KG</span></div>
+      <svg class="ceil-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${line}${dots}</svg>
+      ${rows}
+    </div>
+    <div class="ceil-note">Every entry names the set it came from.<br>
+      Heavier sets closer to failure give the sharper numbers.</div>
+    <button type="button" class="ceil-ask-b" style="width:100%;margin-top:16px"
+      onclick="renderCeiling()">← All lifts</button>`;
+  window.scrollTo(0, 0);
+}
+window.renderCeilingLift = renderCeilingLift;
+window.renderCeiling = renderCeiling;
 
 function showLibPane(which) {
   _libPane = which;
@@ -7533,6 +7834,60 @@ function bestCeilingSet(log, reps) {
   return best;
 }
 
+// ── THE CEILING — the saved history behind the estimates ───────────────
+// One append-only array per athlete: [{ lift, kg, w, r, rpe, d, t }, …] where
+// `kg` is the estimate, `w/r/rpe` the set it came from, `d` the local date and
+// `t` the write time. One entry per lift per day; saving again the same day
+// replaces that day's entry rather than stacking duplicates.
+//
+// ⚠ This key has its own branch in mergeStoredValue() — union by lift+date,
+// newest write wins. Without it the scalar merge takes one side wholesale and a
+// phone that had not synced would delete every estimate saved on the other.
+function ceilingKey() { return ATHLETE_ID + '_1rm'; }
+function ceilingToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+       + '-' + String(d.getDate()).padStart(2, '0');
+}
+function loadCeiling() {
+  let a = [];
+  try { a = JSON.parse(localStorage.getItem(ceilingKey())) || []; } catch (e) {}
+  return Array.isArray(a) ? a.filter(e => e && e.lift && e.d && e.kg > 0) : [];
+}
+function saveCeilingEntry(lift, kg, w, r, rpe) {
+  const d = ceilingToday();
+  const all = loadCeiling().filter(e => !(e.lift === lift && e.d === d));
+  all.push({ lift: lift, kg: kg, w: w, r: r, rpe: rpe, d: d, t: Date.now() });
+  all.sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+  localStorage.setItem(ceilingKey(), JSON.stringify(all));
+}
+// Group into one row per lift, newest first, with the change since that lift's
+// first recorded estimate.
+function ceilingLifts() {
+  const by = {};
+  loadCeiling().forEach(e => { (by[e.lift] = by[e.lift] || []).push(e); });
+  return Object.keys(by).map(lift => {
+    const es = by[lift].sort((a, b) => (a.d < b.d ? -1 : 1));
+    const latest = es[es.length - 1];
+    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg };
+  }).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
+}
+
+// The athlete's most recent body weight — read from AA Proof, never written
+// here. habits.html owns "<id>_hab_wt" ({ 'YYYY-MM-DD': { kg, t } }, where a
+// null kg is a tombstone for a deleted reading); syncFromCloud pulls it down
+// with every other key on the shared blob, and _snapshot() deliberately never
+// pushes it back. So this app gets the number for free and cannot corrupt it.
+function latestBodyWeight() {
+  let wt = null;
+  try { wt = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_wt')); } catch (e) {}
+  if (!wt || typeof wt !== 'object') return null;
+  const days = Object.keys(wt).filter(d => wt[d] && wt[d].kg > 0).sort();
+  if (!days.length) return null;
+  const d = days[days.length - 1];
+  return { kg: wt[d].kg, d: d };
+}
+
 // Append the Ceiling line + panel to a standard exercise card. Renders nothing
 // at all when the exercise could never produce an honest estimate: no rep count
 // (holds, carries, intervals), or so many reps that even RPE 10 lands past the
@@ -7560,6 +7915,7 @@ function attachCeiling(card) {
       <div class="ex-1rm-out"></div>
       <div class="ex-1rm-grade"></div>
       <div class="ex-1rm-from"></div>
+      <button type="button" class="ex-1rm-save">Save to The Ceiling</button>
     </div>`;
   logSlotFor(card).appendChild(box);
 
@@ -7568,6 +7924,7 @@ function attachCeiling(card) {
   const out   = box.querySelector('.ex-1rm-out');
   const grade = box.querySelector('.ex-1rm-grade');
   const from  = box.querySelector('.ex-1rm-from');
+  const save  = box.querySelector('.ex-1rm-save');
   const fKg  = box.querySelector('.ex-1rm-kg');
   const fRp  = box.querySelector('.ex-1rm-rp');
   const fRpe = box.querySelector('.ex-1rm-rpe');
@@ -7587,8 +7944,12 @@ function attachCeiling(card) {
       from.innerHTML = 'Enter a weight, reps and an RPE.<br>Past '
         + ONE_RM_MAX_EFFECTIVE + ' reps in the tank a max is a guess, not an estimate.';
       txt.textContent = 'Estimate a max';
+      save.hidden = true;
       return;
     }
+    save.hidden = false;
+    save.disabled = false;
+    save.textContent = 'Save to The Ceiling';
     const rir  = Math.max(0, 10 - Number(fRpe.value));
     const eff  = Number(fRp.value) + rir;
     const q    = ceilingQuality(eff);
@@ -7640,6 +8001,19 @@ function attachCeiling(card) {
   [fKg, fRp, fRpe].forEach(f => {
     f.addEventListener('input', () => { touched = true; paintFromFields('Your numbers'); });
     f.addEventListener('click', ev => ev.stopPropagation());
+  });
+
+  // The one thing in here that writes anything. Everything above is derived
+  // from the set log; this is what puts a dated entry on the athlete's record.
+  save.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const kg  = parseLoggedKg(fKg.value);
+    const est = estimateOneRM(kg, fRp.value, fRpe.value);
+    if (est == null) return;
+    saveCeilingEntry(name, est, kg, Number(fRp.value), Number(fRpe.value));
+    save.textContent = 'Saved ✓';
+    save.disabled = true;
+    if (navigator.vibrate) navigator.vibrate(12);
   });
 
   card._ceilingRefresh = refresh;
