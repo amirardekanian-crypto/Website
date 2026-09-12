@@ -5,7 +5,7 @@
   Access: Google sign-in, locked to the coach email (client check here +
   Row Level Security in the database is the real gate — same model as coach.html).
   Data: public.call_logs (one row per athlete per call). The athlete dropdown is
-  built from public.athlete_keys + public.athlete_progress (no extra tables).
+  built from public.programs + public.athlete_progress (no extra tables).
 -->
 <html lang="en">
 <head>
@@ -726,25 +726,28 @@ function showGate(err) { $('app').style.display = 'none'; $('gate').style.displa
 sb.auth.onAuthStateChange(() => { booted = false; boot(); });
 boot();
 
-// --- athlete dropdown (from the secure-link list you already keep) ----------
-// Source = athlete_keys (every athlete you've issued a secure link to) merged
-// with athlete_progress (gives the friendly name once they've synced). The
-// program number is read straight off the id (e.g. mhrn_zhr2 → P2).
+// --- athlete dropdown (the roster) -----------------------------------------
+// Source = programs merged with athlete_progress (which gives the friendly name
+// once they've synced). This used to read athlete_keys, but that table is empty
+// since the secret links were retired, so anyone who had a programme and had not
+// yet synced progress silently vanished from this dropdown. programs is the
+// roster now, exactly as loadPrograms() in coach.html treats it. The program
+// number is read straight off the id (e.g. mhrn_zhr2 → P2).
 async function loadAthletes() {
-  const [keysRes, progRes] = await Promise.all([
-    sb.from('athlete_keys').select('athlete_id'),
+  const [rosterRes, progRes] = await Promise.all([
+    sb.from('programs').select('athlete_id'),
     sb.from('athlete_progress').select('athlete_id, athlete_name')
   ]);
   const sel = $('athleteSelect');
-  if (keysRes.error && progRes.error) {
+  if (rosterRes.error && progRes.error) {
     sel.innerHTML = '<option value="">— could not load —</option>';
-    showToast('Athlete list failed: ' + (keysRes.error || progRes.error).message, 'err');
+    showToast('Athlete list failed: ' + (rosterRes.error || progRes.error).message, 'err');
     return;
   }
   const names = {};
   (progRes.data || []).forEach(r => { if (r.athlete_name) names[r.athlete_id] = r.athlete_name; });
   const ids = new Set([
-    ...(keysRes.data || []).map(r => r.athlete_id),
+    ...(rosterRes.data || []).map(r => r.athlete_id),
     ...(progRes.data || []).map(r => r.athlete_id)
   ]);
   athletes = [...ids].map(id => {

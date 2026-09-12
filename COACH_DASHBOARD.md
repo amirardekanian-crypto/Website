@@ -299,7 +299,9 @@ it in this file.
 |---|---|
 | `session_history` | Sessions, ACWR, readiness, adherence, notes to reply |
 | `athlete_progress` | Last active, live snapshot, and the habit log behind every presence dot |
-| `athlete_keys` | Secure links, and the key `leaderboard_top()` is called with |
+| `programs` | **The roster** — every athlete, their name, tier and prescribed plan |
+| `athlete_identities` | Who has a username/password login, and the passwords still to send |
+| ~~`athlete_keys`~~ | ⚠️ Empty since the secret links were retired — reads nothing useful |
 | `messages` | Chat threads and unread counts |
 | `hab_notes` | The wall, the coach line, moderation |
 | `hab_contacts` via `contact_list()` | The funnel, contact buttons, days logged |

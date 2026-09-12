@@ -36,7 +36,14 @@ It is **not** a messaging channel. There is no chat; coaching conversation stays
 
 ## How an athlete gets in
 
-Same private link as their programme: `habits.html?client=<id>&key=<key>`.
+**A username and password**, the same login as their programme — they open
+`habits.html` and sign in. Amir creates the account from coach.html → Athletes → the
+athlete → **Create login**.
+
+⚠️ **The old `habits.html?client=<id>&key=<key>` links are dead** (retired 2026-09-07).
+`public.athlete_keys` is empty and `get_program()` fails closed on that path, so such a
+URL is refused whatever key it carries — and since `data/*.json` is 404 on the live site
+there is no fallback. An athlete **without a login cannot open Proof at all**.
 
 The two apps are **linked both ways**:
 
@@ -46,14 +53,16 @@ The two apps are **linked both ways**:
 | Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
-app stays inside the app shell — no browser bounce, no second install. Each handover
-passes the client id and the resolved key, because an installed PWA often opens
-without `&key=` in the URL.
+app stays inside the app shell — no browser bounce, no second install. The handover
+needs nothing in the URL any more: the Supabase session says who the athlete is on both
+sides, and `athleteFromSession()` resolves the id on arrival.
 
 ### Putting it on the home screen
 
-Proof carries its own manifest, built at load so `start_url` bakes in the athlete's
-`?client=…&key=…`. The installed icon is therefore **their** app, not a login screen.
+Proof carries its own manifest — the static `/manifest-proof.json`, which everyone
+installs from now that the session carries identity. (A generated blob manifest with
+`?client=&key=` in `start_url` is still built for anyone arriving on a legacy link; that
+block can go once every athlete has a login.)
 The app is called **AA Proof** everywhere on the site, and that name has to stay in
 step in three places specifically for the install identity: `manifest.name`,
 `manifest.short_name`, and the `apple-mobile-web-app-title` meta — iOS labels a

@@ -36,10 +36,12 @@ A single row sets the context for the whole call:
 | **Duration** | Free text (e.g. "15 min"). |
 | **Tier buttons** | Game / Set / Match — your service tier for this athlete (1 / 3 / 6-month programme). |
 
-**Where the athlete list comes from:** every athlete you've issued a **secure
-link** to (`athlete_keys`) plus anyone who has synced progress (`athlete_progress`).
-The friendly name comes from their synced data; before they've synced you'll see
-their id (e.g. `mhrn_zhr2`) instead of a name — that's expected.
+**Where the athlete list comes from:** the roster (`programs`) plus anyone who has
+synced progress (`athlete_progress`). The friendly name comes from their synced data;
+before they've synced you'll see their id (e.g. `mhrn_zhr2`) instead of a name — that's
+expected. (It used to read `athlete_keys`, which has been empty since the secret links
+were retired, so anyone who had a programme but had not yet synced silently vanished
+from the dropdown.)
 
 ---
 
@@ -158,7 +160,7 @@ AI for the report; *(optional)* paste it back and **Save report** to store it.
 | `call_logs` | One row per athlete per call (scores, notes, Win Vault, the readable summary, and an optional pasted AI summary) | This page; the dashboard's *Weekly check-in calls* section |
 | `cycle_reports` | An optional saved end-of-cycle report per athlete + cycle | §7 (when you paste a report back to save) |
 | `session_history` *(input)* | Finished workout sessions (RPE, duration, readiness…) | The cycle report's workout-log half |
-| `athlete_keys` + `athlete_progress` *(input)* | Secure-link keys + synced names | Building the athlete dropdown |
+| `programs` + `athlete_progress` *(input)* | The roster + synced names | Building the athlete dropdown |
 
 ---
 

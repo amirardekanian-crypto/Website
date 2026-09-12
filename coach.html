@@ -907,12 +907,17 @@ async function loadLogins() {
 // The message that actually goes to the athlete. One place, so the wording is the
 // same whether it came from a single create or the bulk run.
 function loginMessage(username, password) {
-  return `Your training app\n\n` +
-         `Open: ${SITE}/program.html\n` +
+  // The username IS the athlete id, so the roster knows their tier. A free-tier
+  // athlete has no programme — program.html would open on an empty one — and Proof
+  // is their whole app. Same login either way; only the door differs.
+  const a = (S.ath || {})[username];
+  const free = a && a.tier === 'free';
+  return (free ? `Your habit tracker\n\n` : `Your training app\n\n`) +
+         `Open: ${SITE}/${free ? 'habits.html' : 'program.html'}\n` +
          `Username: ${username}\n` +
          `Password: ${password}\n\n` +
          `Save it when your phone offers to — then it opens straight into your ` +
-         `programme next time, no typing.\n\n` +
+         (free ? `tracker` : `programme`) + ` next time, no typing.\n\n` +
          `To keep it on your home screen: open the link, then Share → Add to Home Screen.`;
 }
 
@@ -1454,7 +1459,13 @@ function assemble() {
       else if (a.contact && (a.contact.shown_as || a.contact.display_name)) a.name = a.contact.shown_as || a.contact.display_name;
       else a.name = unslug(a.id);
     }
-    a.tier = (p && p.tier) === 'free' ? 'free' : (p ? 'coached' : (a.isHab ? 'proof' : 'unknown'));
+    // Free tier lives at data.athlete.tier — that is the field isFree() reads in
+    // habits.html, and every free row on the server carries it there, none at the
+    // top level. Reading only p.tier showed all 13 free athletes as "Coached" here,
+    // in the tier filter, and to athletesNeedingLogin(). Both spellings accepted so a
+    // hand-written row either way still reads right.
+    const ptier = p && (p.tier || (p.athlete && p.athlete.tier));
+    a.tier = ptier === 'free' ? 'free' : (p ? 'coached' : (a.isHab ? 'proof' : 'unknown'));
     a.perWeek = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0;
     a.onBoard = !!S.optin[a.id];
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;

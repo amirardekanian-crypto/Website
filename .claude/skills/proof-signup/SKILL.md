@@ -1,17 +1,30 @@
 ---
 name: proof-signup
-description: Set up a free Proof (habit tracker) user from a signup form email. Use when Amir pastes a name/email/WhatsApp from a "PROOF signup" Web3Forms email, or says "add this person to the habit app", "sign them up for Proof", "give them a habit tracker link". Does the whole job — id, key, contact record, data file, commit, push — and hands back the WhatsApp message to send.
+description: Set up a free Proof (habit tracker) user from a signup form email. Use when Amir pastes a name/email/WhatsApp from a "PROOF signup" Web3Forms email, or says "add this person to the habit app", "sign them up for Proof", "give them a habit tracker link". Does the whole job — id, roster row, contact record — and hands back the WhatsApp message to send.
 ---
 
 # Sign someone up to AA Proof
 
 Amir pastes a signup (usually straight out of the **PROOF signup — habit tracker**
-Web3Forms email). You turn it into a working private link and hand him a message
-to paste into WhatsApp. Target: under two minutes, no questions asked unless
+Web3Forms email). You turn it into a working account and hand him a message to
+paste into WhatsApp. Target: under two minutes, no questions asked unless
 something is genuinely ambiguous.
 
 The form at [`proof.html`](../../proof.html) collects exactly three things:
 **display name · email · WhatsApp**.
+
+> ⚠️ **There are no secret links any more** (retired 2026-09-07). `public.athlete_keys`
+> is empty, `get_program()` fails closed on the key path, and a
+> `habits.html?client=…&key=…` URL is refused whatever key it carries. Free athletes
+> sign in with a **username and password**, exactly like coached ones. See `CLAUDE.md`
+> → *THE BIG ONE*.
+
+> ⚠️ **Two RPCs you cannot call from here.** `add_contact()`, `contact_list()` and
+> `forget_contact()` are all guarded by `is_coach()`, which reads the caller's JWT
+> email. A plain SQL connection has no coach JWT, so every one of them raises
+> `coach only`. They work from coach.html, where Amir is signed in — not from a
+> pipeline run. Use the direct statements below instead. (`add_contact()` is doubly
+> wrong now: it still mints a dead `athlete_keys` row as a side effect.)
 
 ---
 
@@ -25,137 +38,177 @@ Lowercase, underscores, no spaces. From their real or display name:
 one person another person's data:
 
 ```sql
-select athlete_id from public.athlete_keys where athlete_id like 'sara%';
+select athlete_id from public.programs      where athlete_id like 'sara%'
+union
+select athlete_id from public.hab_contacts  where athlete_id like 'sara%';
 ```
 
-### 2. Mint the key and record the contact
+`programs` is the roster now, so it is the list that matters; `hab_contacts` is
+checked too in case a signup was recorded but the roster row never landed.
 
-One call does the key and the contact row:
+### 2. Create their two rows
+
+**The identity row** — `public.programs`. Free users have no programme, so this is
+only an identity, but it is what puts them on the roster and what the app reads to
+know they are free:
 
 ```sql
-select * from public.add_contact(
-  'sara_karimi',        -- athlete id
-  'Sara K.',            -- the display name from the form
-  'sara@example.com',   -- email
-  '+98 912 000 0000'    -- WhatsApp
-);
+insert into public.programs (athlete_id, data, updated_by) values (
+  'sara_karimi',
+  jsonb_build_object('athlete', jsonb_build_object(
+    'id',        'sara_karimi',
+    'firstName', 'Sara',
+    'boardName', 'Sara K.',
+    'tier',      'free')),
+  'proof-signup')
+on conflict (athlete_id) do nothing;
 ```
 
-It returns `aid` and `akey`. **Keep the key** — it goes in the link.
+**`tier: "free"` matters, and it belongs inside `athlete`.** That is the field
+`isFree()` reads in `habits.html`. It is what makes the app show *"Get a programme"*
+instead of a link to a programme that does not exist, and what changes the locked
+WORKOUT row to say it belongs to coached athletes.
 
-Re-running it is safe: an existing key is reused, never rotated, so a link
-someone already has keeps working.
+**`boardName` is the name they typed on the form.** Nothing joins them with it — it
+just pre-fills the join box in Crew, so saying yes to the board is one tap instead of
+a decision about what to call themselves. Leave it out and the app falls back to
+first name + last initial.
 
-> **It does not put them on the leaderboard, and it must not.** They join
-> themselves, from Crew, whenever they feel like it — that is what
-> `privacy.html` promises and it is the honest reading of a form field. It also
-> keeps the board free of names sitting at zero because someone signed up and
-> never opened the link.
+**The contact row** — `public.hab_contacts`, coach-only behind RLS:
 
-### 3. Write their data file
-
-Free users have no programme, so the file is only an identity. Create
-`data/<athlete_id>.json`:
-
-```json
-{
-  "athlete": {
-    "id": "sara_karimi",
-    "firstName": "Sara",
-    "boardName": "Sara K.",
-    "tier": "free"
-  }
-}
+```sql
+insert into public.hab_contacts
+  (athlete_id, display_name, email, whatsapp, source, tier)
+values ('sara_karimi', 'Sara K.', 'sara@example.com', '+98 912 000 0000',
+        'proof.html', 'free')
+on conflict (athlete_id) do nothing;
 ```
 
-**`tier: "free"` matters.** It is what makes the app show *"Get a programme"*
-instead of a link to a programme that does not exist, and what changes the
-locked WORKOUT row to say it belongs to coached athletes.
+> ⚠️ **Never put the email or the WhatsApp number in the programme record.** Contact
+> details belong in `hab_contacts` and nowhere else. The programme row gets the name
+> they chose and nothing else.
 
-**`boardName` is the name they typed on the form.** Nothing joins them with it —
-it just pre-fills the join box in Crew, so saying yes to the board is one tap
-instead of a decision about what to call themselves. Leave it out and the app
-falls back to first name + last initial.
+> **None of this puts them on the leaderboard, and it must not.** They join
+> themselves, from Crew, whenever they feel like it — that is what `privacy.html`
+> promises and it is the honest reading of a form field. It also keeps the board free
+> of names sitting at zero because someone signed up and never opened the app.
 
-> ⚠️ **Never put the email or the WhatsApp number in this file.** `data/*.json`
-> is a static file served by GitHub Pages — anyone who guesses an id can fetch
-> it. Contact details belong in `hab_contacts`, which is behind RLS. The public
-> file gets the name they chose and nothing else.
+### 3. Amir creates the login
 
-### 4. Ship it
+**This part is his click, not a SQL statement** — creating an auth user needs the
+service-role key, which deliberately exists nowhere a browser can read it.
 
-⚠️ **Do not commit `data/<athlete_id>.json`.** It is gitignored and no longer served —
-athlete records live in the Supabase `programs` table now.
+**coach.html → Athletes → the athlete → Create login.** That calls the
+`athlete-login` Edge Function, which creates the account on the internal address
+`athlete.<id>@amirardekani.com` (it never receives mail) and writes
+`public.athlete_identities`.
 
-Write the file locally, then have Amir publish it:
-**coach.html → Athletes → ↑ Publish programme file**, and pick the file.
+Without this step they have **no way in at all** — there is no link to fall back on.
+Don't hand over a signup as "done" until the login exists.
 
-It lands immediately — there is no Pages deploy to wait for any more, so the link works
-as soon as the upload confirms.
+### 4. Hand Amir the message
 
-### 5. Hand Amir the message
+coach.html writes it for him: the password lands under **Logins to send** on the
+Athletes tab, and **Copy message** puts the whole WhatsApp text on his clipboard.
+For a free athlete that message points at **`habits.html`** (Proof is their whole
+app), not `program.html` — `loginMessage()` picks the door off their tier, so this
+only works if step 2 set `tier: "free"` correctly.
 
-Give him this, ready to paste, with the real link filled in:
+If you are drafting it by hand instead, it is:
 
-> Hey <first name> — here's your AA Proof link:
-> https://www.amirardekani.com/habits.html?client=<id>&key=<key>
+> Hey <first name> — here's your habit tracker:
+> https://www.amirardekani.com/habits.html
+> Username: <id>
+> Password: <password>
 >
-> Open it once on your phone and it stays there. Pick what you want to track and
-> tick things off daily — after the first one it'll offer to sit on your home
-> screen as **AA Proof**. Say yes; it opens in one tap and works
-> with no signal.
+> Save it when your phone offers to. Open it once and it stays there — pick what you
+> want to track and tick things off daily. After the first one it'll offer to sit on
+> your home screen as **AA Proof**. Say yes; it opens in one tap and works with no
+> signal.
 >
-> When you want to be on the board with everyone else, it's the CREW tab —
-> your name's already in there as <display name>.
+> When you want to be on the board with everyone else, it's the CREW tab — your
+> name's already in there as <display name>.
 >
 > Shout if anything looks wrong.
 
-Tell him plainly: **the link is the password.** Anyone holding it is that
-athlete. It should go to one person, in a private message.
+Tell him to **mark it sent** once it has gone out. That clears the stored password;
+after that the only way to see one again is a reset.
 
 ---
 
 ## Checking on them later
 
-Who has signed up and how much they have actually logged — the qualifying
-signal, and far better than an email address:
+Who has signed up and how much they have actually logged — the qualifying signal, and
+far better than an email address. From **coach.html → Contacts** (which calls
+`contact_list()` as the signed-in coach), or in SQL:
 
 ```sql
-select * from public.contact_list();
+select c.athlete_id, c.display_name, c.tier, c.created_at,
+       (o.athlete_id is not null) as on_board,
+       coalesce((select count(*) from jsonb_each(public.hab_log_of(ap.data, c.athlete_id)) d
+                 where jsonb_typeof(d.value) = 'object' and d.value <> '{}'::jsonb), 0) as days_logged
+from public.hab_contacts c
+left join public.leaderboard_optin o on o.athlete_id = c.athlete_id
+left join public.athlete_progress  ap on ap.athlete_id = c.athlete_id
+order by c.created_at desc;
 ```
 
-`days_logged` is the number to look at. Someone twenty days in with a long run
-on sleep is a warm lead who has already shown you their adherence. Someone at
-zero after three weeks never started, and a nudge is wasted on them.
+`days_logged` is the number to look at. Someone twenty days in with a long streak on
+sleep is a warm lead who has already shown you their adherence. Someone at zero after
+three weeks never started, and a nudge is wasted on them — though check they were ever
+given a login before writing them off.
 
-`on_board` says whether they took the board up. Someone logging steadily but
-still off it is worth one message — the board is the thing that keeps people
-coming back, and they may simply not have found the CREW tab.
+`on_board` says whether they took the board up. Someone logging steadily but still off
+it is worth one message — the board is the thing that keeps people coming back, and
+they may simply not have found the CREW tab.
 
 ## If they ask to be deleted
+
+`forget_contact()` is the main sweep, but **it is coach-only, so Amir runs it from a
+signed-in coach.html session**, and ⚠️ **it does not finish the job**:
 
 ```sql
 select public.forget_contact('sara_karimi');
 ```
 
-That clears their key, contact, progress, board entry and roll-call lines. Then
-delete `data/<athlete_id>.json` in a follow-up commit — the SQL cannot reach the
-repo.
+That clears `hab_notes`, `leaderboard_optin`, `athlete_progress`, `hab_contacts` and
+the (now vestigial) `athlete_keys` row. It leaves behind:
+
+- **`public.programs`** — their identity row. `delete from public.programs where athlete_id = '…';`
+- **their login** — `public.athlete_identities` plus the auth user itself. Revoke it
+  from **coach.html → Athletes → the athlete → Revoke login**, which goes through the
+  Edge Function; deleting the identity row alone leaves an orphaned auth account.
+- **`public.hab_titles`** and **`public.hab_season_results`** if they ever earned one.
+
+Do all of it, then confirm nothing is left:
+
+```sql
+select 'programs' t, count(*) from public.programs where athlete_id='sara_karimi'
+union all select 'identities', count(*) from public.athlete_identities where athlete_id='sara_karimi'
+union all select 'contacts',   count(*) from public.hab_contacts      where athlete_id='sara_karimi'
+union all select 'progress',   count(*) from public.athlete_progress  where athlete_id='sara_karimi'
+union all select 'titles',     count(*) from public.hab_titles        where athlete_id='sara_karimi';
+```
 
 ---
 
 ## Turning a free user into a coached athlete
 
-They stay the same athlete — same id, same key, same history, same link. Run
+They stay the same athlete — **same id, same login, same history**. That is the whole
+point: upgrading costs them nothing and they keep their level and board place. Run
 `/athlete-intake` and the rest of the coaching pipeline as normal, then:
 
-1. `data/<id>.json` gains the real programme (the pipeline writes it)
-2. Change `"tier": "free"` to `"tier": "coached"` — or drop the field, since
-   anything that is not `"free"` is treated as coached
-3. `select * from public.add_contact('<id>', null, null, null, 'coaching', 'coached');`
-   to update the tier on their contact row (it will not touch their key, their
-   name or their board entry)
+1. The programme row gains the real programme (the pipeline writes it into the same
+   `public.programs` row).
+2. Drop `athlete.tier` — anything that is not `"free"` is treated as coached — or set
+   it to `"coached"`. This is what unlocks WORKOUT.
+3. Update the tier on their contact row:
+   ```sql
+   update public.hab_contacts
+      set tier = 'coached', source = 'coaching', updated_at = now()
+    where athlete_id = 'sara_karimi';
+   ```
 
-Their XP, levels, runs and board position all survive, because none of it was
-ever tied to having a programme. The only thing that changes is that WORKOUT
-stops being locked.
+Their XP, levels, streaks and board position all survive, because none of it was ever
+tied to having a programme. Their login does not change either — the same username and
+password now opens `program.html` as well.

@@ -35,7 +35,7 @@ Static site on GitHub Pages → **amirardekani.com**, backed by Supabase.
 
 ## The app (`program.html`) — "a coach in your pocket"
 
-Each athlete opens a private link — `program.html?client=<id>&key=<key>` — and gets an **installable phone app** (PWA, "AA Performance"). This *is* the product the reels sell.
+Each athlete signs in with their own username and password at `program.html` and gets an **installable phone app** (PWA, "AA Performance"). This *is* the product the reels sell. (Private `?client=&key=` links were how this worked until 2026-09-07; they are retired.)
 
 **The system — "هیچی بی‌دلیل نیست / nothing without a reason":**
 
@@ -102,7 +102,7 @@ This is the human half of *"the coach actually watches you"* — the live app da
 
 ## Backend & plumbing (no server to run)
 
-- **Supabase** (hosted Postgres): backs up each athlete's progress to the cloud, powers the dashboard + two-way messaging, stores the weekly **call logs** and **cycle reports**, and enforces **per-athlete secret keys**.
+- **Supabase** (hosted Postgres): stores every programme, backs up each athlete's progress to the cloud, powers the dashboard + two-way messaging, stores the weekly **call logs** and **cycle reports**, and handles **athlete sign-in** (username + password, one account per athlete).
 - **Notion sync** (`sync_notion.py`): the exercise → demo-video library is generated from a Notion database, not hand-edited.
 
 ---

@@ -87,16 +87,23 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
    `{label, subtitle, days:[{label, focus, exercises:[{name, detail}]}]}` shape.
 2. Replace `workouts.days` with the new cycle.
 3. **Increment `currentCycleIndex` by 1.**
-4. Keep `athlete.key` byte-for-byte unchanged.
+4. Keep the whole `athlete` block unchanged — `id`, the names, `boardName` and `tier`
+   are identity, not programme. ⚠️ There is no `key` any more: if an old file still
+   carries `athlete.key`, drop it. It authorises nothing (`athlete_keys` is empty and
+   `get_program()` fails closed on that path).
 
 **NEW — create the file:**
-- Full skeleton, `currentCycleIndex: 0`, `cycles[]` from the locked roadmap, the key
-  from /athlete-intake (and confirm the `athlete_keys` row exists).
+- Full skeleton, `currentCycleIndex: 0`, `cycles[]` from the locked roadmap, and the
+  `athlete` block (`id`, `firstName`, `lastName`, `boardName`) exactly as /athlete-intake
+  registered it. **No key** — that mechanism is retired; see /athlete-intake Step 3.
+- Confirm instead that the athlete already has a `public.programs` row (intake creates
+  it, and it is what puts them on the roster). Publishing then updates that row rather
+  than inventing a second identity for the same person.
 
 ## Step 3 — Validate (do not skip)
 - `node -e "JSON.parse(require('fs').readFileSync('data/<id>.json','utf8')); console.log('valid')"`
-- Confirm `athlete.id`, `athlete.key` (length 32, unchanged), `currentCycleIndex`,
-  day count, and exercise count print as expected.
+- Confirm `athlete.id`, the `athlete` names, `currentCycleIndex`, day count, and
+  exercise count print as expected.
 - **Format lint** against /program-design rules: every `standard` has sets·reps·tempo·
   RPE·restSec; ballistic/carry correctly OMIT tempo and carry a `max intent` chip;
   warm-up/prep items carry NO RPE chip and prep circuits have `"warmup": true`;
@@ -165,11 +172,14 @@ console.log('done');
 `GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
 
 ## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the Exercise Ledger
-Persist the **COACHING LOG ENTRY** from /program-design to `.claude/coaching-log/<id>.md` — the
-coach-only record of WHY this cycle looks the way it does (the read, decisions, volume,
-progression levers, e1RM). This file is git-tracked but **unpublished** (inside `.claude/`, so
-GitHub Pages never serves it) and the athlete app never reads it — it is the one place the design
-reasoning is allowed to live. See `.claude/coaching-log/README.md` for the convention + template.
+Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this
+cycle looks the way it does (the read, decisions, volume, progression levers, e1RM).
+⚠️ **The record is the `public.coaching_logs` row, not a file.** Coach-only, read from
+coach.html → athlete → File; Step 7 (*The coaching log goes to the server too*) has the
+splice. `.claude/coaching-log/<id>.md` is a **gitignored local working copy** — build the
+entry there if it helps, then write it to the row. It used to be git-tracked in this PUBLIC
+repo, world-readable, which is exactly why it moved; never re-add it to git. The athlete app
+reads neither. See `.claude/coaching-log/README.md` for the convention + template.
 - **File missing (new athlete):** create it with the README's header
   (`# Coaching Log — <First Last> (<id>)` + the coach-only note), an empty **Exercise Ledger**
   table (header row only — see README "Exercise Ledger"), then the entry.
@@ -241,7 +251,9 @@ localise a mistake. Publish in stages, one top-level key per statement, verifyin
 **Dollar-quote everything** (`$W$ … $W$`) and check the payload does not contain your tag.
 Apostrophes are everywhere in athlete-facing copy and single-quoting will shred it.
 
-**Never touch `athlete.key`.** Assert it is unchanged after every statement.
+**Never touch the `athlete` block.** Assert `athlete.id` and the names are unchanged after
+every statement — a `jsonb_set` on the wrong path rewrites identity silently. (An old file
+may still carry a dead `athlete.key`; it authorises nothing and can simply go.)
 
 **The version trigger does the backup for you.** `programs_version_trg` snapshots the row
 into `program_versions` on every update, so the pre-publish state is preserved automatically
@@ -273,13 +285,17 @@ are both plain text, so a straight `md5(body)` comparison IS valid — use it.
 
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm both the programme row
   and the coaching-log row verified.
-- No node on this machine — validate JSON and compute fingerprints with **Python**.
+- Node **is** on this machine (v24), so `node -e` works for JSON validation; Python is
+  equally fine and is what the rest of this skill uses for fingerprints.
 - Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
   gitignored; there is normally nothing to commit at all.
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.
-- Don't regenerate `athlete.key`; reuse across all of an athlete's cycles.
+- Don't add, reuse or regenerate an `athlete.key`, and don't hand out a `?client=&key=`
+  link — that whole mechanism is retired and a key written today authorises nothing.
+  Athletes sign in with a username and password Amir creates from coach.html.
 - Don't write athlete chat/health detail or coach reasoning into `data/<id>.json` or any
-  **published** path — the design rationale's only home is the coach-only, unpublished
-  `.claude/coaching-log/<id>.md` (never the athlete JSON).
+  **published** path — the design rationale's only home is the coach-only
+  `public.coaching_logs` row (never the athlete JSON). The local
+  `.claude/coaching-log/<id>.md` is a gitignored working copy of that row, nothing more.

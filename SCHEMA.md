@@ -9,7 +9,8 @@
 
 - Required keys: `athlete.id`, `athlete.firstName`, `athlete.lastName`, `currentCycleIndex`, `cycles`, `workouts`, `workouts.days`.
 - `athlete.id` must be lowercase `firstname_lastname` (appears in the URL and localStorage).
-- `athlete.key` is a 32-char hex secret that authorises this athlete's cloud backup. Generate one per athlete and **also register it server-side** in the Supabase `athlete_keys` table (see "`athlete.key` & cloud backup"). Without it, progress still saves but is unprotected.
+- ⚠️ **`athlete.key` is RETIRED — do not generate one.** Athletes are authorised by a signed-in session now, not a secret in the file. See "How an athlete is authorised" below.
+- `athlete.tier` is `"free"` for a free Proof user and absent (or `"coached"`) for a coaching client. It is the **only** switch — `isFree()` in `habits.html` reads exactly this field.
 - `currentCycleIndex` is 0-based. `0` means the athlete is on the first cycle in `cycles`.
 - Every `days[]` entry must have a **unique numeric** `id` (1, 2, 3…).
 - Every day must contain at least one `block`; every block must contain at least one `exercise`.
@@ -161,7 +162,8 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 ### Placeholder guidance
 
 - `athlete.id` → lowercase, underscore-separated (e.g. `john_doe`).
-- `athlete.key` → 32-char hex secret (generate with `crypto.randomUUID().replace(/-/g,'')`). Reused across all of an athlete's cycles. Must also be registered in the Supabase `athlete_keys` table — see "`athlete.key` & cloud backup".
+- `athlete.boardName` → the name they chose, used only to pre-fill the join box in Proof's Crew tab. It never joins anyone to the leaderboard.
+- `athlete.tier` → `"free"` for a free Proof user; omit for a coaching client.
 - `sport.badge` → short line shown above the name, e.g. `"🎾 Tennis Performance"`. Omit the whole `sport` object if not relevant.
 - `focuses[]` → one-line training focus statements. Any number allowed.
 - `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
@@ -244,7 +246,9 @@ card has something to open (see "Advancing to the Next Cycle").
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `athlete.id` | string | ✅ | Unique ID, used for localStorage. Format: `firstname_lastname` |
-| `athlete.key` | string | recommended | 32-char hex secret for protected cloud backup. Must match the athlete's row in the Supabase `athlete_keys` table (see below). |
+| `athlete.key` | string | ⚠️ **retired** | Dead field. Authorises nothing (`athlete_keys` is empty and every keyed path fails closed). Don't add it; drop it from old files. |
+| `athlete.tier` | string | optional | `"free"` = free Proof user (locks WORKOUT, swaps programme links for coaching CTAs). Absent or anything else = coached. |
+| `athlete.boardName` | string | optional | Name used to pre-fill Proof's Crew join box. Joins nobody to the board. |
 | `athlete.firstName` | string | ✅ | First name (white in hero) |
 | `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
 | `athlete.avatar` | string | optional | URL or path to athlete's photo. Falls back to initials when missing. |
@@ -257,35 +261,29 @@ card has something to open (see "Advancing to the Next Cycle").
 
 > **Note:** The coach line was removed from the home screen — Amir is always the coach.
 
-#### `athlete.key` & cloud backup
+#### How an athlete is authorised
 
-Every athlete gets a private 32-char hex `key` (a UUID with dashes stripped:
-`crypto.randomUUID().replace(/-/g,'')`). It authorises that athlete's progress
-writes to the cloud. **Two places must hold the same value:**
+⚠️ **The secret-key mechanism is retired (2026-09-07).** `public.athlete_keys` is empty,
+every `?client=<id>&key=<key>` link is refused, and a key written today authorises nothing.
+`athlete.key` in an old file is dead weight — drop it.
 
-1. **The JSON** — `athlete.key` in `data/<id>.json`.
-2. **The database** — a row in the Supabase `athlete_keys` table
-   (`athlete_id`, `secret_key`).
+**Athletes sign in with a username and password.** The account is created from
+coach.html → Athletes → the athlete → **Create login**, which calls the `athlete-login`
+Edge Function (it needs the service-role key, so it cannot be done in SQL) and writes
+`public.athlete_identities`. The username is the `athlete_id`; the account sits on an
+internal address `athlete.<id>@amirardekani.com` that never receives mail.
 
-The app sends the key on every cloud write; `save_progress` rejects the write
-only when a row exists for that `athlete_id` and the key doesn't match:
+Every server-side check now asks the same question — *is this the signed-in athlete?*
 
-| JSON key | DB row | Result |
-|---|---|---|
-| present | present & matching | writes succeed, **protected** ✅ (do this) |
-| present | none | writes succeed but **unprotected** (anyone could write as that athlete) |
-| missing/wrong | present | writes **rejected** — the coach never sees the data |
+| Function | Allows |
+|---|---|
+| `get_program(id, key)` | `id = 'demo'` (the public showcase), `is_coach()`, or `id = current_athlete_id()`. Falls through to the key check, which always fails. |
+| `save_progress(...)` | `is_coach()`, or `athlete_id = current_athlete_id()`. Same dead key fallback. |
+| `current_athlete_id()` | `select athlete_id from athlete_identities where user_id = auth.uid()` |
 
-Register the key once when creating the athlete:
-
-```sql
-insert into public.athlete_keys (athlete_id, secret_key)
-values ('firstname_lastname', '<32-char-hex>')
-on conflict (athlete_id) do nothing;
-```
-
-Reuse the **same** key across all of an athlete's cycles/programs — don't
-regenerate (e.g. `mhrn_zhr1` and `mhrn_zhr2` share one key).
+So an athlete with **no login has no way in at all** — there is no link to fall back on,
+and `data/<id>.json` is 404 on the live site. Creating the login is part of onboarding,
+not an optional extra.
 
 ---
 
@@ -706,8 +704,10 @@ single unbroken paragraph, it renders as one dense block with no visual structur
 1. Copy any existing JSON file (e.g. `john_doe.json`)
 2. Rename to `new_athlete.json`
 3. Update `athlete`, `sport`, `cycles`, and `workouts`
-4. Generate a fresh `athlete.key` and register it in the Supabase `athlete_keys` table (see "`athlete.key` & cloud backup")
-5. Send the athlete: `yoursite.github.io/program.html?client=new_athlete`
+4. Publish it into `public.programs` — coach.html → Athletes → **↑ Publish programme file**.
+   `data/*.json` is gitignored and 404 on the live site; the row is what the app serves.
+5. Give them a login — coach.html → Athletes → the athlete → **Create login**, then send the
+   username and password. ⚠️ **Not** a `?client=` link: those are retired and refused.
 
 No HTML editing required.
 
@@ -833,6 +833,8 @@ stat cells, so leaving them out breaks nothing.
 {
   "id": "full-body-power", "title": "Full-Body Power",
   "category": "strength", "duration": "45 min", "equipment": "Barbell",
+  // Which habit "Mark as done" ticks in AA Proof. REQUIRED — see below.
+  "countsAs": "strength",
   "focusTag": "Full-Body Strength",
   "blocks": [
     { "title": "Strength", "icon": "🎯", "exercises": [
@@ -849,16 +851,36 @@ stat cells, so leaving them out breaks nothing.
 
 Tapping a card opens the workout in its own session screen, which reuses the
 same exercise cards as the training screen (video, sets/reps, coaching cues,
-rest timer). Check-off here is **local-only and resets daily**: ticks are stored
-in the browser under `wkout_<id>` with the date they were made, survive a
-same-day reload, and clear automatically on a new calendar day. Library workouts
-are **not** tied to an athlete — they never write set-logs, RPE, or cloud backup,
-and there is no finish/send-to-coach step.
+rest timer). Per-exercise check-off is **local-only and resets daily**: ticks are
+stored in the browser under `wkout_<id>` with the date they were made, survive a
+same-day reload, and clear automatically on a new calendar day. A library workout
+never writes set-logs, RPE or a cloud backup of its exercise ticks.
+
+**The one thing that does reach the server is `Mark as done`** at the foot of the
+screen. It writes a single row to `public.library_sessions` — athlete, workout,
+date, and nothing else — which feeds the athlete's habits and the coach's report.
+The button is hidden for a signed-out visitor, in demo mode, and in coach preview.
+Its own done-state is stored under `wkdone_<id>` and resets daily the same way.
+
+#### `countsAs` — which habit a library workout ticks
+
+| Value | Ticks in AA Proof | For |
+|---|---|---|
+| `"strength"` | the **WORKOUT** habit | a real session: strength, conditioning, on-court speed (~25 min and up) |
+| `"mobility"` | the **MOBILITY** habit | a mobility flow or a recovery session (~10–20 min) |
+| `"none"` | nothing | a **warm-up** — part of a session, not a session |
+
+**Required.** The server whitelists the value and falls through to "counts for
+nothing" on anything it does not recognise, so omitting it is safe but silent.
+**Do not derive it from the category** — `on-court` holds both a speed session and
+a warm-up, and `conditioning` holds both an engine session and a run warm-up.
+When torn between `strength` and `mobility`, pick `mobility`: WORKOUT is 28.6% of
+the day score. Full reasoning: `supabase/stage28_library_sessions.sql`, `HABITS.md`.
 
 ### Adding a workout
 
 1. Create the workout JSON in `workouts/<category>/<id>.json` (with `title`,
-   `duration`, `equipment`, `focusTag`, `blocks`).
+   `duration`, `equipment`, `countsAs`, `focusTag`, `blocks`).
 2. Add an entry to that category's `workouts` array in `index.json` with the
    **same** `title` / `duration` / `equipment` and the `file` path.
 3. Commit + push. The Workouts tab picks it up on next load.
