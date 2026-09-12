@@ -92,6 +92,20 @@
     // it instead of ahead of it.
     try { window.LAST_ATHLETE = localStorage.getItem('aa_athlete_id') || ''; }
     catch (e) { window.LAST_ATHLETE = ''; }
+    // The username typed at the last successful sign-in, prefilled into the login
+    // form. A page cannot save a PASSWORD - that prompt belongs to the browser and
+    // the OS - but it can spare the athlete the other field.
+    // ⚠️ Read HERE, not next to showSignIn(), for the same reason HAS_SESSION is:
+    // with no session boot() reaches showSignIn() with no `await` above it, i.e.
+    // while this script is still being evaluated, so a `const` declared down
+    // beside the sign-in code would still be in its temporal dead zone.
+    // ⚠️ Deliberately NOT aa_athlete_id, which sign-out clears: that one is an
+    // authority-adjacent optimisation and MUST go when the athlete does. This one
+    // is meant to outlive a sign-out - signing back in on your own phone should
+    // find your username waiting. It is a convenience and never an authority:
+    // nothing reads it but the prefill, and the password is still required.
+    try { window.LAST_USER = localStorage.getItem('aa_last_user') || ''; }
+    catch (e) { window.LAST_USER = ''; }
     // IMPORTANT: keep the &key= in the installed-app start_url. Without it, an
     // athlete who "Add to Home Screen" opens the app with no key, so every
     // key-checked cloud write (save_session / save_progress / messages) is
@@ -254,6 +268,20 @@
   .signin-f input { width: 100%; box-sizing: border-box; font-size: 16px; padding: 12px 13px;
     border: 1.5px solid #d9e0dd; border-radius: 11px; background: #fff; color: #1A1A1A; }
   .signin-f input:focus { outline: none; border-color: var(--court, #0E4A36); }
+  /* Reveal toggle. The input gains room on the right so revealed text never
+     runs under the button, and the button sits over that gap, not over the text. */
+  .signin-f .si-wrap { position: relative; }
+  .signin-f .si-wrap input { padding-right: 52px; }
+  .si-eye { position: absolute; top: 0; right: 0; width: 48px; height: 100%;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+    background: none; border: 0; cursor: pointer; color: #7d8a86;
+    -webkit-tap-highlight-color: transparent; }
+  .si-eye:focus-visible { outline: 2px solid var(--court, #0E4A36); outline-offset: -4px;
+    border-radius: 0 11px 11px 0; }
+  .si-eye svg { width: 20px; height: 20px; display: block; }
+  .si-eye .si-eye-slash { display: none; }
+  .si-eye.on { color: var(--court, #0E4A36); }
+  .si-eye.on .si-eye-slash { display: block; }
   .signin-go { width: 100%; padding: 14px; font-size: 15px; font-weight: 700; color: #fff;
     background: var(--court, #0E4A36); border: 0; border-radius: 11px; cursor: pointer; margin-top: 4px; }
   .signin-go[disabled] { opacity: .6; cursor: default; }
@@ -2836,7 +2864,23 @@
     </label>
     <label class="signin-f">
       <span>Password</span>
-      <input id="si-pass" name="password" type="password" autocomplete="current-password" required>
+      <!-- Reveal toggle. type="button" or every tap submits the form - and note the
+           form's own onsubmit="return false" above, which is what makes a stray
+           submit in here harmless rather than a password in the URL bar. The input
+           keeps autocomplete="current-password" in BOTH states: strip it and the
+           password manager stops offering to fill the field at all. 48px of
+           target, because this is read off a WhatsApp message on a phone. -->
+      <div class="si-wrap">
+        <input id="si-pass" name="password" type="password" autocomplete="current-password" required>
+        <button type="button" class="si-eye" id="si-eye" aria-label="Show password" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M1.8 12S5.6 5.4 12 5.4 22.2 12 22.2 12 18.4 18.6 12 18.6 1.8 12 1.8 12Z"/>
+            <circle cx="12" cy="12" r="3.1"/>
+            <line class="si-eye-slash" x1="3.6" y1="20.4" x2="20.4" y2="3.6"/>
+          </svg>
+        </button>
+      </div>
     </label>
     <button class="signin-go" id="si-go" type="submit">Sign in</button>
     <div class="signin-err" id="si-err" hidden></div>
@@ -3953,8 +3997,36 @@ function showSignIn() {
     passEl.addEventListener(ev, stopAuto, { once: true });
   });
 
+  // Remembered username (read in the head - see window.LAST_USER). Never
+  // overwrites what a password manager has already filled.
+  if (window.LAST_USER && !userEl.value) userEl.value = window.LAST_USER;
+
+  // Reveal toggle. Flips the input's type and nothing else, so the autocomplete
+  // name stays put in both states.
+  const eye = document.getElementById('si-eye');
+  function setReveal(show) {
+    passEl.type = show ? 'text' : 'password';
+    if (!eye) return;
+    eye.classList.toggle('on', show);
+    eye.setAttribute('aria-pressed', show ? 'true' : 'false');
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  }
+  if (eye) eye.addEventListener('click', (e) => {
+    e.preventDefault();            // the button sits inside the field's <label>
+    setReveal(passEl.type === 'password');
+    // Tapping reveal means "let me read this before it goes", so the auto-submit
+    // above must not fire the form out from under them.
+    stopAuto();
+    try { passEl.focus(); } catch (err) { /* focus is a nicety, not a requirement */ }
+  });
+
   form.onsubmit = async (e) => {
     e.preventDefault();
+    // Back to a real password field before anything else. A revealed field is a
+    // text field, and a form that submits without a password field in it is not a
+    // login form as far as the browser's save prompt is concerned - so leaving it
+    // revealed would break the very prompt the block below is trying to earn.
+    setReveal(false);
     const user = (document.getElementById('si-user').value || '').trim().toLowerCase();
     const pass = document.getElementById('si-pass').value || '';
     if (!user || !pass) return;
@@ -3970,10 +4042,35 @@ function showSignIn() {
         password: pass,
       });
       if (error) throw error;
+
+      // One field fewer next time, here and in habits.html (same origin, same key).
+      try { localStorage.setItem('aa_last_user', user); } catch (e) { /* storage blocked */ }
+
+      // Nothing here can *make* the phone save the password. That prompt belongs
+      // to the browser and the OS, and it fires on its own once they recognise a
+      // login form - which is what the autocomplete names on the fields are for.
+      // All we can do is stop getting in its way:
+      //   - Chromium keeps a credential store we are allowed to write to, and
+      //     writing to it is what raises its save bubble. Absent on iOS Safari,
+      //     so treat it as a bonus and never as the mechanism.
+      //   - The prompt is raised once the submit has been registered, so leaving
+      //     the page the instant the request resolves can outrun it. Hence the
+      //     short beat below, with the button saying why it is waiting.
+      // Timed and swallowed: a store that is declined, absent, or simply slow
+      // must never be the reason an athlete cannot get into their programme.
+      try {
+        if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+          await _withTimeout(
+            navigator.credentials.store(new PasswordCredential({ id: user, password: pass })), 1200);
+        }
+      } catch (e) { /* unsupported or refused - carry on regardless */ }
+
       // Reload rather than booting in place: every later stage reads DATA and
       // ATHLETE_ID as boot-time constants, and re-entering boot() would double
-      // up the cloud-sync and timer wiring.
-      location.replace('program.html');
+      // up the cloud-sync and timer wiring. replace() rather than assign() is
+      // kept on purpose - it stops Back landing on the sign-in card again.
+      btn.textContent = 'Signed in';
+      setTimeout(() => location.replace('program.html'), 400);
       return;
     } catch (err) {
       errBox.textContent = /invalid|credentials/i.test(err.message || '')
