@@ -2266,7 +2266,7 @@
     padding: 20px 18px; margin-top: 16px; }
   .ceil-hero-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 54px;
     line-height: 0.86; letter-spacing: -2px; }
-  .ceil-hero-v small { font-size: 22px; letter-spacing: 0; }
+  .ceil-hero-v small { font-size: 28px; letter-spacing: 0; margin-left: 2px; }
   .ceil-hero-l { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase; margin-top: 10px; }
   .ceil-hero-s { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.07em;
@@ -3221,7 +3221,7 @@
      from AA Proof so relative strength can be shown. -->
 <div id="screen-ceiling" class="screen">
   <div class="ceil-head">
-    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to My Plan">←</button>
+    <button class="nav-back" onclick="ceilingBack()" aria-label="Back">←</button>
     <div class="ceil-kick">— Your numbers</div>
     <div class="ceil-title" id="ceil-title">The Ceiling</div>
   </div>
@@ -5693,6 +5693,14 @@ function goTo(screen, historyId, keepContent) {
   // Library tab — Read + Train sections. Both built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
+  // My Plan — refresh the Ceiling card. renderPlan() only runs at boot, so
+  // without this an estimate saved during today's session would not appear on
+  // the card until the app was reloaded.
+  if (screen === 'plan') {
+    const pc = document.getElementById('plan-ceiling-wrap');
+    if (pc) pc.innerHTML = ceilingCardHtml();
+  }
+
   // The Ceiling — rebuilt on every visit so a max saved mid-session shows.
   // `keepContent` is set when renderCeilingLift() routes here itself; it has
   // already painted the per-lift view and must not be overwritten.
@@ -5797,8 +5805,9 @@ function habitCardHtml() {
 function ceilingCardHtml() {
   const lifts = ceilingLifts();
   const top = lifts.slice(0, 3);
+  // Columns follow the number of lifts, so one or two never leave a dead gap.
   const mini = top.length ? `
-    <div class="ceil-mini">${top.map(l => `
+    <div class="ceil-mini" style="grid-template-columns: repeat(${top.length}, 1fr)">${top.map(l => `
       <div><div class="ceil-mini-n">${l.latest.kg}</div><div class="ceil-mini-l">${esc(shortLift(l.lift))}</div></div>`).join('')}
     </div>` : '';
   return `
@@ -5806,7 +5815,9 @@ function ceilingCardHtml() {
       <div class="home-section-title">Strength</div>
     </div>
     <button type="button" class="habit-card" onclick="goTo('ceiling')">
-      <div class="habit-card-lv" style="background: var(--ice)">
+      <!-- No accent override here: #screen-plan deliberately remaps --ice to
+           green so My Plan reads as a single-accent page. Let it be green. -->
+      <div class="habit-card-lv">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg>
       </div>
       <div class="habit-card-body">
@@ -5841,8 +5852,19 @@ function fmtCeilDate(iso) {
   return d.getDate() + ' ' + m[d.getMonth()];
 }
 
+// Which lift's history is open, or null on the all-lifts view. Drives the back
+// chevron, which goes exactly ONE step — out of a lift to the list, and only
+// from the list back to My Plan.
+let _ceilLift = null;
+function ceilingBack() {
+  if (_ceilLift) renderCeiling();
+  else goTo('plan');
+}
+window.ceilingBack = ceilingBack;
+
 // The Ceiling screen — relative strength on top, then one row per lift.
 function renderCeiling() {
+  _ceilLift = null;
   document.getElementById('ceil-title').textContent = 'The Ceiling';
   const lifts = ceilingLifts();
   const body  = document.getElementById('ceil-body');
@@ -5884,12 +5906,15 @@ function renderCeiling() {
       </div>`;
   }
 
-  const rows = lifts.map(l => {
+  // Rows address their lift by INDEX, not by name. esc() escapes < > & but not
+  // quotes, so a perfectly ordinary name like `6" Deficit Deadlift` would break
+  // out of the onclick attribute and kill the row.
+  const rows = lifts.map((l, i) => {
     const up = l.delta > 0, flat = l.delta === 0;
     const trend = l.entries.length < 2 ? 'First estimate'
       : (up ? '▲ ' : flat ? '' : '▼ ') + (flat ? 'No change yet' : Math.abs(l.delta) + ' kg since you started');
     return `
-      <button type="button" class="ceil-lift" onclick="renderCeilingLift('${esc(l.lift).replace(/'/g, "\\'")}')">
+      <button type="button" class="ceil-lift" onclick="renderCeilingLiftAt(${i})">
         <div class="ceil-lift-m">
           <div class="ceil-lift-n">${esc(l.lift)}</div>
           <div class="ceil-lift-d ${up ? 'ceil-up' : (!flat && l.entries.length > 1) ? 'ceil-down' : ''}">${trend}</div>
@@ -5911,6 +5936,7 @@ function renderCeilingLift(lift) {
   const l = ceilingLifts().find(x => x.lift === lift);
   if (!l) return;
   goTo('ceiling', null, true);
+  _ceilLift = lift;
   document.getElementById('ceil-title').textContent = lift;
 
   const v = l.entries.map(e => e.kg);
@@ -5936,11 +5962,16 @@ function renderCeilingLift(lift) {
       ${rows}
     </div>
     <div class="ceil-note">Every entry names the set it came from.<br>
-      Heavier sets closer to failure give the sharper numbers.</div>
-    <button type="button" class="ceil-ask-b" style="width:100%;margin-top:16px"
-      onclick="renderCeiling()">← All lifts</button>`;
+      Heavier sets closer to failure give the sharper numbers.</div>`;
   window.scrollTo(0, 0);
 }
+// Rows call this with their position in ceilingLifts() — see the note there on
+// why a lift is never addressed by name from an HTML attribute.
+function renderCeilingLiftAt(i) {
+  const l = ceilingLifts()[i];
+  if (l) renderCeilingLift(l.lift);
+}
+window.renderCeilingLiftAt = renderCeilingLiftAt;
 window.renderCeilingLift = renderCeilingLift;
 window.renderCeiling = renderCeiling;
 
