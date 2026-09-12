@@ -2345,13 +2345,14 @@
      arrows, and the FIGURE carries the clay — the number is the hottest thing
      on the card. Legible in light and dark mode without a single override,
      which a near-black surface would not be (#202020 cards in dark mode). */
+  /* Inset to match the day cards exactly — they sit 24px from each edge, and a
+     full-bleed card below them read as a different, wider component. */
   .nc {
-    display: block; width: 100%; text-align: left;
+    display: block; width: calc(100% - 48px); text-align: left;
     background: #122A22; border: none; border-radius: 14px;
     padding: 17px; color: #fff; cursor: pointer;
-    margin: 0 0 12px;
+    margin: 0 24px 12px;
   }
-  .nc + .nc { margin-top: 12px; }
   .nc-k { display: flex; align-items: center; gap: 7px;
     font-family: 'Space Mono', monospace; font-size: 8.5px; font-weight: 700;
     letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.58); }
@@ -4595,8 +4596,18 @@ function cycleSlug(name) {
 
 function cycleCardHTML(cycle, opts) {
   opts = opts || {};
-  const cls = 'current-message' + (opts.onclick ? ' is-clickable' : '');
-  const attrs = opts.onclick ? ` role="button" tabindex="0" onclick="${opts.onclick}"` : '';
+  // Cycle cards open EXPANDED (Amir, 2026-09-12). The whole point of My Plan is
+  // the reasoning behind each block, and hiding it behind "Read more" meant most
+  // athletes never read a word of it. They can still collapse any card, and
+  // toggleCycleCard() below flips it back the other way.
+  const cls = 'current-message is-open' + (opts.onclick ? ' is-clickable' : '');
+  // ⚠️ The card's own tap must ignore taps on the Read less/more button inside
+  // it. stopPropagation() in toggleCycleCard() was not enough on its own — a
+  // tap on the toggle of a clickable card both collapsed it AND navigated away.
+  // Checking the target here cannot fail whatever the event does.
+  const attrs = opts.onclick
+    ? ` role="button" tabindex="0" onclick="if(event.target.closest('.cm-toggle'))return; ${opts.onclick}"`
+    : '';
   let h = `<div class="${cls}"${attrs}>`;
 
   // ── Image banner (full-bleed top of the card). We point an <img> at
@@ -4670,8 +4681,9 @@ function cycleCardHTML(cycle, opts) {
   if (detail) {
     // Toggle button lives on the banner (bottom-right); the collapsible body
     // sits below it. Close the banner div first, then add the body.
-    h += `<button class="cm-toggle" aria-expanded="false" onclick="toggleCycleCard(this, event)">`;
-    h += `<span class="cm-toggle-label">Read more</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
+    // Starts expanded, so the button starts as the way OUT of the card.
+    h += `<button class="cm-toggle" aria-expanded="true" onclick="toggleCycleCard(this, event)">`;
+    h += `<span class="cm-toggle-label">Read less</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
     h += `</button>`;
     h += `</div>`; // .cm-banner
     h += `<div class="cm-collapse"><div class="cm-cardbody">${detail}</div></div>`;
