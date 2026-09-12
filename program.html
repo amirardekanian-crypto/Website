@@ -2223,8 +2223,22 @@
     font-family: 'Space Mono', monospace; font-style: normal;
     font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--ice); margin-left: 5px;
   }
-  .ex-1rm-from {
+  /* How much to trust the number — one word, coloured by how close the set was
+     to a true single. Green = sharp, clay = good, grey = rough. */
+  .ex-1rm-grade {
     margin-top: 9px; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 1.4px; text-transform: uppercase;
+  }
+  .ex-1rm-grade:empty { display: none; }
+  .ex-1rm-grade.g1 { color: var(--yellow); }
+  .ex-1rm-grade.g2 { color: var(--ice); }
+  .ex-1rm-grade.g3 { color: var(--grey-text); }
+  body[data-dark] .ex-1rm-grade.g1 { color: #4e9d7e; }
+  body[data-dark] .ex-1rm-grade.g3 { color: #8a8a8a; }
+
+  .ex-1rm-from {
+    margin-top: 5px; text-align: center;
     font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.9px;
     text-transform: uppercase; color: var(--grey-text); line-height: 1.7;
   }
@@ -5410,6 +5424,13 @@ const APP_GUIDE = [
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
+  { icon: 'activity', title: 'Your estimated max (The Ceiling)',
+    body: `<p>Once you log a weight <em>and</em> an RPE on a set, the app works out what you could probably lift for one rep. That number is your estimated max. You never have to test it.</p>
+    <p><strong>Why your RPE matters here.</strong> RPE 8 means you stopped with about 2 reps left. So a set of 5 at RPE 8 is really a set of 7 in you. The app adds those reps back before it does the maths, which is why logging an honest RPE gives a much better number than the weight alone.</p>
+    <p><strong>How to get a number you can trust.</strong> Heavy and close to failure. A hard set of 3 at RPE 9 gives a far sharper estimate than an easy set of 10 at RPE 7 — you are simply much better at judging how many reps you have left when there are only one or two of them. Long sets are a guess, and past 10 reps in the tank the app will tell you it can't give you a number rather than make one up.</p>
+    <p>Every estimate is labelled <strong>Sharp</strong>, <strong>Good</strong> or <strong>Rough</strong> so you always know how much to trust it.</p>
+    <p><strong>Keep logging.</strong> One estimate is a snapshot and can be out by a few kilos either way. Several of them over a few weeks show the real line — whether you're going up, and how fast. That trend is worth far more than any single number, and it's what I look at.</p>
+    <p>It is an estimate, not a target. Your programme is still prescribed in RPE — never load a percentage off this number.</p>` },
   { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
     body: `<p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
@@ -7444,8 +7465,28 @@ function attachSetLog(card) {
 // means the athlete stopped 2 reps short, so the set they COULD have done is 7.
 // Estimating off the 5 they did would undersell them by roughly 7%.
 //   reps in reserve = 10 − RPE      effective reps = reps + reps in reserve
-const ONE_RM_MAX_EFFECTIVE = 12;   // past this an estimate is guesswork — refuse instead
+// 10, not 12. Rep-max equations hold their accuracy under about 10 reps and
+// lose it above (Mayhew 2008 found prediction held where fewer than 10
+// reps-to-fatigue were used; Whisenant 2003 and Mayhew 2002 both report
+// validity falling as repetitions rise). Above this the app says so instead of
+// printing a number it cannot stand behind.
+const ONE_RM_MAX_EFFECTIVE = 10;
 const ONE_RM_ROUND_KG      = 2.5;  // the smallest real plate jump; finer is fake precision
+
+// How much to trust the number, from the one thing that drives it: how close
+// the set was to a true single. Effective reps already fold in the RPE, so a
+// heavy triple at RPE 9 scores better than a set of 8 at RPE 7.
+//
+// This is the evidence talking, not a feel: an athlete's own sense of reps in
+// reserve is roughly 2 reps out at RPE 9 but 5 reps out at RPE 5, and error
+// grows with the number of reps in the set (Zourdos 2021). Both halves of that
+// — closer to failure, fewer reps — point the same way, which is why one
+// number can carry the whole message.
+function ceilingQuality(effective) {
+  if (effective <= 3) return { label: 'Sharp estimate', hint: 'Heavy and close to failure. This is about as good as an estimate gets.' };
+  if (effective <= 6) return { label: 'Good estimate',  hint: 'Fewer reps at a higher RPE would sharpen it further.' };
+  return                     { label: 'Rough estimate', hint: 'Long sets are hard to judge. Go heavier, closer to failure, for a sharper number.' };
+}
 
 // Epley, run on effective reps rather than performed reps. A true single taken
 // to RPE 10 estimates as itself (Epley alone would inflate it by 3%).
@@ -7517,14 +7558,16 @@ function attachCeiling(card) {
         <div class="ex-1rm-field"><input class="ex-1rm-rpe" type="text" inputmode="numeric" aria-label="RPE"><span>rpe</span></div>
       </div>
       <div class="ex-1rm-out"></div>
+      <div class="ex-1rm-grade"></div>
       <div class="ex-1rm-from"></div>
     </div>`;
   logSlotFor(card).appendChild(box);
 
   const line = box.querySelector('.ex-1rm-line');
   const txt  = box.querySelector('.ex-1rm-txt');
-  const out  = box.querySelector('.ex-1rm-out');
-  const from = box.querySelector('.ex-1rm-from');
+  const out   = box.querySelector('.ex-1rm-out');
+  const grade = box.querySelector('.ex-1rm-grade');
+  const from  = box.querySelector('.ex-1rm-from');
   const fKg  = box.querySelector('.ex-1rm-kg');
   const fRp  = box.querySelector('.ex-1rm-rp');
   const fRpe = box.querySelector('.ex-1rm-rpe');
@@ -7539,19 +7582,25 @@ function attachCeiling(card) {
     const est = estimateOneRM(parseLoggedKg(fKg.value), fRp.value, fRpe.value);
     if (est == null) {
       out.innerHTML = `<b>&mdash;</b>`;
-      from.innerHTML = 'Enter a weight, reps and an RPE.<br>Above 12 effective reps a max is a guess, not an estimate.';
+      grade.textContent = '';
+      grade.className = 'ex-1rm-grade';
+      from.innerHTML = 'Enter a weight, reps and an RPE.<br>Past '
+        + ONE_RM_MAX_EFFECTIVE + ' reps in the tank a max is a guess, not an estimate.';
       txt.textContent = 'Estimate a max';
       return;
     }
     const rir  = Math.max(0, 10 - Number(fRpe.value));
-    const tank = rir === 0 ? 'Taken to failure'
+    const eff  = Number(fRp.value) + rir;
+    const q    = ceilingQuality(eff);
+    const tank = rir === 0 ? 'taken to failure'
                            : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in the tank';
     out.innerHTML = `<b>${est}</b><i>KG</i>`;
-    // NOTE: when The Ceiling section lands on My Plan, this last line becomes
-    // the pointer to it ("Your maxes live in The Ceiling, on My Plan"). Until
-    // then it must not name a screen that isn't there.
-    from.innerHTML = source + '<br>' + tank
-      + '<br>Estimate only. Not a weight to load.';
+    grade.textContent = q.label;
+    grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
+    // NOTE: when The Ceiling section lands on My Plan, a fourth line points at
+    // it ("Your maxes live in The Ceiling, on My Plan"). Until then it must not
+    // name a screen that isn't there.
+    from.innerHTML = source + ' &middot; ' + tank + '<br>' + q.hint;
     txt.textContent = '≈ ' + est + ' kg est. max';
   }
 
