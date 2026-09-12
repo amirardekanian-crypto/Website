@@ -81,7 +81,9 @@ change before I build?"* before writing exercises.
    - RETURNING → invoke the **`athlete-brief`** subagent (MODE=returning), passing any
      check-in chat Amir pasted. It returns the one-page brief (loads, RPE, readiness,
      **e1RM from heaviest logged sets**, injuries) and imports any missing sessions. Use
-     the brief — don't re-pull raw data.
+     the brief — don't re-pull raw data. The athlete also has a dated estimated-1RM
+     history of their own — see **The Ceiling** below for what it is and how it may be
+     used when you set loads.
    - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
      /athlete-intake first.
 5. **RETURNING — read the prior rationale:** read `.claude/coaching-log/<id>.md` if it exists.
@@ -421,8 +423,58 @@ Amir drives week-to-week progression from the logs.
 Then hand off: **/program-engage** (Prompt 2 — messages, notes, completion) →
 **/program-assemble** (write + validate JSON, then archive this entry to the coaching log).
 
+## THE CEILING — the athlete's 1RM tracker (a design input, not a prescription)
+
+Athletes now carry an **estimated 1RM per lift**, built from the sets they already log.
+`program.html` derives it from any set that has both a weight and an RPE (reps in reserve
+= 10 − RPE, added back before the maths), and the history lives in **The Ceiling**, the
+strength section on My Plan. Nobody has to test a true max for this to exist.
+
+**Read it before you set loads.** For a RETURNING athlete the brief's *"e1RM from heaviest
+logged sets"* is the same idea; The Ceiling is the tidier, dated version of it, and it also
+carries **relative strength** (estimated 1RM ÷ body weight, taken from the athlete's latest
+Proof weigh-in). For tennis and padel that ratio is the number that matters — absolute
+kilos say much less about a player than kilos per kilo of them.
+
+**Every estimate is graded, and the grade is the instruction:**
+- **Sharp** (≤3 effective reps) — trust it. Usable as a starting-load reference.
+- **Good** (4–6) — trust the direction and roughly the number.
+- **Rough** (7–10) — a trend line only. Never set a load off a single Rough estimate.
+
+**How it may and may not be used:**
+- ✅ As the basis for a **starting-load suggestion on an exercise's `note`** — the one place
+  in the whole app a weight is allowed to appear (see COACHING-PRINCIPLES → RPE-only
+  prescription). *"Last cycle's estimate puts your squat around 125kg. Start the top set
+  near 100 and let RPE decide from there."*
+- ✅ As **evidence in the cycle review** — is the estimate climbing, flat or falling? That
+  answers "did the last block work?" far better than a single logged load, because it
+  normalises for the reps and RPE the set was done at.
+- ✅ To spot a **lagging lift** — if lower-body relative strength has stalled while upper
+  has moved, that is a cycle focus, stated with the number behind it.
+- ❌ **Never as a %1RM prescription.** No "4×5 @ 80%" in chips, cards or notes. The
+  prescription stays RPE. A predicted max carries roughly ±5% error at best, so a
+  percentage built on it is false precision wearing a lab coat.
+- ❌ Never write the estimate into the athlete JSON as a target. It is derived on their
+  device from their own log.
+
+**Refreshing the number — the under-5RM test.** Where an athlete's estimates have all gone
+Rough (long sets, low RPE) and you want a real number, prescribe **one set of 3–5 reps
+taken to a genuine RPE 9–10** on a main lift, about **once a month**. That is the condition
+where both halves of the estimate are at their most accurate: the equation holds under
+about 10 reps, and an athlete's own sense of reps in reserve is roughly 2 reps out at
+RPE 9 against 5 reps out at RPE 5 (Zourdos 2021). **Never prescribe a true 1RM** — it buys
+almost nothing over a hard triple and costs warm-up time, fatigue and risk.
+
+Suitability first: an athlete in their first cycle, in pain, or with poor technique under
+load does not get a max-effort set. Rough estimates are fine for them.
+
+---
+
 ## Don'ts
 - Don't ask trivial questions or drip them — consult only on genuine forks; batch.
+- Don't prescribe %1RM off The Ceiling, and don't prescribe a true 1RM test — see
+  *The Ceiling* above. Loads stay RPE-prescribed; a max estimate informs a starting-load
+  note, nothing more.
 - Don't save one-off athlete-specific calls as principles — only generalizable ones, with Amir's OK.
 - Don't put coach-facing reports or athlete health/chat detail into the athlete JSON or any
   **published** path — the reports' only home is chat + the coach-only, unpublished

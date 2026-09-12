@@ -2188,6 +2188,212 @@
   .ex-set-row.done .ex-set-check::after { opacity: 1; transform: scale(1); }
   body[data-dark] .ex-set-check { border-color: #444; }
 
+  /* ── THE CEILING — estimated 1RM, folded into the bottom of the set log ──
+     One clay line while closed, a small panel when tapped. Everything here is
+     DERIVED from the set log that is already on the card: no storage key, no
+     payload, no merge rule, nothing to sync. The saved history and the
+     free-entry calculator live in The Ceiling section on My Plan. */
+  .ex-1rm { border-top: 1px dashed var(--ice-mid); }
+  body[data-dark] .ex-1rm { border-top-color: rgba(199,85,47,0.35); }
+  /* Hidden until a set has actually been logged. This is also what keeps a max
+     estimate off unloaded work — a box jump never gets a weight typed into it,
+     so the line never appears, with no new flag needed in the programme JSON. */
+  .ex-1rm.is-empty { display: none; }
+  .ex-1rm-line {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 11px 14px;
+    background: transparent; border: none; cursor: pointer; text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase;
+    color: var(--ice);
+  }
+  .ex-1rm-arr { margin-left: auto; font-size: 14px; transition: transform 0.2s; }
+  .ex-1rm.open .ex-1rm-arr { transform: rotate(90deg); }
+  /* Nothing to estimate from yet — greyed, and it says WHY instead of
+     showing a number it has not earned. */
+  .ex-1rm-line:disabled { color: var(--grey-text); opacity: 0.8; cursor: default; }
+  body[data-dark] .ex-1rm-line:disabled { color: #777; }
+
+  .ex-1rm-panel { display: none; padding: 2px 14px 14px; background: var(--ice-dim); }
+  .ex-1rm.open .ex-1rm-panel { display: block; }
+  .ex-1rm-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .ex-1rm-field {
+    background: var(--white); border: 1px solid var(--ice-mid);
+    border-radius: 7px; padding: 7px 4px; text-align: center;
+  }
+  body[data-dark] .ex-1rm-field { background: #222; border-color: rgba(199,85,47,0.35); }
+  .ex-1rm-field input {
+    width: 100%; padding: 0; background: transparent; border: none; outline: none;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px;
+    text-align: center; color: var(--grey-dark);
+  }
+  body[data-dark] .ex-1rm-field input { color: #eee; }
+  .ex-1rm-field span {
+    display: block; margin-top: 3px;
+    font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--grey-text);
+  }
+  .ex-1rm-out { text-align: center; padding: 13px 0 0; line-height: 0.9; }
+  .ex-1rm-out b {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px;
+    letter-spacing: -1.2px; color: var(--ice);
+  }
+  .ex-1rm-out i {
+    font-family: 'Space Mono', monospace; font-style: normal;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--ice); margin-left: 5px;
+  }
+  /* How much to trust the number — one word, coloured by how close the set was
+     to a true single. Green = sharp, clay = good, grey = rough. */
+  .ex-1rm-grade {
+    margin-top: 9px; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 1.4px; text-transform: uppercase;
+  }
+  .ex-1rm-grade:empty { display: none; }
+  .ex-1rm-grade em { font-style: normal; font-weight: 400; letter-spacing: 0.8px;
+    color: var(--grey-text); }
+  .ex-1rm-grade.g1 { color: var(--yellow); }
+  .ex-1rm-grade.g2 { color: var(--ice); }
+  .ex-1rm-grade.g3 { color: var(--grey-text); }
+  body[data-dark] .ex-1rm-grade.g1 { color: #4e9d7e; }
+  body[data-dark] .ex-1rm-grade.g3 { color: #8a8a8a; }
+
+  .ex-1rm-from {
+    margin-top: 5px; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.9px;
+    text-transform: uppercase; color: var(--grey-text); line-height: 1.7;
+  }
+  body[data-dark] .ex-1rm-from { color: #888; }
+
+  .ex-1rm-save {
+    display: block; width: 100%; margin-top: 12px; padding: 11px;
+    background: var(--ice); color: var(--on-accent);
+    border: none; border-radius: 7px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    transition: opacity 0.15s;
+  }
+  .ex-1rm-save:disabled { background: var(--yellow); cursor: default; }
+
+  /* ── THE CEILING (screen) ─────────────────────────────────────── */
+  .ceil-head { position: relative; padding: 46px 18px 18px; background: var(--yellow); color: var(--on-accent); }
+  .ceil-kick { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.78); }
+  .ceil-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 44px;
+    line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; margin-top: 5px; }
+
+  /* Relative-strength hero — the headline for a racket-sport athlete */
+  .ceil-hero { background: var(--yellow); color: var(--on-accent); border-radius: 12px;
+    padding: 20px 18px; margin-top: 16px; }
+  .ceil-hero-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 54px;
+    line-height: 0.86; letter-spacing: -2px; }
+  .ceil-hero-v small { font-size: 28px; letter-spacing: 0; margin-left: 2px; }
+  .ceil-hero-l { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; margin-top: 10px; }
+  .ceil-hero-s { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 6px; line-height: 1.6; }
+
+  /* Prompt shown when AA Proof has no body weight to borrow */
+  .ceil-ask { background: var(--ice-dim); border: 1px dashed var(--ice-mid); border-radius: 12px;
+    padding: 16px; margin-top: 16px; }
+  .ceil-ask-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px;
+    text-transform: uppercase; color: var(--ink, var(--grey-dark)); letter-spacing: 0.3px; }
+  .ceil-ask-d { font-size: 13px; color: var(--grey-text); line-height: 1.55; margin-top: 6px; }
+  .ceil-ask-b { display: inline-block; margin-top: 12px; padding: 10px 16px; background: var(--ice);
+    color: var(--on-accent); border: none; border-radius: 7px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; }
+
+  /* Three-up numbers under the My Plan card, so it is never an empty promise */
+  .ceil-mini { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 9px 24px 0; }
+  .ceil-mini > div { background: var(--grey-card); border-radius: 8px; padding: 10px 6px; text-align: center; }
+  body[data-dark] .ceil-mini > div { background: #242424; }
+  .ceil-mini-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px;
+    line-height: 1; color: var(--yellow); }
+  body[data-dark] .ceil-mini-n { color: #4e9d7e; }
+  .ceil-mini-l { font-family: 'Space Mono', monospace; font-size: 7.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--grey-text); margin-top: 5px; }
+
+  .ceil-label { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey-text);
+    margin: 26px 0 10px; }
+
+  .ceil-lift { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    background: var(--white); border: 1px solid var(--grey-mid); border-radius: 10px;
+    padding: 13px 14px; margin-bottom: 9px; cursor: pointer; }
+  body[data-dark] .ceil-lift { background: #1e1e1e; border-color: #333; }
+  .ceil-lift-m { flex: 1; min-width: 0; }
+  .ceil-lift-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px;
+    line-height: 1.05; text-transform: uppercase; color: var(--grey-dark); letter-spacing: 0.2px; }
+  body[data-dark] .ceil-lift-n { color: #eee; }
+  .ceil-lift-d { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+  .ceil-lift-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 24px;
+    line-height: 1; color: var(--yellow); text-align: right; }
+  body[data-dark] .ceil-lift-v { color: #4e9d7e; }
+  .ceil-lift-u { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.12em;
+    color: var(--grey-text); text-align: right; margin-top: 3px; }
+  .ceil-spark { width: 46px; height: 20px; flex-shrink: 0; }
+  .ceil-up { color: var(--yellow); }
+  body[data-dark] .ceil-up { color: #4e9d7e; }
+  .ceil-down { color: var(--ice); }
+
+  /* Per-lift history */
+  .ceil-card { background: var(--white); border: 1px solid var(--grey-mid); border-radius: 12px;
+    padding: 18px 16px; margin-top: 16px; }
+  body[data-dark] .ceil-card { background: #1e1e1e; border-color: #333; }
+  .ceil-big { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 46px;
+    line-height: 0.9; letter-spacing: -1.5px; color: var(--yellow); }
+  body[data-dark] .ceil-big { color: #4e9d7e; }
+  .ceil-big span { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; color: var(--grey-text); margin-left: 6px; }
+  .ceil-chart { width: 100%; height: 96px; margin: 16px 0 6px; overflow: visible; }
+  .ceil-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 9px 0; border-top: 1px solid var(--grey-card); font-size: 12.5px; color: var(--grey-text); }
+  body[data-dark] .ceil-row { border-top-color: #2a2a2a; }
+  .ceil-row b { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px;
+    color: var(--grey-dark); }
+  body[data-dark] .ceil-row b { color: #eee; }
+  .ceil-row-s { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.06em;
+    text-transform: uppercase; }
+
+  /* Plain-English line under the header. "The Ceiling" is a name, not an
+     explanation, and this is where a first-timer lands. */
+  .ceil-intro { font-size: 14px; line-height: 1.6; color: var(--grey-text);
+    margin-top: 16px; }
+  body[data-dark] .ceil-intro { color: #9a9a9a; }
+  /* Says what the ratio MEANS, not just what it equals */
+  .ceil-hero-p { font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,0.9);
+    margin-top: 9px; }
+
+  .ceil-empty { text-align: center; padding: 44px 16px; color: var(--grey-text);
+    font-size: 13.5px; line-height: 1.65; }
+  .ceil-empty-l { text-align: left; padding: 26px 0 8px; }
+  .ceil-steps { margin: 10px 0 0 20px; padding: 0; }
+  .ceil-steps li { margin-bottom: 7px; line-height: 1.55; }
+
+  /* The full explainer, in place. Folded by default. */
+  .ceil-help { margin-top: 24px; border: 1px solid var(--grey-mid); border-radius: 10px;
+    background: var(--white); overflow: hidden; }
+  body[data-dark] .ceil-help { background: #1e1e1e; border-color: #333; }
+  .ceil-help summary { list-style: none; cursor: pointer; padding: 15px 16px;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.3px; text-transform: uppercase; color: var(--ice); }
+  .ceil-help summary::-webkit-details-marker { display: none; }
+  .ceil-help summary::after { content: '＋'; float: right; font-size: 13px; line-height: 1; }
+  .ceil-help[open] summary::after { content: '−'; }
+  .ceil-help-b { padding: 0 16px 18px; font-size: 13.5px; line-height: 1.68;
+    color: var(--grey-dark); }
+  body[data-dark] .ceil-help-b { color: #ccc; }
+  .ceil-help-b p { margin-bottom: 11px; }
+  .ceil-help-b ul { margin: 0 0 11px 18px; }
+  .ceil-help-b li { margin-bottom: 5px; }
+  .ceil-help-b strong { color: var(--yellow); }
+  body[data-dark] .ceil-help-b strong { color: #6fb495; }
+  .ceil-note { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--grey-text); line-height: 1.75;
+    margin-top: 18px; text-align: center; }
+
   /* ── Inline per-exercise weight field on round-format circuits / supersets ──
      A small box folded into each round row (one weight per exercise). Per-round
      RPE lives below in the standard .rpe-row rows. */
@@ -3052,9 +3258,26 @@
   <!-- All future cycles (next + upcoming), unified layout -->
   <div id="upcoming-wrap"></div>
 
+  <!-- The Ceiling (estimated 1RM) — summary card; opens #screen-ceiling -->
+  <div id="plan-ceiling-wrap"></div>
+
   <!-- Daily habits (Proof) — the companion tracker, opened from here too -->
   <div id="plan-habits-wrap"></div>
 
+</div>
+
+<!-- ═══ THE CEILING ═══ the athlete's estimated 1RM per lift, built from the
+     sets they already log. A sub-screen of My Plan (reached from the card
+     above, never from the tab bar), with its own per-lift history view.
+     Everything here reads from "<id>_1rm"; body weight is borrowed read-only
+     from AA Proof so relative strength can be shown. -->
+<div id="screen-ceiling" class="screen">
+  <div class="ceil-head">
+    <button class="nav-back" onclick="ceilingBack()" aria-label="Back">←</button>
+    <div class="ceil-kick">— Your numbers</div>
+    <div class="ceil-title" id="ceil-title">The Ceiling</div>
+  </div>
+  <div id="ceil-body" style="padding: 0 18px 110px;"></div>
 </div>
 
 <!-- ═══ LIBRARY ═══ shared, app-wide content. A "two doors" landing — Sessions
@@ -3689,6 +3912,26 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
           out.push({ w: pick(a.w, b.w), r: pick(a.r, b.r), d: !!(a.d || b.d) });
         }
         return JSON.stringify(out);
+      }
+    } catch (e) { /* not parseable — fall through */ }
+  }
+  // The Ceiling (estimated 1RM history): union by lift + date, newest write wins
+  // that slot. It MUST have its own branch — the scalar rule below takes one
+  // side wholesale, so a phone that had not synced would silently delete every
+  // estimate saved on the other one. This history only ever grows.
+  if (key.slice(-4) === '_1rm') {
+    try {
+      const L = JSON.parse(localVal), C = JSON.parse(cloudVal);
+      if (Array.isArray(L) && Array.isArray(C)) {
+        const byKey = {};
+        L.concat(C).forEach(e => {
+          if (!e || !e.lift || !e.d) return;
+          const k = e.lift + '|' + e.d;
+          const seen = byKey[k];
+          if (!seen || (e.t || 0) > (seen.t || 0)) byKey[k] = e;
+        });
+        return JSON.stringify(Object.keys(byKey).map(k => byKey[k])
+          .sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0)));
       }
     } catch (e) { /* not parseable — fall through */ }
   }
@@ -4666,6 +4909,11 @@ function renderPlan() {
     document.getElementById('upcoming-wrap').innerHTML = html;
   }
 
+  // The Ceiling (estimated maxes) sits above the habit card — both are
+  // companions to the programme, reachable from the plan that produced them.
+  const planCeil = document.getElementById('plan-ceiling-wrap');
+  if (planCeil) planCeil.innerHTML = ceilingCardHtml();
+
   // The habit tracker sits at the end of My Plan too — the programme and the
   // daily habits are the two halves of the plan, so both are reachable here.
   const planHab = document.getElementById('plan-habits-wrap');
@@ -5062,8 +5310,12 @@ function renderExercise(ex, dayId, num, blockClass) {
   // Sets count drives how many rows the per-set log will render.
   // Falls back to 1 if the chip didn't have a "X Sets" entry.
   const setsCount = parseInt(parsed.sets, 10) || 1;
+  // The prescribed reps ride along on the card so The Ceiling can pre-fill its
+  // estimate without re-parsing the chips. Kept as the raw chip text ("5",
+  // "10-12", "4 Each Side", "30s") — prescribedReps() decides what it means.
+  const repsChip = parsed.reps || '';
 
-  return `<div class="checklist-item collapsed ${blockClass}${(parsed.extras.length || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}">
+  return `<div class="checklist-item collapsed ${blockClass}${(parsed.extras.length || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsChip)}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -5353,6 +5605,35 @@ function renderNotes() {
 // Guide screen (#screen-guide) was removed, so the content lives here directly.
 // Each entry renders as a collapsible note-style card. (`icon` is kept per card
 // so the rows can be given line-icon tiles later without re-deriving them.)
+// The Ceiling, explained for someone who has never heard of a one-rep max.
+// ONE copy, used in two places: the "Using the app" card in the Coach tab, and
+// the "How this works" panel on the Ceiling screen itself. Two copies of the
+// same prose would drift the first time either one is edited.
+const CEILING_HELP = `
+  <p><strong>What it is.</strong> Your one rep max is the heaviest you could lift one single time.
+  It is the normal way to measure how strong you are.</p>
+  <p><strong>You never have to test it.</strong> Testing a real one rep max takes a long warm-up,
+  leaves you wrecked, and carries a risk. So the app works it out instead, from sets you already
+  do in your programme. Log the weight you used and your RPE, and the number appears.</p>
+  <p><strong>Why your RPE matters here.</strong> RPE 8 means you stopped with about 2 reps left in
+  you. So a set of 5 at RPE 8 was really a set of 7 in you. The app adds those reps back before it
+  works anything out. That is why an honest RPE gives a much better number than the weight on its own.</p>
+  <p><strong>How to get a number you can trust.</strong> Go heavy and stop close to your limit.
+  A hard set of 3 at RPE 9 gives a far better number than an easy set of 10 at RPE 7. The reason is
+  simple. When you have one or two reps left you can feel it. When you have five left you are guessing.</p>
+  <p>Every number is labelled so you always know how much to trust it:</p>
+  <ul>
+    <li><strong>Sharp</strong> means heavy and close to your limit. Trust it.</li>
+    <li><strong>Good</strong> means close enough. Trust the direction.</li>
+    <li><strong>Rough</strong> means it was a long set. Treat it as a rough guide only.</li>
+  </ul>
+  <p>If a set is so long that the number would be a guess, the app says so instead of making one up.</p>
+  <p><strong>Keep saving them.</strong> One number on its own can be a few kilos out either way.
+  Save a few over a few weeks and you see the real line, which is whether you are getting stronger
+  and how fast. That line is worth far more than any single number, and it is what I look at.</p>
+  <p><strong>It is not a weight to lift.</strong> Your programme is still set by RPE. Never work out
+  a percentage of this number and load that on the bar.</p>`;
+
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your current cycle, your progress, and what's coming next.</li><li><strong>My Plan</strong> — your actual training. The tabs at the top (D1, D2, D3…) switch between days; tap any exercise to open it.</li><li><strong>Coach</strong> — message me directly, read the personal notes I write you, and find this "Using the app" guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
@@ -5364,6 +5645,9 @@ const APP_GUIDE = [
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
+  { icon: 'activity', title: 'The Ceiling — the most you could lift once',
+    body: `<p>Open <strong>My Plan</strong> and tap <strong>The Ceiling</strong> to see this for every
+    exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
     body: `<p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
@@ -5466,7 +5750,7 @@ async function markCoachRead() {
 }
 window.sendCoachReply = sendCoachReply;
 
-function goTo(screen, historyId) {
+function goTo(screen, historyId, keepContent) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   document.getElementById('v-progress').classList.toggle('active', screen === 'home');
@@ -5486,9 +5770,24 @@ function goTo(screen, historyId) {
   // Library tab — Read + Train sections. Both built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
-  // Update the global tab bar's active button
+  // My Plan — refresh the Ceiling card. renderPlan() only runs at boot, so
+  // without this an estimate saved during today's session would not appear on
+  // the card until the app was reloaded.
+  if (screen === 'plan') {
+    const pc = document.getElementById('plan-ceiling-wrap');
+    if (pc) pc.innerHTML = ceilingCardHtml();
+  }
+
+  // The Ceiling — rebuilt on every visit so a max saved mid-session shows.
+  // `keepContent` is set when renderCeilingLift() routes here itself; it has
+  // already painted the per-lift view and must not be overwritten.
+  if (screen === 'ceiling' && !keepContent) renderCeiling();
+
+  // Update the global tab bar's active button. The Ceiling is a sub-screen of
+  // My Plan, so that tab stays lit while you are inside it.
+  const litTab = (screen === 'ceiling') ? 'plan' : screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
-    n.classList.toggle('active', n.dataset.tab === screen);
+    n.classList.toggle('active', n.dataset.tab === litTab);
   });
 
   // Every nav screen shows the global tab bar + dark-mode toggle (the Home tab
@@ -5575,6 +5874,209 @@ function habitCardHtml() {
       <div class="habit-card-go">→</div>
     </button>`;
 }
+
+// ── THE CEILING — the My Plan card + its own screen ────────────────────
+// Same grammar as the habit card above: a section head, one tappable card, and
+// the depth one tap in. The three numbers show on the card so it is never an
+// empty promise.
+function ceilingCardHtml() {
+  const lifts = ceilingLifts();
+  const top = lifts.slice(0, 3);
+  // Columns follow the number of lifts, so one or two never leave a dead gap.
+  const mini = top.length ? `
+    <div class="ceil-mini" style="grid-template-columns: repeat(${top.length}, 1fr)">${top.map(l => `
+      <div><div class="ceil-mini-n">${l.latest.kg}</div><div class="ceil-mini-l">${esc(shortLift(l.lift))}</div></div>`).join('')}
+    </div>` : '';
+  return `
+    <div class="home-section-head">
+      <div class="home-section-title">Strength</div>
+    </div>
+    <button type="button" class="habit-card" onclick="goTo('ceiling')">
+      <!-- No accent override here: #screen-plan deliberately remaps --ice to
+           green so My Plan reads as a single-accent page. Let it be green. -->
+      <div class="habit-card-lv">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg>
+      </div>
+      <div class="habit-card-body">
+        <div class="habit-card-title">The Ceiling</div>
+        <div class="habit-card-sub">${top.length
+          ? 'The most you could lift for one rep, on every exercise you train.'
+          : 'See the most you could lift for one rep. Log a weight and your RPE on any exercise to start.'}</div>
+      </div>
+      <div class="habit-card-go">→</div>
+    </button>${mini}`;
+}
+// "Barbell Back Squat" → "Back Squat" for the tight three-up on the card.
+function shortLift(name) {
+  const t = String(name || '').replace(/^(barbell|dumbbell|machine|cable|smith machine)\s+/i, '');
+  return t.length > 13 ? t.slice(0, 12).trim() + '…' : t;
+}
+
+// A tiny sparkline for a lift's estimates. Flat when there is only one point.
+function ceilSpark(entries) {
+  const v = entries.map(e => e.kg);
+  if (v.length < 2) return `<svg class="ceil-spark" viewBox="0 0 46 20"><circle cx="43" cy="10" r="2.5" fill="currentColor"/></svg>`;
+  const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
+  const pts = v.map((n, i) => `${(i / (v.length - 1)) * 42 + 2},${16 - ((n - lo) / span) * 12}`).join(' ');
+  return `<svg class="ceil-spark" viewBox="0 0 46 20"><polyline points="${pts}" fill="none"
+    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function fmtCeilDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate() + ' ' + m[d.getMonth()];
+}
+
+// Which lift's history is open, or null on the all-lifts view. Drives the back
+// chevron, which goes exactly ONE step — out of a lift to the list, and only
+// from the list back to My Plan.
+let _ceilLift = null;
+function ceilingBack() {
+  if (_ceilLift) renderCeiling();
+  else goTo('plan');
+}
+window.ceilingBack = ceilingBack;
+
+// The Ceiling screen — relative strength on top, then one row per lift.
+function renderCeiling() {
+  _ceilLift = null;
+  document.getElementById('ceil-title').textContent = 'The Ceiling';
+  const lifts = ceilingLifts();
+  const body  = document.getElementById('ceil-body');
+
+  // Always-on plain-English line. "The Ceiling" is a name, not an explanation,
+  // and this is the first screen someone who has never heard of a one-rep max
+  // will land on.
+  const intro = `<div class="ceil-intro">The most you could lift for one rep, on each exercise.
+    Worked out from your normal sets, so you never have to test it.</div>`;
+
+  if (!lifts.length) {
+    body.innerHTML = intro + `
+      <div class="ceil-empty ceil-empty-l">
+        <p><strong>Nothing here yet.</strong></p>
+        <p style="margin-top:12px">Here is how to get your first one:</p>
+        <ol class="ceil-steps">
+          <li>Open any exercise in today's session.</li>
+          <li>Type in the weight you used.</li>
+          <li>Tap your RPE for that set, which is how hard it felt out of 10.</li>
+          <li>Tap <strong>Save to The Ceiling</strong>.</li>
+        </ol>
+        <p style="margin-top:14px">Your number lands here. Go heavy and stop close to your limit
+        and it will be a good one.</p>
+      </div>` + ceilingHelpHtml(true);
+    return;
+  }
+
+  // Relative strength leads — kilos per kilo of the athlete beats absolute
+  // kilos for a racket-sport player. Body weight is borrowed from AA Proof; if
+  // there is none, ask for it rather than quietly dropping the headline.
+  const bw  = latestBodyWeight();
+  const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
+  let hero;
+  if (bw) {
+    const ratio = (best.latest.kg / bw.kg).toFixed(2);
+    hero = `
+      <div class="ceil-hero">
+        <div class="ceil-hero-v">${ratio}<small>×</small></div>
+        <div class="ceil-hero-l">Your own body weight</div>
+        <div class="ceil-hero-p">You can lift ${ratio} times your own body weight
+          on the ${esc(best.lift)}. On court that counts for more than the raw kilos.</div>
+        <div class="ceil-hero-s">${best.latest.kg} kg lifted &middot; ${bw.kg} kg of you
+          &middot; weighed ${fmtCeilDate(bw.d)} in AA Proof</div>
+      </div>`;
+  } else {
+    hero = `
+      <div class="ceil-ask">
+        <div class="ceil-ask-t">Add your body weight</div>
+        <div class="ceil-ask-d">Lifting ${best.latest.kg} kg means one thing at 65 kg and
+          something else at 95 kg. What counts on court is how strong you are for your size.
+          Add your weight in AA Proof and it shows up here.</div>
+        <button type="button" class="ceil-ask-b" onclick="goHabits()">Open AA Proof →</button>
+      </div>`;
+  }
+
+  // Rows address their lift by INDEX, not by name. esc() escapes < > & but not
+  // quotes, so a perfectly ordinary name like `6" Deficit Deadlift` would break
+  // out of the onclick attribute and kill the row.
+  const rows = lifts.map((l, i) => {
+    const up = l.delta > 0, flat = l.delta === 0;
+    const trend = l.entries.length < 2 ? 'First estimate'
+      : (up ? '▲ ' : flat ? '' : '▼ ') + (flat ? 'No change yet' : Math.abs(l.delta) + ' kg since you started');
+    return `
+      <button type="button" class="ceil-lift" onclick="renderCeilingLiftAt(${i})">
+        <div class="ceil-lift-m">
+          <div class="ceil-lift-n">${esc(l.lift)}</div>
+          <div class="ceil-lift-d ${up ? 'ceil-up' : (!flat && l.entries.length > 1) ? 'ceil-down' : ''}">${trend}</div>
+        </div>
+        <span class="${up ? 'ceil-up' : 'ceil-down'}">${ceilSpark(l.entries)}</span>
+        <div><div class="ceil-lift-v">${l.latest.kg}</div><div class="ceil-lift-u">KG</div></div>
+      </button>`;
+  }).join('');
+
+  body.innerHTML = intro + hero
+    + `<div class="ceil-label">Your lifts</div>${rows}`
+    + `<div class="ceil-note">Tap any lift to see how it has moved.<br>
+        Worked out, not tested.</div>`
+    + ceilingHelpHtml();
+}
+
+// The full explainer, in place. Folded away by default so it does not clutter
+// the screen for someone who has read it once, and open on the empty state
+// where it is the only thing worth reading. Same prose as the Coach tab card.
+function ceilingHelpHtml(open) {
+  return `
+    <details class="ceil-help"${open ? ' open' : ''}>
+      <summary>How this works</summary>
+      <div class="ceil-help-b">${CEILING_HELP}</div>
+    </details>`;
+}
+
+// One lift's history: the number, a chart of every estimate, and the set each
+// one came from so nothing is ever a mystery number.
+function renderCeilingLift(lift) {
+  const l = ceilingLifts().find(x => x.lift === lift);
+  if (!l) return;
+  goTo('ceiling', null, true);
+  _ceilLift = lift;
+  document.getElementById('ceil-title').textContent = lift;
+
+  const v = l.entries.map(e => e.kg);
+  const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
+  const W = 300, H = 80;
+  const x = i => (v.length < 2 ? W / 2 : (i / (v.length - 1)) * (W - 16) + 8);
+  const y = n => H - 10 - ((n - lo) / span) * (H - 24);
+  const line = v.length > 1
+    ? `<polyline points="${v.map((n, i) => `${x(i)},${y(n)}`).join(' ')}" fill="none"
+        stroke="#0E4A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : '';
+  const dots = v.map((n, i) => `<circle cx="${x(i)}" cy="${y(n)}" r="4" fill="#C7552F"/>`).join('');
+
+  const rows = l.entries.slice().reverse().map(e => `
+    <div class="ceil-row">
+      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}</span>
+      <b>${e.kg} kg</b>
+    </div>`).join('');
+
+  document.getElementById('ceil-body').innerHTML = `
+    <div class="ceil-card">
+      <div class="ceil-big">${l.latest.kg}<span>KG</span></div>
+      <svg class="ceil-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${line}${dots}</svg>
+      ${rows}
+    </div>
+    <div class="ceil-note">Every entry names the set it came from.<br>
+      Heavier sets closer to failure give the sharper numbers.</div>`;
+  window.scrollTo(0, 0);
+}
+// Rows call this with their position in ceilingLifts() — see the note there on
+// why a lift is never addressed by name from an HTML attribute.
+function renderCeilingLiftAt(i) {
+  const l = ceilingLifts()[i];
+  if (l) renderCeilingLift(l.lift);
+}
+window.renderCeilingLiftAt = renderCeilingLiftAt;
+window.renderCeilingLift = renderCeilingLift;
+window.renderCeiling = renderCeiling;
 
 function showLibPane(which) {
   _libPane = which;
@@ -7353,6 +7855,7 @@ function attachSetLog(card) {
       cur[idx] = cur[idx] || { w: '', r: '', d: false };
       cur[idx].w = e.target.value;
       saveSetLogValue(name, cur);
+      if (card._ceilingRefresh) card._ceilingRefresh();
     });
     // RPE buttons — toggle-select (tap selected = deselect)
     row.querySelectorAll('.ex-set-rpe .rpe-btn').forEach(b => {
@@ -7369,6 +7872,7 @@ function attachSetLog(card) {
           cur[idx].r = b.dataset.rpe;
         }
         saveSetLogValue(name, cur);
+        if (card._ceilingRefresh) card._ceilingRefresh();
       });
     });
     // Per-set check circle
@@ -7384,6 +7888,275 @@ function attachSetLog(card) {
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
+}
+
+// ── THE CEILING — estimated 1RM from a set the athlete just logged ─────
+// Everything here is DERIVED from the set log already on the card. Nothing is
+// written, so this adds no storage key, no cloud payload and no merge rule.
+// The saved history (and a calculator for lifts that aren't in the programme)
+// lives in The Ceiling section on My Plan.
+//
+// RPE is the reason this beats a normal 1RM calculator. RPE 8 on a set of 5
+// means the athlete stopped 2 reps short, so the set they COULD have done is 7.
+// Estimating off the 5 they did would undersell them by roughly 7%.
+//   reps in reserve = 10 − RPE      effective reps = reps + reps in reserve
+// 10, not 12. Rep-max equations hold their accuracy under about 10 reps and
+// lose it above (Mayhew 2008 found prediction held where fewer than 10
+// reps-to-fatigue were used; Whisenant 2003 and Mayhew 2002 both report
+// validity falling as repetitions rise). Above this the app says so instead of
+// printing a number it cannot stand behind.
+const ONE_RM_MAX_EFFECTIVE = 10;
+const ONE_RM_ROUND_KG      = 2.5;  // the smallest real plate jump; finer is fake precision
+
+// How much to trust the number, from the one thing that drives it: how close
+// the set was to a true single. Effective reps already fold in the RPE, so a
+// heavy triple at RPE 9 scores better than a set of 8 at RPE 7.
+//
+// This is the evidence talking, not a feel: an athlete's own sense of reps in
+// reserve is roughly 2 reps out at RPE 9 but 5 reps out at RPE 5, and error
+// grows with the number of reps in the set (Zourdos 2021). Both halves of that
+// — closer to failure, fewer reps — point the same way, which is why one
+// number can carry the whole message.
+function ceilingQuality(effective) {
+  if (effective <= 3) return { label: 'Sharp',
+    hint: 'Heavy, and you stopped close to your limit. This is as good as it gets.' };
+  if (effective <= 6) return { label: 'Good',
+    hint: 'Want it sharper? Fewer reps with a heavier weight.' };
+  return                     { label: 'Rough',
+    hint: 'Long sets are hard to judge. Fewer reps and more weight give a better number.' };
+}
+
+// Epley, run on effective reps rather than performed reps. A true single taken
+// to RPE 10 estimates as itself (Epley alone would inflate it by 3%).
+function estimateOneRM(kg, reps, rpe) {
+  const w = Number(kg), r = Number(reps), e = Number(rpe);
+  if (!(w > 0) || !(r > 0) || !(e > 0)) return null;
+  const effective = r + Math.max(0, 10 - e);
+  if (effective > ONE_RM_MAX_EFFECTIVE) return null;
+  const raw = effective <= 1 ? w : w * (1 + effective / 30);
+  return Math.round(raw / ONE_RM_ROUND_KG) * ONE_RM_ROUND_KG;
+}
+
+// Pull a rep count out of a reps chip. Ranges ("10-12") take the LOW end — the
+// conservative read, and the panel is editable anyway. Time-based work ("30s",
+// "1:30") has no rep count at all, so it gets no Ceiling line.
+function prescribedReps(repsChip) {
+  const t = String(repsChip || '').trim();
+  if (!t || isPureDuration(t)) return null;
+  const m = t.match(/\d+(?:\.\d+)?/);
+  if (!m) return null;
+  const n = parseFloat(m[0]);
+  return n > 0 ? n : null;
+}
+
+// Weight fields are free text ("60", "60kg", "62.5", "62,5"). Take the first
+// number; anything without one (e.g. "BW") simply has no estimate.
+function parseLoggedKg(v) {
+  const m = String(v == null ? '' : v).replace(',', '.').match(/\d+(?:\.\d+)?/);
+  if (!m) return null;
+  const n = parseFloat(m[0]);
+  return n > 0 ? n : null;
+}
+
+// The set that produces the HIGHEST estimate — the athlete's real best effort
+// of the day, not simply the last row they happened to fill in.
+function bestCeilingSet(log, reps) {
+  let best = null;
+  (log || []).forEach((s, i) => {
+    const est = estimateOneRM(parseLoggedKg(s.w), reps, s.r);
+    if (est != null && (!best || est > best.est)) {
+      best = { est: est, kg: parseLoggedKg(s.w), rpe: Number(s.r), idx: i };
+    }
+  });
+  return best;
+}
+
+// ── THE CEILING — the saved history behind the estimates ───────────────
+// One append-only array per athlete: [{ lift, kg, w, r, rpe, d, t }, …] where
+// `kg` is the estimate, `w/r/rpe` the set it came from, `d` the local date and
+// `t` the write time. One entry per lift per day; saving again the same day
+// replaces that day's entry rather than stacking duplicates.
+//
+// ⚠ This key has its own branch in mergeStoredValue() — union by lift+date,
+// newest write wins. Without it the scalar merge takes one side wholesale and a
+// phone that had not synced would delete every estimate saved on the other.
+function ceilingKey() { return ATHLETE_ID + '_1rm'; }
+function ceilingToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+       + '-' + String(d.getDate()).padStart(2, '0');
+}
+function loadCeiling() {
+  let a = [];
+  try { a = JSON.parse(localStorage.getItem(ceilingKey())) || []; } catch (e) {}
+  return Array.isArray(a) ? a.filter(e => e && e.lift && e.d && e.kg > 0) : [];
+}
+function saveCeilingEntry(lift, kg, w, r, rpe) {
+  const d = ceilingToday();
+  const all = loadCeiling().filter(e => !(e.lift === lift && e.d === d));
+  all.push({ lift: lift, kg: kg, w: w, r: r, rpe: rpe, d: d, t: Date.now() });
+  all.sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+  localStorage.setItem(ceilingKey(), JSON.stringify(all));
+}
+// Group into one row per lift, newest first, with the change since that lift's
+// first recorded estimate.
+function ceilingLifts() {
+  const by = {};
+  loadCeiling().forEach(e => { (by[e.lift] = by[e.lift] || []).push(e); });
+  return Object.keys(by).map(lift => {
+    const es = by[lift].sort((a, b) => (a.d < b.d ? -1 : 1));
+    const latest = es[es.length - 1];
+    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg };
+  }).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
+}
+
+// The athlete's most recent body weight — read from AA Proof, never written
+// here. habits.html owns "<id>_hab_wt" ({ 'YYYY-MM-DD': { kg, t } }, where a
+// null kg is a tombstone for a deleted reading); syncFromCloud pulls it down
+// with every other key on the shared blob, and _snapshot() deliberately never
+// pushes it back. So this app gets the number for free and cannot corrupt it.
+function latestBodyWeight() {
+  let wt = null;
+  try { wt = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_wt')); } catch (e) {}
+  if (!wt || typeof wt !== 'object') return null;
+  const days = Object.keys(wt).filter(d => wt[d] && wt[d].kg > 0).sort();
+  if (!days.length) return null;
+  const d = days[days.length - 1];
+  return { kg: wt[d].kg, d: d };
+}
+
+// Append the Ceiling line + panel to a standard exercise card. Renders nothing
+// at all when the exercise could never produce an honest estimate: no rep count
+// (holds, carries, intervals), or so many reps that even RPE 10 lands past the
+// effective-reps ceiling.
+function attachCeiling(card) {
+  const reps = prescribedReps(card.dataset.reps);
+  if (reps == null || reps > ONE_RM_MAX_EFFECTIVE) return;
+
+  const name  = card.querySelector('.item-name').textContent.trim();
+  const total = parseInt(card.dataset.sets, 10) || 1;
+
+  const box = document.createElement('div');
+  box.className = 'ex-1rm is-empty';   // refresh() reveals it once a set is logged
+  box.addEventListener('click', e => e.stopPropagation());
+  box.innerHTML = `
+    <button type="button" class="ex-1rm-line">
+      <span class="ex-1rm-txt"></span><span class="ex-1rm-arr">&rsaquo;</span>
+    </button>
+    <div class="ex-1rm-panel">
+      <div class="ex-1rm-inputs">
+        <div class="ex-1rm-field"><input class="ex-1rm-kg"  type="text" inputmode="decimal" aria-label="Weight in kilograms"><span>kg</span></div>
+        <div class="ex-1rm-field"><input class="ex-1rm-rp"  type="text" inputmode="numeric" aria-label="Reps"><span>reps</span></div>
+        <div class="ex-1rm-field"><input class="ex-1rm-rpe" type="text" inputmode="numeric" aria-label="RPE"><span>rpe</span></div>
+      </div>
+      <div class="ex-1rm-out"></div>
+      <div class="ex-1rm-grade"></div>
+      <div class="ex-1rm-from"></div>
+      <button type="button" class="ex-1rm-save">Save to The Ceiling</button>
+    </div>`;
+  logSlotFor(card).appendChild(box);
+
+  const line = box.querySelector('.ex-1rm-line');
+  const txt  = box.querySelector('.ex-1rm-txt');
+  const out   = box.querySelector('.ex-1rm-out');
+  const grade = box.querySelector('.ex-1rm-grade');
+  const from  = box.querySelector('.ex-1rm-from');
+  const save  = box.querySelector('.ex-1rm-save');
+  const fKg  = box.querySelector('.ex-1rm-kg');
+  const fRp  = box.querySelector('.ex-1rm-rp');
+  const fRpe = box.querySelector('.ex-1rm-rpe');
+
+  // Once the athlete edits a field the panel is theirs — a later set logged on
+  // the rows must not overwrite what they are in the middle of typing.
+  let touched = false;
+
+  // Recompute from whatever is in the three fields and paint both the panel and
+  // the closed line, so the card never shows two different numbers.
+  function paintFromFields(source) {
+    const est = estimateOneRM(parseLoggedKg(fKg.value), fRp.value, fRpe.value);
+    if (est == null) {
+      out.innerHTML = `<b>&mdash;</b>`;
+      grade.textContent = '';
+      grade.className = 'ex-1rm-grade';
+      from.innerHTML = 'Put in a weight, the reps and your RPE.<br>'
+        + 'If the set is much longer than ' + ONE_RM_MAX_EFFECTIVE
+        + ' reps, the number would only be a guess.';
+      txt.textContent = 'What could you lift for one rep?';
+      save.hidden = true;
+      return;
+    }
+    save.hidden = false;
+    save.disabled = false;
+    save.textContent = 'Save to The Ceiling';
+    const rir  = Math.max(0, 10 - Number(fRpe.value));
+    const eff  = Number(fRp.value) + rir;
+    const q    = ceilingQuality(eff);
+    const tank = rir === 0 ? 'nothing left in you'
+                           : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in you';
+    out.innerHTML = `<b>${est}</b><i>KG</i>`;
+    // "Sharp / Good / Rough" says how much to trust it. The word alone is not
+    // enough for someone meeting this for the first time, so it is captioned.
+    grade.innerHTML = q.label + ' <em>&middot; how much to trust it</em>';
+    grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
+    from.innerHTML = source + ' &middot; ' + tank + '<br>' + q.hint;
+    // Says what the number IS, not what it is called. "Est. max" means nothing
+    // to someone who has never heard of a one-rep max.
+    txt.textContent = '≈ ' + est + ' kg for one rep';
+  }
+
+  // Refresh from the set log. Skipped once the panel has been hand-edited.
+  function refresh() {
+    if (touched) return;
+    const log  = loadSetLog(name, total);
+    const best = bestCeilingSet(log, reps);
+    const anyLogged = log.some(s => parseLoggedKg(s.w) != null && Number(s.r) > 0);
+
+    if (!best) {
+      // Nothing logged yet — stay out of the way entirely. An unloaded exercise
+      // (box jump, bodyweight work) never gets a weight typed in, so it never
+      // offers a max estimate, and no flag had to be added to the programme
+      // JSON to arrange that. Once a real weight IS logged but the reps are too
+      // far from a single to be honest about, the line appears and says so
+      // rather than silently doing nothing.
+      box.classList.toggle('is-empty', !anyLogged);
+      box.classList.remove('open');
+      line.disabled = true;
+      txt.textContent = 'Too many reps to work out a one-rep max';
+      return;
+    }
+    box.classList.remove('is-empty');
+    line.disabled = false;
+    fKg.value  = best.kg;
+    fRp.value  = reps;
+    fRpe.value = best.rpe;
+    paintFromFields(`From set ${best.idx + 1} &middot; ${best.kg} kg &times; ${reps} @ RPE ${best.rpe}`);
+  }
+
+  line.addEventListener('click', ev => {
+    ev.stopPropagation();
+    box.classList.toggle('open');
+  });
+
+  [fKg, fRp, fRpe].forEach(f => {
+    f.addEventListener('input', () => { touched = true; paintFromFields('Your numbers'); });
+    f.addEventListener('click', ev => ev.stopPropagation());
+  });
+
+  // The one thing in here that writes anything. Everything above is derived
+  // from the set log; this is what puts a dated entry on the athlete's record.
+  save.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const kg  = parseLoggedKg(fKg.value);
+    const est = estimateOneRM(kg, fRp.value, fRpe.value);
+    if (est == null) return;
+    saveCeilingEntry(name, est, kg, Number(fRp.value), Number(fRpe.value));
+    save.textContent = 'Saved ✓';
+    save.disabled = true;
+    if (navigator.vibrate) navigator.vibrate(12);
+  });
+
+  card._ceilingRefresh = refresh;
+  refresh();
 }
 
 // Reflect "all sets done?" on the exercise-level check and the day progress.
@@ -7415,8 +8188,10 @@ function initSetOrRPE() {
       // Circuit logging — weight grid and/or per-round RPE, per the JSON flags.
       attachCircuitLog(card);
     } else {
-      // Standard exercise — per-set table
+      // Standard exercise — per-set table, then The Ceiling underneath it.
+      // Order matters: attachCeiling() reads the log the table just seeded.
       attachSetLog(card);
+      attachCeiling(card);
     }
   });
 }

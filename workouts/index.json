@@ -189,6 +189,20 @@
           "file": "workouts/breath/pre-sleep.json"
         }
       ]
+    },
+    {
+      "id": "care",
+      "title": "Care",
+      "banner": "assets/img/workouts/recovery.webp",
+      "workouts": [
+        {
+          "id": "lower-back",
+          "title": "Steady Spine",
+          "duration": "30 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/care/lower-back.json"
+        }
+      ]
     }
   ]
 }

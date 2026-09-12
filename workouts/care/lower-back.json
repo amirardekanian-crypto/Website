@@ -1,0 +1,262 @@
+{
+  "id": "lower-back",
+  "title": "Steady Spine",
+  "category": "care",
+  "countsAs": "strength",
+  "duration": "30 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Lower Back Pain",
+  "blocks": [
+    {
+      "title": "Wake It Up",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "note": "READ THIS ONCE BEFORE YOU START. This session is for ordinary, mechanical back pain that a doctor or physio has already looked at and cleared you to train through. It is not a diagnosis and it is not treatment. Stop and get it looked at properly if you have pain running down your leg, numbness, pins and needles, weakness in a leg or foot, any change in bladder or bowel control, pain that started after a fall, pain that wakes you at night, or pain with feeling unwell. Those are not things to train through. And on any exercise here: an ache you can breathe through is fine, a sharp pain is not. If something bites, stop that one and tell me.",
+          "chips": [
+            { "label": "4 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Walk before anything else. It is the single most useful thing for a sore back",
+              "Easy pace, tall posture, let the arms swing",
+              "Outside is better than a treadmill if you have the option"
+            ],
+            "bad": [
+              "Skipping it to get to the exercises. This is the exercise"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "note": "Your glutes are the engine that should move your hips. When they are asleep, your lower back does their job for them, and it does it badly. Two minutes here changes what the rest of the session feels like.",
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×10 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Ribs down, squeeze the glutes and lift until your hips are level. No higher",
+              "Pause a second at the top of each one and feel the glute, not the lower back"
+            ],
+            "bad": [
+              "Arching the back to lift higher. Height is not the point",
+              "Feeling this in your hamstrings or your back. Move your feet closer if so"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Mobility Where It Is Needed",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+          "videoUrl": null,
+          "note": "Here is the whole idea of this block. Your lower back is not stiff so much as it is doing the moving for joints that will not. Free up the hips and the upper back, keep the lower back still and strong, and it stops being asked to do a job it was never built for. That is why nothing in this session stretches your lower back itself.",
+          "chips": [
+            { "label": "45 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Half-kneeling, squeeze the back glute first, then reach the same-side arm overhead",
+              "Tuck the tailbone under and keep the ribs down before you reach",
+              "You should feel it at the front of the back hip, never in your lower back"
+            ],
+            "bad": [
+              "Arching the lower back to feel more. That is the opposite of the point",
+              "Pushing the hips forward without the glute squeeze"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "90/90 Hip Switch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Both knees bent at ninety, rotate them slowly to the other side",
+              "Sit tall. Put your hands behind you for support if you need to",
+              "Go only as far as you can control, and no further"
+            ],
+            "bad": [
+              "Forcing the knees down with your hands",
+              "Rounding your back to get further round"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Open Book",
+          "videoUrl": null,
+          "chips": [
+            { "label": "8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "On your side, knees stacked and together, open the top arm and follow it with your eyes",
+              "The knees staying together is what makes the turn happen in your ribs",
+              "Breathe out as you open"
+            ],
+            "bad": [
+              "Letting the top knee lift, which just moves the rotation into your lower back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Supine Figure-4 Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "45 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "On your back, ankle across the opposite knee, pull the bottom thigh towards you",
+              "Head and shoulders stay down on the floor",
+              "A tight glute is one of the most common reasons a back stays sore"
+            ],
+            "bad": [
+              "Pulling hard enough that your hips lift off the floor",
+              "Curling your head and shoulders up to reach"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Build the Brace",
+      "icon": "🧱",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Modified Curl-Up",
+          "videoUrl": null,
+          "restSec": 30,
+          "note": "Three things make this different from a sit-up, and all three matter. Your hands go UNDER your lower back to hold its natural arch, so the spine never flexes. One knee stays bent and one leg stays straight, which locks the pelvis. And you lift barely an inch, head and shoulders together like they are glued. If your lower back flattens into the floor, you are doing a sit-up. Also: leave this one alone for the first hour after you wake up, when the discs are most swollen and least happy about being bent.",
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "6 / 4 / 2 Reps" },
+            { "label": "10 sec hold" }
+          ],
+          "cues": {
+            "good": [
+              "Hands palm-down under the small of your back. Do not let that arch flatten",
+              "One knee bent, one leg straight. Swap legs between sets",
+              "Lift head and shoulders barely an inch and hold for ten. Breathe through the hold",
+              "Descending sets, so it gets easier as you tire. Never to failure"
+            ],
+            "bad": [
+              "Pulling your chin to your chest or lacing your hands behind your head",
+              "Lifting high. An inch is the whole range",
+              "Holding your breath"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Side Bridge",
+          "videoUrl": null,
+          "restSec": 30,
+          "note": "Start on your knees. Everyone wants to start from the feet and most people should not. Move to the feet version only when you can hold the knee version for ten seconds with your hips perfectly stacked and no sag, on both sides, for every rep of every set. Your weaker side decides the progression, not your stronger one.",
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "6 / 4 / 2 Reps / side" },
+            { "label": "10 sec hold" }
+          ],
+          "cues": {
+            "good": [
+              "On your side, elbow under the shoulder, knees bent and stacked",
+              "Lift the hips into a straight line and hold ten seconds, then lower under control",
+              "Hips stacked one on top of the other, never rolled forward"
+            ],
+            "bad": [
+              "Letting the hips sag or the top hip roll towards the floor",
+              "Going to the straight-leg version before the knee version is easy"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Bird Dog",
+          "videoUrl": null,
+          "restSec": 30,
+          "note": "The last of the three, and the one everyone rushes. Long and slow beats high and fast every time. If someone put a glass of water on your lower back, it should not spill once in the whole set. Sweeping the hand and foot back to the middle between reps, rather than resting them down, is what keeps the trunk working.",
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "6 / 4 / 2 Reps / side" },
+            { "label": "10 sec hold" }
+          ],
+          "cues": {
+            "good": [
+              "Opposite arm and leg, reach long rather than lift high, back flat",
+              "Hold ten seconds, then sweep the elbow and knee towards each other and straight back out",
+              "Hips stay square to the floor the whole time"
+            ],
+            "bad": [
+              "Lifting the leg above hip height and arching the back",
+              "Letting the hips twist open towards the lifting leg",
+              "Rushing, so the trunk never has to hold anything"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Release",
+      "icon": "🌙",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Supine Rest, Calves Elevated",
+          "videoUrl": null,
+          "note": "You will notice there is no foam rolling here and nothing that stretches the lower back. That is deliberate. A sore lower back does not want to be pressed on or pulled into end range, and the classic knees-to-chest stretch is the one that makes a lot of backs worse the next morning. What it does want is to be unloaded and to stop guarding. That is what these last four minutes are.",
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "On your back, calves resting on a chair or a sofa, knees at about ninety",
+              "Arms out wide, palms up. Nothing to hold",
+              "This takes the load off the lower back completely. Let it be heavy"
+            ],
+            "bad": [
+              "Pulling your knees to your chest instead. Not in this session"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Extended Exhale Breathing",
+          "videoUrl": null,
+          "note": "A back that hurts is usually a back that is bracing all day without being asked to. Long, slow out-breaths are the fastest way to tell everything around it to let go. Stay in the same position and just change the breathing. If this suits you, there is a whole Breath section in the Library.",
+          "chips": [
+            { "label": "2 minutes", "style": "dark" },
+            { "label": "In 4 · out 8" }
+          ],
+          "cues": {
+            "good": [
+              "In through the nose for four, out for eight",
+              "One hand on the belly. Only that hand should move",
+              "Let the shoulders and the jaw go on every exhale"
+            ],
+            "bad": [
+              "Forcing big breaths",
+              "Getting straight up when the timer goes. Take a few normal breaths first"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
