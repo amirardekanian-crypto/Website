@@ -36,6 +36,10 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
   grouping showing which exercises were paired. Name the circuit descriptively
   (`"Push-Pull Superset"`, `"Arm Superset"` — see `amir_ardekani.json` / `Mhrnz_khdm2.json`
   for precedent), never a generic `"Superset A/B"` — the name itself carries the pairing.
+- **Carry `test_flag` straight through** to `"test": "<n>RM"` on that exercise (design emits
+  `test_flag: 5RM`; see SCHEMA "test"). Verbatim, standard lifts only, and never invent one —
+  which lifts get retested is a coaching decision the design pass already made. An exercise
+  with no flag simply has no `test` field.
 - **Place engage's exercise Coach's Notes**, matched by exercise name, into that exercise's
   `note` field (any type) — the app renders it as the clay "Coach's Note" (per SCHEMA
   "Exercise coach's note"). The text comes from /program-engage (which wrote it from
@@ -264,7 +268,7 @@ avoid it, and do not hand-roll a backup.
 `jsonb` reorders keys (by length, then bytewise), so the server's text hash can never match
 your local file's. Instead compute the same canonical string on both sides and compare —
 walk days → blocks → exercises in array order and join `type · name · chip labels · rounds ·
-restSec · note · cues.good · cues.bad · circuit items`; do the same for `notes.cards` and the
+restSec · note · test · cues.good · cues.bad · circuit items`; do the same for `notes.cards` and the
 cycle `focuses`/`paragraphs`/`outcomes`. `jsonb_array_elements(...) with ordinality`
 preserves array order, so the SQL and the Python agree. Compare md5 AND length. Anything
 less than this is not verification — a `jsonb_set` that silently wrote a string where an

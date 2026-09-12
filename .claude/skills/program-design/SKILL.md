@@ -303,6 +303,14 @@ numbers + the coaching intent:
   **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
   decision (see above), not a chip on a standard exercise.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
+- `test_flag` (optional, standard lifts only): `test_flag: 5RM` marks a lift as one this
+  cycle is genuinely **about** — the Personal Records screen then tracks how long it has been
+  since the athlete put a number on it and asks for a retest in the cycle's closing week.
+  **Flag two or three lifts per cycle, no more.** Almost always the cycle's primaries, and
+  only where a rep max is a fair test of the quality being trained: a grinding bilateral or
+  loaded unilateral lift, never a jump, a carry, a warm-up or anything prescribed by time.
+  The nudge earns its attention by being rare — an athlete asked to retest six things at the
+  end of a block retests none of them. Assemble renders this as `"test": "5RM"`.
 - `note_flag` (optional, NOT athlete-facing wording): when an exercise carries guidance that
   belongs on the card itself — an injury caveat, a starting point drawn from the athlete's
   logs, how to load it — flag it in one short coaching-domain line, e.g. `note_flag: staged
@@ -467,8 +475,21 @@ about 10 reps, and an athlete's own sense of reps in reserve is roughly 2 reps o
 RPE 9 against 5 reps out at RPE 5 (Zourdos 2021). **Never prescribe a true 1RM** — it buys
 almost nothing over a hard triple and costs warm-up time, fatigue and risk.
 
+**The app now asks for it, so you do not have to remember to.** Put `test_flag: 5RM` on the
+lift in the spec (see STEP 3's exercise fields) and Personal Records tracks how long it has
+been since that lift got a number, then asks for a retest in the cycle's **closing week** —
+which is the right place for one anyway: it measures the block that is ending and hands the
+next one a real starting figure. The athlete taps through to a form with the reps already
+set, warm-up instructions in place, and the same estimator the exercise card uses. **Two or
+three flags a cycle at most** — the nudge works because it is rare.
+
+They can also log a max for any lift in the cycle without a flag, from Personal Records →
+**+ Log a max**. So a test you asked for in a `note` still reaches the record; the flag is
+what makes the app chase it.
+
 Suitability first: an athlete in their first cycle, in pain, or with poor technique under
-load does not get a max-effort set. Rough estimates are fine for them.
+load does not get a max-effort set — and does not get a `test_flag` either. Rough estimates
+are fine for them.
 
 ---
 

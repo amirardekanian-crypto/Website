@@ -2587,6 +2587,70 @@
     text-transform: uppercase; color: var(--grey-text); line-height: 1.75;
     margin-top: 18px; text-align: center; }
 
+  /* ── Logging a max FROM this page ─────────────────────────────────────
+     The exercise card can only offer an estimate off the set in front of it.
+     This is the other door: pick a lift from the current cycle and enter what
+     you actually lifted, which is what makes a planned rep-max test possible
+     at all. Same three fields, same estimator, same wording as the card —
+     borrowing .ex-1rm-* wholesale rather than inventing a second calculator,
+     because two of those is how the numbers start disagreeing. */
+  .ceil-add {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; margin-top: 18px; padding: 14px;
+    background: var(--ice); color: var(--on-accent);
+    border: none; border-radius: 10px; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-size: 10.5px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+  }
+  .ceil-add:active { opacity: 0.85; }
+
+  /* Retest strip — the whole reason the entry form exists. Only ever built
+     from lifts the coach flagged, and only inside the cycle's closing week. */
+  .ceil-due { background: var(--ice-dim); border: 1px solid var(--ice-mid);
+    border-radius: 12px; padding: 15px 16px; margin-top: 16px; }
+  body[data-dark] .ceil-due { background: rgba(199,85,47,0.1); border-color: rgba(199,85,47,0.35); }
+  .ceil-due-t { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--ice); }
+  .ceil-due-d { font-size: 13px; line-height: 1.55; color: var(--grey-text); margin-top: 7px; }
+  .ceil-due-r { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    margin-top: 10px; padding: 11px 12px; background: var(--white);
+    border: 1px solid var(--ice-mid); border-radius: 9px; cursor: pointer; }
+  body[data-dark] .ceil-due-r { background: #1e1e1e; border-color: rgba(199,85,47,0.35); }
+  .ceil-due-m { flex: 1; min-width: 0; }
+  .ceil-due-n { font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 16px; line-height: 1.1; text-transform: uppercase;
+    color: var(--grey-dark); letter-spacing: 0.2px; }
+  body[data-dark] .ceil-due-n { color: #eee; }
+  .ceil-due-a { flex: none; font-family: 'Space Mono', monospace; font-size: 9px;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); }
+
+  /* The picker — one row per lift in the current cycle that can carry a best */
+  .ceil-pick-s { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+  .ceil-go { flex: none; color: var(--ice); font-size: 19px; line-height: 1; }
+  .ceil-tag { display: inline-block; margin-left: 6px; padding: 2px 6px; border-radius: 4px;
+    background: var(--ice); color: var(--on-accent); vertical-align: 1px;
+    font-family: 'Space Mono', monospace; font-size: 7.5px; font-weight: 700;
+    letter-spacing: 0.1em; }
+
+  /* The entry form. Card chrome from .ceil-card, innards from .ex-1rm-*, so an
+     athlete meets the exact control they already know from the exercise card. */
+  .ceil-form .ex-1rm-field { background: var(--grey-card); border-color: transparent; }
+  body[data-dark] .ceil-form .ex-1rm-field { background: #2a2a2a; }
+  .ceil-form-h { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-text);
+    margin-bottom: 11px; }
+  .ceil-when { display: flex; align-items: center; gap: 10px; margin-top: 12px;
+    padding-top: 12px; border-top: 1px solid var(--grey-card); }
+  body[data-dark] .ceil-when { border-top-color: #2a2a2a; }
+  .ceil-when label { flex: none; font-family: 'Space Mono', monospace; font-size: 8.5px;
+    font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey-text); }
+  .ceil-when input { flex: 1; min-width: 0; background: var(--grey-card); border: 1px solid transparent;
+    border-radius: 7px; padding: 9px 10px; outline: none;
+    font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--grey-dark); }
+  .ceil-when input:focus { border-color: var(--yellow); }
+  body[data-dark] .ceil-when input { background: #2a2a2a; color: #eee; }
+
   /* ── Inline per-exercise weight field on round-format circuits / supersets ──
      A small box folded into each round row (one weight per exercise). Per-round
      RPE lives below in the standard .rpe-row rows. */
@@ -4161,7 +4225,14 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
   // The Ceiling (estimated 1RM history): union by lift + date, newest write wins
   // that slot. It MUST have its own branch — the scalar rule below takes one
   // side wholesale, so a phone that had not synced would silently delete every
-  // estimate saved on the other one. This history only ever grows.
+  // estimate saved on the other one.
+  // ⚠ A DELETED entry is carried here as a TOMBSTONE ({ del: true }), not as a
+  // missing row, and it takes part in this union like any other entry: a
+  // tombstone with a newer `t` beats the estimate it deletes, and an estimate
+  // re-saved afterwards beats the tombstone. A raw removal could never win that
+  // argument — the union only sees what is in front of it, so the other phone
+  // would hand the deleted entry straight back. loadCeiling() is what hides
+  // them from every screen; nothing above this layer sees a tombstone.
   if (key.slice(-4) === '_1rm') {
     try {
       const L = JSON.parse(localVal), C = JSON.parse(cloudVal);
@@ -5868,6 +5939,14 @@ const CEILING_HELP = `
   <p><strong>You never have to test it.</strong> Testing a real one rep max takes a long warm-up,
   leaves you wrecked, and carries a risk. So the app works it out instead, from sets you already
   do in your programme. Log the weight you used and your RPE, and the number appears.</p>
+  <p><strong>You can also put one in yourself.</strong> Tap <strong>Log a max</strong> on this
+  screen, pick a lift from your programme, and enter what you lifted. Useful when you have just
+  tested something, or trained somewhere the app was not open. You can date it to the day you
+  actually lifted it, not the day you got round to typing it in.</p>
+  <p><strong>When I ask you to test one.</strong> Some lifts show a <strong>5RM</strong> tag.
+  Every few weeks, at the end of a block, this screen will ask you to retest one of them: warm
+  up in steps, then one hard set of five where the last rep is a real grind. That is not extra
+  work for its own sake — it is what tells us both whether the block did what it was meant to.</p>
   <p><strong>Why your RPE matters here.</strong> RPE 8 means you stopped with about 2 reps left in
   you. So a set of 5 at RPE 8 was really a set of 7 in you. The app adds those reps back before it
   works anything out. That is why an honest RPE gives a much better number than the weight on its own.</p>
@@ -5899,7 +5978,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
-    body: `<p>Open <strong>My Plan</strong> and tap <strong>The Ceiling</strong> to see this for every
+    body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
     body: `<p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
@@ -6318,6 +6397,51 @@ function fmtCeilDate(iso) {
 // from the list back to My Plan.
 let _ceilLift = null;
 
+// Where the athlete is inside "log a max": null on every other view, {} on the
+// picker, and { lift, … } once a lift is chosen and the form is up. The back
+// chevron unwinds it one step at a time like everything else here.
+let _ceilAdd = null;
+
+// ── The retest nudge ──────────────────────────────────────────────────────
+// Anchored to the CYCLE, not the calendar. Cycles run about five weeks and each
+// chases one quality, so a test in the closing week measures that block and
+// hands the next one a real starting number. A rolling "every 30 days" drifts,
+// and lands a heavy single in the middle of a deload sooner or later.
+//
+// The 28-day floor is what stops a short cycle, or two cycles ending close
+// together, asking for the same lift twice in a month.
+const RETEST_MIN_DAYS = 28;
+const RETEST_WINDOW_DAYS = 7;
+
+function currentCycle() {
+  const cycles = (DATA && DATA.cycles) || [];
+  const i = Number.isInteger(DATA && DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  return cycles[i] || null;
+}
+
+// The closing week of the cycle, or any time after it should have ended. A
+// cycle with no dates on it cannot place a window, so the floor alone decides.
+function inRetestWindow() {
+  const c = currentCycle();
+  if (!c || !c.endDate) return true;
+  const end = new Date(c.endDate);
+  if (isNaN(end)) return true;
+  end.setHours(0, 0, 0, 0);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return (end - today) / 86400000 <= RETEST_WINDOW_DAYS;
+}
+
+// Flagged lifts with nothing on the record, or nothing recent enough.
+function ceilingDue() {
+  if (!inRetestWindow()) return [];
+  const known = {};
+  ceilingLifts().forEach(l => { known[l.lift] = l; });
+  return ceilingCandidates().filter(c => c.test).map(c => {
+    const l = known[c.name];
+    return { name: c.name, test: c.test, age: l ? l.age : null, kg: l ? l.latest.kg : null };
+  }).filter(d => d.age == null || d.age >= RETEST_MIN_DAYS);
+}
+
 // Where to land when the athlete leaves The Ceiling. Set only when they arrived
 // from inside an exercise mid-session, so the back chevron puts them back in
 // that exercise rather than dumping them on Home with their place lost.
@@ -6325,7 +6449,9 @@ let _ceilLift = null;
 let _ceilReturn = null;
 
 function ceilingBack() {
-  if (_ceilLift) { renderCeiling(); return; }   // one step: out of a lift
+  if (_ceilAdd && _ceilAdd.lift) { openCeilingAdd(); return; }   // form -> picker
+  if (_ceilAdd) { renderCeiling(); return; }                     // picker -> the list
+  if (_ceilLift) { renderCeiling(); return; }                    // one step: out of a lift
   if (_ceilReturn) { returnFromCeiling(); return; }
   goTo('home');
 }
@@ -6361,9 +6487,11 @@ function returnFromCeiling() {
   });
 }
 
-// The Ceiling screen — relative strength on top, then one row per lift.
+// The Ceiling screen — retests first, then relative strength, then one row per
+// lift, with the way to add one by hand sitting above the list.
 function renderCeiling() {
   _ceilLift = null;
+  _ceilAdd = null;
   document.getElementById('ceil-title').textContent = 'The Ceiling';
   const lifts = ceilingLifts();
   const body  = document.getElementById('ceil-body');
@@ -6374,8 +6502,14 @@ function renderCeiling() {
   const intro = `<div class="ceil-intro">The most you could lift for one rep, on each exercise.
     Worked out from your normal sets, so you never have to test it.</div>`;
 
+  // Only offered when the current cycle actually holds a liftable movement —
+  // a button that opens an empty list is worse than no button.
+  const canAdd = ceilingCandidates().length > 0;
+  const addBtn = canAdd
+    ? `<button type="button" class="ceil-add" onclick="openCeilingAdd()">+ Log a max</button>` : '';
+
   if (!lifts.length) {
-    body.innerHTML = intro + `
+    body.innerHTML = intro + dueHtml() + `
       <div class="ceil-empty ceil-empty-l">
         <p><strong>Nothing here yet.</strong></p>
         <p style="margin-top:12px">Here is how to get your first one:</p>
@@ -6385,9 +6519,11 @@ function renderCeiling() {
           <li>Tap your RPE for that set, which is how hard it felt out of 10.</li>
           <li>Tap <strong>Save to The Ceiling</strong>.</li>
         </ol>
-        <p style="margin-top:14px">Your number lands here. Go heavy and stop close to your limit
-        and it will be a good one.</p>
-      </div>` + ceilingHelpHtml(true);
+        ${canAdd ? `<p style="margin-top:14px">Or put one in from here — useful when you have
+        just tested a lift, or lifted somewhere the app was not open.</p>`
+        : `<p style="margin-top:14px">Your number lands here. Go heavy and stop close to your limit
+        and it will be a good one.</p>`}
+      </div>` + addBtn + ceilingHelpHtml(true);
     return;
   }
 
@@ -6431,18 +6567,222 @@ function renderCeiling() {
         <div class="ceil-lift-m">
           <div class="ceil-lift-n">${esc(l.lift)}</div>
           <div class="ceil-lift-d ${up ? 'ceil-up' : (!flat && l.entries.length > 1) ? 'ceil-down' : ''}">${trend}</div>
+          <div class="ceil-pick-s">${esc(agoLabel(l.age))}</div>
         </div>
         <span class="${up ? 'ceil-up' : 'ceil-down'}">${ceilSpark(l.entries)}</span>
         <div><div class="ceil-lift-v">${l.latest.kg}</div><div class="ceil-lift-u">KG</div></div>
       </button>`;
   }).join('');
 
-  body.innerHTML = intro + hero
+  body.innerHTML = intro + dueHtml() + hero + addBtn
     + `<div class="ceil-label">Your lifts</div>${rows}`
     + `<div class="ceil-note">Tap any lift to see how it has moved.<br>
-        Worked out, not tested.</div>`
+        Worked out from your sets, or entered after a test.</div>`
     + ceilingHelpHtml();
 }
+
+// "Logged 3 days ago" / "Logged 5 weeks ago". Weeks past a fortnight, because
+// "38 days ago" is a number nobody converts in their head.
+function agoLabel(days) {
+  if (days == null) return 'Never tested';
+  if (days === 0) return 'Logged today';
+  if (days === 1) return 'Logged yesterday';
+  if (days < 14) return 'Logged ' + days + ' days ago';
+  const wk = Math.round(days / 7);
+  return 'Logged ' + wk + ' weeks ago';
+}
+
+// The retest strip. Silent unless the coach flagged a lift AND the cycle is in
+// its closing week AND the lift has gone long enough without a number — three
+// conditions, because a nudge that shows every time is one nobody reads.
+function dueHtml() {
+  const due = ceilingDue();
+  if (!due.length) return '';
+  const cands = ceilingCandidates();
+  const rows = due.map(d => {
+    const i = cands.findIndex(c => c.name === d.name);
+    const meta = d.kg ? d.kg + ' kg · ' + agoLabel(d.age).toLowerCase() : 'nothing on the record yet';
+    return `<button type="button" class="ceil-due-r" onclick="openCeilingForm(${i}, 1)">
+      <div class="ceil-due-m">
+        <div class="ceil-due-n">${esc(d.name)}</div>
+        <div class="ceil-pick-s">${esc(meta)}</div>
+      </div>
+      <span class="ceil-due-a">Test ${esc(d.test.label)} →</span>
+    </button>`;
+  }).join('');
+  return `<div class="ceil-due">
+    <div class="ceil-due-t">— Due for a retest</div>
+    <div class="ceil-due-d">You are at the end of a block. Retest ${due.length === 1
+      ? 'this lift' : 'these lifts'} and the next one starts from a real number.
+      Warm up properly, then one hard set — stop when the last rep is a true grind.</div>
+    ${rows}
+  </div>`;
+}
+
+// ── Log a max, step 1: pick the lift ──────────────────────────────────────
+// Rows carry their INDEX into ceilingCandidates(), never their name — esc()
+// leaves quotes alone, so a name like `6" Deficit Deadlift` would break out of
+// the attribute. Same rule the lift rows follow.
+function openCeilingAdd() {
+  _ceilAdd = {};
+  _ceilLift = null;
+  goTo('ceiling', null, true);
+  document.getElementById('ceil-title').textContent = 'Log a max';
+  const cands = ceilingCandidates();
+  const known = {};
+  ceilingLifts().forEach(l => { known[l.lift] = l; });
+
+  const rows = cands.map((c, i) => {
+    const l = known[c.name];
+    const meta = l ? l.latest.kg + ' kg · ' + agoLabel(l.age).toLowerCase()
+                   : 'nothing on the record yet';
+    return `<button type="button" class="ceil-lift" onclick="openCeilingForm(${i})">
+      <div class="ceil-lift-m">
+        <div class="ceil-lift-n">${esc(c.name)}${c.test
+          ? `<span class="ceil-tag">${esc(c.test.label)}</span>` : ''}</div>
+        <div class="ceil-pick-s">${esc(meta)}</div>
+      </div>
+      <span class="ceil-go" aria-hidden="true">›</span>
+    </button>`;
+  }).join('');
+
+  document.getElementById('ceil-body').innerHTML = `
+    <div class="ceil-intro">Pick the lift, then put in what you actually did. Every exercise
+      in this cycle that carries a weight and a rep count is here.</div>
+    <div class="ceil-label">This cycle</div>${rows}
+    <div class="ceil-note">Only lifts from your current programme.<br>
+      That is what keeps one exercise from becoming two records.</div>`;
+  window.scrollTo(0, 0);
+}
+window.openCeilingAdd = openCeilingAdd;
+
+// ── Log a max, step 2: the numbers ────────────────────────────────────────
+// The same three fields, the same estimator and the same Sharp/Good/Rough as
+// the exercise card. `asTest` opens it as a deliberate rep-max test: reps
+// prefilled to whatever the coach asked for, and the copy stops nagging the
+// athlete to go heavier when going heavier is exactly what they just did.
+function openCeilingForm(i, asTest) {
+  const c = ceilingCandidates()[i];
+  if (!c) return;
+  const spec = asTest ? c.test : null;
+  _ceilAdd = { lift: c.name, test: c.test, spec: spec };
+  _ceilLift = null;
+  goTo('ceiling', null, true);
+  document.getElementById('ceil-title').textContent = c.name;
+
+  // Prefill the prescribed reps only when they could actually produce a number.
+  // A 3×12 leg press is precisely the lift this screen exists to reach, and
+  // seeding the field with 12 would greet the athlete with "the maths is a
+  // guess" before they had typed anything — the same "looks broken" failure the
+  // card's own refusal path was fixed for. Blank asks the question instead.
+  const pres = prescribedReps(c.reps);
+  const reps = spec ? spec.reps : ((pres != null && pres <= ONE_RM_MAX_EFFECTIVE) ? pres : '');
+  document.getElementById('ceil-body').innerHTML = `
+    <div class="ceil-intro">${spec
+      ? `A ${esc(spec.label)} test: warm up in steps, then one hard set of ${spec.reps}.
+         Stop when the last rep is a true grind — that is what makes the number worth having.`
+      : `Put in the heaviest set you did, how many reps, and how hard it felt out of 10.`}</div>
+    <div class="ceil-card ceil-form">
+      <div class="ceil-form-h">What you lifted</div>
+      <div class="ex-1rm-inputs">
+        <div class="ex-1rm-field"><input id="cf-kg" type="text" inputmode="decimal" aria-label="Weight in kilograms"><span>kg</span></div>
+        <div class="ex-1rm-field"><input id="cf-rp" type="text" inputmode="numeric" aria-label="Reps" value="${esc(String(reps))}"><span>reps</span></div>
+        <div class="ex-1rm-field"><input id="cf-rpe" type="text" inputmode="numeric" aria-label="RPE"><span>rpe</span></div>
+      </div>
+      <div class="ex-1rm-out" id="cf-out"></div>
+      <div class="ex-1rm-grade" id="cf-grade"></div>
+      <div class="ex-1rm-from" id="cf-from"></div>
+      <div class="ceil-when">
+        <label for="cf-day">When</label>
+        <input id="cf-day" type="date" value="${ceilingToday()}" max="${ceilingToday()}">
+      </div>
+      <button type="button" class="ex-1rm-save" id="cf-save" onclick="saveCeilingForm()">Save to The Ceiling</button>
+    </div>
+    <div class="ceil-note">A date in the past is fine — log the day you lifted it,<br>
+      not the day you got round to typing it in.</div>`;
+
+  ['cf-kg', 'cf-rp', 'cf-rpe'].forEach(id =>
+    document.getElementById(id).addEventListener('input', paintCeilingForm));
+  paintCeilingForm();
+  document.getElementById('cf-kg').focus();
+  window.scrollTo(0, 0);
+}
+window.openCeilingForm = openCeilingForm;
+
+// Live recompute. Mirrors paintFromFields() on the exercise card, including its
+// hard-won distinction between "you have not filled this in" and "these numbers
+// are too far from a single to be honest about" — saying the wrong one of those
+// is what made the card read as broken.
+function paintCeilingForm() {
+  const out   = document.getElementById('cf-out');
+  const grade = document.getElementById('cf-grade');
+  const from  = document.getElementById('cf-from');
+  const save  = document.getElementById('cf-save');
+  if (!out) return;
+  const kg  = parseLoggedKg(document.getElementById('cf-kg').value);
+  const rp  = Number(document.getElementById('cf-rp').value);
+  const rpe = Number(document.getElementById('cf-rpe').value);
+  const est = estimateOneRM(kg, rp, rpe);
+
+  if (est == null) {
+    out.innerHTML = '<b>&mdash;</b>';
+    grade.textContent = '';
+    grade.className = 'ex-1rm-grade';
+    save.hidden = true;
+    if (kg > 0 && rp > 0 && rpe > 0) {
+      const rir = Math.max(0, 10 - rpe), eff = rp + rir;
+      from.innerHTML = `${rp} reps with ${rir} left in you is <b>${eff} to failure</b>.<br>`
+        + `Past ${ONE_RM_MAX_EFFECTIVE} the maths is a guess, not an estimate. `
+        + `Try a heavier set of 5 or fewer.`;
+    } else {
+      from.innerHTML = 'Put in a weight, the reps and your RPE.';
+    }
+    return;
+  }
+
+  const rir  = Math.max(0, 10 - rpe), eff = rp + rir;
+  const q    = ceilingQuality(eff);
+  const tank = rir === 0 ? 'nothing left in you'
+                         : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in you';
+  save.hidden = false;
+  save.disabled = false;
+  save.textContent = 'Save to The Ceiling';
+  out.innerHTML = `<b>${est}</b><i>KG</i>`;
+  grade.innerHTML = q.label + ' <em>&middot; how much to trust it</em>';
+  grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
+  // A prescribed test done properly must never be told to go heavier — it IS
+  // the heavier thing. A 5RM taken to the grind scores "Good", not "Sharp",
+  // and that is correct: five reps is further from a single than three. The
+  // grade stays honest; only the advice under it changes.
+  const spec = _ceilAdd && _ceilAdd.spec;
+  const hint = (spec && rp === spec.reps && rpe >= 9)
+    ? `That is the ${spec.label} test done properly. Nothing to improve on the number itself.`
+    : q.hint;
+  from.innerHTML = 'Your numbers &middot; ' + tank + '<br>' + hint;
+}
+window.paintCeilingForm = paintCeilingForm;
+
+function saveCeilingForm() {
+  const a = _ceilAdd;
+  if (!a || !a.lift) return;
+  const kg  = parseLoggedKg(document.getElementById('cf-kg').value);
+  const rp  = Number(document.getElementById('cf-rp').value);
+  const rpe = Number(document.getElementById('cf-rpe').value);
+  const est = estimateOneRM(kg, rp, rpe);
+  if (est == null) return;
+  // A blank or future date falls back to today rather than filing the entry
+  // under a day that has not happened — the merge sorts on this field.
+  const picked = document.getElementById('cf-day').value;
+  const day = (picked && /^\d{4}-\d{2}-\d{2}$/.test(picked) && picked <= ceilingToday())
+    ? picked : ceilingToday();
+  saveCeilingEntry(a.lift, est, kg, rp, rpe, day, !!a.spec);
+  if (navigator.vibrate) navigator.vibrate(12);
+  // Straight to that lift's history, so the number they just entered is the
+  // thing on screen rather than a form that has quietly emptied itself.
+  _ceilAdd = null;
+  renderCeilingLift(a.lift);
+}
+window.saveCeilingForm = saveCeilingForm;
 
 // The full explainer, in place. Folded away by default so it does not clutter
 // the screen for someone who has read it once, and open on the empty state
@@ -6459,9 +6799,12 @@ function ceilingHelpHtml(open) {
 // one came from so nothing is ever a mystery number.
 function renderCeilingLift(lift) {
   const l = ceilingLifts().find(x => x.lift === lift);
-  if (!l) return;
+  // The lift's last entry was just deleted — there is no history left to show,
+  // so fall back to the list rather than a screen about nothing.
+  if (!l) { renderCeiling(); return; }
   goTo('ceiling', null, true);
   _ceilLift = lift;
+  _ceilAdd = null;
   document.getElementById('ceil-title').textContent = lift;
 
   const v = l.entries.map(e => e.kg);
@@ -6474,22 +6817,54 @@ function renderCeilingLift(lift) {
         stroke="#0E4A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : '';
   const dots = v.map((n, i) => `<circle cx="${x(i)}" cy="${y(n)}" r="4" fill="#C7552F"/>`).join('');
 
-  const rows = l.entries.slice().reverse().map(e => `
+  // Rows address their entry by the lift name AS STORED plus its date, which is
+  // the pair the record is actually keyed on. l.lift may be the current
+  // programme's name for a lift filed under an older one (see ceilAliasMap), so
+  // deleting by the heading would miss the row sitting right there on screen.
+  const rows = l.entries.slice().reverse().map((e, i) => `
     <div class="ceil-row">
-      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}</span>
+      <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}${
+        e.test ? ' · tested' : ''}</span>
       <b>${e.kg} kg</b>
+      <button type="button" class="wt-del" onclick="removeCeilingEntry(${i})"
+        aria-label="Delete this entry">✕</button>
     </div>`).join('');
 
+  // The reversed row order is rebuilt identically by removeCeilingEntry(), so
+  // the index in the attribute and the entry it names cannot drift apart.
+  _ceilRows = l.entries.slice().reverse();
+
+  // -1 when this lift has left the programme: its history stays readable, but
+  // there is nothing in the current cycle to file a new entry against.
+  const at = ceilingCandidates().findIndex(c => c.name === l.lift);
   document.getElementById('ceil-body').innerHTML = `
     <div class="ceil-card">
       <div class="ceil-big">${l.latest.kg}<span>KG</span></div>
       <svg class="ceil-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${line}${dots}</svg>
       ${rows}
     </div>
+    ${at >= 0 ? `<button type="button" class="ceil-add"
+      onclick="openCeilingForm(${at})">+ Log a max</button>` : ''}
     <div class="ceil-note">Every entry names the set it came from.<br>
       Heavier sets closer to failure give the sharper numbers.</div>`;
   window.scrollTo(0, 0);
 }
+
+// The rows currently drawn on the per-lift history, newest first — what the ✕
+// buttons index into.
+let _ceilRows = [];
+
+// One tap deletes, exactly like a body-weight reading: the entry names the set
+// it came from, so putting it back is retyping three numbers. What it writes is
+// a TOMBSTONE, never a removal — see the note on deleteCeilingEntry().
+function removeCeilingEntry(i) {
+  const e = _ceilRows[i];
+  if (!e) return;
+  const lift = _ceilLift;
+  deleteCeilingEntry(e.lift, e.d);
+  renderCeilingLift(lift);
+}
+window.removeCeilingEntry = removeCeilingEntry;
 // Rows call this with their position in ceilingLifts() — see the note there on
 // why a lift is never addressed by name from an HTML attribute.
 function renderCeilingLiftAt(i) {
@@ -7671,6 +8046,39 @@ function exNameVariants(sfx) {
   return [base, abbrev, noMachine, noParen];
 }
 
+// One bucket per identity tier, each mapping a variant back to the names that
+// produced it. Shared by the key-based rename adoption below and the Ceiling's
+// own alias map, so a rename is judged by identical rules in both places.
+function indexExNames(names) {
+  const store = [{}, {}, {}, {}];
+  names.forEach(n => exNameVariants(n).forEach((v, tier) => {
+    if (!v) return;
+    (store[tier][v] || (store[tier][v] = [])).push(n);
+  }));
+  return store;
+}
+
+// The single match rule: an orphan adopts a current name only when exactly one
+// name on each side shares a variant, at the tightest tier that matches at all.
+// Anything ambiguous is left alone — a number shown against the wrong movement
+// is worse than an honest gap.
+function matchRenamed(orphans, current) {
+  const curIdx = indexExNames(current), orpIdx = indexExNames(orphans);
+  const map = {};
+  orphans.forEach(orphan => {
+    const vs = exNameVariants(orphan);
+    for (let tier = 0; tier < vs.length; tier++) {
+      const v = vs[tier];
+      if (!v) continue;
+      const targets = curIdx[tier][v] || [], rivals = orpIdx[tier][v] || [];
+      if (targets.length !== 1 || rivals.length !== 1) continue;   // ambiguous — hands off
+      map[orphan] = targets[0];
+      break;                                                       // tightest tier wins
+    }
+  });
+  return map;
+}
+
 function adoptRenamedExercises() {
   if (!ATHLETE_ID || !DATA || !DATA.workouts) return;
   const current = new Set();
@@ -7700,38 +8108,21 @@ function adoptRenamedExercises() {
   });
   if (!orphans.size) return;
 
-  const indexBy = names => {
-    const store = [{}, {}, {}, {}];
-    names.forEach(n => exNameVariants(n).forEach((v, tier) => {
-      if (!v) return;
-      (store[tier][v] || (store[tier][v] = [])).push(n);
-    }));
-    return store;
-  };
-  const curIdx = indexBy(current), orpIdx = indexBy(orphans);
+  const renamed = matchRenamed([...orphans], [...current]);
 
   const adopted = [];
-  orphans.forEach(orphan => {
-    const vs = exNameVariants(orphan);
-    for (let tier = 0; tier < vs.length; tier++) {
-      const v = vs[tier];
-      if (!v) continue;
-      const targets = curIdx[tier][v] || [];
-      const rivals  = orpIdx[tier][v] || [];
-      if (targets.length !== 1 || rivals.length !== 1) continue;   // ambiguous — hands off
-      keys.forEach(k => {
-        const p = splitKey(k);
-        if (!p || p.name !== orphan) return;
-        const to = ATHLETE_ID + '_' + p.pfx + targets[0];
-        if (localStorage.getItem(to) != null) return;              // never overwrite
-        let val = localStorage.getItem(k);
-        if (val == null || val === '') return;
-        // Weights carry, the old session's RPE and ticks do not.
-        if (p.pfx === 'setlog_') val = stripSetLogSession(val);
-        try { localStorage.setItem(to, val); adopted.push(p.pfx + targets[0]); } catch (e) {}
-      });
-      break;                                                       // tightest tier wins
-    }
+  keys.forEach(k => {
+    const p = splitKey(k);
+    if (!p) return;
+    const target = renamed[p.name];
+    if (!target) return;
+    const to = ATHLETE_ID + '_' + p.pfx + target;
+    if (localStorage.getItem(to) != null) return;                  // never overwrite
+    let val = localStorage.getItem(k);
+    if (val == null || val === '') return;
+    // Weights carry, the old session's RPE and ticks do not.
+    if (p.pfx === 'setlog_') val = stripSetLogSession(val);
+    try { localStorage.setItem(to, val); adopted.push(p.pfx + target); } catch (e) {}
   });
   if (adopted.length) console.info('[program] carried history across rename:', adopted.join(', '));
 }
@@ -8451,42 +8842,171 @@ function bestCeilingSet(log, reps) {
 }
 
 // ── THE CEILING — the saved history behind the estimates ───────────────
-// One append-only array per athlete: [{ lift, kg, w, r, rpe, d, t }, …] where
-// `kg` is the estimate, `w/r/rpe` the set it came from, `d` the local date and
-// `t` the write time. One entry per lift per day; saving again the same day
-// replaces that day's entry rather than stacking duplicates.
+// One array per athlete: [{ lift, kg, w, r, rpe, d, t, test? }, …] where `kg`
+// is the estimate, `w/r/rpe` the set it came from, `d` the date it happened on
+// and `t` the write time. `test: true` marks a deliberate rep-max test rather
+// than a number lifted out of a working set. One entry per lift per day;
+// saving again for the same day replaces that day's entry rather than stacking.
 //
 // ⚠ This key has its own branch in mergeStoredValue() — union by lift+date,
 // newest write wins. Without it the scalar merge takes one side wholesale and a
 // phone that had not synced would delete every estimate saved on the other.
+//
+// ⚠ A DELETE IS A TOMBSTONE — { lift, d, del: true, t } with a fresh `t`, never
+// a row dropped from the array. The merge only ever walks the entries it can
+// see on both sides, so a row simply removed here is handed straight back by
+// the other phone on its next push and the deletion undoes itself. Exactly the
+// failure body weight already carries the same fix for. Which is also why every
+// write rebuilds from loadCeilingRaw(): rebuilding from loadCeiling() would
+// quietly drop every tombstone the moment the next entry was saved.
 function ceilingKey() { return ATHLETE_ID + '_1rm'; }
-function ceilingToday() {
-  const d = new Date();
+function ceilingToday() { return ceilDay(new Date()); }
+function ceilDay(d) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
        + '-' + String(d.getDate()).padStart(2, '0');
 }
-function loadCeiling() {
+// Everything on the record, tombstones included. For writes and merges only.
+function loadCeilingRaw() {
   let a = [];
   try { a = JSON.parse(localStorage.getItem(ceilingKey())) || []; } catch (e) {}
-  return Array.isArray(a) ? a.filter(e => e && e.lift && e.d && e.kg > 0) : [];
+  return Array.isArray(a) ? a.filter(e => e && e.lift && e.d) : [];
 }
-function saveCeilingEntry(lift, kg, w, r, rpe) {
-  const d = ceilingToday();
-  const all = loadCeiling().filter(e => !(e.lift === lift && e.d === d));
-  all.push({ lift: lift, kg: kg, w: w, r: r, rpe: rpe, d: d, t: Date.now() });
+// The real estimates — what every screen reads. Tombstones drop out here.
+function loadCeiling() {
+  return loadCeilingRaw().filter(e => !e.del && e.kg > 0);
+}
+function writeCeiling(all) {
   all.sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
   localStorage.setItem(ceilingKey(), JSON.stringify(all));
 }
+// `day` defaults to today; the Records page passes a date so a test done on
+// Saturday and logged on Monday lands on the day it was actually lifted.
+function saveCeilingEntry(lift, kg, w, r, rpe, day, test) {
+  const d = day || ceilingToday();
+  const all = loadCeilingRaw().filter(e => !(e.lift === lift && e.d === d));
+  const entry = { lift: lift, kg: kg, w: w, r: r, rpe: rpe, d: d, t: Date.now() };
+  if (test) entry.test = true;
+  all.push(entry);
+  writeCeiling(all);
+}
+function deleteCeilingEntry(lift, day) {
+  const all = loadCeilingRaw().filter(e => !(e.lift === lift && e.d === day));
+  all.push({ lift: lift, d: day, del: true, t: Date.now() });
+  writeCeiling(all);
+}
+// ── Renames, and why this is an ALIAS rather than a rewrite ──────────────
+// Every entry is filed under the exercise's DISPLAY NAME, so the cycle that
+// renames "Barbell Back Squat" to "Back Squat" splits an athlete's squat line
+// into two rows that each look like a beginner's. adoptRenamedExercises() fixes
+// this for the per-exercise keys by copying them, but it cannot help here: the
+// name lives INSIDE one shared array, not in the key, so there is nothing to
+// copy — only a value to rewrite.
+//
+// ⚠ And rewriting it is the wrong move. This array syncs by union across
+// devices, so a phone that renamed its rows pushes them next to the old-named
+// rows still held by a phone that has not booted since, and the split comes
+// straight back — worse, now duplicated. Resolving the name at READ time has no
+// such race: every device draws one lift from the same stored rows, converges
+// instantly, and nothing is ever destroyed if a match turns out to be wrong.
+// Entries keep their stored `lift` so deleting one still addresses the row that
+// is really there.
+function ceilAliasMap() {
+  const current = currentCycleNames();
+  if (!current.length) return {};
+  const cur = {};
+  current.forEach(n => { cur[n] = 1; });
+  const orphans = {};
+  loadCeiling().forEach(e => { if (!cur[e.lift]) orphans[e.lift] = 1; });
+  const names = Object.keys(orphans);
+  return names.length ? matchRenamed(names, current) : {};
+}
+
+// ── What is allowed to have a personal best ──────────────────────────────
+// Every exercise in the CURRENT cycle that could honestly carry one: a
+// `standard` (loaded, logged) movement whose reps chip is a rep count rather
+// than a hold or an interval. Nothing outside the plan, and never free text —
+// an entry is filed under its display name, so letting an athlete type "Squat"
+// next to a prescribed "Barbell Back Squat" splits their history in two the
+// first time they do it, with no way back.
+//
+// ⚠ Deliberately does NOT apply the reps-to-failure ceiling attachCeiling()
+// uses. That gate is about estimating off the set in front of you — a 3×12 leg
+// press cannot produce an honest single, so the card offers nothing there. It
+// says nothing about whether a 5RM test on the leg press is worth having. What
+// was PRESCRIBED stops mattering the moment the athlete is entering what they
+// actually lifted; estimateOneRM() still refuses anything past the ceiling when
+// they try to save it.
+function ceilingCandidates() {
+  const out = [], seen = {};
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(day =>
+    (day.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+      if (!ex || ex.type !== 'standard') return;
+      const name = String(ex.name || '').trim();
+      if (!name || seen[name]) return;
+      const reps = parseChips(ex.chips).reps;
+      if (prescribedReps(reps) == null) return;      // holds, carries, intervals
+      seen[name] = 1;
+      out.push({ name: name, reps: reps, test: exTestSpec(ex) });
+    })));
+  return out;
+}
+
+// The coach's retest flag on an exercise: "test": "5RM" (or any "<n>RM"), or a
+// bare true for the default. Anything else is no flag at all — this decides
+// which lifts nag the athlete, so an unrecognised value must stay silent rather
+// than guess a protocol Amir did not ask for.
+const DEFAULT_TEST_REPS = 5;
+function exTestSpec(ex) {
+  const raw = ex && ex.test;
+  if (raw === true) return { reps: DEFAULT_TEST_REPS, label: DEFAULT_TEST_REPS + 'RM' };
+  const m = String(raw || '').match(/^(\d+)\s*rm$/i);
+  if (!m) return null;
+  const reps = parseInt(m[1], 10);
+  if (!(reps > 0) || reps > ONE_RM_MAX_EFFECTIVE) return null;
+  return { reps: reps, label: reps + 'RM' };
+}
+
+// Every exercise name in the current cycle, whatever its type — the alias map
+// wants to reunite a renamed lift's history even when the movement is no longer
+// prescribed in a shape that could produce a new estimate.
+function currentCycleNames() {
+  const out = [], seen = {};
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(day =>
+    (day.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+      const n = String((ex && ex.name) || '').trim();
+      if (n && !seen[n]) { seen[n] = 1; out.push(n); }
+    })));
+  return out;
+}
+
 // Group into one row per lift, newest first, with the change since that lift's
-// first recorded estimate.
+// first recorded estimate and how long ago it was last put on the record.
 function ceilingLifts() {
+  const alias = ceilAliasMap();
   const by = {};
-  loadCeiling().forEach(e => { (by[e.lift] = by[e.lift] || []).push(e); });
+  loadCeiling().forEach(e => {
+    const lift = alias[e.lift] || e.lift;
+    const day = (by[lift] = by[lift] || {});
+    // Two stored names now reading as one lift can each hold that day. Same
+    // rule as everywhere else on this key: the newer write is the true one.
+    if (!day[e.d] || (e.t || 0) > (day[e.d].t || 0)) day[e.d] = e;
+  });
   return Object.keys(by).map(lift => {
-    const es = by[lift].sort((a, b) => (a.d < b.d ? -1 : 1));
+    const es = Object.keys(by[lift]).sort().map(d => by[lift][d]);
     const latest = es[es.length - 1];
-    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg };
+    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg,
+             age: daysSince(latest.d) };
   }).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
+}
+// Whole days between a stored date and today, on the local clock. Dates are
+// compared at midnight so a reading logged last night is "1 day ago" this
+// morning rather than a rounding of the hours between them.
+function daysSince(iso) {
+  const then = new Date(iso + 'T00:00:00');
+  if (isNaN(then)) return null;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.max(0, Math.round((today - then) / 86400000));
 }
 
 // The athlete's most recent body weight — read from AA Proof, never written

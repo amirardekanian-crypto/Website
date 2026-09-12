@@ -46,23 +46,66 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **The two apps stay out of each other's *writes*.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those), so this app can never push habit data back. It does **read** two of them, both read-only, both degrading gracefully when absent. The Ceiling takes the latest body weight out of `<id>_hab_wt` to show relative strength (see the bullet below). And the **Daily Habits card reads `<id>_hab_card`** — a snapshot habits.html *publishes* at the end of every render (`publishCardSnapshot()` there) holding the level, rank, day streak, today's done/total and the week's seven qualifying flags. ⚠️ **That key exists precisely so this app never re-derives any of it.** The XP curve, rank ladder and weighted day gate already live in two places (habits.html and the `xp_rules` row); computing them here would be a third copy, the exact failure this repo warns about where two screens disagree and nothing errors. Proof exports its *answers*, not its rules. The key is deliberately device-local — habits.html builds its sync payload explicitly from cfg/log/wt, so this never travels — and a phone that has never opened Proof simply gets a card with no numbers. Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
 - **⚠️ The Ceiling (estimated 1RM) — one storage key with a hand-written merge rule.**
   The line at the bottom of an exercise's set log is **pure derivation** — nothing stored, no
-  payload, no merge. Only *Save to The Ceiling* writes, and it writes to **`<id>_1rm`**: an
-  append-only array of `{ lift, kg, w, r, rpe, d, t }`, one entry per lift per day.
+  payload, no merge. Writes come from two doors, both landing in **`<id>_1rm`**: *Save to The
+  Ceiling* on the exercise card, and **+ Log a max** on the Records screen itself. The value
+  is an array of `{ lift, kg, w, r, rpe, d, t, test? }`, one entry per lift per day, where
+  `test: true` marks a deliberate rep-max test rather than a number lifted out of a working set.
   - **That key has its own branch in `mergeStoredValue()` — union by `lift|date`, newest `t`
     wins.** Do not remove it. Without it the key falls through to the scalar rule, which takes
     one side of the merge wholesale, and a phone that had not synced would silently delete every
     estimate saved on the other. Same class of bug as the body-weight tombstone in Proof.
+  - **⚠️ A DELETE IS A TOMBSTONE** — `{ lift, d, del: true, t }` with a fresh `t`, never a row
+    dropped from the array. The union only walks the entries it can see on both sides, so a row
+    simply removed is handed straight back by the other phone on its next push and the deletion
+    undoes itself. Exactly the failure body weight carries the same fix for. Which is also why
+    **every write rebuilds from `loadCeilingRaw()`, never `loadCeiling()`** — the display loader
+    hides tombstones, so rebuilding from it would silently drop them on the next save.
+    `loadCeiling()` is what keeps them off every screen; nothing above that layer sees one.
   - **The maths lives in `estimateOneRM()`** — Epley run on *effective* reps (`reps + (10 − RPE)`),
     so an honest RPE is what makes the number good. A true single at RPE 10 returns itself rather
     than Epley's +3%. Refuses above `ONE_RM_MAX_EFFECTIVE` (10) and rounds to 2.5 kg.
     Both constants are tunable at the top of that block; the *why* behind each is in
     `.claude/skills/program-design/SKILL.md` → **The Ceiling**, which is also where the
     coach-side rules live (no %1RM prescription; the monthly under-5RM refresh).
-  - **It only appears where it can be honest:** no rep count (holds, carries, intervals) → no
-    line; nothing logged yet → hidden entirely, which is also what keeps a max estimate off
-    unloaded work like a box jump without needing a flag in the programme JSON.
-  - Athlete-facing explanation is the **"Your estimated max (The Ceiling)"** card in `APP_GUIDE`;
-    the data handling is `privacy.html` §2.2. Keep all three in step.
+    **Both doors run the same estimator** — `paintCeilingForm()` on the Records screen mirrors
+    `paintFromFields()` on the card, field for field and message for message. A second copy of
+    the maths is how the two screens would start disagreeing.
+  - **On the exercise card it only appears where it can be honest:** no rep count (holds,
+    carries, intervals) → no line; nothing logged yet → hidden entirely, which is also what
+    keeps a max estimate off unloaded work like a box jump without needing a flag in the JSON.
+  - **⚠️ The Records screen's own list is a DIFFERENT gate, deliberately.** `ceilingCandidates()`
+    offers every `standard` exercise in the current cycle whose reps chip is a rep count — and
+    does **not** apply the reps-to-failure ceiling the card uses. The card's gate is about
+    estimating off the set in front of it (a 3×12 leg press cannot produce an honest single);
+    that says nothing about whether a 5RM test on the leg press is worth having. What was
+    *prescribed* stops mattering once the athlete enters what they actually lifted.
+    `estimateOneRM()` still refuses anything past the ceiling on save.
+  - **Never free text.** An entry is filed under its display name, so a typed "Squat" beside a
+    prescribed "Barbell Back Squat" splits the athlete's history in two with no way back. The
+    picker is the whole defence.
+  - **Renames are resolved at READ time, not rewritten** (`ceilAliasMap()`). The name lives
+    *inside* the shared array, so `adoptRenamedExercises()`'s copy-the-key trick cannot help —
+    there is only a value to overwrite, and overwriting it loses the race across devices (a
+    phone that renamed its rows pushes them next to the old-named rows still held by a phone
+    that has not booted since, and the split comes back doubled). Aliasing on read converges
+    instantly on every device and destroys nothing if a match is wrong. Entries keep their
+    stored `lift`, so deleting one still addresses the row that is really there. Both sides use
+    the same matcher — `matchRenamed()`, shared with `adoptRenamedExercises()`, ported into
+    `coach.html` as `ceilAliasMapC()` so the coach and the athlete never see one lift as two.
+  - **The retest nudge is anchored to the CYCLE, not the calendar.** A lift the programme marks
+    `"test": "5RM"` (see `SCHEMA.md` → `test`) appears in the Records screen's *Due for a
+    retest* strip when all three hold: the cycle is in its closing week or past its `endDate`,
+    the lift has gone `RETEST_MIN_DAYS` (28) without an entry, and it is in the current cycle.
+    Cycles run ~5 weeks and each chases one quality, so a test in the closing week measures the
+    block that is ending; a rolling "every 30 days" drifts into a deload sooner or later. A
+    cycle with no `endDate` cannot place the window, so the floor decides alone.
+  - **The coach sees it on `coach.html` → The work → Personal records** (`maxesPanel()`), read
+    from the same progress blob. It flags a stale lift at the same 28 days but **ignores the
+    closing-week window** — the athlete's strip waits so it does not nag, and Amir is the one
+    deciding when to ask.
+  - Athlete-facing explanation is the **"Your estimated max (The Ceiling)"** card in `APP_GUIDE`
+    plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the data
+    handling is `privacy.html` §2.2. Keep all of them in step.
 - **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read one
   localStorage key, `<id>_completed_d<N>`, holding **`"<toDateString()>|c<currentCycleIndex>"`**.
   - **Done** (`isDone`, brown pill) shows only when the stamp's cycle matches the cycle on screen

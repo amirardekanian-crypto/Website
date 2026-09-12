@@ -240,6 +240,27 @@ programme app** — that is why `saveWt()` is a stub and the pull-side merge is 
 
 Everything below still holds — it is simply enforced in the other file now.
 
+### 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
+
+Full account in `CODEBASE.md` → *The Ceiling*. The three duplications to keep in step:
+
+- **Two ways in, one estimator.** *Save to The Ceiling* on an exercise card, and **+ Log a max**
+  on the Records screen (pick a lift from the current cycle, enter kg/reps/RPE, optionally
+  backdated). `paintCeilingForm()` mirrors `paintFromFields()` deliberately — a second copy of
+  the maths is how the two screens start disagreeing. Change one, change both.
+- **The rename matcher is in `program.html` AND `coach.html`** (`matchRenamed()` /
+  `ceilAliasMapC()`). It decides whether a lift renamed between cycles reads as one row or
+  two; if the copies drift, the coach and the athlete are looking at different records for
+  the same body. ⚠️ It resolves names at READ time and never rewrites stored ones — rewriting
+  loses the race across devices and brings the split back doubled.
+- **A DELETE IS A TOMBSTONE** (`{ del: true }`), never a dropped row, for exactly the reason
+  body weight's is — and every write must rebuild from `loadCeilingRaw()`, not `loadCeiling()`,
+  or the next save silently drops them all.
+
+The `"test": "5RM"` retest flag is written by `/program-design` (`test_flag`) → `/program-assemble`
+→ `SCHEMA.md`; the athlete's nudge is anchored to the **cycle's closing week** with a 28-day floor,
+the coach's is the floor alone. Two or three flagged lifts a cycle — the nudge works by being rare.
+
 Added 2026-09-03 (Amir: *"add a weight tracker, with history … push my clients to open the
 habit tracker"*). Kilograms, **on by default for everyone, toggled off** in
 Settings → Body weight (`CFG.wt.on`; flipped from off-by-default 2026-09-05, Amir:
