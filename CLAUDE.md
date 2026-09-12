@@ -459,12 +459,29 @@ place carry over on the same id and login.
 in one call, `contact_list()` shows who signed up **and how many days they have logged**
 (the qualifying signal), `forget_contact()` erases them. Full walkthrough:
 `.claude/skills/proof-signup/SKILL.md`.
-**Signing someone up must never join them to the leaderboard** — they join themselves
-from Crew. `privacy.html` promises that; `CFG.onBoard` is a client flag never read back
-from the server, so an auto-joined athlete would appear on everyone else's board while
-their own app said *"Not on the board"*; and every signup would sit on the board at 0 XP.
-The name they typed on the form goes in the programme record as `athlete.boardName`,
-which only pre-fills the join box.
+⚠️ **REVERSED 2026-09-12 — everyone is on the leaderboard now.** This used to read
+*"signing someone up must never join them to the leaderboard"*. Amir decided the opposite,
+with the consequences stated: the board is shared by coached clients **and** free signups,
+so every athlete's display name (first name + last initial by default), level and rank are
+visible to everyone on it. He also chose to include athletes who had **previously left** —
+they are indistinguishable in the data from athletes who never decided, so the sweep puts
+everyone on once.
+
+`autoJoinBoard()` in `habits.html` runs on boot. **`CFG.boardSwept` makes it a ONE-TIME
+sweep — do not remove that.** Re-joining on every boot would mean an athlete could tap
+*Leave the board*, watch it succeed, and be back on it next launch with no way out.
+Leaving after the sweep sticks. The flag is stamped only after a join actually succeeds,
+so a first boot with no signal is retried rather than marked done.
+
+Because it is automatic, it **cannot be consent**: `privacy.html` moved the board entry to
+**legitimate interests (Art. 6(1)(f))** with leaving as the objection route — the same
+reasoning body weight uses. Roll Call stays consent, because nothing appears unless the
+athlete writes it. `renderBoardNotice()` is the standing banner that makes the athlete
+*meet* this on the day screen rather than find it in a policy document; it names the
+display name others see and links to the setting.
+
+The name typed on the signup form still goes in the programme record as
+`athlete.boardName`, and is now what the athlete is auto-joined under.
 
 **Quests are a lever Amir pulls, not a standing feature.** There are **none** unless he
 starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Pull the lever

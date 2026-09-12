@@ -3291,6 +3291,10 @@ function defaultCfg() {
            seenComeback:null,
            questPool:null, questRuns:null, seasons:null, seasonNames:null, sound:false, lbSeen:null,
            onBoard:false, boardName:null, notes:null, updatedAt:0,
+           // Everyone is on the board (2026-09-12) — see autoJoinBoard().
+           // boardSwept: the one-time sweep has run. boardNoticed: they have
+           // met the on-screen notice saying they are on it.
+           boardSwept:false, boardNoticed:true,
            // ON by default (Amir, 2026-09-05: "should be on for everyone
            // automatically ... they can turn it off") — and still unrelated to
            // everything else in here (Amir, 2026-09-03: "this is not in any way
@@ -5597,6 +5601,41 @@ async function fetchBoard() {
   }
   LB.loading = false; LB.loaded = true; render();
 }
+// ── Everyone is on the board ───────────────────────────────────────────────
+// Amir, 2026-09-12: every athlete using the app should already be on the
+// leaderboard. This replaces the old opt-in, and it was a deliberate decision
+// taken with the consequences on the table — the board is shared by coached
+// clients and free signups alike, so an athlete's display name (first name plus
+// last initial), level and rank are visible to everyone on it.
+//
+// ⚠️ THE SWEEP RUNS ONCE. `CFG.boardSwept` is set the first time and never
+// again. That is not a softening of the decision — it is what keeps *Leave the
+// board* functional. Re-joining on every boot would mean an athlete could tap
+// Leave, watch it succeed, and be back on the board the next time they opened
+// the app, with no way out at all. Once swept, leaving sticks.
+//
+// Amir chose to include athletes who had previously left: they look identical
+// in the data to athletes who never decided, so this puts everyone on once.
+// Anyone who leaves AFTER the sweep stays off.
+async function autoJoinBoard() {
+  if (window.IS_DEMO) return;
+  if (CFG.boardSwept) return;
+  if (CFG.onBoard) { CFG.boardSwept = true; saveCfg(); return; }  // already on
+
+  await joinBoard(CFG.boardName || defaultDisplayName(), true);
+
+  // joinBoard() swallows its own errors and only sets onBoard on success, so
+  // this is how we tell a real join from an offline one. The flag is stamped
+  // ONLY after it worked — otherwise an athlete who first opened the app on a
+  // train would be marked swept without ever reaching the board.
+  if (CFG.onBoard) {
+    CFG.boardSwept  = true;
+    CFG.boardNoticed = false;   // arms the on-screen notice below
+    saveCfg();
+    render();
+  }
+}
+
 async function joinBoard(name, joining) {
   if (window.IS_DEMO) { toast('Demo mode — the board is live only for real athletes.'); return; }
   try {
@@ -7721,6 +7760,7 @@ function renderToday(LI, doneCount, pct) {
            whether they asked for it or not, which is exactly what the notice
            directly below is for. -->
       ${renderLibOffer()}
+      ${renderBoardNotice()}
       ${renderWtNotice()}
       ${renderWtRow()}
 
@@ -8342,6 +8382,27 @@ function renderLibOffer() {
     <span>
       <span class="eyebrow">${esc(did)}</span>
       <span class="rcq">A workout you finished counts towards this habit, but you are not tracking it yet. Turn it on and it pays.</span>
+    </span>
+    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">&rarr;</span>
+  </button>`;
+}
+
+// ── "You are on the board" ────────────────────────────────────────────────
+// The leaderboard is automatic now, so the athlete has to MEET that fact, not
+// be left to find it in a policy document. Same standing banner the body-weight
+// default uses, and it clears the moment they tap it (which lands them on the
+// board setting, where leaving is one more tap) — or the moment they visit Crew
+// and see the board for themselves.
+function renderBoardNotice() {
+  if (!CFG.onBoard || CFG.boardNoticed || editingPast()) return '';
+  return `<button class="rcprompt" data-k="lbnotice" ${on(() => {
+    CFG.boardNoticed = true; saveCfg(); UI.backTo = 'today'; go('settings');
+  })}>
+    <span>
+      <span class="eyebrow">You are on the leaderboard</span>
+      <span class="rcq">Everyone training with me is. Other athletes see
+        <b>${esc(CFG.boardName || defaultDisplayName())}</b>, your level and your rank.
+        Leave any time in Settings.</span>
     </span>
     <span class="hd" style="font-size:19px;color:var(--accent);flex:none">&rarr;</span>
   </button>`;
@@ -10613,6 +10674,9 @@ function showError(msg) {
   render();
   armIdle();
   document.getElementById('loading').classList.add('hidden');
+
+  // Everyone is on the board (Amir, 2026-09-12). See autoJoinBoard().
+  autoJoinBoard();
 
   // Anything still unsent from a previous session goes up now.
   if (SYNC.dirty) pushNow();
