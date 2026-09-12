@@ -783,7 +783,20 @@ like every one else."*
 The streak and the seven-day count were never lost — both are on Today and Progress, where
 they are the point. The rank was nowhere on Crew at all.
 
-## Body weight — the one thing here that is not a habit
+## Body weight — MOVED OUT, 2026-09-12
+
+⚠️ **It is not in this app any more.** The card, the history screen, the chart, logging and
+deleting all live in `program.html` (Home → Body Weight). `habits.html` has no weight UI, does
+not push `<id>_hab_wt`, does not merge it, and `saveWt()` is a stub — **both apps share this
+origin's localStorage, so writing that key here would overwrite readings taken there.** The
+manual's Body weight section now just points athletes across. Free-tier athletes, who have no
+programme app, no longer have body-weight tracking at all; Amir chose that knowingly.
+
+The account below is kept because it is still the design brief for the feature — it simply
+describes `program.html` now. See CLAUDE.md for the ownership rules.
+
+<details><summary>The original brief (now implemented in program.html)</summary>
+
 
 Added 2026-09-03 (Amir: *"my aim is to add a weight tracker, with history … the aim is to
 push my clients to open the habit tracker so they start using it"*). **Kilograms only, on

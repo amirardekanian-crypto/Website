@@ -3795,10 +3795,9 @@ function saveLog() {
 // score, so nothing cached off the log or the roster can have gone stale. It
 // still marks dirty, because it does have to reach the other phone and the
 // coach's dashboard.
-function saveWt() {
-  try { localStorage.setItem(K_WT(), JSON.stringify(WT)); } catch (e) {}
-  markDirty();
-}
+// Body weight is written by program.html now (2026-09-12); this app must not
+// touch <id>_hab_wt, because both share this origin's localStorage.
+function saveWt() { /* moved to program.html */ }
 // ── The WORKOUT habit is fed by the training app, via the server ───────────
 // These are two separate apps and neither writes into the other's storage. The
 // one shared fact — "did they train that day" — comes from the server:
@@ -4201,7 +4200,9 @@ async function pushNow() {
     // the stored blob at the TOP LEVEL (data || excluded.data, stage1) and
     // whitelists nothing, so this needed no migration — and the coach dashboard
     // already selects the whole blob, so it needed none there either.
-    payload[K_WT()] = JSON.stringify(WT || {});
+    // Body weight moved to program.html (2026-09-12) — it owns and pushes
+    // <id>_hab_wt now. This app must not send it, or a stale copy here
+    // would overwrite readings taken there.
     const { error } = await sb.rpc('save_progress', {
       p_athlete_id: ATHLETE_ID, p_athlete_name: ATHLETE_NAME, p_data: payload, p_key: KEY
     });
@@ -4278,38 +4279,10 @@ async function syncFromCloud() {
       });
       localStorage.setItem(K_LOG(), JSON.stringify(LOG));
     } catch (e) {}
-    // ── Weight: UNION BY DATE, NEWEST READING WINS THAT DATE ────────────────
-    // Neither of the other two merge rules is usable here, and both would lose
-    // real data:
-    //   · max() per key — the rule immediately above — cannot record a loss. A
-    //     phone still holding 80.0 would overwrite a corrected 78.4 every time
-    //     it synced, and the number could only ever climb.
-    //   · wholesale adoption — the rule immediately below — deletes any date the
-    //     other device has not heard about yet. That is precisely the bug that
-    //     ate earned rewards until CFG.pass.owned was special-cased into a union.
-    // So: take every date we do not have, and on a date we both hold, keep the
-    // reading that was actually recorded later. `t` is stamped at entry, which
-    // is what makes "later" mean later rather than "synced more recently".
-    try {
-      const cloudWt = JSON.parse(data[K_WT()] || '{}') || {};
-      Object.keys(cloudWt).forEach(day => {
-        const theirs = cloudWt[day];
-        if (!theirs || typeof theirs !== 'object') return;
-        // A reading, or a tombstone (kg:null) — both are real writes with a
-        // timestamp and both must be able to win. Anything else is junk from a
-        // hand-edited blob and is ignored rather than trusted.
-        const isRead = typeof theirs.kg === 'number' && isFinite(theirs.kg);
-        const isTomb = theirs.kg === null;
-        if (!isRead && !isTomb) return;
-        const mine = WT[day];
-        if (!mine) { WT[day] = theirs; return; }
-        // Newest write wins outright, whichever kind it is: a newer tombstone
-        // deletes a reading this device still holds, and a newer reading
-        // revives a day the athlete deleted and then weighed again.
-        if ((theirs.t || 0) > (mine.t || 0)) WT[day] = theirs;
-      });
-      localStorage.setItem(K_WT(), JSON.stringify(WT));
-    } catch (e) {}
+    // Body weight is program.html's now (2026-09-12). It owns the key, pushes
+    // it and merges it there. This app must not write <id>_hab_wt at all —
+    // both apps share this origin's localStorage, so a merge here against a
+    // WT this app no longer maintains would overwrite real readings.
     // Config: newest wins wholesale, but never clobber unsent local settings.
     try {
       const cloudCfg = JSON.parse(data[K_CFG()] || '{}');
@@ -7777,8 +7750,6 @@ function renderToday(LI, doneCount, pct) {
            directly below is for. -->
       ${renderLibOffer()}
       ${renderBoardNotice()}
-      ${renderWtNotice()}
-      ${renderWtRow()}
 
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
@@ -8081,7 +8052,6 @@ function renderProgress(LI, earned, totalAch) {
            measurement, so it groups with the personal half of the screen rather
            than with the game half. Not a habit row — no ring, no level, no pips,
            because it has none of those things. -->
-      ${wtOn() ? sectionLabel('Body weight', 'Tap for history') + renderWtProgressRow() : ''}
 
       ${sectionLabel('Quests', 'Seven days')}
       ${renderQuestBlock()}
@@ -9169,13 +9139,8 @@ function renderManual() {
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
       ${block(h2('Body weight') +
-        p(`<strong style="color:var(--ink)">On by default</strong>, and easy to turn off — Settings, then Body weight. It is the one thing in this app that is not a habit: it earns <strong style="color:var(--ink)">no XP</strong>, it is in no streak, it cannot make a day perfect and it cannot spoil one. Switching it on or off costs you nothing either way, and switching it off keeps every reading you have taken.`) +
-        p(`When it is on, a <strong style="color:var(--ink)">Body weight</strong> card sits under your habits on Today, with your number, the month's direction and a small trend line on it. It says <strong style="color:var(--ink)">Weigh in</strong> until you have, and opens the full history either way: seven days, a month, or three.`) +
-        p(`The chart draws a <strong style="color:var(--ink)">${WT_AVG_WINDOW}-day average</strong> as the line and your actual readings as dots behind it, and every change it quotes compares one average against another. That is deliberate. Weight moves a kilo either way on water, food and sleep, so a single morning tells you nothing and two mornings compared tell you less than nothing. The line is the part worth reading.`) +
-        p(`Under the chart are the numbers that answer whether it is actually working. <strong style="color:var(--ink)">Per week</strong> is your rate across whichever span you picked — a rate shows a stall while a total is still creeping. <strong style="color:var(--ink)">Since you started</strong> ignores the span entirely and compares today with your very first reading, which is the only honest answer to "am I getting anywhere". Your readings sit underneath — the last eight, or all of them if you tap the heading.`) +
-        p(`Weigh at the same time of day, ideally first thing. Consistency of method beats frequency — <strong style="color:var(--ink)">once a week done properly</strong> is worth more than seven rushed readings, and the app never asks you for one you did not offer.`) +
-        p(`It is <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone.</strong> It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`) +
-        p(`You can delete <strong style="color:var(--ink)">any single reading</strong> from its row in the history, or <strong style="color:var(--ink)">every reading you have ever logged</strong> in one go from Settings → Body weight. Neither touches the rest of your account.`))}
+        p(`Body weight has <strong style="color:var(--ink)">moved to your programme app</strong>. Open it and you will find a <strong style="color:var(--ink)">Body Weight</strong> card on the home screen, with your number, the month's direction and the full history behind it.`) +
+        p(`Nothing was lost in the move — every reading you have ever logged is still there, and it is still <strong style="color:var(--ink)">yours and ${isFree() ? 'Amir' : 'your coach'}'s alone</strong>. It is never on the leaderboard, never on the wall, and no other athlete can reach it in any form.`))}
 
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
@@ -10207,7 +10172,6 @@ function navVal(text) { return `<span class="navval">${esc(text)}</span>`; }
 function renderSettings() {
   if (UI.sub === 'habits')     return renderSettingsHabits();
   if (UI.sub === 'appearance') return renderSettingsAppearance();
-  if (UI.sub === 'weight')     return renderSettingsWeight();
 
   const LI = overallLevel();
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -10233,10 +10197,6 @@ function renderSettings() {
                  'The five, your add-ons and anything you invent',
                  navVal(onCount + ' of ' + addTotal + ' add-ons on'),
                  () => goSub('habits'))}
-        ${navRow('⚖️', 'Body weight',
-                 'On by default, and nothing to do with your habits or your XP',
-                 navVal(wtOn() ? 'On' : 'Off'),
-                 () => goSub('weight'))}
         ${navRow('🎨', 'Appearance', 'Dark mode and the tick sound',
                  navVal(CFG.dark ? 'Dark' : 'Light'),
                  () => goSub('appearance'))}
@@ -10687,12 +10647,6 @@ function showError(msg) {
   // captured on the day it happens, while the level is still there to prove it.
   syncTitles();
 
-  // ?screen=weight lands straight on the body-weight history. program.html's
-  // Home card links here, so an athlete tapping it gets the screen they asked
-  // for rather than the front page and a hunt through Settings. Only routes
-  // that are safe to open cold are honoured.
-  const wanted = params.get('screen');
-  if (wanted === 'weight' && CFG.onboarded) { UI.backTo = 'today'; UI.screen = 'weight'; }
 
   render();
   armIdle();
