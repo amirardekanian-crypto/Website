@@ -9,14 +9,14 @@
         {
           "id": "full-body-power",
           "title": "Full-Body Power",
-          "duration": "45 min",
+          "duration": "50 min",
           "equipment": "Barbell",
           "file": "workouts/strength/full-body-power.json"
         },
         {
           "id": "push-pull-pump",
-          "title": "Push Pull Pump",
-          "duration": "35 min",
+          "title": "Serve Armour",
+          "duration": "40 min",
           "equipment": "Dumbbells",
           "file": "workouts/strength/push-pull-pump.json"
         },
@@ -51,7 +51,7 @@
         {
           "id": "engine-builder",
           "title": "Engine Builder",
-          "duration": "30 min",
+          "duration": "35 min",
           "equipment": "Bike",
           "file": "workouts/conditioning/engine-builder.json"
         },
@@ -135,7 +135,7 @@
         {
           "id": "reset-roll",
           "title": "Reset & Roll",
-          "duration": "12 min",
+          "duration": "15 min",
           "equipment": "Foam Roller",
           "file": "workouts/recovery/reset-roll.json"
         },

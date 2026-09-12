@@ -5,35 +5,141 @@
   "countsAs": "strength",
   "duration": "25 min",
   "equipment": "Court",
-  "focusTag": "Acceleration & Footwork",
+  "focusTag": "Acceleration & First Step",
   "blocks": [
     {
-      "title": "Movement Prep",
+      "title": "Activation & Prep",
       "icon": "🔥",
       "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            { "label": "3 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Baseline to baseline, easy, until you are warm and breathing",
+              "Nothing here is fast yet"
+            ],
+            "bad": [
+              "Skipping this because you feel fine — you are about to sprint"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps / side" },
+            { "label": "Front-back, then side-side" }
+          ],
+          "cues": {
+            "good": [
+              "Hold the fence, stand tall, let the leg swing freely",
+              "Build the range across the ten"
+            ],
+            "bad": [
+              "Arching the back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            { "label": "6 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Sit into the bent hip, other leg straight, chest tall",
+              "Push back out through the heel"
+            ],
+            "bad": [
+              "Letting the knee roll inward"
+            ]
+          }
+        },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "5 Reps / side" }
+            { "label": "4 Reps / side" }
           ],
           "cues": {
             "good": [
-              "Move slowly and reach tall through the top hand",
-              "Feel the hip and upper back open on each rep"
+              "Drive the back hip down before you rotate",
+              "Reach the top hand at the sky and look at it"
             ],
             "bad": [
-              "Rushing through without controlling the position"
+              "Rotating before the hip has opened"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "A-Skip",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×15 m" }
+          ],
+          "cues": {
+            "good": [
+              "Tall hips, strike the ground underneath you, quiet contacts",
+              "Rhythm first, height second"
+            ],
+            "bad": [
+              "Reaching the foot out in front of the body"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Pogo",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 Sets" },
+            { "label": "×10 Reps" }
+          ],
+          "cues": {
+            "good": [
+              "Stiff ankles, knees nearly straight, off the ground as fast as you land",
+              "This wakes up the spring you are about to use"
+            ],
+            "bad": [
+              "Bending the knees and turning it into a squat jump"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Build-Up Run",
+          "videoUrl": null,
+          "chips": [
+            { "label": "3 Sets" },
+            { "label": "×20 m, 60% → 80% → 90%" }
+          ],
+          "cues": {
+            "good": [
+              "Accelerate smoothly to the top speed of each one, then ease off",
+              "The last one should feel fast but relaxed",
+              "This is the bridge between warm and sprinting. Do not skip it"
+            ],
+            "bad": [
+              "Going straight to full effort on the first one"
             ]
           }
         }
       ]
     },
     {
-      "title": "Speed",
-      "icon": "🎾",
+      "title": "Acceleration",
+      "icon": "⚡",
       "exercises": [
         {
           "type": "standard",
@@ -46,12 +152,35 @@
           ],
           "cues": {
             "good": [
-              "Land the split-step then explode hard into the first stride",
-              "Stay low for the first two steps before rising up"
+              "Land the split-step already loaded, then explode into the first stride",
+              "Stay low for the first two steps before you rise up",
+              "Full rest between every one — this is a speed session, not conditioning"
             ],
             "bad": [
               "A slow, flat-footed first step",
-              "Standing tall too early out of the start"
+              "Standing tall straight out of the start",
+              "Cutting the rest short to get it over with"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Falling Start",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            { "label": "4 Sets", "style": "yellow" },
+            { "label": "×10 m" }
+          ],
+          "cues": {
+            "good": [
+              "Stand tall, lean forward from the ankles until you have to catch yourself, then run",
+              "The lean is what puts you in the right shape — do not bend at the waist",
+              "Let the first three steps be long and low"
+            ],
+            "bad": [
+              "Bending at the hips instead of leaning from the ankle",
+              "Stepping to catch yourself before you have really fallen"
             ]
           }
         }
@@ -63,24 +192,41 @@
       "exercises": [
         {
           "type": "circuit",
-          "name": "Agility Ladder",
-          "rounds": "4 Rounds",
-          "restSec": 45,
+          "name": "Baseline Footwork",
+          "rounds": "3 Rounds",
+          "restSec": 60,
           "items": [
             {
-              "name": "In-In-Out-Out",
-              "detail": "1 length",
+              "name": "Split-Step to First Step",
+              "detail": "6 reps, alternating sides",
               "cues": {
-                "good": ["Quick feet, stay light on the balls of the feet"],
-                "bad": ["Looking down at the ladder the whole time"]
+                "good": [
+                  "Split-step on the baseline, then one hard push-off to the side and set",
+                  "The first step goes where you are going, not across your body"
+                ],
+                "bad": ["Landing the split-step flat and heavy"]
               }
             },
             {
-              "name": "Lateral Shuffle",
-              "detail": "1 length each way",
+              "name": "Recovery Shuffle",
+              "detail": "4 reps each way",
               "cues": {
-                "good": ["Stay low through the hips and push off the outside foot"],
-                "bad": ["Crossing the feet over each other"]
+                "good": [
+                  "From wide out at the tramline, shuffle back to the middle and set",
+                  "Stay low the whole way, face the net"
+                ],
+                "bad": ["Standing up tall halfway back", "Crossing the feet"]
+              }
+            },
+            {
+              "name": "Backward-to-Forward Transition",
+              "detail": "4 reps",
+              "cues": {
+                "good": [
+                  "Drop-step back three steps, then turn and drive forward to the service line",
+                  "Open the hip to turn — do not step across yourself"
+                ],
+                "bad": ["Turning your back on the court"]
               }
             }
           ]

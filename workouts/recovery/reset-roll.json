@@ -3,67 +3,102 @@
   "title": "Reset & Roll",
   "category": "recovery",
   "countsAs": "mobility",
-  "duration": "12 min",
+  "duration": "15 min",
   "equipment": "Foam Roller",
-  "focusTag": "Down-Regulate & Restore",
+  "focusTag": "Release & Down-Regulate",
   "blocks": [
     {
-      "title": "Activate",
-      "icon": "🌱",
-      "exercises": [
-        {
-          "type": "simple",
-          "name": "Glute Bridge",
-          "videoUrl": null,
-          "chips": [
-            { "label": "2 Sets" },
-            { "label": "12 Reps" }
-          ],
-          "cues": {
-            "good": [
-              "Push the floor away and squeeze the glutes hard at the top",
-              "Keep the ribs down so the lower back doesn't arch"
-            ],
-            "bad": [
-              "Hyperextending the lower back at the top"
-            ]
-          }
-        }
-      ]
-    },
-    {
       "title": "Release",
-      "icon": "🧊",
+      "icon": "🌀",
       "exercises": [
         {
           "type": "simple",
-          "name": "Quad Foam Roll",
+          "name": "Calf Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60s / side" }
+            { "label": "60 sec / side" }
           ],
           "cues": {
             "good": [
-              "Roll slowly and pause on any tender spots for a few breaths"
+              "Slow. Stop on the sore spots and breathe there for a few seconds",
+              "Cross the other leg on top if you want more pressure",
+              "Start at the ankle and work up, not the other way"
             ],
             "bad": [
-              "Rolling fast and rushing over the tight areas"
+              "Rolling back and forth fast like you are sawing wood",
+              "Holding your breath on the tender spots"
             ]
           }
         },
         {
           "type": "simple",
-          "name": "Calf Foam Roll",
+          "name": "Quad Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60s / side" }
+            { "label": "60 sec / side" }
           ],
           "cues": {
             "good": [
-              "Cross the other leg on top for more pressure where needed"
+              "Face down, one thigh on the roller, slow from knee to hip",
+              "Bend and straighten the knee while you pause on a spot"
             ],
             "bad": [
-              "Holding your breath while you roll"
+              "Racing through it",
+              "Rolling directly over the kneecap"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Roll",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Sit on the roller, cross one ankle over the opposite knee, lean into that side",
+              "Small movements. You are hunting one spot, not covering ground",
+              "This is the one most players skip and most need"
+            ],
+            "bad": [
+              "Sitting on it and not actually loading one side"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Upper Back Roll",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60 sec", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Roller across the upper back, hands behind the head, ribs down",
+              "Pause and breathe into each level before moving up",
+              "Stay above the bottom of the ribcage. The lower back does not get rolled"
+            ],
+            "bad": [
+              "Rolling the lower back",
+              "Letting the ribs flare and arching over the roller"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lat Roll",
+          "videoUrl": null,
+          "chips": [
+            { "label": "45 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "On your side, arm overhead, roller under the armpit and down the side of the back",
+              "Your serving side will be the worse one. Give it the time"
+            ],
+            "bad": [
+              "Rolling into the ribs themselves"
             ]
           }
         }
@@ -71,22 +106,41 @@
     },
     {
       "title": "Down-Regulate",
-      "icon": "🌙",
+      "icon": "🧘",
       "exercises": [
+        {
+          "type": "simple",
+          "name": "Child's Pose",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60 sec", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Knees wide, hips back to the heels, arms long",
+              "Breathe into your back and let it widen"
+            ],
+            "bad": [
+              "Rushing to the breathing before the body has settled"
+            ]
+          }
+        },
         {
           "type": "simple",
           "name": "Box Breathing",
           "videoUrl": null,
           "chips": [
-            { "label": "2 min" }
+            { "label": "3 minutes", "style": "dark" }
           ],
           "cues": {
             "good": [
-              "Inhale 4s, hold 4s, exhale 4s, hold 4s — smooth and even",
-              "Let the shoulders drop and the jaw soften"
+              "In for four, hold four, out for four, hold four",
+              "Lie down, one hand on the belly. Only that hand should move",
+              "This is the part that actually switches you off. Do not cut it short"
             ],
             "bad": [
-              "Forcing long breaths that feel strained"
+              "Straining to hold the counts. Shorten to three if four is a fight",
+              "Doing it with your phone in your other hand"
             ]
           }
         }

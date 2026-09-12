@@ -5,85 +5,180 @@
   "countsAs": "mobility",
   "duration": "15 min",
   "equipment": "Bodyweight",
-  "focusTag": "Full-Body Mobility",
+  "focusTag": "Ankles, Hips, Upper Back",
   "blocks": [
     {
-      "title": "Spine & Hips",
-      "icon": "🌀",
+      "title": "Spine & Ribs",
+      "icon": "🧘",
       "exercises": [
         {
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
             { "label": "10 Reps" }
           ],
           "cues": {
             "good": [
-              "Move one segment of the spine at a time, slow and controlled",
-              "Breathe out as you round, in as you arch"
+              "One vertebra at a time, breathe with the movement",
+              "Out as you round, in as you arch"
             ],
             "bad": [
-              "Rushing and only moving the lower back"
+              "Snapping between the two shapes"
             ]
           }
         },
         {
           "type": "simple",
-          "name": "90/90 Hip Switch",
+          "name": "Open Book",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
             { "label": "8 Reps / side" }
           ],
           "cues": {
             "good": [
-              "Keep the chest tall and rotate from the hips, not the lower back"
+              "On your side, knees stacked, open the top arm and follow it with your eyes",
+              "Knees stay together. The turn comes from the ribs, not the hips",
+              "Your serve and your forehand both live here"
             ],
             "bad": [
-              "Collapsing the torso forward to get the knees down"
+              "Letting the top knee lift so the hips rotate instead"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Thread the Needle",
+          "videoUrl": null,
+          "chips": [
+            { "label": "6 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "On all fours, reach one arm under the other and let the shoulder settle to the floor",
+              "Then reach it back up to the ceiling and open the chest"
+            ],
+            "bad": [
+              "Letting the hips drift away from over the knees"
             ]
           }
         }
       ]
     },
     {
-      "title": "Open Up",
-      "icon": "🧘",
+      "title": "Hips",
+      "icon": "🦵",
       "exercises": [
         {
           "type": "simple",
-          "name": "World's Greatest Stretch",
+          "name": "90/90 Hip Switch",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "5 Reps / side" }
+            { "label": "8 Reps / side" }
           ],
           "cues": {
             "good": [
-              "Reach tall through the top hand and follow it with the eyes",
-              "Feel the hip flexor and upper back open together"
+              "Both knees at ninety, rotate them slowly to the other side",
+              "Chest tall, no hands if you can",
+              "Go only as far as you own without pushing"
             ],
             "bad": [
-              "Holding the breath or forcing the range"
+              "Forcing the knees down with your hands"
             ]
           }
         },
         {
           "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "5 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Drive the back hip towards the floor, then rotate and reach tall",
+              "Hip and upper back in one movement, which is why it earns its name"
+            ],
+            "bad": [
+              "Rotating before the hip has opened"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Couch Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "45 sec / side" }
+          ],
+          "cues": {
+            "good": [
+              "Back foot up on a sofa or wall, squeeze the back glute and stand tall",
+              "The glute squeeze is the stretch. Without it you are just arching your back",
+              "The front of the hip is what hours in a low stance takes from you"
+            ],
+            "bad": [
+              "Arching the lower back to get deeper",
+              "Holding your breath"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Deep Squat Hold",
+          "videoUrl": null,
+          "chips": [
+            { "label": "60 sec", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "Sit into the bottom of a squat and stay there, elbows inside the knees",
+              "Hold a door frame for balance if your heels lift",
+              "Breathe. Let it settle rather than fighting it"
+            ],
+            "bad": [
+              "Bouncing to get lower"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Ankles & Shoulders",
+      "icon": "🦶",
+      "exercises": [
+        {
+          "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
             { "label": "10 Reps / side" }
           ],
           "cues": {
             "good": [
-              "Drive the knee forward over the toes and keep the heel down"
+              "Half-kneeling, drive the knee forward over the toes, heel glued down",
+              "Stiff ankles are the first thing that limits a split-step"
             ],
             "bad": [
-              "Letting the heel lift off the floor"
+              "Letting the heel lift",
+              "Letting the arch collapse inward"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Shoulder Cross-Body Swings",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Swing the arm across the body and back open, relaxed and rhythmic",
+              "Let the upper back turn with it"
+            ],
+            "bad": [
+              "Forcing the end range"
             ]
           }
         }

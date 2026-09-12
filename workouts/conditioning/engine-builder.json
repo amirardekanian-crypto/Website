@@ -3,80 +3,129 @@
   "title": "Engine Builder",
   "category": "conditioning",
   "countsAs": "strength",
-  "duration": "30 min",
+  "duration": "35 min",
   "equipment": "Bike",
-  "focusTag": "Aerobic Engine",
+  "focusTag": "Aerobic Base",
   "blocks": [
     {
-      "title": "Warm-Up",
+      "title": "Activation & Prep",
       "icon": "🔥",
       "exercises": [
         {
           "type": "simple",
-          "name": "Assault Bike",
+          "name": "Easy Spin",
           "videoUrl": null,
           "chips": [
-            { "label": "5 min" }
+            { "label": "5 minutes", "style": "dark" }
           ],
           "cues": {
             "good": [
-              "Smooth, relaxed pace to raise the heart rate gradually",
-              "Settle into a steady rhythm with the arms and legs"
+              "Upright bike, seat high enough that your hips stay above your knees and you sit tall",
+              "An incline treadmill walk does the same job if you prefer",
+              "Very easy. You are only raising the temperature"
             ],
             "bad": [
-              "Going too hard before the body is warm"
+              "Using an air bike for this. It rounds your lower back and drives it with every arm stroke, and five minutes of that before every session adds up",
+              "Starting hard"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps / side" },
+            { "label": "Front-back, then side-side" }
+          ],
+          "cues": {
+            "good": [
+              "Tall posture, free swing, build the range"
+            ],
+            "bad": [
+              "Arching the back to swing higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            { "label": "4 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Hips and upper back, before you sit down for half an hour"
+            ],
+            "bad": [
+              "Skipping it because the bike feels like enough"
             ]
           }
         }
       ]
     },
     {
-      "title": "Intervals",
-      "icon": "🚴",
+      "title": "Aerobic Base",
+      "icon": "🫀",
       "exercises": [
         {
-          "type": "circuit",
-          "name": "Bike Intervals",
-          "rounds": "6 Rounds",
-          "restSec": 0,
-          "items": [
-            {
-              "name": "Hard Effort",
-              "detail": "90s hard",
-              "cues": {
-                "good": ["A strong, repeatable push — not an all-out sprint"],
-                "bad": ["Blasting the first round and fading early"]
-              }
-            },
-            {
-              "name": "Easy Recovery",
-              "detail": "90s easy",
-              "cues": {
-                "good": ["Spin light and let the breathing settle before the next effort"],
-                "bad": ["Stopping completely between efforts"]
-              }
-            }
-          ]
+          "type": "simple",
+          "name": "Steady Ride",
+          "videoUrl": null,
+          "chips": [
+            { "label": "22 minutes", "style": "dark" },
+            { "label": "Conversation pace" }
+          ],
+          "cues": {
+            "good": [
+              "One pace, the whole way. No surges",
+              "The test is your breath: you should be able to hold a conversation in full sentences, and breathe through your nose most of the time",
+              "If you cannot talk, you are going too hard. This session only works if it stays easy",
+              "This is the base that lets you recover between points, and between sessions"
+            ],
+            "bad": [
+              "Drifting faster as you get bored, or chasing a number on the screen",
+              "Treating it as a hard day. The hard days are elsewhere in your week"
+            ]
+          }
         }
       ]
     },
     {
       "title": "Cool-Down",
-      "icon": "🧊",
+      "icon": "🧘",
       "exercises": [
         {
           "type": "simple",
-          "name": "Rowing",
+          "name": "Easy Spin",
           "videoUrl": null,
           "chips": [
-            { "label": "5 min" }
+            { "label": "3 minutes", "style": "dark" }
           ],
           "cues": {
             "good": [
-              "Long, easy strokes to bring the heart rate back down"
+              "Same bike, almost no resistance, until your breathing settles"
             ],
             "bad": [
-              "Stopping abruptly straight after the last interval"
+              "Stopping dead and getting straight off"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Nasal Breathing",
+          "videoUrl": null,
+          "chips": [
+            { "label": "2 minutes", "style": "dark" }
+          ],
+          "cues": {
+            "good": [
+              "In through the nose for four, out for six",
+              "Shoulders down on every exhale"
+            ],
+            "bad": [
+              "Forcing big breaths"
             ]
           }
         }

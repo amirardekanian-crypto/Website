@@ -122,12 +122,12 @@
       ]
     },
     {
-      "title": "Activate & Micro-Dose",
+      "title": "Activate",
       "icon": "⚡",
       "exercises": [
         {
           "type": "circuit",
-          "name": "Micro-Dose Circuit",
+          "name": "Ankle & Hamstring Primer",
           "rounds": "2 Rounds",
           "restSec": 45,
           "items": [

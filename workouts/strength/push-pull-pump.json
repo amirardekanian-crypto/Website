@@ -1,38 +1,160 @@
 {
   "id": "push-pull-pump",
-  "title": "Push Pull Pump",
+  "title": "Serve Armour",
   "category": "strength",
   "countsAs": "strength",
-  "duration": "35 min",
+  "duration": "40 min",
   "equipment": "Dumbbells",
-  "focusTag": "Upper Body Pump",
+  "focusTag": "Upper Body for Racket Athletes",
   "blocks": [
     {
-      "title": "Warm-Up",
+      "title": "Activation & Prep",
       "icon": "🔥",
       "exercises": [
         {
           "type": "simple",
-          "name": "Band External Rotation",
+          "name": "Rowing Machine",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "12 Reps / arm" }
+            { "label": "4 minutes", "style": "dark" }
           ],
           "cues": {
             "good": [
-              "Keep the elbow pinned to your side and rotate from the shoulder"
+              "Easy pace. It raises the temperature and rehearses the pull at the same time",
+              "Any machine works if there is no rower"
             ],
             "bad": [
-              "Letting the elbow drift away from the ribs"
+              "Hammering it — this is the raise, not a workout"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Arm Circles",
+          "videoUrl": null,
+          "chips": [
+            { "label": "10 Reps / direction" }
+          ],
+          "cues": {
+            "good": [
+              "Start small, grow the circle as the shoulder loosens",
+              "Backward circles matter more than forward for your sport"
+            ],
+            "bad": [
+              "Starting with the biggest circle you can make"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Open Book",
+          "videoUrl": null,
+          "chips": [
+            { "label": "8 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "On your side, knees stacked, open the top arm and follow it with your eyes",
+              "Get the upper back turning before you ask the shoulder to press"
+            ],
+            "bad": [
+              "Letting the knees roll apart so the hips do the work"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Prone Y-T Raise",
+          "videoUrl": null,
+          "chips": [
+            { "label": "8 Reps / shape" },
+            { "label": "Bodyweight" }
+          ],
+          "cues": {
+            "good": [
+              "Face down, lift the arms a few inches — a Y, then a T",
+              "Thumbs up, neck long, no shrugging",
+              "Switches on the muscles that hold the shoulder together"
+            ],
+            "bad": [
+              "Shrugging towards the ears",
+              "Lifting the chest to cheat the arms higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Light Dumbbell Rehearsal",
+          "videoUrl": null,
+          "chips": [
+            { "label": "1 Set" },
+            { "label": "×10 Reps, very light" }
+          ],
+          "cues": {
+            "good": [
+              "One light set of the first working movement before you load it",
+              "Groove the path, feel the shoulder, then go"
+            ],
+            "bad": [
+              "Going straight to your working weight"
             ]
           }
         }
       ]
     },
     {
-      "title": "Push / Pull",
+      "title": "Primary",
       "icon": "🎯",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Single-Arm Dumbbell Row",
+          "videoUrl": null,
+          "restSec": 90,
+          "chips": [
+            { "label": "4 Sets", "style": "yellow" },
+            { "label": "×10 Reps / side" },
+            { "label": "RPE 7-8" }
+          ],
+          "cues": {
+            "good": [
+              "Hand and knee on the bench, flat back, pull to the hip",
+              "Pause at the top, lower it slowly",
+              "Pulling leads this session on purpose — it is the half your sport never trains"
+            ],
+            "bad": [
+              "Twisting the torso to get the dumbbell higher",
+              "Dropping it fast and bouncing the next rep"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Half-Kneeling Single-Arm Overhead Press",
+          "videoUrl": null,
+          "restSec": 90,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×8 Reps / side" },
+            { "label": "RPE 7" }
+          ],
+          "cues": {
+            "good": [
+              "Half-kneeling, squeeze the back glute, ribs down",
+              "Press straight up beside the ear, not out in front",
+              "Kneeling is deliberate — it stops your lower back arching to finish the rep"
+            ],
+            "bad": [
+              "Leaning back to press the weight up",
+              "Pressing through pain. Stop and tell me instead"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Accessory",
+      "icon": "💪",
       "exercises": [
         {
           "type": "standard",
@@ -40,84 +162,88 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "×10-12 Reps" }
+            { "label": "2 Sets", "style": "yellow" },
+            { "label": "×10 Reps" },
+            { "label": "RPE 7" }
           ],
           "cues": {
             "good": [
-              "Press the dumbbells up and slightly toward each other at the top",
-              "Feel the stretch across the chest at the bottom, then squeeze to drive up"
+              "Elbows about 45° from the body, not flared wide",
+              "Two sets only, and that is on purpose — your shoulder already presses all week"
             ],
             "bad": [
-              "Flaring the elbows straight out to 90 degrees"
+              "Adding sets because it feels like the fun one",
+              "Letting the elbows flare to ninety degrees"
             ]
           }
         },
         {
           "type": "standard",
-          "name": "Single-Arm Dumbbell Row",
+          "name": "Rear Delt Fly",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "×10-12 Reps / arm" }
-          ],
-          "cues": {
-            "good": [
-              "Drive the elbow past the ribs and squeeze the lat at the top"
-            ],
-            "bad": [
-              "Twisting the torso to heave the weight up"
-            ]
-          }
-        },
-        {
-          "type": "standard",
-          "name": "Seated Dumbbell Overhead Press",
-          "videoUrl": null,
-          "restSec": 75,
+          "restSec": 60,
           "chips": [
             { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps" }
+            { "label": "×12 Reps" },
+            { "label": "RPE 7" }
           ],
           "cues": {
             "good": [
-              "Keep the ribs down and press straight up to a full lockout"
+              "Hinge over, light weight, lead with the elbows",
+              "Small weight and a real squeeze beats a big weight and a swing"
             ],
             "bad": [
-              "Arching the lower back to press the weight up"
+              "Using the lower back to throw them up",
+              "Going so heavy it becomes a row"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Dumbbell Wrist Extension",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            { "label": "2 Sets", "style": "yellow" },
+            { "label": "×15 Reps / side" }
+          ],
+          "cues": {
+            "good": [
+              "Forearm on your thigh, palm down, very light, slow all the way down",
+              "This is the one that keeps tennis elbow away. Two minutes, every week"
+            ],
+            "bad": [
+              "Going heavy. Light and slow is the whole point",
+              "Skipping it because it looks like nothing"
             ]
           }
         }
       ]
     },
     {
-      "title": "Pump Finisher",
-      "icon": "💥",
+      "title": "Core",
+      "icon": "🧱",
       "exercises": [
         {
-          "type": "circuit",
-          "name": "Arm Pump Superset",
-          "rounds": "3 Rounds",
-          "restSec": 45,
-          "items": [
-            {
-              "name": "Dumbbell Hammer Curl",
-              "detail": "15 reps",
-              "cues": {
-                "good": ["Keep the elbows pinned to your sides through the whole rep"],
-                "bad": ["Swinging the torso to lift the weight"]
-              }
-            },
-            {
-              "name": "Bench Dip",
-              "detail": "15 reps",
-              "cues": {
-                "good": ["Keep the elbows tracking straight back, chest tall"],
-                "bad": ["Letting the shoulders shrug up toward the ears"]
-              }
-            }
-          ]
+          "type": "standard",
+          "name": "Suitcase Carry",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            { "label": "3 Sets", "style": "yellow" },
+            { "label": "×20 m / side" }
+          ],
+          "cues": {
+            "good": [
+              "Pick it up like a deadlift — hips back, flat back, stand up with it",
+              "One heavy dumbbell, one side. Walk tall and do not lean away from it",
+              "Set it down the same way you picked it up"
+            ],
+            "bad": [
+              "Bending over and yanking it off the floor",
+              "Leaning sideways to counterbalance"
+            ]
+          }
         }
       ]
     }
