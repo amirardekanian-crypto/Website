@@ -1182,6 +1182,10 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 700;
   }
+  /* First-timer version: a sentence rather than a label, so it wraps and the
+     tick sits at the top of it rather than floating in the middle. */
+  .complete-habit.is-intro { align-items: flex-start; text-align: left; max-width: 340px; }
+  .complete-habit.is-intro .complete-habit-text { line-height: 1.5; }
   .complete-habit-text { font-size: 12.5px; color: var(--grey-dark); }
   body[data-dark] .complete-habit-text { color: #EDEAE4; }
   .complete-habit-text b { color: #C7552F; }
@@ -3546,8 +3550,10 @@
     <div id="day-cards-wrap"></div>
 
     <!-- Personal Records stays below the week: it is about the training just
-         above it, and it only changes when a lift moves. -->
+         above it, and it only changes when a lift moves. Body weight sits
+         under it — the other number an athlete watches, read from AA Proof. -->
     <div id="home-ceiling-wrap"></div>
+    <div id="home-weight-wrap"></div>
   </div>
 
   <!-- ── DAY VIEW: a single day's workout, opened from a day card. Holds the
@@ -5157,6 +5163,8 @@ function renderHome() {
   // today's session would otherwise not show until the app was reloaded.
   const homeCeil = document.getElementById('home-ceiling-wrap');
   if (homeCeil) { homeCeil.innerHTML = ceilingCardHtml(); ceilingCountUp(homeCeil); }
+  const homeWt = document.getElementById('home-weight-wrap');
+  if (homeWt) homeWt.innerHTML = weightCardHtml();
   const habWrap = document.getElementById('home-habits-wrap');
   if (habWrap) habWrap.innerHTML = habitCardHtml();
 
@@ -5947,6 +5955,8 @@ function goTo(screen, historyId, keepContent) {
     if (hc) { hc.innerHTML = ceilingCardHtml(); ceilingCountUp(hc); }
     const hh = document.getElementById('home-habits-wrap');
     if (hh) hh.innerHTML = habitCardHtml();
+    const hw = document.getElementById('home-weight-wrap');
+    if (hw) hw.innerHTML = weightCardHtml();
   }
 
   // Leaving The Ceiling by any route other than its own back chevron drops the
@@ -7461,7 +7471,22 @@ function confirmSession(day) {
   // Proof's space — so all we do here is say so.
   if (!window.IS_DEMO) {
     const tick = document.getElementById('habit-tick-' + day);
-    if (tick) tick.hidden = false;
+    if (tick) {
+      tick.hidden = false;
+      // Someone who has never opened AA Proof has no idea what "your Workout
+      // habit" means (Amir, 2026-09-12: "some people dont know what it is").
+      // habCardSnapshot() is null until Proof has rendered once on this device,
+      // which is exactly the test for "never used it" — so they get told what
+      // it is and what just happened, instead of a word they have never seen.
+      if (!habCardSnapshot()) {
+        tick.classList.add('is-intro');
+        tick.innerHTML =
+          `<span class="complete-habit-mark">✓</span>
+           <span class="complete-habit-text">This session just ticked itself off in
+             <b>AA Proof</b>, your daily habit tracker. Sleep, steps, water and protein
+             live there too. <b>·&nbsp;take a look</b></span>`;
+      }
+    }
   }
   markSuggestedDay();
 }
@@ -8387,6 +8412,65 @@ function ceilingLifts() {
 // null kg is a tombstone for a deleted reading); syncFromCloud pulls it down
 // with every other key on the shared blob, and _snapshot() deliberately never
 // pushes it back. So this app gets the number for free and cannot corrupt it.
+// Every real reading, oldest first, for the Home card's trend. Tombstones
+// (kg: null, a deleted reading) are skipped, same as latestBodyWeight().
+function bodyWeightSeries() {
+  let wt = null;
+  try { wt = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_wt')); } catch (e) {}
+  if (!wt || typeof wt !== 'object') return [];
+  return Object.keys(wt).filter(d => wt[d] && wt[d].kg > 0).sort()
+    .map(d => ({ d: d, kg: wt[d].kg }));
+}
+
+// ── Body weight, on Home ───────────────────────────────────────────────────
+// AA Proof owns this number — it is written, synced and deleted there, and
+// _snapshot() never pushes `hab_` keys, so writing it here would strand the
+// reading on one device. This card READS it and hands the athlete across to
+// log one. Amir, 2026-09-12: there are two front doors to body weight now, this
+// card and the tracker itself, and either is a fine place to point someone.
+function weightCardHtml() {
+  const series = bodyWeightSeries();
+  const head = `
+    <div class="home-section-head">
+      <div class="home-section-title">Body Weight</div>
+    </div>`;
+
+  if (!series.length) {
+    return head + `
+      <button type="button" class="nc" onclick="goHabitsWeight()">
+        <div class="nc-k"><span>Body weight</span></div>
+        <div class="nc-big">Not tracked yet</div>
+        <div class="nc-f">Add today's weight in AA Proof<span class="nc-a">→</span></div>
+      </button>`;
+  }
+
+  const last = series[series.length - 1];
+  // Compare against the reading closest to a month back, not the one before it —
+  // day-to-day weight swings a kilo on water alone and would report noise.
+  const monthAgo = new Date(last.d + 'T00:00:00');
+  monthAgo.setDate(monthAgo.getDate() - 30);
+  const older = series.filter(e => new Date(e.d + 'T00:00:00') <= monthAgo).pop()
+             || (series.length > 1 ? series[0] : null);
+  const diff = older ? +(last.kg - older.kg).toFixed(1) : 0;
+  const trend = !older ? 'First reading'
+    : diff === 0 ? 'Level over the last month'
+    : `${diff > 0 ? '▲' : '▼'} ${Math.abs(diff)} kg since ${fmtCeilDate(older.d)}`;
+
+  return head + `
+    <button type="button" class="nc" onclick="goHabitsWeight()">
+      <div class="nc-k"><span>Body weight</span><span class="nc-r">${esc(fmtCeilDate(last.d))}</span></div>
+      <div class="nc-row">
+        <div class="nc-n">${last.kg}</div><div class="nc-u">KG</div>
+        <div class="nc-sp">${ncSpark(series.map(e => ({ kg: e.kg })))}</div>
+      </div>
+      <div class="nc-f">${esc(trend)}<span class="nc-a">→</span></div>
+    </button>`;
+}
+
+// Straight to the body-weight screen in AA Proof, not its front page.
+function goHabitsWeight() { window.location.href = habitsUrl() + '&screen=weight'; }
+window.goHabitsWeight = goHabitsWeight;
+
 function latestBodyWeight() {
   let wt = null;
   try { wt = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_wt')); } catch (e) {}

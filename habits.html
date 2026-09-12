@@ -5617,10 +5617,26 @@ async function fetchBoard() {
 // Amir chose to include athletes who had previously left: they look identical
 // in the data to athletes who never decided, so this puts everyone on once.
 // Anyone who leaves AFTER the sweep stays off.
+// Has this athlete actually trained? The WORKOUT habit is locked and fed from
+// the server by importWorkoutDays(), so a tick on it means a finished session
+// in the programme app — not something they could set themselves.
+function hasFinishedAWorkout() {
+  const h = habitById('strength');
+  if (!h) return false;
+  return loggedDays().some(k => isDone(h, k));
+}
+
 async function autoJoinBoard() {
   if (window.IS_DEMO) return;
   if (CFG.boardSwept) return;
   if (CFG.onBoard) { CFG.boardSwept = true; saveCfg(); return; }  // already on
+  // ⚠️ Gated on having finished a workout (Amir, 2026-09-12, revising the
+  // blanket sweep). Two things fall out of that, both wanted:
+  //   · An athlete who has stopped using the app never qualifies, so they are
+  //     left off the board instead of being dragged back onto it.
+  //   · Nobody lands on the board at 0 XP with nothing to show.
+  // The flag stays unset until then, so this simply re-checks on each open.
+  if (!hasFinishedAWorkout()) return;
 
   await joinBoard(CFG.boardName || defaultDisplayName(), true);
 
@@ -10671,11 +10687,18 @@ function showError(msg) {
   // captured on the day it happens, while the level is still there to prove it.
   syncTitles();
 
+  // ?screen=weight lands straight on the body-weight history. program.html's
+  // Home card links here, so an athlete tapping it gets the screen they asked
+  // for rather than the front page and a hunt through Settings. Only routes
+  // that are safe to open cold are honoured.
+  const wanted = params.get('screen');
+  if (wanted === 'weight' && CFG.onboarded) { UI.backTo = 'today'; UI.screen = 'weight'; }
+
   render();
   armIdle();
   document.getElementById('loading').classList.add('hidden');
 
-  // Everyone is on the board (Amir, 2026-09-12). See autoJoinBoard().
+  // The board sweep, now gated on having actually trained. See autoJoinBoard().
   autoJoinBoard();
 
   // Anything still unsent from a previous session goes up now.

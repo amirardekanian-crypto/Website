@@ -467,11 +467,17 @@ visible to everyone on it. He also chose to include athletes who had **previousl
 they are indistinguishable in the data from athletes who never decided, so the sweep puts
 everyone on once.
 
-`autoJoinBoard()` in `habits.html` runs on boot. **`CFG.boardSwept` makes it a ONE-TIME
-sweep — do not remove that.** Re-joining on every boot would mean an athlete could tap
-*Leave the board*, watch it succeed, and be back on it next launch with no way out.
-Leaving after the sweep sticks. The flag is stamped only after a join actually succeeds,
-so a first boot with no signal is retried rather than marked done.
+`autoJoinBoard()` in `habits.html` runs on boot, and **is gated on having finished a
+workout** (Amir revised the blanket sweep the same day): it returns early unless the
+locked WORKOUT habit has been ticked at least once, which only the server can do. Two
+consequences, both deliberate — **an athlete who has stopped using the app never qualifies
+and is left off the board rather than dragged back onto it**, and nobody lands there at
+0 XP with nothing to show.
+
+**`CFG.boardSwept` makes it a ONE-TIME sweep — do not remove that.** Re-joining on every
+boot would mean an athlete could tap *Leave the board*, watch it succeed, and be back on it
+next launch with no way out. **If they leave, they left.** The flag is stamped only after a
+join actually succeeds, so a first boot with no signal is retried rather than marked done.
 
 Because it is automatic, it **cannot be consent**: `privacy.html` moved the board entry to
 **legitimate interests (Art. 6(1)(f))** with leaving as the objection route — the same

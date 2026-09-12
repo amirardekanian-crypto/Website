@@ -433,7 +433,9 @@ strength section on My Plan. Nobody has to test a true max for this to exist.
 **Read it before you set loads.** For a RETURNING athlete the brief's *"e1RM from heaviest
 logged sets"* is the same idea; The Ceiling is the tidier, dated version of it, and it also
 carries **relative strength** (estimated 1RM ÷ body weight, taken from the athlete's latest
-Proof weigh-in). For tennis and padel that ratio is the number that matters — absolute
+Proof weigh-in). **Body weight has two front doors now** — the *Body Weight* card on the
+programme app's Home, and AA Proof itself — so when a note needs to send someone off to
+weigh in, either is fine and the Home card is usually the closer one. For tennis and padel that ratio is the number that matters — absolute
 kilos say much less about a player than kilos per kilo of them.
 
 **Every estimate is graded, and the grade is the instruction:**
