@@ -2,6 +2,7 @@
   "id": "push-pull-pump",
   "title": "Push Pull Pump",
   "category": "strength",
+  "countsAs": "strength",
   "duration": "35 min",
   "equipment": "Dumbbells",
   "focusTag": "Upper Body Pump",

@@ -2,6 +2,7 @@
   "id": "run-warm-up",
   "title": "Rolling Start",
   "category": "conditioning",
+  "countsAs": "none",
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Zone 2 Run Warm-Up",

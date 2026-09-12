@@ -2,6 +2,7 @@
   "id": "bodyweight-band-strength",
   "title": "Banded Lower Burner",
   "category": "strength",
+  "countsAs": "strength",
   "duration": "40 min",
   "equipment": "Bands",
   "focusTag": "Legs & Glutes",

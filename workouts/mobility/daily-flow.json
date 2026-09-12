@@ -2,6 +2,7 @@
   "id": "daily-flow",
   "title": "Daily Mobility Flow",
   "category": "mobility",
+  "countsAs": "mobility",
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Full-Body Mobility",

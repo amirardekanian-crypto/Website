@@ -2,6 +2,7 @@
   "id": "first-step-speed",
   "title": "First-Step Speed",
   "category": "on-court",
+  "countsAs": "strength",
   "duration": "25 min",
   "equipment": "Court",
   "focusTag": "Acceleration & Footwork",

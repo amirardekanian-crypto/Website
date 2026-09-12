@@ -3829,6 +3829,60 @@ function importWorkoutDays(src) {
   return changed;
 }
 
+// ── Library workouts feed a habit too, the same way ────────────────────────
+// Same contract as the block above — the server holds the fact, Proof reads it
+// — but a Library workout can land on EITHER of two habits, so the RPC returns
+// the habit with the date instead of a bare date. The mapping itself lives on
+// the server (supabase/stage28_library_sessions.sql); nothing here decides it.
+//
+//   a 25-45 min strength / conditioning / on-court session → 'strength'
+//   a 12-15 min mobility flow or recovery session          → 'mobility'
+//   a warm-up                                              → not returned at all
+//
+// A warm-up ticks nothing because it is part of a session rather than a
+// session. It is still recorded server-side for the coach's report — Proof
+// simply never hears about it.
+async function fetchLibraryDays() {
+  if (window.IS_DEMO || !ATHLETE_ID) return [];
+  try {
+    const sb = _sb();
+    if (!sb) return [];
+    // Same season floor as the workout import: a new season must not backfill
+    // months of old library work into a score that just reset to zero.
+    const { data, error } = await sb.rpc('get_library_days', {
+      p_athlete_id: ATHLETE_ID, p_since: seasonStart()
+    });
+    if (error || !Array.isArray(data)) return [];
+    return data;
+  } catch (e) { return []; }   // offline, or stage28 is not applied yet
+}
+
+function importLibraryDays(src) {
+  if (!Array.isArray(src) || !src.length) return false;
+  invalidateBonus();          // same reason as importWorkoutDays above
+  let changed = false;
+  src.forEach(row => {
+    const d  = row && typeof row.completed_on === 'string' ? row.completed_on.slice(0, 10) : '';
+    const id = row && row.counts_as;
+    if (!d || (id !== 'strength' && id !== 'mobility')) return;
+    // ⚠️ MOBILITY is an add-on habit, so plenty of athletes do not track it.
+    // Ticking a habit the day's roster does not contain would add XP that the
+    // day's DENOMINATOR never counted: dayPct() takes its denominator from
+    // rosterOn(day), so the day could read over 100%, and hab_xp() on the
+    // server would happily score the stray key — the board and the phone
+    // disagreeing, which is the one failure this app cannot afford.
+    // STRENGTH is core:true and therefore always in the roster, so it never
+    // trips this; the session is still recorded for the coach either way.
+    if (!rosterOn(d).some(h => h.id === id)) return;
+    const h = habitById(id);
+    if (!h) return;
+    if (!LOG[d]) LOG[d] = {};
+    if ((Number(LOG[d][id]) || 0) < h.target) { LOG[d][id] = h.target; changed = true; }
+  });
+  if (changed) saveLog();
+  return changed;
+}
+
 function saveMeta() {
   try { localStorage.setItem(K_META(), JSON.stringify({
     dirty: SYNC.dirty, lastOk: SYNC.lastOk, days: Array.from(_dirtyDays)
@@ -8782,6 +8836,7 @@ function renderManual() {
           <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here — ${isFree()
             ? `it unlocks when you are on a coaching programme, and then it ticks itself every time you finish a session.`
             : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
+          ${isFree() ? '' : `<div>▸ <strong style="color:var(--ink)">Use the Library.</strong> Open a workout in your programme app and mark it done. A strength, conditioning or on-court session ticks your session. A mobility flow or a recovery session ticks Mobility. A warm-up ticks nothing, because a warm-up is part of a session rather than a session of its own.</div>`}
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
           <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Habits &amp; targets</strong>.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken streaks.</div>
@@ -10376,8 +10431,17 @@ function showError(msg) {
   // everyone until the first season actually closes — see seasonRecords().
   await within(fetchSeasonRecord(), 4000, null);
   // Sessions finished in the training app tick the WORKOUT habit here. The
-  // dates come from the server, not from the other app's storage.
-  importWorkoutDays(await within(fetchWorkoutDays(), 4000, null));
+  // dates come from the server, not from the other app's storage. Library
+  // workouts do the same through their own RPC, and land on WORKOUT or
+  // MOBILITY depending on what the workout actually is. Both are fetched
+  // together so the second one costs boot no extra wait, and both are imported
+  // before stampRoster() below, same as the workout import always was.
+  const [_wDays, _lDays] = await Promise.all([
+    within(fetchWorkoutDays(), 4000, null),
+    within(fetchLibraryDays(), 4000, null),
+  ]);
+  importWorkoutDays(_wDays);
+  importLibraryDays(_lDays);
   // Every source of logged days has now reported — local, cloud, and the
   // training app. Settle the roster timeline against the full log before
   // anything scores off it.

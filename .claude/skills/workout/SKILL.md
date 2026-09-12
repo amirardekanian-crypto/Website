@@ -190,12 +190,42 @@ Create **`workouts/<category-id>/<slug>.json`**:
   "id": "<slug>",
   "title": "<Title>",
   "category": "<category-id>",
+  "countsAs": "strength | mobility | none",
   "duration": "<N min>",
   "equipment": "<Primary equipment>",
   "focusTag": "<Short focus descriptor>",
   "blocks": [ … ]
 }
 ```
+
+### ⚠️ `countsAs` is required — decide it, don't omit it
+
+An athlete can press **Mark as done** at the foot of a library workout, and this
+field is the only thing that decides which habit that ticks in AA Proof:
+
+| `countsAs` | Ticks | Use it for |
+|---|---|---|
+| `"strength"` | the **WORKOUT** habit | a real session — strength, conditioning, on-court speed. Roughly 25 min and up |
+| `"mobility"` | the **MOBILITY** habit | a mobility flow or a recovery session. Roughly 10–20 min |
+| `"none"` | nothing | a **warm-up**. It is part of a session, not a session |
+
+**Leave it out and the workout counts for nothing.** The server whitelists this
+value and falls through to "counts for nothing" on anything it does not
+recognise — deliberately, so a new workout can never inflate a score by
+accident. Safe, but silent: the athlete presses Done, is told it does not tick a
+habit, and nobody finds out it was an oversight rather than a decision.
+
+**Do not pick it from the category.** The split is not the categories:
+`on-court` holds both a 25-minute speed session (`strength`) and a 15-minute
+warm-up (`none`), and `conditioning` holds both an engine session (`strength`)
+and a run warm-up (`none`). Ask what the thing *is*.
+
+And be strict about `"strength"`. The WORKOUT habit is **28.6% of the day
+score** in Proof, so marking a 12-minute foam roll as `strength` hands every
+athlete a daily route to the biggest habit on the list without training. When
+you are torn between `strength` and `mobility`, pick `mobility`.
+
+Full reasoning: `supabase/stage28_library_sessions.sql`.
 
 ## Step 4 — Register in the manifest
 

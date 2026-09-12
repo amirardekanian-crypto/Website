@@ -2,6 +2,7 @@
   "id": "engine-builder",
   "title": "Engine Builder",
   "category": "conditioning",
+  "countsAs": "strength",
   "duration": "30 min",
   "equipment": "Bike",
   "focusTag": "Aerobic Engine",

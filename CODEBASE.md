@@ -240,6 +240,8 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 
 #### `workouts/index.json` + `workouts/<category>/*.json` — Train library
 - **What it does:** The manifest and individual session files for the Library → Train tab. Works exactly like the Read library but for on-demand workout sessions. Each workout is reachable at `program.html?workout=<id>`.
+- **⚠️ These files are the FALLBACK now, not the source.** The live library is the `library` table, published from coach.html; `ensureLibManifests()` only reads these if that call fails. Keep them in step, but publish through the dashboard.
+- **⚠️ Every workout needs a `countsAs`** — `"strength"`, `"mobility"` or `"none"`. It decides which habit **Mark as done** ticks in AA Proof: a real session ticks WORKOUT, a mobility flow or recovery session ticks MOBILITY, a warm-up ticks nothing. Omit it and the workout counts for nothing — safe, but silent. The `/workout` skill covers how to choose; the reasoning is in `supabase/stage28_library_sessions.sql` and `HABITS.md`.
 - **Edit this when:** Adding a new shared workout session. Always create the JSON file and add the entry to the manifest together.
 - **See also:** `SCHEMA.md → "Library tab — Train section"` for the exact format.
 

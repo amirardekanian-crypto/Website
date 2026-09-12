@@ -103,20 +103,29 @@ create policy "coach manage library sessions" on public.library_sessions
 -- `p_key` arm that get_workout_days still carries is deliberately absent —
 -- public.athlete_keys has been empty since logins replaced links, so that arm
 -- can only ever fail, and repeating it here would suggest it still works.
-create or replace function public.log_library_session(
+drop function if exists public.log_library_session(text, text, date);
+
+create function public.log_library_session(
   p_athlete_id text,
   p_slug       text,
   p_on         date default null
 )
-returns table (completed_on date, counts_as text, title text)
+-- ⚠️ The OUT names are deliberately NOT completed_on / counts_as / title.
+-- plpgsql resolves an OUT parameter ahead of a column of the same name, so
+-- naming them after the table's own columns makes the INSERT below fail at
+-- RUNTIME with "column reference is ambiguous" — including inside the
+-- ON CONFLICT target, where it cannot be qualified away. It creates cleanly
+-- and only breaks the first time an athlete presses Done, which is the worst
+-- possible moment to find out. (It did exactly that in testing, 2026-09-12.)
+returns table (logged_on date, counted_as text, workout_title text)
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_item  jsonb;
-  v_cat   text;
-  v_when  date := coalesce(p_on, current_date);
+  v_item   jsonb;
+  v_cat    text;
+  v_when   date := coalesce(p_on, current_date);
   v_counts text;
   v_title  text;
   v_dur    int;
@@ -159,10 +168,10 @@ begin
   values
     (p_athlete_id, p_slug, v_when, v_counts, v_title, v_cat, v_dur)
   on conflict (athlete_id, slug, completed_on) do update
-    set counts_as   = excluded.counts_as,
-        title       = excluded.title,
-        category_id = excluded.category_id,
-        duration_min= excluded.duration_min;
+    set counts_as    = excluded.counts_as,
+        title        = excluded.title,
+        category_id  = excluded.category_id,
+        duration_min = excluded.duration_min;
 
   return query select v_when, v_counts, v_title;
 end;
@@ -230,6 +239,12 @@ revoke all on function public.library_sessions_for(text, int)         from publi
 grant execute on function public.log_library_session(text, text, date) to anon, authenticated;
 grant execute on function public.get_library_days(text, date)          to anon, authenticated;
 grant execute on function public.library_sessions_for(text, int)       to authenticated;
+-- ⚠️ `revoke ... from public` is NOT enough to keep anon out. Supabase ships a
+-- default-privileges grant that hands anon EXECUTE on new functions in this
+-- schema, so the coach-only report comes back reachable by anon unless it is
+-- revoked by name. The is_coach() guard inside still refuses it, so this is
+-- defence in depth rather than the only lock — but the grant should not exist.
+revoke execute on function public.library_sessions_for(text, int)      from anon;
 
 -- ── Backfill: what the ten existing workouts count as ───────────────────────
 -- Written as an explicit map rather than a rule over category_id, because the

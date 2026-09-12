@@ -2,6 +2,7 @@
   "id": "full-body-power",
   "title": "Full-Body Power",
   "category": "strength",
+  "countsAs": "strength",
   "duration": "45 min",
   "equipment": "Barbell",
   "focusTag": "Full-Body Strength",

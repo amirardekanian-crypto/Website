@@ -874,6 +874,32 @@
   .ws-eyebrow { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
   .ws-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; line-height: 1; text-transform: uppercase; color: #fff; }
   .ws-meta { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.78); margin-top: 8px; }
+
+  /* Finish bar for a LIBRARY workout. Deliberately not the programme's
+     .send-session-btn: that one emails the coach and closes a programme day.
+     This one writes a single row and says what it counted as. */
+  .ws-finish { padding: 8px 24px 40px; text-align: center; }
+  .ws-done-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--yellow);
+    color: var(--on-accent);
+    border: 2px solid var(--yellow);
+    padding: 14px 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 260px; max-width: 100%;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .ws-done-btn:disabled { opacity: 0.55; cursor: default; }
+  /* Done: hollow rather than filled, so a finished workout reads as settled
+     instead of still asking to be pressed. */
+  .ws-done-btn.is-done { background: transparent; color: var(--yellow); }
+  .ws-done-note {
+    font-size: 13px; line-height: 1.6; color: var(--grey-text);
+    margin-top: 12px; max-width: 340px; margin-left: auto; margin-right: auto;
+  }
   #ws-body { padding: 0 20px; }
   /* The shared exercise cards use a big top margin on the first section header
      (designed to sit under the day-tabs); trim it inside the workout body. */
@@ -3059,7 +3085,11 @@
 
 <!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
      Workouts tab. Reuses the exercise-card visuals, but with its OWN local-only
-     check-off (keyed by workout id) — no athlete data, no cloud, no set-logs. -->
+     check-off (keyed by workout id) — no athlete data, no cloud, no set-logs.
+
+     The one thing here that DOES reach the server is the Done button below:
+     it writes a row to public.library_sessions, which feeds both the athlete's
+     Proof habits and the coach's report. See supabase/stage28_library_sessions.sql. -->
 <div id="screen-workout" class="screen">
   <div class="ws-header">
     <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to workouts">←</button>
@@ -3068,6 +3098,10 @@
     <div class="ws-meta" id="ws-meta"></div>
   </div>
   <div id="ws-body"></div>
+  <div id="ws-finish" class="ws-finish" hidden>
+    <button type="button" class="ws-done-btn" id="ws-done-btn" onclick="markLibraryDone()"></button>
+    <div class="ws-done-note" id="ws-done-note"></div>
+  </div>
 </div>
 
 <!-- ═══ ARTICLE ═══ a single blog/read article opened from the Library Read tab
@@ -5922,6 +5956,18 @@ async function openWorkoutDeepLink(idOrPath) {
 }
 window.openWorkoutDeepLink = openWorkoutDeepLink;
 
+// The database row's slug is 'workouts/<category>/<id>', and that is what
+// log_library_session() expects. get_library() hands the client the workout's
+// own JSON, which carries `category` and `id` but NOT the slug, so rebuild it
+// rather than guessing from `file` — `file` is 'category/id' when the library
+// came from the database and a real path (possibly with a .json tail) on the
+// legacy file fallback.
+function _wsSlug(wk, file) {
+  if (wk && wk.category && wk.id) return 'workouts/' + wk.category + '/' + wk.id;
+  const f = String(file || '').replace(/\.json$/, '');
+  return f.indexOf('workouts/') === 0 ? f : 'workouts/' + f;
+}
+
 async function openWorkout(file) {
   if (!file) return;
   const body = document.getElementById('ws-body');
@@ -5929,6 +5975,12 @@ async function openWorkout(file) {
   document.getElementById('ws-title').textContent = 'Loading…';
   document.getElementById('ws-meta').textContent = '';
   body.innerHTML = '';
+  // Both stay cleared until the workout is actually loaded, so a failed load
+  // cannot leave the PREVIOUS workout's Done button on screen pointing at the
+  // previous workout's slug.
+  const fin = document.getElementById('ws-finish');
+  if (fin) fin.hidden = true;
+  _wsCurrent = null;
   goTo('workout');
 
   // Served from the cache get_library() filled, so opening a workout costs nothing.
@@ -5947,7 +5999,7 @@ async function openWorkout(file) {
   }
 
   const id = wk.id || file;
-  _wsCurrent = { id, checkKey: 'wkout_' + id };
+  _wsCurrent = { id, checkKey: 'wkout_' + id, slug: _wsSlug(wk, file), countsAs: wk.countsAs || '' };
 
   // Header
   document.getElementById('ws-eyebrow').textContent = wk.focusTag || 'Workout';
@@ -6003,6 +6055,7 @@ async function openWorkout(file) {
     });
   });
 
+  renderLibraryDone();
   window.scrollTo(0, 0);
 }
 
@@ -6027,6 +6080,96 @@ function _wsSaveChecks() {
     .map(i => i.classList.contains('checked'));
   localStorage.setItem(_wsCurrent.checkKey, JSON.stringify({ date: new Date().toDateString(), checks }));
 }
+
+// ═══ FINISHING A LIBRARY WORKOUT ═══════════════════════════════════════════
+//
+// The only thing on this screen that reaches the server. Pressing Done writes
+// one row to public.library_sessions (stage28), which two things then read:
+// Proof ticks the habit that workout counts as, and the coach's report lists
+// what the athlete actually did.
+//
+// WHAT IT COUNTS AS IS NOT DECIDED HERE. `countsAs` is read off the workout for
+// display only — the server resolves it again from its own copy at write time
+// and ignores whatever the client thinks, so a tampered page cannot claim a
+// 12-minute foam roll was a session. See the stage28 header for why that
+// matters: WORKOUT is 28.6% of the day score.
+const WS_COUNTS_AS_LABEL = { strength: 'Session', mobility: 'Mobility' };
+
+// Same daily-reset rule as the exercise ticks above: a Done belongs to the day
+// it was pressed on. Device-local, so a Done pressed on a phone shows as
+// un-pressed on a tablet — harmless, because the server upsert is idempotent
+// and pressing it again just rewrites the same row.
+function _wsDoneKey(id) { return 'wkdone_' + id; }
+function _wsIsDoneToday(id) {
+  try {
+    const blob = JSON.parse(localStorage.getItem(_wsDoneKey(id)));
+    return !!blob && blob.date === new Date().toDateString();
+  } catch (e) { return false; }
+}
+
+function renderLibraryDone() {
+  const wrap = document.getElementById('ws-finish');
+  const btn  = document.getElementById('ws-done-btn');
+  const note = document.getElementById('ws-done-note');
+  if (!wrap || !btn || !note || !_wsCurrent) return;
+
+  // No athlete, no record to write to. The Library is also reachable by a
+  // signed-out visitor and by the coach in read-only preview, and neither
+  // should be able to put a row in someone's training record.
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) { wrap.hidden = true; return; }
+  wrap.hidden = false;
+
+  const label = WS_COUNTS_AS_LABEL[_wsCurrent.countsAs] || '';
+  const done  = _wsIsDoneToday(_wsCurrent.id);
+
+  btn.disabled = false;
+  btn.classList.toggle('is-done', done);
+  btn.textContent = done ? 'Done today ✓' : 'Mark as done';
+
+  if (done) {
+    note.textContent = label
+      ? 'Done today. This ticks your ' + label + ' habit next time you open AA Proof.'
+      : 'Done today. A warm-up does not tick a habit, but your coach can see you did it.';
+  } else {
+    note.textContent = label
+      ? 'Tap when you finish. It ticks your ' + label + ' habit in AA Proof.'
+      : 'Tap when you finish. A warm-up does not tick a habit, but your coach can see you did it.';
+  }
+}
+
+async function markLibraryDone() {
+  if (!_wsCurrent || !ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return;
+  const btn  = document.getElementById('ws-done-btn');
+  const note = document.getElementById('ws-done-note');
+  if (!btn || btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const sb = await _sbReady();
+    if (!sb) throw new Error('offline');
+    const { error } = await sb.rpc('log_library_session', {
+      p_athlete_id: ATHLETE_ID,
+      p_slug:       _wsCurrent.slug,
+    });
+    if (error) throw error;
+    localStorage.setItem(_wsDoneKey(_wsCurrent.id),
+      JSON.stringify({ date: new Date().toDateString() }));
+    if (navigator.vibrate) navigator.vibrate([15, 40, 15]);
+    renderLibraryDone();
+  } catch (e) {
+    // Deliberately NOT queued for replay like a programme session is. A
+    // programme session carries RPE, notes and set logs that would be lost;
+    // this is one row saying "did this today", and a replay that lands
+    // tomorrow would date it wrong — the server only accepts today or
+    // yesterday. Better to say it plainly and let them tap again.
+    btn.disabled = false;
+    btn.classList.remove('is-done');
+    btn.textContent = 'Mark as done';
+    if (note) note.textContent = 'Could not save that. Check your connection and tap again.';
+  }
+}
+window.markLibraryDone = markLibraryDone;
 
 function switchDay(n) {
   const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => d.id);

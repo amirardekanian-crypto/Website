@@ -2,6 +2,7 @@
   "id": "reset-roll",
   "title": "Reset & Roll",
   "category": "recovery",
+  "countsAs": "mobility",
   "duration": "12 min",
   "equipment": "Foam Roller",
   "focusTag": "Down-Regulate & Restore",

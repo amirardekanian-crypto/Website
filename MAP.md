@@ -160,7 +160,10 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`stage18_day_rosters`](supabase/stage18_day_rosters.sql) (a day is scored against the
   habits that were on **that** day — the current `hab_bonus_xp`) ·
   [`stage27_intake`](supabase/stage27_intake.sql) (the apply form lands in the DB —
-  anon `submit_intake`, coach-only `intake_list` / `set_intake_status` / `delete_intake`).
+  anon `submit_intake`, coach-only `intake_list` / `set_intake_status` / `delete_intake`) ·
+  [`stage28_library_sessions`](supabase/stage28_library_sessions.sql) (a Library workout
+  can be marked done — `log_library_session` writes it, `get_library_days` ticks the
+  habit it actually is in Proof, coach-only `library_sessions_for` is the report).
 - **Notion sync (exercise videos):** [`sync_notion.py`](sync_notion.py) +
   [`NOTION_SYNC.md`](NOTION_SYNC.md) → regenerates `exercise_library.json`.
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
