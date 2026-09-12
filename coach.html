@@ -1055,11 +1055,19 @@ window.bulkCreateLogins = bulkCreateLogins;
    Runs entirely in Amir's signed-in session — RLS decides what it can read, so
    there is no service key anywhere. Download it weekly and keep it off this PC too.
    ═══════════════════════════════════════════════════════════════════════════ */
+// ⚠️ This list must hold EVERY table in the public schema. A backup that
+// silently misses one is worse than no backup, because you only find out on the
+// day you need it. Check it against:
+//   select tablename from pg_tables where schemaname = 'public' order by 1;
+// and remember that a table with RLS on and no coach policy reads back as zero
+// rows rather than an error — hab_season_results did exactly that until
+// 2026-09-12, and it is the one table nothing else could rebuild.
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
+  'library', 'library_categories', 'library_sessions',
 ];
 
 async function downloadBackup(btn) {

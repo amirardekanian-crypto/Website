@@ -80,7 +80,7 @@ TABLES = [
     "athlete_progress", "session_history", "messages", "hab_notes",
     "hab_contacts", "hab_titles", "hab_intake", "leaderboard_optin",
     "seasons", "xp_rules", "call_logs", "cycle_reports", "hab_season_results",
-    "athlete_keys", "library", "library_categories",
+    "athlete_keys", "library", "library_categories", "library_sessions",
 ]
 
 
@@ -90,12 +90,24 @@ def get_key():
         return key
     if KEY_FILE.exists():
         return KEY_FILE.read_text(encoding="utf-8").strip()
+    # ASCII only, deliberately. This repo lives under a path with Cyrillic in it
+    # ("Documents" in Russian), and a Windows console running cp1252 mangles both
+    # the path and any smart punctuation - which turned the one message a stuck
+    # user actually reads into line noise.
     sys.exit(
-        "No Supabase key found.\n\n"
-        "Set the SUPABASE_SERVICE_KEY env var, OR create a file `.supabase_key` in\n"
-        f"  {KEY_FILE.parent}\n"
-        "containing only the service_role key from\n"
-        "  Supabase dashboard -> Project Settings -> API keys.\n"
+        "No Supabase key found - nothing was backed up.\n\n"
+        "EASIEST FIX: you do not need this script at all. Open coach.html,\n"
+        "go to the Athletes tab, and press the Backup button (down-arrow icon).\n"
+        "It runs in your signed-in session, needs no key at all, and downloads\n"
+        "the same data as one JSON file. Do that now; set this script up later\n"
+        "only if you want the backup scripted.\n\n"
+        "TO USE THIS SCRIPT: put the service_role key in a file named\n"
+        "  .supabase_key\n"
+        "(no extension, nothing else in it) in the same folder as this script -\n"
+        "the one that also holds coach.html. Get the key from the Supabase\n"
+        "dashboard: Project Settings -> API keys -> service_role -> Reveal.\n"
+        "It is gitignored. It bypasses every row-level policy, so it must never\n"
+        "leave this machine. Or set the SUPABASE_SERVICE_KEY env var instead.\n"
     )
 
 
