@@ -148,6 +148,15 @@ is just the quick-reference.
 - Fonts: Barlow Condensed (all display, uppercase) · Barlow (body) · Space Mono (eyebrows/meta/timers).
 - Chrome: no top nav; bottom tab bar (Home / Coach / Library / My Plan), green icons, active gets glow.
 - Signature elements: greeting eyebrow (Space Mono clay) over giant Barlow Condensed 900 first name · cycle cards = white card, 16:9 photo banner + green scrim + "CYCLE n OF N" + pills · day cards = 5:2 banner + "DAY n" · cycle meter = 5px segments (done green, current glowing) · exercise rows = white cards w/ 3px block-coloured left stripe (warm-up/power clay, strength green) · RPE squares fill green · rest timer = full-screen ring, 96px mono · Library = Two Doors (Sessions green photo / Playbook clay photo) · article reader "Center Court" = clay drop-cap, tennis-ball bullets, clay callouts.
+- **Login screen = "Baseline"** (Amir picked it 2026-09-12 from the three directions in
+  [`login-directions.html`](login-directions.html), taking the icon placement and the mantra
+  headline from the "Floodlight" direction). `court-sessions.jpg` under a green scrim, 52px logo
+  tile above a clay-2 Space Mono eyebrow, `A COACH IN YOUR POCKET.` in Barlow Condensed 900 with
+  **coach** in clay-2, then the form rising over the photo as a paper sheet (30px top radius,
+  -30px overlap). Clay button. ⚠ The hero is a green background **colour** with the photo as an
+  `<img>` fading over it — the form paints from markup in ~50ms and must never wait on a photo,
+  so the green stands in until the court arrives. The other two directions (Logbook, Floodlight)
+  stay in that file as the reference for anything else on this surface.
 - **Screenshots:** serve over HTTP (`python3 -m http.server`) — file:// fails; wait out `.loading-screen` (~1s) and entrance anims (or inject `*{animation-duration:0s!important}`); Chromium at `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; demo data = `?client=demo` (athlete "Alex Rivera").
 
 ## The websites' look
