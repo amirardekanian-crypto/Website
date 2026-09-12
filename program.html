@@ -875,6 +875,27 @@
   .ws-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; line-height: 1; text-transform: uppercase; color: #fff; }
   .ws-meta { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.78); margin-top: 8px; }
 
+  /* "Why this session" — the workout's own explainer, inside the green header.
+     Open by default; closing it is remembered for every workout, not just this
+     one, because it is a preference about how much preamble you want. */
+  .ws-why { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 12px; }
+  .ws-why-toggle {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.72);
+    background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ws-why-toggle:hover { color: #fff; }
+  .ws-why-toggle .chev { transition: transform 0.18s; font-size: 13px; }
+  .ws-why.is-closed .ws-why-toggle .chev { transform: rotate(-90deg); }
+  .ws-why.is-closed .ws-why-body { display: none; }
+  .ws-why-body { margin-top: 10px; }
+  .ws-why-body p {
+    font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.86);
+    margin: 0 0 10px;
+  }
+  .ws-why-body p:last-child { margin-bottom: 0; }
+
   /* Finish bar for a LIBRARY workout. Deliberately not the programme's
      .send-session-btn: that one emails the coach and closes a programme day.
      This one writes a single row and says what it counted as. */
@@ -2275,6 +2296,20 @@
   }
   .ex-1rm-save:disabled { background: var(--yellow); cursor: default; }
 
+  /* Straight through to Personal Records from inside a set. The back chevron
+     over there returns to this exact exercise — see _ceilReturn. */
+  .ex-1rm-go {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; margin-top: 9px; padding: 10px;
+    background: transparent; border: 1px solid var(--ice-mid); border-radius: 7px;
+    cursor: pointer; color: var(--ice);
+    font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 1.1px; text-transform: uppercase;
+  }
+  .ex-1rm-go svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .ex-1rm-go-a { margin-left: auto; font-size: 12px; }
+  body[data-dark] .ex-1rm-go { border-color: rgba(199,85,47,0.4); }
+
   /* ── THE CEILING (screen) ─────────────────────────────────────── */
   .ceil-head { position: relative; padding: 46px 18px 18px; background: var(--yellow); color: var(--on-accent); }
   .ceil-kick { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
@@ -3258,11 +3293,9 @@
   <!-- All future cycles (next + upcoming), unified layout -->
   <div id="upcoming-wrap"></div>
 
-  <!-- The Ceiling (estimated 1RM) — summary card; opens #screen-ceiling -->
-  <div id="plan-ceiling-wrap"></div>
-
-  <!-- Daily habits (Proof) — the companion tracker, opened from here too -->
-  <div id="plan-habits-wrap"></div>
+  <!-- Personal Records and Daily Habits used to sit here. They moved to the
+       bottom of Home, under the week's day cards (Amir, 2026-09-12) — Home is
+       the screen athletes actually land on. -->
 
 </div>
 
@@ -3274,7 +3307,7 @@
 <div id="screen-ceiling" class="screen">
   <div class="ceil-head">
     <button class="nav-back" onclick="ceilingBack()" aria-label="Back">←</button>
-    <div class="ceil-kick">— Your numbers</div>
+    <div class="ceil-kick">— Personal records</div>
     <div class="ceil-title" id="ceil-title">The Ceiling</div>
   </div>
   <div id="ceil-body" style="padding: 0 18px 110px;"></div>
@@ -3338,6 +3371,13 @@
     <div class="ws-eyebrow" id="ws-eyebrow"></div>
     <div class="ws-title" id="ws-title"></div>
     <div class="ws-meta" id="ws-meta"></div>
+    <!-- Why this session: 1-2 paragraphs from the workout's own `intro`. Sits in
+         the header under the duration line, open by default, and the athlete's
+         choice to close it is remembered across every workout. -->
+    <div class="ws-why" id="ws-why" hidden>
+      <button type="button" class="ws-why-toggle" id="ws-why-toggle" onclick="toggleWhy()"></button>
+      <div class="ws-why-body" id="ws-why-body"></div>
+    </div>
   </div>
   <div id="ws-body"></div>
   <div id="ws-finish" class="ws-finish" hidden>
@@ -3384,14 +3424,17 @@
     <!-- Current cycle card (View Plan pill → My Plan, no Read more) -->
     <div id="home-cycle-wrap"></div>
 
-    <!-- Daily habits (Proof) — live level pulled from the tracker's own keys -->
-    <div id="home-habits-wrap"></div>
-
     <!-- "This Week" header + current-week indicator (only when dates exist) -->
     <div id="home-week-wrap"></div>
 
     <!-- Day cards — each opens that day's workout -->
     <div id="day-cards-wrap"></div>
+
+    <!-- The two companions to the training itself, BELOW the week's day cards
+         (Amir, 2026-09-12): what you could lift, and what you do every day.
+         Both used to sit on My Plan; Home is where athletes actually land. -->
+    <div id="home-ceiling-wrap"></div>
+    <div id="home-habits-wrap"></div>
   </div>
 
   <!-- ── DAY VIEW: a single day's workout, opened from a day card. Holds the
@@ -4909,15 +4952,8 @@ function renderPlan() {
     document.getElementById('upcoming-wrap').innerHTML = html;
   }
 
-  // The Ceiling (estimated maxes) sits above the habit card — both are
-  // companions to the programme, reachable from the plan that produced them.
-  const planCeil = document.getElementById('plan-ceiling-wrap');
-  if (planCeil) planCeil.innerHTML = ceilingCardHtml();
-
-  // The habit tracker sits at the end of My Plan too — the programme and the
-  // daily habits are the two halves of the plan, so both are reachable here.
-  const planHab = document.getElementById('plan-habits-wrap');
-  if (planHab) planHab.innerHTML = habitCardHtml();
+  // Personal Records and Daily Habits are rendered by renderHome() now — they
+  // live under the day cards on Home. Nothing to draw here.
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -4972,11 +5008,6 @@ function renderHome() {
   }
 
   // "This Week" header + week indicator (only when the cycle has both dates).
-  // Daily habits card — shows their real level when they've used the tracker,
-  // and an invitation when they haven't. Tapping it opens habits.html.
-  const habWrap = document.getElementById('home-habits-wrap');
-  if (habWrap) habWrap.innerHTML = habitCardHtml();
-
   const weekWrap = document.getElementById('home-week-wrap');
   if (weekWrap) {
     const weekLabel = homeWeekLabel(cur);
@@ -4995,6 +5026,15 @@ function renderHome() {
   if (cardsWrap) {
     cardsWrap.innerHTML = days.map((d, i) => dayCardHTML(d, i + 1, days.length)).join('');
   }
+
+  // The two companion cards, under the week. Personal Records first (it is about
+  // the training just above it), then Daily Habits. Both are also refreshed on
+  // every goTo('home') — renderHome() runs once at boot, so a max saved during
+  // today's session would otherwise not show until the app was reloaded.
+  const homeCeil = document.getElementById('home-ceiling-wrap');
+  if (homeCeil) homeCeil.innerHTML = ceilingCardHtml();
+  const habWrap = document.getElementById('home-habits-wrap');
+  if (habWrap) habWrap.innerHTML = habitCardHtml();
 
   const tabsHtml = days.map((day, i) => {
     const total = countTotalUnits(day);
@@ -5770,22 +5810,27 @@ function goTo(screen, historyId, keepContent) {
   // Library tab — Read + Train sections. Both built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
-  // My Plan — refresh the Ceiling card. renderPlan() only runs at boot, so
-  // without this an estimate saved during today's session would not appear on
-  // the card until the app was reloaded.
-  if (screen === 'plan') {
-    const pc = document.getElementById('plan-ceiling-wrap');
-    if (pc) pc.innerHTML = ceilingCardHtml();
+  // Home — refresh the Personal Records card. renderHome() only runs at boot,
+  // so without this an estimate saved during today's session would not appear
+  // on the card until the app was reloaded.
+  if (screen === 'home') {
+    const hc = document.getElementById('home-ceiling-wrap');
+    if (hc) hc.innerHTML = ceilingCardHtml();
   }
+
+  // Leaving The Ceiling by any route other than its own back chevron drops the
+  // saved return point, so a later visit can never teleport the athlete into a
+  // day view they did not come from.
+  if (screen !== 'ceiling') _ceilReturn = null;
 
   // The Ceiling — rebuilt on every visit so a max saved mid-session shows.
   // `keepContent` is set when renderCeilingLift() routes here itself; it has
   // already painted the per-lift view and must not be overwritten.
   if (screen === 'ceiling' && !keepContent) renderCeiling();
 
-  // Update the global tab bar's active button. The Ceiling is a sub-screen of
-  // My Plan, so that tab stays lit while you are inside it.
-  const litTab = (screen === 'ceiling') ? 'plan' : screen;
+  // Update the global tab bar's active button. The Ceiling is reached from
+  // Home, so that tab stays lit while you are inside it.
+  const litTab = (screen === 'ceiling') ? 'home' : screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
   });
@@ -5889,7 +5934,7 @@ function ceilingCardHtml() {
     </div>` : '';
   return `
     <div class="home-section-head">
-      <div class="home-section-title">Strength</div>
+      <div class="home-section-title">Personal Records</div>
     </div>
     <button type="button" class="habit-card" onclick="goTo('ceiling')">
       <!-- No accent override here: #screen-plan deliberately remaps --ice to
@@ -5933,11 +5978,49 @@ function fmtCeilDate(iso) {
 // chevron, which goes exactly ONE step — out of a lift to the list, and only
 // from the list back to My Plan.
 let _ceilLift = null;
+
+// Where to land when the athlete leaves The Ceiling. Set only when they arrived
+// from inside an exercise mid-session, so the back chevron puts them back in
+// that exercise rather than dumping them on Home with their place lost.
+// Cleared by goTo() the moment they leave by any other route.
+let _ceilReturn = null;
+
 function ceilingBack() {
-  if (_ceilLift) renderCeiling();
-  else goTo('plan');
+  if (_ceilLift) { renderCeiling(); return; }   // one step: out of a lift
+  if (_ceilReturn) { returnFromCeiling(); return; }
+  goTo('home');
 }
 window.ceilingBack = ceilingBack;
+
+// Open The Ceiling from an exercise card, remembering exactly where we were.
+function openCeilingFrom(card) {
+  _ceilReturn = {
+    dayId: card.dataset.day,
+    exName: card.querySelector('.item-name').textContent.trim()
+  };
+  goTo('ceiling');
+}
+window.openCeilingFrom = openCeilingFrom;
+
+// Back to the exercise they came from: same day, same card open, same panel
+// open, scrolled to it. openDayView() rebuilds the day and scrolls to the top,
+// so the card has to be re-found and re-opened afterwards rather than held on to.
+function returnFromCeiling() {
+  const r = _ceilReturn;
+  _ceilReturn = null;
+  goTo('home');
+  openDayView(r.dayId);
+  requestAnimationFrame(() => {
+    const card = [...document.querySelectorAll('#day-view .checklist-item')]
+      .find(c => c.querySelector('.item-name') &&
+                 c.querySelector('.item-name').textContent.trim() === r.exName);
+    if (!card) return;                       // exercise gone (cycle changed) — leave them on the day
+    card.classList.remove('collapsed');
+    const box = card.querySelector('.ex-1rm');
+    if (box) { box.classList.add('open'); box.scrollIntoView({ block: 'center' }); }
+    else card.scrollIntoView({ block: 'center' });
+  });
+}
 
 // The Ceiling screen — relative strength on top, then one row per lift.
 function renderCeiling() {
@@ -6485,6 +6568,45 @@ window.openWorkoutDeepLink = openWorkoutDeepLink;
 // rather than guessing from `file` — `file` is 'category/id' when the library
 // came from the database and a real path (possibly with a .json tail) on the
 // legacy file fallback.
+// ── "Why this session" ──────────────────────────────────────────────────────
+// Each library workout carries an `intro`: one or two short paragraphs saying
+// why the session exists and how it runs. It lives in the header rather than in
+// the exercise cards, which is what lets the Coach's Notes on the exercises stay
+// to one sentence each — the reasoning has somewhere else to go now.
+//
+// The open/closed choice is stored ONCE for every workout, not per workout: it
+// is a preference about how much preamble you want, and an athlete who closed it
+// on their tenth session does not want to close it again on the next one.
+const WS_WHY_KEY = 'ws_why_off';
+function _wsWhyClosed() {
+  try { return localStorage.getItem(WS_WHY_KEY) === '1'; } catch (e) { return false; }
+}
+function renderWhy(wk) {
+  const wrap = document.getElementById('ws-why');
+  const body = document.getElementById('ws-why-body');
+  const btn  = document.getElementById('ws-why-toggle');
+  if (!wrap || !body || !btn) return;
+  const paras = Array.isArray(wk && wk.intro) ? wk.intro.filter(Boolean)
+              : (wk && typeof wk.intro === 'string' && wk.intro ? [wk.intro] : []);
+  if (!paras.length) { wrap.hidden = true; body.innerHTML = ''; return; }
+  wrap.hidden = false;
+  body.innerHTML = paras.map(p => `<p>${esc(p)}</p>`).join('');
+  const closed = _wsWhyClosed();
+  wrap.classList.toggle('is-closed', closed);
+  btn.innerHTML = `Why this session <span class="chev">▾</span>`;
+  btn.setAttribute('aria-expanded', String(!closed));
+}
+function toggleWhy() {
+  const wrap = document.getElementById('ws-why');
+  const btn  = document.getElementById('ws-why-toggle');
+  if (!wrap) return;
+  const closed = !wrap.classList.contains('is-closed');
+  wrap.classList.toggle('is-closed', closed);
+  if (btn) btn.setAttribute('aria-expanded', String(!closed));
+  try { localStorage.setItem(WS_WHY_KEY, closed ? '1' : '0'); } catch (e) {}
+}
+window.toggleWhy = toggleWhy;
+
 function _wsSlug(wk, file) {
   if (wk && wk.category && wk.id) return 'workouts/' + wk.category + '/' + wk.id;
   const f = String(file || '').replace(/\.json$/, '');
@@ -6503,6 +6625,8 @@ async function openWorkout(file) {
   // previous workout's slug.
   const fin = document.getElementById('ws-finish');
   if (fin) fin.hidden = true;
+  const why = document.getElementById('ws-why');
+  if (why) why.hidden = true;
   _wsCurrent = null;
   goTo('workout');
 
@@ -6529,6 +6653,7 @@ async function openWorkout(file) {
   document.getElementById('ws-title').textContent = wk.title || 'Workout';
   const meta = [wk.duration, wk.equipment].filter(Boolean).join(' · ');
   document.getElementById('ws-meta').textContent = meta;
+  renderWhy(wk);
 
   // Body — reuse the SAME exercise card renderers as the training screen. We
   // pass a fixed dayId of 'ws' purely so the markup is well-formed; the inline
@@ -8053,6 +8178,10 @@ function attachCeiling(card) {
       <div class="ex-1rm-grade"></div>
       <div class="ex-1rm-from"></div>
       <button type="button" class="ex-1rm-save">Save to The Ceiling</button>
+      <button type="button" class="ex-1rm-go">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg>
+        <span>Personal Records</span><span class="ex-1rm-go-a">→</span>
+      </button>
     </div>`;
   logSlotFor(card).appendChild(box);
 
@@ -8144,6 +8273,12 @@ function attachCeiling(card) {
 
   // The one thing in here that writes anything. Everything above is derived
   // from the set log; this is what puts a dated entry on the athlete's record.
+  // Straight through to Personal Records, remembering where to come back to.
+  box.querySelector('.ex-1rm-go').addEventListener('click', ev => {
+    ev.stopPropagation();
+    openCeilingFrom(card);
+  });
+
   save.addEventListener('click', ev => {
     ev.stopPropagation();
     const kg  = parseLoggedKg(fKg.value);

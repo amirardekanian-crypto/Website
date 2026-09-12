@@ -6,6 +6,10 @@
   "duration": "50 min",
   "equipment": "Barbell",
   "focusTag": "Lower-Body Strength & Power",
+  "intro": [
+    "A full gym session built around the back squat, with jumps in front of it while you are fresh. Heavy enough to matter, not heavy enough to wreck the rest of your week.",
+    "Pressing is deliberately absent and pulling is not. Your shoulder already presses all week on court, so the volume goes into legs and back instead."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,15 +20,18 @@
           "name": "Bike",
           "videoUrl": null,
           "chips": [
-            { "label": "5 minutes", "style": "dark" }
+            {
+              "label": "5 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Easy to moderate, enough to raise the temperature and break a sweat",
-              "Any machine you like — bike, rower, treadmill"
+              "Easy to moderate, any machine you like",
+              "Warm enough to sweat, not enough to tire you"
             ],
             "bad": [
-              "Going hard. You are lifting in fifteen minutes"
+              "Going hard — you are lifting in fifteen minutes"
             ]
           }
         },
@@ -33,16 +40,20 @@
           "name": "Glute Bridge",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×12 Reps" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×12 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Ribs down, squeeze the glutes to lift, pause at the top",
-              "Wake them up now so the squat does not become all quads"
+              "Push through your heels until your hips are level",
+              "Feel the glutes, not the lower back"
             ],
             "bad": [
-              "Arching the lower back to get higher"
+              "Arching the back to lift higher"
             ]
           }
         },
@@ -51,15 +62,17 @@
           "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "5 Reps / side" }
+            {
+              "label": "5 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Back hip down, then rotate and reach tall",
-              "Hips and upper back, which is everything the squat needs"
+              "Back hip down first, then rotate and reach tall",
+              "Feel the front of the back hip open"
             ],
             "bad": [
-              "Rushing the rotation"
+              "Rotating before the hip has opened"
             ]
           }
         },
@@ -68,16 +81,20 @@
           "name": "Goblet Squat",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×8 Reps, light" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×8 Reps, light"
+            }
           ],
           "cues": {
             "good": [
-              "Light weight held at the chest, slow, find today's depth",
-              "This is the rehearsal for the bar"
+              "Light weight at the chest, slow, find today's depth",
+              "It should feel like a rehearsal, not a set"
             ],
             "bad": [
-              "Loading it up — this is prep, not a working set"
+              "Loading it up — this is prep"
             ]
           }
         },
@@ -86,18 +103,20 @@
           "name": "Empty Bar Warm-Up Sets",
           "videoUrl": null,
           "chips": [
-            { "label": "Squat: bar × 8, then build" }
+            {
+              "label": "Squat: bar × 8, then build"
+            }
           ],
           "cues": {
             "good": [
               "Empty bar, then two or three rising sets to your working weight",
-              "Drop the reps as the weight goes up — 8, then 5, then 3",
-              "These do not count as working sets and carry no RPE"
+              "Drop the reps as the weight goes up"
             ],
             "bad": [
               "Jumping from the empty bar to your top set"
             ]
-          }
+          },
+          "note": "These do not count as working sets and carry no RPE."
         }
       ]
     },
@@ -111,20 +130,24 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "×3 Reps" }
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×3 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Dip fast, jump as high as you can, land soft and reset",
-              "Quality over quantity — three good ones, then rest",
-              "Power goes first in the session, while you are fresh"
+              "Dip fast and jump as high as you can",
+              "Land soft and reset between every rep"
             ],
             "bad": [
-              "Turning it into conditioning by rushing the reps",
-              "Landing stiff"
+              "Rushing the reps and turning it into conditioning"
             ]
-          }
+          },
+          "note": "Power goes first in the session, while you are fresh."
         }
       ]
     },
@@ -138,22 +161,27 @@
           "videoUrl": null,
           "restSec": 180,
           "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "×5 Reps" },
-            { "label": "RPE 7-8" }
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×5 Reps"
+            },
+            {
+              "label": "RPE 7-8"
+            }
           ],
           "cues": {
             "good": [
               "Brace before every rep, then sit between the hips",
-              "Same depth on the last rep as the first",
-              "Leave two or three reps in the tank. This is not a testing day"
+              "Same depth on the last rep as the first"
             ],
             "bad": [
-              "Chest collapsing forward out of the bottom",
-              "Knees caving in as it gets heavy",
-              "Cutting rest short — three minutes is the prescription"
+              "Knees caving in as it gets heavy"
             ]
-          }
+          },
+          "note": "Leave two or three reps in the tank — this is not a testing day."
         },
         {
           "type": "standard",
@@ -161,19 +189,24 @@
           "videoUrl": null,
           "restSec": 150,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps" },
-            { "label": "RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
-              "Push the hips back, bar close to the legs, flat back",
-              "Stop where your hamstrings stop, not where the floor is",
-              "Squeeze the glutes to stand up"
+              "Push the hips back with the bar close to your legs",
+              "Stop where your hamstrings stop, not where the floor is"
             ],
             "bad": [
-              "Rounding the back to reach lower",
-              "Turning it into a squat by bending the knees"
+              "Rounding the back to reach lower"
             ]
           }
         }
@@ -189,17 +222,23 @@
           "videoUrl": null,
           "restSec": 90,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" },
-            { "label": "RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
               "Long stance, drop straight down, push through the front heel",
-              "One side at a time, full rest — do not rush the second leg"
+              "The front leg does the work, not the back"
             ],
             "bad": [
-              "Short stance that turns it into a knee-only movement",
               "Leaning forward to make it easier"
             ]
           }
@@ -210,19 +249,24 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps" },
-            { "label": "RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
-              "Chest on the bench so the lower back does nothing",
-              "Pull to the hip, pause, lower it under control",
-              "Pulling volume is deliberately higher than pressing here"
+              "Chest on the bench, pull to the hip and pause",
+              "Feel it between the shoulder blades"
             ],
             "bad": [
-              "Heaving it with the whole body",
-              "Shrugging the shoulder up at the top"
+              "Heaving it with the whole body"
             ]
           }
         }
@@ -238,17 +282,21 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Press straight out and resist the pull — nothing should turn",
-              "Squeeze the back glute to lock the hips"
+              "Press straight out and resist the pull",
+              "Nothing should turn"
             ],
             "bad": [
-              "Letting the ribs twist towards the cable",
-              "Going heavy enough that you have to lean"
+              "Letting the ribs twist towards the cable"
             ]
           }
         }

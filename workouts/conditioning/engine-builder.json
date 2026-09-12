@@ -6,6 +6,10 @@
   "duration": "35 min",
   "equipment": "Bike",
   "focusTag": "Aerobic Base",
+  "intro": [
+    "The easy one, and the one people ruin by making it hard. Twenty-two minutes at a pace you could hold a conversation at.",
+    "This is the base that lets you recover between points and between sessions. Going harder does not make it work better, it just turns it into a different session that you already do elsewhere."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,34 +20,41 @@
           "name": "Easy Spin",
           "videoUrl": null,
           "chips": [
-            { "label": "5 minutes", "style": "dark" }
+            {
+              "label": "5 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Upright bike, seat high enough that your hips stay above your knees and you sit tall",
-              "An incline treadmill walk does the same job if you prefer",
-              "Very easy. You are only raising the temperature"
+              "Upright bike, sit tall with your hips above your knees",
+              "Easy enough to breathe through your nose"
             ],
             "bad": [
-              "Using an air bike for this. It rounds your lower back and drives it with every arm stroke, and five minutes of that before every session adds up",
-              "Starting hard"
+              "Using an air bike — it rounds your lower back and drives it with every stroke"
             ]
-          }
+          },
+          "note": "An incline treadmill walk does the same job if you prefer."
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / side" },
-            { "label": "Front-back, then side-side" }
+            {
+              "label": "10 Reps / side"
+            },
+            {
+              "label": "Front-back, then side-side"
+            }
           ],
           "cues": {
             "good": [
-              "Tall posture, free swing, build the range"
+              "Hold the fence, stand tall, let the leg swing freely",
+              "Build the range across the ten"
             ],
             "bad": [
-              "Arching the back to swing higher"
+              "Arching the back to throw the leg higher"
             ]
           }
         },
@@ -52,14 +63,17 @@
           "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "4 Reps / side" }
+            {
+              "label": "4 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Hips and upper back, before you sit down for half an hour"
+              "Drive the back hip down, then rotate and reach tall",
+              "Feel the front of the back hip open"
             ],
             "bad": [
-              "Skipping it because the bike feels like enough"
+              "Rotating before the hip has opened"
             ]
           }
         }
@@ -74,21 +88,24 @@
           "name": "Steady Ride",
           "videoUrl": null,
           "chips": [
-            { "label": "22 minutes", "style": "dark" },
-            { "label": "Conversation pace" }
+            {
+              "label": "22 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "Conversation pace"
+            }
           ],
           "cues": {
             "good": [
-              "One pace, the whole way. No surges",
-              "The test is your breath: you should be able to hold a conversation in full sentences, and breathe through your nose most of the time",
-              "If you cannot talk, you are going too hard. This session only works if it stays easy",
-              "This is the base that lets you recover between points, and between sessions"
+              "One pace the whole way, no surges",
+              "You should be able to talk in full sentences"
             ],
             "bad": [
-              "Drifting faster as you get bored, or chasing a number on the screen",
-              "Treating it as a hard day. The hard days are elsewhere in your week"
+              "Drifting faster as you get bored, or chasing a number on the screen"
             ]
-          }
+          },
+          "note": "If you cannot talk, you are going too hard."
         }
       ]
     },
@@ -101,28 +118,36 @@
           "name": "Easy Spin",
           "videoUrl": null,
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Same bike, almost no resistance, until your breathing settles"
+              "Upright bike, sit tall with your hips above your knees",
+              "Easy enough to breathe through your nose"
             ],
             "bad": [
-              "Stopping dead and getting straight off"
+              "Using an air bike — it rounds your lower back and drives it with every stroke"
             ]
-          }
+          },
+          "note": "An incline treadmill walk does the same job if you prefer."
         },
         {
           "type": "simple",
           "name": "Nasal Breathing",
           "videoUrl": null,
           "chips": [
-            { "label": "2 minutes", "style": "dark" }
+            {
+              "label": "2 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
               "In through the nose for four, out for six",
-              "Shoulders down on every exhale"
+              "Let the shoulders drop on every exhale"
             ],
             "bad": [
               "Forcing big breaths"

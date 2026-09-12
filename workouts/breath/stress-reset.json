@@ -6,6 +6,10 @@
   "duration": "12 min",
   "equipment": "Bodyweight",
   "focusTag": "After a Hard Day",
+  "intro": [
+    "For the days when your body is fine and your head is not. Work, travel, exams, a bad week.",
+    "A little movement first to give your attention somewhere to go, then five minutes of box breathing, then two minutes of long exhales to actually drop you down."
+  ],
   "blocks": [
     {
       "title": "Loosen",
@@ -15,17 +19,18 @@
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
-          "note": "This one is for the days when your body is fine and your head is not. Work, travel, exams, a bad week. The movement here is short on purpose. You are not training, you are giving your attention somewhere to go before you ask it to sit still.",
           "chips": [
-            { "label": "10 Reps" }
+            {
+              "label": "10 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Slow. Let the breath lead and the spine follow",
+              "Move slowly between the two shapes, let the breath lead",
               "Out as you round, in as you arch"
             ],
             "bad": [
-              "Pushing into end range. Nothing here should feel like effort"
+              "Pushing into end range — nothing here should feel like effort"
             ]
           }
         },
@@ -34,12 +39,14 @@
           "name": "Thread the Needle",
           "videoUrl": null,
           "chips": [
-            { "label": "6 Reps / side" }
+            {
+              "label": "6 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "On all fours, reach one arm under the other and let the shoulder settle",
-              "Then reach it up to the ceiling and open the chest"
+              "Reach one arm under the other and let the shoulder settle",
+              "Feel it across the back of the shoulder blade"
             ],
             "bad": [
               "Letting the hips drift away from over the knees"
@@ -50,14 +57,15 @@
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "note": "A stressful day usually shows up in the same places: the upper back rounds, the shoulders creep up, the breathing moves into the chest. This opens the first one so the breathing has somewhere to go.",
           "chips": [
-            { "label": "8 Reps / side" }
+            {
+              "label": "8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your side, knees stacked, open the top arm and follow it with your eyes",
-              "Breathe out as you open. Do not rush back"
+              "Knees stacked, open the top arm and follow it with your eyes",
+              "Breathe out as you open"
             ],
             "bad": [
               "Letting the knees come apart so the hips do the turning"
@@ -74,19 +82,22 @@
           "type": "simple",
           "name": "Box Breathing",
           "videoUrl": null,
-          "note": "Box breathing suits a busy head better than anything else here. The counting is the point: it occupies the part of you that wants to keep going over the day. Five minutes is the dose. If your mind wanders, notice it and go back to the count. That is the exercise, not a failure at it.",
+          "note": "If your mind wanders, notice it and go back to the count — that is the exercise, not a failure at it.",
           "chips": [
-            { "label": "5 minutes", "style": "dark" },
-            { "label": "In 4 · hold 4 · out 4 · hold 4" }
+            {
+              "label": "5 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "In 4 · hold 4 · out 4 · hold 4"
+            }
           ],
           "cues": {
             "good": [
-              "Sit upright somewhere comfortable, or lie down. Both work",
-              "In for four, hold four, out for four, hold four. All equal",
+              "Sit upright or lie down, in four, hold four, out four, hold four",
               "Nose breathing throughout if you can"
             ],
             "bad": [
-              "Straining the holds. Drop to three counts if four is a fight",
               "Doing it with the TV on"
             ]
           }
@@ -101,19 +112,23 @@
           "type": "simple",
           "name": "Child's Pose with Extended Exhale",
           "videoUrl": null,
-          "note": "Finishing with the long exhale rather than the box is deliberate. Box breathing steadies you. The long out-breath is what actually drops you down. Two minutes of it at the end is what you will feel walking away.",
+          "note": "Box breathing steadies you; the long exhale is what drops you.",
           "chips": [
-            { "label": "2 minutes", "style": "dark" },
-            { "label": "In 4 · out 8" }
+            {
+              "label": "2 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "In 4 · out 8"
+            }
           ],
           "cues": {
             "good": [
-              "Knees wide, hips back to the heels, forehead down",
-              "In through the nose for four, out for eight",
+              "Knees wide, forehead down, in for four and out for eight",
               "Let the shoulders get heavier on every exhale"
             ],
             "bad": [
-              "Getting up the second the timer goes. Take a few breaths before you move"
+              "Getting up the second the timer goes"
             ]
           }
         }

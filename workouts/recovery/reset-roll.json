@@ -6,6 +6,10 @@
   "duration": "15 min",
   "equipment": "Foam Roller",
   "focusTag": "Release & Down-Regulate",
+  "intro": [
+    "Fifteen minutes with a foam roller, after training or on the evening of a hard day.",
+    "Slow is the whole thing. Stop on the sore spots and breathe there rather than sawing back and forth, and never roll your lower back — stay above the bottom of the ribcage."
+  ],
   "blocks": [
     {
       "title": "Release",
@@ -16,17 +20,17 @@
           "name": "Calf Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec / side" }
+            {
+              "label": "60 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Slow. Stop on the sore spots and breathe there for a few seconds",
-              "Cross the other leg on top if you want more pressure",
-              "Start at the ankle and work up, not the other way"
+              "Slow from the ankle up, cross the other leg on top for more pressure",
+              "Stop on the sore spots and breathe"
             ],
             "bad": [
-              "Rolling back and forth fast like you are sawing wood",
-              "Holding your breath on the tender spots"
+              "Rolling back and forth fast"
             ]
           }
         },
@@ -35,15 +39,16 @@
           "name": "Quad Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec / side" }
+            {
+              "label": "60 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Face down, one thigh on the roller, slow from knee to hip",
+              "Face down, slow from knee to hip",
               "Bend and straighten the knee while you pause on a spot"
             ],
             "bad": [
-              "Racing through it",
               "Rolling directly over the kneecap"
             ]
           }
@@ -53,35 +58,38 @@
           "name": "Glute Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec / side" }
+            {
+              "label": "60 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Sit on the roller, cross one ankle over the opposite knee, lean into that side",
-              "Small movements. You are hunting one spot, not covering ground",
-              "This is the one most players skip and most need"
+              "Sit on the roller, cross one ankle over the opposite knee and lean into it",
+              "Small movements — you are hunting one spot"
             ],
             "bad": [
-              "Sitting on it and not actually loading one side"
+              "Sitting on it without actually loading one side"
             ]
-          }
+          },
+          "note": "This is the one most players skip and most need."
         },
         {
           "type": "simple",
           "name": "Upper Back Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec", "style": "dark" }
+            {
+              "label": "60 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
               "Roller across the upper back, hands behind the head, ribs down",
-              "Pause and breathe into each level before moving up",
-              "Stay above the bottom of the ribcage. The lower back does not get rolled"
+              "Pause and breathe at each level"
             ],
             "bad": [
-              "Rolling the lower back",
-              "Letting the ribs flare and arching over the roller"
+              "Rolling the lower back"
             ]
           }
         },
@@ -90,15 +98,17 @@
           "name": "Lat Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your side, arm overhead, roller under the armpit and down the side of the back",
-              "Your serving side will be the worse one. Give it the time"
+              "On your side, arm overhead, roller under the armpit",
+              "Small movements, pause where it bites"
             ],
             "bad": [
-              "Rolling into the ribs themselves"
+              "Rolling onto the ribs themselves"
             ]
           }
         }
@@ -113,7 +123,10 @@
           "name": "Child's Pose",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec", "style": "dark" }
+            {
+              "label": "60 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
@@ -121,7 +134,7 @@
               "Breathe into your back and let it widen"
             ],
             "bad": [
-              "Rushing to the breathing before the body has settled"
+              "Rushing to get to the breathing"
             ]
           }
         },
@@ -130,19 +143,21 @@
           "name": "Box Breathing",
           "videoUrl": null,
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
               "In for four, hold four, out for four, hold four",
-              "Lie down, one hand on the belly. Only that hand should move",
-              "This is the part that actually switches you off. Do not cut it short"
+              "Lie down, one hand on the belly, only that hand moves"
             ],
             "bad": [
-              "Straining to hold the counts. Shorten to three if four is a fight",
-              "Doing it with your phone in your other hand"
+              "Straining to hold the counts — shorten to three"
             ]
-          }
+          },
+          "note": "This is the part that actually switches you off, so do not cut it short."
         }
       ]
     }

@@ -6,6 +6,10 @@
   "duration": "40 min",
   "equipment": "Dumbbells",
   "focusTag": "Upper Body for Racket Athletes",
+  "intro": [
+    "An upper-body session for an arm that plays a racket sport. Pull-led, because pulling is the half your sport never trains.",
+    "Two sets of bench on purpose, and a light set of wrist work at the end. Your shoulder presses all week already, and the elbow is usually where the forearm ends up complaining."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,15 +20,18 @@
           "name": "Rowing Machine",
           "videoUrl": null,
           "chips": [
-            { "label": "4 minutes", "style": "dark" }
+            {
+              "label": "4 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Easy pace. It raises the temperature and rehearses the pull at the same time",
-              "Any machine works if there is no rower"
+              "Easy pace, any machine if there is no rower",
+              "Warm and breathing, nothing more"
             ],
             "bad": [
-              "Hammering it — this is the raise, not a workout"
+              "Hammering it"
             ]
           }
         },
@@ -33,12 +40,14 @@
           "name": "Arm Circles",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / direction" }
+            {
+              "label": "10 Reps / direction"
+            }
           ],
           "cues": {
             "good": [
-              "Start small, grow the circle as the shoulder loosens",
-              "Backward circles matter more than forward for your sport"
+              "Start small and grow the circle as it loosens",
+              "Backward circles matter more for your sport"
             ],
             "bad": [
               "Starting with the biggest circle you can make"
@@ -50,15 +59,17 @@
           "name": "Open Book",
           "videoUrl": null,
           "chips": [
-            { "label": "8 Reps / side" }
+            {
+              "label": "8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your side, knees stacked, open the top arm and follow it with your eyes",
-              "Get the upper back turning before you ask the shoulder to press"
+              "Knees stacked, open the top arm and follow it with your eyes",
+              "Feel the turn in the ribs"
             ],
             "bad": [
-              "Letting the knees roll apart so the hips do the work"
+              "Letting the knees roll apart"
             ]
           }
         },
@@ -67,18 +78,20 @@
           "name": "Prone Y-T Raise",
           "videoUrl": null,
           "chips": [
-            { "label": "8 Reps / shape" },
-            { "label": "Bodyweight" }
+            {
+              "label": "8 Reps / shape"
+            },
+            {
+              "label": "Bodyweight"
+            }
           ],
           "cues": {
             "good": [
-              "Face down, lift the arms a few inches — a Y, then a T",
-              "Thumbs up, neck long, no shrugging",
-              "Switches on the muscles that hold the shoulder together"
+              "Face down, lift the arms a few inches, thumbs up",
+              "Feel the muscles between the shoulder blades switch on"
             ],
             "bad": [
-              "Shrugging towards the ears",
-              "Lifting the chest to cheat the arms higher"
+              "Shrugging towards the ears"
             ]
           }
         },
@@ -87,13 +100,17 @@
           "name": "Light Dumbbell Rehearsal",
           "videoUrl": null,
           "chips": [
-            { "label": "1 Set" },
-            { "label": "×10 Reps, very light" }
+            {
+              "label": "1 Set"
+            },
+            {
+              "label": "×10 Reps, very light"
+            }
           ],
           "cues": {
             "good": [
-              "One light set of the first working movement before you load it",
-              "Groove the path, feel the shoulder, then go"
+              "One light set of the first working movement",
+              "Groove the path and feel the shoulder"
             ],
             "bad": [
               "Going straight to your working weight"
@@ -112,21 +129,27 @@
           "videoUrl": null,
           "restSec": 90,
           "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "×10 Reps / side" },
-            { "label": "RPE 7-8" }
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps / side"
+            },
+            {
+              "label": "RPE 7-8"
+            }
           ],
           "cues": {
             "good": [
-              "Hand and knee on the bench, flat back, pull to the hip",
-              "Pause at the top, lower it slowly",
-              "Pulling leads this session on purpose — it is the half your sport never trains"
+              "Flat back, pull to the hip and pause at the top",
+              "Feel it in the mid-back, not the arm"
             ],
             "bad": [
-              "Twisting the torso to get the dumbbell higher",
-              "Dropping it fast and bouncing the next rep"
+              "Twisting the torso to get the dumbbell higher"
             ]
-          }
+          },
+          "note": "Pulling leads this session on purpose."
         },
         {
           "type": "standard",
@@ -134,21 +157,27 @@
           "videoUrl": null,
           "restSec": 90,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" },
-            { "label": "RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
-              "Half-kneeling, squeeze the back glute, ribs down",
               "Press straight up beside the ear, not out in front",
-              "Kneeling is deliberate — it stops your lower back arching to finish the rep"
+              "Squeeze the back glute and keep the ribs down"
             ],
             "bad": [
-              "Leaning back to press the weight up",
-              "Pressing through pain. Stop and tell me instead"
+              "Leaning back to press the weight up"
             ]
-          }
+          },
+          "note": "Kneeling is what stops your lower back arching to finish the rep."
         }
       ]
     },
@@ -162,20 +191,27 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "2 Sets", "style": "yellow" },
-            { "label": "×10 Reps" },
-            { "label": "RPE 7" }
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
-              "Elbows about 45° from the body, not flared wide",
-              "Two sets only, and that is on purpose — your shoulder already presses all week"
+              "Elbows about 45 degrees from the body",
+              "Chest does the work, not the front of the shoulder"
             ],
             "bad": [
-              "Adding sets because it feels like the fun one",
-              "Letting the elbows flare to ninety degrees"
+              "Letting the elbows flare out wide"
             ]
-          }
+          },
+          "note": "Two sets only, and that is on purpose."
         },
         {
           "type": "standard",
@@ -183,17 +219,23 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×12 Reps" },
-            { "label": "RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×12 Reps"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
               "Hinge over, light weight, lead with the elbows",
-              "Small weight and a real squeeze beats a big weight and a swing"
+              "Feel the back of the shoulder"
             ],
             "bad": [
-              "Using the lower back to throw them up",
               "Going so heavy it becomes a row"
             ]
           }
@@ -204,19 +246,24 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "2 Sets", "style": "yellow" },
-            { "label": "×15 Reps / side" }
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×15 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Forearm on your thigh, palm down, very light, slow all the way down",
-              "This is the one that keeps tennis elbow away. Two minutes, every week"
+              "Forearm on your thigh, palm down, very light and slow",
+              "Feel the top of the forearm"
             ],
             "bad": [
-              "Going heavy. Light and slow is the whole point",
-              "Skipping it because it looks like nothing"
+              "Going heavy"
             ]
-          }
+          },
+          "note": "This is the one that keeps tennis elbow away."
         }
       ]
     },
@@ -230,18 +277,21 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×20 m / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×20 m / side"
+            }
           ],
           "cues": {
             "good": [
-              "Pick it up like a deadlift — hips back, flat back, stand up with it",
-              "One heavy dumbbell, one side. Walk tall and do not lean away from it",
-              "Set it down the same way you picked it up"
+              "Pick it up like a deadlift, then walk tall",
+              "Do not let yourself lean away from it"
             ],
             "bad": [
-              "Bending over and yanking it off the floor",
-              "Leaning sideways to counterbalance"
+              "Bending over and yanking it off the floor"
             ]
           }
         }

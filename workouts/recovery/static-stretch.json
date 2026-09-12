@@ -6,6 +6,10 @@
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Static Stretching, No Kit",
+  "intro": [
+    "Static stretching with no kit at all, for the days you do not have a roller or do not want one.",
+    "These belong after training or on a rest day, never in the ten minutes before you play. Held long enough to matter, a stretch takes a little edge off how forcefully a muscle contracts for the next hour or so — exactly what you want tonight and exactly what you do not want before a match."
+  ],
   "blocks": [
     {
       "title": "Lower Body",
@@ -15,19 +19,18 @@
           "type": "simple",
           "name": "Lying Hamstring Stretch",
           "videoUrl": null,
-          "note": "Static holds like these belong AFTER training or on a rest day, never before you play. Held long enough to matter, they take a little edge off how forcefully a muscle contracts for the next hour or so. That is exactly what you want tonight and exactly what you do not want ten minutes before a match.",
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your back, one leg up, hands behind the thigh, other leg flat on the floor",
-              "Soft bend in the raised knee. Straighter is not better",
-              "Relax into it. The hold does the work, not the pull"
+              "One leg up, hands behind the thigh, other leg flat on the floor",
+              "Soft bend in the raised knee — straighter is not better"
             ],
             "bad": [
-              "Yanking the leg towards you",
-              "Letting the other leg lift off the floor"
+              "Yanking the leg towards you"
             ]
           }
         },
@@ -36,13 +39,14 @@
           "name": "Figure-4 Glute Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your back, ankle across the opposite knee, pull the bottom thigh in",
-              "Keep the crossed knee pushed gently away",
-              "Head and shoulders stay down"
+              "Ankle across the opposite knee, pull the bottom thigh in",
+              "Feel it deep in the glute of the crossed leg"
             ],
             "bad": [
               "Pulling so hard the hips lift off the floor"
@@ -54,16 +58,17 @@
           "name": "Butterfly Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec", "style": "dark" }
+            {
+              "label": "60 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Soles of the feet together, sit tall, let the knees fall",
-              "Lean forward from the hips, not by rounding the back",
-              "Elbows can rest on the thighs. No pushing"
+              "Soles together, sit tall and lean forward from the hips",
+              "Let the knees fall rather than pushing them"
             ],
             "bad": [
-              "Bouncing the knees",
               "Rounding the spine to get lower"
             ]
           }
@@ -73,12 +78,14 @@
           "name": "Couch Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
               "Back foot up on a sofa or wall, squeeze the back glute and stand tall",
-              "The glute squeeze is the stretch"
+              "Feel the front of the back hip, never the lower back"
             ],
             "bad": [
               "Arching the lower back to get deeper"
@@ -90,17 +97,19 @@
           "name": "Wall Calf Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" },
-            { "label": "Straight knee, then bent" }
+            {
+              "label": "45 sec / side"
+            },
+            {
+              "label": "Straight knee, then bent"
+            }
           ],
           "cues": {
             "good": [
-              "Hands on the wall, back leg straight, heel down, hips forward",
-              "Then bend that back knee slightly and hold again. Two different muscles",
-              "Toes pointing straight at the wall the whole time"
+              "Back leg straight, heel down, hips forward, then repeat with the knee bent",
+              "Two different muscles, so do both"
             ],
             "bad": [
-              "Letting the back heel lift",
               "Turning the back foot out to cheat the range"
             ]
           }
@@ -116,16 +125,17 @@
           "name": "Doorway Pec Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
               "Forearm on the door frame, elbow at shoulder height, step through and turn away",
-              "Chest open, ribs down"
+              "Feel it across the front of the chest"
             ],
             "bad": [
-              "Letting the shoulder roll forward into the stretch",
-              "Going so far it pinches at the front of the shoulder. Back off if it does"
+              "Letting the shoulder roll forward into it"
             ]
           }
         },
@@ -134,7 +144,9 @@
           "name": "Child's Pose with Side Reach",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
@@ -150,18 +162,19 @@
           "type": "simple",
           "name": "Cross-Body Shoulder Stretch",
           "videoUrl": null,
-          "note": "The back of the serving shoulder takes a beating and it is the one nobody stretches. Gentle is the word here. If you feel a pinch at the front of the shoulder rather than a stretch behind it, come out and tell me.",
+          "note": "The back of the serving shoulder is the one nobody stretches — go gently.",
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
               "Arm straight across the chest, pull it in with the other forearm",
-              "Keep the shoulder down, do not let it shrug up towards the ear"
+              "Shoulder stays down, not shrugged to the ear"
             ],
             "bad": [
-              "Pulling at the elbow joint itself",
-              "Rotating the whole torso to make it feel like more"
+              "Pushing into a pinch at the front of the shoulder"
             ]
           }
         }

@@ -6,6 +6,10 @@
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Hips & Groin",
+  "intro": [
+    "Hips and groin, which is what tennis and padel punish most. Every wide ball, every open-stance forehand and every lunge to the net is an adductor at length under load.",
+    "This trains that range rather than hoping you have it when the ball arrives. The Cossack squat in the middle is the closest thing in a gym to a wide defensive ball, and it is the position a groin tears in if you are not strong there."
+  ],
   "blocks": [
     {
       "title": "Groin",
@@ -15,19 +19,18 @@
           "type": "simple",
           "name": "Frog Rock",
           "videoUrl": null,
-          "note": "Tennis and padel ask your groin for more range than almost any other sport. Every wide ball, every open-stance forehand, every lunge to the net is an adductor at length under load. This session trains that range instead of hoping you have it when the ball arrives.",
           "chips": [
-            { "label": "10 Reps" }
+            {
+              "label": "10 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "On all fours, knees wide, feet turned out in line with the knees",
-              "Rock the hips back slowly until you feel the groin, then come forward",
-              "Keep the lower back flat. When it starts to round, that is your end range"
+              "Knees wide, feet turned out, rock the hips back slowly",
+              "Feel it through the groin"
             ],
             "bad": [
-              "Bouncing at the back of the rock",
-              "Widening the knees past what you can control"
+              "Rocking back far enough that the lower back rounds"
             ]
           }
         },
@@ -36,13 +39,14 @@
           "name": "Adductor Rock Back",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / side" }
+            {
+              "label": "10 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "On all fours, one leg out straight to the side, foot flat",
-              "Rock back and feel it down the inside of the straight leg",
-              "Slow. Let the range open over the ten rather than forcing the first one"
+              "One leg out straight to the side, foot flat, rock back",
+              "Feel it down the inside of the straight leg"
             ],
             "bad": [
               "Letting the straight leg's foot roll onto its edge"
@@ -59,19 +63,19 @@
           "type": "simple",
           "name": "Cossack Squat",
           "videoUrl": null,
-          "note": "This is the closest thing in the gym to a wide defensive ball. You are strong in the bottom of it or you are not, and if you are not, that is the position where a groin tears. Bodyweight only, hands out in front for balance, and hold a chair if you need it.",
+          "note": "Go only as deep as you can come back up from without a wobble.",
           "chips": [
-            { "label": "8 Reps / side" }
+            {
+              "label": "8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
               "Wide stance, sit down over one leg with the other straight",
-              "Heel of the bent leg stays down. Turn the straight foot up if it helps",
-              "Go only as deep as you can come back up from without a wobble"
+              "The bent-leg heel stays down"
             ],
             "bad": [
-              "Dropping in and using a bounce to get out",
-              "Letting the bent knee cave inwards"
+              "Dropping in and bouncing to get out"
             ]
           }
         },
@@ -80,16 +84,17 @@
           "name": "Lateral Lunge with Reach",
           "videoUrl": null,
           "chips": [
-            { "label": "8 Reps / side" }
+            {
+              "label": "8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Step wide, sit into that hip, reach both hands past the outside of the foot",
-              "Push back out through the heel to stand",
-              "This is the same shape as the Cossack but moving, so it should feel easier"
+              "Step wide, sit into that hip, reach past the outside of the foot",
+              "Push back out through the heel"
             ],
             "bad": [
-              "Staying upright. The reach is what makes the hip work"
+              "Staying upright — the reach is what makes the hip work"
             ]
           }
         }
@@ -103,19 +108,18 @@
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "videoUrl": null,
-          "note": "Hours in a low ready stance leave the front of the hip short, and a short hip flexor quietly steals range from everything above it. Squeezing the back glute is what makes this a stretch of the hip rather than a stretch of your lower back.",
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Half-kneeling, squeeze the back glute first, then reach the same-side arm overhead",
-              "Ribs down. Tuck the tailbone under before you reach",
-              "Add a small lean away from the kneeling side for the last fifteen seconds"
+              "Squeeze the back glute, then reach the same-side arm overhead",
+              "Feel the front of the back hip, never the lower back"
             ],
             "bad": [
-              "Arching the lower back to feel more",
-              "Pushing the hips forward without the glute squeeze"
+              "Arching the lower back to feel more"
             ]
           }
         },
@@ -124,17 +128,18 @@
           "name": "Deep Squat Hold",
           "videoUrl": null,
           "chips": [
-            { "label": "90 sec", "style": "dark" }
+            {
+              "label": "90 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Sit into the bottom of a squat, elbows inside the knees, gently push them out",
-              "Hold a door frame if your heels lift",
-              "Breathe and let it settle. Shift side to side if you want more"
+              "Sit into the bottom of a squat, elbows inside the knees",
+              "Let it settle rather than fighting it"
             ],
             "bad": [
-              "Bouncing to get lower",
-              "Holding your breath through it"
+              "Bouncing to get lower"
             ]
           }
         }

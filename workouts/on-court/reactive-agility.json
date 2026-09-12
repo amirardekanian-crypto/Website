@@ -6,6 +6,10 @@
   "duration": "20 min",
   "equipment": "Court",
   "focusTag": "Reaction & Quickness",
+  "intro": [
+    "Quickness you cannot rehearse. Every drill here makes you react to something rather than run a pattern you already know.",
+    "All of it works alone, off a wall or a ball you drop yourself. Vary the throws so you cannot predict the bounce — the moment it becomes predictable it is footwork practice, not reaction."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,14 +20,18 @@
           "name": "Easy Jog",
           "videoUrl": null,
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Easy pace until you are warm and breathing"
+              "Easy pace until you are warm and breathing",
+              "Nothing here is fast yet"
             ],
             "bad": [
-              "Going straight into the fast stuff cold"
+              "Starting hard — you are about to sprint"
             ]
           }
         },
@@ -32,17 +40,20 @@
           "name": "Side Shuffle",
           "videoUrl": null,
           "chips": [
-            { "label": "4 Lengths" },
-            { "label": "Service line to service line" }
+            {
+              "label": "4 Lengths"
+            },
+            {
+              "label": "Service line to service line"
+            }
           ],
           "cues": {
             "good": [
-              "Stay low, push the ground away with the trailing foot",
+              "Stay low and push the ground away with the trailing foot",
               "Face the net the whole way"
             ],
             "bad": [
-              "Bobbing up and down between steps",
-              "Crossing the feet"
+              "Bobbing up and down between steps"
             ]
           }
         },
@@ -51,7 +62,9 @@
           "name": "Carioca",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Lengths / side" }
+            {
+              "label": "2 Lengths / side"
+            }
           ],
           "cues": {
             "good": [
@@ -68,8 +81,12 @@
           "name": "Split-Step Bounces",
           "videoUrl": null,
           "chips": [
-            { "label": "3 Sets" },
-            { "label": "×6 Reps" }
+            {
+              "label": "3 Sets"
+            },
+            {
+              "label": "×6 Reps"
+            }
           ],
           "cues": {
             "good": [
@@ -93,20 +110,24 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "6 Sets", "style": "yellow" },
-            { "label": "×5 Balls" }
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×5 Balls"
+            }
           ],
           "cues": {
             "good": [
-              "Throw the ball hard at the wall, split-step, then move to where it comes off",
-              "Vary how hard you throw so you cannot predict the bounce",
-              "Get there and set your feet — catching it flat-footed does not count"
+              "Throw hard at the wall, split-step, then move to where it comes off",
+              "Get there and set your feet"
             ],
             "bad": [
-              "Throwing the same ball to the same spot every time",
-              "Guessing and moving before the ball leaves the wall"
+              "Throwing the same ball to the same spot every time"
             ]
-          }
+          },
+          "note": "Vary how hard you throw so you cannot predict the bounce."
         },
         {
           "type": "standard",
@@ -114,18 +135,21 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "3 each side" }
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "3 each side"
+            }
           ],
           "cues": {
             "good": [
-              "Hold the ball at shoulder height behind you, drop it and chase it down",
-              "First move is the drop-step — open the hip, do not step across",
-              "Catch it before the second bounce"
+              "Drop the ball from shoulder height behind you and chase it down",
+              "First move is the drop-step — open the hip"
             ],
             "bad": [
-              "Turning your back and running — stay open to the court",
-              "Setting off before you let go of the ball"
+              "Turning your back and running"
             ]
           }
         }
@@ -145,16 +169,26 @@
               "name": "Lateral Line Hops",
               "detail": "15 seconds",
               "cues": {
-                "good": ["Two feet over the line and back, as fast as you can cycle them"],
-                "bad": ["Looking down at the line"]
+                "good": [
+                  "Two feet over the line and back, as fast as you can cycle them",
+                  "Stay on the balls of the feet"
+                ],
+                "bad": [
+                  "Looking down at the line"
+                ]
               }
             },
             {
               "name": "Front-Back Line Hops",
               "detail": "15 seconds",
               "cues": {
-                "good": ["Tiny hops, stiff ankles, stay on the balls of the feet"],
-                "bad": ["Jumping high instead of fast"]
+                "good": [
+                  "Tiny hops over the line and back",
+                  "Stiff ankles, light contacts"
+                ],
+                "bad": [
+                  "Jumping high instead of fast"
+                ]
               }
             },
             {
@@ -163,9 +197,11 @@
               "cues": {
                 "good": [
                   "Split-step, move to a corner, recover to the middle, repeat",
-                  "Pick the corner late — make yourself react, not rehearse"
+                  "Pick the corner late"
                 ],
-                "bad": ["Falling into the same left-right-left pattern every round"]
+                "bad": [
+                  "Falling into the same left-right-left pattern every round"
+                ]
               }
             }
           ]

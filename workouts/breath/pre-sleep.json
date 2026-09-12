@@ -6,6 +6,10 @@
   "duration": "10 min",
   "equipment": "Bodyweight",
   "focusTag": "Before Sleep",
+  "intro": [
+    "The last thing before sleep, done in your bedroom with the lights already low and nothing planned afterwards.",
+    "No box breathing tonight. Counting four sides of a box keeps a part of you alert, which is what you want before a match and the opposite of what you want now. Long exhales only, and falling asleep during it means it worked."
+  ],
   "blocks": [
     {
       "title": "Settle",
@@ -15,18 +19,20 @@
           "type": "simple",
           "name": "Legs Up the Wall",
           "videoUrl": null,
-          "note": "Do this one in your bedroom with the lights already low, and do not plan to do anything after it. The whole session is built to be the last thing before you sleep. If you get up afterwards and go back to a screen, you have undone it.",
+          "note": "Go straight to bed after this — going back to a screen undoes it.",
           "chips": [
-            { "label": "4 minutes", "style": "dark" }
+            {
+              "label": "4 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "On your back, heels up the wall or up the headboard, arms out wide",
-              "Nothing to hold. Let the legs be heavy",
-              "Lights low. Phone in another room if you can"
+              "Heels up the wall or the headboard, arms out wide",
+              "Let the legs be heavy"
             ],
             "bad": [
-              "Scrolling through it. That is the opposite of the point"
+              "Scrolling through it"
             ]
           }
         },
@@ -35,7 +41,10 @@
           "name": "Knees to Chest",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec", "style": "dark" }
+            {
+              "label": "60 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
@@ -43,7 +52,7 @@
               "Just enough movement to let the lower back let go"
             ],
             "bad": [
-              "Pulling hard. Nothing tonight is a stretch you fight"
+              "Pulling hard"
             ]
           }
         }
@@ -57,20 +66,23 @@
           "type": "simple",
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
-          "note": "Only the long exhale tonight, and no box breathing. Counting four sides of a box keeps a part of you awake and alert, which is exactly what you want before a match and exactly what you do not want now. In for four, out for eight, and let it get sloppy as you drift. Falling asleep during this is the session working, not you failing it.",
+          "note": "If you lose count, start again; if you fall asleep, good.",
           "chips": [
-            { "label": "5 minutes", "style": "dark" },
-            { "label": "In 4 · out 8" }
+            {
+              "label": "5 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "In 4 · out 8"
+            }
           ],
           "cues": {
             "good": [
-              "Lying down, in bed is ideal. One hand on the belly, only that hand moves",
-              "In through the nose for four, out for eight, through the nose or softly through the mouth",
-              "If you lose count, start again. If you fall asleep, good"
+              "Lying down, in through the nose for four, out for eight",
+              "Only the hand on your belly should move"
             ],
             "bad": [
-              "Setting a loud alarm for the end of it",
-              "Straining for the full eight. Shorten to six and keep it easy"
+              "Straining for the full eight — shorten to six and keep it easy"
             ]
           }
         }

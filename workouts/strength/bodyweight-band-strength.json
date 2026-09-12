@@ -6,6 +6,10 @@
   "duration": "40 min",
   "equipment": "Bands",
   "focusTag": "Legs & Glutes, Minimal Kit",
+  "intro": [
+    "Legs and glutes with a band and a chair. No gym needed, and it bites plenty if you slow the lowering down.",
+    "Straight sets throughout, nothing paired up. The two single-leg lifts are the session, so they get full rest and your full attention."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,11 +20,15 @@
           "name": "March on the Spot",
           "videoUrl": null,
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Knee up, opposite arm back, build the pace across the three minutes"
+              "Knee up, opposite arm back",
+              "Build the pace across the three minutes"
             ],
             "bad": [
               "Standing still between reps"
@@ -32,18 +40,23 @@
           "name": "Banded Glute Bridge",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×15 Reps" },
-            { "label": "Mini band above the knees" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×15 Reps"
+            },
+            {
+              "label": "Mini band above the knees"
+            }
           ],
           "cues": {
             "good": [
               "Push the knees out against the band the whole set",
-              "Ribs down, squeeze at the top, pause a second"
+              "Feel the glutes, not the lower back"
             ],
             "bad": [
-              "Letting the knees collapse in",
-              "Arching the lower back to lift higher"
+              "Letting the knees collapse in"
             ]
           }
         },
@@ -52,16 +65,17 @@
           "name": "Banded Lateral Walk",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Steps each way" }
+            {
+              "label": "10 Steps each way"
+            }
           ],
           "cues": {
             "good": [
-              "Half-squat, band above the knees, step wide and stay low",
+              "Half-squat, step wide and stay low",
               "Keep tension on the band even on the trailing leg"
             ],
             "bad": [
-              "Standing tall and waddling",
-              "Letting the feet snap together between steps"
+              "Standing tall and waddling"
             ]
           }
         },
@@ -70,12 +84,16 @@
           "name": "Bodyweight Squat",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps" },
-            { "label": "3s down" }
+            {
+              "label": "10 Reps"
+            },
+            {
+              "label": "3s down"
+            }
           ],
           "cues": {
             "good": [
-              "Three seconds down, sit between the hips, chest tall",
+              "Three seconds down, chest tall",
               "Find today's depth before you load one leg"
             ],
             "bad": [
@@ -88,11 +106,14 @@
           "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "4 Reps / side" }
+            {
+              "label": "4 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Back hip down first, then rotate and reach tall"
+              "Back hip down first, then rotate and reach tall",
+              "Feel the hip open before the turn"
             ],
             "bad": [
               "Rotating before the hip opens"
@@ -111,22 +132,27 @@
           "videoUrl": null,
           "restSec": 90,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" },
-            { "label": "3s down · RPE 7-8" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            },
+            {
+              "label": "3s down · RPE 7-8"
+            }
           ],
           "cues": {
             "good": [
-              "Back foot on a chair or bench, drop straight down, push through the front heel",
-              "Three seconds on the way down, every rep",
-              "Straight sets with full rest. Finish one leg, rest, do the other"
+              "Back foot on a chair, drop straight down over three seconds",
+              "The front heel drives you back up"
             ],
             "bad": [
-              "Rushing to the second leg without resting",
-              "Leaning forward onto the front knee to make it easier",
-              "Pairing it with something else to save time — this one gets your full attention"
+              "Leaning forward onto the front knee"
             ]
-          }
+          },
+          "note": "Straight sets with full rest — finish one leg, rest, then do the other."
         },
         {
           "type": "standard",
@@ -134,21 +160,27 @@
           "videoUrl": null,
           "restSec": 90,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" },
-            { "label": "3s down · RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            },
+            {
+              "label": "3s down · RPE 7"
+            }
           ],
           "cues": {
             "good": [
-              "Hinge from the hip, back leg long behind you, flat back",
-              "Hips stay square to the floor — do not let the back hip open up",
-              "Touch a wall with your fingertips if balance is the limiter, not the hamstring"
+              "Hinge from the hip with the back leg long behind you",
+              "Feel the hamstring of the standing leg"
             ],
             "bad": [
-              "Twisting open at the hip",
-              "Bending the standing knee so it becomes a squat"
+              "Twisting open at the hip"
             ]
-          }
+          },
+          "note": "Fingertips on a wall if balance is the limiter rather than the hamstring."
         }
       ]
     },
@@ -162,18 +194,24 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps / side" },
-            { "label": "RPE 7" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps / side"
+            },
+            {
+              "label": "RPE 7"
+            }
           ],
           "cues": {
             "good": [
-              "Step back, drop the back knee softly, drive through the front heel",
-              "Stepping backwards is kinder to the knee than stepping forwards"
+              "Step back and drop the back knee softly",
+              "The front heel drives you up"
             ],
             "bad": [
-              "Crashing the back knee into the floor",
-              "Letting the front knee travel far past the toes"
+              "Crashing the back knee into the floor"
             ]
           }
         },
@@ -183,18 +221,24 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×12 Reps / side" },
-            { "label": "Band above the knees" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×12 Reps / side"
+            },
+            {
+              "label": "Band above the knees"
+            }
           ],
           "cues": {
             "good": [
-              "One foot planted, other knee hugged in, drive the hips up level",
+              "One foot planted, drive the hips up level",
               "Push out against the band on the working side"
             ],
             "bad": [
-              "Letting the hips twist towards the working leg",
-              "Pushing through the toes instead of the heel"
+              "Letting the hips twist towards the working leg"
             ]
           }
         }
@@ -210,17 +254,21 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×30 sec / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×30 sec / side"
+            }
           ],
           "cues": {
             "good": [
               "Straight line ankle to ear, hips stacked and lifted",
-              "This is the hip muscle the lateral walks warmed up, working long"
+              "Feel it down the bottom side"
             ],
             "bad": [
-              "Letting the top hip roll forward",
-              "Holding past the point the position falls apart"
+              "Letting the top hip roll forward"
             ]
           }
         }

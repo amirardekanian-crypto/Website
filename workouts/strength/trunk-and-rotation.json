@@ -6,6 +6,10 @@
   "duration": "20 min",
   "equipment": "Bodyweight",
   "focusTag": "Trunk Control & Rotation",
+  "intro": [
+    "Twenty minutes on the middle of you. Rotation first while you are fresh, then the bracing work that stops the hips and ribs cheating.",
+    "Slow beats fast on all of it. You are teaching the trunk to hold still while everything around it turns, which is what a forehand actually asks for."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,7 +20,10 @@
           "name": "March on the Spot",
           "videoUrl": null,
           "chips": [
-            { "label": "2 minutes", "style": "dark" }
+            {
+              "label": "2 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
@@ -33,12 +40,14 @@
           "name": "Cat-Cow",
           "videoUrl": null,
           "chips": [
-            { "label": "8 Reps" }
+            {
+              "label": "8 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Move one vertebra at a time, breathe with it",
-              "Find the range before you ask the trunk to hold still"
+              "Move slowly between the two shapes",
+              "Breathe with it"
             ],
             "bad": [
               "Rushing between the two shapes"
@@ -50,15 +59,17 @@
           "name": "Open Book",
           "videoUrl": null,
           "chips": [
-            { "label": "8 Reps / side" }
+            {
+              "label": "8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your side, knees stacked, open the top arm and follow it with your eyes",
-              "Let the chest turn and keep the knees together — that is the whole point"
+              "Knees stacked and together, open the top arm",
+              "Feel the turn in the ribs"
             ],
             "bad": [
-              "Letting the top knee lift so the hips do the rotating instead of the ribs"
+              "Letting the top knee lift"
             ]
           }
         },
@@ -67,17 +78,20 @@
           "name": "Glute Bridge",
           "videoUrl": null,
           "chips": [
-            { "label": "12 Reps" }
+            {
+              "label": "12 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Ribs down, squeeze the glutes to lift",
-              "Hips are where rotation gets its power from"
+              "Push through the heels until the hips are level",
+              "Feel the glutes switch on"
             ],
             "bad": [
               "Arching the lower back at the top"
             ]
-          }
+          },
+          "note": "Rotation gets its power from the hips, so wake them first."
         }
       ]
     },
@@ -91,18 +105,21 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Half-kneeling, hands at the chest, turn the ribs and keep the hips square",
-              "Squeeze the back glute — that is what stops the hips cheating",
-              "Slow. You are teaching the trunk to turn on a still base"
+              "Turn the ribs and keep the hips square",
+              "Squeeze the back glute to lock the hips"
             ],
             "bad": [
-              "The hips turning with the shoulders",
-              "Rushing and swinging the arms for momentum"
+              "The hips turning with the shoulders"
             ]
           }
         },
@@ -112,21 +129,24 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Hands together, chop from high on one side to low on the other",
-              "Let the back heel turn — the shot starts at the ground",
-              "Build the speed across the set once the path feels clean",
-              "If you have a ball and a wall, throw it instead — same movement, more intent"
+              "Chop from high on one side to low on the other",
+              "Let the back heel turn — the shot starts at the ground"
             ],
             "bad": [
-              "Arms only, feet glued to the floor",
-              "Going fast before the path is repeatable"
+              "Arms only, with the feet glued to the floor"
             ]
-          }
+          },
+          "note": "With a ball and a wall, throw it instead — same movement, more intent."
         }
       ]
     },
@@ -140,18 +160,24 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Taps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Taps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Feet wide, tap the opposite shoulder without letting the hips rock",
-              "Slower taps are harder taps"
+              "Feet wide, tap the opposite shoulder",
+              "The hips stay completely still"
             ],
             "bad": [
               "Hips swinging side to side with every tap"
             ]
-          }
+          },
+          "note": "Slower taps are harder taps."
         },
         {
           "type": "standard",
@@ -159,17 +185,21 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×30 sec / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×30 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Straight line ankle to ear, hips stacked and lifted",
-              "Drop to the bottom knee if the hips start to sink"
+              "Straight line ankle to ear, hips stacked",
+              "Feel it down the bottom side"
             ],
             "bad": [
-              "Letting the top hip roll forward",
-              "Holding on past the point the position falls apart"
+              "Letting the top hip roll forward"
             ]
           }
         },
@@ -179,17 +209,21 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Opposite arm and leg, long and slow, back flat",
-              "Imagine a glass of water on your lower back that must not spill"
+              "Reach the opposite arm and leg long, not high",
+              "Back stays flat"
             ],
             "bad": [
-              "Lifting the leg higher than the hip and arching the back",
-              "Rushing so the trunk never has to hold anything"
+              "Lifting the leg above hip height and arching"
             ]
           }
         }

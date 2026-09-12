@@ -6,6 +6,10 @@
   "duration": "25 min",
   "equipment": "Court",
   "focusTag": "Acceleration & First Step",
+  "intro": [
+    "Twenty-five minutes on the first two steps. Ten of that is the warm-up, and that is not padding — you cannot sprint off a cold hip.",
+    "Full rest between every effort. This is a speed session, so quality is the whole point; the moment you shorten the rest it becomes conditioning and stops training speed."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,15 +20,18 @@
           "name": "Easy Jog",
           "videoUrl": null,
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Baseline to baseline, easy, until you are warm and breathing",
+              "Easy pace until you are warm and breathing",
               "Nothing here is fast yet"
             ],
             "bad": [
-              "Skipping this because you feel fine — you are about to sprint"
+              "Starting hard — you are about to sprint"
             ]
           }
         },
@@ -33,8 +40,12 @@
           "name": "Leg Swings",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / side" },
-            { "label": "Front-back, then side-side" }
+            {
+              "label": "10 Reps / side"
+            },
+            {
+              "label": "Front-back, then side-side"
+            }
           ],
           "cues": {
             "good": [
@@ -51,12 +62,14 @@
           "name": "Lateral Lunge",
           "videoUrl": null,
           "chips": [
-            { "label": "6 Reps / side" }
+            {
+              "label": "6 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Sit into the bent hip, other leg straight, chest tall",
-              "Push back out through the heel"
+              "Step wide and sit into that hip, chest tall",
+              "Feel the inside of the straight leg"
             ],
             "bad": [
               "Letting the knee roll inward"
@@ -68,12 +81,14 @@
           "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "4 Reps / side" }
+            {
+              "label": "4 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Drive the back hip down before you rotate",
-              "Reach the top hand at the sky and look at it"
+              "Drive the back hip down, then rotate and reach tall",
+              "Feel the front of the back hip open"
             ],
             "bad": [
               "Rotating before the hip has opened"
@@ -85,12 +100,16 @@
           "name": "A-Skip",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×15 m" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×15 m"
+            }
           ],
           "cues": {
             "good": [
-              "Tall hips, strike the ground underneath you, quiet contacts",
+              "Tall hips, strike the ground underneath you",
               "Rhythm first, height second"
             ],
             "bad": [
@@ -103,13 +122,17 @@
           "name": "Ankle Pogo",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×10 Reps" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×10 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Stiff ankles, knees nearly straight, off the ground as fast as you land",
-              "This wakes up the spring you are about to use"
+              "Stiff ankles, off the ground as fast as you land",
+              "Quiet contacts"
             ],
             "bad": [
               "Bending the knees and turning it into a squat jump"
@@ -121,19 +144,23 @@
           "name": "Build-Up Run",
           "videoUrl": null,
           "chips": [
-            { "label": "3 Sets" },
-            { "label": "×20 m, 60% → 80% → 90%" }
+            {
+              "label": "3 Sets"
+            },
+            {
+              "label": "×20 m, 60% → 80% → 90%"
+            }
           ],
           "cues": {
             "good": [
-              "Accelerate smoothly to the top speed of each one, then ease off",
-              "The last one should feel fast but relaxed",
-              "This is the bridge between warm and sprinting. Do not skip it"
+              "Accelerate smoothly to the top speed of each one",
+              "The last one should feel fast but relaxed"
             ],
             "bad": [
               "Going straight to full effort on the first one"
             ]
-          }
+          },
+          "note": "This is the bridge between warm and sprinting — do not skip it."
         }
       ]
     },
@@ -147,21 +174,24 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "6 Sets", "style": "yellow" },
-            { "label": "×5 m" }
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×5 m"
+            }
           ],
           "cues": {
             "good": [
               "Land the split-step already loaded, then explode into the first stride",
-              "Stay low for the first two steps before you rise up",
-              "Full rest between every one — this is a speed session, not conditioning"
+              "Stay low for the first two steps"
             ],
             "bad": [
-              "A slow, flat-footed first step",
-              "Standing tall straight out of the start",
-              "Cutting the rest short to get it over with"
+              "A slow, flat-footed first step"
             ]
-          }
+          },
+          "note": "Full rest between every one — this is a speed session, not conditioning."
         },
         {
           "type": "standard",
@@ -169,18 +199,21 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "4 Sets", "style": "yellow" },
-            { "label": "×10 m" }
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 m"
+            }
           ],
           "cues": {
             "good": [
-              "Stand tall, lean forward from the ankles until you have to catch yourself, then run",
-              "The lean is what puts you in the right shape — do not bend at the waist",
+              "Lean from the ankles until you have to catch yourself, then run",
               "Let the first three steps be long and low"
             ],
             "bad": [
-              "Bending at the hips instead of leaning from the ankle",
-              "Stepping to catch yourself before you have really fallen"
+              "Bending at the hips instead of leaning from the ankle"
             ]
           }
         }
@@ -201,10 +234,12 @@
               "detail": "6 reps, alternating sides",
               "cues": {
                 "good": [
-                  "Split-step on the baseline, then one hard push-off to the side and set",
+                  "Split-step on the baseline, then one hard push-off and set",
                   "The first step goes where you are going, not across your body"
                 ],
-                "bad": ["Landing the split-step flat and heavy"]
+                "bad": [
+                  "Landing the split-step flat and heavy"
+                ]
               }
             },
             {
@@ -212,10 +247,12 @@
               "detail": "4 reps each way",
               "cues": {
                 "good": [
-                  "From wide out at the tramline, shuffle back to the middle and set",
-                  "Stay low the whole way, face the net"
+                  "From the tramline, shuffle back to the middle and set",
+                  "Stay low the whole way, facing the net"
                 ],
-                "bad": ["Standing up tall halfway back", "Crossing the feet"]
+                "bad": [
+                  "Standing up tall halfway back"
+                ]
               }
             },
             {
@@ -223,10 +260,12 @@
               "detail": "4 reps",
               "cues": {
                 "good": [
-                  "Drop-step back three steps, then turn and drive forward to the service line",
-                  "Open the hip to turn — do not step across yourself"
+                  "Drop-step back three steps, then turn and drive forward",
+                  "Open the hip to turn"
                 ],
-                "bad": ["Turning your back on the court"]
+                "bad": [
+                  "Turning your back on the court"
+                ]
               }
             }
           ]

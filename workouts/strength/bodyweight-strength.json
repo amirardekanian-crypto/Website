@@ -6,6 +6,10 @@
   "duration": "30 min",
   "equipment": "Bodyweight",
   "focusTag": "Full-Body Strength, No Kit",
+  "intro": [
+    "Full body with nothing but the floor. Built for a hotel room, a park, or a week when the gym is not happening.",
+    "Legs lead, pressing stays light, and there is a set of prone raises to balance out all the pressing your shoulder already does on court."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,14 +20,18 @@
           "name": "March on the Spot",
           "videoUrl": null,
           "chips": [
-            { "label": "2 minutes", "style": "dark" }
+            {
+              "label": "2 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Knee up, opposite arm back, build the pace"
+              "Knee up, opposite arm back",
+              "Build the pace"
             ],
             "bad": [
-              "Shuffling on the spot without really driving the knee"
+              "Shuffling on the spot without driving the knee"
             ]
           }
         },
@@ -32,16 +40,20 @@
           "name": "Glute Bridge",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×12 Reps" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×12 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Squeeze the glutes to lift, ribs stay down",
-              "Pause a second at the top of every rep"
+              "Push through the heels until the hips are level",
+              "Feel the glutes, not the lower back"
             ],
             "bad": [
-              "Arching the lower back to get higher"
+              "Arching the back to get higher"
             ]
           }
         },
@@ -50,8 +62,12 @@
           "name": "Bodyweight Squat",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×10 Reps" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×10 Reps"
+            }
           ],
           "cues": {
             "good": [
@@ -68,15 +84,17 @@
           "name": "Arm Circles",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / direction" }
+            {
+              "label": "10 Reps / direction"
+            }
           ],
           "cues": {
             "good": [
-              "Start small and grow the circle as the shoulder loosens",
-              "Both directions — the backward ones matter more"
+              "Start small and grow the circle",
+              "Loosen the shoulder before you press it"
             ],
             "bad": [
-              "Going straight to the biggest circle you can make"
+              "Starting with the biggest circle you can make"
             ]
           }
         },
@@ -85,12 +103,14 @@
           "name": "Inchworm",
           "videoUrl": null,
           "chips": [
-            { "label": "5 Reps" }
+            {
+              "label": "5 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Walk the hands out to a plank, hold a second, walk the feet in",
-              "This is the position you are about to press from — set it here"
+              "Walk the hands out to a plank and hold a second",
+              "Ribs down when you are long"
             ],
             "bad": [
               "Letting the hips sag at the top of the walk-out"
@@ -109,20 +129,24 @@
           "videoUrl": null,
           "restSec": 90,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Feet in a long stance, drop straight down, push through the front heel",
-              "Torso tall — do not lean forward to make it easier",
-              "Slow on the way down, three seconds if you want it harder"
+              "Long stance, drop straight down, push through the front heel",
+              "Torso tall the whole way"
             ],
             "bad": [
-              "A short stance that turns it into a knee-only movement",
-              "Bouncing the back knee off the floor"
+              "A short stance that turns it into a knee-only movement"
             ]
-          }
+          },
+          "note": "Three seconds on the way down if you want it harder."
         },
         {
           "type": "standard",
@@ -130,17 +154,21 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×10 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "One foot planted, other knee hugged in, drive the hips up level",
-              "Hold the top for a second and feel the glute, not the hamstring cramping"
+              "One foot planted, drive the hips up level",
+              "Feel the glute, not the hamstring"
             ],
             "bad": [
-              "Letting the hips twist towards the working side",
-              "Pushing through the toes instead of the heel"
+              "Letting the hips twist towards the working side"
             ]
           }
         }
@@ -156,19 +184,24 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "One straight line from ear to heel, elbows about 45° from the body",
-              "Hands on a step or a wall if you cannot hold the line for all eight"
+              "One straight line from ear to heel",
+              "Elbows about 45 degrees, not flared wide"
             ],
             "bad": [
-              "Hips sagging or riding up",
-              "Head poking forward to touch the floor first"
+              "Hips sagging or riding up"
             ]
-          }
+          },
+          "note": "Hands on a step or a wall if you cannot hold the line for all eight."
         },
         {
           "type": "standard",
@@ -176,18 +209,21 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 each shape" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 each shape"
+            }
           ],
           "cues": {
             "good": [
-              "Face down, lift the arms a few inches — a Y, then a T",
-              "Thumbs up, lead with the hands, keep the neck long",
-              "This is the one that balances out all the pressing your shoulder does"
+              "Face down, lift the arms a few inches, thumbs up",
+              "Feel between the shoulder blades"
             ],
             "bad": [
-              "Shrugging the shoulders up to the ears",
-              "Lifting the chest off the floor to cheat the arms higher"
+              "Shrugging the shoulders towards the ears"
             ]
           }
         }
@@ -203,18 +239,24 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×8 Reps / side" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Lower back glued to the floor the whole set",
-              "Opposite arm and leg, slow, breathe out as you reach"
+              "Opposite arm and leg, slow, breathe out as you reach",
+              "Lower back stays glued to the floor"
             ],
             "bad": [
-              "The lower back lifting away from the floor — shorten the reach instead"
+              "The lower back lifting away from the floor"
             ]
-          }
+          },
+          "note": "Shorten the reach rather than let the back lift."
         }
       ]
     }

@@ -6,6 +6,10 @@
   "duration": "12 min",
   "equipment": "Foam Roller",
   "focusTag": "Forearm, Elbow & Shoulder",
+  "intro": [
+    "Twelve minutes on the arm that plays the sport: forearm, elbow and shoulder.",
+    "It opens at the forearm rather than the elbow, because that is where tennis elbow actually starts — the muscles that grip the racket and brake the wrist on every shot, with the elbow just the place they attach and complain."
+  ],
   "blocks": [
     {
       "title": "Forearm & Elbow",
@@ -15,19 +19,20 @@
           "type": "simple",
           "name": "Forearm Roll",
           "videoUrl": null,
-          "note": "Tennis elbow almost never starts at the elbow. It starts in the forearm muscles that grip the racket and brake the wrist on every shot, and the elbow is just where they attach and complain. Five minutes a week on the forearm itself is worth more than any brace you can buy.",
           "chips": [
-            { "label": "60 sec / side" },
-            { "label": "Top and underside" }
+            {
+              "label": "60 sec / side"
+            },
+            {
+              "label": "Top and underside"
+            }
           ],
           "cues": {
             "good": [
-              "Forearm across the roller on a table or the floor, roll slowly from elbow to wrist",
-              "Do the top of the forearm first. That is the side that gives you tennis elbow",
-              "Stop on a sore spot and slowly open and close your fist a few times"
+              "Forearm across the roller, slow from elbow to wrist, top side first",
+              "Open and close your fist while you pause on a sore spot"
             ],
             "bad": [
-              "Rolling fast",
               "Rolling straight over the bony point of the elbow"
             ]
           }
@@ -37,16 +42,17 @@
           "name": "Wrist Extensor Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "30 sec / side" }
+            {
+              "label": "30 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Arm straight out, palm down, gently bend the wrist so the fingers point at the floor",
-              "Pull with the other hand, softly. You should feel the top of the forearm"
+              "Arm straight, palm down, bend the wrist so the fingers point down",
+              "Feel the top of the forearm"
             ],
             "bad": [
-              "Bending the elbow to make it easier",
-              "Pulling hard. This one is easy to overdo and it bites back"
+              "Pulling hard — this one is easy to overdo"
             ]
           }
         },
@@ -55,12 +61,14 @@
           "name": "Wrist Flexor Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "30 sec / side" }
+            {
+              "label": "30 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "Arm straight out, palm up, gently bend the wrist so the fingers point at the floor",
-              "Now you should feel the underside of the forearm"
+              "Arm straight, palm up, bend the wrist so the fingers point down",
+              "Feel the underside of the forearm"
             ],
             "bad": [
               "Letting the elbow bend"
@@ -77,14 +85,16 @@
           "type": "simple",
           "name": "Lat Roll",
           "videoUrl": null,
-          "note": "The lat is the biggest muscle in your serve and the one that goes quietly tight. It is also the reason a stiff shoulder sometimes will not free up no matter how much you stretch the shoulder itself. Your serving side will be the worse one. Give it the extra time.",
+          "note": "Your serving side will be the worse one, so give it the extra time.",
           "chips": [
-            { "label": "60 sec / side" }
+            {
+              "label": "60 sec / side"
+            }
           ],
           "cues": {
             "good": [
-              "On your side, arm overhead, roller under the armpit and down the side of the back",
-              "Small movements. Pause where it bites and breathe"
+              "On your side, arm overhead, roller under the armpit",
+              "Small movements, pause where it bites"
             ],
             "bad": [
               "Rolling onto the ribs themselves"
@@ -96,17 +106,18 @@
           "name": "Upper Back Roll",
           "videoUrl": null,
           "chips": [
-            { "label": "60 sec", "style": "dark" }
+            {
+              "label": "60 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
               "Roller across the upper back, hands behind the head, ribs down",
-              "Pause and breathe at each level before moving up",
-              "Stay above the bottom of the ribcage. The lower back does not get rolled"
+              "Pause and breathe at each level"
             ],
             "bad": [
-              "Rolling the lower back",
-              "Arching over the roller and letting the ribs flare"
+              "Rolling the lower back"
             ]
           }
         },
@@ -115,16 +126,17 @@
           "name": "Cross-Body Shoulder Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
               "Arm straight across the chest, pull it in with the other forearm",
-              "Shoulder stays down, not shrugged towards the ear"
+              "Shoulder stays down, not shrugged to the ear"
             ],
             "bad": [
-              "Pulling at the elbow joint",
-              "Pushing into a pinch at the front of the shoulder. Back off if you feel one"
+              "Pushing into a pinch at the front of the shoulder"
             ]
           }
         },
@@ -133,12 +145,14 @@
           "name": "Doorway Pec Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "45 sec / side" }
+            {
+              "label": "45 sec / side"
+            }
           ],
           "cues": {
             "good": [
               "Forearm on the door frame, elbow at shoulder height, step through and turn away",
-              "Chest open, ribs down"
+              "Feel it across the front of the chest"
             ],
             "bad": [
               "Letting the shoulder roll forward into it"

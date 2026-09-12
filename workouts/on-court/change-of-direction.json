@@ -6,6 +6,10 @@
   "duration": "25 min",
   "equipment": "Court",
   "focusTag": "Deceleration & Change of Direction",
+  "intro": [
+    "First-Step Speed trains getting going. This one trains stopping, which is the half that actually decides whether you reach the next ball.",
+    "You cannot accelerate again until you have killed the momentum from the last shot. Deceleration comes first while you are fresh, then the turns that use it."
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
@@ -16,15 +20,18 @@
           "name": "Easy Jog",
           "videoUrl": null,
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Easy pace, just enough to break a sweat",
-              "Baseline to baseline, turn on both feet"
+              "Easy pace until you are warm and breathing",
+              "Nothing here is fast yet"
             ],
             "bad": [
-              "Starting hard — this is the raise, not the session"
+              "Starting hard — you are about to sprint"
             ]
           }
         },
@@ -33,16 +40,20 @@
           "name": "Leg Swings",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / side" },
-            { "label": "Front-back, then side-side" }
+            {
+              "label": "10 Reps / side"
+            },
+            {
+              "label": "Front-back, then side-side"
+            }
           ],
           "cues": {
             "good": [
-              "Hold the fence and let the leg swing from a tall hip",
-              "Build the range over the ten, do not force the first one"
+              "Hold the fence, stand tall, let the leg swing freely",
+              "Build the range across the ten"
             ],
             "bad": [
-              "Throwing the leg and letting the back arch to get height"
+              "Arching the back to throw the leg higher"
             ]
           }
         },
@@ -51,15 +62,17 @@
           "name": "Lateral Lunge",
           "videoUrl": null,
           "chips": [
-            { "label": "6 Reps / side" }
+            {
+              "label": "6 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Sit into the bent hip and keep the other leg straight",
-              "Chest tall, push back out through the heel"
+              "Step wide and sit into that hip, chest tall",
+              "Feel the inside of the straight leg"
             ],
             "bad": [
-              "Letting the knee roll in over the toe"
+              "Letting the knee roll inward"
             ]
           }
         },
@@ -68,15 +81,17 @@
           "name": "World's Greatest Stretch",
           "videoUrl": null,
           "chips": [
-            { "label": "4 Reps / side" }
+            {
+              "label": "4 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Drive the back hip to the floor before you rotate",
-              "Reach the top hand at the sky and follow it with your eyes"
+              "Drive the back hip down, then rotate and reach tall",
+              "Feel the front of the back hip open"
             ],
             "bad": [
-              "Rushing the rotation before the hip has opened"
+              "Rotating before the hip has opened"
             ]
           }
         },
@@ -85,13 +100,17 @@
           "name": "A-Skip",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×15 m" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×15 m"
+            }
           ],
           "cues": {
             "good": [
-              "Tall through the hips, strike the ground underneath you",
-              "Quiet, rhythmic contacts"
+              "Tall hips, strike the ground underneath you",
+              "Rhythm first, height second"
             ],
             "bad": [
               "Reaching the foot out in front of the body"
@@ -103,13 +122,17 @@
           "name": "Ankle Pogo",
           "videoUrl": null,
           "chips": [
-            { "label": "2 Sets" },
-            { "label": "×10 Reps" }
+            {
+              "label": "2 Sets"
+            },
+            {
+              "label": "×10 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Bounce off stiff ankles, knees almost locked",
-              "Off the ground as fast as you land"
+              "Stiff ankles, off the ground as fast as you land",
+              "Quiet contacts"
             ],
             "bad": [
               "Bending the knees and turning it into a squat jump"
@@ -128,20 +151,24 @@
           "videoUrl": null,
           "restSec": 45,
           "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "×5 Reps" }
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×5 Reps"
+            }
           ],
           "cues": {
             "good": [
               "From tall on the toes, snap down into an athletic stance and freeze",
-              "Feel your hips go back and your knees bend to soak it up",
-              "Land quiet — you should hear almost nothing"
+              "Feel the hips go back and the knees soak it up"
             ],
             "bad": [
-              "Landing stiff-legged and taking it through the knees",
-              "Wobbling out of the position instead of sticking it"
+              "Landing stiff-legged and taking it through the knees"
             ]
-          }
+          },
+          "note": "Land quiet — you should hear almost nothing."
         },
         {
           "type": "standard",
@@ -149,20 +176,24 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "5 Sets", "style": "yellow" },
-            { "label": "×10 m" }
+            {
+              "label": "5 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 m"
+            }
           ],
           "cues": {
             "good": [
               "Accelerate hard, then kill it in two steps and hold the stance",
-              "Drop the hips on the stop — the last two steps get wider and lower",
-              "Own the stop before you make it faster"
+              "The last two steps get wider and lower"
             ],
             "bad": [
-              "Slowing down gradually over five or six steps",
-              "Stopping upright with straight legs"
+              "Slowing down gradually over five or six steps"
             ]
-          }
+          },
+          "note": "Own the stop before you make it faster."
         }
       ]
     },
@@ -176,18 +207,21 @@
           "videoUrl": null,
           "restSec": 60,
           "chips": [
-            { "label": "6 Sets", "style": "yellow" },
-            { "label": "3 each way" }
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "3 each way"
+            }
           ],
           "cues": {
             "good": [
-              "Shuffle 3 m low, plant the outside foot, then sprint 5 m off it",
-              "The plant foot lands outside your hip — that is what turns you",
-              "Get the shoulders pointing where you are going before the second step"
+              "Shuffle low, plant the outside foot, then sprint off it",
+              "The plant foot lands outside your hip — that is what turns you"
             ],
             "bad": [
-              "Standing up tall to change direction",
-              "Taking a little stutter step before the plant"
+              "Standing up tall to change direction"
             ]
           }
         },
@@ -197,20 +231,24 @@
           "videoUrl": null,
           "restSec": 75,
           "chips": [
-            { "label": "6 Sets", "style": "yellow" },
-            { "label": "3 each side" }
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "3 each side"
+            }
           ],
           "cues": {
             "good": [
-              "Run 8 m out, plant one foot, turn 180° and sprint 5 m back",
-              "Brake over two steps, then push — do not drift the turn wide",
-              "Turn off the same foot for a whole set, then swap"
+              "Run out, plant one foot, turn 180 degrees and sprint back",
+              "Brake over two steps, then push"
             ],
             "bad": [
-              "Rounding the turn like a running track",
-              "Always turning off your strong side and never training the other"
+              "Rounding the turn like a running track"
             ]
-          }
+          },
+          "note": "Turn off the same foot for a whole set, then swap."
         }
       ]
     }

@@ -6,6 +6,10 @@
   "duration": "18 min",
   "equipment": "Bodyweight",
   "focusTag": "After Competition",
+  "intro": [
+    "For the hour after a match, when the score is settled but you are still wired. Adrenaline does not switch off just because you sat down.",
+    "Move first to bleed it off, get your legs above your heart, then breathe. Box breathing comes before the long exhale on purpose: a head still going over points needs something to hold on to before it will drop."
+  ],
   "blocks": [
     {
       "title": "Bleed It Off",
@@ -15,18 +19,20 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "note": "Do not sit down yet. After a match your heart rate is still high and there is adrenaline in your system, and trying to go straight to stillness does not work. Give it five minutes of easy movement first and the rest of this session will actually land.",
+          "note": "Five minutes of easy movement first is what makes the rest of this land.",
           "chips": [
-            { "label": "5 minutes", "style": "dark" }
+            {
+              "label": "5 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "Slow walk, anywhere. Around the court is fine",
-              "Let your breathing come down on its own. Do not try to control it yet"
+              "Slow walk anywhere, around the court is fine",
+              "Let your breathing come down on its own"
             ],
             "bad": [
-              "Sitting straight down with your bag",
-              "Replaying points while you walk. That comes later, not now"
+              "Sitting straight down with your bag"
             ]
           }
         },
@@ -35,15 +41,17 @@
           "name": "Shoulder Cross-Body Swings",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps / side" }
+            {
+              "label": "10 Reps / side"
+            }
           ],
           "cues": {
             "good": [
-              "Relaxed and loose, let the arm swing across and open",
+              "Swing the arm across the body and back open, relaxed",
               "Let the upper back turn with it"
             ],
             "bad": [
-              "Forcing the end range. Nothing here is a stretch you fight"
+              "Forcing the end range"
             ]
           }
         },
@@ -52,15 +60,17 @@
           "name": "Cat-Cow",
           "videoUrl": null,
           "chips": [
-            { "label": "10 Reps" }
+            {
+              "label": "10 Reps"
+            }
           ],
           "cues": {
             "good": [
-              "Slow, one vertebra at a time, breathe with it",
-              "Out as you round, in as you arch"
+              "Move slowly between the two shapes",
+              "Breathe with it, out as you round"
             ],
             "bad": [
-              "Rushing between the two shapes"
+              "Snapping between the shapes"
             ]
           }
         }
@@ -74,14 +84,17 @@
           "type": "simple",
           "name": "Legs Up the Wall",
           "videoUrl": null,
-          "note": "Heavy legs after a long match are partly blood and fluid sitting in them. Getting your feet above your heart for a few minutes helps that drain. It is also the easiest position in the world to breathe in, which is why it comes before the breathing rather than after.",
+          "note": "Feet above the heart is what helps heavy legs drain after a long match.",
           "chips": [
-            { "label": "3 minutes", "style": "dark" }
+            {
+              "label": "3 minutes",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
-              "On your back, heels resting up the wall, arms out wide",
-              "Nothing to hold. Let the legs be heavy and the floor take you"
+              "Heels resting up the wall, arms out wide",
+              "Let the legs be heavy and the floor take you"
             ],
             "bad": [
               "Checking your phone through it"
@@ -93,7 +106,10 @@
           "name": "Child's Pose",
           "videoUrl": null,
           "chips": [
-            { "label": "90 sec", "style": "dark" }
+            {
+              "label": "90 sec",
+              "style": "dark"
+            }
           ],
           "cues": {
             "good": [
@@ -115,20 +131,23 @@
           "type": "simple",
           "name": "Box Breathing",
           "videoUrl": null,
-          "note": "Box breathing comes first here for a reason. Straight after competition your head is still going over points and the counting gives it something to hold on to. Trying to just relax with a racing mind rarely works. Corral the attention first, then drop.",
+          "note": "The counting is the point: it gives a racing head something to hold on to.",
           "chips": [
-            { "label": "4 minutes", "style": "dark" },
-            { "label": "In 4 · hold 4 · out 4 · hold 4" }
+            {
+              "label": "4 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "In 4 · hold 4 · out 4 · hold 4"
+            }
           ],
           "cues": {
             "good": [
-              "All four counts equal. In for four, hold four, out for four, hold four",
-              "Through the nose the whole way if you can",
-              "Shorten to three if four is a fight. The count matters less than the rhythm"
+              "In for four, hold four, out for four, hold four",
+              "Nose breathing the whole way if you can"
             ],
             "bad": [
-              "Straining to hold. If you are gasping on the next inhale, the count is too long",
-              "Speeding up as you get bored"
+              "Straining the holds — drop to three counts if four is a fight"
             ]
           }
         },
@@ -136,20 +155,23 @@
           "type": "simple",
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
-          "note": "The long exhale is the part that does the work. A longer out-breath than in-breath is what tips you towards the recovery side of your nervous system. Everything before this session was getting you into a position and a state where this actually works.",
+          "note": "The long out-breath is the part that does the work.",
           "chips": [
-            { "label": "4 minutes", "style": "dark" },
-            { "label": "In 4 · out 8" }
+            {
+              "label": "4 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "In 4 · out 8"
+            }
           ],
           "cues": {
             "good": [
               "In through the nose for four, out through the mouth for eight",
-              "One hand on your chest, one on your belly. Only the belly hand should move",
-              "Let the shoulders drop on every single exhale"
+              "Only the hand on your belly should move"
             ],
             "bad": [
-              "Rushing the exhale to get to the next breath",
-              "Breathing high into the chest and shoulders"
+              "Rushing the exhale to get to the next breath"
             ]
           }
         }
