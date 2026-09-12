@@ -1477,9 +1477,23 @@ habit has to do the same.
 ### Proof publishes a card snapshot the programme app draws — its ANSWERS, never its rules
 
 `publishCardSnapshot()` runs at the end of every `render()` and writes
-**`<id>_hab_card`**: `{ lv, rank, streak, done, total, qualified, week[7], t }`.
-`program.html` reads it to draw the **Daily Habits** card at the bottom of its Home tab —
-a level, a rank, a day streak, today's done-of-total, and a seven-pip week.
+**`<id>_hab_card`**:
+`{ lv, rank, streak, done, total, qualified, week[7], days[7], pct, toNext, crest, t }`.
+
+`program.html` uses it to draw **this file's own Today hero, rebuilt on that app's
+palette** (Amir, 2026-09-12 — he asked for the card he already has here rather than a
+second design to learn): the XP ring around the level, the rank crest, `toNext` as
+*"168 XP to level 2"*, the level bar, and the seven-day strip. `days[]` is that strip
+exactly as `weekReport()` draws it — a **percentage** per day plus its letter, not a
+yes/no. `week[]` (booleans) is kept only so a programme app that has not been updated
+alongside this one still renders something.
+
+⚠️ **`crest` is rendered HERE, as markup.** `rankCrest()` gained an optional third
+argument for the crest's inner fill; every call in this file omits it, and the snapshot
+passes a dark-green one so the badge arrives on the programme app's palette instead of
+importing MEADOW's purple. The metal rim, the clip shape and the icon are identical, so a
+rank looks like the same rank in both apps — and the METALS ladder is never rebuilt over
+there.
 
 ⚠️ **This key exists so the programme app never re-derives any of it.** The XP curve, the
 rank ladder and the weighted day gate already live in two places (this file and the

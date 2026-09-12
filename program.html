@@ -2395,9 +2395,59 @@
   .nc-pips i.today { animation: ncToday 1.7s ease-in-out infinite; transform: none; }
   @keyframes ncToday { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
 
+  /* ── The Daily Habits card is Proof's own Today hero, rebuilt on this app's
+     palette (Amir, 2026-09-12: "the personal card that exists on today's tab").
+     Same structure so an athlete learns it once — XP ring around the level, the
+     rank crest, distance to the next level, and the seven-day strip. The crest
+     markup and every number arrive from Proof; nothing here re-derives them. ── */
+  .nc-hero { padding-bottom: 14px; }
+  .nch-top { display: flex; align-items: center; gap: 14px; margin-top: 13px; }
+  .nch-lv { position: relative; width: 62px; height: 62px; flex: none; }
+  .nch-ring { width: 62px; height: 62px; transform: rotate(-90deg); }
+  .nch-ring circle { fill: none; stroke-width: 3.4; }
+  .nch-ring .rail { stroke: rgba(255,255,255,0.16); }
+  .nch-ring .run  { stroke: #E06B43; stroke-linecap: round;
+    stroke-dasharray: 97.4; transition: stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1); }
+  .nch-in { position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; line-height: 1; }
+  .nch-in b { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 25px; color: #fff; }
+  .nch-in i { font-style: normal; font-family: 'Space Mono', monospace; font-size: 6.5px;
+    letter-spacing: 0.14em; color: rgba(255,255,255,0.55); margin-top: 2px; }
+  .nch-body { flex: 1; min-width: 0; }
+  .nch-rank { display: flex; align-items: center; gap: 7px; }
+  .nch-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 19px;
+    text-transform: uppercase; letter-spacing: 0.3px; color: #fff; }
+  .nch-rank .nc-a { margin-left: 0; }
+  .nch-xp { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: rgba(255,255,255,0.58); margin-top: 6px; }
+  .nch-xp b { color: #E06B43; font-weight: 700; }
+  .nch-bar-rail { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.16);
+    margin-top: 8px; overflow: hidden; }
+  .nch-bar-rail span { display: block; height: 100%; border-radius: 3px; background: #E06B43;
+    transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
+
+  .nch-week { display: flex; align-items: center; gap: 11px; margin-top: 14px;
+    padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); }
+  .nch-cap { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); flex: none; }
+  .nch-days { display: flex; gap: 5px; flex: 1; }
+  .nch-d { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .nch-bar { width: 100%; height: 21px; border-radius: 6px; background: rgba(255,255,255,0.1);
+    overflow: hidden; display: block; transform: scaleY(0); transform-origin: bottom;
+    animation: ncGrow 0.34s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .nch-bar i { display: block; width: 100%; height: 100%; background: #E06B43; }
+  @keyframes ncGrow { to { transform: scaleY(1); } }
+  /* Today, while it is still open — the one cell that keeps moving. */
+  .nch-bar.now { box-shadow: inset 0 0 0 1.5px rgba(224,107,67,0.85); animation: ncGrow 0.34s cubic-bezier(0.4,0,0.2,1) forwards, ncToday 1.7s 0.5s ease-in-out infinite; }
+  .nch-l { font-family: 'Space Mono', monospace; font-size: 7.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .nch-l.now { color: #E06B43; font-weight: 700; }
+
   /* An athlete who has asked their phone for less motion gets none of it. */
   @media (prefers-reduced-motion: reduce) {
-    .nc-dot.live, .nc-pips.seq i, .nc-pips i.today { animation: none; transform: none; opacity: 1; }
+    .nc-dot.live, .nc-pips.seq i, .nc-pips i.today,
+    .nch-bar, .nch-bar.now { animation: none; transform: none; opacity: 1; }
+    .nch-ring .run, .nch-bar-rail span { transition: none; }
   }
 
   /* Three-up numbers under the My Plan card, so it is never an empty promise */
@@ -6015,23 +6065,49 @@ function habitCardHtml() {
   // green the moment the day qualifies. The motion stopping IS the message.
   const dotCls = s.qualified ? 'nc-dot done' : 'nc-dot live';
   const dotTxt = s.qualified ? 'Day complete' : 'Logging today';
-  // Streak pips (idea 4): the week fills left to right, and today keeps
-  // pulsing until it counts.
-  const pips = (s.week || []).map((on, i) => {
-    const today = i === (s.week.length - 1);
-    const cls = (on ? '' : ' off') + (today && !s.qualified ? ' today' : '');
-    return `<i class="${cls}" style="animation-delay:${(0.05 + i * 0.06).toFixed(2)}s"></i>`;
+
+  // The XP ring, drawn around the level exactly as Proof's Today hero draws it:
+  // r=15.5 in a 36 viewBox, so the circumference is ~97.4.
+  const pct  = typeof s.pct === 'number' ? s.pct : 0;
+  const ring = `<svg class="nch-ring" viewBox="0 0 36 36" aria-hidden="true">
+      <circle class="rail" cx="18" cy="18" r="15.5"></circle>
+      <circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - pct / 100)).toFixed(1)}"></circle>
+    </svg>`;
+
+  // The seven-day strip. `days` carries a percentage per day; a snapshot from a
+  // Proof that predates it falls back to the yes/no week so the card still draws.
+  const days = Array.isArray(s.days) && s.days.length
+    ? s.days
+    : (s.week || []).map((on, i, a) => ({ p: on ? 100 : 0, l: '', now: i === a.length - 1 }));
+  const strip = days.map((d, i) => {
+    const fill = d.p > 0 ? (0.22 + 0.78 * d.p / 100).toFixed(2) : '0';
+    const pulse = d.now && !s.qualified ? ' now' : '';
+    return `<div class="nch-d">
+      <span class="nch-bar${pulse}" style="animation-delay:${(0.05 + i * 0.05).toFixed(2)}s"><i style="opacity:${fill}"></i></span>
+      <span class="nch-l${d.now ? ' now' : ''}">${esc(d.l || '')}</span>
+    </div>`;
   }).join('');
 
+  // Crest comes rendered from Proof so the METALS ladder is never rebuilt here.
+  const crest = s.crest || '';
+
   return head + `
-    <button type="button" class="nc" onclick="goHabits()">
-      <div class="nc-k"><span class="${dotCls}"></span>${esc(dotTxt)}<span class="nc-r">${esc(s.rank || '')}</span></div>
-      <div class="nc-row">
-        <div class="nc-n">${s.lv}</div><div class="nc-u">LEVEL</div>
-        <div class="nc-sp"><div class="nc-pips seq">${pips}</div></div>
+    <button type="button" class="nc nc-hero" onclick="goHabits()">
+      <div class="nc-k"><span class="${dotCls}"></span>${esc(dotTxt)}<span class="nc-r">${s.streak} day${s.streak === 1 ? '' : 's'} in a row</span></div>
+      <div class="nch-top">
+        <div class="nch-lv">${ring}<span class="nch-in"><b>${s.lv}</b><i>LEVEL</i></span></div>
+        <div class="nch-body">
+          <div class="nch-rank">${crest}<span class="nch-name">${esc(s.rank || '')}</span><span class="nc-a">→</span></div>
+          ${typeof s.toNext === 'number'
+            ? `<div class="nch-xp"><b>${String(s.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b> XP to level ${s.lv + 1}</div>`
+            : ''}
+          <div class="nch-bar-rail"><span style="width:${pct}%"></span></div>
+        </div>
       </div>
-      <div class="nc-f">${s.streak} day${s.streak === 1 ? '' : 's'} in a row ·
-        <b>${s.done} of ${s.total} today</b><span class="nc-a">→</span></div>
+      <div class="nch-week">
+        <span class="nch-cap">7 Days</span>
+        <div class="nch-days">${strip}</div>
+      </div>
     </button>`;
 }
 
