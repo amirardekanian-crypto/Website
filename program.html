@@ -5336,7 +5336,7 @@ function renderNotes() {
 // so the rows can be given line-icon tiles later without re-deriving them.)
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your current cycle, your progress, and what's coming next.</li><li><strong>My Plan</strong> — your actual training. The tabs at the top (D1, D2, D3…) switch between days; tap any exercise to open it.</li><li><strong>Coach</strong> — message me directly, read the personal notes I write you, and find this "Using the app" guide.</li><li><strong>Workouts</strong> — a library of extra, on-demand sessions, separate from your program (ticking them off doesn't affect your week's plan).</li></ul>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your current cycle, your progress, and what's coming next.</li><li><strong>My Plan</strong> — your actual training. The tabs at the top (D1, D2, D3…) switch between days; tap any exercise to open it.</li><li><strong>Coach</strong> — message me directly, read the personal notes I write you, and find this "Using the app" guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', title: 'RPE & Tempo',
@@ -5919,11 +5919,13 @@ window.openArticleDeepLink = openArticleDeepLink;
 // ═══════════════════════════════════════════════════════════════════════
 //  WORKOUT SESSION — open one library workout from its card.
 //  Reuses the pure visual exercise renderers (renderExercise / renderCircuit)
-//  but the check-off is LOCAL-ONLY and workout-scoped: it never touches
-//  ATHLETE_ID, set-logs, RPE, the cloud backup, or the Finish/send flow.
+//  but the per-exercise check-off is LOCAL-ONLY and workout-scoped: it never
+//  touches set-logs, RPE, the cloud backup, or the Finish/send flow.
 //  Check state persists under "wkout_<id>" so re-opening restores ticks.
+//  The ONE exception is the Done button — see markLibraryDone() below, which
+//  writes a single library_sessions row that feeds Proof and the coach report.
 // ═══════════════════════════════════════════════════════════════════════
-let _wsCurrent = null;   // { id, checkKey } for the open workout
+let _wsCurrent = null;   // { id, checkKey, slug, countsAs } for the open workout
 
 // Deep-link resolver for the ?workout= URL param (see the init reveal). Accepts:
 //   • a workout id from workouts/index.json   → ?workout=full-body-power
