@@ -530,6 +530,25 @@
   .chart-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .chart-svg { display: block; width: 100%; height: auto; margin-top: 12px; }
   .chart-legend { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+
+  /* Personal records — one line per lift on The work tab */
+  .pr-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline;
+    padding: 10px 0; border-top: 1px solid var(--line); }
+  .prlist .pr-row:first-child { border-top: none; padding-top: 0; }
+  .pr-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px;
+    text-transform: uppercase; letter-spacing: .02em; }
+  /* Pinned to the second column explicitly: an auto-placed item that names its
+     own row lands in column 1 and puts the whole row back to front. */
+  .pr-v { grid-column: 2; grid-row: 1 / span 2; align-self: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 19px; font-weight: 700; text-align: right; white-space: nowrap; }
+  .pr-v small { font-size: 11px; color: var(--muted); margin-left: 3px; }
+  .pr-s { font-size: 12px; color: var(--muted); }
+  .pr-s.amber { color: var(--ochre); }
+  .pr-s b { font-weight: 700; }
+  .pr-tag { display: inline-block; margin-left: 7px; padding: 1px 6px; border-radius: 5px;
+    background: var(--track); color: var(--muted); vertical-align: 2px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .08em; }
   .bar { height: 8px; background: var(--track); border-radius: 6px; margin-top: 12px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 6px; }
 
@@ -1378,6 +1397,84 @@ function wtChangeOf(wt, days) {
 }
 function fmtDeltaKg(v) { return (v > 0 ? '+' : v < 0 ? '−' : '±') + round1(Math.abs(v)).toFixed(1); }
 
+// ── Personal records (estimated 1RM) ──────────────────────────────────────
+// program.html writes "<id>_1rm" into the same progress blob: one entry per
+// lift per day, { lift, kg, w, r, rpe, d, t, test? }, where `kg` is the
+// estimate and w/r/rpe the set it came from. Read-only here.
+//
+// ⚠ A deleted entry arrives as a TOMBSTONE ({ del: true }), not as a missing
+// row — that is what stops the athlete's other phone handing it straight back.
+// Filtering them out is this function's whole job; a coach looking at a number
+// the athlete has already deleted is worse than showing nothing.
+function oneRmOf(blob, id) {
+  const raw = jparse(blob ? blob[id + '_1rm'] : null);
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(e => e && e.lift && e.d && !e.del && e.kg > 0);
+}
+
+// The athlete's own name matching, ported so the two never disagree about
+// whether a renamed lift is one lift or two — see ceilAliasMap() in
+// program.html. Same four tiers, same "exactly one on each side" rule.
+const EX_ABBREV_C = { db: 'dumbbell', bb: 'barbell', kb: 'kettlebell' };
+function normExNameC(s) {
+  return String(s || '').toLowerCase()
+    .normalize('NFKD').replace(/[^\x00-\x7f]/g, '')
+    .replace(/'/g, '').replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function exNameVariantsC(sfx) {
+  const base = normExNameC(sfx);
+  const toks = base.split(' ').filter(Boolean);
+  const abbrev = toks.map(t => EX_ABBREV_C[t] || t).join(' ');
+  const noMachine = abbrev.split(' ').filter(t => t && t !== 'machine').sort().join(' ');
+  const noParen = normExNameC(String(sfx).replace(/\([^)]*\)/g, ' '));
+  return [base, abbrev, noMachine, noParen];
+}
+function ceilAliasMapC(entries, current) {
+  if (!current.length) return {};
+  const cur = {};
+  current.forEach(n => { cur[n] = 1; });
+  const orphans = [];
+  entries.forEach(e => { if (!cur[e.lift] && orphans.indexOf(e.lift) === -1) orphans.push(e.lift); });
+  if (!orphans.length) return {};
+  const index = names => {
+    const store = [{}, {}, {}, {}];
+    names.forEach(n => exNameVariantsC(n).forEach((v, tier) => {
+      if (!v) return;
+      (store[tier][v] || (store[tier][v] = [])).push(n);
+    }));
+    return store;
+  };
+  const curIdx = index(current), orpIdx = index(orphans), map = {};
+  orphans.forEach(o => {
+    const vs = exNameVariantsC(o);
+    for (let tier = 0; tier < vs.length; tier++) {
+      const v = vs[tier];
+      if (!v) continue;
+      if ((curIdx[tier][v] || []).length !== 1 || (orpIdx[tier][v] || []).length !== 1) continue;
+      map[o] = curIdx[tier][v][0];
+      break;
+    }
+  });
+  return map;
+}
+// One row per lift: the latest estimate, the change since the first one, and
+// how long the athlete has gone without putting a number on it.
+function oneRmLifts(entries, current) {
+  const alias = ceilAliasMapC(entries, current || []);
+  const by = {};
+  entries.forEach(e => {
+    const lift = alias[e.lift] || e.lift;
+    const day = (by[lift] = by[lift] || {});
+    if (!day[e.d] || (e.t || 0) > (day[e.d].t || 0)) day[e.d] = e;
+  });
+  return Object.keys(by).map(lift => {
+    const es = Object.keys(by[lift]).sort().map(d => by[lift][d]);
+    const latest = es[es.length - 1];
+    return { lift: lift, entries: es, latest: latest, delta: latest.kg - es[0].kg,
+             age: daysSince(latest.d + 'T12:00:00') };
+  }).sort((a, b) => (a.latest.d < b.latest.d ? 1 : -1));
+}
+
 function habDaysOf(blob, id) {
   const raw = blob ? blob[id + '_hab_log'] : null;
   const log = jparse(raw);
@@ -1437,6 +1534,7 @@ function assemble() {
     if (r.updated_at && (!a.lastActive || r.updated_at > a.lastActive)) a.lastActive = r.updated_at;
     a.habDays = habDaysOf(r.data, r.athlete_id);
     a.wt = wtOf(r.data, r.athlete_id);
+    a.oneRm = oneRmOf(r.data, r.athlete_id);
     a.blob = r.data;                       // kept for syncGapsOf below (a reference, not a copy)
     const dk = Object.keys(a.habDays).sort();
     a.isHab = dk.length > 0;
@@ -2753,6 +2851,7 @@ function workTabHtml(D) {
   const live = liveSnapshotHtml(D);
   return `${cycHead}
     ${metricStripHtml(metrics)}
+    ${maxesPanel(D)}
     ${cards.length ? cards.join('') : `<p class="empty">No program file found (looked for data/${esc(athleteId)}.json) and no finished sessions yet.</p>`}
     <div class="sec"><span>Backfill</span>
       <span class="acts"><button class="btn sm" onclick="toggleAddSession()">+ Add past session from email</button></span></div>
@@ -2768,6 +2867,56 @@ function workTabHtml(D) {
     </div>
     ${live}`;
 }
+// What the athlete has on the record, and how stale it is. Absent rather than
+// empty when there is nothing — same rule as weightPanel(): an empty card on
+// every athlete's page trains you to scroll past the one that has something.
+//
+// The "due" flag mirrors the athlete's own rule (RETEST_MIN_DAYS in
+// program.html): a lift the current cycle marks with `test` that has gone 28
+// days or more without a number. The coach sees it whatever week the cycle is
+// in — the athlete's strip waits for the closing week so it does not nag, but
+// Amir is the one deciding when to ask, so he needs it early.
+const RETEST_MIN_DAYS_C = 28;
+function maxesPanel(D) {
+  const a = D.a || {};
+  const entries = a.oneRm || [];
+  const days = (D.programDays || []);
+  const names = [], flagged = {};
+  days.forEach(d => (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+    const n = String((ex && ex.name) || '').trim();
+    if (!n) return;
+    if (names.indexOf(n) === -1) names.push(n);
+    if (ex.test) flagged[n] = (ex.test === true) ? '5RM' : String(ex.test);
+  })));
+  const lifts = oneRmLifts(entries, names);
+  // A flagged lift with nothing on the record at all never reaches oneRmLifts,
+  // and it is the one most worth chasing — so it is added here as a row of its own.
+  const untested = Object.keys(flagged).filter(n => !lifts.some(l => l.lift === n));
+  if (!lifts.length && !untested.length) return '';
+
+  const row = (name, kg, sub, tone) => `<div class="pr-row">
+      <div class="pr-n">${esc(name)}${flagged[name] ? `<span class="pr-tag">${esc(flagged[name])}</span>` : ''}</div>
+      <div class="pr-s ${tone || ''}">${sub}</div>
+      <div class="pr-v">${kg == null ? '—' : round1(kg) + '<small>kg</small>'}</div>
+    </div>`;
+
+  const rows = lifts.map(l => {
+    const due = flagged[l.lift] && l.age >= RETEST_MIN_DAYS_C;
+    const move = l.entries.length < 2 ? 'first estimate'
+      : (l.delta === 0 ? 'no change' : fmtDeltaKg(l.delta) + ' kg since the first');
+    const ago = l.age === 0 ? 'today' : l.age === 1 ? 'yesterday' : l.age + ' days ago';
+    return row(l.lift, l.latest.kg,
+      `${move} · ${l.latest.test ? 'tested' : 'from a set'} ${ago}${due ? ' · <b>due a retest</b>' : ''}`,
+      due ? 'amber' : '');
+  }).concat(untested.map(n => row(n, null, 'nothing on the record yet · <b>due a retest</b>', 'amber')));
+
+  return `<div class="sec"><span>Personal records</span></div>
+    <section class="panel"><div class="prlist">${rows.join('')}</div>
+      <p class="empty" style="padding:10px 0 0">Estimated one-rep maxes, worked out from their
+      logged sets or entered after a test. They own the record — this is read-only.</p>
+    </section>`;
+}
+
 // The three numbers, always visible; the charts behind one tap. They used to be
 // three full-width cards above everything, which pushed the actual work below
 // the fold on every single athlete.

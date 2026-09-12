@@ -527,6 +527,37 @@ Best for: all loaded exercises (strength, plyos, accessories) — and any single
 
 Every `standard` exercise gets, automatically: rest timer + weight log + RPE selector + personal note. `restSec` defaults to **120s** if omitted. Common values: `60`, `90`, `120` (= 2 min), `180` (= 3 min), `240` (= 4 min).
 
+### `test` — Mark a lift for a periodic rep-max retest (optional, `standard` only)
+
+Flags an exercise as one of the athlete's **key lifts**: the Personal Records screen then
+tracks how long it has been since a number was put on the record, and nudges for a retest in
+the closing week of the cycle.
+
+```json
+{
+  "type": "standard",
+  "name": "Barbell Back Squat",
+  "test": "5RM",
+  "chips": [ ... ]
+}
+```
+
+Accepted values: `"5RM"` (or any `"<n>RM"` up to 10 reps), or `true` for the 5RM default.
+Anything else is ignored entirely and the lift is simply not flagged — this field decides
+what nags an athlete, so an unrecognised value must stay silent rather than guess a protocol
+nobody asked for.
+
+**Flag only the two or three lifts a cycle is actually about.** The nudge earns attention by
+being rare: an athlete asked to retest six things at the end of a block retests none of them.
+A flagged lift appears in the retest strip only when all three of these hold — the cycle is
+in its closing week (or past its `endDate`), the lift has gone **28 days or more** without an
+entry, and the exercise is in the current cycle. A cycle with no `endDate` cannot place the
+window, so the 28-day floor decides on its own.
+
+The flag changes nothing about how the lift is programmed or scored — it is purely which
+lifts the Records screen chases. Athletes can log a max for **any** `standard` exercise with
+a rep count, flagged or not, from Personal Records → **+ Log a max**.
+
 ### `videoUrl` — Optional Exercise Video
 
 Any exercise (any type) can include a `videoUrl`. When present, a play button appears next to the name. When omitted, no button renders.
