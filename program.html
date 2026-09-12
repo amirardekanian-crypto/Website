@@ -2169,6 +2169,67 @@
   .ex-set-row.done .ex-set-check::after { opacity: 1; transform: scale(1); }
   body[data-dark] .ex-set-check { border-color: #444; }
 
+  /* ── THE CEILING — estimated 1RM, folded into the bottom of the set log ──
+     One clay line while closed, a small panel when tapped. Everything here is
+     DERIVED from the set log that is already on the card: no storage key, no
+     payload, no merge rule, nothing to sync. The saved history and the
+     free-entry calculator live in The Ceiling section on My Plan. */
+  .ex-1rm { border-top: 1px dashed var(--ice-mid); }
+  body[data-dark] .ex-1rm { border-top-color: rgba(199,85,47,0.35); }
+  /* Hidden until a set has actually been logged. This is also what keeps a max
+     estimate off unloaded work — a box jump never gets a weight typed into it,
+     so the line never appears, with no new flag needed in the programme JSON. */
+  .ex-1rm.is-empty { display: none; }
+  .ex-1rm-line {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 11px 14px;
+    background: transparent; border: none; cursor: pointer; text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase;
+    color: var(--ice);
+  }
+  .ex-1rm-arr { margin-left: auto; font-size: 14px; transition: transform 0.2s; }
+  .ex-1rm.open .ex-1rm-arr { transform: rotate(90deg); }
+  /* Nothing to estimate from yet — greyed, and it says WHY instead of
+     showing a number it has not earned. */
+  .ex-1rm-line:disabled { color: var(--grey-text); opacity: 0.8; cursor: default; }
+  body[data-dark] .ex-1rm-line:disabled { color: #777; }
+
+  .ex-1rm-panel { display: none; padding: 2px 14px 14px; background: var(--ice-dim); }
+  .ex-1rm.open .ex-1rm-panel { display: block; }
+  .ex-1rm-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .ex-1rm-field {
+    background: var(--white); border: 1px solid var(--ice-mid);
+    border-radius: 7px; padding: 7px 4px; text-align: center;
+  }
+  body[data-dark] .ex-1rm-field { background: #222; border-color: rgba(199,85,47,0.35); }
+  .ex-1rm-field input {
+    width: 100%; padding: 0; background: transparent; border: none; outline: none;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px;
+    text-align: center; color: var(--grey-dark);
+  }
+  body[data-dark] .ex-1rm-field input { color: #eee; }
+  .ex-1rm-field span {
+    display: block; margin-top: 3px;
+    font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--grey-text);
+  }
+  .ex-1rm-out { text-align: center; padding: 13px 0 0; line-height: 0.9; }
+  .ex-1rm-out b {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px;
+    letter-spacing: -1.2px; color: var(--ice);
+  }
+  .ex-1rm-out i {
+    font-family: 'Space Mono', monospace; font-style: normal;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--ice); margin-left: 5px;
+  }
+  .ex-1rm-from {
+    margin-top: 9px; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: 0.9px;
+    text-transform: uppercase; color: var(--grey-text); line-height: 1.7;
+  }
+  body[data-dark] .ex-1rm-from { color: #888; }
+
   /* ── Inline per-exercise weight field on round-format circuits / supersets ──
      A small box folded into each round row (one weight per exercise). Per-round
      RPE lives below in the standard .rpe-row rows. */
@@ -5043,8 +5104,12 @@ function renderExercise(ex, dayId, num, blockClass) {
   // Sets count drives how many rows the per-set log will render.
   // Falls back to 1 if the chip didn't have a "X Sets" entry.
   const setsCount = parseInt(parsed.sets, 10) || 1;
+  // The prescribed reps ride along on the card so The Ceiling can pre-fill its
+  // estimate without re-parsing the chips. Kept as the raw chip text ("5",
+  // "10-12", "4 Each Side", "30s") — prescribedReps() decides what it means.
+  const repsChip = parsed.reps || '';
 
-  return `<div class="checklist-item collapsed ${blockClass}${(parsed.extras.length || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}">
+  return `<div class="checklist-item collapsed ${blockClass}${(parsed.extras.length || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsChip)}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -7334,6 +7399,7 @@ function attachSetLog(card) {
       cur[idx] = cur[idx] || { w: '', r: '', d: false };
       cur[idx].w = e.target.value;
       saveSetLogValue(name, cur);
+      if (card._ceilingRefresh) card._ceilingRefresh();
     });
     // RPE buttons — toggle-select (tap selected = deselect)
     row.querySelectorAll('.ex-set-rpe .rpe-btn').forEach(b => {
@@ -7350,6 +7416,7 @@ function attachSetLog(card) {
           cur[idx].r = b.dataset.rpe;
         }
         saveSetLogValue(name, cur);
+        if (card._ceilingRefresh) card._ceilingRefresh();
       });
     });
     // Per-set check circle
@@ -7365,6 +7432,169 @@ function attachSetLog(card) {
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
+}
+
+// ── THE CEILING — estimated 1RM from a set the athlete just logged ─────
+// Everything here is DERIVED from the set log already on the card. Nothing is
+// written, so this adds no storage key, no cloud payload and no merge rule.
+// The saved history (and a calculator for lifts that aren't in the programme)
+// lives in The Ceiling section on My Plan.
+//
+// RPE is the reason this beats a normal 1RM calculator. RPE 8 on a set of 5
+// means the athlete stopped 2 reps short, so the set they COULD have done is 7.
+// Estimating off the 5 they did would undersell them by roughly 7%.
+//   reps in reserve = 10 − RPE      effective reps = reps + reps in reserve
+const ONE_RM_MAX_EFFECTIVE = 12;   // past this an estimate is guesswork — refuse instead
+const ONE_RM_ROUND_KG      = 2.5;  // the smallest real plate jump; finer is fake precision
+
+// Epley, run on effective reps rather than performed reps. A true single taken
+// to RPE 10 estimates as itself (Epley alone would inflate it by 3%).
+function estimateOneRM(kg, reps, rpe) {
+  const w = Number(kg), r = Number(reps), e = Number(rpe);
+  if (!(w > 0) || !(r > 0) || !(e > 0)) return null;
+  const effective = r + Math.max(0, 10 - e);
+  if (effective > ONE_RM_MAX_EFFECTIVE) return null;
+  const raw = effective <= 1 ? w : w * (1 + effective / 30);
+  return Math.round(raw / ONE_RM_ROUND_KG) * ONE_RM_ROUND_KG;
+}
+
+// Pull a rep count out of a reps chip. Ranges ("10-12") take the LOW end — the
+// conservative read, and the panel is editable anyway. Time-based work ("30s",
+// "1:30") has no rep count at all, so it gets no Ceiling line.
+function prescribedReps(repsChip) {
+  const t = String(repsChip || '').trim();
+  if (!t || isPureDuration(t)) return null;
+  const m = t.match(/\d+(?:\.\d+)?/);
+  if (!m) return null;
+  const n = parseFloat(m[0]);
+  return n > 0 ? n : null;
+}
+
+// Weight fields are free text ("60", "60kg", "62.5", "62,5"). Take the first
+// number; anything without one (e.g. "BW") simply has no estimate.
+function parseLoggedKg(v) {
+  const m = String(v == null ? '' : v).replace(',', '.').match(/\d+(?:\.\d+)?/);
+  if (!m) return null;
+  const n = parseFloat(m[0]);
+  return n > 0 ? n : null;
+}
+
+// The set that produces the HIGHEST estimate — the athlete's real best effort
+// of the day, not simply the last row they happened to fill in.
+function bestCeilingSet(log, reps) {
+  let best = null;
+  (log || []).forEach((s, i) => {
+    const est = estimateOneRM(parseLoggedKg(s.w), reps, s.r);
+    if (est != null && (!best || est > best.est)) {
+      best = { est: est, kg: parseLoggedKg(s.w), rpe: Number(s.r), idx: i };
+    }
+  });
+  return best;
+}
+
+// Append the Ceiling line + panel to a standard exercise card. Renders nothing
+// at all when the exercise could never produce an honest estimate: no rep count
+// (holds, carries, intervals), or so many reps that even RPE 10 lands past the
+// effective-reps ceiling.
+function attachCeiling(card) {
+  const reps = prescribedReps(card.dataset.reps);
+  if (reps == null || reps > ONE_RM_MAX_EFFECTIVE) return;
+
+  const name  = card.querySelector('.item-name').textContent.trim();
+  const total = parseInt(card.dataset.sets, 10) || 1;
+
+  const box = document.createElement('div');
+  box.className = 'ex-1rm is-empty';   // refresh() reveals it once a set is logged
+  box.addEventListener('click', e => e.stopPropagation());
+  box.innerHTML = `
+    <button type="button" class="ex-1rm-line">
+      <span class="ex-1rm-txt"></span><span class="ex-1rm-arr">&rsaquo;</span>
+    </button>
+    <div class="ex-1rm-panel">
+      <div class="ex-1rm-inputs">
+        <div class="ex-1rm-field"><input class="ex-1rm-kg"  type="text" inputmode="decimal" aria-label="Weight in kilograms"><span>kg</span></div>
+        <div class="ex-1rm-field"><input class="ex-1rm-rp"  type="text" inputmode="numeric" aria-label="Reps"><span>reps</span></div>
+        <div class="ex-1rm-field"><input class="ex-1rm-rpe" type="text" inputmode="numeric" aria-label="RPE"><span>rpe</span></div>
+      </div>
+      <div class="ex-1rm-out"></div>
+      <div class="ex-1rm-from"></div>
+    </div>`;
+  logSlotFor(card).appendChild(box);
+
+  const line = box.querySelector('.ex-1rm-line');
+  const txt  = box.querySelector('.ex-1rm-txt');
+  const out  = box.querySelector('.ex-1rm-out');
+  const from = box.querySelector('.ex-1rm-from');
+  const fKg  = box.querySelector('.ex-1rm-kg');
+  const fRp  = box.querySelector('.ex-1rm-rp');
+  const fRpe = box.querySelector('.ex-1rm-rpe');
+
+  // Once the athlete edits a field the panel is theirs — a later set logged on
+  // the rows must not overwrite what they are in the middle of typing.
+  let touched = false;
+
+  // Recompute from whatever is in the three fields and paint both the panel and
+  // the closed line, so the card never shows two different numbers.
+  function paintFromFields(source) {
+    const est = estimateOneRM(parseLoggedKg(fKg.value), fRp.value, fRpe.value);
+    if (est == null) {
+      out.innerHTML = `<b>&mdash;</b>`;
+      from.innerHTML = 'Enter a weight, reps and an RPE.<br>Above 12 effective reps a max is a guess, not an estimate.';
+      txt.textContent = 'Estimate a max';
+      return;
+    }
+    const rir  = Math.max(0, 10 - Number(fRpe.value));
+    const tank = rir === 0 ? 'Taken to failure'
+                           : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in the tank';
+    out.innerHTML = `<b>${est}</b><i>KG</i>`;
+    // NOTE: when The Ceiling section lands on My Plan, this last line becomes
+    // the pointer to it ("Your maxes live in The Ceiling, on My Plan"). Until
+    // then it must not name a screen that isn't there.
+    from.innerHTML = source + '<br>' + tank
+      + '<br>Estimate only. Not a weight to load.';
+    txt.textContent = '≈ ' + est + ' kg est. max';
+  }
+
+  // Refresh from the set log. Skipped once the panel has been hand-edited.
+  function refresh() {
+    if (touched) return;
+    const log  = loadSetLog(name, total);
+    const best = bestCeilingSet(log, reps);
+    const anyLogged = log.some(s => parseLoggedKg(s.w) != null && Number(s.r) > 0);
+
+    if (!best) {
+      // Nothing logged yet — stay out of the way entirely. An unloaded exercise
+      // (box jump, bodyweight work) never gets a weight typed in, so it never
+      // offers a max estimate, and no flag had to be added to the programme
+      // JSON to arrange that. Once a real weight IS logged but the reps are too
+      // far from a single to be honest about, the line appears and says so
+      // rather than silently doing nothing.
+      box.classList.toggle('is-empty', !anyLogged);
+      box.classList.remove('open');
+      line.disabled = true;
+      txt.textContent = 'Too many reps to estimate a max';
+      return;
+    }
+    box.classList.remove('is-empty');
+    line.disabled = false;
+    fKg.value  = best.kg;
+    fRp.value  = reps;
+    fRpe.value = best.rpe;
+    paintFromFields(`From set ${best.idx + 1} &middot; ${best.kg} kg &times; ${reps} @ RPE ${best.rpe}`);
+  }
+
+  line.addEventListener('click', ev => {
+    ev.stopPropagation();
+    box.classList.toggle('open');
+  });
+
+  [fKg, fRp, fRpe].forEach(f => {
+    f.addEventListener('input', () => { touched = true; paintFromFields('Your numbers'); });
+    f.addEventListener('click', ev => ev.stopPropagation());
+  });
+
+  card._ceilingRefresh = refresh;
+  refresh();
 }
 
 // Reflect "all sets done?" on the exercise-level check and the day progress.
@@ -7396,8 +7626,10 @@ function initSetOrRPE() {
       // Circuit logging — weight grid and/or per-round RPE, per the JSON flags.
       attachCircuitLog(card);
     } else {
-      // Standard exercise — per-set table
+      // Standard exercise — per-set table, then The Ceiling underneath it.
+      // Order matters: attachCeiling() reads the log the table just seeded.
       attachSetLog(card);
+      attachCeiling(card);
     }
   });
 }
