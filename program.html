@@ -2231,6 +2231,8 @@
     letter-spacing: 1.4px; text-transform: uppercase;
   }
   .ex-1rm-grade:empty { display: none; }
+  .ex-1rm-grade em { font-style: normal; font-weight: 400; letter-spacing: 0.8px;
+    color: var(--grey-text); }
   .ex-1rm-grade.g1 { color: var(--yellow); }
   .ex-1rm-grade.g2 { color: var(--ice); }
   .ex-1rm-grade.g3 { color: var(--grey-text); }
@@ -2336,8 +2338,39 @@
   .ceil-row-s { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.06em;
     text-transform: uppercase; }
 
+  /* Plain-English line under the header. "The Ceiling" is a name, not an
+     explanation, and this is where a first-timer lands. */
+  .ceil-intro { font-size: 14px; line-height: 1.6; color: var(--grey-text);
+    margin-top: 16px; }
+  body[data-dark] .ceil-intro { color: #9a9a9a; }
+  /* Says what the ratio MEANS, not just what it equals */
+  .ceil-hero-p { font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,0.9);
+    margin-top: 9px; }
+
   .ceil-empty { text-align: center; padding: 44px 16px; color: var(--grey-text);
     font-size: 13.5px; line-height: 1.65; }
+  .ceil-empty-l { text-align: left; padding: 26px 0 8px; }
+  .ceil-steps { margin: 10px 0 0 20px; padding: 0; }
+  .ceil-steps li { margin-bottom: 7px; line-height: 1.55; }
+
+  /* The full explainer, in place. Folded by default. */
+  .ceil-help { margin-top: 24px; border: 1px solid var(--grey-mid); border-radius: 10px;
+    background: var(--white); overflow: hidden; }
+  body[data-dark] .ceil-help { background: #1e1e1e; border-color: #333; }
+  .ceil-help summary { list-style: none; cursor: pointer; padding: 15px 16px;
+    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.3px; text-transform: uppercase; color: var(--ice); }
+  .ceil-help summary::-webkit-details-marker { display: none; }
+  .ceil-help summary::after { content: '＋'; float: right; font-size: 13px; line-height: 1; }
+  .ceil-help[open] summary::after { content: '−'; }
+  .ceil-help-b { padding: 0 16px 18px; font-size: 13.5px; line-height: 1.68;
+    color: var(--grey-dark); }
+  body[data-dark] .ceil-help-b { color: #ccc; }
+  .ceil-help-b p { margin-bottom: 11px; }
+  .ceil-help-b ul { margin: 0 0 11px 18px; }
+  .ceil-help-b li { margin-bottom: 5px; }
+  .ceil-help-b strong { color: var(--yellow); }
+  body[data-dark] .ceil-help-b strong { color: #6fb495; }
   .ceil-note { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.07em;
     text-transform: uppercase; color: var(--grey-text); line-height: 1.75;
     margin-top: 18px; text-align: center; }
@@ -5553,6 +5586,35 @@ function renderNotes() {
 // Guide screen (#screen-guide) was removed, so the content lives here directly.
 // Each entry renders as a collapsible note-style card. (`icon` is kept per card
 // so the rows can be given line-icon tiles later without re-deriving them.)
+// The Ceiling, explained for someone who has never heard of a one-rep max.
+// ONE copy, used in two places: the "Using the app" card in the Coach tab, and
+// the "How this works" panel on the Ceiling screen itself. Two copies of the
+// same prose would drift the first time either one is edited.
+const CEILING_HELP = `
+  <p><strong>What it is.</strong> Your one rep max is the heaviest you could lift one single time.
+  It is the normal way to measure how strong you are.</p>
+  <p><strong>You never have to test it.</strong> Testing a real one rep max takes a long warm-up,
+  leaves you wrecked, and carries a risk. So the app works it out instead, from sets you already
+  do in your programme. Log the weight you used and your RPE, and the number appears.</p>
+  <p><strong>Why your RPE matters here.</strong> RPE 8 means you stopped with about 2 reps left in
+  you. So a set of 5 at RPE 8 was really a set of 7 in you. The app adds those reps back before it
+  works anything out. That is why an honest RPE gives a much better number than the weight on its own.</p>
+  <p><strong>How to get a number you can trust.</strong> Go heavy and stop close to your limit.
+  A hard set of 3 at RPE 9 gives a far better number than an easy set of 10 at RPE 7. The reason is
+  simple. When you have one or two reps left you can feel it. When you have five left you are guessing.</p>
+  <p>Every number is labelled so you always know how much to trust it:</p>
+  <ul>
+    <li><strong>Sharp</strong> means heavy and close to your limit. Trust it.</li>
+    <li><strong>Good</strong> means close enough. Trust the direction.</li>
+    <li><strong>Rough</strong> means it was a long set. Treat it as a rough guide only.</li>
+  </ul>
+  <p>If a set is so long that the number would be a guess, the app says so instead of making one up.</p>
+  <p><strong>Keep saving them.</strong> One number on its own can be a few kilos out either way.
+  Save a few over a few weeks and you see the real line, which is whether you are getting stronger
+  and how fast. That line is worth far more than any single number, and it is what I look at.</p>
+  <p><strong>It is not a weight to lift.</strong> Your programme is still set by RPE. Never work out
+  a percentage of this number and load that on the bar.</p>`;
+
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your current cycle, your progress, and what's coming next.</li><li><strong>My Plan</strong> — your actual training. The tabs at the top (D1, D2, D3…) switch between days; tap any exercise to open it.</li><li><strong>Coach</strong> — message me directly, read the personal notes I write you, and find this "Using the app" guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
@@ -5564,13 +5626,9 @@ const APP_GUIDE = [
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
-  { icon: 'activity', title: 'Your estimated max (The Ceiling)',
-    body: `<p>Once you log a weight <em>and</em> an RPE on a set, the app works out what you could probably lift for one rep. That number is your estimated max. You never have to test it.</p>
-    <p><strong>Why your RPE matters here.</strong> RPE 8 means you stopped with about 2 reps left. So a set of 5 at RPE 8 is really a set of 7 in you. The app adds those reps back before it does the maths, which is why logging an honest RPE gives a much better number than the weight alone.</p>
-    <p><strong>How to get a number you can trust.</strong> Heavy and close to failure. A hard set of 3 at RPE 9 gives a far sharper estimate than an easy set of 10 at RPE 7 — you are simply much better at judging how many reps you have left when there are only one or two of them. Long sets are a guess, and past 10 reps in the tank the app will tell you it can't give you a number rather than make one up.</p>
-    <p>Every estimate is labelled <strong>Sharp</strong>, <strong>Good</strong> or <strong>Rough</strong> so you always know how much to trust it.</p>
-    <p><strong>Keep logging.</strong> One estimate is a snapshot and can be out by a few kilos either way. Several of them over a few weeks show the real line — whether you're going up, and how fast. That trend is worth far more than any single number, and it's what I look at.</p>
-    <p>It is an estimate, not a target. Your programme is still prescribed in RPE — never load a percentage off this number.</p>` },
+  { icon: 'activity', title: 'The Ceiling — the most you could lift once',
+    body: `<p>Open <strong>My Plan</strong> and tap <strong>The Ceiling</strong> to see this for every
+    exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
     body: `<p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
@@ -5823,8 +5881,8 @@ function ceilingCardHtml() {
       <div class="habit-card-body">
         <div class="habit-card-title">The Ceiling</div>
         <div class="habit-card-sub">${top.length
-          ? 'Your estimated maxes, built from the sets you log.'
-          : 'Log a weight and an RPE on any lift and your estimated max appears here.'}</div>
+          ? 'The most you could lift for one rep, on every exercise you train.'
+          : 'See the most you could lift for one rep. Log a weight and your RPE on any exercise to start.'}</div>
       </div>
       <div class="habit-card-go">→</div>
     </button>${mini}`;
@@ -5869,14 +5927,26 @@ function renderCeiling() {
   const lifts = ceilingLifts();
   const body  = document.getElementById('ceil-body');
 
+  // Always-on plain-English line. "The Ceiling" is a name, not an explanation,
+  // and this is the first screen someone who has never heard of a one-rep max
+  // will land on.
+  const intro = `<div class="ceil-intro">The most you could lift for one rep, on each exercise.
+    Worked out from your normal sets, so you never have to test it.</div>`;
+
   if (!lifts.length) {
-    body.innerHTML = `
-      <div class="ceil-empty">
+    body.innerHTML = intro + `
+      <div class="ceil-empty ceil-empty-l">
         <p><strong>Nothing here yet.</strong></p>
-        <p style="margin-top:10px">Open any lift in your programme, log the weight you used and
-        your RPE for the set, then tap <em>Save to The Ceiling</em>. Your estimated max lands here.</p>
-        <p style="margin-top:10px">You never have to test a one-rep max for this to work.</p>
-      </div>`;
+        <p style="margin-top:12px">Here is how to get your first one:</p>
+        <ol class="ceil-steps">
+          <li>Open any exercise in today's session.</li>
+          <li>Type in the weight you used.</li>
+          <li>Tap your RPE for that set, which is how hard it felt out of 10.</li>
+          <li>Tap <strong>Save to The Ceiling</strong>.</li>
+        </ol>
+        <p style="margin-top:14px">Your number lands here. Go heavy and stop close to your limit
+        and it will be a good one.</p>
+      </div>` + ceilingHelpHtml(true);
     return;
   }
 
@@ -5891,17 +5961,19 @@ function renderCeiling() {
     hero = `
       <div class="ceil-hero">
         <div class="ceil-hero-v">${ratio}<small>×</small></div>
-        <div class="ceil-hero-l">Body weight · ${esc(best.lift)}</div>
-        <div class="ceil-hero-s">${best.latest.kg} kg ÷ ${bw.kg} kg
-          · weighed ${fmtCeilDate(bw.d)} in AA Proof</div>
+        <div class="ceil-hero-l">Your own body weight</div>
+        <div class="ceil-hero-p">You can lift ${ratio} times your own body weight
+          on the ${esc(best.lift)}. On court that counts for more than the raw kilos.</div>
+        <div class="ceil-hero-s">${best.latest.kg} kg lifted &middot; ${bw.kg} kg of you
+          &middot; weighed ${fmtCeilDate(bw.d)} in AA Proof</div>
       </div>`;
   } else {
     hero = `
       <div class="ceil-ask">
         <div class="ceil-ask-t">Add your body weight</div>
-        <div class="ceil-ask-d">Lifting ${best.latest.kg} kg means something different at 65 kg than
-          at 95 kg. For tennis and padel, strength <em>per kilo of you</em> is the number that counts.
-          Log your weight in AA Proof and it shows up here.</div>
+        <div class="ceil-ask-d">Lifting ${best.latest.kg} kg means one thing at 65 kg and
+          something else at 95 kg. What counts on court is how strong you are for your size.
+          Add your weight in AA Proof and it shows up here.</div>
         <button type="button" class="ceil-ask-b" onclick="goHabits()">Open AA Proof →</button>
       </div>`;
   }
@@ -5924,10 +5996,22 @@ function renderCeiling() {
       </button>`;
   }).join('');
 
-  body.innerHTML = hero
+  body.innerHTML = intro + hero
     + `<div class="ceil-label">Your lifts</div>${rows}`
-    + `<div class="ceil-note">Estimates, not tested maxes.<br>
-        One is a snapshot — the line across several is the real answer.</div>`;
+    + `<div class="ceil-note">Tap any lift to see how it has moved.<br>
+        Worked out, not tested.</div>`
+    + ceilingHelpHtml();
+}
+
+// The full explainer, in place. Folded away by default so it does not clutter
+// the screen for someone who has read it once, and open on the empty state
+// where it is the only thing worth reading. Same prose as the Coach tab card.
+function ceilingHelpHtml(open) {
+  return `
+    <details class="ceil-help"${open ? ' open' : ''}>
+      <summary>How this works</summary>
+      <div class="ceil-help-b">${CEILING_HELP}</div>
+    </details>`;
 }
 
 // One lift's history: the number, a chart of every estimate, and the set each
@@ -7815,9 +7899,12 @@ const ONE_RM_ROUND_KG      = 2.5;  // the smallest real plate jump; finer is fak
 // — closer to failure, fewer reps — point the same way, which is why one
 // number can carry the whole message.
 function ceilingQuality(effective) {
-  if (effective <= 3) return { label: 'Sharp estimate', hint: 'Heavy and close to failure. This is about as good as an estimate gets.' };
-  if (effective <= 6) return { label: 'Good estimate',  hint: 'Fewer reps at a higher RPE would sharpen it further.' };
-  return                     { label: 'Rough estimate', hint: 'Long sets are hard to judge. Go heavier, closer to failure, for a sharper number.' };
+  if (effective <= 3) return { label: 'Sharp',
+    hint: 'Heavy, and you stopped close to your limit. This is as good as it gets.' };
+  if (effective <= 6) return { label: 'Good',
+    hint: 'Want it sharper? Fewer reps with a heavier weight.' };
+  return                     { label: 'Rough',
+    hint: 'Long sets are hard to judge. Fewer reps and more weight give a better number.' };
 }
 
 // Epley, run on effective reps rather than performed reps. A true single taken
@@ -7972,9 +8059,10 @@ function attachCeiling(card) {
       out.innerHTML = `<b>&mdash;</b>`;
       grade.textContent = '';
       grade.className = 'ex-1rm-grade';
-      from.innerHTML = 'Enter a weight, reps and an RPE.<br>Past '
-        + ONE_RM_MAX_EFFECTIVE + ' reps in the tank a max is a guess, not an estimate.';
-      txt.textContent = 'Estimate a max';
+      from.innerHTML = 'Put in a weight, the reps and your RPE.<br>'
+        + 'If the set is much longer than ' + ONE_RM_MAX_EFFECTIVE
+        + ' reps, the number would only be a guess.';
+      txt.textContent = 'What could you lift for one rep?';
       save.hidden = true;
       return;
     }
@@ -7984,16 +8072,17 @@ function attachCeiling(card) {
     const rir  = Math.max(0, 10 - Number(fRpe.value));
     const eff  = Number(fRp.value) + rir;
     const q    = ceilingQuality(eff);
-    const tank = rir === 0 ? 'taken to failure'
-                           : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in the tank';
+    const tank = rir === 0 ? 'nothing left in you'
+                           : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in you';
     out.innerHTML = `<b>${est}</b><i>KG</i>`;
-    grade.textContent = q.label;
+    // "Sharp / Good / Rough" says how much to trust it. The word alone is not
+    // enough for someone meeting this for the first time, so it is captioned.
+    grade.innerHTML = q.label + ' <em>&middot; how much to trust it</em>';
     grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
-    // NOTE: when The Ceiling section lands on My Plan, a fourth line points at
-    // it ("Your maxes live in The Ceiling, on My Plan"). Until then it must not
-    // name a screen that isn't there.
     from.innerHTML = source + ' &middot; ' + tank + '<br>' + q.hint;
-    txt.textContent = '≈ ' + est + ' kg est. max';
+    // Says what the number IS, not what it is called. "Est. max" means nothing
+    // to someone who has never heard of a one-rep max.
+    txt.textContent = '≈ ' + est + ' kg for one rep';
   }
 
   // Refresh from the set log. Skipped once the panel has been hand-edited.
@@ -8013,7 +8102,7 @@ function attachCeiling(card) {
       box.classList.toggle('is-empty', !anyLogged);
       box.classList.remove('open');
       line.disabled = true;
-      txt.textContent = 'Too many reps to estimate a max';
+      txt.textContent = 'Too many reps to work out a one-rep max';
       return;
     }
     box.classList.remove('is-empty');
