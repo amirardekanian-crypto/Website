@@ -14,7 +14,7 @@ The "what the product actually is" context doc. Pair it with **`DESIGN_SYSTEM.md
 
 | | English website | Instagram / Farsi content |
 |---|---|---|
-| **Who** | competitive **tennis & padel** players | broader **general-fitness** Tehrani market |
+| **Who** | competitive **tennis & padel** players | broader **general-fitness** Tehrani market (the Farsi *website* moved to **tennis & padel** on 2026-09-13) |
 | **Line** | *Move Better. Hit Harder. Last Longer.* | «یه مربی، تو جیبت» / «هیچی بی‌دلیل نیست» |
 | **Goal** | get qualified players to apply | justify the premium price & retain clients by showing the depth behind the work |
 | **Voice** | sharp, athletic, evidence-based | warm, direct, colloquial Tehrani, no-BS |

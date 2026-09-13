@@ -43,6 +43,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Page | EN | FA | What it is |
 |---|---|---|---|
 | Home | [`index.html`](index.html) | [`index-fa.html`](index-fa.html) | Front door: hero, proof, FAQ, CTAs → form |
+| Articles (web) | [`en/articles/`](en/articles/index.html) | [`fa/articles/`](fa/articles/index.html) | Every app article as a public page. **Generated** by [`scripts/build_article_pages.py`](scripts/build_article_pages.py) — never hand-edit |
 | Apply form | [`form.html`](form.html) | [`form-fa.html`](form-fa.html) | Intake questionnaire → **saved to Supabase** (`hab_intake`, read in `coach.html` → Intake) **and** emails Amir (Web3Forms) |
 | Terms | [`terms.html`](terms.html) | [`terms-fa.html`](terms-fa.html) | Legal / training disclaimers |
 | Privacy | [`privacy.html`](privacy.html) | — | GDPR privacy notice |
@@ -52,7 +53,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Etminan academy | [`etminan-en.html`](etminan-en.html) | [`etminan.html`](etminan.html) | Partner page + sign-up form for Etminan Tennis Academy players (also [`etminan-dv.html`](etminan-dv.html), Dhivehi). Intakes tagged `Etminan Tennis Academy`. `noindex` |
 | EN redirect | [`index-en.html`](index-en.html) | — | Permanent redirect to `/` |
 
-**Plumbing:** [`CNAME`](CNAME) (domain) · [`sitemap.xml`](sitemap.xml) ·
+**Plumbing:** [`CNAME`](CNAME) (domain) · [`sitemap.xml`](sitemap.xml) (generated) ·
 [`robots.txt`](robots.txt) · [`manifest.json`](manifest.json) (PWA install) ·
 [`sw.js`](sw.js) (service worker / offline) · [`favicon.ico`](favicon.ico).
 
@@ -128,7 +129,7 @@ The brain behind every program. Read the principles before touching sets/reps.
 
 | Library | Manifest | Files | Tab |
 |---|---|---|---|
-| **Read** (articles) | [`articles/index.json`](articles/index.json) | `articles/<category>/*.json` | Library → Read |
+| **Read** (articles) | [`articles/index.json`](articles/index.json) | `articles/<category>/*.json` (+ `*.fa.json` website translations) | Library → Read · and `/en/articles/`, `/fa/articles/` on the site |
 | **Train** (workouts) | [`workouts/index.json`](workouts/index.json) | `workouts/<category>/*.json` | Library → Train |
 | **Athlete programs** | — | `data/<athlete-id>.json` (one per athlete) | the whole app |
 | **Exercise → video** | [`exercise_library.json`](exercise_library.json) | *generated from Notion* | video pop-ups |
@@ -217,6 +218,9 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 ---
 
 ## 🛠️ Reference docs (the manuals)
+
+**SEO:** [`.claude/SEO-SOP.md`](.claude/SEO-SOP.md) — getting found on Google in Iran: Search Console, the monthly routine, how article titles are chosen.
+
 
 | Doc | Covers |
 |---|---|
