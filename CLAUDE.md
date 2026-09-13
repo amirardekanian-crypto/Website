@@ -585,6 +585,9 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
   bylines and the JSON-LD `Person` lead with **Ardekanian / اردکانیان**, the name people search
   (Amir, 2026-09-13). Both homepages define that `Person` under one `@id`
   (`https://www.amirardekani.com/#person`) with every spelling in `alternateName` — keep them in step.
+- ⚠️ **`index.html` carries the Google Search Console verification tag** (`<meta name="google-site-verification" ...>`, added 2026-09-13 for the URL-prefix property
+  `https://www.amirardekani.com/`, `sitemap.xml` submitted there). Removing or changing it un-verifies the
+  property and hides the search data. Keep it whenever the `<head>` is edited. Routine: `.claude/SEO-SOP.md` section 3.
 - ⚠️ **Unverified from Iran:** the Farsi pages load Vazirmatn from Google Fonts and the Plausible
   script, same as `index-fa.html`. `/reach/` measures Google Fonts; if it is blocked, self-host the font.
 
