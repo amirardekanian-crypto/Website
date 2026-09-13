@@ -544,6 +544,14 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - Shared **nav/footer** are injected by `assets/js/shared.js` from `partials/nav.html` + `partials/footer.html`.
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
+- **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (v7, 2026-09-13).
+  It must keep leaving `/reach/` (the Iran reachability probe) and `/tennis/` (the planned paid
+  course, which will ship its own worker) untouched. Otherwise the probe reports a cached pass
+  and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
+  Storage is shared by the origin, and the old `k !== CACHE` filter would have wiped any other
+  app's offline copy on every bump.
+- **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
+  only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +
   clay (`--accent-2` #C7552F) accent, logo mark (white rounded square w/ `assets/img/icon-192.png`),
   and gentle section banding (`#FAF7F2` ↔ `#F1ECE3`).
