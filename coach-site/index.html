@@ -27,9 +27,12 @@
   4.  قیمت‌ها          → ✅ هر چهار کلاس پولی قیمت واقعی دارن (تومان، با پکیج ۱۰ جلسه).
                         ⚠ گروهی فقط تنیسه — پدل حداکثر ۲ نفره، پس خصوصی و نیمه‌خصوصی
   4b. form.html       → فرم رزرو؛ جوابش به واتساپ می‌ره. شماره‌ش باید با همین فایل یکی باشه
-  5.  آمارها           → ✅ واقعی‌ان حالا: ۱۳ سال سابقه، تیم ملی، بازی حرفه‌ای، مسابقات کشوری
+  5.  آمارها و کارنامه  → ✅ از خود مهرانه: رنکینگ ۱ بانوان کشور، رنکینگ ۳ آسیا زیر ۱۴،
+                        مقام اول ATF آسیا، تیم ملی رده‌های ۱۲/۱۴/۱۶ و بزرگسال
   6.  متن «درباره‌ی من» → ✅ از متن خودش نوشته شده
-  7.  نظر شاگردها      → اسم‌ها و متن‌ها ساختگی‌ان
+  7.  نظر شاگردها      → ❌ حذف شد. سه نظر ساختگی بود و مهرانه هنوز شاگردی نداره که
+                        ازش نظر بگیره؛ جاش بخش «مربی‌ای که خودش بازیکنه» نشست.
+                        ⚠ نظر ساختگی برنگردون — وقتی نظر واقعی داشت، CSSاش هنوز هست
   8.  باشگاه و آدرس    → بخش «تماس» و فوتر
   9.  کادرهای عکس      → هر جا نوشته «عکس اینجا»، عکس واقعی بذار
   10. نشان «نسخه‌ی نمونه» → تگ <a class="draft-badge"> رو کلاً پاک کن
@@ -374,16 +377,25 @@ section{position:relative}
 .venues{display:grid;gap:14px;margin-block-start:28px}
 @media(min-width:640px){.venues{grid-template-columns:1fr 1fr}}
 @media(min-width:1020px){.venues{grid-template-columns:repeat(4,1fr)}}
-.venue{
+.venue,.cred{
   background:#fff;border:1px solid var(--line-dark);border-radius:16px;padding:20px;
   display:flex;gap:13px;align-items:flex-start;
   transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s;
 }
-.venue:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.venue .pin{width:26px;height:26px;border-radius:9px;background:var(--mist);display:grid;place-content:center;flex:none;margin-block-start:2px}
-.venue .pin svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.venue b{display:block;font-size:16px;line-height:1.5}
-.venue span{font-size:13.5px;color:var(--muted)}
+.venue:hover,.cred:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.venue .pin,.cred .pin{width:26px;height:26px;border-radius:9px;background:var(--mist);display:grid;place-content:center;flex:none;margin-block-start:2px}
+.venue .pin svg,.cred .pin svg{width:15px;height:15px;stroke:var(--ink);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.venue b,.cred b{display:block;font-size:16px;line-height:1.5}
+.venue span,.cred span{font-size:13.5px;color:var(--muted)}
+
+/* ============ کارنامه — همون قالب .venue، نشان به جای پین ============ */
+.creds{display:grid;gap:14px;margin-block-start:28px}
+@media(min-width:640px){.creds{grid-template-columns:1fr 1fr}}
+@media(min-width:1020px){.creds{grid-template-columns:repeat(4,1fr)}}
+.cred{padding:22px 20px}
+.cred .pin{width:34px;height:34px;border-radius:11px;margin-block-start:0}
+.cred .pin svg{width:18px;height:18px}
+.cred b{font-size:16.5px;font-weight:800}
 
 /* ============ steps ============ */
 .steps{display:grid;gap:22px;counter-reset:s}
@@ -395,6 +407,20 @@ section{position:relative}
 }
 .step h3{font-size:19px;margin-block-end:10px}
 .step p{color:var(--muted-on-dark);font-size:15.5px;line-height:1.85}
+/* نسخه‌ی روشن، ۲ ستونه — برای «چرا مربیِ بازیکن» */
+.steps.light{grid-template-columns:1fr}
+@media(min-width:760px){.steps.light{grid-template-columns:1fr 1fr}}
+.steps.light .step{
+  background:#fff;border-color:var(--line-dark);padding:28px 26px;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s;
+}
+.steps.light .step:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.steps.light .step .num{
+  width:40px;height:40px;border-radius:12px;font-size:20px;margin-block-end:14px;
+  background:var(--ball-card);color:var(--on-ball-card);
+}
+.steps.light .step h3{font-size:17.5px}
+.steps.light .step p{color:var(--muted)}
 
 /* ============ testimonials ============ */
 .quotes{display:grid;gap:20px}
@@ -971,7 +997,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
       <a href="#classes">کلاس‌ها</a>
       <a href="#venues">زمین‌ها</a>
       <a href="#how">چطور شروع کنیم</a>
-      <a href="#words">نظر شاگردها</a>
+      <a href="#record">کارنامه</a>
       <a href="#faq">سوال‌ها</a>
       <a href="#contact">تماس</a>
     </nav>
@@ -1024,9 +1050,9 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
 <section class="stats">
   <div class="wrap stats-in">
     <div class="stat rv"><b data-count="13">۱۳</b><span>سال سابقه در تنیس</span></div>
-    <div class="stat rv"><b>تیم ملی</b><span>عضویت</span></div>
-    <div class="stat rv"><b>حرفه‌ای</b><span>سابقه‌ی بازی</span></div>
-    <div class="stat rv"><b>کشوری</b><span>حضور در مسابقات</span></div>
+    <div class="stat rv"><b>رنکینگ ۱</b><span>بانوان کشور</span></div>
+    <div class="stat rv"><b>رنکینگ ۳</b><span>آسیا · زیر ۱۴ سال</span></div>
+    <div class="stat rv"><b>تیم ملی</b><span>۱۲، ۱۴، ۱۶ و بزرگسال</span></div>
   </div>
 </section>
 
@@ -1058,6 +1084,35 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span><span data-t="chip2"></span></span>
         <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span><span data-t="chip3"></span></span>
         <span class="chip"><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.3 4.6 9 10 3"/></svg></span><span data-t="chip4"></span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RECORD ============ -->
+<section class="pad-lg tint" id="record">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow on-light"><span class="dot"></span>کارنامه</span>
+      <h2 class="h-sec">چی بازی کردم</h2>
+      <p class="lead" data-t="recordLead"></p>
+    </div>
+    <div class="creds rv">
+      <div class="cred">
+        <span class="pin"><svg viewBox="0 0 24 24"><path d="M7.5 3.5h9V9a4.5 4.5 0 0 1-9 0Z"/><path d="M7.5 5H5v1.5a3 3 0 0 0 2.8 3M16.5 5H19v1.5a3 3 0 0 1-2.8 3"/><path d="M12 13.5v3M8.5 20.5h7l-.8-4h-5.4Z"/></svg></span>
+        <div><b>رنکینگ ۱ بانوان کشور</b><span>تنیس</span></div>
+      </div>
+      <div class="cred">
+        <span class="pin"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.2 2.4 3.3 5.3 3.3 8.5s-1.1 6.1-3.3 8.5c-2.2-2.4-3.3-5.3-3.3-8.5S9.8 5.9 12 3.5Z"/></svg></span>
+        <div><b>رنکینگ ۳ آسیا</b><span>رده‌ی زیر ۱۴ سال</span></div>
+      </div>
+      <div class="cred">
+        <span class="pin"><svg viewBox="0 0 24 24"><circle cx="12" cy="14.6" r="5.6"/><path d="M8.7 9.7 6.4 3.5h11.2l-2.3 6.2"/></svg></span>
+        <div><b>مقام اول مسابقات آسیایی</b><span>تور ATF</span></div>
+      </div>
+      <div class="cred">
+        <span class="pin"><svg viewBox="0 0 24 24"><path d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path d="m9.2 12 2 2 3.6-3.9"/></svg></span>
+        <div><b>بازیکن تیم ملی</b><span>رده‌های ۱۲، ۱۴ و ۱۶ سال و بزرگسال</span></div>
       </div>
     </div>
   </div>
@@ -1182,32 +1237,39 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
   </div>
 </section>
 
-<!-- ============ WORDS ============ -->
-<section class="pad-lg" id="words">
+<!-- ============ WHY A PLAYER-COACH ============ -->
+<!-- جای بخش «نظر شاگردها» رو گرفت: اون سه نظر ساختگی بودن و مهرانه هنوز شاگردی
+     نداره که ازش نظر بگیره. CSS نظرها (.quote/.qrail/.qtrack/.stars/.who/.av)
+     عمداً سر جاش مونده تا وقتی نظر واقعی داشت، برگردوندنش یه کپی‌پیست باشه. -->
+<section class="pad-lg" id="why">
   <div class="wrap">
     <div class="sec-head rv">
-      <span class="eyebrow on-light"><span class="dot"></span>نظر شاگردها</span>
-      <h2 class="h-sec">حرف خودشون</h2>
+      <span class="eyebrow on-light"><span class="dot"></span>چرا من</span>
+      <h2 class="h-sec">مربی‌ای که خودش بازیکنه</h2>
+      <p class="lead">خودم بازیکن بودم و هستم، با تجربه‌ی مسابقه. این فقط یه خط توی رزومه نیست — روی چیزی که سر کلاس می‌بینی مستقیم اثر داره.</p>
     </div>
-    <div class="qrail rv"><div class="qtrack">
-      <article class="quote">
-        <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
-        <p>«سه ساله بازی می‌کردم و فورهندم همیشه تو تور می‌خورد. مهرانه توی دو جلسه فهمید مشکل از پاهامه، نه از دستم. الان بازی کردن برام کلاً فرق کرده.»</p>
-        <div class="who"><span class="av">س</span><div><b>سارا ک.</b><span data-t="q1tag"></span></div></div>
-      </article>
-
-      <article class="quote">
-        <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
-        <p data-t="q2body"></p>
-        <div class="who"><span class="av">ر</span><div><b>رضا م.</b><span data-t="q2tag"></span></div></div>
-      </article>
-
-      <article class="quote">
-        <div class="stars"><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg><svg viewBox="0 0 20 20"><path d="M10 1.5 12.4 7l6 .5-4.5 3.9 1.4 5.9L10 14.2 4.7 17.3l1.4-5.9L1.6 7.5l6-.5Z"/></svg></div>
-        <p>«دخترم ۹ سالشه و قبلاً هیچ ورزشی رو ادامه نمی‌داد. حالا خودش روزشماری می‌کنه که کی کلاس داره. همین برام کافیه.»</p>
-        <div class="who"><span class="av">م</span><div><b>مریم ط.</b><span>مادر شاگرد</span></div></div>
-      </article>
-    </div></div>
+    <div class="steps light">
+      <div class="step rv">
+        <div class="num">۱</div>
+        <h3>محیط مسابقه رو از داخل زمین می‌شناسم</h3>
+        <p>استرس، فشار امتیاز و تصمیمی که باید توی یه ثانیه بگیری — خودم توش بودم. تمرین رو جوری می‌چینم که برای همون لحظه آماده باشی، نه فقط برای تمرین.</p>
+      </div>
+      <div class="step rv">
+        <div class="num">۲</div>
+        <h3>جزئیات رو دقیق‌تر می‌بینم</h3>
+        <p>از نگاه یه بازیکن نگاه می‌کنم: جزئیات تکنیک، حرکت پا و تصمیم‌گیری. چیزهایی که از بیرون زمین راحت از چشم می‌افته.</p>
+      </div>
+      <div class="step rv">
+        <div class="num">۳</div>
+        <h3>الگوی عملی‌ام، نه فقط توضیح</h3>
+        <p>لازم نیست فقط تعریف کنم ضربه باید چطوری باشه؛ می‌تونم اجراش کنم. دیدنِ اجرای درست خیلی زودتر از شنیدنش جواب می‌ده.</p>
+      </div>
+      <div class="step rv">
+        <div class="num">۴</div>
+        <h3>برنامه‌ت واقع‌گراست</h3>
+        <p>چون خودم این مسیر رو رفتم، می‌دونم چی شدنیه و چقدر طول می‌کشه. برنامه‌ای می‌چینم که بتونی واقعاً انجامش بدی، نه یه لیست قشنگ.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1599,9 +1661,7 @@ var SPORTS = {
       chip2:"بازی برای لذت و سلامتی",
       chip3:"پیشرفت حرفه‌ای",
       chip4:"آماده‌سازی مسابقه",
-      q1tag:"۳۲ ساله · تنیس",
-      q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام بازی می‌کنم و کم نمیارم.»",
-      q2tag:"۴۱ ساله · تنیس",
+      recordLead:"اینا رو خودم توی زمین به دست آوردم. وقتی می‌گم یه ضربه یا یه تصمیم تو مسابقه جواب می‌ده، از جایی می‌گم که خودم بودم.",
       footTag:"مربی تنیس در مشهد — ۱۳ سال سابقه، بازی حرفه‌ای و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی، هیتینگ پارتنر و استعدادیابی رایگان."
     },
     media:{
@@ -1627,9 +1687,7 @@ var SPORTS = {
       chip2:"بازی برای لذت و سلامتی",
       chip3:"پیشرفت تکنیک",
       chip4:"بازی جدی‌تر",
-      q1tag:"۳۲ ساله · پدل",
-      q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»",
-      q2tag:"۴۱ ساله · پدل",
+      recordLead:"این کارنامه‌ی تنیسمه — همون پایه‌ای که توی پدل هم ازش استفاده می‌کنم: خوندن توپ، حرکت پا و تصمیم درست سر هر ضربه.",
       footTag:"مربی پدل در مشهد — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی و هیتینگ پارتنر (پدل حداکثر دو نفره‌ست)."
     },
     media:{}   /* no padel photos yet — slots fall back to placeholders */
@@ -1686,7 +1744,6 @@ function applySport(key){
     tt.innerHTML = S.ticker.map(function(w){ return "<span>" + w + "</span>"; }).join("");
     loopTrack(tt);
   }
-  loopTrack(document.querySelector(".qtrack"));
 
   fillSlot(document.querySelector('[data-slot="hero"]'), S.media.hero);
   ["s0","s1","s2"].forEach(function(id){
