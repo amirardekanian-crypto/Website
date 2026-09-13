@@ -4,13 +4,30 @@
 exclude:
   - Content/          # design-reference workspace (reels, carousels, business docs) — not site content
   - supabase/          # DB schema/migration SQL — internal infra, not public
+  # Root docs. This is an explicit list, not a glob: a new .md at the root is served
+  # (as .md AND as a rendered .html) until it is added here.
+  - AFFILIATES.md      # affiliate roster — partner coaches' names and handles
   - CLAUDE.md
   - CALL_LOG.md
   - COACH_DASHBOARD.md
   - CODEBASE.md
+  - HABITS.md
   - IMAGES.md
   - IMPORTING_SESSION_REPORTS.md
   - MAP.md
   - NOTION_SYNC.md
+  - QUESTS.md
   - SCHEMA.md
+  - XP_SYSTEM.md
+  # Folder READMEs — jekyll-readme-index was serving each one as its folder's index page.
+  - assets/cycles/README.md
+  - assets/days/README.md
+  - assets/js/jump/README.md
+  # Local tooling — run on Amir's PC, never fetched by the site.
+  - backup_supabase.py
+  - sync_notion.py
+  - scripts/           # pre-commit guards + node test
+  - assets/img/generate_icons.py
   - chips-selftest.html   # dev harness — embeds athlete ids, and reads data/*.json; run it locally
+  # NOT excluded on purpose: coach-site/ is served at /coach-site/ so Mehraneh can review her
+  # draft site. Add `- coach-site/` here when it moves to her own domain.

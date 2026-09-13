@@ -623,6 +623,10 @@ for the Tehran general-fitness audience. Don't touch those pages over this direc
   `amirardekani.com/CLAUDE.md` is a permanent 404 — polling one to confirm a docs-only commit
   waits for ever. A docs-only change has nothing to verify live; check `git ls-remote origin main`
   instead.
+  ⚠ **That exclude list is explicit, not a glob — a new root doc or script is LIVE until you add
+  it.** On 2026-09-13 `AFFILIATES.md`, `HABITS.md`, `QUESTS.md`, `XP_SYSTEM.md`, two root `.py`
+  files, `scripts/` and three folder READMEs were all found serving HTTP 200, the docs as both
+  `.md` and rendered `.html`. Adding a `.md`, `.py` or tooling folder means adding a line there.
 - **Do not treat a missing Actions run as a failed deploy — but do not treat it as a successful one
   either. Ask the deployments API, which answers the question directly:**
   ```
