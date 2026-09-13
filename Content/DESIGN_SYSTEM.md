@@ -221,7 +221,7 @@ A persistent device, app UI animating inside:
 ## 10. Voice & content rules
 
 - **Language:** Persian/Farsi, **colloquial Tehrani** — warm, direct, confident, no fluff. (The English wordmark voice is sharp & athletic: *Move Better. Hit Harder. Last Longer.*)
-- **Audience:** general-fitness clients in the Farsi market (not only athletes), even though the English site speaks to competitive tennis/padel players. Speak to the everyday trainee.
+- **Audience:** general-fitness clients in the Farsi market (not only athletes), even though the English site speaks to competitive tennis/padel players. Speak to the everyday trainee. ⚠️ The Farsi **website** (`index-fa.html`, `/fa/articles/`) moved to tennis & padel players on 2026-09-13; this line still describes Farsi social content.
 - **Goal of content:** justify the premium price & retain clients (show depth and the behind-the-scenes work) — not cheap lead-gen.
 - **Format:** vertical reels/carousels, hook in the first 2 seconds, **burned-in captions** (many watch muted).
 - **Credibility to lean on when useful:** ارشدِ قدرت و آمادگی · ارشدِ فیزیولوژیِ ورزشی (two MSc degrees) · ۵۰۰+ ورزشکار. *(In Farsi say «ارشد», never "MSc".)*
@@ -229,7 +229,7 @@ A persistent device, app UI animating inside:
 - **Accuracy of claims:** he holds an exercise-physiology ارشد and fact-checks, so every training/physiology number must be right. Prefer a **simple round figure with no on-slide math** (e.g. «ضربانِ قلب، زیرِ ۱۴۰») over a formula or a percentage you haven't verified. Note: Zone 2 is a metabolic threshold (LT1/VT1 ≈ lactate 2 mmol/L), **not** a fixed % of max HR — don't publish "60–70% of max" as if it were exact.
 
 **Farsi word choices — use these exact terms (decided with the client):**
-- **His title:** «مربیِ بدنسازیِ حرفه‌ای» — *not* «مربیِ قدرت و آمادگی». Keep «قدرت و آمادگی» only inside the real degree names.
+- **His title:** «مربیِ بدنسازیِ حرفه‌ای» — *not* «مربیِ قدرت و آمادگی». Keep «قدرت و آمادگی» only inside the real degree names. On the Farsi **website** since 2026-09-13 (tennis & padel): «مربیِ بدنسازیِ تنیس و پدل».
 - **Degrees:** «ارشد» — never "MSc" → «ارشدِ قدرت و آمادگی» · «ارشدِ فیزیولوژیِ ورزشی».
 - **The cheap alternative:** call it «یه برنامه» / «یه برنامه‌ی آماده» — *never* «فایل» or «PDF». Frame the offer as *«فقط یه برنامه نیست — یه تجربه‌ی کاملِ مربی‌گریه»* (it's not just a program, it's a full coaching experience).
 - **Training intensity / RPE:** «شدت» — *not* «سختی».

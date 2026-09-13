@@ -1,6 +1,8 @@
 #!/bin/sh
-# Blocks a commit that would ship a broken habits.html.
+# Two guards. Each runs only when its own files are staged, so a commit that
+# touches neither costs nothing.
 #
+# ── 1. habits.html must actually boot ────────────────────────────────────────
 # Why: an HTML comment sitting inside a JS template literal in habits.html
 # has broken the live app TWICE in one afternoon (2026-08-01) — a stray
 # backtick in the comment prose silently terminates the template literal,
@@ -11,39 +13,63 @@
 # case a hook protects against that "remember to test" does not: it runs on
 # every commit, regardless of who or what created it.
 #
-# This only runs the check when habits.html is actually staged, so it costs
-# nothing on commits that do not touch it.
+# ── 2. Article web pages must match their articles (added 2026-09-13) ────────
+# Why: Amir's standing rule is "every time I add an article it updates the
+# website as well". scripts/build_article_pages.py turns articles/*.json, plus
+# the reviewed *.fa.json translations, into /en/articles/ and /fa/articles/
+# pages and sitemap.xml. This blocks a commit that changes an article without
+# rebuilding its pages, adds one with no Farsi translation, or leaves a Farsi
+# translation behind its revised English — whichever session or tool made it.
+# Root *.html is in the trigger too, because a new public page changes the sitemap.
 #
-# NOTE: this checks the WORKING-TREE copy of habits.html, not the exact
-# staged blob. That is a real gap if you ever `git add -p` a partial hunk —
-# for this repo's actual workflow (always the whole file, together) it is
-# not one in practice. If that ever changes, check the staged blob instead:
+# NOTE: both checks read the WORKING-TREE copy, not the exact staged blob.
+# That is a real gap if you ever `git add -p` a partial hunk — for this
+# repo's actual workflow (always whole files, together) it is not one in
+# practice. If that ever changes, check the staged blob instead:
 #   git show :habits.html > /tmp/staged.html && check_js_syntax.py /tmp/staged.html
 
 repo_root=$(git rev-parse --show-toplevel) || exit 1
 cd "$repo_root" || exit 1
 
-staged=$(git diff --cached --name-only --diff-filter=ACM)
-echo "$staged" | grep -qx "habits.html" || exit 0
-
 PY=python
 command -v python >/dev/null 2>&1 || PY=python3
 
-echo "pre-commit: habits.html changed — checking it actually boots..."
+failed=0
 
-"$PY" scripts/check_js_syntax.py habits.html
-syntax_status=$?
+# ── 1. habits.html ───────────────────────────────────────────────────────────
+if git diff --cached --name-only --diff-filter=ACM | grep -qx "habits.html"; then
+  echo "pre-commit: habits.html changed — checking it actually boots..."
 
-"$PY" scripts/check_habits_boots.py habits.html
-boot_status=$?
+  "$PY" scripts/check_js_syntax.py habits.html
+  syntax_status=$?
 
-if [ $syntax_status -ne 0 ] || [ $boot_status -ne 0 ]; then
-  echo ""
-  echo "pre-commit: BLOCKED — habits.html failed the check(s) above."
-  echo "Fix it, or in a genuine emergency: git commit --no-verify"
-  echo "(but that is what let the last one through, so read the errors first)."
-  exit 1
+  "$PY" scripts/check_habits_boots.py habits.html
+  boot_status=$?
+
+  if [ $syntax_status -ne 0 ] || [ $boot_status -ne 0 ]; then
+    echo ""
+    echo "pre-commit: BLOCKED — habits.html failed the check(s) above."
+    echo "Fix it, or in a genuine emergency: git commit --no-verify"
+    echo "(but that is what let the last one through, so read the errors first)."
+    failed=1
+  else
+    echo "pre-commit: habits.html OK."
+  fi
 fi
 
-echo "pre-commit: habits.html OK — committing."
-exit 0
+# ── 2. article pages ─────────────────────────────────────────────────────────
+if git diff --cached --name-only --diff-filter=ACMD \
+     | grep -qE '^(articles/|en/articles/|fa/articles/|scripts/build_article_pages\.py$|sitemap\.xml$|robots\.txt$|[^/]+\.html$)'; then
+  echo "pre-commit: articles or public pages changed — checking the website pages match..."
+  if "$PY" scripts/build_article_pages.py --check; then
+    echo "pre-commit: article pages OK."
+  else
+    echo ""
+    echo "pre-commit: BLOCKED — the article web pages are out of date (details above)."
+    echo "Run: python scripts/build_article_pages.py   and stage what it writes."
+    echo "A missing or stale Farsi translation needs Amir's OK first: see .claude/skills/article/SKILL.md."
+    failed=1
+  fi
+fi
+
+exit $failed

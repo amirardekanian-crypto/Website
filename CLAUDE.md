@@ -14,7 +14,8 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - **Two audiences, deliberately different** (don't force them identical — match *facts &
   features*, not wording):
   - **English** site = competitive **tennis/padel** players. Voice: sharp, athletic, evidence-based.
-  - **Farsi** site = broader **general-fitness** Tehran market. Voice: warm, colloquial.
+  - **Farsi** site = **tennis & padel** players in Iran (Amir, 2026-09-13 — it was general
+    fitness until then). Voice: warm, colloquial. See *Article pages & SEO* below.
 
 ## Reference docs (read these, don't re-derive)
 - `MAP.md` — **start here.** The atlas: one linked index to every page, asset, skill, doc and design element.
@@ -556,6 +557,37 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   clay (`--accent-2` #C7552F) accent, logo mark (white rounded square w/ `assets/img/icon-192.png`),
   and gentle section banding (`#FAF7F2` ↔ `#F1ECE3`).
 
+## Article pages & SEO — every article is also a public web page (2026-09-13)
+
+Amir: *"every time I add an article it updates the website as well."* The goal is that people in
+Iran who search his name or a tennis/padel S&C topic find amirardekani.com (Google is ~99.6% of
+search in Iran). The routine (Search Console, the monthly checklist, how titles are chosen) is
+**`.claude/SEO-SOP.md`**.
+
+- **`scripts/build_article_pages.py`** turns `articles/<cat>/<slug>.json` (the English app
+  article) plus `articles/<cat>/<slug>.fa.json` (a reviewed Farsi translation) into
+  **`/fa/articles/<slug>.html`**, **`/en/articles/<slug>.html`**, an index page per language, and
+  **`sitemap.xml`**. Static HTML on purpose: Google reads it best, and it does not depend on
+  Supabase answering from inside Iran. Everything under `en/articles/`, `fa/articles/` and
+  `sitemap.xml` is **generated** — never hand-edit it; rebuild.
+- **`.githooks/pre-commit` runs `--check`** whenever articles, those folders, `sitemap.xml`,
+  `robots.txt` or any root `*.html` is staged. It blocks a stale page, a missing Farsi
+  translation, and a Farsi file whose English changed after it was stamped (`sourceHash`;
+  re-stamp with `--stamp <slug>` once the Farsi is brought back in line).
+- ⚠️ **A `.fa.json` must never carry `id` or `category`.** coach.html's *+ Publish article* upserts
+  any file that has both, by slug — a Farsi file with them would overwrite the English article in
+  the app for every athlete. The build refuses such a file.
+- **The `/article` skill does the whole chain** (Steps 6–9): Farsi draft → **Amir's OK** →
+  `--stamp` → build → commit → coach.html publish. Nothing Farsi ships unread.
+- **The sitemap lists a root page only when it has a canonical link and no `noindex`.** A new
+  public page needs a canonical, then a rebuild.
+- **The name:** the visible brand stays "Amir Ardekani / امیر اردکانی", but page titles, article
+  bylines and the JSON-LD `Person` lead with **Ardekanian / اردکانیان**, the name people search
+  (Amir, 2026-09-13). Both homepages define that `Person` under one `@id`
+  (`https://www.amirardekani.com/#person`) with every spelling in `alternateName` — keep them in step.
+- ⚠️ **Unverified from Iran:** the Farsi pages load Vazirmatn from Google Fonts and the Plausible
+  script, same as `index-fa.html`. `/reach/` measures Google Fonts; if it is blocked, self-host the font.
+
 ## How Amir works (preferences)
 - **Ship it live.** He expects work committed, pushed, AND merged so it's live — he iterates on the
   live site. Dev on branch `claude/website-write-access-o2o0kj`; ship via PR → merge to `main`
@@ -608,6 +640,9 @@ reference for mechanics only, not for language/voice.
 **Scope confirmed (Amir, same day): social content only** — the live Farsi **website**
 (`index-fa.html`, `form-fa.html`, `terms-fa.html`) is unaffected and stays exactly as-is
 for the Tehran general-fitness audience. Don't touch those pages over this directive.
+⚠️ **Superseded for `index-fa.html` on 2026-09-13:** Amir moved the Farsi homepage to **tennis &
+padel** and had its body rewritten (see *Article pages & SEO*). `form-fa.html` and
+`terms-fa.html` are unchanged.
 
 ## Verifying the live site (important gotchas)
 - **Try the live fetch first — when it works it is the real proof — but it DEPENDS ON THE
