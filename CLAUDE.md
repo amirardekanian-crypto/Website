@@ -623,10 +623,28 @@ for the Tehran general-fitness audience. Don't touch those pages over this direc
   `amirardekani.com/CLAUDE.md` is a permanent 404 — polling one to confirm a docs-only commit
   waits for ever. A docs-only change has nothing to verify live; check `git ls-remote origin main`
   instead.
-- **Do not treat a missing Actions run as a failed deploy.** The "pages build and deployment" run
-  (`event: dynamic`) sometimes never appears for a commit — on 2026-08-09 a merge deployed
-  correctly with no run listed for its SHA, and runs for an *earlier* SHA appeared twice. The
-  Actions list is a weak signal; the live fetch above is the strong one.
+- **Do not treat a missing Actions run as a failed deploy — but do not treat it as a successful one
+  either. Ask the deployments API, which answers the question directly:**
+  ```
+  curl -sS "https://api.github.com/repos/amirardekanian-crypto/Website/deployments?environment=github-pages&per_page=5" \
+    | python3 -c "import sys,json;[print(x['sha'][:8], x['created_at']) for x in json.load(sys.stdin)]"
+  ```
+  Unauthenticated and not proxy-blocked. **Your SHA in that list = it deployed. Absent = it did
+  not.** Add `&sha=<full-sha>` to ask about one commit; an empty array is a real negative.
+  The Actions list is a *weak* signal in both directions: the "pages build and deployment" run
+  (`event: dynamic`) sometimes never appears for a commit that deployed fine (2026-08-09), and
+  runs for an *earlier* SHA can appear twice.
+  ⚠ **A merge can also be genuinely dropped, which is what the old wording would have missed.**
+  On 2026-09-13 the merge API returned **502** while still merging `df3d601`; GitHub then created
+  no Pages run *and* no deployment for it, so a change that was on `main` was never served. It was
+  caught only because Amir asked "is this live?" and the deployments list said no. Two lessons:
+  treat a 502 on merge as "verify everything downstream", and when the live fetch is blocked,
+  **the deployments list is the strong signal, not the Actions list.**
+  **You cannot force a rebuild from here** — `POST /pages/builds` returns
+  `403 Access to this GitHub API path is not permitted through this proxy`. The fix is to land any
+  real commit on `main`; the build deploys the whole tree, so the stranded change rides along. A
+  docs-only commit works even though `_config.yml` excludes the `.md` files — `exclude` controls
+  what is *served*, not whether a build runs.
   Tell Amir to **hard-refresh** to bypass browser cache.
 - For visual checks: serve with `python3 -m http.server` and screenshot with Chromium at
   `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. Two headless quirks: scroll-reveal hides
