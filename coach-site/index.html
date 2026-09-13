@@ -24,7 +24,8 @@
   1.  PHONE           → ✅ ۰۹۱۵۵۹۸۵۰۶۸ — واتساپ و تماس هر دو از روی همین ساخته می‌شن
   2.  INSTAGRAM       → ✅ mehraneh_zohourian
   3.  «مهرانه ظهوریان»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
-  4.  قیمت‌ها          → هنوز خالی‌ان؛ دنبال «TODO: قیمت واقعی» بگرد (۴ تا کلاس پولی)
+  4.  قیمت‌ها          → ✅ خصوصی، نیمه‌خصوصی و گروهی واقعی‌ان (تومان، پکیج ۱۰ جلسه).
+                        فقط «هیتینگ پارتنر» مونده — دنبال «TODO: قیمت واقعی» بگرد
   4b. form.html       → فرم رزرو؛ جوابش به واتساپ می‌ره. شماره‌ش باید با همین فایل یکی باشه
   5.  آمارها           → ✅ واقعی‌ان حالا: ۱۳ سال سابقه، تیم ملی، بازی حرفه‌ای، مسابقات کشوری
   6.  متن «درباره‌ی من» → ✅ از متن خودش نوشته شده
@@ -341,11 +342,20 @@ section{position:relative}
 .card p{font-size:15.5px;color:var(--muted);line-height:1.85}
 .card .price{
   margin-block-start:auto;padding-block-start:18px;border-block-start:1px solid var(--line-dark);
-  display:flex;align-items:baseline;gap:7px;font-weight:800;font-size:20px;
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 7px;font-weight:800;font-size:20px;
 }
 .card .price small{font-size:13px;font-weight:500;color:var(--muted)}
 .card .price small a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+/* پکیج ۱۰ جلسه — یه پیل زیر قیمت، با همون زبونِ .eyebrow و .tag */
+.card .pack{
+  align-self:flex-start;width:fit-content;   /* نه flex — وگرنه gap فاصله‌ی دور عدد رو دوبرابر می‌کنه */
+  font-size:13px;font-weight:700;line-height:1.6;
+  padding:7px 14px;border-radius:999px;
+  background:rgb(var(--ink-rgb) / .05);border:1px solid var(--line-dark);
+}
+.card .pack b{font-weight:800}
 .card.feat{background:var(--ink);color:#fff;border-color:transparent}
+.card.feat .pack{background:rgb(var(--ball-rgb) / .13);border-color:rgb(var(--ball-rgb) / .3)}
 .card.feat .ic{background:rgb(var(--ball-rgb) / .16)}
 .card.feat .ic svg{stroke:var(--ball)}
 .card.feat p,.card.feat .meta{color:var(--muted-on-dark)}
@@ -1070,7 +1080,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <h3>کلاس خصوصی</h3>
         <span class="meta">یک به یک</span>
         <p>تمام وقت جلسه مال خودته. سریع‌ترین راه برای درست کردن تکنیک، چون هر ضربه‌ات دیده و اصلاح می‌شه.</p>
-        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
+        <div class="price">۱,۵۰۰,۰۰۰ <small>تومان · هر جلسه</small></div>
+        <span class="pack">پکیج ۱۰ جلسه: <b>۱۲,۰۰۰,۰۰۰</b> تومان</span>
       </article>
 
       <article class="card rv">
@@ -1078,7 +1089,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <h3>کلاس نیمه‌خصوصی</h3>
         <span class="meta">دو نفر، یک مربی</span>
         <p>با دوست، همسر یا هم‌بازیت. هزینه‌ش کمتر از خصوصیه و چون یه نفر روبه‌روته، تمرین امتیازی و بازی واقعی هم می‌شه گذاشت.</p>
-        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
+        <div class="price">۹۰۰,۰۰۰ <small>تومان · نفری، هر جلسه</small></div>
+        <span class="pack">پکیج ۱۰ جلسه: <b>۷,۵۰۰,۰۰۰</b> تومان نفری</span>
       </article>
 
       <article class="card rv">
@@ -1086,7 +1098,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <h3>کلاس گروهی</h3>
         <span class="meta">۳ تا ۴ نفر</span>
         <p>پرانرژی‌ترین کلاس. تمرین، بازی و کمی رقابت دوستانه — برای کسی که می‌خواد کنار یاد گرفتن، آدم‌های جدید هم پیدا کنه.</p>
-        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
+        <div class="price">۶,۰۰۰,۰۰۰ <small>تومان · نفری، ۱۰ جلسه با ۳ نفر</small></div>
+        <span class="pack">با ۴ نفر: <b>۴,۵۰۰,۰۰۰</b> تومان نفری</span>
       </article>
 
       <article class="card rv">
@@ -1094,7 +1107,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <h3>هیتینگ پارتنر</h3>
         <span class="meta">بدون درس · فقط بازی</span>
         <p>وقتی درس نمی‌خوای، توپ خوب می‌خوای. با سابقه‌ی بازی حرفه‌ای و تیم ملی می‌تونم توپ رو با عمق و سرعت ثابت بهت بدم: رالی طولانی، کار روی یه ضربه‌ی خاص، یا ست بازی کردن. هر جا خواستی فشار رو می‌برم بالاتر.</p>
-        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی -->
+        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی — تنها کلاس پولی که قیمتش رو ندادیم -->
       </article>
 
       <article class="card rv" data-only="tennis">
@@ -1117,7 +1130,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
 
     </div>
 
-    <p class="price-note rv">قیمت‌ها و پکیج‌ها رو تو واتساپ بپرس. کلاس‌های استعدادیابی رایگانن و معمولاً پنجشنبه و جمعه برگزار می‌شن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</p>
+    <p class="price-note rv">همه‌ی قیمت‌ها به تومانه. کلاس‌های استعدادیابی رایگانن و معمولاً پنجشنبه و جمعه برگزار می‌شن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</p>
   </div>
 </section>
 
