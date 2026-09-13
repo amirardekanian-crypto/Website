@@ -130,6 +130,17 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   **and drains the queue** right after the email succeeds (proof the network is up), and
   `coach.html`'s `syncGapsOf()` flags any athlete whose `<id>_sent_d<N>` has no matching
   `session_history` row, as a *needs you* reason on the roster.
+  ⚠️ **Until 2026-09-13 `_replayQueue()` also demanded a secret key**, so for every athlete who
+  signs in with a password — none of them has one — neither drain ever ran and a failed save
+  stayed queued for good. It runs on the signed-in session now (`save_session` accepts
+  `current_athlete_id()`), and it re-reads the queue before writing it back, so a save that
+  fails while a replay is still waiting on the network is not erased.
+- **Coach preview (`?preview=1`) must never write.** It runs under Amir's own sign-in, and every
+  athlete RPC accepts `is_coach()` — so a write that is not gated on `IS_PREVIEW` lands in that
+  athlete's real record. Boot skips the backup mirror, the pull, the queue replay and the message
+  fetch; `recordSessionToCloud()`, `sendSession()` (email + record), `_replayQueue()` and
+  `sendCoachReply()` each return early too. Until 2026-09-13 those four did not, and tapping
+  Finish, an RPE or Send while previewing wrote a `session_history` row for the athlete.
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
 - **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, `content/`, and `workouts/`, not here. Ask an AI assistant to guide you before structural edits.
 

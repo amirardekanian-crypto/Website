@@ -279,6 +279,7 @@ Every server-side check now asks the same question — *is this the signed-in at
 |---|---|
 | `get_program(id, key)` | `id = 'demo'` (the public showcase), `is_coach()`, or `id = current_athlete_id()`. Falls through to the key check, which always fails. |
 | `save_progress(...)` | `is_coach()`, or `athlete_id = current_athlete_id()`. Same dead key fallback. |
+| `save_session(...)`, `send_athlete_message(...)`, `mark_athlete_read(...)` | Same: `is_coach()`, or `athlete_id = current_athlete_id()`, then the dead key fallback. The client can pass `p_key: null`. (Checked against the live definitions 2026-09-13 — the migrations `athlete_functions_accept_session` / `_accept_coach` are on the server but not in `supabase/*.sql`.) |
 | `current_athlete_id()` | `select athlete_id from athlete_identities where user_id = auth.uid()` |
 
 So an athlete with **no login has no way in at all** — there is no link to fall back on,
