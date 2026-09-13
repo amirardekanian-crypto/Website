@@ -4303,10 +4303,18 @@ function setupCloudBackup(athleteId, data, key) {
 }
 
 // ── Cloud-session retry queue ──────────────────────────────────────────
-// When save_session fails for any reason (wrong key, offline, Supabase
-// not loaded yet), we store the payload in localStorage and retry on
-// the next load — using the CURRENT key so a key-rotation or a fresh
-// secure-link open automatically heals past failures.
+// When save_session fails for any reason (offline, Supabase not loaded
+// yet, the server refusing the call), we store the payload in localStorage
+// and retry on the next load and again right after a successful Send.
+//
+// ⚠️ NO KEY REQUIRED. Replay used to return early whenever _sbKey was empty,
+// which was harmless while every athlete opened a secret link. Since logins
+// replaced the links (2026-09-07) an athlete who signs in has no key at all,
+// so a save that failed once — no signal in the gym — sat in this queue for
+// ever: the email reached the coach and session_history never got the row.
+// save_session accepts the signed-in session (current_athlete_id()), so
+// replay just calls it; a stored legacy key rides along and changes nothing.
+// A refused replay stays queued, exactly as before.
 function _enqueueSession(base) {
   if (!ATHLETE_ID) return;
   try {
@@ -4318,10 +4326,13 @@ function _enqueueSession(base) {
   } catch (e) {}
 }
 async function _replayQueue() {
-  if (window.IS_DEMO || !ATHLETE_ID || !_sbKey) return;
+  // IS_PREVIEW is checked here and not only at boot: sendSession() drains the
+  // queue too, and coach preview runs under Amir's own sign-in, which
+  // save_session accepts — a replay there would write into the athlete's record.
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
   const k = ATHLETE_ID + '_csq';
   let q; try { q = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return; }
-  if (!q.length) return;
+  if (!Array.isArray(q) || !q.length) return;
   const sb = _sb(); if (!sb) return;
   const failed = [];
   for (const base of q) {
@@ -4330,7 +4341,17 @@ async function _replayQueue() {
       if (error) failed.push(base);
     } catch (e) { failed.push(base); }
   }
-  localStorage.setItem(k, JSON.stringify(failed));
+  // Re-read before writing back. A save that failed WHILE this loop was waiting
+  // on the network (stalled gym wifi) was queued after `q` was read, and writing
+  // `failed` straight over the queue would silently erase it. Keep whatever was
+  // added meanwhile; it supersedes a failed entry for the same day, the same
+  // one-entry-per-day rule _enqueueSession applies.
+  let now; try { now = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { now = []; }
+  if (!Array.isArray(now)) now = [];
+  const tried = new Set(q.map(s => JSON.stringify(s)));
+  const added = now.filter(s => !tried.has(JSON.stringify(s)));
+  const keep  = failed.filter(f => !added.some(a => Number(a.p_day) === Number(f.p_day)));
+  localStorage.setItem(k, JSON.stringify(keep.concat(added).slice(-20)));
 }
 // ──────────────────────────────────────────────────────────────────────
 let STORAGE_KEY = '';
@@ -6061,6 +6082,9 @@ function renderCoachThread() {
   </div>`;
 }
 async function sendCoachReply() {
+  // Coach preview: the composer is on screen, but send_athlete_message accepts the
+  // coach, so a note typed here would be posted as if the athlete had written it.
+  if (window.IS_PREVIEW) return;
   const ta = document.getElementById('coach-reply-input');
   if (!ta) return;
   const body = ta.value.trim();
@@ -8502,9 +8526,13 @@ function buildSessionData(day) {
 // Saves a permanent session record to the cloud (coach dashboard). Called on
 // finish (full OR partial), on later RPE/note edits, and on send — all upsert
 // the same (athlete, day, today) row, so the dashboard always has the latest.
-// On failure the payload is queued in localStorage and replayed on next load.
+// On failure the payload is queued in localStorage and replayed on the next load
+// and again right after a successful Send (see _replayQueue).
 async function recordSessionToCloud(day) {
-  if (window.IS_DEMO || day == null) return;
+  // Never in coach preview. Preview runs under Amir's own sign-in and save_session
+  // accepts the coach, so Finish, an RPE tap or a note typed while looking around
+  // wrote a real session_history row into this athlete's record.
+  if (window.IS_DEMO || window.IS_PREVIEW || day == null) return;
   const D = buildSessionData(day);
   if (!D) return;
   const base = {
@@ -8544,6 +8572,16 @@ async function sendSession(day) {
     status.innerHTML = 'Demo only — in the real app this instantly emails your coach. <a href="/form.html">Apply to get yours →</a>';
     btn.disabled = true;
     btn.textContent = 'Demo — not sent';
+    return;
+  }
+
+  // Coach preview: nothing leaves the page. Sending would email a session report
+  // in the athlete's name and write their session record (see recordSessionToCloud).
+  if (window.IS_PREVIEW) {
+    status.className = 'send-session-status';
+    status.textContent = 'Coach preview — nothing is sent or saved.';
+    btn.disabled = true;
+    btn.textContent = 'Preview — not sent';
     return;
   }
 
