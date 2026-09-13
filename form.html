@@ -1156,49 +1156,69 @@
     });
 
     // ═══════════════════════════════════════════════════════════════════
-    // DISCOUNT CODES — edit this list to add, change, or remove codes.
-    //   'CODE': percent        (codes are matched case-insensitively,
-    //                           so 'SIALASH10' also matches "sialash10")
-    //   e.g. 'SUMMER25': 25  →  someone typing "summer25" gets 25% off
-    // To remove a code, delete its line. To add one, copy a line and
-    // change the text + number. Keep the same format on the Farsi form
-    // (form-fa.html) so a code works on both.
+    // DISCOUNT CODES live in the database now — public.affiliates, managed
+    // from coach.html → Affiliates. There is nothing to edit here any more:
+    // add or retire a code in the dashboard and it works on both forms at once.
+    //
+    // check_discount() answers one question — "is this code live, and for how
+    // much?" — and never returns the list or who owns a code
+    // (supabase/stage29_affiliates.sql). If the check can't be reached, the
+    // code the client typed still goes out in the "Discount Code" field, so a
+    // discount is never lost; it just gets confirmed by hand.
     // ═══════════════════════════════════════════════════════════════════
-    const DISCOUNT_CODES = {
-      'SIALASH10': 10,
-      'MHRN10':    10,
-      'NAVAZI10':  10,
-      'NIK10':     10,
-      'RAHMANI10': 10,
-      'PROTRACK10':10,
-    };
-
     const discountInput   = document.getElementById('discountCode');
     const discountMsg     = document.getElementById('discountMsg');
     const discountApplied = document.getElementById('discountApplied');
+    // discountSeq lets a later keystroke win over a slower earlier check;
+    // discountCheck is the latest check, which the submit handler waits on.
+    let discountSeq = 0, discountTimer = null, discountCheck = Promise.resolve();
 
-    function checkDiscount(showError) {
+    function showDiscount(kind, text) {
+      discountMsg.className = kind ? 'discount-msg show ' + kind : 'discount-msg';
+      discountMsg.textContent = text || '';
+    }
+
+    async function checkDiscount(showError) {
       const raw  = discountInput.value.trim();
       const code = raw.toUpperCase();
-      if (Object.prototype.hasOwnProperty.call(DISCOUNT_CODES, code)) {
-        const pct = DISCOUNT_CODES[code];
-        discountMsg.className = 'discount-msg show ok';
-        discountMsg.textContent = '✓ Code approved — ' + pct + '% off';
+      const seq  = ++discountSeq;
+      discountApplied.value = '';
+      if (!raw) { showDiscount('', ''); return; }
+      let pct;
+      try {
+        const res = await fetch(SB_URL + '/rest/v1/rpc/check_discount', {
+          method: 'POST',
+          headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_code: code })
+        });
+        if (!res.ok) throw new Error('check_discount ' + res.status);
+        pct = await res.json();
+      } catch (err) {
+        if (seq !== discountSeq) return;
+        // Could not ask — so never tell someone a good code is bad.
+        if (showError) showDiscount('err', 'Couldn’t check this code right now — send the form anyway and it will be applied by hand.');
+        return;
+      }
+      if (seq !== discountSeq) return;
+      if (typeof pct === 'number' && pct > 0) {
+        showDiscount('ok', '✓ Code approved — ' + pct + '% off');
         discountApplied.value = code + ' (' + pct + '% off)';
+      } else if (showError) {
+        showDiscount('err', 'Code not recognized — check the spelling');
       } else {
-        discountApplied.value = '';
-        if (raw && showError) {
-          discountMsg.className = 'discount-msg show err';
-          discountMsg.textContent = 'Code not recognized — check the spelling';
-        } else {
-          discountMsg.className = 'discount-msg';
-          discountMsg.textContent = '';
-        }
+        showDiscount('', '');
       }
     }
-    // Success shows as you type; "not recognized" only after you click away.
-    discountInput.addEventListener('input', function () { checkDiscount(false); });
-    discountInput.addEventListener('blur',  function () { checkDiscount(true); });
+    // Success shows as you type (after a short pause); "not recognized" only
+    // after you click away.
+    discountInput.addEventListener('input', function () {
+      clearTimeout(discountTimer);
+      discountTimer = setTimeout(function () { discountCheck = checkDiscount(false); }, 350);
+    });
+    discountInput.addEventListener('blur', function () {
+      clearTimeout(discountTimer);
+      discountCheck = checkDiscount(true);
+    });
 
     // ── Sliders ──────────────────────────────────────────────────────────
     // The range input carries no name. Its value is copied into a hidden
@@ -1362,6 +1382,12 @@
       const originalHTML = btn.innerHTML;
       btn.disabled = true;
       btn.innerHTML = 'Sending…';
+
+      // Tapping Send blurs the code field, which starts a check. Give it a
+      // moment to finish so "Discount Applied" goes out filled in — but never
+      // hold a lead hostage to it: after 2s the form sends regardless, and the
+      // typed code is in "Discount Code" either way.
+      await Promise.race([discountCheck, new Promise(function (r) { setTimeout(r, 2000); })]);
 
       try {
         // Land the submission in Amir's own database first (durable — shows

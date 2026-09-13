@@ -81,6 +81,7 @@ TABLES = [
     "hab_contacts", "hab_titles", "hab_intake", "leaderboard_optin",
     "seasons", "xp_rules", "call_logs", "cycle_reports", "hab_season_results",
     "athlete_keys", "library", "library_categories", "library_sessions",
+    "affiliates",
 ]
 
 

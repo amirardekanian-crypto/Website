@@ -28,7 +28,7 @@ safe to open anywhere — handy for screenshots or design work.
 
 ---
 
-## 2. The five tabs
+## 2. The six tabs
 
 | Tab | What it's for |
 |---|---|
@@ -37,8 +37,9 @@ safe to open anywhere — handy for screenshots or design work.
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done |
 | **Proof** | The board, the season, the signup funnel, titles minted |
 | **Links** | Copyable deep links to every published article and workout |
+| **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
 
-The URL carries the view (`#today`, `#intake`, `#athletes`, `#proof`, `#links`,
+The URL carries the view (`#today`, `#intake`, `#athletes`, `#proof`, `#links`, `#affiliates`,
 `#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any screen can be bookmarked or
 reloaded in place.
 **↻ Refresh** re-pulls everything.
@@ -64,6 +65,49 @@ and the **badge on the tab counts the new ones**:
 Nothing here joins anyone to Proof or writes a programme — it's an inbox. When you take
 a lead on, onboard them the usual way (`/athlete-intake`). Backend, and the coach-only
 guard on every read/write: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
+
+### Affiliates — the referral-code roster
+
+Coaches who refer clients apply through `partner-fa.html` (Farsi only); the application
+arrives as a Web3Forms email — search Gmail for `subject:(Affiliate)`, and check Trash
+too, one has landed there. **This tab is the one list of codes.** `form.html` and
+`form-fa.html` ask the database whether a typed code is live (`check_discount()`), so a
+code added here works on **both** forms the moment you save it, and a retired one stops
+just as fast. Until 2026-09-13 the codes were hand-copied into both form files and the
+roster lived in a public markdown file; two accepted coaches' codes never reached either
+form.
+
+**The deal** (as `partner-fa.html` puts it to the coach): the client gets the code's % off
+(10% on every code so far); the coach earns **10% of what the client actually pays**,
+after the discount, on the first payment **and every renewal** while that client stays on
+the code. No cap. Payout normally within 7 working days of the client's payment clearing.
+It is a referral partnership, not employment — the coach handles their own tax. Either side
+can end it with notice; commission on already-active clients is kept. Every applicant is
+screened, and code misuse (fake codes, spam, promises that can't be kept) ends it.
+
+**Adding a coach:** accept the application → **+ Add code**. The convention is `NAME10`
+(uppercase letters and digits, no spaces); if they asked for something different, say so in
+the notes. Fill in their name (English and Farsi), Instagram, WhatsApp, email and — if they
+also train with you — their athlete id, which links the card to their file.
+
+- **Retire code** — it stops working on both forms immediately. The row stays under
+  *Retired*, so its history and the intakes that used it still add up. **Reactivate**
+  brings it back.
+- A code **can't be renamed** — it is the key. Retire it and add the new one.
+- Each card counts the **intakes that used the code** (typed, or approved on the form) and
+  names them — that is the "who do I owe commission" list.
+- **Unattributed** marks a live code with no owner on file: it discounts every sale it
+  touches with nobody to pay. Settle who it belongs to, or retire it.
+
+⚠️ **Never put payout or card details in this table.** They stay in the application email.
+The table is coach-only, but every **⤓ Backup** file carries the whole of it, and that file
+sits on your PC.
+
+Backend: [`supabase/stage29_affiliates.sql`](supabase/stage29_affiliates.sql). Coach-only
+RLS, and anon has no privileges on the table at all; the forms' only door is
+`check_discount()`, which returns the percent for one exact live code — never the list,
+never an owner. Probing that with guesses is possible, but strictly less than before, when
+every code sat in the forms' page source.
 
 ---
 

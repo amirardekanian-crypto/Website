@@ -188,6 +188,15 @@
   .i-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   .arch-toggle { cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); }
 
+  /* ── Affiliates (referral-code roster — public.affiliates, stage29) ── */
+  .aff-code { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: .02em; }
+  .ipill.pct { background: var(--court-100); color: var(--court); }
+  .ipill.warn { background: var(--clay-100); color: var(--clay); }
+  .ipill.used { background: var(--paper); color: var(--muted); border: 1px solid var(--line); text-transform: none; letter-spacing: 0; font-weight: 600; }
+  .aff-form { padding: 14px 16px; background: var(--court-100); border-radius: 12px; }
+  .aff-form .exf input { min-width: 160px; }
+  .aff-uses { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+
   /* ── Needs you ── */
   .need { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
           padding: 10px 12px; border-radius: 14px; border: 1px solid var(--rule); margin-bottom: 8px;
@@ -824,6 +833,7 @@ const S = {
                    // username/password. Same reason as above: must not be undefined.
   clogs: {},       // athlete_id -> coaching_logs row (metadata only; the body is
                    // fetched on demand, it is long prose).
+  affiliates: [],  // public.affiliates rows — the referral-code roster (coach only).
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
@@ -836,7 +846,7 @@ const S = {
 
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
-  const [prog, hist, msgs, notes, contacts, rules, seasons, titles, optin, intake] = await Promise.all([
+  const [prog, hist, msgs, notes, contacts, rules, seasons, titles, optin, intake, affs] = await Promise.all([
     sb.from('athlete_progress').select('athlete_id, athlete_name, data, updated_at'),
     sb.from('session_history').select('*'),
     sb.from('messages').select('*').order('created_at', { ascending: true }),
@@ -847,6 +857,7 @@ async function loadAll() {
     sb.from('hab_titles').select('*').order('earned_on', { ascending: false }).limit(30),
     sb.from('leaderboard_optin').select('athlete_id, display_name, title'),
     sb.rpc('intake_list'),
+    sb.from('affiliates').select('*').order('code'),
   ]);
   const firstErr = [prog, hist, msgs, notes, rules, seasons, titles, optin].find(r => r && r.error);
   if (firstErr) throw new Error(firstErr.error.message);
@@ -860,6 +871,7 @@ async function loadAll() {
   S.titles = titles.data || [];
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
   S.intake = (intake && intake.data) || [];   // RPC may be missing pre-stage27; degrade quietly
+  S.affiliates = (affs && !affs.error && affs.data) || [];   // table may be missing pre-stage29; degrade quietly
   await loadLogins();
   await loadCoachingLogs();
   await loadLibrary();
@@ -876,6 +888,7 @@ async function refetch(parts) {
   if (parts.includes('rules')) jobs.push(sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle().then(r => { if (!r.error) S.rules = (r.data && r.data.rules) || null; }));
   if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
   if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
+  if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
   if (parts.includes('hist')) jobs.push(sb.from('session_history').select('*').then(r => { if (!r.error) { S.hist = r.data || []; assemble(); } }));
   if (parts.includes('msgs')) jobs.push(sb.from('messages').select('*').order('created_at', { ascending: true }).then(r => { if (!r.error) { S.msgs = r.data || []; assemble(); } }));
   await Promise.all(jobs);
@@ -1087,6 +1100,7 @@ const BACKUP_TABLES = [
   'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules',
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',
+  'affiliates',
 ];
 
 async function downloadBackup(btn) {
@@ -1659,6 +1673,7 @@ const TABS = [
   { id: 'athletes', label: 'Athletes' },
   { id: 'proof', label: 'Proof' },
   { id: 'links', label: 'Links' },
+  { id: 'affiliates', label: 'Affiliates' },
 ];
 // #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its five
 // screens, so any of them can be bookmarked or reloaded in place.
@@ -1700,6 +1715,7 @@ function render() {
   else if (r.view === 'detail') renderDetail(r.id, r.sub);
   else if (r.view === 'proof') renderProof();
   else if (r.view === 'links') renderLinks();
+  else if (r.view === 'affiliates') renderAffiliates();
 }
 window.addEventListener('hashchange', render);
 window.hardRefresh = hardRefresh;
@@ -3640,6 +3656,180 @@ function linkRow(title, url, meta) {
   </div>`;
 }
 
+// --- AFFILIATES (referral-code roster) --------------------------------------
+// public.affiliates is the ONE list of discount codes. form.html and form-fa.html
+// ask check_discount() whether a typed code is live, so a code added here works on
+// both forms immediately and a retired one stops. Coach-only table; payout / card
+// details are deliberately NOT stored — they stay in the Web3Forms application
+// email, so the Backup file never carries them. Backend: supabase/stage29_affiliates.sql.
+const AFF_FIELDS = [
+  ['code', 'Code', 'text'], ['percent', '% off', 'number'],
+  ['coach_name', 'Coach name', 'text'], ['coach_name_fa', 'Name (Farsi)', 'text'],
+  ['instagram', 'Instagram', 'text'], ['whatsapp', 'WhatsApp', 'text'],
+  ['email', 'Email', 'text'], ['athlete_id', 'Athlete id (if they train with you)', 'text'],
+  ['applied_on', 'Applied', 'date'],
+];
+let _affEditing = null;   // the code whose card is in edit mode, '__new__' for the add form, or null
+
+// Iranian mobiles are typed 09…; wa.me needs the country code instead of the 0.
+function affWa(num) {
+  let d = String(num || '').replace(/[^0-9]/g, '');
+  if (/^09\d{9}$/.test(d)) d = '98' + d.slice(1);
+  return d ? 'https://wa.me/' + d : '';
+}
+function affIg(handle) {
+  const h = String(handle || '').trim().replace(/^@/, '');
+  return h ? 'https://instagram.com/' + encodeURIComponent(h) : '';
+}
+// Intakes that used a code: the typed "Discount Code", or the "Discount Applied"
+// the form fills in once the code checks out (e.g. "NIK10 (10% off)").
+function affUses(code) {
+  return (S.intake || []).filter(i => {
+    const p = i.payload || {};
+    const typed = intakeVal(p['Discount Code']).trim().toUpperCase();
+    const applied = intakeVal(p['Discount Applied']).trim().toUpperCase().split(' ')[0];
+    return typed === code || applied === code;
+  });
+}
+
+function affForm(a) {
+  const isNew = !a;
+  const v = a || { percent: 10 };
+  const field = ([k, label, type]) => {
+    const locked = k === 'code' && !isNew;
+    const val = v[k] == null ? '' : v[k];
+    const extra = (type === 'number' ? ' min="1" max="90" step="1"' : '') +
+                  (locked ? ' readonly' : '') + (k === 'code' ? ' style="text-transform:uppercase"' : '');
+    return `<label class="exf"><span>${esc(label)}</span><input type="${type}" data-k="${k}" value="${esc(val)}"${extra}></label>`;
+  };
+  return `<div class="aff-form" data-new="${isNew ? 1 : 0}">
+    <div class="exed-grid">${AFF_FIELDS.map(field).join('')}</div>
+    <label class="exf exf-wide"><span>Notes</span><textarea data-k="notes" rows="3">${esc(v.notes || '')}</textarea></label>
+    ${isNew ? '<p class="empty" style="padding:8px 0 0">Convention is NAME10 — uppercase letters and digits, no spaces. Payout / card details stay in the application email, never here.</p>'
+            : '<p class="empty" style="padding:8px 0 0">A code can’t be renamed — it is the key. Retire it and add the new one, so intakes that used the old code still add up.</p>'}
+    <div class="i-actions"><button class="btn sm primary aff-save">${isNew ? 'Add code' : 'Save'}</button><button class="btn sm aff-cancel">Cancel</button></div>
+  </div>`;
+}
+
+function affCard(a) {
+  const uses = affUses(a.code);
+  const owner = a.coach_name || a.coach_name_fa;
+  const who = owner ? esc(owner) : '<span style="color:var(--clay)">No owner on file</span>';
+  const pills = `<span class="ipill pct">${esc(a.percent)}% off</span>` +
+    (owner ? '' : '<span class="ipill warn">Unattributed</span>') +
+    (uses.length ? `<span class="ipill used">${uses.length} intake${uses.length === 1 ? '' : 's'}</span>` : '');
+  const when = a.active ? (a.applied_on ? 'since ' + esc(a.applied_on) : '') : 'retired ' + esc(a.retired_on || '');
+  const editing = _affEditing === a.code;
+
+  const cbits = [];
+  if (a.instagram) cbits.push(`<a href="${esc(affIg(a.instagram))}" target="_blank" rel="noopener">${esc(a.instagram)}</a>`);
+  if (a.whatsapp) cbits.push(`<a href="${esc(affWa(a.whatsapp))}" target="_blank" rel="noopener">${esc(a.whatsapp)}</a> <button class="btn sm copy-btn-js" data-url="${esc(a.whatsapp)}">Copy</button>`);
+  if (a.email) cbits.push(`<a href="mailto:${esc(a.email)}">${esc(a.email)}</a> <button class="btn sm copy-btn-js" data-url="${esc(a.email)}">Copy</button>`);
+  const contactLine = cbits.join('<span class="dot">·</span>') || '<span class="muted">No contact on file</span>';
+
+  const rows = [];
+  if (a.coach_name && a.coach_name_fa) rows.push(['Farsi name', esc(a.coach_name_fa)]);
+  if (a.athlete_id) rows.push(['Trains with you', `<a href="#a/${encodeURIComponent(a.athlete_id)}">${esc(nameOf(a.athlete_id))}</a>`]);
+  if (a.applied_on) rows.push(['Applied', esc(a.applied_on)]);
+  if (!a.active) rows.push(['Retired', esc(a.retired_on || '—')]);
+  if (a.notes) rows.push(['Notes', esc(a.notes)]);
+  const table = rows.length
+    ? `<table class="meta-table">${rows.map(([k, val]) => `<tr><td class="k">${k}</td><td class="v">${val}</td></tr>`).join('')}</table>` : '';
+  const usedBy = uses.length
+    ? `<div class="aff-uses">Used by: ${uses.map(i => `${esc(intakeName(i))} (${esc(String(i.created_at || '').slice(0, 10))})`).join(', ')}</div>` : '';
+  const acts = `<button class="btn sm aff-edit" data-code="${esc(a.code)}">Edit</button>` + (a.active
+    ? `<button class="btn sm danger aff-retire" data-code="${esc(a.code)}">Retire code</button>`
+    : `<button class="btn sm aff-reactivate" data-code="${esc(a.code)}">Reactivate</button>`);
+
+  return `<details class="intake-card${a.active ? '' : ' archived'}"${editing ? ' open' : ''}>
+    <summary><span class="aff-code">${esc(a.code)}</span><span class="i-name">${who}</span>${pills}<span class="i-when">${when}</span></summary>
+    <div class="i-body">${editing ? affForm(a)
+      : `<div class="i-contact">${contactLine}</div>${table}${usedBy}<div class="i-actions">${acts}</div>`}</div>
+  </details>`;
+}
+
+// PostgREST answers an update that RLS filtered out with success and zero rows,
+// so every write asks for the row back and treats "nothing came back" as failure.
+async function affWrite(q) {
+  const { data, error } = await q.select('code');
+  if (error) return error.message;
+  if (!data || !data.length) return 'nothing was saved (signed in as the coach?)';
+  return null;
+}
+
+async function affSave(formEl, btn) {
+  const isNew = formEl.dataset.new === '1';
+  const row = {};
+  formEl.querySelectorAll('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    let val = String(el.value || '').trim();
+    if (k === 'code') val = val.toUpperCase();
+    row[k] = val === '' ? null : (k === 'percent' ? Number(val) : val);
+  });
+  if (!row.code || !/^[A-Z0-9]{2,32}$/.test(row.code)) { toast('Code must be 2–32 letters or digits, no spaces'); return; }
+  if (!Number.isInteger(row.percent) || row.percent < 1 || row.percent > 90) { toast('% off must be a whole number from 1 to 90'); return; }
+  if (isNew && (S.affiliates || []).some(x => x.code === row.code)) { toast(row.code + ' already exists — edit that one instead'); return; }
+  if (btn) btn.disabled = true;
+  const code = row.code;
+  const patch = Object.assign({}, row); delete patch.code;
+  if (DEMO) {
+    if (isNew) (S.affiliates = S.affiliates || []).push(Object.assign({ active: true, retired_on: null }, row));
+    else Object.assign((S.affiliates || []).find(x => x.code === code) || {}, patch);
+  } else {
+    const err = await affWrite(isNew ? sb.from('affiliates').insert(row) : sb.from('affiliates').update(patch).eq('code', code));
+    if (err) { if (btn) btn.disabled = false; toast('Could not save — ' + err); return; }
+  }
+  _affEditing = null;
+  toast(DEMO ? 'Demo mode — nothing saved' : (isNew ? code + ' is live on both apply forms' : 'Saved'));
+  if (DEMO) renderAffiliates(); else await refetch(['affiliates']);
+}
+
+async function affSetActive(code, active, btn) {
+  if (!active && !confirm(`Retire ${code}?\n\nIt stops working on both apply forms straight away. The row stays, so its history and the intakes that used it are kept.`)) return;
+  const patch = active ? { active: true, retired_on: null } : { active: false, retired_on: todayKey() };
+  if (btn) btn.disabled = true;
+  if (DEMO) {
+    Object.assign((S.affiliates || []).find(x => x.code === code) || {}, patch);
+  } else {
+    const err = await affWrite(sb.from('affiliates').update(patch).eq('code', code));
+    if (err) { if (btn) btn.disabled = false; toast('Could not update — ' + err); return; }
+  }
+  toast(DEMO ? 'Demo mode — nothing saved' : (active ? code + ' is live again' : code + ' retired'));
+  if (DEMO) renderAffiliates(); else await refetch(['affiliates']);
+}
+
+function renderAffiliates() {
+  const all = (S.affiliates || []).slice().sort((a, b) =>
+    String(b.applied_on || '').localeCompare(String(a.applied_on || '')) || String(a.code).localeCompare(String(b.code)));
+  const live = all.filter(a => a.active), retired = all.filter(a => !a.active);
+  const orphans = live.filter(a => !a.coach_name && !a.coach_name_fa).length;
+
+  let html = `<div class="controls">
+      <button class="btn primary sm" id="affAdd">+ Add code</button>
+      <span class="empty" style="align-self:center">These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.</span>
+    </div>`;
+  if (_affEditing === '__new__') html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New code</span></div>${affForm(null)}</section>`;
+  html += `<section class="panel"><div class="phead"><span class="t hd">Live codes</span><span class="r">${live.length} live${orphans ? ` · <span style="color:var(--clay)">${orphans} with no owner</span>` : ''}</span></div>`;
+  html += live.length ? live.map(affCard).join('')
+    : '<p class="empty">No live codes. When you accept a coach from partner-fa.html, add their code here.</p>';
+  html += `<p class="psub" style="margin:12px 0 0">The deal: the client gets the code's % off; the coach earns 10% of what the client actually pays — first payment and every renewal. Payout details stay in the application email (Gmail, subject:(Affiliate)).</p></section>`;
+  if (retired.length) {
+    const openRetired = retired.some(a => a.code === _affEditing) ? ' open' : '';
+    html += `<section class="panel" style="margin-top:16px"><details${openRetired}><summary class="arch-toggle">Retired · ${retired.length}</summary><div style="margin-top:12px">${retired.map(affCard).join('')}</div></details></section>`;
+  }
+
+  const c = $('content');
+  c.innerHTML = html;
+  const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
+  on('.copy-btn-js', el => copyText(el.dataset.url, el));
+  on('#affAdd', () => { _affEditing = '__new__'; renderAffiliates(); });
+  on('.aff-edit', el => { _affEditing = el.dataset.code; renderAffiliates(); });
+  on('.aff-cancel', () => { _affEditing = null; renderAffiliates(); });
+  on('.aff-save', el => affSave(el.closest('.aff-form'), el));
+  on('.aff-retire', el => affSetActive(el.dataset.code, false, el));
+  on('.aff-reactivate', el => affSetActive(el.dataset.code, true, el));
+}
+
 // --- INTAKE (coaching apply-form submissions) -------------------------------
 // form.html / form-fa.html write here via submit_intake(); Amir reads them here.
 // The Web3Forms email still fires too — this table is the durable copy so a
@@ -3903,13 +4093,19 @@ function demoStore() {
   ];
   S.intake = [
     { id: 'demo-i1', created_at: new Date(Date.now() - 3 * 3600000).toISOString(), lang: 'en', name: 'Marcus Vale', email: 'marcus@example.com', contact: '@marcus.plays', programme: 'Match — $300 / 6 months', status: 'new',
-      payload: { 'First Name': 'Marcus', 'Last Name': 'Vale', 'Email': 'marcus@example.com', 'Programme': 'Match — $300 / 6 months', 'Age': '28', 'Biological Sex': 'Male', 'Activity Type': 'Tennis', 'Competitive Level': 'National', 'Goals': ['Serve power', 'On-court endurance'], 'Environment': 'Full gym', 'Available Days': '5', 'Session Length': '60–75 min', 'Current Injury': 'No', 'Sleep Hours': '7' } },
+      payload: { 'First Name': 'Marcus', 'Last Name': 'Vale', 'Email': 'marcus@example.com', 'Programme': 'Match — $300 / 6 months', 'Age': '28', 'Biological Sex': 'Male', 'Activity Type': 'Tennis', 'Competitive Level': 'National', 'Goals': ['Serve power', 'On-court endurance'], 'Environment': 'Full gym', 'Available Days': '5', 'Session Length': '60–75 min', 'Current Injury': 'No', 'Sleep Hours': '7', 'Discount Code': 'court10', 'Discount Applied': 'COURT10 (10% off)' } },
     { id: 'demo-i2', created_at: new Date(Date.now() - 26 * 3600000).toISOString(), lang: 'fa', name: 'Negar Mousavi', email: 'negar@example.com', contact: '+98 912 345 6789', programme: null, status: 'new',
       payload: { 'First Name': 'Negar', 'Last Name': 'Mousavi', 'Email': 'negar@example.com', 'Location': 'Tehran', 'Age': '34', 'Activity Level': 'Intermediate', 'Goals': ['Weight loss', 'Strength'], 'Available Days': '4', 'Session Length': '45 min' } },
     { id: 'demo-i3', created_at: new Date(Date.now() - 5 * 86400000).toISOString(), lang: 'en', name: 'Dana Reid', email: 'dana@example.com', contact: '@dana.padel', programme: 'Set — $180 / 3 months', status: 'handled',
       payload: { 'First Name': 'Dana', 'Last Name': 'Reid', 'Email': 'dana@example.com', 'Programme': 'Set — $180 / 3 months', 'Activity Type': 'Padel', 'Goals': ['Agility'], 'Available Days': '3' } },
     { id: 'demo-i4', created_at: new Date(Date.now() - 9 * 86400000).toISOString(), lang: 'en', name: 'No Reply', email: 'noreply@x.com', contact: '', programme: null, status: 'archived',
       payload: { 'First Name': 'No', 'Last Name': 'Reply', 'Email': 'noreply@x.com', 'Goals': ['—'] } },
+  ];
+  S.affiliates = [
+    { code: 'COURT10', percent: 10, coach_name: 'Leila Demo', coach_name_fa: 'لیلا دمو', instagram: '@leila.demo', whatsapp: '09120000000', email: 'leila@example.com', athlete_id: 'pegah_hmt2', applied_on: d(40), active: true, retired_on: null, notes: 'Tennis coach, ~8 athletes. Demo row — nothing here is real.' },
+    { code: 'PADEL15', percent: 15, coach_name: 'Sam Example', coach_name_fa: null, instagram: '@sam.example', whatsapp: '+44 7000 000001', email: null, athlete_id: null, applied_on: d(6), active: true, retired_on: null, notes: 'Affiliate only — not one of your athletes.' },
+    { code: 'MYSTERY10', percent: 10, coach_name: null, coach_name_fa: null, instagram: null, whatsapp: null, email: null, athlete_id: null, applied_on: null, active: true, retired_on: null, notes: 'Live with no application on file.' },
+    { code: 'OLDCODE10', percent: 10, coach_name: 'Retired Example', coach_name_fa: null, instagram: '@retired.example', whatsapp: null, email: null, athlete_id: null, applied_on: d(90), active: false, retired_on: d(12), notes: 'Partnership ended.' },
   ];
   S.rules = {
     quests: [
