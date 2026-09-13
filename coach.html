@@ -3682,7 +3682,7 @@ function affIg(handle) {
   return h ? 'https://instagram.com/' + encodeURIComponent(h) : '';
 }
 // Intakes that used a code: the typed "Discount Code", or the "Discount Applied"
-// the form fills in once the code checks out (e.g. "NIK10 (10% off)").
+// the form fills in once the code checks out (e.g. "NAME10 (10% off)").
 function affUses(code) {
   return (S.intake || []).filter(i => {
     const p = i.payload || {};
