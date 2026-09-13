@@ -141,6 +141,23 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   fetch; `recordSessionToCloud()`, `sendSession()` (email + record), `_replayQueue()` and
   `sendCoachReply()` each return early too. Until 2026-09-13 those four did not, and tapping
   Finish, an RPE or Send while previewing wrote a `session_history` row for the athlete.
+  `markLibraryDone()` already checked `IS_PREVIEW` from the start.
+- **`habits.html` had the same hole, in six places** (fixed 2026-09-13, same review pass). Their
+  "Their app" tile on `coach.html` opens `habits.html?client=<id>&preview=1` the same way, on the
+  same sign-in. `joinBoard()` (Crew's Join/Rename/Leave), `postNote()` (the roll-call composer),
+  `pushTitle()` (equipping a title in the Locker — reachable directly, and via `joinBoard()`),
+  `syncTitles()` and `autoJoinBoard()` (both unconditional on every boot) and `refreshNotePct()`
+  (fired from `saveLog()` on every single habit tick — the most ordinary tap in the app) had no
+  `IS_PREVIEW` check of their own, only `IS_DEMO`. All six now return early — `joinBoard()` and
+  `postNote()`, the ones a tap would otherwise leave looking like nothing happened, toast **"Coach
+  preview — nothing is saved."**; the rest (boot-time or already visually complete before the
+  write) stay silent, matching how `IS_DEMO` already behaved everywhere. `pushNow()` itself also
+  gained the check — it is not reachable from a tap, but `loadLocal()` restores `SYNC.dirty`
+  straight from `<id>_hab_meta` in this browser's own storage, and boot/pagehide/visibilitychange
+  call `pushNow()` directly whenever that flag is true, with no `markDirty()` (already gated)
+  involved. On a machine that had ever loaded that athlete outside preview, a stale `dirty:true`
+  would have uploaded whatever CFG/LOG this browser held under their key over their real cloud
+  row — the same class of bug, just triggered by leftover local state instead of a tap.
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
 - **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, `content/`, and `workouts/`, not here. Ask an AI assistant to guide you before structural edits.
 

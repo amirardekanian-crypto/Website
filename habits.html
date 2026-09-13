@@ -4079,7 +4079,16 @@ function markDirty() {
   _pushTimer = setTimeout(pushNow, 1200);
 }
 async function pushNow() {
-  if (window.IS_DEMO || !ATHLETE_ID || !SYNC.dirty) return SYNC.dirty === false;
+  // Coach preview: markDirty() already refuses to set SYNC.dirty, but a device
+  // that PREVIOUSLY loaded this athlete outside preview can still have
+  // `dirty:true` sitting in <id>_hab_meta — loadLocal() restores it straight
+  // from localStorage, no markDirty() involved — and boot/pagehide/
+  // visibilitychange all call pushNow() directly whenever SYNC.dirty is true.
+  // Without this check that stale flag would upload whatever CFG/LOG happen to
+  // be in this browser's storage under the athlete's key, overwriting their
+  // real cloud record. This is the one place that check has to live, since
+  // every push path funnels through here.
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !SYNC.dirty) return SYNC.dirty === false;
   // A push already in flight is not a reason to drop this one — its payload was
   // built before the write that woke us, so it cannot contain it. Used to
   // return silently and schedule nothing, which is how an edit went missing.
@@ -5514,7 +5523,11 @@ function hasFinishedAWorkout() {
 }
 
 async function autoJoinBoard() {
-  if (window.IS_DEMO) return;
+  // Coach preview: runs unconditionally on every boot, and CFG/LOG here are
+  // whatever this browser has stored locally under the athlete's key — not a
+  // reliable signal that the real athlete never trained. Never let the sweep
+  // fire against their real board row.
+  if (window.IS_DEMO || window.IS_PREVIEW) return;
   if (CFG.boardSwept) return;
   if (CFG.onBoard) { CFG.boardSwept = true; saveCfg(); return; }  // already on
   // ⚠️ Gated on having finished a workout (Amir, 2026-09-12, revising the
@@ -5541,6 +5554,10 @@ async function autoJoinBoard() {
 
 async function joinBoard(name, joining) {
   if (window.IS_DEMO) { toast('Demo mode — the board is live only for real athletes.'); return; }
+  // Reachable from Crew's Join/Rename/Leave buttons while previewing — say so
+  // rather than letting the tap look like it worked and quietly change the
+  // athlete's real board row.
+  if (window.IS_PREVIEW) { toast('Coach preview — nothing is saved.'); return; }
   try {
     const sb = _sb();
     if (!sb) throw new Error('offline');
@@ -5574,7 +5591,9 @@ async function joinBoard(name, joining) {
 // copy is what survives a cleared browser; the client's is what survives being
 // offline; the union is the truth, and neither side is allowed to subtract.
 async function syncTitles() {
-  if (window.IS_DEMO) return;
+  // Runs unconditionally on every boot, including a coach preview — must not
+  // mint/claim titles against the athlete's real record.
+  if (window.IS_DEMO || window.IS_PREVIEW) return;
   const sb = _sb();
   if (!sb) return;
   try {
@@ -5601,7 +5620,10 @@ async function syncTitles() {
 //   · a refusal takes the title OFF, and never out of `owned`. Wearing is
 //     revocable, owning is not — that is the whole promise of the track.
 async function pushTitle() {
-  if (window.IS_DEMO || !CFG.onBoard) return;
+  // Called from joinBoard() and from wear() in the Locker (equipping a title
+  // is a real tap in preview). The equip already happened locally and
+  // rendered; this just must not publish it to the athlete's real board row.
+  if (window.IS_DEMO || window.IS_PREVIEW || !CFG.onBoard) return;
   const sb = _sb();
   if (!sb) return;
   try {
@@ -5678,6 +5700,10 @@ function setMyNote(k, body) {
 async function postNote(body) {
   const k = TKEY(), clean = String(body || '').replace(/\s+/g, ' ').trim().slice(0, NOTE_MAX);
   if (window.IS_DEMO) { toast('Demo mode — the wall is live only for real athletes.'); return; }
+  // Reachable from the roll-call composer (Post it / Change it / Delete) while
+  // previewing — a post here would go on the wall visible to everyone on the
+  // athlete's board, under their name.
+  if (window.IS_PREVIEW) { toast('Coach preview — nothing is saved.'); return; }
   if (!CFG.onBoard) { toast('Join the board first — that is where your name comes from.'); return; }
   UI.noteBusy = true; render();
   try {
@@ -5705,7 +5731,12 @@ async function postNote(body) {
 // you keep logging afterwards, quietly bring it up to date rather than leaving
 // "38%" under a sentence written at lunchtime on a day you went on to finish.
 function refreshNotePct() {
-  if (!myNote(TKEY()) || !CFG.onBoard || window.IS_DEMO) return;
+  // Called from saveLog() on every single habit tick, so this fires on the
+  // most ordinary tap there is while previewing. No preview visit could have a
+  // real note of its own — myNote()/CFG.onBoard only read whatever this
+  // browser happens to have stored locally for the athlete's key — so treat
+  // any of that as untrustworthy here too.
+  if (!myNote(TKEY()) || !CFG.onBoard || window.IS_DEMO || window.IS_PREVIEW) return;
   clearTimeout(_notePctTimer);
   _notePctTimer = setTimeout(() => {
     const sb = _sb();
@@ -9811,6 +9842,10 @@ function renderSettings() {
         ${navRow('☁️', 'Sync', 'Everything is saved here first, then sent up',
                  `<span class="navval" data-sync>${esc(syncLabel())}</span>`,
                  async () => { if (window.IS_DEMO) { toast('Demo mode — nothing is sent.'); return; }
+                               // pushNow() already refuses to run in preview, but without this
+                               // the tap would fall through to the "up to date" toast — a lie,
+                               // since nothing was ever attempted.
+                               if (window.IS_PREVIEW) { toast('Coach preview — nothing is saved.'); return; }
                                markDirty(); await pushNow();
                                toast(SYNC.dirty ? 'Still offline — it is saved here and will go up on its own.' : 'Everything is up to date.'); })}
         <!-- Destructive, so it asks once. The armed state disarms itself after a
