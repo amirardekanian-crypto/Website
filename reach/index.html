@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>آزمون دسترسی · AA Performance</title>
+<!--
+  Reachability probe for athletes inside Iran (Tennis Performance System plan, Phase 0).
+  It measures which services a phone can reach, VPN on and off, and prints one line the
+  athlete screenshots and sends to Amir.
+
+  ⚠️ Keep this page COMPLETELY self-contained: no external CSS, fonts, scripts or analytics,
+  because every one of those is itself something that may be blocked, and it would stop the
+  probe loading at all. It stores nothing and sends nothing except the test requests below
+  (the Supabase calls carry only the public publishable key; the upload test sends padding).
+
+  The root /sw.js leaves /reach/ alone (v7). Without that, the athlete app's worker would
+  answer this page and pad.bin from cache and "works without a VPN" would be a false result.
+
+  Result line fields: version | origin | ISP | vpn0/1 | day/eve | tests... | sw (a worker
+  controls the page) | net (page came over the network) | pwa | pers (persistent storage) |
+  q (storage quota) | c (connection type) | skew (device clock minus server clock) | OS-browser
+-->
+<style>
+  :root{--green:#0E4A36;--clay:#C7552F;--paper:#FAF7F2;--line:#E4DDD0;--ink:#1F2A24;--muted:#66756C}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.85 Vazirmatn,Tahoma,"Segoe UI",system-ui,sans-serif}
+  main{max-width:520px;margin:0 auto;padding:24px 18px 56px}
+  h1{font-size:23px;line-height:1.5;margin:0 0 8px;color:var(--green)}
+  p{margin:0 0 14px}
+  .muted{color:var(--muted);font-size:15px}
+  fieldset{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px 14px 14px;margin:0 0 14px}
+  legend{font-weight:700;padding:0 6px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opts label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:16px;cursor:pointer;background:#fff}
+  .opts input{accent-color:var(--green);width:18px;height:18px;margin:0}
+  button{font:inherit;border:0;border-radius:12px;padding:12px 18px;cursor:pointer}
+  #go{width:100%;background:var(--green);color:#fff;font-weight:700;font-size:17px}
+  #go:disabled{opacity:.5;cursor:default}
+  #steps{list-style:none;padding:0;margin:16px 0 0}
+  #steps li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:6px 0;font-size:15px}
+  .ok{color:var(--green);font-weight:700}
+  .bad{color:var(--clay);font-weight:700}
+  .wait{color:var(--muted)}
+  #out[hidden],#old[hidden]{display:none}
+  #out{margin-top:18px}
+  #line{direction:ltr;text-align:left;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:#fff;border:2px solid var(--green);border-radius:12px;padding:12px;word-break:break-all;-webkit-user-select:all;user-select:all}
+  #copy{margin-top:10px;background:var(--clay);color:#fff;font-weight:700}
+  #old{background:#fff;border:2px solid var(--clay);border-radius:12px;padding:12px}
+</style>
+</head>
+<body>
+<main>
+  <h1>آزمون دسترسی</h1>
+  <p>این صفحه فقط بررسی می‌کند اینترنت شما به چند سرویس می‌رسد یا نه، و با چه سرعتی. هیچ اطلاعات شخصی ذخیره یا ارسال نمی‌شود. حدود یک دقیقه طول می‌کشد.</p>
+  <p class="muted">لطفاً یک بار با فیلترشکن خاموش و یک بار با فیلترشکن روشن انجام دهید.</p>
+
+  <p id="old" hidden>مرورگر شما خیلی قدیمی است و این آزمون روی آن اجرا نمی‌شود. لطفاً همین را برای امیر بنویسید، همراه با مدل گوشی.</p>
+
+  <fieldset>
+    <legend>اپراتور اینترنت شما</legend>
+    <div class="opts" id="isp">
+      <label><input type="radio" name="isp" value="MCI">همراه اول</label>
+      <label><input type="radio" name="isp" value="MTN">ایرانسل</label>
+      <label><input type="radio" name="isp" value="RTL">رایتل</label>
+      <label><input type="radio" name="isp" value="TCI">مخابرات (ADSL / فیبر)</label>
+      <label><input type="radio" name="isp" value="SHT">شاتل</label>
+      <label><input type="radio" name="isp" value="AST">آسیاتک</label>
+      <label><input type="radio" name="isp" value="OTH">سایر</label>
+      <label><input type="radio" name="isp" value="OUT">خارج از ایران</label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>فیلترشکن (VPN)</legend>
+    <div class="opts" id="vpn">
+      <label><input type="radio" name="vpn" value="vpn0">خاموش</label>
+      <label><input type="radio" name="vpn" value="vpn1">روشن</label>
+    </div>
+  </fieldset>
+
+  <button id="go" type="button" disabled>شروع آزمون</button>
+  <ul id="steps"></ul>
+
+  <div id="out" hidden>
+    <p>تمام شد. از کادر زیر اسکرین‌شات بگیرید یا «کپی» را بزنید و برای امیر بفرستید.</p>
+    <div id="line"></div>
+    <button id="copy" type="button">کپی</button>
+  </div>
+</main>
+
+<script>
+  // Separate classic script with no modern syntax: if the main script below fails to parse
+  // on a very old browser, this one still tells the athlete what to report.
+  if (typeof window.fetch !== 'function' || typeof window.Promise !== 'function') {
+    document.getElementById('old').hidden = false;
+  }
+</script>
+
+<script>
+(function () {
+  'use strict';
+  if (typeof window.fetch !== 'function' || typeof window.Promise !== 'function') return;
+
+  var V = 'v1';
+  var SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
+  var SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';   // public; already in program.html
+  var YT_ID = 'f2gbLLXVGFE';        // "Ankle Dorsiflexion Rocks" in exercise_library.json
+  var TIMEOUT = 12000;
+  // Second origin (O2) on a different network and certificate authority, once it exists.
+  // Each entry is probed with a no-cors request to its /favicon.ico.
+  var PEERS = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var SKEW = null;
+
+  function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
+  function bust() { return 'r=' + Date.now().toString(36) + Math.floor(Math.random() * 1e9).toString(36); }
+  function withQ(url) { return url + (url.indexOf('?') < 0 ? '?' : '&') + bust(); }
+  function race(p, ms) {
+    return Promise.race([p, new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timeout')); }, ms); })]);
+  }
+
+  // fetch with a hard timeout. no-cors requests resolve on ANY HTTP answer (even 404) and
+  // reject only when the network could not reach the host, which is exactly what we want.
+  async function tfetch(url, opts, readBody) {
+    var t0 = now();
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, TIMEOUT) : null;
+    try {
+      var o = Object.assign({ cache: 'no-store', credentials: 'omit' }, opts || {});
+      if (ctl) o.signal = ctl.signal;
+      var r = await race(fetch(url, o), TIMEOUT + 500);
+      var bytes = 0;
+      if (readBody) { var b = await race(r.arrayBuffer(), TIMEOUT + 500); bytes = b.byteLength; }
+      if (timer) clearTimeout(timer);
+      return { ok: true, status: r.status, opaque: r.type === 'opaque', ms: Math.round(now() - t0), bytes: bytes,
+               date: r.type === 'basic' ? r.headers.get('date') : null };
+    } catch (e) {
+      if (timer) clearTimeout(timer);
+      var ms = Math.round(now() - t0);
+      var timedOut = ms >= TIMEOUT - 100 || (e && (e.name === 'AbortError' || e.message === 'timeout'));
+      return { ok: false, err: timedOut ? 'timeout' : 'fail', ms: ms };
+    }
+  }
+
+  // An <img> load proves the host served a real image (an iframe's load event would not).
+  function imgTest(url) {
+    return new Promise(function (resolve) {
+      var t0 = now(), done = false, img = new Image();
+      function finish(res) { if (done) return; done = true; clearTimeout(to); img.onload = img.onerror = null; resolve(res); }
+      var to = setTimeout(function () { finish({ ok: false, err: 'timeout', ms: TIMEOUT }); }, TIMEOUT);
+      img.onload = function () { finish({ ok: true, ms: Math.round(now() - t0) }); };
+      img.onerror = function () { finish({ ok: false, err: 'fail', ms: Math.round(now() - t0) }); };
+      img.referrerPolicy = 'no-referrer';
+      img.src = withQ(url);
+    });
+  }
+
+  function code(id, r, opts) {
+    opts = opts || {};
+    if (!r.ok) return { pass: false, text: id + ':' + r.err };
+    if (opts.expect200 && r.status !== 200) return { pass: false, text: id + ':http' + r.status + ':' + r.ms + 'ms' };
+    var s = id + ':ok:' + r.ms + 'ms';
+    if (opts.extra) s += ':' + opts.extra;
+    return { pass: true, text: s };
+  }
+
+  var PAD64 = null, PAD256 = null;
+  function pad(n) { return JSON.stringify({ pad: new Array(n + 1).join('x') }); }
+
+  var TESTS = [
+    { id: 'T1', fa: 'دانلود از همین سایت', run: async function () {
+        var r = await tfetch(withQ('/reach/pad.bin'), {}, true);
+        if (r.ok && r.status === 200 && r.bytes > 0) {
+          if (r.date) SKEW = Math.round((Date.now() - Date.parse(r.date)) / 1000);
+          return code('T1', r, { extra: Math.round(r.bytes * 8 / Math.max(r.ms, 1)) + 'kbps' });
+        }
+        return code('T1', r, { expect200: true });
+    } },
+    { id: 'T2', fa: 'سرور ورود به حساب', run: async function () {
+        return code('T2', await tfetch(SB_URL + '/auth/v1/settings', { headers: { apikey: SB_KEY } }), { expect200: true });
+    } },
+    { id: 'T3', fa: 'دریافت داده از سرور', run: async function () {
+        return code('T3', await tfetch(SB_URL + '/rest/v1/rpc/get_library', {
+          method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: '{}' }, true), { expect200: true });
+    } },
+    { id: 'T4a', fa: 'ارسال دادهٔ کوچک (۶۴ کیلوبایت)', run: async function () {
+        // The server answers "no such function" (404) on purpose: only the upload time matters.
+        PAD64 = PAD64 || pad(64000);
+        return code('T4a', await tfetch(SB_URL + '/rest/v1/rpc/get_library', {
+          method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: PAD64 }));
+    } },
+    { id: 'T4b', fa: 'ارسال دادهٔ بزرگ (۲۵۶ کیلوبایت)', run: async function () {
+        PAD256 = PAD256 || pad(256000);
+        return code('T4b', await tfetch(SB_URL + '/rest/v1/rpc/get_library', {
+          method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: PAD256 }));
+    } },
+    { id: 'YT', fa: 'تصویر یوتیوب', run: async function () {
+        return code('YT', await imgTest('https://i.ytimg.com/vi/' + YT_ID + '/default.jpg'));
+    } },
+    { id: 'NC', fa: 'پخش‌کنندهٔ یوتیوب (nocookie)', run: async function () {
+        return code('NC', await tfetch(withQ('https://www.youtube-nocookie.com/favicon.ico'), { mode: 'no-cors' }));
+    } },
+    { id: 'AP', fa: 'آپارات', run: async function () {
+        return code('AP', await tfetch(withQ('https://www.aparat.com/favicon.ico'), { mode: 'no-cors' }));
+    } },
+    { id: 'JD', fa: 'کتابخانهٔ برنامه (jsDelivr)', run: async function () {
+        return code('JD', await tfetch('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/package.json', { mode: 'no-cors' }));
+    } },
+    { id: 'GF', fa: 'فونت گوگل', run: async function () {
+        return code('GF', await tfetch('https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap', { mode: 'no-cors' }));
+    } }
+  ];
+  PEERS.forEach(function (peer, i) {
+    var id = 'P' + (i + 1);
+    TESTS.push({ id: id, fa: 'میزبان دوم', run: async function () {
+      return code(id, await tfetch(withQ(peer.replace(/\/$/, '') + '/favicon.ico'), { mode: 'no-cors' }));
+    } });
+  });
+
+  function picked(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function refresh() { $('go').disabled = !(picked('isp') && picked('vpn')); }
+  $('isp').addEventListener('change', refresh);
+  $('vpn').addEventListener('change', refresh);
+
+  function originLabel() {
+    var h = location.hostname;
+    if (h === 'www.amirardekani.com') return 'O1';
+    if (h === 'amirardekani.com') return 'O1apex';
+    return h.replace(/[^a-z0-9.-]/gi, '') || 'local';
+  }
+
+  function uaShort() {
+    var u = navigator.userAgent, m;
+    var os = /iPhone|iPad|iPod/.test(u) ? 'iOS' + (((m = u.match(/OS (\d+)[_.]/)) && m[1]) || '')
+      : (m = u.match(/Android (\d+)/)) ? 'And' + m[1]
+      : /Windows/.test(u) ? 'Win' : /Mac OS X/.test(u) ? 'Mac' : /Linux/.test(u) ? 'Lin' : 'Oth';
+    var br = (m = u.match(/CriOS\/(\d+)/)) ? 'CrI' + m[1]
+      : (m = u.match(/FxiOS\/(\d+)/)) ? 'FxI' + m[1]
+      : (m = u.match(/EdgA?\/(\d+)/)) ? 'Edg' + m[1]
+      : (m = u.match(/SamsungBrowser\/(\d+)/)) ? 'Sam' + m[1]
+      : (m = u.match(/Chrome\/(\d+)/)) ? 'Chr' + m[1]
+      : (m = u.match(/Firefox\/(\d+)/)) ? 'Ff' + m[1]
+      : (m = u.match(/Version\/(\d+).*Safari/)) ? 'Saf' + m[1] : 'Br';
+    return os + '-' + br;
+  }
+
+  async function envParts() {
+    var p = [];
+    p.push('sw' + ((navigator.serviceWorker && navigator.serviceWorker.controller) ? 1 : 0));
+    try {
+      var nav = performance.getEntriesByType('navigation')[0];
+      p.push('net' + (nav && typeof nav.transferSize === 'number' ? (nav.transferSize > 0 ? 1 : 0) : 'x'));
+    } catch (_) { p.push('netx'); }
+    var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    p.push('pwa' + (standalone ? 1 : 0));
+    try {
+      if (navigator.storage && navigator.storage.persisted) p.push('pers' + ((await navigator.storage.persisted()) ? 1 : 0));
+      else p.push('persx');
+    } catch (_) { p.push('persx'); }
+    try {
+      if (navigator.storage && navigator.storage.estimate) {
+        var q = await navigator.storage.estimate();
+        if (q && q.quota) p.push('q' + Math.round(q.quota / 1048576) + 'MB');
+      }
+    } catch (_) {}
+    if (navigator.connection && navigator.connection.effectiveType) p.push('c' + navigator.connection.effectiveType);
+    p.push('skew:' + (SKEW === null ? 'x' : (SKEW >= 0 ? '+' : '') + SKEW + 's'));
+    p.push(uaShort());
+    return p;
+  }
+
+  async function run() {
+    $('go').disabled = true;
+    $('out').hidden = true;
+    SKEW = null;
+    var list = $('steps');
+    list.innerHTML = '';
+    var hour = new Date().getHours();
+    var parts = [V, originLabel(), picked('isp'), picked('vpn'), (hour >= 7 && hour < 19) ? 'day' : 'eve'];
+
+    for (var i = 0; i < TESTS.length; i++) {
+      var t = TESTS[i];
+      var li = document.createElement('li');
+      var name = document.createElement('span');
+      var state = document.createElement('span');
+      name.textContent = t.fa;
+      state.textContent = '…';
+      state.className = 'wait';
+      li.appendChild(name); li.appendChild(state);
+      list.appendChild(li);
+      var res;
+      try { res = await t.run(); } catch (_) { res = { pass: false, text: t.id + ':error' }; }
+      state.textContent = res.pass ? '✓' : '✗';
+      state.className = res.pass ? 'ok' : 'bad';
+      parts.push(res.text);
+    }
+
+    parts = parts.concat(await envParts());
+    $('line').textContent = parts.join('|');
+    $('out').hidden = false;
+    $('go').textContent = 'دوباره';
+    refresh();
+  }
+
+  $('go').addEventListener('click', function () { run(); });
+
+  $('copy').addEventListener('click', function () {
+    var text = $('line').textContent;
+    function flash() { $('copy').textContent = 'کپی شد ✓'; setTimeout(function () { $('copy').textContent = 'کپی'; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flash, fallback);
+    } else { fallback(); }
+    function fallback() {
+      var range = document.createRange();
+      range.selectNodeContents($('line'));
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      try { document.execCommand('copy'); flash(); } catch (_) {}
+    }
+  });
+})();
+</script>
+</body>
+</html>

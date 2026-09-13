@@ -13,7 +13,11 @@
 // moved from the full URL to the pathname, so a v4 cache would miss every one.
 // v6: the login screen is the Baseline design now — it loads court-sessions.jpg,
 // which joins the pre-cache so the second open never waits for it.
-const CACHE = 'aap-v6';
+// v7: the shell did not change. The worker now leaves /reach/ and /tennis/ alone (the
+// Iran reachability probe, and the future paid course, which ships its own worker),
+// and activate deletes only this app's own aap-* caches, so a bump here can never wipe
+// another app's offline copy on the same origin.
+const CACHE = 'aap-v7';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -39,12 +43,15 @@ self.addEventListener('install', e => {
   );
 });
 
-// Activate: wipe any caches from older SW versions, take control of all open tabs now.
+// Activate: wipe THIS app's older caches, take control of all open tabs now.
+// ⚠️ Cache Storage is shared by the whole origin. The old filter (`k !== CACHE`) deleted
+// every other cache too, so each bump here would silently destroy the offline copy of any
+// other app on amirardekani.com. Only ever delete the aap- prefix.
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+        keys.filter(k => k.startsWith('aap-') && k !== CACHE).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );
@@ -84,6 +91,13 @@ self.addEventListener('fetch', e => {
 
   // Only intercept same-origin requests.
   if (url.origin !== location.origin) return;
+
+  // Hands off /reach/ and /tennis/. This worker's scope is '/', so without this it would
+  // answer those pages from its own cache: the reachability probe would then report
+  // "opens without a VPN" from a cached copy on exactly the phones being tested, and the
+  // paid course app (which has its own worker and caches) would get stale files pinned.
+  // Returning without respondWith() sends the request to the network untouched.
+  if (/^\/(reach|tennis)(\/|$)/.test(url.pathname)) return;
 
   // HTML (navigate) — STALE-WHILE-REVALIDATE (Amir, 2026-09-12: opening the
   // home-screen icon was slow). This was network-first, which meant every tap on
