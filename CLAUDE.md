@@ -602,9 +602,17 @@ reference for mechanics only, not for language/voice.
 for the Tehran general-fitness audience. Don't touch those pages over this directive.
 
 ## Verifying the live site (important gotchas)
-- **You CAN fetch the live site — do that, it is the real proof.** (This note used to say the
-  proxy blocked the host; that was wrong as of 2026-08-09.) The apex 301s to `www`, so follow
-  redirects, and diff what is served against your working copy:
+- **Try the live fetch first — when it works it is the real proof — but it DEPENDS ON THE
+  SESSION'S NETWORK POLICY, so a failure is not a failed deploy.** Some environments allow the
+  host and some deny it: on 2026-09-13 `curl` to `amirardekani.com`, `www.` and the
+  `github.io` origin all returned HTTP 000, and
+  `curl -sS "$HTTPS_PROXY/__agentproxy/status"` named the reason — `connect_rejected`,
+  "gateway answered 403 to CONNECT (policy denial)". Check that endpoint before spending any
+  time on it, and **never poll a blocked host in a loop waiting for a deploy that already
+  happened.** When it is blocked, the fallbacks are `git ls-remote origin main` (the commit is
+  on the branch Pages serves) plus the **"pages build and deployment" run for that exact SHA
+  reporting `conclusion: success`** — which, unlike a *missing* run, is a real signal.
+  The apex 301s to `www`, so follow redirects, and diff what is served against your working copy:
   ```
   curl -sL -o /tmp/live.html https://amirardekani.com/coach.html   # -L matters: apex -> www
   python -c "import hashlib;a=open('/tmp/live.html','rb').read().replace(b'\r\n',b'\n');b=open('coach.html','rb').read().replace(b'\r\n',b'\n');print(hashlib.sha256(a).hexdigest()==hashlib.sha256(b).hexdigest())"
