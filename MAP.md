@@ -47,7 +47,7 @@ English is the default (`/`); Farsi is the broader Tehran-market mirror. Match
 | Terms | [`terms.html`](terms.html) | [`terms-fa.html`](terms-fa.html) | Legal / training disclaimers |
 | Privacy | [`privacy.html`](privacy.html) | — | GDPR privacy notice |
 | Proof signup | [`proof.html`](proof.html) | — | Public landing page for the **free habit tracker** — what it is, then name + email + WhatsApp → emails Amir (Web3Forms). **Not linked from nav** on purpose: it's the Instagram bio link. Sign people up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill |
-| Coach affiliate | — | [`partner-fa.html`](partner-fa.html) | Referral partnership pitch for other coaches — the 10%/10% deal, plain-language terms, and an application form → emails Amir (Web3Forms). Codes issued here are added by hand to **both** apply forms; roster in [`AFFILIATES.md`](AFFILIATES.md) |
+| Coach affiliate | — | [`partner-fa.html`](partner-fa.html) | Referral partnership pitch for other coaches — the 10%/10% deal, plain-language terms, and an application form → emails Amir (Web3Forms). Accepted coaches get a code in [`coach.html`](coach.html) → **Affiliates** (`public.affiliates`, coach-only), which both apply forms check live — no form edits |
 | UTS padel course | [`uts-padel.html`](uts-padel.html) | — | Client-facing page + athlete form for the **6-Week Padel Performance Course at The UTS, Hoylake** (Amir's club course). UTS-branded (their logo + gym photo in [`assets/img/uts/`](assets/img/uts/)); the six weeks drawn as a Tube line; a 6-step form with a health screen, emergency contact, under-18 guardian consent. Saved to Supabase `hab_intake` (programme = `UTS Padel Performance Course`) **and** emails Amir. `noindex`, not linked from nav |
 | Etminan academy | [`etminan-en.html`](etminan-en.html) | [`etminan.html`](etminan.html) | Partner page + sign-up form for Etminan Tennis Academy players (also [`etminan-dv.html`](etminan-dv.html), Dhivehi). Intakes tagged `Etminan Tennis Academy`. `noindex` |
 | EN redirect | [`index-en.html`](index-en.html) | — | Permanent redirect to `/` |
@@ -226,7 +226,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) | Customer-facing process explainer |
 | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) | `coach.html` manual |
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
-| [`AFFILIATES.md`](AFFILIATES.md) | **Affiliate coaches** — who holds which referral discount code, and how to add or retire one |
+| [`supabase/stage29_affiliates.sql`](supabase/stage29_affiliates.sql) | **Affiliate coaches** — the referral-code roster moved out of the public `AFFILIATES.md` into the coach-only `public.affiliates` table (2026-09-13). Manage it in `coach.html` → Affiliates; the deal and how-to are in [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) §2 |
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
 | [`NOTION_SYNC.md`](NOTION_SYNC.md) · [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Sync / import how-tos |
 | [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |

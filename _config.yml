@@ -6,7 +6,6 @@ exclude:
   - supabase/          # DB schema/migration SQL — internal infra, not public
   # Root docs. This is an explicit list, not a glob: a new .md at the root is served
   # (as .md AND as a rendered .html) until it is added here.
-  - AFFILIATES.md      # affiliate roster — partner coaches' names and handles
   - CLAUDE.md
   - CALL_LOG.md
   - COACH_DASHBOARD.md

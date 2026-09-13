@@ -509,34 +509,42 @@
     return null;
   }
   // ═══════════════════════════════════════════════════════════════════
-  // DISCOUNT CODES — edit this list to add, change, or remove codes.
-  //   'CODE': percent   (matched case-insensitively → 'MHRN10' also
-  //                      matches "mhrn10"). Keep the SAME codes on the
-  //                      English form (form.html) so a code works on both.
+  // DISCOUNT CODES live in the database now — public.affiliates, managed
+  // from coach.html → Affiliates. Nothing to edit here: a code added or
+  // retired in the dashboard works on both forms at once.
+  // check_discount() only answers "is this code live, and for how much?" —
+  // never the list, never who owns it (supabase/stage29_affiliates.sql).
+  // If it can't be reached, the typed code still goes out in the
+  // "Discount Code" field, so a discount is never lost.
+  // SB_URL / SB_KEY are declared further down; these only run on user input,
+  // long after the whole script has executed.
   // ═══════════════════════════════════════════════════════════════════
-  var DISCOUNT_CODES={
-    'SIALASH10':10,
-    'MHRN10':10,
-    'NAVAZI10':10,
-    'NIK10':10,
-    'RAHMANI10':10,
-    'PROTRACK10':10
-  };
   var dcode=document.getElementById('dcode'),dmsg=document.getElementById('dmsg'),dapplied=document.getElementById('dapplied');
-  function checkDiscount(showErr){
-    var raw=dcode.value.trim(),code=raw.toUpperCase();
-    if(Object.prototype.hasOwnProperty.call(DISCOUNT_CODES,code)){
-      var pct=DISCOUNT_CODES[code];
-      dmsg.className='dmsg show valid';dmsg.textContent='✓ کد تایید شد — '+fa(pct)+'٪ تخفیف';
-      dapplied.value=code+' ('+pct+'% off)';
-    }else{
-      dapplied.value='';
-      if(raw&&showErr){dmsg.className='dmsg show invalid';dmsg.textContent='این کد معتبر نیست — املا رو چک کن';}
-      else{dmsg.className='dmsg';dmsg.textContent='';}
+  var dSeq=0,dTimer=null,dCheck=Promise.resolve();   // dSeq: a later keystroke wins; dCheck: what submit waits on
+  function dShow(kind,txt){dmsg.className=kind?'dmsg show '+kind:'dmsg';dmsg.textContent=txt||'';}
+  async function checkDiscount(showErr){
+    var raw=dcode.value.trim(),code=raw.toUpperCase(),seq=++dSeq,pct;
+    dapplied.value='';
+    if(!raw){dShow('','');return;}
+    try{
+      var res=await fetch(SB_URL+'/rest/v1/rpc/check_discount',{method:'POST',
+        headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+        body:JSON.stringify({p_code:code})});
+      if(!res.ok)throw new Error('check_discount '+res.status);
+      pct=await res.json();
+    }catch(err){
+      if(seq!==dSeq)return;
+      // نشد بپرسیم — پس هیچ‌وقت کدِ درست رو غلط اعلام نکن
+      if(showErr)dShow('invalid','الان نشد کد رو چک کنیم — فرم رو بفرست، تخفیف دستی اعمال می‌شه.');
+      return;
     }
+    if(seq!==dSeq)return;
+    if(typeof pct==='number'&&pct>0){dShow('valid','✓ کد تایید شد — '+fa(pct)+'٪ تخفیف');dapplied.value=code+' ('+pct+'% off)';}
+    else if(showErr)dShow('invalid','این کد معتبر نیست — املا رو چک کن');
+    else dShow('','');
   }
-  dcode.addEventListener('input',function(){checkDiscount(false);});
-  dcode.addEventListener('blur',function(){checkDiscount(true);});
+  dcode.addEventListener('input',function(){clearTimeout(dTimer);dTimer=setTimeout(function(){dCheck=checkDiscount(false);},350);});
+  dcode.addEventListener('blur',function(){clearTimeout(dTimer);dCheck=checkDiscount(true);});
 
   // dynamic subject
   function subj(){var n=[document.getElementById('fn').value.trim(),document.getElementById('ln').value.trim()].filter(Boolean).join(' ');
@@ -616,6 +624,8 @@
     }
 
     var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
+    // بررسیِ کدِ تخفیف (که با blur شروع شده) رو حداکثر ۲ ثانیه صبر کن، بعد در هر حال بفرست
+    await Promise.race([dCheck,new Promise(function(r){setTimeout(r,2000);})]);
     try{
       // ثبتِ پایدار در Supabase اول، و ارسال ایمیلِ Web3Forms هم‌زمان. اگر یکی
       // موفق بشه کافی‌ست — پس قطعیِ Web3Forms دیگه فرم رو گم نمی‌کنه.
