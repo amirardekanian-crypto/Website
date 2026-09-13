@@ -295,7 +295,7 @@ textarea{resize:vertical;min-height:92px;line-height:1.8}
       <div class="opts" data-req="kind" id="kinds">
         <label class="opt"><input type="radio" name="kind" value="کلاس خصوصی (یک به یک)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>خصوصی</span></label>
         <label class="opt"><input type="radio" name="kind" value="کلاس نیمه‌خصوصی (دو نفر)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>نیمه‌خصوصی</span></label>
-        <label class="opt"><input type="radio" name="kind" value="کلاس گروهی (۳ تا ۴ نفر)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>گروهی</span></label>
+        <label class="opt" data-only="تنیس"><input type="radio" name="kind" value="کلاس گروهی (۳ تا ۴ نفر)"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>گروهی</span></label>
         <label class="opt"><input type="radio" name="kind" value="هیتینگ پارتنر"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>هیتینگ پارتنر</span></label>
         <label class="opt" data-only="تنیس"><input type="radio" name="kind" value="استعدادیابی رایگان"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>استعدادیابی رایگان</span></label>
         <label class="opt"><input type="radio" name="kind" value="هنوز نمی‌دونم"><span><i class="tick"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.6 9 10 3"/></svg></i>هنوز نمی‌دونم</span></label>
@@ -461,7 +461,7 @@ function applySport(){
   var s = sport();
   document.documentElement.dataset.skin = SKIN[s];
   document.querySelector('meta[name=theme-color]').setAttribute("content", s === "پدل" ? "#0250B0" : "#003320");
-  /* استعدادیابی فقط تنیسه — مثل خود سایت */
+  /* استعدادیابی و کلاس گروهی فقط تنیسن — مثل خود سایت (پدل حداکثر ۲ نفره) */
   $$("[data-only]").forEach(function(el){
     var on = el.getAttribute("data-only") === s;
     el.hidden = !on;
