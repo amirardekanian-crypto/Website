@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>مهرانه ظهوریان — مربی تنیس و پدل</title>
-<meta name="description" content="کلاس خصوصی و گروهی تنیس و پدل در مشهد، با ۱۳ سال سابقه در تنیس و عضویت در تیم ملی. آموزش متناسب با مسیر و هدف تو.">
+<meta name="description" content="کلاس تنیس و پدل در مشهد: خصوصی و نیمه‌خصوصی در هر دو رشته، گروهی و استعدادیابی رایگان در تنیس. با ۱۳ سال سابقه در تنیس و عضویت در تیم ملی.">
 <meta name="robots" content="noindex,nofollow">   <!-- DRAFT: remove when it moves to her own domain -->
 <meta name="theme-color" content="#003320">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23D6F84C'/%3E%3Cpath d='M3 8a16 16 0 0 1 0 16M29 8a16 16 0 0 0 0 16' stroke='%2317123A' stroke-width='2.4' fill='none'/%3E%3C/svg%3E">
 <meta property="og:title" content="مهرانه ظهوریان — مربی تنیس و پدل">
-<meta property="og:description" content="کلاس خصوصی و گروهی تنیس و پدل در مشهد. آموزش متناسب با مسیر و هدف تو.">
+<meta property="og:description" content="کلاس تنیس و پدل در مشهد: خصوصی و نیمه‌خصوصی در هر دو رشته، گروهی در تنیس. آموزش متناسب با مسیر و هدف تو.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +24,8 @@
   1.  PHONE           → ✅ ۰۹۱۵۵۹۸۵۰۶۸ — واتساپ و تماس هر دو از روی همین ساخته می‌شن
   2.  INSTAGRAM       → ✅ mehraneh_zohourian
   3.  «مهرانه ظهوریان»    → اسم واقعی مربی (۶ جا: title, og, nav, hero, about, footer)
-  4.  قیمت‌ها          → ✅ خصوصی، نیمه‌خصوصی و گروهی واقعی‌ان (تومان، پکیج ۱۰ جلسه).
-                        فقط «هیتینگ پارتنر» مونده — دنبال «TODO: قیمت واقعی» بگرد
+  4.  قیمت‌ها          → ✅ هر چهار کلاس پولی قیمت واقعی دارن (تومان، با پکیج ۱۰ جلسه).
+                        ⚠ گروهی فقط تنیسه — پدل حداکثر ۲ نفره، پس خصوصی و نیمه‌خصوصی
   4b. form.html       → فرم رزرو؛ جوابش به واتساپ می‌ره. شماره‌ش باید با همین فایل یکی باشه
   5.  آمارها           → ✅ واقعی‌ان حالا: ۱۳ سال سابقه، تیم ملی، بازی حرفه‌ای، مسابقات کشوری
   6.  متن «درباره‌ی من» → ✅ از متن خودش نوشته شده
@@ -124,6 +124,8 @@ section{position:relative}
   white-space:nowrap;
 }
 .btn svg{width:20px;height:20px;flex:none}
+/* دو کانال، دو نشان: واتساپ پُره، فرم خطیه — تا از روی دکمه معلوم باشه کجا می‌ره */
+.i-form{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .btn-primary{background:var(--ball);color:var(--on-ball);box-shadow:0 14px 34px -14px rgb(var(--ball-rgb) / .7)}
 .btn-primary:hover{transform:translateY(-3px);box-shadow:0 20px 42px -14px rgb(var(--ball-rgb) / .85)}
 .btn-ghost{border:1.5px solid var(--line);color:#fff}
@@ -961,7 +963,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <a href="#faq">سوال‌ها</a>
       </nav>
       <a class="swap" href="#" data-swap></a>
-      <a class="btn btn-primary nav-cta" data-form href="form.html">رزرو جلسه</a>
+      <a class="btn btn-primary nav-cta" data-form href="form.html"><svg class="i-form" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.6" width="6" height="3.6" rx="1.3"/><path d="M9 4.4H6.6A1.6 1.6 0 0 0 5 6v13.4A1.6 1.6 0 0 0 6.6 21h10.8a1.6 1.6 0 0 0 1.6-1.6V6a1.6 1.6 0 0 0-1.6-1.6H15"/><path d="M8.6 11.2h6.8M8.6 15.2h4.4"/></svg>فرم رزرو</a>
       <button class="burger" id="burger" aria-label="منو"><span></span><span></span><span></span></button>
     </div>
     <nav class="menu" id="menu">
@@ -986,7 +988,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
       <div class="hero-btns rv">
         <a class="btn btn-primary" data-wa href="#">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>
-          رزرو جلسه
+          پیام تو واتساپ
         </a>
         <a class="btn btn-ghost" href="#classes">کلاس‌ها و قیمت‌ها</a>
       </div>
@@ -1093,7 +1095,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <span class="pack">پکیج ۱۰ جلسه: <b>۷,۵۰۰,۰۰۰</b> تومان نفری</span>
       </article>
 
-      <article class="card rv">
+      <article class="card rv" data-only="tennis"><!-- پدل حداکثر ۲ نفره؛ گروهی فقط تنیس -->
         <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M6 20.5c0-3.6 2.7-6 6-6s6 2.4 6 6"/><path d="M9 11.5 7 15M15 11.5 17 15"/></svg></div>
         <h3>کلاس گروهی</h3>
         <span class="meta">۳ تا ۴ نفر</span>
@@ -1107,7 +1109,8 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
         <h3>هیتینگ پارتنر</h3>
         <span class="meta">بدون درس · فقط بازی</span>
         <p>وقتی درس نمی‌خوای، توپ خوب می‌خوای. با سابقه‌ی بازی حرفه‌ای و تیم ملی می‌تونم توپ رو با عمق و سرعت ثابت بهت بدم: رالی طولانی، کار روی یه ضربه‌ی خاص، یا ست بازی کردن. هر جا خواستی فشار رو می‌برم بالاتر.</p>
-        <div class="price">قیمت <small>تو واتساپ بپرس</small></div><!-- TODO: قیمت واقعی — تنها کلاس پولی که قیمتش رو ندادیم -->
+        <div class="price">۱,۲۰۰,۰۰۰ <small>تومان · هر جلسه</small></div>
+        <span class="pack">پکیج ۱۰ جلسه: <b>۱۰,۰۰۰,۰۰۰</b> تومان</span>
       </article>
 
       <article class="card rv" data-only="tennis">
@@ -1130,7 +1133,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
 
     </div>
 
-    <p class="price-note rv">همه‌ی قیمت‌ها به تومانه. کلاس‌های استعدادیابی رایگانن و معمولاً پنجشنبه و جمعه برگزار می‌شن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</p>
+    <p class="price-note rv">همه‌ی قیمت‌ها به تومانه.<span data-only="tennis"> کلاس‌های استعدادیابی رایگانن و معمولاً پنجشنبه و جمعه برگزار می‌شن، ولی زمین محدوده و نوبتش فقط با تماس تلفنی گرفته می‌شه.</span><span data-only="padel"> پدل حداکثر دو نفره‌ست، برای همین کلاس گروهی نداره.</span></p>
   </div>
 </section>
 
@@ -1157,7 +1160,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
     <div class="sec-head rv">
       <span class="eyebrow"><span class="dot"></span>چطور شروع کنیم</span>
       <h2 class="h-sec">سه قدم، همین امروز</h2>
-      <p class="lead on-dark">لازم نیست فرم پر کنی یا منتظر بمونی. یه پیام بده، بقیه‌ش با من.</p>
+      <p class="lead on-dark">دو تا راه داری: فرم رزرو رو پر کن، یا مستقیم تو واتساپ پیام بده. هر کدوم رو راحت‌تری — بقیه‌ش با من.</p>
     </div>
     <div class="steps">
       <div class="step rv">
@@ -1277,7 +1280,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
     <h2 class="rv">آماده‌ای اولین جلسه رو بذاریم؟</h2>
     <p class="lead on-dark rv">فرم رو پر کن تا بدونم دنبال چی هستی و کِی و کجا برات راحته — بعد خودم باهات تماس می‌گیرم. اگه راحت‌تری، مستقیم تو واتساپ پیام بده.</p>
     <div class="cta-btns rv">
-      <a class="btn btn-primary" data-form href="form.html">فرم رزرو رو پر کن</a>
+      <a class="btn btn-primary" data-form href="form.html"><svg class="i-form" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.6" width="6" height="3.6" rx="1.3"/><path d="M9 4.4H6.6A1.6 1.6 0 0 0 5 6v13.4A1.6 1.6 0 0 0 6.6 21h10.8a1.6 1.6 0 0 0 1.6-1.6V6a1.6 1.6 0 0 0-1.6-1.6H15"/><path d="M8.6 11.2h6.8M8.6 15.2h4.4"/></svg>فرم رزرو رو پر کن</a>
       <a class="btn btn-ghost" data-wa href="#">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>
         پیام تو واتساپ
@@ -1328,7 +1331,7 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
 <!-- ============ STICKY MOBILE BAR ============ -->
 <div class="bar" id="bar">
   <div class="txt"><b>جلسه‌ی اولت رو بذار</b>یه پیام کوتاه کافیه</div>
-  <a class="btn btn-primary" data-wa href="#">واتساپ</a>
+  <a class="btn btn-primary" data-wa href="#"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23a8.18 8.18 0 0 1 5.82 2.42 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.23 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.53.06-.25-.12-1.05-.39-1.99-1.23-.74-.65-1.23-1.46-1.38-1.71-.14-.24-.01-.37.11-.49.11-.11.25-.29.37-.43.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.24-.86.85-.86 2.07s.89 2.4 1.01 2.56c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.19.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.28Z"/></svg>واتساپ</a>
 </div>
 
 <script>
@@ -1611,7 +1614,7 @@ var SPORTS = {
   padel: {
     skin:"court", label:"پدل", other:"تنیس", otherKey:"tennis",
     title:"مهرانه ظهوریان — مربی پدل",
-    desc:"کلاس خصوصی و گروهی پدل در مشهد، از صفر تا بازی کردن توی زمین — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی.",
+    desc:"کلاس خصوصی و نیمه‌خصوصی پدل در مشهد، از صفر تا بازی کردن توی زمین — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی.",
     theme:"#0250B0",
     wa:"سلام! از سایت پیام می‌دم. می‌خوام درباره‌ی کلاس‌های پدل بپرسم.",
     ticker:["پدل","سرویس","والی","بانداخا","ویبورا","اسمش","دیوار شیشه‌ای","حرکت پا","جفت","تاکتیک","دفاع","بازی"],
@@ -1627,7 +1630,7 @@ var SPORTS = {
       q1tag:"۳۲ ساله · پدل",
       q2body:"«از صفر شروع کردم و راستش خجالت می‌کشیدم. ولی هیچ‌وقت حس بدی نداشتم. الان با دوستام پدل بازی می‌کنم و کم نمیارم.»",
       q2tag:"۴۱ ساله · پدل",
-      footTag:"مربی پدل در مشهد — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی، گروهی و هیتینگ پارتنر."
+      footTag:"مربی پدل در مشهد — با ۱۳ سال سابقه‌ی تنیس و عضویت در تیم ملی. کلاس خصوصی، نیمه‌خصوصی و هیتینگ پارتنر (پدل حداکثر دو نفره‌ست)."
     },
     media:{}   /* no padel photos yet — slots fall back to placeholders */
   }
