@@ -11,10 +11,16 @@
         RSR  = flight time / contact time     no units (Healy)
       If you ever decide to show only one, show RSI, and keep the label.
 
-   2. This test needs a faster camera than the jump height tests. Contact time
-      is about two and a half times shorter than flight time, and the takeoff
-      frame is shared between the two, so a timing error hits RSI twice.
-      minFps is 120 here on purpose, not 60.
+   2. This test needs a faster camera than jump height would on its own.
+      Contact time is about two and a half times shorter than flight time, and
+      the takeoff frame is shared between the two, so a timing error hits RSI
+      twice. Every test refuses clips under 120 fps now, but this one would
+      need that floor even if the others didn't.
+
+   3. There is no "real change" verdict for this test yet (changeRule null).
+      Nobody has checked a between-day error for drop jump RSI against the
+      literature for this app. Add a sourced changeRule, in the same shape as
+      cmj.js, when someone does.
    ========================================================================= */
 
 (function (root) {
@@ -186,6 +192,14 @@
     },
 
     /* ================================================================
+       WHEN A CHANGE IS REAL
+       No verdict yet, see note 3 in the header.
+       ================================================================ */
+
+    changeRule: null,
+    changeRuleNote: "We haven't found good enough research on how much drop jump RSI moves from day to day, so we won't guess whether a change is real. Every session is still saved here.",
+
+    /* ================================================================
        Orientation bands. NOT peer-reviewed norms. They exist so a beginner
        has some context for a number they've never seen before, and they are
        labelled as orientation everywhere they appear.
@@ -223,7 +237,7 @@
 
       /* ---- frame rate gate for contact time -------------------------- */
 
-      if (trial.fpsLocal && trial.fpsLocal < this.requires.minFps) {
+      if (trial.fpsLocal && !P.meetsMinFps(trial.fpsLocal, this.requires.minFps)) {
         out.warnings.push({
           id: "FR-03",
           severity: "block",
@@ -282,7 +296,8 @@
 
       /* ---- precision -------------------------------------------------- */
 
-      var sigE = trial.timingError_s || P.timingError_s(1 / (trial.fpsLocal || 240));
+      // One event's error, not the whole interval's, see physics.eventTimingError_s.
+      var sigE = (trial.timingError_s || P.timingError_s(1 / (trial.fpsLocal || 240))) / Math.SQRT2;
       var rsiErr = P.rsiRelativeError(sigE, ft, gct);
 
       /* ---- primary is RSI, and it is never shown alone ---------------- */

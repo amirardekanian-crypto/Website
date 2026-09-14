@@ -130,7 +130,7 @@
     reduceError: [
       "**Do this on the same day as your countermovement jump, in the same session.** The ratio between them is only meaningful if nothing else changed.",
       "Countermovement jump first, then squat jump. Doing it the other way round leaves the spring primed and contaminates the squat jump.",
-      "Three reps, 60 seconds rest, average the good ones.",
+      "Three reps, 60 seconds rest. Your score is your best good one.",
       "**If your squat jump comes out higher than your countermovement jump, something's wrong.** Almost always it's a hidden dip. Scrub back through the frames before the jump and look at the hips.",
       "Watch the hold on the video, not just in the room. A dip small enough to miss with your eye is big enough to change the number."
     ],
@@ -153,7 +153,7 @@
     /* ================================================================ */
 
     requires: {
-      minFps: 60,
+      minFps: 120,             // same floor as the countermovement jump, see cmj.js
       preferredFps: 240,
       needsContactTime: false,
       needsBodyMass: false,
@@ -171,8 +171,30 @@
     scoring: {
       trials: 3,
       restSeconds: 60,
-      score: "mean",
-      note: "Average of 3 good reps. Any rep with a dip in it doesn't count as a rep, redo it after full rest."
+      score: "best",
+      note: "Your score is your best good rep out of 3. A rep with a dip in it doesn't count, redo it after full rest. The average of your good reps shows too, as a fatigue check, but track the best."
+    },
+
+    /* ================================================================
+       WHEN A CHANGE IS REAL
+       Read by progress.js. Same shape and same maths as cmj.js, see the
+       notes there. The squat jump wobbles more than the countermovement
+       jump in the same children (typical error 1.5 cm against 1.0 cm), so
+       it gets its own wider lines. There's no squat jump data for adults or
+       bigger jumpers, so one set of lines covers everyone. Amir chose these
+       lines on 2026-09-14. All values in metres.
+       ================================================================ */
+
+    changeRule: {
+      standard: {
+        te: 0.015, wobble: 0.020, real: 0.045,
+        source: "Bogataj et al. 2020, children aged 11 to 14 filmed at 240 fps"
+      },
+      bigJumper: null,
+      under11: {
+        real: 0.045,
+        source: "no data under 11, so the same line, and it has to show up twice"
+      }
     },
 
     /* ================================================================
@@ -189,6 +211,15 @@
           id: "SJ-NOFLIGHT",
           severity: "block",
           text: "We couldn't find a flight phase in this clip. Check you've trimmed to the jump itself."
+        });
+        return out;
+      }
+
+      if (trial.fpsLocal && !P.meetsMinFps(trial.fpsLocal, this.requires.minFps)) {
+        out.warnings.push({
+          id: "FR-03",
+          severity: "block",
+          text: "This clip is about " + Math.round(trial.fpsLocal) + " fps. Below " + this.requires.minFps + " fps the camera's own error is big enough to hide a real change, so we won't give you a number. Record in slow motion at 240 fps."
         });
         return out;
       }
@@ -219,7 +250,8 @@
         return out;
       }
 
-      var sigT = Math.sqrt(2) * (trial.timingError_s || P.timingError_s(1 / (trial.fpsLocal || 240)));
+      // timingError_s is already the whole flight time's error, both events in.
+      var sigT = trial.timingError_s || P.timingError_s(1 / (trial.fpsLocal || 240));
       var sigH = P.heightSensitivity_m_per_s(ft) * sigT;
 
       out.primary = {
@@ -339,6 +371,7 @@
       "McGuigan et al. (2006) for the eccentric utilisation ratio, height variant. The peak power variant exists but we don't implement it, because our peak power is itself an estimate and a ratio of two estimates compounds the error past usefulness.",
       "Sayers et al. (1999), squat jump coefficients.",
       "The 3 second hold, roughly 90 degree knee angle and hands on hips follow standard NSCA and UKSCA squat jump protocol.",
+      "Bogataj et al. (2020) for the change lines. In children aged 11 to 14 filmed at 240 fps, the best squat jump moved about 1.5 cm between two test days, against 1.0 cm for the countermovement jump. That's why this test needs a 4.5 cm change before History calls it real.",
       "The rule that a low ratio usually means a hidden dip rather than a real eccentric deficit is standard practice guidance, and it's the reason the app checks the pre-takeoff frames automatically."
     ]
   });

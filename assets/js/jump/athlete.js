@@ -85,17 +85,17 @@
       label: "Sex",
       type: "choice",
       required: false,
-      tests: ["cmj", "sj", "dj", "hop105"],
+      tests: ["cmj"],
       choices: [
         { value: "f", label: "Female" },
         { value: "m", label: "Male" },
         { value: "", label: "Rather not say" }
       ],
       whatItBuys:
-        "Makes the app smarter about when to flag your result as unusual. A 26 cm countermovement jump is a normal result for a female athlete and a low one for a male athlete, and without knowing which we have to use one wide band for everyone.",
+        "Lets us show where your countermovement jump sits against tennis players of your sex and age. Boys and girls jump about the same until 12 or 13, then boys pull ahead, so one range for everyone would mislead you.",
       withoutIt:
-        "Your jump height is exactly the same. We just flag fewer results as worth a second look, and occasionally flag one that was fine.",
-      usedFor: "The typical range shown beside your result, and the unusually high or low warnings."
+        "Your jump height is exactly the same. We just can't show where it sits.",
+      usedFor: "The reference range beside your countermovement jump, from German squad tennis players."
     },
 
     /* ---------------------------------------------------------------- */
@@ -105,13 +105,13 @@
       type: "number",
       min: 8, max: 90, step: 1,
       required: false,
-      tests: ["cmj", "sj", "dj", "hop105"],
+      tests: ["cmj", "sj", "dj"],
       placeholder: "optional",
       whatItBuys:
-        "Two things. It sharpens the same unusual-result flags as above, and on the drop jump it lets us recommend a box height instead of guessing.",
+        "It tells History how big a change has to be before it counts as real, because younger and older athletes wobble by different amounts. It also picks the reference range for your countermovement jump and the right drop jump box height.",
       withoutIt:
-        "The drop jump defaults to a 30 cm box, which is right for most adults and too high for a lot of younger athletes.",
-      usedFor: "Typical ranges, and the drop jump box height recommendation."
+        "History judges changes by the size of your jump instead. There's no reference range, and the drop jump starts you on a 30 cm box, which is too high for a lot of younger athletes.",
+      usedFor: "The real change rule in History, the reference range and the drop jump box height."
     },
 
     /* ---------------------------------------------------------------- */
@@ -158,70 +158,98 @@
   }
 
   /* --------------------------------------------------------------------
-     Typical ranges.
+     The reference range beside a countermovement jump.
 
-     These exist ONLY to decide when to say "that is worth a second look".
-     They are not a score, not a grade, and the app must never present them
-     as a target. A first number is a starting line.
+     Context, never a target and never a grade. A first number is a
+     starting line. What matters is the athlete's own number moving, and
+     History decides when it has.
 
-     Sources are broad training-population figures. If you want to tighten
-     them for tennis and padel specifically, this is the place, and say so in
-     the note so the app can keep being honest about where it came from.
+     SOURCE
+     German Tennis Federation (DTB), "Normwerte DTB-Konditionstest",
+     updated 5 September 2025, linked from the DTB test manuals:
+     https://docs.google.com/spreadsheets/d/1ZjKadqPJkhCQ6QhOtIzkSTke50Prfnky6bkNOyw5smA
+     Tabs "Normwerte nach kalendarischem Alter" (boys) and "Tabellenblatt6"
+     (girls), column "C-Movement Jump [cm]". Regional and national junior
+     squad players on a contact mat, flight time, hands on hips, best of 2
+     scored jumps, so the same method as this app. 54 to 507 players per
+     class. Every P20 and P80 below was read out of that file on 2026-09-14
+     and matched the research copy exactly.
+
+     WHAT IS SHOWN
+     P20 to P80 for the athlete's sex and age, the middle 60% of squad
+     players, and it says squad players, because that's a high bar for a club
+     player. A whole-year age averages the two half-year classes. Age 9 uses
+     the under 10 class and says it's rough. 18 to 21 use the over 18 class.
+     Nothing under 9 or over 21. Nothing for the squat jump, drop jump or
+     10-5, because none of them has a source. Amir chose this on 2026-09-14,
+     replacing ranges that had no source at all.
      -------------------------------------------------------------------- */
 
-  var TYPICAL = {
-    cmj: {
-      m: { low: 0.30, high: 0.45 },
-      f: { low: 0.22, high: 0.34 },
-      unknown: { low: 0.20, high: 0.48 }
-    },
-    sj: {
-      m: { low: 0.27, high: 0.42 },
-      f: { low: 0.20, high: 0.31 },
-      unknown: { low: 0.18, high: 0.45 }
-    },
-    dj: {   // RSI, m/s
-      m: { low: 1.2, high: 2.6 },
-      f: { low: 0.9, high: 2.1 },
-      unknown: { low: 0.8, high: 2.8 }
-    },
-    hop105: {
-      m: { low: 1.1, high: 2.4 },
-      f: { low: 0.9, high: 2.0 },
-      unknown: { low: 0.8, high: 2.6 }
-    }
+  // [class start age, P20 cm, P80 cm]. 9 is the "under 10" class, 18 is "over 18".
+  var DTB_CMJ = {
+    m: [
+      [9, 23.1, 29.3], [10, 24.2, 30.7], [10.5, 24.8, 31.4], [11, 25.7, 32.2], [11.5, 26.9, 33.1],
+      [12, 27.6, 33.8], [12.5, 28.6, 35.0], [13, 29.8, 36.0], [13.5, 30.9, 37.8], [14, 32.3, 39.0],
+      [14.5, 33.9, 41.0], [15, 34.8, 42.4], [15.5, 35.9, 43.6], [16, 37.2, 44.1], [16.5, 37.5, 45.2],
+      [17, 38.2, 45.8], [17.5, 38.0, 45.9], [18, 39.7, 47.6]
+    ],
+    f: [
+      [9, 22.9, 30.3], [10, 24.2, 30.7], [10.5, 23.9, 31.0], [11, 24.9, 31.3], [11.5, 26.7, 32.9],
+      [12, 27.1, 33.4], [12.5, 28.4, 34.2], [13, 28.6, 34.3], [13.5, 29.2, 35.1], [14, 29.4, 35.5],
+      [14.5, 29.4, 35.8], [15, 29.1, 36.0], [15.5, 29.4, 36.6], [16, 29.7, 36.3], [16.5, 30.3, 37.9],
+      [17, 29.4, 36.9], [17.5, 30.1, 36.8], [18, 30.0, 38.1]
+    ]
   };
+  var DTB_MIN_AGE = 9;
+  var DTB_MAX_AGE = 21;
+
+  function dtbClass(table, start) {
+    for (var i = 0; i < table.length; i++) if (table[i][0] === start) return table[i];
+    return null;
+  }
 
   /**
-   * Typical band for a test, narrowed by whatever the athlete has told us.
-   * Returns null when we have nothing useful to say, which is better than
-   * saying something vague.
+   * Where a result sits against a reference group.
+   * null when this test has no reference at all. { none: why } when it has
+   * one but can't place this athlete: "sex" or "age" when we weren't told,
+   * "young" under 9, "adult" over 21. Otherwise
+   *   { low, high, rough, group }     low and high in metres
+   */
+  function referenceRange(testId, cfg) {
+    if (testId !== "cmj") return null;
+    var sex = cfg && cfg.sex;
+    var age = cfg && cfg.age != null && cfg.age !== "" ? +cfg.age : null;
+    if (sex !== "m" && sex !== "f") return { none: "sex" };
+    if (age == null || !isFinite(age)) return { none: "age" };
+    if (age < DTB_MIN_AGE) return { none: "young" };
+    if (age >= DTB_MAX_AGE + 1) return { none: "adult" };
+
+    var table = DTB_CMJ[sex];
+    var rows;
+    if (age < 10) rows = [dtbClass(table, 9)];
+    else if (age >= 18) rows = [dtbClass(table, 18)];
+    else if (Math.floor(age) === age) rows = [dtbClass(table, age), dtbClass(table, age + 0.5)];
+    else rows = [dtbClass(table, Math.floor(age * 2) / 2)];
+
+    var low = 0, high = 0;
+    rows.forEach(function (r) { low += r[1]; high += r[2]; });
+    return {
+      low: Math.round(low / rows.length * 10) / 1000,
+      high: Math.round(high / rows.length * 10) / 1000,
+      rough: age < 10,
+      group: "German squad tennis players"
+    };
+  }
+
+  /**
+   * The old shape, kept so a jump.html cached on a phone from before
+   * 2026-09-14 still works if it loads this file. New code uses
+   * referenceRange.
    */
   function typicalRange(testId, cfg) {
-    var table = TYPICAL[testId];
-    if (!table) return null;
-
-    var sex = (cfg && cfg.sex) || "unknown";
-    var band = table[sex] || table.unknown;
-    var specific = sex === "m" || sex === "f";
-
-    var out = { low: band.low, high: band.high, specific: specific, adjusted: [] };
-    if (specific) out.adjusted.push("sex");
-
-    // Youth athletes jump lower, and flagging a 14 year old's normal jump as
-    // "low" is both wrong and discouraging.
-    var age = cfg && cfg.age;
-    if (age && age < 16) {
-      var factor = age <= 12 ? 0.70 : 0.85;
-      out.low *= factor;
-      out.high *= factor;
-      out.adjusted.push("age");
-    } else if (age && age >= 50) {
-      out.low *= 0.80;
-      out.high *= 0.85;
-      out.adjusted.push("age");
-    }
-    return out;
+    var r = referenceRange(testId, cfg);
+    if (!r || r.none) return null;
+    return { low: r.low, high: r.high, specific: true, adjusted: ["sex", "age"] };
   }
 
   /**
@@ -279,6 +307,7 @@
     },
     missingUpgrades: missingUpgrades,
     missingRequired: missingRequired,
+    referenceRange: referenceRange,
     typicalRange: typicalRange,
     recommendedDropHeight: recommendedDropHeight,
     upgradeOffer: upgradeOffer
