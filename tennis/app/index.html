@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E4A36">
+<meta name="robots" content="noindex,nofollow">
+<title>سیستم آمادگی جسمانی تنیس</title>
+<link rel="icon" href="data:,">
+<link rel="manifest" href="app.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/img/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="آمادگی تنیس">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!--
+  Tennis Performance System, Level 2: the paid Farsi handbook app, served at amirardekani.com/tennis/app/.
+  Source lives in the private tps-content repo; only this shell is copied to the public website
+  (app/_dev/deploy_to_website.py). The handbook itself comes from Supabase (tps_content, readable
+  only by an active buyer account) and is kept on the phone in IndexedDB, so after the first
+  sign-in the app opens with no connection. Nothing about the buyer is stored or sent; the only
+  preference kept is the age version, in localStorage "tps.prefs".
+  Local modes, private repo only (the website has no content or _dev folder):
+    ?local=1, or ?content=<folder>: content from the JSON files next to the app, no sign-in.
+    ?stub=1: a fake Supabase (_dev/stub-supabase.js), already signed in.
+-->
+<script>
+  // Is anybody signed in on this device? Answered here, synchronously, from localStorage, so the
+  // sign-in screen paints without waiting for the Supabase library (program.html does the same).
+  // This app's Supabase client keeps its session under its own key, "tps-auth", so a program.html,
+  // coach.html or testing-app session on the same website is never mistaken for a buyer's.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    window.LOCAL = q.get('local') === '1' || q.has('content');
+    if (q.get('stub') === '1') {
+      try { if (!localStorage.getItem('tps-auth')) localStorage.setItem('tps-auth', '{"stub":true}'); } catch (e) {}
+      document.write('<script src="_dev/stub-supabase.js"><\/script>');
+    }
+    document.documentElement.classList.toggle('is-local', window.LOCAL);
+    window.HAS_SESSION = false;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && /^tps-auth(\.\d+)?$/.test(k)) { window.HAS_SESSION = true; break; }
+      }
+    } catch (e) { window.HAS_SESSION = true; }   // storage blocked: take the slow path, don't guess
+    window.NEEDS_SIGNIN = !window.LOCAL && !window.HAS_SESSION;
+    // The username from the last successful sign-in, prefilled. A convenience, never an authority.
+    try { window.LAST_USER = localStorage.getItem('tps_last_user') || ''; } catch (e) { window.LAST_USER = ''; }
+  })();
+</script>
+<link rel="preload" href="fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="app.css?v=9ae38acb">
+</head>
+<body>
+<div class="sample-bar">نسخهٔ نمونه · در حال ساخت</div>
+
+<!-- ═══ SIGN IN ═══ program.html's sign-in screen, in Farsi. The buyer types the username Amir sent;
+     app.js adds the internal address on submit, so nobody sees or types an email. The autocomplete
+     names are what let the phone's password manager offer to save and fill it. -->
+<div class="signin-screen" id="signin-screen">
+  <form class="signin-card" id="signin-form" autocomplete="on" onsubmit="return false">
+    <div class="si-hero">
+      <img class="si-hero-img" src="../../court-sessions.jpg" alt="" aria-hidden="true"
+           fetchpriority="high" decoding="async" onload="this.classList.add('in')" onerror="this.remove()">
+      <div class="si-hero-scrim"></div>
+      <div class="si-hero-copy">
+        <img class="signin-mark" src="../../assets/img/icon-192.png" alt="AA Performance" width="52" height="52"
+             decoding="async" onerror="this.remove()">
+        <div class="si-eyebrow" dir="ltr">AA Performance</div>
+        <h1 class="signin-title">سیستم آمادگی <em>جسمانی</em> تنیس</h1>
+        <p class="si-mantra">۱۶ هفته تمرین، آموزش و آزمون؛ روی گوشی شما، حتی بدون اینترنت.</p>
+      </div>
+    </div>
+    <div class="si-sheet">
+      <label class="signin-f">
+        <span>نام کاربری</span>
+        <input id="si-user" name="username" autocomplete="username" autocapitalize="none"
+               autocorrect="off" spellcheck="false" dir="ltr" required>
+      </label>
+      <label class="signin-f">
+        <span>رمز عبور</span>
+        <div class="si-wrap">
+          <input id="si-pass" name="password" type="password" autocomplete="current-password" dir="ltr" required>
+          <button type="button" class="si-eye" id="si-eye" aria-label="نمایش رمز" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M1.8 12S5.6 5.4 12 5.4 22.2 12 22.2 12 18.4 18.6 12 18.6 1.8 12 1.8 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+              <line class="si-eye-slash" x1="3.6" y1="20.4" x2="20.4" y2="3.6"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+      <button class="signin-go" id="si-go" type="submit">ورود</button>
+      <div class="signin-err" id="si-err" hidden></div>
+      <p class="signin-help">ورود بار اول به اینترنت نیاز دارد؛ بعد از آن، اپ بدون اینترنت هم باز می‌شود.</p>
+      <p class="signin-help">نام کاربری یا رمز را گم کرده‌اید؟ به امیر پیام بدهید تا اطلاعات تازه بفرستد.</p>
+      <div class="signin-foot" dir="ltr">amirardekani.com</div>
+    </div>
+  </form>
+</div>
+<script>
+  // Painted from here, not from app.js: nobody signed in means nothing to load. The
+  // onsubmit="return false" above keeps a native submit from putting the password in the URL
+  // until app.js wires the form.
+  if (window.NEEDS_SIGNIN) document.getElementById('signin-screen').classList.add('visible');
+</script>
+
+<div id="app">
+  <main id="view" aria-live="polite">
+    <div class="loading">در حال بارگذاری…</div>
+  </main>
+</div>
+
+<nav class="tabs" id="tabs" aria-label="بخش‌های کتاب">
+  <a href="#/start" data-tab="start">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></span>
+    <span class="tl">شروع</span>
+  </a>
+  <a href="#/programme" data-tab="programme">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 9.5h16M8.5 3v4M15.5 3v4"/><path d="M8 13h3M8 16.5h6"/></svg></span>
+    <span class="tl">برنامه</span>
+  </a>
+  <a href="#/exercises" data-tab="exercises">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8v8M17.5 8v8M3.5 10v4M20.5 10v4M6.5 12h11"/></svg></span>
+    <span class="tl">تمرین‌ها</span>
+  </a>
+  <a href="#/learn" data-tab="learn">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5Z"/><path d="M12 6.5v13"/></svg></span>
+    <span class="tl">آموزش</span>
+  </a>
+  <a href="#/tests" data-tab="tests">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg></span>
+    <span class="tl">آزمون</span>
+  </a>
+</nav>
+
+<!-- Step-by-step session mode (full screen). Filled by app.js. -->
+<div id="step" class="step" hidden></div>
+
+<script defer src="lib/supabase.js"></script>
+<script src="app.js?v=c8acded2" defer></script>
+</body>
+</html>

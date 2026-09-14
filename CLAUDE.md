@@ -546,11 +546,17 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (v7, 2026-09-13).
-  It must keep leaving `/reach/` (the Iran reachability probe) and `/tennis/` (the planned paid
-  course, which will ship its own worker) untouched. Otherwise the probe reports a cached pass
+  It must keep leaving `/reach/` (the Iran reachability probe) and `/tennis/` (the paid course,
+  whose app at `/tennis/app/` ships its own worker and `tps-shell-*` caches) untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
   Storage is shared by the origin, and the old `k !== CACHE` filter would have wiped any other
   app's offline copy on every bump.
+- **`/tennis/app/` is the paid course app** (Tennis Performance System, Level 2; Farsi). Its source
+  and content live in the private `tps-content` repo: only the shell (index.html, app.js, app.css,
+  sw.js, the self-hosted font and Supabase library) is copied here by
+  `tps-content/app/_dev/deploy_to_website.py`, so **never edit those files here**. The handbook itself
+  is in Supabase (`tps_content`, readable only by an active buyer); logins come from coach.html →
+  **Course**. Backend: `supabase/tps_01_accounts_content.sql` + `supabase/functions/tps-login`.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +
