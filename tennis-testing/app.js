@@ -1118,7 +1118,7 @@
   const TABLE = { player: 'assess_players', result: 'assess_results', note: 'assess_notes' };
   const NO_ACCESS = 'این حساب به اپ آزمون دسترسی ندارد. اگر فکر می‌کنید اشتباه شده، به امیر پیام بدهید.';
   const NO_NET = 'الان ورود ممکن نشد. اینترنت را بررسی کنید و دوباره امتحان کنید.';
-  const ACC = { userId: '', username: '', outbox: [], failed: false, flushing: false };
+  const ACC = { userId: '', username: '', outbox: [], failed: false, flushing: false, offline: false };
   let sbClient = null;
 
   const withTimeout = (p, ms) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
@@ -1199,23 +1199,57 @@
     location.replace(location.pathname + location.search);
   }
 
+  // The user id of the session supabase-js keeps, readable with no connection. A stored session
+  // without one falls back to the cached account (accKey('account')), if this phone has just one.
+  function storedUserId() {
+    const s = lsGet('assess-auth');
+    if (!s) return '';
+    if (s.user && s.user.id) return s.user.id;
+    let ids = [];
+    try { ids = Object.keys(localStorage).map(k => (/^assess\.([^.]+)\.account$/.exec(k) || [])[1]).filter(Boolean); } catch (e) { /* blocked */ }
+    return ids.length === 1 ? ids[0] : '';
+  }
+
+  // The server says this login is revoked: sign out on this phone and say why.
+  async function revokeHere(sb) {
+    if (sb) await withTimeout(sb.auth.signOut(), 4000);
+    try { localStorage.removeItem('assess-auth'); } catch (e) { /* blocked */ }
+    showSignIn(NO_ACCESS);
+  }
+
+  // After an offline open, nothing is fetched or sent until supabase-js has this account's session
+  // again; it refreshes the token by itself once there is a connection.
+  async function reconnect() {
+    if (!ACC.offline) return true;
+    const sb = await sbReady();
+    const got = sb ? await withTimeout(sb.auth.getSession(), 8000) : null;
+    const session = got && got.data && got.data.session;
+    if (session && session.user.id === ACC.userId) ACC.offline = false;
+    return !ACC.offline;
+  }
+
   async function bootCloud() {
     if (window.NEEDS_SIGNIN) { showSignIn(); return; }
     const sb = await sbReady();
     const got = sb ? await withTimeout(sb.auth.getSession(), 8000) : null;
     const session = got && got.data && got.data.session;
-    if (!session) { showSignIn(sb ? '' : NO_NET); return; }
-    ACC.userId = session.user.id;
+    const why = got && got.error ? (got.error.name || '') + ' ' + (got.error.message || '') : '';
+    ACC.userId = session ? session.user.id : '';
+    if (!session) {
+      if (/banned/i.test(why)) { await revokeHere(sb); return; }
+      // With no connection supabase-js cannot refresh an expired token (or did not load at all),
+      // but the session stays stored. That is still this account, so the copy on this phone opens,
+      // and nothing is fetched or sent until the session is back. A real sign-out removes it.
+      const noNet = !sb || !got || /fetch|network|retryable|timeout/i.test(why);
+      ACC.userId = noNet ? storedUserId() : '';
+      if (!ACC.userId) { showSignIn(noNet ? NO_NET : ''); return; }
+      ACC.offline = true;
+    }
     ACC.outbox = lsGet(accKey('outbox')) || [];
     // Access is checked online on every open. With no connection, the copy on this phone is used.
-    const acct = await withTimeout(sb.from('assess_accounts').select('username, revoked_at').eq('user_id', ACC.userId).maybeSingle(), 8000);
+    const acct = ACC.offline ? null : await withTimeout(sb.from('assess_accounts').select('username, revoked_at').eq('user_id', ACC.userId).maybeSingle(), 8000);
     if (acct && !acct.error) {
-      if (!acct.data || acct.data.revoked_at) {
-        await withTimeout(sb.auth.signOut(), 4000);
-        try { localStorage.removeItem('assess-auth'); } catch (e) { /* blocked */ }
-        showSignIn(NO_ACCESS);
-        return;
-      }
+      if (!acct.data || acct.data.revoked_at) { await revokeHere(sb); return; }
       ACC.username = acct.data.username;
       lsSet(accKey('account'), { username: ACC.username });
     } else {
@@ -1223,7 +1257,7 @@
       if (!cached) { showSignIn(NO_NET); return; }
       ACC.username = cached.username;
     }
-    const res = await withTimeout(sb.from('assess_content').select('key, body, version'), 20000);
+    const res = ACC.offline ? null : await withTimeout(sb.from('assess_content').select('key, body, version'), 20000);
     let docs = res && !res.error && res.data && res.data.length ? res.data : null;
     if (docs) lsSet(accKey('content'), docs); else docs = lsGet(accKey('content'));
     if (!docs) { view().innerHTML = errorCard('محتوا بارگذاری نشد', 'برای بار اول، اپ به اینترنت نیاز دارد. اتصال را بررسی کنید و صفحه را دوباره باز کنید.'); return; }
@@ -1231,7 +1265,7 @@
     await pullData(sb);
     route();
     flush();
-    setInterval(() => { if (ACC.outbox.length) flush(); }, 30000);
+    setInterval(async () => { if (ACC.outbox.length && await reconnect()) flush(); }, 30000);
   }
 
   // Every row of one table for this account, a page of 1000 at a time, in a stable order.
@@ -1246,11 +1280,12 @@
       if (res.data.length < 1000) return out;
     }
   }
-  // Server rows, with the unsent outbox laid over them, become the app's player objects.
+  // Server rows (after an offline open, the copy on this phone), with the unsent outbox laid over
+  // them, become the app's player objects.
   async function pullData(sb) {
-    const got = await Promise.all(['assess_players', 'assess_results', 'assess_notes'].map(n => fetchAll(sb, n)));
+    const got = ACC.offline ? null : await Promise.all(['assess_players', 'assess_results', 'assess_notes'].map(n => fetchAll(sb, n)));
     let rows;
-    if (got.every(Boolean)) { rows = { players: got[0], results: got[1], notes: got[2] }; lsSet(accKey('rows'), rows); }
+    if (got && got.every(Boolean)) { rows = { players: got[0], results: got[1], notes: got[2] }; lsSet(accKey('rows'), rows); }
     else rows = lsGet(accKey('rows')) || { players: [], results: [], notes: [] };
     ACC.outbox.forEach(op => applyOp(rows, op));
     PLAYERS = rowsToPlayers(rows);
@@ -1278,7 +1313,7 @@
     return Object.keys(byId).map(k => byId[k]);
   }
 
-  // Apply on the phone first, then send. The sample saves nothing.
+  // Apply on the phone first, then send. The sample saves nothing; after an offline open, sending waits for reconnect().
   function queue(op) {
     if (window.SAMPLE) return;
     ACC.outbox.push(op);
@@ -1289,7 +1324,7 @@
     flush();
   }
   async function flush() {
-    if (window.SAMPLE || ACC.flushing || !ACC.outbox.length) { paintSync(); return; }
+    if (window.SAMPLE || ACC.offline || ACC.flushing || !ACC.outbox.length) { paintSync(); return; }
     ACC.flushing = true; paintSync();
     try {
       const sb = await sbReady();
@@ -1377,9 +1412,9 @@
   });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && RT.running) { keepAwake(true); rtTick(); } });
   window.addEventListener('hashchange', route);
-  window.addEventListener('online', () => { if (!window.SAMPLE && ACC.userId) flush(); });
+  window.addEventListener('online', async () => { if (!window.SAMPLE && ACC.userId && await reconnect()) flush(); });
   document.addEventListener('visibilitychange', async () => {
-    if (window.SAMPLE || !ACC.userId || document.visibilityState !== 'visible') return;
+    if (window.SAMPLE || !ACC.userId || document.visibilityState !== 'visible' || !(await reconnect())) return;
     await flush();
     // Other coaches may have saved on their own phones: refresh the player pages, never a form in progress.
     if (!ACC.outbox.length && /^#\/players(\/(?!new)[^/]+)?$/.test(location.hash || '')) {
