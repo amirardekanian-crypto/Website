@@ -6,6 +6,9 @@
 // verify_jwt is OFF deliberately: the platform accepts the publishable key as a "valid JWT".
 // The real check is below: the bearer token must resolve to the coach.
 //
+// The password is generated, or typed by Amir in coach.html (create, reset, restore): then it must
+// pass checkTyped() below, the same rule coach.html applies before sending it.
+//
 // Unlike athlete-login, create never touches an existing username (a typo must not reset
 // another buyer's password), and revoke BANS the user instead of deleting it, so the buyer's
 // players and results are kept and restore can undo it.
@@ -34,6 +37,16 @@ function makePassword(): string {
   return `${pick()}-${pick()}-${pick()}-${n}`;
 }
 
+// A password typed in coach.html. It gets typed again on the buyer's phone, often with a Farsi
+// keyboard one switch away, so only printable English characters: 8 to 72 of them (72 is the most
+// bcrypt reads), no spaces. coach.html checks the same rule first; this is the check that counts.
+// Returns what is wrong, or '' when it is fine.
+function checkTyped(password: string, username: string): string {
+  if (!/^[\x21-\x7E]{8,72}$/.test(password)) return 'password: 8-72 characters, English letters, numbers and symbols only, no spaces';
+  if (password.toLowerCase() === username.toLowerCase()) return 'password must not be the same as the username';
+  return '';
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'POST only' }, 405);
@@ -49,13 +62,16 @@ Deno.serve(async (req: Request) => {
   if (whoErr || !who?.user?.email) return json({ error: 'not signed in' }, 401);
   if (who.user.email.toLowerCase() !== COACH_EMAIL) return json({ error: 'coach only' }, 403);
 
-  let body: { action?: string; username?: string; label?: string };
+  let body: { action?: string; username?: string; label?: string; password?: string };
   try { body = await req.json(); } catch { return json({ error: 'bad JSON' }, 400); }
 
   const action   = String(body.action || '');
   const username = String(body.username || '').trim().toLowerCase();
   const label    = String(body.label || '').trim().slice(0, 80) || null;
   if (!/^[a-z0-9_]{3,32}$/.test(username)) return json({ error: 'bad username: 3-32 characters, a-z 0-9 _' }, 400);
+  const typed = body.password == null || action === 'revoke' ? '' : String(body.password);
+  const bad = typed ? checkTyped(typed, username) : '';
+  if (bad) return json({ error: bad }, 400);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
   const now = new Date().toISOString();
@@ -64,7 +80,7 @@ Deno.serve(async (req: Request) => {
 
   if (action === 'create') {
     if (acct?.user_id) return json({ error: 'username already taken' }, 409);
-    const password = makePassword();
+    const password = typed || makePassword();
     const { data: made, error: mkErr } = await admin.auth.admin.createUser({
       email: `${PREFIX}${username}@${LOGIN_DOMAIN}`, password,
       email_confirm: true,             // nobody can click a link at an address with no inbox
@@ -86,7 +102,7 @@ Deno.serve(async (req: Request) => {
 
   if (action === 'reset' || action === 'restore') {
     if (action === 'reset' && acct.revoked_at) return json({ error: 'login is revoked; restore it instead' }, 409);
-    const password = makePassword();
+    const password = typed || makePassword();
     const { error } = await admin.auth.admin.updateUserById(acct.user_id, { password, ban_duration: 'none' });
     if (error) return json({ error: error.message }, 400);
     await admin.from('assess_accounts').update({

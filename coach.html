@@ -479,6 +479,14 @@
   .credpass { font-family: 'Space Mono', monospace; font-size: 12.5px; background: var(--court-100);
     padding: 3px 9px; border-radius: 6px; flex: 1; min-width: 190px; }
   .credrow .acts { display: flex; gap: 7px; }
+  /* Typing a login password (Athletes, Testing app, Course): the box, its buttons, and the rule under them. */
+  .pwform { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 0 12px;
+    border-bottom: 1px solid var(--rule); }
+  .pwform:last-child { border-bottom: 0; }
+  .pwin { flex: 1; min-width: 190px; font-family: 'Space Mono', monospace; font-size: 14px; padding: 8px 12px;
+    border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); }
+  .pwin:focus { outline: none; border-color: var(--court); }
+  .pwhint { flex-basis: 100%; font-size: 12px; color: var(--muted); margin: 0; }
   .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
   .cmp-did > span { display: inline-block; margin-right: 8px; }
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay); }
@@ -956,6 +964,21 @@ function loginMessage(username, password) {
 }
 
 
+// A password typed in coach.html for any login (Athletes, Testing app, Course), tidied the way it
+// gets typed: spaces at the ends dropped, Persian or Arabic digits turned into 0-9. Empty means
+// "generate one". The rule is the same as checkTyped() in the three login functions, which check it
+// again: 8-72 printable English characters, no spaces, not the username. Returns { password } or { error }.
+function typedPassword(raw, username) {
+  const p = String(raw || '').trim()
+    .replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06F0))
+    .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660));
+  if (!p) return { password: '' };
+  if (!/^[\x21-\x7E]{8,72}$/.test(p)) return { error: 'Password: 8 to 72 characters, English letters, numbers and symbols only, no spaces.' };
+  if (p.toLowerCase() === String(username || '').toLowerCase()) return { error: 'The password can’t be the same as the username.' };
+  return { password: p };
+}
+const PW_HINT = 'Password: 8+ characters, English letters, numbers and symbols, no spaces. Leave it empty to generate one.';
+
 // Clears the stored password once it has gone out. The account is unaffected;
 // this only drops the copy kept for distribution.
 async function markLoginSent(athleteId) {
@@ -1009,18 +1032,38 @@ function pendingCredsHtml() {
   </section>`;
 }
 
+// The athlete whose "Change password" form is open on their page, or null.
+let _athPwOpen = null;
+// Opening or closing it redraws only the athlete's open tab (renderDetailBody), so the page keeps its place.
+function openAthletePw(athleteId) {
+  _athPwOpen = athleteId;
+  renderDetailBody();
+  const el = document.getElementById('athPw');
+  if (el) el.focus();
+}
+function closeAthletePw() { _athPwOpen = null; renderDetailBody(); }
+// Create a login or change its password with what is in the box: a typed password, or empty to generate one.
+function athleteSavePw(athleteId, action) {
+  const el = document.getElementById('athPw');
+  const t = typedPassword(el ? el.value : '', athleteId);
+  if (t.error) { toast(t.error); return; }
+  athleteLoginAction(athleteId, action, t.password);
+}
+
 // Create / reset / revoke an athlete's login. All three go through the
 // athlete-login Edge Function, because creating a user needs the service-role key
-// and that must never exist in a page anyone can view source on.
-async function athleteLoginAction(athleteId, action) {
+// and that must never exist in a page anyone can view source on. A create or reset
+// can carry a password Amir typed (checked by typedPassword first, and again by the
+// function); without one, the function generates it.
+async function athleteLoginAction(athleteId, action, password) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const { data, error } = await sb.functions.invoke('athlete-login', {
-    body: { action, athlete_id: athleteId },
+    body: { action, athlete_id: athleteId, password: password || undefined },
   });
-  if (error || (data && data.error)) {
-    alert('Could not ' + action + ' the login:\n\n' + ((data && data.error) || error.message));
-    return;
-  }
+  let msg = data && data.error;
+  if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
+  if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  _athPwOpen = null;
   await loadLogins();
   render();
 
@@ -1028,7 +1071,7 @@ async function athleteLoginAction(athleteId, action) {
 
   copyText(loginMessage(data.username, data.password));
   alert(
-    (data.created ? 'Login created' : 'Password reset') + ' for ' + data.username + '\n\n' +
+    (data.created ? 'Login created' : password ? 'Password changed' : 'Password reset') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
     'The full WhatsApp message is copied to your clipboard. It also stays under ' +
     '"Logins to send" on the Athletes tab until you mark it sent.'
@@ -3204,18 +3247,29 @@ function fileTabHtml(D) {
           <b>${esc(athleteId)}</b> has a username and password — created ${esc(prettyDate(String(login.linked_at).slice(0,10)))}.
           They sign in at <code>${esc(SITE)}/program.html</code> with no link needed.
         </p>
+        ${_athPwOpen === athleteId ? `
+        <div class="pwform">
+          <input id="athPw" class="pwin" placeholder="new password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
+                 onkeydown="if(event.key==='Enter') athleteSavePw('${esc(athleteId)}','reset')">
+          <button class="btn sm primary" onclick="athleteSavePw('${esc(athleteId)}','reset')">Save password</button>
+          <button class="btn sm" onclick="closeAthletePw()">Cancel</button>
+          <p class="pwhint">${PW_HINT} The old password stops working straight away.</p>
+        </div>` : `
         <div class="note-actions">
-          <button class="btn sm" onclick="athleteLoginAction('${esc(athleteId)}','reset')">Reset password</button>
+          <button class="btn sm" onclick="openAthletePw('${esc(athleteId)}')">Change password</button>
           <button class="btn sm danger" onclick="if(confirm('Remove ${esc(athleteId)}\\'s login? They will not be able to sign in until you make a new one.')) athleteLoginAction('${esc(athleteId)}','revoke')">Remove login</button>
-        </div>`
+        </div>`}`
       : `
         <p class="empty" style="padding:0 0 10px">
           No login yet — ${esc(athleteId)} still gets in through the secret link below.
           Creating one gives them a username and password to sign in with instead, which their
           phone can save.
         </p>
-        <div class="note-actions">
-          <button class="btn sm primary" onclick="athleteLoginAction('${esc(athleteId)}','create')">Create login</button>
+        <div class="pwform">
+          <input id="athPw" class="pwin" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
+                 onkeydown="if(event.key==='Enter') athleteSavePw('${esc(athleteId)}','create')">
+          <button class="btn sm primary" onclick="athleteSavePw('${esc(athleteId)}','create')">Create login</button>
+          <p class="pwhint">${PW_HINT}</p>
         </div>`}
     </section>
     <div class="sec"><span>Program file</span></div>
@@ -3845,6 +3899,7 @@ function renderAffiliates() {
 // Backend: supabase/assess_01_accounts_content_data.sql + supabase/functions/assess-login.
 const ASSESS_URL = SITE + '/tennis-testing/';
 let _assessBusy = false;
+let _assessPw = null;   // the username whose password form is open (Change password or Restore), or null
 
 async function loadAssess() {
   if (DEMO) {
@@ -3870,22 +3925,23 @@ function assessMessage(username, password) {
     'برای افزودن به صفحهٔ اصلی گوشی: لینک را باز کنید، بعد Share و Add to Home Screen.';
 }
 
-async function assessAction(action, username, label, btn) {
+// password: one Amir typed (already checked by typedPassword), or '' to have the function generate one.
+async function assessAction(action, username, label, btn, password) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (_assessBusy) return;
   if (action === 'revoke' && !confirm('Revoke ' + username + '?\n\nThey can no longer sign in. Their saved players and results are kept, and Restore brings the login back with a new password.')) return;
-  if (action === 'reset' && !confirm('Give ' + username + ' a new password? The old one stops working.')) return;
   _assessBusy = true; if (btn) btn.disabled = true;
-  const { data, error } = await sb.functions.invoke('assess-login', { body: { action, username, label } });
+  const { data, error } = await sb.functions.invoke('assess-login', { body: { action, username, label, password: password || undefined } });
   _assessBusy = false; if (btn) btn.disabled = false;
   let msg = data && data.error;
   if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
   if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  _assessPw = null;
   await loadAssess();
   if (action === 'revoke') { toast(username + ' revoked'); renderAssess(); return; }
   copyText(assessMessage(data.username, data.password));
   renderAssess();
-  alert((data.created ? 'Login created' : 'New password') + ' for ' + data.username + '\n\n' +
+  alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
     'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.');
 }
@@ -3915,30 +3971,47 @@ function renderAssess() {
       ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>`
         : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
       <span class="acts">${r.revoked_at
-        ? `<button class="btn sm as-act" data-act="restore" data-u="${esc(r.username)}">Restore</button>`
+        ? `<button class="btn sm as-pw" data-u="${esc(r.username)}">Restore</button>`
         : (r.initial_password ? `<button class="btn sm primary as-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm as-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm as-act" data-act="reset" data-u="${esc(r.username)}">New password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
-    </div>`;
+          `<button class="btn sm as-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
+    </div>` + (_assessPw === r.username ? `<div class="pwform">
+      <input class="pwin as-pwin" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button class="btn sm primary as-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
+      <button class="btn sm as-pwcancel">Cancel</button>
+      <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
+    </div>` : '');
   const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
   let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="asUser" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
       <input id="asLabel" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="asPass" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="asCreate">Create login</button>
     </div>
-    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username and password.</p></section>`;
+    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username and password. ${PW_HINT}</p></section>`;
   html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay)">${toSend} to send</span>` : ''}</span></div>` +
     (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _assessPw) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
   c.innerHTML = html;
   const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
   on('#asCreate', el => {
     const u = ($('asUser').value || '').trim().toLowerCase();
     if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
-    assessAction('create', u, ($('asLabel').value || '').trim(), el);
+    const t = typedPassword($('asPass').value, u);
+    if (t.error) { toast(t.error); return; }
+    assessAction('create', u, ($('asLabel').value || '').trim(), el, t.password);
   });
   on('.as-act', el => assessAction(el.dataset.act, el.dataset.u, '', el));
+  on('.as-pw', el => { _assessPw = el.dataset.u; renderAssess(); const i = c.querySelector('.as-pwin'); if (i) i.focus(); });
+  on('.as-pwcancel', () => { _assessPw = null; renderAssess(); });
+  on('.as-pwsave', el => {
+    const t = typedPassword(c.querySelector('.as-pwin').value, el.dataset.u);
+    if (t.error) { toast(t.error); return; }
+    assessAction(el.dataset.act, el.dataset.u, '', el, t.password);
+  });
+  const asPwIn = c.querySelector('.as-pwin');
+  if (asPwIn) asPwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.as-pwsave').click(); } });
   on('.as-sent', el => assessMarkSent(el.dataset.u));
   on('.as-copy', el => {
     const r = rows.find(x => x.username === el.dataset.u);
@@ -3955,6 +4028,7 @@ function renderAssess() {
 // Backend: supabase/tps_01_accounts_content.sql + supabase/functions/tps-login.
 const COURSE_URL = SITE + '/tennis/app/';
 let _courseBusy = false;
+let _coursePw = null;   // the username whose password form is open (Change password or Restore), or null
 
 async function loadCourse() {
   if (DEMO) {
@@ -3982,22 +4056,23 @@ function courseMessage(username, password) {
     'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید.';
 }
 
-async function courseAction(action, username, label, btn) {
+// password: one Amir typed (already checked by typedPassword), or '' to have the function generate one.
+async function courseAction(action, username, label, btn, password) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (_courseBusy) return;
   if (action === 'revoke' && !confirm('Revoke ' + username + '?\n\nThey can no longer sign in, and the app deletes the handbook from their phone the next time it opens online. Restore brings the login back with a new password.')) return;
-  if (action === 'reset' && !confirm('Give ' + username + ' a new password? The old one stops working.')) return;
   _courseBusy = true; if (btn) btn.disabled = true;
-  const { data, error } = await sb.functions.invoke('tps-login', { body: { action, username, label } });
+  const { data, error } = await sb.functions.invoke('tps-login', { body: { action, username, label, password: password || undefined } });
   _courseBusy = false; if (btn) btn.disabled = false;
   let msg = data && data.error;
   if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
   if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  _coursePw = null;
   await loadCourse();
   if (action === 'revoke') { toast(username + ' revoked'); renderCourse(); return; }
   copyText(courseMessage(data.username, data.password));
   renderCourse();
-  alert((data.created ? 'Login created' : 'New password') + ' for ' + data.username + '\n\n' +
+  alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
     'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.');
 }
@@ -4027,30 +4102,47 @@ function renderCourse() {
       ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>`
         : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
       <span class="acts">${r.revoked_at
-        ? `<button class="btn sm tp-act" data-act="restore" data-u="${esc(r.username)}">Restore</button>`
+        ? `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Restore</button>`
         : (r.initial_password ? `<button class="btn sm primary tp-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm tp-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm tp-act" data-act="reset" data-u="${esc(r.username)}">New password</button><button class="btn sm tp-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
-    </div>`;
+          `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm tp-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
+    </div>` + (_coursePw === r.username ? `<div class="pwform">
+      <input class="pwin tp-pwin" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button class="btn sm primary tp-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
+      <button class="btn sm tp-pwcancel">Cancel</button>
+      <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
+    </div>` : '');
   const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
   let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the Tennis Performance System course (Level 2), <a href="${COURSE_URL}" target="_blank" rel="noopener">${COURSE_URL}</a>. One login per buyer.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="tpUser" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
       <input id="tpLabel" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="tpPass" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="tpCreate">Create login</button>
     </div>
-    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps.</p></section>`;
+    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps. ${PW_HINT}</p></section>`;
   html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay)">${toSend} to send</span>` : ''}</span></div>` +
     (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _coursePw) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
   c.innerHTML = html;
   const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
   on('#tpCreate', el => {
     const u = ($('tpUser').value || '').trim().toLowerCase();
     if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
-    courseAction('create', u, ($('tpLabel').value || '').trim(), el);
+    const t = typedPassword($('tpPass').value, u);
+    if (t.error) { toast(t.error); return; }
+    courseAction('create', u, ($('tpLabel').value || '').trim(), el, t.password);
   });
   on('.tp-act', el => courseAction(el.dataset.act, el.dataset.u, '', el));
+  on('.tp-pw', el => { _coursePw = el.dataset.u; renderCourse(); const i = c.querySelector('.tp-pwin'); if (i) i.focus(); });
+  on('.tp-pwcancel', () => { _coursePw = null; renderCourse(); });
+  on('.tp-pwsave', el => {
+    const t = typedPassword(c.querySelector('.tp-pwin').value, el.dataset.u);
+    if (t.error) { toast(t.error); return; }
+    courseAction(el.dataset.act, el.dataset.u, '', el, t.password);
+  });
+  const tpPwIn = c.querySelector('.tp-pwin');
+  if (tpPwIn) tpPwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.tp-pwsave').click(); } });
   on('.tp-sent', el => courseMarkSent(el.dataset.u));
   on('.tp-copy', el => {
     const r = rows.find(x => x.username === el.dataset.u);
