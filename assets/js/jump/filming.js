@@ -43,7 +43,7 @@
         body: [
           "**Record in your phone's slow-motion mode, 240 fps, 1080p.** Every phone made in the last several years has it. Don't use 4K, most phones drop to 60 or 120 fps when you do.",
           "Here's why it matters this much. At 240 frames a second, one frame is 4 milliseconds and we can measure your jump to about **a fifth of a centimetre**. At 30 frames a second, which is what normal video records at, one frame is 33 milliseconds and the same jump is only good to **plus or minus 4 centimetres**.",
-          "4 centimetres is more than most athletes improve in a season. So a 30 fps clip can't tell you whether you got better or whether the camera blinked at a different moment. **This page won't accept video below 60 fps**, and it will tell you what it found before it does anything else.",
+          "4 centimetres is more than most athletes improve in a season. So a 30 fps clip can't tell you whether you got better or whether the camera blinked at a different moment. **This page won't accept video below 120 fps**, and it will tell you what it found before it does anything else.",
           "Going above 240 buys you almost nothing. Don't chase 960."
         ],
         bullets: []
@@ -194,7 +194,7 @@
       "**Typical** is what you actually get. **Worst case** is what one badly chosen frame costs you.",
       "Contact time is punished about two and a half times harder than flight time, because it's two and a half times shorter. That's why RSI needs a faster camera than jump height does.",
       "Above 240 fps there's almost nothing left to win. There's a floor of about 0.8 milliseconds that comes from motion blur and your foot squashing against the floor, and no camera fixes that.",
-      "**These are the tool's errors, not yours.** Your own day to day variation is about 3% on jump height and 5 to 8% on RSI, which at 240 fps is bigger than everything in this table. That's the point. At 240 fps the camera stops being the thing holding you back.",
+      "**These are the tool's errors, not yours.** Your own best jump moves about 1 to 1.5 cm between test days even when nothing has changed, which at 240 fps is bigger than everything in this table. That's the point. At 240 fps the camera stops being the thing holding you back.",
       "Separately from all of the above, a height measured from flight time reads about 2.5 to 3 cm higher than a force plate would say. That's a difference in what's being measured, not a mistake, and a faster camera doesn't shrink it. Just don't put these numbers on the same chart as force plate numbers."
     ]
   };

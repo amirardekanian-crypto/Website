@@ -12,6 +12,8 @@
 
     kit.js        the registry and the shape a test file must follow
     physics.js    every formula, with its derivation and its units
+    athlete.js    what we ask the athlete, and the reference range
+    progress.js   reps into sessions, the baseline, and when a change is real
     filming.js    the shared camera guide
     video.js      container parsing for exact frame timing, frame extraction
     tracking.js   background subtraction, foot tracking, sub frame refinement
@@ -19,6 +21,13 @@
 
   To change a protocol, a cue, a threshold or a formula, edit the test file.
   Nothing in here needs to know.
+
+  CACHING, READ THIS BEFORE YOU SHIP A CHANGE UNDER assets/js/jump/
+  sw.js, the programme app's service worker, serves every JS file on this
+  origin cache-first, and it controls this page too for anyone who has the
+  programme app. A changed file only reaches them if its URL changes. So bump
+  the ?v= on the script tags at the bottom of this file, and on the same tags
+  in jump-selftest.html.
 
   NO BACKTICKS ANYWHERE IN THIS FILE. A backtick inside a comment inside a
   template literal has taken the live app down twice.
@@ -752,17 +761,19 @@ details .dbody{padding:0 16px 16px}
 </nav>
 
 
-<!-- the knowledge, one file per thing that might change -->
-<script src="/assets/js/jump/kit.js"></script>
-<script src="/assets/js/jump/physics.js"></script>
-<script src="/assets/js/jump/athlete.js"></script>
-<script src="/assets/js/jump/filming.js"></script>
-<script src="/assets/js/jump/video.js"></script>
-<script src="/assets/js/jump/tracking.js"></script>
-<script src="/assets/js/jump/tests/cmj.js"></script>
-<script src="/assets/js/jump/tests/sj.js"></script>
-<script src="/assets/js/jump/tests/dj.js"></script>
-<script src="/assets/js/jump/tests/hop-10-5.js"></script>
+<!-- the knowledge, one file per thing that might change. Bump every ?v= when
+     any of them changes, see CACHING at the top of this file. -->
+<script src="/assets/js/jump/kit.js?v=20260914"></script>
+<script src="/assets/js/jump/physics.js?v=20260914"></script>
+<script src="/assets/js/jump/athlete.js?v=20260914"></script>
+<script src="/assets/js/jump/progress.js?v=20260914"></script>
+<script src="/assets/js/jump/filming.js?v=20260914"></script>
+<script src="/assets/js/jump/video.js?v=20260914"></script>
+<script src="/assets/js/jump/tracking.js?v=20260914"></script>
+<script src="/assets/js/jump/tests/cmj.js?v=20260914"></script>
+<script src="/assets/js/jump/tests/sj.js?v=20260914"></script>
+<script src="/assets/js/jump/tests/dj.js?v=20260914"></script>
+<script src="/assets/js/jump/tests/hop-10-5.js?v=20260914"></script>
 
 <script>
 (function () {
@@ -1133,7 +1144,7 @@ details .dbody{padding:0 16px 16px}
     var optCard = el('<div class="card" style="margin-top:14px"></div>');
     optCard.innerHTML =
       '<p class="eyebrow">Optional, and what each one adds</p>' +
-      '<p class="small" style="margin-bottom:16px">None of these change your jump height. They make the app better at telling you when a result is worth a second look, and at giving you advice that fits you. Skip any of them.</p>' +
+      '<p class="small" style="margin-bottom:16px">None of these change your jump height. They help the app put your number in context, and give you advice that fits you. Skip any of them.</p>' +
       optional.map(inputFor).join("");
     host.appendChild(optCard);
 
@@ -1337,16 +1348,17 @@ details .dbody{padding:0 16px 16px}
     var need = App.test.requires.minFps;
     if (!fps) return { warn: true, text: "We couldn’t pin down a single frame rate for this clip, so we’re timing from each frame’s own timestamp. That’s the right thing to do, but precision is reduced." };
     if (fps < 60) {
-      return { block: true, text: "This clip is about " + Math.round(fps) + " frames per second. One frame is " + Math.round(1000 / fps) + " milliseconds, which is around 4 cm on a jump, more than most athletes improve in a season. We won’t produce a number from it. Record in your phone’s slow motion mode." };
+      return { block: true, text: "This clip is about " + Math.round(fps) + " frames per second. One frame is " + Math.round(1000 / fps) + " milliseconds, which can be several centimetres on a jump, more than most athletes improve in a season. We won’t produce a number from it. Record in your phone’s slow motion mode." };
     }
-    if (fps < need) {
-      return { block: true, text: "This clip is about " + Math.round(fps) + " fps, and this test needs at least " + need + ". Time on the ground is far shorter than time in the air, so it needs a faster camera. Record at 240 fps." };
+    // The floor is per test, and a phone's 119.88 counts as 120, see physics.meetsMinFps.
+    if (!P.meetsMinFps(fps, need)) {
+      var why = App.test.requires.needsContactTime
+        ? "Time on the ground is far shorter than time in the air, so it needs a faster camera."
+        : "Below that the camera’s own error is big enough to hide a real change, so History couldn’t use it.";
+      return { block: true, text: "This clip is about " + Math.round(fps) + " fps, and this test needs at least " + need + ". " + why + " Record in slow motion at 240 fps." };
     }
-    if (fps < 120) {
-      return { warn: true, text: "About " + Math.round(fps) + " fps. Expect roughly plus or minus 2 cm. Fine for a look, but don’t track progress with it and don’t compare it against a 240 fps result." };
-    }
-    if (fps < 240) {
-      return { warn: true, text: "About " + Math.round(fps) + " fps. Usable, but 240 is the standard for this and it roughly halves the error." };
+    if (!P.meetsMinFps(fps, 240)) {
+      return { warn: true, text: "About " + Math.round(fps) + " fps. Usable, but 240 is the standard for this and it roughly halves the error. Stick to one frame rate, because History won’t compare a 120 fps session with a 240 fps one." };
     }
     return {};
   }
@@ -1369,8 +1381,9 @@ details .dbody{padding:0 16px 16px}
     row("Frames", p.nSamples);
     if (fps) row("Frame period", (1000 / fps).toFixed(2) + " ms");
     if (fps) {
+      // timingError_s is already the whole flight time's error, see physics.js.
       var te = P.timingError_s(1 / fps);
-      var sig = P.heightSensitivity_m_per_s(0.5) * Math.sqrt(2) * te * 100;
+      var sig = P.heightSensitivity_m_per_s(0.5) * te * 100;
       row("Expected precision", "plus or minus " + sig.toFixed(2) + " cm on height");
     }
     if (p.captureFpsHint) row("Phone says captured at", p.captureFpsHint.toFixed(0) + " fps");
@@ -1770,6 +1783,10 @@ details .dbody{padding:0 16px 16px}
     var t = App.test;
     var fps = 1 / medianDiff(a.T);
 
+    // What the athlete has done with this rep so far. Void wins over Count it
+    // anyway, and both work before or after Save.
+    App.rep = { voided: false, keep: false, savedId: null };
+
     var trial = {
       flights: a.flights,
       contacts: a.contacts,
@@ -1830,8 +1847,11 @@ details .dbody{padding:0 16px 16px}
 
     var blocked = res.warnings.filter(function (w) { return w.severity === "block"; });
 
+    // innerHTML, not appendChild(el(...)). el() keeps only the FIRST element
+    // of the string, so the hero used to show the label and drop the number,
+    // the unit and the precision, from the first commit until 2026-09-14.
     if (!res.primary || blocked.length) {
-      hero.appendChild(el('<div class="rl">No number</div><div class="rv" style="font-size:44px">—</div>'));
+      hero.innerHTML = '<div class="rl">No number</div><div class="rv" style="font-size:44px">—</div>';
       blocked.forEach(function (w) {
         body.appendChild(el('<div class="notice notice--stop"><span class="nt">Why there’s no number</span>' + esc(w.text) + "</div>"));
       });
@@ -1841,13 +1861,12 @@ details .dbody{padding:0 16px 16px}
     }
 
     var p = res.primary;
-    hero.appendChild(el(
+    hero.innerHTML =
       '<div class="rl">' + esc(p.label) + "</div>" +
       '<div><span class="rv">' + esc(p.display) + '</span><span class="ru">' + esc(p.unit) + "</span></div>" +
       '<div class="rs">' + esc(p.sublabel) + "</div>" +
       (p.precision ? '<div class="rp">' + esc(p.precision) + "</div>" : "") +
-      (p.band ? '<div class="rs" style="margin-top:10px">' + esc(p.band) + "</div>" : "")
-    ));
+      (p.band ? '<div class="rs" style="margin-top:10px">' + esc(p.band) + "</div>" : "");
 
     // Secondary metrics. Pinned ones always show, the rest fold away.
     var pinned = res.secondary.filter(function (m) { return m.pinned; });
@@ -1857,8 +1876,17 @@ details .dbody{padding:0 16px 16px}
 
     var warnAmber = res.warnings.filter(function (w) { return w.severity !== "block"; });
     warnAmber.forEach(function (w) {
+      // A warning with a voidOption is one that inflates the number. Saving
+      // the rep keeps it, but it doesn't count toward the score unless the
+      // athlete taps Count it anyway (progress.repOutcome).
       var n = el('<div class="notice notice--warn"><span class="nt">Worth knowing</span>' + esc(w.text) +
-        (w.voidOption ? '<div style="margin-top:12px"><button class="btn btn--ghost btn--sm" data-void="' + esc(w.voidOption) + '">Void this rep: ' + esc(w.voidOption) + "</button></div>" : "") + "</div>");
+        (w.voidOption
+          ? '<div class="row" style="margin-top:12px">' +
+              '<button class="btn btn--ghost btn--sm" data-void="' + esc(w.voidOption) + '">Void this rep: ' + esc(w.voidOption) + "</button>" +
+              '<button class="btn btn--ghost btn--sm" data-keep="1">Count it anyway</button>' +
+            "</div>" +
+            '<p class="tiny" style="margin-top:8px">If you save it without voiding, it’s kept but it doesn’t count toward your score. Tap Count it anyway only if the app got this wrong.</p>'
+          : "") + "</div>");
       body.appendChild(n);
     });
 
@@ -1867,8 +1895,8 @@ details .dbody{padding:0 16px 16px}
     }
 
     // Context for the number, but only as much as we have actually earned.
-    // If they have not told us who they are, we say the band is wide and why,
-    // rather than pretending a one-size band means something.
+    // If we can't place them against the reference, we say why rather than
+    // show a range that doesn't fit them.
     var band = typicalContext(res, ctx);
     if (band) body.appendChild(band);
 
@@ -1906,13 +1934,53 @@ details .dbody{padding:0 16px 16px}
 
     body.appendChild(actionsCard(true, res));
 
-    body.addEventListener("click", function (e) {
-      var vb = e.target.closest("[data-void]");
-      if (vb) {
-        vb.disabled = true;
-        vb.textContent = "Voided";
-      }
-    });
+    // One listener for the life of the page. renderResult runs once per rep,
+    // and it used to add another listener every time.
+    if (!body.getAttribute("data-wired")) {
+      body.setAttribute("data-wired", "1");
+      body.addEventListener("click", function (e) {
+        if (e.target.closest("[data-void]")) voidRep();
+        else if (e.target.closest("[data-keep]")) keepRep();
+      });
+    }
+  }
+
+  // Void: never saved, or taken back out of History if it already was.
+  function voidRep() {
+    if (App.rep.voided) return;
+    App.rep.voided = true;
+    if (App.rep.savedId) {
+      var gone = App.rep.savedId;
+      App.log = App.log.filter(function (r) { return r.id !== gone; });
+      save(LS.log, App.log);
+      App.rep.savedId = null;
+    }
+    disableButtons("[data-void]", "Voided");
+    disableButtons("[data-keep]", null);
+    var sb = $("btnSaveRep");
+    if (sb) { sb.disabled = true; sb.textContent = "Voided, not saved"; }
+  }
+
+  // Count it anyway: the athlete says the flag was wrong.
+  function keepRep() {
+    if (App.rep.voided || App.rep.keep) return;
+    App.rep.keep = true;
+    if (App.rep.savedId) {
+      var id = App.rep.savedId;
+      App.log.forEach(function (r) { if (r.id === id) r.counted = true; });
+      save(LS.log, App.log);
+      var sb = $("btnSaveRep");
+      if (sb) sb.textContent = "Saved";
+    }
+    disableButtons("[data-keep]", "Counted");
+  }
+
+  function disableButtons(selector, text) {
+    var bs = document.querySelectorAll("#resultBody " + selector);
+    for (var i = 0; i < bs.length; i++) {
+      bs[i].disabled = true;
+      if (text) bs[i].textContent = text;
+    }
   }
 
 
@@ -1925,31 +1993,27 @@ details .dbody{padding:0 16px 16px}
      ------------------------------------------------------------------ */
 
   function typicalContext(res, ctx) {
-    if (!res.primary) return null;
-    var A = JumpKit.athlete;
-    var r = A.typicalRange(App.test.id, App.cfg);
+    if (!res.primary || res.primary.key !== "height") return null;
+    var r = JumpKit.athlete.referenceRange(App.test.id, App.cfg);
     if (!r) return null;
 
-    var isHeight = res.primary.key === "height";
-    var v = res.primary.value;
-    var lo = isHeight ? r.low : r.low;
-    var hi = isHeight ? r.high : r.high;
-    var fmtV = isHeight
-      ? function (x) { return (x * 100).toFixed(0) + " cm"; }
-      : function (x) { return x.toFixed(1); };
-
-    var where = v < lo ? "below" : (v > hi ? "above" : "inside");
-    var line = "Most people doing this test land between <strong>" + fmtV(lo) + "</strong> and <strong>" +
-               fmtV(hi) + "</strong>. You are " + where + " that.";
-
-    if (!r.specific) {
-      line += " That band is deliberately wide, because we do not know your sex or age. Tell us and it gets a lot more useful.";
-    } else if (r.adjusted.indexOf("age") !== -1) {
-      line += " Adjusted for your age.";
+    var line;
+    if (r.none) {
+      line = {
+        sex: "Tell us your sex and age and we’ll show where your jump sits against German squad tennis players your age.",
+        age: "Tell us your age and we’ll show where your jump sits against German squad tennis players your age.",
+        young: "There’s no reliable reference under age 9, so we don’t show one. Your own progress is what counts.",
+        adult: "Our tennis reference stops at age 21. After that, compare yourself with your own baseline in History."
+      }[r.none];
+    } else {
+      var v = res.primary.value;
+      var cm = function (x) { return (x * 100).toFixed(1) + " cm"; };
+      var where = v < r.low ? "below" : (v > r.high ? "above" : "inside");
+      line = "The middle 60% of " + r.group + " your age jump between <strong>" + cm(r.low) + "</strong> and <strong>" +
+             cm(r.high) + "</strong>. You’re " + where + " that." +
+             (r.rough ? " Under 10 the reference group is small, so treat this as rough." : "") +
+             " These are selected squad players, a high bar for most club players. <strong>This is context, not a target.</strong> What matters is your own number moving, and History tells you when a change is real.";
     }
-
-    line += " <strong>This is context, not a target.</strong> What matters is your own number moving, and the app will tell you when a change is real rather than noise.";
-
     return el('<div class="notice notice--info"><span class="nt">Where this sits</span>' + line + "</div>");
   }
 
@@ -2090,11 +2154,12 @@ details .dbody{padding:0 16px 16px}
     var row = c.querySelector("#actRow");
 
     if (canSave) {
-      var saveBtn = el('<button class="btn btn--sm">Save this rep</button>');
+      var saveBtn = el('<button class="btn btn--sm" id="btnSaveRep">Save this rep</button>');
       saveBtn.addEventListener("click", function () {
-        saveResult(res);
+        if (App.rep.voided || App.rep.savedId) return;
+        var rec = saveResult(res);
         saveBtn.disabled = true;
-        saveBtn.textContent = "Saved";
+        saveBtn.textContent = rec.counted ? "Saved" : "Saved, not counted";
       });
       row.appendChild(saveBtn);
     }
@@ -2118,17 +2183,23 @@ details .dbody{padding:0 16px 16px}
 
   /* ==================================================================
      Saving and history
+
+     A saved result is ONE REP. History turns reps into sessions and
+     decides whether anything really changed, through progress.js. It
+     never compares two reps with each other, and never two athletes.
      ================================================================== */
 
   function saveResult(res) {
     var a = App.analysis;
     var fps = 1 / medianDiff(a.T);
     var f = a.mainFlight;
+    var outcome = K.progress.repOutcome(res, App.rep);
+    var id = Date.now() + "-" + Math.round(Math.random() * 1e6);
 
     // The record carries everything that makes two results comparable or not.
-    // Charts refuse to join points where any of these differ.
-    App.log.push({
-      id: Date.now() + "-" + Math.round(Math.random() * 1e6),
+    // History never puts two sessions on one line where any of these differ.
+    var rec = {
+      id: id,
       date: new Date().toISOString().slice(0, 10),
       time: new Date().toISOString(),
       athlete: App.cfg.name || "you",
@@ -2151,9 +2222,20 @@ details .dbody{padding:0 16px 16px}
       flightTime_s: f ? (f.end - f.start) : null,
       confidence: a.confidence,
       detector: a.detector === "manual" ? "manual" : "auto",
-      scoreType: App.test.scoring.score
-    });
+      scoreType: App.test.scoring.score,
+      // A rep flagged for a soft landing, tucked legs or a dip is kept but not
+      // counted, unless the athlete tapped Count it anyway.
+      counted: outcome.counted,
+      flags: outcome.flags,
+      // Stored with the rep, so the change rule uses the age the athlete was
+      // at the time, and each athlete on a shared phone keeps their own.
+      age: App.cfg.age == null || App.cfg.age === "" ? null : App.cfg.age,
+      sex: App.cfg.sex || null
+    };
+    App.log.push(rec);
     save(LS.log, App.log);
+    App.rep.savedId = id;
+    return rec;
   }
 
   function renderHistory() {
@@ -2165,51 +2247,36 @@ details .dbody{padding:0 16px 16px}
       return;
     }
 
-    var byTest = {};
-    App.log.forEach(function (r) { (byTest[r.testId] = byTest[r.testId] || []).push(r); });
+    var Pr = K.progress;
+    var people = Pr.athletes(App.log);
+    var keys = people.map(function (p) { return p.key; });
+    var mine = Pr.athleteKey(App.cfg.name);
+    if (keys.indexOf(App.historyAthlete) === -1) {
+      App.historyAthlete = keys.indexOf(mine) !== -1 ? mine : keys[0];
+    }
+    var who = App.historyAthlete;
 
-    Object.keys(byTest).forEach(function (id) {
-      var t = K.getTest(id);
-      var rows = byTest[id].slice().reverse();
-      var best = rows.reduce(function (b, r) { return (!b || r.value > b.value) ? r : b; }, null);
-
-      var card = el('<div class="card" style="margin-bottom:14px"><div class="card-h"><h3>' +
-        esc(t ? t.name : id) + "</h3></div></div>");
-
-      // Anything that changes the meaning of the number breaks the line.
-      var conditions = {};
-      rows.forEach(function (r) {
-        conditions[[r.arms, r.surface, r.dropHeight_cm, r.cue, r.footwear || ""].join("|")] = true;
+    // One phone, several athletes. Their results never mix.
+    if (people.length > 1) {
+      var seg = '<div class="field"><label class="fl">Whose results</label><div class="seg">';
+      people.forEach(function (p) {
+        seg += '<button type="button" data-who="' + esc(p.key) + '" aria-pressed="' + (p.key === who ? "true" : "false") + '">' +
+               esc(p.name) + "</button>";
       });
-      if (Object.keys(conditions).length > 1) {
-        card.appendChild(el('<div class="notice notice--warn" style="margin-bottom:12px"><span class="nt">Not one line</span>' +
-          "These weren’t all done under the same conditions, so they can’t be read as one trend. Arms, surface, shoes, box height or the cue changed somewhere in here, and any one of those moves the number on its own.</div>"));
-      }
-
-      rows.forEach(function (r) {
-        card.appendChild(el('<div class="hist-row"><span class="hd">' + esc(r.date) + "</span>" +
-          '<span class="hv">' + esc(r.display) + "</span>" +
-          '<span class="hm">' + esc(r.unit) + (r === best ? ' <span class="pb">Best</span>' : "") +
-          (r.detector === "manual" ? " · marked by hand" : "") +
-          (r.lambda !== 1 ? ' · <span style="color:var(--clay)">corrected ÷' + r.lambda + "</span>" : "") +
-          "</span></div>"));
+      seg += "</div></div>";
+      var pick = el("<div>" + seg + "</div>");
+      pick.addEventListener("click", function (e) {
+        var b = e.target.closest("button[data-who]");
+        if (!b) return;
+        App.historyAthlete = b.getAttribute("data-who");
+        renderHistory();
       });
+      host.appendChild(pick);
+    }
 
-      // The change gate. Below the minimum detectable change we say nothing
-      // moved, and we do not draw an arrow.
-      if (rows.length >= 2 && t) {
-        var cv = id === "cmj" || id === "sj" ? P.CV.cmjHeight_240fps : P.CV.djRsi_betweenDays;
-        var mdc = P.mdc95(cv, Math.max(1, t.scoring.trials));
-        var delta = (rows[0].value - rows[1].value) / rows[1].value;
-        var real = Math.abs(delta) > mdc;
-        card.appendChild(el('<p class="tiny" style="margin-top:12px">' +
-          (real
-            ? "Latest is " + (delta > 0 ? "up" : "down") + " " + Math.abs(delta * 100).toFixed(1) + "% on the one before. That's past the noise floor of " + (mdc * 100).toFixed(1) + "%, so it's a real change."
-            : "No change detected. The difference is " + Math.abs(delta * 100).toFixed(1) + "%, and anything under " + (mdc * 100).toFixed(1) + "% is noise for this test. Nothing to act on.") +
-          "</p>"));
-      }
-
-      host.appendChild(card);
+    K.tests.forEach(function (t) {
+      var rep = Pr.report(App.log, t, who, { age: who === mine ? App.cfg.age : null });
+      if (rep.sessions.length) host.appendChild(historyCard(t, rep));
     });
 
     var clear = el('<button class="btn btn--ghost btn--sm" style="margin-top:10px">Clear all jump data on this device</button>');
@@ -2221,6 +2288,69 @@ details .dbody{padding:0 16px 16px}
       }
     });
     host.appendChild(clear);
+  }
+
+  // One test for one athlete. The verdict first, because it's what they came
+  // for, then every session, newest first, in lines of matching conditions.
+  function historyCard(t, rep) {
+    var Pr = K.progress;
+    var height = rep.sessions[0].reps[0].unit === "cm";
+    var fmt = height ? P.fmt.heightCm : P.fmt.rsi;
+    var unit = height ? "cm" : "m/s";
+    var card = el('<div class="card" style="margin-bottom:14px"><div class="card-h"><h3>' + esc(t.name) + "</h3></div></div>");
+
+    var d = Pr.describe(rep, t);
+    if (d && d.reason) {
+      card.appendChild(el('<div class="notice notice--info"><span class="nt">' + esc(d.title) + "</span>" + esc(d.text) + "</div>"));
+    } else if (d) {
+      d.items.forEach(function (it) {
+        card.appendChild(el('<div class="notice notice--' + it.tone + '"><span class="nt">' + esc(it.title) + "</span><strong>" +
+          esc(it.head) + "</strong> " + esc(it.text) + "</div>"));
+      });
+      card.appendChild(el('<p class="tiny" style="margin-top:10px">' + esc(d.explain) + "</p>"));
+    }
+
+    var lines = [];
+    var byLine = {};
+    rep.sessions.forEach(function (s) {
+      if (!byLine[s.lineKey]) {
+        byLine[s.lineKey] = { conditions: s.conditions, sessions: [] };
+        lines.push(byLine[s.lineKey]);
+      }
+      byLine[s.lineKey].sessions.push(s);
+    });
+    var baseline = rep.latest && rep.latest.baseline ? rep.latest.baseline.sessions : [];
+
+    lines.forEach(function (ln) {
+      if (lines.length > 1) {
+        card.appendChild(el('<p class="eyebrow" style="margin:18px 0 0">' + esc(Pr.conditionsText(ln.conditions)) + "</p>"));
+      }
+      var best = null;
+      ln.sessions.forEach(function (s) { if (s.eligible && (!best || s.score > best.score)) best = s; });
+      ln.sessions.forEach(function (s) {
+        card.appendChild(sessionRow(s, s === best, baseline.indexOf(s) !== -1, fmt, unit));
+      });
+    });
+    return card;
+  }
+
+  function sessionRow(s, isBest, isBaseline, fmt, unit) {
+    var FPS_TEXT = { "240": "240 fps", "120": "120 fps", low: "under 100 fps" };
+    var score = s.score == null ? "none" : fmt(s.score);
+    var how = s.score == null ? "no counted reps" : (s.scoreType === "best" ? "best of " + s.nCounted : "average of " + s.nCounted);
+    var notes = [];
+    if (s.scoreType === "best" && s.nCounted > 1) notes.push("mean " + fmt(s.mean));
+    notes.push("reps " + s.reps.map(function (r) { return fmt(r.value) + (r.counted === false ? " (not counted)" : ""); }).join(", "));
+    notes.push(FPS_TEXT[s.conditions.fpsClass] || "frame rate unknown");
+    if (s.reps.some(function (r) { return r.detector === "manual"; })) notes.push("marked by hand");
+    var corrected = s.reps.filter(function (r) { return r.lambda && r.lambda !== 1; })[0];
+    if (corrected) notes.push("corrected ÷" + corrected.lambda);
+    return el('<div class="hist-row"><span class="hd">' + esc(s.day) + "</span>" +
+      '<span class="hv">' + esc(score) + "</span>" +
+      '<span class="hm">' + esc(unit) + " · " + esc(how) +
+      (isBest ? ' <span class="pb">Best</span>' : "") +
+      (isBaseline ? ' <span class="tagauto">Baseline</span>' : "") +
+      '<br><span class="tiny">' + esc(notes.join(" · ")) + "</span></span></div>");
   }
 
   /* ==================================================================
@@ -2266,7 +2396,7 @@ details .dbody{padding:0 16px 16px}
     var rows = P.frameRateErrorTable();
     var tbl = '<div class="tablewrap"><table><thead><tr><th>Frame rate</th><th>One frame</th><th>Frames in the air</th><th>Typical error</th><th>Worst case</th><th>RSI error</th></tr></thead><tbody>';
     rows.forEach(function (r) {
-      var cls = r.fps < 60 ? "is-out" : (r.fps === 240 ? "is-std" : "");
+      var cls = r.fps < 120 ? "is-out" : (r.fps === 240 ? "is-std" : "");
       tbl += '<tr class="' + cls + '"><td>' + r.fps + " fps</td><td>" + r.framePeriod_ms.toFixed(2) + " ms</td><td>" +
         r.framesInFlight + "</td><td>" + (r.heightErrorTypical_m * 100).toFixed(2) + " cm</td><td>" +
         (r.heightErrorOneFrame_m * 100).toFixed(2) + " cm</td><td>" + (r.rsiErrorTypical_frac * 100).toFixed(1) + "%</td></tr>";

@@ -179,6 +179,17 @@
       note: "One set of 10 hops. The score is the average RSI of your best 5, picked by value, and they don't have to be in a row."
     },
 
+    /* ================================================================
+       WHEN A CHANGE IS REAL
+       No verdict yet. The day to day error of the 10-5 score hasn't been
+       checked against the literature for this app, so progress.js shows the
+       sessions and says so rather than guessing. Add a sourced changeRule,
+       in the same shape as cmj.js, when there is one.
+       ================================================================ */
+
+    changeRule: null,
+    changeRuleNote: "We haven't found good enough research on how much the 10-5 score moves from day to day, so we won't guess whether a change is real. Every session is still saved here.",
+
     /* --- tunables you might want to change later --------------------- */
     entryContactsToSkip: 1,    // the landing from the entry jump is not scored
     scoredHops: 10,
@@ -199,7 +210,7 @@
 
       /* ---- frame rate gate ------------------------------------------- */
 
-      if (trial.fpsLocal && trial.fpsLocal < this.requires.minFps) {
+      if (trial.fpsLocal && !P.meetsMinFps(trial.fpsLocal, this.requires.minFps)) {
         out.warnings.push({
           id: "FR-03",
           severity: "block",
@@ -311,7 +322,8 @@
 
       /* ---- output ------------------------------------------------------- */
 
-      var sigE = trial.timingError_s || P.timingError_s(framePeriod);
+      // One event's error, not the whole interval's, see physics.eventTimingError_s.
+      var sigE = (trial.timingError_s || P.timingError_s(framePeriod)) / Math.SQRT2;
       var rsiErr = P.rsiRelativeError(sigE, meanH > 0 ? P.flightTimeFromJumpHeight(meanH) : 0.3, meanGct);
 
       out.primary = {

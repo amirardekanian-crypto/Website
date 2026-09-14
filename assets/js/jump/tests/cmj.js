@@ -16,7 +16,10 @@
      trial.flights      [{start, end, ok, sdStart, sdEnd}]  seconds
      trial.contacts     [{start, end, ok, sdStart, sdEnd}]  seconds
      trial.fpsLocal     frames per second across the analysed window
-     trial.timingError_s  one sigma on a single event, from physics.timingError_s
+     trial.timingError_s  one sigma on a whole measured interval (a flight time
+                          or a contact time), from physics.timingError_s. It
+                          already includes both events, so never multiply it
+                          by sqrt(2).
      trial.confidence   0 to 1, how much the detector trusts itself
      trial.posture      {standingBboxH, takeoffBboxH, landingBboxH, minFlightBboxH} px
      trial.parabola     {a, r2, impliedHeight_m, rho, band} from the airborne fit
@@ -56,11 +59,11 @@
     whyItMatters: [
       "This is the standard test for how much force your legs can put into the floor, and how fast. You dip, then jump, in one movement.",
       "**The dip is the whole point.** When you drop quickly and reverse, your muscles and tendons stretch and snap back like a spring. Nearly everything that looks explosive in sport is built on that, so this one number tells us a lot about your legs.",
-      "It's also the most sensitive thing we have for spotting fatigue. When you're properly tired, your jump drops before you notice anything else, and often before you'd say you feel tired."
+      "It's also useful for spotting fatigue. When you're carrying a lot of it, the average of your reps tends to drop, sometimes before you'd say you feel tired."
     ],
 
     decisionItFeeds:
-      "If this climbs while your body mass holds steady, the power work is doing its job. If it drops by more than a couple of centimetres across a week, you're carrying fatigue and the next block gets lighter before it gets harder.",
+      "If your score climbs by a real change while your body mass holds steady, the power work is doing its job. If it drops by a real change, check your sleep and training load before the next block gets harder. History tells you when a change is real.",
 
     /* ================================================================
        HOW TO DO IT
@@ -165,7 +168,7 @@
       "**Hands on hips every time, or arm swing every time.** Never mix the two. An arm swing is worth 10 to 30%, so a mixed history is a meaningless history.",
       "At least 24 hours after hard lower body training, and 48 hours after a match. Otherwise you're measuring your fatigue.",
       "The same warm-up, in the same order, every session.",
-      "Same phone and same frame rate. A 60 fps result and a 240 fps result don't belong on the same line."
+      "Same phone and same frame rate every time. A 120 fps result and a 240 fps result don't go on the same line, and History keeps them apart."
     ],
 
     /* ================================================================
@@ -173,10 +176,10 @@
        ================================================================ */
 
     reduceError: [
-      "**Three reps, not one.** One jump isn't a measurement. A single rep can be off by nearly 3 cm from your own true average just through normal variation, which is bigger than most real improvements.",
+      "**Three good reps, not one.** Your jumps vary by about 6% from one rep to the next just through normal variation, about 2 cm on a 30 cm jump. Your score is your best good rep, and History needs all three before it judges a change.",
       "Rest a full minute between reps. Rushing them turns a power test into a fitness test.",
       "If your third rep is clearly your best, do a fourth. That usually means you were still warming into it.",
-      "**Same shoes, same floor, same time of day.** A 3 to 5% swing between days is normal noise, not a change in you.",
+      "**Same shoes, same floor, same time of day.** Your best jump moves about 1 to 1.5 cm between days even when nothing has changed. That's normal noise, not a change in you, and History won't call it one.",
       "Don't test within 24 hours of hard lower body training, or 48 hours after a match. You'll be measuring your fatigue instead of your legs."
     ],
 
@@ -209,7 +212,10 @@
        ================================================================ */
 
     requires: {
-      minFps: 60,              // below this we refuse outright, see the error table
+      // Refused below this. It was 60 until 2026-09-14, but at 60 fps the
+      // camera alone pushes the 95% change line past the 3 cm real change
+      // line, see the README. Amir chose 120 on 2026-09-14.
+      minFps: 120,
       preferredFps: 240,
       needsContactTime: false,
       needsBodyMass: false,    // optional, only gates the power estimate
@@ -236,8 +242,44 @@
     scoring: {
       trials: 3,
       restSeconds: 60,
-      score: "mean",
-      note: "The tracking number is the average of 3 good reps. Your best rep is stored too, but pick one and stick to it. Quietly switching between best and average invents progress that isn't there."
+      // Best of 3, like the DTB protocol, and it's the score the typical error
+      // in changeRule was measured on (Bogataj et al. 2020). The mean still
+      // shows in History as a fatigue check. Amir chose this on 2026-09-14.
+      score: "best",
+      note: "Your score is your best good rep out of 3. A rep the app flags for a soft landing or tucked legs doesn't count unless you tell it the app got it wrong. The average of your good reps shows too, as a fatigue check, but track the best. Switching between best and average invents progress that isn't there."
+    },
+
+    /* ================================================================
+       WHEN A CHANGE IS REAL
+       Read by progress.js. Every line comes from a measured between-day
+       typical error (te) of the session score, best of 3.
+         wobble = sqrt(2) x te, to the nearest half centimetre
+         real   = 1.96 x sqrt(2) x te = 2.77 x te, rounded up to the next
+                  half centimetre
+       Change te and the lines together, with the source. The self test
+       checks each line against its te and fails if they drift apart.
+       Amir approved these lines on 2026-09-14. All values in metres.
+       ================================================================ */
+
+    changeRule: {
+      standard: {
+        te: 0.010, wobble: 0.015, real: 0.030,
+        source: "Bogataj et al. 2020, children aged 11 to 14 filmed at 240 fps"
+      },
+      // From age 18, or once the baseline is 35 cm or more. Measured in 17
+      // and 18 year old professionals, so using it for older adults is an
+      // extrapolation.
+      bigJumper: {
+        fromAge: 18, fromScore: 0.35,
+        te: 0.0139, wobble: 0.020, real: 0.040,
+        source: "Wilczyński et al. 2026, professional volleyball players aged 17 and 18"
+      },
+      // Nobody has published phone video jump reliability under 11. The
+      // higher line, and it has to show up at two tests in a row.
+      under11: {
+        real: 0.040,
+        source: "no data under 11"
+      }
     },
 
     /* ================================================================
@@ -254,6 +296,19 @@
           id: "CMJ-NOFLIGHT",
           severity: "block",
           text: "We couldn't find a flight phase in this clip. Check you've trimmed to the jump itself."
+        });
+        return out;
+      }
+
+      /* ---- frame rate ------------------------------------------------ */
+      // The page refuses a slow clip before analysis. This catches a variable
+      // frame rate clip that had no single rate to check there.
+
+      if (trial.fpsLocal && !P.meetsMinFps(trial.fpsLocal, this.requires.minFps)) {
+        out.warnings.push({
+          id: "FR-03",
+          severity: "block",
+          text: "This clip is about " + Math.round(trial.fpsLocal) + " fps. Below " + this.requires.minFps + " fps the camera's own error is big enough to hide a real change, so we won't give you a number. Record in slow motion at 240 fps."
         });
         return out;
       }
@@ -290,9 +345,10 @@
 
       /* ---- precision ------------------------------------------------ */
 
-      // Two events, each with its own timing error, so the flight time error
-      // is the two added in quadrature.
-      var sigT = Math.sqrt(2) * (trial.timingError_s || P.timingError_s(1 / (trial.fpsLocal || 240)));
+      // timingError_s is already the error of the whole flight time, both
+      // events added in quadrature (physics.js). It used to be multiplied by
+      // sqrt(2) again here, which made every precision 1.4 times too big.
+      var sigT = trial.timingError_s || P.timingError_s(1 / (trial.fpsLocal || 240));
       var sigH = P.heightSensitivity_m_per_s(ft) * sigT;
 
       out.primary = {
@@ -432,7 +488,10 @@
       "The landing posture inflation figures (8% at 20 degrees, 13% at 30 degrees) come from the ankle plantarflexion analyses in the flight-time validity literature.",
       "Sayers et al. (1999) for the peak power regression, with its published standard error carried into the display.",
       "Ebben and Petushek (2010) for RSImod, and Balsalobre-Fernandez (2022) for the video time to takeoff correction.",
-      "Hands on hips, self-selected depth, 3 trials with 60 s rest follows standard NSCA and UKSCA testing practice."
+      "Hands on hips, self-selected depth, 3 trials with 60 s rest follows standard NSCA and UKSCA testing practice.",
+      "Best of 3 as the score, as in the German Tennis Federation (DTB) test protocol. The DTB norm sheet, updated 5 September 2025, is where the range beside your result comes from.",
+      "Bogataj et al. (2020) for the change lines. In 48 children aged 11 to 14 filmed at 240 fps, the best countermovement jump moved about 1.0 cm between two test days. Wilczyński et al. (2026) found 1.39 cm in 17 and 18 year old professional volleyball players, which sets the line for bigger jumpers.",
+      "Pueo et al. (2023) for the frame rate. Filming at 120 fps adds about 1.4% error to jump height and 240 fps about 0.7%, which is why 120 is the floor and 240 the standard."
     ]
   });
 

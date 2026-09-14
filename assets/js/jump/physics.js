@@ -43,13 +43,21 @@
   // with a latitude lookup, it would be false precision.
   var G = 9.81;
 
-  // The irreducible detection floor, in seconds. Even with an infinitely fast
-  // camera you cannot resolve the takeoff instant better than this, because of
-  // motion blur and the foot deforming against the floor on the way up.
-  // Fitted to Pueo et al. (2023), who measured 3.4 / 1.8 / 1.2 / 0.8 ms at
-  // 120 / 240 / 480 / 1000 Hz. Used to stop the app quoting a precision it
-  // cannot deliver at high frame rates.
+  // The irreducible detection floor, in seconds, on one measured interval (a
+  // flight time or a contact time). Even with an infinitely fast camera you
+  // cannot resolve takeoff and landing better than this, because of motion
+  // blur and the foot deforming against the floor.
+  // Fitted to Pueo et al. (2023), who measured the error of the WHOLE flight
+  // time at 3.4 / 1.8 / 1.2 ms at 120 / 240 / 480 Hz, against a 1000 Hz
+  // reference. Frame quantisation alone predicts 3.4 / 1.7 / 0.85 ms, so the
+  // extra at the faster rates is this floor. Used to stop the app quoting a
+  // precision it cannot deliver at high frame rates.
   var DETECTION_FLOOR_S = 0.0008;
+
+  // Phones write 119.88 or 239.76 fps as often as 120 or 240. A minimum of
+  // 120 fps accepts anything within 3% of it, which lets those through and
+  // still refuses 100 fps.
+  var FPS_TOLERANCE = 0.97;
 
   /* --------------------------------------------------------------------
      Core: flight time and jump height
@@ -345,14 +353,41 @@
   }
 
   /**
-   * Typical (RMS) timing error for a given frame period, in seconds.
-   * Two terms: quantisation, and the detection floor.
-   *   quantisation with a fixed frame-selection convention = period/sqrt(6)
-   *   floor = 0.8 ms, measured, does not shrink with frame rate
+   * Typical (RMS) error of ONE MEASURED INTERVAL, a flight time or a contact
+   * time, for a given frame period, in seconds.
+   * An interval runs between two frame-marked events. With a fixed frame
+   * selection convention each event lands somewhere inside one frame, an
+   * error of period/sqrt(12). Two independent events give period/sqrt(6).
+   *   interval error = sqrt( (period/sqrt(6))² + floor² )
+   * That matches what Pueo et al. (2023) measured for the whole flight time:
+   * 3.49 / 1.88 / 1.17 ms here against their 3.4 / 1.8 / 1.2 ms.
+   *
+   * ⚠️ It already contains both events. Do not multiply it by sqrt(2) to get
+   * a flight time error. The app did until 2026-09-14, and every "plus or
+   * minus" it showed was 1.4 times too big.
    */
   function timingError_s(framePeriod_s) {
     var q = framePeriod_s / Math.sqrt(6);
     return Math.sqrt(q * q + DETECTION_FLOOR_S * DETECTION_FLOOR_S);
+  }
+
+  /**
+   * The error of ONE frame-marked event on its own, a takeoff or a landing.
+   *   event error = interval error / sqrt(2)
+   * rsiRelativeError needs this rather than the interval error, because it
+   * treats the three events of a drop jump separately.
+   */
+  function eventTimingError_s(framePeriod_s) {
+    return timingError_s(framePeriod_s) / Math.SQRT2;
+  }
+
+  /**
+   * Does a clip meet a test's minimum frame rate? Within FPS_TOLERANCE, so a
+   * phone clip at 119.88 fps counts as 120.
+   */
+  function meetsMinFps(fps, minFps) {
+    if (!minFps) return true;
+    return !!fps && fps >= minFps * FPS_TOLERANCE;
   }
 
   /**
@@ -362,6 +397,9 @@
    * than flight time, is why RSI is punished so much harder than height.
    *
    *   sigma_RSI/RSI = sigma_e · sqrt[ (2/tf)² + (2/tf + 1/tc)² + (1/tc)² ]
+   *
+   * sigma_e is ONE event's error, eventTimingError_s. Passing timingError_s
+   * here counts every event's error sqrt(2) times too big.
    *
    * @returns {number} fractional error (0.027 = 2.7%)
    */
@@ -373,17 +411,36 @@
   }
 
   /**
-   * Minimum detectable change at 95% confidence, as a fraction.
-   *   MDC95 = 1.96 · CV · sqrt(2/n)
-   * This is the gate that stops a coach acting on noise. Below it the app
-   * says "no change detected" and draws no trend arrow. That refusal is a
-   * feature, not a missing one.
+   * Minimum detectable change at 95% confidence, between TEST DAYS.
+   *   MDC95 = 1.96 · TE · sqrt(1 + 1/k)
+   * TE is the between-day typical error of the session score, measured the
+   * way the score is formed (Hopkins 2000). k is how many sessions were
+   * averaged into the thing you compare against.
+   *   k = 1, one test against another:        1.96 · sqrt(2) · TE = 2.77 · TE
+   *   k = 2, against a two-session baseline:  1.96 · sqrt(1.5) · TE = 2.40 · TE
+   * The one test against another form is the one in Weir (2005).
+   *
+   * WHY NOT 1.96 · CV · sqrt(2/n)
+   * That was this function until 2026-09-14, with n the reps in a session.
+   * It assumes averaging reps removes the day to day part of the noise. It
+   * doesn't. Reps cancel rep to rep noise, but the whole session still moves
+   * with the day. It put the jump gate at 6.4% where the evidence puts it at
+   * 11 to 13%, and called about 1 in 4 retests with no real change "real".
+   *
+   * Works in any unit, TE in metres gives metres. The lines each test uses
+   * live in its changeRule, and progress.js applies them.
    */
-  function mdc95(cv, n) {
-    return 1.96 * cv * Math.sqrt(2 / n);
+  function mdc95(te, k) {
+    return 1.96 * te * Math.sqrt(1 + 1 / (k || 1));
   }
 
-  /** Assumed within-athlete CV by metric and condition. Edit with evidence. */
+  /**
+   * ⚠️ DEPRECATED, NOT USED BY THE APP. These CVs were never sourced, and the
+   * gate that read them was wrong. The sourced numbers live in each test's
+   * changeRule now. Kept only so a copy of jump.html cached on a phone from
+   * before 2026-09-14 doesn't crash if it loads this file. Delete after
+   * October 2026.
+   */
   var CV = {
     cmjHeight_240fps: 0.04,
     cmjHeight_120fps: 0.05,
@@ -416,7 +473,8 @@
         heightErrorOneFrame_m: sens * period,
         heightErrorTypical_m: sens * te,
         contactErrorTypical_frac: te / gct,
-        rsiErrorTypical_frac: rsiRelativeError(te, ft, gct),
+        // te is a whole interval's error. rsiRelativeError wants one event's.
+        rsiErrorTypical_frac: rsiRelativeError(te / Math.SQRT2, ft, gct),
         insideBracketBias_m: -sens * period,
         referenceHeight_m: h
       };
@@ -474,8 +532,13 @@
     { id: 'balsalobre2022', text: 'Balsalobre-Fernandez, C. (2022). Video-derived time to takeoff correction at 240 fps.' },
     { id: 'mcguigan2006', text: 'McGuigan, M. et al. (2006). Eccentric utilisation ratio.' },
     { id: 'sayers1999', text: 'Sayers, S. et al. (1999). Cross-validation of three jump power equations.' },
-    { id: 'pueo2023', text: 'Pueo, B. et al. (2023). Sampling rate effects on jump timing. Source of the 0.8 ms detection floor.' },
-    { id: 'balsalobre2015', text: 'Balsalobre-Fernandez, C. et al. (2015). Validity of My Jump against a force platform. The accuracy bar this tool aims at.' }
+    { id: 'pueo2023', text: 'Pueo, B. et al. (2023). Accuracy of flight time and jump height from video at different frame rates. The whole flight time error was 3.4 / 1.8 / 1.2 ms at 120 / 240 / 480 Hz, which is where the timing error model and its 0.8 ms floor come from.' },
+    { id: 'balsalobre2015', text: 'Balsalobre-Fernandez, C. et al. (2015). Validity of My Jump against a force platform. The accuracy bar this tool aims at.' },
+    { id: 'bogataj2020', text: 'Bogataj, S. et al. (2020). My Jump 2 in 48 children aged 11 to 14 at 240 fps, retested after two weeks. The best countermovement jump moved 1.0 cm between days, the best squat jump 1.5 cm. The change lines for both jumps are built on these.' },
+    { id: 'wilczynski2026', text: 'Wilczyński, B. et al. (2026). Phone, force plate and sensor jump testing in professional volleyball players aged 17 and 18. Phone jump height SEM 1.39 cm, MDC95 3.86 cm. The 4 cm line for bigger jumpers is built on this.' },
+    { id: 'weir2005', text: 'Weir, J. (2005). Quantifying test-retest reliability. The minimum detectable change between two tests, 1.96 x sqrt(2) x the standard error of measurement.' },
+    { id: 'hopkins2000', text: 'Hopkins, W. (2000). Measures of reliability in sports medicine and science. The typical error, and why it has to be measured on the score the way you actually form it.' },
+    { id: 'dtb2025', text: 'German Tennis Federation (DTB). Normwerte DTB-Konditionstest, updated 5 September 2025. Countermovement jump by age and sex in regional and national squad players, the range shown beside a result.' }
   ];
 
   /* --------------------------------------------------------------------
@@ -524,6 +587,21 @@
     var aTrue = (G * scale) / 2;
     near(impliedTimebaseDivisor(impliedGravity(aTrue / 64, scale)), 8, 0.001, 'impliedTimebaseDivisor');
 
+    // The timing error model against what Pueo et al. (2023) measured for a
+    // whole flight time: 3.4 / 1.8 / 1.2 ms at 120 / 240 / 480 Hz.
+    near(timingError_s(1 / 120), 0.0034, 0.00015, 'timing error at 120 Hz against Pueo 2023');
+    near(timingError_s(1 / 240), 0.0018, 0.00015, 'timing error at 240 Hz against Pueo 2023');
+    near(timingError_s(1 / 480), 0.0012, 0.0001, 'timing error at 480 Hz against Pueo 2023');
+
+    // MDC95 between days: 2.77 x TE against one test, 2.40 x TE against a
+    // two-session baseline.
+    near(mdc95(1, 1), 2.7719, 0.001, 'mdc95 one test against another');
+    near(mdc95(1, 2), 2.4005, 0.001, 'mdc95 against a two-session baseline');
+
+    // A phone's 119.88 fps meets a 120 fps floor, 100 fps doesn't.
+    if (!meetsMinFps(119.88, 120)) fails.push('meetsMinFps refused a 119.88 fps clip');
+    if (meetsMinFps(100, 120)) fails.push('meetsMinFps accepted a 100 fps clip');
+
     if (fails.length) {
       console.error('[JumpKit.physics] SELF TEST FAILED:\n  ' + fails.join('\n  '));
     }
@@ -537,11 +615,12 @@
   JumpKit.physics = {
     G: G,
     DETECTION_FLOOR_S: DETECTION_FLOOR_S,
+    FPS_TOLERANCE: FPS_TOLERANCE,
     HEIGHT_TIMEBASE_FAULT_M: HEIGHT_TIMEBASE_FAULT_M,
     HEIGHT_HUMAN_CEILING_M: HEIGHT_HUMAN_CEILING_M,
     FLIGHT_TIME_FAULT_S: FLIGHT_TIME_FAULT_S,
     SAYERS_SEE_W: SAYERS_SEE_W,
-    CV: CV,
+    CV: CV,   // deprecated, unused, see the note on it above
 
     jumpHeightFromFlightTime: jumpHeightFromFlightTime,
     flightTimeFromJumpHeight: flightTimeFromJumpHeight,
@@ -562,6 +641,8 @@
 
     heightSensitivity_m_per_s: heightSensitivity_m_per_s,
     timingError_s: timingError_s,
+    eventTimingError_s: eventTimingError_s,
+    meetsMinFps: meetsMinFps,
     rsiRelativeError: rsiRelativeError,
     mdc95: mdc95,
     frameRateErrorTable: frameRateErrorTable,
