@@ -41,7 +41,10 @@ as a rainy-day fallback. Never commit one; the `.gitignore` entry explains why.
 **Athletes sign in with a username and password.** Every `?client=&key=` link is dead —
 `public.athlete_keys` is empty and the RPCs fail closed. Accounts are created from
 coach.html (Athletes → an athlete → Create login), keyed on an internal address
-`athlete.<id>@amirardekani.com` that never receives mail. `demo` is named explicitly as
+`athlete.<id>@amirardekani.com` that never receives mail. The password is generated, or typed
+there (8-72 printable English characters, no spaces, not the username: `typedPassword()` in
+coach.html and `checkTyped()` in each login function apply the same rule, so change both). The
+Testing app and Course tabs work the same way. `demo` is named explicitly as
 public inside `get_program()` so the marketing link still opens.
 
 **The coaching pipeline writes to the server.** It may still produce a local

@@ -1,5 +1,9 @@
 // Creates, resets and revokes athlete logins.
 //
+// The password is generated (makePassword), or typed by Amir in coach.html for a single create or
+// reset: then it must pass checkTyped() below, the same rule coach.html applies before sending it.
+// create_many always generates.
+//
 // Athletes have no email address, so an account is keyed on an internal address
 // athlete.<id>@amirardekani.com that never receives mail. The athlete types their
 // username (their athlete id); the app adds the rest.
@@ -47,6 +51,16 @@ function makePassword(): string {
   return `${pick()}-${pick()}-${pick()}-${n}`;
 }
 
+// A password typed in coach.html. It gets typed again on the athlete's phone, often with a Farsi
+// keyboard one switch away, so only printable English characters: 8 to 72 of them (72 is the most
+// bcrypt reads), no spaces. coach.html checks the same rule first; this is the check that counts.
+// Returns what is wrong, or '' when it is fine.
+function checkTyped(password: string, username: string): string {
+  if (!/^[\x21-\x7E]{8,72}$/.test(password)) return 'password: 8-72 characters, English letters, numbers and symbols only, no spaces';
+  if (password.toLowerCase() === username.toLowerCase()) return 'password must not be the same as the username';
+  return '';
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json({ error: 'POST only' }, 405);
@@ -66,7 +80,7 @@ Deno.serve(async (req: Request) => {
   if (whoErr || !who?.user?.email) return json({ error: 'not signed in' }, 401);
   if (who.user.email.toLowerCase() !== COACH_EMAIL) return json({ error: 'coach only' }, 403);
 
-  let body: { action?: string; athlete_id?: string; athlete_ids?: string[] };
+  let body: { action?: string; athlete_id?: string; athlete_ids?: string[]; password?: string };
   try { body = await req.json(); } catch { return json({ error: 'bad JSON' }, 400); }
 
   const action = String(body.action || '');
@@ -74,11 +88,11 @@ Deno.serve(async (req: Request) => {
 
   const valid = (id: string) => /^[A-Za-z0-9_]{1,64}$/.test(id);
 
-  // Make or reset one login. Returns the password so the caller can show it, and
-  // stores it on the identity row so a bulk run is not lost to a closed dialog.
-  async function provision(athleteId: string) {
+  // Make or reset one login, with the typed password or a generated one. Returns the password so
+  // the caller can show it, and stores it on the identity row so a bulk run is not lost to a closed dialog.
+  async function provision(athleteId: string, typed = '') {
     const email = `${PREFIX}${athleteId.toLowerCase()}@${LOGIN_DOMAIN}`;
-    const password = makePassword();
+    const password = typed || makePassword();
 
     const { data: existing } = await admin
       .from('athlete_identities').select('user_id').eq('athlete_id', athleteId).maybeSingle();
@@ -115,7 +129,10 @@ Deno.serve(async (req: Request) => {
   if (action === 'create' || action === 'reset') {
     const athleteId = String(body.athlete_id || '').trim();
     if (!valid(athleteId)) return json({ error: 'bad athlete_id' }, 400);
-    const r = await provision(athleteId);
+    const typed = body.password == null ? '' : String(body.password);
+    const bad = typed ? checkTyped(typed, athleteId) : '';
+    if (bad) return json({ error: bad }, 400);
+    const r = await provision(athleteId, typed);
     if ('error' in r) return json({ error: r.error }, 400);
     return json({ ok: true, ...r });
   }
