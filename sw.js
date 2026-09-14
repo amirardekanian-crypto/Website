@@ -17,7 +17,9 @@
 // Iran reachability probe, and the future paid course, which ships its own worker),
 // and activate deletes only this app's own aap-* caches, so a bump here can never wipe
 // another app's offline copy on the same origin.
-const CACHE = 'aap-v7';
+// v8: the shell did not change. The worker also leaves /tennis-testing/ alone (the tennis
+// testing app, which keeps its own offline copy of content and saves in localStorage).
+const CACHE = 'aap-v8';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -97,7 +99,8 @@ self.addEventListener('fetch', e => {
   // "opens without a VPN" from a cached copy on exactly the phones being tested, and the
   // paid course app (which has its own worker and caches) would get stale files pinned.
   // Returning without respondWith() sends the request to the network untouched.
-  if (/^\/(reach|tennis)(\/|$)/.test(url.pathname)) return;
+  // /tennis-testing/ is the testing app: it must always get its newest script, never a pinned copy.
+  if (/^\/(reach|tennis|tennis-testing)(\/|$)/.test(url.pathname)) return;
 
   // HTML (navigate) — STALE-WHILE-REVALIDATE (Amir, 2026-09-12: opening the
   // home-screen icon was slow). This was network-first, which meant every tap on

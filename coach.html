@@ -834,6 +834,7 @@ const S = {
   clogs: {},       // athlete_id -> coaching_logs row (metadata only; the body is
                    // fetched on demand, it is long prose).
   affiliates: [],  // public.affiliates rows — the referral-code roster (coach only).
+  assess: null,    // public.assess_accounts rows — testing-app logins, loaded when that tab opens.
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
@@ -1674,6 +1675,7 @@ const TABS = [
   { id: 'proof', label: 'Proof' },
   { id: 'links', label: 'Links' },
   { id: 'affiliates', label: 'Affiliates' },
+  { id: 'assess', label: 'Testing app' },
 ];
 // #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its five
 // screens, so any of them can be bookmarked or reloaded in place.
@@ -1701,7 +1703,7 @@ function renderRail() {
 }
 async function hardRefresh() {
   $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing…</div>';
-  loadLevels._done = false; S.board = { season: null, week: null };
+  loadLevels._done = false; S.board = { season: null, week: null }; S.assess = null;
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
 }
@@ -1716,6 +1718,7 @@ function render() {
   else if (r.view === 'proof') renderProof();
   else if (r.view === 'links') renderLinks();
   else if (r.view === 'affiliates') renderAffiliates();
+  else if (r.view === 'assess') renderAssess();
 }
 window.addEventListener('hashchange', render);
 window.hardRefresh = hardRefresh;
@@ -3828,6 +3831,116 @@ function renderAffiliates() {
   on('.aff-save', el => affSave(el.closest('.aff-form'), el));
   on('.aff-retire', el => affSetActive(el.dataset.code, false, el));
   on('.aff-reactivate', el => affSetActive(el.dataset.code, true, el));
+}
+
+// --- TESTING APP (buyer logins) ---------------------------------------------
+// The tennis testing app at /tennis-testing/ (its source is the private assess-content repo).
+// Same pattern as athlete logins: the assess-login Edge Function makes the auth user on an
+// internal address, assess.<username>@amirardekani.com, and hands back a password to send.
+// Revoke bans the login but keeps the buyer's saved players and results; Restore brings it back
+// with a new password. Buyer data itself is not readable from here, by design ("we don't monitor").
+// Backend: supabase/assess_01_accounts_content_data.sql + supabase/functions/assess-login.
+const ASSESS_URL = SITE + '/tennis-testing/';
+let _assessBusy = false;
+
+async function loadAssess() {
+  if (DEMO) {
+    S.assess = S.assess || [{ username: 'academy_demo', label: 'Demo academy', created_at: new Date().toISOString(),
+      initial_password: 'amber-cedar-kite-42', sent_at: null, revoked_at: null }];
+    return;
+  }
+  const r = await sb.from('assess_accounts')
+    .select('username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
+    .order('created_at', { ascending: false });
+  S.assess = r.error ? [] : (r.data || []);
+  if (r.error) toast('Could not load testing-app logins: ' + r.error.message);
+}
+
+// The WhatsApp message a buyer gets, in Farsi like the app.
+function assessMessage(username, password) {
+  return 'اپ آزمون آمادگی جسمانی تنیس\n\n' +
+    'لینک: ' + ASSESS_URL + '\n' +
+    'نام کاربری: ' + username + '\n' +
+    'رمز عبور: ' + password + '\n\n' +
+    'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید تا دفعهٔ بعد بدون تایپ وارد شوید. ' +
+    'این اطلاعات را فقط به مربی‌های آکادمی خودتان بدهید.\n\n' +
+    'برای افزودن به صفحهٔ اصلی گوشی: لینک را باز کنید، بعد Share و Add to Home Screen.';
+}
+
+async function assessAction(action, username, label, btn) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (_assessBusy) return;
+  if (action === 'revoke' && !confirm('Revoke ' + username + '?\n\nThey can no longer sign in. Their saved players and results are kept, and Restore brings the login back with a new password.')) return;
+  if (action === 'reset' && !confirm('Give ' + username + ' a new password? The old one stops working.')) return;
+  _assessBusy = true; if (btn) btn.disabled = true;
+  const { data, error } = await sb.functions.invoke('assess-login', { body: { action, username, label } });
+  _assessBusy = false; if (btn) btn.disabled = false;
+  let msg = data && data.error;
+  if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
+  if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  await loadAssess();
+  if (action === 'revoke') { toast(username + ' revoked'); renderAssess(); return; }
+  copyText(assessMessage(data.username, data.password));
+  renderAssess();
+  alert((data.created ? 'Login created' : 'New password') + ' for ' + data.username + '\n\n' +
+    'Password: ' + data.password + '\n\n' +
+    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.');
+}
+
+async function assessMarkSent(username) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const { error } = await sb.from('assess_accounts')
+    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username);
+  if (error) { alert('Could not update: ' + error.message); return; }
+  await loadAssess();
+  renderAssess();
+}
+
+function renderAssess() {
+  const c = $('content');
+  if (!S.assess) {
+    c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    loadAssess().then(renderAssess);
+    return;
+  }
+  const rows = S.assess;
+  const active = rows.filter(r => !r.revoked_at), revoked = rows.filter(r => r.revoked_at);
+  const toSend = active.filter(r => r.initial_password).length;
+  const day = d => esc(String(d || '').slice(0, 10));
+  const row = r => `<div class="credrow">
+      <span class="credname">${esc(r.username)}${r.label ? ` <span class="muted">· ${esc(r.label)}</span>` : ''}</span>
+      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>`
+        : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
+      <span class="acts">${r.revoked_at
+        ? `<button class="btn sm as-act" data-act="restore" data-u="${esc(r.username)}">Restore</button>`
+        : (r.initial_password ? `<button class="btn sm primary as-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm as-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
+          `<button class="btn sm as-act" data-act="reset" data-u="${esc(r.username)}">New password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
+    </div>`;
+  const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
+  let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.</span></div>`;
+  html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input id="asUser" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
+      <input id="asLabel" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <button class="btn primary sm" id="asCreate">Create login</button>
+    </div>
+    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username and password.</p></section>`;
+  html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay)">${toSend} to send</span>` : ''}</span></div>` +
+    (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
+  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+  c.innerHTML = html;
+  const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
+  on('#asCreate', el => {
+    const u = ($('asUser').value || '').trim().toLowerCase();
+    if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
+    assessAction('create', u, ($('asLabel').value || '').trim(), el);
+  });
+  on('.as-act', el => assessAction(el.dataset.act, el.dataset.u, '', el));
+  on('.as-sent', el => assessMarkSent(el.dataset.u));
+  on('.as-copy', el => {
+    const r = rows.find(x => x.username === el.dataset.u);
+    if (r && r.initial_password) { copyText(assessMessage(r.username, r.initial_password), el); toast('Message copied — paste it into WhatsApp'); }
+  });
 }
 
 // --- INTAKE (coaching apply-form submissions) -------------------------------

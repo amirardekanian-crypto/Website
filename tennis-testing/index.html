@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E4A36">
+<meta name="robots" content="noindex,nofollow">
+<title>آزمون آمادگی جسمانی تنیس</title>
+<link rel="icon" href="data:,">
+<!--
+  Tennis physical testing app (coach-facing). Source lives in the private assess-content repo.
+  Signed in (the default): content comes from Supabase (assess_content, readable only by an
+  active buyer account) and players, results and notes save to the account.
+  ?sample=1: the clickable sample, with local content files and made-up players, nothing saved.
+  Built on the course app's base (tps-content/app). The sign-in screen is program.html's.
+  Still to fix before launch: Vazirmatn comes from Google Fonts (self-host later).
+-->
+<script>
+  // Is anybody signed in on this device? Answered here, synchronously, from localStorage, so
+  // the sign-in screen paints without waiting for the Supabase SDK (program.html does the same).
+  // This app's Supabase client stores its session under its own key, "assess-auth", so a
+  // program.html or coach.html session on the same website is never mistaken for a buyer's.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    window.SAMPLE = q.get('sample') === '1';
+    // ?stub=1, local testing only: a fake Supabase in localStorage, already signed in (_dev is never deployed).
+    if (q.get('stub') === '1') {
+      try { if (!localStorage.getItem('assess-auth')) localStorage.setItem('assess-auth', '{"stub":true}'); } catch (e) {}
+      document.write('<script src="_dev/stub-supabase.js"><\/script>');
+    }
+    document.documentElement.classList.toggle('is-sample', window.SAMPLE);
+    window.HAS_SESSION = false;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && /^assess-auth(\.\d+)?$/.test(k)) { window.HAS_SESSION = true; break; }
+      }
+    } catch (e) { window.HAS_SESSION = true; }   // storage blocked: take the slow path, don't guess
+    window.NEEDS_SIGNIN = !window.SAMPLE && !window.HAS_SESSION;
+    // The username from the last successful sign-in, prefilled. A convenience, never an authority.
+    try { window.LAST_USER = localStorage.getItem('assess_last_user') || ''; } catch (e) { window.LAST_USER = ''; }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="app.css?v=fd8fbe08">
+</head>
+<body>
+<div class="sample-bar">نسخهٔ نمونه · در حال ساخت</div>
+
+<!-- ═══ SIGN IN ═══ program.html's sign-in screen, in Farsi. The buyer types the username Amir sent;
+     app.js adds the internal address on submit, so nobody sees or types an email. The autocomplete
+     names are what let the phone's password manager offer to save and fill it. -->
+<div class="signin-screen" id="signin-screen">
+  <form class="signin-card" id="signin-form" autocomplete="on" onsubmit="return false">
+    <div class="si-hero">
+      <img class="si-hero-img" src="../court-sessions.jpg" alt="" aria-hidden="true"
+           fetchpriority="high" decoding="async" onload="this.classList.add('in')" onerror="this.remove()">
+      <div class="si-hero-scrim"></div>
+      <div class="si-hero-copy">
+        <img class="signin-mark" src="../assets/img/icon-192.png" alt="AA Performance" width="52" height="52"
+             decoding="async" onerror="this.remove()">
+        <div class="si-eyebrow" dir="ltr">AA Performance</div>
+        <h1 class="signin-title">آزمون آمادگی <em>جسمانی</em> تنیس</h1>
+        <p class="si-mantra">بدانید بازیکن‌هایتان کجا هستند، و تمرین جواب داده یا نه.</p>
+      </div>
+    </div>
+    <div class="si-sheet">
+      <label class="signin-f">
+        <span>نام کاربری</span>
+        <input id="si-user" name="username" autocomplete="username" autocapitalize="none"
+               autocorrect="off" spellcheck="false" dir="ltr" required>
+      </label>
+      <label class="signin-f">
+        <span>رمز عبور</span>
+        <div class="si-wrap">
+          <input id="si-pass" name="password" type="password" autocomplete="current-password" dir="ltr" required>
+          <button type="button" class="si-eye" id="si-eye" aria-label="نمایش رمز" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M1.8 12S5.6 5.4 12 5.4 22.2 12 22.2 12 18.4 18.6 12 18.6 1.8 12 1.8 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+              <line class="si-eye-slash" x1="3.6" y1="20.4" x2="20.4" y2="3.6"/>
+            </svg>
+          </button>
+        </div>
+      </label>
+      <button class="signin-go" id="si-go" type="submit">ورود</button>
+      <div class="signin-err" id="si-err" hidden></div>
+      <p class="signin-help">نام کاربری یا رمز را گم کرده‌اید؟ به امیر پیام بدهید تا اطلاعات تازه بفرستد.</p>
+      <div class="signin-foot" dir="ltr">amirardekani.com</div>
+    </div>
+  </form>
+</div>
+<script>
+  // Painted from here, not from app.js: nobody signed in means nothing to load. The
+  // onsubmit="return false" above keeps a native submit from putting the password in the URL
+  // until app.js wires the form.
+  if (window.NEEDS_SIGNIN) document.getElementById('signin-screen').classList.add('visible');
+</script>
+
+<div id="app">
+  <main id="view" aria-live="polite">
+    <div class="loading">در حال بارگذاری…</div>
+  </main>
+</div>
+
+<nav class="tabs" id="tabs" aria-label="بخش‌های اپ">
+  <a href="#/start" data-tab="start">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></span>
+    <span class="tl">شروع</span>
+  </a>
+  <a href="#/tests" data-tab="tests">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg></span>
+    <span class="tl">آزمون‌ها</span>
+  </a>
+  <a href="#/tools" data-tab="tools">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/></svg></span>
+    <span class="tl">ابزارها</span>
+  </a>
+  <a href="#/players" data-tab="players">
+    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8"/><path d="M17.5 14.3c1.7.6 2.8 2.2 3.1 4.7"/></svg></span>
+    <span class="tl">بازیکنان</span>
+  </a>
+</nav>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js?v=6ccfc9f9" defer></script>
+</body>
+</html>
