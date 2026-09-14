@@ -59,7 +59,9 @@
     requires:      '{minFps, needsContactTime, needsBodyMass, needsDropHeight, minValidTrials}',
     compute:       'function(trial, ctx) -> {primary, secondary[], warnings[]}',
     plausible:     'object   per-metric {warnBelow, warnAbove, blockBelow, blockAbove}',
-    scoring:       '{trials, restSeconds, score, note} how a session score is formed',
+    scoring:       '{trials, restSeconds, score, note} how a session score is formed. score "best" takes the best counted rep, anything else the mean.',
+    changeRule:    'object|null  optional. The sourced day to day error of the session score, and the lines that decide a real change. See progress.js and cmj.js. null or missing means no verdict.',
+    changeRuleNote: 'string  optional. What History says when changeRule is null.',
 
     // --- provenance -------------------------------------------------------
     sources:       'string[] where the protocol and the thresholds came from'

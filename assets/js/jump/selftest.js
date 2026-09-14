@@ -273,19 +273,223 @@
     };
   }
 
+  /* --- the change rule: built histories with a known right answer -------- */
+
+  // One saved rep, shaped the way jump.html's saveResult writes it.
+  function rep(o) {
+    var testId = o.test || "cmj";
+    var d = new Date(2026, 0, o.day, 10, o.minute || 0, 0);
+    return {
+      id: testId + "-" + o.day + "-" + (o.minute || 0) + "-" + o.cm,
+      date: d.toISOString().slice(0, 10),
+      time: d.toISOString(),
+      athlete: o.athlete || "Sara",
+      testId: testId,
+      metric: "height",
+      value: o.cm / 100,
+      unit: "cm",
+      arms: "hands_on_hips",
+      surface: "rigid_floor",
+      footwear: o.shoes || "Nike",
+      dropHeight_cm: null,
+      cue: JumpKit.getTest(testId).howToPerform.cue,
+      fps_used: o.fps || 240,
+      lambda: 1,
+      detector: "auto",
+      counted: o.counted !== false,
+      flags: o.counted === false ? ["TC-01"] : [],
+      age: o.age === undefined ? 14 : o.age,
+      sex: "f"
+    };
+  }
+
+  // One session: a rep per height, two minutes apart, on day n of January.
+  function session(day, cms, extra) {
+    return cms.map(function (cm, i) {
+      var o = { day: day, minute: i * 2, cm: cm };
+      for (var k in (extra || {})) o[k] = extra[k];
+      return rep(o);
+    });
+  }
+
+  function joinLogs() {
+    return Array.prototype.concat.apply([], arguments);
+  }
+
+  function latestOf(log, testId, athlete) {
+    return JumpKit.progress.report(log, JumpKit.getTest(testId || "cmj"), athlete || "Sara").latest;
+  }
+
+  function verdictOf(v, which) {
+    if (!v) return "no report";
+    if (v.reason) return "no verdict (" + v.reason + ")";
+    var j = which === "previous" ? v.vsPrevious : v.vsBaseline;
+    return j ? j.label : "none";
+  }
+
+  function runChangeRuleCases() {
+    var P = JumpKit.physics;
+    var Pr = JumpKit.progress;
+    var out = [];
+
+    function check(name, expected, got) {
+      out.push({ name: name, expected: String(expected), got: String(got), pass: String(expected) === String(got) });
+    }
+
+    // Best jumps of 30.0 and 30.2 cm, two days apart, so a baseline of 30.1.
+    var base = joinLogs(session(1, [30.0, 29.5, 29.8]), session(3, [30.2, 29.9, 30.0]));
+
+    check("The old 6.4% gate is gone: +2.2 cm on a 30 cm jump isn't real",
+      "possible", verdictOf(latestOf(joinLogs(base, session(20, [32.3, 31.0, 30.5])))));
+    check("3 cm or more over the baseline is real, under 18",
+      "real", verdictOf(latestOf(joinLogs(base, session(20, [33.2, 32.0, 31.9])))));
+    check("Under 1.5 cm is normal wobble",
+      "wobble", verdictOf(latestOf(joinLogs(base, session(20, [31.0, 30.2, 30.4])))));
+
+    var bigBase = joinLogs(session(1, [40.0, 39.1, 39.5]), session(3, [40.4, 39.8, 40.0]));
+    check("Baseline of 35 cm or more: +3.6 cm is only possible",
+      "possible", verdictOf(latestOf(joinLogs(bigBase, session(20, [43.8, 43.0, 42.9])))));
+    check("Baseline of 35 cm or more: +4.2 cm is real",
+      "real", verdictOf(latestOf(joinLogs(bigBase, session(20, [44.4, 43.0, 42.9])))));
+
+    var adult = { age: 25 };
+    var adultBase = joinLogs(session(1, [30.0, 29.5, 29.8], adult), session(3, [30.2, 29.9, 30.0], adult));
+    check("From 18 the wobble line is 2 cm: +1.8 cm is wobble",
+      "wobble", verdictOf(latestOf(joinLogs(adultBase, session(20, [31.9, 31.0, 30.8], adult)))));
+
+    var kid = { age: 10 };
+    var kidBase = joinLogs(session(1, [25.0, 24.4, 24.8], kid), session(3, [25.2, 24.9, 25.0], kid));
+    check("Under 11: +3.5 cm is still wobble",
+      "wobble", verdictOf(latestOf(joinLogs(kidBase, session(20, [28.6, 28.0, 27.9], kid)))));
+    check("Under 11: 4 cm once is only possible",
+      "possible", verdictOf(latestOf(joinLogs(kidBase, session(20, [29.3, 28.0, 27.9], kid)))));
+    check("Under 11: 4 cm twice in a row is real",
+      "real", verdictOf(latestOf(joinLogs(kidBase, session(20, [29.3, 28.0, 27.9], kid), session(27, [29.5, 28.8, 28.9], kid)))));
+
+    check("Two possible changes the same way in a row read as likely real",
+      "likely", verdictOf(latestOf(joinLogs(base, session(20, [31.9, 31.0, 30.8]), session(27, [32.0, 31.2, 31.0])))));
+
+    check("Reps inside one session are never compared with each other",
+      "no verdict (first)", verdictOf(latestOf(session(1, [30.0, 33.0, 36.0]))));
+
+    var omid = { athlete: "Omid", age: 25 };
+    var twoAthletes = joinLogs(base, session(2, [45.0, 44.0, 44.5], omid), session(19, [48.0, 47.0, 47.5], omid),
+      session(20, [30.5, 30.0, 29.9]));
+    check("Two athletes on one phone are never compared",
+      "wobble", verdictOf(latestOf(twoAthletes)));
+    check("Names match loosely, so \"sara \" is Sara",
+      "wobble", verdictOf(latestOf(twoAthletes, "cmj", "sara ")));
+
+    check("A session filmed under 120 fps gets no verdict",
+      "no verdict (fps)", verdictOf(latestOf(joinLogs(base, session(20, [33.2, 32.0, 31.9], { fps: 60 })))));
+    check("A 120 fps session isn't compared with 240 fps ones",
+      "no verdict (newLine)", verdictOf(latestOf(joinLogs(base, session(20, [33.2, 32.0, 31.9], { fps: 120 })))));
+    check("New shoes start a new line with its own baseline",
+      "no verdict (newLine)", verdictOf(latestOf(joinLogs(base, session(20, [33.2, 32.0, 31.9], { shoes: "Adidas" })))));
+
+    var flaggedS = latestOf(joinLogs(base, session(20, [30.0, 30.5, 30.2]),
+      [rep({ day: 20, minute: 9, cm: 36.0, counted: false })])).session;
+    check("A flagged rep doesn't count toward the best",
+      "30.5 cm from 3 counted of 4", (flaggedS.best * 100).toFixed(1) + " cm from " + flaggedS.nCounted + " counted of " + flaggedS.nReps);
+    check("Fewer than 3 counted reps gets no verdict",
+      "no verdict (reps)", verdictOf(latestOf(joinLogs(base, session(20, [33.2, 32.0]),
+        [rep({ day: 20, minute: 9, cm: 34.0, counted: false })]))));
+
+    var djLog = joinLogs(session(1, [1.8, 1.9, 2.0], { test: "dj" }), session(3, [2.4, 2.5, 2.3], { test: "dj" }));
+    check("Drop jump gets no verdict until its error is sourced",
+      "no verdict (noRule)", verdictOf(latestOf(djLog, "dj")));
+
+    var sj = { test: "sj" };
+    var sjBase = joinLogs(session(1, [22.0, 21.4, 21.8], sj), session(3, [22.4, 21.9, 22.0], sj));
+    check("Squat jump has its own lines: +3.8 cm is only possible",
+      "possible", verdictOf(latestOf(joinLogs(sjBase, session(20, [26.0, 25.1, 25.0], sj)), "sj")));
+    check("Squat jump: +4.6 cm is real",
+      "real", verdictOf(latestOf(joinLogs(sjBase, session(20, [26.8, 25.1, 25.0], sj)), "sj")));
+
+    var far = latestOf(joinLogs(session(1, [30.0, 29.5, 29.8]), session(12, [30.4, 30.0, 29.9]), session(20, [33.1, 32.0, 31.9])));
+    check("Second test more than 7 days later: the first test alone is the baseline",
+      "k=1, 30.0 cm, real", "k=" + far.baseline.k + ", " + (far.baseline.value * 100).toFixed(1) + " cm, " + verdictOf(far));
+
+    var second = latestOf(joinLogs(session(1, [30.0, 29.5, 29.8]), session(3, [31.6, 30.9, 31.0])));
+    check("The second test sets the baseline and is judged against the first",
+      "possible, baseline k=2", verdictOf(second, "previous") + ", baseline k=" + second.baseline.k);
+
+    // Every line has to still match the evidence it was built from:
+    // wobble = sqrt(2) x TE to the nearest 0.5 cm, real = 2.77 x TE rounded up.
+    ["cmj", "sj", "dj", "hop105"].forEach(function (id) {
+      var t = JumpKit.getTest(id);
+      var rule = t.changeRule;
+      if (!rule) {
+        check(t.shortName + " has no rule, and says why", "true", !!t.changeRuleNote);
+        return;
+      }
+      [rule.standard, rule.bigJumper].forEach(function (g, i) {
+        if (!g) return;
+        var wobble = Math.round(Math.SQRT2 * g.te * 200) / 200;
+        var real = Math.ceil(P.mdc95(g.te, 1) * 200 - 1e-9) / 200;
+        check(t.shortName + (i ? " bigger jumpers" : "") + " lines match a TE of " + (g.te * 100).toFixed(2) + " cm",
+          (wobble * 100).toFixed(1) + " / " + (real * 100).toFixed(1) + " cm",
+          (g.wobble * 100).toFixed(1) + " / " + (g.real * 100).toFixed(1) + " cm");
+      });
+      var top = Math.max(rule.standard.real, rule.bigJumper ? rule.bigJumper.real : 0);
+      check(t.shortName + " under 11 line is at least its highest real line", "true", !!(rule.under11 && rule.under11.real >= top));
+    });
+
+    check("MDC95 between days: 2.77 x TE, or 2.40 x TE against a two-session baseline",
+      "2.77 / 2.40", P.mdc95(1, 1).toFixed(2) + " / " + P.mdc95(1, 2).toFixed(2));
+    check("A 119.88 fps phone clip meets a 120 fps floor, 110 fps doesn't",
+      "true / false", P.meetsMinFps(119.88, 120) + " / " + P.meetsMinFps(110, 120));
+    check("Precision at 240 fps on a 30.7 cm jump, sqrt(2) not counted twice",
+      "0.23 cm", (P.heightSensitivity_m_per_s(0.5) * P.timingError_s(1 / 240) * 100).toFixed(2) + " cm");
+
+    var softLanding = { warnings: [{ id: "TC-01", severity: "amber", voidOption: "Soft landing" }] };
+    check("A soft landing is saved but not counted",
+      "false TC-01", Pr.repOutcome(softLanding, {}).counted + " " + Pr.repOutcome(softLanding, {}).flags.join(","));
+    check("Count it anyway counts it",
+      "true", Pr.repOutcome(softLanding, { keep: true }).counted);
+    check("A clean rep counts",
+      "true", Pr.repOutcome({ warnings: [] }, {}).counted);
+
+    // The reference range, read straight off the DTB sheet (5 Sep 2025).
+    var A = JumpKit.athlete;
+    function range(cfg) {
+      var r = A.referenceRange("cmj", cfg);
+      if (!r) return "none";
+      if (r.none) return "none (" + r.none + ")";
+      return (r.low * 100).toFixed(1) + " to " + (r.high * 100).toFixed(1) + " cm" + (r.rough ? ", rough" : "");
+    }
+    check("DTB range, girl aged 16: the 16.0 and 16.5 classes averaged",
+      "30.0 to 37.1 cm", range({ sex: "f", age: 16 }));
+    check("DTB range, boy aged 14: the 14.0 and 14.5 classes averaged",
+      "33.1 to 40.0 cm", range({ sex: "m", age: 14 }));
+    check("DTB range, age 9 uses the under 10 class and says it's rough",
+      "23.1 to 29.3 cm, rough", range({ sex: "m", age: 9 }));
+    check("DTB range, a 20 year old woman uses the over 18 class",
+      "30.0 to 38.1 cm", range({ sex: "f", age: 20 }));
+    check("No DTB range over 21, under 9, or without sex",
+      "none (adult) / none (young) / none (sex)",
+      range({ sex: "m", age: 25 }) + " / " + range({ sex: "m", age: 8 }) + " / " + range({ sex: "", age: 14 }));
+    check("No reference range at all for the squat jump",
+      "true", A.referenceRange("sj", { sex: "m", age: 14 }) === null);
+
+    return out;
+  }
+
   /* --- public ------------------------------------------------------------ */
 
   function runAll() {
     var cases = CASES.map(runCase);
     var hop = runHopCase();
     var timebase = runTimebaseCase();
+    var changeRule = runChangeRuleCases();
     var physicsFails = JumpKit.physics.selfTest();
 
-    var all = cases.concat([hop, timebase]);
+    var all = cases.concat([hop, timebase]).concat(changeRule);
     return {
       cases: cases,
       hop: hop,
       timebase: timebase,
+      changeRule: changeRule,
       physicsSelfTest: physicsFails,
       passed: all.filter(function (r) { return r.pass; }).length,
       total: all.length,
@@ -298,6 +502,7 @@
     runCase: runCase,
     runHopCase: runHopCase,
     runTimebaseCase: runTimebaseCase,
+    runChangeRuleCases: runChangeRuleCases,
     buildClip: buildClip,
     CASES: CASES
   };
