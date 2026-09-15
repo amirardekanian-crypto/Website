@@ -571,9 +571,10 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   three lessons open, everything else locked behind a WhatsApp buy button. The lock is server-side:
   `tps_demo()` (`supabase/tps_02_demo.sql`, where the picks live) sends each locked item as its card
   only, so nothing locked ever reaches the phone. Never "lock" something in app.js alone. It is the one
-  mode that loads Plausible (goals `Demo opened`, `Demo failed`, `Demo locked`, `Demo buy`). Amir is
-  testing it from Iran first: if it will not open there without a VPN, move the free parts to static
-  files on the website. A «یه نگاه به داخلِ اپ» button on `/tennis/` waits for that test.
+  mode that loads Plausible (goals `Demo opened`, `Demo failed`, `Demo locked`, `Demo buy`). It is linked
+  publicly (Amir, 2026-09-15, before his Iran test): from `/tennis/` (menu, hero link, the phone
+  screenshot, the inside section, the price card, an FAQ), the course card on `index-fa.html`, and
+  `links.html`. If it will not open in Iran without a VPN, move the free parts to static files on the website.
 - **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets
   its own page, on one shared layout (hero → who → inside → how → price → FAQ → buy):
   `assets/css/fa-product.css`, with Vazirmatn self-hosted in `assets/fonts/`. **Bump the `?v=` on that
@@ -595,7 +596,7 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   - `index-fa.html` has a clay top banner («تازه: دوره‌ی تنیس و اپِ آزمون ←», not sticky) that jumps to the «محصولات» strip.
   - That strip sits right under the hero and the stats bars.
   - The menu has «دوره» and «برای مربی‌ها».
-  - `links.html` has a button for each product.
+  - `links.html` has a button for each product, plus the course demo («هفته‌ی ۱ رو رایگان امتحان کن»).
   - **The English site deliberately does not mention them** (Amir's choice): it stays about coaching for international players.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
