@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- The course's product page (Farsi). The app itself is /tennis/app/ (private source: tps-content).
-     Shared layout: /assets/css/fa-product.css. The level test: level-test.js next to this file. -->
+     Shared layout: /assets/css/fa-product.css. The level test: level-test.js next to this file.
+     The demo (/tennis/app/?demo=1) is linked from the menu, the hero (text link and phone), the inside
+     section, the price card and the FAQ. -->
 <title>سیستم آمادگی جسمانی تنیس | دوره‌ی ۱۶ هفته‌ای امیر اردکانیان</title>
 <meta name="description" content="برنامه‌ی کاملِ ۱۶ هفته‌ایِ بدنسازیِ تنیس رو گوشیت: جلسه‌های باشگاه و زمین، تمرینِ اضافه، ۱۱۴ حرکت، ۲۲ درس و ۷ تست. اول با تستِ ۲ دقیقه‌ای ببین تو کدوم سطحی.">
 <meta name="robots" content="index, follow">
@@ -38,6 +40,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="stylesheet" href="/assets/css/fa-product.css?v=2">
+<style>
+  /* The demo links (2026-09-15). Page-only, so fa-product.css and its ?v stay as they are. */
+  .hero-demo{display:inline-block;margin-top:18px;font-weight:700;font-size:17px;color:#fff;border-bottom:2px solid var(--clay-2);padding-bottom:2px;}
+  .hero-demo:hover{color:var(--clay-2);}
+  .demo-row{display:flex;align-items:center;flex-wrap:wrap;gap:14px 22px;margin-top:34px;}
+  .demo-row p{font-weight:600;font-size:17px;color:var(--ink-2);line-height:1.7;}
+</style>
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)};</script>
 </head>
@@ -51,6 +60,7 @@
       <a href="#inside">داخلش چیه؟</a>
       <a href="#price">قیمت</a>
       <a href="#faq">سؤال‌ها</a>
+      <a href="/tennis/app/?demo=1">نسخه‌ی نمایشی</a>
     </div>
     <a class="btn btn-primary btn-sm" href="#price">خرید</a>
   </div>
@@ -69,11 +79,12 @@
         <a class="btn btn-primary" href="#test">تو کدوم سطحی؟ ←</a>
         <a class="btn btn-ghost" href="#price">خرید · ۱۷ دلار</a>
       </div>
+      <a class="hero-demo" href="/tennis/app/?demo=1">یا اول هفته‌ی ۱ رو رایگان امتحان کن ←</a>
     </div>
-    <!-- A real screen from the course app (week 3, session A), by Amir's choice (2026-09-15). -->
-    <div class="phone">
+    <!-- A real screen from the course app (week 3, session A), by Amir's choice (2026-09-15). Tapping it opens the demo. -->
+    <a class="phone" href="/tennis/app/?demo=1" style="display:block" aria-label="نسخه‌ی نمایشیِ اپ رو باز کن">
       <div class="pscreen"><img src="/tennis/app-session.webp" alt="نمایی از اپ: هفتهٔ ۳، جلسهٔ A" width="540" height="1132"></div>
-    </div>
+    </a>
   </div>
 </header>
 
@@ -124,6 +135,10 @@
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="7"/><path d="M12 14v-4M10 2.5h4M12 2.5V7"/></svg></div><h3>۷ تستِ ساده</h3><p>پرش، دوی سرعت ۲۰ متر، آزمونِ عنکبوتی، یو-یو و بررسیِ قدرت؛ هفته‌ی صفر و هر ۴ هفته. فقط با عددِ خودت مقایسه می‌کنی.</p></div>
       <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></div><h3>رو گوشیت، حتی آفلاین</h3><p>مثلِ یه اپ نصب میشه و بعد از اولین ورود، بدونِ اینترنت هم باز میشه. نسخه‌ی نوجوانان (۱۳ تا ۱۵ سال) هم داخلشه.</p></div>
     </div>
+    <div class="demo-row">
+      <a class="btn btn-primary" href="/tennis/app/?demo=1">یه نگاه به داخلِ اپ ←</a>
+      <p>هفته‌ی ۱ کامل، تستِ پرشِ طول و ۳ درس بازه. بدونِ ثبت‌نام.</p>
+    </div>
   </div>
 </section>
 
@@ -158,7 +173,7 @@
         <li><span class="ck">✓</span>رو گوشی، حتی بدونِ اینترنت</li>
       </ul>
       <a class="btn btn-primary btn-block js-buy" href="https://wa.me/447435363461" target="_blank" rel="noopener">خرید از واتساپ 💬</a>
-      <div class="price-small">هنوز مطمئن نیستی؟ <a href="#test">اول تست بده</a></div>
+      <div class="price-small">هنوز مطمئن نیستی؟ <a href="#test">اول تست بده</a> یا <a href="/tennis/app/?demo=1">هفته‌ی ۱ رو رایگان امتحان کن</a></div>
     </div>
   </div>
 </section>
@@ -180,6 +195,7 @@
     <h2 class="sec-h">قبل از خرید، اینا رو بدون.</h2>
     <div class="faq">
       <details open><summary>فرقش با برنامه‌ی اختصاصی چیه؟</summary><p>این دوره خودآموزه: یه برنامه‌ی کامل و آماده که خودت اجراش می‌کنی، و برای هر نفر عوض نمیشه. اگه می‌خوای برنامه از روی خودت نوشته بشه و هر هفته آپدیت بشه، <a href="/index-fa.html#pricing">برنامه‌ی اختصاصی</a> رو ببین.</p></details>
+      <details><summary>قبل از خرید می‌تونم داخلش رو ببینم؟</summary><p>آره. <a href="/tennis/app/?demo=1">نسخه‌ی نمایشی</a> رو باز کن: هفته‌ی ۱ کامل، تستِ پرشِ طول و ۳ درس بازه، بدونِ ثبت‌نام. بقیه‌ی دوره قفله و بعد از خرید باز میشه.</p></details>
       <details><summary>باشگاه لازم دارم؟</summary><p>هر هفته ۲ جلسه تو باشگاه و ۱ جلسه تو زمینه. بیشترِ حرکت‌ها جایگزینِ بی‌وسیله هم دارن، و تمرینِ مقاوم‌سازی و تحرک‌پذیری تو خونه انجام میشه.</p></details>
       <details><summary>چند سالم باید باشه؟</summary><p>۱۳ سال و بالاتر. ۱۳ تا ۱۷ سال: پدر یا مادر همراهِ بازیکن راهنما رو می‌خونه. ۱۳ تا ۱۵ سال: نسخه‌ی نوجوانان داخلِ برنامه‌ست و هر جلسه یه بزرگسال حاضره.</p></details>
       <details><summary>اینترنت قطع بشه چی؟</summary><p>بار اول، ورود و دریافتِ دوره اینترنت می‌خواد (اگه وصل نشد، با VPN امتحان کن). بعد از اون، اپ بدونِ اینترنت هم باز میشه.</p></details>
