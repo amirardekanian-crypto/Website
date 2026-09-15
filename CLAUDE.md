@@ -560,6 +560,16 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   `tps-content/app/_dev/deploy_to_website.py`, so **never edit those files here**. The handbook itself
   is in Supabase (`tps_content`, readable only by an active buyer); logins come from coach.html →
   **Course**. Backend: `supabase/tps_01_accounts_content.sql` + `supabase/functions/tps-login`.
+- **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets
+  its own page, on one shared layout (hero → who → inside → how → price → FAQ → buy):
+  `assets/css/fa-product.css`, with Vazirmatn self-hosted in `assets/fonts/`. **Bump the `?v=` on that
+  link after any change**, because `sw.js` serves `/assets/` cache-first to anyone who has opened
+  program.html. The **«تو کدوم سطحی؟» level test** is `tennis/level-test.js`. Amir's rules (aiming at
+  ~70% Level 2, 15% Level 1, 15% Level 3) are in its header: change them there, and nowhere else. It stores
+  nothing and sends only a Plausible custom event `Level test 1|2|3` (each needs a goal in Plausible).
+  The page reaches `sitemap.xml` through `FOLDER_PAGES` in `scripts/build_article_pages.py`.
+  `index-fa.html` links it from the menu («دوره») and the «محصولات» strip; the testing app for coaches
+  gets its own page and card next.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +

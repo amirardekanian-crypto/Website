@@ -579,10 +579,15 @@ def indexable_loc(text, disallow):
     return loc
 
 
+# Public pages that live in a folder instead of at the root (the product pages). Like a root
+# page, each is listed only while it has a canonical link and no noindex.
+FOLDER_PAGES = ['tennis/index.html']
+
+
 def sitemap_entries(outputs):
     disallow = robots_disallow()
     roots = []
-    for f in sorted(ROOT.glob('*.html')):
+    for f in sorted(ROOT.glob('*.html')) + [ROOT / p for p in FOLDER_PAGES if (ROOT / p).exists()]:
         loc = indexable_loc(f.read_text(encoding='utf-8', errors='replace'), disallow)
         if loc:
             roots.append((loc, f))
