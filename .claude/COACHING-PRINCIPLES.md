@@ -338,7 +338,18 @@ publish it. No athlete health/chat detail goes here — principles only.
   a later cycle). Pairing two not-yet-calibrated loads/movements adds logistics friction
   exactly when you need clean baseline data — run straight sets with independent rest until
   each movement has at least one cycle of logged working weights, then superset from there.
-  *(2026-07-05, Bardia C1)*
+  ⚠️ **The friction is concrete: a circuit logs ONE weight per exercise for the whole block and
+  ONE RPE per round, so a first cycle spent inside supersets produces no per-set progression
+  record at all** — and the next cycle, whose whole job is to load off those numbers, has
+  nothing to load from. It also hides an over-cap effort, because a shared round-RPE can't say
+  which of the two lifts is the one running hot. **This applies to a mid-cycle restructure too,
+  not just the original build** — merging two already-running straight-set exercises into a pair
+  destroys the resolution they were already giving you. *(2026-07-05, Bardia C1; again
+  amir_ardekani C1, caught 2026-09-15 on Amir's review — three supersets had been merged in
+  mid-cycle, leaving 5 of 16 working exercises with no baseline going into "Forge — Earn the
+  Load", while the Delt pair logged an identical `R1 9 · R2 9 · R3 9` against a prescribed RPE
+  7/8 for two sessions running. The same two lifts had logged cleanly per set, with RPE, before
+  they were paired. Unpicked back to straight sets; volume unchanged.)*
 - **A superset pair is authored as ONE `type: circuit` entry — never two `"standard"`
   exercises each carrying a `"superset"` chip.** The chip-based version breaks the entire
   point of a superset: each `"standard"` exercise gets its own independent rest timer, so the

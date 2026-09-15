@@ -5431,7 +5431,7 @@ function renderHome() {
       const blockClass = blockCategory(block.title, bIdx);
       html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
       block.exercises.forEach(ex => {
-        html += renderExercise(ex, day.id, exerciseNum++, blockClass);
+        html += renderExercise(ex, day.id, exerciseNum++, blockClass, block.title);
       });
     });
 
@@ -5502,13 +5502,35 @@ function countTotalUnits(day) {
   return total;
 }
 
+// Is this block the warm-up? Decided from the TITLE ALONE, with no positional
+// fallback — an unrecognised title is deliberately NOT prep.
+//
+// ⚠️ Do not reuse blockCategory() for this. That function falls back to cycling
+// classes by block index when it doesn't recognise a title, which is harmless
+// for colour and destructive for logging: "Core" sitting at index 3 lands on
+// fallback[3 % 3] === 'block-warmup', which would have silently switched the
+// weight + RPE fields off on every Core circuit in the file. Caught by
+// scripts/check_circuit_logging.py before it shipped — keep them separate.
+//
+// 'prime' and 'prep' are here because SCHEMA names the warm-up block "Prime"
+// OR "Activation & Prep", and free-named prep blocks ("Shoulder Prep",
+// "Dynamic Mobility", "Shoulder Activation") are common. Note that 'primary'
+// does NOT contain 'prime', so the main-lift block is unaffected.
+function isPrepBlockTitle(title) {
+  const t = (title || '').toLowerCase();
+  return t.includes('warm')  || t.includes('mobility') || t.includes('activation') ||
+         t.includes('cool')  || t.includes('prime')    || t.includes('prep');
+}
+
 // Map a block.title (e.g. "Strength", "Warm-Up", "Plyometrics") to a stripe color class.
 // If the title doesn't match any known keyword, fall back to cycling through the three
 // colors by block index so ANY new block type still gets a stripe and the design stays
 // consistent. blockIndex is the 0-based position of the block within its day.
+// ⚠️ COSMETIC ONLY — that index fallback makes this unsafe for any behavioural
+// decision; use isPrepBlockTitle() above for those.
 function blockCategory(title, blockIndex) {
   const t = (title || '').toLowerCase();
-  if (t.includes('warm') || t.includes('mobility') || t.includes('activation') || t.includes('cool')) return 'block-warmup';
+  if (isPrepBlockTitle(title)) return 'block-warmup';
   if (t.includes('plyo') || t.includes('power') || t.includes('jump') || t.includes('med ball') || t.includes('rotational') || t.includes('explosive')) return 'block-power';
   if (t.includes('strength')) return 'block-strength';
   // Fallback for unknown / future block types — cycles ice → yellow → purple → ice …
@@ -5676,8 +5698,8 @@ function renderVideoBlock(url) {
   </div>`;
 }
 
-function renderExercise(ex, dayId, num, blockClass) {
-  if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass);
+function renderExercise(ex, dayId, num, blockClass, blockTitle) {
+  if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass, blockTitle);
 
   const isStandard = ex.type === 'standard';
   const parsed = parseChips(ex.chips);
@@ -5743,15 +5765,29 @@ function renderExercise(ex, dayId, num, blockClass) {
   </div>`;
 }
 
-function renderCircuit(ex, dayId, num, blockClass) {
-  // Circuits log weight (a small field per exercise) + one RPE per round BY
-  // DEFAULT — that covers supersets, complexes AND conditioning circuits alike.
-  // A warm-up opts out with "warmup": true (logs nothing — the pre-session
-  // readiness check covers how the athlete feels). logWeight / logRPE remain as
-  // optional fine-grained overrides (e.g. a no-weight RPE-only circuit).
-  const isWarmup  = ex.warmup === true;
-  const logWeight = !isWarmup && ex.logWeight !== false;
-  const logRPE    = !isWarmup && ex.logRPE   !== false;
+function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
+  // THE BLOCK DECIDES THE DEFAULT (2026-09-15). A circuit in a prep/activation
+  // block logs NOTHING; a circuit anywhere else logs a weight field per item +
+  // one RPE per round — supersets, complexes and conditioning alike.
+  //
+  // This used to be the other way round: everything logged unless the JSON said
+  // "warmup": true, so a prep circuit that simply forgot the flag asked athletes
+  // for kilograms and an RPE on a mobility drill. That was live on 13 circuits
+  // across 4 athletes, the demo file included. Opting out had to be remembered
+  // every single time; opting in only has to be remembered when a primer is
+  // genuinely loaded — which is the rarer case and the one that gets noticed.
+  //
+  // Both overrides still work in BOTH directions and beat the block default:
+  //   logWeight/logRPE: true   → log it even in a prep block (loaded primer)
+  //   logWeight/logRPE: false  → don't, even in a working block
+  // "warmup": true still forces everything off from any block (back-compat).
+  const isWarmup    = ex.warmup === true;
+  const inPrepBlock = isPrepBlockTitle(blockTitle);
+  const logsByDefault = !isWarmup && !inPrepBlock;
+  const logWeight = isWarmup ? false
+                  : (ex.logWeight !== undefined ? ex.logWeight !== false : logsByDefault);
+  const logRPE    = isWarmup ? false
+                  : (ex.logRPE   !== undefined ? ex.logRPE   !== false : logsByDefault);
   const showLog   = logRPE; // the Log section holds the per-round RPE rows
 
   // The circuit itself takes ONE number from the day's running counter.
@@ -7465,7 +7501,7 @@ async function openWorkout(file) {
     const blockClass = blockCategory(block.title, bIdx);
     html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
     (block.exercises || []).forEach(ex => {
-      html += renderExercise(ex, 'ws', num++, blockClass);
+      html += renderExercise(ex, 'ws', num++, blockClass, block.title);
     });
   });
   body.innerHTML = html || `<div class="wl-empty">This workout has no exercises yet.</div>`;

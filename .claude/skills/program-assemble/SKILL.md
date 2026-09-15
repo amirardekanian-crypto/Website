@@ -65,8 +65,11 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
   omit tempo; warm-up/prep omit RPE (see 2e).
 - **Working (non-warm-up) circuits:** build each item's `detail` from the spec's per-item
   reps (`"×12"`), and if the spec gives one overall circuit RPE append it (`"×12 · RPE 7"`).
-  Do **not** set `warmup` — working circuits log a weight field per item + one RPE per round
-  by default (per SCHEMA "Circuit logging"). Only prep circuits get `warmup: true` (2e).
+  Set **no logging flags** — since 2026-09-15 the BLOCK decides: a circuit in a working block
+  (Primary/Accessory/Core/Power/Conditioning) logs a weight per item + one RPE per round, and
+  a circuit in a prep block logs nothing. The only flag you ever write is `"logWeight": true`
+  on a genuinely **loaded** primer sitting in a prep block (e.g. a Leg Press primer). See
+  SCHEMA.md → "Circuit logging".
 
 **2c — Section titles + icons** (per SCHEMA "Standard section names", fixed order):
 Activation & Prep 🔥 → [power/explosive: free-named by content] → **Primary** 🎯 →
@@ -82,7 +85,10 @@ higher-priority word hijack the image (`"engine"`→conditioning, `"power"`→po
 "Lower — squat/quad" → `"Built From The Legs Up"`; "Upper push & pull" → `"Press, Pull,
 Repeat"`. Never ship a dry label (`"Upper Body & Press"` ✗).
 
-**2e — Warm-up / prep logs nothing.** Prep circuits get `"warmup": true` (no weight/RPE).
+**2e — Warm-up / prep logs nothing.** The prep BLOCK already silences its circuits, so
+`"warmup": true` is no longer required (harmless if present). Name the block so it reads as
+prep — `Activation & Prep`, `Prime`, `Warm-Up`, or a free name containing *mobility* /
+*activation* / *prep*; a prep block named something unrecognised will log like a working one.
 Warm-up `simple` items carry the dose chip only — **no RPE chip** (an RPE on a warm-up is
 noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure & time".
 
@@ -118,6 +124,28 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
   collapse any hit to a single number (the top of the range) per COACHING-PRINCIPLES.md →
   "Progression (coach-driven)". The app has no rep-range field; this is a hard reject, not a
   style preference.
+- **⛔ No working circuit in a FIRST cycle — hard reject.** If `currentCycleIndex` is `0`,
+  every `"circuit"` must sit in a prep block. A superset or complex in Primary/Accessory/Core
+  on cycle 1 violates COACHING-PRINCIPLES.md → Session structure ("no supersets in an
+  athlete's first cycle"), and the cost is concrete: a circuit records one weight per exercise
+  for the whole block and one RPE per round, so the cycle whose entire job is to establish
+  baselines produces none for those exercises. Rebuild them as separate `"standard"` entries
+  with independent `restSec`.
+  ```
+  node -e "const d=JSON.parse(require('fs').readFileSync('data/<id>.json','utf8'));
+  if(d.currentCycleIndex!==0){console.log('not a first cycle — check skipped');process.exit(0)}
+  const prep=t=>/warm|mobility|activation|cool|prime|prep/i.test(t||'');
+  const bad=[];(d.workouts.days||[]).forEach(dy=>(dy.blocks||[]).forEach(b=>
+    (b.exercises||[]).forEach(e=>{if(e.type==='circuit'&&!prep(b.title)&&e.warmup!==true)
+      bad.push('Day '+dy.id+' ['+b.title+'] '+e.name)})));
+  console.log(bad.length?'REJECT — working circuits in cycle 1:\n  '+bad.join('\n  '):'ok — no working circuits in cycle 1')"
+  ```
+- **⚠️ Later cycles: every exercise inside a circuit needs a logged working weight already.**
+  The same principle covers "any exercise new to that client, even in a later cycle." For each
+  item in a working circuit, confirm the athlete has a prior per-set number for it (session
+  history / The Ceiling / the coaching log's Exercise Ledger). Any item without one comes out
+  of the circuit and runs as straight sets this cycle — pair it next cycle, once it has a
+  baseline. Flag to Amir rather than silently rebuilding.
 - **No superset shipped as a chip.** Grep every `"standard"` exercise's `chips[]` for a label
   of `"superset"` (or any structural-pairing wording) — if found, that pair was never
   converted to the required `"circuit"` block per 2a. Hard reject: rebuild it as one circuit

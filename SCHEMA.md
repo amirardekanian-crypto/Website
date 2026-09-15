@@ -26,7 +26,7 @@
 - The `type` field decides what tools an exercise gets — no separate flags needed:
   - `"simple"` → just the row. No rest, no weight, no RPE, no note.
   - `"standard"` → always has rest timer + weight log + RPE selector + personal note.
-  - `"circuit"` → rest timer at the end + personal note, and **by default** an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning all log load this way). Add `"warmup": true` to make a circuit log nothing (prep/mobility). See "Circuit logging" below.
+  - `"circuit"` → rest timer at the end + personal note, and **the block decides whether it logs**: a circuit in a **prep/activation block logs nothing**; a circuit in any **working block** gets an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning). Override either way with `logWeight` / `logRPE`. See "Circuit logging" below.
 - `"restSec"` (number, seconds) controls the rest timer duration. Defaults if omitted: **120s for `standard`**, **60s for `circuit`**. Override per exercise as needed.
 - A `"circuit"` exercise must include `rounds` (string) and `items[]` (array).
 - The legacy `"hasRest"` field is no longer used and can be removed. Old files that still contain it will keep working — the field is simply ignored.
@@ -466,16 +466,26 @@ Every circuit gets, automatically:
 
 ##### Circuit logging (`warmup`, and optional `logWeight` / `logRPE`)
 
-**By default every circuit logs** — a small inline **weight field on each exercise** (one weight per item, folded into the round row) **plus one RPE per round**. This covers supersets, complexes, *and* conditioning circuits (load can be added to any of them). A **warm-up** is the exception: it logs nothing.
+**THE BLOCK DECIDES THE DEFAULT** (changed 2026-09-15).
+
+- A circuit inside a **prep / activation block** logs **nothing** — no weight, no RPE. The pre-session readiness check already captures how the athlete feels.
+- A circuit inside any **working block** (Primary, Accessory, Core, Power, Conditioning…) logs a small inline **weight field on each exercise** (one per item, folded into the round row) **plus one RPE per round**. This covers supersets, complexes *and* conditioning circuits.
+
+A block counts as prep when its **title** contains `warm`, `mobility`, `activation`, `cool`, `prime` or `prep` — so `Prime`, `Activation & Prep`, `Warm-Up`, `Dynamic Mobility` and `Shoulder Prep` are all prep. Note `Primary` does **not** contain `prime`. This is `isPrepBlockTitle()` in `program.html`; it reads the **title only, with no positional fallback** — an unrecognised title is not prep, which fails safe toward logging.
 
 | Flag | Default | Effect |
 |---|---|---|
-| `warmup` | `false` | `true` → the circuit logs **nothing** (no weight, no RPE) — for prep/mobility. The pre-session readiness check already captures how the athlete feels. |
-| `logWeight` | `true` | Optional override — set `false` to hide the weight field on a non-warm-up circuit. |
-| `logRPE` | `true` | Optional override — set `false` to hide the per-round RPE rows. |
+| `warmup` | `false` | `true` → logs **nothing**, from any block. Kept for back-compat; in a prep block it is now redundant. |
+| `logWeight` | block-dependent | Override in **both** directions — `true` shows the weight field even in a prep block (a genuinely loaded primer), `false` hides it in a working block. |
+| `logRPE` | block-dependent | Same, for the per-round RPE rows. |
 
-- **Superset / conditioning / complex** → no flags needed: each item gets its own inline weight box + one RPE per round. Syncs to the coach as two lines — `Incline Dumbbell Press 30 · Chest-Supported Dumbbell Row 25` then `RPE: R1 8 · R2 8 · R3 9`.
-- **Warm-up / prep** → `"warmup": true`: logs nothing.
+- **Superset / conditioning / complex in a working block** → no flags needed. Syncs to the coach as two lines — `Incline Dumbbell Press 30 · Chest-Supported Dumbbell Row 25` then `RPE: R1 8 · R2 8 · R3 9`.
+- **Warm-up / prep** → no flags needed either; the block already silences it.
+- **A loaded primer in a prep block** (e.g. `Loaded Leg Primer` = Leg Press + Cable Pull Through at RPE 6) → `"logWeight": true`, so the athlete's working weight is remembered without asking for an RPE the prescription already fixes.
+
+> ⚠️ **Why the default flipped.** It used to be "everything logs unless the JSON says `warmup: true`", so a prep circuit that simply forgot the flag asked athletes for kilograms and an RPE on a mobility drill — live on 13 circuits across 4 athletes, the demo file included. Opting out had to be remembered every single time; opting in only has to be remembered for the rare loaded primer, which is the case someone notices.
+>
+> ⚠️ **Do not implement prep-ness with `blockCategory()`.** That function falls back to cycling classes by block *index* for titles it doesn't know, so `Core` at index 3 returns `block-warmup` by arithmetic coincidence and every Core circuit silently stops logging. `scripts/check_circuit_logging.py` guards this and runs from `.githooks/pre-commit`.
 
 ##### Common mistake — a superset is NOT a chip
 

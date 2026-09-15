@@ -346,7 +346,12 @@ def blocks_html(blocks, lang):
     for b in blocks:
         kind = b.get('type')
         if kind == 'p':
-            out.append(f'<p{" class=\"lead\"" if lead else ""}>{esc(b.get("text"))}</p>')
+            # The class attribute is built outside the f-string on purpose: a
+            # backslash inside an f-string expression is a syntax error before
+            # Python 3.12, and this script has to run under whatever python the
+            # pre-commit hook finds.
+            lead_attr = ' class="lead"' if lead else ''
+            out.append(f'<p{lead_attr}>{esc(b.get("text"))}</p>')
             lead = False
         elif kind == 'h':
             out.append(f'<h2>{esc(b.get("text"))}</h2>')
