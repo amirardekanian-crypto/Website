@@ -302,6 +302,12 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Edit this when:** You want to change how the video pop-up or "install app" prompt behaves.
 - **Don't touch:** Unless you're comfortable with JavaScript. This is the most fragile file to edit by hand.
 
+#### `assets/js/fa-nav.js` — The phone menu on the Farsi pages
+- **What it does:** Opens and closes the ☰ menu on `index-fa.html`, `/tennis/` and `/tennis-testing/`, which keep their own nav instead of `partials/nav.html`. On phones their menu links drop down as a panel under the green bar; this closes it again on a link tap, a tap outside, Escape, or when the window grows wide enough to show the links in the bar.
+- **If deleted:** The ☰ button does nothing, so phone visitors cannot reach those pages' menu links.
+- **Depends on:** The look lives in each page: `index-fa.html`'s own CSS and `assets/css/fa-product.css`.
+- **Edit this when:** You change how the phone menu opens or closes. Bump its `?v=` on all three pages, because `sw.js` serves `/assets/` cache-first.
+
 ---
 
 ### Reusable HTML Pieces (Partials)

@@ -39,7 +39,7 @@
 <link rel="preload" href="/assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="stylesheet" href="/assets/css/fa-product.css?v=2">
+<link rel="stylesheet" href="/assets/css/fa-product.css?v=3">
 <style>
   /* The demo links (2026-09-15). Page-only, so fa-product.css and its ?v stay as they are. */
   .hero-demo{display:inline-block;margin-top:18px;font-weight:700;font-size:17px;color:#fff;border-bottom:2px solid var(--clay-2);padding-bottom:2px;}
@@ -54,15 +54,18 @@
 
 <nav class="nav">
   <div class="wrap">
-    <a class="brand" href="/index-fa.html"><span class="mark"><img src="/assets/img/icon-192.png" alt="" width="40" height="40"></span>امیر اردکانی</a>
-    <div class="nav-links">
+    <a class="brand" href="/index-fa.html" aria-label="امیر اردکانی"><span class="mark"><img src="/assets/img/icon-192.png" alt="" width="40" height="40"></span><span class="brand-name">امیر اردکانی</span></a>
+    <div class="nav-links" id="nav-menu">
       <a href="#test">تو کدوم سطحی؟</a>
       <a href="#inside">داخلش چیه؟</a>
       <a href="#price">قیمت</a>
       <a href="#faq">سؤال‌ها</a>
       <a href="/tennis/app/?demo=1">نسخه‌ی نمایشی</a>
     </div>
-    <a class="btn btn-primary btn-sm" href="#price">خرید</a>
+    <div class="nav-side">
+      <a class="btn btn-primary btn-sm" href="#price">خرید</a>
+      <button class="nav-menu-btn" type="button" aria-label="منو" aria-expanded="false" aria-controls="nav-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-open" d="M4 7h16M4 12h16M4 17h16"/><path class="i-close" d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
   </div>
 </nav>
 
@@ -231,5 +234,6 @@
 </footer>
 
 <script src="/tennis/level-test.js?v=1" defer></script>
+<script src="/assets/js/fa-nav.js?v=1" defer></script>
 </body>
 </html>

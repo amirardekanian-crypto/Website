@@ -595,7 +595,11 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - **Where the Farsi products are introduced (Amir, 2026-09-15):**
   - `index-fa.html` has a clay top banner («تازه: دوره‌ی تنیس و اپِ آزمون ←», not sticky) that jumps to the «محصولات» strip.
   - That strip sits right under the hero and the stats bars.
-  - The menu has «دوره» and «برای مربی‌ها».
+  - The menu keeps only links that go to another page: «دوره», «برای مربی‌ها», «مقاله‌ها» (Amir,
+    2026-09-15: the seven links that jumped down the page are gone). On phones they drop down from a ☰
+    panel under the bar, with English as its last row. `/tennis/` and `/tennis-testing/` have the same
+    phone menu but keep their section links. One script opens and closes all three:
+    `assets/js/fa-nav.js`; the look is in `index-fa.html`'s CSS and `fa-product.css`, so change both.
   - `links.html` has a button for each product, plus the course demo («هفته‌ی ۱ رو رایگان امتحان کن»).
   - **The English site deliberately does not mention them** (Amir's choice): it stays about coaching for international players.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
