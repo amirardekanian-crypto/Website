@@ -3130,11 +3130,52 @@
   .timer-presets { display: flex; gap: 10px; margin-top: 32px; }
   .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
   .preset-btn.selected { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
-  .timer-controls { display: flex; gap: 12px; margin-top: 20px; }
-  .timer-ctrl-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 28px; border-radius: 4px; border: none; cursor: pointer; }
+  .timer-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin-top: 20px; max-width: 320px; }
+  .timer-ctrl-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 24px; border-radius: 4px; border: none; cursor: pointer; }
   .btn-start { background: var(--yellow); color: var(--on-accent); }
+  .btn-add { background: var(--grey-card); color: var(--yellow); border: 1px solid var(--grey-mid); }
   .btn-close { background: var(--grey-card); color: var(--grey-dark); }
   .btn-reset { background: var(--grey-card); color: var(--grey-text); border: 1px solid var(--grey-mid); }
+  body[data-dark] .btn-add { background: #2a2a2a; border-color: #444; }
+
+  /* ── Guided Mode entry point (session-timer bar) ── */
+  .session-timer-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .session-timer-btn.guided { background: transparent; color: var(--ice); border: 1.5px solid var(--ice); }
+  body[data-dark] .session-timer-btn.guided { background: transparent; }
+
+  /* ── Guided Mode — walks the day's standard exercises one set at a time. See
+     openStepMode() in the script: it relocates the REAL .ex-detail node (video, stats,
+     cues, the set-log table, Ceiling) from the card below into .step-scroll, so nothing
+     about logging a set is reimplemented here — this is layout and navigation only. ── */
+  .step-overlay { display: none; position: fixed; inset: 0; z-index: 90; background: var(--grey-bg); flex-direction: column; }
+  .step-overlay.visible { display: flex; }
+  body[data-dark] .step-overlay { background: #141414; }
+  .step-topbar { display: flex; align-items: center; gap: 12px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px; flex-shrink: 0; }
+  .step-exit { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); font-size: 15px; line-height: 1; cursor: pointer; flex-shrink: 0; }
+  body[data-dark] .step-exit { background: #202020; border-color: #333; color: #eee; }
+  .step-topbar-text { flex: 1; min-width: 0; }
+  .step-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); }
+  .step-pill { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: var(--yellow); }
+  .step-scroll { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
+  .step-ex-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.15; color: var(--grey-dark); margin-bottom: 10px; }
+  body[data-dark] .step-ex-name { color: #f0f0f0; }
+  /* .ex-detail only hides via .checklist-item.collapsed .ex-detail (an ancestor rule) — once
+     relocated in here it is no longer that card's descendant, so it shows with no CSS of ours. */
+  .step-scroll .ex-rest-bottom { display: none; }   /* Guided rests itself — see stepAfterDone() */
+  .ex-set-row.step-current { background: var(--yellow-dim); border-radius: 10px; margin: 0 -8px; padding-left: 18px; padding-right: 18px; }
+  body[data-dark] .ex-set-row.step-current { background: rgba(14,74,54,0.28); }
+  .step-footer { display: flex; gap: 10px; padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 14px); border-top: 1px solid var(--grey-mid); background: var(--grey-bg); flex-shrink: 0; }
+  body[data-dark] .step-footer { background: #141414; border-top-color: #333; }
+  .step-nav-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; padding: 0 14px; border-radius: 8px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
+  .step-nav-btn[disabled] { opacity: 0.35; cursor: default; }
+  .step-primary-btn { flex: 1; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 0.5px; text-transform: uppercase; padding: 15px; border-radius: 10px; border: none; background: var(--yellow); color: var(--on-accent); cursor: pointer; }
+  .step-primary-btn:active { transform: scale(0.98); }
+  .step-primary-full { flex: 1 1 100%; }
+  .step-complete { text-align: center; padding: 48px 12px; }
+  .step-complete-check { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: var(--yellow); color: var(--on-accent); font-size: 28px; display: flex; align-items: center; justify-content: center; }
+  .step-complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: var(--grey-dark); margin-bottom: 8px; }
+  body[data-dark] .step-complete-title { color: #f0f0f0; }
+  .step-complete-sub { font-size: 14px; color: var(--grey-text); max-width: 280px; margin: 0 auto; line-height: 1.5; }
 
   .day-focus-tag { display: inline-block; background: var(--yellow); color: var(--on-accent); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; margin-bottom: 16px; }
 
@@ -3757,8 +3798,9 @@
   </div>
   <div class="timer-controls">
     <button class="timer-ctrl-btn btn-start" id="startStopBtn" onclick="toggleTimer()">Start</button>
+    <button class="timer-ctrl-btn btn-add" onclick="addTimerSeconds(15)">+15s</button>
     <button class="timer-ctrl-btn btn-reset" onclick="resetTimer()">Reset</button>
-    <button class="timer-ctrl-btn btn-close" onclick="closeTimer()">Close</button>
+    <button class="timer-ctrl-btn btn-close" id="timerCloseBtn" onclick="closeTimer()">Close</button>
   </div>
 </div>
 
@@ -3774,6 +3816,21 @@
       <button type="button" class="readiness-skip" onclick="skipReadiness()">Skip for today</button>
     </div>
   </div>
+</div>
+
+<!-- Guided Mode — walks one exercise (and within it, one set) at a time, reusing the
+     exact same set-log rows/listeners as the list view (see openStepMode in the script
+     below): nothing here is a second copy of the logging or Ceiling logic. -->
+<div class="step-overlay" id="stepOverlay">
+  <div class="step-topbar">
+    <button type="button" class="step-exit" onclick="closeStepMode()" aria-label="Exit guided mode">✕</button>
+    <div class="step-topbar-text">
+      <div class="step-eyebrow" id="step-eyebrow"></div>
+      <div class="step-pill" id="step-pill"></div>
+    </div>
+  </div>
+  <div class="step-scroll" id="step-scroll"></div>
+  <div class="step-footer" id="step-footer"></div>
 </div>
 
 <script>
@@ -5352,6 +5409,9 @@ function renderHome() {
   document.getElementById('day-tabs').innerHTML = tabsHtml;
 
   const panelsHtml = days.map((day, i) => {
+    // Guided Mode only makes sense where there is a per-set log to walk through —
+    // circuits and warm-ups stay list-only for now (see openStepMode/buildStepSeq).
+    const hasStandard = (day.blocks || []).some(b => (b.exercises || []).some(ex => ex.type === 'standard'));
     let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
     html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
@@ -5359,7 +5419,10 @@ function renderHome() {
         <div class="session-timer-label">Click Start to begin</div>
         <div class="session-timer-time">00:00</div>
       </div>
-      <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
+      <div class="session-timer-actions">
+        <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
+        ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided ▶</button>` : ''}
+      </div>
     </div>`;
 
     // Continuous numbering across the whole day (1 → total exercises)
@@ -7756,6 +7819,10 @@ function startTimerNow(day) {
   saveTimer(day, t);
   renderTimer(day);
   if (navigator.vibrate) navigator.vibrate(8);
+  // Guided ▶ was tapped on a day with no timer running yet, so it went through the
+  // readiness check first (see openGuided) — now that the session has actually begun,
+  // open the guided view it was waiting to show.
+  if (window._pendingGuidedDay === day) { window._pendingGuidedDay = null; openStepMode(day); }
 }
 // Called when the athlete hits "Finish Session" — locks the duration in.
 function finishTimer(day) {
@@ -7869,6 +7936,7 @@ function cancelReadiness() {
   closeReadinessModal();
   _readinessDay = null;
   _readinessSel = {};
+  window._pendingGuidedDay = null;   // Guided was waiting on this readiness check — it wasn't answered
 }
 
 function beginSession() {
@@ -9625,6 +9693,7 @@ function syncDarkToggle() {
 // Rest duration comes from the clicked exercise's `data-rest` attribute (set from
 // the JSON's `restSec` field), or falls back to 120s if not provided.
 let timerDuration = 120, timerRemaining = 120, timerInterval = null, timerRunning = false;
+let timerOnComplete = null;   // set only by openTimerAuto (Guided Mode) — see closeTimer()
 const circumference = 2 * Math.PI * 100;
 
 function openTimer(e) {
@@ -9636,16 +9705,46 @@ function openTimer(e) {
   // Read rest duration from the button's data-rest, default to 120s
   const parsed = btn ? parseInt(btn.getAttribute('data-rest'), 10) : NaN;
   const secs = (Number.isFinite(parsed) && parsed > 0) ? parsed : 120;
+  showTimer(secs, name, null);
+}
+
+// Guided Mode's rest: same overlay, but it starts itself and calls onComplete when the
+// rest ends — naturally, or via Skip. Never used from the manual Rest button, so list-mode
+// (tap Rest, tap Start yourself) is unchanged.
+function openTimerAuto(secs, name, onComplete) {
+  showTimer(secs, name, onComplete);
+  startTimer();
+}
+
+// Shared setup for both entry points above.
+function showTimer(secs, name, onComplete) {
   timerDuration = secs;
   timerRemaining = secs;
-
+  timerOnComplete = onComplete;
   document.getElementById('timer-exercise-name').textContent = name;
+  document.getElementById('timerCloseBtn').textContent = onComplete ? 'Skip →' : 'Close';
   document.getElementById('timerOverlay').classList.add('visible');
   // resetTimer() refreshes display + ring using the new timerDuration
   resetTimer();
 }
 
-function closeTimer() { document.getElementById('timerOverlay').classList.remove('visible'); pauseTimer(); }
+function closeTimer() {
+  document.getElementById('timerOverlay').classList.remove('visible');
+  pauseTimer();
+  // Fires once, whether the rest ran out on its own or Skip/Close ended it early. Only
+  // ever set by openTimerAuto (Guided Mode), so the manual Rest button never triggers this.
+  if (timerOnComplete) { const fn = timerOnComplete; timerOnComplete = null; fn(); }
+}
+
+// +15s while resting. Bumps the duration up to match so the ring never shows more than
+// full, rather than reporting a fraction over 1.
+function addTimerSeconds(n) {
+  timerRemaining = Math.max(0, timerRemaining + n);
+  timerDuration = Math.max(timerDuration, timerRemaining);
+  updateTimerDisplay();
+  updateRing(timerDuration ? timerRemaining / timerDuration : 1);
+  if (navigator.vibrate) navigator.vibrate(6);
+}
 
 function toggleTimer() { timerRunning ? pauseTimer() : startTimer(); }
 
@@ -9685,6 +9784,163 @@ function updateTimerDisplay() {
 
 function updateRing(fraction) {
   document.getElementById('ringProgress').style.strokeDashoffset = circumference * (1 - fraction);
+}
+
+// ── Guided Mode ──────────────────────────────────────────────────────
+// Walks the day's "standard" exercises (the ones with a per-set log — see
+// hasStandard/renderExercise) one set at a time, reusing the REAL DOM already built
+// and wired by attachSetLog()/attachCeiling(): the weight input, RPE buttons, per-set
+// check circle and Ceiling panel are the exact same nodes and listeners the list view
+// uses, just relocated into this overlay while it's open. Nothing about how a set is
+// logged, saved or estimated is reimplemented here — see CODEBASE.md's warning about
+// coach.html's parseSessionLog being "a second reader of a grammar program.html owns";
+// this is the same trap, avoided by never re-reading or re-writing that grammar at all.
+let STEP = null;   // { day, seq, pos, homeCard, homeDetail } — null while closed
+
+// Tapped instead of (or before) Start. A day with no timer running yet must pass the
+// same readiness check Start would show; startTimerNow() carries on into Guided Mode
+// via _pendingGuidedDay once that's answered (or skipped). A day already under way (or
+// finished) has no modal to wait for, so the guided view opens immediately.
+function openGuided(day) {
+  window._pendingGuidedDay = day;
+  toggleSessionTimer(day);
+  const ro = document.getElementById('readiness-overlay');
+  if (!ro || !ro.classList.contains('visible')) {
+    window._pendingGuidedDay = null;
+    openStepMode(day);
+  }
+}
+
+// One entry per (exercise, set) in on-screen order — exactly the cards initSetOrRPE()
+// attached a set-log table to (a .rest-btn present, and not a circuit's round-group).
+function buildStepSeq(day) {
+  const cards = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`))
+    .filter(c => c.querySelector('.rest-btn') && !c.classList.contains('round-group'));
+  const seq = [];
+  cards.forEach((card, exI) => {
+    const total = parseInt(card.dataset.sets, 10) || 1;
+    const name = card.querySelector('.item-name').textContent.trim();
+    for (let setI = 0; setI < total; setI++) seq.push({ card, exI, exCount: cards.length, total, setI, name });
+  });
+  return seq;
+}
+
+function openStepMode(day) {
+  const seq = buildStepSeq(day);
+  if (!seq.length) return;   // nothing loggable today (e.g. a circuit-only day)
+  STEP = { day, seq, pos: 0, homeCard: null, homeDetail: null };
+  document.getElementById('stepOverlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  renderStep();
+}
+
+// Puts the currently-relocated .ex-detail back on its own card, exactly where
+// renderExercise() built it — so exiting mid-workout leaves the list view untouched.
+function restoreStepHome() {
+  if (STEP && STEP.homeCard && STEP.homeDetail) {
+    STEP.homeCard.appendChild(STEP.homeDetail);
+  }
+  if (STEP) { STEP.homeCard = null; STEP.homeDetail = null; }
+}
+
+function closeStepMode() {
+  if (!STEP) return;
+  if (document.getElementById('timerOverlay').classList.contains('visible')) closeTimer();
+  restoreStepHome();
+  document.getElementById('stepOverlay').classList.remove('visible');
+  document.body.style.overflow = '';
+  STEP = null;
+}
+
+function renderStep() {
+  if (!STEP) return;
+  const item = STEP.seq[STEP.pos];
+  const scroll = document.getElementById('step-scroll');
+
+  if (STEP.homeCard !== item.card) {
+    restoreStepHome();
+    STEP.homeCard = item.card;
+    STEP.homeDetail = item.card.querySelector('.ex-detail');
+    // The exercise name lives in .item-main, not the relocated .ex-detail, so it's
+    // repainted here — everything below it (video, stats, cues, the set-log table,
+    // Ceiling) is the real node, moved in whole.
+    scroll.innerHTML = `<div class="step-ex-name">${item.card.querySelector('.item-name').innerHTML}</div>`;
+    scroll.appendChild(STEP.homeDetail);
+  }
+
+  // Draw the eye to the set this step is on; .dim is existing CSS (ex-set-row.dim),
+  // defined for this exact purpose but never wired up until now. Queried off
+  // homeDetail, not item.card — the rows moved out of the card along with it.
+  STEP.homeDetail.querySelectorAll('.ex-set-row').forEach(row => {
+    const i = parseInt(row.dataset.setIdx, 10);
+    row.classList.toggle('step-current', i === item.setI);
+    row.classList.toggle('dim', i !== item.setI);
+  });
+
+  document.getElementById('step-eyebrow').textContent = `Exercise ${item.exI + 1} of ${item.exCount}`;
+  document.getElementById('step-pill').textContent = `Set ${item.setI + 1} of ${item.total}`;
+  renderStepFooter();
+  scroll.scrollTop = 0;
+}
+
+// The relocated .ex-detail for the current exercise is STEP.homeDetail, not something
+// still living under item.card — see renderStep().
+function currentStepRow() {
+  const item = STEP.seq[STEP.pos];
+  return STEP.homeDetail.querySelector(`.ex-set-row[data-set-idx="${item.setI}"]`);
+}
+
+function renderStepFooter() {
+  const isLast = STEP.pos === STEP.seq.length - 1;
+  const done = currentStepRow().classList.contains('done');
+  const label = done ? (isLast ? 'Finish Workout ✓' : 'Next →') : 'Done — Start Rest ✓';
+  document.getElementById('step-footer').innerHTML = `
+    <button type="button" class="step-nav-btn" onclick="stepPrev()"${STEP.pos === 0 ? ' disabled' : ''}>‹ Prev</button>
+    <button type="button" class="step-primary-btn" onclick="stepPrimary()">${esc(label)}</button>`;
+}
+
+// The one big button. Marking a set done goes through the row's OWN check-circle click —
+// the exact listener attachSetLog() wired up (saves the log, refreshes Ceiling, updates
+// the day's progress pill) — this function never touches that data itself.
+function stepPrimary() {
+  const row = currentStepRow();
+  if (!row.classList.contains('done')) {
+    row.querySelector('.ex-set-check').click();
+    stepAfterDone();
+  } else {
+    stepAdvance();
+  }
+}
+
+function stepAfterDone() {
+  if (STEP.pos === STEP.seq.length - 1) { showStepComplete(); return; }
+  const item = STEP.seq[STEP.pos];
+  const restBtn = STEP.homeDetail.querySelector('.rest-btn');   // hidden by CSS, but still real
+  const secs = parseInt(restBtn && restBtn.getAttribute('data-rest'), 10) || 120;
+  openTimerAuto(secs, item.name, stepAdvance);
+}
+
+function stepAdvance() {
+  if (!STEP) return;   // Guided Mode was closed while the rest timer was still running
+  if (STEP.pos < STEP.seq.length - 1) { STEP.pos++; renderStep(); }
+  else showStepComplete();
+}
+
+function stepPrev() {
+  if (STEP.pos > 0) { STEP.pos--; renderStep(); }
+}
+
+function showStepComplete() {
+  document.getElementById('step-eyebrow').textContent = 'Guided workout';
+  document.getElementById('step-pill').textContent = 'Complete';
+  document.getElementById('step-scroll').insertAdjacentHTML('beforeend', `
+    <div class="step-complete">
+      <div class="step-complete-check">✓</div>
+      <div class="step-complete-title">Every set logged.</div>
+      <p class="step-complete-sub">Rate the session and send it to your coach from Finish Session, below.</p>
+    </div>`);
+  document.getElementById('step-footer').innerHTML =
+    `<button type="button" class="step-primary-btn step-primary-full" onclick="closeStepMode()">Exit Guided Mode</button>`;
 }
 
 function esc(str) {
