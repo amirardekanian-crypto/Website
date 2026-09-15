@@ -577,6 +577,12 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   sample players (`?sample=1`). Like the course app, it self-hosts Vazirmatn and supabase-js 2.116.0
   (`fonts/`, `lib/`), so nothing waits on Google Fonts or jsDelivr. `index-fa.html` links it from the menu («برای مربی‌ها») and the third
   «محصولات» card.
+- **Where the Farsi products are introduced (Amir, 2026-09-15):**
+  - `index-fa.html` has a clay top banner («تازه: دوره‌ی تنیس و اپِ آزمون ←», not sticky) that jumps to the «محصولات» strip.
+  - That strip sits right under the hero and the stats bars.
+  - The menu has «دوره» and «برای مربی‌ها».
+  - `links.html` has a button for each product.
+  - **The English site deliberately does not mention them** (Amir's choice): it stays about coaching for international players.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +
