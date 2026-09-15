@@ -3,8 +3,12 @@
    The only preference kept is the chosen version, in localStorage "tps.prefs": { age: "adult" | "u16" }.
    Signed in (the default): the handbook comes from Supabase and is kept on the phone in IndexedDB,
    so it opens with no connection (see "Account and the offline copy" below). ?local=1 or
-   ?content=<folder> reads the JSON files next to the app instead (private repo only).
-   Routes are hash-based. */
+   ?content=<folder> reads the JSON files next to the app instead (needs a content folder, which the
+   website does not have). ?demo=1 is the demo: no sign-in, only the free parts (see "Demo" below).
+   Routes are hash-based.
+   The demo was built in the website's copy of this file on 2026-09-15, not in the private tps-content
+   repo it is deployed from (that repo was not reachable from Amir's PC): copy it into that repo before
+   its next deploy, or the deploy erases the demo. After any edit there run: python scripts/stamp_tps_app.py */
 (function () {
   'use strict';
 
@@ -297,9 +301,75 @@
   // The setup page's account card: who is signed in, how to install, and sign-out. Nothing in the local modes.
   function accountBlock() {
     if (window.LOCAL) return '';
+    if (DEMO) return `<div class="section"><div class="card clay"><h3>نسخهٔ نمایشی</h3>
+      <p class="lead">در نسخهٔ نمایشی فقط بخشی از دوره باز است.</p>${buyActions('setup')}</div></div>`;
     return `<div class="section"><div class="card"><h3>حساب</h3>
       <div class="acct"><span class="who">وارد شده با <b dir="ltr">${esc(ACC.username || '—')}</b></span><button class="btn ghost" data-signout>خروج</button></div>
       <p class="lead" style="margin-top:10px">نصب روی گوشی: در آیفون، در Safari دکمهٔ Share و بعد Add to Home Screen. در اندروید، از منوی ⋮ مرورگر گزینهٔ Install app یا Add to Home screen. کتاب روی همین گوشی می‌ماند و بدون اینترنت هم باز می‌شود.</p></div></div>`;
+  }
+
+  /* ── Demo (?demo=1) ────────────────────────────────────────────────── */
+  // The link that shows people what the course contains before they buy. No sign-in. tps_demo() in
+  // Supabase sends week 1, one test, a few lessons and the exercises week 1 uses, and for everything
+  // else only its card (name, icon, one line) marked locked: true. So a lock is real, with nothing
+  // behind it on the phone. The picks live in that function (supabase/tps_02_demo.sql), not here.
+  // No service worker and no offline copy: the demo needs the connection anyway.
+  // This mode, and only this mode, counts anonymous Plausible events (index.html loads the script):
+  // Demo opened · Demo failed · Demo locked {kind, item} · Demo buy {from}. Each needs a goal in Plausible.
+  const DEMO = !!window.DEMO;
+  const COURSE = 'سیستم آمادگی جسمانی تنیس · سطح ۲';   // the name in the product page's buy message (tennis/level-test.js)
+  const BUY_URL = 'https://wa.me/447435363461?text=' + encodeURIComponent('سلام امیر، نسخه‌ی نمایشی رو دیدم و می‌خوام «' + COURSE + '» رو بخرم.');
+  const LOCK = '<span class="lock" aria-label="قفل">🔒</span>';
+  const isLocked = o => !!(o && o.locked);
+  const lockedCount = list => list.filter(isLocked).length;
+  const openWeeksText = () => fa(((C.programme && C.programme.weeks) || []).map(w => w.week).join('، '));
+  function track(name, props) {
+    if (!DEMO) return;
+    try { window.plausible(name, props ? { props } : undefined); } catch (e) { /* stats are optional */ }
+  }
+
+  async function bootDemo(startApp) {
+    view().innerHTML = `<div class="loading">در حال باز کردن نسخهٔ نمایشی…</div>`;
+    let d = null;
+    try {
+      const r = await withTimeout(fetch(SB_URL + '/rest/v1/rpc/tps_demo', { method: 'POST', cache: 'no-store',
+        headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: '{}' }), 20000);
+      if (r && r.ok) d = await withTimeout(r.json(), 20000);
+    } catch (e) { /* no connection, or Supabase unreachable: the screen below says so */ }
+    if (!d || !d.programme) { track('Demo failed'); demoFailed(); return; }
+    ['start', 'programme', 'exercises', 'learn', 'tests', 'library'].forEach(k => { if (d[k]) ingest(k, d[k]); });
+    finishContent();
+    track('Demo opened');
+    startApp();
+  }
+
+  function demoFailed() {
+    view().innerHTML = banner({ kicker: 'نسخهٔ نمایشی', title: 'الان باز نشد' }) +
+      `<div class="section"><div class="card clay"><h3>اتصال برقرار نشد</h3>
+        <p class="lead">اینترنت را بررسی کنید و دوباره امتحان کنید. اگر باز نشد، با فیلترشکن امتحان کنید.</p>
+        <button class="btn primary" data-retry>دوباره امتحان کنید</button></div>
+        <div class="card"><h3>سیستم آمادگی جسمانی تنیس</h3>${buyActions('failed')}</div></div>`;
+  }
+
+  // Buy on WhatsApp (the message already typed), read the product page, or sign in if already bought.
+  const buyActions = from => `<div class="demo-actions">
+      <a class="btn clay" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="${from}">خرید نسخهٔ کامل از واتساپ</a>
+      <a class="btn ghost" href="/tennis/">دربارهٔ دوره و قیمت</a>
+      <p class="lead">قبلاً خریده‌اید؟ <a class="link-btn" href="./">ورود</a></p></div>`;
+
+  // A locked item: its card, and the way to unlock it. Everything else about it stayed on the server.
+  function viewLocked(o) {
+    track('Demo locked', { kind: o.kind, item: o.item });
+    view().innerHTML = banner({ back: o.back, kicker: '🔒 ' + o.kicker, title: o.title, sub: o.sub || '' }) +
+      `<div class="section"><div class="card clay"><h3>این بخش در نسخهٔ کامل باز می‌شود</h3>
+        ${o.pills ? `<div class="tags" style="margin:2px 0 8px">${o.pills}</div>` : ''}${o.why ? `<p>${esc(o.why)}</p>` : ''}
+        <p class="lead" style="margin-top:8px">${o.line}</p>${buyActions(o.kind)}</div></div>`;
+  }
+
+  // The Start page's first card in the demo: what is open, counted from the content itself.
+  function demoIntro() {
+    const L = (C.learn && C.learn.lessons) || [], T = (C.tests && C.tests.tests) || [];
+    return `<div class="card clay"><h3>نسخهٔ نمایشی</h3><p>هفتهٔ ${openWeeksText()} برنامه، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است. بقیه قفل است و در نسخهٔ کامل باز می‌شود.</p></div>`;
   }
 
   /* ── Small renderers ───────────────────────────────────────────────── */
@@ -443,6 +513,7 @@
     let h = banner({ kicker: 'کتاب راهنمای آمادگی جسمانی تنیس', title: esc(s.title || ''), sub: esc(s.subtitle || ''), gear: true });
     h += `<div class="section">`;
     if ((s.intro || []).length) h += `<p class="intro">${esc(s.intro[0])}</p>`;
+    if (DEMO) h += demoIntro();
     if (!prefs) {
       h += `<div class="card green"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
     } else {
@@ -487,13 +558,16 @@
       const [a, b] = blockRange(bl);
       let weeks = '';
       for (let w = a; w <= b; w++) {
-        weeks += weekData(w) ? `<a class="week open" href="#/programme/week/${w}">${fa(w)}</a>` : `<span class="week soon" title="به‌زودی">${fa(w)}</span>`;
+        weeks += weekData(w) ? `<a class="week open" href="#/programme/week/${w}">${fa(w)}</a>`
+          : DEMO ? `<a class="week locked" href="#/programme/week/${w}" aria-label="هفتهٔ ${fa(w)}، قفل">${fa(w)}</a>`
+          : `<span class="week soon" title="به‌زودی">${fa(w)}</span>`;
       }
       h += `<div class="block-card"><div class="bc-top"><b>بلوک ${fa(i + 1)} · ${esc(bl.name)}</b><span dir="ltr">${esc(bl.nameEn)}</span></div>
         <div class="bc-body"><div class="bc-goal">${esc(bl.goal || '')}</div><div class="weeks">${weeks}</div></div></div>`;
     });
     const ready = (P.weeks || []).map(w => w.week);
-    h += ready.length < 16 ? `<p class="lead">در این نسخهٔ نمونه این هفته‌ها آماده است: ${fa(ready.join('، '))}</p></div>` : `</div>`;
+    h += DEMO ? `<p class="lead">🔒 در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته در نسخهٔ کامل است.</p></div>`
+      : ready.length < 16 ? `<p class="lead">در این نسخهٔ نمونه این هفته‌ها آماده است: ${fa(ready.join('، '))}</p></div>` : `</div>`;
     view().innerHTML = h;
   }
 
@@ -513,6 +587,11 @@
 
   function viewWeek(week) {
     const r = sessionsFor(week);
+    if (!r && DEMO && blockOf(week)) {
+      return viewLocked({ kind: 'week', item: String(week), back: '#/programme', kicker: 'برنامه', title: `هفتهٔ ${fa(week)}`,
+        sub: esc('بلوک · ' + (blockOf(week).name || '')),
+        line: `در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته، با جلسه‌های اصلی و انتخابی، در نسخهٔ کامل است.` });
+    }
     if (!r) { view().innerHTML = banner({ back: '#/programme', title: 'این هفته هنوز آماده نیست' }); return; }
     const bl = blockOf(week) || {};
     let h = banner({ back: '#/programme', kicker: `بلوک · ${esc(bl.name || '')}`, title: `هفتهٔ ${fa(week)}`, sub: esc(r.w.title || ''),
@@ -574,6 +653,7 @@
 
   function viewSession(week, code) {
     const f = findSession(week, code);
+    if (!f && DEMO && !weekData(week) && blockOf(week)) return viewWeek(week);   // a locked week
     if (!f) { view().innerHTML = banner({ back: `#/programme/week/${week}`, title: 'این جلسه پیدا نشد' }); return; }
     const { r, s } = f;
     if (s.type === 'test') return viewTestDay(week, r, s);
@@ -599,15 +679,16 @@
   }
   function exListHtml() {
     const rows = Object.entries(C.exercises).filter(([id, ex]) => exMatches(id, ex))
-      .sort((a, b) => String(a[1].slot).localeCompare(String(b[1].slot)));
+      .sort((a, b) => (isLocked(a[1]) - isLocked(b[1])) || String(a[1].slot).localeCompare(String(b[1].slot)));   // demo: open ones first
     if (!rows.length) return `<div class="empty">تمرینی پیدا نشد.</div>`;
-    return rows.map(([id, ex]) => `<a class="list-row" href="#/exercises/${encodeURIComponent(id)}">
+    return rows.map(([id, ex]) => `<a class="list-row ${isLocked(ex) ? 'locked' : ''}" href="#/exercises/${encodeURIComponent(id)}">
       <span class="lr-body"><span class="lr-title"><bdi>${esc(exName(ex))}</bdi></span><br><span class="lr-sub">${esc(ex.slotTitle || '')}</span></span>
-      <span class="lr-go">←</span></a>`).join('');
+      <span class="lr-go">${isLocked(ex) ? LOCK : '←'}</span></a>`).join('');
   }
   function viewExercises() {
-    const total = Object.keys(C.exercises).length;
-    view().innerHTML = banner({ kicker: 'کتابخانهٔ تمرین‌ها', title: 'تمرین‌ها', sub: `${fa(total)} تمرین در این نمونه · جست‌وجو کن یا یک دسته انتخاب کن` }) +
+    const all = Object.values(C.exercises), open = all.filter(ex => !isLocked(ex)).length;
+    view().innerHTML = banner({ kicker: 'کتابخانهٔ تمرین‌ها', title: 'تمرین‌ها',
+      sub: DEMO ? `${fa(all.length)} تمرین · ${fa(open)} تمرین هفتهٔ ${openWeeksText()} باز است` : `${fa(all.length)} تمرین · جست‌وجو کن یا یک دسته انتخاب کن` }) +
       `<div class="section"><input class="search" id="exq" type="search" placeholder="جست‌وجو: زانو، پرش، اسکوات…" value="${esc(exQuery)}">
        <div class="chips" style="margin-top:10px">${GROUPS.map(g => `<button class="chip ${exFilter === g.key ? 'on' : ''}" data-filter="${g.key}">${g.label}</button>`).join('')}</div>
        <div id="exlist">${exListHtml()}</div></div>`;
@@ -616,6 +697,8 @@
   function viewExercise(id) {
     const ex = C.exercises[id];
     if (!ex) { view().innerHTML = banner({ back: '#/exercises', title: 'این تمرین پیدا نشد' }); return; }
+    if (isLocked(ex)) return viewLocked({ kind: 'exercise', item: id, back: '#/exercises', kicker: esc(ex.slotTitle || 'تمرین'),
+      title: `<bdi>${esc(exName(ex))}</bdi>`, line: 'نکته‌های اجرا و اشتباه‌های رایج این تمرین در نسخهٔ کامل است.' });
     const v = cur(), uses = [];
     const seen = new Set();
     (C.programme.weeks || []).forEach(w => { const P = (w.plans || {})[v.age] || {};
@@ -636,14 +719,16 @@
     const L = ((C.learn && C.learn.lessons) || []).slice().sort((x, y) => (x.order || 999) - (y.order || 999));
     const groups = [];
     L.forEach(l => { const name = l.group || 'درس‌ها'; let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
-    const card = l => `<a class="card tap green" href="#/learn/${encodeURIComponent(l.id)}"><h3>${esc(l.icon || '')} ${esc(l.title)}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}</a>`;
+    const card = l => `<a class="card tap ${isLocked(l) ? 'locked' : 'green'}" href="#/learn/${encodeURIComponent(l.id)}"><h3>${esc(l.icon || '')} ${esc(l.title)}${isLocked(l) ? LOCK : ''}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}</a>`;
     view().innerHTML = banner({ kicker: 'درس‌ها', title: 'آموزش', sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
       `<div class="section">${groups.map(g => (groups.length > 1 ? `<div class="h2">${esc(g.name)}</div>` : '') + g.items.map(card).join('')).join('')}</div>`;
   }
 
   function viewLesson(id) {
-    const l = ((C.learn && C.learn.lessons) || []).find(x => x.id === id);
+    const L = (C.learn && C.learn.lessons) || [], l = L.find(x => x.id === id);
     if (!l) { view().innerHTML = banner({ back: '#/learn', title: 'این درس پیدا نشد' }); return; }
+    if (isLocked(l)) return viewLocked({ kind: 'lesson', item: id, back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`,
+      sub: esc(l.summary || ''), line: `این درس و ${fa(lockedCount(L) - 1)} درس دیگر در نسخهٔ کامل است.` });
     let h = banner({ back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`, sub: esc(l.summary || '') }) + `<div class="section prose">`;
     (l.sections || []).forEach(sec => {
       if (sec.h) h += `<h3>${esc(sec.h)}</h3>`;
@@ -898,7 +983,7 @@
 
   function viewTests() {
     const T = (C.tests && C.tests.tests) || [], D = C.tests && C.tests.day;
-    const card = t => `<a class="card tap green" href="#/tests/${encodeURIComponent(t.id)}"><h3>${esc(t.icon || '')} ${esc(t.title)}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p></a>`;
+    const card = t => `<a class="card tap ${isLocked(t) ? 'locked' : 'green'}" href="#/tests/${encodeURIComponent(t.id)}"><h3>${esc(t.icon || '')} ${esc(t.title)}${isLocked(t) ? LOCK : ''}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p></a>`;
     const onDay = T.filter(t => !t.optional), extra = T.filter(t => t.optional);
     let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.' }) +
       `<div class="section"><div class="card"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
@@ -909,8 +994,11 @@
   }
 
   function viewTest(id) {
-    const t = ((C.tests && C.tests.tests) || []).find(x => x.id === id);
+    const T = (C.tests && C.tests.tests) || [], t = T.find(x => x.id === id);
     if (!t) { view().innerHTML = banner({ back: '#/tests', title: 'این آزمون پیدا نشد' }); return; }
+    if (isLocked(t)) return viewLocked({ kind: 'test', item: id, back: '#/tests', kicker: 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}`,
+      why: t.why, pills: (t.player ? pill('🔊 صدای آزمون داخل اپ', 'green') : '') + (t.calc ? pill('🧮 ماشین‌حساب سقف داخل اپ', 'green') : ''),
+      line: `این آزمون و ${fa(lockedCount(T) - 1)} آزمون دیگر، با راهنمای کامل و برگهٔ نتایج، در نسخهٔ کامل است.` });
     const sh = t.sheet || {};
     const cols = sh.cols || ['تلاش ۱', 'تلاش ۲', 'تلاش ۳', 'عدد نهایی'];
     const rows = sh.rows || ['هفتهٔ ۰ · روز اول', 'هفتهٔ ۰ · روز دوم', 'هفتهٔ ۴', 'هفتهٔ ۸', 'هفتهٔ ۱۲', 'هفتهٔ ۱۶'];
@@ -1124,6 +1212,9 @@
 
   document.addEventListener('click', e => {
     const t = e.target;
+    const buy = t.closest('[data-buy]');
+    if (buy) { track('Demo buy', { from: buy.dataset.buy }); return; }   // the link itself opens WhatsApp
+    if (t.closest('[data-retry]')) { location.reload(); return; }
     const accHead = t.closest('.acc-head');
     if (accHead) { const box = accHead.parentElement; box.classList.toggle('open'); accHead.setAttribute('aria-expanded', box.classList.contains('open')); return; }
     const chk = t.closest('.wchk');
@@ -1175,7 +1266,8 @@
   window.addEventListener('hashchange', () => { if (READY) route(); });
 
   const startApp = () => { READY = true; route(); };
-  (window.LOCAL ? loadLocalContent().then(startApp) : bootCloud(startApp)).catch(err => {
+  document.querySelectorAll('a[data-buy]').forEach(a => { a.href = BUY_URL; });   // the demo bar in index.html
+  (window.LOCAL ? loadLocalContent().then(startApp) : DEMO ? bootDemo(startApp) : bootCloud(startApp)).catch(err => {
     view().innerHTML = `<div class="section"><div class="card clay"><h3>محتوا بارگذاری نشد</h3><p class="lead" dir="ltr">${esc(err.message)}</p></div></div>`;
   });
 })();

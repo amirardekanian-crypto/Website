@@ -1,6 +1,6 @@
 #!/bin/sh
-# Two guards. Each runs only when its own files are staged, so a commit that
-# touches neither costs nothing.
+# Three guards. Each runs only when its own files are staged, so a commit that
+# touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
 # Why: an HTML comment sitting inside a JS template literal in habits.html
@@ -68,6 +68,20 @@ if git diff --cached --name-only --diff-filter=ACMD \
     echo "pre-commit: BLOCKED — the article web pages are out of date (details above)."
     echo "Run: python scripts/build_article_pages.py   and stage what it writes."
     echo "A missing or stale Farsi translation needs Amir's OK first: see .claude/skills/article/SKILL.md."
+    failed=1
+  fi
+fi
+
+# ── 3. the course app's cache stamps (added 2026-09-15) ──────────────────────
+# Why: tennis/app/ is normally deployed, already stamped, from the private
+# tps-content repo, but it can be edited here too (the demo was, 2026-09-15).
+# Its service worker answers from cache first: a change committed under an
+# unchanged sw.js VERSION never reaches a phone that already has the app.
+if git diff --cached --name-only --diff-filter=ACMD | grep -q '^tennis/app/'; then
+  echo "pre-commit: tennis/app changed — checking its cache stamps..."
+  if ! "$PY" scripts/stamp_tps_app.py --check; then
+    echo ""
+    echo "pre-commit: BLOCKED — run: python scripts/stamp_tps_app.py   and stage what it writes."
     failed=1
   fi
 fi

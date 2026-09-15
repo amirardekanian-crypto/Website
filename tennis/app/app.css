@@ -444,3 +444,18 @@ table.sheet th { background: var(--card); font-weight: 800; }
 /* main-lift alternative ("or Barbell Back Squat") */
 .ex-alt { display: block; font-size: 13px; font-weight: 700; color: #6b6b6b; line-height: 1.5; }
 .step-alt .ex-alt { font-size: 16px; color: inherit; opacity: .75; margin: -2px 0 6px; }
+
+/* ── Demo (?demo=1): the top bar, locked items, the buy buttons ─────── */
+.demo-bar { display: none; }
+html.is-demo .demo-bar { display: flex; justify-content: center; align-items: center; gap: 4px 12px; flex-wrap: wrap;
+  background: var(--clay); color: #fff; font-size: 13.5px; font-weight: 700; padding: 5px 12px; line-height: 1.7; }
+.demo-bar a { color: #fff; font-weight: 900; }
+.lock { font-size: 0.8em; margin-inline-start: 6px; }
+.card.tap.locked { border-style: dashed; box-shadow: none; }
+.card.tap.locked h3, .card.tap.locked p { color: var(--muted); }
+.list-row.locked { border-style: dashed; }
+.list-row.locked .lr-title { color: var(--muted); }
+.week.locked { position: relative; color: #9a9a9a; border-style: dashed; }
+.week.locked::after { content: '🔒'; position: absolute; top: -8px; inset-inline-end: -6px; font-size: 12px; line-height: 1; }
+.demo-actions { display: grid; gap: 10px; margin-top: 14px; }
+.demo-actions .lead { margin: 2px 0 0; text-align: center; font-size: 14px; }
