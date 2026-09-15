@@ -40,6 +40,20 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 
 #### `program.html` — The athlete app
 - **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **My Plan** (daily workouts, videos, timers, weight logs, RPE scoring, and **The Ceiling** — estimated 1RM per lift), **Coach** (messaging + notes), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads an athlete's programme from `/data/`. Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
+- **Guided Mode — a second way through a session, not a second copy of it.** My Plan's default is
+  the list: every exercise a collapsible card, sets logged by hand, Rest tapped when wanted. **Guided**
+  (next to Start on the session timer) instead walks the day's "standard" exercises one set at a time,
+  with rest auto-starting and auto-advancing between them (`openStepMode()`/`STEP` state, near the end
+  of the script). It relocates the REAL `.ex-detail` node — video, cues, the set-log table, Ceiling —
+  out of the card and into the overlay while a step is showing (`renderStep()`), then puts it back on
+  exit. **Nothing about logging, saving or estimating a set is reimplemented**: the weight input, RPE
+  buttons and check circle are the exact nodes `attachSetLog()`/`attachCeiling()` already wired up, so
+  Guided Mode can never disagree with the list view about what happened — the same trap this doc warns
+  about for `coach.html`'s `parseSessionLog()`. Circuits and simple check-off exercises (warm-ups, and
+  a few conditioning finishers with no per-set log) are **not** in the sequence yet — the athlete
+  finishes those from the list, same as always; `getDayCompletion()`'s "unfinished" list already
+  handles that gracefully. `openTimer()`'s rest overlay grew an optional auto-start/auto-advance path
+  (`openTimerAuto()`) and a `+15s` button, used only from Guided Mode — the manual Rest button is unchanged.
 - **If deleted:** All athletes lose access to their programme.
 - **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Links to the habit tracker — and nothing more.** A **Daily Habits** shortcut card on Home and at the end of My Plan opens [`habits.html`](habits.html), handing over the client id and resolved key. Same origin and PWA scope, so from an installed app this stays inside the app shell instead of bouncing to the browser. The card is deliberately plain: **this app holds no habit state, no XP maths and no level formula** — duplicating those would be a third copy to keep in sync and weight it doesn't need.
