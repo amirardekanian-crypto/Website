@@ -1,5 +1,5 @@
 #!/bin/sh
-# Three guards. Each runs only when its own files are staged, so a commit that
+# Four guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -72,7 +72,26 @@ if git diff --cached --name-only --diff-filter=ACMD \
   fi
 fi
 
-# ── 3. the course app's cache stamps (added 2026-09-15) ──────────────────────
+# ── 3. program.html circuit logging (added 2026-09-15) ───────────────────────
+# Why: a circuit decides whether the athlete sees a weight field per item and an
+# RPE row per round, and getting it wrong is silent BOTH ways — a prep circuit
+# demanding kilograms for a mobility drill (live on 13 circuits across 4
+# athletes until this was fixed), or a superset recording nothing, which cost
+# amir_ardekani C1 the per-set baseline on 5 of 16 exercises. The specific trap
+# the check guards: deciding prep-ness from blockCategory(), whose positional
+# fallback makes "Core" at index 3 read as the warm-up block.
+if git diff --cached --name-only --diff-filter=ACM | grep -qx "program.html"; then
+  echo "pre-commit: program.html changed — checking circuit logging rules..."
+  if "$PY" scripts/check_circuit_logging.py; then
+    echo "pre-commit: circuit logging OK."
+  else
+    echo ""
+    echo "pre-commit: BLOCKED — program.html failed the circuit logging check above."
+    failed=1
+  fi
+fi
+
+# ── 4. the course app's cache stamps (added 2026-09-15) ──────────────────────
 # Why: tennis/app/ is normally deployed, already stamped, from the private
 # tps-content repo, but it can be edited here too (the demo was, 2026-09-15).
 # Its service worker answers from cache first: a change committed under an
