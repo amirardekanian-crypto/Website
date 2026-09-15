@@ -1,131 +1,270 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0E4A36">
-<meta name="robots" content="noindex,nofollow">
-<title>آزمون آمادگی جسمانی تنیس</title>
-<link rel="icon" href="data:,">
-<!--
-  Tennis physical testing app (coach-facing). Source lives in the private assess-content repo.
-  Signed in (the default): content comes from Supabase (assess_content, readable only by an
-  active buyer account) and players, results and notes save to the account.
-  ?sample=1: the clickable sample, with local content files and made-up players, nothing saved.
-  Built on the course app's base (tps-content/app). The sign-in screen is program.html's.
-  Still to fix before launch: Vazirmatn comes from Google Fonts (self-host later).
--->
-<script>
-  // Is anybody signed in on this device? Answered here, synchronously, from localStorage, so
-  // the sign-in screen paints without waiting for the Supabase SDK (program.html does the same).
-  // This app's Supabase client stores its session under its own key, "assess-auth", so a
-  // program.html or coach.html session on the same website is never mistaken for a buyer's.
-  (function () {
-    var q = new URLSearchParams(location.search);
-    window.SAMPLE = q.get('sample') === '1';
-    // ?stub=1, local testing only: a fake Supabase in localStorage, already signed in (_dev is never deployed).
-    if (q.get('stub') === '1') {
-      try { if (!localStorage.getItem('assess-auth')) localStorage.setItem('assess-auth', '{"stub":true}'); } catch (e) {}
-      document.write('<script src="_dev/stub-supabase.js"><\/script>');
-    }
-    document.documentElement.classList.toggle('is-sample', window.SAMPLE);
-    window.HAS_SESSION = false;
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k && /^assess-auth(\.\d+)?$/.test(k)) { window.HAS_SESSION = true; break; }
-      }
-    } catch (e) { window.HAS_SESSION = true; }   // storage blocked: take the slow path, don't guess
-    window.NEEDS_SIGNIN = !window.SAMPLE && !window.HAS_SESSION;
-    // The username from the last successful sign-in, prefilled. A convenience, never an authority.
-    try { window.LAST_USER = localStorage.getItem('assess_last_user') || ''; } catch (e) { window.LAST_USER = ''; }
-  })();
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- The testing app's product page (Farsi, for coaches and academies). The app itself is
+     /tennis-testing/app/ (private source: assess-content). Shared layout: /assets/css/fa-product.css.
+     The phone screens are real, taken with made-up sample players (?sample=1). -->
+<title>آزمون آمادگی جسمانی تنیس | اپِ آزمونِ بدنی برای مربی‌ها و آکادمی‌ها</title>
+<meta name="description" content="آزمون‌های بدنیِ ساده و استاندارد برای بازیکن‌های تنیس: اجرای هر آزمون، ماشین‌حساب، و نتیجه‌ای که سه‌جور خونده میشه. یه حساب برای همه‌ی مربی‌های آکادمی، حتی بدونِ اینترنت کنارِ زمین.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.amirardekani.com/tennis-testing/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.amirardekani.com/tennis-testing/">
+<meta property="og:title" content="آزمون آمادگی جسمانی تنیس · برای مربی‌ها و آکادمی‌ها">
+<meta property="og:description" content="آزمون‌های بدنیِ ساده و استاندارد، نتیجه‌ای که سه‌جور خونده میشه، و یه حساب برای کلِ آکادمی.">
+<meta property="og:image" content="https://www.amirardekani.com/assets/img/og-image.jpg">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:site_name" content="امیر اردکانیان">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": "https://www.amirardekani.com/tennis-testing/#app",
+  "name": "آزمون آمادگی جسمانی تنیس",
+  "applicationCategory": "SportsApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "fa",
+  "url": "https://www.amirardekani.com/tennis-testing/",
+  "description": "اپِ آزمونِ بدنیِ بازیکن‌های تنیس برای مربی‌ها و آکادمی‌ها: اجرای هر آزمون، ماشین‌حساب، و نتیجه در سه خوانش (پیشرفتِ خودِ بازیکن، مقایسه با جدول‌ها، رتبه در گروه).",
+  "author": { "@type": "Person", "@id": "https://www.amirardekani.com/#person", "name": "Amir Ardekanian" },
+  "offers": { "@type": "Offer", "price": "17", "priceCurrency": "USD" }
+}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap">
-<link rel="stylesheet" href="app.css?v=10f3598b">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="stylesheet" href="/assets/css/fa-product.css?v=2">
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
-<div class="sample-bar">نسخهٔ نمونه · در حال ساخت</div>
 
-<!-- ═══ SIGN IN ═══ program.html's sign-in screen, in Farsi. The buyer types the username Amir sent;
-     app.js adds the internal address on submit, so nobody sees or types an email. The autocomplete
-     names are what let the phone's password manager offer to save and fill it. -->
-<div class="signin-screen" id="signin-screen">
-  <form class="signin-card" id="signin-form" autocomplete="on" onsubmit="return false">
-    <div class="si-hero">
-      <img class="si-hero-img" src="../court-sessions.jpg" alt="" aria-hidden="true"
-           fetchpriority="high" decoding="async" onload="this.classList.add('in')" onerror="this.remove()">
-      <div class="si-hero-scrim"></div>
-      <div class="si-hero-copy">
-        <img class="signin-mark" src="../assets/img/icon-192.png" alt="AA Performance" width="52" height="52"
-             decoding="async" onerror="this.remove()">
-        <div class="si-eyebrow" dir="ltr">AA Performance</div>
-        <h1 class="signin-title">آزمون آمادگی <em>جسمانی</em> تنیس</h1>
-        <p class="si-mantra">بدانید بازیکن‌هایتان کجا هستند، و تمرین جواب داده یا نه.</p>
-      </div>
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="/index-fa.html"><span class="mark"><img src="/assets/img/icon-192.png" alt="" width="40" height="40"></span>امیر اردکانی</a>
+    <div class="nav-links">
+      <a href="#why">چرا آزمون؟</a>
+      <a href="#tests">آزمون‌ها</a>
+      <a href="#results">نتیجه‌ها</a>
+      <a href="#price">قیمت</a>
+      <a href="#faq">سؤال‌ها</a>
     </div>
-    <div class="si-sheet">
-      <label class="signin-f">
-        <span>نام کاربری</span>
-        <input id="si-user" name="username" autocomplete="username" autocapitalize="none"
-               autocorrect="off" spellcheck="false" dir="ltr" required>
-      </label>
-      <label class="signin-f">
-        <span>رمز عبور</span>
-        <div class="si-wrap">
-          <input id="si-pass" name="password" type="password" autocomplete="current-password" dir="ltr" required>
-          <button type="button" class="si-eye" id="si-eye" aria-label="نمایش رمز" aria-pressed="false">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M1.8 12S5.6 5.4 12 5.4 22.2 12 22.2 12 18.4 18.6 12 18.6 1.8 12 1.8 12Z"/>
-              <circle cx="12" cy="12" r="3.1"/>
-              <line class="si-eye-slash" x1="3.6" y1="20.4" x2="20.4" y2="3.6"/>
-            </svg>
-          </button>
-        </div>
-      </label>
-      <button class="signin-go" id="si-go" type="submit">ورود</button>
-      <div class="signin-err" id="si-err" hidden></div>
-      <p class="signin-help">نام کاربری یا رمز را گم کرده‌اید؟ به امیر پیام بدهید تا اطلاعات تازه بفرستد.</p>
-      <div class="signin-foot" dir="ltr">amirardekani.com</div>
-    </div>
-  </form>
-</div>
-<script>
-  // Painted from here, not from app.js: nobody signed in means nothing to load. The
-  // onsubmit="return false" above keeps a native submit from putting the password in the URL
-  // until app.js wires the form.
-  if (window.NEEDS_SIGNIN) document.getElementById('signin-screen').classList.add('visible');
-</script>
-
-<div id="app">
-  <main id="view" aria-live="polite">
-    <div class="loading">در حال بارگذاری…</div>
-  </main>
-</div>
-
-<nav class="tabs" id="tabs" aria-label="بخش‌های اپ">
-  <a href="#/start" data-tab="start">
-    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></span>
-    <span class="tl">شروع</span>
-  </a>
-  <a href="#/tests" data-tab="tests">
-    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg></span>
-    <span class="tl">آزمون‌ها</span>
-  </a>
-  <a href="#/tools" data-tab="tools">
-    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/></svg></span>
-    <span class="tl">ابزارها</span>
-  </a>
-  <a href="#/players" data-tab="players">
-    <span class="ti"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8"/><path d="M17.5 14.3c1.7.6 2.8 2.2 3.1 4.7"/></svg></span>
-    <span class="tl">بازیکنان</span>
-  </a>
+    <a class="btn btn-primary btn-sm" href="#price">خرید</a>
+  </div>
 </nav>
 
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=f6e3bcc6" defer></script>
+<header class="hero">
+  <div class="orb orb-g" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker">برای مربی‌ها و آکادمی‌های تنیس</span>
+      <h1>حدس نزن،<br><span class="acc">اندازه بگیر.</span></h1>
+      <div class="name">آزمون آمادگی جسمانی تنیس</div>
+      <p class="sub">آزمون‌های بدنیِ ساده و استاندارد، با متر، مخروط و دوربینِ گوشی. برای هر آزمون: اجرا، ماشین‌حساب، و نتیجه‌ای که سه‌جور خونده میشه. یه حساب برای همه‌ی مربی‌های آکادمی، حتی بدونِ اینترنت کنارِ زمین.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#price">خرید · ۱۷ دلار</a>
+        <a class="btn btn-ghost" href="#tests">آزمون‌ها رو ببین</a>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="pscreen"><img src="/tennis-testing/shot-result.webp" alt="نمایی از اپ: نتیجه‌ی یک آزمون، سه‌جور خونده‌شده (بازیکنِ نمونه)" width="540" height="1132"></div>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat"><b>۱۲</b> آزمونِ آماده</div>
+    <div class="stat"><b>۶</b> آزمونِ بعدی، رایگان</div>
+    <div class="stat"><b>۳</b> جور خوندنِ نتیجه</div>
+    <div class="stat"><b>۱</b> حساب برای کلِ آکادمی</div>
+  </div>
+</div>
+
+<section class="pad band" id="why">
+  <div class="wrap">
+    <span class="eyebrow">چرا آزمون؟</span>
+    <h2 class="sec-h">سه دلیل برای <span class="acc">آزمون گرفتن.</span></h2>
+    <p class="sec-sub">آزمونِ درست بهت میگه هر بازیکن کجاست، و تمرینت جواب داده یا نه.</p>
+    <div class="feat-grid">
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></div><h3>انتخاب</h3><p>یه نمره‌ی بدنیِ منصفانه، کنارِ ارزیابیِ تنیسِ بازیکن.</p></div>
+      <div class="feat clay"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16 16"/></svg></div><h3>شناختِ بازیکن</h3><p>نقاطِ قوت و ضعفِ بدنیِ هر بازیکن، تا تمرین روی نیازِ واقعی باشه.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 15l5-5 4 3 7-7"/></svg></div><h3>بررسیِ پیشرفت</h3><p>آزمونِ دوباره بعد از ۶ و ۱۲ هفته نشون میده تمرین جواب داده یا نه.</p></div>
+    </div>
+    <div class="callout">این آزمون‌ها نمیگن کی مسابقه رو می‌بره. نشون میدن بدنِ بازیکن برای تمرینِ سخت، ریکاوری بینِ امتیازها و سالم موندن آماده‌ست یا نه.</div>
+  </div>
+</section>
+
+<section class="pad" id="tests">
+  <div class="wrap">
+    <span class="eyebrow">آزمون‌ها</span>
+    <h2 class="sec-h">از قد و وزن <span class="acc">تا قدرت.</span></h2>
+    <p class="sec-sub">هر آزمون صفحه‌ی خودش رو داره: چی رو نشون میده، چطور اجرا بشه، هر بار چی باید یکسان بمونه و چه عددی یادداشت کنی.</p>
+    <div class="tgroups">
+      <div class="tgroup"><h3>بدن <span class="chip">آماده</span></h3><ul class="tlist"><li>قد، وزن و طولِ دست‌ها</li><li>سرعتِ رشد، برای زیرِ ۱۸ سال</li></ul></div>
+      <div class="tgroup"><h3>توان <span class="chip">آماده</span></h3><ul class="tlist"><li>پرشِ عمودی (پرش و لمسِ دیوار)</li><li>پرشِ طولِ جفت‌پا</li><li>پرشِ جانبیِ تک‌پا</li><li>پرتابِ توپِ طبیِ ۲ کیلوگرمی از بالای سر</li></ul></div>
+      <div class="tgroup"><h3>قدرت <span class="chip">آماده</span></h3><ul class="tlist"><li>ددلیفت با هگزبار (یا اسکات از پشت)</li><li>اسکاتِ بلغاری</li><li>شنا</li><li>پرسِ سینه با هالتر (۱۶ سال و بالاتر)</li><li>رولِ دمبل تک‌دست</li><li>قدرتِ چنگش (اختیاری)</li></ul></div>
+      <div class="tgroup soon"><h3>بعدی‌ها <span class="chip">به‌زودی</span></h3><ul class="tlist"><li>دوی سرعتِ ۵، ۱۰ و ۲۰ متر</li><li>آزمونِ ۵۰۵ (چرخش)</li><li>آزمونِ عنکبوتی</li><li>۶ × ۲۰ متر رفت‌وبرگشت</li><li>دوی ۱۲ دقیقه (کوپر)</li><li>تحرک و مقاومتِ بدن</li></ul></div>
+    </div>
+    <div class="callout">آزمون‌های بعدی، هر کدوم آماده شد، برای شما رایگانه و خودش تو اپتون میاد. ابزارها هم داخلشه: تایمرِ استراحت و ماشین‌حسابِ حداکثرِ قدرت (1RM)؛ و به‌زودی بیپِ دوهای تکراری، ساعتِ کوپر و زمان‌سنجِ ویدیویی.</div>
+  </div>
+</section>
+
+<section class="pad band" id="results">
+  <div class="wrap">
+    <span class="eyebrow">نتیجه‌ها</span>
+    <h2 class="sec-h">هر نتیجه، <span class="acc">سه‌جور خونده میشه.</span></h2>
+    <div class="steps three">
+      <div class="step"><div class="n">۱</div><h3>پیشرفتِ خودِ بازیکن</h3><p>مقایسه با اولین آزمونش. اپ میگه تغییر واقعیه یا فقط نوسانِ عادیِ روزبه‌روز.</p></div>
+      <div class="step"><div class="n">۲</div><h3>مقایسه با جدول‌ها</h3><p>هر جا جدولِ معتبرِ منتشرشده هست (پرشِ طول، پرتابِ توپ طبی و قدرتِ چنگش)، جای بازیکن رو تو ۴ رده‌ی هم‌سن‌هاش نشون میده.</p></div>
+      <div class="step"><div class="n">۳</div><h3>رتبه تو آکادمی</h3><p>بینِ بازیکن‌های هم‌جنس و هم‌سنِ خودتون، وقتی دست‌کم ۸ بازیکن دارید.</p></div>
+    </div>
+    <div class="callout">اپ هیچ‌وقت عددی از خودش نمی‌سازه: هر جا جدولِ معتبر نیست، فقط پیشرفتِ خودِ بازیکن و رتبه تو گروه رو نشون میده.</div>
+  </div>
+</section>
+
+<section class="pad" id="how">
+  <div class="wrap">
+    <span class="eyebrow">چطور کار می‌کنه؟</span>
+    <h2 class="sec-h">یه حساب، <span class="acc">همه‌ی مربی‌ها.</span></h2>
+    <div class="steps">
+      <div class="step"><div class="n">۱</div><h3>تو واتساپ پیام بده</h3><p>دکمه‌ی خرید پیامتو آماده می‌کنه؛ فقط بفرست.</p></div>
+      <div class="step"><div class="n">۲</div><h3>پرداخت و نام کاربری</h3><p>بعد از کارت‌به‌کارت، نام کاربری و رمزِ آکادمی تو واتساپ میاد.</p></div>
+      <div class="step"><div class="n">۳</div><h3>رو گوشیِ مربی‌ها</h3><p>همه‌ی مربی‌های آکادمی با همون حساب وارد میشن و اپ رو رو صفحه‌ی گوشی نصب می‌کنن.</p></div>
+      <div class="step"><div class="n">۴</div><h3>آزمون کنارِ زمین</h3><p>بازیکن‌ها رو اضافه کن و نتیجه‌ها رو ثبت کن؛ بدونِ اینترنت هم ذخیره میشه و بعد خودش می‌فرسته.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pad band" id="screens">
+  <div class="wrap">
+    <span class="eyebrow">از داخلِ اپ</span>
+    <h2 class="sec-h">همونی که <span class="acc">می‌خری.</span></h2>
+    <div class="shots">
+      <figure class="shot"><div class="phone"><div class="pscreen"><img src="/tennis-testing/shot-tests.webp" alt="فهرستِ آزمون‌ها در اپ" width="540" height="1132" loading="lazy"></div></div><figcaption>فهرستِ آزمون‌ها: آماده و به‌زودی</figcaption></figure>
+      <figure class="shot"><div class="phone"><div class="pscreen"><img src="/tennis-testing/shot-player.webp" alt="صفحه‌ی یک بازیکن در اپ، با نتیجه‌های یک روزِ آزمون" width="540" height="1132" loading="lazy"></div></div><figcaption>صفحه‌ی بازیکن: همه‌ی نتیجه‌ها یه‌جا</figcaption></figure>
+    </div>
+    <p class="fine">بازیکن‌های این تصویرها ساختگی‌اند.</p>
+  </div>
+</section>
+
+<section class="pad" id="equipment">
+  <div class="wrap">
+    <span class="eyebrow">وسایلِ لازم</span>
+    <h2 class="sec-h">وسیله‌ی <span class="acc">گرون</span> لازم نیست.</h2>
+    <ul class="inc">
+      <li><span class="ck">✓</span>گوشی‌ای که فیلمِ آهسته با ۱۲۰ فریم در ثانیه یا بیشتر بگیره</li>
+      <li><span class="ck">✓</span>سه‌پایه یا پایه‌ی گوشی</li>
+      <li><span class="ck">✓</span>مترِ فلزیِ ۸ متری یا بلندتر</li>
+      <li><span class="ck">✓</span>۱۲ مخروط، ترجیحاً مخروطِ تخت</li>
+      <li><span class="ck">✓</span>۱۰ توپِ تنیس</li>
+      <li><span class="ck">✓</span>۲ کرنومتر</li>
+      <li><span class="ck">✓</span>ترازو</li>
+      <li><span class="ck">✓</span>توپِ طبی</li>
+      <li><span class="ck">✓</span>نوارچسب برای علامت زدنِ خط‌ها</li>
+      <li><span class="ck">✓</span>گچ یا دستمالِ مرطوب برای آزمونِ پرش</li>
+    </ul>
+    <div class="callout">آزمون‌های قدرت باشگاه لازم دارن، و آزمونِ اختیاریِ قدرتِ چنگش یه دینامومترِ دستی.</div>
+  </div>
+</section>
+
+<section class="pad-sm band" id="price">
+  <div class="wrap">
+    <span class="eyebrow">قیمت</span>
+    <h2 class="sec-h">یه‌بار بخر، <span class="acc">برای کلِ آکادمی.</span></h2>
+    <div class="price-card">
+      <div class="price-eq">برای ساکنینِ ایران، معادلِ</div>
+      <div class="price-num">$17</div>
+      <div class="price-term">یه‌بار پرداخت</div>
+      <div class="price-note">به تومان، با نرخِ روز پرداخت میشه</div>
+      <ul class="inc">
+        <li><span class="ck">✓</span>۱۲ آزمونِ آماده، با اجرا و ماشین‌حساب</li>
+        <li><span class="ck">✓</span>۶ آزمونِ بعدی، رایگان وقتی اضافه بشن</li>
+        <li><span class="ck">✓</span>نتیجه‌ی هر آزمون، سه‌جور خونده‌شده</li>
+        <li><span class="ck">✓</span>بازیکن‌ها، نتیجه‌ها و یادداشت‌ها رو همه‌ی گوشی‌ها</li>
+        <li><span class="ck">✓</span>یه حساب برای همه‌ی مربی‌های آکادمی</li>
+        <li><span class="ck">✓</span>کنارِ زمین، حتی بدونِ اینترنت</li>
+      </ul>
+      <a class="btn btn-primary btn-block js-buy" href="https://wa.me/447435363461" target="_blank" rel="noopener">خرید از واتساپ 💬</a>
+      <div class="price-small">بازیکنی و برنامه‌ی خودت رو می‌خوای؟ <a href="/tennis/">سیستم آمادگی جسمانی تنیس</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="author">
+  <div class="wrap author">
+    <img src="/assets/img/coach.jpg" alt="امیر اردکانیان" width="180" height="180" loading="lazy">
+    <div>
+      <span class="eyebrow">کی ساخته؟</span>
+      <h2 class="sec-h">امیر <span class="acc">اردکانیان</span></h2>
+      <p>مربیِ بدنسازیِ تنیس و پدل، با دو مدرکِ ارشد (قدرت و آمادگیِ جسمانی، و فیزیولوژیِ ورزشی)، ۷+ سال مربیگری و ۱۰۰۰+ بازیکنِ تنیس و پدل. این اپ از روی مجموعه‌آزمونی ساخته شده که خودش برای ارزیابیِ بازیکن‌ها نوشته، و هر عدد و قاعده‌ش با پژوهش‌های منتشرشده چک شده.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pad band" id="faq">
+  <div class="wrap">
+    <span class="eyebrow">سؤال‌های پرتکرار</span>
+    <h2 class="sec-h">قبل از خرید، اینا رو بدون.</h2>
+    <div class="faq">
+      <details open><summary>چند تا مربی می‌تونن ازش استفاده کنن؟</summary><p>همه‌ی مربی‌های یه آکادمی، با یه نام کاربری و رمز، رو گوشی‌های خودشون. بازیکن‌ها و نتیجه‌ها رو همه‌ی گوشی‌ها یکی‌ان. هر حساب برای یه آکادمیه.</p></details>
+      <details><summary>کنارِ زمین اینترنت نداریم</summary><p>اشکالی نداره. بعد از اولین ورود، اپ بدونِ اینترنت هم باز میشه و نتیجه‌ها رو ذخیره می‌کنه؛ وقتی وصل شدی، خودش همه‌چی رو می‌فرسته. بارِ اول، ورود اینترنت می‌خواد (اگه وصل نشد، با VPN امتحان کن).</p></details>
+      <details><summary>آزمون‌های بعدی پولِ جدا می‌خوان؟</summary><p>نه. دوی سرعت، ۵۰۵، آزمونِ عنکبوتی، دوهای تکراری، کوپر و آزمونِ تحرک و مقاومتِ بدن، هر کدوم آماده شد، رایگان تو اپتون میاد.</p></details>
+      <details><summary>برای چه سنی؟</summary><p>برای نوجوان‌ها و بزرگسال‌ها. هر آزمون میگه برای چه سنی جدولِ مقایسه داره. زیرِ ۱۶ سال، آزمون‌های قدرت فقط با ست‌های سبک انجام میشن، و پرسِ سینه از ۱۶ سالگیه.</p></details>
+      <details><summary>اطلاعاتِ بازیکن‌ها کجا ذخیره میشه؟</summary><p>تو حسابِ آکادمیِ خودتون، و فقط با همون حساب دیده میشه. برای هر بازیکن فقط اسم، جنس، سال و ماهِ تولد، نتیجه‌ها و یادداشت‌ها ذخیره میشه.</p></details>
+      <details><summary>فرقش با «سیستم آمادگی جسمانی تنیس» چیه؟</summary><p>اون دوره برای خودِ بازیکنه: یه برنامه‌ی ۱۶ هفته‌ای که خودش اجرا می‌کنه. این اپ برای مربیه: آزمون گرفتن از بازیکن‌ها و دنبال کردنِ پیشرفتشون. <a href="/tennis/">درباره‌ی دوره</a></p></details>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>فصلِ بعد رو<br><span class="acc">با عدد</span> شروع کن.</h2>
+    <div class="actions">
+      <a class="btn btn-primary" href="#price">خرید · ۱۷ دلار</a>
+      <a class="btn btn-ghost" href="#tests">آزمون‌ها رو ببین</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div>© <span id="yr"></span> امیر اردکانی — مربیِ بدنسازیِ تنیس و پدل</div>
+    <div class="links">
+      <a href="/index-fa.html">صفحه‌ی اصلی</a>
+      <a href="/tennis/">دوره‌ی بازیکن‌ها</a>
+      <a href="/fa/articles/">مقاله‌ها</a>
+      <a href="https://instagram.com/amirardekanian" target="_blank" rel="noopener">اینستاگرام</a>
+      <a href="https://wa.me/447435363461" target="_blank" rel="noopener">واتساپ</a>
+      <a href="/terms-fa.html">قوانین</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  // Buy buttons open WhatsApp with the message already typed.
+  var msg = 'سلام امیر، می‌خوام «آزمون آمادگی جسمانی تنیس» رو بخرم.';
+  Array.prototype.forEach.call(document.querySelectorAll('.js-buy'), function (a) {
+    a.href = 'https://wa.me/447435363461?text=' + encodeURIComponent(msg);
+  });
+  var yr = document.getElementById('yr');
+  if (yr) yr.textContent = new Date().getFullYear();
+  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('visible'); io.unobserve(x.target); } });
+    }, { threshold: 0.12 });
+    Array.prototype.forEach.call(document.querySelectorAll('.sec-h,.sec-sub,.feat,.step,.tgroup,.price-card,.faq details,.author,.shot'), function (n) {
+      n.classList.add('reveal'); io.observe(n);
+    });
+  }
+})();
+</script>
 </body>
 </html>

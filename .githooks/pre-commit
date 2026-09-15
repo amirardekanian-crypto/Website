@@ -59,7 +59,7 @@ fi
 
 # ── 2. article pages ─────────────────────────────────────────────────────────
 if git diff --cached --name-only --diff-filter=ACMD \
-     | grep -qE '^(articles/|en/articles/|fa/articles/|scripts/build_article_pages\.py$|sitemap\.xml$|robots\.txt$|[^/]+\.html$|tennis/index\.html$)'; then
+     | grep -qE '^(articles/|en/articles/|fa/articles/|scripts/build_article_pages\.py$|sitemap\.xml$|robots\.txt$|[^/]+\.html$|(tennis|tennis-testing)/index\.html$)'; then
   echo "pre-commit: articles or public pages changed — checking the website pages match..."
   if "$PY" scripts/build_article_pages.py --check; then
     echo "pre-commit: article pages OK."

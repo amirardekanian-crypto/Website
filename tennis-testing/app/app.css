@@ -3,6 +3,16 @@
    paper #FAF7F2, white cards, grey pills, striped green banners), in Farsi RTL with Vazirmatn.
    Logical properties (inline-start/end) everywhere so RTL needs no mirrored rules. */
 
+/* Vazirmatn, self-hosted (v33.0.3, SIL Open Font License: fonts/OFL.txt), the same file as the course app.
+   One variable file covers every weight, and the text never waits on Google Fonts, which may not load from Iran. */
+@font-face {
+  font-family: Vazirmatn;
+  src: url("fonts/Vazirmatn-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --green: #0E4A36;
   --green-2: #14684c;
@@ -265,7 +275,8 @@ a.res-row { text-decoration: none; color: inherit; }
 .e1rm .big-result { margin-top: 12px; }
 
 /* ── Sign in: program.html's screen, set in Vazirmatn for Farsi ───────── */
-html:not(.is-sample) .sample-bar { display: none; }
+/* Both sample labels show only in the clickable sample (?sample=1), never to a buyer (Amir, 2026-09-15). */
+html:not(.is-sample) .sample-bar, html:not(.is-sample) .sample-note { display: none; }
 .signin-screen { display: none; position: fixed; inset: 0; z-index: 900; background: var(--green); overflow-y: auto; }
 .signin-screen.visible { display: block; }
 .signin-card { width: 100%; max-width: 460px; min-height: 100%; margin: 0 auto; background: var(--paper); display: flex; flex-direction: column; }

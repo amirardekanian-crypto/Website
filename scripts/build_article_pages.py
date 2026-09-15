@@ -581,7 +581,7 @@ def indexable_loc(text, disallow):
 
 # Public pages that live in a folder instead of at the root (the product pages). Like a root
 # page, each is listed only while it has a canonical link and no noindex.
-FOLDER_PAGES = ['tennis/index.html']
+FOLDER_PAGES = ['tennis/index.html', 'tennis-testing/index.html']
 
 
 def sitemap_entries(outputs):

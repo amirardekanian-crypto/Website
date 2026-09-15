@@ -568,8 +568,15 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   ~70% Level 2, 15% Level 1, 15% Level 3) are in its header: change them there, and nowhere else. It stores
   nothing and sends only a Plausible custom event `Level test 1|2|3` (each needs a goal in Plausible).
   The page reaches `sitemap.xml` through `FOLDER_PAGES` in `scripts/build_article_pages.py`.
-  `index-fa.html` links it from the menu («دوره») and the «محصولات» strip; the testing app for coaches
-  gets its own page and card next.
+  `index-fa.html` links it from the menu («دوره») and the «محصولات» strip.
+- **`/tennis-testing/` is the testing app's product page** (Farsi, indexable, for coaches and academies;
+  full sale at $17 once, 2026-09-15) on the same `fa-product.css` layout. **The app itself moved to
+  `/tennis-testing/app/`** that day, while no login existed. Its shell is copied there by
+  `assess-content/app/_dev/deploy_to_website.py`, so never edit `tennis-testing/app/` by hand; logins come
+  from coach.html → **Testing app** (`ASSESS_URL`). The page's phone screens are real, taken with made-up
+  sample players (`?sample=1`). Like the course app, it self-hosts Vazirmatn and supabase-js 2.116.0
+  (`fonts/`, `lib/`), so nothing waits on Google Fonts or jsDelivr. `index-fa.html` links it from the menu («برای مربی‌ها») and the third
+  «محصولات» card.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +

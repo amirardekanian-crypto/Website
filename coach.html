@@ -3891,13 +3891,14 @@ function renderAffiliates() {
 }
 
 // --- TESTING APP (buyer logins) ---------------------------------------------
-// The tennis testing app at /tennis-testing/ (its source is the private assess-content repo).
+// The tennis testing app at /tennis-testing/app/ (its source is the private assess-content repo;
+// /tennis-testing/ itself is the product page).
 // Same pattern as athlete logins: the assess-login Edge Function makes the auth user on an
 // internal address, assess.<username>@amirardekani.com, and hands back a password to send.
 // Revoke bans the login but keeps the buyer's saved players and results; Restore brings it back
 // with a new password. Buyer data itself is not readable from here, by design ("we don't monitor").
 // Backend: supabase/assess_01_accounts_content_data.sql + supabase/functions/assess-login.
-const ASSESS_URL = SITE + '/tennis-testing/';
+const ASSESS_URL = SITE + '/tennis-testing/app/';
 let _assessBusy = false;
 let _assessPw = null;   // the username whose password form is open (Change password or Restore), or null
 
