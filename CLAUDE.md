@@ -560,6 +560,20 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   `tps-content/app/_dev/deploy_to_website.py`, so **never edit those files here**. The handbook itself
   is in Supabase (`tps_content`, readable only by an active buyer); logins come from coach.html →
   **Course**. Backend: `supabase/tps_01_accounts_content.sql` + `supabase/functions/tps-login`.
+  ⚠️ **One exception, 2026-09-15: the demo was built directly in this folder**, because `tps-content`
+  was not reachable from Amir's PC (not in its folders, and his stored GitHub login sees neither it
+  nor `assess-content`, which another session deployed from that same day). **So the next deploy from
+  `tps-content` erases the demo** unless `app.js`, `app.css`, `index.html` and `sw.js` are first
+  copied from here into it. Whenever this folder is edited here, run `python scripts/stamp_tps_app.py`
+  (the pre-commit hook blocks a stale stamp): the app's worker answers from its cache first, so a change
+  shipped under an unchanged `sw.js` VERSION never reaches a phone that already has the app.
+  **The demo is `/tennis/app/?demo=1`** (Amir, 2026-09-15): no sign-in; week 1, the broad jump test and
+  three lessons open, everything else locked behind a WhatsApp buy button. The lock is server-side:
+  `tps_demo()` (`supabase/tps_02_demo.sql`, where the picks live) sends each locked item as its card
+  only, so nothing locked ever reaches the phone. Never "lock" something in app.js alone. It is the one
+  mode that loads Plausible (goals `Demo opened`, `Demo failed`, `Demo locked`, `Demo buy`). Amir is
+  testing it from Iran first: if it will not open there without a VPN, move the free parts to static
+  files on the website. A «یه نگاه به داخلِ اپ» button on `/tennis/` waits for that test.
 - **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets
   its own page, on one shared layout (hero → who → inside → how → price → FAQ → buy):
   `assets/css/fa-product.css`, with Vazirmatn self-hosted in `assets/fonts/`. **Bump the `?v=` on that

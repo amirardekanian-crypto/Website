@@ -15,12 +15,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!--
   Tennis Performance System, Level 2: the paid Farsi handbook app, served at amirardekani.com/tennis/app/.
-  Source lives in the private tps-content repo; only this shell is copied to the public website
-  (app/_dev/deploy_to_website.py). The handbook itself comes from Supabase (tps_content, readable
-  only by an active buyer account) and is kept on the phone in IndexedDB, so after the first
-  sign-in the app opens with no connection. Nothing about the buyer is stored or sent; the only
-  preference kept is the age version, in localStorage "tps.prefs".
-  Local modes, private repo only (the website has no content or _dev folder):
+  The shell is copied here from the private tps-content repo (app/_dev/deploy_to_website.py). The demo
+  (?demo=1) was then built here directly on 2026-09-15, because that repo was not reachable from Amir's
+  PC: copy these files into it before its next deploy, or the deploy erases the demo. After any edit
+  here run python scripts/stamp_tps_app.py. The handbook itself comes from Supabase (tps_content,
+  readable only by an active buyer account) and
+  is kept on the phone in IndexedDB, so after the first sign-in the app opens with no connection.
+  Nothing about the buyer is stored or sent; the only preference kept is the age version, in
+  localStorage "tps.prefs".
+  ?demo=1: the demo. No sign-in; Supabase tps_demo() sends only the free parts (supabase/tps_02_demo.sql),
+  and this mode alone loads Plausible for a few anonymous events.
+  Local modes (they need a content or _dev folder, which the website does not have):
     ?local=1, or ?content=<folder>: content from the JSON files next to the app, no sign-in.
     ?stub=1: a fake Supabase (_dev/stub-supabase.js), already signed in.
 -->
@@ -32,11 +37,20 @@
   (function () {
     var q = new URLSearchParams(location.search);
     window.LOCAL = q.get('local') === '1' || q.has('content');
+    // ?demo=1: the demo (app.js, "Demo"). No sign-in, and the one mode that loads Plausible.
+    window.DEMO = !window.LOCAL && q.has('demo');
+    if (window.DEMO) {
+      window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };
+      var ps = document.createElement('script');
+      ps.defer = true; ps.setAttribute('data-domain', 'amirardekani.com'); ps.src = 'https://plausible.io/js/script.js';
+      document.head.appendChild(ps);
+    }
     if (q.get('stub') === '1') {
       try { if (!localStorage.getItem('tps-auth')) localStorage.setItem('tps-auth', '{"stub":true}'); } catch (e) {}
       document.write('<script src="_dev/stub-supabase.js"><\/script>');
     }
     document.documentElement.classList.toggle('is-local', window.LOCAL);
+    document.documentElement.classList.toggle('is-demo', window.DEMO);
     window.HAS_SESSION = false;
     try {
       for (var i = 0; i < localStorage.length; i++) {
@@ -44,16 +58,18 @@
         if (k && /^tps-auth(\.\d+)?$/.test(k)) { window.HAS_SESSION = true; break; }
       }
     } catch (e) { window.HAS_SESSION = true; }   // storage blocked: take the slow path, don't guess
-    window.NEEDS_SIGNIN = !window.LOCAL && !window.HAS_SESSION;
+    window.NEEDS_SIGNIN = !window.LOCAL && !window.DEMO && !window.HAS_SESSION;
     // The username from the last successful sign-in, prefilled. A convenience, never an authority.
     try { window.LAST_USER = localStorage.getItem('tps_last_user') || ''; } catch (e) { window.LAST_USER = ''; }
   })();
 </script>
 <link rel="preload" href="fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="app.css?v=9ae38acb">
+<link rel="stylesheet" href="app.css?v=ef23ea63">
 </head>
 <body>
 <div class="sample-bar">نسخهٔ نمونه · در حال ساخت</div>
+<!-- The demo's bar (html.is-demo only). app.js points the link at WhatsApp; /tennis/ is the fallback. -->
+<div class="demo-bar">نسخهٔ نمایشی · بخشی از دوره باز است <a href="/tennis/" data-buy="bar" target="_blank" rel="noopener">خرید نسخهٔ کامل ←</a></div>
 
 <!-- ═══ SIGN IN ═══ program.html's sign-in screen, in Farsi. The buyer types the username Amir sent;
      app.js adds the internal address on submit, so nobody sees or types an email. The autocomplete
@@ -140,6 +156,6 @@
 <div id="step" class="step" hidden></div>
 
 <script defer src="lib/supabase.js"></script>
-<script src="app.js?v=c8acded2" defer></script>
+<script src="app.js?v=fbdd02fe" defer></script>
 </body>
 </html>

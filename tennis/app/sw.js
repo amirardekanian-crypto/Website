@@ -1,12 +1,15 @@
 /* Tennis Performance System app: service worker (scope: this folder, /tennis/app/ on the website).
    Keeps the app shell on the phone so the handbook opens with no connection. The handbook content
    is not cached here: app.js keeps it in IndexedDB, per account.
-   deploy_to_website.py stamps VERSION with a hash of the shell files, so every deploy installs a
-   fresh cache and deletes the old one. With VERSION 'dev' (the private repo's dev server) this
-   worker caches nothing, so local edits always show.
+   VERSION is a hash of the shell files, stamped by scripts/stamp_tps_app.py (the pre-commit hook
+   checks it), so every change installs a fresh cache and deletes the old one. It MUST change with
+   every change to the shell: the fetch handler below answers from this cache first, so a phone that
+   already has the app keeps the old one until sw.js itself changes. (A deploy from the private
+   tps-content repo stamps it with that repo's own deploy script instead.)
+   With VERSION 'dev' this worker caches nothing, so local edits always show.
    The site's root sw.js leaves /tennis/ alone and only ever deletes its own aap-* caches; this
    worker only ever deletes its own tps-shell-* caches. */
-const VERSION = 'f4700745aeac';
+const VERSION = 'e1c8ea6dc173';
 const CACHE = 'tps-shell-' + VERSION;
 const SHELL = ['./', 'app.js', 'app.css', 'app.webmanifest', 'lib/supabase.js',
   'fonts/Vazirmatn-Variable.woff2', '../../assets/img/icon-192.png'];
