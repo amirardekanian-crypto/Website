@@ -1282,6 +1282,10 @@
      painting a white placeholder box over the green banner. */
   #day-cards-wrap .cm-banner-img,
   #day-view-card .cm-banner-img { background: transparent; }
+  /* The day view repeats the same card, so it must repeat the same CROP. It was
+     inheriting 16:9 from .planlike while the Home card is 5:2, which cut one file
+     two different ways — and the art is composed for one of them. */
+  #day-view-card .cm-banner { aspect-ratio: 5 / 2; min-height: 100px; max-height: 170px; }
   /* A touch more space between stacked day cards. */
   #day-cards-wrap .current-message { margin-bottom: 14px; }
   /* Day cards lead with "Day N"; the day name sits a little smaller beneath it,
@@ -4960,11 +4964,16 @@ const APP_ART = {
     voltage: 'voltage-v1', spring: 'spring-v1', brakes: 'brakes-v1',
     engine: 'engine-v1', reset: 'reset-v1', peak: 'peak-v1',
   },
+  days: {
+    lower: 'lower-v1', upper: 'upper-v1', power: 'power-v1', conditioning: 'conditioning-v1',
+    core: 'core-v1', recovery: 'recovery-v1', fullbody: 'fullbody-v1', default: 'default-v1',
+  },
   finish:  ['finish-1-v1', 'finish-2-v1', 'finish-3-v1'],
   pr:      ['pr-1-v1', 'pr-2-v1', 'pr-3-v1'],
   welcome: 'welcome-v1',
 };
 const ART_CYCLES  = 'assets/art/cycles/';
+const ART_DAYS    = 'assets/art/days/';
 const ART_MOMENTS = 'assets/art/moments/';
 
 // Which family a cycle belongs to. The pipeline writes `art` on the cycle (see
@@ -5264,22 +5273,37 @@ function homeWeekLabel(cycle) {
   return `Week ${wk} of ${totalWeeks}`;
 }
 
-// Map a day's focus/title to ONE of a small pool of generic category images.
-// Upload these ~8 files ONCE to assets/days/ and every day of every athlete is
-// covered — no per-day images needed. First keyword hit wins (order matters).
+// Map a day to ONE of eight category pictures. Eight files cover every day of
+// every athlete — no per-day images needed. The day's own `art` word wins when it
+// is there (written by /program-assemble, see SCHEMA.md); these keywords are the
+// fallback for every day written before that.
 const DAY_IMAGE_RULES = [
-  { cat: 'recovery',     re: /recover|mobility|regen|deload|rest|stretch|flexib/i },
+  // ⚠️ The four word boundaries below are load-bearing, not tidiness. Without
+  // them "rest" matches Restored, "abs" matches Absorb, "arm" matches Warm-up and
+  // "row" matches Throw — and with earliest-match-wins, a stray hit inside a
+  // longer word can outrank the real keyword.
+  { cat: 'recovery',     re: /recover|mobility|regen|deload|\brest\b|stretch|flexib/i },
   { cat: 'power',        re: /power|plyo|explos|speed|jump|sprint|rotational|med.?ball|throw/i },
   { cat: 'conditioning', re: /condition|cardio|engine|aerobic|hiit|metcon|interval|endur/i },
-  { cat: 'core',         re: /core|abs|trunk|anti.?rot|plank|brace/i },
-  { cat: 'upper',        re: /upper|push|pull|press|shoulder|chest|back|arm|bench|row/i },
+  { cat: 'core',         re: /core|\babs\b|trunk|anti.?rot|plank|brace/i },
+  { cat: 'upper',        re: /upper|push|pull|press|shoulder|chest|back|\barm|bench|\brow/i },
   { cat: 'lower',        re: /lower|leg|squat|hinge|glute|deadlift|hamstring|quad|calf|lunge|knee/i },
   { cat: 'fullbody',     re: /full.?body|total.?body|whole.?body/i },
 ];
 function dayImageCategory(day) {
+  const named = String((day && day.art) || '').toLowerCase().trim();
+  if (APP_ART.days[named]) return named;
   const hay = `${day.title || ''} ${day.focusTag || ''} ${day.subtitle || ''}`;
-  for (const r of DAY_IMAGE_RULES) if (r.re.test(hay)) return r.cat;
-  return 'default';
+  // ⚠️ EARLIEST MATCH WINS, not the rule that happens to be listed first. Amir's
+  // day names are written, not labelled: "Hinge Slow, Pull Hard" is a hinge day,
+  // but the old order tested `upper` before `lower`, read the word "Pull", and
+  // filed it under upper body. Whatever the title leads with is what the day is.
+  let best = null, at = Infinity;
+  for (const r of DAY_IMAGE_RULES) {
+    const m = r.re.exec(hay);
+    if (m && m.index < at) { best = r.cat; at = m.index; }
+  }
+  return best || 'default';
 }
 
 // One day card for the home overview — image-banner look matching the cycle
@@ -5292,10 +5316,9 @@ function dayCardHTML(day, dayNum, total, opts) {
   const id = day.id != null ? day.id : dayNum;
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
-  // Shared category image — one of the ~8 .webp files in assets/days/. Extension
-  // is hardcoded to .webp (the format these were uploaded in); a missing file
+  // Shared category image — one of the eight in assets/art/days/. A missing file
   // falls back to the green gradient via dayImgError().
-  const catImg = `assets/days/${dayImageCategory(day)}.webp`;
+  const catImg = ART_DAYS + (APP_ART.days[dayImageCategory(day)] || APP_ART.days.default) + '.webp';
   const idStr = esc(String(id));
 
   // Subtitle = "N blocks · M movements". Each exercise entry counts as one

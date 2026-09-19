@@ -366,38 +366,43 @@ The actual training content for the current cycle.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `id` | number | ✅ | Day number (1, 2, 3...) — used for tab labels |
-| `focusTag` | string | optional | Day name + yellow badge. **Also picks the banner image** — see below |
+| `focusTag` | string | optional | Day name + yellow badge. Also the fallback for picking the banner image — see below |
+| `art` | string | recommended | Which of the eight day pictures this day shows: `lower` · `upper` · `power` · `conditioning` · `core` · `recovery` · `fullbody` · `default`. Write it and the guessing stops. Omitting it is safe (the app reads the title), but a day called *"Hinge Slow, Pull Hard"* is a hinge day and no keyword list knows that for certain. |
 | `completionTitle` | string | optional | Heading shown when day is finished |
 | `completionMessage` | string | optional | Body text on completion |
 | `blocks` | array | ✅ | List of training sections — any order, any count |
 
-#### Day `focusTag` → banner image
+#### How a day finds its picture
 
-A day has no per-day image. The app derives one from a small shared pool by scanning the
-day's `title` + `focusTag` for the **first** matching keyword, in this fixed priority order
-(first hit wins — earlier categories outrank later ones):
+Eight pictures cover every day of every athlete (`assets/art/days/`, see `IMAGES.md` §0).
+The day's own **`art`** word wins. When it is missing, the app scans the day's `title` +
+`focusTag` + `subtitle` and takes the keyword that appears **EARLIEST IN THE TEXT** —
+not the highest-priority rule. The order below only breaks a tie:
 
-| Priority | Image category | Trigger keywords (case-insensitive) |
+| Tie-break | Image category | Trigger keywords (case-insensitive) |
 |---|---|---|
-| 1 | `recovery` | recover, mobility, regen, deload, rest, stretch, flexib |
+| 1 | `recovery` | recover, mobility, regen, deload, **rest** (whole word), stretch, flexib |
 | 2 | `power` | power, plyo, explos, speed, jump, sprint, rotational, med ball, throw |
 | 3 | `conditioning` | condition, cardio, engine, aerobic, hiit, metcon, interval, endur |
-| 4 | `core` | core, abs, trunk, anti-rot, plank, brace |
-| 5 | `upper` | upper, push, pull, press, shoulder, chest, back, arm, bench, row |
+| 4 | `core` | core, **abs** (whole word), trunk, anti-rot, plank, brace |
+| 5 | `upper` | upper, push, pull, press, shoulder, chest, back, **arm** / **row** (word start) |
 | 6 | `lower` | lower, leg, squat, hinge, glute, deadlift, hamstring, quad, calf, lunge, knee |
 | 7 | `fullbody` | full body, total body, whole body |
 | — | `default` | (no keyword matched → green gradient) |
 
 **Naming consequences (get these right):**
-- Lead the `focusTag` with the keyword for the image you want; a *higher-priority* keyword
-  hijacks it. `"Lower + Brace"` → **core** image (brace, pri 4, beats lower, pri 6).
-  `"Upper Body & Conditioning"` → **conditioning** (pri 3 beats upper, pri 5).
-- A name with **no** keyword falls to the bare gradient. `"Total + Carry"` matches nothing
-  ("carry" isn't a keyword; "total" only counts as `total body`) → `default`.
-- For a true full-body day use the literal phrase **`Full-Body`** / `Total Body` so it hits
-  `fullbody` rather than nothing.
+- **Whatever the name leads with is what the day is.** `"Hinge Slow, Pull Hard"` → **lower**
+  (hinge comes first), `"Throw Hard, Hinge Harder"` → **power**. Under the old
+  priority-order rule both of those went to the wrong picture.
+- A name with **no** keyword falls to `default`. `"Nothing To Prove Today"` matches nothing,
+  which is correct: there is a picture for exactly that.
+- For a true full-body day use the literal phrase **`Full-Body`** / `Total Body`.
+- ⚠️ The word boundaries on `rest`, `abs`, `arm` and `row` are load-bearing: without them
+  *Restored*, *Absorb*, *Warm-up* and *Throw* match, and with earliest-wins a stray hit
+  inside a longer word outranks the real keyword. `"The Hinge Restored"` was filing as
+  a recovery day because of exactly this.
 
-(Source of truth: `DAY_IMAGE_RULES` in `program.html`. Keep this table in sync if those change.)
+(Source of truth: `DAY_IMAGE_RULES` + `dayImageCategory()` in `program.html`. Keep this table in sync if those change.)
 
 ### `blocks[n]` — Training Section
 
