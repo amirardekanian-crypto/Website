@@ -297,6 +297,7 @@ Each cycle describes one training phase.
 | `num` | number | ✅ | Cycle number (shown as the big faded number on the phase row) |
 | `name` | string | ✅ | Phase name, e.g. `"Foundation Forge"` |
 | `tagline` | string | optional | Short italic line under the name |
+| `art` | string | recommended | Which picture the cycle card shows. One of: `bedrock` (foundation, first numbers) · `iron` (heavy strength) · `build` (muscle, volume) · `armour` (durability, tendons, rehab) · `voltage` (power, rotation) · `spring` (elastic, change of direction) · `brakes` (deceleration) · `engine` (conditioning, fat loss, running, repeat effort) · `reset` (deload, maintenance) · `peak` (taper, finish, physique). **Omitting it is safe** — the app guesses from the cycle name — but write it: the guess cannot know that one athlete's "Uncoil" is a mobility block and another's is a speed block. Ten pictures cover every cycle; see `IMAGES.md` section 0. |
 | `weeks` | string | optional | e.g. `"Weeks 1–5"` |
 | `startDate` | string | recommended | Cycle start date, ISO format `"YYYY-MM-DD"`. Shown on the athlete card for the current cycle. Omitting it hides the date range from the athlete card. |
 | `endDate` | string | recommended | Cycle end date, ISO format `"YYYY-MM-DD"`. Drives the subscription/renewal banner (appears when ≤14 days remain). **Omitting this disables the renewal reminder entirely** — the client will see no expiry warning. |

@@ -22,7 +22,50 @@ path, so **every device loads the exact same file** — nothing can get lost or
 
 ---
 
-## 1. Cycle banners — `assets/cycles/`  ⭐ (the ones you manage most)
+## 0. App art — `assets/art/` ⭐ (the current system, 2026-09-19)
+
+Every generated picture inside `program.html`. Made in Higgsfield (GPT Image 2.5
+Flare), graded to one look, exported to WebP. **The shot list — the prompt, spec and
+text safe zone for every image — is the artifact at
+<https://claude.ai/artifact/XsWgHHpnonUgrZbaUrqSmJ>** (private to Amir).
+
+| What | Path | Aspect | Export | Cap |
+|---|---|---|---|---|
+| **Cycle families** (10) | `assets/art/cycles/<family>-v1.webp` | 16:9 | 1200×675 | 70 KB |
+| **Session complete** (3) | `assets/art/moments/finish-1..3-v1.webp` | 5:2 | 1200×480 | 40 KB |
+| **New best** (3) | `assets/art/moments/pr-1..3-v1.webp` | 2.4:1 | 1200×500 | 45 KB |
+| **Welcome** (1) | `assets/art/moments/welcome-v1.webp` | 1:1 | 1080×1080 | 60 KB |
+
+- **Cycle art is keyed by FAMILY, never by cycle name.** The ten families are
+  bedrock · iron · build · armour · voltage · spring · brakes · engine · reset ·
+  peak. 161 live cycles share those ten pictures, and `/program-design` invents
+  new names every block, so one file per name could never keep up.
+- **A cycle finds its family** from the `art` word on the cycle (see `SCHEMA.md`),
+  and falls back to keyword rules on the **name only** (`CYCLE_ART_RULES` in
+  `program.html`). ⚠️ Do not widen that haystack: matching the tagline or the
+  focus list was tried and got the demo wrong 5 times out of 5, because a focus
+  list names every quality a block touches and a tagline is a written line, not a
+  label.
+- **Two cards in a row from the same family**: the second is mirrored and takes a
+  clay scrim (`.cm-banner.is-alt`). That is why no image may carry text or a
+  handed subject.
+- ⚠️ **Filenames carry a version.** `sw.js` serves `/assets/` cache-first by full
+  URL, so replacing a picture at the same path would never reach a phone that
+  already has the app. Ship a replacement as `-v2` and change `APP_ART` in
+  `program.html`.
+- **The look**: real photograph, no people, no logos, no text, no yellow. Shadows
+  fall to green-black, highlights are warm cream, clay is the only saturated
+  colour. Every file gets the same grade pass before export, which is what makes
+  images made in separate runs read as one set.
+- `assets/cycles/` (below) is **retired for the app** but not deleted:
+  `index.html` and `index-fa.html` still load `strength-engine.jpg`.
+
+---
+
+## 1. Cycle banners — `assets/cycles/`  ⚠️ retired for the app
+
+Superseded by section 0 on 2026-09-19. Kept because the public homepages still
+load one of these files. The app no longer reads this folder.
 
 The image at the top of each cycle card on the **My Plan** page.
 
