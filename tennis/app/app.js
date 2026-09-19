@@ -402,7 +402,11 @@
     lesson: {                                                              // by lesson id
       'tennis-demands': { f: 'rally-map', pos: '50% 50%' },
       'read-your-card': { f: 'clock-and-chalk', pos: '50% 50%' },
-      'rpe-weights': { f: 'which-one', pos: '50% 55%' }
+      'rpe-weights': { f: 'which-one', pos: '50% 55%' },
+      'strength': { f: 'the-row', pos: '50% 50%' },
+      'jumps-power': { f: 'impact', pos: '50% 50%' },
+      'robustness': { f: 'armour', pos: '50% 50%' },
+      'warmup-ramp': { f: 'first-turn', pos: '50% 55%' }
     },
     test: { 'broad-jump': { f: 'the-coin', pos: '50% 45%' } },             // by test id
     done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
