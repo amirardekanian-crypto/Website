@@ -25,6 +25,8 @@
   localStorage "tps.prefs".
   ?demo=1: the demo. No sign-in; Supabase tps_demo() sends only the free parts (supabase/tps_02_demo.sql),
   and this mode alone loads Plausible for a few anonymous events.
+  ?demo=1&art=1: the same demo with Amir's AI pictures (assets/tps/, made by scripts/grade_tps_art.py).
+  Hidden behind ?art=1 until the set is finished; app.js ("Pictures") has the rules.
   Local modes (they need a content or _dev folder, which the website does not have):
     ?local=1, or ?content=<folder>: content from the JSON files next to the app, no sign-in.
     ?stub=1: a fake Supabase (_dev/stub-supabase.js), already signed in.
@@ -64,7 +66,7 @@
   })();
 </script>
 <link rel="preload" href="fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="app.css?v=ef23ea63">
+<link rel="stylesheet" href="app.css?v=89e1de06">
 </head>
 <body>
 <div class="sample-bar">نسخهٔ نمونه · در حال ساخت</div>
@@ -156,6 +158,6 @@
 <div id="step" class="step" hidden></div>
 
 <script defer src="lib/supabase.js"></script>
-<script src="app.js?v=fbdd02fe" defer></script>
+<script src="app.js?v=ba29cbe5" defer></script>
 </body>
 </html>

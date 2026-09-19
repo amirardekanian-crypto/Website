@@ -360,7 +360,7 @@
   // A locked item: its card, and the way to unlock it. Everything else about it stayed on the server.
   function viewLocked(o) {
     track('Demo locked', { kind: o.kind, item: o.item });
-    view().innerHTML = banner({ back: o.back, kicker: '🔒 ' + o.kicker, title: o.title, sub: o.sub || '' }) +
+    view().innerHTML = banner({ back: o.back, kicker: '🔒 ' + o.kicker, title: o.title, sub: o.sub || '', art: artFor('locked', '*') }) +
       `<div class="section"><div class="card clay"><h3>این بخش در نسخهٔ کامل باز می‌شود</h3>
         ${o.pills ? `<div class="tags" style="margin:2px 0 8px">${o.pills}</div>` : ''}${o.why ? `<p>${esc(o.why)}</p>` : ''}
         <p class="lead" style="margin-top:8px">${o.line}</p>${buyActions(o.kind)}</div></div>`;
@@ -372,6 +372,26 @@
     return `<div class="card clay"><h3>نسخهٔ نمایشی</h3><p>هفتهٔ ${openWeeksText()} برنامه، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است. بقیه قفل است و در نسخهٔ کامل باز می‌شود.</p></div>`;
   }
 
+  /* ── Pictures (?demo=1&art=1) ──────────────────────────────────────── */
+  // Amir's AI pictures for the course (2026-09-19), made in GPT Image 2 and Higgsfield, then graded and
+  // exported by scripts/grade_tps_art.py into assets/tps/. They show only behind ?art=1 while the set is
+  // unfinished, so the public demo stays exactly as it was: open /tennis/app/?demo=1&art=1 to see them.
+  // To retire the flag, let ART_ON be just DEMO. A picture that fails to load takes its own layer away and
+  // leaves the green banner, so a missing file costs nothing.
+  // Every picture has its subject on the LEFT and the right and bottom left calm: this app is
+  // right-to-left, so titles sit at the right and the bottom. Keep to that when adding more.
+  // Bump ART_V after regrading a file: the site's root worker keeps /assets/ files cache-first, by full URL.
+  const ART_ON = DEMO && new URLSearchParams(location.search).has('art');
+  const ART_V = 1;
+  const ART = {
+    block: { 1: { f: 'first-light', pos: '50% 40%' } },                   // block 1 to 4: its cover, on the block card and the week's banner
+    lesson: { 'tennis-demands': { f: 'rally-map', pos: '50% 50%' } },      // by lesson id
+    test: { 'broad-jump': { f: 'the-coin', pos: '50% 45%' } },             // by test id
+    locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
+  };
+  const artFor = (kind, key) => (ART_ON && ART[kind] && ART[kind][key]) || null;
+  const artLayer = a => a ? `<div class="ph"><img src="../../assets/tps/${a.f}.webp?v=${ART_V}" alt="" decoding="async" style="object-position:${a.pos || '50% 50%'}" onload="this.classList.add('in')" onerror="var p=this.closest('.has-art');if(p)p.classList.remove('has-art');this.parentNode.remove()"></div>` : '';
+
   /* ── Small renderers ───────────────────────────────────────────────── */
   const exName = ex => (ex && (ex.nameEn || ex.name)) || '';   // English only (Amir, 2026-09-14)
   // Same loose match as the coaching app: case, accents and punctuation don't matter; words and digits do.
@@ -381,7 +401,8 @@
   const GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
 
   function banner(o) {
-    return `<header class="banner ${o.back ? 'has-back' : ''}">
+    return `<header class="banner ${o.back ? 'has-back' : ''} ${o.art ? 'has-art' : ''}">
+      ${artLayer(o.art)}
       ${o.back ? `<button class="back" data-back="${esc(o.back)}" aria-label="بازگشت">→</button>` : ''}
       ${o.gear ? `<a class="gear" href="#/setup" aria-label="تنظیم نسخه">${GEAR}</a>` : ''}
       ${o.kicker ? `<div class="kicker">${o.kicker}</div>` : ''}
@@ -562,7 +583,8 @@
           : DEMO ? `<a class="week locked" href="#/programme/week/${w}" aria-label="هفتهٔ ${fa(w)}، قفل">${fa(w)}</a>`
           : `<span class="week soon" title="به‌زودی">${fa(w)}</span>`;
       }
-      h += `<div class="block-card"><div class="bc-top"><b>بلوک ${fa(i + 1)} · ${esc(bl.name)}</b><span dir="ltr">${esc(bl.nameEn)}</span></div>
+      const art = artFor('block', i + 1);
+      h += `<div class="block-card"><div class="bc-top ${art ? 'has-art' : ''}">${artLayer(art)}<div class="bc-t"><b>بلوک ${fa(i + 1)} · ${esc(bl.name)}</b><span dir="ltr">${esc(bl.nameEn)}</span></div></div>
         <div class="bc-body"><div class="bc-goal">${esc(bl.goal || '')}</div><div class="weeks">${weeks}</div></div></div>`;
     });
     const ready = (P.weeks || []).map(w => w.week);
@@ -595,7 +617,7 @@
     if (!r) { view().innerHTML = banner({ back: '#/programme', title: 'این هفته هنوز آماده نیست' }); return; }
     const bl = blockOf(week) || {};
     let h = banner({ back: '#/programme', kicker: `بلوک · ${esc(bl.name || '')}`, title: `هفتهٔ ${fa(week)}`, sub: esc(r.w.title || ''),
-      meta: pill(AGE_LABEL[r.v.age], 'light') });
+      meta: pill(AGE_LABEL[r.v.age], 'light'), art: artFor('block', (C.programme.blocks || []).indexOf(bl) + 1) });
     h += `<div class="section">${prefs ? '' : versionLine()}`;
     if (r.w.note) h += `<div class="card green"><p>${esc(r.w.note)}</p></div>`;
     h += `<div class="h2">جلسه‌های اصلی</div>`;
@@ -719,7 +741,9 @@
     const L = ((C.learn && C.learn.lessons) || []).slice().sort((x, y) => (x.order || 999) - (y.order || 999));
     const groups = [];
     L.forEach(l => { const name = l.group || 'درس‌ها'; let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
-    const card = l => `<a class="card tap ${isLocked(l) ? 'locked' : 'green'}" href="#/learn/${encodeURIComponent(l.id)}"><h3>${esc(l.icon || '')} ${esc(l.title)}${isLocked(l) ? LOCK : ''}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}</a>`;
+    const card = l => { const art = artFor('lesson', l.id);
+      const body = `<h3>${esc(l.icon || '')} ${esc(l.title)}${isLocked(l) ? LOCK : ''}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}`;
+      return `<a class="card tap ${isLocked(l) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/learn/${encodeURIComponent(l.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
     view().innerHTML = banner({ kicker: 'درس‌ها', title: 'آموزش', sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
       `<div class="section">${groups.map(g => (groups.length > 1 ? `<div class="h2">${esc(g.name)}</div>` : '') + g.items.map(card).join('')).join('')}</div>`;
   }
@@ -729,7 +753,7 @@
     if (!l) { view().innerHTML = banner({ back: '#/learn', title: 'این درس پیدا نشد' }); return; }
     if (isLocked(l)) return viewLocked({ kind: 'lesson', item: id, back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`,
       sub: esc(l.summary || ''), line: `این درس و ${fa(lockedCount(L) - 1)} درس دیگر در نسخهٔ کامل است.` });
-    let h = banner({ back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`, sub: esc(l.summary || '') }) + `<div class="section prose">`;
+    let h = banner({ back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`, sub: esc(l.summary || ''), art: artFor('lesson', id) }) + `<div class="section prose">`;
     (l.sections || []).forEach(sec => {
       if (sec.h) h += `<h3>${esc(sec.h)}</h3>`;
       (sec.p || []).forEach(p => { h += `<p>${esc(p)}</p>`; });
@@ -983,7 +1007,9 @@
 
   function viewTests() {
     const T = (C.tests && C.tests.tests) || [], D = C.tests && C.tests.day;
-    const card = t => `<a class="card tap ${isLocked(t) ? 'locked' : 'green'}" href="#/tests/${encodeURIComponent(t.id)}"><h3>${esc(t.icon || '')} ${esc(t.title)}${isLocked(t) ? LOCK : ''}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p></a>`;
+    const card = t => { const art = artFor('test', t.id);
+      const body = `<h3>${esc(t.icon || '')} ${esc(t.title)}${isLocked(t) ? LOCK : ''}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p>`;
+      return `<a class="card tap ${isLocked(t) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/tests/${encodeURIComponent(t.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
     const onDay = T.filter(t => !t.optional), extra = T.filter(t => t.optional);
     let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.' }) +
       `<div class="section"><div class="card"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
@@ -1002,7 +1028,7 @@
     const sh = t.sheet || {};
     const cols = sh.cols || ['تلاش ۱', 'تلاش ۲', 'تلاش ۳', 'عدد نهایی'];
     const rows = sh.rows || ['هفتهٔ ۰ · روز اول', 'هفتهٔ ۰ · روز دوم', 'هفتهٔ ۴', 'هفتهٔ ۸', 'هفتهٔ ۱۲', 'هفتهٔ ۱۶'];
-    let h = banner({ back: '#/tests', kicker: t.badge ? `آزمون · ${esc(t.badge)}` : 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}` }) + `<div class="section prose">`;
+    let h = banner({ back: '#/tests', kicker: t.badge ? `آزمون · ${esc(t.badge)}` : 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}`, art: artFor('test', id) }) + `<div class="section prose">`;
     if (t.why) h += `<h3>چرا این آزمون؟</h3><p>${esc(t.why)}</p>`;
     if (t.caution) h += `<div class="card warn"><h3>${esc(t.cautionTitle || 'احتیاط')}</h3><p>${esc(t.caution)}</p></div>`;
     if (t.rmGuide) h += `<h3>${esc(t.rmTitle || 'کدام RM؟')}</h3><div class="table-wrap"><table class="rmg"><thead><tr><th>شما</th><th>آزمون</th><th>برچسب</th></tr></thead><tbody>${t.rmGuide.map(r => `<tr><td>${esc(r.who)}</td><td><bdi>${esc(r.rm)}</bdi></td><td>${esc(r.note || '')}</td></tr>`).join('')}</tbody></table></div>`;
