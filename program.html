@@ -528,6 +528,15 @@
     background: linear-gradient(to top,
       rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.28) 44%, rgba(0,0,0,0) 74%);
   }
+  /* The repeat rule. When two cycle cards in a row resolve to the same family,
+     the second one is mirrored and takes a clay wash instead of green, so the
+     stack never shows the same picture twice running. Nothing in the art carries
+     text or a handed subject, which is what makes mirroring safe. */
+  .planlike .cm-banner.is-alt .cm-banner-img { transform: scaleX(-1); }
+  .planlike .cm-banner.is-alt .cm-banner-scrim {
+    background: linear-gradient(to top,
+      rgba(150,58,28,0.80) 0%, rgba(150,58,28,0.30) 44%, rgba(150,58,28,0) 74%);
+  }
   .planlike .cm-banner-caption {
     position: relative; z-index: 2;
     align-self: flex-end;
@@ -2316,6 +2325,46 @@
 
   /* ── THE CEILING (screen) ─────────────────────────────────────── */
   .ceil-head { position: relative; padding: 46px 18px 18px; background: var(--yellow); color: var(--on-accent); }
+  /* New best. The header band carries a photo, but only on the lift that just
+     beat its own record, and only here: #screen-weight reuses .ceil-head, so
+     every rule below is scoped to The Ceiling. The lift name sits over the left,
+     which is why the art has its subject on the right. */
+  #screen-ceiling .ceil-head.is-pr { background-size: cover; background-position: 72% 50%; }
+  #screen-ceiling .ceil-head.is-pr::before { content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(8,38,27,0.95) 0%, rgba(8,38,27,0.78) 45%, rgba(8,38,27,0.18) 100%); }
+  /* Lift the head's own children above the scrim — but never the back arrow,
+     which is absolutely positioned and drops into the flow (landing on the
+     kicker) the moment something makes it relative. */
+  #screen-ceiling .ceil-head.is-pr > *:not(.nav-back) { position: relative; z-index: 1; }
+  #screen-ceiling .ceil-head.is-pr .nav-back { z-index: 2; }
+  #screen-ceiling .ceil-head.is-pr .ceil-kick { color: #E06B43; }
+  #screen-ceiling .ceil-head .ceil-gain { font-family: 'Barlow', sans-serif; font-size: 13px;
+    color: rgba(255,255,255,0.88); margin-top: 5px; }
+  /* Welcome — shown once, straight after a new athlete signs in. Built on the
+     sign-in screen's own furniture so it reads as the next frame of it. */
+  .wel { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column;
+    background: var(--grey-bg); animation: fadeUp 0.35s ease both; }
+  .wel-hero { position: relative; flex: 0 0 auto; height: clamp(296px, 42vh, 380px);
+    background: #0E4A36; overflow: hidden; display: flex; }
+  .wel-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    object-position: center 40%; opacity: 0; transition: opacity 0.5s ease; }
+  .wel-hero img.in { opacity: 1; }
+  .wel-scrim { position: absolute; inset: 0; background: linear-gradient(to top,
+    rgba(8,38,27,0.96) 6%, rgba(8,38,27,0.40) 56%, rgba(10,10,10,0.52)); }
+  .wel-copy { position: relative; z-index: 2; margin-top: auto; padding: 0 22px 52px; }
+  .wel-eyebrow { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: #E06B43; margin-bottom: 8px; }
+  .wel-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px;
+    line-height: 1; text-transform: uppercase; color: #fff; }
+  .wel-sheet { position: relative; margin-top: -30px; border-radius: 30px 30px 0 0;
+    background: var(--grey-bg); padding: 26px 22px 30px; flex: 1 1 auto; }
+  .wel-sheet p { margin: 0 0 10px; font-size: 15px; color: var(--grey-dark); }
+  .wel-sheet p.sub { color: var(--grey-text); font-size: 13.5px; }
+  .wel-go { display: block; width: 100%; margin-top: 18px; padding: 15px; border: 0; border-radius: 10px;
+    background: var(--ice); color: #fff; font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+    font-size: 17px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+  .wel-skip { display: block; width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none;
+    color: var(--grey-text); font-size: 14px; cursor: pointer; }
   .ceil-kick { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.78); }
   .ceil-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 44px;
@@ -2822,6 +2871,21 @@
   /* ── Session Complete ── */
   .session-complete { display: none; background: var(--white); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid var(--grey-mid); }
   .session-complete.visible { display: block; animation: fadeUp 0.4s ease both; }
+  /* Moment art — a 5:2 band across the top of the card with the medallion
+     overlapping its bottom edge. Decorative only: alt="" and aria-hidden, no
+     text over it, and the card's own padding is cancelled so it runs edge to
+     edge. scroll-margin-top keeps the sticky session timer off the band when
+     confirmSession() scrolls the card into view. */
+  .session-complete { overflow: hidden; scroll-margin-top: 84px; }
+  body.is-demo .session-complete { scroll-margin-top: 128px; }
+  .complete-art { position: relative; margin: -36px -24px 0; aspect-ratio: 5 / 2; max-height: 150px; background: #122A22; overflow: hidden; }
+  .complete-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .complete-art::after { content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, var(--white) 100%); }
+  .complete-art:not([hidden]) + .complete-emoji { margin: -32px auto 18px; position: relative; z-index: 1; background: var(--white); }
+  /* --yellow is the brand green, which all but disappears on the dark card. */
+  body[data-dark] .complete-emoji { color: #4e9d7e; border-color: #4e9d7e; }
+  body[data-dark] .complete-title { color: #4e9d7e; }
   /* Refined completion medallion — circular yellow ring with a check, scales in with a glow */
   .complete-emoji {
     width: 64px; height: 64px;
@@ -4656,6 +4720,7 @@ function getVideoUrl(ex) {
   setTimeout(() => {
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('screen-home').classList.add('active');
+    maybeWelcome();
     // Reveal the global tab bar and mark Home (the training screen) as the
     // active tab on first load.
     const tabs = document.getElementById('global-tabs');
@@ -4829,6 +4894,10 @@ function showSignIn() {
       // ATHLETE_ID as boot-time constants, and re-entering boot() would double
       // up the cloud-sync and timer wiring. replace() rather than assign() is
       // kept on purpose - it stops Back landing on the sign-in card again.
+      // Tell the app this is a fresh sign-in, and start pulling the welcome
+      // picture now so it is there by the time the app has booted.
+      try { localStorage.setItem('aa_fresh_signin', '1'); } catch (e) { /* storage blocked */ }
+      try { new Image().src = 'assets/art/moments/welcome-v1.webp'; } catch (e) {}
       btn.textContent = 'Signed in';
       setTimeout(() => location.replace('program.html'), 400);
       return;
@@ -4875,6 +4944,154 @@ async function signOutAthlete() {
 // Slugify a cycle name into an image filename stem: lowercase, punctuation/spaces
 // collapse to hyphens. Case-insensitive, so "Load & Build" and "LOAD & BUILD"
 // both map to "load-build" → one image serves every capitalisation.
+// ═══════════════════════════════════════════════════════════════════════
+//  APP ART — every generated picture in the app, in one place
+// ═══════════════════════════════════════════════════════════════════════
+// Cycle art is keyed by FAMILY, never by cycle name. 161 live cycles share ten
+// pictures, and /program-design invents new names every block, so one file per
+// name could never keep up. Moment art is a small rotating pool.
+//
+// ⚠️ Filenames carry a version (…-v1.webp). sw.js serves /assets/ cache-first by
+// full URL, so a REPLACED picture at the same path would never reach a phone
+// that already has the app. Ship a new file as -v2 and change it here.
+const APP_ART = {
+  cycles: {
+    bedrock: 'bedrock-v1', iron: 'iron-v1', build: 'build-v1', armour: 'armour-v1',
+    voltage: 'voltage-v1', spring: 'spring-v1', brakes: 'brakes-v1',
+    engine: 'engine-v1', reset: 'reset-v1', peak: 'peak-v1',
+  },
+  finish:  ['finish-1-v1', 'finish-2-v1', 'finish-3-v1'],
+  pr:      ['pr-1-v1', 'pr-2-v1', 'pr-3-v1'],
+  welcome: 'welcome-v1',
+};
+const ART_CYCLES  = 'assets/art/cycles/';
+const ART_MOMENTS = 'assets/art/moments/';
+
+// Which family a cycle belongs to. The pipeline writes `art` on the cycle (see
+// SCHEMA.md); these rules are the fallback for every cycle written before that,
+// and for anything the pipeline forgets. Tested against all 161 live cycles:
+// they agree with the hand mapping on 156. The five they miss are names whose
+// job changes per athlete — "Uncoil" is mobility for one and speed for another —
+// which is exactly what the `art` word is for. ORDER MATTERS: the first match
+// wins, so the narrow families (brakes, spring) are tested before the broad
+// ones (build, iron), the same way DAY_IMAGE_RULES works.
+const CYCLE_ART_RULES = [
+  { family: 'brakes',  re: /\b(brak(e|es|ed|ing)|hard stop|kill switch|decel\w*|eccentric\w*|absorb\w*|landings?|land soft|stop (hard|to go))\b/i },
+  { family: 'spring',  re: /\b(spring\w*|elastic\w*|reactive|plyo\w*|sidewinder|first strike|first step|court proof|change[ -]of[ -]direction|cut, plant|bounds?|pogos?|ground contacts?)\b/i },
+  { family: 'engine',  re: /\b(metabolic|slow burn|race|running|runs?|third set|closing speed|crossover|hybrid|match engine|conditioning|fat[ -]loss|deficit|repeat[ -](effort|power)|aerobic|zone[ -]?2|work capacity|intervals?)\b/i },
+  { family: 'voltage', re: /\b(power|voltage|live wire|whip ?crack|trigger|uncoil|rotation(al)?|translat\w*|transfer|explosive|rate of force|throws?|med[ -]?balls?|ballistic\w*|speed)\b/i },
+  { family: 'peak',    re: /\b(peak\w*|polish\w*|capstone|final cut|reveal|sculpt\w*|defin\w*|shape|integrated|recomposition|sharpen\w*|taper\w*)\b/i },
+  { family: 'armour',  re: /\b(armou?r\w*|durab\w*|tendons?|bulletproof\w*|resilien\w*|rehab\w*|injur\w*|structural strength|protect\w*|pain[ -]free)\b/i },
+  { family: 'reset',   re: /\b(active recovery|recover\w*|deload\w*|de-load\w*|back-?off|ballast|hold fast|keeper|maint\w*|consolidat\w*|reset|lighter)\b/i },
+  { family: 'bedrock', re: /\b(bedrock|foundation\w*|groundwork|plumb\w*|cold start|bare metal|floor|rebar|breath\w*|baselines?|platform)\b/i },
+  { family: 'build',   re: /\b(build|volume|growth|grow|hypertroph\w*|size|muscle|symmetry|rigging|density|tension|frame|silhouette|mass)\b/i },
+  { family: 'iron',    re: /\b(iron\w*|steel|anvil|forge|foundry|keystone|hardpoint|payday|double down|force bank|temper\w*|strength|strong\w*|heav(y|ier|iest)|max(imal)?|reclaim|ladder)\b/i },
+];
+function cycleArt(cycle) {
+  const named = String((cycle && cycle.art) || '').toLowerCase().trim();
+  if (APP_ART.cycles[named]) return named;
+  // ⚠️ THE NAME ONLY. Two wider haystacks were tried against the live roster
+  // and both were worse. The focus list describes everything a block touches
+  // ("change of direction", "aerobic", "braking"), so every cycle matched an
+  // early narrow rule and all five demo cycles came out wrong. The tagline is a
+  // written line, not a label: "Spring earned, not stolen" sits on a power block
+  // and "Load the Foundation" on a size block. The name is what the block IS.
+  const hay = String((cycle && cycle.name) || '');
+  for (const r of CYCLE_ART_RULES) if (r.re.test(hay)) return r.family;
+  return 'bedrock';   // a cycle with no clue in its name is a first block far more often than not
+}
+
+// The session-complete band. Three pictures, rotated so the same one never
+// lands twice running. The stamp is the day plus today's date, so resetting and
+// finishing the same session again keeps the picture it already had instead of
+// stepping the pool on every tap.
+function paintFinishArt(day) {
+  const el = document.getElementById('complete-art-' + day);
+  if (!el) return;
+  const pool = APP_ART.finish;
+  const key  = ATHLETE_ID + '_art_finish';
+  const stamp = String(day) + '|' + new Date().toDateString();
+  let i = 0;
+  try {
+    const prev = JSON.parse(localStorage.getItem(key) || 'null');
+    if (prev && prev.k === stamp && typeof prev.i === 'number') {
+      i = ((prev.i % pool.length) + pool.length) % pool.length;
+    } else {
+      i = (((prev && typeof prev.i === 'number' ? prev.i : -1) + 1) % pool.length + pool.length) % pool.length;
+      localStorage.setItem(key, JSON.stringify({ i: i, k: stamp }));
+    }
+  } catch (e) { i = 0; }
+  el.innerHTML = '<img src="' + ART_MOMENTS + pool[i] + '.webp" alt="" aria-hidden="true">';
+  el.hidden = false;
+}
+
+// ── New best on The Ceiling ────────────────────────────────────────────
+// A new best is an estimate that beats this lift's best from ANY OTHER DAY.
+// Same-day saves replace each other, so comparing against today would make
+// every correction a "new best". A first-ever estimate is never celebrated:
+// there is nothing to beat, and a manufactured win is worth less than none.
+function ceilingPrevBest(lift, day) {
+  const l = (ceilingLifts() || []).find(x => x.lift === lift);   // resolves renamed lifts
+  if (!l) return null;
+  const others = l.entries.filter(e => e.d !== day).map(e => e.kg);
+  return others.length ? Math.max.apply(null, others) : null;
+}
+function noteNewBest(lift, est, day) {
+  const prev = ceilingPrevBest(lift, day);
+  if (prev == null || !(est > prev)) return false;
+  try {
+    localStorage.setItem(ATHLETE_ID + '_ceil_best', JSON.stringify({
+      lift: lift, kg: est, prev: prev, d: day, t: Date.now(),
+      i: Math.floor(Math.random() * APP_ART.pr.length),
+    }));
+  } catch (e) { /* storage blocked — the record still saves, only the band is lost */ }
+  return true;
+}
+
+// Welcome, once. The sign-in page sets aa_fresh_signin just before it reloads
+// into the app; boot() calls this after Home is painted, so the overlay opens
+// over a real screen and closing it is instant.
+function maybeWelcome() {
+  let fresh = null;
+  try {
+    fresh = localStorage.getItem('aa_fresh_signin');
+    localStorage.removeItem('aa_fresh_signin');
+  } catch (e) { return; }
+  if (fresh !== '1' || window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || !DATA) return;
+  const key = ATHLETE_ID + '_welcomed';
+  try {
+    if (localStorage.getItem(key)) return;   // second sign-in on this phone: they have met it
+    localStorage.setItem(key, '1');
+  } catch (e) { return; }
+  const first = (DATA.athlete && DATA.athlete.firstName) || '';
+  // Read the cycle from the data, not from boot()'s local: _currentCycle lives
+  // inside boot() and is not in scope here.
+  const cyc = (DATA.cycles || [])[DATA.currentCycleIndex || 0];
+  const plan = cyc && cyc.name
+    ? 'Your plan is ready. First up is ' + esc(cyc.name) + (cyc.weeks ? ', ' + esc(cyc.weeks) : '') + '.'
+    : 'Your plan is ready.';
+  const el = document.createElement('div');
+  el.className = 'wel';
+  el.innerHTML =
+    '<div class="wel-hero">' +
+      '<img src="' + ART_MOMENTS + APP_ART.welcome + '.webp" alt="" aria-hidden="true" onload="this.classList.add(\'in\')">' +
+      '<div class="wel-scrim"></div>' +
+      '<div class="wel-copy">' +
+        '<div class="wel-eyebrow">You\'re in</div>' +
+        '<div class="wel-title">Welcome, ' + esc(first) + '.</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="wel-sheet">' +
+      '<p>' + plan + '</p>' +
+      '<p class="sub">Any questions, message me from the Coach tab.</p>' +
+      '<button type="button" class="wel-go">See my plan</button>' +
+      '<button type="button" class="wel-skip">Look around first</button>' +
+    '</div>';
+  document.body.appendChild(el);
+  el.querySelector('.wel-go').addEventListener('click', function () { el.remove(); goTo('plan'); });
+  el.querySelector('.wel-skip').addEventListener('click', function () { el.remove(); });
+}
+
 function cycleSlug(name) {
   return String(name || '')
     .toLowerCase()
@@ -4898,20 +5115,18 @@ function cycleCardHTML(cycle, opts) {
     : '';
   let h = `<div class="${cls}"${attrs}>`;
 
-  // ── Image banner (full-bleed top of the card). We point an <img> at
-  // assets/cycles/<slug>.<ext> and let onerror walk a short list of extensions;
-  // if none of the files exist the handler adds `.no-img` and the green gradient
-  // fallback shows instead. Drop a file named after the cycle into that folder
-  // and it appears here automatically — no JSON or code changes needed.
-  const slug = cycleSlug(cycle.name);
-  const base = `assets/cycles/${slug}`;
-  const bannerCls = 'cm-banner' + (slug ? '' : ' no-img');
+  // ── Image banner (full-bleed top of the card). The picture comes from the
+  // cycle's FAMILY (see cycleArt), not its name: ten pictures cover every cycle
+  // any athlete is on, including names the pipeline has not invented yet. If the
+  // file is missing, cycleImgError() flags the banner `.no-img` and the green
+  // court fallback shows. opts.alt mirrors the picture and swaps the scrim to
+  // clay, which is how two cards in a row from the same family stay apart.
+  const family = cycleArt(cycle);
+  const artFile = ART_CYCLES + (APP_ART.cycles[family] || APP_ART.cycles.bedrock) + '.webp';
+  const bannerCls = 'cm-banner' + (opts.alt ? ' is-alt' : '');
   h += `<div class="${bannerCls}">`;
-  if (slug) {
-    h += `<img class="cm-banner-img" alt="${esc(cycle.name || '')}" ` +
-         `src="${base}.jpg" data-base="${base}" data-exts="jpg,jpeg,png,webp" data-ext-idx="0" ` +
-         `onerror="cycleImgError(this)">`;
-  }
+  h += `<img class="cm-banner-img" alt="" aria-hidden="true" loading="lazy" ` +
+       `src="${artFile}" onerror="cycleImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
   if (opts.pill) h += `<div class="cm-pill${opts.pillStyle ? ' cm-pill-' + opts.pillStyle : ''}">${esc(opts.pill)}</div>`;
 
@@ -5235,12 +5450,19 @@ function renderPlan() {
   // Uses the same shared card as the current/future cycles, plus a "Done" pill
   // and an onclick that opens the archive view. Only rendered when there is a
   // previous cycle AND an archived program to view.
+  // Two cards in a row from the same family read as one picture repeated, so the
+  // second one is mirrored and re-tinted. Cards render in DOM order below: past,
+  // current, then the future stack, which is the order an athlete scrolls them.
+  let _artPrev = null;
+  const artAlt = c => { const f = cycleArt(c); const same = f === _artPrev; _artPrev = f; return same; };
+
   const prevCycle = idx >= 1 ? cycles[idx - 1] : null;
   const archiveList = Array.isArray(DATA.programHistory) ? DATA.programHistory : [];
   if (prevCycle && archiveList.length) {
     const histId = archiveList[0].id;
     document.getElementById('past-card-wrap').innerHTML = cycleCardHTML(prevCycle, {
       pill: 'Done',
+      alt: artAlt(prevCycle),
       total: cycles.length,
       onclick: `goTo('archive', '${esc(histId)}')`
     });
@@ -5283,6 +5505,7 @@ function renderPlan() {
     const msg = current.message || {};
     document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
       pill: 'Active',
+      alt: artAlt(current),
       pillStyle: 'active',
       total: cycles.length,
       onclick: "goTo('home')",
@@ -5303,6 +5526,7 @@ function renderPlan() {
       const isNext = i === 0;
       html += cycleCardHTML(c, {
         pill: isNext ? 'Up next!' : 'Locked',
+        alt: artAlt(c),
         pillStyle: isNext ? 'next' : 'locked',
         total: cycles.length,
         paragraphs: teaser.paragraphs,
@@ -5448,6 +5672,7 @@ function renderHome() {
       <button class="confirm-btn" onclick="confirmSession('${day.id}')">Finish Session ✓</button>
     </div>`;
     html += `<div class="session-complete" id="complete-${day.id}">
+      <div class="complete-art" id="complete-art-${day.id}" hidden aria-hidden="true"></div>
       <div class="complete-emoji">✓</div>
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
@@ -6898,6 +7123,9 @@ function saveCeilingForm() {
   const picked = document.getElementById('cf-day').value;
   const day = (picked && /^\d{4}-\d{2}-\d{2}$/.test(picked) && picked <= ceilingToday())
     ? picked : ceilingToday();
+  // Must run BEFORE the save: the save replaces this date's entry, and the
+  // comparison is against the best on every other date.
+  noteNewBest(a.lift, est, day);
   saveCeilingEntry(a.lift, est, kg, rp, rpe, day, !!a.spec);
   if (navigator.vibrate) navigator.vibrate(12);
   // Straight to that lift's history, so the number they just entered is the
@@ -6929,6 +7157,26 @@ function renderCeilingLift(lift) {
   _ceilLift = lift;
   _ceilAdd = null;
   document.getElementById('ceil-title').textContent = lift;
+
+  // The new-best band. Only on the lift that just beat its own record, only for
+  // a week after it happened, and only here — #screen-weight reuses .ceil-head.
+  const head = document.querySelector('#screen-ceiling .ceil-head');
+  if (head) {
+    let best = null;
+    try { best = JSON.parse(localStorage.getItem(ATHLETE_ID + '_ceil_best') || 'null'); } catch (e) {}
+    const fresh = best && best.lift === lift && best.t && (Date.now() - best.t) < 7 * 864e5;
+    head.classList.toggle('is-pr', !!fresh);
+    head.style.backgroundImage = fresh
+      ? `url('${ART_MOMENTS}${APP_ART.pr[(best.i || 0) % APP_ART.pr.length]}.webp')` : '';
+    const kick = head.querySelector('.ceil-kick');
+    if (kick) kick.textContent = fresh ? 'New best' : '— Personal records';
+    let gain = head.querySelector('.ceil-gain');
+    if (fresh) {
+      if (!gain) { gain = document.createElement('div'); gain.className = 'ceil-gain'; head.appendChild(gain); }
+      const d = Math.round((best.kg - best.prev) * 10) / 10;
+      gain.textContent = d + ' kg over your last best';
+    } else if (gain) { gain.remove(); }
+  }
 
   const v = l.entries.map(e => e.kg);
   const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
@@ -8044,6 +8292,9 @@ function confirmSession(day) {
   finishTimer(day);
   // Reveal the completion card (now contains the RPE prompt + coach note + Send button).
   const completeEl = document.getElementById('complete-' + day);
+  // The picture is the reward for finishing the session, so a partial finish
+  // keeps the plain card (Amir, 2026-09-19).
+  if (!isPartial) paintFinishArt(day);
   completeEl.classList.add('visible');
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   localStorage.setItem(ATHLETE_ID + '_completed_d' + day, stampCompleted());
@@ -9537,8 +9788,9 @@ function attachCeiling(card) {
     const kg  = parseLoggedKg(fKg.value);
     const est = estimateOneRM(kg, fRp.value, fRpe.value);
     if (est == null) return;
+    const isBest = noteNewBest(name, est, ceilingToday());
     saveCeilingEntry(name, est, kg, Number(fRp.value), Number(fRpe.value));
-    save.textContent = 'Saved ✓';
+    save.textContent = isBest ? 'New best ✓' : 'Saved ✓';
     save.disabled = true;
     if (navigator.vibrate) navigator.vibrate(12);
   });

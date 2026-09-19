@@ -681,6 +681,20 @@ html2canvas drops SVG `<use>` and CSS transforms — inline images, hard px. Ins
 in new designs = **@amirardekanian** (site: AMIRARDEKANI.COM); never retro-edit
 already-shipped designs.
 
+**The athlete app's pictures (2026-09-19).** Every image inside `program.html` is
+generated art in `assets/art/`, made in Higgsfield (GPT Image 2.5 Flare) from a shot
+list, all graded through one pass so separate runs read as one set. Rules every picture
+follows: **no people, no logos, no text or numbers, no yellow or gold**; green-black
+shadows, warm cream highlights, clay the only saturated colour. **Cycle cards use 10
+FAMILY images, never one per cycle name** — 161 live cycles share ten pictures and the
+pipeline invents new names every block. The family comes from the `art` word on the
+cycle, with keyword rules on the NAME as fallback (`cycleArt()`); when two cards in a
+row share a family the second is mirrored with a clay scrim, so no image may carry text
+or a handed subject. Moments: session complete (3, rotating), new best on The Ceiling
+(3), welcome (1, once per athlete). ⚠️ **A replacement ships as `-v2`, never over the
+same path** — `sw.js` serves `/assets/` cache-first by URL. Full specs `IMAGES.md` §0;
+asset shelf row in `Content/DESIGN-ATLAS.md`.
+
 **Reel delivery process (Amir, 2026-07-02 — was too slow first time, fix this):** For a reel,
 the deliverable is **the HTML file itself**, sent via SendUserFile so he can open/preview and
 screen-record it himself. **Do NOT render an MP4 unless he explicitly asks for one** — skip

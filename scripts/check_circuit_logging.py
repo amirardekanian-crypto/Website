@@ -49,6 +49,16 @@ import sys
 import tempfile
 from pathlib import Path
 
+# This script prints "→" in its results table. On Windows the console hands
+# Python cp1252, which cannot encode it, so the print raised UnicodeEncodeError
+# and the pre-commit hook reported a FAILED check on a program.html that had
+# actually passed every case. Encoding is not what this guard is about.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT = ROOT / "program.html"
 

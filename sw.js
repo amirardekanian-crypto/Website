@@ -155,7 +155,14 @@ self.addEventListener('fetch', e => {
     caches.match(request).then(cached => {
       if (cached) return cached;
       return fetch(request).then(res => {
-        caches.open(CACHE).then(c => c.put(request, res.clone()));
+        // ⚠️ Only cache a real answer. Cache.put stores ANY response, 404s
+        // included, and this branch is cache-first — so a phone that asked for
+        // an image before it existed would keep serving that 404 for ever, and
+        // art uploaded later would never appear. Found 2026-09-19, when the app
+        // had spent months probing four extensions for every missing cycle
+        // banner. No CACHE bump: the art ships under new paths, and bumping
+        // would throw away every athlete's offline copy of the app for nothing.
+        if (res && res.ok) caches.open(CACHE).then(c => c.put(request, res.clone()));
         return res;
       });
     })
