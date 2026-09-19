@@ -575,6 +575,17 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   publicly (Amir, 2026-09-15, before his Iran test): from `/tennis/` (menu, hero link, the phone
   screenshot, the inside section, the price card, an FAQ), the course card on `index-fa.html`, and
   `links.html`. If it will not open in Iran without a VPN, move the free parts to static files on the website.
+- **The course app's pictures (Amir, 2026-09-19).** AI-made (GPT Image 2 and Higgsfield), one look: shadows lean deep green,
+  highlights lean warm cream, clay orange the only loud colour. They live in `assets/tps/` as WebP, made from masters by
+  **`scripts/grade_tps_art.py`**, which applies ONE shared colour grade (prompts drift off-colour, the grade does not) and
+  exports 1080 px, 16:9, about 40 KB each. They show only at **`/tennis/app/?demo=1&art=1`** for now: `ART_ON`, `ART` and
+  `ART_V` in `app.js` decide where each goes (block covers by block number, lessons and tests by id, one tarp picture for
+  every locked page). Retire the flag by letting `ART_ON` be just `DEMO`. Rules every picture follows: no text or logos in
+  the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
+  or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
+  files cache-first by full URL. 4 of the 13 demo pictures exist so far. Like the rest of the demo it was built in this
+  folder, so the next deploy from `tps-content` erases the `app.js`, `app.css` and `index.html` changes unless they are
+  copied there first.
 - **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets
   its own page, on one shared layout (hero → who → inside → how → price → FAQ → buy):
   `assets/css/fa-product.css`, with Vazirmatn self-hosted in `assets/fonts/`. **Bump the `?v=` on that
