@@ -264,9 +264,31 @@ you are torn between `strength` and `mobility`, pick `mobility`.
 
 Full reasoning: `supabase/stage28_library_sessions.sql`.
 
-## Step 4 — Register in the manifest
+## Step 4 — ⚠️ The database is the library, not the files
 
-Read `workouts/index.json`, find the right category by `id`, and add to its `workouts` array:
+**`program.html` reads the library from Supabase — `get_library()` — and the JSON
+files are only an offline fallback.** The row lives in `public.library`, one per
+session, and its `slug` is **`workouts/<category-id>/<slug>`**.
+
+This is the step that makes a session exist. Writing the file and pushing it does
+**not** put the workout in the app. Two consequences:
+
+- **A session only appears once Amir publishes it** (Step 7). Never tell him a
+  workout is live off a `git push` alone — it isn't.
+- **Moving a session between categories is a database write**, because the category
+  is baked into the slug. The file move and the manifest edit are the easy half.
+  Check `public.library_sessions` first: if an athlete has logged that session, the
+  old slug is what the log holds. (It was empty when Racket Arm moved to Care on
+  2026-09-19, so nothing was orphaned — don't assume that stays true.)
+
+The category must already exist in `public.library_categories`. The seven that do:
+`strength` · `conditioning` · `on-court` · `mobility` · `recovery` · `breath` ·
+`care`. Their banners are `assets/art/library/sessions-<id>-v1.webp`.
+
+## Step 5 — Keep the fallback manifest in step
+
+Read `workouts/index.json`, find the right category by `id`, and add to its
+`workouts` array:
 
 ```json
 {
@@ -278,21 +300,25 @@ Read `workouts/index.json`, find the right category by `id`, and add to its `wor
 }
 ```
 
-The `title`, `duration`, and `equipment` in the manifest must **exactly match** the workout file — these are what show on the list card before the file is opened.
+The `title`, `duration`, and `equipment` here must **exactly match** the workout
+file. This copy is what serves an athlete whose Supabase call fails, so a stale
+entry is a session that reads wrong offline and right online.
 
-If the category doesn't exist in the manifest, add it with the right `banner` image and an empty `workouts` array. Banner images follow the pattern `assets/img/workouts/<category>.webp`.
-
-## Step 5 — Verify the JSON is valid
+## Step 6 — Verify the JSON is valid
 
 Before committing:
 - Valid JSON (no trailing commas, no comments in the output)
 - `id` in the workout file matches the slug in the manifest `file` path
+- `category` in the workout file matches the folder it sits in — **the publish
+  picker reads the shelf off this field, not off the path**
 - `file` path in the manifest exactly matches the file you created
 - Every `standard` exercise has exactly one `"N Sets"` chip with `"style": "yellow"`
 - No rep counts in modifier (green) chips — those are technique cues only
 - Circuit `items` have `name` and `detail`, not `chips`
+- Every exercise `good: [2], bad: [1]`, every `note` one sentence, `intro` present
+- `countsAs` is set deliberately
 
-## Step 6 — Commit and push
+Then commit:
 
 ```
 git add workouts/<category>/<slug>.json workouts/index.json
@@ -300,7 +326,23 @@ git commit -m "Add workout: <Title> (<Category>)"
 git push
 ```
 
+## Step 7 — Hand it to Amir to publish
+
+The publish step is **his**, in the browser, and it is not optional:
+
+> **coach.html → Library → `+ Publish workout`**, pick the JSON file(s).
+
+The picker is **multi-select**, so a batch of sessions publishes in one pass —
+write them all, then send him one instruction. It validates `id` and `category`,
+refuses a category that doesn't exist, shows him the titles, and upserts on `slug`,
+so re-publishing an edited file updates the existing row rather than duplicating it.
+
+⚠️ It does **not** set `sort_order` — every row it writes lands at `0`, so a batch
+of new sessions shares a shelf position with whatever is already there. If the order
+on the shelf matters, say so and set it in SQL afterwards.
+
 Then tell Amir:
+- **That he needs to publish it**, and where
 - The workout URL: `program.html?workout=<slug>` (shareable, works without login)
 - Which category it appears in the Train list
 - Duration and equipment
