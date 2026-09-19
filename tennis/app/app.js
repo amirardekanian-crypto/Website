@@ -382,11 +382,26 @@
   // right-to-left, so titles sit at the right and the bottom. Keep to that when adding more.
   // Bump ART_V after regrading a file: the site's root worker keeps /assets/ files cache-first, by full URL.
   const ART_ON = DEMO && new URLSearchParams(location.search).has('art');
-  const ART_V = 1;
+  const ART_V = 2;   // rally-map and last-ball were regraded on 2026-09-19
   const ART = {
-    block: { 1: { f: 'first-light', pos: '50% 40%' } },                   // block 1 to 4: its cover, on the block card and the week's banner
-    lesson: { 'tennis-demands': { f: 'rally-map', pos: '50% 50%' } },      // by lesson id
+    block: {                                                               // its cover, on the block card and every week banner inside it
+      1: { f: 'first-light', pos: '50% 40%' },
+      2: { f: 'morning-load', pos: '50% 45%' },
+      3: { f: 'full-acceleration', pos: '50% 45%' },
+      4: { f: 'under-lights', pos: '50% 38%' }                             // keeps her lit shoulders in a short crop
+    },
+    place: {                                                               // session cards, by where the session happens
+      gym: { f: 'gym-room', pos: '50% 50%' },
+      court: { f: 'court-room', pos: '50% 55%' },
+      home: { f: 'home-room', pos: '50% 55%' }
+    },
+    lesson: {                                                              // by lesson id
+      'tennis-demands': { f: 'rally-map', pos: '50% 50%' },
+      'read-your-card': { f: 'clock-and-chalk', pos: '50% 50%' },
+      'rpe-weights': { f: 'which-one', pos: '50% 55%' }
+    },
     test: { 'broad-jump': { f: 'the-coin', pos: '50% 45%' } },             // by test id
+    done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
     locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
   };
   const artFor = (kind, key) => (ART_ON && ART[kind] && ART[kind][key]) || null;
@@ -602,8 +617,9 @@
     }
     const count = (s.groups || []).filter(g => g.slot !== 'W').reduce((n, g) => n + (g.items || []).length, 0);
     const addon = s.kind === 'addon';
+    const art = artFor('place', s.place);   // the test day keeps its clay banner: it has no picture yet
     return `<a class="session-card ${addon ? 'addon' : ''}" href="${href}">
-      <div class="sc-top"><div class="sc-code">${addon ? '+ ' + addonTitle(s) : 'جلسهٔ ' + esc(s.code)}</div><div class="sc-title">${addon ? esc(s.forWhom || '') : esc(s.title)}</div></div>
+      <div class="sc-top ${art ? 'has-art' : ''}">${artLayer(art)}<div class="sc-code">${addon ? '+ ' + addonTitle(s) : 'جلسهٔ ' + esc(s.code)}</div><div class="sc-title">${addon ? esc(s.forWhom || '') : esc(s.title)}</div></div>
       <div class="sc-meta">${placePill(s)}${mins}${count ? pill('گرم کردن + ' + fa(count) + ' تمرین') : ''}</div></a>`;
   }
 
@@ -1171,7 +1187,8 @@
       <div class="where">هفتهٔ ${fa(ST.week)} · ${sessionShort(ST.s)} · ${ST.phase === 'done' ? 'تمام شد' : `تمرین ${fa(ST.i + 1)} از ${fa(n)}`}</div></div>
       <div class="bar"><i style="width:${ST.phase === 'done' ? 100 : Math.round((ST.i / n) * 100)}%"></i></div></div>`;
     if (ST.phase === 'done') {
-      stepEl().innerHTML = top + `<div class="step-body"><div class="done-screen"><div class="big">🎾</div><h2>جلسه تمام شد</h2>
+      const dart = artFor('done', '*');
+      stepEl().innerHTML = top + `<div class="step-body"><div class="done-screen">${dart ? `<div class="done-art has-art">${artLayer(dart)}</div>` : `<div class="big">🎾</div>`}<h2>جلسه تمام شد</h2>
         <p>آفرین. چیزی ذخیره نمی‌شود؛ هر وقت خواستی جلسهٔ بعدی را از برنامه باز کن.</p></div></div>
         <div class="step-foot"><button class="btn primary" data-step="close">بستن</button></div>`;
       return;

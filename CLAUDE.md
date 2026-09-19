@@ -580,10 +580,10 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   **`scripts/grade_tps_art.py`**, which applies ONE shared colour grade (prompts drift off-colour, the grade does not) and
   exports 1080 px, 16:9, about 40 KB each. They show only at **`/tennis/app/?demo=1&art=1`** for now: `ART_ON`, `ART` and
   `ART_V` in `app.js` decide where each goes (block covers by block number, lessons and tests by id, one tarp picture for
-  every locked page). Retire the flag by letting `ART_ON` be just `DEMO`. Rules every picture follows: no text or logos in
+  every locked page, one room per session card, one for the session-complete screen). Retire the flag by letting `ART_ON` be just `DEMO`. Rules every picture follows: no text or logos in
   the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
   or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
-  files cache-first by full URL. 4 of the 13 demo pictures exist so far. Like the rest of the demo it was built in this
+  files cache-first by full URL. **All 13 demo pictures exist** (2026-09-19); what is left is the other 27 for the rest of the app. Like the rest of the demo it was built in this
   folder, so the next deploy from `tps-content` erases the `app.js`, `app.css` and `index.html` changes unless they are
   copied there first.
 - **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets
