@@ -12,11 +12,16 @@ description: Review and edit an athlete's program JSON — apply Amir's coaching
 > A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
 > Amir edits anything in the dashboard. Never trust it over the table.
 >
-> **To write one:** small changes (sets, reps, RPE, tempo, rest, an exercise note)
-> are Amir's job in the dashboard's inline editor, which versions every save. For a
-> whole new cycle, write the JSON locally and have him publish it with
-> coach.html → Athletes → **↑ Publish programme file**, or apply it directly with
-> `update programs set data = '<json>'::jsonb where athlete_id = '<id>';`
+> **To write one:** ⚠️ **corrected 2026-09-19 — do not hand Amir a publish step.** He is the
+> coach of record, not a deployment stage; asking him to click Publish for work he has already
+> approved just adds a hop where the change sits unshipped. *(Amir, 2026-09-07, verbatim: "go
+> live, we dont use json files anymore, upload to the servers.")* **Once he approves, write it
+> to `public.programs` yourself through the Supabase MCP and report it live.** Amir's inline
+> dashboard editor still exists and he may use it whenever he likes — that is why you verify
+> the row against local scratch before editing (Step 0b.3), not a reason to wait for him.
+> A **new cycle** ships via /program-assemble Step 7; a change **inside the live cycle** ships
+> via **Step 0b** below. `data/<id>.json` stays local scratch you lint and diff against, never
+> the deliverable, and never committed.
 >
 > **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
 > It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.
@@ -30,6 +35,65 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 
 1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it.
 2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim the coaching log (`select body from coaching_logs where athlete_id = '<athlete_id>';`) for this cycle's rationale, so edits respect *why* each piece was chosen.
+
+## Step 0b — Mid-cycle adjustment: the process
+
+Use this whenever the change lands **inside the cycle the athlete is currently training** — a
+session report, an injury, a scan result, a stall. It is a different operation from a cycle
+build, and the differences are the part that bites. *(Written 2026-09-19 from a live mid-cycle edit driven by a new clinical finding. The athlete's
+reasoning stays in her log on the server; only the transferable process is here.)*
+
+1. **Pull the evidence before proposing anything.** `select ... from session_history where
+   athlete_id = '<id>' and completed_on >= '<date of the last edit>'`. Mid-cycle changes are
+   report-driven (COACHING-PRINCIPLES → Progression, 2026-07-12), and the sessions since the
+   last edit routinely change the recommendation. They tell you whether the last edit actually
+   worked, and they surface what nobody reported: an exercise quietly skipped twice, a capped
+   RPE being overshot, a rep count she reduced herself. **Never design the adjustment off the
+   conversation alone** — Amir is reporting what he has been told, not what the log holds.
+
+2. **Check where you are in the cycle.** `cycles[currentCycleIndex].endDate` against today. If
+   only a session or two remain, the value is in the NEXT design, not a live rewrite — keep the
+   live edit surgical and put the reasoning into the log, where the next build reads it.
+
+3. **Verify the live row against the local scratch BEFORE editing.** `data/<id>.json` is
+   gitignored scratch and can drift from `public.programs` the moment Amir edits in the
+   dashboard. Fingerprint first — per-exercise `md5(note)` + length walked days → blocks →
+   exercises — and only then treat the local file as a safe base. Skip this and a later
+   whole-object write silently reverts his dashboard edit.
+
+4. **Patch PATHS, never the whole object.** Chain
+   `jsonb_set(data, '{workouts,days,N,blocks,N,exercises,N,note}', $tag$…$tag$::jsonb)` — one
+   path per thing you actually changed, so anything you did not author survives. **Do NOT derive
+   `programHistory` and do NOT bump `currentCycleIndex`**: those belong to the new-cycle path in
+   /program-assemble Step 7 and are wrong here, because the cycle is not advancing. Dollar-quote
+   every payload — athlete-facing copy is full of apostrophes.
+
+5. **Sweep the whole cycle for EXPIRED language.** This is the failure mode unique to mid-cycle
+   work, and nothing else catches it. Any relative-time or dated phrase written into an exercise
+   `note` or a notes card goes stale silently, because nobody ever re-reads it — *"no jump this
+   week or next"*, *"book it by <a date that has now passed>"*, *"for the next two sessions"*. Both of
+   those examples were live and wrong in a real athlete's file by the time the next edit came
+   round, and the first had quietly turned into permission to add load. So: grep the active cycle for dates and
+   relative-time phrases on **every** mid-cycle pass, not just the exercises you came to change.
+   And prefer wording that expires into a coach decision (*"this holds until we build the next
+   block"*) over wording that expires into silence.
+
+6. **Verify with the content fingerprint**, not a row count — reuse the method in
+   /program-assemble Step 7 ("Verify with a CONTENT FINGERPRINT"), and assert the `athlete`
+   block is unchanged after every write. The version trigger snapshots the prior state into
+   `program_versions` on its own; do not hand-roll a backup.
+
+7. **Log it — and mind what append-only means for a recommendation that is now WRONG.** The
+   Exercise Ledger is mutated in place; cycle sections are append-only. So when an existing
+   section carries a forward plan the new information invalidates — it has happened: one athlete's
+   C4 entry recommended a specific exercise for the C5 build in two separate places, and a later
+   finding inverted it — you do **not** edit it out. Three moves instead: set that exercise's **ledger status** so the next
+   design cannot pick it up, write an explicit **override** in the new entry naming what it
+   overrides and where, and leave the original reasoning untouched on the record. A ban that
+   lives only in prose gets missed; a ban that lives only in the ledger loses the why.
+   **Heading convention:** follow whatever the athlete's log already uses — existing files carry
+   both `## In-cycle edits — Cycle N` and
+   `## Cycle NN — MID-CYCLE ADJUSTMENT · <date> · <reason>`.
 
 ## Step 1 — Apply the structural checklist
 
