@@ -460,8 +460,8 @@ html.is-demo .demo-bar { display: flex; justify-content: center; align-items: ce
 .demo-actions { display: grid; gap: 10px; margin-top: 14px; }
 .demo-actions .lead { margin: 2px 0 0; text-align: center; font-size: 14px; }
 
-/* ── Pictures (?demo=1&art=1) ──────────────────────────────────────── */
-/* AI pictures, graded and exported by scripts/grade_tps_art.py into assets/tps/ and shown only behind ?art=1
+/* ── Pictures (the demo) ───────────────────────────────────────────── */
+/* AI pictures, graded and exported by scripts/grade_tps_art.py into assets/tps/, shown in the demo
    (app.js, "Pictures"). Every one has its subject on the LEFT and the right and bottom calm, because the app is
    right-to-left and its titles sit there. The green stripes stay behind the picture, so it fades in over the
    banner, and a picture that fails to load simply is not there. */
