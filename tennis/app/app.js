@@ -372,16 +372,20 @@
     return `<div class="card clay"><h3>نسخهٔ نمایشی</h3><p>هفتهٔ ${openWeeksText()} برنامه، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است. بقیه قفل است و در نسخهٔ کامل باز می‌شود.</p></div>`;
   }
 
-  /* ── Pictures (?demo=1&art=1) ──────────────────────────────────────── */
+  /* ── Pictures (the demo) ───────────────────────────────────────────── */
   // Amir's AI pictures for the course (2026-09-19), made in GPT Image 2 and Higgsfield, then graded and
-  // exported by scripts/grade_tps_art.py into assets/tps/. They show only behind ?art=1 while the set is
-  // unfinished, so the public demo stays exactly as it was: open /tennis/app/?demo=1&art=1 to see them.
-  // To retire the flag, let ART_ON be just DEMO. A picture that fails to load takes its own layer away and
-  // leaves the green banner, so a missing file costs nothing.
+  // exported by scripts/grade_tps_art.py into assets/tps/. The ?art=1 flag they were built behind came off
+  // on 2026-09-19, once all 13 of the demo's pictures existed: this is the demo everyone opens now.
+  // A picture that fails to load takes its own layer away and leaves the green banner, so a missing file
+  // costs nothing.
+  //
+  // ⚠️ DEMO ONLY, on purpose. A buyer has 22 lessons and 7 tests, and only 3 and 1 of those have a cover,
+  // so showing these to buyers would leave most of their app half-illustrated. The demo is exactly the
+  // surface these 13 cover. Widen it (ART_ON = true) once the lesson and test covers are done.
   // Every picture has its subject on the LEFT and the right and bottom left calm: this app is
   // right-to-left, so titles sit at the right and the bottom. Keep to that when adding more.
   // Bump ART_V after regrading a file: the site's root worker keeps /assets/ files cache-first, by full URL.
-  const ART_ON = DEMO && new URLSearchParams(location.search).has('art');
+  const ART_ON = DEMO;
   const ART_V = 2;   // rally-map and last-ball were regraded on 2026-09-19
   const ART = {
     block: {                                                               // its cover, on the block card and every week banner inside it

@@ -578,9 +578,9 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - **The course app's pictures (Amir, 2026-09-19).** AI-made (GPT Image 2 and Higgsfield), one look: shadows lean deep green,
   highlights lean warm cream, clay orange the only loud colour. They live in `assets/tps/` as WebP, made from masters by
   **`scripts/grade_tps_art.py`**, which applies ONE shared colour grade (prompts drift off-colour, the grade does not) and
-  exports 1080 px, 16:9, about 40 KB each. They show only at **`/tennis/app/?demo=1&art=1`** for now: `ART_ON`, `ART` and
+  exports 1080 px, 16:9, about 40 KB each. They show in the **demo** (`/tennis/app/?demo=1`), where all 13 of its pictures exist: `ART_ON`, `ART` and
   `ART_V` in `app.js` decide where each goes (block covers by block number, lessons and tests by id, one tarp picture for
-  every locked page, one room per session card, one for the session-complete screen). Retire the flag by letting `ART_ON` be just `DEMO`. Rules every picture follows: no text or logos in
+  every locked page, one room per session card, one for the session-complete screen). ⚠️ **Demo-only on purpose**: a buyer has 22 lessons and 7 tests and only 3 and 1 have covers, so widening it (`ART_ON = true`) waits until those are done. Rules every picture follows: no text or logos in
   the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
   or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
   files cache-first by full URL. **All 13 demo pictures exist** (2026-09-19); what is left is the other 27 for the rest of the app. Like the rest of the demo it was built in this
