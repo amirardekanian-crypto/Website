@@ -5,7 +5,7 @@
       "id": "for-coaches",
       "title": "For Coaches",
       "icon": "book",
-      "banner": "assets/img/workouts/strength.webp",
+      "banner": "assets/art/library/read-for-coaches-v1.webp",
       "articles": [
         {
           "id": "pre-session-warm-up",
@@ -20,7 +20,7 @@
       "id": "pre-competition",
       "title": "Pre-Competition",
       "icon": "tennis",
-      "banner": "assets/img/workouts/on-court.webp",
+      "banner": "assets/art/library/read-pre-competition-v1.webp",
       "articles": [
         {
           "id": "tennis-warm-up",
@@ -35,7 +35,7 @@
       "id": "recovery",
       "title": "Recovery",
       "icon": "sleep",
-      "banner": "assets/img/workouts/recovery.webp",
+      "banner": "assets/art/library/read-recovery-v1.webp",
       "articles": [
         {
           "id": "training-with-injury",
@@ -57,21 +57,21 @@
       "id": "mental",
       "title": "Mental",
       "icon": "mindset",
-      "banner": "assets/img/workouts/conditioning.webp",
+      "banner": "assets/art/library/read-mental-v1.webp",
       "articles": []
     },
     {
       "id": "nutrition",
       "title": "Nutrition",
       "icon": "nutrition",
-      "banner": "assets/img/workouts/strength.webp",
+      "banner": "assets/art/library/read-nutrition-v1.webp",
       "articles": []
     },
     {
       "id": "supplements",
       "title": "Supplements",
       "icon": "bodycomp",
-      "banner": "assets/img/workouts/mobility.webp",
+      "banner": "assets/art/library/read-supplements-v1.webp",
       "articles": []
     }
   ]

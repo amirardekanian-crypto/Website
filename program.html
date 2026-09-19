@@ -879,6 +879,10 @@
   /* ── Workout session (a single opened library workout) ── */
   #screen-workout { background: var(--grey-bg); padding-bottom: 110px; }
   .ws-header { background: var(--yellow); padding: 48px 24px 24px; position: relative; }
+  /* A workout opens on its shelf's picture instead of the flat green. Set as a
+     background-image on the header itself (scrim baked into the gradient), so
+     nothing in the header markup has to move. */
+  .ws-header.has-art { background-size: cover; background-position: center; }
   .ws-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
   .ws-eyebrow { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
   .ws-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; line-height: 1; text-transform: uppercase; color: #fff; }
@@ -7721,6 +7725,17 @@ function _wsSlug(wk, file) {
   return f.indexOf('workouts/') === 0 ? f : 'workouts/' + f;
 }
 
+// Which shelf a workout sits on, and therefore which picture its own screen
+// opens with. Read from the manifest rather than tracked separately, so it
+// cannot drift from what the shelf itself is showing.
+function libBannerFor(file) {
+  const cats = (_trainManifest && _trainManifest.categories) || [];
+  for (const c of cats) {
+    if ((c.workouts || []).some(w => (w.file || '') === file)) return c.banner || '';
+  }
+  return '';
+}
+
 async function openWorkout(file) {
   if (!file) return;
   const body = document.getElementById('ws-body');
@@ -7756,7 +7771,15 @@ async function openWorkout(file) {
   const id = wk.id || file;
   _wsCurrent = { id, checkKey: 'wkout_' + id, slug: _wsSlug(wk, file), countsAs: wk.countsAs || '' };
 
-  // Header
+  // Header — on the shelf's picture when there is one, flat green when there is not.
+  const wsHead = document.querySelector('#screen-workout .ws-header');
+  if (wsHead) {
+    const art = libBannerFor(file);
+    wsHead.classList.toggle('has-art', !!art);
+    wsHead.style.backgroundImage = art
+      ? `linear-gradient(to top, rgba(8,38,27,0.95) 0%, rgba(8,38,27,0.62) 55%, rgba(8,38,27,0.34) 100%), url('${art}')`
+      : '';
+  }
   document.getElementById('ws-eyebrow').textContent = wk.focusTag || 'Workout';
   document.getElementById('ws-title').textContent = wk.title || 'Workout';
   const meta = [wk.duration, wk.equipment].filter(Boolean).join(' · ');

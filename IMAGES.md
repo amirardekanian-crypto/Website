@@ -36,6 +36,7 @@ text safe zone for every image — is the artifact at
 | **New best** (3) | `assets/art/moments/pr-1..3-v1.webp` | 2.4:1 | 1200×500 | 45 KB |
 | **Welcome** (1) | `assets/art/moments/welcome-v1.webp` | 1:1 | 1080×1080 | 60 KB |
 | **Day cards** (8) | `assets/art/days/<category>-v1.webp` | 5:2 | 1200×480 | 40 KB |
+| **Library shelves** (13) | `assets/art/library/sessions-<id>-v1.webp` · `read-<id>-v1.webp` | 2:1 | 1600×800 | 60 KB |
 
 - **Cycle art is keyed by FAMILY, never by cycle name.** The ten families are
   bedrock · iron · build · armour · voltage · spring · brakes · engine · reset ·
@@ -58,6 +59,11 @@ text safe zone for every image — is the artifact at
   fall to green-black, highlights are warm cream, clay is the only saturated
   colour. Every file gets the same grade pass before export, which is what makes
   images made in separate runs read as one set.
+- ⚠️ **A Library banner's path lives in the DATABASE, not in a file.** `public.library_categories.banner`
+  is what the app reads (through `get_library()`); `workouts/index.json` and `articles/index.json`
+  are only the offline fallback. Change a shelf picture in **both**, or the app and the fallback
+  disagree. The same picture is used three ways: the shelf banner, the thumbnail on every workout
+  card in that shelf's rail, and the header of each workout's own screen.
 - **Day pictures** are the eight categories: lower · upper · power · conditioning · core ·
   recovery · fullbody · default. A day's `art` word wins; otherwise the app takes the
   keyword that appears **earliest in the day's name** (`SCHEMA.md` → *How a day finds its
