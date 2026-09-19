@@ -35,8 +35,12 @@ HILITE = np.array([0.045, 0.030, -0.032], np.float32)
 SAT = 0.92
 
 # Per-picture dials, only for a picture that sits outside the family. gain below 1 darkens.
+# Clay courts are genuinely more colourful than a dark gym, so these do not aim to match the indoor
+# pictures — only to keep the four clay ones consistent with each other. Measured saturation across the
+# set: indoor sits at 0.21-0.36, clay at 0.55-0.69, and these two were the top of that range.
 TWEAKS = {
-    'rally-map': {'sat': 0.80, 'gain': 0.90},   # the clay top-down: brighter and louder than the moody rest
+    'rally-map': {'sat': 0.72, 'gain': 0.88},   # the clay top-down, flat and full-frame: the loudest of all
+    'last-ball': {'sat': 0.86, 'gain': 0.93},   # bright clay in low sun, right next to a white line
 }
 
 
