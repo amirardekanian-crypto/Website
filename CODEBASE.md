@@ -56,7 +56,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   (`openTimerAuto()`) and a `+15s` button, used only from Guided Mode — the manual Rest button is unchanged.
 - **If deleted:** All athletes lose access to their programme.
 - **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
-- **Every picture in the app comes from `assets/art/`** (2026-09-19). Ten cycle-card
+- **Every picture in the app comes from `assets/art/`** (2026-09-19), including the 13 Library shelf pictures (7 Sessions + 6 Playbook) — whose paths live in `public.library_categories.banner`, with the index JSONs as the offline fallback, and which also fill each workout card's thumbnail and the header of each workout's own screen (`libBannerFor()`). Ten cycle-card
   images keyed by FAMILY, not by cycle name (`APP_ART` + `cycleArt()`), plus seven
   moment images: three for the session-complete card, three for a new best on The
   Ceiling, one welcome screen. A cycle's family comes from the `art` word on the cycle

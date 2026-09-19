@@ -4,7 +4,7 @@
     {
       "id": "strength",
       "title": "Strength",
-      "banner": "assets/img/workouts/strength.webp",
+      "banner": "assets/art/library/sessions-strength-v1.webp",
       "workouts": [
         {
           "id": "full-body-power",
@@ -46,7 +46,7 @@
     {
       "id": "conditioning",
       "title": "Conditioning",
-      "banner": "assets/img/workouts/conditioning.webp",
+      "banner": "assets/art/library/sessions-conditioning-v1.webp",
       "workouts": [
         {
           "id": "engine-builder",
@@ -74,7 +74,7 @@
     {
       "id": "on-court",
       "title": "On-Court",
-      "banner": "assets/img/workouts/on-court.webp",
+      "banner": "assets/art/library/sessions-on-court-v1.webp",
       "workouts": [
         {
           "id": "tennis-warm-up-routine",
@@ -109,7 +109,7 @@
     {
       "id": "mobility",
       "title": "Mobility",
-      "banner": "assets/img/workouts/mobility.webp",
+      "banner": "assets/art/library/sessions-mobility-v1.webp",
       "workouts": [
         {
           "id": "daily-flow",
@@ -137,7 +137,7 @@
     {
       "id": "recovery",
       "title": "Recovery",
-      "banner": "assets/img/workouts/recovery.webp",
+      "banner": "assets/art/library/sessions-recovery-v1.webp",
       "workouts": [
         {
           "id": "reset-roll",
@@ -165,7 +165,7 @@
     {
       "id": "breath",
       "title": "Breath",
-      "banner": "assets/img/workouts/recovery.webp",
+      "banner": "assets/art/library/sessions-breath-v1.webp",
       "workouts": [
         {
           "id": "post-competition",
@@ -193,7 +193,7 @@
     {
       "id": "care",
       "title": "Care",
-      "banner": "assets/img/workouts/recovery.webp",
+      "banner": "assets/art/library/sessions-care-v1.webp",
       "workouts": [
         {
           "id": "lower-back",
