@@ -152,13 +152,6 @@
           "duration": "15 min",
           "equipment": "Bodyweight",
           "file": "workouts/recovery/static-stretch.json"
-        },
-        {
-          "id": "racket-arm",
-          "title": "Racket Arm",
-          "duration": "12 min",
-          "equipment": "Foam Roller",
-          "file": "workouts/recovery/racket-arm.json"
         }
       ]
     },
@@ -201,6 +194,13 @@
           "duration": "30 min",
           "equipment": "Bodyweight",
           "file": "workouts/care/lower-back.json"
+        },
+        {
+          "id": "racket-arm",
+          "title": "Racket Arm",
+          "duration": "12 min",
+          "equipment": "Foam Roller",
+          "file": "workouts/care/racket-arm.json"
         }
       ]
     }
