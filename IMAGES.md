@@ -35,6 +35,7 @@ text safe zone for every image — is the artifact at
 | **Session complete** (3) | `assets/art/moments/finish-1..3-v1.webp` | 5:2 | 1200×480 | 40 KB |
 | **New best** (3) | `assets/art/moments/pr-1..3-v1.webp` | 2.4:1 | 1200×500 | 45 KB |
 | **Welcome** (1) | `assets/art/moments/welcome-v1.webp` | 1:1 | 1080×1080 | 60 KB |
+| **Day cards** (8) | `assets/art/days/<category>-v1.webp` | 5:2 | 1200×480 | 40 KB |
 
 - **Cycle art is keyed by FAMILY, never by cycle name.** The ten families are
   bedrock · iron · build · armour · voltage · spring · brakes · engine · reset ·
@@ -57,8 +58,14 @@ text safe zone for every image — is the artifact at
   fall to green-black, highlights are warm cream, clay is the only saturated
   colour. Every file gets the same grade pass before export, which is what makes
   images made in separate runs read as one set.
-- `assets/cycles/` (below) is **retired for the app** but not deleted:
-  `index.html` and `index-fa.html` still load `strength-engine.jpg`.
+- **Day pictures** are the eight categories: lower · upper · power · conditioning · core ·
+  recovery · fullbody · default. A day's `art` word wins; otherwise the app takes the
+  keyword that appears **earliest in the day's name** (`SCHEMA.md` → *How a day finds its
+  picture*). The caption covers the left ~60% at nearly full height, so the subject sits
+  on the right.
+- `assets/cycles/` and `assets/days/` (below) are **retired for the app** but not deleted:
+  `index.html` and `index-fa.html` still load `strength-engine.jpg`, and `index-fa.html`
+  loads `days/lower.webp` inside its phone mock-up.
 
 ---
 

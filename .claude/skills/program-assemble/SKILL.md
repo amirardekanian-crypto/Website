@@ -78,12 +78,15 @@ Activation & Prep 🔥 → [power/explosive: free-named by content] → **Primar
 single "Strength" block.
 
 **2d — Finalize the `focusTag`** (design only gave a plain working title). Make it VIVID —
-sports-headline energy that makes the athlete want to train — AND embed the keyword that
-lands the right banner image per SCHEMA "Day `focusTag` → banner image" (first-keyword-wins
-priority: recovery → power → conditioning → core → upper → lower → fullbody). Don't let a
-higher-priority word hijack the image (`"engine"`→conditioning, `"power"`→power). E.g.
-"Lower — squat/quad" → `"Built From The Legs Up"`; "Upper push & pull" → `"Press, Pull,
-Repeat"`. Never ship a dry label (`"Upper Body & Press"` ✗).
+sports-headline energy that makes the athlete want to train. E.g. "Lower — squat/quad" →
+`"Built From The Legs Up"`; "Upper push & pull" → `"Press, Pull, Repeat"`. Never ship a dry
+label (`"Upper Body & Press"` ✗).
+
+**Write the day's `art` word and the name is free.** The picture no longer depends on
+smuggling a keyword into the title — you set `art` directly (see the block below). The
+keyword scan is only the fallback, and it now takes whatever the name **leads with**, so a
+vivid name and the right picture stopped being in tension: `"Hinge Slow, Pull Hard"` is a
+hinge day either way.
 
 **2e — Warm-up / prep logs nothing.** The prep BLOCK already silences its circuits, so
 `"warmup": true` is no longer required (harmless if present). Name the block so it reads as
@@ -102,11 +105,20 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
    carries `athlete.key`, drop it. It authorises nothing (`athlete_keys` is empty and
    `get_program()` fails closed on that path).
 
-**Every cycle carries `art`** — the family whose picture the cycle card shows, from the
-roadmap's Art line (`SCHEMA.md` → `cycles[n]`, the ten families in `IMAGES.md` §0). If the
-roadmap predates that line, pick the family from what the block trains and say which you
-chose. A missing `art` is not fatal (the app guesses from the cycle name) but a wrong
-guess is invisible, so write it.
+**Write the picture on every cycle AND every day — this is part of assembling, not an
+extra.** Both use the same field name, `art`, and both are listed in `SCHEMA.md`:
+
+- **`cycles[n].art`** — one of ten families: `bedrock` `iron` `build` `armour` `voltage`
+  `spring` `brakes` `engine` `reset` `peak`. Take it from the roadmap's Art line; if the
+  roadmap predates that line, pick from what the block actually trains and say which you
+  chose.
+- **`workouts.days[n].art`** — one of eight: `lower` `upper` `power` `conditioning` `core`
+  `recovery` `fullbody` `default`. Pick what the day IS, not what its name rhymes with.
+
+A missing `art` is never fatal — the app guesses from the name — but the guess is invisible
+when it is wrong, and it cannot know that one athlete's *Uncoil* frees a stiff hip while
+another's turns strength into speed, or that *"Hinge Slow, Pull Hard"* is a hinge day.
+Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
 
 **NEW — create the file:**
 - Full skeleton, `currentCycleIndex: 0`, `cycles[]` from the locked roadmap, and the
