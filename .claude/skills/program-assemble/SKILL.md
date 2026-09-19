@@ -260,6 +260,12 @@ missing there, fix the JSON before shipping, don't just mention it in the brief.
 
 ## Step 7 — Ship: PUBLISH TO THE SERVER YOURSELF
 
+> **⚠️ Scope: this step is the NEW-CYCLE path.** Deriving `programHistory`, bumping
+> `currentCycleIndex` and replacing `workouts` wholesale are all correct when a cycle
+> advances and all three are WRONG for a mid-cycle edit to a live block. For a targeted
+> change inside the cycle the athlete is currently training, use
+> **/program-edit → "Mid-cycle adjustment"** instead. *(2026-09-19)*
+
 **Amir, 2026-09-07, verbatim: *"go live, we dont use json files anymore, upload to the
 servers."*** Do not build a file and hand it to him. Write it to `public.programs` through
 the Supabase MCP (`execute_sql`) and tell him it is live. `data/<id>.json` stays a local,
@@ -317,8 +323,12 @@ are both plain text, so a straight `md5(body)` comparison IS valid — use it.
 
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm both the programme row
   and the coaching-log row verified.
-- Node **is** on this machine (v24), so `node -e` works for JSON validation; Python is
-  equally fine and is what the rest of this skill uses for fingerprints.
+- ⚠️ **Node is NOT on this machine** — corrected 2026-09-19, verified in both bash and
+  PowerShell (`node`, `npm` and `gh` are all "command not found"). This line previously
+  claimed "Node **is** on this machine (v24)", which was wrong. **Use Python** (3.14 is
+  installed) — it is what the rest of this skill uses for fingerprints anyway. The three
+  `node -e` snippets above (Steps 3 and 4) are still written in JavaScript and will fail
+  as-is; translate them to Python before running. See also: no `gh`, so ship by local merge.
 - Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
   gitignored; there is normally nothing to commit at all.
 
