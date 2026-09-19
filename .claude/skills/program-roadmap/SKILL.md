@@ -56,14 +56,28 @@ never drift from the plan.
   the given start date).
 - Concise. This is a roadmap, not a program — no exercises.
 
-## Output (becomes `cycles[]` — names / taglines / weeks / dates / focuses only)
+## Output (becomes `cycles[]` — names / taglines / weeks / dates / focuses / art only)
 ```
 CYCLE 1 — [Name] · Weeks 1–[X] ([start] – [end])
 Tagline: …
+Art: [one of the ten families]
 Primary: …
 Secondary: …
 [repeat for every cycle]
 ```
+
+**Art** is the picture the athlete's cycle card shows. Pick the family that matches what
+the block actually trains, not what the name sounds like:
+`bedrock` foundation, patterns, first numbers · `iron` heavy strength · `build` muscle
+and volume · `armour` durability, tendons, rehab, a graded return · `voltage` power and
+rotation · `spring` elastic, reactive, change of direction · `brakes` deceleration and
+landing · `engine` conditioning, fat loss, running, repeat effort · `reset` deload and
+maintenance · `peak` taper, finish, physique finish.
+
+The app guesses from the name when this is missing, so it is never fatal — but the guess
+cannot know that one athlete's *Uncoil* frees a stiff hip and another's turns strength
+into speed. That is the call you are making here. Ten pictures cover every cycle
+(`IMAGES.md` §0).
 
 Close with: **"ROADMAP LOCKED — /program-design and /program-engage consume this,
 never edit it."** /program-assemble writes it into `cycles[]`.

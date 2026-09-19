@@ -102,6 +102,12 @@ noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure 
    carries `athlete.key`, drop it. It authorises nothing (`athlete_keys` is empty and
    `get_program()` fails closed on that path).
 
+**Every cycle carries `art`** — the family whose picture the cycle card shows, from the
+roadmap's Art line (`SCHEMA.md` → `cycles[n]`, the ten families in `IMAGES.md` §0). If the
+roadmap predates that line, pick the family from what the block trains and say which you
+chose. A missing `art` is not fatal (the app guesses from the cycle name) but a wrong
+guess is invisible, so write it.
+
 **NEW — create the file:**
 - Full skeleton, `currentCycleIndex: 0`, `cycles[]` from the locked roadmap, and the
   `athlete` block (`id`, `firstName`, `lastName`, `boardName`) exactly as /athlete-intake
