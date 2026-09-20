@@ -350,6 +350,24 @@ shelf, alphabetically by slug**, not in the order you wrote them. If the order m
 afterwards: `update public.library set sort_order = N where slug = 'workouts/<cat>/<slug>';`
 (Existing rows hold 0, 1, 2… so the next free number is one past the shelf's last.)
 
+**When Amir says "ship it", Claude can publish the rows itself** instead of handing him the picker. Through the Supabase
+MCP, one shelf per call:
+
+```sql
+insert into public.library (slug, kind, category_id, data, published, sort_order) values
+  ('workouts/<cat>/<id>','workout','<cat>',$wk${…minified file…}$wk$::jsonb,true,<n>), …
+on conflict (slug) do update set data = excluded.data, category_id = excluded.category_id,
+  published = true, sort_order = excluded.sort_order
+returning slug, sort_order, md5(data::text) as md5;
+```
+
+Set `sort_order` in the same statement (existing rows hold 0, 1, 2… so use one past the shelf's last). Then **prove every row
+landed intact**, because the payload is pasted by hand: `md5(data::text)` is the md5 of the jsonb *text form*, which Python can
+reproduce exactly (object keys ordered by byte length then bytes, `", "` and `": "` separators, strings from
+`json.dumps(ensure_ascii=False)`). Compute the expected md5 for each file locally, send them back as a `values` list and compare
+in SQL in one query. A mismatch means the paste drifted from the file. Done on 2026-09-20 for 20 new rows; the same function
+reproduced four live rows first, which is what makes the check trustworthy.
+
 Then tell Amir:
 - **That he needs to publish it**, and where
 - The workout URL: `program.html?workout=<slug>` (shareable, works without login)
