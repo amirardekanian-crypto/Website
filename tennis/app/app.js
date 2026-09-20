@@ -379,15 +379,14 @@
   // A picture that fails to load takes its own layer away and leaves the green banner, so a missing file
   // costs nothing.
   //
-  // WHO SEES WHAT (Amir, 2026-09-20). The Programme tab is finished: block covers, week banners, session cards and
-  // pages, test day, the session-complete screen. Buyers see those, and they are the kinds in ART_KINDS below.
-  // Lessons, tests and the locked pages stay DEMO-ONLY until all 22 lessons and 7 tests have a cover (14 and 3 do):
-  // otherwise a buyer's lesson list is half pictures. When they are done, let artFor() ignore ART_KINDS.
+  // EVERYONE SEES EVERYTHING (Amir, 2026-09-20). All 22 lessons and all 7 tests have a cover now, so the demo
+  // and a paying buyer see the same pictures: block covers, week banners, session cards and pages, test day,
+  // lessons, tests, the locked pages and the session-complete screen. A new lesson or test needs its cover
+  // added here (by its id), or its card stays the plain green banner: never half a list of pictures.
   // Pictures are kept for offline use by sw.js, in its own tps-art cache, the first time each one is shown.
   // Every picture has its subject on the LEFT and the right and bottom left calm: this app is
   // right-to-left, so titles sit at the right and the bottom. Keep to that when adding more.
   // Bump ART_V after regrading a file: the site's root worker keeps /assets/ files cache-first, by full URL.
-  const ART_KINDS = ['block', 'place', 'testday', 'done'];   // the kinds every buyer sees
   const ART_V = 2;   // rally-map and last-ball were regraded on 2026-09-19
   const ART = {
     block: {                                                               // its cover, on the block card and every week banner inside it
@@ -402,31 +401,43 @@
       home: { f: 'home-room', pos: '50% 55%' }
     },
     lesson: {                                                              // by lesson id
+      'growth': { f: 'door-frame', pos: '50% 55%' },
+      'agility-reaction': { f: 'the-split-second', pos: '50% 25%' },
+      'jumps-power': { f: 'impact', pos: '50% 50%' },
+      'speed-braking': { f: 'braking-mark', pos: '50% 45%' },
+      'strength': { f: 'the-row', pos: '50% 50%' },
       'tennis-demands': { f: 'rally-map', pos: '50% 50%' },
       'read-your-card': { f: 'clock-and-chalk', pos: '50% 50%' },
-      'rpe-weights': { f: 'which-one', pos: '50% 55%' },
-      'strength': { f: 'the-row', pos: '50% 50%' },
-      'jumps-power': { f: 'impact', pos: '50% 50%' },
-      'robustness': { f: 'armour', pos: '50% 50%' },
-      'warmup-ramp': { f: 'first-turn', pos: '50% 55%' },
-      'sleep-recovery': { f: 'lights-out', pos: '50% 55%' },
       'recovery-adaptation': { f: 'ice-and-clay', pos: '50% 62%' },
-      'tennis-tournaments': { f: 'the-bag', pos: '50% 45%' },
+      'robustness': { f: 'armour', pos: '50% 50%' },
+      'rpe-weights': { f: 'which-one', pos: '50% 55%' },
+      'sleep-recovery': { f: 'lights-out', pos: '50% 55%' },
+      'tennis-fitness': { f: 'tennis-fitness', pos: '50% 18%' },
+      'missed-sessions': { f: 'still-by-the-door', pos: '50% 60%' },
+      'pain-red-flags': { f: 'ice-and-tape', pos: '50% 45%' },
       'parents-guide': { f: 'from-the-chair', pos: '50% 50%' },
-      'why-strength': { f: 'iron-pair', pos: '50% 55%' },
+      'ready-level-3': { f: 'five-signs', pos: '50% 55%' },
+      'tennis-tournaments': { f: 'the-bag', pos: '50% 45%' },
+      'warmup-ramp': { f: 'first-turn', pos: '50% 55%' },
+      'fuel-competition': { f: 'match-day-box', pos: '50% 60%' },
+      'fuel-training': { f: 'before-and-after', pos: '50% 45%' },
       'hydration-heat': { f: 'steam', pos: '50% 60%' },
-      'ready-level-3': { f: 'five-signs', pos: '50% 55%' }
+      'why-strength': { f: 'iron-pair', pos: '50% 55%' }
     },
     test: {                                                                // by test id
       'broad-jump': { f: 'the-coin', pos: '50% 45%' },
+      'height': { f: 'against-the-wall', pos: '50% 50%' },
+      'jump-and-reach': { f: 'chalk-bowl', pos: '50% 55%' },
+      'spider-drill': { f: 'five-points', pos: '50% 50%' },
+      'sprint-20m': { f: 'twenty-metres', pos: '50% 55%' },
       'strength-check': { f: 'the-heavy-set', pos: '50% 45%' },
-      'jump-and-reach': { f: 'chalk-bowl', pos: '50% 55%' }
-    },             // by test id
+      'yo-yo-ir1': { f: 'the-lane', pos: '50% 45%' }
+    },
     testday: { '*': { f: 'test-day', pos: '50% 50%' } },                   // the test-day card and its page (weeks 4, 8, 12, 16)
     done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
     locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
   };
-  const artFor = (kind, key) => ((DEMO || ART_KINDS.includes(kind)) && ART[kind] && ART[kind][key]) || null;
+  const artFor = (kind, key) => (ART[kind] && ART[kind][key]) || null;
   const artLayer = a => a ? `<div class="ph"><img src="../../assets/tps/${a.f}.webp?v=${ART_V}" alt="" decoding="async" style="object-position:${a.pos || '50% 50%'}" onload="this.classList.add('in')" onerror="var p=this.closest('.has-art');if(p)p.classList.remove('has-art');this.parentNode.remove()"></div>` : '';
 
   /* ── Small renderers ───────────────────────────────────────────────── */

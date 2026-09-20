@@ -10,7 +10,7 @@
    With VERSION 'dev' this worker caches nothing, so local edits always show.
    The site's root sw.js leaves /tennis/ alone and only ever deletes its own aap-* caches; this
    worker only ever deletes its own tps-shell-* caches. */
-const VERSION = '33be2a9c6c8b';
+const VERSION = 'b21fec5be5ee';
 const CACHE = 'tps-shell-' + VERSION;
 const ART_CACHE = 'tps-art';   // NOT tps-shell-*: activate deletes those on every shell change, and a picture must outlive a code update
 const SHELL = ['./', 'app.js', 'app.css', 'app.webmanifest', 'lib/supabase.js',

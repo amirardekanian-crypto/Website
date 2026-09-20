@@ -50,6 +50,9 @@ TWEAKS = {
     'walk-on': {'ratio': (4, 3)},                   # the sign-in hero is nearly square on a phone
     'rally-map': {'sat': 0.72, 'gain': 0.88},   # the clay top-down, flat and full-frame: the loudest of all
     'last-ball': {'sat': 0.86, 'gain': 0.93},   # bright clay in low sun, right next to a white line
+    'door-frame': {'gain': 0.66},               # a bright room: 0.46
+    'five-points': {'sat': 0.80, 'gain': 0.94}, # top-down clay, more saturated than the other clay pictures (0.72 against about 0.6)
+    'braking-mark': {'sat': 0.85, 'gain': 0.95},# clay in low sun, 0.67
 }
 
 
