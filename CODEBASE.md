@@ -318,6 +318,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **If deleted:** No menu. No footer. No video pop-ups. No mobile nav. The site looks unfinished and bare.
 - **Depends on:** `partials/nav.html`, `partials/footer.html`.
 - **Edit this when:** You want to change how the video pop-up or "install app" prompt behaves.
+- ⚠️ **The video pop-up embeds from `www.youtube.com`, on purpose — do not "restore" `youtube-nocookie.com`.** (2026-09-20.) It is the small play button on circuit items; standard exercises play through `loadInlineVideo()` in `program.html`, which always used `www.youtube.com`. In Iran the cookieless nocookie player gets YouTube's "sign in to confirm you're not a bot" wall while the other one plays on the same phone (Ehsan reported exactly that split). Keep the two players on the same host, and keep `privacy.html` §2.6 in step. The Farsi course app (`tennis/app/app.js`, built in the private `tps-content` repo) still uses nocookie and could show the same wall to buyers in Iran.
 - **Don't touch:** Unless you're comfortable with JavaScript. This is the most fragile file to edit by hand.
 
 #### `assets/js/fa-nav.js` — The phone menu on the Farsi pages

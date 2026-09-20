@@ -19,7 +19,11 @@
 // another app's offline copy on the same origin.
 // v8: the shell did not change. The worker also leaves /tennis-testing/ alone (the tennis
 // testing app, which keeps its own offline copy of content and saves in localStorage).
-const CACHE = 'aap-v8';
+// v9: shared.js changed. Its video pop-up (the small play button on circuit items) now embeds
+// from www.youtube.com like the inline player does, because the nocookie player was getting
+// YouTube's sign-in wall in Iran. shared.js is in the shell and served cache-first, so without
+// a bump every installed phone would keep the old pop-up for ever.
+const CACHE = 'aap-v9';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -40,7 +44,11 @@ const SHELL = [
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(SHELL))
+      // cache:'reload' — a bare addAll() can be answered from the browser's HTTP cache, which
+      // files the OLD bytes under the NEW version name; the fetch handler is cache-first, so
+      // they would then be pinned until the next bump. Seen testing the v9 bump: the fresh
+      // cache held the previous shared.js.
+      .then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
