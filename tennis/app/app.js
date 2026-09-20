@@ -406,9 +406,21 @@
       'strength': { f: 'the-row', pos: '50% 50%' },
       'jumps-power': { f: 'impact', pos: '50% 50%' },
       'robustness': { f: 'armour', pos: '50% 50%' },
-      'warmup-ramp': { f: 'first-turn', pos: '50% 55%' }
+      'warmup-ramp': { f: 'first-turn', pos: '50% 55%' },
+      'sleep-recovery': { f: 'lights-out', pos: '50% 55%' },
+      'recovery-adaptation': { f: 'ice-and-clay', pos: '50% 62%' },
+      'tennis-tournaments': { f: 'the-bag', pos: '50% 45%' },
+      'parents-guide': { f: 'from-the-chair', pos: '50% 50%' },
+      'why-strength': { f: 'iron-pair', pos: '50% 55%' },
+      'hydration-heat': { f: 'steam', pos: '50% 60%' },
+      'ready-level-3': { f: 'five-signs', pos: '50% 55%' }
     },
-    test: { 'broad-jump': { f: 'the-coin', pos: '50% 45%' } },             // by test id
+    test: {                                                                // by test id
+      'broad-jump': { f: 'the-coin', pos: '50% 45%' },
+      'strength-check': { f: 'the-heavy-set', pos: '50% 45%' },
+      'jump-and-reach': { f: 'chalk-bowl', pos: '50% 55%' }
+    },             // by test id
+    testday: { '*': { f: 'test-day', pos: '50% 50%' } },                   // the test-day card and its page (weeks 4, 8, 12, 16)
     done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
     locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
   };
@@ -620,7 +632,8 @@
     const href = `#/programme/week/${week}/${encodeURIComponent(s.code)}`;
     const mins = s.minutes ? pill(fa(s.minutes) + ' دقیقه') : '';
     if (s.type === 'test') {
-      return `<a class="session-card test" href="${href}"><div class="sc-top"><div class="sc-code">روز آزمون</div><div class="sc-title">${esc(s.title || '')}</div></div>
+      const tart = artFor('testday', '*');
+      return `<a class="session-card test" href="${href}"><div class="sc-top ${tart ? 'has-art' : ''}">${artLayer(tart)}<div class="sc-code">روز آزمون</div><div class="sc-title">${esc(s.title || '')}</div></div>
         <div class="sc-meta">${placePill(s)}${mins}${pill(fa((s.tests || []).length) + ' آزمون')}</div></a>`;
     }
     const count = (s.groups || []).filter(g => g.slot !== 'W').reduce((n, g) => n + (g.items || []).length, 0);
@@ -685,7 +698,7 @@
   function viewTestDay(week, r, s) {
     const T = (C.tests && C.tests.tests) || [];
     let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)} · ${AGE_LABEL[r.v.age]}`,
-      title: `روز آزمون · ${esc(s.title || '')}`, meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
+      title: `روز آزمون · ${esc(s.title || '')}`, art: artFor('testday', '*'), meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
     h += `<div class="section">${s.note ? `<div class="card green"><p>${esc(s.note)}</p></div>` : ''}`;
     (s.tests || []).forEach((id, k) => {
       const t = T.find(x => x.id === id);
@@ -705,7 +718,7 @@
     if (s.type === 'test') return viewTestDay(week, r, s);
     let n = 0;
     let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)} · ${AGE_LABEL[r.v.age]}`,
-      title: s.kind === 'addon' ? `+ ${addonTitle(s)}` : `جلسهٔ ${esc(s.code)} · ${esc(s.title)}`, meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
+      title: s.kind === 'addon' ? `+ ${addonTitle(s)}` : `جلسهٔ ${esc(s.code)} · ${esc(s.title)}`, art: artFor('place', s.place), meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
     h += `<div class="section">`;
     (s.groups || []).forEach(g => {
       if (g.slot === 'W') { h += warmCard(g); return; }

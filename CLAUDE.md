@@ -645,7 +645,7 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   every locked page, one room per session card, one for the session-complete screen). ⚠️ **Demo-only on purpose**: a buyer has 22 lessons and 7 tests and only 3 and 1 have covers, so widening it (`ART_ON = true`) waits until those are done. Rules every picture follows: no text or logos in
   the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
   or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
-  files cache-first by full URL. **All 13 demo pictures exist** (2026-09-19); what is left is the other 27 for the rest of the app. Like the rest of the demo it was built in this
+  files cache-first by full URL. **All 13 demo pictures exist** (2026-09-19), and 15 more since (2026-09-20: the sign-in walk-on, the test-day card, and nine lesson and test covers), 28 in all. 12 lesson and test covers are still to generate. The sign-in walk-on is NOT gated by `ART_ON`: it replaces `court-sessions.jpg` for everyone, because it swaps a picture rather than adding one. Nine of the covers are program.html stills (its art is composed with the subject on the RIGHT, the opposite of this RTL app), reused by mirroring them: `FLIPPED` in `scripts/grade_tps_art.py`. Like the rest of the demo it was built in this
   folder, so the next deploy from `tps-content` erases the `app.js`, `app.css` and `index.html` changes unless they are
   copied there first.
 - **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets

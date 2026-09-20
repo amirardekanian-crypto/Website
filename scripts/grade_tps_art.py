@@ -13,6 +13,11 @@ should do.
 Each slug=path writes assets/tps/<slug>.webp: 1080 px wide, 16:9 (centre-cropped when the master is
 another ratio), WebP quality 72, about 40 KB. Masters are only read, never moved or copied into the repo.
 
+Two dials live in TWEAKS, per picture: "ratio" for the rare one that is not 16:9 (the sign-in hero is
+taller), and "flip" to mirror it. program.html's art is composed with its subject on the RIGHT (English
+text sits on the left), which is the opposite of this app, so a program.html still that fits a slot here
+is flipped rather than regenerated. Only flip a still life: never one with text, a logo or a handed subject.
+
 After regrading a file, raise ART_V in tennis/app/app.js (the site's root worker keeps /assets/ files
 cache-first, by full URL) and run scripts/stamp_tps_app.py.
 
@@ -23,7 +28,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'assets' / 'tps'
@@ -38,7 +43,11 @@ SAT = 0.92
 # Clay courts are genuinely more colourful than a dark gym, so these do not aim to match the indoor
 # pictures — only to keep the four clay ones consistent with each other. Measured saturation across the
 # set: indoor sits at 0.21-0.36, clay at 0.55-0.69, and these two were the top of that range.
+FLIPPED = ('ice-and-clay', 'the-heavy-set', 'iron-pair', 'chalk-bowl', 'steam', 'five-signs', 'the-bag',
+           'lights-out', 'from-the-chair')          # program.html stills, subject on the right
 TWEAKS = {
+    **{slug: {'flip': True} for slug in FLIPPED},
+    'walk-on': {'ratio': (4, 3)},                   # the sign-in hero is nearly square on a phone
     'rally-map': {'sat': 0.72, 'gain': 0.88},   # the clay top-down, flat and full-frame: the loudest of all
     'last-ball': {'sat': 0.86, 'gain': 0.93},   # bright clay in low sun, right next to a white line
 }
@@ -57,23 +66,26 @@ def grade(im, sat=SAT, gain=1.0):
     return Image.fromarray((np.clip(a, 0, 1) * 255 + 0.5).astype(np.uint8))
 
 
-def fit_16x9(im):
+def fit_ratio(im, rw=16, rh=9):
     w, h = im.size
-    if abs(w / h - 16 / 9) > 0.01:
-        nh = round(w * 9 / 16)
+    if abs(w / h - rw / rh) > 0.01:
+        nh = round(w * rh / rw)
         if nh <= h:                       # too tall: trim top and bottom evenly
             top = (h - nh) // 2
             im = im.crop((0, top, w, top + nh))
         else:                             # too wide: trim the sides evenly
-            nw = round(h * 16 / 9)
+            nw = round(h * rw / rh)
             left = (w - nw) // 2
             im = im.crop((left, 0, left + nw, h))
-    return im.resize((WIDTH, round(WIDTH * 9 / 16)), Image.LANCZOS)
+    return im.resize((WIDTH, round(WIDTH * rh / rw)), Image.LANCZOS)
 
 
 def export(slug, src):
     t = TWEAKS.get(slug, {})
-    out = fit_16x9(grade(Image.open(src), sat=t.get('sat', SAT), gain=t.get('gain', 1.0)))
+    im = Image.open(src)
+    if t.get('flip'):
+        im = ImageOps.mirror(im)
+    out = fit_ratio(grade(im, sat=t.get('sat', SAT), gain=t.get('gain', 1.0)), *t.get('ratio', (16, 9)))
     OUT.mkdir(parents=True, exist_ok=True)
     dest = OUT / (slug + '.webp')
     out.save(dest, 'WEBP', quality=QUALITY, method=6)
