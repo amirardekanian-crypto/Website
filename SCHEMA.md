@@ -890,8 +890,8 @@ stat cells, so leaving them out breaks nothing.
   // the duration line. REQUIRED — see "Where the coaching goes" below.
   "intro": ["…", "…"],
   // What to STOP for, as rows of { label, text }. Renders as an always-visible white
-  // "Before you start" card above the intro. Optional (a session written before
-  // 2026-09-20 has none) but expected on any session that carries risk.
+  // "Before you start" card above the intro. All 42 library sessions have one
+  // (2026-09-20), so a new session should too. Absent or empty, the card stays hidden.
   "before": [ { "label": "Not today", "text": "…" }, { "label": "Stop now", "text": "…" } ],
   "focusTag": "Full-Body Strength",
   "blocks": [
@@ -951,9 +951,11 @@ much."
 above the intro and **is never behind a toggle**. Measured 2026-09-20: the intro's *Why this session*
 toggle is one preference shared by every workout, so an athlete who closed it once had every session's
 "stop if…" wording hidden for good, and a 300-word intro put the first exercise about 1,200 px down a
-phone. So anything that keeps someone safe goes in `before` (labels the 20 sessions written that day use:
-*Not today · Stop and get it checked · Stop now · A day or two later · Past injury · Keep clear ·
-First time · Who it's for*), and `intro` carries only the why and the how. Never put the same warning in both.
+phone. So anything that keeps someone safe goes in `before` (labels in use across the library:
+*Not today · Stop and get it checked/looked at · Stop now · A day or two later · Past injury · Keep clear ·
+First time · Who it's for · Check the space/setup/kit · While you train · Never roll · Lightheaded · Heat*),
+and `intro` carries only the why and the how. Never put the same warning in both. The wording of the rows
+every session shares is in the `/workout` skill, **Standard rows**: copy it, so one warning reads the same everywhere.
 
 **Cues are exactly three, never more, never fewer** — one **external** (where to
 push, what to move toward), one **internal** (what to feel), one **avoid** (the

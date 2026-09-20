@@ -241,10 +241,29 @@ that no toggle can hide, while *Why this session* is one preference shared by ev
 once it passes 100 words. Measured 2026-09-20 on a phone: a 300-word intro put the first exercise about 1,200 px
 down, and one athlete closing the toggle once hid every session's "stop if…" for good. So: anything that keeps
 someone safe (not today, red flags, "get it checked", spacing from a match or another hard session, the
-first-time dose) goes in `before`, once, and the intro never repeats it. Reuse the labels the 20 sessions of
-2026-09-20 use so the card reads the same everywhere: *Not today · Stop and get it checked · Stop now ·
-A day or two later · Past injury · Keep clear · First time · Who it's for*. Any session with real load or
-speed in it needs the card; a plain mobility flow needs only the rows that apply.
+first-time dose) goes in `before`, once, and the intro never repeats it. All 42 library sessions have the card
+(the 22 older ones got theirs on 2026-09-20, written from what each session asks of the body, since their intros
+said almost nothing about safety). Any session with real load or speed in it needs the card; a plain mobility flow
+needs only the rows that apply, and even a breathing session earns one row (Lights Out has a single one).
+One to eight rows, 30 to 210 words, plain English, no em-dashes.
+
+**Standard rows: copy these word for word, so one warning reads the same on every session.** All but the last are the
+wording the coaches' panel reviewed on the 20 new sessions. *Lightheaded* was written for the breath sessions on
+2026-09-20 and has not been through a panel. Write new wording only for what a session has that these do not
+(a rack, a band, breath holds).
+
+| Label | Wording | Use on |
+|---|---|---|
+| Not today | A sore ankle, knee, calf, hamstring, groin or Achilles, or an injury in the last month? Get it looked at first. | court, jumps, sprints, lower-body work (swap the joints to fit: hip, lower back, shoulder, wrist) |
+| Stop and get it checked | A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop. | anything loaded or fast |
+| Stop now | Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first. | anything that raises the heart rate |
+| A day or two later | Far more sore than normal, or your pee goes dark? Get it checked the same day. | heavy, eccentric or new work |
+| Keep clear | 48 hours away from another hard session, and not the day before a match. | hard sessions (tissue cost, not a weekly count) |
+| Back red flags | Pain down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day. | anything that loads or turns the spine |
+| While you train | A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. | Care sessions |
+| Never roll | Your lower back, the front or side of your neck, the back of your knee, the inside of your elbow, your armpit or right into the groin crease. Nothing that's swollen, hot, bruised or freshly hurt. | any foam roller or ball session |
+| Swollen calf | If one calf is swollen, warm or tender and you didn't strain it playing, see a doctor the same day. | any session that stretches or rolls the calf |
+| Lightheaded | Dizzy, or pins and needles in your hands or face? Stop counting and breathe normally. Never do breath holds in water or while driving. | box breathing and any breath hold |
 
 **Check before publishing:** every exercise `good: [2], bad: [1]`, every note one
 sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
