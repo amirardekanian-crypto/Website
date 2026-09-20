@@ -772,6 +772,16 @@ real credits from a pot shared with Amir's own generations, so never generate un
 that run** (Amir, 2026-09-20: *"wait untill i say to generate more"*). Its *Learned the hard way*
 log is where each round's lessons go.
 
+**Generating video clips is the `/video` skill** (`.claude/skills/video/SKILL.md`), which starts from
+a picture, so read `/image` first. It opens with **Amir's spend protocol** (2026-09-20, after the first
+two test clips cost 23.5 credits and the same tests done lean cost 9.5: *"the credit is expensive, but
+you did some things without letting me know, or asking for me"*): **show a plan block and wait for his
+yes before ANY generation, even a test; reuse a picture that exists before making one; sound OFF (the
+default is ON, so always pass `sound: "off"`); 3-second clips, never 5; the cheapest settings that show
+the thing; report the cost in numbers after.** The same rules hold for pictures. It also has the price
+list, the prompt craft for a locked camera, `tools/clip_check.py` and a ledger of every picture and clip
+already in the Higgsfield account.
+
 **Reel delivery process (Amir, 2026-07-02 — was too slow first time, fix this):** For a reel,
 the deliverable is **the HTML file itself**, sent via SendUserFile so he can open/preview and
 screen-record it himself. **Do NOT render an MP4 unless he explicitly asks for one** — skip
