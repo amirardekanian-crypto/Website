@@ -368,6 +368,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   its own weight; the RPE rates the whole round). Only **warm-up / prep** circuits opt out
   with `"warmup": true` (they log nothing — the pre-session readiness check covers feel).
   Authored in the JSON; see SCHEMA.md "Circuit logging". *(2026-06-17)*
+- **A library session is as hard as its adaptation needs — it is never capped or softened by a weekly
+  budget.** *(Amir, 2026-09-20, verbatim: "the athlete doesn't have to pick 2 or 3. they might only do 1
+  so it doesn't matter if they are hard or easy, the difficulty should be based on the adaptation they are
+  looking for.")* A library athlete opens ONE session, not a week, so "two hard sessions a week in total"
+  protects nobody and only waters down the card that has to be hard. Set intensity from the quality being
+  trained (aerobic base RPE 6 · threshold 7-8 · repeat sprints 9) and write **no per-week count into any
+  library file**. What stays is spacing that comes from **tissue cost**: 48 hours clear of another hard
+  session, and not the day before a match. *(2026-09-20, the twenty new Train-library sessions — the
+  planning panel had ruled a shared weekly ceiling across shelves; overruled.)*
 
 ## Progression (coach-driven)
 - **Progression is coach-driven from the weekly logs** — the app shows one prescription
