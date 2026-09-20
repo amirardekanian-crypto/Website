@@ -1003,11 +1003,12 @@ the day score. Full reasoning: `supabase/stage28_library_sessions.sql`, `HABITS.
    `workouts/<category>/<id>`, so a category move is a database write too.
 5. Set `sort_order` if the shelf position matters — the picker leaves it NULL, which sorts last, then
    alphabetically by slug.
-6. **Changing a session's `before`/`intro` on a live one is a two-step rollout**, because an installed phone keeps
-   the app shell it already has until its next open (`sw.js` is stale-while-revalidate): ship the app change first,
-   let it sit for a day, and only then publish the data. A phone still on the old shell **ignores `before`**, so a
-   session whose safety wording has been *moved* into `before` would show that phone neither. (`sw.js` `CACHE` v10 is
-   the shell that draws it.)
+6. **Moving safety wording out of an intro and into `before` on a live session is a three-step rollout**, because an
+   installed phone keeps the app shell it already has (`sw.js` is stale-while-revalidate, so every athlete's *first*
+   open after a deploy still runs the old shell, and `CACHE` v10 is the first one that draws the card):
+   (1) ship the app change; (2) **add** `before` to the rows and leave the intro alone: an old shell ignores
+   `before` and shows the long intro exactly as it did, so this step is safe at once; (3) about a day later, **trim**
+   the intro. Trim it early and a phone on the old shell shows neither the card nor the stop rules.
 
 > **Keep them matching:** the name/duration/equipment exist in *both* the manifest
 > (for the card) and the file (for the opened view). If you rename a workout, change
