@@ -10,7 +10,16 @@ function grab(startMarker, endMarker) {
 }
 const code = grab('function parseSetLine(rest) {', 'function dayVerdict(groups) {')
            + grab('function dayVerdict(groups) {', '// ── THE WORK TAB');
-const sandbox = { round1: n => Math.round(n * 10) / 10 };
+// coach.html gets its parser from assets/js/chips.js at runtime, so the harness
+// has to load the real module too — testing against a stub would be testing the
+// stub. This is also what keeps legacyRx()/rxOf() covered by these cases.
+const vm = require('vm');
+const chipsCtx = { window: {} };
+chipsCtx.global = chipsCtx;
+vm.createContext(chipsCtx);
+vm.runInContext(fs.readFileSync('assets/js/chips.js', 'utf8'), chipsCtx);
+
+const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window };
 new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
 

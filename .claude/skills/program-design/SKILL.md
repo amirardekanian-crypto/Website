@@ -26,9 +26,9 @@ description: Design one athlete's training program for a cycle — the core S&C 
 
 This is the highest-value work in the pipeline. **Spend the reasoning budget here** — and
 spend it on the **programming** (the analysis + training decisions), not on polish. Exercise
-names, chips, day titles, banner keywords, and formatting are all rendered downstream by
-**/program-assemble** (it normalizes names to the library, renders chips, writes the vivid
-`focusTag`, lint-checks the JSON) — so if a name or chip is rough, flag it and keep moving;
+names, day titles, banner keywords, and formatting are all handled downstream by
+**/program-assemble** (it normalizes names to the library, copies your dose into `rx`, writes
+the vivid `focusTag`, lint-checks the JSON) — so if a name is rough, flag it and keep moving;
 don't burn analysis budget perfecting wording. The cleaner your domain spec, the better the
 program — let the machine handle serialization.
 Work like an **assistant coach sitting next to Amir**: do the thinking, but consult him
@@ -235,7 +235,7 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   a structural decision, not a per-exercise tag** — spec the whole pair as ONE circuit-role
   entry (see the STEP 3 template below), never as two accessory-role entries each carrying
   `intent: superset`. That exact mistake shipped once (Pooya C3, all 4 days): two independent
-  standard exercises with a decorative chip, no visible pairing, and a stray rest after the
+  standard exercises with a decorative pill, no visible pairing, and a stray rest after the
   first lift instead of one shared rest per round.
 - **Never superset a unilateral Primary lift** (Split Squat, Single-Leg Hip Thrust, Single-Leg
   RDL — any main lift dosed Each Side/Each Leg). It already costs double the per-set time/
@@ -274,20 +274,24 @@ SCHEMA "Standard section names"; assemble assigns titles + icons.)
 **NAMING:** Follow COACHING-PRINCIPLES.md → "Exercise naming" (read at STEP 0 — it is the
 single source of truth; don't restate or re-derive it here). In one line: `[modification]
 [equipment] [movement]`, bodyweight = bare name (no "Bodyweight" prefix), defining setups
-in the name, everything else (grip/intent/range/tempo/holds/digits/punctuation) → chips,
+in the name, everything else (grip/intent/range/tempo/holds/digits/punctuation) → the dose
+fields, `intent` or `setup`,
 and match the `exercise_library.json` spelling. If a name is rough mid-design, flag it and
 move on — /program-assemble lint-checks names against the library.
 
-**PRESCRIPTION — emit the DOSE as plain fields, not chips.** Chip styling/order/`×`-prefix
-is /program-assemble's job (it renders chips per SCHEMA "Chip parsing"). You just decide the
-numbers + the coaching intent:
+**PRESCRIPTION — emit the DOSE as plain fields.** These fields ARE the storage format now
+(`rx` — see SCHEMA.md): /program-assemble copies them across rather than rendering anything,
+so what you write is what ships. You just decide the numbers + the coaching intent:
 - **Reps: write it however you naturally think about it — a single number or a range** (e.g.
-  `8-10` for a hypertrophy zone). Don't spend design budget pre-converting to one number —
-  that's mechanical, and /program-assemble does it automatically (top of the range) before it
-  ever reaches the app, which has no rep-range field. See COACHING-PRINCIPLES.md → "Progression
-  (coach-driven)". Applies to every reps field: standard lifts, circuit items, unilateral
+  `8-10` for a hypertrophy zone). **A range ships as a range** — `rx` has a real range field
+  since 2026-09-20, so nothing collapses it to the top any more and the athlete sees the zone
+  you actually meant. Applies to every reps field: standard lifts, circuit items, unilateral
   (each-side) counts.
-- standard grinding lift → sets · reps/duration · tempo · RPE · rest · intent (e.g. `3s eccentric`, or none)
+- **OMIT WHAT YOU DID NOT PRESCRIBE.** An absent field is not a gap for someone downstream to
+  fill — it means "not prescribed", and the app draws no cell for it. This is why a warm-up
+  with no RPE now renders as a clean one-liner instead of a grid of dashes. Never ask for a
+  placeholder, and do not invent a rest just to have one.
+- standard grinding lift → sets · reps/duration/distance · tempo · RPE · rest · intent (or none)
 - ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
 - loaded carry → sets · distance/duration · RPE · rest — **no tempo**
 - circuit (working) → rounds + rest + per-item reps + one overall RPE — **no per-item tempo**.
@@ -296,12 +300,16 @@ numbers + the coaching intent:
   each with its own `rest:` and an `intent: superset` tag — see the "Superset" bullet in STEP 2.
 - **warm-up / prep (simple or circuit)** → dose only (reps/duration); **no RPE, logs nothing**
   (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
-- `intent` is the coaching intention in plain words (`3s eccentric`, `glute focus`,
-  `max intent`, `2s hold`) — assemble renders it as the green modifier chip. Leave blank if none.
+- `intent` is ONE coaching intention in plain words (`max intent`, `glute focus`,
+  `stick the landing`) — it ships as the exercise's `intent` field and draws the single green
+  pill. Leave blank if none. **Never restate the tempo here**: `3s eccentric` beside a tempo of
+  `3-1-1-0` is the same instruction twice, and the app already spells the tempo out for the
+  athlete under the grid. Equipment or position (`neutral grip`, `45° bench`) is not an intent —
+  that goes to `setup`.
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
   **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
-  decision (see above), not a chip on a standard exercise.
+  decision (see above), not an `intent` on a standard exercise.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 - `test_flag` (optional, standard lifts only): `test_flag: 5RM` marks a lift as one this
   cycle is genuinely **about** — the Personal Records screen then tracks how long it has been
@@ -319,7 +327,7 @@ numbers + the coaching intent:
   reason. **Don't draft the athlete-facing sentence** — /program-engage PART 3 writes the
   actual "Coach's Note" copy from this flag + the full athlete picture, and /program-assemble
   places it on the exercise. This is the ONLY athlete-facing place a weight number may ever
-  appear (in engage's copy, never in a chip). Program-wide guidance goes to engage's notes
+  appear (in engage's copy, never in the dose). Program-wide guidance goes to engage's notes
   cards instead — see COACHING-PRINCIPLES.md → "Communication & in-app text".
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
@@ -337,9 +345,9 @@ Leans on the app's readiness check + ACWR.
 programHistory. /program-engage and /program-assemble own those.
 
 **OUTPUT FORMAT — a light DESIGN SPEC, not final formatting.** Express the training
-decisions in plain domain terms. No chip styling, no `×`-prefixes, no emoji, no JSON — those
-are /program-assemble's job. Use the semantic SECTION names (Activation & Prep · [power] ·
-Primary · Accessory · Core · [conditioning]); assemble assigns titles, icons, chips, the
+decisions in plain domain terms. No emoji, no JSON, no formatting — those are
+/program-assemble's job. Use the semantic SECTION names (Activation & Prep · [power] ·
+Primary · Accessory · Core · [conditioning]); assemble assigns titles, icons, the
 vivid `focusTag`, and canonical names.
 ```
 ATHLETE_ID: [id]
@@ -461,7 +469,7 @@ kilos say much less about a player than kilos per kilo of them.
   normalises for the reps and RPE the set was done at.
 - ✅ To spot a **lagging lift** — if lower-body relative strength has stalled while upper
   has moved, that is a cycle focus, stated with the number behind it.
-- ❌ **Never as a %1RM prescription.** No "4×5 @ 80%" in chips, cards or notes. The
+- ❌ **Never as a %1RM prescription.** No "4×5 @ 80%" in the dose, cards or notes. The
   prescription stays RPE. A predicted max carries roughly ±5% error at best, so a
   percentage built on it is false precision wearing a lab coat.
 - ❌ Never write the estimate into the athlete JSON as a target. It is derived on their

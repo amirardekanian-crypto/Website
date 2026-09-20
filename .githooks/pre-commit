@@ -105,4 +105,24 @@ if git diff --cached --name-only --diff-filter=ACMD | grep -q '^tennis/app/'; th
   fi
 fi
 
+# ── 5. the prescription format (added 2026-09-20) ──────────────────────
+# Why: rxOf() — which decides what an exercise's prescription MEANS — exists
+# twice, inline in program.html (the offline PWA, deliberately self-contained)
+# and in assets/js/chips.js (which coach.html loads). If the two drift, the
+# coach's dashboard and the athlete's phone show different prescriptions for the
+# same exercise and NOTHING ERRORS. Same class of bug as the xp_rules/habits.html
+# pair CLAUDE.md warns about, and caught the same way: run fixtures through both
+# copies and diff. It also audits every rx in the Train library.
+if git diff --cached --name-only --diff-filter=ACM      | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|workouts/|scripts/(check_rx|migrate_rx)\.js)'; then
+  echo "pre-commit: prescription code or data changed — checking rx..."
+  if node scripts/check_rx.js && node scripts/test_coach_compare.js >/dev/null; then
+    echo "pre-commit: rx OK."
+  else
+    echo ""
+    echo "pre-commit: BLOCKED — the rx check failed (details above)."
+    echo "If program.html and assets/js/chips.js disagree, fix BOTH — they are one model in two files."
+    failed=1
+  fi
+fi
+
 exit $failed

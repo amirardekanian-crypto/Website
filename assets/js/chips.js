@@ -295,8 +295,270 @@
     return problems;
   }
 
+  /* ═══ rx — THE STRUCTURED PRESCRIPTION (2026-09-20) ═══════════════════════
+     Everything above this line treats a prescription as display strings and
+     pattern-matches them back into numbers at render time. That is what made
+     the notation drift (277 distinct chip labels across 34 programmes for six
+     real fields), what forced every exercise into the same five-cell grid, and
+     what put a duration in a cell labelled REPS.
+
+     `ex.rx` replaces it. It is plain data, it is authored directly, and the
+     only rule is: WRITE WHAT YOU PRESCRIBED, OMIT WHAT YOU DID NOT.
+
+       rx.sets      number                      omit for a single-effort/prep item
+       rx.reps      number | "8-10"          ─┐
+       rx.time      "30s" | "5 min"           ├─ exactly ONE of these three
+       rx.distance  "20m" | "400m"           ─┘
+       rx.side      true                        the dose is per side
+       rx.rpe       number | "6-7"              omit when effort is not graded
+       rx.tempo     "3-1-1-0" | "iso"           omit for ballistic / carries / prep
+       rx.rest      seconds                     omit and NOTHING is invented
+       rx.rounds    number                      circuits only
+       rx.work      "40s on / 20s off"          intervals only
+       rx.label     "Hold"                      optional one-word dose-cell override
+     and beside it, on the exercise itself — FOUR fields, four meanings, four
+     looks, which is what stopped the pill row being a junk drawer of 121 labels:
+       ex.setup     "neutral grip"              equipment / position → quiet grey line
+       ex.intent    "max intent"                ONE coaching intention → the green pill
+       ex.note      "start shallow…"            the coach's note   → clay callout
+       ex.cues      {good:[…], bad:[…]}         technique         → the cues list
+
+     rxOf() is the ONLY thing renderers should call. It reads `ex.rx` when it is
+     there and falls back to parsing legacy chips when it is not, so an exercise
+     that has never been migrated keeps rendering exactly as it always did.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  // Dose-cell labels. The label names what the number IS — which is the whole
+  // point of the change: "5 min" used to sit under a cell labelled REPS.
+  const DOSE_LABEL = { reps: 'Reps', time: 'Time', distance: 'Distance', work: 'Work' };
+
+  function cleanStr(v) {
+    const s = (v === null || v === undefined) ? '' : String(v).trim();
+    return s ? s : null;
+  }
+
+  // "3-1-1-0" → "3s down · 1s pause · 1s up". Generated from the numbers, so it
+  // can never disagree with the tempo cell the way a hand-written "3s eccentric"
+  // pill did on 153 cards. Zeroes are dropped; a 1s reset is not worth a phrase.
+  function tempoWords(tempo) {
+    const t = cleanStr(tempo);
+    if (!t) return null;
+    if (/^iso$/i.test(t)) return 'Hold the position';
+    const parts = t.split(/[-–]/).map(x => parseFloat(x));
+    if (parts.length < 3 || parts.some(isNaN)) return null;
+    const bits = [];
+    if (parts[0] > 0) bits.push(parts[0] + 's down');
+    if (parts[1] > 0) bits.push(parts[1] + 's pause');
+    if (parts[2] > 0) bits.push(parts[2] + 's up');
+    if (parts.length > 3 && parts[3] > 0) bits.push(parts[3] + 's reset');
+    return bits.length ? bits.join(' · ') : null;
+  }
+
+  // Normalised, display-ready view of one exercise's prescription.
+  // Every field is either a real value or null — never a placeholder, because a
+  // placeholder is exactly what the renderer used to turn into an em-dash.
+  function rxOf(ex) {
+    ex = ex || {};
+    const out = {
+      sets: null, dose: null, rpe: null, tempo: null, rest: null, rounds: null,
+      setup: cleanStr(ex.setup), intent: cleanStr(ex.intent), extras: [], source: 'rx'
+    };
+
+    const rx = ex.rx;
+    if (rx && typeof rx === 'object') {
+      out.sets   = (rx.sets   === 0 || rx.sets)   ? String(rx.sets).trim()  : null;
+      out.rounds = (rx.rounds === 0 || rx.rounds) ? String(rx.rounds).trim(): null;
+      out.rpe    = cleanStr(rx.rpe);
+      out.tempo  = cleanStr(rx.tempo);
+      out.rest   = (typeof rx.rest === 'number' && rx.rest > 0)
+        ? rx.rest
+        : (cleanStr(rx.rest) ? parseDurationToSec(rx.rest) || null : null);
+
+      // Exactly one dose. Checked in priority order so a file carrying two by
+      // mistake renders deterministically rather than differently per device.
+      const kind = cleanStr(rx.reps) ? 'reps'
+                 : cleanStr(rx.time) ? 'time'
+                 : cleanStr(rx.distance) ? 'distance'
+                 : cleanStr(rx.work) ? 'work' : null;
+      if (kind) {
+        out.dose = {
+          kind: kind,
+          value: cleanStr(rx[kind]),
+          side: rx.side === true,
+          label: cleanStr(rx.label) || DOSE_LABEL[kind]
+        };
+      }
+      return out;
+    }
+
+    /* ── legacy fallback: an exercise that still carries chips[] ──────────── */
+    const p = parseChips(ex.chips);
+    out.source = 'chips';
+    out.sets  = p.sets || null;
+    out.rpe   = p.target ? p.target.replace(/^@/, '') : null;
+    out.tempo = p.tempo || null;
+    out.rounds = cleanStr(ex.rounds);
+    out.extras = p.extras.slice();
+    out.rest = (typeof ex.restSec === 'number' && ex.restSec > 0)
+      ? ex.restSec
+      : (p.rest > 0 ? p.rest : null);
+    if (p.reps) {
+      // Recover what the old REPS cell was really holding. A duration or a
+      // distance stuffed in there gets its own label back.
+      const raw = p.reps;
+      const side = /(\/\s*|each\s+)(side|leg|arm|hand|direction|way)/i.test(raw);
+      // Strip the side marker AND a trailing "Reps" — "10 Reps / side" must become
+      // the value 10 under a label that already says REPS / SIDE, not "10 Reps".
+      const bare = raw
+        .replace(/\s*(\/\s*|each\s+)(side|leg|arm|hand|direction|way)s?\s*$/i, '')
+        .replace(/\s*reps?$/i, '')
+        .trim();
+      // DISTANCE IS TESTED FIRST. isPureDuration() reads a bare "m" as minutes, so
+      // "20 m" — a 20-metre sprint or carry — would otherwise be labelled TIME and
+      // read as twenty minutes. "5 min" still parses as time: "min" is not "m".
+      const kind = /^\d+(?:\.\d+)?\s*(m|km|yd|metres?|meters?)$/i.test(bare) ? 'distance'
+                 : isPureDuration(bare) ? 'time'
+                 : 'reps';
+      out.dose = { kind: kind, value: bare || raw, side: side, label: DOSE_LABEL[kind] };
+    }
+    return out;
+  }
+
+  // Does this exercise prescribe a countable rep? Holds, carries and intervals
+  // do not, which is what keeps them off the Ceiling and out of the rep log.
+  function repCount(ex) {
+    const r = rxOf(ex);
+    if (!r.dose || r.dose.kind !== 'reps') return null;
+    const m = String(r.dose.value).match(/\d+(?:\.\d+)?/);   // a range takes its LOW end
+    const n = m ? parseFloat(m[0]) : NaN;
+    return n > 0 ? n : null;
+  }
+
+  /* ── WRITE ─────────────────────────────────────────────────────────────── */
+
+  // Return a NEW exercise with `patch` merged into its rx. A key set to '' or
+  // null is REMOVED rather than blanked — an absent field is the whole contract,
+  // so there must be no way to store an empty one. Setting any dose clears the
+  // other two, because "exactly one dose" is an invariant and not a convention.
+  function applyRx(ex, patch) {
+    const next = Object.assign({}, ex);
+    const rx = Object.assign({}, ex && ex.rx);
+    patch = patch || {};
+    const DOSE = ['reps', 'time', 'distance', 'work'];
+
+    Object.keys(patch).forEach(k => {
+      const v = patch[k];
+      const cleared = v === '' || v === null || v === undefined || v === false;
+      if (cleared) { delete rx[k]; return; }
+      if (DOSE.indexOf(k) >= 0) DOSE.forEach(d => { if (d !== k) delete rx[d]; });
+      if (k === 'rest' || k === 'sets' || k === 'rounds') {
+        const n = (k === 'rest' && typeof v === 'string') ? parseDurationToSec(v) : Number(v);
+        if (n > 0) rx[k] = n; else delete rx[k];
+        return;
+      }
+      rx[k] = (k === 'side') ? true : (typeof v === 'number' ? v : String(v).trim());
+    });
+
+    if ('setup'  in patch) { const v = cleanStr(patch.setup);  if (v) next.setup  = v; else delete next.setup; }
+    if ('intent' in patch) { const v = cleanStr(patch.intent); if (v) next.intent = v; else delete next.intent; }
+
+    next.rx = rx;
+    delete next.chips;      // one source of truth, or it is the old bug again
+    delete next.restSec;    // rest lives in rx.rest now
+    return next;
+  }
+
+  // Convert one legacy exercise to rx. Used by scripts/migrate_rx.py's JS twin
+  // and by the coach editor the first time it saves an unmigrated exercise.
+  //
+  // The leftover green pills are triaged, not dumped: a pill that merely restates
+  // the tempo is DROPPED when a tempo cell already says it (153 cards were
+  // carrying that duplicate), and anything else becomes the `setup` line — which
+  // is where "neutral grip" and "45° bench" always belonged.
+  const TEMPO_WORDS = /(eccentric|squeeze|hold|pause|lower|slow|controlled|stretch|return|tempo)/i;
+
+  // What reads as an INTENTION rather than a condition. "max speed" on a sprint
+  // is the point of the exercise and has to stay loud; "neutral grip" is a
+  // condition and belongs in quiet text. Anything not matched here goes to setup,
+  // which is the safe direction to be wrong in.
+  const INTENT_WORDS = /^(max |fast |explosive|stick |stick$|drive |quiet |minimal ground|snap |punch |build |accelerat|attack)/i;
+
+  function toRx(ex) {
+    const r = rxOf(ex);
+    if (r.source === 'rx') return Object.assign({}, ex);
+    const rx = {};
+    if (r.sets)   rx.sets   = Number(r.sets) || r.sets;
+    if (r.rounds) rx.rounds = Number(r.rounds) || r.rounds;
+    if (r.dose)   { rx[r.dose.kind] = numIfPlain(r.dose.value); if (r.dose.side) rx.side = true; }
+    if (r.rpe)    rx.rpe    = numIfPlain(r.rpe);
+    if (r.tempo)  rx.tempo  = r.tempo;
+    if (r.rest)   rx.rest   = r.rest;
+
+    // A pill that only restates the tempo is DROPPED when a tempo cell already
+    // says it — 153 cards were carrying that exact duplicate. Everything else is
+    // sorted into the one field that matches what it actually is.
+    const keep = r.extras
+      .map(x => x.label)
+      .filter(l => !(rx.tempo && TEMPO_WORDS.test(l)));
+
+    const intents = keep.filter(l => INTENT_WORDS.test(l));
+    const rest    = keep.filter(l => !INTENT_WORDS.test(l));
+
+    // An exercise with no countable dose — "Start the Run", "Empty Bar Warm-Up
+    // Sets" — gets NO rx at all rather than an empty one. Its instruction lives
+    // in setup/cues, and an empty object would only be a slot for a future bug.
+    const next = Object.assign({}, ex);
+    if (Object.keys(rx).length) next.rx = rx; else delete next.rx;
+    const intent = ex.intent || intents[0] || '';
+    const setup = [ex.setup].concat(intents.slice(1), rest).filter(Boolean).join(' · ');
+    if (intent) next.intent = intent; else delete next.intent;
+    if (setup)  next.setup  = setup;  else delete next.setup;
+    delete next.chips;
+    delete next.restSec;
+    return next;
+  }
+
+  function numIfPlain(v) {
+    const s = String(v).trim();
+    return /^\d+$/.test(s) ? parseInt(s, 10) : s;
+  }
+
+  /* ── AUDIT (rx) ────────────────────────────────────────────────────────── */
+
+  // The old audit() catches malformed chip LABELS. These are the mistakes that
+  // are still possible once labels are gone — far fewer, which is the point.
+  function auditRx(ex) {
+    ex = ex || {};
+    const problems = [];
+    if (!ex.rx || typeof ex.rx !== 'object') return problems;
+    const rx = ex.rx;
+    const doses = ['reps', 'time', 'distance', 'work'].filter(k => cleanStr(rx[k]));
+
+    if (doses.length > 1) problems.push({ level: 'warn', code: 'two-doses', label: doses.join(' + '),
+      msg: 'More than one dose on the same exercise — only "' + doses[0] + '" will be shown.' });
+
+    if (ex.chips) problems.push({ level: 'warn', code: 'chips-and-rx', label: 'chips[]',
+      msg: 'This exercise has rx AND chips — the chips are dead weight and will drift.' });
+
+    if (ex.type === 'standard' && doses[0] === 'reps' && !rx.sets)
+      problems.push({ level: 'warn', code: 'reps-without-sets', label: String(rx.reps),
+        msg: 'A rep count with no set count.' });
+
+    const rpeLow = parseFloat(String(rx.rpe === undefined ? '' : rx.rpe));
+    if (!isNaN(rpeLow) && rpeLow < 6)
+      problems.push({ level: 'warn', code: 'rpe-below-floor', label: String(rx.rpe),
+        msg: 'RPE below 6 — the selector floor is 6, so this cannot be logged.' });
+
+    if (cleanStr(rx.tempo) && !/^(iso|\d+(\.\d+)?([-–]\d+(\.\d+)?){2,3})$/i.test(String(rx.tempo).trim()))
+      problems.push({ level: 'warn', code: 'tempo-shape', label: String(rx.tempo),
+        msg: 'Tempo should be "iso" or 3–4 numbers like 3-1-1-0.' });
+
+    return problems;
+  }
+
   global.Chips = {
     parseChips, parseDurationToSec, isPureDuration,
-    slotOf, fmt, readStats, applyStats, audit
+    slotOf, fmt, readStats, applyStats, audit,
+    rxOf, repCount, applyRx, toRx, auditRx, tempoWords, DOSE_LABEL
   };
 })(typeof window !== 'undefined' ? window : globalThis);

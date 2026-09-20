@@ -37,12 +37,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace until you are warm and breathing",
@@ -51,20 +45,15 @@
             "bad": [
               "Starting hard — you are about to sprint"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Side Shuffle",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "4 Lengths"
-            },
-            {
-              "label": "Service line to service line"
-            }
-          ],
           "cues": {
             "good": [
               "Stay low and push the ground away with the trailing foot",
@@ -73,17 +62,16 @@
             "bad": [
               "Bobbing up and down between steps"
             ]
-          }
+          },
+          "rx": {
+            "reps": "4 Lengths"
+          },
+          "setup": "Service line to service line"
         },
         {
           "type": "simple",
           "name": "Carioca",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Lengths / side"
-            }
-          ],
           "cues": {
             "good": [
               "Let the hips rotate and keep the shoulders quiet",
@@ -92,20 +80,16 @@
             "bad": [
               "Turning the whole body and making it a run"
             ]
+          },
+          "rx": {
+            "reps": "2 Lengths",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Split-Step Bounces",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 Sets"
-            },
-            {
-              "label": "×6 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Small hop, land wide and low on the balls of both feet",
@@ -114,6 +98,10 @@
             "bad": [
               "A big jump that leaves you in the air when the ball is struck"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 6
           }
         }
       ]
@@ -126,16 +114,6 @@
           "type": "standard",
           "name": "Wall Feed Reaction",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×5 Balls"
-            }
-          ],
           "cues": {
             "good": [
               "Throw hard at the wall, split-step, then move to where it comes off",
@@ -145,22 +123,17 @@
               "Throwing the same ball to the same spot every time"
             ]
           },
-          "note": "Vary how hard you throw so you cannot predict the bounce."
+          "note": "Vary how hard you throw so you cannot predict the bounce.",
+          "rx": {
+            "sets": 6,
+            "reps": "5 Balls",
+            "rest": 60
+          }
         },
         {
           "type": "standard",
           "name": "Self-Drop Drop-Step",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "3 each side"
-            }
-          ],
           "cues": {
             "good": [
               "Drop the ball from shoulder height behind you and chase it down",
@@ -169,6 +142,12 @@
             "bad": [
               "Turning your back and running"
             ]
+          },
+          "rx": {
+            "sets": 4,
+            "reps": 3,
+            "side": true,
+            "rest": 45
           }
         }
       ]

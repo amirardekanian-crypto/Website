@@ -53,12 +53,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace until you are warm and breathing",
@@ -67,20 +61,15 @@
             "bad": [
               "Starting hard — you are about to sprint"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / side"
-            },
-            {
-              "label": "Front-back, then side-side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold the fence, stand tall, let the leg swing freely",
@@ -89,17 +78,17 @@
             "bad": [
               "Arching the back to throw the leg higher"
             ]
-          }
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
+          },
+          "setup": "Front-back, then side-side"
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "6 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit into that hip, chest tall",
@@ -108,17 +97,16 @@
             "bad": [
               "Letting the knee roll inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "4 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the back hip down, then rotate and reach tall",
@@ -127,20 +115,16 @@
             "bad": [
               "Rotating before the hip has opened"
             ]
+          },
+          "rx": {
+            "reps": 4,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "A-Skip",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×15 m"
-            }
-          ],
           "cues": {
             "good": [
               "Tall hips, strike the ground underneath you",
@@ -149,20 +133,16 @@
             "bad": [
               "Reaching the foot out in front of the body"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "distance": "15 m"
           }
         },
         {
           "type": "simple",
           "name": "Ankle Pogo",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Stiff ankles, off the ground as fast as you land",
@@ -171,6 +151,10 @@
             "bad": [
               "Bending the knees and turning it into a squat jump"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         }
       ]
@@ -183,16 +167,6 @@
           "type": "standard",
           "name": "Snap Down",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×5 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "From tall on the toes, snap down into an athletic stance and freeze",
@@ -202,22 +176,17 @@
               "Landing stiff-legged and taking it through the knees"
             ]
           },
-          "note": "Land quiet — you should hear almost nothing."
+          "note": "Land quiet — you should hear almost nothing.",
+          "rx": {
+            "sets": 3,
+            "reps": 5,
+            "rest": 45
+          }
         },
         {
           "type": "standard",
           "name": "Sprint to Two-Step Stop",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "5 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 m"
-            }
-          ],
           "cues": {
             "good": [
               "Accelerate hard, then kill it in two steps and hold the stance",
@@ -227,7 +196,12 @@
               "Slowing down gradually over five or six steps"
             ]
           },
-          "note": "Own the stop before you make it faster."
+          "note": "Own the stop before you make it faster.",
+          "rx": {
+            "sets": 5,
+            "distance": "10 m",
+            "rest": 60
+          }
         }
       ]
     },
@@ -239,16 +213,6 @@
           "type": "standard",
           "name": "Shuffle to Sprint",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "3 each way"
-            }
-          ],
           "cues": {
             "good": [
               "Shuffle low, plant the outside foot, then sprint off it",
@@ -257,22 +221,18 @@
             "bad": [
               "Standing up tall to change direction"
             ]
+          },
+          "rx": {
+            "sets": 6,
+            "reps": 3,
+            "side": true,
+            "rest": 60
           }
         },
         {
           "type": "standard",
           "name": "Turn and Go",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "3 each side"
-            }
-          ],
           "cues": {
             "good": [
               "Run out, plant one foot, turn 180 degrees and sprint back",
@@ -282,7 +242,13 @@
               "Rounding the turn like a running track"
             ]
           },
-          "note": "Turn off the same foot for a whole set, then swap."
+          "note": "Turn off the same foot for a whole set, then swap.",
+          "rx": {
+            "sets": 6,
+            "reps": 3,
+            "side": true,
+            "rest": 75
+          }
         }
       ]
     }

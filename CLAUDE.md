@@ -244,6 +244,52 @@ programme app** — that is why `saveWt()` is a stub and the pull-side merge is 
 
 Everything below still holds — it is simply enforced in the other file now.
 
+### 📋 A PRESCRIPTION IS DATA NOW — `rx`, not `chips[]` (2026-09-20)
+
+Amir: *"sometimes we have to write the time, in the reps chart … and sometimes the pills get
+mixed up."* Both were symptoms of one thing: sets/reps/RPE/tempo/rest were stored as **display
+strings** in `chips[]` and `parseChips()` pattern-matched them back into numbers at render time.
+
+**The prescription is now `ex.rx`** — `sets` · one of `reps`/`time`/`distance`/`work` · `side` ·
+`rpe` · `tempo` · `rest` · `rounds`. **An absent field means NOT PRESCRIBED**, and the card draws
+no cell for it. Full spec: `SCHEMA.md` → "`rx` — the prescription". What that fixed, measured
+before the change: **1,151 em-dashes** in the 42 free library sessions (237 of 352 exercises drew
+a five-cell grid with four cells empty), **139 of 163** warm-up items across the live programmes
+doing the same, and a duration filed under a cell labelled **REPS**.
+
+**Four fields beside it, four meanings, four looks** — this is the fix for "pills get mixed up",
+where one green pill stood for 121 different labels (a tempo said in words, equipment, an intent
+cue, and occasionally a real dose):
+`rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (ONE
+intention) · `note` → clay callout · `cues` → the cues list.
+**Never restate the tempo in `intent`** — `3s eccentric` beside `Tempo 3-1-1-0` is one sentence
+twice, which **153 cards** were doing. The app spells the tempo out itself under the grid.
+
+⚠ **REST IS NEVER INVENTED.** It used to fall back to 120s for any `standard` exercise, so all 26
+cards in the demo claimed "REST 2m" while every `restSec` in it was `null` — a calf raise and a
+back squat shown as identical, and a Pallof press told to sit for two minutes. Omit `rest` and
+there is no rest cell; the timer button stays, labelled *Rest timer*.
+
+⚠ **`rxOf()` / `repCount()` / `tempoWords()` EXIST TWICE** — inline in `program.html` (the offline
+PWA, deliberately self-contained) and in `assets/js/chips.js` (which `coach.html` loads). Drift
+means the coach's dashboard and the athlete's phone show different prescriptions for the same
+exercise and **nothing errors**. `scripts/check_rx.js` runs fixtures through both copies and is in
+`.githooks/pre-commit`. `chips.js` also owns the write side: `applyRx()`, `toRx()`, `auditRx()`.
+
+**Legacy `chips[]` is still READ, never written.** `rxOf()` parses it on the fly and recovers what
+each number really was, so **the ~34 live programmes were deliberately NOT bulk-migrated** — they
+already render correctly and better (the Supabase project has no automatic backups, and a
+dual-read costs nothing). They convert one at a time, for free, whenever an exercise is saved from
+**coach.html → ✎** or a new cycle is written by `/program-assemble`. The Train library WAS
+converted in bulk (`scripts/migrate_rx.js`, git is the undo). Never author `chips[]` again, and
+never leave `chips` sitting beside an `rx`.
+
+**Writing a programme got shorter, which was the point.** `/program-design` already emitted plain
+dose fields; `/program-assemble` step 2b used to convert them into chips under a page of rules
+(`×`-prefix, style colours, chip order, "never put a dose in a modifier", collapse rep ranges to
+the top). That step is now a copy. **Rep ranges ship as ranges** — `rx` has a real range field, so
+`"reps": "8-10"` reaches the athlete as the zone Amir actually meant.
+
 ### 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
 
 Full account in `CODEBASE.md` → *The Ceiling*. The three duplications to keep in step:

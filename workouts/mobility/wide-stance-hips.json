@@ -41,11 +41,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "7 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk at an easy pace with your arms swinging",
@@ -54,6 +49,9 @@
             "bad": [
               "Cutting the walk short before you feel warm"
             ]
+          },
+          "rx": {
+            "time": "7 minutes"
           }
         }
       ]
@@ -66,11 +64,6 @@
           "type": "simple",
           "name": "90/90 Hip Rotation",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Sit tall and swing both knees across to the other side",
@@ -79,17 +72,16 @@
             "bad": [
               "Pushing your knees down with your hands"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Adductor Rock Back",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Kneel with one leg out to the side and rock your hips back toward your heels",
@@ -98,17 +90,16 @@
             "bad": [
               "Letting your lower back round as you rock back"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Squat",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit back into one hip, going a little deeper each rep",
@@ -117,6 +108,10 @@
             "bad": [
               "Letting the heel of the bent leg lift"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -129,24 +124,7 @@
           "type": "standard",
           "name": "Cossack Squat",
           "videoUrl": null,
-          "restSec": 60,
           "note": "Go only as deep as you can control and come up a little if the front of the hip pinches.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Each Side"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "2s pause",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sit deep into one hip with the other leg straight and its heel down",
@@ -155,29 +133,21 @@
             "bad": [
               "Bouncing out of the bottom"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rpe": 7,
+            "rest": 60
+          },
+          "setup": "2s pause"
         },
         {
           "type": "standard",
           "name": "Copenhagen Plank",
           "videoUrl": null,
-          "restSec": 45,
           "note": "Stop the set when your hips start to drop, even if that's before fifteen seconds.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×15s Each Side"
-            },
-            {
-              "label": "Tempo Iso"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your side with your top knee on a bench and lift your hips in a straight line",
@@ -186,6 +156,14 @@
             "bad": [
               "Letting your hips sag toward the floor"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "time": "15s",
+            "side": true,
+            "rpe": 7,
+            "tempo": "Iso",
+            "rest": 45
           }
         }
       ]

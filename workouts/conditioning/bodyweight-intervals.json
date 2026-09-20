@@ -53,12 +53,6 @@
           "type": "simple",
           "name": "March on the Spot",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Knee up, opposite arm back",
@@ -67,17 +61,15 @@
             "bad": [
               "Starting at full speed"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Bodyweight Squat",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Sit between your hips, chest tall",
@@ -86,17 +78,15 @@
             "bad": [
               "Heels lifting off the floor"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Reverse Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "6 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Step back and drop the back knee softly",
@@ -105,17 +95,16 @@
             "bad": [
               "Crashing the back knee into the floor"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Inchworm",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "6 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Walk the hands out to a plank, then the feet back in",
@@ -124,6 +113,9 @@
             "bad": [
               "Letting the hips sag at the top of the walk-out"
             ]
+          },
+          "rx": {
+            "reps": 6
           }
         }
       ]
@@ -202,12 +194,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Keep moving until your breathing settles",
@@ -216,18 +202,15 @@
             "bad": [
               "Sitting down the second the last round ends"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Nasal Breathing",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "In through the nose for four, out for six",
@@ -236,6 +219,9 @@
             "bad": [
               "Forcing big breaths"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         }
       ]

@@ -37,11 +37,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Jog easy until you're warm and breathing a little harder",
@@ -50,17 +45,15 @@
             "bad": [
               "Starting at run pace"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg front to back, then side to side",
@@ -69,17 +62,16 @@
             "bad": [
               "Arching your lower back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit back into that hip, chest tall",
@@ -88,17 +80,16 @@
             "bad": [
               "Letting the bent knee cave inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Shuffle",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×4 Lengths"
-            }
-          ],
           "cues": {
             "good": [
               "Shuffle ten metres each length, staying low and pushing the floor away with the trailing foot",
@@ -107,17 +98,15 @@
             "bad": [
               "Bobbing up and down between steps"
             ]
+          },
+          "rx": {
+            "reps": "4 Lengths"
           }
         },
         {
           "type": "simple",
           "name": "Carioca",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×2 Lengths Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Cross the back foot in front, then behind, as you travel sideways",
@@ -126,17 +115,16 @@
             "bad": [
               "Twisting your shoulders along with your hips"
             ]
+          },
+          "rx": {
+            "reps": "2 Lengths",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Split-Step Bounces",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6"
-            }
-          ],
           "cues": {
             "good": [
               "Take a small hop and land wide and low on the balls of both feet",
@@ -145,26 +133,15 @@
             "bad": [
               "Landing flat-footed on stiff knees"
             ]
+          },
+          "rx": {
+            "reps": 6
           }
         },
         {
           "type": "standard",
           "name": "Build-Up Run",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "build 60-80-90",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Add speed on each run, about 60, then 80, then 90 percent of your top speed",
@@ -173,7 +150,13 @@
             "bad": [
               "Going flat out on the first one"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "20 m",
+            "rest": 45
+          },
+          "intent": "build 60-80-90"
         }
       ]
     },
@@ -185,20 +168,6 @@
           "type": "standard",
           "name": "Wall Feed Reaction",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×4 Throws"
-            },
-            {
-              "label": "change your distance each set",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Throw hard at the wall, split-step as it hits, then move to where it comes off",
@@ -207,26 +176,18 @@
             "bad": [
               "Chasing the ball without checking how close the wall is"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "reps": "4 Throws",
+            "rest": 60
+          },
+          "setup": "change your distance each set"
         },
         {
           "type": "standard",
           "name": "Self-Drop Chase",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×1"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Bounce the ball hard off the floor at an angle, then chase it down before the second bounce",
@@ -235,7 +196,13 @@
             "bad": [
               "Stepping on the ball as you chase it"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "reps": 1,
+            "rest": 45
+          },
+          "setup": "alternate sides"
         }
       ]
     },
@@ -247,21 +214,7 @@
           "type": "standard",
           "name": "Backpedal and Turn",
           "videoUrl": null,
-          "restSec": 75,
           "note": "Do the first two at half speed to get the feel, then build up.",
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×1"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Face the wall and throw the ball hard into it, backpedal away while you watch the rebound, then turn and chase it down",
@@ -270,7 +223,13 @@
             "bad": [
               "Backpedalling faster than you can control"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "reps": 1,
+            "rest": 75
+          },
+          "setup": "alternate sides"
         }
       ]
     }

@@ -37,11 +37,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 min"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace until you are warm and breathing",
@@ -50,6 +45,9 @@
             "bad": [
               "Starting at running pace"
             ]
+          },
+          "rx": {
+            "time": "3 min"
           }
         }
       ]
@@ -62,11 +60,6 @@
           "type": "simple",
           "name": "Walking Lunge with Overhead Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step into a long lunge and reach both arms overhead",
@@ -75,17 +68,16 @@
             "bad": [
               "Arching the lower back to reach higher"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit into that hip, chest tall",
@@ -94,17 +86,16 @@
             "bad": [
               "Letting the knee roll inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Walking Hamstring Sweep",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step onto a straight leg and sweep the hands down the shin",
@@ -113,17 +104,16 @@
             "bad": [
               "Rounding the back instead of hinging at the hip"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Front-to-Back Leg Swing",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold the fence, stand tall, let the leg swing freely",
@@ -132,17 +122,16 @@
             "bad": [
               "Arching the back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Side-to-Side Leg Swing",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Swing the leg across the body and back out",
@@ -151,6 +140,10 @@
             "bad": [
               "Twisting the whole torso with it"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         }
       ]
@@ -229,20 +222,6 @@
           "type": "standard",
           "name": "Build-Up",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×15 s"
-            },
-            {
-              "label": "fast but relaxed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Accelerate smoothly to the top speed of each one",
@@ -252,17 +231,18 @@
               "Going to full effort on the first one"
             ]
           },
-          "note": "This is the bridge between warm and running — do not skip it."
+          "note": "This is the bridge between warm and running — do not skip it.",
+          "rx": {
+            "sets": 3,
+            "time": "15 s",
+            "rest": 45
+          },
+          "intent": "fast but relaxed"
         },
         {
           "type": "simple",
           "name": "Start the Run",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "Zone 2"
-            }
-          ],
           "cues": {
             "good": [
               "Straight into your run from here",
@@ -271,7 +251,8 @@
             "bad": [
               "Standing around long enough to go cold again"
             ]
-          }
+          },
+          "setup": "Zone 2"
         }
       ]
     }

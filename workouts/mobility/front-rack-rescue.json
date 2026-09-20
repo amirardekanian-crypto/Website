@@ -25,9 +25,6 @@
           "type": "simple",
           "name": "Foam-Roll Lats",
           "videoUrl": null,
-          "chips": [
-            { "label": "60s / side" }
-          ],
           "cues": {
             "good": [
               "Roll slowly from the armpit down the side of the back, pausing on any tender spots",
@@ -36,16 +33,16 @@
             "bad": [
               "Rushing through — this is meant to soften the tissue, not bruise it"
             ]
+          },
+          "rx": {
+            "time": "60s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Foam Roller T-Spine Extensions",
           "videoUrl": null,
-          "chips": [
-            { "label": "2 Sets" },
-            { "label": "10 Reps" }
-          ],
           "cues": {
             "good": [
               "Roller under the upper back — extend back over it one segment at a time",
@@ -54,6 +51,10 @@
             "bad": [
               "Cranking from the lower back instead of the mid-back"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         }
       ]
@@ -66,10 +67,6 @@
           "type": "simple",
           "name": "Wrist Rocks",
           "videoUrl": null,
-          "chips": [
-            { "label": "2 Sets" },
-            { "label": "10 Reps" }
-          ],
           "cues": {
             "good": [
               "Hands flat, rock gently forward and back to open the wrists",
@@ -78,15 +75,16 @@
             "bad": [
               "Forcing the stretch or loading it hard"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Quadruped T-Spine Rotations",
           "videoUrl": null,
-          "chips": [
-            { "label": "8 Reps / side" }
-          ],
           "cues": {
             "good": [
               "Hand behind the head — rotate the elbow up toward the ceiling and follow it with the eyes",
@@ -95,15 +93,16 @@
             "bad": [
               "Twisting from the lower back or letting the hips rock"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Banded Lat Stretch",
           "videoUrl": null,
-          "chips": [
-            { "label": "40s / side" }
-          ],
           "cues": {
             "good": [
               "Anchor the band high, hinge back and sink the chest to lengthen the lat",
@@ -112,15 +111,16 @@
             "bad": [
               "Shrugging the shoulder up toward the ear"
             ]
+          },
+          "rx": {
+            "time": "40s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Overhead Triceps Stretch",
           "videoUrl": null,
-          "chips": [
-            { "label": "40s / side" }
-          ],
           "cues": {
             "good": [
               "Reach the hand down the spine and gently guide the elbow back and overhead",
@@ -129,16 +129,16 @@
             "bad": [
               "Arching the lower back to fake more range"
             ]
+          },
+          "rx": {
+            "time": "40s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Elbows-on-Bench Dowel Stretch",
           "videoUrl": null,
-          "chips": [
-            { "label": "2 Sets" },
-            { "label": "30s" }
-          ],
           "cues": {
             "good": [
               "Elbows on the bench holding a dowel — sink the chest to open T-spine, lats and triceps at once",
@@ -147,6 +147,10 @@
             "bad": [
               "Bouncing — hold a steady, settled stretch"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "time": "30s"
           }
         }
       ]
@@ -159,10 +163,6 @@
           "type": "simple",
           "name": "Front-Rack Elbow Punches",
           "videoUrl": null,
-          "chips": [
-            { "label": "2 Sets" },
-            { "label": "10 Reps" }
-          ],
           "cues": {
             "good": [
               "Empty bar in the front rack — actively drive the elbows up to their new ceiling",
@@ -171,16 +171,16 @@
             "bad": [
               "Rushing — the point is to teach the nervous system to hold the range the stretching just opened"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Rack Hold",
           "videoUrl": null,
-          "chips": [
-            { "label": "2 Sets" },
-            { "label": "Max hold" }
-          ],
           "cues": {
             "good": [
               "Hold the front rack on fingertips or three fingers, elbows as high as they'll stay controlled",
@@ -189,7 +189,11 @@
             "bad": [
               "Letting the elbows drop or the chest collapse just to hold longer"
             ]
-          }
+          },
+          "rx": {
+            "sets": 2
+          },
+          "intent": "Max hold"
         }
       ]
     }

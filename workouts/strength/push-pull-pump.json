@@ -45,12 +45,6 @@
           "type": "simple",
           "name": "Rowing Machine",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "4 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace, any machine if there is no rower",
@@ -59,17 +53,15 @@
             "bad": [
               "Hammering it"
             ]
+          },
+          "rx": {
+            "time": "4 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Arm Circles",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / direction"
-            }
-          ],
           "cues": {
             "good": [
               "Start small and grow the circle as it loosens",
@@ -78,17 +70,16 @@
             "bad": [
               "Starting with the biggest circle you can make"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Knees stacked, open the top arm and follow it with your eyes",
@@ -97,20 +88,16 @@
             "bad": [
               "Letting the knees roll apart"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Prone Y-T Raise",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / shape"
-            },
-            {
-              "label": "Bodyweight"
-            }
-          ],
           "cues": {
             "good": [
               "Face down, lift the arms a few inches, thumbs up",
@@ -119,20 +106,16 @@
             "bad": [
               "Shrugging towards the ears"
             ]
-          }
+          },
+          "rx": {
+            "reps": "8 Reps / shape"
+          },
+          "setup": "Bodyweight"
         },
         {
           "type": "simple",
           "name": "Light Dumbbell Rehearsal",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "1 Set"
-            },
-            {
-              "label": "×10 Reps, very light"
-            }
-          ],
           "cues": {
             "good": [
               "One light set of the first working movement",
@@ -141,6 +124,10 @@
             "bad": [
               "Going straight to your working weight"
             ]
+          },
+          "rx": {
+            "sets": 1,
+            "reps": "10 Reps, very light"
           }
         }
       ]
@@ -153,19 +140,6 @@
           "type": "standard",
           "name": "Single-Arm Dumbbell Row",
           "videoUrl": null,
-          "restSec": 90,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps / side"
-            },
-            {
-              "label": "RPE 7-8"
-            }
-          ],
           "cues": {
             "good": [
               "Flat back, pull to the hip and pause at the top",
@@ -175,25 +149,19 @@
               "Twisting the torso to get the dumbbell higher"
             ]
           },
-          "note": "Pulling leads this session on purpose."
+          "note": "Pulling leads this session on purpose.",
+          "rx": {
+            "sets": 4,
+            "reps": 10,
+            "side": true,
+            "rpe": "7-8",
+            "rest": 90
+          }
         },
         {
           "type": "standard",
           "name": "Half-Kneeling Single-Arm Overhead Press",
           "videoUrl": null,
-          "restSec": 90,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps / side"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Press straight up beside the ear, not out in front",
@@ -203,7 +171,14 @@
               "Leaning back to press the weight up"
             ]
           },
-          "note": "Kneeling is what stops your lower back arching to finish the rep."
+          "note": "Kneeling is what stops your lower back arching to finish the rep.",
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rpe": 7,
+            "rest": 90
+          }
         }
       ]
     },
@@ -215,19 +190,6 @@
           "type": "standard",
           "name": "Dumbbell Bench Press",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Elbows about 45 degrees from the body",
@@ -237,25 +199,18 @@
               "Letting the elbows flare out wide"
             ]
           },
-          "note": "Two sets only, and that is on purpose."
+          "note": "Two sets only, and that is on purpose.",
+          "rx": {
+            "sets": 2,
+            "reps": 10,
+            "rpe": 7,
+            "rest": 75
+          }
         },
         {
           "type": "standard",
           "name": "Rear Delt Fly",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×12 Reps"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Hinge over, light weight, lead with the elbows",
@@ -264,22 +219,18 @@
             "bad": [
               "Going so heavy it becomes a row"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 12,
+            "rpe": 7,
+            "rest": 60
           }
         },
         {
           "type": "standard",
           "name": "Dumbbell Wrist Extension",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×15 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Forearm on your thigh, palm down, very light and slow",
@@ -289,7 +240,13 @@
               "Going heavy"
             ]
           },
-          "note": "This is the one that keeps tennis elbow away."
+          "note": "This is the one that keeps tennis elbow away.",
+          "rx": {
+            "sets": 2,
+            "reps": 15,
+            "side": true,
+            "rest": 45
+          }
         }
       ]
     },
@@ -301,16 +258,6 @@
           "type": "standard",
           "name": "Suitcase Carry",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m / side"
-            }
-          ],
           "cues": {
             "good": [
               "Pick it up like a deadlift, then walk tall",
@@ -319,6 +266,12 @@
             "bad": [
               "Bending over and yanking it off the floor"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "20 m",
+            "side": true,
+            "rest": 60
           }
         }
       ]

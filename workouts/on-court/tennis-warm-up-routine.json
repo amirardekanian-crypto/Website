@@ -24,7 +24,6 @@
         {
           "type": "simple",
           "name": "Easy Jog / Skip",
-          "chips": [{ "label": "3 min" }],
           "cues": {
             "good": [
               "Alternate between jogging and skipping — jog a length, skip a length",
@@ -34,12 +33,14 @@
             "bad": [
               "Going too hard — you're warming the engine, not racing it"
             ]
+          },
+          "rx": {
+            "time": "3 min"
           }
         },
         {
           "type": "simple",
           "name": "Side Shuffles",
-          "chips": [{ "label": "×3 Lengths" }],
           "cues": {
             "good": [
               "Face the net, stay low through the hips",
@@ -48,12 +49,14 @@
             "bad": [
               "Crossing your feet over each other"
             ]
+          },
+          "rx": {
+            "reps": "3 Lengths"
           }
         },
         {
           "type": "simple",
           "name": "High Knees",
-          "chips": [{ "label": "×1 Length" }],
           "cues": {
             "good": [
               "Drive each knee up to hip height",
@@ -62,12 +65,14 @@
             "bad": [
               "Leaning back — stay tall"
             ]
+          },
+          "rx": {
+            "reps": "1 Length"
           }
         },
         {
           "type": "simple",
           "name": "Butt Kicks",
-          "chips": [{ "label": "×1 Length" }],
           "cues": {
             "good": [
               "Quick tempo, heels flicking up behind you",
@@ -76,6 +81,9 @@
             "bad": [
               "Big, slow strides — this should be fast and tight"
             ]
+          },
+          "rx": {
+            "reps": "1 Length"
           }
         }
       ]
@@ -87,7 +95,6 @@
         {
           "type": "simple",
           "name": "Prisoner Squats",
-          "chips": [{ "label": "×10" }],
           "cues": {
             "good": [
               "Hands laced behind your head, elbows wide — keep them there throughout",
@@ -98,12 +105,14 @@
               "Letting the elbows collapse forward — if they drop, your chest is following",
               "Rushing the descent — control the way down"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Airplane",
-          "chips": [{ "label": "×6 Each Side" }],
           "cues": {
             "good": [
               "Stand on one leg, hinge forward until your torso and free leg are parallel to the floor",
@@ -114,12 +123,15 @@
               "Letting the hip of the raised leg hike up — keep both hips level",
               "Rushing through — hold a beat at the bottom to feel the balance challenge"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Hip Openers",
-          "chips": [{ "label": "×10 Each Side" }],
           "cues": {
             "good": [
               "Standing tall, drive one knee up to hip height then rotate it out to the side",
@@ -130,12 +142,15 @@
               "Leaning away from the working leg — stay upright and let the hip do the work",
               "Small, lazy circles — open the hip as wide as you can each rep"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Reverse Lunge with Knee Drive",
-          "chips": [{ "label": "×10 Each Leg" }],
           "cues": {
             "good": [
               "Step back and lower until your back knee is just above the floor",
@@ -146,12 +161,15 @@
               "Letting the front knee cave inward — keep it tracking over your second toe",
               "Rushing the drive — the knee lift should be deliberate, not a flick"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Arm Circles",
-          "chips": [{ "label": "×10 Each Direction" }],
           "cues": {
             "good": [
               "Start small and build to full shoulder range",
@@ -160,12 +178,15 @@
             "bad": [
               "Going straight to big circles with a cold shoulder"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
-          "chips": [{ "label": "×10 Each Arm" }],
           "cues": {
             "good": [
               "Swing across the chest and let momentum carry it back",
@@ -174,12 +195,15 @@
             "bad": [
               "Forcing the range — it should swing freely, not be pulled"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Half Kneeling T-Spine Rotations",
-          "chips": [{ "label": "×8 Each Side" }],
           "cues": {
             "good": [
               "Take a half-kneeling position — one knee down, one foot forward at 90°",
@@ -191,6 +215,10 @@
               "Rotating from the lower back or letting the hips open — lock them in place",
               "Collapsing the chest forward between reps"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -203,12 +231,6 @@
           "type": "standard",
           "name": "Ankle Pogos",
           "videoUrl": null,
-          "restSec": 20,
-          "chips": [
-            { "label": "2 Sets", "style": "yellow" },
-            { "label": "×10" },
-            { "label": "fast turnover", "style": "dark" }
-          ],
           "cues": {
             "good": [
               "Feet hip-width, bounce through the ankles — minimal knee bend",
@@ -219,18 +241,18 @@
               "Bending too much at the knee — the ankle should be doing the work",
               "Slow, lazy bounces — this should feel snappy"
             ]
-          }
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10,
+            "rest": 20
+          },
+          "intent": "fast turnover"
         },
         {
           "type": "standard",
           "name": "Countermovement Jumps (CMJ)",
           "videoUrl": null,
-          "restSec": 30,
-          "chips": [
-            { "label": "2 Sets", "style": "yellow" },
-            { "label": "×3" },
-            { "label": "max intent", "style": "dark" }
-          ],
           "cues": {
             "good": [
               "Quick dip into a quarter squat, then drive arms up and explode off the floor",
@@ -241,17 +263,18 @@
               "Slow, stiff take-off — you want a sharp, fast countermovement",
               "Crashing the landing — control it, don't collapse"
             ]
-          }
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 3,
+            "rest": 30
+          },
+          "intent": "max intent"
         },
         {
           "type": "standard",
           "name": "10m Accelerations",
           "videoUrl": null,
-          "restSec": 30,
-          "chips": [
-            { "label": "3 Sets", "style": "yellow" },
-            { "label": "max speed", "style": "dark" }
-          ],
           "cues": {
             "good": [
               "Start from a split stance, lean forward and drive hard for the first 3–4 steps",
@@ -262,7 +285,12 @@
               "Standing tall from the start — you need that forward lean to accelerate",
               "Jogging it — these are maximal sprints, not strides"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "rest": 30
+          },
+          "intent": "max speed"
         }
       ]
     }

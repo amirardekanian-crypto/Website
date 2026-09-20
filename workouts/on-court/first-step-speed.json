@@ -49,12 +49,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace until you are warm and breathing",
@@ -63,20 +57,15 @@
             "bad": [
               "Starting hard — you are about to sprint"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / side"
-            },
-            {
-              "label": "Front-back, then side-side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold the fence, stand tall, let the leg swing freely",
@@ -85,17 +74,17 @@
             "bad": [
               "Arching the back to throw the leg higher"
             ]
-          }
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
+          },
+          "setup": "Front-back, then side-side"
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "6 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit into that hip, chest tall",
@@ -104,17 +93,16 @@
             "bad": [
               "Letting the knee roll inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "4 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the back hip down, then rotate and reach tall",
@@ -123,20 +111,16 @@
             "bad": [
               "Rotating before the hip has opened"
             ]
+          },
+          "rx": {
+            "reps": 4,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "A-Skip",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×15 m"
-            }
-          ],
           "cues": {
             "good": [
               "Tall hips, strike the ground underneath you",
@@ -145,20 +129,16 @@
             "bad": [
               "Reaching the foot out in front of the body"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "distance": "15 m"
           }
         },
         {
           "type": "simple",
           "name": "Ankle Pogo",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Stiff ankles, off the ground as fast as you land",
@@ -167,20 +147,16 @@
             "bad": [
               "Bending the knees and turning it into a squat jump"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Build-Up Run",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 Sets"
-            },
-            {
-              "label": "×20 m, 60% → 80% → 90%"
-            }
-          ],
           "cues": {
             "good": [
               "Accelerate smoothly to the top speed of each one",
@@ -190,7 +166,11 @@
               "Going straight to full effort on the first one"
             ]
           },
-          "note": "This is the bridge between warm and sprinting — do not skip it."
+          "note": "This is the bridge between warm and sprinting — do not skip it.",
+          "rx": {
+            "sets": 3,
+            "reps": "20 m, 60% → 80% → 90%"
+          }
         }
       ]
     },
@@ -202,16 +182,6 @@
           "type": "standard",
           "name": "Split-Step to Sprint",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×5 m"
-            }
-          ],
           "cues": {
             "good": [
               "Land the split-step already loaded, then explode into the first stride",
@@ -221,22 +191,17 @@
               "A slow, flat-footed first step"
             ]
           },
-          "note": "Full rest between every one — this is a speed session, not conditioning."
+          "note": "Full rest between every one — this is a speed session, not conditioning.",
+          "rx": {
+            "sets": 6,
+            "distance": "5 m",
+            "rest": 60
+          }
         },
         {
           "type": "standard",
           "name": "Falling Start",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 m"
-            }
-          ],
           "cues": {
             "good": [
               "Lean from the ankles until you have to catch yourself, then run",
@@ -245,6 +210,11 @@
             "bad": [
               "Bending at the hips instead of leaning from the ankle"
             ]
+          },
+          "rx": {
+            "sets": 4,
+            "distance": "10 m",
+            "rest": 75
           }
         }
       ]

@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Thoracic Rotation",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Sit tall with a hand behind your head and turn your elbow round to the side",
@@ -46,17 +41,16 @@
             "bad": [
               "Turning from your lower back"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Alternating Overhead Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Stand tall and reach one arm long toward the ceiling, then the other",
@@ -65,6 +59,10 @@
             "bad": [
               "Leaning back and arching your lower back"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         }
       ]
@@ -77,11 +75,6 @@
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push the floor away through your heels",
@@ -90,17 +83,15 @@
             "bad": [
               "Arching your lower back to lift higher"
             ]
+          },
+          "rx": {
+            "reps": 12
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg forward and back like a pendulum",
@@ -109,17 +100,16 @@
             "bad": [
               "Swinging harder than you can control"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Reverse Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step back and lower the back knee toward the floor",
@@ -128,6 +118,10 @@
             "bad": [
               "Letting the front knee cave inward"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -140,11 +134,6 @@
           "type": "simple",
           "name": "Inchworm",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Walk your hands out to a plank, then walk your feet up to them",
@@ -153,17 +142,15 @@
             "bad": [
               "Letting your hips sag when your hands are out"
             ]
+          },
+          "rx": {
+            "reps": 6
           }
         },
         {
           "type": "simple",
           "name": "Squat to Stand",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Hold your toes, sink your hips down, then lift your chest and stand",
@@ -172,6 +159,9 @@
             "bad": [
               "Letting your heels lift off the floor"
             ]
+          },
+          "rx": {
+            "reps": 8
           }
         }
       ]

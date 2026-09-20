@@ -9,7 +9,7 @@ Turn raw workout content into a published session in the Library → Train tab. 
 
 ## Step 0 — Required reading (every run)
 
-1. **`SCHEMA.md` → "Library tab — Train section"** — exercise types (simple/standard/circuit), chip rules, manifest format, chip parsing.
+1. **`SCHEMA.md` → "Library tab — Train section"** and **"`rx` — the prescription"** — exercise types (simple/standard/circuit), how a dose is written, manifest format.
 2. **`Content/PRODUCT.md`** — what the product is and who it's for. Train workouts are shared across all athletes — they should be generally applicable to competitive tennis/padel players, not one athlete's specific programme.
 
 ## Step 1 — Understand what you've been given
@@ -64,7 +64,7 @@ Best for: warm-up drills, mobility movements, cool-down, time/distance entries t
   "type": "simple",
   "name": "Easy Jog",
   "videoUrl": null,
-  "chips": [{ "label": "5 min" }],
+  "rx": { "time": "5 min" },
   "cues": {
     "good": ["Keep effort conversational"],
     "bad": ["Don't go hard — this is warm-up"]
@@ -72,23 +72,28 @@ Best for: warm-up drills, mobility movements, cool-down, time/distance entries t
 }
 ```
 
-Chip rules for `simple`: use `"×N Reps"` / `"×N Each Side"` / `"×N Each Leg"` for reps, or a bare duration/distance (`"5 min"`, `"30s"`, `"20m"`). Optionally add `"RPE N"`. No set count chip.
+**`rx` is the prescription, and the only rule is: write what you prescribed, omit what you
+did not.** An absent field means *not prescribed*, and the app draws no cell for it. (Before
+2026-09-20 this was `chips[]` — free-text labels the app pattern-matched back into numbers —
+and the library alone rendered **1,151 em-dashes**, with 237 of 352 exercises showing a
+five-cell grid that was four-fifths empty. See SCHEMA.md → "`rx` — the prescription".)
 
-**Critical rule — always embed side/leg/arm info in the same chip as the rep count.** Never use a separate `"Each Side"` chip — it doesn't match any stat pattern and renders as a green modifier pill with an empty REPS cell.
+For a `simple` item: a dose and nothing else. `{ "reps": 6, "side": true }`,
+`{ "time": "5 min" }`, `{ "distance": "20m" }`. **No `rpe`, no `tempo`, no `rest`** on a
+warm-up — with only a dose the app drops the grid entirely and renders the item as a name and
+a number on one line, which is what a warm-up should look like.
 
-| ✅ Correct | ❌ Wrong |
+| Instead of the old… | write |
 |---|---|
-| `{ "label": "×6 Each Side" }` | `{ "label": "6 Reps" }` + `{ "label": "Each side" }` |
-| `{ "label": "×10 Each Leg" }` | `{ "label": "10 Reps" }` + `{ "label": "Each leg" }` |
-| `{ "label": "×10 Each Direction" }` | `{ "label": "10 Reps" }` + `{ "label": "Each direction" }` |
+| `{ "label": "×6 Each Side" }` | `"rx": { "reps": 6, "side": true }` |
+| `{ "label": "45 sec / side" }` | `"rx": { "time": "45s", "side": true }` |
+| `{ "label": "×20 m" }` | `"rx": { "distance": "20m" }` |
+| `{ "label": "5 min" }` | `"rx": { "time": "5 min" }` |
 
-The `×`-prefix routes the chip to the REPS stat cell (visible in the expanded stats grid). Without `×`, a bare label like `"Each Side"` becomes a green modifier pill — always visible, including in the collapsed row.
-
-**Same trap for durations, mostly fixed.** `"45s/side"` and `"×8 Each Side"` always reached the REPS cell. `"45 sec / side"`
-and `"8 Reps / side"` (a space before the slash) did not, so on 21 of the 22 older sessions (65 exercises, measured 2026-09-20)
-the dose fell into a green pill and the row drew **no stats grid at all**. `parseChips()` and `isPureDuration()` (in `program.html`
-and, identically, `assets/js/chips.js`) now read `/ side`, `each way`, `4 Lengths` and `6 / 4 / 2 Reps / side` as reps. Still
-prefer the `×` form in anything new, and never write a dose as a bare modifier.
+Side/leg/arm is **its own field** now (`"side": true`), never baked into the number — that
+trap (a separate `"Each Side"` chip becoming a green pill with an empty REPS cell) cannot
+happen any more. Nor can a distance be read as minutes: `20m` is a `distance`, `20 min` is a
+`time`, and they are different keys rather than the same string parsed two ways.
 
 ---
 
@@ -100,13 +105,7 @@ Best for: all strength exercises, single-exercise loaded rows, any set/rep work 
   "type": "standard",
   "name": "Back Squat",
   "videoUrl": null,
-  "restSec": 180,
-  "chips": [
-    { "label": "4 Sets", "style": "yellow" },
-    { "label": "×5 Reps" },
-    { "label": "Tempo 3-0-1-0" },
-    { "label": "RPE 8" }
-  ],
+  "rx": { "sets": 4, "reps": 5, "rpe": 8, "tempo": "3-0-1-0", "rest": 180 },
   "cues": {
     "good": ["Push the floor away", "Brace through the whole set"],
     "bad": ["Knees caving in", "Chest collapsing forward"]
@@ -114,27 +113,39 @@ Best for: all strength exercises, single-exercise loaded rows, any set/rep work 
 }
 ```
 
-Chip rules for `standard`:
-- Set count: `"N Sets"` with `"style": "yellow"` — always first, always one per exercise
-- Reps: `"×N Reps"`, `"×N Each Side"` — start with `×`
-- Tempo: `"Tempo 3-0-1-0"` format
-- RPE: `"RPE N"`
-- Modifier (green pill, intention/technique only): `"3s eccentric"`, `"max intent"`, `"max speed"`, `"fast turnover"`, `"pause at bottom"` — **never put a rep count or dose here**
-- `restSec`: seconds of rest. Common values: 60, 90, 120, 150, 180, 240. Default is 120s if omitted.
+`rx` keys for `standard`: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe`
+(6–10) · `tempo` (`"3-0-1-0"` or `"iso"`) · `rest` (seconds). Rep **ranges** are allowed:
+`"reps": "8-10"`.
 
-**Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer via `restSec`. Use a modifier chip to communicate the movement intention to the athlete:
+⚠ **`rest` is not defaulted any more.** Omit it and the card shows no rest cell; the timer
+button is still there, labelled *Rest timer*. It used to fall back to 120s, which is how the
+demo ended up claiming "REST 2m" on all 26 cards while every rest in it was actually unset.
 
-| Movement type | Intention chip |
+**Three fields beside `rx`, three different jobs — this is what stopped the pill row being a
+junk drawer of 121 labels:**
+
+| Field | What it is | How it draws |
+|---|---|---|
+| `setup` | equipment / position — `"neutral grip"`, `"45° bench"`, `"In 4 · out 8"` | quiet grey line under the name |
+| `intent` | **ONE** intention — `"max intent"`, `"max speed"` | the green pill (the only pill) |
+| `cues` | technique, `good[]` / `bad[]` | the cues list |
+
+**Never restate the tempo in `intent`.** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
+same sentence twice; the app spells the tempo out for you under the grid as
+`3s down · 1s pause · 1s up`.
+
+**Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer. Use `intent` to communicate the movement intention:
+
+| Movement type | `intent` |
 |---|---|
 | Ankle pogos, fast hops | `"fast turnover"` |
 | CMJ, box jumps, bounding | `"max intent"` |
 | Short sprints, accelerations | `"max speed"` |
 | Med-ball throws | `"max power"` |
 
-**Chip visibility rules (how the renderer handles chips):**
-- Grey stat chips (REPS/SETS/RPE/TEMPO/REST-matched): shown as a compact summary on the **collapsed** row, then hidden when expanded — replaced by the full stats grid.
-- Green modifier pills (`style: "dark"`, no stat match): visible **both collapsed and expanded**, anchored next to the exercise name.
-- Use this distinction deliberately: modifier pills are always in the athlete's face — only put things there worth seeing every time (intentions, key technique cues).
+**How the card draws it:** the grid is as wide as the prescription — two facts, two cells —
+and stat pills collapse into it when the card is expanded. The `intent` pill stays visible
+either way, so only put something there worth seeing every single time.
 
 ---
 
@@ -355,9 +366,13 @@ Before committing:
 - `category` in the workout file matches the folder it sits in — **the publish
   picker reads the shelf off this field, not off the path**
 - `file` path in the manifest exactly matches the file you created
-- Every `standard` exercise has exactly one `"N Sets"` chip with `"style": "yellow"`
-- No rep counts in modifier (green) chips — those are technique cues only
-- Circuit `items` have `name` and `detail`, not `chips`
+- Every `standard` exercise has `rx.sets` and exactly one dose
+  (`reps` / `time` / `distance` / `work`)
+- No dose hiding in `intent` or `setup` — `intent` is ONE intention, `setup` is kit/position
+- No `chips[]` anywhere, and no `chips` left beside an `rx`
+- Circuit `items` have `name` and `detail`, not `rx`
+- **`node scripts/check_rx.js` passes** — it audits every `rx` in the library and is in the
+  pre-commit hook anyway
 - Every exercise `good: [2], bad: [1]`, every `note` one sentence, `intro` present (about 100–150 words)
 - `before` present on anything with load or speed, and no warning repeated between it and the intro
 - `countsAs` is set deliberately

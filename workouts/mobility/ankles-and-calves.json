@@ -41,11 +41,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk at an easy pace and roll through each foot",
@@ -54,6 +49,9 @@
             "bad": [
               "Shuffling flat-footed"
             ]
+          },
+          "rx": {
+            "time": "5 minutes"
           }
         },
         {
@@ -61,11 +59,6 @@
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
           "note": "A doorframe works if you don't have a wall to face.",
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes with your heel down",
@@ -74,17 +67,16 @@
             "bad": [
               "Letting your heel lift to get the knee further"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Tibialis Raise",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×15 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Lean back against a wall with your feet a step out and lift your toes toward your shins",
@@ -93,17 +85,15 @@
             "bad": [
               "Bending at the hips to help the lift"
             ]
+          },
+          "rx": {
+            "reps": 15
           }
         },
         {
           "type": "simple",
           "name": "Toe Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "20m"
-            }
-          ],
           "cues": {
             "good": [
               "Walk on the balls of your feet with your heels high",
@@ -112,17 +102,15 @@
             "bad": [
               "Letting your heels sink between steps"
             ]
+          },
+          "rx": {
+            "distance": "20m"
           }
         },
         {
           "type": "simple",
           "name": "Downward Dog Heel Drive",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "From downward dog, bend one knee and press the other heel toward the floor",
@@ -131,6 +119,10 @@
             "bad": [
               "Rounding your back to reach the heel down"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         }
       ]
@@ -143,23 +135,7 @@
           "type": "standard",
           "name": "Split Squat",
           "videoUrl": null,
-          "restSec": 45,
           "note": "This is one long hold, not reps, and if the front of the ankle pinches rather than stretches, take the knee back a little.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20s Each Side"
-            },
-            {
-              "label": "Tempo Iso"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Sink into a long split stance and drive the front knee forward over your toes",
@@ -168,6 +144,14 @@
             "bad": [
               "Letting the front heel lift"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "time": "20s",
+            "side": true,
+            "rpe": 7,
+            "tempo": "Iso",
+            "rest": 45
           }
         }
       ]
@@ -180,24 +164,7 @@
           "type": "standard",
           "name": "Calf Raise",
           "videoUrl": null,
-          "restSec": 45,
           "note": "Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "3s lower",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Rise onto the balls of both feet from the edge of a step, holding a wall, then take three seconds to lower",
@@ -206,29 +173,19 @@
             "bad": [
               "Bouncing at the bottom"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 20,
+            "rpe": 7,
+            "rest": 45
+          },
+          "setup": "3s lower"
         },
         {
           "type": "standard",
           "name": "Bent-Knee Calf Raise",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×15"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "2s lower",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Keep your knees bent and stay there as you rise onto the balls of your feet",
@@ -237,7 +194,14 @@
             "bad": [
               "Straightening your knees as you rise"
             ]
-          }
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 15,
+            "rpe": 7,
+            "rest": 45
+          },
+          "setup": "2s lower"
         }
       ]
     }

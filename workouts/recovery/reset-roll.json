@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Calf Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Slow from the ankle up, cross the other leg on top for more pressure",
@@ -46,17 +41,16 @@
             "bad": [
               "Rolling back and forth fast"
             ]
+          },
+          "rx": {
+            "time": "60 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Quad Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Face down, slow from knee to hip",
@@ -65,17 +59,16 @@
             "bad": [
               "Rolling directly over the kneecap"
             ]
+          },
+          "rx": {
+            "time": "60 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Glute Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Sit on the roller, cross one ankle over the opposite knee and lean into it",
@@ -85,18 +78,16 @@
               "Sitting on it without actually loading one side"
             ]
           },
-          "note": "This is the one most players skip and most need."
+          "note": "This is the one most players skip and most need.",
+          "rx": {
+            "time": "60 sec",
+            "side": true
+          }
         },
         {
           "type": "simple",
           "name": "Upper Back Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Roller across the upper back, hands behind the head, ribs down",
@@ -105,17 +96,15 @@
             "bad": [
               "Rolling the lower back"
             ]
+          },
+          "rx": {
+            "time": "60 sec"
           }
         },
         {
           "type": "simple",
           "name": "Lat Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "On your side, arm overhead, roller under the armpit",
@@ -124,6 +113,10 @@
             "bad": [
               "Rolling onto the ribs themselves"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         }
       ]
@@ -136,12 +129,6 @@
           "type": "simple",
           "name": "Child's Pose",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Knees wide, hips back to the heels, arms long",
@@ -150,18 +137,15 @@
             "bad": [
               "Rushing to get to the breathing"
             ]
+          },
+          "rx": {
+            "time": "60 sec"
           }
         },
         {
           "type": "simple",
           "name": "Box Breathing",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "In for four, hold four, out for four, hold four",
@@ -171,7 +155,10 @@
               "Straining to hold the counts — shorten to three"
             ]
           },
-          "note": "This is the part that actually switches you off, so do not cut it short."
+          "note": "This is the part that actually switches you off, so do not cut it short.",
+          "rx": {
+            "time": "3 minutes"
+          }
         }
       ]
     }

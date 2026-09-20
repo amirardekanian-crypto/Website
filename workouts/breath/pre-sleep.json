@@ -26,12 +26,6 @@
           "name": "Legs Up the Wall",
           "videoUrl": null,
           "note": "Go straight to bed after this — going back to a screen undoes it.",
-          "chips": [
-            {
-              "label": "4 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Heels up the wall or the headboard, arms out wide",
@@ -40,18 +34,15 @@
             "bad": [
               "Scrolling through it"
             ]
+          },
+          "rx": {
+            "time": "4 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Knees to Chest",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Hug both knees in gently and rock slowly side to side",
@@ -60,6 +51,9 @@
             "bad": [
               "Pulling hard"
             ]
+          },
+          "rx": {
+            "time": "60 sec"
           }
         }
       ]
@@ -73,15 +67,6 @@
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
           "note": "If you lose count, start again; if you fall asleep, good.",
-          "chips": [
-            {
-              "label": "5 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "In 4 · out 8"
-            }
-          ],
           "cues": {
             "good": [
               "Lying down, in through the nose for four, out for eight",
@@ -90,7 +75,11 @@
             "bad": [
               "Straining for the full eight — shorten to six and keep it easy"
             ]
-          }
+          },
+          "rx": {
+            "time": "5 minutes"
+          },
+          "setup": "In 4 · out 8"
         }
       ]
     }

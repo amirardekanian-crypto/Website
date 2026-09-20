@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Brisk Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk fast enough that your arms swing, and look ahead",
@@ -46,17 +41,15 @@
             "bad": [
               "Turning it into a jog"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes",
@@ -65,17 +58,16 @@
             "bad": [
               "Letting the heel lift or the arch collapse"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Hamstring Scoop",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step forward onto a straight leg and reach both hands toward your toes",
@@ -84,17 +76,16 @@
             "bad": [
               "Rounding your back instead of hinging at the hip"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Squeeze the back glute, then reach the same-side arm overhead",
@@ -103,17 +94,16 @@
             "bad": [
               "Arching your lower back to feel more"
             ]
+          },
+          "rx": {
+            "time": "45s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg front to back, then side to side",
@@ -122,17 +112,16 @@
             "bad": [
               "Arching your lower back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Single-Leg Calf Raise",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×12 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Rise onto the ball of your foot, pause, then lower slowly",
@@ -141,17 +130,16 @@
             "bad": [
               "Bouncing out of the bottom"
             ]
+          },
+          "rx": {
+            "reps": 12,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Jog-to-Run Ramp",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Jog a little faster every minute until you reach your run pace",
@@ -160,6 +148,9 @@
             "bad": [
               "Starting at run pace"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         }
       ]
@@ -173,19 +164,6 @@
           "name": "Easy Run",
           "videoUrl": null,
           "note": "If you don't run already, run two minutes and walk one the whole way instead.",
-          "chips": [
-            {
-              "label": "28 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "RPE 6"
-            },
-            {
-              "label": "full sentences",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Pick a flat loop you can repeat and hold one pace the whole way",
@@ -194,7 +172,12 @@
             "bad": [
               "Speeding up because it starts to feel easy"
             ]
-          }
+          },
+          "rx": {
+            "time": "28 minutes",
+            "rpe": 6
+          },
+          "setup": "full sentences"
         }
       ]
     },
@@ -206,11 +189,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk slowly with your arms hanging loose",
@@ -219,17 +197,15 @@
             "bad": [
               "Standing still the second the run ends"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Standing Calf Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Press the back heel into the floor and lean your hips toward a wall",
@@ -238,6 +214,10 @@
             "bad": [
               "Letting the back heel lift off the floor"
             ]
+          },
+          "rx": {
+            "time": "45s",
+            "side": true
           }
         }
       ]

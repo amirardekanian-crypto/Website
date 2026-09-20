@@ -53,12 +53,6 @@
           "type": "simple",
           "name": "Bike",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Easy to moderate, any machine you like",
@@ -67,20 +61,15 @@
             "bad": [
               "Going hard — you are lifting in fifteen minutes"
             ]
+          },
+          "rx": {
+            "time": "5 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push through your heels until your hips are level",
@@ -89,17 +78,16 @@
             "bad": [
               "Arching the back to lift higher"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 12
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Back hip down first, then rotate and reach tall",
@@ -108,20 +96,16 @@
             "bad": [
               "Rotating before the hip has opened"
             ]
+          },
+          "rx": {
+            "reps": 5,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Goblet Squat",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×8 Reps, light"
-            }
-          ],
           "cues": {
             "good": [
               "Light weight at the chest, slow, find today's depth",
@@ -130,17 +114,16 @@
             "bad": [
               "Loading it up — this is prep"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": "8 Reps, light"
           }
         },
         {
           "type": "simple",
           "name": "Empty Bar Warm-Up Sets",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "Squat: bar × 8, then build"
-            }
-          ],
           "cues": {
             "good": [
               "Empty bar, then two or three rising sets to your working weight",
@@ -150,7 +133,8 @@
               "Jumping from the empty bar to your top set"
             ]
           },
-          "note": "These do not count as working sets and carry no RPE."
+          "note": "These do not count as working sets and carry no RPE.",
+          "setup": "Squat: bar × 8, then build"
         }
       ]
     },
@@ -162,16 +146,6 @@
           "type": "standard",
           "name": "Countermovement Jump",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×3 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Dip fast and jump as high as you can",
@@ -181,7 +155,12 @@
               "Rushing the reps and turning it into conditioning"
             ]
           },
-          "note": "Power goes first in the session, while you are fresh."
+          "note": "Power goes first in the session, while you are fresh.",
+          "rx": {
+            "sets": 4,
+            "reps": 3,
+            "rest": 60
+          }
         }
       ]
     },
@@ -193,19 +172,6 @@
           "type": "standard",
           "name": "Barbell Back Squat",
           "videoUrl": null,
-          "restSec": 180,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×5 Reps"
-            },
-            {
-              "label": "RPE 7-8"
-            }
-          ],
           "cues": {
             "good": [
               "Brace before every rep, then sit between the hips",
@@ -215,25 +181,18 @@
               "Knees caving in as it gets heavy"
             ]
           },
-          "note": "Leave two or three reps in the tank — this is not a testing day."
+          "note": "Leave two or three reps in the tank — this is not a testing day.",
+          "rx": {
+            "sets": 4,
+            "reps": 5,
+            "rpe": "7-8",
+            "rest": 180
+          }
         },
         {
           "type": "standard",
           "name": "Barbell Romanian Deadlift",
           "videoUrl": null,
-          "restSec": 150,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Push the hips back with the bar close to your legs",
@@ -242,6 +201,12 @@
             "bad": [
               "Rounding the back to reach lower"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "rpe": 7,
+            "rest": 150
           }
         }
       ]
@@ -254,19 +219,6 @@
           "type": "standard",
           "name": "Dumbbell Split Squat",
           "videoUrl": null,
-          "restSec": 90,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps / side"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Long stance, drop straight down, push through the front heel",
@@ -275,25 +227,19 @@
             "bad": [
               "Leaning forward to make it easier"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rpe": 7,
+            "rest": 90
           }
         },
         {
           "type": "standard",
           "name": "Chest-Supported Dumbbell Row",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Chest on the bench, pull to the hip and pause",
@@ -302,6 +248,12 @@
             "bad": [
               "Heaving it with the whole body"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "rpe": 7,
+            "rest": 75
           }
         }
       ]
@@ -314,16 +266,6 @@
           "type": "standard",
           "name": "Half-Kneeling Pallof Press",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Press straight out and resist the pull",
@@ -332,6 +274,12 @@
             "bad": [
               "Letting the ribs twist towards the cable"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "side": true,
+            "rest": 45
           }
         }
       ]

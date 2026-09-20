@@ -45,11 +45,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace until you are warm and breathing",
@@ -58,17 +53,15 @@
             "bad": [
               "Starting at run pace"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg front to back, then side to side",
@@ -77,17 +70,16 @@
             "bad": [
               "Arching your lower back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit back into that hip, chest tall",
@@ -96,17 +88,16 @@
             "bad": [
               "Letting the bent knee cave inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×4 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step long, drop the back hip, then reach the inside arm up to the ceiling",
@@ -115,22 +106,16 @@
             "bad": [
               "Rushing the reach before the hips have dropped"
             ]
+          },
+          "rx": {
+            "reps": 4,
+            "side": true
           }
         },
         {
           "type": "standard",
           "name": "A-Skip",
           "videoUrl": null,
-          "restSec": 30,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            }
-          ],
           "cues": {
             "good": [
               "Tall hips, and strike the ground right underneath you",
@@ -139,27 +124,18 @@
             "bad": [
               "Reaching the foot out in front of your body"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "20 m",
+            "rest": 30
           }
         },
         {
           "type": "standard",
           "name": "Build-Up Run",
           "videoUrl": null,
-          "restSec": 45,
           "note": "Run the last two as ten metres out, a turn at about three quarters speed and ten metres back.",
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "easy to fast",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Each one a little faster than the last, and the final one at about nine tenths of top speed",
@@ -168,7 +144,13 @@
             "bad": [
               "Going flat out on the first one"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "distance": "20 m",
+            "rest": 45
+          },
+          "setup": "easy to fast"
         }
       ]
     },
@@ -180,24 +162,7 @@
           "type": "standard",
           "name": "Shuttle Sprint",
           "videoUrl": null,
-          "restSec": 25,
           "note": "Game 1 of 4: if your turns get sloppy, a foot slips, something twinges or your sprints slow right down, stop after this game and go to the cool-down.",
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "RPE 9"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sprint to the line, plant and turn, then drive straight back out",
@@ -206,30 +171,20 @@
             "bad": [
               "Planting with a stiff leg way out in front of your body"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "distance": "20 m",
+            "rpe": 9,
+            "rest": 25
+          },
+          "intent": "max speed"
         },
         {
           "type": "standard",
           "name": "Shuttle Sprint",
           "videoUrl": null,
-          "restSec": 25,
           "note": "Game 2 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "RPE 9"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sprint to the line, plant and turn, then drive straight back out",
@@ -238,30 +193,20 @@
             "bad": [
               "Planting with a stiff leg way out in front of your body"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "distance": "20 m",
+            "rpe": 9,
+            "rest": 25
+          },
+          "intent": "max speed"
         },
         {
           "type": "standard",
           "name": "Shuttle Sprint",
           "videoUrl": null,
-          "restSec": 25,
           "note": "Game 3 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "RPE 9"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sprint to the line, plant and turn, then drive straight back out",
@@ -270,30 +215,20 @@
             "bad": [
               "Planting with a stiff leg way out in front of your body"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "distance": "20 m",
+            "rpe": 9,
+            "rest": 25
+          },
+          "intent": "max speed"
         },
         {
           "type": "standard",
           "name": "Shuttle Sprint",
           "videoUrl": null,
-          "restSec": 25,
           "note": "Game 4 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "RPE 9"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sprint to the line, plant and turn, then drive straight back out",
@@ -302,7 +237,14 @@
             "bad": [
               "Planting with a stiff leg way out in front of your body"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "distance": "20 m",
+            "rpe": 9,
+            "rest": 25
+          },
+          "intent": "max speed"
         }
       ]
     },
@@ -314,11 +256,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "4 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk slowly and let your arms swing loose",
@@ -327,6 +264,9 @@
             "bad": [
               "Sitting down while your heart is still racing"
             ]
+          },
+          "rx": {
+            "time": "4 minutes"
           }
         }
       ]

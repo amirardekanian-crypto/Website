@@ -37,11 +37,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk at an easy pace and let your arms swing",
@@ -50,17 +45,15 @@
             "bad": [
               "Hunching your shoulders up as you walk"
             ]
+          },
+          "rx": {
+            "time": "5 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Arm Circles",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Direction"
-            }
-          ],
           "cues": {
             "good": [
               "Make slow circles with your arms straight out to the sides, starting small and getting bigger",
@@ -69,6 +62,10 @@
             "bad": [
               "Shrugging your shoulders up to your ears"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         }
       ]
@@ -81,11 +78,6 @@
           "type": "simple",
           "name": "Quadruped Thoracic Rotation",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
@@ -94,6 +86,10 @@
             "bad": [
               "Turning from your lower back"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
@@ -101,11 +97,6 @@
           "name": "Bench Thoracic Extension",
           "videoUrl": null,
           "note": "Use a bench or the arm of a heavy sofa, not a chair, because a chair can slide out from behind you.",
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Rest the edge under your shoulder blades with your hands behind your head and open your chest toward the ceiling",
@@ -114,17 +105,15 @@
             "bad": [
               "Arching from your lower back instead of your upper back"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Thoracic Windmill",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your side with your knees bent and stacked, and sweep your top arm in a big arc across your body",
@@ -133,6 +122,10 @@
             "bad": [
               "Forcing your arm down to the floor"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -145,23 +138,7 @@
           "type": "standard",
           "name": "Half-Kneeling Single-Arm Dumbbell Overhead Hold",
           "videoUrl": null,
-          "restSec": 45,
           "note": "Use a lighter dumbbell than you use for the press.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×25s Each Side"
-            },
-            {
-              "label": "Tempo Iso"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a dumbbell straight over your shoulder with your ribs down",
@@ -170,26 +147,21 @@
             "bad": [
               "Letting your ribs flare and your lower back arch"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "time": "25s",
+            "side": true,
+            "rpe": 7,
+            "tempo": "Iso",
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Half-Kneeling Single-Arm Dumbbell Press",
           "videoUrl": null,
-          "restSec": 45,
           "note": "If your arm won't go all the way up without your back arching, stop the press where it starts to arch.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Each Side"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Press the dumbbell straight up from your shoulder and lower it under control",
@@ -198,6 +170,13 @@
             "bad": [
               "Leaning back to help the press"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rpe": 7,
+            "rest": 45
           }
         }
       ]
