@@ -643,25 +643,31 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | `note` | the coach's note to this athlete | clay "Coach's Note" callout |
 | `cues` | technique — `good[]` / `bad[]` | the cues list |
 
-⚠ **The athlete never sees `3-1-1-0`.** The card breaks the tempo into the phases they
-actually perform and draws each one as a **real grid cell in a second row**:
+#### The TEMPO cell, and the digit that carries the instruction
+
+The tempo keeps the notation coaches write — one cell, `TEMPO 3-1-1-0` — but the digits
+that are actually the point are drawn in **clay**, bold, while the rest stay dark:
 
 ```
-SETS 4  |  REPS 6  |  RPE 7/10
-LOWER 3s  |  PAUSE 1s  |  LIFT 1s
+SETS 4  |  REPS 6  |  RPE 7/10  |  TEMPO 3-1-1-0
+                                         ^ ^
+                                         clay
 ```
 
-Phases are `LOWER · PAUSE · LIFT · TOP`, and **a zero phase draws no cell** — `2-0-1-0` is
-two cells, not four. `"iso"` draws one cell reading `TEMPO / Hold`. A tempo that will not
-parse falls back to one line of raw notation so nothing is lost.
+`tempoDisplay()` decides which: **the slowest phase when it is 2s or more, plus any
+non-zero pause** (a pause is never accidental — nobody writes one by default). So
+`3-0-1-0` colours the 3, `2-1-1-0` colours the 2 and the 1, `2-0-2-0` colours both 2s, and
+`1-0-1-0` — a tempo asking for nothing in particular — colours nothing. `"iso"` renders as
+`Hold`. A tempo that will not parse prints escaped and uncoloured.
 
-It took three attempts, so do not undo it: a cell reading `3-1-1-0` is notation most
-athletes never decode (which is why 153 cards carried a hand-written `3s eccentric` pill
-beside it); spelling it out in a grey line under the grid fixed the meaning but read as a
-footnote (Amir, 2026-09-20: *"it doesnt capture the eye and it doesnt look professional"*).
-Phases as cells say it **once**, at the weight it deserves.
+Four shapes were tried before this one, so **do not re-litigate it**: a plain cell (the
+notation went undecoded, which is why 153 cards carried a hand-written `3s eccentric` pill
+beside it), a grey line under the grid spelling it out (read as a footnote — Amir: *"it
+doesnt capture the eye and it doesnt look professional"*), phase cells on a second row
+(*"i dont like the new tempo"*), and now the notation back with its point coloured.
 
-**For the same reason, never restate the tempo in `intent`, `setup` or a CUE.**
+**The rule that survived all four: say it ONCE. Never restate the tempo in `intent`,
+`setup` or a CUE.**
 `"3s eccentric"` as a pill was the old duplicate on 153 cards; "three seconds down, one
 second pause, drive up" as a cue is the same instruction again and costs one of only three
 cues (39 of 506 live exercises with a tempo still do this). Spend the cue on what the

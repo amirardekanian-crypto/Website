@@ -1959,26 +1959,14 @@
      renderStatsGrid(). (Before 2026-09-20 this was repeat(5,1fr) and the free
      library alone rendered 1,151 dashes.) */
   .ex-stats-grid {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
     border: 1px solid var(--grey-mid);
     border-radius: 8px;
     margin-top: 4px;
     background: var(--white);
-    overflow: hidden;            /* so a row's edge cannot escape the radius */
   }
-  .ex-stats-row {
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
-  }
-  /* The tempo row sits under the dose row inside the same box, divided by one
-     rule. Same cells, same weight — the tempo is part of the prescription, not a
-     note about it. */
-  .ex-stats-row + .ex-stats-row { border-top: 1px solid var(--grey-mid); }
-  body[data-dark] .ex-stats-row + .ex-stats-row { border-top-color: #333; }
-  /* Phase values carry the clay accent so the eye separates "how you lift it"
-     from "how much" at a glance, without a second box or a heading. */
-  .ex-stat.phase .ex-stat-value { color: var(--ice); }
-  body[data-dark] .ex-stat.phase .ex-stat-value { color: var(--ice); }
 
   /* Setup line — equipment / position ("neutral grip", "45° bench"). Sits under
      the name as quiet text, because it is a condition of the exercise, not a
@@ -1990,17 +1978,6 @@
     margin-top: 3px;
   }
   body[data-dark] .ex-setup { color: #999; }
-
-  /* Fallback only: a tempo that will not parse into phases, printed raw so it
-     still reaches the athlete rather than vanishing. */
-  .ex-tempo-words {
-    font-family: 'Barlow', sans-serif;
-    font-size: 12.5px;
-    color: var(--grey-text);
-    margin-top: 8px;
-    text-align: center;
-  }
-  body[data-dark] .ex-tempo-words { color: #999; }
 
   /* A prep item is a name and a dose. No grid, because there is nothing else to
      say: a 5-minute row has one number and four blanks under the old layout. */
@@ -2051,6 +2028,15 @@
   /* Target stat (RPE target) is always yellow */
   .ex-stat.target .ex-stat-value { color: var(--yellow); }
   body[data-dark] .ex-stat.target .ex-stat-value { color: var(--yellow); }
+  /* Tempo can get long — shrink slightly */
+  .ex-stat.tempo .ex-stat-value { font-size: 14px; letter-spacing: 0.5px; }
+  /* THE DIGIT THAT CARRIES THE INSTRUCTION. A tempo is four numbers and usually
+     only one or two of them are the point; clay picks those out so the athlete
+     reads "3" and not "3-0-1-0". Which digits are hot is decided by
+     tempoDisplay(): the slowest phase when it is 2s or more, plus any non-zero
+     pause. This is what replaced writing "3s eccentric" a second time beside it. */
+  .ex-stat.tempo .t-hot { color: var(--ice); font-weight: 800; }
+  body[data-dark] .ex-stat.tempo .t-hot { color: var(--ice); }
 
   /* Circuit meta — 2-cell mini grid (Rounds + Rest) shown at the top of an
      expanded circuit so the round count and rest time stay visible. */
@@ -5992,7 +5978,7 @@ function isPureDuration(label) {
 }
 
 /* ═══ rx — THE STRUCTURED PRESCRIPTION ═══════════════════════════════════════
-   ⚠ Mirrored in assets/js/chips.js (rxOf / repCount / tempoCells / DOSE_LABEL).
+   ⚠ Mirrored in assets/js/chips.js (rxOf / repCount / tempoDisplay / DOSE_LABEL).
    chips-selftest.html asserts the two copies agree; program.html stays
    self-contained on purpose (it is the offline PWA), which is why this is a
    copy rather than a <script src>.
@@ -6012,34 +5998,44 @@ function isPureDuration(label) {
 
 const DOSE_LABEL = { reps: 'Reps', time: 'Time', distance: 'Distance', work: 'Work' };
 
+// The rx layer escapes with its own helper rather than the page's global esc(),
+// so the whole mirrored block stands alone — scripts/check_rx.js lifts it out of
+// this file and runs it against chips.js, and a reference to anything outside it
+// would make the two copies untestable rather than merely different.
+function escHtml(s) {
+  return String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+}
+
 function _cleanStr(v) {
   const s = (v === null || v === undefined) ? '' : String(v).trim();
   return s ? s : null;
 }
 
-// "3-1-1-0" → [{LOWER,3s},{PAUSE,1s},{LIFT,1s}] — the tempo broken into the phases
-// the athlete actually performs, each one a real grid cell.
+// The tempo, back in ONE cell as the notation coaches write — with the digit
+// that carries the instruction picked out in clay.
 //
-// It has been through three shapes. A cell reading "3-1-1-0" is notation most
-// athletes do not decode, which is why 153 cards carried a hand-written
-// "3s eccentric" pill beside it. Spelling it out in a grey line under the grid
-// fixed the meaning but read as a footnote (Amir, 2026-09-20: "it doesnt capture
-// the eye and it doesnt look professional"). Phases AS CELLS say it once, in
-// words, at the same weight as SETS and REPS — which is what it is worth.
+// Which digit matters: the SLOWEST phase, when it is 2s or more, plus any
+// non-zero PAUSE (a pause is never accidental — nobody writes one by default).
+// So "3-0-1-0" highlights the 3, "2-1-1-0" highlights the 2 and the 1, and
+// "1-0-1-0" — a tempo asking for nothing in particular — highlights nothing.
 //
-// A zero phase is not drawn: "2-0-1-0" is two cells, not four. Across the live
-// programmes the pause is 0 on roughly two thirds of tempos, so the usual row is
-// LOWER + LIFT and the widest realistic one is four.
-function tempoCells(tempo) {
+// The returned html is built from PARSED NUMBERS, never from the raw string, so
+// nothing from the data reaches the page unescaped. A tempo that will not parse
+// falls back to its escaped text with no highlight.
+function tempoDisplay(tempo) {
   const t = _cleanStr(tempo);
   if (!t) return null;
-  if (/^iso$/i.test(t)) return [{ label: 'TEMPO', value: 'Hold' }];
+  if (/^iso$/i.test(t)) return { text: 'Hold', html: 'Hold' };
   const parts = t.split(/[-–]/).map(x => parseFloat(x));
-  if (parts.length < 3 || parts.some(isNaN)) return null;
-  const NAMES = ['LOWER', 'PAUSE', 'LIFT', 'TOP'];
-  const out = [];
-  parts.slice(0, 4).forEach((n, i) => { if (n > 0) out.push({ label: NAMES[i], value: n + 's' }); });
-  return out.length ? out : null;
+  if (parts.length < 3 || parts.length > 4 || parts.some(isNaN)) {
+    return { text: t, html: escHtml(t) };
+  }
+  const max = Math.max.apply(null, parts);
+  const hot = i => (parts[i] === max && max >= 2) || ((i === 1 || i === 3) && parts[i] > 0);
+  return {
+    text: parts.join('-'),
+    html: parts.map((n, i) => hot(i) ? `<span class="t-hot">${n}</span>` : String(n)).join('-')
+  };
 }
 
 function rxOf(ex) {
@@ -6123,20 +6119,16 @@ function renderStatsGrid(rx) {
     value: rx.dose.value, cls: ''
   });
   if (rx.rpe)   cells.push({ label: 'RPE',   value: rx.rpe + '/10', cls: 'target' });
+  const tempo = tempoDisplay(rx.tempo);
+  if (tempo)    cells.push({ label: 'TEMPO', html: tempo.html, cls: 'tempo' });
   if (rx.rest)  cells.push({ label: 'REST',  value: formatRestLabel(rx.rest), cls: '' });
 
-  // The tempo is a SECOND ROW of the same box — same cells, same weight, one
-  // horizontal rule between. Not a cell of notation, and not a grey line
-  // underneath; both of those have been tried and both were wrong.
-  const phases = tempoCells(rx.tempo);
-  const row = cs => `<div class="ex-stats-row">${cs.map(c => `
+  if (!cells.length) return '';
+  return `<div class="ex-stats-grid">${cells.map(c => `
     <div class="ex-stat ${c.cls || ''}">
       <div class="ex-stat-label">${esc(c.label)}</div>
-      <div class="ex-stat-value">${esc(c.value)}</div>
+      <div class="ex-stat-value">${c.html || esc(c.value)}</div>
     </div>`).join('')}</div>`;
-  if (!cells.length && !phases) return '';
-  return `<div class="ex-stats-grid">${cells.length ? row(cells) : ''}${
-    phases ? row(phases.map(pc => ({ label: pc.label, value: pc.value, cls: 'phase' }))) : ''}</div>`;
 }
 
 // Stat pills for the collapsed row — each stat is its own small rounded pill.
@@ -6225,14 +6217,8 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
     : '';
 
   const statsGrid = doseOnly ? '' : renderStatsGrid(Object.assign({}, rx, { rest: restCell }));
-  // A tempo that does not parse into phases still has to reach the athlete, so it
-  // falls back to the raw notation on one line rather than vanishing.
-  const words = (doseOnly || !rx.tempo || tempoCells(rx.tempo)) ? null : 'Tempo ' + rx.tempo;
   const cuesHtml  = renderInlineCues(ex.cues);
-  const statsBlock = statsGrid
-    ? `<div class="ex-stats-block">${statsGrid}${
-        words ? `<div class="ex-tempo-words">${esc(words)}</div>` : ''}</div>`
-    : '';
+  const statsBlock = statsGrid ? `<div class="ex-stats-block">${statsGrid}</div>` : '';
 
   // The log section is only meaningful for "standard" exercises (the ones that
   // get rest, weight, RPE). Simple warm-ups skip it.

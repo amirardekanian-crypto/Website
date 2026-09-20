@@ -337,26 +337,40 @@
     return s ? s : null;
   }
 
-  // "3-1-1-0" → [{LOWER,3s},{PAUSE,1s},{LIFT,1s}] — the tempo broken into the
-  // phases the athlete performs, each one a real grid cell in program.html.
+  // The tempo in ONE cell, as the notation coaches write — with the digit that
+  // carries the instruction picked out in clay.
   //
-  // Three shapes so far. A cell reading "3-1-1-0" is notation most athletes do
-  // not decode, which is why 153 cards carried a hand-written "3s eccentric"
-  // pill beside it. A grey line under the grid fixed the meaning but read as a
-  // footnote (Amir, 2026-09-20: "it doesnt capture the eye and it doesnt look
-  // professional"). Phases as cells say it once, at the weight it deserves.
+  // Which digit matters: the SLOWEST phase, when it is 2s or more, plus any
+  // non-zero PAUSE (a pause is never accidental). So "3-0-1-0" highlights the 3,
+  // "2-1-1-0" highlights the 2 and the 1, and "1-0-1-0" — a tempo asking for
+  // nothing in particular — highlights nothing.
   //
-  // A zero phase is not drawn: "2-0-1-0" is two cells, not four.
-  function tempoCells(tempo) {
+  // It took four tries to land here: a plain cell (notation athletes did not
+  // decode, hence 153 hand-written "3s eccentric" pills), a grey line under the
+  // grid (read as a footnote), phase cells (Amir: "i dont like the new tempo"),
+  // and now the plain cell again with the point of it coloured.
+  //
+  // `html` is built from PARSED NUMBERS, never the raw string, so nothing from
+  // the data reaches the page unescaped. An unparseable tempo falls back to
+  // escaped text with no highlight.
+  function tempoDisplay(tempo) {
     const t = cleanStr(tempo);
     if (!t) return null;
-    if (/^iso$/i.test(t)) return [{ label: 'TEMPO', value: 'Hold' }];
+    if (/^iso$/i.test(t)) return { text: 'Hold', html: 'Hold' };
     const parts = t.split(/[-–]/).map(x => parseFloat(x));
-    if (parts.length < 3 || parts.some(isNaN)) return null;
-    const NAMES = ['LOWER', 'PAUSE', 'LIFT', 'TOP'];
-    const out = [];
-    parts.slice(0, 4).forEach((n, i) => { if (n > 0) out.push({ label: NAMES[i], value: n + 's' }); });
-    return out.length ? out : null;
+    if (parts.length < 3 || parts.length > 4 || parts.some(isNaN)) {
+      return { text: t, html: escHtml(t) };
+    }
+    const max = Math.max.apply(null, parts);
+    const hot = i => (parts[i] === max && max >= 2) || ((i === 1 || i === 3) && parts[i] > 0);
+    return {
+      text: parts.join('-'),
+      html: parts.map((n, i) => hot(i) ? '<span class="t-hot">' + n + '</span>' : String(n)).join('-')
+    };
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
   }
 
   // Normalised, display-ready view of one exercise's prescription.
@@ -620,6 +634,6 @@
   global.Chips = {
     parseChips, parseDurationToSec, isPureDuration,
     slotOf, fmt, readStats, applyStats, audit,
-    rxOf, repCount, applyRx, toRx, circuitToRx, detailToRx, auditRx, tempoCells, DOSE_LABEL
+    rxOf, repCount, applyRx, toRx, circuitToRx, detailToRx, auditRx, tempoDisplay, DOSE_LABEL
   };
 })(typeof window !== 'undefined' ? window : globalThis);

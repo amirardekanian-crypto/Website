@@ -42,7 +42,7 @@ const inlineSrc = slice('function parseDurationToSec(', 'function renderStatsGri
 
 const inline = {};
 vm.createContext(inline);
-vm.runInContext(inlineSrc + '\n;this.rxOf = rxOf; this.repCount = repCount; this.tempoCells = tempoCells;', inline);
+vm.runInContext(inlineSrc + '\n;this.rxOf = rxOf; this.repCount = repCount; this.tempoDisplay = tempoDisplay;', inline);
 const B = inline;
 
 /* ── fixtures ─────────────────────────────────────────────────────────────── */
@@ -96,9 +96,10 @@ FIXTURES.forEach(f => {
   say(a === b, 'mirror: ' + f.name, 'chips.js   ' + a + '\n        program.html ' + b);
   say(A.repCount(f.ex) === B.repCount(f.ex), 'repCount: ' + f.name);
 });
-['3-1-1-0', '3-0-1-0', '2-0-1-0', '2-0-1-1', 'iso', '3-1-1', 'nonsense', ''].forEach(t =>
-  say(JSON.stringify(A.tempoCells(t)) === JSON.stringify(B.tempoCells(t)),
-      'tempoCells("' + t + '")'));
+['3-1-1-0', '3-0-1-0', '2-0-1-0', '2-0-1-1', '2-1-1-0', '1-0-1-0', '2-0-2-0',
+ 'iso', '3-1-1', 'nonsense', '', '<img src=x>'].forEach(t =>
+  say(JSON.stringify(A.tempoDisplay(t)) === JSON.stringify(B.tempoDisplay(t)),
+      'tempoDisplay("' + t + '")'));
 
 console.log('2 · the model behaves');
 const eq = (got, want, what) => say(JSON.stringify(got) === JSON.stringify(want), what,
@@ -111,14 +112,19 @@ eq(A.rxOf({ type: 'standard', chips: [{ label: '3 Sets' }] }).rest, null,
    'legacy standard with no rest no longer falls back to 120s');
 eq(A.repCount({ rx: { time: '30s' } }), null, 'a hold has no rep count');
 eq(A.repCount({ rx: { reps: '8-10' } }), 8, 'a rep range takes its low end');
-eq(A.tempoCells('3-1-1-0'), [{label:'LOWER',value:'3s'},{label:'PAUSE',value:'1s'},{label:'LIFT',value:'1s'}],
-   'tempo becomes phase cells');
-eq(A.tempoCells('2-0-1-0'), [{label:'LOWER',value:'2s'},{label:'LIFT',value:'1s'}],
-   'a zero phase draws no cell');
-eq(A.tempoCells('2-0-1-1'), [{label:'LOWER',value:'2s'},{label:'LIFT',value:'1s'},{label:'TOP',value:'1s'}],
-   'a top pause is its own phase');
-eq(A.tempoCells('iso'), [{label:'TEMPO',value:'Hold'}], 'iso is one cell');
-eq(A.tempoCells('nonsense'), null, 'an unparseable tempo yields no cells (the card prints it raw)');
+// The tempo keeps its notation; only the digit that carries the instruction is coloured.
+eq(A.tempoDisplay('3-0-1-0').html, '<span class="t-hot">3</span>-0-1-0',
+   'the slow eccentric is the hot digit');
+eq(A.tempoDisplay('2-1-1-0').html, '<span class="t-hot">2</span>-<span class="t-hot">1</span>-1-0',
+   'a non-zero pause is always hot, however small');
+eq(A.tempoDisplay('2-0-2-0').html, '<span class="t-hot">2</span>-0-<span class="t-hot">2</span>-0',
+   'controlled both ways highlights both');
+eq(A.tempoDisplay('1-0-1-0').html, '1-0-1-0',
+   'a tempo asking for nothing in particular highlights nothing');
+eq(A.tempoDisplay('iso'), { text: 'Hold', html: 'Hold' }, 'iso reads Hold');
+eq(A.tempoDisplay('nonsense'), { text: 'nonsense', html: 'nonsense' }, 'an odd tempo still prints');
+eq(A.tempoDisplay('<img src=x>').html, '&lt;img src=x&gt;', 'an unparseable tempo is escaped');
+eq(A.tempoDisplay(''), null, 'no tempo, no cell');
 
 // applyRx: one dose at a time, and blanks remove rather than store empty.
 eq(A.applyRx({ rx: { reps: 8 } }, { time: '30s' }).rx, { time: '30s' }, 'setting time clears reps');

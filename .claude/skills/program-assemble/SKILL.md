@@ -82,7 +82,7 @@ string, or a zero. In particular: **no `rpe` on warm-up/prep, no `tempo` on ball
 or carries, and no `rest` unless the spec named one** (the app stopped inventing 120s).
 
 **Never restate the tempo in `intent`.** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
-same instruction twice; the app already spells the tempo out under the grid.
+same instruction twice; the card already shows the tempo with its key digits highlighted.
 
 **Never write `chips[]`.** It is legacy-read-only. Equipment or position notes
 (`neutral grip`, `45° bench`) go in `"setup"`, not a chip and not the name.

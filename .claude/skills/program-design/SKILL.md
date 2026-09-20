@@ -303,8 +303,8 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 - `intent` is ONE coaching intention in plain words (`max intent`, `glute focus`,
   `stick the landing`) — it ships as the exercise's `intent` field and draws the single green
   pill. Leave blank if none. **Never restate the tempo here**: `3s eccentric` beside a tempo of
-  `3-1-1-0` is the same instruction twice, and the app already spells the tempo out for the
-  athlete under the grid. Equipment or position (`neutral grip`, `45° bench`) is not an intent —
+  `3-1-1-0` is the same instruction twice, and the card already shows the tempo with its key
+  digits highlighted. Equipment or position (`neutral grip`, `45° bench`) is not an intent —
   that goes to `setup`.
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
@@ -334,11 +334,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 
 **CUES — exactly three:** ext (outside) · int (internal feel) · avoid (most common error).
 
-**Never spend a cue on the tempo.** The app already spells it out under the grid from
-`rx.tempo` itself — `3s down · 1s pause · 1s up`. A cue reading "three seconds down, one
-second pause, drive up" is the same instruction a third time (the pill was the second), and
-it costs one of only three cues. Say something the numbers cannot: what to feel, where to
-brace, what usually goes wrong.
+**Never spend a cue on the tempo.** The card already shows `rx.tempo` with the digits that
+matter picked out in clay. A cue reading "three seconds down, one second pause, drive up" is
+the same instruction a third time (the pill was the second), and it costs one of only three
+cues. Say something the numbers cannot: what to feel, where to brace, what usually goes wrong.
 Calibrate to training age.
 
 **AUTOREGULATION (required output):** include the standard note — drop every RPE by 1 on

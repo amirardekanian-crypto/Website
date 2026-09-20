@@ -262,15 +262,17 @@ where one green pill stood for 121 different labels (a tempo said in words, equi
 cue, and occasionally a real dose):
 `rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (ONE
 intention) · `note` → clay callout · `cues` → the cues list.
-⚠ **THE TEMPO IS A SECOND ROW OF THE GRID, and the athlete never sees `3-1-1-0`.** It is broken
-into the phases they perform — `LOWER 3s · PAUSE 1s · LIFT 1s`, each a real cell — with zero
-phases drawn as nothing (`2-0-1-0` is two cells) and `iso` as one cell reading `TEMPO / Hold`.
-**Three attempts, so do not undo it:** a `3-1-1-0` cell is notation athletes do not decode (hence
-153 hand-written `3s eccentric` pills); a grey line under the grid fixed the meaning but read as
-a footnote (Amir: *"it doesnt capture the eye and it doesnt look professional"*); phases as cells
-say it once, at the weight it deserves. **And never restate the tempo in `intent`, `setup` or a
-cue** — a cue spelling the count out is a third copy that costs one of only three (still true of
-39 of 506 live exercises with a tempo).
+⚠ **THE TEMPO IS ONE CELL, with the digit that carries the instruction in CLAY.**
+`TEMPO 3-1-1-0`, notation intact, and `tempoDisplay()` colours **the slowest phase when it is 2s
+or more, plus any non-zero pause** — so `3-0-1-0` colours the 3, `2-1-1-0` the 2 and the 1, and
+`1-0-1-0` nothing at all. `iso` reads `Hold`.
+**Four shapes were tried; do not re-litigate:** a plain cell (undecoded notation — hence 153
+hand-written `3s eccentric` pills), a grey line under the grid (a footnote — *"it doesnt capture
+the eye and it doesnt look professional"*), phase cells on a second row (*"i dont like the new
+tempo"*), and now the notation back with its point coloured (Amir: *"if a number is important in
+tempo highlight it with other color"*). **The rule that survived all four: SAY IT ONCE — never
+restate the tempo in `intent`, `setup` or a cue** (a cue spelling the count out burns one of only
+three; still true of 39 of 506 live exercises with a tempo).
 
 **`block.rest` states a section's rest ONCE** — on the section header (`PRIMARY ——— Rest 2m`),
 feeding every timer in the block, drawing no per-card cell. An exercise's own `rx.rest` overrides

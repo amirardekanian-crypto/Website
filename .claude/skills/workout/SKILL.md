@@ -123,9 +123,9 @@ demo ended up claiming "REST 2m" on all 26 cards while every rest in it was actu
 
 **When a whole block shares one rest, put it on the block** — `{"title":"Strength","rest":120}`.
 It renders once on the section header and feeds every timer in it; `rx.rest` on an exercise
-overrides it. **The tempo needs no cell**: the card breaks `rx.tempo` into phase cells
-(`LOWER 3s · PAUSE 1s · LIFT 1s`) on a second row of the grid, with zero phases drawn as
-nothing and `"iso"` as one cell reading `TEMPO / Hold`.
+overrides it. **The tempo is one cell** — `TEMPO 3-1-1-0`, with the digits that carry the
+instruction drawn in clay (the slowest phase when it is 2s or more, plus any non-zero pause).
+`"iso"` reads `Hold`. Nothing to author beyond `rx.tempo` itself.
 
 **Three fields beside `rx`, three different jobs — this is what stopped the pill row being a
 junk drawer of 121 labels:**
@@ -136,10 +136,10 @@ junk drawer of 121 labels:**
 | `intent` | **ONE** intention — `"max intent"`, `"max speed"` | the green pill (the only pill) |
 | `cues` | technique, `good[]` / `bad[]` | the cues list |
 
-**Never restate the tempo in `intent` — or in a cue.** The athlete never sees the raw
-`3-1-1-0`; the app spells it out under the grid as `3s down · 1s pause · 1s up`. So
-`"3s eccentric"` as a pill, or "three seconds down, one second pause" as a cue, is the same
-instruction a second and third time. Spend the cue on what the numbers cannot say.
+**Never restate the tempo in `intent` — or in a cue.** The card already shows `rx.tempo` with
+its key digits in clay, so `"3s eccentric"` as a pill, or "three seconds down, one second
+pause" as a cue, is the same instruction a second and third time. Spend the cue on what the
+numbers cannot say.
 
 **Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer. Use `intent` to communicate the movement intention:
 

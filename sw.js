@@ -28,7 +28,7 @@
 // forms. An installed athlete on the pre-cached v9 shell keeps a renderer that IGNORES
 // `before`, so this bump is what gets the new shell onto phones. It is also why the sessions'
 // safety wording is only moved into `before` AFTER this version has been live for a while.
-const CACHE = 'aap-v12';
+const CACHE = 'aap-v13';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
