@@ -619,6 +619,7 @@ Chips route to the stats grid by their **label pattern** (next section), not the
 | Starts with `×` | REPS cell (strips `×` + trailing "Reps") | `"×8 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"` |
 | Ends with "reps" / "rep" | REPS cell | `"8 Reps"` |
 | `"N Each Side/Leg/Arm"` (no `×`) | REPS cell | `"4 Each Side"`, `"10-12 Each Leg"` |
+| Per-side forms with a space or a word (added 2026-09-20) | REPS cell | `"45 sec / side"`, `"8 Reps / side"`, `"30 sec each side"`, `"10 Steps each way"`, `"4 Lengths"`, `"6 / 4 / 2 Reps / side"` |
 | Bare number or range | REPS cell | `"8"`, `"10-12"` |
 | Pure duration / distance | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"5 min"`, `"1:30"` |
 | `"Tempo a-b-c-d"` | TEMPO cell | `"Tempo 3-0-1-0"` |
@@ -884,10 +885,14 @@ stat cells, so leaving them out breaks nothing.
   "category": "strength", "duration": "45 min", "equipment": "Barbell",
   // Which habit "Mark as done" ticks in AA Proof. REQUIRED — see below.
   "countsAs": "strength",
-  // 1-2 short paragraphs: why this session exists and how it runs. Renders in
-  // the green header under the duration line, open by default. REQUIRED — see
-  // "Where the coaching goes" below.
+  // 1-2 short paragraphs, about 100-150 words in all: why this session exists,
+  // how it runs, what kit and timing it needs. Renders in the green header under
+  // the duration line. REQUIRED — see "Where the coaching goes" below.
   "intro": ["…", "…"],
+  // What to STOP for, as rows of { label, text }. Renders as an always-visible white
+  // "Before you start" card above the intro. Optional (a session written before
+  // 2026-09-20 has none) but expected on any session that carries risk.
+  "before": [ { "label": "Not today", "text": "…" }, { "label": "Stop now", "text": "…" } ],
   "focusTag": "Full-Body Strength",
   "blocks": [
     { "title": "Strength", "icon": "🎯", "exercises": [
@@ -915,7 +920,20 @@ date, and nothing else — which feeds the athlete's habits and the coach's repo
 The button is hidden for a signed-out visitor, in demo mode, and in coach preview.
 Its own done-state is stored under `wkdone_<id>` and resets daily the same way.
 
-#### Where the coaching goes — three places, three jobs
+**The header, top to bottom:** shelf picture, title, `duration · equipment`, the **Before you start** card
+(`renderBefore()`, hidden when `before` is absent or empty), then the collapsible **Why this session**
+(`renderWhy()`). The toggle is remembered once for every workout in `localStorage.ws_why_off`, in three
+states: `'1'` closed, `'0'` open, nothing stored = the default. The default is *open* when the intro is
+100 words or fewer (`WS_WHY_LONG`) and *closed* when it is longer, **but only on a workout that has a `before`
+card**: on an older session the red flags may still be written into the intro, so it keeps opening as it always did.
+
+**A shared link (`?workout=<id>`) resolves through the database first**, exactly like the shelf's own
+card (`openWorkoutDeepLink()`): `<id>`, `<category>/<id>` and the old `workouts/<category>/<id>.json` all
+work, the header gets its shelf picture, and an edit made in the database shows on a link shared earlier.
+The `workouts/*.json` files are read only if the database could not be reached at all, and an id the
+database does not have does **not** fall back to a file, so unpublishing a session really unpublishes it.
+
+#### Where the coaching goes — four places, four jobs
 
 Amir's rule, 2026-09-12, after every AI-written session in the library broke it.
 The three carry different weight and **must not repeat each other** — the failure
@@ -924,9 +942,18 @@ much."
 
 | | What it is | Length |
 |---|---|---|
-| **`intro`** | Why this session exists and how it runs | **1–2 paragraphs**, per workout |
+| **`before`** | What to stop for: who should not do it today, red flags, spacing, first-time dose | rows of `{label, text}`, **about 50–210 words** in all |
+| **`intro`** | Why this session exists, how it runs, what kit and timing | **1–2 paragraphs, about 100–150 words** |
 | **`note`** | One thing about *this exercise* the cues cannot carry | **one sentence**, and only where it earns its place |
 | **`cues`** | How to do the rep | **exactly 3** — see below |
+
+**`before` is the safety card, and it is why `intro` can stay short.** It is drawn as a white card
+above the intro and **is never behind a toggle**. Measured 2026-09-20: the intro's *Why this session*
+toggle is one preference shared by every workout, so an athlete who closed it once had every session's
+"stop if…" wording hidden for good, and a 300-word intro put the first exercise about 1,200 px down a
+phone. So anything that keeps someone safe goes in `before` (labels the 20 sessions written that day use:
+*Not today · Stop and get it checked · Stop now · A day or two later · Past injury · Keep clear ·
+First time · Who it's for*), and `intro` carries only the why and the how. Never put the same warning in both.
 
 **Cues are exactly three, never more, never fewer** — one **external** (where to
 push, what to move toward), one **internal** (what to feel), one **avoid** (the
@@ -976,6 +1003,11 @@ the day score. Full reasoning: `supabase/stage28_library_sessions.sql`, `HABITS.
    `workouts/<category>/<id>`, so a category move is a database write too.
 5. Set `sort_order` if the shelf position matters — the picker leaves it NULL, which sorts last, then
    alphabetically by slug.
+6. **Changing a session's `before`/`intro` on a live one is a two-step rollout**, because an installed phone keeps
+   the app shell it already has until its next open (`sw.js` is stale-while-revalidate): ship the app change first,
+   let it sit for a day, and only then publish the data. A phone still on the old shell **ignores `before`**, so a
+   session whose safety wording has been *moved* into `before` would show that phone neither. (`sw.js` `CACHE` v10 is
+   the shell that draws it.)
 
 > **Keep them matching:** the name/duration/equipment exist in *both* the manifest
 > (for the card) and the file (for the opened view). If you rename a workout, change

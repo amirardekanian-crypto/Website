@@ -909,6 +909,28 @@
   }
   .ws-why-body p:last-child { margin-bottom: 0; }
 
+  /* "Before you start" — a light card in the green header. Always visible: no toggle, and
+     nothing about it is remembered between workouts. Rows are a bold lead-in and a sentence;
+     the colon after the lead-in is drawn here so the data stays a plain noun phrase. */
+  .ws-before {
+    margin-top: 16px; padding: 11px 14px 3px;
+    background: #fff; border-radius: 12px; border-left: 4px solid var(--ice);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+  }
+  .ws-before-h {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--ice); margin-bottom: 8px;
+  }
+  .ws-before p { font-size: 13px; line-height: 1.45; color: #2b2b2b; margin: 0 0 7px; }
+  .ws-before p b {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 14px;
+    letter-spacing: 0.4px; text-transform: uppercase; color: var(--grey-dark);
+  }
+  .ws-before p b::after { content: ':'; }
+  body[data-dark] .ws-before { background: #1f1f1f; box-shadow: none; }
+  body[data-dark] .ws-before p { color: rgba(255,255,255,0.86); }
+  body[data-dark] .ws-before p b { color: #fff; }
+
   /* Finish bar for a LIBRARY workout. Deliberately not the programme's
      .send-session-btn: that one emails the coach and closes a programme day.
      This one writes a single row and says what it counted as. */
@@ -3718,9 +3740,18 @@
     <div class="ws-eyebrow" id="ws-eyebrow"></div>
     <div class="ws-title" id="ws-title"></div>
     <div class="ws-meta" id="ws-meta"></div>
+    <!-- Before you start: the workout's own `before` rows — what to stop for, and the
+         rules that keep it safe. Its OWN element, deliberately outside "Why this
+         session" below: that block can be closed, the choice is remembered for every
+         workout, and a red flag must never be the thing a closed toggle hides. -->
+    <section class="ws-before" id="ws-before" aria-labelledby="ws-before-h" hidden>
+      <div class="ws-before-h" id="ws-before-h">Before you start</div>
+      <div id="ws-before-body"></div>
+    </section>
     <!-- Why this session: 1-2 paragraphs from the workout's own `intro`. Sits in
-         the header under the duration line, open by default, and the athlete's
-         choice to close it is remembered across every workout. -->
+         the header under the duration line. Open by default when short, closed when
+         long (see WS_WHY_LONG), and the athlete's own choice is remembered across
+         every workout. -->
     <div class="ws-why" id="ws-why" hidden>
       <button type="button" class="ws-why-toggle" id="ws-why-toggle" onclick="toggleWhy()"></button>
       <div class="ws-why-body" id="ws-why-body"></div>
@@ -5855,6 +5886,15 @@ function parseChips(chips) {
     // Per-side / leg / arm / hand counts written WITHOUT the leading × (e.g.
     // "4 Each Side", "10-12 Each Leg") — these are REPS, not modifier chips.
     if (/^\d+(?:\s*[-–]\s*\d+)?\s+each\s+(?:side|leg|arm|hand)s?$/i.test(label)) { out.reps = label; return; }
+    // The same count written the other way round — a count, an optional unit, then "/ side" or
+    // "each side": "8 Reps / side", "10 Reps / direction", "2 Lengths / side", "10 Steps each way".
+    // Until 2026-09-20 these fell through to a green pill with an empty REPS cell and no stats grid
+    // at all (65 exercises across 21 of the 22 first Train sessions were written this way).
+    // ⚠ Mirrored in assets/js/chips.js (parseChips AND slotOf). "12 each" is still NOT reps.
+    if (/^\d+(?:\s*[-–]\s*\d+)?\s*(?:reps?|lengths?|steps?|throws?|balls?)?\s*(?:\/\s*(?:side|leg|arm|hand|direction|shape|way)|each\s+(?:side|leg|arm|hand|direction|way))s?$/i.test(label)) { out.reps = label; return; }
+    // A count with its unit and nothing else ("4 Lengths"), and a descending scheme ("6 / 4 / 2 Reps / side").
+    if (/^\d+\s*(?:lengths?|steps?|throws?|balls?)$/i.test(label)) { out.reps = label; return; }
+    if (/^\d+(?:\s*\/\s*\d+)+\s*reps?(?:\s*\/\s*(?:side|leg|arm|hand))?$/i.test(label)) { out.reps = label; return; }
     // A bare rep count / count-with-unit (e.g. "8", "10-12") with no other word — also REPS.
     if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(label)) { out.reps = label; return; }
     // Anything else — preserve the chip's `style` so "yellow" highlighted ones stand out
@@ -5879,11 +5919,13 @@ function parseChips(chips) {
 // Strict duration check: matches plain time labels only, NOT compound labels
 // like "30s Hard RPE 6-7" (those stay in extras as descriptors).
 //   "30s", "30 sec", "30 seconds", "1 min", "5 minutes", "1:30",
-//   "30s/side", "30 sec each", "20m/side"
+//   "30s/side", "30 sec each", "20m/side", "45 sec / side"
+// (a space either side of the slash is fine — "45 sec / side" used to fail this and lose its stats grid.
+//  ⚠ Mirrored in assets/js/chips.js.)
 function isPureDuration(label) {
   const t = String(label || '').trim();
   if (/^\d+:\d+$/.test(t)) return true;
-  return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?(?:side|leg|each(?:\s+\w+)?))?$/i.test(t);
+  return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?\s*(?:side|leg|arm|hand)s?|each(?:\s+\w+)?)?$/i.test(t);
 }
 
 // Renders the 5-cell stats grid: SETS · REPS · TARGET RPE · TEMPO · REST.
@@ -7654,30 +7696,53 @@ window.openArticleDeepLink = openArticleDeepLink;
 let _wsCurrent = null;   // { id, checkKey, slug, countsAs } for the open workout
 
 // Deep-link resolver for the ?workout= URL param (see the init reveal). Accepts:
-//   • a workout id from workouts/index.json   → ?workout=full-body-power
-//   • a "category/slug" pair                  → ?workout=strength/full-body-power
-//   • a direct .json path                     → ?workout=workouts/strength/full-body-power.json
-// Resolves to the workout file, then reuses openWorkout(). On a bad/unknown id
-// it quietly no-ops (visitor just stays on home); openWorkout() shows its own
-// error if a resolved file fails to load. The rest of the app remains loaded.
+//   • a workout id                     → ?workout=full-body-power
+//   • a "category/id" pair             → ?workout=strength/full-body-power
+//   • a file path, as older links were → ?workout=workouts/strength/full-body-power.json
+//
+// THE LIBRARY IS THE DATABASE (get_library(), held in _libItems / _trainManifest by
+// ensureLibManifests), so a link resolves through it FIRST and opens the very object the
+// shelf's own card opens. That is what lets the header find its shelf picture (libBannerFor
+// matches on the manifest's own key) and what makes an edit made in the database show up on a
+// link that was shared earlier. Until 2026-09-20 this read workouts/index.json and the JSON
+// files instead, so a shared link never got the picture and served the FILE's copy of a session.
+// The files are the fallback only when the database could not be reached at all.
+// On an unknown id it quietly no-ops (the visitor just stays on home).
 async function openWorkoutDeepLink(idOrPath) {
   if (!idOrPath) return;
-  let file = idOrPath;
-  if (!/\.json$/i.test(idOrPath)) {
-    // Not a direct path — try to resolve it as an id via the manifest.
+  const raw = String(idOrPath).trim().replace(/^\/+/, '').replace(/^workouts\//, '').replace(/\.json$/i, '');
+  try {
+    await ensureLibManifests();
+    let key = null;
+    if (_libItems[raw]) key = raw;                                    // "category/id"
+    else {
+      for (const c of ((_trainManifest && _trainManifest.categories) || [])) {
+        const hit = (c.workouts || []).find(w => w.id === raw);
+        if (hit && hit.file) { key = hit.file; break; }
+      }
+    }
+    if (key) { openWorkout(key); return; }
+    // The database answered and does not have it (unpublished, or a typo): do not go and
+    // dig the same session out of the files, or unpublishing would not actually unpublish.
+    if (Object.keys(_libItems).length) { console.warn('Deep-link workout not found:', idOrPath); return; }
+  } catch (e) { /* fall through to the files */ }
+
+  // Fallback — the library never loaded from the database, so use the file copy.
+  let file = String(idOrPath);
+  if (!/\.json$/i.test(file)) {
     let resolved = null;
     try {
       const res = await fetch('workouts/index.json', { cache: 'no-cache' });
       if (res.ok) {
         const manifest = await res.json();
         for (const cat of (manifest.categories || [])) {
-          const hit = (cat.workouts || []).find(w => w.id === idOrPath);
+          const hit = (cat.workouts || []).find(w => w.id === file);
           if (hit && hit.file) { resolved = hit.file; break; }
         }
       }
     } catch (e) { /* fall back to the path heuristic below */ }
     if (resolved) file = resolved;
-    else if (idOrPath.includes('/')) file = `workouts/${idOrPath}.json`;  // category/slug
+    else if (file.includes('/')) file = `workouts/${file}.json`;      // category/id
     else { console.warn('Deep-link workout not found:', idOrPath); return; }
   }
   openWorkout(file);
@@ -7699,9 +7764,22 @@ window.openWorkoutDeepLink = openWorkoutDeepLink;
 // The open/closed choice is stored ONCE for every workout, not per workout: it
 // is a preference about how much preamble you want, and an athlete who closed it
 // on their tenth session does not want to close it again on the next one.
+//
+// Three states, since 2026-09-20: '1' closed, '0' open, and NOTHING stored yet. With no choice
+// made, an intro of up to WS_WHY_LONG words opens (as it always has), and a longer one starts
+// closed so the exercises are not two screens down the phone. That default applies ONLY to a
+// workout that has a Before-you-start card (see renderWhy): on any other, the red flags may
+// still be written into the intro. On a workout that has the card, nothing that keeps an
+// athlete safe lives in here, because the card is never behind a toggle.
 const WS_WHY_KEY = 'ws_why_off';
-function _wsWhyClosed() {
-  try { return localStorage.getItem(WS_WHY_KEY) === '1'; } catch (e) { return false; }
+const WS_WHY_LONG = 100;
+function _wsWhyClosed(isLong) {
+  try {
+    const v = localStorage.getItem(WS_WHY_KEY);
+    if (v === '1') return true;
+    if (v === '0') return false;
+  } catch (e) { /* private window: fall through to the default */ }
+  return !!isLong;
 }
 function renderWhy(wk) {
   const wrap = document.getElementById('ws-why');
@@ -7713,10 +7791,28 @@ function renderWhy(wk) {
   if (!paras.length) { wrap.hidden = true; body.innerHTML = ''; return; }
   wrap.hidden = false;
   body.innerHTML = paras.map(p => `<p>${esc(p)}</p>`).join('');
-  const closed = _wsWhyClosed();
+  const words = paras.join(' ').split(/\s+/).filter(Boolean).length;
+  // Only a workout that HAS a Before-you-start card may start closed: a session whose red flags
+  // still live in its intro (every one written before 2026-09-20) must keep opening as it always did.
+  const hasBefore = Array.isArray(wk && wk.before) && wk.before.length > 0;
+  const closed = _wsWhyClosed(hasBefore && words > WS_WHY_LONG);
   wrap.classList.toggle('is-closed', closed);
   btn.innerHTML = `Why this session <span class="chev">▾</span>`;
   btn.setAttribute('aria-expanded', String(!closed));
+}
+// The card itself. `before` is an array of { label, text } rows; a bare string is accepted too,
+// so a hand-written file with a plain list still shows. Absent or empty → the card stays hidden,
+// which is every session written before 2026-09-20.
+function renderBefore(wk) {
+  const wrap = document.getElementById('ws-before');
+  const body = document.getElementById('ws-before-body');
+  if (!wrap || !body) return;
+  const rows = Array.isArray(wk && wk.before) ? wk.before.filter(r => r && (typeof r === 'string' ? r : r.text)) : [];
+  if (!rows.length) { wrap.hidden = true; body.innerHTML = ''; return; }
+  body.innerHTML = rows.map(r => typeof r === 'string'
+    ? `<p>${esc(r)}</p>`
+    : `<p>${r.label ? `<b>${esc(r.label)}</b> ` : ''}${esc(r.text)}</p>`).join('');
+  wrap.hidden = false;
 }
 function toggleWhy() {
   const wrap = document.getElementById('ws-why');
@@ -7760,6 +7856,10 @@ async function openWorkout(file) {
   if (fin) fin.hidden = true;
   const why = document.getElementById('ws-why');
   if (why) why.hidden = true;
+  // Same reason as the two above: a failed load must not leave the PREVIOUS workout's
+  // safety rows sitting under a different workout's title.
+  const bef = document.getElementById('ws-before');
+  if (bef) bef.hidden = true;
   _wsCurrent = null;
   goTo('workout');
 
@@ -7794,6 +7894,7 @@ async function openWorkout(file) {
   document.getElementById('ws-title').textContent = wk.title || 'Workout';
   const meta = [wk.duration, wk.equipment].filter(Boolean).join(' · ');
   document.getElementById('ws-meta').textContent = meta;
+  renderBefore(wk);
   renderWhy(wk);
 
   // Body — reuse the SAME exercise card renderers as the training screen. We

@@ -45,7 +45,7 @@
   function isPureDuration(label) {
     const t = String(label || '').trim();
     if (/^\d+:\d+$/.test(t)) return true;
-    return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?(?:side|leg|each(?:\s+\w+)?))?$/i.test(t);
+    return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?\s*(?:side|leg|arm|hand)s?|each(?:\s+\w+)?)?$/i.test(t);
   }
 
   function parseChips(chips) {
@@ -68,6 +68,9 @@
       if (/^×/.test(label)) { out.reps = label.replace(/^×/, '').replace(/\s*reps?$/i, '').trim(); return; }
       if (/reps?$/i.test(label)) { out.reps = label.replace(/\s*reps?$/i, '').trim(); return; }
       if (/^\d+(?:\s*[-–]\s*\d+)?\s+each\s+(?:side|leg|arm|hand)s?$/i.test(label)) { out.reps = label; return; }
+      if (/^\d+(?:\s*[-–]\s*\d+)?\s*(?:reps?|lengths?|steps?|throws?|balls?)?\s*(?:\/\s*(?:side|leg|arm|hand|direction|shape|way)|each\s+(?:side|leg|arm|hand|direction|way))s?$/i.test(label)) { out.reps = label; return; }
+      if (/^\d+\s*(?:lengths?|steps?|throws?|balls?)$/i.test(label)) { out.reps = label; return; }
+      if (/^\d+(?:\s*\/\s*\d+)+\s*reps?(?:\s*\/\s*(?:side|leg|arm|hand))?$/i.test(label)) { out.reps = label; return; }
       if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(label)) { out.reps = label; return; }
       out.extras.push({ label, style: c.style || '' });
     });
@@ -102,6 +105,9 @@
     if (/^×/.test(t)) return 'reps';
     if (/reps?$/i.test(t)) return 'reps';
     if (/^\d+(?:\s*[-–]\s*\d+)?\s+each\s+(?:side|leg|arm|hand)s?$/i.test(t)) return 'reps';
+    if (/^\d+(?:\s*[-–]\s*\d+)?\s*(?:reps?|lengths?|steps?|throws?|balls?)?\s*(?:\/\s*(?:side|leg|arm|hand|direction|shape|way)|each\s+(?:side|leg|arm|hand|direction|way))s?$/i.test(t)) return 'reps';
+    if (/^\d+\s*(?:lengths?|steps?|throws?|balls?)$/i.test(t)) return 'reps';
+    if (/^\d+(?:\s*\/\s*\d+)+\s*reps?(?:\s*\/\s*(?:side|leg|arm|hand))?$/i.test(t)) return 'reps';
     if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(t)) return 'reps';
     return '';
   }

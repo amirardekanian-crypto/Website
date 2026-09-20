@@ -23,7 +23,12 @@
 // from www.youtube.com like the inline player does, because the nocookie player was getting
 // YouTube's sign-in wall in Iran. shared.js is in the shell and served cache-first, so without
 // a bump every installed phone would keep the old pop-up for ever.
-const CACHE = 'aap-v9';
+// v10: program.html changed. It now draws a workout's "Before you start" card (its `before`
+// field), resolves ?workout= links through the database, and reads two more per-side chip
+// forms. An installed athlete on the pre-cached v9 shell keeps a renderer that IGNORES
+// `before`, so this bump is what gets the new shell onto phones. It is also why the sessions'
+// safety wording is only moved into `before` AFTER this version has been live for a while.
+const CACHE = 'aap-v10';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

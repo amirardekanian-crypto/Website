@@ -84,9 +84,11 @@ Chip rules for `simple`: use `"×N Reps"` / `"×N Each Side"` / `"×N Each Leg"`
 
 The `×`-prefix routes the chip to the REPS stat cell (visible in the expanded stats grid). Without `×`, a bare label like `"Each Side"` becomes a green modifier pill — always visible, including in the collapsed row.
 
-**Same trap for durations.** `"45s/side"` and `"×8 Each Side"` reach the REPS cell. `"45 sec / side"` and `"8 Reps / side"`
-(a space before the slash) do not: `isPureDuration()` in `program.html` rejects them, the dose falls into a green pill, and the row
-draws **no stats grid at all**. Measured 2026-09-20: 65 exercises across 21 of the 22 older sessions are written that way.
+**Same trap for durations, mostly fixed.** `"45s/side"` and `"×8 Each Side"` always reached the REPS cell. `"45 sec / side"`
+and `"8 Reps / side"` (a space before the slash) did not, so on 21 of the 22 older sessions (65 exercises, measured 2026-09-20)
+the dose fell into a green pill and the row drew **no stats grid at all**. `parseChips()` and `isPureDuration()` (in `program.html`
+and, identically, `assets/js/chips.js`) now read `/ side`, `each way`, `4 Lengths` and `6 / 4 / 2 Reps / side` as reps. Still
+prefer the `×` form in anything new, and never write a dose as a bare modifier.
 
 ---
 
@@ -198,12 +200,16 @@ Create **`workouts/<category-id>/<slug>.json`**:
   "duration": "<N min>",
   "equipment": "<Primary equipment>",
   "focusTag": "<Short focus descriptor>",
-  "intro": ["<why this session exists>", "<how it runs>"],
+  "intro": ["<why this session exists>", "<how it runs, kit, timing>"],
+  "before": [
+    { "label": "Not today", "text": "<who should not do it today>" },
+    { "label": "Stop now", "text": "<the red flag that ends the session>" }
+  ],
   "blocks": [ … ]
 }
 ```
 
-### ⚠️ Three places to coach, and they must not repeat each other
+### ⚠️ Four places to coach, and they must not repeat each other
 
 Amir's correction, 2026-09-12, after every AI-written session in the library got
 this wrong: *"you are coaching in the Coach's Note and on the cues, that's too
@@ -211,7 +217,8 @@ much."*
 
 | | Job | Length |
 |---|---|---|
-| **`intro`** | Why this session exists and how it runs | **1–2 paragraphs** |
+| **`before`** | What to stop for: who it is not for today, the red flags, spacing, the first-time dose | rows of `{label, text}`, **50–210 words** in all |
+| **`intro`** | Why this session exists, how it runs, kit and timing | **1–2 paragraphs, about 100–150 words** |
 | **`note`** | One thing about *this exercise* the cues cannot carry | **ONE SENTENCE** |
 | **`cues`** | How to do the rep | **EXACTLY 3** |
 
@@ -229,8 +236,18 @@ after you wake up"), a safety line. It is **not** where you explain why the
 session is built the way it is. That is `intro`, and giving the reasoning its own
 home is exactly what lets a note stay to one sentence.
 
+**`before` is the safety card and `intro` is not.** The app draws `before` as a white "Before you start" card
+that no toggle can hide, while *Why this session* is one preference shared by every workout and starts closed
+once it passes 100 words. Measured 2026-09-20 on a phone: a 300-word intro put the first exercise about 1,200 px
+down, and one athlete closing the toggle once hid every session's "stop if…" for good. So: anything that keeps
+someone safe (not today, red flags, "get it checked", spacing from a match or another hard session, the
+first-time dose) goes in `before`, once, and the intro never repeats it. Reuse the labels the 20 sessions of
+2026-09-20 use so the card reads the same everywhere: *Not today · Stop and get it checked · Stop now ·
+A day or two later · Past injury · Keep clear · First time · Who it's for*. Any session with real load or
+speed in it needs the card; a plain mobility flow needs only the rows that apply.
+
 **Check before publishing:** every exercise `good: [2], bad: [1]`, every note one
-sentence, `intro` present.
+sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
 
 ### ⚠️ `countsAs` is required — decide it, don't omit it
 
@@ -322,7 +339,8 @@ Before committing:
 - Every `standard` exercise has exactly one `"N Sets"` chip with `"style": "yellow"`
 - No rep counts in modifier (green) chips — those are technique cues only
 - Circuit `items` have `name` and `detail`, not `chips`
-- Every exercise `good: [2], bad: [1]`, every `note` one sentence, `intro` present
+- Every exercise `good: [2], bad: [1]`, every `note` one sentence, `intro` present (about 100–150 words)
+- `before` present on anything with load or speed, and no warning repeated between it and the intro
 - `countsAs` is set deliberately
 
 Then commit:
