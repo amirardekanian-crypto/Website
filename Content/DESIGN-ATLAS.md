@@ -80,6 +80,7 @@ Never reuse anything in the right column, even though old files still contain it
 | **Recovery-run photo set** | [`recovery-run/`](recovery-run/) — couch/shoes/watch/dock/liver-building/log per its [`README.txt`](recovery-run/README.txt) | Only slide 1 has a graded export (`1-couch-graded.jpg`); grade recipe = `_grade-preview-couch.jpg`. |
 | **Finished result cards** | [`instagram-cards/`](instagram-cards/) — 7 PNGs 1080² | ⚠ legacy black/neon-yellow style — **off-palette**; redesign against the current system before making more. |
 | **Ball photo** | [`../assets/img/tennis-ball-clay.png`](../assets/img/tennis-ball-clay.png) (1024², 1.8MB) | Unwired master; glow baked in. Kit pagination/arc use their own embedded ball PNGs — don't swap in this file raw. |
+| **Court pair, dawn + night (vertical)** (2026-09-20) | [`reel-7-course/assets/bg-day.webp`](reel-7-course/assets/bg-day.webp) · [`bg-night.webp`](reel-7-course/assets/bg-night.webp) (1080×1920, graded) · masters in [`reel-7-course/masters/`](reel-7-course/masters/) · [`ball.webp`](reel-7-course/assets/ball.webp) (clean ball cutout, alpha) | One clay court, same camera, first light then floodlit night with the clay marked by work. No people, ball, text or yellow. Made in Higgsfield for reel-7 and reusable as the background of any tennis ad; the white baseline is `y = 0.268x + 1260.5` in canvas coordinates. |
 | **Marketing/library screenshots** | root `library-*.jpg` | Orphaned archive of an older Library UI — reference only, stale vs live app. |
 
 ---
@@ -120,7 +121,18 @@ Never reuse anything in the right column, even though old files still contain it
 techniques, the three URL modes, known gotchas, the MP4 export pipeline) lives there now; this
 is just the quick-reference.
 
-- **Newest reference = [`reel-6-system.html`](reel-6-system.html)** (English, current rules,
+- **Newest reel = [`reel-7-course.html`](reel-7-course.html)** (Farsi, 2026-09-20 — Amir's explicit choice,
+  because it sells the Farsi-only TPS course; silent, ~30 s, ends on «هفته‌ی ۱ رو رایگان امتحان کن» = the
+  free demo). Techniques worth copying: **two full-bleed pictures of one court (dawn, night) crossfade
+  under everything** while the four block pictures play as 16:9 windows; the white baseline was measured
+  from the picture, and **the 16 week-ticks, the dashed arcs and the ball are registered on it** (they sit
+  in a second `.cam` layer that shares one Web Animations camera with the photos, so nothing drifts apart);
+  the ball is a circular cutout of `assets/img/tennis-ball-clay.png`; the phone shows **real screenshots of
+  the live demo** (Playwright with `channel:'msedge'`, `tps.prefs` pre-set) with tap ripples, and
+  `?beat=5&sub=0..4` freezes each screen. State lives in `st-N` classes on the reel (transitions on the state
+  rule, never the base); the two hop animations alternate `hopA`/`hopB` because a state change that keeps the
+  same animation name does not restart it. Vazirmatn is embedded (base64), so the file needs no font network.
+- **Earlier reference = [`reel-6-system.html`](reel-6-system.html)** (English, current rules,
   **continuously animated** — not a slideshow): drifting ambient orb + a drawn/marching dashed
   clay arc behind every scene, pulsing live topbar dot, Ken Burns on photos, bouncing directional
   cues, staggered card-row reveals, typing dots before a message lands, blinking timer colon,
@@ -132,7 +144,7 @@ is just the quick-reference.
 - **Phone spec:** device 556×1136, radius 62, pad 14, dark gradient body, shadow + **clay halo** `0 0 140px rgba(199,85,47,.16)`, 6.5s idle float. Screen radius 48, paper bg, **`dir=ltr` + Barlow** (the real English app), dynamic island 128×34, status bar 58px. Screen transition: `opacity 0 / translateY(22px) scale(.985)` → on.
 - **Rhythm:** hook in first 2s · 2–6s per beat · ~30–40s total · text cascades `.rise` (translateY ~44px, delays in .12s steps) · count-ups ease-out.
 - **Canonical app beats:** lock screen → splash → today's program → exercise video → log weight+RPE → readiness check → coach chat → coach dashboard → canonical outro endcard.
-- **Delivery — the deliverable is the HTML file itself**, sent directly so Amir can open/preview/screen-record it himself. **No MP4 unless explicitly asked**; no per-beat screenshot walls; no audit workflow for a routine draft. The `/reel` skill's Step 9 covers the Playwright+ffmpeg export pipeline for when an MP4 *is* requested.
+- **Delivery — the deliverable is the HTML file itself**, sent directly so Amir can open/preview/screen-record it himself. **No MP4 unless explicitly asked**; no per-beat screenshot walls; no audit workflow for a routine draft. The `/reel` skill's Step 9 covers the export for when an MP4 *is* requested: a **frame-accurate renderer** (`.claude/skills/reel/tools/render_mp4.js`, 30 s of reel in about 35 s, 26 MB at crf 15), not a screen recording. A reel that will really be posted (an ad) gets the full check in Step 7 first, and is saved with its sources in `Content/<reel>/` (Step 10).
 - ⚠ Reels 1–3 (and reel-5, Farsi) predate the current rules or the language directive — copy mechanics only, not styling/language, from those files. Never retro-edit shipped reels; start a new numbered file.
 
 ## Recipe: result cards & app mockups

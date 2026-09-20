@@ -200,7 +200,12 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   [`file-vs-coach`](Content/carousel-1-file-vs-coach.html) (stale chrome — see atlas) ·
   oldest: [`instagram-carousels.html`](Content/instagram-carousels.html).
 - **Reels** (1080×1920): build with the [`/reel` skill](.claude/skills/reel/SKILL.md) ·
-  **newest** = [`reel-6-system`](Content/reel-6-system.html) (English, continuously animated —
+  **newest** = [`reel-7-course`](Content/reel-7-course.html) (**Farsi**, Amir's choice on 2026-09-20
+  because the course it sells is Farsi-only · silent, ~30 s · ends on the free demo · the ticks, ball
+  and camera all sit on one court line · real demo screens in a phone · sources, both pictures and the
+  rebuild steps in [`reel-7-course/`](Content/reel-7-course/README.md) · reel tools in
+  [`.claude/skills/reel/tools/`](.claude/skills/reel/tools/README.md), incl. the MP4 renderer) ·
+  English scene-swap reference = [`reel-6-system`](Content/reel-6-system.html) (continuously animated —
   ambient motion, Ken Burns, typing dots, etc. — `?beat=N` still mode, `?capture=1` export mode) ·
   **signature product pattern** = [`reel-4-app`](Content/reel-4-app.html) ("App-as-Product") ·
   earlier/retired-language generation: [`reel-5-system`](Content/reel-5-system.html) (Farsi) ·
