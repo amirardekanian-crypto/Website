@@ -10,9 +10,12 @@
    unmigrated exercise — so there is exactly one definition of what an old chip
    row means, and this script cannot drift away from the app.
 
-   Circuits are deliberately left alone: they never had the empty-cell problem
-   (a circuit draws Rounds + Rest, not the five-cell grid), and their per-item
-   `detail` strings are a separate job. rxOf() reads them either way.
+   Circuits are converted too (2026-09-20): the rounds string becomes a number —
+   "×2 Rounds" is why the cell used to read "Rounds: ×2 Rounds" — the rest becomes
+   rx.rest, and each item's free-text `detail` becomes its own rx WHERE IT PARSES
+   CLEANLY. "20 seconds, alternating" and "15 sec, switch legs each round" keep
+   their wording: losing a coach's phrasing to a tidier shape is a bad trade, and
+   rxOf() reads both.
 
    USAGE
        node scripts/migrate_rx.js            # dry run — prints what would change
@@ -39,7 +42,7 @@ const files = [];
   });
 })(ROOT);
 
-let touched = 0, exCount = 0, setups = [], mismatches = [];
+let touched = 0, exCount = 0, circuits = 0, circuitItems = 0, setups = [], mismatches = [];
 
 files.forEach(file => {
   const raw = fs.readFileSync(file, 'utf8');
@@ -47,7 +50,15 @@ files.forEach(file => {
   let changed = false;
 
   (j.blocks || []).forEach(b => (b.exercises || []).forEach((ex, i) => {
-    if (ex.type === 'circuit' || !ex.chips) return;
+    if (ex.type === 'circuit') {
+      if (ex.rx && ex.rx.rounds) return;
+      const next = Chips.circuitToRx(ex);
+      const itemsDone = (next.items || []).filter(it => it.rx).length;
+      circuits++; circuitItems += itemsDone;
+      b.exercises[i] = next; changed = true;
+      return;
+    }
+    if (!ex.chips) return;
 
     const before = Chips.rxOf(ex);
     const next = Chips.toRx(ex);
@@ -78,6 +89,7 @@ files.forEach(file => {
 });
 
 console.log((WRITE ? 'WROTE' : 'DRY RUN') + ` — ${exCount} exercises in ${touched} of ${files.length} files`);
+console.log(`circuits converted: ${circuits} (${circuitItems} item doses structured; the rest keep their wording)`);
 console.log(`refused (would have lost a fact): ${mismatches.length}`);
 mismatches.slice(0, 10).forEach(m =>
   console.log('   ' + m.file + ' / ' + m.name + ' ' + JSON.stringify(m.chips) + '\n     ' + m.before + '\n     ' + m.after));

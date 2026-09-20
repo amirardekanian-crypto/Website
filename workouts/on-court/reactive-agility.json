@@ -159,12 +159,9 @@
         {
           "type": "circuit",
           "name": "Line Drill",
-          "rounds": "3 Rounds",
-          "restSec": 60,
           "items": [
             {
               "name": "Lateral Line Hops",
-              "detail": "15 seconds",
               "cues": {
                 "good": [
                   "Two feet over the line and back, as fast as you can cycle them",
@@ -173,11 +170,13 @@
                 "bad": [
                   "Looking down at the line"
                 ]
+              },
+              "rx": {
+                "time": "15 seconds"
               }
             },
             {
               "name": "Front-Back Line Hops",
-              "detail": "15 seconds",
               "cues": {
                 "good": [
                   "Tiny hops over the line and back",
@@ -186,11 +185,13 @@
                 "bad": [
                   "Jumping high instead of fast"
                 ]
+              },
+              "rx": {
+                "time": "15 seconds"
               }
             },
             {
               "name": "Shadow Change of Direction",
-              "detail": "20 seconds",
               "cues": {
                 "good": [
                   "Split-step, move to a corner, recover to the middle, repeat",
@@ -199,9 +200,16 @@
                 "bad": [
                   "Falling into the same left-right-left pattern every round"
                 ]
+              },
+              "rx": {
+                "time": "20 seconds"
               }
             }
-          ]
+          ],
+          "rx": {
+            "rounds": 3,
+            "rest": 60
+          }
         }
       ]
     }

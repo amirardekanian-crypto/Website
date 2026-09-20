@@ -155,12 +155,9 @@
         {
           "type": "circuit",
           "name": "Ankle & Hamstring Primer",
-          "rounds": "2 Rounds",
-          "restSec": 45,
           "items": [
             {
               "name": "Single-Leg Calf Raise",
-              "detail": "×10 Each Side",
               "cues": {
                 "good": [
                   "Up slowly on one foot, all the way to the top",
@@ -169,11 +166,14 @@
                 "bad": [
                   "Bouncing through them"
                 ]
+              },
+              "rx": {
+                "reps": 10,
+                "side": true
               }
             },
             {
               "name": "Single-Leg Romanian Deadlift Reach",
-              "detail": "×6 Each Side",
               "cues": {
                 "good": [
                   "Hinge from the hip with the back leg long behind you",
@@ -182,11 +182,14 @@
                 "bad": [
                   "Twisting open at the hip"
                 ]
+              },
+              "rx": {
+                "reps": 6,
+                "side": true
               }
             },
             {
               "name": "Pogo Hop",
-              "detail": "×20",
               "cues": {
                 "good": [
                   "Stiff ankles, off the ground as fast as you land",
@@ -195,11 +198,13 @@
                 "bad": [
                   "Bending the knees and turning it into a squat jump"
                 ]
+              },
+              "rx": {
+                "reps": 20
               }
             },
             {
               "name": "A-Skip",
-              "detail": "20m",
               "cues": {
                 "good": [
                   "Tall hips, strike the ground underneath you",
@@ -208,9 +213,16 @@
                 "bad": [
                   "Reaching the foot out in front of the body"
                 ]
+              },
+              "rx": {
+                "distance": "20m"
               }
             }
-          ]
+          ],
+          "rx": {
+            "rounds": 2,
+            "rest": 45
+          }
         }
       ]
     },

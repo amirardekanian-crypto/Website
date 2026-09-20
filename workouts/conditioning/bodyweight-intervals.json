@@ -127,12 +127,9 @@
         {
           "type": "circuit",
           "name": "Repeat-Effort Circuit",
-          "rounds": "4 Rounds",
-          "restSec": 90,
           "items": [
             {
               "name": "Squat Jump",
-              "detail": "20 seconds",
               "cues": {
                 "good": [
                   "Land soft and go straight into the next one",
@@ -141,11 +138,13 @@
                 "bad": [
                   "Landing stiff and loud once you get tired"
                 ]
+              },
+              "rx": {
+                "time": "20 seconds"
               }
             },
             {
               "name": "Mountain Climber",
-              "detail": "20 seconds",
               "cues": {
                 "good": [
                   "Hands under the shoulders, drive the knees fast",
@@ -154,6 +153,9 @@
                 "bad": [
                   "Bouncing the hips up and down"
                 ]
+              },
+              "rx": {
+                "time": "20 seconds"
               }
             },
             {
@@ -171,7 +173,6 @@
             },
             {
               "name": "Fast Feet on the Spot",
-              "detail": "20 seconds",
               "cues": {
                 "good": [
                   "Tiny, quick contacts on the balls of the feet",
@@ -180,9 +181,16 @@
                 "bad": [
                   "Big heavy steps"
                 ]
+              },
+              "rx": {
+                "time": "20 seconds"
               }
             }
-          ]
+          ],
+          "rx": {
+            "rounds": 4,
+            "rest": 90
+          }
         }
       ]
     },

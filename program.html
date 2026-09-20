@@ -1711,6 +1711,13 @@
   .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; line-height: 1; transition: color 0.2s; }
   /* Thicker trailing line — colour matches the block accent for a strong section break */
   .section-header-prog::after { content: ''; flex: 1; height: 3px; border-radius: 2px; background: var(--grey-mid); transition: background 0.2s; }
+  /* Block rest — said ONCE for the whole section instead of repeated on every
+     card in it. Sits at the end of the section rule, quiet but findable. */
+  .section-rest {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; white-space: nowrap;
+  }
+  body[data-dark] .section-rest { color: #888; }
 
   /* Per-block section colours — full neon, matching the rest of the design system.
      Title and line use the same bright variant for a strong, on-brand section break. */
@@ -1952,14 +1959,26 @@
      renderStatsGrid(). (Before 2026-09-20 this was repeat(5,1fr) and the free
      library alone rendered 1,151 dashes.) */
   .ex-stats-grid {
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
     border: 1px solid var(--grey-mid);
     border-radius: 8px;
     margin-top: 4px;
     background: var(--white);
+    overflow: hidden;            /* so a row's edge cannot escape the radius */
   }
+  .ex-stats-row {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+  }
+  /* The tempo row sits under the dose row inside the same box, divided by one
+     rule. Same cells, same weight — the tempo is part of the prescription, not a
+     note about it. */
+  .ex-stats-row + .ex-stats-row { border-top: 1px solid var(--grey-mid); }
+  body[data-dark] .ex-stats-row + .ex-stats-row { border-top-color: #333; }
+  /* Phase values carry the clay accent so the eye separates "how you lift it"
+     from "how much" at a glance, without a second box or a heading. */
+  .ex-stat.phase .ex-stat-value { color: var(--ice); }
+  body[data-dark] .ex-stat.phase .ex-stat-value { color: var(--ice); }
 
   /* Setup line — equipment / position ("neutral grip", "45° bench"). Sits under
      the name as quiet text, because it is a condition of the exercise, not a
@@ -1972,9 +1991,8 @@
   }
   body[data-dark] .ex-setup { color: #999; }
 
-  /* Tempo spelled out, generated from the tempo itself, shown only when the card
-     is open. This is what replaced the hand-written "3s eccentric" pill that sat
-     beside a TEMPO cell already saying the same thing on 153 cards. */
+  /* Fallback only: a tempo that will not parse into phases, printed raw so it
+     still reaches the athlete rather than vanishing. */
   .ex-tempo-words {
     font-family: 'Barlow', sans-serif;
     font-size: 12.5px;
@@ -5761,9 +5779,15 @@ function renderHome() {
     let exerciseNum = 1;
     day.blocks.forEach((block, bIdx) => {
       const blockClass = blockCategory(block.title, bIdx);
-      html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
+      // A block can prescribe ONE rest for everything in it (`block.rest`, seconds).
+      // Eight cards in a Primary block repeating "REST 2m" is the same fact eight
+      // times; stating it on the section header says it once and still lets any
+      // exercise override with its own rx.rest.
+      const blockRest = (typeof block.rest === 'number' && block.rest > 0) ? block.rest : 0;
+      html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span>${
+        blockRest ? `<span class="section-rest">Rest ${esc(formatRestLabel(blockRest))}</span>` : ''}</div>`;
       block.exercises.forEach(ex => {
-        html += renderExercise(ex, day.id, exerciseNum++, blockClass, block.title);
+        html += renderExercise(ex, day.id, exerciseNum++, blockClass, block.title, blockRest);
       });
     });
 
@@ -5968,7 +5992,7 @@ function isPureDuration(label) {
 }
 
 /* ═══ rx — THE STRUCTURED PRESCRIPTION ═══════════════════════════════════════
-   ⚠ Mirrored in assets/js/chips.js (rxOf / repCount / tempoWords / DOSE_LABEL).
+   ⚠ Mirrored in assets/js/chips.js (rxOf / repCount / tempoCells / DOSE_LABEL).
    chips-selftest.html asserts the two copies agree; program.html stays
    self-contained on purpose (it is the offline PWA), which is why this is a
    copy rather than a <script src>.
@@ -5993,20 +6017,29 @@ function _cleanStr(v) {
   return s ? s : null;
 }
 
-// "3-1-1-0" → "3s down · 1s pause · 1s up". Generated, so it can never disagree
-// with the tempo cell the way a hand-written "3s eccentric" pill did.
-function tempoWords(tempo) {
+// "3-1-1-0" → [{LOWER,3s},{PAUSE,1s},{LIFT,1s}] — the tempo broken into the phases
+// the athlete actually performs, each one a real grid cell.
+//
+// It has been through three shapes. A cell reading "3-1-1-0" is notation most
+// athletes do not decode, which is why 153 cards carried a hand-written
+// "3s eccentric" pill beside it. Spelling it out in a grey line under the grid
+// fixed the meaning but read as a footnote (Amir, 2026-09-20: "it doesnt capture
+// the eye and it doesnt look professional"). Phases AS CELLS say it once, in
+// words, at the same weight as SETS and REPS — which is what it is worth.
+//
+// A zero phase is not drawn: "2-0-1-0" is two cells, not four. Across the live
+// programmes the pause is 0 on roughly two thirds of tempos, so the usual row is
+// LOWER + LIFT and the widest realistic one is four.
+function tempoCells(tempo) {
   const t = _cleanStr(tempo);
   if (!t) return null;
-  if (/^iso$/i.test(t)) return 'Hold the position';
+  if (/^iso$/i.test(t)) return [{ label: 'TEMPO', value: 'Hold' }];
   const parts = t.split(/[-–]/).map(x => parseFloat(x));
   if (parts.length < 3 || parts.some(isNaN)) return null;
-  const bits = [];
-  if (parts[0] > 0) bits.push(parts[0] + 's down');
-  if (parts[1] > 0) bits.push(parts[1] + 's pause');
-  if (parts[2] > 0) bits.push(parts[2] + 's up');
-  if (parts.length > 3 && parts[3] > 0) bits.push(parts[3] + 's reset');
-  return bits.length ? bits.join(' · ') : null;
+  const NAMES = ['LOWER', 'PAUSE', 'LIFT', 'TOP'];
+  const out = [];
+  parts.slice(0, 4).forEach((n, i) => { if (n > 0) out.push({ label: NAMES[i], value: n + 's' }); });
+  return out.length ? out : null;
 }
 
 function rxOf(ex) {
@@ -6091,17 +6124,19 @@ function renderStatsGrid(rx) {
   });
   if (rx.rpe)   cells.push({ label: 'RPE',   value: rx.rpe + '/10', cls: 'target' });
   if (rx.rest)  cells.push({ label: 'REST',  value: formatRestLabel(rx.rest), cls: '' });
-  // NO TEMPO CELL. The tempo is said once, in words, under the grid — see
-  // tempoLine() in renderExercise. A cell reading "3-1-1-0" beside a line reading
-  // "3s down · 1s pause · 1s up" is the same instruction twice, which is exactly
-  // the duplication that killed the old "3s eccentric" pill (Amir, 2026-09-20).
-  // The stored value is still the 4-part notation — coach.html shows Amir that.
-  if (!cells.length) return '';
-  return `<div class="ex-stats-grid">${cells.map(c => `
-    <div class="ex-stat ${c.cls}">
+
+  // The tempo is a SECOND ROW of the same box — same cells, same weight, one
+  // horizontal rule between. Not a cell of notation, and not a grey line
+  // underneath; both of those have been tried and both were wrong.
+  const phases = tempoCells(rx.tempo);
+  const row = cs => `<div class="ex-stats-row">${cs.map(c => `
+    <div class="ex-stat ${c.cls || ''}">
       <div class="ex-stat-label">${esc(c.label)}</div>
       <div class="ex-stat-value">${esc(c.value)}</div>
     </div>`).join('')}</div>`;
+  if (!cells.length && !phases) return '';
+  return `<div class="ex-stats-grid">${cells.length ? row(cells) : ''}${
+    phases ? row(phases.map(pc => ({ label: pc.label, value: pc.value, cls: 'phase' }))) : ''}</div>`;
 }
 
 // Stat pills for the collapsed row — each stat is its own small rounded pill.
@@ -6156,8 +6191,8 @@ function renderVideoBlock(url) {
   </div>`;
 }
 
-function renderExercise(ex, dayId, num, blockClass, blockTitle) {
-  if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass, blockTitle);
+function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
+  if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest);
 
   const isStandard = ex.type === 'standard';
   const rx = rxOf(ex);
@@ -6167,16 +6202,20 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle) {
   // press told to sit for two minutes. An unprescribed rest now draws no cell.
   // The timer button still works (see restBottom) — it just stops pretending the
   // number came from the coach.
-  const restSec = rx.rest || 0;
+  // Rest: the exercise's own → the block's → none. Still NEVER an invented default.
+  const restSec = rx.rest || blockRest || 0;
+  // Only the exercise's own rest earns a cell. A block rest is already stated on
+  // the section header, and repeating it on every card is what this replaced.
+  const restCell = rx.rest || 0;
   const _vid = getVideoUrl(ex);
 
   // A PREP ITEM IS A NAME AND A DOSE. When the only thing prescribed is the dose
   // — no sets, no RPE, no tempo, no rest — a five-cell grid was four em-dashes
   // and one number, 237 times in the free library alone. Draw the line instead.
-  const doseOnly = !!rx.dose && !rx.sets && !rx.rpe && !rx.tempo && !restSec;
+  const doseOnly = !!rx.dose && !rx.sets && !rx.rpe && !rx.tempo && !restCell;
 
   // The dose line already states the dose, so the summary must not repeat it.
-  const summary    = renderExSummary(rx, !!ex.note, doseOnly);
+  const summary    = renderExSummary(Object.assign({}, rx, { rest: restCell }), !!ex.note, doseOnly);
   const noteHtml   = renderCoachNote(ex.note);
   const videoBlock = renderVideoBlock(_vid);
   const setupHtml  = rx.setup ? `<div class="ex-setup">${esc(rx.setup)}</div>` : '';
@@ -6185,11 +6224,10 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle) {
         esc(rx.dose.value + (rx.dose.side ? ' / side' : ''))}</span></div>`
     : '';
 
-  const statsGrid = doseOnly ? '' : renderStatsGrid(rx);
-  // Spelled out when it parses; the raw notation as a fallback, so an odd tempo is
-  // still shown rather than silently dropped now that it has no cell of its own.
-  const words = doseOnly ? null
-    : (tempoWords(rx.tempo) || (rx.tempo ? 'Tempo ' + rx.tempo : null));
+  const statsGrid = doseOnly ? '' : renderStatsGrid(Object.assign({}, rx, { rest: restCell }));
+  // A tempo that does not parse into phases still has to reach the athlete, so it
+  // falls back to the raw notation on one line rather than vanishing.
+  const words = (doseOnly || !rx.tempo || tempoCells(rx.tempo)) ? null : 'Tempo ' + rx.tempo;
   const cuesHtml  = renderInlineCues(ex.cues);
   const statsBlock = statsGrid
     ? `<div class="ex-stats-block">${statsGrid}${
@@ -6243,7 +6281,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle) {
   </div>`;
 }
 
-function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
+function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // THE BLOCK DECIDES THE DEFAULT (2026-09-15). A circuit in a prep/activation
   // block logs NOTHING; a circuit anywhere else logs a weight field per item +
   // one RPE per round — supersets, complexes and conditioning alike.
@@ -6270,6 +6308,16 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
 
   // The circuit itself takes ONE number from the day's running counter.
   // Each item inside is labelled A, B, C…
+  // One item's dose. Reads `item.rx` when it has one and falls back to the old
+  // free-text `detail` when it does not, so an unconverted circuit is unchanged.
+  const itemDose = item => {
+    const r = rxOf(item);
+    if (!r.dose) return item.detail || '';
+    const bits = [r.dose.value + (r.dose.side ? '/side' : '')];
+    if (r.rpe) bits.push('RPE ' + r.rpe);
+    return bits.join(' · ');
+  };
+
   const roundsHtml = (ex.items || []).map((item, i) => {
     const letter = String.fromCharCode(65 + i); // 65 = 'A'
     const itemCues = renderRoundCues(item.cues);
@@ -6285,7 +6333,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
       <div class="round-row-main">
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
-        <span class="round-detail">${esc(item.detail)}</span>
+        <span class="round-detail">${esc(itemDose(item))}</span>
         ${logWeight ? `<input class="round-wt" type="text" inputmode="decimal" placeholder="kg" data-item="${i}">` : ''}
         ${itemPlay}
       </div>
@@ -6298,17 +6346,26 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
   // (rendered above via getVideoUrl(item)). This is why circuits behave a bit
   // differently from standard/simple exercises, which do show one video.
 
-  // Circuits don't fit the standard 5-cell grid (no sets/reps/tempo/rpe), so we
-  // surface the rounds string + rest as the headline info.
-  // Rest priority: ex.restSec → "Rest X" chip → 60s default for circuits
+  // A circuit surfaces rounds + rest rather than the dose grid — the dose lives
+  // on each item. `rx.rounds` is a NUMBER now ("×2 Rounds" used to be a display
+  // string, which is why the cell read "Rounds: ×2 Rounds"); `ex.rounds` is still
+  // read for anything not yet converted.
   const _rxC = rxOf(ex);
   // A circuit's rest IS prescribed in practice (it paces the round), so unlike a
-  // standard exercise it keeps a 60s fallback rather than dropping the cell.
-  const circuitRestSec = _rxC.rest || 60;
+  // standard exercise it keeps a fallback rather than dropping the cell.
+  const circuitRestSec = _rxC.rest || blockRest || 60;
+  // A converted circuit stores a NUMBER and gets the × added here; a legacy one
+  // still holds the whole display string ("×2 Rounds") and must be printed as-is,
+  // or it renders "××2 Rounds".
+  const roundsLabel = /^\d+$/.test(String(_rxC.rounds || ''))
+    ? '×' + _rxC.rounds + ' Rounds'
+    : (_rxC.rounds || ex.rounds || '');
   // Render the same .ex-summary-pill style used on standard exercises so the
   // collapsed circuit row reads consistently.
   const summaryPills = [];
-  if (ex.rounds)         summaryPills.push(ex.rounds);
+  if (roundsLabel)       summaryPills.push(roundsLabel);
+  if (_rxC.dose)         summaryPills.push(_rxC.dose.value + (_rxC.dose.side ? '/side' : ''));
+  if (_rxC.rpe)          summaryPills.push(_rxC.rpe + '/10');
   if (circuitRestSec)    summaryPills.push(`⏱ ${formatRestLabel(circuitRestSec)}`);
   const circuitNotePill = ex.note
     ? `<span class="ex-summary-pill modifier coach-note-pill">Coach's Note</span>`
@@ -6321,7 +6378,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
 
   // How many rounds? Parse the leading number out of the rounds string
   // (e.g. "×3 Rounds" → 3). Drives one RPE row per round below. Min 1.
-  const roundCount = parseRoundCount(ex.rounds);
+  const roundCount = _rxC.rounds ? (parseInt(_rxC.rounds, 10) || 1) : parseRoundCount(ex.rounds);
 
   // Rest button at the bottom of the detail
   const restBottom = `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`;
@@ -6340,7 +6397,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
       <div class="ex-circuit-meta">
         <div class="ex-stat">
           <div class="ex-stat-label">Rounds</div>
-          <div class="ex-stat-value">${esc(_rxC.rounds || ex.rounds || '—')}</div>
+          <div class="ex-stat-value">${esc(roundsLabel || '—')}</div>
         </div>
         <div class="ex-stat">
           <div class="ex-stat-label">Rest</div>

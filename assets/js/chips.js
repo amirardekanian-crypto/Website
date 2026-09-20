@@ -337,21 +337,26 @@
     return s ? s : null;
   }
 
-  // "3-1-1-0" → "3s down · 1s pause · 1s up". Generated from the numbers, so it
-  // can never disagree with the tempo cell the way a hand-written "3s eccentric"
-  // pill did on 153 cards. Zeroes are dropped; a 1s reset is not worth a phrase.
-  function tempoWords(tempo) {
+  // "3-1-1-0" → [{LOWER,3s},{PAUSE,1s},{LIFT,1s}] — the tempo broken into the
+  // phases the athlete performs, each one a real grid cell in program.html.
+  //
+  // Three shapes so far. A cell reading "3-1-1-0" is notation most athletes do
+  // not decode, which is why 153 cards carried a hand-written "3s eccentric"
+  // pill beside it. A grey line under the grid fixed the meaning but read as a
+  // footnote (Amir, 2026-09-20: "it doesnt capture the eye and it doesnt look
+  // professional"). Phases as cells say it once, at the weight it deserves.
+  //
+  // A zero phase is not drawn: "2-0-1-0" is two cells, not four.
+  function tempoCells(tempo) {
     const t = cleanStr(tempo);
     if (!t) return null;
-    if (/^iso$/i.test(t)) return 'Hold the position';
+    if (/^iso$/i.test(t)) return [{ label: 'TEMPO', value: 'Hold' }];
     const parts = t.split(/[-–]/).map(x => parseFloat(x));
     if (parts.length < 3 || parts.some(isNaN)) return null;
-    const bits = [];
-    if (parts[0] > 0) bits.push(parts[0] + 's down');
-    if (parts[1] > 0) bits.push(parts[1] + 's pause');
-    if (parts[2] > 0) bits.push(parts[2] + 's up');
-    if (parts.length > 3 && parts[3] > 0) bits.push(parts[3] + 's reset');
-    return bits.length ? bits.join(' · ') : null;
+    const NAMES = ['LOWER', 'PAUSE', 'LIFT', 'TOP'];
+    const out = [];
+    parts.slice(0, 4).forEach((n, i) => { if (n > 0) out.push({ label: NAMES[i], value: n + 's' }); });
+    return out.length ? out : null;
   }
 
   // Normalised, display-ready view of one exercise's prescription.
@@ -518,6 +523,62 @@
     return next;
   }
 
+  // Convert one circuit: the rounds string ("×2 Rounds") to a number, the rest to
+  // rx.rest, and each item's free-text `detail` to its own rx WHERE IT PARSES
+  // CLEANLY. A detail like "20 seconds, alternating" carries a dose AND a
+  // qualifier; only the unambiguous ones are converted, and anything else keeps
+  // its `detail` untouched — losing a coach's wording to a tidier shape is a bad
+  // trade, and rxOf() reads both.
+  function circuitToRx(ex) {
+    const next = Object.assign({}, ex);
+    const rx = Object.assign({}, ex.rx);
+
+    if (!rx.rounds) {
+      const m = String(ex.rounds || '').match(/(\d+)/);
+      if (m) rx.rounds = parseInt(m[1], 10);
+    }
+    if (!rx.rest) {
+      const chipRest = parseChips(ex.chips).rest;
+      const rest = (typeof ex.restSec === 'number' && ex.restSec > 0) ? ex.restSec : chipRest;
+      if (rest > 0) rx.rest = rest;
+    }
+    if (Object.keys(rx).length) next.rx = rx;
+    if (rx.rounds) delete next.rounds;     // one source, or the cell can disagree
+    delete next.restSec;
+    delete next.chips;
+
+    next.items = (ex.items || []).map(it => {
+      if (it.rx) return it;
+      const d = cleanStr(it.detail);
+      if (!d) return it;
+      const parsed = detailToRx(d);
+      if (!parsed) return it;              // keep the coach's wording as-is
+      const o = Object.assign({}, it, { rx: parsed });
+      delete o.detail;
+      return o;
+    });
+    return next;
+  }
+
+  // The unambiguous circuit-item doses only: "×12", "12 reps", "30 sec",
+  // "20 m", each optionally per side. Anything with a comma, a conjunction or
+  // trailing prose is deliberately refused.
+  function detailToRx(text) {
+    let t = String(text).trim();
+    if (/[,;]| and | then |alternat|switch|each round/i.test(t)) return null;
+    let side = false;
+    const sideRe = /\s*(?:\/\s*|each\s+)(?:side|leg|arm|hand|direction|way)s?\s*$/i;
+    if (sideRe.test(t)) { side = true; t = t.replace(sideRe, '').trim(); }
+    t = t.replace(/^×/, '').replace(/\s*reps?$/i, '').trim();
+    if (!t) return null;
+    let out = null;
+    if (/^\d+(?:\.\d+)?\s*(m|km|yd|metres?|meters?)$/i.test(t)) out = { distance: t };
+    else if (isPureDuration(t)) out = { time: t };
+    else if (/^\d+(?:\s*[-–]\s*\d+)?$/.test(t)) out = { reps: numIfPlain(t) };
+    if (out && side) out.side = true;
+    return out;
+  }
+
   function numIfPlain(v) {
     const s = String(v).trim();
     return /^\d+$/.test(s) ? parseInt(s, 10) : s;
@@ -559,6 +620,6 @@
   global.Chips = {
     parseChips, parseDurationToSec, isPureDuration,
     slotOf, fmt, readStats, applyStats, audit,
-    rxOf, repCount, applyRx, toRx, auditRx, tempoWords, DOSE_LABEL
+    rxOf, repCount, applyRx, toRx, circuitToRx, detailToRx, auditRx, tempoCells, DOSE_LABEL
   };
 })(typeof window !== 'undefined' ? window : globalThis);

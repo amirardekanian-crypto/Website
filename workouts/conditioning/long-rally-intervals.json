@@ -174,8 +174,6 @@
         {
           "type": "circuit",
           "name": "Long-Rally Intervals",
-          "rounds": "6 Rounds · RPE 9",
-          "restSec": 80,
           "items": [
             {
               "name": "Skater Step-Out",
@@ -216,7 +214,11 @@
                 ]
               }
             }
-          ]
+          ],
+          "rx": {
+            "rounds": 6,
+            "rest": 80
+          }
         }
       ]
     },

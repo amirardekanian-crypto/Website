@@ -226,8 +226,6 @@
         {
           "type": "circuit",
           "name": "Baseline Footwork",
-          "rounds": "3 Rounds",
-          "restSec": 60,
           "items": [
             {
               "name": "Split-Step to First Step",
@@ -244,7 +242,6 @@
             },
             {
               "name": "Recovery Shuffle",
-              "detail": "4 reps each way",
               "cues": {
                 "good": [
                   "From the tramline, shuffle back to the middle and set",
@@ -253,11 +250,14 @@
                 "bad": [
                   "Standing up tall halfway back"
                 ]
+              },
+              "rx": {
+                "reps": 4,
+                "side": true
               }
             },
             {
               "name": "Backward-to-Forward Transition",
-              "detail": "4 reps",
               "cues": {
                 "good": [
                   "Drop-step back three steps, then turn and drive forward",
@@ -266,9 +266,16 @@
                 "bad": [
                   "Turning your back on the court"
                 ]
+              },
+              "rx": {
+                "reps": 4
               }
             }
-          ]
+          ],
+          "rx": {
+            "rounds": 3,
+            "rest": 60
+          }
         }
       ]
     }

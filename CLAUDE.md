@@ -262,12 +262,22 @@ where one green pill stood for 121 different labels (a tempo said in words, equi
 cue, and occasionally a real dose):
 `rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (ONE
 intention) · `note` → clay callout · `cues` → the cues list.
-⚠ **There is NO TEMPO CELL.** The card says the tempo ONCE, in words, on a line under the grid
-(`3s down · 1s pause · 1s up`), generated from the stored numbers. The first build shipped the
-numeric cell *and* the line; Amir caught it immediately — same duplication, new clothes. Never
-re-add it. **And never restate the tempo in `intent`, `setup` or a cue**: `3s eccentric` as a pill
-was the old duplicate on 153 cards, and a cue spelling the count out is a third copy that costs
-one of only three cues (still true of 39 of 506 live exercises with a tempo).
+⚠ **THE TEMPO IS A SECOND ROW OF THE GRID, and the athlete never sees `3-1-1-0`.** It is broken
+into the phases they perform — `LOWER 3s · PAUSE 1s · LIFT 1s`, each a real cell — with zero
+phases drawn as nothing (`2-0-1-0` is two cells) and `iso` as one cell reading `TEMPO / Hold`.
+**Three attempts, so do not undo it:** a `3-1-1-0` cell is notation athletes do not decode (hence
+153 hand-written `3s eccentric` pills); a grey line under the grid fixed the meaning but read as
+a footnote (Amir: *"it doesnt capture the eye and it doesnt look professional"*); phases as cells
+say it once, at the weight it deserves. **And never restate the tempo in `intent`, `setup` or a
+cue** — a cue spelling the count out is a third copy that costs one of only three (still true of
+39 of 506 live exercises with a tempo).
+
+**`block.rest` states a section's rest ONCE** — on the section header (`PRIMARY ——— Rest 2m`),
+feeding every timer in the block, drawing no per-card cell. An exercise's own `rx.rest` overrides
+it and keeps its cell. **Circuits carry `rx` too**: `rounds` is a NUMBER now (it was the display
+string `"×2 Rounds"`, which is why the cell read *Rounds: ×2 Rounds*), and an item takes its own
+`rx` when its dose is plain, keeping free-text `detail` when the wording carries more than a
+number (*"15 sec, switch legs each round"*).
 
 ⚠ **REST IS NEVER INVENTED.** It used to fall back to 120s for any `standard` exercise, so all 26
 cards in the demo claimed "REST 2m" while every `restSec` in it was `null` — a calf raise and a

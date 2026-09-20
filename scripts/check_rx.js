@@ -42,7 +42,7 @@ const inlineSrc = slice('function parseDurationToSec(', 'function renderStatsGri
 
 const inline = {};
 vm.createContext(inline);
-vm.runInContext(inlineSrc + '\n;this.rxOf = rxOf; this.repCount = repCount; this.tempoWords = tempoWords;', inline);
+vm.runInContext(inlineSrc + '\n;this.rxOf = rxOf; this.repCount = repCount; this.tempoCells = tempoCells;', inline);
 const B = inline;
 
 /* ── fixtures ─────────────────────────────────────────────────────────────── */
@@ -96,8 +96,9 @@ FIXTURES.forEach(f => {
   say(a === b, 'mirror: ' + f.name, 'chips.js   ' + a + '\n        program.html ' + b);
   say(A.repCount(f.ex) === B.repCount(f.ex), 'repCount: ' + f.name);
 });
-['3-1-1-0', '3-0-1-0', 'iso', '2-0-1', 'nonsense', ''].forEach(t =>
-  say(A.tempoWords(t) === B.tempoWords(t), 'tempoWords("' + t + '")'));
+['3-1-1-0', '3-0-1-0', '2-0-1-0', '2-0-1-1', 'iso', '3-1-1', 'nonsense', ''].forEach(t =>
+  say(JSON.stringify(A.tempoCells(t)) === JSON.stringify(B.tempoCells(t)),
+      'tempoCells("' + t + '")'));
 
 console.log('2 · the model behaves');
 const eq = (got, want, what) => say(JSON.stringify(got) === JSON.stringify(want), what,
@@ -110,7 +111,14 @@ eq(A.rxOf({ type: 'standard', chips: [{ label: '3 Sets' }] }).rest, null,
    'legacy standard with no rest no longer falls back to 120s');
 eq(A.repCount({ rx: { time: '30s' } }), null, 'a hold has no rep count');
 eq(A.repCount({ rx: { reps: '8-10' } }), 8, 'a rep range takes its low end');
-eq(A.tempoWords('3-1-1-0'), '3s down · 1s pause · 1s up', 'tempo spelled out');
+eq(A.tempoCells('3-1-1-0'), [{label:'LOWER',value:'3s'},{label:'PAUSE',value:'1s'},{label:'LIFT',value:'1s'}],
+   'tempo becomes phase cells');
+eq(A.tempoCells('2-0-1-0'), [{label:'LOWER',value:'2s'},{label:'LIFT',value:'1s'}],
+   'a zero phase draws no cell');
+eq(A.tempoCells('2-0-1-1'), [{label:'LOWER',value:'2s'},{label:'LIFT',value:'1s'},{label:'TOP',value:'1s'}],
+   'a top pause is its own phase');
+eq(A.tempoCells('iso'), [{label:'TEMPO',value:'Hold'}], 'iso is one cell');
+eq(A.tempoCells('nonsense'), null, 'an unparseable tempo yields no cells (the card prints it raw)');
 
 // applyRx: one dose at a time, and blanks remove rather than store empty.
 eq(A.applyRx({ rx: { reps: 8 } }, { time: '30s' }).rx, { time: '30s' }, 'setting time clears reps');

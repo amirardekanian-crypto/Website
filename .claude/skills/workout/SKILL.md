@@ -121,6 +121,12 @@ Best for: all strength exercises, single-exercise loaded rows, any set/rep work 
 button is still there, labelled *Rest timer*. It used to fall back to 120s, which is how the
 demo ended up claiming "REST 2m" on all 26 cards while every rest in it was actually unset.
 
+**When a whole block shares one rest, put it on the block** — `{"title":"Strength","rest":120}`.
+It renders once on the section header and feeds every timer in it; `rx.rest` on an exercise
+overrides it. **The tempo needs no cell**: the card breaks `rx.tempo` into phase cells
+(`LOWER 3s · PAUSE 1s · LIFT 1s`) on a second row of the grid, with zero phases drawn as
+nothing and `"iso"` as one cell reading `TEMPO / Hold`.
+
 **Three fields beside `rx`, three different jobs — this is what stopped the pill row being a
 junk drawer of 121 labels:**
 
@@ -371,7 +377,8 @@ Before committing:
   (`reps` / `time` / `distance` / `work`)
 - No dose hiding in `intent` or `setup` — `intent` is ONE intention, `setup` is kit/position
 - No `chips[]` anywhere, and no `chips` left beside an `rx`
-- Circuit `items` have `name` and `detail`, not `rx`
+- Circuits use `rx.rounds` (a NUMBER) and `rx.rest`; items take their own `rx` when the dose is
+  plain and keep free-text `detail` only when the wording says more than a number
 - **`node scripts/check_rx.js` passes** — it audits every `rx` in the library and is in the
   pre-commit hook anyway
 - Every exercise `good: [2], bad: [1]`, every `note` one sentence, `intro` present (about 100–150 words)

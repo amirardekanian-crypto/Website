@@ -66,6 +66,16 @@ fields map one-to-one; there is nothing to convert:
 | rest | `"rest": 120` |
 | `intent` | `"intent": "max intent"` at exercise level — the one green pill |
 
+**Rest belongs to the BLOCK when a section shares one.** Write `"rest": 120` on the block and
+leave `rx.rest` off its exercises — the section header states it once and every timer in the
+block uses it. Put `rx.rest` only on the exercises that genuinely differ; it overrides the
+block and draws its own cell. Eight cards each repeating "REST 2m" is the same fact eight times.
+
+**Circuits take `rx` too:** `{"rx": {"rounds": 3, "rest": 60}}` — `rounds` is a NUMBER, not
+`"×3 Rounds"`. Each item takes its own `rx` when the dose is plain (`{"rx":{"reps":12}}`,
+`{"rx":{"time":"20s"}}`, `{"rx":{"reps":10,"side":true}}`) and keeps free-text `detail` only
+when the wording carries more than a number (`"15 sec, switch legs each round"`).
+
 **OMIT ANYTHING THE SPEC DID NOT GIVE YOU.** An absent field means "not prescribed" and the
 app draws no cell for it — that is the entire contract. Never write a placeholder, an empty
 string, or a zero. In particular: **no `rpe` on warm-up/prep, no `tempo` on ballistic work
@@ -77,8 +87,8 @@ same instruction twice; the app already spells the tempo out under the grid.
 **Never write `chips[]`.** It is legacy-read-only. Equipment or position notes
 (`neutral grip`, `45° bench`) go in `"setup"`, not a chip and not the name.
 
-**Working (non-warm-up) circuits:** build each item's `detail` from the spec's per-item reps
-(`"×12"`), and if the spec gives one overall circuit RPE append it (`"×12 · RPE 7"`).
+**Working (non-warm-up) circuits:** give each item its own `rx` from the spec's per-item reps
+(`{"rx":{"reps":12}}`), and put one overall circuit RPE on the circuit's own `rx.rpe`.
 Set **no logging flags** — since 2026-09-15 the BLOCK decides: a circuit in a working block
 (Primary/Accessory/Core/Power/Conditioning) logs a weight per item + one RPE per round, and
 a circuit in a prep block logs nothing. The only flag you ever write is `"logWeight": true`

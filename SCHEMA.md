@@ -643,18 +643,57 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | `note` | the coach's note to this athlete | clay "Coach's Note" callout |
 | `cues` | technique — `good[]` / `bad[]` | the cues list |
 
-⚠ **There is NO TEMPO CELL, deliberately.** The athlete's card says the tempo once, in
-words, on a line under the grid — `3s down · 1s pause · 1s up`, generated from the stored
-numbers. Do not add a cell showing `3-1-1-0` beside it: a cell and a line saying the same
-thing is the duplication this whole change existed to remove (Amir caught exactly that on
-the first build, 2026-09-20). The raw notation is still what you author and what
-`coach.html` shows the coach.
+⚠ **The athlete never sees `3-1-1-0`.** The card breaks the tempo into the phases they
+actually perform and draws each one as a **real grid cell in a second row**:
+
+```
+SETS 4  |  REPS 6  |  RPE 7/10
+LOWER 3s  |  PAUSE 1s  |  LIFT 1s
+```
+
+Phases are `LOWER · PAUSE · LIFT · TOP`, and **a zero phase draws no cell** — `2-0-1-0` is
+two cells, not four. `"iso"` draws one cell reading `TEMPO / Hold`. A tempo that will not
+parse falls back to one line of raw notation so nothing is lost.
+
+It took three attempts, so do not undo it: a cell reading `3-1-1-0` is notation most
+athletes never decode (which is why 153 cards carried a hand-written `3s eccentric` pill
+beside it); spelling it out in a grey line under the grid fixed the meaning but read as a
+footnote (Amir, 2026-09-20: *"it doesnt capture the eye and it doesnt look professional"*).
+Phases as cells say it **once**, at the weight it deserves.
 
 **For the same reason, never restate the tempo in `intent`, `setup` or a CUE.**
 `"3s eccentric"` as a pill was the old duplicate on 153 cards; "three seconds down, one
 second pause, drive up" as a cue is the same instruction again and costs one of only three
 cues (39 of 506 live exercises with a tempo still do this). Spend the cue on what the
 numbers cannot say.
+
+### `block.rest` — one rest for a whole section
+
+A block can prescribe rest once for everything in it:
+
+```json
+{ "title": "Primary", "rest": 120, "exercises": [ ... ] }
+```
+
+It renders on the section header (`PRIMARY ——— Rest 2m`) and feeds every rest timer in the
+block. An exercise's own `rx.rest` **overrides** it and draws its own REST cell; the block
+rest deliberately draws **no** per-card cell, because eight cards each repeating "REST 2m"
+is the same fact eight times. Use it whenever a section shares one rest, and put `rx.rest`
+only on the exercises that genuinely differ.
+
+### Circuits carry `rx` too
+
+```json
+{ "type": "circuit", "name": "Line Drill", "rx": { "rounds": 3, "rest": 60 },
+  "items": [ { "name": "Lateral Line Hops", "rx": { "time": "15s" } },
+             { "name": "Split Squat", "detail": "15 sec, switch legs each round" } ] }
+```
+
+`rx.rounds` is a **number** — it used to be the display string `"×2 Rounds"`, which is why the
+cell read *Rounds: ×2 Rounds*. An item takes its own `rx` when the dose is a plain one, and
+keeps free-text `detail` when the coach's wording carries more than a number (*"15 sec,
+switch legs each round"*). Both render; `detail` is never rewritten into a tidier shape it
+does not mean.
 
 #### What the card does with it
 
