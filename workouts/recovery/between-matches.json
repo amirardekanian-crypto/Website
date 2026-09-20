@@ -10,6 +10,16 @@
     "You have another match today, so this one is different from the rest of the shelf. Its only job is to stop you going stiff and cold while you wait. Run it in the last twenty to thirty minutes of the gap, then go straight into your normal on-court warm-up. It doesn't replace that warm-up. The gap before it matters more. Walk a few minutes before you sit down. Then eat and drink early and stay out of the sun. If you still haven't eaten or had a drink when this starts, do that first and walk after.",
     "There's no long stretching in here, because a long hold takes the edge off your force for a while and you need that force soon. If your legs cramped out there, walk gently and get fluid in. If something grabbed sharply and it's still sore now, don't play on and get it looked at. If you feel dizzy, sick or confused, or you've stopped sweating, that's heat, not stiffness. Get into the shade, cool down, tell someone and don't play the next match."
   ],
+  "before": [
+    {
+      "label": "A sharp grab",
+      "text": "If something grabbed sharply and it's still sore now, don't play on and get it looked at."
+    },
+    {
+      "label": "Heat",
+      "text": "If you feel dizzy, sick or confused, or you've stopped sweating, that's heat, not stiffness. Get into the shade, cool down, tell someone and don't play the next match."
+    }
+  ],
   "blocks": [
     {
       "title": "Keep Moving",

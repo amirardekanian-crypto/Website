@@ -10,6 +10,20 @@
     "This is for a sore knee, Achilles or ankle that a doctor or physio has already looked at and cleared you to train. Slow, controlled loading of the leg suits all three, so one session covers them. If only one is sore, that's fine, the session still fits. The balance work matters most if you've sprained that ankle before. Stop and get it looked at if you felt a snap or a pop and lost your push-off, if the knee gives way, locks or keeps swelling, if you can't put your full weight on it, if it swelled up fast after a twist or a landing, or if one calf is swollen, warm or tender and you didn't strain it playing. That one needs a doctor the same day.",
     "Leave at least 48 hours between sessions. Don't do it the day after braking or change-of-direction work on court, or the day before a match. Skip it too if the leg is still hammered from something else. This one costs something, so treat it like training. Slow and heavy is the whole dose. Wherever it hurts, find the depth or the step height where it stays quiet and work there. The position that hurts is the wrong position. You need a wall or a rail and a low step, and nothing here jumps or hops. On a flared-up day, do just the Wall Sit block at an RPE of 6 and don't mark the session done. The Wall Sit is fine on its own before you play. Do two holds at an RPE of 6 instead of four. A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If it's no better after about six weeks of doing this, see a physio. See one sooner if it's getting worse or coming on earlier than it used to."
   ],
+  "before": [
+    {
+      "label": "Who it's for",
+      "text": "A sore knee, Achilles or ankle that a doctor or physio has already looked at and cleared you to train."
+    },
+    {
+      "label": "Stop and get it looked at",
+      "text": "A snap or a pop and you lost your push-off, the knee gives way, locks or keeps swelling, you can't put your full weight on it, it swelled up fast after a twist or a landing, or one calf is swollen, warm or tender and you didn't strain it playing. That last one needs a doctor the same day."
+    },
+    {
+      "label": "While you train",
+      "text": "A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. On a flared-up day, do just the Wall Sit block at an RPE of 6 and don't mark the session done."
+    }
+  ],
   "blocks": [
     {
       "title": "Get Moving",

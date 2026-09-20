@@ -10,6 +10,24 @@
     "This is for a shoulder that's stiff, not one that hurts. Stop and get it looked at if the shoulder has come out or feels like it slips, if you felt a pop while serving or smashing and couldn't lift the arm afterwards, if you have pain at night that wakes you up, a dead arm, pins and needles or numbness down the arm or coming from the neck, or pain that shows up earlier every time you play. If your shoulder is sore rather than stiff and someone has already looked at it, Shoulder Brake in the Care list is the one built for that.",
     "The serve is your upper back turning and your shoulder going overhead, and both can get tight the more you play. Padel players serve underhand, but the bandeja loads the same overhead shoulder, just at half speed and a lot more often. Leave a day between goes. Do it on a rest day or after a short hit, and not in the hours before you play, because it leaves the arm tired. First time through, do two sets of the hold and the press at RPE 6 and see how the shoulder feels in two days. You need one dumbbell you can hold overhead with your ribs down, and something solid to lie back over, like a bench or the arm of a heavy sofa. An easy bike does the walk's job if you'd rather."
   ],
+  "before": [
+    {
+      "label": "Who it's for",
+      "text": "A shoulder that's stiff, not one that hurts. If your shoulder is sore rather than stiff and someone has already looked at it, Shoulder Brake in the Care list is the one built for that."
+    },
+    {
+      "label": "Stop and get it looked at",
+      "text": "If the shoulder has come out or feels like it slips, you felt a pop while serving or smashing and couldn't lift the arm afterwards, pain wakes you at night, you have a dead arm, pins and needles or numbness down the arm or coming from the neck, or the pain shows up earlier every time you play."
+    },
+    {
+      "label": "Timing",
+      "text": "Leave a day between goes, and keep it out of the hours before you play, because it leaves the arm tired."
+    },
+    {
+      "label": "First time",
+      "text": "Do two sets of the hold and the press at RPE 6 and see how the shoulder feels in two days."
+    }
+  ],
   "blocks": [
     {
       "title": "Raise",

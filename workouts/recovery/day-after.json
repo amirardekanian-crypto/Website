@@ -10,6 +10,20 @@
     "This is for the morning after, when your legs are heavy and stiff. Being heavy and stiff in both legs is normal, and being sorer on one side than the other is common in a racket sport. Stop and get it looked at if the pain is sharp, sits in one spot you can point to with a finger, comes with swelling or bruising, or hurts when you put weight on it. Same if it's still getting worse after three days. Dark brown urine, or a muscle so swollen and tight that you can't bend the joint, means see a doctor the same day. Otherwise it's fine to move through, and moving is the point.",
     "Start with ten easy minutes, walking or on a bike. Then open up your ankles, hamstrings and hips, and finish with a slow squat and a slow hinge so your body remembers what normal feels like. For the last couple of minutes you need a broom handle, and a racket held in front is fine for the squat. This makes today move better. Sleep and food do the repairing. The mobility sessions are for any day and for the places a racket player tends to feel tight. This one is for the day after, when you're heavy, and the walk is the session. If you're this heavy most mornings, something in your week is off. Too much hard work, too little sleep or too little food is the usual reason. If it doesn't shift, get checked."
   ],
+  "before": [
+    {
+      "label": "Normal",
+      "text": "Heavy and stiff in both legs is normal, and being sorer on one side than the other is common in a racket sport."
+    },
+    {
+      "label": "Stop and get it looked at",
+      "text": "If the pain is sharp, sits in one spot you can point to with a finger, comes with swelling or bruising, or hurts when you put weight on it. Same if it's still getting worse after three days."
+    },
+    {
+      "label": "See a doctor the same day",
+      "text": "Dark brown urine, or a muscle so swollen and tight that you can't bend the joint."
+    }
+  ],
   "blocks": [
     {
       "title": "Get Moving",

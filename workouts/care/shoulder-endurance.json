@@ -10,6 +10,20 @@
     "This is for a sore shoulder that a doctor or physio has already looked at and cleared you to train. Stop and get it looked at if your shoulder has come out or feels like it slips, if there was a sudden pop while serving and you couldn't lift the arm, if pain wakes you at night, if the pain started after a fall, or if you have pins and needles or numbness down the arm or coming from the neck. If you get chest pain, or you feel short of breath along with the shoulder pain, see a doctor the same day. If nothing hurts and you're just stiff overhead, this isn't your session. Open The Cage, in the Mobility list, is the one for that. Racket Arm, also in the Care list, is a short roll and stretch. It doesn't load the shoulder, and this one does.",
     "Do it after hitting or on a day you don't hit. Not in the hours before you serve or play, because a tired shoulder makes overhead mechanics worse. The one exception is the Take the Edge Off block. Before you play, do two holds at an RPE of 6 instead of four, so the shoulder is switched on and not tired. Nothing here should push your shoulder into a pinch. If an arm position pinches the front or top of the shoulder, stop that movement there. It's light and long, because endurance is what this is after. Work the sore side, or both if both are sore, which adds about ten minutes. You need a band, something sturdy to anchor it to, like a knot in the band closed in a door, and something very light to hold. Check the band for nicks before each session and don't use it if it has one. A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If it's no better after about six weeks of doing this, see a physio. See one sooner if it's getting worse or coming on earlier than it used to."
   ],
+  "before": [
+    {
+      "label": "Who it's for",
+      "text": "A sore shoulder that a doctor or physio has already looked at and cleared you to train. If nothing hurts and you're just stiff overhead, this isn't your session. Open The Cage, in the Mobility list, is the one for that."
+    },
+    {
+      "label": "Stop and get it looked at",
+      "text": "If your shoulder has come out or feels like it slips, there was a sudden pop while serving and you couldn't lift the arm, pain wakes you at night, the pain started after a fall, or you have pins and needles or numbness down the arm or coming from the neck. Chest pain, or shortness of breath along with the shoulder pain, means see a doctor the same day."
+    },
+    {
+      "label": "While you train",
+      "text": "A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If an arm position pinches the front or top of the shoulder, stop that movement there."
+    }
+  ],
   "blocks": [
     {
       "title": "Warm It Through",

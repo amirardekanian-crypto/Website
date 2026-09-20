@@ -10,6 +10,20 @@
     "This is for a back that's fine lying down and complains when you serve, when you reach low for a volley, or two hours into a match. A doctor or physio has already looked at it and cleared you to train. Stop and get it looked at if you get pain running down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day. Stop and get it looked at too if your back pain started after a fall or a hit, or if it wakes you at night. If your back hurts most of the time, or you've never done anything for it before, start with Steady Spine for a few weeks.",
     "Leave at least 48 hours between sessions, and don't do it the day before a match. The Take the Edge Off block is fine on its own before you play. Do two holds at an RPE of 6 instead of four. The idea is simple. Your back stays still and stiff while your hips push hard and one arm carries a load. Nothing bends or twists your spine under load. So set the dumbbell on a table or a counter at about hip height, pick it up from there, and put it back the same way. Never lift it off the floor. You need a dumbbell, a table or counter, a bench or a firm sofa pushed against a wall so it can't slide, a broom handle, and about fifteen metres to walk. Walk out and back over that distance and turn by stepping your feet around, not by twisting. No room to walk? Hold the carry in place for thirty seconds. A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If it's no better after about six weeks of doing this, see a physio. See one sooner if it's getting worse or coming on earlier than it used to."
   ],
+  "before": [
+    {
+      "label": "Who it's for",
+      "text": "A back that's fine lying down and complains when you serve, when you reach low for a volley, or two hours into a match, and that a doctor or physio has already looked at and cleared you to train. If your back hurts most of the time, or you've never done anything for it before, start with Steady Spine for a few weeks."
+    },
+    {
+      "label": "Stop and get it looked at",
+      "text": "Pain running down a leg, numbness, weakness in a leg or foot, or numbness between your legs. Also if your back pain started after a fall or a hit, or if it wakes you at night. If your bladder or bowel control changes, get seen the same day."
+    },
+    {
+      "label": "While you train",
+      "text": "A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session."
+    }
+  ],
   "blocks": [
     {
       "title": "Get the Hips Going",

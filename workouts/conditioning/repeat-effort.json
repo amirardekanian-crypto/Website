@@ -10,6 +10,32 @@
     "A point lasts about six seconds. Then you get about twenty-five before the next one, and every other game there's a ninety second changeover. This session squeezes that shape down: six sprints, a long breather, six more. The twenty-fourth effort is the one that matters. Each game is its own card, so you'll see Shuttle Sprint four times. Time the rests on a watch. Four games of six sprints. Ten metres out and ten back, as fast as you can control, with one hard turn at the far end. Twenty-five seconds between each one and ninety between games. That twenty-five seconds is the session. It isn't enough on purpose, so don't stretch it. You need twenty metres of flat, dry ground with real grip and a few metres clear at each end. Mark the far end ten metres out with tape or a line on the floor, not something you could step on. Wear court shoes or trainers with grip, and skip wet grass and polished floors. Padel points run longer, so padel players run the out and back twice without stopping, about twelve seconds, with the same rest. Do that only once the normal version feels easy to control.",
     "First time through, run the first game at about three quarters speed and stop after two games. Keep it 48 hours clear of a match, of heavy lower-body lifting, of Hard Stop and Cut & Recover in the On-Court list, and of any other hard running session, on either side. Leave it out of a tournament week. If you have a sore ankle, knee, calf, hamstring, groin or Achilles right now, or an injury has kept you off court in the last month, this isn't the session for today, so get it looked at first. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop at the back of your thigh, in your groin, your calf or your Achilles. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one. If you are far more sore than normal a day or two later, or your pee goes dark, get that checked the same day."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "A sore ankle, knee, calf, hamstring, groin or Achilles, or an injury in the last month? Get it looked at first."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    },
+    {
+      "label": "A day or two later",
+      "text": "Far more sore than normal, or your pee goes dark? Get it checked the same day."
+    },
+    {
+      "label": "Keep clear",
+      "text": "48 hours clear of a match, heavy lower-body lifting, Hard Stop and Cut & Recover in the On-Court list, and any other hard running session, on either side. Leave it out of a tournament week."
+    },
+    {
+      "label": "First time",
+      "text": "Run the first game at about three quarters speed and stop after two games."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",
