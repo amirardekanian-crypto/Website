@@ -93,7 +93,10 @@ CASES = [
 
 NODE_HARNESS = r"""
 const fs = require('fs');
-const src = fs.readFileSync(process.argv[2], 'utf8');
+// CRLF folded to LF: a Windows checkout (core.autocrlf=true) has \r\n, and the
+// logging-flags pattern below ends on a bare \n, so it could never match there and
+// the hook blocked every commit that touched program.html. Nothing else changes.
+const src = fs.readFileSync(process.argv[2], 'utf8').replace(/\r\n/g, '\n');
 const cases = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
 
 function grab(re, what) {
