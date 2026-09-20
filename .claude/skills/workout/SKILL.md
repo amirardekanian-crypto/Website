@@ -130,9 +130,10 @@ junk drawer of 121 labels:**
 | `intent` | **ONE** intention — `"max intent"`, `"max speed"` | the green pill (the only pill) |
 | `cues` | technique, `good[]` / `bad[]` | the cues list |
 
-**Never restate the tempo in `intent`.** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
-same sentence twice; the app spells the tempo out for you under the grid as
-`3s down · 1s pause · 1s up`.
+**Never restate the tempo in `intent` — or in a cue.** The athlete never sees the raw
+`3-1-1-0`; the app spells it out under the grid as `3s down · 1s pause · 1s up`. So
+`"3s eccentric"` as a pill, or "three seconds down, one second pause" as a cue, is the same
+instruction a second and third time. Spend the cue on what the numbers cannot say.
 
 **Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer. Use `intent` to communicate the movement intention:
 

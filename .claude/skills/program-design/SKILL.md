@@ -333,6 +333,12 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 
 **CUES — exactly three:** ext (outside) · int (internal feel) · avoid (most common error).
+
+**Never spend a cue on the tempo.** The app already spells it out under the grid from
+`rx.tempo` itself — `3s down · 1s pause · 1s up`. A cue reading "three seconds down, one
+second pause, drive up" is the same instruction a third time (the pill was the second), and
+it costs one of only three cues. Say something the numbers cannot: what to feel, where to
+brace, what usually goes wrong.
 Calibrate to training age.
 
 **AUTOREGULATION (required output):** include the standard note — drop every RPE by 1 on

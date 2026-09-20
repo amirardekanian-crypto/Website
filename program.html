@@ -2033,8 +2033,6 @@
   /* Target stat (RPE target) is always yellow */
   .ex-stat.target .ex-stat-value { color: var(--yellow); }
   body[data-dark] .ex-stat.target .ex-stat-value { color: var(--yellow); }
-  /* Tempo can get long — shrink slightly */
-  .ex-stat.tempo .ex-stat-value { font-size: 14px; }
 
   /* Circuit meta — 2-cell mini grid (Rounds + Rest) shown at the top of an
      expanded circuit so the round count and rest time stay visible. */
@@ -6092,8 +6090,12 @@ function renderStatsGrid(rx) {
     value: rx.dose.value, cls: ''
   });
   if (rx.rpe)   cells.push({ label: 'RPE',   value: rx.rpe + '/10', cls: 'target' });
-  if (rx.tempo) cells.push({ label: 'TEMPO', value: /^iso$/i.test(rx.tempo) ? 'Hold' : rx.tempo, cls: 'tempo' });
   if (rx.rest)  cells.push({ label: 'REST',  value: formatRestLabel(rx.rest), cls: '' });
+  // NO TEMPO CELL. The tempo is said once, in words, under the grid — see
+  // tempoLine() in renderExercise. A cell reading "3-1-1-0" beside a line reading
+  // "3s down · 1s pause · 1s up" is the same instruction twice, which is exactly
+  // the duplication that killed the old "3s eccentric" pill (Amir, 2026-09-20).
+  // The stored value is still the 4-part notation — coach.html shows Amir that.
   if (!cells.length) return '';
   return `<div class="ex-stats-grid">${cells.map(c => `
     <div class="ex-stat ${c.cls}">
@@ -6184,7 +6186,10 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle) {
     : '';
 
   const statsGrid = doseOnly ? '' : renderStatsGrid(rx);
-  const words     = doseOnly ? null : tempoWords(rx.tempo);
+  // Spelled out when it parses; the raw notation as a fallback, so an odd tempo is
+  // still shown rather than silently dropped now that it has no cell of its own.
+  const words = doseOnly ? null
+    : (tempoWords(rx.tempo) || (rx.tempo ? 'Tempo ' + rx.tempo : null));
   const cuesHtml  = renderInlineCues(ex.cues);
   const statsBlock = statsGrid
     ? `<div class="ex-stats-block">${statsGrid}${

@@ -622,7 +622,7 @@ cell for it. There is no placeholder, no default, and nothing to remember about 
 | `work` | `"40s on / 20s off"` | Intervals, where the dose is a pattern rather than a count. |
 | `side` | `true` | The dose is **per side**. The cell's label becomes `REPS / SIDE`. |
 | `rpe` | number or `"6-7"` | **Omit on warm-up and prep** — an RPE on a mobility drill is noise. Floor is 6 (the selector runs 6–10). |
-| `tempo` | `"3-1-1-0"` or `"iso"` | Eccentric–Pause–Concentric–Reset. Omit on ballistic work and carries. |
+| `tempo` | `"3-1-1-0"` or `"iso"` | Eccentric–Pause–Concentric–Reset. Omit on ballistic work and carries. **The athlete never sees this notation** — see below. |
 | `rest` | seconds | **Omit and nothing is invented.** The timer button still works; the card just stops claiming a number you did not pick. |
 | `rounds` | number | Circuits only. |
 | `label` | one word | Rare override for the dose cell, e.g. `"Hold"` instead of `TIME`. |
@@ -643,9 +643,18 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | `note` | the coach's note to this athlete | clay "Coach's Note" callout |
 | `cues` | technique — `good[]` / `bad[]` | the cues list |
 
-**Never restate the tempo in `intent` or `setup`.** `"3s eccentric"` beside
-`"tempo": "3-1-1-0"` is the same sentence twice — 153 cards were doing exactly that. The
-app spells the tempo out for you under the grid: `3s down · 1s pause · 1s up`.
+⚠ **There is NO TEMPO CELL, deliberately.** The athlete's card says the tempo once, in
+words, on a line under the grid — `3s down · 1s pause · 1s up`, generated from the stored
+numbers. Do not add a cell showing `3-1-1-0` beside it: a cell and a line saying the same
+thing is the duplication this whole change existed to remove (Amir caught exactly that on
+the first build, 2026-09-20). The raw notation is still what you author and what
+`coach.html` shows the coach.
+
+**For the same reason, never restate the tempo in `intent`, `setup` or a CUE.**
+`"3s eccentric"` as a pill was the old duplicate on 153 cards; "three seconds down, one
+second pause, drive up" as a cue is the same instruction again and costs one of only three
+cues (39 of 506 live exercises with a tempo still do this). Spend the cue on what the
+numbers cannot say.
 
 #### What the card does with it
 

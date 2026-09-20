@@ -262,8 +262,12 @@ where one green pill stood for 121 different labels (a tempo said in words, equi
 cue, and occasionally a real dose):
 `rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (ONE
 intention) · `note` → clay callout · `cues` → the cues list.
-**Never restate the tempo in `intent`** — `3s eccentric` beside `Tempo 3-1-1-0` is one sentence
-twice, which **153 cards** were doing. The app spells the tempo out itself under the grid.
+⚠ **There is NO TEMPO CELL.** The card says the tempo ONCE, in words, on a line under the grid
+(`3s down · 1s pause · 1s up`), generated from the stored numbers. The first build shipped the
+numeric cell *and* the line; Amir caught it immediately — same duplication, new clothes. Never
+re-add it. **And never restate the tempo in `intent`, `setup` or a cue**: `3s eccentric` as a pill
+was the old duplicate on 153 cards, and a cue spelling the count out is a third copy that costs
+one of only three cues (still true of 39 of 506 live exercises with a tempo).
 
 ⚠ **REST IS NEVER INVENTED.** It used to fall back to 120s for any `standard` exercise, so all 26
 cards in the demo claimed "REST 2m" while every `restSec` in it was `null` — a calf raise and a
