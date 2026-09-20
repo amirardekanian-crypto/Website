@@ -840,7 +840,8 @@ workouts/
 ### `workouts/index.json` — the manifest
 
 Lists the categories (with their banner image) and, per category, the workouts
-to show as cards. The manifest is the source of truth for the **card** (name,
+to show as cards. (Since 2026-09 the live source of truth is the database — see *Adding a workout* below — and this
+manifest is the offline fallback.) The manifest was the source of truth for the **card** (name,
 duration, equipment) so the Train list renders instantly without opening every file.
 
 ```jsonc
@@ -967,7 +968,14 @@ the day score. Full reasoning: `supabase/stage28_library_sessions.sql`, `HABITS.
    `duration`, `equipment`, `countsAs`, `focusTag`, `blocks`).
 2. Add an entry to that category's `workouts` array in `index.json` with the
    **same** `title` / `duration` / `equipment` and the `file` path.
-3. Commit + push. The Workouts tab picks it up on next load.
+3. Commit + push. **That alone does not put it in the app.** The Library is served from Supabase
+   (`public.library`, read through `get_library()`), and the JSON files and `index.json` are only the
+   offline fallback plus what `?workout=<id>` deep links resolve through.
+4. Publish it: **coach.html → Library → + Publish workout** (multi-select, upserts on `slug`), or an
+   `insert … on conflict (slug)` into `public.library`. The row's slug is
+   `workouts/<category>/<id>`, so a category move is a database write too.
+5. Set `sort_order` if the shelf position matters — the picker leaves it NULL, which sorts last, then
+   alphabetically by slug.
 
 > **Keep them matching:** the name/duration/equipment exist in *both* the manifest
 > (for the card) and the file (for the opened view). If you rename a workout, change
