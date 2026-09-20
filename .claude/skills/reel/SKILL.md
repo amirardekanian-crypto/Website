@@ -26,6 +26,8 @@ Farsi, real product screens, one visual idea carried through) and `Content/reel-
 5. **`Content/reel-7-course/README.md`** and its `src/reel7.template.html` — the ad reference
    (scene map, copy-to-source table, rebuild commands) — plus `.claude/skills/reel/tools/README.md`
    for the checking and export tools.
+6. **Only if the reel uses generated footage:** `.claude/skills/video/SKILL.md` (making the clips;
+   its Step 8 is the plan for playing a `<video>` inside this engine and mixing the clips' sound).
 
 ## Step 0b — Briefing an AD reel (something that sells)
 
@@ -42,8 +44,10 @@ said "incredible"):
    a storyboard, the named animations (small live CSS demos), the pictures he has to generate as cards
    with copy-ready prompts, and two or three quick picks he can answer in a few words ("A, yes, images
    done"). Keep his picture list minimal: reel-7 needed two.
-4. He generates the pictures by hand (Higgsfield or GPT Image) into Downloads and says "go". Fill the
-   board's cards with what he made.
+4. He says "go". Then either he generates the pictures by hand (Higgsfield or GPT Image) into Downloads
+   and you fill the board's cards with what he made (how reel-7 went), or you generate them yourself
+   through the Higgsfield MCP with `/image` (pictures) and `/video` (footage), quoting the credits
+   first: the pot is shared with his own generations, so never spend before that "go".
 5. Build, run the **full check** (Step 7), send the HTML, then the MP4 (Step 9) if he asks, then save
    it (Step 10).
 

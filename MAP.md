@@ -126,7 +126,10 @@ The brain behind every program. Read the principles before touching sets/reps.
 [`carousel`](.claude/skills/carousel/SKILL.md) (build an Instagram carousel) ·
 [`reel`](.claude/skills/reel/SKILL.md) (build an animated Instagram reel) ·
 [`image`](.claude/skills/image/SKILL.md) (generate app art and covers — prompt craft, the
-[gate tool](.claude/skills/image/tools/gate.py), grading and shipping).
+[gate tool](.claude/skills/image/tools/gate.py), grading and shipping) ·
+[`video`](.claude/skills/video/SKILL.md) (generate video clips for ads — start picture first, the
+3-second rule, the price list, the [clip check tool](.claude/skills/video/tools/clip_check.py) and a
+ledger of what already exists in the Higgsfield account).
 
 ---
 
