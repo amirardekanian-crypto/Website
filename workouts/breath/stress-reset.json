@@ -10,6 +10,16 @@
     "For the days when your body is fine and your head is not. Work, travel, exams, a bad week.",
     "A little movement first to give your attention somewhere to go, then five minutes of box breathing, then two minutes of long exhales to actually drop you down."
   ],
+  "before": [
+    {
+      "label": "Lightheaded",
+      "text": "Dizzy, or pins and needles in your hands or face? Stop counting and breathe normally. Never do breath holds in water or while driving."
+    },
+    {
+      "label": "More than a bad week",
+      "text": "If you feel low or anxious most days, or you haven't slept properly for weeks, talk to your doctor."
+    }
+  ],
   "blocks": [
     {
       "title": "Loosen",

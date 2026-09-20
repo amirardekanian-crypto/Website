@@ -10,6 +10,20 @@
     "The easy one, and the one people ruin by making it hard. Twenty-two minutes at a pace you could hold a conversation at.",
     "This is the base that lets you recover between points and between sessions. Going harder does not make it work better, it just turns it into a different session that you already do elsewhere."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "A knee, hip or ankle that hurts when you pedal? Get it looked at first."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, or a joint that gives way."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",

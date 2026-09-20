@@ -10,6 +10,40 @@
     "A full gym session built around the back squat, with jumps in front of it while you are fresh. Heavy enough to matter, not heavy enough to wreck the rest of your week.",
     "Pressing is deliberately absent and pulling is not. Your shoulder already presses all week on court, so the volume goes into legs and back instead."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "A sore knee, ankle, hip or lower back, or an injury in the last month? Get it looked at first."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads or runs down a leg, numbness, swelling, a joint that gives way, or a sudden pull or pop."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    },
+    {
+      "label": "A day or two later",
+      "text": "Far more sore than normal, or your pee goes dark? Get it checked the same day."
+    },
+    {
+      "label": "Past injury",
+      "text": "Coming back from a knee or ankle injury? Ask whoever treated you if jumps and heavy squats are OK."
+    },
+    {
+      "label": "Check the setup",
+      "text": "Set the safety arms or pins in the rack just below the bottom of your squat. No rack? Do the Goblet Squat instead. Nothing overhead for the jumps, like a fan or a low beam."
+    },
+    {
+      "label": "Keep clear",
+      "text": "48 hours away from another heavy leg session or hard running, and not the day before a match."
+    },
+    {
+      "label": "First time",
+      "text": "Do two sets of each lift instead of the full sets, and see how you feel in two days."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",

@@ -10,6 +10,24 @@
     "Quickness you cannot rehearse. Every drill here makes you react to something rather than run a pattern you already know.",
     "All of it works alone, off a wall or a ball you drop yourself. Vary the throws so you cannot predict the bounce — the moment it becomes predictable it is footwork practice, not reaction."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "A sore ankle, knee, calf, hamstring, groin or Achilles, or an injury in the last month? Get it looked at first."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    },
+    {
+      "label": "Check the space",
+      "text": "A wall you're allowed to hit a ball against, clear non-slip floor around you, and no other balls lying about. Stepping on a loose ball is an easy way to roll an ankle."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",

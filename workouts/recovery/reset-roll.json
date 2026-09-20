@@ -8,7 +8,21 @@
   "focusTag": "Release & Down-Regulate",
   "intro": [
     "Fifteen minutes with a foam roller, after training or on the evening of a hard day.",
-    "Slow is the whole thing. Stop on the sore spots and breathe there rather than sawing back and forth, and never roll your lower back — stay above the bottom of the ribcage."
+    "Slow is the whole thing. Stop on the sore spots and breathe there rather than sawing back and forth."
+  ],
+  "before": [
+    {
+      "label": "Never roll",
+      "text": "Your lower back, so stay above the bottom of your ribcage. Also the front or side of your neck, the back of your knee, the inside of your elbow, your armpit or right into the groin crease. Nothing that's swollen, hot, bruised or freshly hurt."
+    },
+    {
+      "label": "Leave that spot alone",
+      "text": "If something grabbed during play and it's still sore now, leave it alone and get it looked at. If it's sharp, or you get pins and needles, back off."
+    },
+    {
+      "label": "Swollen calf",
+      "text": "If one calf is swollen, warm or tender and you didn't strain it playing, don't roll it and see a doctor the same day."
+    }
   ],
   "blocks": [
     {

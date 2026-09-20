@@ -10,6 +10,20 @@
     "Fifteen minutes on the four things a racket player actually loses: ankles, hips, upper back and shoulders.",
     "Short enough to do every day, and that is the point — this works by being frequent rather than by being hard. Go to the edge of what you own and breathe there, rather than forcing past it."
   ],
+  "before": [
+    {
+      "label": "Lower back",
+      "text": "If your lower back is the problem, get it looked at first. The bodyweight back session in the Care list is there once someone has cleared you."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "Pain down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day."
+    },
+    {
+      "label": "Sharp pain in a move",
+      "text": "Skip that move."
+    }
+  ],
   "blocks": [
     {
       "title": "Spine & Ribs",

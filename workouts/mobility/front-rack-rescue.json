@@ -6,6 +6,16 @@
   "duration": "15 min",
   "equipment": "Foam Roller",
   "focusTag": "Clean & Jerk Front-Rack Prep",
+  "before": [
+    {
+      "label": "Stop and get it looked at",
+      "text": "Tingling or numbness into your fingers, a sharp pain in the wrist, elbow or shoulder, or pain after a fall or a wrench."
+    },
+    {
+      "label": "Never roll",
+      "text": "Your lower back, the front or side of your neck, the back of your knee, the inside of your elbow, your armpit or right into the groin crease. Nothing that's swollen, hot, bruised or freshly hurt."
+    }
+  ],
   "blocks": [
     {
       "title": "Soften the Tissue",

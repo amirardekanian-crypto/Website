@@ -10,6 +10,20 @@
     "Static stretching with no kit at all, for the days you do not have a roller or do not want one.",
     "These belong after training or on a rest day, never in the ten minutes before you play. Held long enough to matter, a stretch takes a little edge off how forcefully a muscle contracts for the next hour or so — exactly what you want tonight and exactly what you do not want before a match."
   ],
+  "before": [
+    {
+      "label": "Stop and get it looked at",
+      "text": "Sharp pain, pins and needles, or anything running down a leg or an arm isn't a stretch, so stop that one."
+    },
+    {
+      "label": "Leave out",
+      "text": "If a groin or a hamstring is still sore from playing, leave the hamstring and butterfly stretches out."
+    },
+    {
+      "label": "Swollen calf",
+      "text": "If one calf is swollen, warm or tender and you didn't strain it playing, see a doctor the same day."
+    }
+  ],
   "blocks": [
     {
       "title": "Lower Body",

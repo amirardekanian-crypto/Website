@@ -10,6 +10,32 @@
     "An upper-body session for an arm that plays a racket sport. Pull-led, because pulling is the half your sport never trains.",
     "Two sets of bench on purpose, and a light set of wrist work at the end. Your shoulder presses all week already, and the elbow is usually where the forearm ends up complaining."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "A sore shoulder, elbow, wrist or neck, or an injury in the last month? Get it looked at first."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness or pins and needles down the arm, swelling, a shoulder that slips or comes out, or a sudden pop."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    },
+    {
+      "label": "While you train",
+      "text": "If pressing overhead pinches the front or top of your shoulder, stop that press there and skip it today."
+    },
+    {
+      "label": "A day or two later",
+      "text": "Far more sore than normal, or your pee goes dark? Get it checked the same day."
+    },
+    {
+      "label": "First time",
+      "text": "Do two sets of each lift instead of the full sets, and see how you feel in two days."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",

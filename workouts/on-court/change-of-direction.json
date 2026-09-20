@@ -10,6 +10,40 @@
     "First-Step Speed trains getting going. This one trains stopping, which is the half that actually decides whether you reach the next ball.",
     "You cannot accelerate again until you have killed the momentum from the last shot. Deceleration comes first while you are fresh, then the turns that use it."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "A sore ankle, knee, calf, hamstring, groin or Achilles, or an injury in the last month? Get it looked at first."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    },
+    {
+      "label": "A day or two later",
+      "text": "Far more sore than normal, or your pee goes dark? Get it checked the same day."
+    },
+    {
+      "label": "Past injury",
+      "text": "Ever torn a knee ligament, or coming back from an ankle injury? Ask whoever treated you if stops and cuts are OK."
+    },
+    {
+      "label": "Check the space",
+      "text": "About twenty-five metres of flat, non-slip ground, and court shoes. Mark each distance with tape or a line, not cones or bags you could step on."
+    },
+    {
+      "label": "Keep clear",
+      "text": "48 hours away from another hard session, and not the day before a match."
+    },
+    {
+      "label": "First time",
+      "text": "Do half the sets in the last two blocks and take the full rest."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",

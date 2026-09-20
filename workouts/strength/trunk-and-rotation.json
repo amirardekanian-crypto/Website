@@ -10,6 +10,20 @@
     "Twenty minutes on the middle of you. Rotation first while you are fresh, then the bracing work that stops the hips and ribs cheating.",
     "Slow beats fast on all of it. You are teaching the trunk to hold still while everything around it turns, which is what a forehand actually asks for."
   ],
+  "before": [
+    {
+      "label": "Lower back",
+      "text": "If your lower back is the problem, get it looked at first. The bodyweight back session in the Care list is there once someone has cleared you."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "Pain down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day."
+    },
+    {
+      "label": "Sharp pain in a move",
+      "text": "Skip that move."
+    }
+  ],
   "blocks": [
     {
       "title": "Activation & Prep",

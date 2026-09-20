@@ -6,6 +6,16 @@
   "duration": "15 min",
   "equipment": "Bodyweight",
   "focusTag": "Warm-Up & Prep",
+  "before": [
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop. Don't play on it."
+    },
+    {
+      "label": "Check the space",
+      "text": "About twenty metres of flat, non-slip ground, and nothing overhead for the jumps."
+    }
+  ],
   "blocks": [
     {
       "title": "Raise",

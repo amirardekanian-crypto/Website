@@ -10,6 +10,20 @@
     "For the hour after a match, when the score is settled but you are still wired. Adrenaline does not switch off just because you sat down.",
     "Move first to bleed it off, get your legs above your heart, then breathe. Box breathing comes before the long exhale on purpose: a head still going over points needs something to hold on to before it will drop."
   ],
+  "before": [
+    {
+      "label": "A sharp grab",
+      "text": "If something grabbed sharply in the match and it's still sore now, get it looked at."
+    },
+    {
+      "label": "Heat",
+      "text": "If you feel dizzy, sick or confused, or you've stopped sweating, that's heat, not tiredness. Get into the shade, cool down and tell someone."
+    },
+    {
+      "label": "Lightheaded",
+      "text": "Dizzy, or pins and needles in your hands or face? Stop counting and breathe normally. Never do breath holds in water or while driving."
+    }
+  ],
   "blocks": [
     {
       "title": "Bleed It Off",

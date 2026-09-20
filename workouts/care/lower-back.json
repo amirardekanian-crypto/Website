@@ -7,8 +7,21 @@
   "equipment": "Bodyweight",
   "focusTag": "Lower Back Pain",
   "intro": [
-    "This is for ordinary mechanical back pain that a doctor or physio has already cleared you to train through. Stop and get it looked at if you have pain running down your leg, numbness, weakness in a leg or foot, or any change in bladder or bowel control.",
     "Two or three times a week, alongside your normal training. We walk first, then free up the hips and upper back, then build the brace that keeps the middle still, then unload. Nothing here stretches or rolls your lower back, because that is the one thing a sore back does not want."
+  ],
+  "before": [
+    {
+      "label": "Who it's for",
+      "text": "Ordinary back pain that a doctor or physio has already looked at and cleared you to train through."
+    },
+    {
+      "label": "Stop and get it looked at",
+      "text": "Pain running down a leg, numbness, weakness in a leg or foot, or numbness between your legs. Also if your back pain started after a fall or a hit, or if it wakes you at night. If your bladder or bowel control changes, get seen the same day."
+    },
+    {
+      "label": "While you train",
+      "text": "A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session."
+    }
   ],
   "blocks": [
     {

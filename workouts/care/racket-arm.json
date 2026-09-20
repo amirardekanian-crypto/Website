@@ -10,6 +10,20 @@
     "Twelve minutes on the arm that plays the sport: forearm, elbow and shoulder.",
     "It opens at the forearm rather than the elbow, because that is where tennis elbow actually starts — the muscles that grip the racket and brake the wrist on every shot, with the elbow just the place they attach and complain."
   ],
+  "before": [
+    {
+      "label": "Stop and get it looked at",
+      "text": "Tingling or numbness into your fingers, a grip that suddenly fails, pain after a fall or a wrench, swelling, an elbow that locks or won't straighten, or pain that wakes you at night."
+    },
+    {
+      "label": "Never roll",
+      "text": "Your lower back, the front or side of your neck, the back of your knee, the inside of your elbow, your armpit or right into the groin crease. Nothing that's swollen, hot, bruised or freshly hurt."
+    },
+    {
+      "label": "Leave that spot alone",
+      "text": "If something grabbed during play and it's still sore now, leave it alone and get it looked at. If it's sharp, or you get pins and needles, back off."
+    }
+  ],
   "blocks": [
     {
       "title": "Forearm & Elbow",

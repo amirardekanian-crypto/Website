@@ -10,6 +10,12 @@
     "The last thing before sleep, done in your bedroom with the lights already low and nothing planned afterwards.",
     "No box breathing tonight. Counting four sides of a box keeps a part of you alert, which is what you want before a match and the opposite of what you want now. Long exhales only, and falling asleep during it means it worked."
   ],
+  "before": [
+    {
+      "label": "Legs up the wall",
+      "text": "Feet going numb or tingly, or dizzy when you sit up? Bring your legs down slowly and rest on your side before you get up."
+    }
+  ],
   "blocks": [
     {
       "title": "Settle",

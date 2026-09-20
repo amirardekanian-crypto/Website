@@ -10,6 +10,24 @@
     "Fifteen minutes to get you from cold to ready to run. Raise, mobilise, activate, then prime.",
     "It builds in one pass rather than repeating rounds, and every piece is a step closer to running speed. Do them in order, and do not skip the last block — that is the part that actually makes the first mile feel easy."
   ],
+  "before": [
+    {
+      "label": "Not today",
+      "text": "If a shin, foot, ankle or knee is sore right now, walk instead and get it looked at."
+    },
+    {
+      "label": "Stop and get it checked",
+      "text": "A sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop."
+    },
+    {
+      "label": "Check the space",
+      "text": "About twenty metres of flat, non-slip ground with nothing on it."
+    },
+    {
+      "label": "Stop now",
+      "text": "Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right. Get it looked at before you train again. Told to be careful with hard exercise? Check with your doctor first."
+    }
+  ],
   "blocks": [
     {
       "title": "Raise",
