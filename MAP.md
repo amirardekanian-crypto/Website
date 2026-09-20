@@ -124,7 +124,9 @@ The brain behind every program. Read the principles before touching sets/reps.
 **Content skills:** [`article`](.claude/skills/article/SKILL.md) (publish a blog) ·
 [`workout`](.claude/skills/workout/SKILL.md) (publish a Train session) ·
 [`carousel`](.claude/skills/carousel/SKILL.md) (build an Instagram carousel) ·
-[`reel`](.claude/skills/reel/SKILL.md) (build an animated Instagram reel).
+[`reel`](.claude/skills/reel/SKILL.md) (build an animated Instagram reel) ·
+[`image`](.claude/skills/image/SKILL.md) (generate app art and covers — prompt craft, the
+[gate tool](.claude/skills/image/tools/gate.py), grading and shipping).
 
 ---
 

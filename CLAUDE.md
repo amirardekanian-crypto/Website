@@ -757,6 +757,16 @@ or a handed subject. Moments: session complete (3, rotating), new best on The Ce
 same path** — `sw.js` serves `/assets/` cache-first by URL. Full specs `IMAGES.md` §0;
 asset shelf row in `Content/DESIGN-ATLAS.md`.
 
+**Generating pictures is the `/image` skill** (`.claude/skills/image/SKILL.md`) — Higgsfield is
+connected, so Claude writes the prompt, generates, downloads, judges, grades and ships without
+Amir touching the tool. Read it before writing a prompt: it carries the settings that work
+(medium/1k, **1 credit per 2 images**, a **~4-at-a-time rate limit that fails a big batch
+silently**), the prompt formula, the subjects that have failed, and `tools/gate.py`, which judges
+a candidate through the destination's **own scrim** rather than on the raw file. ⚠️ **It spends
+real credits from a pot shared with Amir's own generations, so never generate unless he asked for
+that run** (Amir, 2026-09-20: *"wait untill i say to generate more"*). Its *Learned the hard way*
+log is where each round's lessons go.
+
 **Reel delivery process (Amir, 2026-07-02 — was too slow first time, fix this):** For a reel,
 the deliverable is **the HTML file itself**, sent via SendUserFile so he can open/preview and
 screen-record it himself. **Do NOT render an MP4 unless he explicitly asks for one** — skip
