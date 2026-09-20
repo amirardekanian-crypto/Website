@@ -775,8 +775,10 @@ padel** and had its body rewritten (see *Article pages & SEO*). `form-fa.html` a
   rate-limit answer is a JSON *object*, so a poll loop that tests `len(...) != 0` reads it as "deployed". Seen
   2026-09-20, after a few minutes of polling. To wait for a deploy, poll the SERVED file for something only the
   new version has (`curl -sL https://amirardekani.com/<file> | grep -c '<new marker>'`), which has no quota.
-  Pages also stalls: that day two pushes in a row were still not served twenty minutes on, right after one had
-  deployed in a minute. The served file is the check, and if it is not there, land another commit.
+  ⚠ **Push `main` BY ITSELF.** On 2026-09-20 three pushes in a row made with `git push origin main <other-branch>`
+  (two refs at once, both at the same commit) got no "pages build and deployment" run at all, and the next push
+  of `main` alone built within seconds. Not proven to be the cause, but it costs nothing to avoid. To see whether a
+  run exists without spending the API quota, read the HTML page `https://github.com/<owner>/Website/actions`.
   Tell Amir to **hard-refresh** to bypass browser cache.
 - For visual checks: serve with `python3 -m http.server` and screenshot with Chromium at
   `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. Two headless quirks: scroll-reveal hides
