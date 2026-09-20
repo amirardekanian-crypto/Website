@@ -31,3 +31,4 @@ data/*.json
 # on Amir's PC and nowhere else. The script writes to ~/AA-Backups by default, well
 # outside this repo; this entry only catches the case where --out is pointed inside.
 AA-Backups/
+__pycache__/
