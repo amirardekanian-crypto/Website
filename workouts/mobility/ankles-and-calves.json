@@ -1,0 +1,223 @@
+{
+  "id": "ankles-and-calves",
+  "title": "Brake Pads",
+  "category": "mobility",
+  "countsAs": "mobility",
+  "duration": "25 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Ankles & Calves",
+  "intro": [
+    "This is for a stiff ankle, not an injured one. Stop and get it looked at if you've rolled it lately, if it's swollen, if it gives way, or if your knee hurts in the deep position. Same if you felt a pop or a snap at the back of the ankle or calf, or if the tendon itself is sore and it's worse the next morning. If one calf is swollen, warm or tender and you didn't strain it playing, see a doctor the same day. If a knee, an Achilles or an ankle is sore rather than stiff, someone should look at you first, and then the knee, Achilles and ankle session in the Care list is the one built for it.",
+    "You brake with your ankle and your calf. When the ankle won't let your knee travel forward, you can end up pulling up high instead of sitting into the last step, and the push back out of the corner gets slower. So we open up the ankle first, then build the calf to hold that range. Do it after training or on its own day. It leaves your calves tired for a day or two, so keep it two days clear of a match and of braking work on court. First time through, do two sets of each loaded exercise and see how you feel in two days. Tired is fine. A sharp spot in the calf or Achilles, or a tendon that's worse the next morning, means stop and get it looked at. You need a step or the bottom stair, and a wall to hold onto. No step works too, you just lose the stretch at the bottom. An easy bike does the walk's job."
+  ],
+  "blocks": [
+    {
+      "title": "Warm the Ground",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "5 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk at an easy pace and roll through each foot",
+              "Feel your calves and ankles warming up"
+            ],
+            "bad": [
+              "Shuffling flat-footed"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "note": "A doorframe works if you don't have a wall to face.",
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes with your heel down",
+              "Feel the stretch low in the calf and the front of the ankle"
+            ],
+            "bad": [
+              "Letting your heel lift to get the knee further"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Tibialis Raise",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×15 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lean back against a wall with your feet a step out and lift your toes toward your shins",
+              "Feel the muscle along the front of your shin"
+            ],
+            "bad": [
+              "Bending at the hips to help the lift"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Toe Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "20m"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk on the balls of your feet with your heels high",
+              "Feel your calves and the arches of your feet working"
+            ],
+            "bad": [
+              "Letting your heels sink between steps"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Downward Dog Heel Drive",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "From downward dog, bend one knee and press the other heel toward the floor",
+              "Feel the stretch through the calf and Achilles of the straight leg"
+            ],
+            "bad": [
+              "Rounding your back to reach the heel down"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Load the Range",
+      "icon": "🦵",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Split Squat",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "This is one long hold, not reps, and if the front of the ankle pinches rather than stretches, take the knee back a little.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×20s Each Side"
+            },
+            {
+              "label": "Tempo Iso"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sink into a long split stance and drive the front knee forward over your toes",
+              "Feel the front ankle stretch and the thigh working"
+            ],
+            "bad": [
+              "Letting the front heel lift"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Calves",
+      "icon": "🦶",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Calf Raise",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×20"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "3s lower",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rise onto the balls of both feet from the edge of a step, holding a wall, then take three seconds to lower",
+              "Feel the calves working the whole way down"
+            ],
+            "bad": [
+              "Bouncing at the bottom"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Bent-Knee Calf Raise",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×15"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "2s lower",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Keep your knees bent and stay there as you rise onto the balls of your feet",
+              "Feel the deeper calf muscle under the big one working"
+            ],
+            "bad": [
+              "Straightening your knees as you rise"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

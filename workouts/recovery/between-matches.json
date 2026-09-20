@@ -1,0 +1,145 @@
+{
+  "id": "between-matches",
+  "title": "Turnaround",
+  "category": "recovery",
+  "countsAs": "mobility",
+  "duration": "10 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Between Matches, Same Day",
+  "intro": [
+    "You have another match today, so this one is different from the rest of the shelf. Its only job is to stop you going stiff and cold while you wait. Run it in the last twenty to thirty minutes of the gap, then go straight into your normal on-court warm-up. It doesn't replace that warm-up. The gap before it matters more. Walk a few minutes before you sit down. Then eat and drink early and stay out of the sun. If you still haven't eaten or had a drink when this starts, do that first and walk after.",
+    "There's no long stretching in here, because a long hold takes the edge off your force for a while and you need that force soon. If your legs cramped out there, walk gently and get fluid in. If something grabbed sharply and it's still sore now, don't play on and get it looked at. If you feel dizzy, sick or confused, or you've stopped sweating, that's heat, not stiffness. Get into the shade, cool down, tell someone and don't play the next match."
+  ],
+  "blocks": [
+    {
+      "title": "Keep Moving",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "5 minutes"
+            },
+            {
+              "label": "Easy · conversation pace",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk tall and let your arms swing",
+              "Feel your legs loosen up while your breathing stays calm"
+            ],
+            "bad": [
+              "Turning it into a brisk power walk"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Stay Loose",
+      "icon": "👟",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Leg"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg front to back for five, then side to side for five",
+              "Feel the hip loosen up as the swing gets bigger"
+            ],
+            "bad": [
+              "Arching your lower back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Standing Hip Circle",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stand on one leg, lift the other knee and draw a big circle with it",
+              "Feel the hip joint moving smoothly all the way round"
+            ],
+            "bad": [
+              "Leaning your trunk to make the circle bigger"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Shoulder Cross-Body Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Swing your arm across your chest, then open it out to the side no further than in line with your shoulder",
+              "Feel your shoulder and upper back loosening"
+            ],
+            "bad": [
+              "Swinging so hard that the arm whips past a comfortable range"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes",
+              "Feel a stretch low in the calf, and back off if you feel a pinch at the front of your ankle"
+            ],
+            "bad": [
+              "Letting the heel lift or the arch collapse"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Split-Step Bounces",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Take a small hop and land wide and low on the balls of both feet",
+              "Feel yourself land loaded and ready to push either way"
+            ],
+            "bad": [
+              "Landing stiff, or with your knees caving in"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

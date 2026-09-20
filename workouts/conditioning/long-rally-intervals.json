@@ -1,0 +1,255 @@
+{
+  "id": "long-rally-intervals",
+  "title": "Deep Water",
+  "category": "conditioning",
+  "countsAs": "strength",
+  "duration": "25 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Long-Rally Tolerance · No Kit",
+  "intro": [
+    "Some rallies don't end. Past ten shots, past twenty, and your legs are full when the next point starts. This session is that feeling on purpose. Six efforts of forty seconds with eighty seconds between, which isn't enough rest, and that's the idea. Go hard, RPE 9. Each forty seconds is skater step-outs, split squats and a bear crawl. Nothing jumps, so keep moving the whole time and move fast through a range you can control. By round four it should feel really hard, and that's where the session happens. You need a clear strip four metres long and two wide, a floor you won't slip on, and shoes on. Fitted carpet is fine, a loose rug isn't. Set a timer that beeps. Padel rallies run longer, so padel players do fifty seconds with the same rest: twenty on the step-outs, twenty on the split squats and ten on the crawl. If your wrists ache, march fast on the spot instead of the bear crawl.",
+    "First time through, do four rounds and stop there. It still counts. If your knees start to cave or your steps get sloppy, that was your last round. Keep it 48 hours clear of a match and of heavy lower-body lifting, and leave it out of a tournament week. If you have a sore ankle, knee, calf, hamstring, groin or Achilles right now, or an injury has kept you off court in the last month, this isn't the session for today, so get it looked at first. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop at the back of your thigh, in your groin, your calf or your Achilles. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one. If you are far more sore than normal a day or two later, or your pee goes dark, get that checked the same day."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog on the Spot",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stay light on the balls of your feet with your arms swinging",
+              "Feel your legs warming up and your breathing lifting"
+            ],
+            "bad": [
+              "Stomping the heels down hard"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg front to back, then side to side",
+              "The swing should get a little bigger every rep"
+            ],
+            "bad": [
+              "Arching your lower back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "45s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Squeeze the back glute, then reach the same-side arm overhead",
+              "Feel it at the front of the back hip"
+            ],
+            "bad": [
+              "Arching your lower back to feel more"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×4 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step long, drop the back hip, then reach the inside arm up to the ceiling",
+              "Feel the front of the back hip and your upper back open up"
+            ],
+            "bad": [
+              "Rushing the reach before the hips have dropped"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×12 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Squeeze the glutes hard at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide and sit back into that hip, chest tall",
+              "Feel the inside of the straight leg stretch"
+            ],
+            "bad": [
+              "Letting the bent knee cave inward"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Skater Step-Out",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide to one side and reach the other foot behind you, at half speed",
+              "Feel the outside of the stepping hip doing the work"
+            ],
+            "bad": [
+              "Hopping off the floor instead of stepping"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Long-Rally Intervals",
+      "icon": "🫀",
+      "exercises": [
+        {
+          "type": "circuit",
+          "name": "Long-Rally Intervals",
+          "rounds": "6 Rounds · RPE 9",
+          "restSec": 80,
+          "items": [
+            {
+              "name": "Skater Step-Out",
+              "detail": "15 sec, alternating sides",
+              "cues": {
+                "good": [
+                  "Step wide to one side and reach the other foot behind you",
+                  "Feel the outside of the stepping hip doing the work"
+                ],
+                "bad": [
+                  "Hopping off the floor instead of stepping"
+                ]
+              }
+            },
+            {
+              "name": "Split Squat",
+              "detail": "15 sec, switch legs each round",
+              "cues": {
+                "good": [
+                  "Drop straight down between your feet and push back up",
+                  "Feel the front thigh and glute doing the work"
+                ],
+                "bad": [
+                  "Letting the front knee cave inward"
+                ]
+              }
+            },
+            {
+              "name": "Bear Crawl",
+              "detail": "10 sec, crawl forward and walk back",
+              "cues": {
+                "good": [
+                  "Keep your knees just off the floor and step hand and foot together",
+                  "Feel your trunk holding you still while the arms and legs move"
+                ],
+                "bad": [
+                  "Letting your hips rise or swing side to side"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Cool-Down",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "2 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk slowly and shake out your arms and legs",
+              "Your heart rate should drop a little with every step"
+            ],
+            "bad": [
+              "Sitting straight down while your heart is still pounding"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Extended Exhale Breathing",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "2 minutes"
+            },
+            {
+              "label": "In 4 · out 8",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest one hand on your belly, breathe in through your nose for four and out through your mouth for eight",
+              "Feel only the hand on your belly move"
+            ],
+            "bad": [
+              "Rushing the exhale to get to the next breath"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

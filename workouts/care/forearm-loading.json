@@ -1,0 +1,265 @@
+{
+  "id": "forearm-loading",
+  "title": "Forearm Forge",
+  "category": "care",
+  "countsAs": "mobility",
+  "duration": "25 min",
+  "equipment": "Dumbbells",
+  "focusTag": "Elbow & Wrist Pain",
+  "intro": [
+    "This is for a sore elbow or wrist that a doctor or physio has already looked at and cleared you to train. Stop and get it looked at if you have tingling or numbness into your fingers, a grip that suddenly fails or you start dropping things, pain after a fall or a wrench, swelling, an elbow that locks or won't straighten, or pain that wakes you at night. Loading is what helps a sore elbow over weeks, so this is slow, light loading. The massage at the start only eases the arm ready for it. It's built for a sore outside or inside of the elbow. If the pain is in the wrist joint itself, keep the weight in the range where it stays quiet. Until it settles, keep heavy carrying and heavy gripping out of your day. Racket Arm, also in the Care list, is a short roll and stretch. It doesn't load the arm, and this one does.",
+    "You can do the Take the Edge Off block on any day. Before you play, do two holds at an RPE of 6 instead of four. Do the Load It block after hitting or on a day you don't hit, and leave at least 48 hours between. Work the sore side, or both if both are sore, which adds about fifteen minutes. You need a bench, chair or table edge to rest your forearm on, and something light to hold, like a one or two kilo dumbbell or a full water bottle. Start there. If a set feels easier than a 7, slow the lowering down or add a second of pause first. Go a little heavier only once your elbow has been quiet the next morning. A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If it's no better after about six weeks of doing this, see a physio. See one sooner if it's getting worse or coming on earlier than it used to."
+  ],
+  "blocks": [
+    {
+      "title": "Warm the Arm",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "4 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk at an easy pace with your arms swinging",
+              "Feel your arms and hands warming up"
+            ],
+            "bad": [
+              "Clenching your fists as you walk"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Arm Circles",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Direction"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Make big slow circles with your arms straight out to the sides",
+              "Feel your shoulders loosen as the circles get bigger"
+            ],
+            "bad": [
+              "Shrugging your shoulders up to your ears"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Wrist Circles",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Direction"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Make slow circles with your wrist while your forearm stays still",
+              "Feel your wrist joint moving smoothly"
+            ],
+            "bad": [
+              "Forcing the circle bigger than feels comfortable"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Wrist Flexion-Extension",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×15 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest your forearm on a bench and bend your wrist up and down with nothing in your hand",
+              "Feel the muscles on both sides of your forearm warming up"
+            ],
+            "bad": [
+              "Bending the wrist into a pinch"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Forearm Self-Massage",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "60s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Press your opposite thumb into the top of your forearm and slide slowly from the wrist to a hand's width below the elbow",
+              "Feel firm, steady pressure that never turns sharp"
+            ],
+            "bad": [
+              "Pressing on the bony point of the elbow or the sore spot beside it"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Take the Edge Off",
+      "icon": "🛡️",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Wrist Extension",
+          "videoUrl": null,
+          "restSec": 30,
+          "note": "On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×45s"
+            },
+            {
+              "label": "Tempo Iso"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "sore side",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest your forearm on a bench palm down and hold a light weight with your wrist up",
+              "Feel the muscles on top of your forearm working"
+            ],
+            "bad": [
+              "Squeezing the weight hard in your fist"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Load It",
+      "icon": "💪",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Single-Arm Eccentric Wrist Extension",
+          "videoUrl": null,
+          "restSec": 40,
+          "note": "If your elbow feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×12"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "sore side",
+              "style": "dark"
+            },
+            {
+              "label": "4s eccentric",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lift the weight up with your free hand, then lower it over four seconds with the wrist you're training",
+              "Feel the muscles on top of your forearm braking the lowering"
+            ],
+            "bad": [
+              "Dropping the weight instead of controlling it"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Dumbbell Wrist Flexion",
+          "videoUrl": null,
+          "restSec": 30,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×12"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "sore side",
+              "style": "dark"
+            },
+            {
+              "label": "3s eccentric",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest your forearm on a bench palm up and curl the weight up, then lower it over three seconds",
+              "Feel the muscles on the underside of your forearm working"
+            ],
+            "bad": [
+              "Lifting your forearm off the bench"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Dumbbell Supination-Pronation",
+          "videoUrl": null,
+          "restSec": 20,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "sore side",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a light dumbbell by one end and slowly turn your palm up, then down",
+              "Feel your forearm rotating, not your elbow moving"
+            ],
+            "bad": [
+              "Letting your elbow swing away from your side"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

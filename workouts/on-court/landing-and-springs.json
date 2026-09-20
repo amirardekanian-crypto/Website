@@ -1,0 +1,340 @@
+{
+  "id": "landing-and-springs",
+  "title": "Landing Gear",
+  "category": "on-court",
+  "countsAs": "strength",
+  "duration": "30 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Landing & Jump Base",
+  "intro": [
+    "You can't stop, cut or push off a leg that can't take a landing, so this session starts there. You take the force in, then you give it back. If you haven't done any jump work lately, start here, before Off the Mark and Hard Stop. You need trainers or court shoes, about four metres of clear, non-slip floor and nothing overhead you could hit, like a fan, a light or a low beam. A court or a rubber mat is kinder than tile or concrete. You'll also need a line to hop over, like a court line or a strip of tape. Skip the Countermovement Jump if there's something overhead. Skip the Lateral Bound if you don't have four clear metres, or if you've ever torn a knee ligament. Don't add reps to make up for anything you skip. It's about ninety ground contacts in all.",
+    "First time through, do about half of the Rebound and Springs blocks and take the full rest. It still counts as a full session. If a landing gets loud or sloppy, end the session there. Keep it 48 hours away from another hard session, and don't do it the day before a match. In a tournament week, skip this and do Green Light from the Mobility list. If you're coming back from an ankle injury, ask whoever treated you if landing and jumping are OK. If you have a sore ankle, knee, calf, hamstring, groin or Achilles right now, or an injury has kept you off court in the last month, this isn't the session for today, so get it looked at first. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop at the back of your thigh, in your groin, your calf or your Achilles. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one. If you are far more sore than normal a day or two later, or your pee goes dark, get that checked the same day."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Jog easy, or march on the spot if you're indoors, until you're warm and breathing a little harder",
+              "Feel your legs loosen up with every minute"
+            ],
+            "bad": [
+              "Starting at run pace"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes",
+              "Feel the stretch low in the calf and the front of the ankle"
+            ],
+            "bad": [
+              "Letting the heel lift or the arch collapse"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg front to back, then side to side",
+              "Feel the hip loosen up as the swing gets bigger"
+            ],
+            "bad": [
+              "Arching your lower back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide and sit back into that hip, chest tall",
+              "Feel the inside of the straight leg stretch"
+            ],
+            "bad": [
+              "Letting the bent knee cave inward"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×3 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step long, drop the back hip, then reach the inside arm up to the ceiling",
+              "Feel the front of the back hip and your upper back open up"
+            ],
+            "bad": [
+              "Rushing the reach before the hips have dropped"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Feel your glutes squeeze at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Single-Leg Calf Raise",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rise onto the ball of your foot, pause, then lower slowly",
+              "Feel the calf working, not just the toes"
+            ],
+            "bad": [
+              "Bouncing out of the bottom"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Land It",
+      "icon": "🪂",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Snap Down",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×5"
+            }
+          ],
+          "cues": {
+            "good": [
+              "From tall on your toes, snap down into an athletic stance and freeze, as quietly as you can",
+              "Your hips go back and your knees soak it up"
+            ],
+            "bad": [
+              "Landing stiff-legged and taking it through your knees"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Single-Leg Snap Down",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×3 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "From tall on one foot, snap down into a single-leg landing and freeze",
+              "Feel your hip and thigh catching the landing, not your knee"
+            ],
+            "bad": [
+              "Letting your knee cave inward on the landing"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Rebound",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Countermovement Jump",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×3"
+            },
+            {
+              "label": "max intent",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Dip fast and jump as high as you can",
+              "Feel the floor pushing back through your whole foot"
+            ],
+            "bad": [
+              "Landing with stiff legs"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Lateral Bound",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×1"
+            },
+            {
+              "label": "max intent",
+              "style": "dark"
+            },
+            {
+              "label": "stick the landing",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push off one foot and bound sideways as far as you can still land and hold for two seconds",
+              "Feel the outside of the landing hip catching you"
+            ],
+            "bad": [
+              "Letting your landing knee cave inward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Springs",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Pogo Jump",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10"
+            },
+            {
+              "label": "fast turnover",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stay stiff through the ankles and bounce off the floor quickly",
+              "Your calves acting like springs"
+            ],
+            "bad": [
+              "Landing on your heels instead of the balls of your feet"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Lateral Line Hop",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10"
+            },
+            {
+              "label": "fast turnover",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hop over the line and back as fast as you can, both feet together",
+              "Feel your ankles doing the work, with quiet contacts"
+            ],
+            "bad": [
+              "Landing on stiff, locked knees"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

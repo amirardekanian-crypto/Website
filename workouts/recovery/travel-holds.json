@@ -1,0 +1,123 @@
+{
+  "id": "travel-holds",
+  "title": "Hotel Floor",
+  "category": "recovery",
+  "countsAs": "mobility",
+  "duration": "12 min",
+  "equipment": "Bodyweight",
+  "focusTag": "On the Road, Hips & Shoulders",
+  "intro": [
+    "This is the one for the road. You don't need any kit. One yoga mat of floor and twelve minutes is enough. Four positions, held long, and you breathe through each one. They're where tennis and padel players tend to feel tight: the front of the hip from the low stance, the groin from the wide ball, the turn through the hips, and the overhead side through your ribs and shoulder. Pad your knees with a towel or a folded shirt. A stretch should feel like a firm pull that fades as you breathe out, never a sharp or burning one. Sharp pain, pins and needles, or anything running down a leg or an arm isn't a stretch, so stop that one and get it looked at. If a groin or a hamstring is still sore from playing, leave the wide and deep ones out. If one calf is swollen, warm or tender and you didn't strain it playing, see a doctor the same day.",
+    "Holding a stretch tonight won't make you flexible tomorrow. That comes from doing it again and again over weeks. What you get from tonight is that you feel looser and it's a calm way to end the day. If you want real range at the hip and groin, do Wide Ball in the Mobility list. Don't do the long holds before you play, because they dull your power for a while."
+  ],
+  "blocks": [
+    {
+      "title": "Loosen Off",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Cat-Cow",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×15 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "On hands and knees, slowly round your back up then let it sink, staying in the middle of the range",
+              "Feel your whole spine moving a little at a time"
+            ],
+            "bad": [
+              "Pushing to the end of the range on either side"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "The Long Holds",
+      "icon": "🦵",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "75s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Squeeze the back glute, then reach the arm on the same side as your back knee overhead",
+              "Feel it at the front of the back hip"
+            ],
+            "bad": [
+              "Arching your lower back to feel more"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Frog Stretch",
+          "videoUrl": null,
+          "note": "If a groin is sore now or grabbed on you lately, skip this one.",
+          "chips": [
+            {
+              "label": "90s"
+            }
+          ],
+          "cues": {
+            "good": [
+              "On hands and knees, slide your knees wide and sink your hips back toward your heels",
+              "Feel the inside of your thighs lengthen, a firm pull that fades as you breathe out"
+            ],
+            "bad": [
+              "Forcing your knees wider than feels comfortable"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "90/90 Hip Stretch",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "75s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sit on a folded towel with both knees bent at ninety degrees, then fold your chest over the front shin only as far as your back stays long",
+              "Feel it deep in the back hip of the front leg"
+            ],
+            "bad": [
+              "Forcing it when you feel a twinge in the knee instead of the hip"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Puppy Pose",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "2 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "From hands and knees, walk your hands forward and let your chest sink toward the floor",
+              "Feel the stretch through your armpits and upper back"
+            ],
+            "bad": [
+              "Forcing your chest down if your shoulder pinches"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

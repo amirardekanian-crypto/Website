@@ -1,0 +1,188 @@
+{
+  "id": "thoracic-and-shoulder",
+  "title": "Open The Cage",
+  "category": "mobility",
+  "countsAs": "mobility",
+  "duration": "20 min",
+  "equipment": "Dumbbells",
+  "focusTag": "Upper Back & Overhead Shoulder",
+  "intro": [
+    "This is for a shoulder that's stiff, not one that hurts. Stop and get it looked at if the shoulder has come out or feels like it slips, if you felt a pop while serving or smashing and couldn't lift the arm afterwards, if you have pain at night that wakes you up, a dead arm, pins and needles or numbness down the arm or coming from the neck, or pain that shows up earlier every time you play. If your shoulder is sore rather than stiff and someone has already looked at it, Shoulder Brake in the Care list is the one built for that.",
+    "The serve is your upper back turning and your shoulder going overhead, and both can get tight the more you play. Padel players serve underhand, but the bandeja loads the same overhead shoulder, just at half speed and a lot more often. Leave a day between goes. Do it on a rest day or after a short hit, and not in the hours before you play, because it leaves the arm tired. First time through, do two sets of the hold and the press at RPE 6 and see how the shoulder feels in two days. You need one dumbbell you can hold overhead with your ribs down, and something solid to lie back over, like a bench or the arm of a heavy sofa. An easy bike does the walk's job if you'd rather."
+  ],
+  "blocks": [
+    {
+      "title": "Raise",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "5 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk at an easy pace and let your arms swing",
+              "Feel your shoulders and hips loosening up"
+            ],
+            "bad": [
+              "Hunching your shoulders up as you walk"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Arm Circles",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Direction"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Make slow circles with your arms straight out to the sides, starting small and getting bigger",
+              "Feel your shoulders loosen as the circles get bigger"
+            ],
+            "bad": [
+              "Shrugging your shoulders up to your ears"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Free the Ribs",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Quadruped Thoracic Rotation",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
+              "Feel the turn in your ribs and upper back"
+            ],
+            "bad": [
+              "Turning from your lower back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Bench Thoracic Extension",
+          "videoUrl": null,
+          "note": "Use a bench or the arm of a heavy sofa, not a chair, because a chair can slide out from behind you.",
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest the edge under your shoulder blades with your hands behind your head and open your chest toward the ceiling",
+              "Feel your upper back bending over the edge"
+            ],
+            "bad": [
+              "Arching from your lower back instead of your upper back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Thoracic Windmill",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie on your side with your knees bent and stacked, and sweep your top arm in a big arc across your body",
+              "Feel your chest and upper back opening as the arm goes back"
+            ],
+            "bad": [
+              "Forcing your arm down to the floor"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Own Overhead",
+      "icon": "💪",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Half-Kneeling Single-Arm Dumbbell Overhead Hold",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "Use a lighter dumbbell than you use for the press.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×25s Each Side"
+            },
+            {
+              "label": "Tempo Iso"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a dumbbell straight over your shoulder with your ribs down",
+              "Feel your shoulder blade and the side of your trunk holding you steady"
+            ],
+            "bad": [
+              "Letting your ribs flare and your lower back arch"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Half-Kneeling Single-Arm Dumbbell Press",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "If your arm won't go all the way up without your back arching, stop the press where it starts to arch.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Each Side"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Press the dumbbell straight up from your shoulder and lower it under control",
+              "Feel your shoulder blade slide up and round your ribs"
+            ],
+            "bad": [
+              "Leaning back to help the press"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "id": "day-after",
+  "title": "The Morning After",
+  "category": "recovery",
+  "countsAs": "mobility",
+  "duration": "17 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Day After, Keep Moving",
+  "intro": [
+    "This is for the morning after, when your legs are heavy and stiff. Being heavy and stiff in both legs is normal, and being sorer on one side than the other is common in a racket sport. Stop and get it looked at if the pain is sharp, sits in one spot you can point to with a finger, comes with swelling or bruising, or hurts when you put weight on it. Same if it's still getting worse after three days. Dark brown urine, or a muscle so swollen and tight that you can't bend the joint, means see a doctor the same day. Otherwise it's fine to move through, and moving is the point.",
+    "Start with ten easy minutes, walking or on a bike. Then open up your ankles, hamstrings and hips, and finish with a slow squat and a slow hinge so your body remembers what normal feels like. For the last couple of minutes you need a broom handle, and a racket held in front is fine for the squat. This makes today move better. Sleep and food do the repairing. The mobility sessions are for any day and for the places a racket player tends to feel tight. This one is for the day after, when you're heavy, and the walk is the session. If you're this heavy most mornings, something in your week is off. Too much hard work, too little sleep or too little food is the usual reason. If it doesn't shift, get checked."
+  ],
+  "blocks": [
+    {
+      "title": "Get Moving",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "10 minutes"
+            },
+            {
+              "label": "Easy · conversation pace",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk with your arms swinging and look ahead, not at your feet",
+              "Feel your legs warming up and your stiffness easing"
+            ],
+            "bad": [
+              "Walking so fast that you can't hold a conversation"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Open What Took the Hits",
+      "icon": "🦵",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes",
+              "Feel a stretch low in the calf, and back off if you feel a pinch at the front of your ankle"
+            ],
+            "bad": [
+              "Letting the heel lift or the arch collapse"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Hamstring Scoop",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step forward onto a straight leg and reach both hands toward your toes",
+              "Feel a gentle stretch down the back of the leg you stepped forward with, never a sharp pull"
+            ],
+            "bad": [
+              "Rounding your back instead of hinging at the hip"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Feel your glutes squeeze at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Move Normal Again",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Squat",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a broom handle or racket out in front and sit down slowly, only as deep as feels comfortable",
+              "Feel your hips and ankles moving freely"
+            ],
+            "bad": [
+              "Rushing the reps or bouncing at the bottom"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Dowel Hip Hinge",
+          "videoUrl": null,
+          "note": "With no broom handle, put your hands on your hips and push them back instead.",
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a broom handle along your spine and push your hips back",
+              "Feel the backs of your thighs load as you hinge"
+            ],
+            "bad": [
+              "Rounding your back as you lean forward"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
