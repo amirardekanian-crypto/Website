@@ -4554,8 +4554,18 @@ function getVideoUrl(ex) {
   // the common case — the remembered id is right, which it is every time except
   // the load straight after a different athlete signs in on this device — costs
   // nothing at all.
+  //
+  // ⚠️ NOT in coach preview (2026-09-20). Preview runs under Amir's own coach
+  // session, so HAS_SESSION is true, and aa_athlete_id is whichever athlete last
+  // signed in on THIS browser (his own testing of a new login leaves one behind —
+  // coach.html never clears it). That remembered id used to overwrite the ?client=
+  // in the URL, so every "View their app" opened the same wrong athlete (Ehsan's
+  // click showed Elmira's programme). In preview the URL names the athlete and the
+  // server (get_program, coach-only for anyone else's) is the only authority. It
+  // also skips the reconcile reload below, which would drop ?preview=1 anyway.
+  const previewing = window.IS_PREVIEW && !!clientId;
   let identityCheck = null;
-  if (!window.IS_DEMO && window.HAS_SESSION) {
+  if (!window.IS_DEMO && !previewing && window.HAS_SESSION) {
     identityCheck = athleteFromSession();
     if (window.LAST_ATHLETE) clientId = window.LAST_ATHLETE;
     else { const signedInAs = await identityCheck; if (signedInAs) clientId = signedInAs; }

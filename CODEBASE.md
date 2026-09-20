@@ -167,6 +167,13 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   `sendCoachReply()` each return early too. Until 2026-09-13 those four did not, and tapping
   Finish, an RPE or Send while previewing wrote a `session_history` row for the athlete.
   `markLibraryDone()` already checked `IS_PREVIEW` from the start.
+- **Coach preview must trust the URL, not the remembered athlete** (fixed 2026-09-20). `boot()` starts
+  from `aa_athlete_id`, the athlete who last signed in on this browser, whenever a session exists — and
+  Amir's coach sign-in counts as one. A stale value (his own test of a new athlete's login leaves one,
+  and `coach.html` never clears it) replaced `?client=`, so every *View their app* opened the same wrong
+  athlete: Ehsan's opened Elmira's. In preview the URL now wins and the identity lookup is skipped.
+  `habits.html` never had this — it asks the server who the session is on every load, and for the coach
+  that answer is empty.
 - **`habits.html` had the same hole, in six places** (fixed 2026-09-13, same review pass). Their
   "Their app" tile on `coach.html` opens `habits.html?client=<id>&preview=1` the same way, on the
   same sign-in. `joinBoard()` (Crew's Join/Rename/Leave), `postNote()` (the roll-call composer),
