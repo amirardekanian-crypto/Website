@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Easy Spin",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Set the seat so your knee is slightly bent at the bottom of each stroke",
@@ -46,17 +41,15 @@
             "bad": [
               "A seat set so low that your knees pinch up at the top of the stroke"
             ]
+          },
+          "rx": {
+            "time": "5 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Squeeze the back glute, then reach the same-side arm overhead",
@@ -65,17 +58,16 @@
             "bad": [
               "Arching your lower back to feel more"
             ]
+          },
+          "rx": {
+            "time": "45s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes",
@@ -84,17 +76,16 @@
             "bad": [
               "Letting the heel lift or the arch collapse"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push the floor away through your heels",
@@ -103,26 +94,15 @@
             "bad": [
               "Arching your lower back to lift higher"
             ]
+          },
+          "rx": {
+            "reps": 12
           }
         },
         {
           "type": "standard",
           "name": "Ramp Efforts",
           "videoUrl": null,
-          "restSec": 30,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×30s"
-            },
-            {
-              "label": "resistance up each one",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Add a little resistance on each one and keep the same cadence",
@@ -131,7 +111,13 @@
             "bad": [
               "Going hard on the first one"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "time": "30s",
+            "rest": 30
+          },
+          "setup": "resistance up each one"
         }
       ]
     },
@@ -143,20 +129,7 @@
           "type": "standard",
           "name": "Threshold Effort",
           "videoUrl": null,
-          "restSec": 120,
           "note": "If you can't hold the same cadence at the same resistance for a whole effort, that was your last one.",
-          "chips": [
-            {
-              "label": "5 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×4 min"
-            },
-            {
-              "label": "RPE 7-8"
-            }
-          ],
           "cues": {
             "good": [
               "Hold one steady cadence and one resistance for all four minutes",
@@ -165,6 +138,12 @@
             "bad": [
               "Grinding a heavy gear at a slow cadence"
             ]
+          },
+          "rx": {
+            "sets": 5,
+            "time": "4 min",
+            "rpe": "7-8",
+            "rest": 120
           }
         }
       ]
@@ -177,11 +156,6 @@
           "type": "simple",
           "name": "Spin Down",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Ease the resistance right off and keep the legs turning",
@@ -190,6 +164,9 @@
             "bad": [
               "Stopping pedalling the moment the last effort ends"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         }
       ]

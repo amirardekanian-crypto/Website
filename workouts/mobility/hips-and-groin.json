@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Frog Rock",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Knees wide, feet turned out, rock the hips back slowly",
@@ -46,17 +41,15 @@
             "bad": [
               "Rocking back far enough that the lower back rounds"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Adductor Rock Back",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "One leg out straight to the side, foot flat, rock back",
@@ -65,6 +58,10 @@
             "bad": [
               "Letting the straight leg's foot roll onto its edge"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         }
       ]
@@ -78,11 +75,6 @@
           "name": "Cossack Squat",
           "videoUrl": null,
           "note": "Go only as deep as you can come back up from without a wobble.",
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Wide stance, sit down over one leg with the other straight",
@@ -91,17 +83,16 @@
             "bad": [
               "Dropping in and bouncing to get out"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge with Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide, sit into that hip, reach past the outside of the foot",
@@ -110,6 +101,10 @@
             "bad": [
               "Staying upright — the reach is what makes the hip work"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -122,11 +117,6 @@
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Squeeze the back glute, then reach the same-side arm overhead",
@@ -135,18 +125,16 @@
             "bad": [
               "Arching the lower back to feel more"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Deep Squat Hold",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "90 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sit into the bottom of a squat, elbows inside the knees",
@@ -155,6 +143,9 @@
             "bad": [
               "Bouncing to get lower"
             ]
+          },
+          "rx": {
+            "time": "90 sec"
           }
         }
       ]

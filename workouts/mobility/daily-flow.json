@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Move slowly, one vertebra at a time",
@@ -46,17 +41,15 @@
             "bad": [
               "Snapping between the two shapes"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Knees stacked and together, open the top arm and follow it with your eyes",
@@ -65,17 +58,16 @@
             "bad": [
               "Letting the top knee lift"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Thread the Needle",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "6 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Reach one arm under the other and let the shoulder settle",
@@ -84,6 +76,10 @@
             "bad": [
               "Letting the hips drift away from over the knees"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         }
       ]
@@ -96,11 +92,6 @@
           "type": "simple",
           "name": "90/90 Hip Switch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Rotate both knees slowly to the other side, chest tall",
@@ -109,17 +100,16 @@
             "bad": [
               "Forcing the knees down with your hands"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the back hip towards the floor, then rotate and reach tall",
@@ -128,17 +118,16 @@
             "bad": [
               "Rotating before the hip has opened"
             ]
+          },
+          "rx": {
+            "reps": 5,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Couch Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Back foot up on a sofa or wall, squeeze the back glute and stand tall",
@@ -147,18 +136,16 @@
             "bad": [
               "Arching the lower back to get deeper"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Deep Squat Hold",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sit into the bottom of a squat, elbows inside the knees",
@@ -167,6 +154,9 @@
             "bad": [
               "Bouncing to get lower"
             ]
+          },
+          "rx": {
+            "time": "60 sec"
           }
         }
       ]
@@ -179,11 +169,6 @@
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Half-kneeling, drive the knee forward over the toes",
@@ -193,17 +178,16 @@
               "Letting the arch collapse inward"
             ]
           },
-          "note": "Stiff ankles are the first thing that limits a split-step."
+          "note": "Stiff ankles are the first thing that limits a split-step.",
+          "rx": {
+            "reps": 10,
+            "side": true
+          }
         },
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Swing the arm across the body and back open, relaxed",
@@ -212,6 +196,10 @@
             "bad": [
               "Forcing the end range"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         }
       ]

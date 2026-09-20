@@ -33,15 +33,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 minutes"
-            },
-            {
-              "label": "Easy · conversation pace",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Walk with your arms swinging and look ahead, not at your feet",
@@ -50,7 +41,11 @@
             "bad": [
               "Walking so fast that you can't hold a conversation"
             ]
-          }
+          },
+          "rx": {
+            "time": "10 minutes"
+          },
+          "setup": "Easy · conversation pace"
         }
       ]
     },
@@ -62,11 +57,6 @@
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes",
@@ -75,17 +65,16 @@
             "bad": [
               "Letting the heel lift or the arch collapse"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Hamstring Scoop",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step forward onto a straight leg and reach both hands toward your toes",
@@ -94,17 +83,16 @@
             "bad": [
               "Rounding your back instead of hinging at the hip"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push the floor away through your heels",
@@ -113,6 +101,9 @@
             "bad": [
               "Arching your lower back to lift higher"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         }
       ]
@@ -125,11 +116,6 @@
           "type": "simple",
           "name": "Squat",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a broom handle or racket out in front and sit down slowly, only as deep as feels comfortable",
@@ -138,6 +124,9 @@
             "bad": [
               "Rushing the reps or bouncing at the bottom"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
@@ -145,11 +134,6 @@
           "name": "Dowel Hip Hinge",
           "videoUrl": null,
           "note": "With no broom handle, put your hands on your hips and push them back instead.",
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a broom handle along your spine and push your hips back",
@@ -158,6 +142,9 @@
             "bad": [
               "Rounding your back as you lean forward"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         }
       ]

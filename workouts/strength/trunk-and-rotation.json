@@ -33,12 +33,6 @@
           "type": "simple",
           "name": "March on the Spot",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Knee up, opposite arm back",
@@ -47,17 +41,15 @@
             "bad": [
               "Standing still between reps"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Move slowly between the two shapes",
@@ -66,17 +58,15 @@
             "bad": [
               "Rushing between the two shapes"
             ]
+          },
+          "rx": {
+            "reps": 8
           }
         },
         {
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Knees stacked and together, open the top arm",
@@ -85,17 +75,16 @@
             "bad": [
               "Letting the top knee lift"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push through the heels until the hips are level",
@@ -105,7 +94,10 @@
               "Arching the lower back at the top"
             ]
           },
-          "note": "Rotation gets its power from the hips, so wake them first."
+          "note": "Rotation gets its power from the hips, so wake them first.",
+          "rx": {
+            "reps": 12
+          }
         }
       ]
     },
@@ -117,16 +109,6 @@
           "type": "standard",
           "name": "Half-Kneeling Rotation",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Turn the ribs and keep the hips square",
@@ -135,22 +117,18 @@
             "bad": [
               "The hips turning with the shoulders"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Standing Chop",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Chop from high on one side to low on the other",
@@ -160,7 +138,13 @@
               "Arms only, with the feet glued to the floor"
             ]
           },
-          "note": "With a ball and a wall, throw it instead — same movement, more intent."
+          "note": "With a ball and a wall, throw it instead — same movement, more intent.",
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "side": true,
+            "rest": 45
+          }
         }
       ]
     },
@@ -172,16 +156,6 @@
           "type": "standard",
           "name": "Plank with Shoulder Tap",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Taps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Feet wide, tap the opposite shoulder",
@@ -191,22 +165,18 @@
               "Hips swinging side to side with every tap"
             ]
           },
-          "note": "Slower taps are harder taps."
+          "note": "Slower taps are harder taps.",
+          "rx": {
+            "sets": 3,
+            "reps": "10 Taps",
+            "side": true,
+            "rest": 45
+          }
         },
         {
           "type": "standard",
           "name": "Side Plank",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×30 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Straight line ankle to ear, hips stacked",
@@ -215,22 +185,18 @@
             "bad": [
               "Letting the top hip roll forward"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "time": "30 sec",
+            "side": true,
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Bird Dog",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Reach the opposite arm and leg long, not high",
@@ -239,6 +205,12 @@
             "bad": [
               "Lifting the leg above hip height and arching"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rest": 45
           }
         }
       ]

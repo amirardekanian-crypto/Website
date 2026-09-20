@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Foot Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Sit on a chair and roll a tennis ball slowly under your foot, from the heel to the ball",
@@ -46,6 +41,10 @@
             "bad": [
               "Standing up and putting your full weight on the ball"
             ]
+          },
+          "rx": {
+            "time": "60s",
+            "side": true
           }
         },
         {
@@ -53,11 +52,6 @@
           "name": "Soleus Roll",
           "videoUrl": null,
           "note": "If your calf is still sore from playing, skip this one.",
-          "chips": [
-            {
-              "label": "60s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Rest one calf on the roller with the knee bent and roll from the ankle up to below the knee",
@@ -66,6 +60,10 @@
             "bad": [
               "Rolling up into the back of the knee"
             ]
+          },
+          "rx": {
+            "time": "60s",
+            "side": true
           }
         }
       ]
@@ -79,11 +77,6 @@
           "name": "Adductor Roll",
           "videoUrl": null,
           "note": "If a groin is still sore from playing, skip this one.",
-          "chips": [
-            {
-              "label": "90s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Lie face down with one leg out to the side and the roller under your inner thigh",
@@ -92,17 +85,16 @@
             "bad": [
               "Rolling right up into the groin crease"
             ]
+          },
+          "rx": {
+            "time": "90s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Thigh Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your side with the roller under your outer thigh and roll from just below the hip bone to just above the knee, holding some of your weight on your arms",
@@ -111,17 +103,16 @@
             "bad": [
               "Rolling over the side of the knee"
             ]
+          },
+          "rx": {
+            "time": "60s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Hamstring Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Sit with the roller under one thigh and the other foot on the floor, then roll from just below the sit bone to a hand's width above the back of the knee",
@@ -130,6 +121,10 @@
             "bad": [
               "Rolling into the back of the knee"
             ]
+          },
+          "rx": {
+            "time": "60s",
+            "side": true
           }
         }
       ]
@@ -142,11 +137,6 @@
           "type": "simple",
           "name": "Foam Roller T-Spine Extensions",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Lie back over the roller under your shoulder blades and cradle your head in your hands",
@@ -155,17 +145,15 @@
             "bad": [
               "Letting your neck or lower back do the bending"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Pec Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Stand facing a wall with the ball between the wall and one side of your chest muscle, and roll slowly, staying off the collarbone and breastbone",
@@ -174,6 +162,10 @@
             "bad": [
               "Rolling up into the armpit"
             ]
+          },
+          "rx": {
+            "time": "60s",
+            "side": true
           }
         }
       ]
@@ -187,15 +179,6 @@
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
           "note": "If you feel dizzy or tingly, go back to normal breathing.",
-          "chips": [
-            {
-              "label": "3 minutes"
-            },
-            {
-              "label": "In 4 · out 8",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your back with one hand on your belly and let each breath out slowly empty it",
@@ -204,7 +187,11 @@
             "bad": [
               "Forcing big deep breaths"
             ]
-          }
+          },
+          "rx": {
+            "time": "3 minutes"
+          },
+          "setup": "In 4 · out 8"
         }
       ]
     }

@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk tall with your arms swinging",
@@ -46,17 +41,15 @@
             "bad": [
               "Hunching over as you walk"
             ]
+          },
+          "rx": {
+            "time": "5 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Dowel Hip Hinge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a broom handle along your spine and push your hips back",
@@ -65,17 +58,15 @@
             "bad": [
               "Rounding your back away from the handle"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push the floor away through your heels",
@@ -84,17 +75,15 @@
             "bad": [
               "Arching your lower back to lift higher"
             ]
+          },
+          "rx": {
+            "reps": 12
           }
         },
         {
           "type": "simple",
           "name": "Quadruped Thoracic Rotation",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
@@ -103,17 +92,16 @@
             "bad": [
               "Turning from your lower back"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Dead Bug",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your back with your knees over your hips and lower the opposite arm and leg slowly",
@@ -122,6 +110,10 @@
             "bad": [
               "Letting your back arch as the leg goes down"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -134,23 +126,7 @@
           "type": "standard",
           "name": "Suitcase Hold",
           "videoUrl": null,
-          "restSec": 30,
           "note": "On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×25s Each Side"
-            },
-            {
-              "label": "Tempo Iso"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Hold one dumbbell at your side and stand dead tall",
@@ -159,6 +135,14 @@
             "bad": [
               "Letting your ribs sag toward the weight"
             ]
+          },
+          "rx": {
+            "sets": 4,
+            "time": "25s",
+            "side": true,
+            "rpe": 7,
+            "tempo": "Iso",
+            "rest": 30
           }
         }
       ]
@@ -171,23 +155,7 @@
           "type": "standard",
           "name": "Dumbbell Split Squat",
           "videoUrl": null,
-          "restSec": 45,
           "note": "If your back feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Each Side"
-            },
-            {
-              "label": "Tempo 3-0-1-0"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Hold the dumbbell at your side and a wall with your other hand, step back into a long stance and lower your back knee straight down",
@@ -196,29 +164,20 @@
             "bad": [
               "Leaning your body toward the weight"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 8,
+            "side": true,
+            "rpe": 7,
+            "tempo": "3-0-1-0",
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Single-Leg Hip Thrust",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Each Side"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "2s top hold",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Rest your upper back on a bench and drive your hips up until your body is flat, with a dumbbell on your hip once bodyweight feels easy",
@@ -227,25 +186,20 @@
             "bad": [
               "Arching your lower back to get your hips higher"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "side": true,
+            "rpe": 7,
+            "rest": 45
+          },
+          "setup": "2s top hold"
         },
         {
           "type": "standard",
           "name": "Suitcase Carry",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×30 m Each Side"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Walk tall with one dumbbell at your side and your eyes on a spot ahead",
@@ -254,6 +208,13 @@
             "bad": [
               "Leaning away from the weight"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "30 m",
+            "side": true,
+            "rpe": 7,
+            "rest": 45
           }
         }
       ]

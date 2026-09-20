@@ -29,15 +29,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 minutes"
-            },
-            {
-              "label": "Easy · conversation pace",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Walk tall and let your arms swing",
@@ -46,7 +37,11 @@
             "bad": [
               "Turning it into a brisk power walk"
             ]
-          }
+          },
+          "rx": {
+            "time": "5 minutes"
+          },
+          "setup": "Easy · conversation pace"
         }
       ]
     },
@@ -58,11 +53,6 @@
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Leg"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg front to back for five, then side to side for five",
@@ -71,17 +61,16 @@
             "bad": [
               "Arching your lower back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Standing Hip Circle",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Stand on one leg, lift the other knee and draw a big circle with it",
@@ -90,17 +79,16 @@
             "bad": [
               "Leaning your trunk to make the circle bigger"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Swing your arm across your chest, then open it out to the side no further than in line with your shoulder",
@@ -109,17 +97,16 @@
             "bad": [
               "Swinging so hard that the arm whips past a comfortable range"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes",
@@ -128,17 +115,16 @@
             "bad": [
               "Letting the heel lift or the arch collapse"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Split-Step Bounces",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10"
-            }
-          ],
           "cues": {
             "good": [
               "Take a small hop and land wide and low on the balls of both feet",
@@ -147,6 +133,9 @@
             "bad": [
               "Landing stiff, or with your knees caving in"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         }
       ]

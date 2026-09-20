@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "4 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk at an easy pace and roll through each foot",
@@ -46,17 +41,15 @@
             "bad": [
               "Shuffling flat-footed"
             ]
+          },
+          "rx": {
+            "time": "4 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes with your heel down",
@@ -65,17 +58,16 @@
             "bad": [
               "Pushing on into pain at the back of the heel or a pinch at the front of the ankle"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Tibialis Raise",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×15 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Lean back against a wall with your feet a step out and lift your toes toward your shins",
@@ -84,17 +76,15 @@
             "bad": [
               "Bending at the hips to help the lift"
             ]
+          },
+          "rx": {
+            "reps": 15
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push the floor away through your heels",
@@ -103,22 +93,15 @@
             "bad": [
               "Arching your lower back to lift higher"
             ]
+          },
+          "rx": {
+            "reps": 12
           }
         },
         {
           "type": "standard",
           "name": "Single-Leg Balance",
           "videoUrl": null,
-          "restSec": 20,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×30s Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Stand on one foot next to a wall and look straight ahead, then turn your head slowly side to side",
@@ -127,6 +110,12 @@
             "bad": [
               "Standing away from the wall, where a wobble puts you on the floor"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "time": "30s",
+            "side": true,
+            "rest": 20
           }
         }
       ]
@@ -139,23 +128,7 @@
           "type": "standard",
           "name": "Wall Sit",
           "videoUrl": null,
-          "restSec": 25,
           "note": "Let pain set the depth, and if it feels easier than a 7 at a depth that stays quiet, hold it for the full time anyway.",
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×45s"
-            },
-            {
-              "label": "Tempo Iso"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Rest your back flat against the wall with your feet a step out and hold",
@@ -164,6 +137,13 @@
             "bad": [
               "Sliding down deeper than the depth where it stays quiet"
             ]
+          },
+          "rx": {
+            "sets": 4,
+            "time": "45s",
+            "rpe": 7,
+            "tempo": "Iso",
+            "rest": 25
           }
         }
       ]
@@ -176,23 +156,7 @@
           "type": "standard",
           "name": "Lateral Step-Down",
           "videoUrl": null,
-          "restSec": 45,
           "note": "If your knee, Achilles or ankle feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Each Side"
-            },
-            {
-              "label": "Tempo 3-0-1-0"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Stand on the bottom stair with a hand on a wall or rail, slowly lower the other heel toward the floor, then tap and come back up",
@@ -201,30 +165,21 @@
             "bad": [
               "Letting your standing knee cave inward"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rpe": 7,
+            "tempo": "3-0-1-0",
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Single-Leg Calf Raise",
           "videoUrl": null,
-          "restSec": 45,
           "note": "Once the bodyweight version feels easier than a 7, hold something heavy in the other hand and add weight before you add reps.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×12 Each Side"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "3s eccentric",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Stand on flat floor with a fingertip on the wall, rise onto the ball of one foot, then take three seconds to lower",
@@ -233,29 +188,20 @@
             "bad": [
               "Bouncing at the bottom"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 12,
+            "side": true,
+            "rpe": 7,
+            "rest": 45
+          },
+          "setup": "3s eccentric"
         },
         {
           "type": "standard",
           "name": "Side-Lying Hip Abduction",
           "videoUrl": null,
-          "restSec": 30,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×15 Each Side"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "2s top hold",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your side with your bottom knee bent and lift the top leg straight up and back a little",
@@ -264,7 +210,15 @@
             "bad": [
               "Rolling your hips backward to lift the leg higher"
             ]
-          }
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 15,
+            "side": true,
+            "rpe": 7,
+            "rest": 30
+          },
+          "setup": "2s top hold"
         }
       ]
     }

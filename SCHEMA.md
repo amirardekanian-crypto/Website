@@ -105,7 +105,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
               {
                 "type": "simple",
                 "name": "Bike",
-                "chips": [{ "label": "5 minutes", "style": "dark" }]
+                "rx": { "time": "5 min" }
               },
               {
                 "type": "circuit",
@@ -128,13 +128,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
                 "type": "standard",
                 "name": "Back Squat",
                 "videoUrl": "https://www.youtube.com/watch?v=example",
-                "restSec": 180,
-                "chips": [
-                  { "label": "4 Sets", "style": "yellow" },
-                  { "label": "×6 Reps" },
-                  { "label": "Tempo 3-1-1" },
-                  { "label": "RPE 7" }
-                ],
+                "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0", "rest": 180 },
                 "cues": {
                   "good": ["Push the floor away"],
                   "bad": ["Don't let the knees cave in"]
@@ -169,7 +163,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 - `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
 - `message.outcomes[]` → 3–6 concrete, measurable expected outcomes.
 - `teaser` → hype section for the NEXT cycle only. Omit the whole `teaser` object if there is no next cycle planned.
-- `chips[]` → metadata pills (sets, reps, tempo, RPE). `style: "yellow"` for the primary set count, `"dark"` for duration / equipment, no style = default grey.
+- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest`. **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `setup` (equipment/position), `intent` (one intention, the green pill), `note`, `cues`. Never write `chips[]`.
 - `videoUrl` → full YouTube / Vimeo URL. Omit the field entirely if no video exists.
 - `notes` → optional. Remove the whole object if there are no coaching notes to add.
 
@@ -437,7 +431,7 @@ Best for: warm-ups, cool-downs, single-item entries that don't need rest, weight
   "type": "simple",
   "name": "Bike",
   "videoUrl": "https://www.youtube.com/watch?v=example",
-  "chips": [{ "label": "5 minutes", "style": "dark" }],
+  "rx": { "time": "5 min" },
   "cues": {
     "good": ["Steady pace"],
     "bad": ["Don't go all-out"]
@@ -528,13 +522,7 @@ Best for: all loaded exercises (strength, plyos, accessories) — and any single
   "type": "standard",
   "name": "Back Squat",
   "videoUrl": "https://www.youtube.com/watch?v=example",
-  "restSec": 180,
-  "chips": [
-    { "label": "4 Sets", "style": "yellow" },
-    { "label": "×6 Reps" },
-    { "label": "Tempo 3-1-1" },
-    { "label": "RPE 7" }
-  ],
+  "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0", "rest": 180 },
   "cues": {
     "good": ["Push the floor away"],
     "bad": ["Don't let knees cave"]
@@ -542,7 +530,17 @@ Best for: all loaded exercises (strength, plyos, accessories) — and any single
 }
 ```
 
-Every `standard` exercise gets, automatically: rest timer + weight log + RPE selector + personal note. `restSec` defaults to **120s** if omitted. Common values: `60`, `90`, `120` (= 2 min), `180` (= 3 min), `240` (= 4 min).
+Every `standard` exercise gets, automatically: rest timer + weight log + RPE selector + personal note.
+
+⚠ **`rest` is no longer defaulted.** It used to fall back to 120s whenever it was
+missing, which meant every card in the demo claimed "REST 2m" while every rest in it was
+actually unset — a calf raise and a back squat shown as identical, and a Pallof press told
+to sit for two minutes. Omit `rest` and the card shows no rest cell; the timer button is
+still there, labelled *Rest timer*, opening at a neutral 2 minutes. Common values when you
+do prescribe it: `60`, `90`, `120`, `180`, `240`.
+
+(`restSec` at the top level of an exercise is the old spelling and is still read. New
+programmes write `rx.rest`; saving from coach.html moves it across.)
 
 ### `test` — Mark a lift for a periodic rep-max retest (optional, `standard` only)
 
@@ -555,7 +553,7 @@ the closing week of the cycle.
   "type": "standard",
   "name": "Barbell Back Squat",
   "test": "5RM",
-  "chips": [ ... ]
+  "rx": { ... }
 }
 ```
 
@@ -588,7 +586,7 @@ Exercise-scoped guidance the athlete must see, attached to that exercise:
   "type": "standard",
   "name": "Machine Hack Squat",
   "note": "Work up from 35 kg in week one and let the RPE decide — wherever 12 clean reps lands at RPE 7–8 is your working weight.",
-  "chips": [ ... ]
+  "rx": { ... }
 }
 ```
 
@@ -598,60 +596,99 @@ Renders as a clay **"Coach's Note"** pill on the collapsed row plus a highlighte
 
 **Authorship split (pipeline convention):** /program-design only flags *which* exercise needs one and *why*, in one short coaching-domain line (a `note_flag`, not athlete-facing prose) — it doesn't draft the sentence. /program-engage writes the actual copy from that flag plus the full athlete picture. /program-assemble places the finished text on the exercise. This keeps wording/formatting decisions out of the programming pass, same as chips and `focusTag` — see COACHING-PRINCIPLES.md → "Athlete-first; naming & styling are downstream."
 
-### Chip Styles
+### `rx` — the prescription (2026-09-20)
 
-Chips route to the stats grid by their **label pattern** (next section), not their style.
-`style` only matters for the leftover **modifier** chips — the ones that match no stat:
-
-| Style | Appearance | Use for |
-|-------|-----------|---------|
-| *(none)* | Grey stat cell / pill | Reps, RPE, tempo — the parsed stats |
-| `"yellow"` | Yellow pill | The set count (`"N Sets"`), one per `standard` exercise |
-| `"dark"` | **Green** modifier pill, anchored by the name | Technique cues only: `"3s eccentric"`, `"1s squeeze"`, `"glute focus"`, `"max intent"` — **never** a structural pairing like `"superset"` (that's a `type: "circuit"` decision, not a chip — see "Common mistake" above) |
-
-### Chip parsing — how every label becomes a stat or a modifier pill
-
-`program.html` parses **every** chip label — on `standard` AND `simple` exercises — and routes it to one of five stat cells (SETS · REPS · RPE · TEMPO · REST). Whatever matches **no** stat pattern becomes a **green modifier pill** anchored next to the exercise name (visible collapsed *and* expanded). Circuits are the exception: they show only their `rounds` + rest.
-
-| Chip label pattern | Routes to | Example |
-|---|---|---|
-| `"N Sets"` | SETS cell | `"3 Sets"` |
-| Starts with `×` | REPS cell (strips `×` + trailing "Reps") | `"×8 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"` |
-| Ends with "reps" / "rep" | REPS cell | `"8 Reps"` |
-| `"N Each Side/Leg/Arm"` (no `×`) | REPS cell | `"4 Each Side"`, `"10-12 Each Leg"` |
-| Per-side forms with a space or a word (added 2026-09-20) | REPS cell | `"45 sec / side"`, `"8 Reps / side"`, `"30 sec each side"`, `"10 Steps each way"`, `"4 Lengths"`, `"6 / 4 / 2 Reps / side"` |
-| Bare number or range | REPS cell | `"8"`, `"10-12"` |
-| Pure duration / distance | REPS cell (auto-promoted) | `"30s"`, `"40m"`, `"5 min"`, `"1:30"` |
-| `"Tempo a-b-c-d"` | TEMPO cell | `"Tempo 3-0-1-0"` |
-| `"Tempo Iso"` | TEMPO cell (any `Tempo <text>` routes there) | hold/isometric exercises — **rule:** every hold (iso machine holds, planks, wall sits) carries `"Tempo Iso"` instead of a numeric tempo |
-| `"RPE N"` | RPE cell | `"RPE 8"` |
-| **Anything else** | **Green modifier pill** (by the name) | `"3s eccentric"`, `"max intent"` |
-
-**Authoring rules — so chips land where you intend:**
-- **Reps → one `×`-prefixed chip:** `"×10 Reps"`, `"×10 Each Side"`, `"×30s Each Side"`, `"×40m"`. Embed side/leg/arm info in that *same* chip — never a separate `"Each Side"` chip. (Bare `"4 Each Side"` and bare numbers still route to REPS as a fallback, but `×` is the rule.)
-- **Modifier (green) chips are technique cues ONLY** — `"3s eccentric"`, `"glute focus"`, `"max intent"`, a `"2s hold"` pause-emphasis. **Never put a rep count, dose, or duration in a bare modifier chip**, or it shows as a green pill with an empty REPS cell (the `"4 Each Side"`-as-green-pill bug).
-- **Never put a `"superset"` (or any structural-pairing) chip on a `"standard"` exercise.** A superset is a `type: "circuit"` decision, not a chip — see "Common mistake" above.
-- **One set count per `standard`** — `"N Sets"`, yellow.
-
-### `simple` exercise chip convention
-
-A `simple` exercise (warm-up / activation / cool-down) takes a **dose chip**, parsed into the stats just like a `standard` one:
-
-1. **Reps / duration** *(required)* — a `×`-prefixed count (`"×6 Each Side"`, `"×8"`) or a bare duration/distance (`"5 min"`, `"30s"`) → REPS cell.
-2. **RPE** *(optional — omit for warm-up / prep)* — `"RPE 6"` → RPE cell. **Warm-up and prep items carry NO RPE chip** (an RPE on a warm-up is noise; the pre-session readiness check covers feel). Add an RPE chip only on a genuinely effort-graded `simple` — a cool-down jog or a conditioning finisher. **The app's RPE selector runs 6–10 — never author an RPE chip below 6 on any exercise type**; RPE 6 is the scale's floor and means easy/conversational (see COACHING-PRINCIPLES → "Chips & modifiers").
-
-No sets, tempo, or rest chip. Don't add a separate chip for the rep count (it *is* the reps chip above), and only add a modifier chip if there's a genuine technique cue — it renders green.
+**A prescription is DATA, not display strings.** Before this, sets/reps/RPE/tempo/rest
+were free-text labels in `chips[]` that `program.html` pattern-matched back into numbers
+at render time. That is why the notation drifted (277 distinct chip labels across 34
+programmes for six real fields), why every exercise was forced into the same five-cell
+grid, and why a 5-minute row on the bike showed its minutes in a cell labelled **REPS**.
 
 ```json
-{ "type": "simple", "name": "Bird Dog",
-  "chips": [{ "label": "×6 Each Side" }] }
-
-{ "type": "simple", "name": "Assault Bike",
-  "chips": [{ "label": "5 min" }] }
-
-{ "type": "simple", "name": "Cool-Down Jog",
-  "chips": [{ "label": "5 min" }, { "label": "RPE 6" }] }
+{ "type": "standard", "name": "Barbell Back Squat",
+  "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0", "rest": 120 } }
 ```
+
+**The only rule: write what you prescribed, omit what you did not.** An absent field is
+not a blank to fill — it is the statement *this was not prescribed*, and the app draws no
+cell for it. There is no placeholder, no default, and nothing to remember about formatting.
+
+| Key | Type | Notes |
+|---|---|---|
+| `sets` | number | Omit on a single-effort or prep item. Drives how many rows the set log renders. |
+| `reps` | number or `"8-10"` | **Ranges are supported** — write the zone you actually mean. No need to collapse to one number. |
+| `time` | `"30s"` · `"5 min"` · `"1:30"` | Holds, carries, bike/row/run durations. |
+| `distance` | `"20m"` · `"400m"` | Sprints, carries, shuttles. |
+| `work` | `"40s on / 20s off"` | Intervals, where the dose is a pattern rather than a count. |
+| `side` | `true` | The dose is **per side**. The cell's label becomes `REPS / SIDE`. |
+| `rpe` | number or `"6-7"` | **Omit on warm-up and prep** — an RPE on a mobility drill is noise. Floor is 6 (the selector runs 6–10). |
+| `tempo` | `"3-1-1-0"` or `"iso"` | Eccentric–Pause–Concentric–Reset. Omit on ballistic work and carries. |
+| `rest` | seconds | **Omit and nothing is invented.** The timer button still works; the card just stops claiming a number you did not pick. |
+| `rounds` | number | Circuits only. |
+| `label` | one word | Rare override for the dose cell, e.g. `"Hold"` instead of `TIME`. |
+
+**Exactly one of `reps` / `time` / `distance` / `work`.** Setting a second is a lint error
+(`two-doses`), and only the first in that order would render.
+
+#### The other four fields — four meanings, four looks
+
+The green pill used to stand for 121 different kinds of thing: a tempo said in words, a
+piece of equipment, an intent cue, and occasionally a real dose. Each now has its own home.
+
+| Field | What it is | How it draws |
+|---|---|---|
+| `rx` | the numbers | the stats grid |
+| `setup` | equipment / position / conditions — `"neutral grip"`, `"45° bench"`, `"In 4 · out 8"` | quiet grey line under the name |
+| `intent` | **ONE** coaching intention — `"max intent"`, `"max speed"`, `"stick the landing"` | the green pill (the only pill) |
+| `note` | the coach's note to this athlete | clay "Coach's Note" callout |
+| `cues` | technique — `good[]` / `bad[]` | the cues list |
+
+**Never restate the tempo in `intent` or `setup`.** `"3s eccentric"` beside
+`"tempo": "3-1-1-0"` is the same sentence twice — 153 cards were doing exactly that. The
+app spells the tempo out for you under the grid: `3s down · 1s pause · 1s up`.
+
+#### What the card does with it
+
+Only prescribed facts get a cell, so the grid is 2–5 cells wide, never padded with dashes.
+A **dose-only item** — no sets, no RPE, no tempo, no rest — skips the grid entirely and
+renders as a name and a dose on one line. That is what a warm-up should look like.
+
+```json
+{ "type": "simple", "name": "Rowing", "rx": { "time": "5 min" } }
+{ "type": "simple", "name": "Bird Dog", "rx": { "reps": 6, "side": true } }
+{ "type": "standard", "name": "Suitcase Carry",
+  "rx": { "sets": 3, "distance": "20m", "side": true, "rest": 90 } }
+{ "type": "standard", "name": "Box Jump", "intent": "max intent",
+  "rx": { "sets": 4, "reps": 4, "rest": 120 } }
+{ "type": "standard", "name": "Copenhagen Plank",
+  "rx": { "sets": 3, "time": "20s", "side": true, "label": "Hold" } }
+```
+
+An exercise with **no countable dose at all** ("Start the Run", "Empty Bar Warm-Up Sets")
+carries **no `rx` key** — its instruction lives in `setup` and `cues`. An empty `rx: {}` is
+a lint error.
+
+#### Legacy `chips[]` — still read, never written
+
+Every programme written before 2026-09-20 still carries `chips[]`. `rxOf()` parses those
+on the fly and recovers what each number really was, so an unmigrated exercise renders
+correctly and *better* than it used to (a duration finally reads as TIME, not REPS).
+Nothing needs migrating by hand:
+
+- the Train library (`workouts/*.json`) was converted in bulk by `scripts/migrate_rx.js`
+- a live programme converts itself the next time it is saved from **coach.html → ✎** or
+  written by `/program-assemble`
+
+**Never author `chips[]` again, and never leave `chips` beside `rx`** (lint error
+`chips-and-rx`) — two sources of truth is the bug this replaced.
+
+#### Where the code lives
+
+`rxOf()` / `repCount()` / `tempoWords()` exist **twice**: inline in `program.html` (the
+offline PWA, deliberately self-contained) and in `assets/js/chips.js` (loaded by
+`coach.html`). ⚠ **Change both.** `scripts/check_rx.js` runs fixtures through both copies
+and fails on any difference; it is in `.githooks/pre-commit`. `assets/js/chips.js` also
+owns the write side — `applyRx()`, `toRx()`, `auditRx()`.
 
 ### Coaching Cues
 
@@ -873,11 +910,12 @@ duration, equipment) so the Train list renders instantly without opening every f
 Same shape as an athlete training **day** (so the app can render it with the
 existing exercise cards): `focusTag` + `blocks[].exercises[]`. Each file also
 repeats its own `id` / `title` / `duration` / `equipment` (used when the workout
-is opened). Supported per exercise: **sets, reps, times, cues, videos** — chips
-for sets/reps/duration, `cues.good[]` / `cues.bad[]`, and `videoUrl` (or leave it
-`null` to auto-resolve a video by exercise name from `exercise_library.json`).
-RPE and tempo are intentionally omitted here; the renderer simply shows fewer
-stat cells, so leaving them out breaks nothing.
+is opened). Supported per exercise: `rx` (the prescription — see "`rx` — the
+prescription"), `cues.good[]` / `cues.bad[]`, and `videoUrl` (or leave it `null` to
+auto-resolve a video by exercise name from `exercise_library.json`).
+RPE and tempo are usually omitted in the library, which costs nothing: the card
+simply draws fewer cells. All 42 sessions were converted from `chips[]` to `rx` on
+2026-09-20 by `scripts/migrate_rx.js`.
 
 ```jsonc
 {
@@ -897,8 +935,7 @@ stat cells, so leaving them out breaks nothing.
   "blocks": [
     { "title": "Strength", "icon": "🎯", "exercises": [
       { "type": "standard", "name": "Barbell Back Squat", "videoUrl": null,
-        "restSec": 150,
-        "chips": [ {"label":"5 Sets","style":"yellow"}, {"label":"×5 Reps"} ],
+        "rx": { "sets": 5, "reps": 5, "rest": 150 },
         "cues": { "good": ["Brace before each rep"], "bad": ["Chest collapsing forward"] } }
     ] }
   ]

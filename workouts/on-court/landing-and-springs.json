@@ -53,11 +53,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Jog easy, or march on the spot if you're indoors, until you're warm and breathing a little harder",
@@ -66,17 +61,15 @@
             "bad": [
               "Starting at run pace"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes",
@@ -85,17 +78,16 @@
             "bad": [
               "Letting the heel lift or the arch collapse"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg front to back, then side to side",
@@ -104,17 +96,16 @@
             "bad": [
               "Arching your lower back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit back into that hip, chest tall",
@@ -123,17 +114,16 @@
             "bad": [
               "Letting the bent knee cave inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×3 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step long, drop the back hip, then reach the inside arm up to the ceiling",
@@ -142,17 +132,16 @@
             "bad": [
               "Rushing the reach before the hips have dropped"
             ]
+          },
+          "rx": {
+            "reps": 3,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push the floor away through your heels",
@@ -161,17 +150,15 @@
             "bad": [
               "Arching your lower back to lift higher"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Single-Leg Calf Raise",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Rise onto the ball of your foot, pause, then lower slowly",
@@ -180,6 +167,10 @@
             "bad": [
               "Bouncing out of the bottom"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -192,16 +183,6 @@
           "type": "standard",
           "name": "Snap Down",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×5"
-            }
-          ],
           "cues": {
             "good": [
               "From tall on your toes, snap down into an athletic stance and freeze, as quietly as you can",
@@ -210,22 +191,17 @@
             "bad": [
               "Landing stiff-legged and taking it through your knees"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 5,
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Single-Leg Snap Down",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×3 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "From tall on one foot, snap down into a single-leg landing and freeze",
@@ -234,6 +210,12 @@
             "bad": [
               "Letting your knee cave inward on the landing"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 3,
+            "side": true,
+            "rest": 45
           }
         }
       ]
@@ -246,20 +228,6 @@
           "type": "standard",
           "name": "Countermovement Jump",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×3"
-            },
-            {
-              "label": "max intent",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Dip fast and jump as high as you can",
@@ -268,34 +236,18 @@
             "bad": [
               "Landing with stiff legs"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 3,
+            "rest": 60
+          },
+          "intent": "max intent"
         },
         {
           "type": "standard",
           "name": "Lateral Bound",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×1"
-            },
-            {
-              "label": "max intent",
-              "style": "dark"
-            },
-            {
-              "label": "stick the landing",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Push off one foot and bound sideways as far as you can still land and hold for two seconds",
@@ -304,7 +256,14 @@
             "bad": [
               "Letting your landing knee cave inward"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "reps": 1,
+            "rest": 75
+          },
+          "intent": "max intent",
+          "setup": "stick the landing · alternate sides"
         }
       ]
     },
@@ -316,20 +275,6 @@
           "type": "standard",
           "name": "Pogo Jump",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10"
-            },
-            {
-              "label": "fast turnover",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Stay stiff through the ankles and bounce off the floor quickly",
@@ -338,26 +283,18 @@
             "bad": [
               "Landing on your heels instead of the balls of your feet"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "rest": 45
+          },
+          "intent": "fast turnover"
         },
         {
           "type": "standard",
           "name": "Lateral Line Hop",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10"
-            },
-            {
-              "label": "fast turnover",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Hop over the line and back as fast as you can, both feet together",
@@ -366,7 +303,13 @@
             "bad": [
               "Landing on stiff, locked knees"
             ]
-          }
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10,
+            "rest": 45
+          },
+          "intent": "fast turnover"
         }
       ]
     }

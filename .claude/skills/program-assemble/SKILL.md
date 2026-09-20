@@ -14,12 +14,16 @@ plumbing — it makes no coaching decisions. Read `SCHEMA.md` first if unsure of
 - No file → **NEW**.
 
 ## Step 2 — Build the JSON
-This stage owns ALL serialization the design spec deliberately left out — chips, section
+This stage owns ALL serialization the design spec deliberately left out — section
 titles/icons, the vivid `focusTag`, names. The spec gives you decisions; you render them.
 
+⚠ **The prescription is no longer one of them.** Since 2026-09-20 the app stores a
+prescription as DATA (`rx`), and design's dose fields already ARE that data — so this stage
+copies them, it does not render them. There is no chip formatting left to get wrong.
+
 **2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
-the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[avoid]} +
-`restSec`; circuits → `rounds` + `items[]`. Map cues: ext+int → `cues.good[]`, avoid →
+the spec. Each exercise → `type` + `rx` + `cues` {good:[ext,int], bad:[avoid]};
+circuits → `rounds` + `items[]`. Map cues: ext+int → `cues.good[]`, avoid →
 `cues.bad[]`. `sport.badge` ← design's `SPORT_BADGE` line. `completionTitle`/
 `completionMessage` per day from /program-engage PART 4; `cycles[currentCycleIndex].message`
 = PART 1 message + outcomes; next cycle's `teaser` = PART 2. Leave `videoUrl: null`
@@ -47,29 +51,39 @@ the spec. Each exercise → `type` + `chips[]` + `cues` {good:[ext,int], bad:[av
   in HTML (that's the cycle notes cards' convention, not this field's). Never move
   exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
 
-**2b — Render chips from the spec's plain dose fields** (per SCHEMA "Chip parsing"):
-- set count → `{label:"N Sets", style:"yellow"}` (first; one per standard exercise)
-- reps/duration/distance → ONE `×`-prefixed grey chip (`"×8"`, `"×10 Each Side"`,
-  `"×30s Each Side"`, `"×40m"`) — embed side/leg info in that same chip, never a separate
-  `"Each Side"` chip
-- **Reps given as a range (`8-10`, `10-12`) → mechanically collapse to the top of the range**
-  (`8-10` → `×10`) before building the chip. Design writes ranges freely by design (see its
-  SKILL.md); this conversion is routine here, not an error to flag — the app has no
-  rep-range field, so every chip that reaches it must already be a single number.
-- tempo → `"Tempo 3-0-1-0"`; RPE → `"RPE N"` (grey)
-- `intent` → a green modifier chip `{style:"dark"}` (`3s eccentric`, `glute focus`,
-  `max intent`, `2s hold`); ≤4 words, lowercase; **never a rep/dose count here, and never a
-  structural pairing like `superset`** — a superset pair is a `"circuit"` block (see 2a
-  above), not a chip on a `"standard"` exercise
-- Chip order: green modifier(s) → yellow set count → grey stats. Carve-outs: ballistic/carry
-  omit tempo; warm-up/prep omit RPE (see 2e).
-- **Working (non-warm-up) circuits:** build each item's `detail` from the spec's per-item
-  reps (`"×12"`), and if the spec gives one overall circuit RPE append it (`"×12 · RPE 7"`).
-  Set **no logging flags** — since 2026-09-15 the BLOCK decides: a circuit in a working block
-  (Primary/Accessory/Core/Power/Conditioning) logs a weight per item + one RPE per round, and
-  a circuit in a prep block logs nothing. The only flag you ever write is `"logWeight": true`
-  on a genuinely **loaded** primer sitting in a prep block (e.g. a Leg Press primer). See
-  SCHEMA.md → "Circuit logging".
+**2b — Copy the dose into `rx`** (per SCHEMA → "`rx` — the prescription"). Design's dose
+fields map one-to-one; there is nothing to convert:
+
+| design spec | `rx` |
+|---|---|
+| sets | `"sets": 4` |
+| reps (**a range stays a range** — `8-10`) | `"reps": 6` or `"reps": "8-10"` |
+| duration | `"time": "30s"` |
+| distance | `"distance": "20m"` |
+| each side / each leg | `"side": true` — **its own field, never baked into the number** |
+| RPE | `"rpe": 7` |
+| tempo | `"tempo": "3-1-1-0"` |
+| rest | `"rest": 120` |
+| `intent` | `"intent": "max intent"` at exercise level — the one green pill |
+
+**OMIT ANYTHING THE SPEC DID NOT GIVE YOU.** An absent field means "not prescribed" and the
+app draws no cell for it — that is the entire contract. Never write a placeholder, an empty
+string, or a zero. In particular: **no `rpe` on warm-up/prep, no `tempo` on ballistic work
+or carries, and no `rest` unless the spec named one** (the app stopped inventing 120s).
+
+**Never restate the tempo in `intent`.** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
+same instruction twice; the app already spells the tempo out under the grid.
+
+**Never write `chips[]`.** It is legacy-read-only. Equipment or position notes
+(`neutral grip`, `45° bench`) go in `"setup"`, not a chip and not the name.
+
+**Working (non-warm-up) circuits:** build each item's `detail` from the spec's per-item reps
+(`"×12"`), and if the spec gives one overall circuit RPE append it (`"×12 · RPE 7"`).
+Set **no logging flags** — since 2026-09-15 the BLOCK decides: a circuit in a working block
+(Primary/Accessory/Core/Power/Conditioning) logs a weight per item + one RPE per round, and
+a circuit in a prep block logs nothing. The only flag you ever write is `"logWeight": true`
+on a genuinely **loaded** primer sitting in a prep block (e.g. a Leg Press primer). See
+SCHEMA.md → "Circuit logging".
 
 **2c — Section titles + icons** (per SCHEMA "Standard section names", fixed order):
 Activation & Prep 🔥 → [power/explosive: free-named by content] → **Primary** 🎯 →
@@ -92,8 +106,9 @@ hinge day either way.
 `"warmup": true` is no longer required (harmless if present). Name the block so it reads as
 prep — `Activation & Prep`, `Prime`, `Warm-Up`, or a free name containing *mobility* /
 *activation* / *prep*; a prep block named something unrecognised will log like a working one.
-Warm-up `simple` items carry the dose chip only — **no RPE chip** (an RPE on a warm-up is
-noise; readiness check covers feel). Per COACHING-PRINCIPLES "Session structure & time".
+Warm-up `simple` items carry the dose only — **no `rpe`, no `tempo`, no `rest`** (an RPE on a
+warm-up is noise; readiness check covers feel). With only a dose, the app drops the grid and
+renders the item as a name and a number on one line, which is what a warm-up should look like. Per COACHING-PRINCIPLES "Session structure & time".
 
 **RETURNING — advance the cycle (per SCHEMA.md "Advancing to the Next Cycle"):**
 1. Move the OLD `workouts` into `programHistory` in the simplified
@@ -132,16 +147,16 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
 - `node -e "JSON.parse(require('fs').readFileSync('data/<id>.json','utf8')); console.log('valid')"`
 - Confirm `athlete.id`, the `athlete` names, `currentCycleIndex`, day count, and
   exercise count print as expected.
-- **Format lint** against /program-design rules: every `standard` has sets·reps·tempo·
-  RPE·restSec; ballistic/carry correctly OMIT tempo and carry a `max intent` chip;
-  warm-up/prep items carry NO RPE chip and prep circuits have `"warmup": true`;
-  chip order = dark → yellow set count → grey; every exercise has exactly 3 cues
-  (ext+int in good, avoid in bad); section titles use the standard names (Primary/Accessory
-  /etc, never "Strength"); **no rep chip is a range** — final sweep for anything 2b missed:
-  grep for an en-dash/hyphen inside a `×`-prefixed or bare rep chip (`×8–10`, `8-10 Reps`) and
-  collapse any hit to a single number (the top of the range) per COACHING-PRINCIPLES.md →
-  "Progression (coach-driven)". The app has no rep-range field; this is a hard reject, not a
-  style preference.
+- **`node scripts/check_rx.js`** — the format lint is a script now. It audits every `rx`
+  (two doses on one exercise, `chips` left beside `rx`, an empty `rx`, a malformed tempo, an
+  RPE under the selector floor) and proves program.html and assets/js/chips.js still agree.
+  It also runs in `.githooks/pre-commit`.
+- **Coaching lint** (still yours): every `standard` has sets·reps·tempo·RPE·rest unless the
+  movement says otherwise; ballistic/carry correctly OMIT tempo and carry an `intent`;
+  warm-up/prep carry NO `rpe`; every exercise has exactly 3 cues (ext+int in good, avoid in
+  bad); section titles use the standard names (Primary/Accessory/etc, never "Strength").
+  **Rep ranges are fine now** — `rx` has a real range field, so `"reps": "8-10"` ships as
+  written and no longer needs collapsing to the top of the range.
 - **⛔ No working circuit in a FIRST cycle — hard reject.** If `currentCycleIndex` is `0`,
   every `"circuit"` must sit in a prep block. A superset or complex in Primary/Accessory/Core
   on cycle 1 violates COACHING-PRINCIPLES.md → Session structure ("no supersets in an
@@ -164,17 +179,17 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   history / The Ceiling / the coaching log's Exercise Ledger). Any item without one comes out
   of the circuit and runs as straight sets this cycle — pair it next cycle, once it has a
   baseline. Flag to Amir rather than silently rebuilding.
-- **No superset shipped as a chip.** Grep every `"standard"` exercise's `chips[]` for a label
-  of `"superset"` (or any structural-pairing wording) — if found, that pair was never
+- **No superset shipped as a pill.** Grep every `"standard"` exercise's `intent`/`setup` for
+  `"superset"` (or any structural-pairing wording) — if found, that pair was never
   converted to the required `"circuit"` block per 2a. Hard reject: rebuild it as one circuit
   entry (shared `name`/`rounds`/`restSec`, both exercises as `items[]`) before shipping — see
   SCHEMA.md → `"circuit"` type, "Common mistake." (Shipped once, Pooya C3 — this check exists
   because of it.)
-- **RPE floor 6 — sweep EVERY athlete-facing string, not just `chips[]`.** Grep the whole
+- **RPE floor 6 — sweep EVERY athlete-facing string, not just `rx.rpe`.** Grep the whole
   JSON for `RPE [1-5]`, and separately for any note/card that tells the athlete to subtract
   from an RPE without naming the floor ("take 1 off every RPE", "drop the RPE by one") — that
   instruction lands on RPE 5 for every exercise authored at 6 and the app's selector cannot
-  record it. Hard reject: rewrite to "…but never go below 6." A chip-only pass is what let
+  record it. Hard reject: rewrite to "…but never go below 6." An rx-only pass is what let
   this ship once (Ghazal C2). See COACHING-PRINCIPLES.md → "Chips & modifiers".
 - **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
   `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
@@ -212,7 +227,7 @@ console.log('done');
 
 **Then act on the output:**
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
-  remove `()` `:` `,` (if the qualifier carried meaning, move it to a chip); snap spelling/
+  remove `()` `:` `,` (if the qualifier carried meaning, move it to `setup`); snap spelling/
   casing to the library's canonical key whenever `MISS -> canonical:` shows one. Edit the JSON,
   then **re-run until clean** (every line `OK`/`GAP`, no `[FIX]`, no fixable `MISS`).
 - **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` (new
@@ -296,7 +311,8 @@ localise a mistake. Publish in stages, one top-level key per statement, verifyin
 
 1. **`programHistory` + `currentCycleIndex` — derive the archive SERVER-SIDE.** Do NOT emit
    it. The live row still holds the OLD `workouts`, so build the history entry from it with
-   `jsonb_agg` over `days → blocks → exercises` (`detail` = chip labels joined with ` · `,
+   `jsonb_agg` over `days → blocks → exercises` (`detail` = the dose read off `rx`, e.g.
+   `4 × 6 · RPE 7` — or the old chip labels joined with ` · ` on a row not yet migrated,
    or `rounds` for a circuit), append it to `programHistory`, and bump `currentCycleIndex`
    in the same statement. This is strictly better than sending your local copy: the archive
    is then provably what the athlete actually had, not what your file says they had.
@@ -319,8 +335,9 @@ avoid it, and do not hand-roll a backup.
 ### Verify with a CONTENT FINGERPRINT, not `md5(data::text)`
 `jsonb` reorders keys (by length, then bytewise), so the server's text hash can never match
 your local file's. Instead compute the same canonical string on both sides and compare —
-walk days → blocks → exercises in array order and join `type · name · chip labels · rounds ·
-restSec · note · test · cues.good · cues.bad · circuit items`; do the same for `notes.cards` and the
+walk days → blocks → exercises in array order and join `type · name · rx fields (or chip
+labels, on a row not yet migrated) · setup · intent · rounds · note · test · cues.good ·
+cues.bad · circuit items`; do the same for `notes.cards` and the
 cycle `focuses`/`paragraphs`/`outcomes`. `jsonb_array_elements(...) with ordinality`
 preserves array order, so the SQL and the Python agree. Compare md5 AND length. Anything
 less than this is not verification — a `jsonb_set` that silently wrote a string where an

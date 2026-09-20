@@ -33,12 +33,6 @@
           "name": "Easy Walk",
           "videoUrl": null,
           "note": "An ache you can breathe through is fine, a sharp pain is not — stop that exercise and tell me.",
-          "chips": [
-            {
-              "label": "4 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Easy pace, tall through the spine, let the arms swing",
@@ -47,6 +41,9 @@
             "bad": [
               "Skipping it to get to the exercises"
             ]
+          },
+          "rx": {
+            "time": "4 minutes"
           }
         },
         {
@@ -54,14 +51,6 @@
           "name": "Glute Bridge",
           "videoUrl": null,
           "note": "Wake the glutes up here and your back does less of their work for the rest of the session.",
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push through your heels until your hips are level",
@@ -70,6 +59,10 @@
             "bad": [
               "Arching your back to lift higher"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         }
       ]
@@ -83,11 +76,6 @@
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "videoUrl": null,
           "note": "We free the hips and upper back so your lower back stops doing their job.",
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Squeeze the back glute, then reach the same-side arm overhead",
@@ -96,17 +84,16 @@
             "bad": [
               "Arching the lower back to feel more"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "90/90 Hip Switch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Rotate both knees slowly to the other side, chest tall",
@@ -115,17 +102,16 @@
             "bad": [
               "Forcing the knees down with your hands"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Knees stacked and together, open the top arm and follow it with your eyes",
@@ -134,17 +120,16 @@
             "bad": [
               "Letting the top knee lift"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Supine Figure-4 Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Ankle across the opposite knee, pull the bottom thigh towards you",
@@ -153,6 +138,10 @@
             "bad": [
               "Pulling hard enough that your hips lift off the floor"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         }
       ]
@@ -165,20 +154,7 @@
           "type": "standard",
           "name": "Modified Curl-Up",
           "videoUrl": null,
-          "restSec": 30,
           "note": "Leave this one for an hour after you wake up, when the discs are most swollen.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "6 / 4 / 2 Reps"
-            },
-            {
-              "label": "10 sec hold"
-            }
-          ],
           "cues": {
             "good": [
               "Hands under the small of your back, lift head and shoulders barely an inch",
@@ -187,26 +163,19 @@
             "bad": [
               "Letting the back flatten into the floor — that is a sit-up"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": "6 / 4 / 2",
+            "rest": 30
+          },
+          "setup": "10 sec hold"
         },
         {
           "type": "standard",
           "name": "Side Bridge",
           "videoUrl": null,
-          "restSec": 30,
           "note": "Start on your knees and only move to the feet when the knee version is easy on both sides.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "6 / 4 / 2 Reps / side"
-            },
-            {
-              "label": "10 sec hold"
-            }
-          ],
           "cues": {
             "good": [
               "Elbow under the shoulder, lift the hips into a straight line",
@@ -215,26 +184,20 @@
             "bad": [
               "Letting the hips sag"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": "6 / 4 / 2",
+            "side": true,
+            "rest": 30
+          },
+          "setup": "10 sec hold"
         },
         {
           "type": "standard",
           "name": "Bird Dog",
           "videoUrl": null,
-          "restSec": 30,
           "note": "Six reps, then four, then two, so it gets easier as you tire — never to failure.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "6 / 4 / 2 Reps / side"
-            },
-            {
-              "label": "10 sec hold"
-            }
-          ],
           "cues": {
             "good": [
               "Reach the opposite arm and leg long, not high",
@@ -243,7 +206,14 @@
             "bad": [
               "Lifting the leg above hip height and arching"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": "6 / 4 / 2",
+            "side": true,
+            "rest": 30
+          },
+          "setup": "10 sec hold"
         }
       ]
     },
@@ -256,12 +226,6 @@
           "name": "Supine Rest, Calves Elevated",
           "videoUrl": null,
           "note": "No rolling and no back stretch here on purpose — a sore back wants unloading, not pressure.",
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Calves on a chair, knees at ninety, arms out wide",
@@ -270,21 +234,15 @@
             "bad": [
               "Pulling your knees to your chest instead"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "In 4 · out 8"
-            }
-          ],
           "cues": {
             "good": [
               "In through the nose for four, out for eight",
@@ -293,7 +251,11 @@
             "bad": [
               "Forcing big breaths"
             ]
-          }
+          },
+          "rx": {
+            "time": "2 minutes"
+          },
+          "setup": "In 4 · out 8"
         }
       ]
     }

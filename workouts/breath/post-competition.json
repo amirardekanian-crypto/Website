@@ -34,12 +34,6 @@
           "name": "Easy Walk",
           "videoUrl": null,
           "note": "Five minutes of easy movement first is what makes the rest of this land.",
-          "chips": [
-            {
-              "label": "5 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Slow walk anywhere, around the court is fine",
@@ -48,17 +42,15 @@
             "bad": [
               "Sitting straight down with your bag"
             ]
+          },
+          "rx": {
+            "time": "5 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Swing the arm across the body and back open, relaxed",
@@ -67,17 +59,16 @@
             "bad": [
               "Forcing the end range"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Move slowly between the two shapes",
@@ -86,6 +77,9 @@
             "bad": [
               "Snapping between the shapes"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         }
       ]
@@ -99,12 +93,6 @@
           "name": "Legs Up the Wall",
           "videoUrl": null,
           "note": "Feet above the heart is what helps heavy legs drain after a long match.",
-          "chips": [
-            {
-              "label": "3 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Heels resting up the wall, arms out wide",
@@ -113,18 +101,15 @@
             "bad": [
               "Checking your phone through it"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Child's Pose",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "90 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Knees wide, hips back to the heels, arms long",
@@ -133,6 +118,9 @@
             "bad": [
               "Rushing to get to the breathing"
             ]
+          },
+          "rx": {
+            "time": "90 sec"
           }
         }
       ]
@@ -146,15 +134,6 @@
           "name": "Box Breathing",
           "videoUrl": null,
           "note": "The counting is the point: it gives a racing head something to hold on to.",
-          "chips": [
-            {
-              "label": "4 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "In 4 · hold 4 · out 4 · hold 4"
-            }
-          ],
           "cues": {
             "good": [
               "In for four, hold four, out for four, hold four",
@@ -163,22 +142,17 @@
             "bad": [
               "Straining the holds — drop to three counts if four is a fight"
             ]
-          }
+          },
+          "rx": {
+            "time": "4 minutes"
+          },
+          "setup": "In 4 · hold 4 · out 4 · hold 4"
         },
         {
           "type": "simple",
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
           "note": "The long out-breath is the part that does the work.",
-          "chips": [
-            {
-              "label": "4 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "In 4 · out 8"
-            }
-          ],
           "cues": {
             "good": [
               "In through the nose for four, out through the mouth for eight",
@@ -187,7 +161,11 @@
             "bad": [
               "Rushing the exhale to get to the next breath"
             ]
-          }
+          },
+          "rx": {
+            "time": "4 minutes"
+          },
+          "setup": "In 4 · out 8"
         }
       ]
     }

@@ -49,11 +49,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Jog easy until you're warm and breathing a little harder",
@@ -62,17 +57,15 @@
             "bad": [
               "Starting at run pace"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Drive the knee forward over your toes",
@@ -81,17 +74,16 @@
             "bad": [
               "Letting the heel lift or the arch collapse"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit back into that hip, chest tall",
@@ -100,17 +92,16 @@
             "bad": [
               "Letting the bent knee cave inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×3 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step long, drop the back hip, then reach the inside arm up to the ceiling",
@@ -119,17 +110,16 @@
             "bad": [
               "Rushing the reach before the hips have dropped"
             ]
+          },
+          "rx": {
+            "reps": 3,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Shuffle",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×4 Lengths"
-            }
-          ],
           "cues": {
             "good": [
               "Shuffle ten metres each length, staying low and pushing the floor away with the trailing foot",
@@ -138,26 +128,15 @@
             "bad": [
               "Bobbing up and down between steps"
             ]
+          },
+          "rx": {
+            "reps": "4 Lengths"
           }
         },
         {
           "type": "standard",
           "name": "Build-Up Run",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "build 60-80-90",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Add speed on each run, about 60, then 80, then 90 percent of your top speed",
@@ -166,22 +145,18 @@
             "bad": [
               "Going flat out on the first one"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "20 m",
+            "rest": 60
+          },
+          "intent": "build 60-80-90"
         },
         {
           "type": "standard",
           "name": "Snap Down",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "1 Set",
-              "style": "yellow"
-            },
-            {
-              "label": "×5"
-            }
-          ],
           "cues": {
             "good": [
               "From tall on your toes, snap down into an athletic stance and freeze, as quietly as you can",
@@ -190,6 +165,11 @@
             "bad": [
               "Landing stiff-legged and taking it through your knees"
             ]
+          },
+          "rx": {
+            "sets": 1,
+            "reps": 5,
+            "rest": 45
           }
         }
       ]
@@ -202,16 +182,6 @@
           "type": "standard",
           "name": "Jog-In Two-Step Stop",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 m"
-            }
-          ],
           "cues": {
             "good": [
               "Jog in, then kill the speed in two steps and hold the stance",
@@ -220,26 +190,17 @@
             "bad": [
               "Slowing down gradually over five or six steps"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "10 m",
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Sprint to Two-Step Stop",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 m"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Accelerate hard, then kill it in two steps and hold the stance",
@@ -248,7 +209,13 @@
             "bad": [
               "Braking on stiff, straight legs with your weight back on your heels"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "10 m",
+            "rest": 75
+          },
+          "intent": "max speed"
         }
       ]
     },
@@ -260,25 +227,7 @@
           "type": "standard",
           "name": "Lateral Run to Outside-Leg Stop",
           "videoUrl": null,
-          "restSec": 75,
           "note": "Do the first two at about three-quarter speed, then go flat out.",
-          "chips": [
-            {
-              "label": "6 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×1"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Run out about five metres to the side at full speed, then plant the foot on the side you're heading toward and stop",
@@ -287,7 +236,14 @@
             "bad": [
               "Letting the plant knee cave inward"
             ]
-          }
+          },
+          "rx": {
+            "sets": 6,
+            "reps": 1,
+            "rest": 75
+          },
+          "intent": "max speed",
+          "setup": "alternate sides"
         }
       ]
     },
@@ -299,28 +255,6 @@
           "type": "standard",
           "name": "Turn and Go",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×1"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            },
-            {
-              "label": "180° turn",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Run out about ten metres, brake over two steps, plant one foot and turn to sprint back",
@@ -329,34 +263,19 @@
             "bad": [
               "Planting on a straight leg with your weight leaning out over the foot"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "reps": 1,
+            "rest": 75
+          },
+          "intent": "max speed",
+          "setup": "180° turn · alternate sides"
         },
         {
           "type": "standard",
           "name": "Cut and Go",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×1"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            },
-            {
-              "label": "45° cut",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Sprint in about ten metres at full speed, plant the foot opposite the way you're going and cut hard off it",
@@ -365,7 +284,14 @@
             "bad": [
               "Planting your foot out in front of you on a straight leg"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "reps": 1,
+            "rest": 60
+          },
+          "intent": "max speed",
+          "setup": "45° cut · alternate sides"
         }
       ]
     }

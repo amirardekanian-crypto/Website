@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Lying Hamstring Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "One leg up, hands behind the thigh, other leg flat on the floor",
@@ -46,17 +41,16 @@
             "bad": [
               "Yanking the leg towards you"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Figure-4 Glute Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Ankle across the opposite knee, pull the bottom thigh in",
@@ -65,18 +59,16 @@
             "bad": [
               "Pulling so hard the hips lift off the floor"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Butterfly Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Soles together, sit tall and lean forward from the hips",
@@ -85,17 +77,15 @@
             "bad": [
               "Rounding the spine to get lower"
             ]
+          },
+          "rx": {
+            "time": "60 sec"
           }
         },
         {
           "type": "simple",
           "name": "Couch Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Back foot up on a sofa or wall, squeeze the back glute and stand tall",
@@ -104,20 +94,16 @@
             "bad": [
               "Arching the lower back to get deeper"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Wall Calf Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            },
-            {
-              "label": "Straight knee, then bent"
-            }
-          ],
           "cues": {
             "good": [
               "Back leg straight, heel down, hips forward, then repeat with the knee bent",
@@ -126,7 +112,12 @@
             "bad": [
               "Turning the back foot out to cheat the range"
             ]
-          }
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
+          },
+          "setup": "Straight knee, then bent"
         }
       ]
     },
@@ -138,11 +129,6 @@
           "type": "simple",
           "name": "Doorway Pec Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Forearm on the door frame, elbow at shoulder height, step through and turn away",
@@ -151,17 +137,16 @@
             "bad": [
               "Letting the shoulder roll forward into it"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Child's Pose with Side Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "From child's pose, walk both hands round to one side",
@@ -170,6 +155,10 @@
             "bad": [
               "Letting the hips come off the heels"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
@@ -177,11 +166,6 @@
           "name": "Cross-Body Shoulder Stretch",
           "videoUrl": null,
           "note": "The back of the serving shoulder is the one nobody stretches — go gently.",
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Arm straight across the chest, pull it in with the other forearm",
@@ -190,6 +174,10 @@
             "bad": [
               "Pushing into a pinch at the front of the shoulder"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         }
       ]

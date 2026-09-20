@@ -29,11 +29,6 @@
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Move slowly between the two shapes, let the breath lead",
@@ -42,17 +37,15 @@
             "bad": [
               "Pushing into end range — nothing here should feel like effort"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Thread the Needle",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "6 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Reach one arm under the other and let the shoulder settle",
@@ -61,17 +54,16 @@
             "bad": [
               "Letting the hips drift away from over the knees"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Knees stacked, open the top arm and follow it with your eyes",
@@ -80,6 +72,10 @@
             "bad": [
               "Letting the knees come apart so the hips do the turning"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         }
       ]
@@ -93,15 +89,6 @@
           "name": "Box Breathing",
           "videoUrl": null,
           "note": "If your mind wanders, notice it and go back to the count — that is the exercise, not a failure at it.",
-          "chips": [
-            {
-              "label": "5 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "In 4 · hold 4 · out 4 · hold 4"
-            }
-          ],
           "cues": {
             "good": [
               "Sit upright or lie down, in four, hold four, out four, hold four",
@@ -110,7 +97,11 @@
             "bad": [
               "Doing it with the TV on"
             ]
-          }
+          },
+          "rx": {
+            "time": "5 minutes"
+          },
+          "setup": "In 4 · hold 4 · out 4 · hold 4"
         }
       ]
     },
@@ -123,15 +114,6 @@
           "name": "Child's Pose with Extended Exhale",
           "videoUrl": null,
           "note": "Box breathing steadies you; the long exhale is what drops you.",
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            },
-            {
-              "label": "In 4 · out 8"
-            }
-          ],
           "cues": {
             "good": [
               "Knees wide, forehead down, in for four and out for eight",
@@ -140,7 +122,11 @@
             "bad": [
               "Getting up the second the timer goes"
             ]
-          }
+          },
+          "rx": {
+            "time": "2 minutes"
+          },
+          "setup": "In 4 · out 8"
         }
       ]
     }

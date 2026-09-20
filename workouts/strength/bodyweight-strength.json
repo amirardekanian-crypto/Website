@@ -37,12 +37,6 @@
           "type": "simple",
           "name": "March on the Spot",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Knee up, opposite arm back",
@@ -51,20 +45,15 @@
             "bad": [
               "Shuffling on the spot without driving the knee"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Glute Bridge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×12 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Push through the heels until the hips are level",
@@ -73,20 +62,16 @@
             "bad": [
               "Arching the back to get higher"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 12
           }
         },
         {
           "type": "simple",
           "name": "Bodyweight Squat",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 Sets"
-            },
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Slow down, sit between the hips, chest tall",
@@ -95,17 +80,16 @@
             "bad": [
               "Rushing them like a warm-up you want to be over"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "reps": 10
           }
         },
         {
           "type": "simple",
           "name": "Arm Circles",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "10 Reps / direction"
-            }
-          ],
           "cues": {
             "good": [
               "Start small and grow the circle",
@@ -114,17 +98,16 @@
             "bad": [
               "Starting with the biggest circle you can make"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Inchworm",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "5 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Walk the hands out to a plank and hold a second",
@@ -133,6 +116,9 @@
             "bad": [
               "Letting the hips sag at the top of the walk-out"
             ]
+          },
+          "rx": {
+            "reps": 5
           }
         }
       ]
@@ -145,16 +131,6 @@
           "type": "standard",
           "name": "Split Squat",
           "videoUrl": null,
-          "restSec": 90,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Long stance, drop straight down, push through the front heel",
@@ -164,22 +140,18 @@
               "A short stance that turns it into a knee-only movement"
             ]
           },
-          "note": "Three seconds on the way down if you want it harder."
+          "note": "Three seconds on the way down if you want it harder.",
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "side": true,
+            "rest": 90
+          }
         },
         {
           "type": "standard",
           "name": "Single-Leg Hip Bridge",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "One foot planted, drive the hips up level",
@@ -188,6 +160,12 @@
             "bad": [
               "Letting the hips twist towards the working side"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "side": true,
+            "rest": 75
           }
         }
       ]
@@ -200,16 +178,6 @@
           "type": "standard",
           "name": "Push-Up",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "One straight line from ear to heel",
@@ -219,22 +187,17 @@
               "Hips sagging or riding up"
             ]
           },
-          "note": "Hands on a step or a wall if you cannot hold the line for all eight."
+          "note": "Hands on a step or a wall if you cannot hold the line for all eight.",
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "rest": 60
+          }
         },
         {
           "type": "standard",
           "name": "Prone Y-T Raise",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 each shape"
-            }
-          ],
           "cues": {
             "good": [
               "Face down, lift the arms a few inches, thumbs up",
@@ -243,6 +206,11 @@
             "bad": [
               "Shrugging the shoulders towards the ears"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": "8 each shape",
+            "rest": 60
           }
         }
       ]
@@ -255,16 +223,6 @@
           "type": "standard",
           "name": "Dead Bug",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×8 Reps / side"
-            }
-          ],
           "cues": {
             "good": [
               "Opposite arm and leg, slow, breathe out as you reach",
@@ -274,7 +232,13 @@
               "The lower back lifting away from the floor"
             ]
           },
-          "note": "Shorten the reach rather than let the back lift."
+          "note": "Shorten the reach rather than let the back lift.",
+          "rx": {
+            "sets": 3,
+            "reps": 8,
+            "side": true,
+            "rest": 45
+          }
         }
       ]
     }

@@ -45,11 +45,6 @@
           "type": "simple",
           "name": "Easy Jog",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Jog easy until you're warm and breathing a little harder",
@@ -58,17 +53,15 @@
             "bad": [
               "Starting at run pace"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Leg Swings",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Hold a wall and swing the leg front to back, then side to side",
@@ -77,17 +70,16 @@
             "bad": [
               "Arching your lower back to throw the leg higher"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Lateral Lunge",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×6 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step wide and sit back into that hip, chest tall",
@@ -96,17 +88,16 @@
             "bad": [
               "Letting the bent knee cave inward"
             ]
+          },
+          "rx": {
+            "reps": 6,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×3 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Step long, drop the back hip, then reach the inside arm up to the ceiling",
@@ -115,22 +106,16 @@
             "bad": [
               "Rushing the reach before the hips have dropped"
             ]
+          },
+          "rx": {
+            "reps": 3,
+            "side": true
           }
         },
         {
           "type": "standard",
           "name": "A-Skip",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "2 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×15 m"
-            }
-          ],
           "cues": {
             "good": [
               "Tall hips, and strike the ground right underneath you",
@@ -139,26 +124,17 @@
             "bad": [
               "Reaching the foot out in front of your body"
             ]
+          },
+          "rx": {
+            "sets": 2,
+            "distance": "15 m",
+            "rest": 45
           }
         },
         {
           "type": "standard",
           "name": "Build-Up Run",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×20 m"
-            },
-            {
-              "label": "build 60-80-90",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Add speed on each run, about 60, then 80, then 90 percent of your top speed",
@@ -167,7 +143,13 @@
             "bad": [
               "Going flat out on the first one"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "distance": "20 m",
+            "rest": 60
+          },
+          "intent": "build 60-80-90"
         }
       ]
     },
@@ -179,20 +161,6 @@
           "type": "standard",
           "name": "Split-Step to Sprint",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×6 m"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Land the split-step loaded, then explode toward the spot you picked",
@@ -201,30 +169,18 @@
             "bad": [
               "Landing the split-step with narrow feet and straight knees"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "distance": "6 m",
+            "rest": 60
+          },
+          "intent": "max speed"
         },
         {
           "type": "standard",
           "name": "Crossover Start",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×6 m"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Turn your hips toward the side you're going and cross the far leg over as you push off the other",
@@ -233,30 +189,19 @@
             "bad": [
               "Twisting on a planted foot instead of turning your hips"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "distance": "6 m",
+            "rest": 75
+          },
+          "intent": "max speed",
+          "setup": "alternate sides"
         },
         {
           "type": "standard",
           "name": "Drop-Step and Drive",
           "videoUrl": null,
-          "restSec": 75,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×6 m"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Open your hip and step back with the foot on the side you're going, then drive off it",
@@ -265,7 +210,14 @@
             "bad": [
               "Leaning back as you drive"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "distance": "6 m",
+            "rest": 75
+          },
+          "intent": "max speed",
+          "setup": "alternate sides"
         }
       ]
     },
@@ -277,24 +229,6 @@
           "type": "standard",
           "name": "Diagonal Closing Step",
           "videoUrl": null,
-          "restSec": 60,
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×5 m"
-            },
-            {
-              "label": "max speed",
-              "style": "dark"
-            },
-            {
-              "label": "alternate sides",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Split-step, then drive forward and diagonally toward the net",
@@ -303,7 +237,14 @@
             "bad": [
               "Reaching your front foot out on the first step"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "distance": "5 m",
+            "rest": 60
+          },
+          "intent": "max speed",
+          "setup": "alternate sides"
         }
       ]
     }

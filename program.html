@@ -1946,14 +1946,56 @@
   .ex-video.playing::after { display: none; }
 
   /* 5-cell stats grid: SETS · REPS · TARGET · TEMPO · REST */
+  /* The grid is as wide as the prescription, not a fixed five. An exercise that
+     was given two facts draws two cells — it never draws an em-dash standing in
+     for a decision the coach did not make. Column count is set inline by
+     renderStatsGrid(). (Before 2026-09-20 this was repeat(5,1fr) and the free
+     library alone rendered 1,151 dashes.) */
   .ex-stats-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
     border: 1px solid var(--grey-mid);
     border-radius: 8px;
     margin-top: 4px;
     background: var(--white);
   }
+
+  /* Setup line — equipment / position ("neutral grip", "45° bench"). Sits under
+     the name as quiet text, because it is a condition of the exercise, not a
+     number. It used to be a green pill indistinguishable from a tempo. */
+  .ex-setup {
+    font-size: 12.5px;
+    color: var(--grey-text);
+    line-height: 1.4;
+    margin-top: 3px;
+  }
+  body[data-dark] .ex-setup { color: #999; }
+
+  /* Tempo spelled out, generated from the tempo itself, shown only when the card
+     is open. This is what replaced the hand-written "3s eccentric" pill that sat
+     beside a TEMPO cell already saying the same thing on 153 cards. */
+  .ex-tempo-words {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12.5px;
+    color: var(--grey-text);
+    margin-top: 8px;
+    text-align: center;
+  }
+  body[data-dark] .ex-tempo-words { color: #999; }
+
+  /* A prep item is a name and a dose. No grid, because there is nothing else to
+     say: a 5-minute row has one number and four blanks under the old layout. */
+  .ex-doseline {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-top: 6px;
+  }
+  .ex-doseline .ex-dose {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--yellow);
+    white-space: nowrap; line-height: 1;
+  }
+  body[data-dark] .ex-doseline .ex-dose { color: var(--yellow); }
   body[data-dark] .ex-stats-grid {
     background: rgba(255,255,255,0.02);
     border-color: #333;
@@ -5785,8 +5827,7 @@ function countTotalUnits(day) {
   (day.blocks || []).forEach(b => {
     (b.exercises || []).forEach(ex => {
       if (ex.type === 'standard') {
-        const parsed = parseChips(ex.chips);
-        total += (parseInt(parsed.sets, 10) || 1);
+        total += (parseInt(rxOf(ex).sets, 10) || 1);
       } else {
         total += 1;
       }
@@ -5928,48 +5969,159 @@ function isPureDuration(label) {
   return /^\d+\s*(s(?:ec(?:onds?)?)?|m(?:in(?:utes?)?)?)\s*(?:\/?\s*(?:side|leg|arm|hand)s?|each(?:\s+\w+)?)?$/i.test(t);
 }
 
-// Renders the 5-cell stats grid: SETS · REPS · TARGET RPE · TEMPO · REST.
-// Target RPE values are formatted as "X/10" (e.g. "7/10", "6-7/10").
-function renderStatsGrid(parsed, restSec) {
-  const restStr = formatRestLabel(restSec) || '—';
-  // Strip the leading "@" added by parseChips, then append "/10" so the value
-  // reads as "7/10" instead of "@7" or just "7".
-  const targetVal = parsed.target
-    ? parsed.target.replace(/^@/, '').trim() + '/10'
-    : '—';
-  const cells = [
-    { label: 'SETS',       value: parsed.sets   || '—', cls: parsed.sets   ? '' : 'dim' },
-    { label: 'REPS',       value: parsed.reps   || '—', cls: parsed.reps   ? '' : 'dim' },
-    { label: 'RPE',        value: targetVal,            cls: 'target ' + (parsed.target ? '' : 'dim') },
-    { label: 'TEMPO',      value: parsed.tempo  || '—', cls: 'tempo '  + (parsed.tempo  ? '' : 'dim') },
-    { label: 'REST',       value: restStr,              cls: '' },
-  ];
+/* ═══ rx — THE STRUCTURED PRESCRIPTION ═══════════════════════════════════════
+   ⚠ Mirrored in assets/js/chips.js (rxOf / repCount / tempoWords / DOSE_LABEL).
+   chips-selftest.html asserts the two copies agree; program.html stays
+   self-contained on purpose (it is the offline PWA), which is why this is a
+   copy rather than a <script src>.
+
+   `ex.rx` is the prescription as DATA — sets / reps|time|distance / side / rpe /
+   tempo / rest — and the contract is that an absent field was not prescribed.
+   Beside it sit FOUR fields with four meanings and four looks, which is what
+   stopped one green pill standing for 121 different kinds of thing:
+     ex.setup   equipment / position   → quiet grey line under the name
+     ex.intent  ONE intention          → the green pill
+     ex.note    the coach's note       → clay callout
+     ex.cues    technique              → the cues list
+   Everything below renders only what is there. An exercise still carrying the
+   old `chips[]` keeps working: rxOf() parses it and recovers what each number
+   really was, so a duration finally stops being labelled REPS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DOSE_LABEL = { reps: 'Reps', time: 'Time', distance: 'Distance', work: 'Work' };
+
+function _cleanStr(v) {
+  const s = (v === null || v === undefined) ? '' : String(v).trim();
+  return s ? s : null;
+}
+
+// "3-1-1-0" → "3s down · 1s pause · 1s up". Generated, so it can never disagree
+// with the tempo cell the way a hand-written "3s eccentric" pill did.
+function tempoWords(tempo) {
+  const t = _cleanStr(tempo);
+  if (!t) return null;
+  if (/^iso$/i.test(t)) return 'Hold the position';
+  const parts = t.split(/[-–]/).map(x => parseFloat(x));
+  if (parts.length < 3 || parts.some(isNaN)) return null;
+  const bits = [];
+  if (parts[0] > 0) bits.push(parts[0] + 's down');
+  if (parts[1] > 0) bits.push(parts[1] + 's pause');
+  if (parts[2] > 0) bits.push(parts[2] + 's up');
+  if (parts.length > 3 && parts[3] > 0) bits.push(parts[3] + 's reset');
+  return bits.length ? bits.join(' · ') : null;
+}
+
+function rxOf(ex) {
+  ex = ex || {};
+  const out = {
+    sets: null, dose: null, rpe: null, tempo: null, rest: null, rounds: null,
+    setup: _cleanStr(ex.setup), intent: _cleanStr(ex.intent), extras: [], source: 'rx'
+  };
+
+  const rx = ex.rx;
+  if (rx && typeof rx === 'object') {
+    out.sets   = (rx.sets   === 0 || rx.sets)   ? String(rx.sets).trim()   : null;
+    out.rounds = (rx.rounds === 0 || rx.rounds) ? String(rx.rounds).trim() : null;
+    out.rpe    = _cleanStr(rx.rpe);
+    out.tempo  = _cleanStr(rx.tempo);
+    out.rest   = (typeof rx.rest === 'number' && rx.rest > 0)
+      ? rx.rest
+      : (_cleanStr(rx.rest) ? parseDurationToSec(rx.rest) || null : null);
+    const kind = _cleanStr(rx.reps) ? 'reps'
+               : _cleanStr(rx.time) ? 'time'
+               : _cleanStr(rx.distance) ? 'distance'
+               : _cleanStr(rx.work) ? 'work' : null;
+    if (kind) out.dose = {
+      kind: kind, value: _cleanStr(rx[kind]), side: rx.side === true,
+      label: _cleanStr(rx.label) || DOSE_LABEL[kind]
+    };
+    return out;
+  }
+
+  // Legacy: an exercise still carrying chips[].
+  const p = parseChips(ex.chips);
+  out.source = 'chips';
+  out.sets   = p.sets || null;
+  out.rpe    = p.target ? p.target.replace(/^@/, '') : null;
+  out.tempo  = p.tempo || null;
+  out.rounds = _cleanStr(ex.rounds);
+  out.extras = p.extras.slice();
+  out.rest = (typeof ex.restSec === 'number' && ex.restSec > 0)
+    ? ex.restSec
+    : (p.rest > 0 ? p.rest : null);
+  if (p.reps) {
+    const raw  = p.reps;
+    const side = /(\/\s*|each\s+)(side|leg|arm|hand|direction|way)/i.test(raw);
+    // Strip the side marker AND a trailing "Reps" — "10 Reps / side" must become
+    // the value 10 under a label that already says REPS / SIDE, not "10 Reps".
+    const bare = raw
+      .replace(/\s*(\/\s*|each\s+)(side|leg|arm|hand|direction|way)s?\s*$/i, '')
+      .replace(/\s*reps?$/i, '')
+      .trim();
+    // DISTANCE IS TESTED FIRST. isPureDuration() reads a bare "m" as minutes, so
+    // "20 m" — a 20-metre sprint or carry — would otherwise be labelled TIME and
+    // read as twenty minutes. "5 min" still parses as time: "min" is not "m".
+    const kind = /^\d+(?:\.\d+)?\s*(m|km|yd|metres?|meters?)$/i.test(bare) ? 'distance'
+               : isPureDuration(bare) ? 'time'
+               : 'reps';
+    out.dose = { kind: kind, value: bare || raw, side: side, label: DOSE_LABEL[kind] };
+  }
+  return out;
+}
+
+// A countable rep, or null for holds / carries / intervals — which is what keeps
+// them off The Ceiling. A range takes its LOW end, the conservative read.
+function repCount(ex) {
+  const r = rxOf(ex);
+  if (!r.dose || r.dose.kind !== 'reps') return null;
+  const m = String(r.dose.value).match(/\d+(?:\.\d+)?/);
+  const n = m ? parseFloat(m[0]) : NaN;
+  return n > 0 ? n : null;
+}
+
+// Renders the stats grid — ONE CELL PER PRESCRIBED FACT, in a fixed order, and
+// nothing for anything that was not prescribed. The dose cell's label names what
+// the number actually is (REPS / TIME / DISTANCE / WORK) instead of calling a
+// 30-second hold "REPS", and carries "/ SIDE" on the label line rather than
+// crowding the value.
+function renderStatsGrid(rx) {
+  const cells = [];
+  if (rx.sets) cells.push({ label: 'SETS', value: rx.sets, cls: '' });
+  if (rx.dose) cells.push({
+    label: rx.dose.label.toUpperCase() + (rx.dose.side ? ' / SIDE' : ''),
+    value: rx.dose.value, cls: ''
+  });
+  if (rx.rpe)   cells.push({ label: 'RPE',   value: rx.rpe + '/10', cls: 'target' });
+  if (rx.tempo) cells.push({ label: 'TEMPO', value: /^iso$/i.test(rx.tempo) ? 'Hold' : rx.tempo, cls: 'tempo' });
+  if (rx.rest)  cells.push({ label: 'REST',  value: formatRestLabel(rx.rest), cls: '' });
+  if (!cells.length) return '';
   return `<div class="ex-stats-grid">${cells.map(c => `
     <div class="ex-stat ${c.cls}">
-      <div class="ex-stat-label">${c.label}</div>
+      <div class="ex-stat-label">${esc(c.label)}</div>
       <div class="ex-stat-value">${esc(c.value)}</div>
     </div>`).join('')}</div>`;
 }
 
 // Stat pills for the collapsed row — each stat is its own small rounded pill.
 // "4×6"  ·  "7/10"  ·  "⏱ 2m" — sized to be glanceable but not loud.
-function renderExSummary(parsed, restSec, hasNote) {
-  // Green "modifier" pills lead the row (the technique chips: 3s eccentric, 1s
-  // squeeze, glute focus, max intent, holds…). They STAY under the name when the
-  // card is expanded. Grey "stat" pills (sets×reps · RPE · rest) follow and show
-  // only on the collapsed row. A coach's note adds a clay pill up front so the
-  // athlete spots it before expanding.
+function renderExSummary(rx, hasNote, hideDose) {
+  // A coach's note adds a clay pill up front so the athlete spots it before
+  // expanding. Legacy green "modifier" pills follow — only exercises that still
+  // carry chips[] have any; under rx that information is the `setup` line or a
+  // coaching cue, both of which have a proper home. Grey stat pills (sets×dose ·
+  // RPE · rest) come last and show only on the collapsed row.
   const notePill = hasNote
     ? `<span class="ex-summary-pill modifier coach-note-pill">Coach's Note</span>`
     : '';
-  const mods = (parsed.extras || []).map(e =>
-    `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}">${esc(e.label)}</span>`
-  );
+  const mods = (rx.intent ? [`<span class="ex-summary-pill modifier">${esc(rx.intent)}</span>`] : [])
+    .concat((rx.extras || []).map(e =>
+      `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}">${esc(e.label)}</span>`));
   const stats = [];
-  if (parsed.sets && parsed.reps) stats.push(`${parsed.sets}×${parsed.reps}`);
-  else if (parsed.reps)           stats.push(parsed.reps);
-  if (parsed.target)              stats.push(parsed.target.replace(/^@/, '').trim() + '/10');
-  if (restSec > 0)                stats.push(`⏱ ${formatRestLabel(restSec)}`);
+  const dose = (rx.dose && !hideDose) ? rx.dose.value + (rx.dose.side ? '/side' : '') : '';
+  if (rx.sets && dose) stats.push(`${rx.sets}×${dose}`);
+  else if (dose)       stats.push(dose);
+  if (rx.rpe)          stats.push(rx.rpe + '/10');
+  if (rx.rest)         stats.push(`⏱ ${formatRestLabel(rx.rest)}`);
   const statPills = stats.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`);
   if (!notePill && !mods.length && !statPills.length) return '';
   return `<div class="ex-summary">${notePill}${mods.join('')}${statPills.join('')}</div>`;
@@ -6006,26 +6158,37 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle) {
   if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass, blockTitle);
 
   const isStandard = ex.type === 'standard';
-  const parsed = parseChips(ex.chips);
-  // Rest priority: explicit ex.restSec → "Rest X" chip → 120s default for standard
-  const restSec = (typeof ex.restSec === 'number' && ex.restSec > 0)
-    ? ex.restSec
-    : (parsed.rest > 0 ? parsed.rest : (isStandard ? 120 : 0));
+  const rx = rxOf(ex);
+  // REST IS NEVER INVENTED. It used to fall back to 120s for any standard
+  // exercise, so every card in the demo claimed "REST 2m" while every restSec in
+  // it was null — a calf raise and a back squat shown as identical, and a Pallof
+  // press told to sit for two minutes. An unprescribed rest now draws no cell.
+  // The timer button still works (see restBottom) — it just stops pretending the
+  // number came from the coach.
+  const restSec = rx.rest || 0;
   const _vid = getVideoUrl(ex);
 
-  const summary    = renderExSummary(parsed, restSec, !!ex.note);
+  // A PREP ITEM IS A NAME AND A DOSE. When the only thing prescribed is the dose
+  // — no sets, no RPE, no tempo, no rest — a five-cell grid was four em-dashes
+  // and one number, 237 times in the free library alone. Draw the line instead.
+  const doseOnly = !!rx.dose && !rx.sets && !rx.rpe && !rx.tempo && !restSec;
+
+  // The dose line already states the dose, so the summary must not repeat it.
+  const summary    = renderExSummary(rx, !!ex.note, doseOnly);
   const noteHtml   = renderCoachNote(ex.note);
   const videoBlock = renderVideoBlock(_vid);
-  // Skip the stats grid entirely if there are no main stats (simple warm-ups
-  // with just a duration chip).
-  const hasGridData = parsed.sets || parsed.reps || parsed.target || parsed.tempo || restSec > 0;
-  const statsGrid  = hasGridData ? renderStatsGrid(parsed, restSec) : '';
-  // Modifier chips (HOLD / Max Intent / 3s eccentric / glute focus…) now render
-  // as green pills next to the name via renderExSummary — visible collapsed AND
-  // expanded — so the expanded block is just the stats grid.
-  const cuesHtml   = renderInlineCues(ex.cues);
+  const setupHtml  = rx.setup ? `<div class="ex-setup">${esc(rx.setup)}</div>` : '';
+  const doseLine = doseOnly
+    ? `<div class="ex-doseline">${setupHtml || '<span></span>'}<span class="ex-dose">${
+        esc(rx.dose.value + (rx.dose.side ? ' / side' : ''))}</span></div>`
+    : '';
+
+  const statsGrid = doseOnly ? '' : renderStatsGrid(rx);
+  const words     = doseOnly ? null : tempoWords(rx.tempo);
+  const cuesHtml  = renderInlineCues(ex.cues);
   const statsBlock = statsGrid
-    ? `<div class="ex-stats-block">${statsGrid}</div>`
+    ? `<div class="ex-stats-block">${statsGrid}${
+        words ? `<div class="ex-tempo-words">${esc(words)}</div>` : ''}</div>`
     : '';
 
   // The log section is only meaningful for "standard" exercises (the ones that
@@ -6035,25 +6198,31 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle) {
     logBlock = `<div class="ex-section-label">Log Sets</div><div class="ex-log"></div>`;
   }
 
-  // Rest button — sits at the bottom of the detail, only for standard exercises
+  // Rest button — bottom of the detail, standard exercises only. It stays put
+  // even when no rest was prescribed, because the TIMER is still useful; what
+  // goes away is the claim that the coach picked the number. Prescribed rest
+  // names itself ("Rest ⏱ 2m"); unprescribed opens the same timer at a neutral
+  // default and says so ("Rest timer").
+  const timerSec = restSec || 120;
   const restBottom = isStandard
-    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${restSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(restSec)}</button></div>`
+    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${timerSec}" onclick="openTimer(event)">${
+        restSec ? `Rest ⏱ ${formatRestLabel(restSec)}` : 'Rest timer ⏱'}</button></div>`
     : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
   // Sets count drives how many rows the per-set log will render.
-  // Falls back to 1 if the chip didn't have a "X Sets" entry.
-  const setsCount = parseInt(parsed.sets, 10) || 1;
+  const setsCount = parseInt(rx.sets, 10) || 1;
   // The prescribed reps ride along on the card so The Ceiling can pre-fill its
-  // estimate without re-parsing the chips. Kept as the raw chip text ("5",
-  // "10-12", "4 Each Side", "30s") — prescribedReps() decides what it means.
-  const repsChip = parsed.reps || '';
+  // estimate. Only a real rep count is passed — a hold or a carry sends nothing,
+  // which is what stops the Ceiling offering an estimate it cannot honour.
+  const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
 
-  return `<div class="checklist-item collapsed ${blockClass}${(parsed.extras.length || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsChip)}">
+  return `<div class="checklist-item collapsed ${blockClass}${(rx.extras.length || rx.intent || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
         <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
+        ${doseOnly ? doseLine : setupHtml}
         ${summary}
       </div>
       <div class="ex-chevron">▾</div>
@@ -6127,10 +6296,10 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
   // Circuits don't fit the standard 5-cell grid (no sets/reps/tempo/rpe), so we
   // surface the rounds string + rest as the headline info.
   // Rest priority: ex.restSec → "Rest X" chip → 60s default for circuits
-  const _parsedC = parseChips(ex.chips);
-  const circuitRestSec = (typeof ex.restSec === 'number' && ex.restSec > 0)
-    ? ex.restSec
-    : (_parsedC.rest > 0 ? _parsedC.rest : 60);
+  const _rxC = rxOf(ex);
+  // A circuit's rest IS prescribed in practice (it paces the round), so unlike a
+  // standard exercise it keeps a 60s fallback rather than dropping the cell.
+  const circuitRestSec = _rxC.rest || 60;
   // Render the same .ex-summary-pill style used on standard exercises so the
   // collapsed circuit row reads consistently.
   const summaryPills = [];
@@ -6166,7 +6335,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle) {
       <div class="ex-circuit-meta">
         <div class="ex-stat">
           <div class="ex-stat-label">Rounds</div>
-          <div class="ex-stat-value">${esc(ex.rounds || '—')}</div>
+          <div class="ex-stat-value">${esc(_rxC.rounds || ex.rounds || '—')}</div>
         </div>
         <div class="ex-stat">
           <div class="ex-stat-label">Rest</div>
@@ -9493,10 +9662,10 @@ function ceilingCandidates() {
       if (!ex || ex.type !== 'standard') return;
       const name = String(ex.name || '').trim();
       if (!name || seen[name]) return;
-      const reps = parseChips(ex.chips).reps;
-      if (prescribedReps(reps) == null) return;      // holds, carries, intervals
+      const r = rxOf(ex);
+      if (repCount(ex) == null) return;              // holds, carries, intervals
       seen[name] = 1;
-      out.push({ name: name, reps: reps, test: exTestSpec(ex) });
+      out.push({ name: name, reps: r.dose ? r.dose.value : '', test: exTestSpec(ex) });
     })));
   return out;
 }

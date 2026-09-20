@@ -33,14 +33,6 @@
           "type": "simple",
           "name": "Forearm Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec / side"
-            },
-            {
-              "label": "Top and underside"
-            }
-          ],
           "cues": {
             "good": [
               "Forearm across the roller, slow from elbow to wrist, top side first",
@@ -49,17 +41,17 @@
             "bad": [
               "Rolling straight over the bony point of the elbow"
             ]
-          }
+          },
+          "rx": {
+            "time": "60 sec",
+            "side": true
+          },
+          "setup": "Top and underside"
         },
         {
           "type": "simple",
           "name": "Wrist Extensor Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "30 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Arm straight, palm down, bend the wrist so the fingers point down",
@@ -68,17 +60,16 @@
             "bad": [
               "Pulling hard — this one is easy to overdo"
             ]
+          },
+          "rx": {
+            "time": "30 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Wrist Flexor Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "30 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Arm straight, palm up, bend the wrist so the fingers point down",
@@ -87,6 +78,10 @@
             "bad": [
               "Letting the elbow bend"
             ]
+          },
+          "rx": {
+            "time": "30 sec",
+            "side": true
           }
         }
       ]
@@ -100,11 +95,6 @@
           "name": "Lat Roll",
           "videoUrl": null,
           "note": "Your serving side will be the worse one, so give it the extra time.",
-          "chips": [
-            {
-              "label": "60 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "On your side, arm overhead, roller under the armpit",
@@ -113,18 +103,16 @@
             "bad": [
               "Rolling onto the ribs themselves"
             ]
+          },
+          "rx": {
+            "time": "60 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Upper Back Roll",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "60 sec",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Roller across the upper back, hands behind the head, ribs down",
@@ -133,17 +121,15 @@
             "bad": [
               "Rolling the lower back"
             ]
+          },
+          "rx": {
+            "time": "60 sec"
           }
         },
         {
           "type": "simple",
           "name": "Cross-Body Shoulder Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Arm straight across the chest, pull it in with the other forearm",
@@ -152,17 +138,16 @@
             "bad": [
               "Pushing into a pinch at the front of the shoulder"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Doorway Pec Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "45 sec / side"
-            }
-          ],
           "cues": {
             "good": [
               "Forearm on the door frame, elbow at shoulder height, step through and turn away",
@@ -171,6 +156,10 @@
             "bad": [
               "Letting the shoulder roll forward into it"
             ]
+          },
+          "rx": {
+            "time": "45 sec",
+            "side": true
           }
         }
       ]

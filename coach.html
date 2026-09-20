@@ -30,7 +30,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Chip semantics, shared with program.html so the editor and the athlete app
      can never disagree about what a prescription says. See chips-selftest.html. -->
-<script src="/assets/js/chips.js"></script>
+<script src="/assets/js/chips.js?v=20260920"></script>
 <style>
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
@@ -2483,6 +2483,22 @@ function logIndex(blocks) {             // flat name → logged exercise, for ma
 // program.html. These were duplicated here and drifted apart in formatting;
 // keeping local names means every existing call site is untouched.
 const { parseChips, parseDurationToSec, isPureDuration } = window.Chips;
+// The dashboard's whole comparison layer was written against parseChips' shape
+// ({sets, reps, target, tempo, rest, extras}). rx replaced that as the storage
+// format, so this adapts one to the other in ONE place rather than touching
+// twenty call sites — and it reads rx or legacy chips, whichever the exercise has.
+function legacyRx(ex) {
+  const r = window.Chips.rxOf(ex || {});
+  return {
+    sets:   r.sets || '',
+    reps:   r.dose ? (r.dose.value + (r.dose.side ? '/side' : '')) : '',
+    target: r.rpe ? '@' + r.rpe : '',
+    tempo:  r.tempo || '',
+    rest:   r.rest || 0,
+    extras: (r.extras || []).concat(r.setup ? [{ label: r.setup, style: 'dark' }] : [])
+  };
+}
+
 function rxLine(rx) {                   // "4 × 10" — the dose, without the RPE
   if (rx.sets && rx.reps) return `${rx.sets} × ${rx.reps}`;
   if (rx.reps) return rx.reps;
@@ -2522,7 +2538,7 @@ function loadSummary(sets) {
 // known — reps are never logged per set (the athlete enters weight and RPE and
 // ticks the set off), so nothing here claims a rep count that was never recorded.
 function compareExercise(pex, logged) {
-  const rx = parseChips(pex && pex.chips);
+  const rx = legacyRx(pex);
   const want = rx.sets ? parseInt(rx.sets, 10) : null;
   const tgt = rpeTarget(rx.target);
   const c = {
@@ -2638,7 +2654,7 @@ function cmpRowHtml(c, lib, athleteId) {
   const eid = editable
     ? (athleteId + '_' + c.path.day + '_' + c.path.block + '_' + c.path.ex).replace(/[^a-z0-9]/gi, '_')
     : '';
-  const warn = c.pex ? Chips.audit(c.pex) : [];
+  const warn = c.pex ? Chips.audit(c.pex).concat(Chips.auditRx(c.pex)) : [];
   const rxBits = [];
   if (dose) rxBits.push(`<span class="rx-dose">${esc(dose)}</span>`);
   if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}</span>`);
@@ -2695,26 +2711,51 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
 
   const found = exAt(athleteId, dayId, blockIdx, exIdx);
   if (!found) { toast('Could not find that exercise'); return; }
-  const st = Chips.readStats(found.ex);
-  const problems = Chips.audit(found.ex);
+  const r  = Chips.rxOf(found.ex);
+  const st = {
+    sets:  r.sets || '',
+    dose:  r.dose ? r.dose.value : '',
+    kind:  r.dose ? r.dose.kind  : 'reps',
+    side:  !!(r.dose && r.dose.side),
+    rpe:   r.rpe || '',
+    tempo: r.tempo || '',
+    restSec: r.rest || '',
+    setup: r.setup || ''
+  };
+  const problems = Chips.audit(found.ex).concat(Chips.auditRx(found.ex));
   const f = (id, label, val, ph, w) =>
     `<label class="exf"><span>${label}</span>
        <input id="${id}-${eid}" value="${esc(val == null ? '' : val)}" placeholder="${esc(ph || '')}"
               style="width:${w || 68}px" autocomplete="off"></label>`;
 
+  // The dose is ONE value plus what kind of thing it is, so a duration can never
+  // again land in a cell labelled REPS. A field left blank is NOT PRESCRIBED, and
+  // the app draws no cell for it — that is the whole contract of rx.
+  const kindSel = `<label class="exf"><span>Dose</span>
+      <select id="exKind-${eid}" style="width:96px">
+        ${['reps','time','distance','work'].map(k =>
+          `<option value="${k}"${st.kind === k ? ' selected' : ''}>${Chips.DOSE_LABEL[k]}</option>`).join('')}
+      </select></label>`;
+  const sideBox = `<label class="exf"><span>Per side</span>
+      <input type="checkbox" id="exSide-${eid}"${st.side ? ' checked' : ''} style="width:auto"></label>`;
+
   box.innerHTML = `
     <div class="exed-grid">
       ${f('exSets',  'Sets',  st.sets,  'e.g. 4')}
-      ${f('exReps',  'Reps',  st.reps,  'e.g. 6 or 10 Each Side', 150)}
+      ${kindSel}
+      ${f('exDose',  'Value', st.dose,  'e.g. 6, 8-10, 30s, 20m', 132)}
+      ${sideBox}
       ${f('exRpe',   'RPE',   st.rpe,   '6–10')}
-      ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0', 96)}
-      ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', '90s / 2 min', 92)}
+      ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0 / iso', 108)}
+      ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', 'blank = none', 92)}
     </div>
+    <label class="exf exf-wide"><span>Setup (grip, bench angle, kit)</span>
+      <input id="exSetup-${eid}" value="${esc(st.setup)}" placeholder="e.g. neutral grip" style="width:100%"></label>
     <label class="exf exf-wide"><span>Your note to them</span>
       <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(found.ex.note || '')}</textarea>
     </label>
-    ${st.modifiers.length ? `<div class="exed-mods">Technique chips kept as-is:
-      ${st.modifiers.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
+    ${r.extras.length ? `<div class="exed-mods">Old technique chips — saving folds these into Setup:
+      ${r.extras.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
     ${problems.length ? `<div class="exed-warn">${problems.map(p => '⚠ ' + esc(p.msg)).join('<br>')}</div>` : ''}
     <div class="exed-acts">
       <button class="btn sm primary" onclick="saveExEditor('${esc(athleteId)}',${Number(dayId)},${blockIdx},${exIdx},'${eid}')">Save</button>
@@ -2734,12 +2775,10 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
   if (!found) { toast('Could not find that exercise'); return; }
 
   const val = id => (document.getElementById(id + '-' + eid) || {}).value;
+  const chk = id => !!(document.getElementById(id + '-' + eid) || {}).checked;
   const restRaw = (val('exRest') || '').trim();
   const patch = {
-    sets:  (val('exSets')  || '').trim(),
-    reps:  (val('exReps')  || '').trim(),
-    rpe:   (val('exRpe')   || '').trim(),
-    tempo: (val('exTempo') || '').trim(),
+    rpe:     (val('exRpe') || '').trim(),
     restSec: restRaw ? Chips.parseDurationToSec(restRaw) : 0
   };
   if (restRaw && !patch.restSec) { alert('Rest "' + restRaw + '" is not a duration I understand. Try 90s, 2 min, or 1:30.'); return; }
@@ -2747,7 +2786,22 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
     if (!confirm('RPE ' + patch.rpe + ' is outside the 6–10 selector the app shows.\n\nThe athlete will not be able to log against it. Save anyway?')) return;
   }
 
-  const updated = Chips.applyStats(found.ex, patch);
+  // Saving an exercise that still carries chips[] also CONVERTS it: toRx() folds
+  // the old labels into rx and moves any leftover technique pill into `setup`, so
+  // an ordinary edit is the migration. From here the exercise has one source.
+  const kind = (val('exKind') || 'reps');
+  const rxPatch = {
+    sets:  (val('exSets')   || '').trim(),
+    rpe:   patch.rpe,
+    tempo: (val('exTempo')  || '').trim(),
+    rest:  patch.restSec,
+    side:  chk('exSide')
+  };
+  rxPatch[kind] = (val('exDose') || '').trim();   // clears the other three doses
+
+  const updated = Chips.applyRx(Chips.toRx(found.ex), rxPatch);
+  const setup = (val('exSetup') || '').trim();
+  if (setup) updated.setup = setup; else delete updated.setup;
   const note = (val('exNote') || '').trim();
   if (note) updated.note = note; else delete updated.note;
 

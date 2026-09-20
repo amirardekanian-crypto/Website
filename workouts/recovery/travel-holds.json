@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Cat-Cow",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×15 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "On hands and knees, slowly round your back up then let it sink, staying in the middle of the range",
@@ -46,6 +41,9 @@
             "bad": [
               "Pushing to the end of the range on either side"
             ]
+          },
+          "rx": {
+            "reps": 15
           }
         }
       ]
@@ -58,11 +56,6 @@
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "75s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Squeeze the back glute, then reach the arm on the same side as your back knee overhead",
@@ -71,6 +64,10 @@
             "bad": [
               "Arching your lower back to feel more"
             ]
+          },
+          "rx": {
+            "time": "75s",
+            "side": true
           }
         },
         {
@@ -78,11 +75,6 @@
           "name": "Frog Stretch",
           "videoUrl": null,
           "note": "If a groin is sore now or grabbed on you lately, skip this one.",
-          "chips": [
-            {
-              "label": "90s"
-            }
-          ],
           "cues": {
             "good": [
               "On hands and knees, slide your knees wide and sink your hips back toward your heels",
@@ -91,17 +83,15 @@
             "bad": [
               "Forcing your knees wider than feels comfortable"
             ]
+          },
+          "rx": {
+            "time": "90s"
           }
         },
         {
           "type": "simple",
           "name": "90/90 Hip Stretch",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "75s/side"
-            }
-          ],
           "cues": {
             "good": [
               "Sit on a folded towel with both knees bent at ninety degrees, then fold your chest over the front shin only as far as your back stays long",
@@ -110,17 +100,16 @@
             "bad": [
               "Forcing it when you feel a twinge in the knee instead of the hip"
             ]
+          },
+          "rx": {
+            "time": "75s",
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Puppy Pose",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "2 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "From hands and knees, walk your hands forward and let your chest sink toward the floor",
@@ -129,6 +118,9 @@
             "bad": [
               "Forcing your chest down if your shoulder pinches"
             ]
+          },
+          "rx": {
+            "time": "2 minutes"
           }
         }
       ]

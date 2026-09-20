@@ -33,11 +33,6 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "3 minutes"
-            }
-          ],
           "cues": {
             "good": [
               "Walk at an easy pace with your arms swinging",
@@ -46,17 +41,15 @@
             "bad": [
               "Hunching your shoulders up as you walk"
             ]
+          },
+          "rx": {
+            "time": "3 minutes"
           }
         },
         {
           "type": "simple",
           "name": "Arm Circles",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Each Direction"
-            }
-          ],
           "cues": {
             "good": [
               "Make small slow circles with your arms straight out to the sides",
@@ -65,17 +58,16 @@
             "bad": [
               "Making the circles bigger than feels comfortable"
             ]
+          },
+          "rx": {
+            "reps": 10,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Band Pull-Apart",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×15 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Hold the band at chest height and pull it apart to your sides",
@@ -84,6 +76,9 @@
             "bad": [
               "Letting your arms drop below shoulder height"
             ]
+          },
+          "rx": {
+            "reps": 15
           }
         }
       ]
@@ -96,11 +91,6 @@
           "type": "simple",
           "name": "Quadruped Thoracic Rotation",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
@@ -109,17 +99,16 @@
             "bad": [
               "Turning from your lower back"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Open Book",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×8 Each Side"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your side with your knees stacked and open your top arm out and back",
@@ -128,17 +117,16 @@
             "bad": [
               "Chasing your top arm back past the point where the front of your shoulder pinches"
             ]
+          },
+          "rx": {
+            "reps": 8,
+            "side": true
           }
         },
         {
           "type": "simple",
           "name": "Scapular Wall Slide",
           "videoUrl": null,
-          "chips": [
-            {
-              "label": "×10 Reps"
-            }
-          ],
           "cues": {
             "good": [
               "Slide your forearms up a wall with your shoulder blades gliding round your ribs",
@@ -147,6 +135,9 @@
             "bad": [
               "Sliding up past the point where the front of your shoulder pinches"
             ]
+          },
+          "rx": {
+            "reps": 10
           }
         }
       ]
@@ -159,27 +150,7 @@
           "type": "standard",
           "name": "Band External Rotation",
           "videoUrl": null,
-          "restSec": 30,
           "note": "On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
-          "chips": [
-            {
-              "label": "4 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×45s"
-            },
-            {
-              "label": "Tempo Iso"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "sore side",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Anchor the band at elbow height with your elbow tucked in, then turn your forearm out and hold",
@@ -188,7 +159,15 @@
             "bad": [
               "Letting your elbow drift away from your side"
             ]
-          }
+          },
+          "rx": {
+            "sets": 4,
+            "time": "45s",
+            "rpe": 7,
+            "tempo": "Iso",
+            "rest": 30
+          },
+          "setup": "sore side"
         }
       ]
     },
@@ -200,28 +179,7 @@
           "type": "standard",
           "name": "Side Lying Dumbbell External Rotation",
           "videoUrl": null,
-          "restSec": 45,
           "note": "If your shoulder feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×12"
-            },
-            {
-              "label": "RPE 7"
-            },
-            {
-              "label": "sore side",
-              "style": "dark"
-            },
-            {
-              "label": "3s eccentric",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Lie on your side with the working arm on top, elbow at your ribs, and turn the dumbbell up toward the ceiling",
@@ -230,30 +188,20 @@
             "bad": [
               "Rolling your body back to lift the dumbbell higher"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 12,
+            "rpe": 7,
+            "rest": 45
+          },
+          "setup": "sore side · 3s eccentric"
         },
         {
           "type": "standard",
           "name": "Prone Y Raise",
           "videoUrl": null,
-          "restSec": 45,
           "note": "If a Y pinches, set your arms in a wide V instead.",
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×10"
-            },
-            {
-              "label": "RPE 6"
-            },
-            {
-              "label": "2s top hold",
-              "style": "dark"
-            }
-          ],
           "cues": {
             "good": [
               "Lie face down with your arms in a Y and your thumbs up, then lift them off the floor with nothing in your hands",
@@ -262,25 +210,19 @@
             "bad": [
               "Lifting your arms past the point where your shoulder starts to pinch"
             ]
-          }
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 10,
+            "rpe": 6,
+            "rest": 45
+          },
+          "setup": "2s top hold"
         },
         {
           "type": "standard",
           "name": "Band Row",
           "videoUrl": null,
-          "restSec": 45,
-          "chips": [
-            {
-              "label": "3 Sets",
-              "style": "yellow"
-            },
-            {
-              "label": "×12"
-            },
-            {
-              "label": "RPE 7"
-            }
-          ],
           "cues": {
             "good": [
               "Pull the band to your ribs with your elbows tucked in",
@@ -289,6 +231,12 @@
             "bad": [
               "Shrugging your shoulders up toward your ears"
             ]
+          },
+          "rx": {
+            "sets": 3,
+            "reps": 12,
+            "rpe": 7,
+            "rest": 45
           }
         }
       ]
