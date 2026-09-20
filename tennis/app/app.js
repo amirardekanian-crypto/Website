@@ -379,13 +379,15 @@
   // A picture that fails to load takes its own layer away and leaves the green banner, so a missing file
   // costs nothing.
   //
-  // ⚠️ DEMO ONLY, on purpose. A buyer has 22 lessons and 7 tests, and only 3 and 1 of those have a cover,
-  // so showing these to buyers would leave most of their app half-illustrated. The demo is exactly the
-  // surface these 13 cover. Widen it (ART_ON = true) once the lesson and test covers are done.
+  // WHO SEES WHAT (Amir, 2026-09-20). The Programme tab is finished: block covers, week banners, session cards and
+  // pages, test day, the session-complete screen. Buyers see those, and they are the kinds in ART_KINDS below.
+  // Lessons, tests and the locked pages stay DEMO-ONLY until all 22 lessons and 7 tests have a cover (14 and 3 do):
+  // otherwise a buyer's lesson list is half pictures. When they are done, let artFor() ignore ART_KINDS.
+  // Pictures are kept for offline use by sw.js, in its own tps-art cache, the first time each one is shown.
   // Every picture has its subject on the LEFT and the right and bottom left calm: this app is
   // right-to-left, so titles sit at the right and the bottom. Keep to that when adding more.
   // Bump ART_V after regrading a file: the site's root worker keeps /assets/ files cache-first, by full URL.
-  const ART_ON = DEMO;
+  const ART_KINDS = ['block', 'place', 'testday', 'done'];   // the kinds every buyer sees
   const ART_V = 2;   // rally-map and last-ball were regraded on 2026-09-19
   const ART = {
     block: {                                                               // its cover, on the block card and every week banner inside it
@@ -424,7 +426,7 @@
     done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
     locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
   };
-  const artFor = (kind, key) => (ART_ON && ART[kind] && ART[kind][key]) || null;
+  const artFor = (kind, key) => ((DEMO || ART_KINDS.includes(kind)) && ART[kind] && ART[kind][key]) || null;
   const artLayer = a => a ? `<div class="ph"><img src="../../assets/tps/${a.f}.webp?v=${ART_V}" alt="" decoding="async" style="object-position:${a.pos || '50% 50%'}" onload="this.classList.add('in')" onerror="var p=this.closest('.has-art');if(p)p.classList.remove('has-art');this.parentNode.remove()"></div>` : '';
 
   /* ── Small renderers ───────────────────────────────────────────────── */
