@@ -771,6 +771,12 @@ padel** and had its body rewritten (see *Article pages & SEO*). `form-fa.html` a
   real commit on `main`; the build deploys the whole tree, so the stranded change rides along. A
   docs-only commit works even though `_config.yml` excludes the `.md` files — `exclude` controls
   what is *served*, not whether a build runs.
+  ⚠ **That API allows 60 calls an hour without a token** (`curl https://api.github.com/rate_limit`), and a
+  rate-limit answer is a JSON *object*, so a poll loop that tests `len(...) != 0` reads it as "deployed". Seen
+  2026-09-20, after a few minutes of polling. To wait for a deploy, poll the SERVED file for something only the
+  new version has (`curl -sL https://amirardekani.com/<file> | grep -c '<new marker>'`), which has no quota.
+  Pages also stalls: that day two pushes in a row were still not served twenty minutes on, right after one had
+  deployed in a minute. The served file is the check, and if it is not there, land another commit.
   Tell Amir to **hard-refresh** to bypass browser cache.
 - For visual checks: serve with `python3 -m http.server` and screenshot with Chromium at
   `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. Two headless quirks: scroll-reveal hides
