@@ -1,0 +1,260 @@
+{
+  "id": "read-and-react",
+  "title": "Eyes First",
+  "category": "on-court",
+  "countsAs": "strength",
+  "duration": "31 min",
+  "equipment": "Court",
+  "focusTag": "Reading the Ball off the Wall",
+  "intro": [
+    "On court you don't choose when to move. The ball chooses for you. Every drill here ends with you reacting to a ball you can't fully predict. You need a wall you're allowed to hit a ball against, a ball, and about eight metres of clear floor behind you to back into. Walk it first and clear anything you could trip on. For the last block, start about six metres from the wall. Without a wall, skip this one today. Keep any other balls in a bag or your pockets, not on the floor, because stepping on a loose ball is an easy way to roll an ankle. It's thirty-four reactions, most of them in sets of four throws.",
+    "Do it early in the day on fresh legs, before hitting or conditioning, because tired legs make you read late. Keep it 48 hours away from hard running or jumping. The day before a match is fine, but skip the Back Away block then. Don't do it on match day. If you start reacting late or missing more, end the session there. If you have a sore ankle, knee, calf, hamstring, groin or Achilles right now, or an injury has kept you off court in the last month, this isn't the session for today, so get it looked at first. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop at the back of your thigh, in your groin, your calf or your Achilles. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Jog easy until you're warm and breathing a little harder",
+              "Feel your legs loosen up with every minute"
+            ],
+            "bad": [
+              "Starting at run pace"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg front to back, then side to side",
+              "Feel the hip loosen up as the swing gets bigger"
+            ],
+            "bad": [
+              "Arching your lower back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide and sit back into that hip, chest tall",
+              "Feel the inside of the straight leg stretch"
+            ],
+            "bad": [
+              "Letting the bent knee cave inward"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Shuffle",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×4 Lengths"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Shuffle ten metres each length, staying low and pushing the floor away with the trailing foot",
+              "Feel your thighs and glutes working to keep you low"
+            ],
+            "bad": [
+              "Bobbing up and down between steps"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Carioca",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×2 Lengths Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Cross the back foot in front, then behind, as you travel sideways",
+              "Feel the twist through your hips as you cross over"
+            ],
+            "bad": [
+              "Twisting your shoulders along with your hips"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Split-Step Bounces",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Take a small hop and land wide and low on the balls of both feet",
+              "Landing loaded and ready to push either way"
+            ],
+            "bad": [
+              "Landing flat-footed on stiff knees"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Build-Up Run",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×20 m"
+            },
+            {
+              "label": "build 60-80-90",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Add speed on each run, about 60, then 80, then 90 percent of your top speed",
+              "Fast but relaxed, never straining"
+            ],
+            "bad": [
+              "Going flat out on the first one"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Read It",
+      "icon": "⚡",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Wall Feed Reaction",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×4 Throws"
+            },
+            {
+              "label": "change your distance each set",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Throw hard at the wall, split-step as it hits, then move to where it comes off",
+              "Your feet already set when the ball reaches you"
+            ],
+            "bad": [
+              "Chasing the ball without checking how close the wall is"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Self-Drop Chase",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×1"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Bounce the ball hard off the floor at an angle, then chase it down before the second bounce",
+              "Your eyes reading the bounce before your feet move"
+            ],
+            "bad": [
+              "Stepping on the ball as you chase it"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Back Away",
+      "icon": "👟",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Backpedal and Turn",
+          "videoUrl": null,
+          "restSec": 75,
+          "note": "Do the first two at half speed to get the feel, then build up.",
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×1"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Face the wall and throw the ball hard into it, backpedal away while you watch the rebound, then turn and chase it down",
+              "Your hips turning as you read where the ball is going"
+            ],
+            "bad": [
+              "Backpedalling faster than you can control"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

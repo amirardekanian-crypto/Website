@@ -68,6 +68,34 @@
           "duration": "20 min",
           "equipment": "Bodyweight",
           "file": "workouts/conditioning/bodyweight-intervals.json"
+        },
+        {
+          "id": "steady-run",
+          "title": "Open Road",
+          "duration": "45 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/conditioning/steady-run.json"
+        },
+        {
+          "id": "threshold-intervals",
+          "title": "Hold the Line",
+          "duration": "42 min",
+          "equipment": "Bike",
+          "file": "workouts/conditioning/threshold-intervals.json"
+        },
+        {
+          "id": "long-rally-intervals",
+          "title": "Deep Water",
+          "duration": "25 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/conditioning/long-rally-intervals.json"
+        },
+        {
+          "id": "repeat-effort",
+          "title": "Deuce Point",
+          "duration": "30 min",
+          "equipment": "Court",
+          "file": "workouts/conditioning/repeat-effort.json"
         }
       ]
     },
@@ -103,6 +131,34 @@
           "duration": "20 min",
           "equipment": "Court",
           "file": "workouts/on-court/reactive-agility.json"
+        },
+        {
+          "id": "landing-and-springs",
+          "title": "Landing Gear",
+          "duration": "30 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/on-court/landing-and-springs.json"
+        },
+        {
+          "id": "first-two-steps",
+          "title": "Off the Mark",
+          "duration": "34 min",
+          "equipment": "Court",
+          "file": "workouts/on-court/first-two-steps.json"
+        },
+        {
+          "id": "braking-and-cuts",
+          "title": "Hard Stop",
+          "duration": "39 min",
+          "equipment": "Court",
+          "file": "workouts/on-court/braking-and-cuts.json"
+        },
+        {
+          "id": "read-and-react",
+          "title": "Eyes First",
+          "duration": "31 min",
+          "equipment": "Court",
+          "file": "workouts/on-court/read-and-react.json"
         }
       ]
     },
@@ -131,6 +187,34 @@
           "duration": "15 min",
           "equipment": "Bodyweight",
           "file": "workouts/mobility/hips-and-groin.json"
+        },
+        {
+          "id": "everyday-mobility",
+          "title": "Green Light",
+          "duration": "8 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/mobility/everyday-mobility.json"
+        },
+        {
+          "id": "wide-stance-hips",
+          "title": "Wide Ball",
+          "duration": "20 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/mobility/wide-stance-hips.json"
+        },
+        {
+          "id": "thoracic-and-shoulder",
+          "title": "Open The Cage",
+          "duration": "20 min",
+          "equipment": "Dumbbells",
+          "file": "workouts/mobility/thoracic-and-shoulder.json"
+        },
+        {
+          "id": "ankles-and-calves",
+          "title": "Brake Pads",
+          "duration": "25 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/mobility/ankles-and-calves.json"
         }
       ]
     },
@@ -152,6 +236,34 @@
           "duration": "15 min",
           "equipment": "Bodyweight",
           "file": "workouts/recovery/static-stretch.json"
+        },
+        {
+          "id": "between-matches",
+          "title": "Turnaround",
+          "duration": "10 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/recovery/between-matches.json"
+        },
+        {
+          "id": "travel-holds",
+          "title": "Hotel Floor",
+          "duration": "12 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/recovery/travel-holds.json"
+        },
+        {
+          "id": "day-after",
+          "title": "The Morning After",
+          "duration": "17 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/recovery/day-after.json"
+        },
+        {
+          "id": "evening-release",
+          "title": "Night Shift",
+          "duration": "20 min",
+          "equipment": "Foam Roller",
+          "file": "workouts/recovery/evening-release.json"
         }
       ]
     },
@@ -201,6 +313,34 @@
           "duration": "12 min",
           "equipment": "Foam Roller",
           "file": "workouts/care/racket-arm.json"
+        },
+        {
+          "id": "back-under-load",
+          "title": "Iron Back",
+          "duration": "32 min",
+          "equipment": "Dumbbells",
+          "file": "workouts/care/back-under-load.json"
+        },
+        {
+          "id": "shoulder-endurance",
+          "title": "Shoulder Brake",
+          "duration": "30 min",
+          "equipment": "Bands",
+          "file": "workouts/care/shoulder-endurance.json"
+        },
+        {
+          "id": "forearm-loading",
+          "title": "Forearm Forge",
+          "duration": "25 min",
+          "equipment": "Dumbbells",
+          "file": "workouts/care/forearm-loading.json"
+        },
+        {
+          "id": "knee-and-achilles-loading",
+          "title": "Quiet Knee",
+          "duration": "32 min",
+          "equipment": "Bodyweight",
+          "file": "workouts/care/knee-and-achilles-loading.json"
         }
       ]
     }

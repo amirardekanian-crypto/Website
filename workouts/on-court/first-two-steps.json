@@ -1,0 +1,285 @@
+{
+  "id": "first-two-steps",
+  "title": "Off the Mark",
+  "category": "on-court",
+  "countsAs": "strength",
+  "duration": "34 min",
+  "equipment": "Court",
+  "focusTag": "Starts in Four Directions",
+  "intro": [
+    "Getting to the ball on time starts with your first two steps, and you can train them. You need a court or about twenty-five metres of flat, non-slip ground, and court shoes. Mark each distance with tape or a line on the floor and pace it out first. Don't use cones or bags you could step on. Every start here is one you choose, so go flat out and take the full rest after each one. Run through the end of every start and slow down over the next ten metres or so. Don't stop dead on the mark. If you haven't done any jump work lately, do Landing Gear first, because every split-step here is a landing. It's sixteen starts and about ninety-two metres of running in all.",
+    "First time through, do two sets of each start instead of four. Do it on fresh legs early in the day, never as a finisher after a hit or after conditioning. If your starts get slower than the ones before, end the session there. Keep it 48 hours away from another hard session, and don't do it the day before a match. If you've ever torn a knee ligament, or you're coming back from an ankle injury, ask whoever treated you if starts and cuts are OK. If you have a sore ankle, knee, calf, hamstring, groin or Achilles right now, or an injury has kept you off court in the last month, this isn't the session for today, so get it looked at first. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop at the back of your thigh, in your groin, your calf or your Achilles. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Jog easy until you're warm and breathing a little harder",
+              "Feel your legs loosen up with every minute"
+            ],
+            "bad": [
+              "Starting at run pace"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg front to back, then side to side",
+              "Feel the hip loosen up as the swing gets bigger"
+            ],
+            "bad": [
+              "Arching your lower back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide and sit back into that hip, chest tall",
+              "Feel the inside of the straight leg stretch"
+            ],
+            "bad": [
+              "Letting the bent knee cave inward"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×3 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step long, drop the back hip, then reach the inside arm up to the ceiling",
+              "Feel the front of the back hip and your upper back open up"
+            ],
+            "bad": [
+              "Rushing the reach before the hips have dropped"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "A-Skip",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×15 m"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Tall hips, and strike the ground right underneath you",
+              "Feel a light, springy bounce off the ball of the foot"
+            ],
+            "bad": [
+              "Reaching the foot out in front of your body"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Build-Up Run",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×20 m"
+            },
+            {
+              "label": "build 60-80-90",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Add speed on each run, about 60, then 80, then 90 percent of your top speed",
+              "Fast but relaxed, never straining"
+            ],
+            "bad": [
+              "Going flat out on the first one"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "First Step",
+      "icon": "🎾",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Split-Step to Sprint",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×6 m"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Land the split-step loaded, then explode toward the spot you picked",
+              "Your legs pushing the ground back behind you"
+            ],
+            "bad": [
+              "Landing the split-step with narrow feet and straight knees"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Crossover Start",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×6 m"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Turn your hips toward the side you're going and cross the far leg over as you push off the other",
+              "Your hips turning before your feet move"
+            ],
+            "bad": [
+              "Twisting on a planted foot instead of turning your hips"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Drop-Step and Drive",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×6 m"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Open your hip and step back with the foot on the side you're going, then drive off it",
+              "Feel your hip turn first and the push come second"
+            ],
+            "bad": [
+              "Leaning back as you drive"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Close the Net",
+      "icon": "👟",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Diagonal Closing Step",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×5 m"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Split-step, then drive forward and diagonally toward the net",
+              "A strong push off the back leg"
+            ],
+            "bad": [
+              "Reaching your front foot out on the first step"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

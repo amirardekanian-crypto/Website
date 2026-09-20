@@ -84,6 +84,10 @@ Chip rules for `simple`: use `"×N Reps"` / `"×N Each Side"` / `"×N Each Leg"`
 
 The `×`-prefix routes the chip to the REPS stat cell (visible in the expanded stats grid). Without `×`, a bare label like `"Each Side"` becomes a green modifier pill — always visible, including in the collapsed row.
 
+**Same trap for durations.** `"45s/side"` and `"×8 Each Side"` reach the REPS cell. `"45 sec / side"` and `"8 Reps / side"`
+(a space before the slash) do not: `isPureDuration()` in `program.html` rejects them, the dose falls into a green pill, and the row
+draws **no stats grid at all**. Measured 2026-09-20: 65 exercises across 21 of the 22 older sessions are written that way.
+
 ---
 
 ### Exercise type: `"standard"` — loaded exercise with rest timer + logging
@@ -309,6 +313,9 @@ entry is a session that reads wrong offline and right online.
 Before committing:
 - Valid JSON (no trailing commas, no comments in the output)
 - `id` in the workout file matches the slug in the manifest `file` path
+- If you rename a live card, grep `workouts/` for the old title first. Sessions point at each other by title
+  (currently Steady Spine, Racket Arm, Cut & Recover, Engine Builder, Daily Mobility Flow), and a stale title
+  sends an athlete to a card that no longer exists
 - `category` in the workout file matches the folder it sits in — **the publish
   picker reads the shelf off this field, not off the path**
 - `file` path in the manifest exactly matches the file you created
@@ -337,9 +344,11 @@ write them all, then send him one instruction. It validates `id` and `category`,
 refuses a category that doesn't exist, shows him the titles, and upserts on `slug`,
 so re-publishing an edited file updates the existing row rather than duplicating it.
 
-⚠️ It does **not** set `sort_order` — every row it writes lands at `0`, so a batch
-of new sessions shares a shelf position with whatever is already there. If the order
-on the shelf matters, say so and set it in SQL afterwards.
+⚠️ It does **not** set `sort_order`. The column defaults to NULL, and `get_library()` orders a shelf by
+`coalesce(sort_order, 2147483647), slug` — so a new session sorts **after everything already on the
+shelf, alphabetically by slug**, not in the order you wrote them. If the order matters, set it in SQL
+afterwards: `update public.library set sort_order = N where slug = 'workouts/<cat>/<slug>';`
+(Existing rows hold 0, 1, 2… so the next free number is one past the shelf's last.)
 
 Then tell Amir:
 - **That he needs to publish it**, and where

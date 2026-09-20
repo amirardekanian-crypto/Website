@@ -1,0 +1,184 @@
+{
+  "id": "threshold-intervals",
+  "title": "Hold the Line",
+  "category": "conditioning",
+  "countsAs": "strength",
+  "duration": "42 min",
+  "equipment": "Bike",
+  "focusTag": "Threshold · No Impact",
+  "intro": [
+    "What decides a long set is how long you can stay at the edge of hard. This trains that edge, and it does it on a bike, so nothing lands. If your legs have already taken a lot of court this week, this is a hard session that adds fitness without adding more stops.",
+    "Five efforts of four minutes. Hard but controlled, the kind where you can get a short sentence out but not a long one. If you're down to single words, ease off a little but keep it hard. If you could chat freely, add a bit of resistance on the next one. Between each one, spin easy for two minutes and keep pedalling. Cutting the rest short turns it into a different session. Keep your legs turning quickly rather than grinding a heavy gear. A rower does the same job, and so does a treadmill on a steep incline. No machine? Walk up a steep hill for the four minutes and stroll back down for the two. First time through, stop after three efforts. Keep it 48 hours clear of a match. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Spin",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "5 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Set the seat so your knee is slightly bent at the bottom of each stroke",
+              "Keep it easy enough to breathe through your nose"
+            ],
+            "bad": [
+              "A seat set so low that your knees pinch up at the top of the stroke"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "45s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Squeeze the back glute, then reach the same-side arm overhead",
+              "Feel it at the front of the back hip"
+            ],
+            "bad": [
+              "Arching your lower back to feel more"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes",
+              "Feel the stretch low in the calf and the front of the ankle"
+            ],
+            "bad": [
+              "Letting the heel lift or the arch collapse"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×12 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Squeeze the glutes hard at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Ramp Efforts",
+          "videoUrl": null,
+          "restSec": 30,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×30s"
+            },
+            {
+              "label": "resistance up each one",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Add a little resistance on each one and keep the same cadence",
+              "Feel your legs load up without any strain"
+            ],
+            "bad": [
+              "Going hard on the first one"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Threshold",
+      "icon": "🫀",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Threshold Effort",
+          "videoUrl": null,
+          "restSec": 120,
+          "note": "If you can't hold the same cadence at the same resistance for a whole effort, that was your last one.",
+          "chips": [
+            {
+              "label": "5 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×4 min"
+            },
+            {
+              "label": "RPE 7-8"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold one steady cadence and one resistance for all four minutes",
+              "Your breathing should be hard but steady, never gasping"
+            ],
+            "bad": [
+              "Grinding a heavy gear at a slow cadence"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Cool-Down",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Spin Down",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Ease the resistance right off and keep the legs turning",
+              "Your heart rate should settle a little every minute"
+            ],
+            "bad": [
+              "Stopping pedalling the moment the last effort ends"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

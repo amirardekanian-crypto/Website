@@ -1,0 +1,172 @@
+{
+  "id": "wide-stance-hips",
+  "title": "Wide Ball",
+  "category": "mobility",
+  "countsAs": "mobility",
+  "duration": "20 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Hips & Groin, Loaded",
+  "intro": [
+    "Every wide ball puts your groin at full length and asks it to take load. So it's worth training that position under load. We walk first, open the position, then load it. This is for a groin that's tight, not one that's strained. Stop and get it looked at if you've strained your groin in the last couple of months, if it grabs when you push off, if you have pain at the pubic bone or low in the belly, or if you feel a lump or bulge in the groin. If you get a sharp pinch at the front of the hip in the deep positions and it keeps happening, get that looked at too.",
+    "Do it on a light day. It leaves the adductors sore for about two days, so keep it two days clear of your next match and of speed or braking work on court. First time through, do just one set of each loaded exercise and see how you feel in two days. Tired or a bit sore is fine. Sharp, in one spot, or worse first thing in the morning means back off and get it looked at. You need something firm at about knee height for the Copenhagen, like a bench or a sturdy sofa seat. A chair only works pushed hard against a wall so it can't slide. Not a bed. An easy bike does the walk's job if you'd rather."
+  ],
+  "blocks": [
+    {
+      "title": "Raise",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "7 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk at an easy pace with your arms swinging",
+              "Feel your hips and legs warming up"
+            ],
+            "bad": [
+              "Cutting the walk short before you feel warm"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Open It",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "90/90 Hip Rotation",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sit tall and swing both knees across to the other side",
+              "Feel the turn happening deep in your hips"
+            ],
+            "bad": [
+              "Pushing your knees down with your hands"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Adductor Rock Back",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Kneel with one leg out to the side and rock your hips back toward your heels",
+              "Feel a gentle stretch along the inside of the straight leg"
+            ],
+            "bad": [
+              "Letting your lower back round as you rock back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Squat",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide and sit back into one hip, going a little deeper each rep",
+              "Feel the inside of the straight leg lengthen"
+            ],
+            "bad": [
+              "Letting the heel of the bent leg lift"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Load the End Range",
+      "icon": "🦵",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Cossack Squat",
+          "videoUrl": null,
+          "restSec": 60,
+          "note": "Go only as deep as you can control and come up a little if the front of the hip pinches.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Each Side"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "2s pause",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sit deep into one hip with the other leg straight and its heel down",
+              "Feel the inside of the straight leg holding the stretch"
+            ],
+            "bad": [
+              "Bouncing out of the bottom"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Copenhagen Plank",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "Stop the set when your hips start to drop, even if that's before fifteen seconds.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×15s Each Side"
+            },
+            {
+              "label": "Tempo Iso"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie on your side with your top knee on a bench and lift your hips in a straight line",
+              "Feel the inside of the top thigh working hard"
+            ],
+            "bad": [
+              "Letting your hips sag toward the floor"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

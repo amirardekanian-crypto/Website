@@ -1,0 +1,232 @@
+{
+  "id": "steady-run",
+  "title": "Open Road",
+  "category": "conditioning",
+  "countsAs": "strength",
+  "duration": "45 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Long Easy Run",
+  "intro": [
+    "This is the base that gets your legs back between points. You get about twenty-five seconds, and your body spends them recovering on oxygen. That's the engine this session builds. It needs shoes and a bit of flat road, nothing else, so it fits into almost any week.",
+    "Run for twenty-eight minutes at one pace. You should be able to say a full sentence out loud the whole way. If you can't, slow down. Harder than that and it stops being this session, so no surges and no fast finish. Running puts braking through your legs, and court days give you plenty already. In a heavy court week, do Engine Builder on the bike instead. If a shin, foot, ankle or knee is sore right now, ride a bike or walk today and get it looked at. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, or a joint that gives way. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Brisk Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk fast enough that your arms swing, and look ahead",
+              "Feel your legs waking up and your breathing lift a little"
+            ],
+            "bad": [
+              "Turning it into a jog"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes",
+              "Feel the stretch low in the calf and the front of the ankle"
+            ],
+            "bad": [
+              "Letting the heel lift or the arch collapse"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Hamstring Scoop",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step forward onto a straight leg and reach both hands toward your toes",
+              "Feel the back of the front thigh stretch"
+            ],
+            "bad": [
+              "Rounding your back instead of hinging at the hip"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "45s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Squeeze the back glute, then reach the same-side arm overhead",
+              "Feel it at the front of the back hip"
+            ],
+            "bad": [
+              "Arching your lower back to feel more"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg front to back, then side to side",
+              "The swing should get a little bigger every rep"
+            ],
+            "bad": [
+              "Arching your lower back to throw the leg higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Single-Leg Calf Raise",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×12 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rise onto the ball of your foot, pause, then lower slowly",
+              "Squeeze the calf at the top"
+            ],
+            "bad": [
+              "Bouncing out of the bottom"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Jog-to-Run Ramp",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Jog a little faster every minute until you reach your run pace",
+              "Feel your stride settle and your breathing find a rhythm"
+            ],
+            "bad": [
+              "Starting at run pace"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Aerobic Base",
+      "icon": "🫀",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Run",
+          "videoUrl": null,
+          "note": "If you don't run already, run two minutes and walk one the whole way instead.",
+          "chips": [
+            {
+              "label": "28 minutes",
+              "style": "dark"
+            },
+            {
+              "label": "RPE 6"
+            },
+            {
+              "label": "full sentences",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Pick a flat loop you can repeat and hold one pace the whole way",
+              "Feel your breathing stay smooth and your shoulders and hands stay loose"
+            ],
+            "bad": [
+              "Speeding up because it starts to feel easy"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Cool-Down",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk slowly with your arms hanging loose",
+              "Feel your heart rate come down with every step"
+            ],
+            "bad": [
+              "Standing still the second the run ends"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Standing Calf Stretch",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "45s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Press the back heel into the floor and lean your hips toward a wall",
+              "Feel it in the upper part of the calf"
+            ],
+            "bad": [
+              "Letting the back heel lift off the floor"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

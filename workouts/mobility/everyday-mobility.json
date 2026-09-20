@@ -1,0 +1,166 @@
+{
+  "id": "everyday-mobility",
+  "title": "Green Light",
+  "category": "mobility",
+  "countsAs": "mobility",
+  "duration": "8 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Daily Whole-Body Flow",
+  "intro": [
+    "Eight minutes, any day you like. It keeps the range you already have, and it's short enough that you'll actually do it. Nothing in here is held, so it's fine in the hour before you play. It won't warm you up for a hit or a speed session though, and the On-Court list has the session for that.",
+    "Think of this as the short daily version, with nothing held. Daily Mobility Flow in this list is the fifteen minute one with long holds, so do that when you have the time and it isn't the hour before you play. The other mobility sessions are the ones that change something. If you're stiff and heavy the morning after a hard match, the day-after session in the Recovery list is built for that. If your lower back is the problem, get it looked at first. The bodyweight back session in the Care list is there once someone has cleared you. Stop and get it checked if you get pain down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day. And if a move gives you sharp pain, skip it."
+  ],
+  "blocks": [
+    {
+      "title": "Turn",
+      "icon": "🧘",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Thoracic Rotation",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sit tall with a hand behind your head and turn your elbow round to the side",
+              "Feel the turn in your upper back and ribs"
+            ],
+            "bad": [
+              "Turning from your lower back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Alternating Overhead Reach",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stand tall and reach one arm long toward the ceiling, then the other",
+              "Feel the side of your ribs lengthen on the reaching side"
+            ],
+            "bad": [
+              "Leaning back and arching your lower back"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Hips",
+      "icon": "🦵",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×12 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Feel your glutes squeeze at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Leg Swings",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a wall and swing the leg forward and back like a pendulum",
+              "Feel the hip loosen up as the swing gets bigger"
+            ],
+            "bad": [
+              "Swinging harder than you can control"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Reverse Lunge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step back and lower the back knee toward the floor",
+              "Feel the front of the back hip and thigh stretch"
+            ],
+            "bad": [
+              "Letting the front knee cave inward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Ground",
+      "icon": "🦶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Inchworm",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk your hands out to a plank, then walk your feet up to them",
+              "Feel the backs of your legs stretch as your feet come in"
+            ],
+            "bad": [
+              "Letting your hips sag when your hands are out"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Squat to Stand",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold your toes, sink your hips down, then lift your chest and stand",
+              "Feel your hips and ankles opening at the bottom"
+            ],
+            "bad": [
+              "Letting your heels lift off the floor"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "id": "evening-release",
+  "title": "Night Shift",
+  "category": "recovery",
+  "countsAs": "mobility",
+  "duration": "20 min",
+  "equipment": "Foam Roller",
+  "focusTag": "Hard Day, Roller Work",
+  "intro": [
+    "Everybody rolls their quads. This one goes where tennis actually lands. Your feet. The deep calf that helps you brake. The inside of the thigh from wide balls and the outside from pushing off. The backs of your thighs from all the stopping. Then your mid back and chest from serving and overheads, and three minutes of slow breathing to finish. You need a roller and a ball, and a tennis ball is fine. Slow is the whole technique. When you find a sore spot, stop on it and take three breaths. Don't saw back and forth. Aim for firm pressure. If it's sharp, or you get pins and needles, back off.",
+    "Rolling helps you feel better and move a bit easier for a while, and that's genuinely it. It doesn't clear anything out of your muscles and it doesn't break anything up. So do it because the day is over and you want to feel human. Never roll your lower back, the front or side of your neck, the back of your knee, the inside of your elbow, your armpit or right into the groin crease. And nothing that's swollen, hot, bruised or freshly hurt. If something grabbed during play and it's still sore now, leave that spot alone and get it looked at. If one calf is swollen, warm or tender and you didn't strain it playing, don't roll it and see a doctor the same day."
+  ],
+  "blocks": [
+    {
+      "title": "Feet and Lower Legs",
+      "icon": "🌀",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Foot Roll",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "60s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sit on a chair and roll a tennis ball slowly under your foot, from the heel to the ball",
+              "Feel the ball pressing into the sole of your foot, firm but not sharp"
+            ],
+            "bad": [
+              "Standing up and putting your full weight on the ball"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Soleus Roll",
+          "videoUrl": null,
+          "note": "If your calf is still sore from playing, skip this one.",
+          "chips": [
+            {
+              "label": "60s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest one calf on the roller with the knee bent and roll from the ankle up to below the knee",
+              "Feel the deep calf muscle under the big one"
+            ],
+            "bad": [
+              "Rolling up into the back of the knee"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Where the Wide Balls Land",
+      "icon": "🌀",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Adductor Roll",
+          "videoUrl": null,
+          "note": "If a groin is still sore from playing, skip this one.",
+          "chips": [
+            {
+              "label": "90s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie face down with one leg out to the side and the roller under your inner thigh",
+              "Feel a dull, heavy pressure that eases when you breathe out"
+            ],
+            "bad": [
+              "Rolling right up into the groin crease"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Thigh Roll",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "60s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie on your side with the roller under your outer thigh and roll from just below the hip bone to just above the knee, holding some of your weight on your arms",
+              "Feel the outer thigh soften as the leg settles onto the roller"
+            ],
+            "bad": [
+              "Rolling over the side of the knee"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Hamstring Roll",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "60s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sit with the roller under one thigh and the other foot on the floor, then roll from just below the sit bone to a hand's width above the back of the knee",
+              "Feel the back of your thigh soften as your weight sinks into the roller"
+            ],
+            "bad": [
+              "Rolling into the back of the knee"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "The Serve Side",
+      "icon": "🌀",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Foam Roller T-Spine Extensions",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie back over the roller under your shoulder blades and cradle your head in your hands",
+              "Feel your upper back opening over the roller"
+            ],
+            "bad": [
+              "Letting your neck or lower back do the bending"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Pec Roll",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "60s/side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stand facing a wall with the ball between the wall and one side of your chest muscle, and roll slowly, staying off the collarbone and breastbone",
+              "Feel firm pressure across the chest, not the shoulder joint"
+            ],
+            "bad": [
+              "Rolling up into the armpit"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Finish Here",
+      "icon": "🌙",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Extended Exhale Breathing",
+          "videoUrl": null,
+          "note": "If you feel dizzy or tingly, go back to normal breathing.",
+          "chips": [
+            {
+              "label": "3 minutes"
+            },
+            {
+              "label": "In 4 · out 8",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie on your back with one hand on your belly and let each breath out slowly empty it",
+              "Feel that hand rise and fall while your chest stays quiet"
+            ],
+            "bad": [
+              "Forcing big deep breaths"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,343 @@
+{
+  "id": "braking-and-cuts",
+  "title": "Hard Stop",
+  "category": "on-court",
+  "countsAs": "strength",
+  "duration": "39 min",
+  "equipment": "Court",
+  "focusTag": "Braking & the Planted Turn",
+  "intro": [
+    "You can't cut what you can't stop, and stopping costs far more than going. This one is hard on your legs, and it brakes sideways, which is how you stop when you're pulled wide. You need a court or about twenty-five metres of flat ground with real grip, and court shoes. A slick surface is where an ankle goes. Mark each distance with tape or a line on the floor and pace it out first. Don't use cones or bags you could step on. No run-in is longer than ten metres. Do Landing Gear first if you haven't, because a brake is a landing you have to hold. It's twenty stops, seventeen of them at full speed, each with its own rest.",
+    "First time through, do half the reps in the last two blocks and take the full rest. Sore thighs and glutes for a few days is normal. Wait until the soreness has gone, and never less than 48 hours, before another hard running session or heavy leg lifting. Keep it two days clear of a match, before and after. Do it on fresh legs at the start of a training day. If a stop gets longer, wider or lazier than the one before, or your legs feel slow and heavy, end the session there. If you've ever torn a knee ligament, or you're coming back from an ankle injury, ask whoever treated you if hard stops and cuts are OK. If you have a sore ankle, knee, calf, hamstring, groin or Achilles right now, or an injury has kept you off court in the last month, this isn't the session for today, so get it looked at first. Stop the session and get it checked if you get a sharp pain, pain that spreads, numbness, swelling, a joint that gives way, or a sudden pull or pop at the back of your thigh, in your groin, your calf or your Achilles. Chest pain, dizziness, a heartbeat that races or skips, or breathing that doesn't feel right means stop now and get it looked at before you train again. If a doctor has told you to be careful with hard exercise, check with them before you do this one. If you are far more sore than normal a day or two later, or your pee goes dark, get that checked the same day."
+  ],
+  "blocks": [
+    {
+      "title": "Activation & Prep",
+      "icon": "🔥",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Jog",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "3 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Jog easy until you're warm and breathing a little harder",
+              "Feel your legs loosen up with every minute"
+            ],
+            "bad": [
+              "Starting at run pace"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes",
+              "Feel the stretch low in the calf and the front of the ankle"
+            ],
+            "bad": [
+              "Letting the heel lift or the arch collapse"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Lunge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×6 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step wide and sit back into that hip, chest tall",
+              "Feel the inside of the straight leg stretch"
+            ],
+            "bad": [
+              "Letting the bent knee cave inward"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "World's Greatest Stretch",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×3 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Step long, drop the back hip, then reach the inside arm up to the ceiling",
+              "Feel the front of the back hip and your upper back open up"
+            ],
+            "bad": [
+              "Rushing the reach before the hips have dropped"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Lateral Shuffle",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×4 Lengths"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Shuffle ten metres each length, staying low and pushing the floor away with the trailing foot",
+              "Feel your thighs and glutes working to keep you low"
+            ],
+            "bad": [
+              "Bobbing up and down between steps"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Build-Up Run",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×20 m"
+            },
+            {
+              "label": "build 60-80-90",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Add speed on each run, about 60, then 80, then 90 percent of your top speed",
+              "Fast but relaxed, never straining"
+            ],
+            "bad": [
+              "Going flat out on the first one"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Snap Down",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "1 Set",
+              "style": "yellow"
+            },
+            {
+              "label": "×5"
+            }
+          ],
+          "cues": {
+            "good": [
+              "From tall on your toes, snap down into an athletic stance and freeze, as quietly as you can",
+              "Your hips go back and your knees soak it up"
+            ],
+            "bad": [
+              "Landing stiff-legged and taking it through your knees"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Build the Brake",
+      "icon": "🛑",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Jog-In Two-Step Stop",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 m"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Jog in, then kill the speed in two steps and hold the stance",
+              "Feel the last two steps getting wider and lower"
+            ],
+            "bad": [
+              "Slowing down gradually over five or six steps"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Sprint to Two-Step Stop",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 m"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Accelerate hard, then kill it in two steps and hold the stance",
+              "Feel your thighs and glutes absorbing the speed"
+            ],
+            "bad": [
+              "Braking on stiff, straight legs with your weight back on your heels"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Outside Foot",
+      "icon": "👟",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Lateral Run to Outside-Leg Stop",
+          "videoUrl": null,
+          "restSec": 75,
+          "note": "Do the first two at about three-quarter speed, then go flat out.",
+          "chips": [
+            {
+              "label": "6 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×1"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Run out about five metres to the side at full speed, then plant the foot on the side you're heading toward and stop",
+              "Feel the outside leg soaking it up, with your hips low and back"
+            ],
+            "bad": [
+              "Letting the plant knee cave inward"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Plant and Go",
+      "icon": "🎾",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Turn and Go",
+          "videoUrl": null,
+          "restSec": 75,
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×1"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            },
+            {
+              "label": "180° turn",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Run out about ten metres, brake over two steps, plant one foot and turn to sprint back",
+              "Your hips dropping as you brake"
+            ],
+            "bad": [
+              "Planting on a straight leg with your weight leaning out over the foot"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Cut and Go",
+          "videoUrl": null,
+          "restSec": 60,
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×1"
+            },
+            {
+              "label": "max speed",
+              "style": "dark"
+            },
+            {
+              "label": "45° cut",
+              "style": "dark"
+            },
+            {
+              "label": "alternate sides",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Sprint in about ten metres at full speed, plant the foot opposite the way you're going and cut hard off it",
+              "Feel a firm push through the planted foot"
+            ],
+            "bad": [
+              "Planting your foot out in front of you on a straight leg"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "id": "back-under-load",
+  "title": "Iron Back",
+  "category": "care",
+  "countsAs": "strength",
+  "duration": "32 min",
+  "equipment": "Dumbbells",
+  "focusTag": "Lower Back Under Load",
+  "intro": [
+    "This is for a back that's fine lying down and complains when you serve, when you reach low for a volley, or two hours into a match. A doctor or physio has already looked at it and cleared you to train. Stop and get it looked at if you get pain running down a leg, numbness, weakness in a leg or foot, or numbness between your legs. If your bladder or bowel control changes, get seen the same day. Stop and get it looked at too if your back pain started after a fall or a hit, or if it wakes you at night. If your back hurts most of the time, or you've never done anything for it before, start with Steady Spine for a few weeks.",
+    "Leave at least 48 hours between sessions, and don't do it the day before a match. The Take the Edge Off block is fine on its own before you play. Do two holds at an RPE of 6 instead of four. The idea is simple. Your back stays still and stiff while your hips push hard and one arm carries a load. Nothing bends or twists your spine under load. So set the dumbbell on a table or a counter at about hip height, pick it up from there, and put it back the same way. Never lift it off the floor. You need a dumbbell, a table or counter, a bench or a firm sofa pushed against a wall so it can't slide, a broom handle, and about fifteen metres to walk. Walk out and back over that distance and turn by stepping your feet around, not by twisting. No room to walk? Hold the carry in place for thirty seconds. A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If it's no better after about six weeks of doing this, see a physio. See one sooner if it's getting worse or coming on earlier than it used to."
+  ],
+  "blocks": [
+    {
+      "title": "Get the Hips Going",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "5 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk tall with your arms swinging",
+              "Feel your hips and back loosening up"
+            ],
+            "bad": [
+              "Hunching over as you walk"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Dowel Hip Hinge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold a broom handle along your spine and push your hips back",
+              "Feel the backs of your thighs load as you hinge"
+            ],
+            "bad": [
+              "Rounding your back away from the handle"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×12 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Feel your glutes squeeze at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Quadruped Thoracic Rotation",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
+              "Feel the turn in your ribs and upper back"
+            ],
+            "bad": [
+              "Turning from your lower back"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Dead Bug",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×8 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie on your back with your knees over your hips and lower the opposite arm and leg slowly",
+              "Feel your lower back staying flat against the floor"
+            ],
+            "bad": [
+              "Letting your back arch as the leg goes down"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Take the Edge Off",
+      "icon": "🛡️",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Suitcase Hold",
+          "videoUrl": null,
+          "restSec": 30,
+          "note": "On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×25s Each Side"
+            },
+            {
+              "label": "Tempo Iso"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold one dumbbell at your side and stand dead tall",
+              "Feel the side of your waist away from the weight working to keep you level"
+            ],
+            "bad": [
+              "Letting your ribs sag toward the weight"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Load It",
+      "icon": "💪",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Dumbbell Split Squat",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "If your back feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Each Side"
+            },
+            {
+              "label": "Tempo 3-0-1-0"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Hold the dumbbell at your side and a wall with your other hand, step back into a long stance and lower your back knee straight down",
+              "Feel your front thigh and glute doing the work while your body stays tall"
+            ],
+            "bad": [
+              "Leaning your body toward the weight"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Single-Leg Hip Thrust",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×10 Each Side"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "2s top hold",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest your upper back on a bench and drive your hips up until your body is flat, with a dumbbell on your hip once bodyweight feels easy",
+              "Feel your glute doing the work, not your lower back"
+            ],
+            "bad": [
+              "Arching your lower back to get your hips higher"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Suitcase Carry",
+          "videoUrl": null,
+          "restSec": 45,
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×30 m Each Side"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk tall with one dumbbell at your side and your eyes on a spot ahead",
+              "Feel the side of your waist stopping the weight from pulling you over"
+            ],
+            "bad": [
+              "Leaning away from the weight"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,258 @@
+{
+  "id": "knee-and-achilles-loading",
+  "title": "Quiet Knee",
+  "category": "care",
+  "countsAs": "strength",
+  "duration": "32 min",
+  "equipment": "Bodyweight",
+  "focusTag": "Knee, Achilles & Ankle",
+  "intro": [
+    "This is for a sore knee, Achilles or ankle that a doctor or physio has already looked at and cleared you to train. Slow, controlled loading of the leg suits all three, so one session covers them. If only one is sore, that's fine, the session still fits. The balance work matters most if you've sprained that ankle before. Stop and get it looked at if you felt a snap or a pop and lost your push-off, if the knee gives way, locks or keeps swelling, if you can't put your full weight on it, if it swelled up fast after a twist or a landing, or if one calf is swollen, warm or tender and you didn't strain it playing. That one needs a doctor the same day.",
+    "Leave at least 48 hours between sessions. Don't do it the day after braking or change-of-direction work on court, or the day before a match. Skip it too if the leg is still hammered from something else. This one costs something, so treat it like training. Slow and heavy is the whole dose. Wherever it hurts, find the depth or the step height where it stays quiet and work there. The position that hurts is the wrong position. You need a wall or a rail and a low step, and nothing here jumps or hops. On a flared-up day, do just the Wall Sit block at an RPE of 6 and don't mark the session done. The Wall Sit is fine on its own before you play. Do two holds at an RPE of 6 instead of four. A bit of ache is fine. Sharp pain isn't, and neither is pain that builds through a set or feels worse the next morning. If it builds, stop that exercise. If it's sharp, stop the session. If it's no better after about six weeks of doing this, see a physio. See one sooner if it's getting worse or coming on earlier than it used to."
+  ],
+  "blocks": [
+    {
+      "title": "Get Moving",
+      "icon": "🚶",
+      "exercises": [
+        {
+          "type": "simple",
+          "name": "Easy Walk",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "4 minutes"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Walk at an easy pace and roll through each foot",
+              "Feel your ankles and knees warming up"
+            ],
+            "bad": [
+              "Shuffling flat-footed"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Ankle Dorsiflexion Rocks",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×10 Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Drive the knee forward over your toes with your heel down",
+              "Feel your ankle glide forward, only as far as it stays comfortable"
+            ],
+            "bad": [
+              "Pushing on into pain at the back of the heel or a pinch at the front of the ankle"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Tibialis Raise",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×15 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lean back against a wall with your feet a step out and lift your toes toward your shins",
+              "Feel the muscle along the front of your shin"
+            ],
+            "bad": [
+              "Bending at the hips to help the lift"
+            ]
+          }
+        },
+        {
+          "type": "simple",
+          "name": "Glute Bridge",
+          "videoUrl": null,
+          "chips": [
+            {
+              "label": "×12 Reps"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Push the floor away through your heels",
+              "Feel your glutes squeeze at the top"
+            ],
+            "bad": [
+              "Arching your lower back to lift higher"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Single-Leg Balance",
+          "videoUrl": null,
+          "restSec": 20,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×30s Each Side"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stand on one foot next to a wall and look straight ahead, then turn your head slowly side to side",
+              "Feel the small muscles around your ankle working to keep you steady"
+            ],
+            "bad": [
+              "Standing away from the wall, where a wobble puts you on the floor"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Take the Edge Off",
+      "icon": "🛡️",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Wall Sit",
+          "videoUrl": null,
+          "restSec": 25,
+          "note": "Let pain set the depth, and if it feels easier than a 7 at a depth that stays quiet, hold it for the full time anyway.",
+          "chips": [
+            {
+              "label": "4 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×45s"
+            },
+            {
+              "label": "Tempo Iso"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Rest your back flat against the wall with your feet a step out and hold",
+              "Feel your thighs working, not the front of your knees"
+            ],
+            "bad": [
+              "Sliding down deeper than the depth where it stays quiet"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "title": "Load It",
+      "icon": "💪",
+      "exercises": [
+        {
+          "type": "standard",
+          "name": "Lateral Step-Down",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "If your knee, Achilles or ankle feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×8 Each Side"
+            },
+            {
+              "label": "Tempo 3-0-1-0"
+            },
+            {
+              "label": "RPE 7"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stand on the bottom stair with a hand on a wall or rail, slowly lower the other heel toward the floor, then tap and come back up",
+              "Feel your standing thigh and hip controlling the lowering"
+            ],
+            "bad": [
+              "Letting your standing knee cave inward"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Single-Leg Calf Raise",
+          "videoUrl": null,
+          "restSec": 45,
+          "note": "Once the bodyweight version feels easier than a 7, hold something heavy in the other hand and add weight before you add reps.",
+          "chips": [
+            {
+              "label": "3 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×12 Each Side"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "3s eccentric",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Stand on flat floor with a fingertip on the wall, rise onto the ball of one foot, then take three seconds to lower",
+              "Feel the calf and Achilles taking the load"
+            ],
+            "bad": [
+              "Bouncing at the bottom"
+            ]
+          }
+        },
+        {
+          "type": "standard",
+          "name": "Side-Lying Hip Abduction",
+          "videoUrl": null,
+          "restSec": 30,
+          "chips": [
+            {
+              "label": "2 Sets",
+              "style": "yellow"
+            },
+            {
+              "label": "×15 Each Side"
+            },
+            {
+              "label": "RPE 7"
+            },
+            {
+              "label": "2s top hold",
+              "style": "dark"
+            }
+          ],
+          "cues": {
+            "good": [
+              "Lie on your side with your bottom knee bent and lift the top leg straight up and back a little",
+              "Feel the side of your hip working"
+            ],
+            "bad": [
+              "Rolling your hips backward to lift the leg higher"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
