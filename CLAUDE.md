@@ -759,10 +759,15 @@ asset shelf row in `Content/DESIGN-ATLAS.md`.
 
 **Generating pictures is the `/image` skill** (`.claude/skills/image/SKILL.md`) — Higgsfield is
 connected, so Claude writes the prompt, generates, downloads, judges, grades and ships without
-Amir touching the tool. Read it before writing a prompt: it carries the settings that work
-(medium/1k, **1 credit per 2 images**, a **~4-at-a-time rate limit that fails a big batch
-silently**), the prompt formula, the subjects that have failed, and `tools/gate.py`, which judges
-a candidate through the destination's **own scrim** rather than on the raw file. ⚠️ **It spends
+Amir touching the tool. Read it before writing a prompt. **Its Step 0 is "look at what we already
+have"** (Amir, 2026-09-20: *"have a look at what we already have, so we can reuse and we don't have
+to regenerate"*): run `tools/shelf.py` for a contact sheet of every shipped picture, search
+`LEDGER.md` for what each one shows, and walk the reuse ladder (as it is, mirror, re-crop, `bench/`,
+unused candidates) before generating anything. The skill also carries the settings that work
+(medium/1k, **1 credit per image**, a shared rate limit that rejects part of a big batch, so submit
+6 at a time), the prompt formula, the subjects that have failed, `tools/crop.py` (what the 2.9:1
+course card really shows) and `tools/gate.py`, which judges a candidate through the destination's
+**own scrim** rather than on the raw file. ⚠️ **It spends
 real credits from a pot shared with Amir's own generations, so never generate unless he asked for
 that run** (Amir, 2026-09-20: *"wait untill i say to generate more"*). Its *Learned the hard way*
 log is where each round's lessons go.
