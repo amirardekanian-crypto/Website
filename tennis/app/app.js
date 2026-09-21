@@ -1360,7 +1360,12 @@
       title: 'قبل از اولین جلسه، این را بخوان',
       body: `چه وقت تمرین نکن، و با چه علامت‌هایی باید همان‌جا دست نگه داری و پیش پزشک بروی.
              یک بار خواندنش کافی است.`,
-      hash: '#/start', sel: () => tq('#safety'), when: () => !!tq('#safety')
+      // ⚠️ `when` runs when the step list is BUILT, which is wherever the tour was
+      // started from — the guide screen, on a replay. So it asks the content
+      // whether viewStart() will draw this accordion, never the DOM: testing the
+      // DOM silently dropped the one step that names the red flags, on the one
+      // path somebody took deliberately. `sel` stays lazy; only this is eager.
+      hash: '#/start', sel: () => tq('#safety'), when: () => !!(C.start && C.start.safety)
     });
 
     S.push({
