@@ -38,6 +38,18 @@ selection, video prompts, edit plan, review:
 The blank is `.claude/skills/ad/BRIEF-TEMPLATE.md`; the pipeline is `.claude/skills/ad/SKILL.md`.
 Shot-list craft: `SHOTS.md`. Higgsfield prompts for the three optional clips: `PROMPTS.md`.
 
+## Working folders
+
+- **`takes/`** — Amir's filmed takes go here. It is the only way a recording reaches Claude; the web
+  sessions cannot download from Higgsfield, though they can upload to it.
+- **`clips/`** — Higgsfield clips after Amir downloads them. Three already generated and waiting in
+  his gallery; job ids in `.claude/skills/ad/LEDGER.md`.
+
+⚠️ **Amir writes his own scripts when he wants to** (2026-09-21) — that is **Route B** in
+`.claude/skills/ad/SKILL.md`, and it makes a better edit than Route A because the beats come from
+his real delivery. The scripts in the five briefs below stay as drafts for the ads he does not
+rewrite.
+
 ## Decisions (Amir, 2026-09-21)
 
 - **Ad 05 goes to WhatsApp, not the demo.** It is the only ad that asks for money, so it runs to

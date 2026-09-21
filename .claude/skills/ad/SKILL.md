@@ -40,6 +40,37 @@ sessions once generated the same twelve pictures in the same minute.
 `BRIEF-TEMPLATE.md` and filled in as you go. It is the ad's record, it is versioned, and the next
 session reads it instead of guessing.
 
+## ⚠️ Two ways in — check which one this is
+
+**Route A · from scratch.** Stages 1–17 in order. Claude writes the script at stage 10 and Amir
+films it. This is what the five current briefs were built through.
+
+**Route B · Amir brings the script and the take** (his preferred way, stated 2026-09-21: *"if I come
+up with a script, and then record 30-45 sec of me talking on the phone, can we generate some videos
+to put on screen and add some motion graphics?"*). **Yes — and it makes a better edit**, because the
+beats come from his real delivery instead of a planned timing.
+
+When his files are in `Content/tps-ads/takes/`:
+
+1. **Watch and time the take first.** Build the beat sheet from where he actually pauses and
+   breathes — those gaps are where the cutaways land. Stages 9 and 10 are *read off the take*, not
+   written.
+2. **Then fill stages 1–6 backwards from what he said.** Which problem does it open on, which
+   objection does it kill, what is the one ask? If the take has no ask in it, say so — that is the
+   most common thing missing from a self-written script, and it is fixable with an end card rather
+   than a reshoot.
+3. **Stage 11 onward runs normally.** Roughly **one cutaway per 5–8 seconds**, so a 40-second take
+   wants 5–8 b-roll moments. Reuse pass first: 78 graded stills in `assets/tps/` and `assets/art/`,
+   the three clips of 2026-09-21, and real app captures will cover most of it.
+4. **Motion graphics are free** — the reel engine (`.claude/skills/reel/SKILL.md`), not credits.
+   Vazirmatn, RTL, Persian numerals, clay the only accent, count-ups, clay-line wipes running right
+   to left, the button at the end.
+5. **His voice is the only audio.** Generated clips are silent by design; he adds music in Instagram.
+
+⚠️ **Route B still passes the stage 17 review.** A script he wrote himself has not been through the
+refusal list — check it for a named coach, a promised result on a timeline, fear, and any price that
+is not the Iran price.
+
 ## PART A · THE BRIEF — settle all six before a single creative thought
 
 If any of these six cannot be filled in, there is no ad yet. Ask Amir rather than inventing one.
