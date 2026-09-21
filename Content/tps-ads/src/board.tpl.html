@@ -1,0 +1,257 @@
+<title>Five Ads for the Tennis Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Vazirmatn:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --ground:#0B140F; --surface:#111E17; --surface2:#0D1812; --raise:#16261E;
+    --clay:#C7552F; --clay2:#E06B43;
+    --paper:#FAF7F2; --muted:#9BAAA1; --dim:#6E8077;
+    --line:rgba(250,247,242,.12); --line2:rgba(250,247,242,.07);
+    --disp:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+    --body:"Barlow",system-ui,-apple-system,sans-serif;
+    --fa:"Vazirmatn","Segoe UI",Tahoma,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--paper);
+    font-family:var(--body); font-size:15px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding-inline:20px; padding-block:0 72px}
+  a{color:var(--clay2)}
+
+  /* ---------- masthead ---------- */
+  .mast{padding-block:56px 40px; border-bottom:1px solid var(--line)}
+  .kicker{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.16em;
+    font-size:13px; font-weight:600; color:var(--clay2); margin:0 0 14px
+  }
+  .mast h1{
+    font-family:var(--disp); font-weight:700; text-transform:uppercase;
+    font-size:clamp(38px,8vw,76px); line-height:.95; letter-spacing:.01em;
+    margin:0 0 18px; text-wrap:balance; max-width:16ch;
+  }
+  .mast h1 em{font-style:normal; color:var(--clay2)}
+  .lede{max-width:62ch; color:var(--muted); font-size:17px; margin:0 0 26px}
+  .lede strong{color:var(--paper); font-weight:600}
+  .facts{display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none}
+  .facts li{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.09em;
+    font-size:12px; font-weight:600; color:var(--muted);
+    border:1px solid var(--line); border-radius:2px; padding:6px 10px;
+  }
+  .facts li b{color:var(--paper); font-weight:700}
+
+  /* ---------- ad entries ---------- */
+  .ads{display:flex; flex-direction:column; gap:0}
+  .ad{
+    display:grid; grid-template-columns:300px minmax(0,1fr); gap:38px;
+    padding-block:46px; border-bottom:1px solid var(--line2); align-items:start;
+  }
+  .framecol{position:sticky; top:24px}
+  .frame{
+    position:relative; border-radius:3px; overflow:hidden;
+    aspect-ratio:9/16; background:#000; border:1px solid var(--line);
+  }
+  .frame img{width:100%; height:100%; object-fit:cover; display:block}
+  .scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(to top,rgba(4,10,7,.93) 0%,rgba(4,10,7,.55) 34%,rgba(4,10,7,.05) 62%);
+  }
+  .hooklay{position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between; padding:16px 18px}
+  .num{
+    font-family:var(--disp); font-size:40px; font-weight:700; line-height:1;
+    color:var(--paper); opacity:.34; align-self:flex-start;
+  }
+  .hook{
+    font-family:var(--fa); font-weight:700; font-size:23px; line-height:1.65;
+    margin:0; text-align:right; color:var(--paper);
+    text-shadow:0 2px 18px rgba(0,0,0,.8);
+  }
+
+  .adhead{margin-bottom:20px}
+  .role{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.15em;
+    font-size:12px; font-weight:600; color:var(--clay2); display:block; margin-bottom:8px;
+  }
+  .adhead h2{
+    font-family:var(--disp); text-transform:uppercase; font-weight:700;
+    font-size:clamp(26px,4.4vw,38px); line-height:1.02; margin:0 0 12px; letter-spacing:.01em;
+  }
+  .fatitle{
+    font-family:var(--fa); text-transform:none; font-weight:500;
+    font-size:.55em; color:var(--dim); letter-spacing:0; white-space:nowrap;
+  }
+  .chip{
+    display:inline-block; font-family:var(--disp); text-transform:uppercase;
+    letter-spacing:.1em; font-size:12px; font-weight:700; padding:5px 11px;
+    background:var(--clay); color:var(--paper); border-radius:2px;
+  }
+  .chip.free{background:transparent; color:var(--muted); border:1px solid var(--line)}
+
+  dl.meta{margin:0 0 26px; display:grid; grid-template-columns:auto; gap:0}
+  dl.meta dt{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.13em;
+    font-size:11px; font-weight:600; color:var(--dim); margin-top:15px;
+  }
+  dl.meta dt:first-child{margin-top:0}
+  dl.meta dd{margin:4px 0 0; max-width:68ch; color:var(--paper)}
+  dl.meta.tail dd{color:var(--muted); font-size:14px}
+  dd.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; color:var(--muted)}
+
+  .body h3{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.14em;
+    font-size:12px; font-weight:600; color:var(--dim);
+    margin:0 0 10px; padding-top:18px; border-top:1px solid var(--line2);
+  }
+  ol.beats{list-style:none; margin:0 0 26px; padding:0; counter-reset:b}
+  ol.beats li{
+    display:grid; grid-template-columns:62px minmax(0,1fr); gap:0 16px;
+    padding:11px 0; border-bottom:1px solid var(--line2);
+  }
+  ol.beats li:last-child{border-bottom:0}
+  .t{
+    font-family:var(--disp); font-size:14px; font-weight:600; color:var(--clay2);
+    letter-spacing:.04em; padding-top:1px; font-variant-numeric:tabular-nums;
+  }
+  .d{color:var(--muted); font-size:14px}
+  .fa{
+    font-family:var(--fa); grid-column:2; font-size:16px; font-weight:500;
+    color:var(--paper); margin-top:5px; line-height:1.85; text-align:right;
+  }
+  .prov{
+    grid-column:2; justify-self:start; margin-top:7px;
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.12em;
+    font-size:10px; font-weight:700; padding:3px 7px; border-radius:2px;
+  }
+  .prov.v{background:rgba(31,122,77,.22); color:#7FC4A0; border:1px solid rgba(127,196,160,.3)}
+  .prov.c{background:transparent; color:var(--dim); border:1px solid var(--line)}
+  .prov.d{background:rgba(199,85,47,.18); color:var(--clay2); border:1px solid rgba(224,107,67,.34)}
+  .cap{margin:9px 0 0; font-size:11.5px; color:var(--dim); line-height:1.45; max-width:300px}
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 0; padding:0; list-style:none}
+  .legend li{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--muted)}
+  .status{
+    display:inline-block; font-family:var(--disp); text-transform:uppercase;
+    letter-spacing:.13em; font-size:12px; font-weight:700; padding:6px 12px;
+    border-radius:2px; background:rgba(31,122,77,.2); color:#7FC4A0;
+    border:1px solid rgba(127,196,160,.32); margin-bottom:20px;
+  }
+  .settled{list-style:none; margin:0; padding:0; display:grid; gap:12px}
+  .settled li{
+    display:grid; grid-template-columns:22px minmax(0,1fr); gap:12px;
+    padding-bottom:12px; border-bottom:1px solid var(--line2); font-size:14px; color:var(--muted);
+  }
+  .settled li:last-child{border-bottom:0; padding-bottom:0}
+  .settled b{color:var(--paper); font-weight:600}
+  .settled .mark{font-family:var(--disp); font-size:15px; font-weight:700; color:#7FC4A0; line-height:1.5}
+  .settled .mark.open{color:var(--clay2)}
+  .warn{
+    margin:0; padding:13px 16px; border-left:2px solid var(--clay);
+    background:var(--surface2); color:var(--muted); font-size:14px; border-radius:0 2px 2px 0;
+  }
+
+  /* ---------- money + decisions ---------- */
+  section.block{padding-block:48px; border-bottom:1px solid var(--line)}
+  section.block > h2{
+    font-family:var(--disp); text-transform:uppercase; font-weight:700;
+    font-size:clamp(26px,5vw,40px); line-height:1; margin:0 0 8px; letter-spacing:.01em;
+  }
+  section.block > p.sub{color:var(--muted); margin:0 0 26px; max-width:64ch}
+  .scroll{overflow-x:auto}
+  table{border-collapse:collapse; width:100%; min-width:520px; font-size:14px}
+  th,td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--line2)}
+  th{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.12em;
+    font-size:11px; font-weight:600; color:var(--dim); border-bottom:1px solid var(--line);
+  }
+  td.n{text-align:right; font-variant-numeric:tabular-nums; font-family:var(--disp); font-size:16px; font-weight:600}
+  tr.sum td{border-bottom:0; border-top:1px solid var(--line); padding-top:14px; color:var(--paper); font-weight:600}
+  tr.sum td.n{color:var(--clay2); font-size:20px}
+  td.zero{color:var(--dim)}
+
+  .asks{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-top:6px}
+  .ask{background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:20px}
+  .ask .q{
+    font-family:var(--disp); text-transform:uppercase; letter-spacing:.11em;
+    font-size:12px; font-weight:700; color:var(--clay2); margin:0 0 10px;
+  }
+  .ask p{margin:0; color:var(--muted); font-size:14px}
+  .ask p b{color:var(--paper); font-weight:600}
+
+  .note{
+    margin-top:30px; padding:18px 20px; border:1px dashed var(--line);
+    border-radius:3px; color:var(--muted); font-size:14px; max-width:74ch;
+  }
+  .note b{color:var(--paper); font-weight:600}
+  footer{padding-block:34px; color:var(--dim); font-size:13px}
+
+  @media (max-width:860px){
+    .ad{grid-template-columns:1fr; gap:24px}
+    .framecol{position:relative; top:0; max-width:300px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="kicker">Ad plan · Tennis Performance System · 21 Sep 2026 · draft 3, rebuilt off the interview</p>
+    <h1>Five ads, five <em>real problems</em></h1>
+    <p class="lede">Rebuilt from scratch after the interview. The first draft aimed two of its five ads at an audience that isn't watching and a problem nobody reports — these five each open on something <strong>Amir's customers actually said</strong>, in their words: tired legs in the third set, not being quick to the ball, knee pain from braking, and the belief that the gym will make them slow and bulky. <strong>Every Farsi line is marked</strong> for whether it is the course's own words or my draft, so you can see which <strong>{{DRAFTS}} of the {{LINES}}</strong> are yours to argue with.</p>
+    <ul class="legend">
+      <li><span class="prov v" style="grid-column:auto">verbatim</span> word for word from the course, the page or the button</li>
+      <li><span class="prov c" style="grid-column:auto">from the course</span> its own fact, tightened for the screen</li>
+      <li><span class="prov d" style="grid-column:auto">draft — change it</span> my wording</li>
+    </ul>
+    <ul class="facts">
+      <li>Farsi — <b>all social, confirmed 21 Sep</b></li>
+      <li>Vertical <b>1080×1920</b></li>
+      <li><b>Amir on camera</b> — talking head is the default now</li>
+      <li>Iran prices only — <b>$100 vs $17</b></li>
+      <li>All five would cost <b>12 credits</b></li>
+      <li><b>Nothing generated yet</b></li>
+    </ul>
+    
+  </header>
+
+  <div class="ads">
+<!--CARDS-->
+  </div>
+
+  <section class="block">
+    <h2>What it would cost</h2>
+    <span class="status">Nothing generated · your call, 21 Sep</span>
+    <p class="sub">Balance is <b>96.76</b> and it has not moved. <b>Every clip here is optional</b> — each one has a still already in the shelf that does the job; they buy motion in the first ten seconds, which is where motion is worth most. Paste-ready prompts are in <span class="mono">.claude/skills/ad/PROMPTS.md</span> if you want to run them yourself. Two of the five need nothing generated at all, because the clips they want already exist and were paid for on 20 September. Every price below was preflighted, not estimated.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Ad</th><th>New picture</th><th>New clip</th><th class="n">Credits</th></tr></thead>
+        <tbody>
+          <tr><td>01 · His legs, not his technique</td><td>full-acceleration → 9:16</td><td>push-off + dust, 3s</td><td class="n">4</td></tr>
+          <tr><td>02 · Your own starting number</td><td>the-coin → 9:16</td><td>coin settling, 3s</td><td class="n">4</td></tr>
+          <tr><td>03 · Slow and bulky</td><td class="zero">— reuses the grip picture</td><td class="zero">— reuses the grip clip</td><td class="n zero">0</td></tr>
+          <tr><td>04 · The brake nobody taught you</td><td>braking-mark → 9:16</td><td>brake + dust, 3s</td><td class="n">4</td></tr>
+          <tr><td>05 · A hundred dollars or seventeen</td><td class="zero">— reuses the night master</td><td class="zero">— reuses the night plate</td><td class="n zero">0</td></tr>
+          <tr class="sum"><td>All five</td><td>3 pictures</td><td>3 clips · 3s · silent</td><td class="n">{{TOTAL}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Every clip is 3 seconds, <b>sound off</b>, Cinema Studio v2 on <span class="mono">std</span> — the cheapest settings that show the thing. Balance would go <b>96.76 → {{AFTER}}</b>. Say the word and I start with whichever ad you like; <b>Ad 01 alone is 4 credits</b> if you want to see one finished before the rest.</p>
+  </section>
+
+  <section class="block">
+    <h2>Where this stands</h2>
+    <p class="sub">Two things you settled on 21 September, and what is still open.</p>
+    <ul class="settled">
+      <li><span class="mark">✓</span><span><b>Rebuilt off real problems.</b> Every ad now opens on something a customer actually said. The parents' ad is gone — parents are not in your audience — and the gym-vs-court ad is replaced by the bulk myth, which is a thing people really believe.</span></li>
+      <li><span class="mark">✓</span><span><b>Ad 03 is new, and may be the most valuable.</b> «باشگاه منو کند و حجیم می‌کنه» is the only objection that stops someone before they consider buying anything at all. It is also your own argument from the other side: they fear the gym because the gym they have seen is bodybuilding.</span></li>
+      <li><span class="mark">✓</span><span><b>Iran prices only.</b> $25/month, so about $100 for the same 16 weeks, against $17. The $200 and the £50 UK session are not prices an Iranian player can buy and never appear in a Farsi ad.</span></li>
+      <li><span class="mark">✓</span><span><b>You are in four of the five.</b> Talking head plus b-roll is the default now. Film the whole script in one take — the cutaways hide any stumble.</span></li>
+      <li><span class="mark open">?</span><span><b>The {{DRAFTS}} draft lines</b>, and the hooks above all. Those are the first two seconds and you have to say them out loud.</span></li>
+      <li><span class="mark open">?</span><span><b>Your story.</b> Still the missing piece — it blocks the one angle that answers "I don't trust an online course from anyone", and now that you are on camera it is the ad only you can make.</span></li>
+    </ul>
+  </section>
+
+  <footer>Sources: <span class="mono">tps_content</span> (lessons, tests, blocks), <span class="mono">/tennis/</span>, the demo picks in <span class="mono">tps_02_demo.sql</span>, and the shipped art in <span class="mono">assets/tps/</span>. Previews above are the existing pictures we would recompose — not final frames.</footer>
+
+</div>

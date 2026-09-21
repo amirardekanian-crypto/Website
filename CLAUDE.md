@@ -807,6 +807,27 @@ the thing; report the cost in numbers after.** The same rules hold for pictures.
 list, the prompt craft for a locked camera, `tools/clip_check.py` and a ledger of every picture and clip
 already in the Higgsfield account.
 
+**Selling something is the `/ad` skill** (`.claude/skills/ad/SKILL.md`), built 2026-09-21 from a
+five-round interview with Amir — so it is the first design doc here that records *his* answers
+rather than a reading of his past work. It runs **Amir's own 17-stage pipeline** (his structure, 2026-09-21, with three moves and one
+addition he approved): objective → audience → problem in their words → **the objection it kills** →
+core message → **CTA** → creative idea → emotional direction → *his yes* → storyboard → script →
+shot list → look lock → image prompts → selection → video prompts → edit plan → final review.
+⚠️ **The CTA sits at stage 6, not 14** — the ask decides the film's length, hook and last ten
+seconds, so deciding it late means discovering the ad leads nowhere after it is cut. Reference files:
+`BRAND.md` (who the audience is, the refusals), `STRATEGY.md` (ten angles, thirteen hooks, five
+visual concepts, three CTAs), `SHOTS.md`, `PROMPTS.md`, `WHATSAPP.md` (the reply set, anchored on
+Iran prices — $100 for the same 16 weeks against $17), `LEDGER.md`. **Every ad gets its own brief
+file** in `Content/tps-ads/`, from `BRIEF-TEMPLATE.md`. `/image` and `/video` stay as the craft files it
+calls; `/reel` builds a fully-generated ad.
+⚠️ **Four things it settled that contradict older notes here.** (1) **Amir goes on camera** — face
+and voice, filming himself; every reel before this was animation with no human in it. (2) **Editing
+is his bottleneck**, and he edits in Instagram's own editor, so the deliverable is a **finished
+MP4**, never parts to assemble — he films one take, Claude cuts it. (3) **Parents are not in his
+audience**, so a parent-facing ad can only travel second-hand. (4) The refusal list is now hard:
+**attack the method never the person** (the coaches watching are also who share his work),
+**promise the retest never the result**, **teach soreness-vs-pain never fear**, and no hype editing.
+
 **Reel delivery process (Amir, 2026-07-02 — was too slow first time, fix this):** For a reel,
 the deliverable is **the HTML file itself**, sent via SendUserFile so he can open/preview and
 screen-record it himself. **Do NOT render an MP4 unless he explicitly asks for one** — skip
@@ -820,12 +841,19 @@ explicitly: keep inventing, don't reuse the same set of animations every reel. T
 skill has a toolbox (ambient drift, drawn lines, Ken Burns, typing dots, etc.) as inspiration
 only — treat it as a floor to riff past, not a checklist to satisfy.
 
-**2026-07-02 — content language directive (Amir, verbatim): "we changed everything to
-english, im not creating content in farsi anymore."** Effective immediately: all NEW social
-content (carousels, reels, posts, result cards) is **English**, sharp/uppercase Barlow
-Condensed display per the EN site voice — not a translation of the Farsi template.
-Farsi-specific rules (Vazirmatn, no letter-spacing, no uppercase, Persian numerals, RTL
-mirroring) still apply only if Amir explicitly asks for Farsi again. Older Farsi social
+⚠️ **REVERSED 2026-09-21 — Farsi for everything now.** Amir, asked directly while building the
+`/ad` skill: all new social content is **Farsi** again. The business is Iran-only where it sells
+(the course is priced in Toman and bought over WhatsApp), so English social reached people who
+could not buy. **Farsi typography is back in force everywhere:** Vazirmatn, `dir="rtl"`, **no
+uppercase, no letter-spacing**, Persian numerals, mirrored layouts, wipes running right to left.
+Reel 7 (2026-09-20) already broke the English rule for the course with his say-so; this generalises
+it. The superseded directive is kept below because the shipped English work was built to it.
+
+~~**2026-07-02 — content language directive (Amir, verbatim): "we changed everything to
+english, im not creating content in farsi anymore."**~~ *(superseded 2026-09-21.)* It made all NEW
+social content (carousels, reels, posts, result cards) **English**, sharp/uppercase Barlow
+Condensed per the EN site voice. English work shipped under it (`reel-6-system`,
+`carousel-warmup-tennis`, the EN carousels) stays as built — **never retro-edit a shipped design**. Older Farsi social
 files (`reel-1..3`, `reel-5-system`, the `carousel-*` Farsi decks) are left as shipped —
 reference for mechanics only, not for language/voice.
 **Scope confirmed (Amir, same day): social content only** — the live Farsi **website**
