@@ -45,6 +45,37 @@ document; the board is the visual summary of it.
 **Retired from draft 2**, and why: *Stronger in the gym* (built on a problem Amir does not hear) and
 *New shoes again?* (parents are not in the audience — keep it as a share-driven idea, not cold reach).
 
+## Generated 2026-09-21 — the nine start-picture candidates
+
+9 credits (96.76 → 87.76). `gpt_image_2_5` flare, medium/1k, 9:16, 752×1344, each recomposed from a
+shipped still passed as an `image_references` media. ⚠️ **Claude could not see these** — the session's
+network refuses Higgsfield's CloudFront hosts, so **Amir judged them in the gallery**. Uploads to S3
+worked (200), downloads did not: that asymmetry is worth remembering.
+
+**Source media ids** (reusable for 24h from upload, then re-upload):
+`3eeafb51-13e2-4618-9c81-e2db03db4fe2` full-acceleration ·
+`87e57a85-fce0-45c0-b184-9e3169713c43` the-coin ·
+`4bebf046-2047-4a38-ab66-28203bd6bbb8` braking-mark
+
+| Shown | Slot | For | Job id | Picked? |
+|---|---|---|---|---|
+| 1 | push-off A | Ad 01 | `ba6d189b-7874-4438-95d5-fc7003dbf6a5` | |
+| 2 | push-off B | Ad 01 | `ecaaeff9-fac0-4ac4-90e5-169498f69349` | |
+| 3 | push-off C | Ad 01 | `28b7c675-ec0e-46f7-ae1d-ee9a52491e28` | |
+| 4 | coin A | Ad 02 | `cfbfe236-ccde-4e19-ab70-6d5ec743fd5e` | |
+| 5 | coin B | Ad 02 | `1ca13660-dcae-45cf-85ed-9703f486b7a5` | |
+| 6 | coin C | Ad 02 | `ed1d1fa9-0d71-4ca5-bdf9-9f43d9a2198a` | |
+| 7 | brake A | Ad 04 | `830e380e-0e15-4d0b-a2e5-95d5ddab0f0e` | |
+| 8 | brake B | Ad 04 | `4d26dcc7-cfd8-4c04-ad8c-fb81f2160bd7` | |
+| 9 | brake C | Ad 04 | `f71d9cfb-0426-41fb-8d73-5c79b591af2c` | |
+
+**Next:** the winner's job id goes straight in as `start_image` for its clip (no download needed) —
+3 clips × 3 credits = 9, taking the balance to about 78.76. Prompts: `PROMPTS.md`.
+
+⚠️ **The rate limit is real and shared.** A 6-wide batch had 2 items rejected with
+`429 rate_limit_reached` — **no job id and no charge** — and both went through on the next
+submission. Resubmit only the rejected indexes.
+
 ## Assets already paid for — reuse before generating
 
 Full detail in `.claude/skills/video/SKILL.md`'s ledger. The two that matter most for ads:
