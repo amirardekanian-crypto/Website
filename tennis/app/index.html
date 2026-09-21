@@ -21,12 +21,13 @@
   here run python scripts/stamp_tps_app.py. The handbook itself comes from Supabase (tps_content,
   readable only by an active buyer account) and
   is kept on the phone in IndexedDB, so after the first sign-in the app opens with no connection.
-  Nothing about the buyer is stored or sent; the only preference kept is the age version, in
-  localStorage "tps.prefs".
+  Nothing about the buyer is stored or sent. Two things are kept in localStorage: the age version
+  ("tps.prefs") and whether the guided tour has run ("tps.toured"). The tour (?tour=1 replays it) and
+  the guide screen it leaves behind, #/guide, live in app.js under "The tour and the guide".
   ?demo=1: the demo. No sign-in; Supabase tps_demo() sends only the free parts (supabase/tps_02_demo.sql),
   and this mode alone loads Plausible for a few anonymous events.
   The demo carries Amir's AI pictures (assets/tps/, made by scripts/grade_tps_art.py); app.js
-  ("Pictures") has the rules. They are demo-only until the lesson and test covers are finished.
+  ("Pictures") has the rules. Everyone sees them, demo and buyer alike (2026-09-20).
   Local modes (they need a content or _dev folder, which the website does not have):
     ?local=1, or ?content=<folder>: content from the JSON files next to the app, no sign-in.
     ?stub=1: a fake Supabase (_dev/stub-supabase.js), already signed in.
@@ -66,7 +67,7 @@
   })();
 </script>
 <link rel="preload" href="fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="app.css?v=3c231f45">
+<link rel="stylesheet" href="app.css?v=c46f9816">
 </head>
 <body>
 <div class="sample-bar">نسخهٔ نمونه · در حال ساخت</div>
@@ -157,7 +158,12 @@
 <!-- Step-by-step session mode (full screen). Filled by app.js. -->
 <div id="step" class="step" hidden></div>
 
+<!-- The guided tour's layer: the dimmer, the clay ring and the card. Filled by app.js
+     ("The tour and the guide"). It sits OUTSIDE #view, which every route replaces wholesale,
+     and above #step (z-index 800 vs 100), because the tour walks into step-by-step mode. -->
+<div id="tour" class="tour" hidden></div>
+
 <script defer src="lib/supabase.js"></script>
-<script src="app.js?v=d4acf222" defer></script>
+<script src="app.js?v=ec45e9cc" defer></script>
 </body>
 </html>

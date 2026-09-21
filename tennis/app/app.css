@@ -129,13 +129,17 @@ html:not(.is-local) .sample-bar { display: none; }
   font-size: 20px; line-height: 1;
 }
 .back:active { transform: scale(0.92); }
-.gear {
-  position: absolute; top: 14px; inset-inline-end: 14px;
+/* Both banner buttons ride in one row, so a page can carry the version gear,
+   the guide "؟", or both, without either one moving. */
+.bnav { position: absolute; top: 14px; inset-inline-end: 14px; z-index: 2; display: flex; gap: 8px; }
+.gear, .bhelp {
   width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(0,0,0,0.28); color: #fff;
+  background: rgba(0,0,0,0.28); color: #fff; text-decoration: none;
   display: flex; align-items: center; justify-content: center;
 }
 .gear svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.bhelp { font-size: 20px; font-weight: 900; line-height: 1; }
+.gear:active, .bhelp:active { transform: scale(0.92); }
 
 /* ── Layout ─────────────────────────────────────────────────────────── */
 .section { padding: 16px 16px 4px; }
@@ -492,3 +496,78 @@ html.is-demo .demo-bar { display: flex; justify-content: center; align-items: ce
 /* The session-complete screen. No scrim: nothing is written over this one. */
 .done-art { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
 .done-art .ph::after { content: none; }
+
+/* ── The guided tour (راهنمای تصویری) ─────────────────────────────────
+   A clay ring around a real control, a card beside it saying what that control
+   does, and the rest of the screen dimmed. Built the way habits.html's tour is,
+   with the differences this app forces:
+
+     · Z-INDEX 800 — above the tab bar (20) and above step-by-step mode (100),
+       because the tour walks INTO step mode and rings its buttons. Below the
+       sign-in screen (900): nobody is toured before they are let in.
+     · The dimmer is FOUR PANES with a real hole, never one lid with a
+       transparent window. A step marked `act` is finished by actually doing the
+       thing — tapping the green button really does open the session.
+     · The layer lives outside #view, which every route replaces wholesale.
+     · RTL needs no mirrored rules here: the card is centred and the geometry is
+       in viewport coordinates. Only the arrows are handed (→ back, ← next),
+       matching the app's own .back button and .lr-go rows. */
+.tour { position: fixed; inset: 0; z-index: 800; pointer-events: none; }
+.tour[hidden] { display: none !important; }
+.tourmask, .tourblock { position: fixed; pointer-events: auto; background: rgba(8,38,27,0.66); }
+.tourblock { background: none; }
+.tour.opening .tourmask { animation: tourFade .22s ease; }
+@keyframes tourFade { from { opacity: 0; } to { opacity: 1; } }
+.tourring {
+  position: fixed; pointer-events: none; border: 3px solid var(--clay);
+  border-radius: 14px; animation: tourPulse 1.7s ease-in-out infinite;
+}
+@keyframes tourPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,0.55); }
+  50%      { box-shadow: 0 0 0 9px rgba(199,85,47,0); }
+}
+.tourcard {
+  position: fixed; pointer-events: auto; background: var(--white);
+  border-radius: 18px; border-top: 4px solid var(--clay);
+  box-shadow: 0 18px 44px rgba(8,38,27,0.34);
+  padding: 15px 17px 14px; display: flex; flex-direction: column; gap: 9px;
+  animation: tourRise .22s ease;
+  /* Bounded, so the ring always has somewhere to be. On a short phone an
+     unbounded card is over half the viewport and no placement leaves the thing
+     it is describing visible. The prose scrolls; title and buttons never move. */
+  max-height: 58vh;
+}
+@keyframes tourRise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+.tourcard .tourbody { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.tourcard .tourbody::-webkit-scrollbar { width: 0; }
+.tourcard .tourtop { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.tourcard h4 { font-size: 19px; font-weight: 900; line-height: 1.45; min-width: 0; }
+.tourcard .tourn { font-size: 12px; font-weight: 800; color: var(--clay); flex: none; }
+.tourcard p { font-size: 14.5px; line-height: 1.75; color: var(--muted); }
+.tourcard p b { color: var(--ink); font-weight: 800; }
+.tourcard .tourhint { color: var(--clay); }
+.tourcard .tournav { display: flex; gap: 8px; align-items: stretch; margin-top: 2px; }
+.tourcard .tournav .btn { flex: 1; padding: 12px 14px; }
+.tourcard .tournav .tourback { flex: none; width: 50px; font-size: 17px; font-weight: 800; }
+.tourskip { align-self: flex-start; font-size: 12.5px; font-weight: 700; color: var(--muted); padding: 4px 0 0; }
+/* The pointing finger: a plain clay triangle off the card's edge. */
+.tourcard .tourtip { position: absolute; width: 0; height: 0; }
+.tourcard .tourtip.up   { top: -9px;    border-inline: 9px solid transparent; border-bottom: 9px solid var(--clay); }
+.tourcard .tourtip.down { bottom: -9px; border-inline: 9px solid transparent; border-top: 9px solid var(--white); }
+
+/* ── The guide screen (#/guide) — the map the tour leaves behind ────────
+   The tour is 90 seconds and then gone; this is what someone opens in week 9
+   when they cannot remember where the Yo-Yo beeps live. Every row is a real
+   link, so it is navigation as well as an explanation. */
+.guide-row { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--line); text-decoration: none; }
+.guide-row:last-child { border-bottom: 0; }
+.guide-row .gi { flex: none; width: 38px; height: 38px; border-radius: 11px; background: var(--green-dim); color: var(--green);
+  display: flex; align-items: center; justify-content: center; font-size: 19px; }
+.guide-row .gi svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.guide-row .gb { flex: 1; min-width: 0; }
+/* Both are spans inside one .gb, so they need to be blocks or the name runs
+   straight into the description with no space between them. */
+.guide-row .gt { display: block; font-size: 16px; font-weight: 800; line-height: 1.5; }
+.guide-row .gs { display: block; font-size: 14px; color: var(--muted); line-height: 1.7; }
+.guide-row .gg { flex: none; color: var(--muted); font-size: 17px; align-self: center; }
+.guide-row:active { opacity: 0.6; }
