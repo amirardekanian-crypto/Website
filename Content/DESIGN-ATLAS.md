@@ -194,7 +194,14 @@ Site CSS: [`tokens.css`](../assets/css/tokens.css) → [`base.css`](../assets/cs
 - **Cool names, never literal.** When naming anything, bring 3–4 evocative options and let him pick.
 - **Cinematic photo grade:** moody, green-leaning shadows, warm cream highlights, muted saturation — except in-frame clay/terracotta accents, which may pop. Grade all frames off one base.
 - **Accuracy gate:** he holds two MSc's and fact-checks physiology. Simple round figures, no on-slide math, no invented numbers/results/names. Zone 2 ≠ fixed %HRmax.
-- **Farsi-first social** (warm Tehrani, general-fitness audience); English site voice sharp/athletic (tennis/padel). Match facts across languages, never wording.
+- **Farsi for all social, confirmed 2026-09-21** (reversing the 2026-07-02 English-only directive):
+  warm Tehrani, **tennis & padel** — not general fitness. Vazirmatn, no uppercase, no letter-spacing,
+  Persian numerals, RTL. English site voice stays sharp/athletic for the EN site only. Match facts
+  across languages, never wording.
+- **Ads have their own skill and their own brief:** `.claude/skills/ad/` — `BRAND.md` (who the
+  audience is and the four hard refusals), `STRATEGY.md` (seven angles, hooks, CTA ladder).
+  Read those before designing anything that sells. **Amir is on camera now** (2026-09-21), so
+  talking-head plus b-roll is the default ad shape, not fully-generated animation.
 - He gives **blunt feedback** — normal, not a problem. Push back when something's off; fix at the source.
 - **Ship it live:** commit → push → PR → merge; verify with headless renders before merging.
 

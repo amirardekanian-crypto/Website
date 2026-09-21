@@ -1,9 +1,13 @@
 ---
 name: video
-description: Generate video clips (footage) for Amir's brand ads with the connected Higgsfield MCP — Amir's spend protocol (show a plan and wait for yes, reuse before generating, sound off, 3 seconds), the start-picture-then-clip pipeline, prompt craft for a locked camera, the price list, judging a clip, trimming, and how a clip goes into a reel. Use whenever Amir asks for footage, a clip, b-roll, a video plate, "real video" in an ad, or to animate a picture. Read it before writing a single prompt.
+description: Generate video clips (footage) for Amir's brand ads with the connected Higgsfield MCP. The craft file the `/ad` skill calls at its prompt stage — for a whole ad (angle, hook, script, shot list, then prompts) start at `/ad`, not here. Covers Amir's spend protocol (show a plan and wait for yes, reuse before generating, sound off, 3 seconds), the start-picture-then-clip pipeline, prompt craft for a locked camera, the price list, judging a clip, trimming, and how a clip goes into a reel. Use whenever Amir asks for footage, a clip, b-roll, a video plate, "real video" in an ad, or to animate a picture. Read it before writing a single prompt.
 ---
 
 # Generating video clips — AA Performance
+
+> **Making a whole ad? Start at `.claude/skills/ad/SKILL.md`.** It owns the brand, the angle, the
+> hook, the Farsi script and the shot list, and reaches this file only at its step 7, for the shots
+> that survived the reuse pass. This file is the clip craft and the spend protocol, and both bind there.
 
 Claude generates, downloads, judges and trims clips itself through the Higgsfield MCP (first used
 2026-09-20). This file is the protocol, the craft and the price list. It is the sister of **`/image`**:

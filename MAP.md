@@ -129,7 +129,12 @@ The brain behind every program. Read the principles before touching sets/reps.
 [gate tool](.claude/skills/image/tools/gate.py), grading and shipping) ·
 [`video`](.claude/skills/video/SKILL.md) (generate video clips for ads — start picture first, the
 3-second rule, the price list, the [clip check tool](.claude/skills/video/tools/clip_check.py) and a
-ledger of what already exists in the Higgsfield account).
+ledger of what already exists in the Higgsfield account) ·
+**[`ad`](.claude/skills/ad/SKILL.md) (build an ad that sells — start here for anything selling, not
+at `/video`)**: the [brand and audience brief](.claude/skills/ad/BRAND.md) from Amir's own
+interview, the [angle bank](.claude/skills/ad/STRATEGY.md) (seven angles, hook shapes, CTA ladder),
+then script → shot list → Higgsfield prompts → a finished MP4, logged in
+[`LEDGER.md`](.claude/skills/ad/LEDGER.md).
 
 ---
 
