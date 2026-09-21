@@ -14,6 +14,7 @@ files beside it are the content.
 |---|---|---|
 | **`BRAND.md`** | Who Amir is, who is watching, what he will never do. The interview, not my inference. | **Step 0, every run.** |
 | **`STRATEGY.md`** | Seven angles, the problem→angle map, hook shapes, the CTA ladder, visual shapes. | Step 2. |
+| **`WHATSAPP.md`** | What Amir sends when someone messages — the price anchor, the objections, the routing. | Step 3, for any ad whose ask is WhatsApp. |
 | **`LEDGER.md`** | Every ad made, what it cost, what it did. | Step 0 (read) and step 9 (write). |
 | `.claude/skills/image/SKILL.md` | Prompt craft, settings, real prices, judging, grading. **Its Step 0 is the reuse pass.** | Steps 5 and 7. |
 | `.claude/skills/video/SKILL.md` | The clip pipeline and the spend protocol. | Steps 6 and 7. |
@@ -93,8 +94,10 @@ Write it as a table so it can be filmed and cut from one document:
 - **On-screen text is not the script repeated.** It carries the number, the word or the name his
   voice cannot spell — three or four words at most, and Persian numerals.
 - **The last line is the one ask**, in the destination's own words.
-- **If the ask is WhatsApp, write his first reply too** (BRAND §8). The ad is not finished without
-  it.
+- **If the ask is WhatsApp, the matching reply from `WHATSAPP.md` ships with the ad** (BRAND §8) —
+  usually T3, since most people open by asking the price. Adapt it to this ad's promise rather than
+  writing a new one, and **keep the price anchor exactly as it is**: $17 once against ~$100 for the
+  same 16 weeks of personal coaching.
 
 Check the finished script against the refusal list before showing it: no named coach, no promised
 outcome on a timeline, no fear, no invented number.

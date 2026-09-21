@@ -70,8 +70,25 @@ real message, quoted, is worth more than the whole table. Ask him again; put it 
 2. **They think they can find it free on YouTube.**
 3. **They want a real coach watching them.**
 
-⚠️ **All three attack the format, not the price.** Self-guided, online, pre-made, nobody watching.
-$17 is not the obstacle. So an ad that only *describes the course well* does nothing — it has to
+### And a fourth, which is the one they say out loud first
+
+**Most people open with «قیمت؟» before any value has been established** (Amir, 2026-09-21).
+**He thinks $17 is very cheap. They hear it as expensive.** That is not a price problem, it is a
+**unit problem** — they are comparing $17 against nothing.
+
+The fix is an anchor, and the honest one is his own coaching: the personal programme is
+**معادلِ ۲۵ دلار در ماه**, so the same 16 weeks costs about **$100**. The course covers those 16
+weeks for **$17**, at their own speed, with no expiry. Roughly six times less, for the same period,
+and every number is checkable on his own pages.
+
+⚠️ **Amir said "3 times this price for a month" on 2026-09-21; his live Farsi page says $25/month,
+which is 1.5×.** The per-period comparison above is both true and stronger, so it is what the
+templates use. **If he has raised the Iran coaching price, `index-fa.html`, `Content/PRODUCT.md` and
+`WHATSAPP.md` all need to move together** — a sales line that contradicts the public page is worse
+than no line.
+
+⚠️ **The first three objections attack the format, not the price.** Self-guided, online, pre-made,
+nobody watching. $17 is not the real obstacle even when price is the word they use. So an ad that only *describes the course well* does nothing — it has to
 answer *why him*, *why not free*, and *why nobody is watching me*. An ad that answers none of the
 three is not an ad, it is a brochure.
 
@@ -97,6 +114,20 @@ the engine of most angles:
 you a baseline and a retest. A man with a stopwatch looks like someone who knows more than your
 coach. Lead with measurement when there is no reason to lead with something else — see
 `STRATEGY.md` §A1.
+
+### What the product is — his words (2026-09-21)
+
+The first statement of the value proposition from Amir rather than from the page:
+
+- **The cheaper way to get his method** than the personal coaching he sells.
+- **Structured progression** — it builds on itself, rather than being a pile of workouts.
+- **Education, not just prescription** — how to perform each movement, plus the lessons.
+- **Everything a tennis player needs, in one place.**
+- **Home, gym and on court** — all three.
+- **Every physical quality a tennis player needs, based on science.**
+
+⚠️ **Never phrase it as the "cheap version".** Same method, self-guided, at a price anyone can do.
+What differs is who does the thinking week to week, not the quality of the training.
 
 **The existing mantra still holds:** «هیچی بی‌دلیل نیست» — nothing without a reason. It is already
 the coaching app's spine (`Content/PRODUCT.md`) and it is the same idea as (3) pointed inward.
@@ -216,6 +247,9 @@ Writing him that first-reply template is part of the CTA layer, not an afterthou
 
 ## Changelog
 
+- **2026-09-21 (later)** — Amir added the value proposition in his own words (§3) and the price
+  conversation (§2): they ask the price first, and hear $17 as expensive. Recorded the anchor and
+  the discrepancy between his "3 times" and his live page's $25/month. `WHATSAPP.md` created.
 - **2026-09-21** — Created from the five-round interview. Established: the course as the thing being
   sold, organic-only, WhatsApp as the number, the three customer problems, the three format
   objections, "knows more than your coach" as the position, measurement as the spine, Amir on camera
