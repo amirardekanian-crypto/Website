@@ -133,8 +133,12 @@ ledger of what already exists in the Higgsfield account) ·
 **[`ad`](.claude/skills/ad/SKILL.md) (build an ad that sells — start here for anything selling, not
 at `/video`)**: the [brand and audience brief](.claude/skills/ad/BRAND.md) from Amir's own
 interview, the [angle bank](.claude/skills/ad/STRATEGY.md) (seven angles, hook shapes, CTA ladder),
-then script → shot list → Higgsfield prompts → a finished MP4, logged in
-[`LEDGER.md`](.claude/skills/ad/LEDGER.md).
+then Amir's own **17-stage pipeline** — objective → audience → problem → objection → message → CTA →
+idea → emotion → storyboard → script → [shot list](.claude/skills/ad/SHOTS.md) → look lock →
+[image prompts](.claude/skills/ad/PROMPTS.md) → selection → video prompts → edit plan → review.
+One [brief per ad](Content/tps-ads/) from [`BRIEF-TEMPLATE.md`](.claude/skills/ad/BRIEF-TEMPLATE.md);
+[`WHATSAPP.md`](.claude/skills/ad/WHATSAPP.md) is what he sends when someone replies;
+[`LEDGER.md`](.claude/skills/ad/LEDGER.md) records what each ad cost and did.
 
 ---
 

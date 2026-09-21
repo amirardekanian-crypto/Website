@@ -784,10 +784,16 @@ already in the Higgsfield account.
 
 **Selling something is the `/ad` skill** (`.claude/skills/ad/SKILL.md`), built 2026-09-21 from a
 five-round interview with Amir — so it is the first design doc here that records *his* answers
-rather than a reading of his past work. It owns the whole chain: the brand and audience definition
-(`BRAND.md`), the seven angles, hook shapes and CTA ladder (`STRATEGY.md`), then the Farsi script,
-the shot list, and only at the end the Higgsfield prompts for whatever is still missing
-(`LEDGER.md` records what each ad cost and did). `/image` and `/video` stay as the craft files it
+rather than a reading of his past work. It runs **Amir's own 17-stage pipeline** (his structure, 2026-09-21, with three moves and one
+addition he approved): objective → audience → problem in their words → **the objection it kills** →
+core message → **CTA** → creative idea → emotional direction → *his yes* → storyboard → script →
+shot list → look lock → image prompts → selection → video prompts → edit plan → final review.
+⚠️ **The CTA sits at stage 6, not 14** — the ask decides the film's length, hook and last ten
+seconds, so deciding it late means discovering the ad leads nowhere after it is cut. Reference files:
+`BRAND.md` (who the audience is, the refusals), `STRATEGY.md` (ten angles, thirteen hooks, five
+visual concepts, three CTAs), `SHOTS.md`, `PROMPTS.md`, `WHATSAPP.md` (the reply set, anchored on
+Iran prices — $100 for the same 16 weeks against $17), `LEDGER.md`. **Every ad gets its own brief
+file** in `Content/tps-ads/`, from `BRIEF-TEMPLATE.md`. `/image` and `/video` stay as the craft files it
 calls; `/reel` builds a fully-generated ad.
 ⚠️ **Four things it settled that contradict older notes here.** (1) **Amir goes on camera** — face
 and voice, filming himself; every reel before this was animation with no human in it. (2) **Editing

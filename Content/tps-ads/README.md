@@ -25,8 +25,18 @@ not watching (parents) and a problem nobody reports (not knowing what to do in t
 before they consider buying anything, and it is Amir's own argument from the other side: they fear
 the gym because the gym they have seen is bodybuilding.
 
-Shot lists for all five: `.claude/skills/ad/SHOTS.md`. Higgsfield prompts for the three optional
-clips: `.claude/skills/ad/PROMPTS.md`.
+**Each ad has its own brief**, all 17 stages of Amir's pipeline filled in — objective, audience,
+problem, objection, message, CTA, idea, emotion, storyboard, script, shot list, look lock, prompts,
+selection, video prompts, edit plan, review:
+
+- [`ad-01-the-match-you-lost.md`](ad-01-the-match-you-lost.md)
+- [`ad-02-your-own-starting-number.md`](ad-02-your-own-starting-number.md)
+- [`ad-03-slow-and-bulky.md`](ad-03-slow-and-bulky.md) ← **film this one first**
+- [`ad-04-the-brake-nobody-taught-you.md`](ad-04-the-brake-nobody-taught-you.md)
+- [`ad-05-a-hundred-or-seventeen.md`](ad-05-a-hundred-or-seventeen.md)
+
+The blank is `.claude/skills/ad/BRIEF-TEMPLATE.md`; the pipeline is `.claude/skills/ad/SKILL.md`.
+Shot-list craft: `SHOTS.md`. Higgsfield prompts for the three optional clips: `PROMPTS.md`.
 
 ## Decisions (Amir, 2026-09-21)
 

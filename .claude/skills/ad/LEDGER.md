@@ -30,8 +30,9 @@ reference for a V2 ad — read its README before building another one.
 ## Planned, not built
 
 **The five ads, draft 3** — rebuilt 2026-09-21 off the angle bank, after the first board turned out
-to aim two of its five at an audience and a problem the interview says are not there. Board:
-`Content/tps-ads/plan-board.html` and the Artifact. Shot lists in `SHOTS.md`.
+to aim two of its five at an audience and a problem the interview says are not there. Board: `Content/tps-ads/plan-board.html` and the Artifact.
+**Each has a full 17-stage brief** at `Content/tps-ads/ad-NN-<slug>.md` — that is the working
+document; the board is the visual summary of it.
 
 | # | Ad | Angle | Problem | Looks | Asks | Credits |
 |---|---|---|---|---|---|---|
