@@ -1,6 +1,9 @@
 /* Tennis Performance System, Level 2 · app logic.
    A content reader, not a fitness app. Nothing about the player is stored or sent.
-   The only preference kept is the chosen version, in localStorage "tps.prefs": { age: "adult" | "u16" }.
+   Nothing is stored but two things, both in localStorage: the chosen version, "tps.prefs":
+   { age: "adult" | "u16" }, and whether the guided tour has run, "tps.toured" (see "The tour and
+   the guide"). The tour is kept out of tps.prefs on purpose: a prefs object existing before a
+   version is chosen would read as "already chosen" everywhere in this file.
    Signed in (the default): the handbook comes from Supabase and is kept on the phone in IndexedDB,
    so it opens with no connection (see "Account and the offline copy" below). ?local=1 or
    ?content=<folder> reads the JSON files next to the app instead (needs a content folder, which the
@@ -452,7 +455,9 @@
     return `<header class="banner ${o.back ? 'has-back' : ''} ${o.art ? 'has-art' : ''}">
       ${artLayer(o.art)}
       ${o.back ? `<button class="back" data-back="${esc(o.back)}" aria-label="بازگشت">→</button>` : ''}
-      ${o.gear ? `<a class="gear" href="#/setup" aria-label="تنظیم نسخه">${GEAR}</a>` : ''}
+      ${o.gear || o.help ? `<div class="bnav">
+        ${o.gear ? `<a class="gear" href="#/setup" aria-label="تنظیم نسخه">${GEAR}</a>` : ''}
+        ${o.help ? `<a class="bhelp" href="#/guide" aria-label="راهنما">؟</a>` : ''}</div>` : ''}
       ${o.kicker ? `<div class="kicker">${o.kicker}</div>` : ''}
       <h1>${o.title}</h1>
       ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
@@ -579,14 +584,14 @@
   function viewStart(anchor) {
     const s = C.start || {};
     const ul = a => `<ul class="list">${(a || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
-    let h = banner({ kicker: 'کتاب راهنمای آمادگی جسمانی تنیس', title: esc(s.title || ''), sub: esc(s.subtitle || ''), gear: true });
+    let h = banner({ kicker: 'کتاب راهنمای آمادگی جسمانی تنیس', title: esc(s.title || ''), sub: esc(s.subtitle || ''), gear: true, help: true });
     h += `<div class="section">`;
     if ((s.intro || []).length) h += `<p class="intro">${esc(s.intro[0])}</p>`;
     if (DEMO) h += demoIntro();
     if (!prefs) {
-      h += `<div class="card green"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
+      h += `<div class="card green" data-tour="version"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
     } else {
-      h += `<div class="card"><h3>نسخهٔ تو</h3>${versionLine()}</div>`;
+      h += `<div class="card" data-tour="version"><h3>نسخهٔ تو</h3>${versionLine()}</div>`;
     }
     h += `<a class="btn primary big" href="#/programme/week/1">▶ شروع هفتهٔ ۱</a>`;
     if (s.safety) {
@@ -619,7 +624,7 @@
 
   function viewProgramme() {
     const P = C.programme;
-    let h = banner({ kicker: 'برنامهٔ ۱۶ هفته‌ای · ۴ بلوک', title: 'برنامه', gear: true,
+    let h = banner({ kicker: 'برنامهٔ ۱۶ هفته‌ای · ۴ بلوک', title: 'برنامه', gear: true, help: true,
       meta: prefs ? pill(AGE_LABEL[cur().age], 'light') : '' });
     h += `<div class="section">${prefs ? '' : versionLine()}
       <div class="card green"><h3>هر هفته</h3><p>۳ جلسهٔ اصلی: دو جلسه در باشگاه و یک جلسه روی زمین تنیس. اگر لازم داری، جلسه‌های انتخابی را هم اضافه کن.</p></div>`;
@@ -759,7 +764,7 @@
   }
   function viewExercises() {
     const all = Object.values(C.exercises), open = all.filter(ex => !isLocked(ex)).length;
-    view().innerHTML = banner({ kicker: 'کتابخانهٔ تمرین‌ها', title: 'تمرین‌ها',
+    view().innerHTML = banner({ kicker: 'کتابخانهٔ تمرین‌ها', title: 'تمرین‌ها', help: true,
       sub: DEMO ? `${fa(all.length)} تمرین · ${fa(open)} تمرین هفتهٔ ${openWeeksText()} باز است` : `${fa(all.length)} تمرین · جست‌وجو کن یا یک دسته انتخاب کن` }) +
       `<div class="section"><input class="search" id="exq" type="search" placeholder="جست‌وجو: زانو، پرش، اسکوات…" value="${esc(exQuery)}">
        <div class="chips" style="margin-top:10px">${GROUPS.map(g => `<button class="chip ${exFilter === g.key ? 'on' : ''}" data-filter="${g.key}">${g.label}</button>`).join('')}</div>
@@ -794,7 +799,7 @@
     const card = l => { const art = artFor('lesson', l.id);
       const body = `<h3>${esc(l.icon || '')} ${esc(l.title)}${isLocked(l) ? LOCK : ''}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}`;
       return `<a class="card tap ${isLocked(l) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/learn/${encodeURIComponent(l.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
-    view().innerHTML = banner({ kicker: 'درس‌ها', title: 'آموزش', sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
+    view().innerHTML = banner({ kicker: 'درس‌ها', title: 'آموزش', help: true, sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
       `<div class="section">${groups.map(g => (groups.length > 1 ? `<div class="h2">${esc(g.name)}</div>` : '') + g.items.map(card).join('')).join('')}</div>`;
   }
 
@@ -1061,7 +1066,7 @@
       const body = `<h3>${esc(t.icon || '')} ${esc(t.title)}${isLocked(t) ? LOCK : ''}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p>`;
       return `<a class="card tap ${isLocked(t) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/tests/${encodeURIComponent(t.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
     const onDay = T.filter(t => !t.optional), extra = T.filter(t => t.optional);
-    let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.' }) +
+    let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', help: true, sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.' }) +
       `<div class="section"><div class="card"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
     if (D) h += acc('testday', '', '📋 ' + esc(D.title || 'روز آزمون'), testDayBody(D), false);
     if (onDay.length) h += `<div class="h2">روز آزمون · به همین ترتیب</div>${onDay.map(card).join('')}`;
@@ -1261,6 +1266,495 @@
         <div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled style="opacity:.4"' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div></div>`;
   }
 
+  /* ── The tour and the guide (راهنما) ───────────────────────────────── */
+  // Two halves of one answer to "where is everything?".
+  //
+  //   THE TOUR  — a clay ring around a real control, a card beside it, the rest
+  //               dimmed. It walks all five tabs AND opens step-by-step mode for
+  //               real, because the green button at the foot of a session is the
+  //               part nobody finds on their own. Runs once on a first open,
+  //               replayable for ever from the guide or ?tour=1.
+  //   THE GUIDE — #/guide, the map the tour leaves behind: every section, every
+  //               control that hides (the version gear, the warm-up timer, the
+  //               Yo-Yo beeps, the one-rep-max calculator), each row a real link.
+  //               This is what somebody opens in week 9, not a tour.
+  //
+  // Built on habits.html's tour, with the three differences this app forces:
+  //   1. #view is REPLACED on every route, so targets are resolved live, per
+  //      paint, and a step that changes screen waits for the router (TOUR.wait,
+  //      released by the hashchange listener) instead of guessing a delay.
+  //   2. The dimmer is four panes with a real hole. On a step marked `act` the
+  //      tap lands on the app's own button and really opens the session.
+  //   3. RTL costs nothing: the geometry is in viewport coordinates and the card
+  //      is centred. Only the arrows are handed — → back, ← next, the way the
+  //      app's own .back button and .lr-go rows already point.
+  //
+  // Whether it has run is the one thing kept besides the version, under its own
+  // localStorage key: folding it into tps.prefs would make a prefs object exist
+  // before a version is chosen, and every `!prefs` test in this file reads that
+  // as "already chosen".
+  const TOUR_KEY = 'tps.toured';
+  const toured = () => { try { return localStorage.getItem(TOUR_KEY) === '1'; } catch (e) { return true; } };
+  const markToured = () => { try { localStorage.setItem(TOUR_KEY, '1'); } catch (e) { /* private mode: fine */ } };
+
+  const TOUR = { on: false, i: 0, steps: [], wait: null, opened: false, raf: 0, ch: 0, vw: 0, key: null };
+  const tq = sel => document.querySelector(sel);
+  const reduced = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+
+  // The session the tour opens in step-by-step mode: the first real (non-test)
+  // session of the first week that is actually loaded. Week 1 for a buyer, and
+  // week 1 in the demo too — but read from the content, never hard-coded, so a
+  // demo that opens a different week still tours.
+  function tourSession() {
+    const weeks = (C.programme && C.programme.weeks) || [];
+    for (let k = 0; k < weeks.length; k++) {
+      const r = sessionsFor(weeks[k].week);
+      if (!r) continue;
+      const s = r.core.concat(r.addons).find(x => x.type !== 'test');
+      if (!s) continue;
+      // Where the first real exercise sits in the flat list openStep() builds: a
+      // warm-up group is ONE item there, however many movements it holds. Without
+      // this the step that talks about sets is shown over the warm-up card, whose
+      // button says "warm-up done" and has no sets at all.
+      const groups = s.groups || [];
+      let at = 0;
+      while (at < groups.length && groups[at].slot === 'W') at++;
+      return { week: weeks[k].week, code: s.code, at: at, warm: groups.length > 0 && groups[0].slot === 'W',
+               hash: `#/programme/week/${weeks[k].week}/${encodeURIComponent(s.code)}` };
+    }
+    return null;
+  }
+
+  function tourSteps() {
+    const S = [], sess = tourSession();
+    // Always re-enter step mode at the item this step is about. Closing and
+    // reopening in one task never paints in between, so there is no flash, and
+    // it keeps the tour to openStep()'s own front door.
+    const openAt = at => { if (ST.open) closeStep(); openStep(sess.week, sess.code, at); };
+    const L = (C.learn && C.learn.lessons) || [], T = (C.tests && C.tests.tests) || [];
+    const openL = L.length - lockedCount(L), openT = T.length - lockedCount(T);
+
+    S.push({
+      title: 'این راهنما یک دقیقه است',
+      body: `هر بخش اپ را نشان می‌دهد و می‌گوید چه چیزی کجاست. هر جا خواستی رد کن —
+             همیشه پشت دکمهٔ <b>؟</b> بالای صفحه می‌ماند.`,
+      hash: '#/start', cta: 'شروع کن'
+    });
+
+    S.push({
+      title: 'کل اپ، همین پنج بخش',
+      body: `<b>شروع</b> همین‌جاست، <b>برنامه</b> تمرین‌های ۱۶ هفته است، <b>تمرین‌ها</b> کتابخانهٔ
+             حرکت‌هاست، <b>آموزش</b> درس‌هاست و <b>آزمون</b> تست‌ها. صفحهٔ ششمی جایی پنهان نشده.`,
+      hash: '#/start', sel: () => tq('#tabs'), pad: 0
+    });
+
+    S.push({
+      title: 'اول نسخه‌ات را انتخاب کن',
+      body: `دوره دو نسخه دارد: <b>۱۶ سال و بالاتر</b> و <b>زیر ۱۶ سال</b>. یک بار انتخاب کن؛
+             از آن به بعد برنامه فقط نسخهٔ تو را نشان می‌دهد. هر وقت خواستی با چرخ‌دندهٔ بالای
+             صفحه عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.`,
+      hash: '#/start', sel: () => tq('[data-tour="version"]')
+    });
+
+    S.push({
+      title: 'قبل از اولین جلسه، این را بخوان',
+      body: `چه وقت تمرین نکن، و با چه علامت‌هایی باید همان‌جا دست نگه داری و پیش پزشک بروی.
+             یک بار خواندنش کافی است.`,
+      hash: '#/start', sel: () => tq('#safety'), when: () => !!tq('#safety')
+    });
+
+    S.push({
+      title: '۱۶ هفته، ۴ بلوک',
+      body: `هر بلوک چهار هفته است و یک هدف دارد. روی شمارهٔ هفته بزن تا باز شود.` +
+            (DEMO ? ` در نسخهٔ نمایشی هفتهٔ ${openWeeksText()} باز است و بقیه قفل.` : ''),
+      hash: '#/programme', sel: () => tq('.block-card .weeks')
+    });
+
+    if (sess) S.push({
+      title: 'هر هفته، سه جلسهٔ اصلی',
+      body: `دو جلسه در باشگاه و یک جلسه روی زمین تنیس. زیر آن‌ها <b>جلسه‌های انتخابی</b> است —
+             اگر وقت و نیازش را داشتی اضافه کن. هفته‌های ۴، ۸، ۱۲ و ۱۶ به‌جای جلسهٔ آخر
+             <b>روز آزمون</b> دارند.`,
+      hash: `#/programme/week/${sess.week}`, sel: () => tq('.session-card')
+    });
+
+    if (sess) S.push({
+      title: 'هر ردیف یک تمرین است',
+      body: `رویش بزن تا باز شود: ست و تکرار، نکته‌های اجرا، اشتباه‌های رایج، حرکت جایگزین و ویدیو.
+             اولین کارت هر جلسه هم همیشه <b>گرم کردن</b> است.`,
+      hash: sess.hash, sel: () => tq('.ex:not(.warm)') || tq('.ex')
+    });
+
+    if (sess) S.push({
+      title: 'جلسه را قدم‌به‌قدم ببر',
+      body: `دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلویت می‌گذارد، ست‌ها را می‌شمارد و
+             استراحت را خودش نگه می‌دارد. بیشترِ آدم‌ها همین را باز می‌کنند و گوشی را کنار می‌گذارند.`,
+      hash: sess.hash, sel: () => tq('.cta-bar .btn.primary'),
+      act: true, hint: 'بزنش — یا «بعدی» را بزن، خودم بازش می‌کنم.'
+    });
+
+    if (sess && sess.warm) S.push({
+      title: 'اول گرم کردن',
+      body: `هر جلسه با همین شروع می‌شود. تایمر ده دقیقه‌ای را برایت می‌گیرد و می‌توانی
+             حرکت‌ها را پایین‌تر تیک بزنی. تیک‌ها فقط برای خودت است و جایی ذخیره نمی‌شود.`,
+      hash: sess.hash, before: () => openAt(0), sel: () => tq('.step-body .rest')
+    });
+
+    if (sess) S.push({
+      title: 'فقط همین یک دکمه',
+      body: `ستت که تمام شد بزنش. اگر آن تمرین استراحت داشته باشد تایمر خودش شروع می‌شود و
+             ته آن <b>زنگ می‌زند</b>، حتی اگر گوشی در جیبت باشد. تا وقتی این حالت باز است
+             صفحهٔ گوشی هم خاموش نمی‌شود.`,
+      hash: sess.hash, before: () => openAt(sess.at), sel: () => tq('.step-foot .btn.primary')
+    });
+
+    if (sess) S.push({
+      title: 'کجای جلسه‌ای',
+      body: `نوار بالا می‌گوید تمرین چندم از چند، و <b>✕</b> از این حالت بیرونت می‌آورد.
+             هیچ چیزی ذخیره نمی‌شود — هر وقت برگردی از اول شروع می‌کند.`,
+      hash: sess.hash, before: () => openAt(sess.at), sel: () => tq('.step-top')
+    });
+
+    S.push({
+      title: 'دنبال یک حرکت می‌گردی؟',
+      body: `کتابخانهٔ تمرین‌ها: هر حرکتی که در دوره می‌آید، یک‌جا. اسمش را بنویس یا از
+             دسته‌های زیرش انتخاب کن — گرم کردن، پرش و توان، سرعت، چابکی، قدرت پا و بقیه.
+             هر تمرین هم می‌گوید در کدام هفته‌ها و جلسه‌ها از آن استفاده می‌کنی.`,
+      before: () => { if (ST.open) closeStep(); },
+      hash: '#/exercises', sel: () => tq('.search')
+    });
+
+    S.push({
+      title: 'درس‌ها',
+      body: `چرا قدرت، چطور گرم کنی، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر…
+             ${DEMO ? `${fa(openL)} درس در نسخهٔ نمایشی باز است` : `${fa(L.length)} درس`}، هر کدام دو-سه دقیقه.
+             اگر جایی از برنامه برایت سؤال شد، جوابش معمولاً اینجاست.`,
+      hash: '#/learn', sel: () => tq('.section .card.tap')
+    });
+
+    S.push({
+      title: 'ببین تمرین جواب داده یا نه',
+      body: `${DEMO ? `${fa(openT)} آزمون از ${fa(T.length)} آزمون` : `${fa(T.length)} آزمون`} ساده، با متر و کرنومتر و یک همراه.
+             هر کدام روش دقیق اجرا و <b>برگهٔ نتایج</b> دارد. آزمون یو-یو زنگ‌هایش را خود اپ می‌زند،
+             و آزمون قدرت <b>سقفت</b> (یک‌تکرار بیشینه) را برایت حساب می‌کند.`,
+      hash: '#/tests', sel: () => tq('.section .card.tap')
+    });
+
+    // The last step rings the way back IN — the "؟" — so the tour ends pointing at
+    // its own door rather than spending a step of its own on it.
+    S.push(DEMO ? {
+      title: 'تا اینجا نسخهٔ نمایشی بود',
+      body: `هفتهٔ ${openWeeksText()}، ${fa(openT)} آزمون و ${fa(openL)} درس باز است و بقیه قفل.
+             نسخهٔ کامل هر ۱۶ هفته، ${fa(L.length)} درس و ${fa(T.length)} آزمون را باز می‌کند.
+             این راهنما و نقشهٔ کامل اپ هم همیشه پشت دکمهٔ <b>؟</b> بالای صفحه می‌ماند.`,
+      extra: `<a class="btn clay" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="tour">خرید نسخهٔ کامل از واتساپ</a>`,
+      hash: '#/tests', sel: () => tq('.bhelp'), cta: 'تمام', last: true
+    } : {
+      title: 'همین بود',
+      body: `پشت این دکمه هر وقت خواستی برمی‌گردی: هم <b>نقشهٔ کامل اپ</b>، هم همین راهنما دوباره.
+             حالا از <b>▶ شروع هفتهٔ ۱</b> در صفحهٔ شروع راه بیفت — اپ بعد از اولین ورود
+             <b>بدون اینترنت</b> هم باز می‌شود، پس در باشگاه و روی زمین هم در دسترس است.`,
+      hash: '#/tests', sel: () => tq('.bhelp'), cta: 'برویم سراغ برنامه', last: true
+    });
+
+    return S.filter(st => !st.when || st.when());
+  }
+
+  function startTour() {
+    if (!C.programme) return;                       // nothing loaded: nothing to point at
+    TOUR.steps = tourSteps();
+    if (!TOUR.steps.length) return;
+    TOUR.i = 0; TOUR.on = true; TOUR.opened = false; TOUR.key = null;
+    markToured();
+    track('Tour opened');
+    document.addEventListener('click', tourTap, true);
+    // Capture: a scroll inside .step-body does not bubble, and the ring is drawn
+    // in viewport coordinates.
+    addEventListener('scroll', tourReflow, true);
+    addEventListener('resize', tourReflow);
+    addEventListener('orientationchange', tourReflow);
+    tourShow();
+  }
+
+  function endTour(finished) {
+    if (!TOUR.on) return;
+    TOUR.on = false; TOUR.wait = null;
+    document.removeEventListener('click', tourTap, true);
+    removeEventListener('scroll', tourReflow, true);
+    removeEventListener('resize', tourReflow);
+    removeEventListener('orientationchange', tourReflow);
+    cancelAnimationFrame(TOUR.raf); TOUR.raf = 0;
+    track(finished ? 'Tour finished' : 'Tour skipped');
+    paintTour();                                    // tears the layer down
+    if (ST.open) closeStep();
+    if (finished) location.hash = '#/start';        // the screen with the "start week 1" button
+  }
+
+  function tourGo(d) {
+    if (!TOUR.on) return;
+    const n = TOUR.i + d;
+    if (n < 0) return;
+    if (n >= TOUR.steps.length) { endTour(true); return; }
+    TOUR.i = n;
+    tourShow();
+  }
+
+  function tourShow() {
+    const st = TOUR.steps[TOUR.i];
+    if (!st) { endTour(true); return; }
+    // `before` runs AFTER the router, never before it: route() closes step mode on
+    // its way past, so a step that opens step mode and also names a screen would
+    // otherwise have its own work undone a moment later.
+    const run = () => { if (st.before) st.before(); tourSettle(); };
+    const here = location.hash || '#/start';
+    if (st.hash && st.hash !== here) { TOUR.wait = run; location.hash = st.hash; return; }
+    if (st.hash) route();                           // same screen, rebuilt so the step measures a fresh view
+    run();
+  }
+
+  // Released by the hashchange listener once route() has repainted #view.
+  function tourAfterRoute() { const f = TOUR.wait; if (f) { TOUR.wait = null; f(); } }
+
+  // One frame for the new screen to lay out, then bring the target into view,
+  // then measure. Measuring before the scroll settles rings the wrong place.
+  function tourSettle() {
+    requestAnimationFrame(() => {
+      const st = TOUR.on && TOUR.steps[TOUR.i];
+      if (!st) return;
+      const el = st.sel ? st.sel() : null;
+      let scrolled = false;
+      if (el && el.scrollIntoView) {
+        const b = el.getBoundingClientRect();
+        // Already fully on screen — which is every fixed thing, the tab bar and
+        // the step-mode chrome included — so scrolling would only shove the page
+        // about for nothing.
+        if (b.top < 0 || b.bottom > innerHeight) {
+          scrolled = !reduced();
+          el.scrollIntoView({
+            // Tall targets keep their top (centring scrolls away the only part
+            // that identifies them), and so does a short phone, where a centred
+            // target leaves room for the card on neither side.
+            block: (b.height > innerHeight * 0.45 || innerHeight < 700) ? 'start' : 'center',
+            behavior: reduced() ? 'auto' : 'smooth'
+          });
+        }
+      }
+      setTimeout(paintTour, scrolled ? 340 : 40);
+    });
+  }
+
+  function tourReflow() {
+    if (!TOUR.on || TOUR.raf) return;
+    TOUR.raf = requestAnimationFrame(() => { TOUR.raf = 0; if (TOUR.on) placeTour(); });
+  }
+
+  // A step marked `act` leaves its target tappable. When it is used for real,
+  // let the app finish what the tap started, then move on.
+  function tourTap(ev) {
+    if (!TOUR.on) return;
+    const st = TOUR.steps[TOUR.i];
+    if (!st || !st.act || !st.sel) return;
+    const el = st.sel();
+    if (!el || !(el === ev.target || el.contains(ev.target))) return;
+    setTimeout(() => { if (TOUR.on) tourGo(1); }, 420);
+  }
+
+  // PAINTING IS SPLIT IN TWO, and that split is the point:
+  //   paintTour() decides whether the layer exists and builds its DOM once per
+  //   STEP; placeTour() only writes geometry onto nodes that already exist.
+  // Smooth scrolling fires scroll ~25 times per step, and a phone keeps firing
+  // on momentum after the finger is gone. Rebuilding on each one restarts the
+  // card's entrance animation over and over — that is the jumping and ticking
+  // habits.html's tour was built to cure.
+  function paintTour() {
+    const lay = tq('#tour');
+    if (!lay) return;
+    const st = TOUR.on ? TOUR.steps[TOUR.i] : null;
+    if (!st) { lay.hidden = true; lay.className = 'tour'; lay.innerHTML = ''; TOUR.key = null; return; }
+    const key = TOUR.i + ':' + st.title;
+    if (key !== TOUR.key) { buildTour(lay, st); TOUR.key = key; }
+    placeTour();
+  }
+
+  function buildTour(lay, st) {
+    const n = TOUR.i + 1, total = TOUR.steps.length;
+    lay.hidden = false;
+    // `opening` on the first build of a run only, so the dimmer fades in once
+    // and then simply stays dark as the athlete steps through it.
+    lay.className = 'tour' + (TOUR.opened ? '' : ' opening');
+    TOUR.opened = true;
+    lay.innerHTML =
+      `<div class="tourmask" data-m="t"></div><div class="tourmask" data-m="b"></div>
+       <div class="tourmask" data-m="l"></div><div class="tourmask" data-m="r"></div>
+       ${st.act ? '' : '<div class="tourblock" data-m="k"></div>'}
+       <div class="tourring" data-m="ring"></div>
+       <div class="tourcard" data-m="card" style="top:-9999px">
+         <span class="tourtip" style="display:none"></span>
+         <div class="tourtop"><h4>${esc(st.title)}</h4><span class="tourn num">${fa(n)}/${fa(total)}</span></div>
+         <div class="tourbody"><p>${st.body}</p>${st.hint ? `<p class="tourhint">${esc(st.hint)}</p>` : ''}${st.extra || ''}</div>
+         <div class="tournav">
+           ${TOUR.i > 0 ? '<button class="btn ghost tourback" data-t="back" aria-label="قبلی">→</button>' : ''}
+           <button class="btn primary" data-t="next">${esc(st.cta || (st.last ? 'تمام' : 'بعدی ←'))}</button>
+         </div>
+         ${st.last ? '' : '<button class="tourskip" data-t="skip">رد کردن راهنما</button>'}
+       </div>`;
+    lay.querySelectorAll('[data-t]').forEach(b => b.addEventListener('click', ev => {
+      ev.stopPropagation();
+      const k = b.getAttribute('data-t');
+      if (k === 'next') tourGo(1); else if (k === 'back') tourGo(-1); else endTour(false);
+    }));
+    // Swallow taps on the dimmed area: wandering off mid-tour is how a tutorial
+    // ends up half read with no way back into it.
+    lay.querySelectorAll('.tourmask, .tourblock').forEach(m => m.addEventListener('click', ev => ev.stopPropagation()));
+    TOUR.ch = 0;                                    // force a re-measure in placeTour
+  }
+
+  function placeTour() {
+    const lay = tq('#tour'), st = TOUR.on ? TOUR.steps[TOUR.i] : null;
+    if (!lay || !st || TOUR.key === null) return;
+    const cEl = lay.querySelector('[data-m="card"]');
+    if (!cEl) return;
+
+    const vw = innerWidth, vh = innerHeight;
+    const cw = Math.min(vw - 28, 460), cx0 = Math.round((vw - cw) / 2), gap = 14;
+    // Width drives height, so height is only re-measured when the step or the
+    // viewport width changes. offsetHeight forces synchronous layout; doing it
+    // on every scroll frame is the expensive part.
+    if (TOUR.ch === 0 || TOUR.vw !== vw) {
+      cEl.style.width = cw + 'px'; cEl.style.left = cx0 + 'px';
+      TOUR.ch = cEl.offsetHeight; TOUR.vw = vw;
+    }
+    const ch = TOUR.ch, pad = st.pad == null ? 5 : st.pad;
+
+    let r = null;
+    const el = st.sel ? st.sel() : null;
+    if (el) {
+      const b = el.getBoundingClientRect();
+      // A target scrolled right out of the viewport rings nothing — better a
+      // plain centred card than a clay box jammed against the top edge.
+      if (b.width > 0 && b.height > 0 && b.bottom > 0 && b.top < vh) {
+        const t = Math.max(0, b.top - pad), l = Math.max(0, b.left - pad);
+        r = { t: t, l: l, w: Math.min(vw - l, b.width + pad * 2), h: Math.min(vh - t, b.height + pad * 2) };
+      }
+    }
+
+    // The card must never cover the thing it describes, and the ring must never
+    // be squeezed to nothing, so the two are solved together: card BELOW the
+    // ring when what is left above it still leaves a usable ring, card ABOVE
+    // when the ring starts low enough, and on a short phone with a tall target,
+    // card pinned to whichever edge leaves more of the target showing.
+    const EDGE = 12, MINRING = 36;
+    let top, tip = null;
+    if (!r) { top = Math.round((vh - ch) / 2); }
+    else {
+      const hA = vh - EDGE - gap - ch - r.t;
+      if (hA >= MINRING) { r.h = Math.min(r.h, hA); top = r.t + r.h + gap; tip = 'up'; }
+      else if (r.t - gap - ch >= EDGE) { r.h = Math.min(r.h, vh - r.t - EDGE); top = r.t - gap - ch; tip = 'down'; }
+      else {
+        const cardAtBottom = vh - ch - EDGE, hCardBottom = cardAtBottom - gap - r.t;
+        const ringBelowCard = EDGE + ch + gap, hCardTop = (r.t + r.h) - ringBelowCard;
+        if (hCardTop > hCardBottom) { top = EDGE; r.h = Math.max(MINRING, Math.min(hCardTop, vh - ringBelowCard - EDGE)); r.t = ringBelowCard; }
+        else { top = cardAtBottom; r.h = Math.max(MINRING, hCardBottom); }
+      }
+    }
+    cEl.style.top = top + 'px';
+
+    const tEl = cEl.querySelector('.tourtip');
+    if (tip && r) {
+      tEl.className = 'tourtip ' + tip; tEl.style.display = '';
+      tEl.style.left = Math.max(14, Math.min(cw - 32, Math.round(r.l + r.w / 2 - cx0 - 9))) + 'px';
+    } else { tEl.style.display = 'none'; }
+
+    // Style writes only, on nodes that already exist. A pane that comes out
+    // empty is hidden, never removed, so the node set is stable for the step.
+    const put = (m, x, y, w, h) => {
+      const node = lay.querySelector('[data-m="' + m + '"]');
+      if (!node) return;
+      if (!(w > 0 && h > 0)) { node.style.display = 'none'; return; }
+      node.style.display = '';
+      node.style.left = x + 'px'; node.style.top = y + 'px';
+      node.style.width = w + 'px'; node.style.height = h + 'px';
+    };
+    if (r) {
+      const rb = r.t + r.h, rr = r.l + r.w;
+      put('t', 0, 0, vw, r.t); put('b', 0, rb, vw, vh - rb);
+      put('l', 0, r.t, r.l, r.h); put('r', rr, r.t, vw - rr, r.h);
+      put('k', r.l, r.t, r.w, r.h);                 // absent on an `act` step
+      put('ring', r.l, r.t, r.w, r.h);
+    } else {
+      put('t', 0, 0, vw, vh);
+      ['b', 'l', 'r', 'k', 'ring'].forEach(m => put(m, 0, 0, 0, 0));
+    }
+  }
+
+  /* ── The guide screen (#/guide) ────────────────────────────────────── */
+  // A map, not an essay: every row is a real link, so reading where something
+  // lives and going there are the same tap.
+  function gRow(href, icon, title, sub) {
+    const inner = `<span class="gi">${icon}</span><span class="gb"><span class="gt">${title}</span><span class="gs">${sub}</span></span>` +
+      (href ? '<span class="gg">←</span>' : '');
+    return href ? `<a class="guide-row" href="${href}">${inner}</a>` : `<div class="guide-row">${inner}</div>`;
+  }
+
+  // Link straight at a test when the content has it open, and at the list when
+  // it does not — a demo visitor must never be sent into a lock by the guide.
+  function testHref(id) {
+    const t = ((C.tests && C.tests.tests) || []).find(x => x.id === id);
+    return t && !isLocked(t) ? `#/tests/${encodeURIComponent(id)}` : '#/tests';
+  }
+
+  function viewGuide() {
+    const L = (C.learn && C.learn.lessons) || [], T = (C.tests && C.tests.tests) || [];
+    const tabIcon = tab => { const a = tq(`#tabs a[data-tab="${tab}"] svg`); return a ? a.outerHTML : ''; };
+    let h = banner({ back: '#/start', kicker: 'راهنما', title: 'نقشهٔ اپ',
+      sub: 'چه چیزی کجاست، و آن چند چیزی که معمولاً پیدا نمی‌شود.' });
+    h += `<div class="section">
+      <div class="card clay"><h3>راهنمای تصویری · یک دقیقه</h3>
+        <p>خود اپ را نشانت می‌دهد: هر دکمه را می‌گیرد و می‌گوید چه کار می‌کند.</p>
+        <button class="btn primary" style="margin-top:12px" data-tour-start>▶ پخش راهنما</button></div>
+
+      <div class="h2">پنج بخش</div>
+      <div class="card">
+        ${gRow('#/start', tabIcon('start'), 'شروع', 'نسخه‌ات را انتخاب کن، ایمنی را بخوان، و از همین‌جا وارد هفتهٔ ۱ شو.')}
+        ${gRow('#/programme', tabIcon('programme'), 'برنامه', '۱۶ هفته در ۴ بلوک. هر هفته سه جلسهٔ اصلی، به‌علاوهٔ جلسه‌های انتخابی. هفته‌های ۴، ۸، ۱۲ و ۱۶ روز آزمون دارند.')}
+        ${gRow('#/exercises', tabIcon('exercises'), 'تمرین‌ها', 'کتابخانهٔ حرکت‌ها. جست‌وجو کن یا دسته انتخاب کن؛ هر تمرین نکته‌ها، اشتباه‌های رایج، جایگزین و ویدیو دارد.')}
+        ${gRow('#/learn', tabIcon('learn'), 'آموزش', `${fa(L.length)} درس کوتاه: چرا قدرت، گرم کردن، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر.`)}
+        ${gRow('#/tests', tabIcon('tests'), 'آزمون', `${fa(T.length)} آزمون ساده با روش دقیق اجرا و برگهٔ نتایج.`)}
+      </div>
+
+      <div class="h2">چیزهایی که دیر پیدا می‌شوند</div>
+      <div class="card">
+        ${gRow('#/setup', '⚙️', 'عوض کردن نسخه', 'چرخ‌دندهٔ بالای صفحهٔ شروع و برنامه. بین «۱۶ سال و بالاتر» و «زیر ۱۶ سال» جابه‌جا شو؛ برنامه همان لحظه عوض می‌شود.')}
+        ${gRow(null, '▶', 'حالت قدم‌به‌قدم', 'دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
+        ${gRow(null, '⏱', 'تایمر گرم کردن', 'داخل همان حالت، روی کارت گرم کردن. ده دقیقه را برایت می‌گیرد و می‌توانی حرکت‌ها را تیک بزنی.')}
+        ${gRow('#/exercises', '🔍', 'جست‌وجوی تمرین', 'اسم حرکت، یا اسم ناحیه مثل «زانو». هر تمرین می‌گوید در کدام هفته‌ها و جلسه‌ها می‌آید.')}
+        ${gRow(testHref('strength-check'), '🧮', 'حساب‌گر سقف', 'یک‌تکرار بیشینه‌ات را از وزن، تکرار و RPE حساب می‌کند. داخل صفحهٔ آزمون قدرت.')}
+        ${gRow(testHref('yo-yo-ir1'), '🔊', 'صدای آزمون یو-یو', 'زنگ‌های آزمون یو-یو را خود اپ می‌زند. بلندگو را بلند کن و گوشی را کنار زمین بگذار.')}
+        ${gRow(null, '🖨', 'چاپ برگهٔ نتایج', 'پایین هر صفحهٔ آزمون. جدول را چاپ کن یا روی کاغذ بکش؛ اپ نتیجه‌ای ذخیره نمی‌کند.')}
+      </div>`;
+
+    h += DEMO
+      ? `<div class="card clay"><h3>این نسخهٔ نمایشی است</h3>
+           <p>هفتهٔ ${openWeeksText()}، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است.
+              نسخهٔ کامل هر ۱۶ هفته، ${fa(L.length)} درس و ${fa(T.length)} آزمون را باز می‌کند.</p>
+           ${buyActions('guide')}</div>`
+      : `<div class="card green"><h3>بدون اینترنت هم باز می‌شود</h3>
+           <p>بعد از اولین ورود، کل کتاب روی گوشی می‌ماند. در باشگاه و روی زمین، با یا بدون اینترنت، باز می‌شود.
+              اپ هیچ چیزی دربارهٔ تو ذخیره یا ارسال نمی‌کند؛ تنها چیزی که روی گوشی می‌ماند نسخه‌ای است که انتخاب کرده‌ای.</p></div>`;
+
+    view().innerHTML = h + `</div>`;
+  }
+
+  // First open: run the tour once, for a buyer and a demo visitor alike. Not
+  // when they arrived on a deep link — that person came for a particular page,
+  // not for a tour of the furniture. ?tour=1 always plays it.
+  function maybeTour() {
+    const forced = new URLSearchParams(location.search).get('tour') === '1';
+    const here = location.hash || '#/start';
+    if (!forced && (toured() || !here.startsWith('#/start'))) return;
+    setTimeout(() => { if (!TOUR.on) startTour(); }, 700);
+  }
+
   /* ── Router + events ───────────────────────────────────────────────── */
   function setTab(tab) {
     const t = tab === 'setup' ? 'start' : tab;
@@ -1274,6 +1768,7 @@
     window.scrollTo(0, 0);
     switch (tab) {
       case 'setup': return viewSetup();
+      case 'guide': return viewGuide();
       case 'programme':
         if (a !== 'week' || !b) return viewProgramme();
         if (!c) return viewWeek(+b);
@@ -1319,6 +1814,7 @@
       }
       return;
     }
+    if (t.closest('[data-tour-start]')) { startTour(); return; }
     if (t.closest('[data-signout]')) { signOut(); return; }
     const back = t.closest('[data-back]');
     if (back) { if (history.length > 1) history.back(); else location.hash = back.dataset.back; return; }
@@ -1340,9 +1836,11 @@
     }
   });
   document.addEventListener('input', e => { if (e.target.id === 'exq') { exQuery = e.target.value; $('#exlist').innerHTML = exListHtml(); } });
-  window.addEventListener('hashchange', () => { if (READY) route(); });
+  // route() repaints #view wholesale, so a tour step that changed screen waits here
+  // for the new view rather than guessing how long the router takes.
+  window.addEventListener('hashchange', () => { if (READY) { route(); tourAfterRoute(); } });
 
-  const startApp = () => { READY = true; route(); };
+  const startApp = () => { READY = true; route(); maybeTour(); };
   document.querySelectorAll('a[data-buy]').forEach(a => { a.href = BUY_URL; });   // the demo bar in index.html
   (window.LOCAL ? loadLocalContent().then(startApp) : DEMO ? bootDemo(startApp) : bootCloud(startApp)).catch(err => {
     view().innerHTML = `<div class="section"><div class="card clay"><h3>محتوا بارگذاری نشد</h3><p class="lead" dir="ltr">${esc(err.message)}</p></div></div>`;

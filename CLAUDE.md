@@ -637,6 +637,31 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
   publicly (Amir, 2026-09-15, before his Iran test): from `/tennis/` (menu, hero link, the phone
   screenshot, the inside section, the price card, an FAQ), the course card on `index-fa.html`, and
   `links.html`. If it will not open in Iran without a VPN, move the free parts to static files on the website.
+- **The course app has a TOUR and a GUIDE** (2026-09-21, Amir: *"i want the TPS course, and the demo,
+  to have a tutorial made for it, showing the different sections and where to find where, in farsi"*).
+  Both are in `tennis/app/app.js` under *The tour and the guide*, and they run for a **buyer and a demo
+  visitor alike** — the demo's copy names what is locked and its last card carries the buy button.
+  - **The tour** is habits.html's, ported: a clay ring around a real control, a card beside it, four
+    mask panes with a **real hole** so a step marked `act` is finished by doing the thing. 15 steps
+    across all five tabs, and it **opens step-by-step mode for real** (three steps: the warm-up card
+    and its timer, a real set, the ✕) because the green button at the foot of a session is the part
+    nobody finds alone. It runs **once** on a first open — not on a deep link, which is somebody who
+    came for a page — and `?tour=1` always replays it. Whether it has run is `localStorage` key
+    **`tps.toured`**, deliberately NOT inside `tps.prefs`: a prefs object existing before a version is
+    chosen reads as "already chosen" in every `!prefs` test in that file.
+  - **The guide** is `#/guide`, reached from the **؟** beside the gear on all five tab banners. It is
+    a map, not an essay: the five sections and the controls that hide (version gear, step mode, the
+    warm-up timer, exercise search, the one-rep-max calculator, the Yo-Yo beeps, printing the results
+    sheet), **every row a real link** — and in the demo it links at `#/tests` rather than into a
+    locked test. It also replays the tour.
+  - ⚠️ **Move a control, rename a tab, or change what a tap does and the tour is actively lying**, on
+    the first screen a new buyer or a demo visitor sees. The same rule habits.html's `tourSteps()`
+    carries. Its targets are resolved out of the live DOM per step, so a renamed class silently rings
+    nothing rather than erroring: `.block-card .weeks`, `.session-card`, `.ex`, `.cta-bar .btn.primary`,
+    `.step-body .rest`, `.step-foot .btn.primary`, `.step-top`, `.search`, `.card.tap`, `#tabs`,
+    `.bhelp` and `[data-tour="version"]`.
+  - Two new Plausible goals to create, demo only: **`Tour opened`** and **`Tour finished`** (plus
+    `Tour skipped`).
 - **The course app's pictures (Amir, 2026-09-19).** AI-made (GPT Image 2 and Higgsfield), one look: shadows lean deep green,
   highlights lean warm cream, clay orange the only loud colour. They live in `assets/tps/` as WebP, made from masters by
   **`scripts/grade_tps_art.py`**, which applies ONE shared colour grade (prompts drift off-colour, the grade does not) and
