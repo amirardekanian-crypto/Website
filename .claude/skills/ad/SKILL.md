@@ -13,7 +13,9 @@ files beside it are the content.
 | File | What it is | When |
 |---|---|---|
 | **`BRAND.md`** | Who Amir is, who is watching, what he will never do. The interview, not my inference. | **Step 0, every run.** |
-| **`STRATEGY.md`** | Seven angles, the problem→angle map, hook shapes, the CTA ladder, visual shapes. | Step 2. |
+| **`STRATEGY.md`** | The ten principles, ten angles, thirteen hooks, the problem→angle map, five visual concepts, three CTAs. | Step 2. |
+| **`SHOTS.md`** | How Amir films himself, the source ladder, and the five current ads' shot lists. | Step 4. |
+| **`PROMPTS.md`** | Paste-ready Higgsfield prompts, and the house formula for writing new ones. | Step 7. |
 | **`WHATSAPP.md`** | What Amir sends when someone messages — the price anchor, the objections, the routing. | Step 3, for any ad whose ask is WhatsApp. |
 | **`LEDGER.md`** | Every ad made, what it cost, what it did. | Step 0 (read) and step 9 (write). |
 | `.claude/skills/image/SKILL.md` | Prompt craft, settings, real prices, judging, grading. **Its Step 0 is the reuse pass.** | Steps 5 and 7. |
@@ -60,6 +62,9 @@ and production level — and put it in that file. **Never imply research that ha
 ---
 
 ## Step 2 — angle and hook
+
+**Check the ten principles first** (`STRATEGY.md` §1) — especially *open on a problem or a desire,
+never the product*, *no wasted second*, and *an arresting first frame that is still*.
 
 Pick the angle from `STRATEGY.md` using the problem→angle map. Default to **A1 Measurement** when
 nothing argues otherwise: it is the only angle that serves Amir's own argument, the strongest
@@ -109,13 +114,8 @@ outcome on a timeline, no fear, no invented number.
 One row per shot, and **every row says where the picture comes from** — that is what makes the next
 two steps cheap.
 
-| # | Beat | Shot | Source | Notes |
-|---|---|---|---|---|
-| 1 | hook | MCU Amir, chest up, plain wall | **AMIR** | soft window light, no direct sun |
-| 2 | 0:03 | tape measure running away on a hall floor | **REUSE** `the-coin` | recompose to 9:16 |
-| 3 | 0:12 | chalk dust lifting off a bar | **HAVE** clip `804a5c00` | 0–3 s, silent |
-| 4 | 0:20 | the app's test screen | **CAPTURE** demo | `capture_app_screens.js` |
-| 5 | 0:28 | button | **BUILD** | reel engine |
+**`SHOTS.md` holds the format, the filming rules and five worked examples.** Copy one of those
+shot lists rather than inventing a layout.
 
 **Sources, in the order to try them:** `AMIR` (free, and the strongest thing in the ad) · `HAVE` (a
 clip or picture already generated — `LEDGER.md` and `.claude/skills/video/SKILL.md`'s ledger) ·
@@ -154,7 +154,9 @@ is made from, its length, sound **off**, and its credits; the total; the balance
 
 ## Step 7 — the Higgsfield prompts
 
-Only for what survived step 5. Full craft in `.claude/skills/image/SKILL.md` (pictures) and
+Only for what survived step 5. **`PROMPTS.md` already holds paste-ready prompts for the three clips
+the current five ads want**, plus the house formula — check there before writing a new one. Full
+craft in `.claude/skills/image/SKILL.md` (pictures) and
 `.claude/skills/video/SKILL.md` (clips); what follows is only what is particular to an ad.
 
 **A start picture, 9:16, in this order:** the scene, concrete and singular · the light (the

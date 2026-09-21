@@ -1,229 +1,234 @@
-# STRATEGY — the angle bank
+# STRATEGY — principles, angles, hooks, problems, visuals, CTAs
 
-`BRAND.md` is who he is and what he will not do. This file is **what to actually say**, and it only
-makes sense downstream of that file, so read it second.
+`BRAND.md` is who he is and what he will not do. This file is **what to actually say**, so read it
+second. `SHOTS.md` turns a chosen angle into shots; `PROMPTS.md` turns the missing shots into
+Higgsfield prompts.
 
-Everything here is built off three facts from the interview: they gas out in the third set, they are
-late to the ball, and something hurts — and they will not buy because they do not trust online,
-think it is free on YouTube, and want a coach watching them.
+Everything here is built on what Amir reported in the interview (2026-09-21): six problems players
+send him, three things they want, and three objections that all attack the format rather than the
+price.
 
 ---
 
-## How an ad gets chosen
+## 1. The principles
 
-**One ad = one problem × one objection × one angle × one ask.** If you cannot fill that line in
-before writing, there is no ad yet.
+Amir proposed four on 2026-09-21. Two are kept as he wrote them, two were changed with his
+agreement, and the rest are forced by his own constraints.
 
-```
-their problem   →   the angle that owns it   →   the objection it kills   →   one ask
-```
-
-Never stack. An ad that answers all three objections answers none of them.
-
-### The map
-
-| Their problem | Angle to reach for | Why |
+| # | Principle | Where it comes from |
 |---|---|---|
-| «تو ست سوم کم میارم» | **A3 Demands**, then **A1 Measurement** | Explain why it happens, then give them a way to see it |
-| «دیر می‌رسم به توپ» | **A2 Wrong Tool**, then **A1** | The thing they trained is not the thing that makes them late |
-| «زانوم درد می‌کنه» | **A4 Soreness vs Pain** — *only* | Never sell off this one; teach off it (BRAND §5.3) |
+| **1** | **Open on a problem or a desire — never on the product.** The first line is about them. | Amir |
+| **2** | **One clear ask.** Never two. | Amir |
+| **3** | **No wasted second** — *not* "short copy". A 40-second ad that teaches gets saved; a 10-second slogan gets scrolled. Length is not the enemy, an empty second is. | Replaced his "short copy" — organic reach comes from saves |
+| **4** | **An arresting first frame that is STILL.** Unmistakable, and quiet. His face mid-sentence, or one object posing a question. | Replaced "strong visual hook" — a loud one is the hype editing he banned |
+| **5** | **It has to be worth keeping.** Organic only, no ad spend, so reach comes from saves and sends. Every ad needs a reason to be kept. | Forced by the channel |
+| **6** | **Answer the format objection, not the price.** Self-guided, online, nobody watching — that is what stops them, even when they say "expensive". | The interview |
+| **7** | **Teach before asking.** The position is authority; an ad that only sells does not build it. | The position |
+| **8** | **Every claim checkable on his own pages.** Prices, counts, test protocols. | The accuracy gate |
+| **9** | **The ask uses the destination's own words, verbatim.** | Reel 7 |
+| **10** | **His face in the first three seconds whenever trust is the barrier.** | He is on camera now |
 
-| Their objection | Angle that kills it |
-|---|---|
-| Don't trust online | **A7 Story** (needs his story — a GAP) · **A1** (a man with a stopwatch) |
-| It's free on YouTube | **A5 Order** — the direct answer · **A1** — free gives no baseline |
-| Want a coach watching | **A6 Nobody's Watching** — answer it out loud, don't dodge |
-
----
-
-## The angles
-
-Seven. Each one is reusable — an angle is a shape that makes many ads, not one ad.
-
-### A1 · MEASUREMENT — "six months of training. which number changed?"
-
-**The house angle.** Reach for it unless there is a reason not to. It is the only one that serves
-his top annoyance (nobody measures), the strongest objection (free on YouTube) and the position
-(knows more than your coach) in a single move.
-
-- **Answers:** "it's free on YouTube" — free content hands out exercises; it cannot give you a
-  baseline, a protocol and a retest four weeks later.
-- **Proof it uses:** the 7 tests · retest at weeks 4, 8, 12, 16 · «فقط با عددِ خودت مقایسه می‌کنی»
-- **Visual:** measurement as the whole design language — a tape running down the frame, a coin at a
-  heel, a stopwatch, type hanging off a ruler like ticks. `the-coin`, `test-day`, `twenty-metres`,
-  `against-the-wall`, `five-points` all already exist.
-- **Ask:** the broad jump is **free in the demo** — so this angle can give a whole test away and the
-  payoff is a real page, not a teaser.
-- **Travels:** strongly. People save a test they intend to do.
-- ⚠️ **Never state a pass/fail standard.** The course sets none; that is the point (BRAND §5.2).
-
-**Hooks:** «شش ماهه تمرین می‌کنی. کدوم عددت عوض شده؟» · «بلند شو. این تست رو همین الان بده.» ·
-«عدد شروع خودت رو بلدی؟»
-
-### A2 · WRONG TOOL — "running laps is not tennis fitness"
-
-- **Answers:** his argument (1) and (2) — bodybuilder splits, and conditioning-as-laps.
-- ⚠️ **The method is the enemy, never a person** (BRAND §5.1). A coach must be able to share this
-  without losing face. Many will agree with it loudly, which is how it travels.
-- **Proof:** the `tennis-demands` lesson · the block structure · his credentials.
-- **Visual:** the contrast cut — the wrong thing, then the real demand of the sport. Iron and dark
-  against clay and light.
-- **Travels:** yes, because it is arguable. Expect comments; that is the point.
-
-**Hooks:** «دویدن دور زمین، بدنسازی تنیس نیست.» · «تنیس یه ورزش استقامتیه؟ نه اونجوری که فکر می‌کنی.»
-
-### A3 · DEMANDS — "what a tennis point actually asks of your body"
-
-Pure teaching. The "finally, someone explains why" ad, straight out of «هیچی بی‌دلیل نیست».
-
-- **Answers:** the third-set problem and the late-to-the-ball problem, by explaining the mechanism
-  rather than selling a fix.
-- **Proof:** `tennis-demands` — how points are shaped, what the body does in each one, where the
-  problems actually show up.
-- **Visual:** the court from above, rally marks, the split second. `rally-map`, `the-split-second`,
-  `five-points`.
-- **Travels:** yes — it is useful on its own, which is what gets it saved.
-- **Ask:** soft. This angle earns the right to sell later; let it.
-
-**Hooks:** «یه امتیاز تنیس چند بار جهت عوض می‌کنی؟» · «تو ست سوم پات نمی‌کشه؟ مشکل از ریه‌ت نیست.»
-
-### A4 · SORENESS vs PAIN — "they are not the same thing. here's the line."
-
-The highest-value free thing he can give, and the safest way to touch the pain problem.
-
-- ⚠️ **This angle never sells.** It teaches, and it ends on the course only if it has earned it. It
-  exists because a third of his inbound says something hurts, and because BRAND §5.3 forbids the
-  fear version.
-- **Proof:** the `pain-red-flags` lesson, which already draws the line and names the red flags that
-  send someone to a doctor. Keep that referral in the ad; it is what makes it trustworthy.
-- **Visual:** quiet and clinical. `ice-and-tape`, `armour`. No wincing, no grabbing knees.
-- **Travels:** the strongest of all seven. This is the one that gets sent to a friend.
-
-**Hooks:** «کوفتگی با درد فرق داره. اینجوری تشخیص بده.» · «کدوم دردها باید بری پیش پزشک؟»
-
-### A5 · ORDER — "free videos give you exercises. nobody gives you the order."
-
-The direct answer to the objection Amir hears most often after trust.
-
-- **Answers:** "it's free on YouTube", head on and without insulting anyone for looking.
-- **Proof:** the four blocks, by name — **پایه‌سازی → پیشرفت → انفجار → انتقال به زمین** — and that
-  the fourth is literally the transfer to the court. 16 weeks, and the order is the product.
-- **Visual:** a ladder, a sequence, one thing becoming the next. The four block covers exist
-  (`first-light`, `morning-load`, `full-acceleration`, `under-lights`).
-- **Travels:** moderate. Sell-shaped, so it needs a genuinely useful first 10 seconds.
-
-**Hooks:** «۱۱۴ حرکت داری. ترتیبشون رو داری؟» · «مشکل نداشتن تمرین نیست. نداشتن ترتیبه.»
-
-### A6 · NOBODY'S WATCHING — "no, nobody is watching you. here's what replaces it."
-
-The disarming one. Answers the third objection by agreeing with it.
-
-- **Answers:** "I want a real coach watching me" — which is true, and the course is self-guided by
-  design. Pretending otherwise loses the people who notice.
-- **The reframe:** the tests are the watching. The retest is the feedback. The RPE scale is how the
-  session adjusts to you. Self-guided is a design decision, not a missing feature — and if you want
-  someone actually watching, that is the coaching, and it costs more.
-- **Proof:** the app on screen · the `read-your-card` and `rpe-weights` lessons (both free in the
-  demo).
-- **Visual:** him, talking. This is a face-to-camera angle above all others.
-- ⚠️ Honest, so it must stay honest: **never imply the course includes coaching.**
-
-**Hooks:** «تو این دوره کسی حواسش به تو نیست. بذار بگم چی جاشو می‌گیره.» ·
-«می‌خوای یکی بالا سرت باشه؟ پس این دوره برای تو نیست — مگه اینکه…»
-
-### A7 · WHY I MADE THIS — the trust angle
-
-- **Answers:** "I don't trust an online course from anyone" — the objection nothing else touches.
-- **Proof:** two MSc's · 1000+ players · 15 years playing · and the real reason he built it.
-- **Visual:** him, plainly. Least produced of the seven on purpose.
-- ⚠️ **[BLOCKED — GAP]** This angle cannot be written until Amir answers *why he does this*
-  (BRAND §4). Do not fabricate a founder story. Ask, wait, then write.
+Plus the four refusals from `BRAND.md` §5, which are not negotiable: **method never the person ·
+retest never the result · teach soreness-vs-pain never fear · no hype editing.**
 
 ---
 
-## Hooks — the first two seconds
+## 2. What they say, and what they want
 
-Organic, so the hook is not fighting a skip button, it is fighting a **thumb already moving**. In a
-teacherly register the hook is a *question he is about to answer* or a *correction he is about to
-justify* — never a shout.
+**Six problems, in Amir's own ticking.** These are the openers — an ad starts here.
 
-Six shapes that fit his voice:
-
-| Shape | Example | Use for |
+| | Problem | Angle that owns it |
 |---|---|---|
-| **The question they can't answer** | «شش ماهه تمرین می‌کنی. کدوم عددت عوض شده؟» | A1, A5 |
-| **The flat correction** | «دویدن دور زمین، بدنسازی تنیس نیست.» | A2 |
-| **The instruction** | «بلند شو. این تست رو همین الان بده.» | A1 |
-| **The distinction** | «کوفتگی با درد فرق داره.» | A4 |
-| **The admission** | «کسی حواسش به تو نیست.» | A6 |
-| **The mechanism** | «تو ست سوم پات نمی‌کشه؟ مشکل از ریه‌ت نیست.» | A3 |
+| **P1** | *"In the third set my energy is low and **my legs are tired**"* | A3, then A1 |
+| **P2** | *"I'm not quick to the balls — **I want to be faster**"* (stated as a desire) | A2, then A1 |
+| **P3** | *"Knee pain **from deceleration**"* | **A4** for the pain itself; **A2/A10** for braking, which is trainable |
+| **P4** | «هر چی تمرین می‌کنم بهتر نمی‌شم» — plateaued despite training | **A7**, then A1 |
+| **P5** | «به کسی می‌بازم که تکنیکش از من بدتره» — losing to worse players | **A8** — emotionally the sharpest |
+| **P6** | «نمی‌دونم چقدر وزنه بزنم» — no idea how to load | **A9** — and the answer is free in the demo |
+| **P9** | **«باشگاه منو کند و حجیم می‌کنه»** — the gym will make me slow or bulky | **A12** — the only one that stops them before they consider buying anything |
 
-**Rules.** Write **three** hooks per ad and pick out loud — he has to say it, so it has to be
-sayable. No question that can be answered "no" and scrolled past. The hook names the viewer's
-problem or contradicts their belief; it never names the product. Nothing in the first two seconds
-mentions the course, the price or the app.
+**Two more, derived from the course rather than from Amir** — marked, because he did not say them:
 
----
+| | Problem | Source | Angle |
+|---|---|---|---|
+| *P7* | Came back after injury or a break and lost the thread | `missed-sessions` lesson | A10 |
+| *P8* | Warms up by hitting, or not at all | `warmup-ramp` lesson | A3 |
 
-## CTA
+**Three desires,** his ticking. Principle 1 says an ad may open on one of these instead.
 
-**One ask. Always one.** (BRAND §5.7.) The number being counted is WhatsApp messages, but the
-lowest-friction ask is the free demo, and an angle that has not earned a sale should not make one.
-
-| Ask | Words | When |
+| | Desire | Notes |
 |---|---|---|
-| **The demo** | «هفته‌ی ۱ رو رایگان امتحان کن» — verbatim off `links.html` | The default. Teaching angles (A3, A4), and anything aimed at someone who has never heard of him. |
-| **WhatsApp / buy** | «خرید از واتساپ» — verbatim off the price card | Only when the ad has already made the case: A5, A6, and repeat viewers. |
-| **A reply in the comments** | e.g. «عددت رو بنویس» | A1 with a test. Costs nothing, feeds the algorithm, and a comment thread is itself reach. |
+| **D1** | **Win the matches they are currently losing** | Closest to the sale. Pairs with P5. |
+| **D2** | **Keep playing for years without breaking down** | Longevity. Pairs with P3 and an older segment. |
+| **D3** | **Move like an athlete, not a club player** | Identity. ⚠️ Drifts toward the general-fitness audience he does not want — keep it tennis-specific or leave it. |
 
-**Three standing rules.**
-1. **Use the destination's own words, verbatim.** The button on the page and the last line of the ad
-   must match, or the click feels like a different place. (Reel 7 established this.)
-2. **The ad's promise and his first WhatsApp reply must be the same promise.** He replies personally
-   with no template (BRAND §8), so every ad that asks for WhatsApp ships **with a suggested first
-   reply** written in his voice. The ad is not finished without it.
-3. **Never ask for a follow.** It is a second ask wearing a small hat.
+He did **not** pick "be taken seriously / ranking / team", and did **not** pick lack of time as a
+problem. Do not build on either.
 
 ---
 
-## Visual concepts
+## 3. Ten angles
 
-Now that he is on camera there are three shapes, and the default has changed.
+An angle is a **shape that makes many ads**, not one ad. Each says what it answers, what proves it,
+how it looks, what it asks, and whether it travels.
 
-### V1 · Talking head + b-roll — **the new default**
-Him, framed chest-up, explaining. Generated footage and the shipped stills cut *under* his voice to
-show the thing he is naming. His face carries the trust; the footage carries the production value.
-Cheapest to produce, strongest against the objections, and the only shape that uses his best asset.
+### A1 · MEASUREMENT — «شش ماهه تمرین می‌کنی. کدوم عددت عوض شده؟»
+**The house angle.** Reach for it unless something argues otherwise: it serves his top annoyance
+(nobody measures), the strongest objection (free on YouTube) and the position, in one move.
+*Answers:* it's-free-online — free content hands out exercises; it cannot give a baseline and a
+retest. · *Proof:* 7 tests · retests at weeks 4, 8, 12, 16 · «فقط با عددِ خودت مقایسه می‌کنی» ·
+*Looks:* V3 · *Asks:* the demo, or a comment · *Travels:* **strongly** — people save a test.
+⚠️ Never state a pass/fail standard; the course sets none, and that is the point.
 
-### V2 · Fully generated — the reel-7 shape
-No human. Animated type, real app screens, graded stills, one hero object. Reserve it for ads that
-are **about the product itself** rather than about an idea — and accept that it answers the trust
-objection least well of the three.
+### A2 · WRONG TOOL — «دویدن دور زمین، بدنسازی تنیس نیست»
+*Answers:* P2, and his arguments (1) and (2). · *Proof:* `tennis-demands`, the block structure ·
+*Looks:* V4 · *Travels:* yes, because it is arguable — coaches will comment, and comments are reach.
+⚠️ **The method is the enemy, never a person.** A coach must be able to share it without losing face.
 
-### V3 · Demonstration
-Him, or a hand, doing the measurable thing: laying the tape, marking the heel, starting the
-stopwatch. The natural body for A1.
-⚠️ **Never demonstrate exercise form** — a grip, a push-off, a measurement is fine; a lift is not.
+### A3 · DEMANDS — «یه امتیاز تنیس از بدنت چی می‌خواد؟»
+Pure teaching — «هیچی بی‌دلیل نیست» made into an ad.
+*Answers:* P1 and P2 by explaining the mechanism instead of selling a fix. · *Proof:*
+`tennis-demands` · *Looks:* V2 or V5 · *Asks:* softly; this angle earns the right to sell later ·
+*Travels:* yes.
 
-**Holding all three together:** green-black shadows, warm cream highlights, clay the only saturated
-colour, no yellow or gold. Whatever he films gets graded toward that, so **shoot in the dullest,
-softest light available** rather than bright daylight — the grade can deepen, it cannot rescue a
-blown-out frame.
+### A4 · SORENESS vs PAIN — «کوفتگی با درد فرق داره»
+*Answers:* P3, the only safe way to touch it. · ⚠️ **This angle never sells.** It teaches, and keeps
+the referral to a doctor in frame — that referral is what makes it trustworthy. · *Proof:*
+`pain-red-flags` · *Looks:* V1 · *Travels:* **the strongest of all ten.** This is the one that gets
+sent to a friend.
+
+### A5 · ORDER — «۱۱۴ حرکت داری. ترتیبشون رو داری؟»
+*Answers:* it's-free-online, head on, without insulting anyone for looking. · *Proof:* the four
+blocks by name — پایه‌سازی → پیشرفت → انفجار → انتقال به زمین — and that the fourth *is* the transfer
+to the court · *Looks:* V2 · *Travels:* moderate; sell-shaped, so it needs a genuinely useful first
+ten seconds.
+
+### A6 · NOBODY'S WATCHING — «تو این دوره کسی حواسش به تو نیست»
+The disarming one: answers the third objection by agreeing with it.
+*The reframe:* the tests are the watching, the retest is the feedback, RPE is how the session adjusts
+to you. Self-guided is a design decision, not a missing feature — and if they want someone actually
+watching, that is the coaching, and it costs more. · *Looks:* **V1, always** · ⚠️ Never imply the
+course includes coaching.
+
+### A7 · THE PLATEAU — «داری تکرار می‌کنی، نه پیشرفت»
+*Answers:* **P4**, the problem with the widest reach. Training hard and not improving is not a
+effort problem, it is a progression problem: same weights, same drills, same weeks. ·
+*Proof:* the 16 weeks in 4 blocks, each built on the last · the retest · RPE ·
+*Looks:* V4 · *Travels:* yes — it reframes something they blame themselves for.
+
+### A8 · THE MATCH YOU LOST — «تکنیکش از تو بدتر بود. پاهاش نه.»
+*Answers:* **P5 and D1.** Emotionally the sharpest thing in the bank: everyone has lost that match
+and nobody has an explanation for it. The explanation is physical, which is exactly what he sells. ·
+*Proof:* `tennis-demands` · the third-set argument · *Looks:* V1 · *Travels:* yes.
+⚠️ Never name or caricature an opponent or a coach. The subject is the viewer's own match.
+
+### A9 · THE LOAD QUESTION — «نمی‌دونی چقدر وزنه بزنی؟ اینجوری حساب کن.»
+*Answers:* **P6**, with the actual answer given away. RPE explained properly in under a minute. ·
+*Proof:* the `rpe-weights` lesson — **free in the demo**, so the ad's payoff is a real page ·
+*Looks:* V1 + V5 · *Travels:* **strongly** — it is a tool, and tools get saved.
+
+### A10 · THE LONG GAME — «می‌خوای ده سال دیگه هم بازی کنی؟»
+*Answers:* **D2**, and P3 without touching fear, and P7. · *Proof:* the robustness work, the
+`recovery-adaptation` and `sleep-recovery` lessons · *Looks:* V1 · *Travels:* moderate ·
+⚠️ Stays clear of injury-scare (refusal 3): it is about what they keep, not what they lose.
+
+### A12 · THE BULK MYTH — «باشگاه کندت می‌کنه؟ اون باشگاهی که دیدی، آره.»
+*Answers:* **P9**, the belief that blocks everything upstream of the sale.
+⚠️ **Never argue "no it won't".** They have seen it happen — to bodybuilders. Agree with the fear,
+then move it onto the method: that is the wrong tool for tennis (his argument 1), and it is not what
+this is. Heavy-but-low-volume strength, plyometrics and braking do not build the body they are
+picturing. · *Proof:* `why-strength`, `jumps-power` and `speed-braking` lessons · the block names ·
+*Looks:* V1, then V4 · *Travels:* **yes** — it is a myth everyone in the club repeats, and
+correcting it is shareable. · *Asks:* the demo.
+
+**Hook:** «می‌ترسی باشگاه کندت کنه؟ حق داری — ولی نه از این تمرین.»
+
+### A11 · WHY I MADE THIS — **BLOCKED**
+The trust angle, and the only one that touches "I don't trust an online course from anyone".
+⚠️ **Cannot be written until Amir answers why he does this** (`BRAND.md` §4). Do not fabricate a
+founder story. This is also the only place the **UK £50 session** belongs — as what his time is
+worth, never as a saving, and never in a Farsi price argument.
 
 ---
 
-## Competitive research — **[GAP]**
+## 4. Ten hooks
 
-Amir named three kinds of competitor (BRAND §7) and no accounts. Nothing has been collected or
-pulled apart. Until it has, do not claim to know what the market is doing.
+Written to be **said out loud by him**, in a teacherly register: a question he is about to answer, or
+a correction he is about to justify. Never a shout.
 
-When it is done, it belongs here: the account, what they sell, their hook shapes, their production
-level, what they get away with, and the one thing they cannot say that Amir can. `SKILL.md` step 1b.
+| # | Hook | Angle | Opens on |
+|---|---|---|---|
+| H1 | «شش ماهه تمرین می‌کنی. کدوم عددت عوض شده؟» | A1 | P4 |
+| H2 | «تکنیکش از تو بدتر بود. پاهاش نه.» | A8 | P5 |
+| H3 | «دویدن دور زمین، بدنسازی تنیس نیست.» | A2 | P2 |
+| H4 | «تو ست سوم پات نمی‌کشه؟ مشکل از ریه‌ت نیست.» | A3 | P1 |
+| H5 | «کوفتگی با درد فرق داره. بذار خطش رو نشونت بدم.» | A4 | P3 |
+| H6 | «نمی‌دونی چقدر وزنه بزنی؟ عدد رو ول کن، اینو بپرس.» | A9 | P6 |
+| H7 | «یه سال تمرین کردی و همون‌جایی. داری تکرار می‌کنی، نه پیشرفت.» | A7 | P4 |
+| H8 | «۱۱۴ حرکت تو گوشیت داری. ترتیبشون رو نداری.» | A5 | objection |
+| H9 | «تو این دوره کسی حواسش به تو نیست. بذار بگم چی جاش رو می‌گیره.» | A6 | objection |
+| H10 | «می‌خوای ده سال دیگه هم تنیس بازی کنی؟ از الان تصمیمش گرفته می‌شه.» | A10 | D2 |
+| H11 | «می‌ترسی باشگاه کندت کنه؟ حق داری — ولی نه از این تمرین.» | A12 | P9 |
+| H12 | «تو ست سوم نفست کم میاد یا پاهات؟» | A3 | P1, in their own words |
+| H13 | «زانوت موقع ترمز درد می‌گیره؟ ترمز یه مهارته که کسی یادت نداده.» | A2/A4 | P3, in their own words |
+
+**Rules.** Write three per ad and **read them out loud** — he has to say them. No question a viewer
+can answer "no" to and scroll past. The hook names their problem or contradicts their belief; it
+**never names the product, the price or the app** in the first two seconds.
+
+---
+
+## 5. Five visual concepts
+
+| | Concept | What it is | Best for | Cost |
+|---|---|---|---|---|
+| **V1** | **Talking head + b-roll** — *the default* | Him chest-up, explaining; footage cuts under his voice to show what he names. | A4, A6, A8, A10 — anything where trust is the barrier | Low — his phone plus what we own |
+| **V2** | **Fully generated** — the reel-7 shape | No human. Animated type, real app screens, graded stills, one hero object. | A3, A5 — ads about the product rather than an idea | High, and answers trust least well |
+| **V3** | **Demonstration** | Him or a hand doing the measurable thing: laying the tape, marking the heel, starting the watch. | **A1** | Low ⚠️ never demonstrate exercise form |
+| **V4** | **The hard compare** | Two states, one cut, no motion. The wrong thing, then the real demand. Nothing else on screen. | A2, A7 | Low — two stills and a cut |
+| **V5** | **Screen-led** | The app itself is the picture, his voice over it. Real screens, captured, never mocked up. | A9, A5 | Low — `capture_app_screens.js` |
+
+All five hold the same look: green-black shadows, warm cream highlights, clay the only saturated
+colour, no yellow or gold. **Whatever he films gets graded toward that, so shoot dull and soft** —
+the grade can deepen a frame, it cannot rescue a blown-out one.
+
+---
+
+## 6. Three CTAs
+
+**One per ad. Always one** (principle 2).
+
+| | Ask | Words | When |
+|---|---|---|---|
+| **C1** | **The demo** | «هفته‌ی ۱ رو رایگان امتحان کن» — verbatim off `links.html` | The default. Teaching angles, and anyone who has never heard of him. |
+| **C2** | **WhatsApp** | «خرید از واتساپ» — verbatim off the price card | Only once the ad has made the case: A5, A6, and repeat viewers. **Ships with its reply** from `WHATSAPP.md`, usually T3. |
+| **C3** | **A comment** | «عددت رو بنویس» | A1 and A9, where a number or an answer is the payoff. Costs nothing, and a comment thread is itself reach. |
+
+**Never ask for a follow** — it is a second ask wearing a small hat.
+
+### The price anchor (settled 2026-09-21)
+
+**Iran prices only, in any Farsi ad:** personal programme **معادلِ ۲۵ دلار در ماه**, so the same 16
+weeks is about **$100**; the course is **$17**, once, at their own speed, with no expiry. Roughly six
+times less for the same period, and every number is on his own pages.
+
+⚠️ **The $200-for-4-months and the £50 UK session are NOT Iran prices.** $200 is the English ladder;
+£50 is a UK in-person session. Neither may appear in a Farsi price argument — an Iranian player
+cannot buy either, and quoting them inflates the saving against a number they never faced. The £50
+belongs only to A11, as what his time is worth.
+
+---
+
+## 7. Competitive research — **[GAP]**
+
+Amir named three kinds of competitor (`BRAND.md` §7) and no accounts. Nothing has been collected.
+Until it has, do not claim to know what the market is doing. `SKILL.md` step 1b.
 
 ---
 
 ## Changelog
 
-- **2026-09-21** — Created from the interview. Seven angles, the problem→angle map, six hook shapes
-  in his register, the one-ask CTA ladder with the WhatsApp-reply rule, and three visual shapes with
-  talking-head as the new default. A7 blocked and competitive research empty, both pending Amir.
+- **2026-09-21 (later)** — Rewritten after the second round: ten principles (two of Amir's replaced
+  with his agreement), six reported problems plus two derived, three desires, ten angles, ten
+  written hooks, five visual concepts, three CTAs, and the Iran-only price ruling.
+- **2026-09-21** — Created: seven angles, six hook shapes, the CTA ladder, three visual shapes.

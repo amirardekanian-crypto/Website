@@ -29,19 +29,20 @@ reference for a V2 ad — read its README before building another one.
 
 ## Planned, not built
 
-The five-ad board of 2026-09-21 (`Content/tps-ads/`, and an Artifact) was drawn **before** the
-interview and partly contradicts it — see *Learned the hard way* in `SKILL.md`. Keep it for the
-three that survive, rebrief the rest.
+**The five ads, draft 3** — rebuilt 2026-09-21 off the angle bank, after the first board turned out
+to aim two of its five at an audience and a problem the interview says are not there. Board:
+`Content/tps-ads/plan-board.html` and the Artifact. Shot lists in `SHOTS.md`.
 
-| # | Board name | Angle now | Status after the interview |
-|---|---|---|---|
-| 01 | One step late | **A2 Wrong Tool** / A3 | **Holds** — aimed at "late to the ball", a problem he really hears |
-| 02 | Stronger in the gym | A5-ish | **Rebrief** — built on a problem Amir does not hear |
-| 03 | New shoes again? | — | **Rebrief as share-driven** — parents are not in the audience, only reachable second-hand |
-| 04 | Your own starting number | **A1 Measurement** | **Holds, and is now the house angle** — promote it |
-| 05 | Once, forever | A5 / close | **Holds** — ends on «خرید از واتساپ» per Amir, 2026-09-21 |
+| # | Ad | Angle | Problem | Looks | Asks | Credits |
+|---|---|---|---|---|---|---|
+| 01 | His legs, not his technique | A8 | P5 + P1 | V1 | demo | 4 |
+| 02 | Your own starting number | A1 + A7 | P4 | V3 | comment | 4 |
+| 03 | Slow and bulky | **A12** | **P9** | V1 + V4 | demo | 0 |
+| 04 | The brake nobody taught you | A2 + A4 | P3 | V1 + V4 | demo | 4 |
+| 05 | A hundred dollars or seventeen | A5 + anchor | the objection | V5 | WhatsApp | 0 |
 
----
+**Retired from draft 2**, and why: *Stronger in the gym* (built on a problem Amir does not hear) and
+*New shoes again?* (parents are not in the audience — keep it as a share-driven idea, not cold reach).
 
 ## Assets already paid for — reuse before generating
 

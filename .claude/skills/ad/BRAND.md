@@ -53,16 +53,29 @@ flagship.)
 
 ### What they say is wrong — in the order he hears it
 
-1. **«تو ست سوم کم میارم»** — they run out of gas in the third set.
-2. **«دیر می‌رسم به توپ»** — late to the ball, feel slow.
-3. **«زانوم / شونه‌م / کمرم درد می‌کنه»** — something hurts.
+**In their words, as Amir reported them 2026-09-21** — quote these, do not improve them:
+
+1. **"In the third set my energy is low and my legs are tired."**
+   ⚠️ **Legs, not lungs.** The fix they imagine is running; the fix is strength endurance and
+   braking. That gap between what they'd do and what works is an ad on its own.
+2. **"I'm not quick to the balls — I want to be faster."**
+   ⚠️ Stated as a **desire**, not a complaint. It can open an ad either way.
+3. **"Some kind of injury — knee pain from deceleration."**
+   ⚠️ **Deceleration**, not "my knee hurts". Braking is trainable, and untrained braking is where
+   the load goes. This turns P3 from a referral-only topic into one with a real training answer
+   (`speed-braking`, `robustness`) — while the doctor referral stays in frame (§5.3).
+4. **"Going to the gym will make me slower or bulky."** — see the fourth objection below.
 
 ⚠️ He did **not** pick "I go to the gym but don't know what to do for tennis." Do not build an ad
 on the transfer-from-the-gym problem and call it a customer problem; it is an argument Amir finds
 true, not a sentence anyone sends him.
 
-**[GAP] Nobody's actual words.** Every phrasing above is my paraphrase of a menu Amir ticked. One
-real message, quoted, is worth more than the whole table. Ask him again; put it here when it lands.
+**Also reported, 2026-09-21:** plateau («هر چی تمرین می‌کنم بهتر نمی‌شم»), losing to players with
+worse technique, and not knowing how much weight to lift. He did **not** report lack of time.
+
+**What they want** (his ticking): win the matches they are currently losing · keep playing for years
+without breaking down · move like an athlete rather than a club player. He did **not** pick status,
+ranking or team selection.
 
 ### Why they do not buy — all three are the same objection
 
@@ -86,6 +99,20 @@ which is 1.5×.** The per-period comparison above is both true and stronger, so 
 templates use. **If he has raised the Iran coaching price, `index-fa.html`, `Content/PRODUCT.md` and
 `WHATSAPP.md` all need to move together** — a sales line that contradicts the public page is worse
 than no line.
+
+### The fourth objection — a belief, not a format
+
+**«باشگاه منو کند و حجیم می‌کنه»** — *"the gym will make me slow or bulky."* (Amir, 2026-09-21.)
+
+⚠️ **This is the only objection that stops them before they even consider a course**, and it is the
+one Amir's own argument explains: they are afraid of the gym because **the gym they have seen is
+bodybuilding** — which is his complaint (1), from the other side. Their fear and his annoyance are
+the same fact.
+
+So the answer is never "no it won't". It is: **you are right to be afraid of that kind of training —
+it is the wrong tool for tennis, and it is not what this is.** Heavy-but-low-volume strength,
+plyometrics, braking and change of direction do not build the body they are picturing. Own the fear,
+then redirect it at the method. Angle A12.
 
 ⚠️ **The first three objections attack the format, not the price.** Self-guided, online, pre-made,
 nobody watching. $17 is not the real obstacle even when price is the word they use. So an ad that only *describes the course well* does nothing — it has to

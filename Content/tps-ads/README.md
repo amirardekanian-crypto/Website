@@ -7,21 +7,26 @@ Also published as an Artifact: https://claude.ai/artifact/Wqw1QznEYc8NufX7bm6s1P
 **Status: nothing has been generated.** Balance was 96.76 before this session and is unchanged.
 Amir's call on 2026-09-21 was *"nothing yet"* — refine the concepts and the copy first.
 
-## The five, and why they do not overlap
+## The five (rebuilt 2026-09-21, draft 3)
 
-Read in order they are a funnel, not five versions of one ad.
+The first draft was drawn before the interview and aimed two of its five ads at an audience that is
+not watching (parents) and a problem nobody reports (not knowing what to do in the gym). Rebuilt off
+`.claude/skills/ad/STRATEGY.md`, every ad now opens on something **a customer actually said**.
 
-| # | Name | Job | Talks to | The one idea |
-|---|---|---|---|---|
-| 01 | One step late | Cold reach | A player who trains tennis and never trains their body | You lose the point at the second step, not at the racket |
-| 02 | Stronger in the gym | The differentiator | A player who already lifts | Strength does not become speed by itself — block 4 is literally «انتقال به زمین» |
-| 03 | New shoes again? | A new audience | **Parents of 13–17 year olds** | The course's own first sign of a growth spurt, in its own words |
-| 04 | Your own starting number | Value first | Anyone who has never measured anything | Give the broad-jump test away whole; it is already free in the demo |
-| 05 | Once, forever | The close | Someone who saw the demo and did not buy | Price, no subscription, and it works offline |
+| # | Ad | Angle | Their words | Looks | Asks | Credits |
+|---|---|---|---|---|---|---|
+| 01 | His legs, not his technique | A8 | *"my energy is low and my legs are tired"* | V1 | demo | 4 |
+| 02 | Your own starting number | A1+A7 | *"however much I train, I don't get better"* | V3 | comment | 4 |
+| 03 | **Slow and bulky** | A12 | *"the gym will make me slower or bulky"* | V1+V4 | demo | **0** |
+| 04 | The brake nobody taught you | A2+A4 | *"knee pain from deceleration"* | V1+V4 | demo | 4 |
+| 05 | A hundred dollars or seventeen | A5 | they ask the price first | V5 | WhatsApp | **0** |
 
-Each also has its own **look**, not just its own words: 01 never lifts the camera off the clay;
-02 is hard cuts between iron and clay; 03 is a home, with no court or gym in it at all;
-04 is a measurement graphic; 05 is one unbroken dark plate with type on it.
+**Ad 03 is the new one and may be the most valuable.** It is the only objection that stops someone
+before they consider buying anything, and it is Amir's own argument from the other side: they fear
+the gym because the gym they have seen is bodybuilding.
+
+Shot lists for all five: `.claude/skills/ad/SHOTS.md`. Higgsfield prompts for the three optional
+clips: `.claude/skills/ad/PROMPTS.md`.
 
 ## Decisions (Amir, 2026-09-21)
 
@@ -30,7 +35,10 @@ Each also has its own **look**, not just its own words: 01 never lifts the camer
   Ads 01–04 all end on the demo button, «هفته‌ی ۱ رو رایگان امتحان کن», verbatim off `links.html`.
 - **The trap-bar grip clip from 2026-09-20 is good** (job `804a5c00-f07c-422b-9c02-f66d2aa86d5c`).
   Ad 02 opens on it, so Ad 02 generates nothing.
-- **No generating yet.**
+- **No generating yet.** All three clips are optional — each has a shipped still that does the job.
+- **Iran prices only** in any Farsi ad: ۲۵ دلار در ماه, so ~$100 for the same 16 weeks, against $17.
+  The $200-for-4-months is the English ladder and the £50 session is the UK; neither may appear.
+- **Amir is on camera**, so four of the five are talking-head.
 
 ## Copy provenance — the point of the board
 
