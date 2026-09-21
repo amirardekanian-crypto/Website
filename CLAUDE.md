@@ -660,6 +660,12 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
     nothing rather than erroring: `.block-card .weeks`, `.session-card`, `.ex`, `.cta-bar .btn.primary`,
     `.step-body .rest`, `.step-foot .btn.primary`, `.step-top`, `.search`, `.card.tap`, `#tabs`,
     `.bhelp` and `[data-tour="version"]`.
+  - ⚠️ **`sel` is lazy; `when` is EAGER — never let a `when` test the DOM.** A step's `sel` runs each
+    time that step opens, so it sees the right screen. A step's `when` runs when the list is *built*,
+    which is wherever the tour was started from — the guide screen, on a replay. The safety step's
+    `when` read `#safety` at first and so dropped itself on every replay (14 steps, not 15), losing
+    the one step that names the red flags, on the one path somebody chose deliberately. A `when` asks
+    the **content** (`C.start.safety`) whether the view will draw the thing.
   - Two new Plausible goals to create, demo only: **`Tour opened`** and **`Tour finished`** (plus
     `Tour skipped`).
 - **The course app's pictures (Amir, 2026-09-19).** AI-made (GPT Image 2 and Higgsfield), one look: shadows lean deep green,
