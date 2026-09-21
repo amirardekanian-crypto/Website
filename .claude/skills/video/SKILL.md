@@ -187,9 +187,11 @@ ToolSearch "select:mcp__<higgsfield>__generate_video_batch,mcp__<higgsfield>__ge
 - `jobs_wait { jobs: [{ index, job_id }], timeout_seconds: 15 }` long-polls: call it again until
   the job is `completed`. A 3 s clip took about a minute, a 5 s clip about two, a picture about 30 s.
 - The result is a plain CloudFront URL, no auth: `curl -sS -o clip.mp4 "<result url>"`.
-- ⚠️ A submission can come back **`submission_failed` with a recommended preset** (it happened on a
-  night scene, preset «IN THE DARK»). Resubmit the identical params plus
-  `declined_preset_id: "<that preset id>"` to get a plain generation.
+- ⚠️ A submission can come back **`submission_failed` with a recommended preset** («IN THE DARK»,
+  `24bae836-2c4a-48e0-89b6-49fcc0b21612`). Resubmit the identical params plus
+  `declined_preset_id: "<that preset id>"` to get a plain generation. **No job id and no charge** on
+  the rejection. Seen twice now — a night court (2026-09-20) and a dark hall floor (2026-09-21) — so
+  **expect it on any dark plate** and keep the preset id to hand.
 - ⚠️ **Never resubmit after a transport timeout**: the job may exist. Reuse its id.
 - ⚠️ **In auto mode the harness's safety check can block the download** (it did once, reason
   "Real-World Transactions", right after two paid jobs). Do not retry it and do not route around it.

@@ -59,18 +59,38 @@ worked (200), downloads did not: that asymmetry is worth remembering.
 
 | Shown | Slot | For | Job id | Picked? |
 |---|---|---|---|---|
-| 1 | push-off A | Ad 01 | `ba6d189b-7874-4438-95d5-fc7003dbf6a5` | |
+| 1 | push-off A | Ad 01 | `ba6d189b-7874-4438-95d5-fc7003dbf6a5` | **✅ PICKED** |
 | 2 | push-off B | Ad 01 | `ecaaeff9-fac0-4ac4-90e5-169498f69349` | |
 | 3 | push-off C | Ad 01 | `28b7c675-ec0e-46f7-ae1d-ee9a52491e28` | |
 | 4 | coin A | Ad 02 | `cfbfe236-ccde-4e19-ab70-6d5ec743fd5e` | |
-| 5 | coin B | Ad 02 | `1ca13660-dcae-45cf-85ed-9703f486b7a5` | |
+| 5 | coin B | Ad 02 | `1ca13660-dcae-45cf-85ed-9703f486b7a5` | **✅ PICKED** |
 | 6 | coin C | Ad 02 | `ed1d1fa9-0d71-4ca5-bdf9-9f43d9a2198a` | |
 | 7 | brake A | Ad 04 | `830e380e-0e15-4d0b-a2e5-95d5ddab0f0e` | |
 | 8 | brake B | Ad 04 | `4d26dcc7-cfd8-4c04-ad8c-fb81f2160bd7` | |
-| 9 | brake C | Ad 04 | `f71d9cfb-0426-41fb-8d73-5c79b591af2c` | |
+| 9 | brake C | Ad 04 | `f71d9cfb-0426-41fb-8d73-5c79b591af2c` | **✅ PICKED** |
 
-**Next:** the winner's job id goes straight in as `start_image` for its clip (no download needed) —
-3 clips × 3 credits = 9, taking the balance to about 78.76. Prompts: `PROMPTS.md`.
+**Amir picked 1, 5 and 9** (push-off A, coin B, brake C), handed back through the gallery's
+"use as reference". Each winner's job id went straight in as the clip's `start_image` — **no download
+at any point**, which is what made this possible from a session that cannot fetch results.
+
+## The three clips — 2026-09-21
+
+9 credits (87.76 → **78.76**). Cinema Studio v2, `mode: std`, 3 s, 9:16, **sound off**, 768×1344.
+⚠️ **Claude has not seen these either.** Amir judges.
+
+| # | Clip | Ad | Start picture | Job id | speedramp |
+|---|---|---|---|---|---|
+| 1 | shoe drives off clay, dust bursts | Ad 01 | push-off A | `641ff541-779d-45dc-8c41-487a00591e3d` | slowmo |
+| 2 | coin spins and settles by the tape | Ad 02 | coin B | `2c7d3589-a458-4c9f-b044-6afece8bc67c` | linear |
+| 3 | shoe brakes, clay piles, dust throws forward | Ad 04 | brake C | `1df09ea0-5fe2-4de3-a3c7-0b13e32c2b1e` | slowmo |
+
+⚠️ **The "IN THE DARK" preset trap recurred** (preset `24bae836-2c4a-48e0-89b6-49fcc0b21612`), on the
+coin shot — a dark scene, same as the night court in September. `submission_failed`, **no job and no
+charge**; resubmitting the identical params plus `declined_preset_id` went straight through. Expect
+it on any dark plate.
+
+**Session total: 18 credits** (9 pictures + 9 clips), 96.76 → 78.76, matching the approved plan to
+the credit.
 
 ⚠️ **The rate limit is real and shared.** A 6-wide batch had 2 items rejected with
 `429 rate_limit_reached` — **no job id and no charge** — and both went through on the next
