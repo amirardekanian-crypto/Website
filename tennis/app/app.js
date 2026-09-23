@@ -498,10 +498,8 @@
     const id = ytId(url);
     if (!id) return '';   // no demo yet: show nothing (Amir, step 2)
     const short = ytShort(url);
-    const out = short ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
     return `<div class="video${short ? ' short' : ''}" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
-      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>
-      <a class="yt-out" href="${out}" target="_blank" rel="noopener">باز کردن در اپ یوتیوب ↗</a>`;
+      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>`;
   }
 
   function statsGrid(it) {
