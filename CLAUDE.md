@@ -671,8 +671,8 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - **Videos play from `www.youtube.com/embed` in BOTH apps, never `youtube-nocookie.com`** (2026-09-23; Iranian
   athletes could not watch the course videos). The nocookie player hits YouTube's sign-in wall in Iran, and many VPN apps
   there route only the `youtube.com` names. Both apps read watch, `youtu.be`, `shorts/`, `embed/` and `live/` links, give a
-  Shorts link a tall 9:16 box, and put a link under every video that opens it in the phone's YouTube app, for a VPN that
-  covers that app but not the browser («باز کردن در اپ یوتیوب» in the course app, *Open in YouTube* in `program.html`).
+  Shorts link a tall 9:16 box, and play every video inside the app. An "open in the YouTube app" link was tried and
+  removed the same day (Amir): do not add it back.
   The three parsers must agree: `ytId()` in `tennis/app/app.js`, `ytVideoId()` in `program.html`, the modal in
   `assets/js/shared.js`. ⚠️ This was edited here, so copy `app.js` and `app.css` into `tps-content` before its next deploy.
 - **The course app's pictures (Amir, 2026-09-19).** AI-made (GPT Image 2 and Higgsfield), one look: shadows lean deep green,
