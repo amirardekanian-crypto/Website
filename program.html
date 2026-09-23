@@ -1951,6 +1951,14 @@
   .ex-video.playing .ex-video-play,
   .ex-video.playing::before,
   .ex-video.playing::after { display: none; }
+  /* A Shorts clip is vertical: a tall 9:16 box, centred, instead of the wide one */
+  .ex-video.short { height: auto; aspect-ratio: 9 / 16; width: min(100%, 300px); margin-inline: auto; }
+  /* "Open in YouTube": hands the clip to the phone's YouTube app */
+  .ex-video-out {
+    display: block; width: fit-content; margin: 2px 0 6px auto; padding: 4px 2px;
+    font-size: 12px; font-weight: 600; color: #888; text-decoration: none;
+  }
+  .ex-video-out:hover { text-decoration: underline; }
 
   /* 5-cell stats grid: SETS · REPS · TARGET · TEMPO · REST */
   /* The grid is as wide as the prescription, not a fixed five. An exercise that
@@ -6176,11 +6184,17 @@ function renderInlineCues(cues) {
 
 // Big video placeholder — only rendered if the exercise has a video.
 // Click ▶ → loadInlineVideo() replaces the placeholder with a YouTube iframe.
+// Under it, "Open in YouTube" hands the video to the phone's own YouTube app: for an
+// athlete whose VPN covers the YouTube app but not the browser, it is the way in.
+// A Shorts link gets a tall 9:16 box, so the clip is not a sliver in a wide one.
 function renderVideoBlock(url) {
   if (!url) return '';
-  return `<div class="ex-video" data-url="${esc(url)}">
+  const id = ytVideoId(url);
+  const out = id ? ytWatchUrl(url, id) : url;
+  return `<div class="ex-video${ytIsShort(url) ? ' short' : ''}" data-url="${esc(url)}">
     <button type="button" class="ex-video-play" onclick="loadInlineVideo(this);event.stopPropagation();">▶</button>
-  </div>`;
+  </div>
+  <a class="ex-video-out" href="${esc(out)}" target="_blank" rel="noopener" onclick="event.stopPropagation();">Open in YouTube ↗</a>`;
 }
 
 function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
@@ -6439,27 +6453,36 @@ function toggleExpand(item) {
   item.classList.toggle('collapsed');
 }
 
+// YouTube links come in several shapes: youtube.com/watch?v=ID, youtu.be/ID,
+// youtube.com/shorts/ID, youtube.com/embed/ID (and /live/, /v/). All of them play
+// inline through the same www.youtube.com/embed player. Keep this in step with
+// ytId() in tennis/app/app.js and the parser in assets/js/shared.js.
+function ytVideoId(url) {
+  const m = String(url || '').match(/(?:[?&]v=|youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|\/v\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+function ytIsShort(url) { return /\/shorts\//.test(String(url || '')); }
+// The address the "Open in YouTube" link uses. On a phone it opens the YouTube app.
+function ytWatchUrl(url, id) {
+  return ytIsShort(url) ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
+}
+
 // Replace the video placeholder with a YouTube iframe (inline playback).
-// Supports common YouTube URL shapes: youtu.be/ID, youtube.com/watch?v=ID
 function loadInlineVideo(btn) {
   const wrap = btn.closest('.ex-video');
   if (!wrap || wrap.classList.contains('playing')) return;
   const url = wrap.getAttribute('data-url') || '';
-  let id = '';
-  let m = url.match(/[?&]v=([\w-]+)/);
-  if (m) id = m[1];
-  if (!id) {
-    m = url.match(/youtu\.be\/([\w-]+)/);
-    if (m) id = m[1];
-  }
+  const id = ytVideoId(url);
   if (!id) {
     // Unknown URL shape — fall back to opening in a new tab so the user still
     // has access to the video. (The existing video modal could also be used.)
     window.open(url, '_blank');
     return;
   }
+  // ⚠️ www.youtube.com, NOT youtube-nocookie.com: in Iran the nocookie player gets
+  // YouTube's sign-in wall (see sw.js v9 and shared.js).
   const iframe = document.createElement('iframe');
-  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1`;
   iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true;
   wrap.appendChild(iframe);
