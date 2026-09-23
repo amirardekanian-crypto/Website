@@ -487,12 +487,21 @@
     return p.join('');
   }
 
-  const ytId = u => { const m = String(u || '').match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([A-Za-z0-9_-]{11})/); return m ? m[1] : null; };
+  // Every YouTube shape plays here: watch?v=, youtu.be/, shorts/, embed/, live/. Kept in step
+  // with ytVideoId() in program.html. The ▶ plays the clip INSIDE the app (www.youtube.com/embed,
+  // never youtube-nocookie.com: in Iran the nocookie player hits YouTube's sign-in wall, and many
+  // VPN apps only route the youtube.com names). The link under it hands the clip to the phone's
+  // YouTube app, for whoever has a VPN on that app but not on the browser.
+  const ytId = u => { const m = String(u || '').match(/(?:[?&]v=|youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|\/v\/)([A-Za-z0-9_-]{11})/); return m ? m[1] : null; };
+  const ytShort = u => /\/shorts\//.test(String(u || ''));
   function videoBlock(url) {
     const id = ytId(url);
     if (!id) return '';   // no demo yet: show nothing (Amir, step 2)
-    return `<div class="video" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
-      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>`;
+    const short = ytShort(url);
+    const out = short ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
+    return `<div class="video${short ? ' short' : ''}" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
+      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>
+      <a class="yt-out" href="${out}" target="_blank" rel="noopener">باز کردن در اپ یوتیوب ↗</a>`;
   }
 
   function statsGrid(it) {
@@ -1805,7 +1814,8 @@
     const play = t.closest('.video .play');
     if (play) {
       const v = play.closest('.video');
-      v.insertAdjacentHTML('beforeend', `<iframe src="https://www.youtube-nocookie.com/embed/${v.dataset.yt}?autoplay=1&rel=0&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="ویدیو"></iframe>`);
+      if (v.classList.contains('playing')) return;
+      v.insertAdjacentHTML('beforeend', `<iframe src="https://www.youtube.com/embed/${v.dataset.yt}?autoplay=1&rel=0&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="ویدیو"></iframe>`);
       v.classList.add('playing'); return;
     }
     const seg = t.closest('.seg button');
