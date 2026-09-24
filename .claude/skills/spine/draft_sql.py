@@ -19,12 +19,15 @@ ROOT = __file__.rsplit('/.claude/', 1)[0]
 batch = json.load(open(sys.argv[1]))
 existing = {l.strip() for l in open(sys.argv[2]) if l.strip()}
 lib = json.load(open(ROOT + '/exercise_library.json'))
-libn = {re.sub(r'\s+', ' ', k.lower()).strip(): v for k, v in lib.items()}
+def yt(v):  # exercise_library.json holds a few non-video links (a Notion page) and bare 'youtube.com/...' ones
+    if not isinstance(v, str) or not re.search(r'(youtube\.com|youtu\.be)/', v): return None
+    return v if v.startswith('http') else 'https://' + v.lstrip('/')
+libn = {re.sub(r'\s+', ' ', k.lower()).strip(): yt(v) for k, v in lib.items() if yt(v)}
 
 PATTERNS = {'squat', 'hinge', 'single-leg', 'isolation', 'pull-vertical', 'pull-horizontal',
             'push-vertical', 'push-horizontal', 'anti-extension', 'anti-rotation',
             'anti-lateral-flexion', 'carry', 'rotation', 'throw', 'jump-land', 'conditioning',
-            'mobility', 'sprint'}
+            'mobility', 'sprint-cod'}  # must match SPINE_PATTERNS in coach.html
 FLAGS = {'loaded-knee-flexion', 'axial-load', 'free-hinge', 'overhead', 'high-impact'}
 
 ids = {e['id'] for e in batch}
@@ -47,9 +50,10 @@ if problems:
 def q(s): return 'null' if s is None or s == '' else "'" + str(s).replace("'", "''") + "'"
 def arr(a): return "'{}'" if not a else 'array[' + ','.join(q(x) for x in a) + ']::text[]'
 
-rows, crow = [], []
+rows, crow, nvid = [], [], 0
 for e in batch:
-    vid = libn.get(re.sub(r'\s+', ' ', e['name'].lower()).strip())
+    vid = next((libn[k] for k in (re.sub(r'\s+', ' ', x.lower()).strip() for x in [e['name']] + e.get('aliases', [])) if k in libn), None)
+    nvid += vid is not None
     rows.append('(' + ','.join([q(e['id']), q(e['name']), arr(e.get('aliases')), q(e['pattern']),
         q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')),
         arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), q(vid), "'draft'", "'claude-draft'"]) + ')')
@@ -64,13 +68,16 @@ print("""
 update public.exercises x set cues = c.cues
 from (
   select name, cues from (
-    select lower(e->>'name') as name, e->'cues' as cues,
-           row_number() over (partition by lower(e->>'name') order by p.updated_at desc) rk
+    select lower(x->>'name') as name, x->'cues' as cues,
+           row_number() over (partition by lower(x->>'name') order by p.updated_at desc) rk
     from public.programs p, jsonb_array_elements(p.data->'workouts'->'days') d,
-         jsonb_array_elements(d->'blocks') b, jsonb_array_elements(b->'exercises') e
-    where p.athlete_id <> 'demo' and jsonb_typeof(e->'cues') = 'object'
+         jsonb_array_elements(d->'blocks') b, jsonb_array_elements(b->'exercises') e,
+         -- the exercise itself, or each exercise inside a circuit
+         lateral (select e as x where e->'items' is null
+                  union all select i from jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array' then e->'items' else '[]' end) i) f
+    where p.athlete_id <> 'demo' and jsonb_typeof(x->'cues') = 'object'
   ) z where rk = 1
 ) c
 where x.cues is null and x.status = 'draft'
   and (c.name = lower(x.name) or c.name = any(select lower(a) from unnest(x.aliases) a));""")
-print(f'-- {len(batch)} drafts, {sum(1 for e in batch if libn.get(re.sub(chr(92)+"s+"," ",e["name"].lower()).strip()))} with a video', file=sys.stderr)
+print(f'-- {len(batch)} drafts, {nvid} with a video', file=sys.stderr)

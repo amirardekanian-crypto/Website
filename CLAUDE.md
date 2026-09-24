@@ -333,7 +333,8 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   TABLE so no athlete query can ever touch the flags. `get_exercises()` serves **approved rows only**.
 - **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
   (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;
-  their cues are Amir's own wording, copied from the most recent live programme using each one.
+  their cues are Amir's own wording, copied from the most recent live programme using each one. Batch 2 (80 more, the same day) took the exercises inside circuits, which
+  batch 1's query could not see.
   **The next batch is the `/spine` skill** (`.claude/skills/spine/`): the what's-missing query, the
   alias/new/skip sort, and `draft_sql.py`, which checks every link. The batch file with SFR and
   flags stays in the scratchpad, never in this public repo.
