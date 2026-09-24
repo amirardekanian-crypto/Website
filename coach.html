@@ -2381,7 +2381,11 @@ function decode(athleteId, blob) {
     else if ((m = key.match(/^readiness_(\d+)$/))) { day(m[1]).readiness = jparse(val); }
     else if ((m = key.match(/^daynote_(\d+)$/))) { day(m[1]).note = val; }
     else if ((m = key.match(/^setlog_(.+)$/)))   { exer(m[1]).sets = jparse(val) || []; }
-    else if ((m = key.match(/^note_(.+)$/)))     { exer(m[1]).note = val; }
+    // Exercise notes are per SESSION since 2026-09-24: <id>_snote_<Name> = { d, v },
+    // written by program.html and only meaningful on day d. The old durable note_
+    // key is kept for athletes still on a cached older app, and never beats snote_.
+    else if ((m = key.match(/^snote_(.+)$/)))    { const o = jparse(val); if (o && o.v) { exer(m[1]).note = o.v; exer(m[1]).noteOn = o.d; exer(m[1]).snote = true; } }
+    else if ((m = key.match(/^note_(.+)$/)))     { if (!exer(m[1]).snote) exer(m[1]).note = val; }
     else if ((m = key.match(/^rpe_(.+)$/)))      { exer(m[1]).rpe = val; }
   });
   return { days, ex };

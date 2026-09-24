@@ -616,7 +616,7 @@ cell for it. There is no placeholder, no default, and nothing to remember about 
 | Key | Type | Notes |
 |---|---|---|
 | `sets` | number | Omit on a single-effort or prep item. Drives how many rows the set log renders. |
-| `reps` | number or `"8-10"` | **Ranges are supported** — write the zone you actually mean. No need to collapse to one number. |
+| `reps` | number | **One number, never a range** (Amir, 2026-09-24: *"I don't prescribe rep ranges"*). The set log pre-fills this number and a tick means "done as written", so a range would leave the app guessing what was done. A design that thinks in a zone ships the one number meant. `auditRx()` flags a range as `rep-range`. |
 | `time` | `"30s"` · `"5 min"` · `"1:30"` | Holds, carries, bike/row/run durations. |
 | `distance` | `"20m"` · `"400m"` | Sprints, carries, shuttles. |
 | `work` | `"40s on / 20s off"` | Intervals, where the dose is a pattern rather than a count. |

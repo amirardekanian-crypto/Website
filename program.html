@@ -2175,19 +2175,19 @@
 
   /* ── Per-set log table (standard exercises) ──────────────────────
      The header and the rows below are two separate grids that MUST stay on the
-     same template, or SET / WEIGHT / RPE stop sitting above the things they
-     label. Every track is explicit so both grids resolve to identical widths:
-       26px   set number (the header's SET label needs all of it)
-       1fr    weight input, floored at 64px so a 3-4 character load stays readable
-       142px  RPE strip, shrinkable to 0, the buttons flex down with it
-       28px   check circle (exactly the button's own size)
-     A 375px phone gives this row 255px of content. The old
-     `28px 1fr auto 32px` on a 10px gap spent 232px of that on the fixed columns
-     and the five 26px RPE squares, leaving the weight input 23px: about one
-     and a half characters. Floor the weight; let RPE take what is left. */
+     same template, or SET / KG / REPS stop sitting above the things they label.
+     Countersign layout (2026-09-24, Content/SET-LOGGING-DESIGN.md):
+       26px   set number
+       1fr    weight input
+       (.78fr reps input — .has-reps only)
+       54px   RPE tag: empty until the set is ticked, then "RPE 8" (reopens the strip)
+       44px   tick, a 36px circle inside a thumb-sized track
+     The RPE strip is NOT a column any more. It was five ~20px buttons on every
+     row, visible before a single rep; it now opens full width under a row once
+     that row is ticked (.rpe-open), with 40px buttons. */
   .ex-set-header {
     display: grid;
-    grid-template-columns: 26px minmax(64px, 1fr) minmax(0, 142px) 28px;
+    grid-template-columns: 26px minmax(0, 1fr) 54px 44px;
     gap: 6px;
     align-items: center;
     padding: 10px 10px 8px;
@@ -2200,7 +2200,7 @@
   body[data-dark] .ex-set-header { color: #777; }
   .ex-set-row {
     display: grid;
-    grid-template-columns: 26px minmax(64px, 1fr) minmax(0, 142px) 28px;
+    grid-template-columns: 26px minmax(0, 1fr) 54px 44px;
     gap: 6px;
     align-items: center;
     padding: 8px 10px;
@@ -2242,12 +2242,9 @@
     gap: 3px;
     min-width: 0;
   }
-  /* Smaller RPE buttons inside the per-set row so 5 of them fit on mobile. They
-     share whatever the row has left once the weight field has its floor: about
-     24px on a 375px phone, up to 26px on a wider screen. They must stay
-     shrinkable (`flex: 1 1 0`, never a fixed width): .ex-log clips its overflow,
-     so a strip that refuses to shrink cuts the check circle off the right edge
-     on anything narrower than this. */
+  /* Base look of the per-set RPE buttons. Since 2026-09-24 the strip sits under its
+     row once the set is ticked and the countersign block further down sizes them to
+     40px; these rules are only the starting style it overrides. */
   .ex-set-rpe .rpe-btn {
     flex: 1 1 0;
     min-width: 0;
@@ -2306,10 +2303,8 @@
      move to the same five-track template together (see the note above). */
   .ex-set-log.has-reps .ex-set-header,
   .ex-set-log.has-reps .ex-set-row {
-    grid-template-columns: 26px minmax(46px, 1fr) 30px minmax(0, 128px) 28px;
-    gap: 5px;
+    grid-template-columns: 26px minmax(0, 1fr) minmax(0, .78fr) 54px 44px;
   }
-  .ex-set-log.has-reps .ex-set-weight { padding: 7px 8px; }
   .ex-set-reps {
     width: 100%;
     background: var(--grey-card);
@@ -2331,6 +2326,71 @@
   .ex-set-reps:focus { border-color: var(--yellow); }
   body[data-dark] .ex-set-reps { background: #2a2a2a; }
   body[data-dark] .ex-set-reps::placeholder { color: #ddd; }
+
+  /* ── Countersign rows (2026-09-24) ── see attachSetLog()/paintSets().
+     16px text in both inputs: below 16px iOS zooms the whole page on focus, which
+     is what the old 13px fields did mid-set. */
+  .ex-set-header, .ex-set-row { gap: 8px; }
+  .ex-set-header > div:nth-child(3) { text-align: center; }
+  .ex-set-log:not(.has-reps) .ex-set-header > div:nth-child(3) { text-align: left; }
+  .ex-set-weight, .ex-set-reps { height: 40px; font-size: 16px; border-radius: 8px; }
+  .ex-set-weight { padding: 0 10px; }
+  .ex-set-reps { padding: 0; }
+  .ex-set-row { transition: background 0.2s, opacity 0.2s; }
+  /* The set about to be done. Same tint Guided Mode uses for its current set. */
+  .ex-set-row.live { background: var(--yellow-dim); border-top-color: transparent; border-radius: 10px; }
+  .ex-set-row.live + .ex-set-row { border-top-color: transparent; }
+  body[data-dark] .ex-set-row.live { background: rgba(14,74,54,0.28); }
+  /* A countersigned set reads as a receipt: flat, bold, still editable on tap. */
+  .ex-set-row.done .ex-set-weight,
+  .ex-set-row.done .ex-set-reps { background: transparent; font-weight: 700; color: var(--grey-dark); }
+  /* A typed rep count is a set that went differently: it keeps its clay as a receipt. */
+  .ex-set-row.done .ex-set-reps:not(:placeholder-shown) { color: var(--ice); }
+  .ex-set-row.done .ex-set-reps:placeholder-shown::placeholder { color: var(--grey-dark); opacity: 1; font-weight: 700; }
+  .ex-set-row.done .ex-set-weight:focus,
+  .ex-set-row.done .ex-set-reps:focus { background: var(--grey-card); }
+  body[data-dark] .ex-set-row.done .ex-set-weight,
+  body[data-dark] .ex-set-row.done .ex-set-reps { background: transparent; color: #eee; }
+  body[data-dark] .ex-set-row.done .ex-set-reps:not(:placeholder-shown) { color: var(--ice); }
+  body[data-dark] .ex-set-row.done .ex-set-reps:placeholder-shown::placeholder { color: #eee; }
+  .ex-set-check { width: 36px; height: 36px; justify-self: center; }
+  .ex-set-check::after { font-size: 17px; }
+  /* RPE tag: invisible until the set is ticked. */
+  .ex-set-rpetag {
+    height: 32px; padding: 0; border: 1px solid transparent; border-radius: 8px;
+    background: transparent; cursor: pointer; visibility: hidden;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px;
+    letter-spacing: 0.3px; color: var(--yellow); white-space: nowrap;
+  }
+  .ex-set-row.done .ex-set-rpetag { visibility: visible; }
+  .ex-set-rpetag.empty { color: var(--grey-text); border: 1px dashed var(--grey-mid); font-weight: 600; }
+  .ex-set-row.rpe-open .ex-set-rpetag { border-color: var(--yellow); border-style: solid; }
+  body[data-dark] .ex-set-rpetag { color: #9fd3bd; }
+  body[data-dark] .ex-set-rpetag.empty { color: #888; border-color: #444; }
+  /* The strip: full width under its row, only while open. */
+  .ex-set-rpe {
+    grid-column: 1 / -1; display: none; align-items: center; gap: 6px;
+    padding: 4px 0 2px;
+  }
+  .ex-set-row.rpe-open .ex-set-rpe { display: flex; }
+  .ex-set-rpe-q {
+    font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 1.3px;
+    text-transform: uppercase; color: var(--grey-text); white-space: nowrap; margin-right: 2px;
+  }
+  .ex-set-rpe .rpe-btn { flex: 1 1 0; max-width: none; height: 40px; font-size: 16px; border-radius: 8px; }
+  body[data-dark] .ex-set-row.done .ex-set-num { color: #9fd3bd; }
+  /* The narrowest phones (320px): every fixed track gives a little so a load like
+     "102.5" still fits the weight box. */
+  @media (max-width: 360px) {
+    .ex-set-header, .ex-set-row { gap: 5px; padding-left: 6px; padding-right: 6px; }
+    .ex-set-header, .ex-set-row { grid-template-columns: 20px minmax(0, 1fr) 46px 40px; }
+    .ex-set-log.has-reps .ex-set-header,
+    .ex-set-log.has-reps .ex-set-row { grid-template-columns: 20px minmax(0, 1fr) minmax(0, .7fr) 46px 40px; }
+    .ex-set-weight { padding: 0 6px; }
+    .ex-set-rpetag { font-size: 12.5px; }
+    .ex-set-check { width: 34px; height: 34px; }
+    .ex-set-rpe-q { display: none; }
+  }
 
   /* ── The Card Remembers (2026-09-24) — see paintLastTime() ──
      Direction B from the build brief: a clay-OUTLINED pill on the closed card
@@ -3389,6 +3449,29 @@
   .preset-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; padding: 10px 20px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
   .preset-btn.selected { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
   .timer-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin-top: 20px; max-width: 320px; }
+  /* Guided Mode's rest: the ring gives up some height to the set-log panel. */
+  .timer-overlay.has-log .timer-ring { width: 176px; height: 176px; }
+  .timer-overlay.has-log .timer-display { font-size: 72px; }
+  .timer-overlay.has-log .timer-controls { margin-top: 12px; }
+  .timer-log { width: min(360px, calc(100vw - 32px)); margin-top: 18px; padding: 14px 14px 12px;
+    background: var(--white, #fff); border: 1px solid var(--grey-mid); border-radius: 14px; box-sizing: border-box; }
+  .timer-log[hidden] { display: none; }
+  .tl-head { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--grey-text); margin-bottom: 10px; }
+  .tl-line { display: flex; align-items: center; gap: 8px; }
+  .tl-line + .tl-line { margin-top: 10px; }
+  .tl-lab { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.3px; text-transform: uppercase;
+    color: var(--grey-text); width: 38px; flex-shrink: 0; }
+  .tl-step { width: 48px; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
+    font-size: 24px; line-height: 1; color: var(--grey-dark); cursor: pointer; }
+  .tl-val { flex: 1; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: var(--grey-dark); }
+  .tl-val.off { color: var(--ice); }
+  .tl-rpe-btn { flex: 1 1 0; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--grey-text); cursor: pointer; }
+  .tl-rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  body[data-dark] .timer-log { background: #202020; border-color: #383838; }
+  body[data-dark] .tl-step, body[data-dark] .tl-rpe-btn { border-color: #444; color: #ccc; }
+  body[data-dark] .tl-val { color: #eee; }
   .timer-ctrl-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 24px; border-radius: 4px; border: none; cursor: pointer; }
   .btn-start { background: var(--yellow); color: var(--on-accent); }
   .btn-add { background: var(--grey-card); color: var(--yellow); border: 1px solid var(--grey-mid); }
@@ -4069,6 +4152,8 @@
     <button class="timer-ctrl-btn btn-reset" onclick="resetTimer()">Reset</button>
     <button class="timer-ctrl-btn btn-close" id="timerCloseBtn" onclick="closeTimer()">Close</button>
   </div>
+  <!-- Guided Mode only: describe the set just done while resting (stepAfterDone). -->
+  <div class="timer-log" id="timerLog" hidden></div>
 </div>
 
 <!-- Readiness check — shown on Start, before the timer runs. Records only. -->
@@ -6231,6 +6316,15 @@ function rxOf(ex) {
 
 // A countable rep, or null for holds / carries / intervals — which is what keeps
 // them off The Ceiling. A range takes its LOW end, the conservative read.
+// The ONE rep number a set is pre-filled with and recorded at when the athlete
+// just ticks it. Unlike repCount() — which The Ceiling uses, and where a range's low
+// end is a safe conservative read — a range here returns null, so a set of 10 ticked
+// against a leftover "8-10" is never written down as 8.
+function plannedReps(ex) {
+  const r = rxOf(ex);
+  if (!r.dose || r.dose.kind !== 'reps') return null;
+  return /\d\s*[-–]\s*\d/.test(String(r.dose.value)) ? null : repCount(ex);
+}
 function repCount(ex) {
   const r = rxOf(ex);
   if (!r.dose || r.dose.kind !== 'reps') return null;
@@ -6756,7 +6850,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p><strong>Reps</strong> already show the number I prescribed, in grey. Leave it alone when you hit it. If you did fewer (or more), type what you actually did: it turns orange, and I see it.</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
+    body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
@@ -7301,7 +7395,7 @@ function renderCeiling() {
         <ol class="ceil-steps">
           <li>Open any exercise in today's session.</li>
           <li>Type in the weight you used.</li>
-          <li>Tap your RPE for that set, which is how hard it felt out of 10.</li>
+          <li>Tick the set, then tap your RPE for it, which is how hard it felt out of 10.</li>
           <li>Tap <strong>Save to The Ceiling</strong>.</li>
         </ol>
         ${canAdd ? `<p style="margin-top:14px">Or put one in from here — useful when you have
@@ -8876,6 +8970,7 @@ function resetDay(day) {
         const rp = row.querySelector('.ex-set-reps');
         if (rp) rp.value = '';
       });
+      if (card._paintSets) card._paintSets();
     }
   });
   // Hide RPE row indicator (used by circuits + simple exercises)
@@ -9341,7 +9436,7 @@ function buildSessionData(day) {
   const collectFor = (ex, isCircuit) => {
     const name = ex.name;
     const k = name.replace(/\s+/g, '_');
-    const n = localStorage.getItem(ATHLETE_ID + '_note_' + k) || '';
+    const n = loadSessionNote(name);
     if (isCircuit) {
       const card = Array.from(document.querySelectorAll('.round-group'))
         .find(c => (c.querySelector('.item-name')?.textContent || '').trim() === name);
@@ -9372,7 +9467,10 @@ function buildSessionData(day) {
       const m = missingByName.get(ex.name);
       const tag = m ? ` (${m.label})` : ' (✓)';
       summary += `• ${ex.name}${tag}\n`;
-      const planned = data.kind === 'sets' ? repCount(ex) : null;
+      const planned = data.kind === 'sets' ? plannedReps(ex) : null;
+      // A reps exercise with no single number (a leftover range) still records the
+      // reps the athlete TYPED; it just never invents one for a bare tick.
+      const repsKind = data.kind === 'sets' && !!(rxOf(ex).dose && rxOf(ex).dose.kind === 'reps');
       if (data.kind === 'sets') {
         log.push({ ex: ex.name, block: block.title || '', reps: planned,
           sets: data.log.map(s => ({ w: s.w || '', n: setReps(s, planned), r: s.r || '', d: !!s.d })),
@@ -9388,7 +9486,8 @@ function buildSessionData(day) {
           if (s.w) bits.push(s.w);
           // Reps as "×5", written only for a set that was actually logged. coach.html's
           // parseSetLine() reads the × back out — change the two together.
-          if (planned && (s.w || s.r || s.d)) bits.push('×' + setReps(s, planned));
+          const nDone = setReps(s, planned);
+          if (repsKind && nDone && (s.w || s.r || s.d)) bits.push('×' + nDone);
           if (s.r) bits.push('@' + s.r);
           const tail = s.d ? '✓' : (s.w || s.r ? '·' : 'skipped');
           summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
@@ -9613,7 +9712,10 @@ function loadSetLog(exName, totalSets) {
   return log;
 }
 // The prescribed rep count on a card, or null (holds, carries, intervals).
+// A leftover RANGE ("8-10") is not a prescribed number and returns null — see
+// repRangeText(). Amir prescribes one number, never a range (2026-09-24).
 function cardReps(card) {
+  if (/\d\s*[-–]\s*\d/.test(String((card && card.dataset.reps) || ''))) return null;
   const m = String((card && card.dataset.reps) || '').match(/\d+/);
   const n = m ? parseInt(m[0], 10) : NaN;
   return n > 0 ? n : null;
@@ -9627,7 +9729,29 @@ function saveSetLogValue(exName, log) {
   localStorage.setItem(setLogKey(exName), JSON.stringify(log));
 }
 
-// Build the per-set log table for a single (standard) exercise card.
+// ── The set log: WRITTEN BY THE COACH, COUNTERSIGNED BY THE ATHLETE ──────────
+// (2026-09-24, Content/SET-LOGGING-DESIGN.md.) Every set arrives pre-written: the
+// reps box shows the prescribed number, and the tick means "done as written". Only
+// a set that went differently costs more than that one tap.
+//
+// One row per set: SET · KG · REPS · (RPE tag) · tick. The RPE is NOT on the row
+// before the set is done: it used to be five ~20px buttons on every row, all visible
+// before a single rep, which is too small to hit with a thumb and asks the question
+// before the answer exists. Now it opens full width UNDER a row the moment that row
+// is ticked, and once picked it folds into a small "RPE 8" tag that reopens it.
+//
+// Row states (paintSets): `.live` is the first set not yet ticked, the one the
+// athlete is about to do. `.done` is a countersigned set. Nothing else changes look.
+//
+// ⚠ A rep RANGE in a legacy programme (13 left in live chips[] as of 2026-09-24;
+// Amir prescribes one number, never a range) gets NO pre-filled number: the box
+// shows the range and reps are recorded only when typed, because inventing the low
+// end would log "8" for every set of 10 an athlete ticked.
+function repRangeText(card) {
+  const t = String((card && card.dataset.reps) || '').trim();
+  return /\d\s*[-–]\s*\d/.test(t) ? t.replace(/\s*[-–]\s*/, '–').replace(/[^\d–]/g, '') : '';
+}
+
 function attachSetLog(card) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
@@ -9643,86 +9767,122 @@ function attachSetLog(card) {
   const slot = logSlotFor(card);
   const wrap = document.createElement('div');
   const planned = cardReps(card);
-  wrap.className = 'ex-set-log' + (planned ? ' has-reps' : '');
+  const range   = planned ? '' : repRangeText(card);
+  const repsCol = !!(planned || range);
+  wrap.className = 'ex-set-log' + (repsCol ? ' has-reps' : '');
   wrap.addEventListener('click', e => e.stopPropagation());
 
-  let html = `<div class="ex-set-header"><div>SET</div><div>${planned ? 'KG' : 'WEIGHT'}</div>${planned ? '<div>REPS</div>' : ''}<div>RPE</div><div></div></div>`;
+  let html = `<div class="ex-set-header"><div>SET</div><div>${repsCol ? 'KG' : 'WEIGHT'}</div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
   log.forEach((s, i) => {
     const rpeBtns = [6,7,8,9,10].map(n =>
-      `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button">${n}</button>`
+      `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="RPE ${n}">${n}</button>`
     ).join('');
-    const repsBox = planned
-      ? `<input class="ex-set-reps" type="text" inputmode="numeric" maxlength="3" placeholder="${planned}" value="${esc(s.n || '')}" aria-label="Reps done on set ${i+1}, if not ${planned}">`
+    const repsBox = repsCol
+      ? `<input class="ex-set-reps" type="text" inputmode="numeric" maxlength="3" placeholder="${planned || range}" value="${esc(s.n || '')}" aria-label="Reps done on set ${i+1}${planned ? ', if not ' + planned : ''}">`
       : '';
     html += `<div class="ex-set-row${s.d ? ' done' : ''}" data-set-idx="${i}">
       <div class="ex-set-num">${i+1}</div>
-      <input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}">
+      <input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}" aria-label="Weight on set ${i+1}">
       ${repsBox}
-      <div class="ex-set-rpe">${rpeBtns}</div>
-      <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done"></button>
+      <button class="ex-set-rpetag" type="button" aria-label="Rate set ${i+1}"></button>
+      <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done as written"></button>
+      <div class="ex-set-rpe"><span class="ex-set-rpe-q">How hard?</span>${rpeBtns}</div>
     </div>`;
   });
   wrap.innerHTML = html;
   slot.appendChild(wrap);
 
-  // Wire each row up
-  wrap.querySelectorAll('.ex-set-row').forEach(row => {
+  const rows = Array.from(wrap.querySelectorAll('.ex-set-row'));
+  // Which rows have their RPE strip open. Opened by a tick, closed by picking.
+  const open = new Set();
+
+  // Repaint every row from storage — the single place row state is drawn, so the
+  // list, Guided Mode, "tick all" and Reset can never leave two rows disagreeing.
+  function paintSets() {
+    const cur = loadSetLog(name, total);
+    const liveIdx = cur.findIndex(s => !s.d);
+    rows.forEach((row, i) => {
+      const s = cur[i] || {};
+      row.classList.toggle('done', !!s.d);
+      row.classList.toggle('live', i === liveIdx);
+      row.classList.toggle('rpe-open', !!s.d && open.has(i));
+      const tag = row.querySelector('.ex-set-rpetag');
+      tag.textContent = (s.d && s.r) ? 'RPE ' + s.r : (s.d ? 'RPE' : '');
+      tag.classList.toggle('empty', !s.r);
+      row.querySelectorAll('.rpe-btn').forEach(b => b.classList.toggle('selected', String(s.r) === b.dataset.rpe));
+    });
+  }
+  card._paintSets = (openIdx) => { if (openIdx != null) open.add(openIdx); paintSets(); };
+
+  rows.forEach(row => {
     const idx = parseInt(row.dataset.setIdx, 10);
-    // Weight input — saves on every keystroke
-    row.querySelector('.ex-set-weight').addEventListener('input', e => {
+    const edit = fn => {
       const cur = loadSetLog(name, total);
       cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
-      cur[idx].w = e.target.value;
+      fn(cur[idx]);
       saveSetLogValue(name, cur);
       if (card._ceilingRefresh) card._ceilingRefresh();
+      return cur;
+    };
+    // Weight — saves on every keystroke. Persian/Arabic digits and decimal marks are
+    // normalised on the way in (live logs held "۲۵" and "٫20", which nothing can read).
+    row.querySelector('.ex-set-weight').addEventListener('input', e => {
+      const v = normDigits(e.target.value);
+      if (v !== e.target.value) e.target.value = v;
+      edit(s => { s.w = v; });
     });
     // Reps — only typed when the set was NOT the prescribed number. Typing the
     // prescribed number itself stores nothing, so "as prescribed" stays one state.
     const repsIn = row.querySelector('.ex-set-reps');
     if (repsIn) repsIn.addEventListener('input', e => {
-      const digits = e.target.value.replace(/\D/g, '').slice(0, 3);
+      const digits = normDigits(e.target.value).replace(/\D/g, '').slice(0, 3);
       if (digits !== e.target.value) e.target.value = digits;
-      const cur = loadSetLog(name, total);
-      cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
-      cur[idx].n = (digits && parseInt(digits, 10) !== planned) ? digits : '';
-      saveSetLogValue(name, cur);
-      if (card._ceilingRefresh) card._ceilingRefresh();
+      edit(s => { s.n = (digits && parseInt(digits, 10) !== planned) ? digits : ''; });
     });
     // Typing the prescribed number back in means "as prescribed": show it that way.
     if (repsIn) repsIn.addEventListener('blur', e => {
-      if (parseInt(e.target.value, 10) === planned) e.target.value = '';
+      if (planned && parseInt(e.target.value, 10) === planned) e.target.value = '';
     });
-    // RPE buttons — toggle-select (tap selected = deselect)
+    // RPE — toggle-select (tap selected = deselect). Picking one closes the strip.
     row.querySelectorAll('.ex-set-rpe .rpe-btn').forEach(b => {
       b.addEventListener('click', ev => {
         ev.stopPropagation();
-        const wasSelected = b.classList.contains('selected');
-        row.querySelectorAll('.rpe-btn').forEach(x => x.classList.remove('selected'));
-        const cur = loadSetLog(name, total);
-        cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
-        if (wasSelected) {
-          cur[idx].r = '';
-        } else {
-          b.classList.add('selected');
-          cur[idx].r = b.dataset.rpe;
-        }
-        saveSetLogValue(name, cur);
-        if (card._ceilingRefresh) card._ceilingRefresh();
+        const was = b.classList.contains('selected');
+        edit(s => { s.r = was ? '' : b.dataset.rpe; });
+        if (!was) open.delete(idx);
+        paintSets();
+        if (navigator.vibrate) navigator.vibrate(8);
       });
     });
-    // Per-set check circle
+    // The RPE tag on a done row reopens (or closes) its strip.
+    row.querySelector('.ex-set-rpetag').addEventListener('click', ev => {
+      ev.stopPropagation();
+      if (!row.classList.contains('done')) return;
+      if (open.has(idx)) open.delete(idx); else open.add(idx);
+      paintSets();
+    });
+    // The tick: countersigns the set. Ticking opens the RPE strip on that row unless
+    // an RPE is already there; unticking closes it. Nothing is erased either way.
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
-      const cur = loadSetLog(name, total);
-      cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
-      cur[idx].d = !cur[idx].d;
-      saveSetLogValue(name, cur);
-      row.classList.toggle('done', cur[idx].d);
+      const cur = edit(s => { s.d = !s.d; });
+      if (cur[idx].d && !cur[idx].r) open.add(idx); else open.delete(idx);
+      paintSets();
       // Sync the exercise-level check: all sets done = exercise checked.
       syncExerciseCheck(card, cur);
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
+  paintSets();
+}
+
+// Persian (۰-۹) and Arabic-Indic (٠-٩) digits to ASCII, and their decimal marks
+// ("٫", "،") to a point — so a load typed on a Farsi keyboard is a number.
+function normDigits(v) {
+  return String(v || '')
+    .replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06F0))
+    .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[٫،]/g, '.');
 }
 
 // ── THE CEILING — estimated 1RM from a set the athlete just logged ─────
@@ -9786,8 +9946,9 @@ function prescribedReps(repsChip) {
 
 // Weight fields are free text ("60", "60kg", "62.5", "62,5"). Take the first
 // number; anything without one (e.g. "BW") simply has no estimate.
+// Persian/Arabic digits ("۲۵") are read too — real logs carry them.
 function parseLoggedKg(v) {
-  const m = String(v == null ? '' : v).replace(',', '.').match(/\d+(?:\.\d+)?/);
+  const m = normDigits(v == null ? '' : v).replace(',', '.').match(/\d+(?:\.\d+)?/);
   if (!m) return null;
   const n = parseFloat(m[0]);
   return n > 0 ? n : null;
@@ -10390,9 +10551,10 @@ function setAllSetsDone(card, done) {
   const cur = loadSetLog(name, total).map(s => ({ w: s.w, n: s.n || '', r: s.r, d: !!done }));
   saveSetLogValue(name, cur);
   // Reflect on the rendered rows
-  card.querySelectorAll('.ex-set-row').forEach((row, i) => {
-    row.classList.toggle('done', !!done);
-  });
+  // Reflect on the rendered rows — through the set log's own painter, so the live
+  // row and the RPE tags follow. "Tick all" means all as written: no strip opens.
+  if (card._paintSets) card._paintSets();
+  else card.querySelectorAll('.ex-set-row').forEach(row => row.classList.toggle('done', !!done));
 }
 
 // Public init that decides per-card whether to use per-set log or legacy single-RPE
@@ -10487,14 +10649,34 @@ function saveCircuitWeights(name, g) {
   localStorage.setItem(circuitWKey(name), JSON.stringify(g));
 }
 
-// Personal note per exercise — saved to localStorage per athlete + exercise.
-// Only added to "main" exercises (those with a rest button), same scope as weight-log.
+// Only added to "main" exercises (those with a rest button), same scope as the set log.
+// ── The exercise note: ONE PER SESSION (Amir, 2026-09-24) ──────────────────
+// It used to be one durable note per exercise, never cleared and written into
+// every session report. Of 522 exercise notes Amir received, only 259 were
+// distinct; one went out 9 sessions running, so "only got 6" kept arriving long
+// after it stopped being true. Now a note belongs to the day it was written:
+// stored as { d: 'YYYY-MM-DD' (local), v: text } under <id>_snote_<Name>, shown and
+// sent only on that day. A date stamp rather than a clear-on-reset, because the
+// cloud merge prefers real text over a blank and would hand a cleared note straight
+// back from another device. Last session's note is not lost: the Last time strip
+// shows it (it comes from the session record). The old <id>_note_ keys are no
+// longer read.
+function sessionNoteKey(name) { return ATHLETE_ID + '_snote_' + String(name).replace(/\s+/g, '_'); }
+function loadSessionNote(name) {
+  try {
+    const o = JSON.parse(localStorage.getItem(sessionNoteKey(name)));
+    return (o && o.d === ceilingToday() && typeof o.v === 'string') ? o.v : '';
+  } catch (e) { return ''; }
+}
+function saveSessionNote(name, v) {
+  localStorage.setItem(sessionNoteKey(name), JSON.stringify({ d: ceilingToday(), v: String(v || '') }));
+}
+
 function initNotes() {
   document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
     if (!card.querySelector('.rest-btn')) return;
     const name  = card.querySelector('.item-name').textContent.trim();
-    const key   = ATHLETE_ID + '_note_' + name.replace(/\s+/g, '_');
-    const saved = localStorage.getItem(key) || '';
+    const saved = loadSessionNote(name);
     const det = document.createElement('details');
     det.className = 'note-row';
     det.innerHTML =
@@ -10503,11 +10685,11 @@ function initNotes() {
          Note
          <span class="note-preview">${esc(saved)}</span>
        </summary>
-       <textarea placeholder="Add a personal note… (auto-saves)">${esc(saved)}</textarea>`;
+       <textarea placeholder="Anything about today's sets? Your coach sees it with this session.">${esc(saved)}</textarea>`;
     const ta = det.querySelector('textarea');
     const preview = det.querySelector('.note-preview');
     ta.addEventListener('input', e => {
-      localStorage.setItem(key, e.target.value);
+      saveSessionNote(name, e.target.value);
       preview.textContent = e.target.value;
     });
     // Keep clicks inside the note from bubbling up to the card's check-toggle
@@ -10587,6 +10769,10 @@ function showTimer(secs, name, onComplete) {
   timerOnComplete = onComplete;
   document.getElementById('timer-exercise-name').textContent = name;
   document.getElementById('timerCloseBtn').textContent = onComplete ? 'Skip →' : 'Close';
+  // The set-log panel belongs to Guided Mode's rest only; the manual Rest button never shows it.
+  const tl = document.getElementById('timerLog');
+  if (tl) { tl.hidden = !(onComplete && tl.dataset.ready === '1'); tl.dataset.ready = ''; }
+  document.getElementById('timerOverlay').classList.toggle('has-log', !!(tl && !tl.hidden));
   document.getElementById('timerOverlay').classList.add('visible');
   // resetTimer() refreshes display + ring using the new timerDuration
   resetTimer();
@@ -10779,9 +10965,56 @@ function stepPrimary() {
 function stepAfterDone() {
   if (STEP.pos === STEP.seq.length - 1) { showStepComplete(); return; }
   const item = STEP.seq[STEP.pos];
+  paintTimerLog(currentStepRow(), item);
   const restBtn = STEP.homeDetail.querySelector('.rest-btn');   // hidden by CSS, but still real
   const secs = parseInt(restBtn && restBtn.getAttribute('data-rest'), 10) || 120;
   openTimerAuto(secs, item.name, stepAdvance);
+}
+
+// The rest screen asks what the set was, while the athlete is sitting down anyway:
+// reps (pre-filled with the prescription, − / + to correct) and RPE. It holds no
+// state of its own. Every tap goes through the set row's OWN reps input and RPE
+// buttons, the exact nodes attachSetLog() wired, so Guided Mode and the list can
+// never disagree about a set (the rule CODEBASE.md sets for this mode).
+function paintTimerLog(row, item) {
+  const tl = document.getElementById('timerLog');
+  if (!tl || !row) return;
+  const repsIn = row.querySelector('.ex-set-reps');
+  const planned = repsIn ? parseInt(repsIn.getAttribute('placeholder'), 10) || null : null;
+  const isRange = !!(repsIn && /–/.test(repsIn.getAttribute('placeholder') || ''));
+  const repsNow = () => parseInt(repsIn.value, 10) || (isRange ? null : planned);
+  const selRpe = () => { const b = row.querySelector('.rpe-btn.selected'); return b ? b.dataset.rpe : ''; };
+  function draw() {
+    const n = repsIn ? repsNow() : null;
+    const off = repsIn && repsIn.value !== '';
+    tl.innerHTML = `
+      <div class="tl-head">Set ${item.setI + 1} of ${item.total} · how did it go?</div>
+      ${repsIn ? `<div class="tl-line">
+        <span class="tl-lab">Reps</span>
+        <button type="button" class="tl-step" data-d="-1" aria-label="One rep fewer">−</button>
+        <span class="tl-val${off ? ' off' : ''}">${n != null ? n : esc(repsIn.getAttribute('placeholder') || '')}</span>
+        <button type="button" class="tl-step" data-d="1" aria-label="One rep more">+</button>
+      </div>` : ''}
+      <div class="tl-line tl-rpe">
+        <span class="tl-lab">RPE</span>
+        ${[6,7,8,9,10].map(v => `<button type="button" class="tl-rpe-btn${selRpe() === String(v) ? ' selected' : ''}" data-rpe="${v}">${v}</button>`).join('')}
+      </div>`;
+    tl.querySelectorAll('.tl-step').forEach(b => b.addEventListener('click', () => {
+      const base = repsNow() || (isRange ? parseInt(repsIn.getAttribute('placeholder'), 10) || 1 : 1);
+      const next = Math.max(0, Math.min(999, base + Number(b.dataset.d)));
+      repsIn.value = (planned && !isRange && next === planned) ? '' : String(next);
+      repsIn.dispatchEvent(new Event('input'));
+      draw();
+    }));
+    tl.querySelectorAll('.tl-rpe-btn').forEach(b => b.addEventListener('click', () => {
+      const rb = row.querySelector(`.rpe-btn[data-rpe="${b.dataset.rpe}"]`);
+      if (rb) rb.click();
+      if (navigator.vibrate) navigator.vibrate(8);
+      draw();
+    }));
+  }
+  draw();
+  tl.dataset.ready = '1';
 }
 
 function stepAdvance() {
