@@ -20,13 +20,21 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 - **2026-09-24 · One map for every idea.** *"if you have came up with a new idea along the way, this
   should be added to the coaching graph."* He reads the ideas as one connected map, not as a trail
-  of separate briefs. So grown ideas (History Sheet, Rungs, Who Has This, Not Yet) and build status
+  of separate briefs. So grown ideas (History Sheet, Who Has This, Not Yet) and build status
   live on The Coaching Graph as well as in `BANK.md`. Rule in `SKILL.md` → *The Coaching Graph
   stays the one map*.
 - **2026-09-24 · #4 Because.** *"Go"*, on the recommended picks: dot on the ⓘ plus a Why page, 5–10
   per cycle, all six source tags, no backfill, #16 Not Yet next.
 
-- **2026-09-24 · #1 The Spine and #14 Rungs.** *"I love your rung idea. I love the exercise database."* Two rules came with it, both now standing: **"I just dont want to make my exercise cards busier. Maybe add something clickable and then you can see more?"** (so a new feature adds at most one small control to a card and puts the rest behind a tap), and **"the cues should be there so we dont write the cues for each exercise everytime"** (write shared content once, on the entity, and let a programme override it).
+- **2026-09-24 · Rungs REJECTED, after it shipped.** *"remove the rung, too much information, even im
+  mixed up. doesnt help athlete … the easier and harder is regressions and progressions. i mean real
+  regressions and progressions. and alternatives should be the ones with other machines or
+  equipment."* Two lessons: **a visual he praised in a pitch can still fail on the phone**, so a
+  structure the athlete must decode (a ladder, marks, counts) loses to a plain list; and **use his
+  coaching words**: Regressions, Progressions, Alternatives, each with its strict meaning. Never
+  pitch a ladder, staircase or "rungs climbed" again.
+
+- **2026-09-24 · #1 The Spine and #14 Rungs** (Rungs later removed, above). *"I love your rung idea. I love the exercise database."* Two rules came with it, both now standing: **"I just dont want to make my exercise cards busier. Maybe add something clickable and then you can see more?"** (so a new feature adds at most one small control to a card and puts the rest behind a tap), and **"the cues should be there so we dont write the cues for each exercise everytime"** (write shared content once, on the entity, and let a programme override it).
 
 - **2026-09-24 · The History Sheet** (the extra idea added inside the #5 deep-dive: every time an exercise was done, with a trend). *"I liked how you add a new idea, the story sheet."* He values an unrequested idea that grows out of the picked one, **so a deep-dive should always look for one**. Decisions on #5: *"lets go with your suggestions"*, with one correction from his coaching: **"I dont prescribe rep ranges, i prescribe a number only"**, and the reps box exists **so athletes can record fewer reps when they can't hit the number**. Never design for rep ranges in his programmes.
 

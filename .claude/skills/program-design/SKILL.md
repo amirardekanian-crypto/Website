@@ -350,7 +350,9 @@ from public.exercises e left join public.exercise_coach c using (id) order by e.
 Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
 **restrictions** (`flags`: `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`,
 `overhead` — check every flag against the athlete's injury picture), and **PROGRESS/REPLACE**
-along the ladder (`harder[0]` is the next rung, `alts` do the same job). Prefer an exercise that
+with the entry's links: `harder` = progressions (the same movement made harder), `easier` =
+regressions (the same movement made easier), `alts` = alternatives (the same movement on other
+equipment or a machine: the swap when a gym lacks the kit). Prefer an exercise that
 has an entry; a new one is fine, flag it as `new_exercise:` so it gets an entry.
 
 **THE QUALITY CHECK — before the spec goes to Amir (Quality Map, 2026-09-24).** Each Spine entry
@@ -439,7 +441,7 @@ SECTION: Core
 [Movement or circuit] | dose | note_flag: [optional]
 
 (cues: none in the spec. They come from each exercise's Spine entry. Anything you noticed about
- an entry while designing, such as a missing rung, a wrong flag or a better general cue, goes in as
+ an entry while designing, such as a missing regression/progression/alternative, a wrong flag or a better general cue, goes in as
  spine_cue: / new_exercise: lines. /program-assemble applies them in its Spine upkeep step.
  new_exercise: [name] | ext / int / avoid, written for anyone → drafted into the Spine
  spine_cue: [entry id] | [a general wording change for Amir to make on the entry])

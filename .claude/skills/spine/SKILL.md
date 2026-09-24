@@ -1,6 +1,6 @@
 ---
 name: spine
-description: Draft the next batch of exercises for The Spine (public.exercises), the one-record-per-exercise catalogue behind the ⓘ, the About sheet, Rungs and Library → Exercises. Use when Amir says "add the next 80 exercises", "draft more exercises", "fill the Spine", "add <exercise> to the Spine", or when /program-assemble finds a name the Spine does not have. Drafts only: Amir approves in coach.html → Exercises. Also the Upkeep pass that ends every /program-assemble, /program-edit and /workout run: draft missing exercises, fill empty fields, propose updates.
+description: Draft the next batch of exercises for The Spine (public.exercises), the one-record-per-exercise catalogue behind the ⓘ, the About sheet (Regressions · Progressions · Alternatives) and Library → Exercises. Use when Amir says "add the next 80 exercises", "draft more exercises", "fill the Spine", "add <exercise> to the Spine", or when /program-assemble finds a name the Spine does not have. Drafts only: Amir approves in coach.html → Exercises. Also the Upkeep pass that ends every /program-assemble, /program-edit and /workout run: draft missing exercises, fill empty fields, propose updates.
 ---
 
 # The Spine: drafting the next batch
@@ -70,13 +70,23 @@ the existing ids for the links, and they show you which names are only variants.
 `purpose`, `tennis`, `equipment`, `loads`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
 - **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
   sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
-  wherever it fits, because Rungs are drawn per pattern.
+  wherever it fits, so Library → Exercises groups it with its family.
 - **purpose:** one sentence in Amir's voice (`COACHING-PRINCIPLES.md` → *Communication*). Say what
   it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general. The
   *why for this athlete* belongs to the programme, not to the entry.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch.
-- **easier / harder / alts:** these draw the Rungs, so link only to ids that exist (in the Spine
-  or in this batch). A rung you would like to have but nobody programmes can wait.
+- **easier / harder / alts** are shown to athletes as **Regressions**, **Progressions** and
+  **Alternatives** (Amir, 2026-09-24; the old Rungs ladder is gone for good: *"too much
+  information, even im mixed up"*). Keep the three meanings strict:
+  - `easier` = a REAL regression: the **same movement** made easier (less range, more support,
+    bilateral, lighter implement). Split squat → supported split squat, not split squat → leg press.
+  - `harder` = a REAL progression: the **same movement** made harder (more range, less support,
+    single-leg, more load or speed). Split squat → front-foot-elevated → Bulgarian.
+  - `alts` = **the same movement on other equipment or a machine**: DB bench ↔ barbell bench ↔
+    machine chest press, lying ↔ seated leg curl. It is the swap when a gym lacks the kit, not
+    "another exercise that also trains the legs".
+  Link only to ids that exist (in the Spine or in this batch), link both ways (a progression's
+  entry lists this one as a regression), and leave a list empty rather than stretch it.
 - **qualities:** the Quality Map (stage32). One to three of `strength · muscle · power · spring ·
   speed · brakes · rotation · engine · armour · movement`, **first = primary**: what the exercise is
   mostly FOR. A day card on Home counts working sets × (primary 1, secondary ½), so tag what it
@@ -148,7 +158,7 @@ select nm, id, status,
     case when coalesce(tennis, '') = '' then 'tennis?' end,
     case when cardinality(equipment) = 0 then 'equipment' end,
     case when cardinality(loads) = 0 then 'loads' end,
-    case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'rungs' end,
+    case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'links' end,
     case when id is not null and cardinality(qualities) = 0 and cardinality(coalesce(suggested_qualities, '{}')) = 0 then 'qualities' end,
     case when id is not null and exid is null then 'exId on the card' end,
     case when id is not null and sfr is null then 'sfr?' end], null) gaps
@@ -161,7 +171,7 @@ no SFR. Answer them once and they stop mattering.
 | | A **draft** entry | An **approved** entry (athletes see it) |
 |---|---|---|
 | **No entry at all** | Draft it now with `draft_sql.py` (the whole Run above, for one or a few names) | — |
-| **Empty field** (video, alias, equipment, loads, a rung, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
+| **Empty field** (video, alias, equipment, loads, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
@@ -171,8 +181,10 @@ no SFR. Answer them once and they stop mattering.
 - **Qualities:** tag what the exercise is mostly FOR, first = primary, stop at three. A new
   exercise without qualities makes its day card go blank (under 70% tagged shows nothing), so this
   is never optional.
-- **Rungs:** link only to ids that exist. A new exercise that is the next rung of an existing one
-  gets linked from both sides (`harder` on the old, `easier` on the new).
+- **Links:** link only to ids that exist, by the strict meanings in the Run above. A new exercise
+  that is a progression of an existing one gets linked from both sides (`harder` on the old,
+  `easier` on the new); an alternative goes in `alts` on both. On an approved entry, adding a
+  missing link is filling a gap; changing or removing one is a proposal.
 - **What this programme taught us counts as "can be updated":** a better general cue Amir wrote
   or approved while designing (design's `spine_cue:` lines), a new restriction flag the athlete's
   picture showed was missing, an SFR order Amir overruled at the checkpoint. On a draft, apply
@@ -183,7 +195,7 @@ no SFR. Answer them once and they stop mattering.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
 `SPINE — added 2 drafts (names) · filled 5 gaps (what) · tagged qualities on 3 (2 as suggestions on
-approved entries) · linked 2 rungs · 3 proposals for you (entry: old → new) ·
+approved entries) · linked 2 (regressions/progressions/alternatives) · 3 proposals for you (entry: old → new) ·
 N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 
 ## Batch size and order

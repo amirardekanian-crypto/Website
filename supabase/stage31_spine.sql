@@ -12,8 +12,9 @@
 -- programme that used a lift (891 exercise slots, 298 names, 33 athletes).
 --
 -- ── Two tables, two audiences ──────────────────────────────────────────────
--- exercises       what an athlete may read: purpose, pattern, cues, the ladder
---                 (easier / harder / alternatives, as ids), what it loads, video.
+-- exercises       what an athlete may read: purpose, pattern, cues, regressions /
+--                 progressions / alternatives (easier / harder / alts, as ids),
+--                 what it loads, video.
 -- exercise_coach  what only the coach reads: SFR rank within its pattern, and
 --                 the restriction flags the pipeline filters on (loaded-knee-
 --                 flexion, axial-load, free-hinge, high-impact, overhead …).
@@ -44,9 +45,9 @@ create table if not exists public.exercises (
   cues        jsonb,                              -- { good: [..], bad: [..] }, same shape as a programme card
   equipment   text[] not null default '{}',
   loads       text[] not null default '{}',       -- body regions it loads (for #8 Body Check)
-  easier      text[] not null default '{}',       -- ids, first one is the main rung down
-  harder      text[] not null default '{}',       -- ids, first one is the main rung up
-  alts        text[] not null default '{}',       -- ids that do the same job
+  easier      text[] not null default '{}',       -- regressions: the same movement made easier
+  harder      text[] not null default '{}',       -- progressions: the same movement made harder
+  alts        text[] not null default '{}',       -- alternatives: same movement, other equipment
   video       text,
   status      text not null default 'draft' check (status in ('draft', 'approved')),
   updated_at  timestamptz not null default now(),

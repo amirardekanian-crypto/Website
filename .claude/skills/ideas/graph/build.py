@@ -147,17 +147,17 @@ IDEAS = [
   coach="Fewer <em>how am I doing?</em> messages, and every row is the same log line you already read in coach.html.",
   mvp="Built with #5: read from <code>get_my_history()</code>, old sessions parsed from their summary text, nothing migrated.",
   adv="Renames already join through the Personal Records matcher. Next: mark the sessions where a Ceiling best was set."),
- dict(n=14, name="Rungs", sub="Each movement pattern as a staircase you climb", layer="Grown along the way", grown="1",
-  stages=["Progression","Education","Exercise selection"], needs=[1, 5],
-  cost="None beyond the Spine review. The ladder comes from the easier and harder links you approve.",
-  chain=["Exercise","Easier ⇄ Harder links","Your programme archive","Your logged sessions","Rungs climbed"],
-  what="The About sheet draws the exercise's pattern as a ladder: the rungs below, the rungs above, and which ones this athlete has already trained.",
-  problem="An athlete sees one exercise at a time and has no picture of where it sits. <em>Why am I still doing split squats?</em> has an answer, and the app never showed it.",
-  how="Inside the ⓘ sheet: each rung marked <em>Done</em>, <em>In your plan</em>, <em>This one</em> or <em>Next rung</em>, with <em>N rungs climbed</em> over the top. Tap a rung to read about it.",
-  athlete="A long plan made visible: where they started, where they are, and the next step up.",
-  coach="Makes your progression logic legible without you writing it out. Moving up stays your call at the next cycle.",
-  mvp="Built inside the Spine (you: <em>I love your rung idea</em>): easier[0] and harder[0] walked from the entry, marked from the archive and #5's history.",
-  adv="#16 Not Yet adds the paused rungs, with what unlocks them."),
+ dict(n=14, name="Rungs", sub="Removed 24 Sep: three plain lists instead", layer="Grown along the way", grown="1",
+  stages=["Progression","Education","Exercise selection"], needs=[1],
+  cost="None. It was taken out.",
+  chain=["Exercise","Regressions","Progressions","Alternatives"],
+  what="Rungs drew each movement pattern as a ladder in the ⓘ sheet, marked with what the athlete had climbed. It was built and then <strong>removed the same day</strong>.",
+  problem="You, on seeing it: <em>remove the rung, too much information, even im mixed up. doesnt help athlete.</em> A ladder built from first links mixed real progressions with exercises that only train the same area.",
+  how="The ⓘ sheet now shows three plain lists: <strong>Regressions</strong> (the same movement made easier), <strong>Progressions</strong> (the same movement made harder) and <strong>Alternatives</strong> (the same movement on other equipment or a machine). All 212 entries were relinked to those meanings; the old links are kept coach-side.",
+  athlete="Three short, honest lists instead of a staircase to decode.",
+  coach="Your words on the screen: regressions, progressions, alternatives. Moving up stays your call at the next cycle.",
+  mvp="Done: the ladder, its marks and <em>N rungs climbed</em> are gone from the app, the skills and the docs.",
+  adv="Do not bring a ladder back."),
  dict(n=15, name="Who Has This", sub="Change a cue or a video, and see who it reaches", layer="Grown along the way", grown="1",
   stages=["Programming","Communication"], needs=[1], cost="None.",
   chain=["Spine entry","Every live programme","Athletes doing it now"],
@@ -168,17 +168,17 @@ IDEAS = [
   coach="A one-look answer to <em>who will this change affect?</em>, and a to-do list for the Spine.",
   mvp="Built with the Exercises tab: read from <code>programs</code> through the same name resolver the app uses.",
   adv="A note to those athletes when an approved cue or video changes."),
- dict(n=16, name="Not Yet", sub="The next rung, with what unlocks it", layer="Grown along the way", grown="4",
+ dict(n=16, name="Not Yet", sub="A paused progression, with what unlocks it", layer="Grown along the way", grown="4",
   stages=["Progression","Education","Communication"], needs=[1, 4],
   cost="None extra. The gate is written once, in the Exercise Ledger you already keep.",
-  chain=["Ledger: Paused exercise","Its gate","Rungs (dashed)","The athlete's film or test","Unlocked next cycle"],
-  what="A <strong>Paused</strong> exercise (never a Banned one) shows in the Rungs as a dashed step, with its gate in plain words: what unlocks it and how you will know.",
+  chain=["Ledger: Paused exercise","Its gate","The athlete's film or test","Unlocked next cycle"],
+  what="A <strong>Paused</strong> exercise (never a Banned one) with its gate in plain words: what unlocks it and how you will know. <strong>Parked 24 Sep</strong>: it was going to live in Rungs, which you removed as too much information, so it waits for your call on whether it earns a place at all.",
   problem="The ledgers hold 49 Paused or Banned exercises, the other half of every decision. The athlete never sees what they are working towards, so <em>when can I jump?</em> arrives by message.",
-  how="In the ⓘ sheet's ladder: <em>Box Drop · not yet · Unlocks when your snap-downs land quiet and still. Film three and send them.</em>",
-  athlete="The next rung is a target, not a mystery. The boring drill has a point.",
+  how="If it comes back: one line under <strong>Progressions</strong> in the ⓘ sheet, <em>Box Drop · not yet · unlocks when your snap-downs land quiet and still.</em>",
+  athlete="The next step is a target, not a mystery. The boring drill has a point.",
   coach="Fewer <em>when can I…</em> messages, and filmed evidence arriving at the moment you need it.",
-  mvp="A <code>gates</code> list on the programme (exercise id plus one sentence), written with the Becauses, drawn as a dashed rung.",
-  adv="The unlock ties to a real result, a Personal Record or a test, and the rung turns solid the day it's met."),
+  mvp="A <code>gates</code> list on the programme (exercise id plus one sentence), written with the Becauses.",
+  adv="The unlock ties to a real result, a Personal Record or a test."),
  dict(n=17, name="Still Warm", sub="Qualities the cycle means to keep, watched for going cold", layer="Grown along the way", grown="2",
   stages=["Monitoring","Adaptation","Progression"], needs=[2, 5], cost="None. It reads what was logged against the qualities already tagged.",
   chain=["Cycle: qualities to keep","Logged working sets","Days since last trained","Radar row"],
@@ -208,15 +208,17 @@ STATUS = {
  4: ("Built 24 Sep", "https://claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw"),
  5: ("Built 24 Sep", "https://claude.ai/artifact/NTtDNds5vcLoE6AfX21Zoj"),
  2: ("Built 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
- "5b": ("Built 24 Sep", None), 14: ("Built 24 Sep", None), 15: ("Built 24 Sep", None),
+ "5b": ("Built 24 Sep", None), 14: ("Removed 24 Sep", None), 15: ("Built 24 Sep", None),
+ 16: ("Parked 24 Sep", None),
 }
 
 def chips(i):
     st = STATUS.get(i["n"])
     s = ""
     if st:
-        s += (f'<a class="chip built" href="{st[1]}">{E(st[0])} · the brief ›</a>' if st[1]
-              else f'<span class="chip built">{E(st[0])}</span>')
+        cls = "built" if st[0].startswith("Built") else "gone"
+        s += (f'<a class="chip {cls}" href="{st[1]}">{E(st[0])} · the brief ›</a>' if st[1]
+              else f'<span class="chip {cls}">{E(st[0])}</span>')
     if i.get("grown"):
         s += f'<a class="chip grown" href="#idea-{i["grown"]}">grew from #{i["grown"]}</a>'
     s += "".join(f'<span class="chip">{E(x)}</span>' for x in i["stages"])
