@@ -24,7 +24,7 @@ Brief: product strategy across assessment → … → adaptation; connected info
 | 9 | Radar | coach.html Needs-you fires on readiness drop, RPE creep, pain, missed sessions, retest due, handoff dates | — | pitched |
 | 10 | Pinned | Messages attached to an exercise/session/outcome and shown on it | 1 | pitched · suggested park |
 | 11 | Right Read, Right Time | Articles tagged to exercises/qualities/cycles/moments, offered in context | 1, 2 | pitched |
-| 12 | The Debrief | Cycle outcomes scored against measures + what changes next cycle and why | — | **picked** 2026-09-24 for a real athlete (Alireza's Cycle 1) · deep-dive + his Farsi debrief: https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx |
+| 12 | The Debrief | Cycle outcomes scored against measures + what changes next cycle and why | — | **picked** 2026-09-24 for a real athlete (Alireza's Cycle 1) · deep-dive: https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx · **first one done by hand** the same day: Farsi cycle report for WhatsApp + a `## Debrief — Cycle 01` section in his `coaching_logs`, which `/program-design` now reads |
 | 13 | Patterns | Proof habits × readiness × RPE × Personal Records findings, above a minimum amount of data | — | pitched · suggested park |
 
 Quick win noted in the same round: the TPS course app's `easier`/`harder` are free text; making them

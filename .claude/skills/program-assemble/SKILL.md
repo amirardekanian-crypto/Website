@@ -293,6 +293,8 @@ reads neither. See `.claude/coaching-log/README.md` for the convention + templat
   lockstep with `programHistory` / `currentCycleIndex`.)
 - Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
 - Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
+  A `## Debrief — Cycle NN …` section (the end-of-cycle review) may sit between two cycle sections:
+  it is not a cycle section, never edit or move it, and append the new cycle after it.
 - **⚖️ The Volume & Dose section must carry BOTH set-count tables** — the per-exercise
   contribution table (day · exercise · sets · what it counts toward, fractions shown) *and* the
   per-muscle total against its goal range. Standing order from Amir (2026-09-08): *"whenever you
