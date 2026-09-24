@@ -372,6 +372,14 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   alternative is the same movement on different kit. **On court** shows to tennis and padel
   athletes only (`isRacketSport()`). All 212 entries' links were rewritten to this rule that day;
   the old links are in `exercise_coach.links_before` (stage33).
+  ⚠ **A link is an id OR A PLAIN NAME** (Amir, 2026-09-24: *"if we already have it, link it, if
+  not, just put the name"*). An item shaped like an id (`goblet-squat`) must be an entry; anything
+  else (`Nordic Hamstring Curl`) is the name of an exercise with no entry yet, drawn as a quiet
+  dashed pill with nothing to tap. The name resolves at READ time like a card does (`spineFor()`),
+  so it becomes a real link on its own once an approved entry carries that name or alias. Only id
+  links are mirrored both ways. The same day's link pass (stage34) took the Spine from 255
+  links to 387 (103 of them names) and from 40 entries with no link to 16 (warm-up drills and
+  stretches); each entry's links before it are in `exercise_coach.links_history`.
 - **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
   *"the aim is to use these cues for all the exercises that everyone has from now on … if there is
   a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline

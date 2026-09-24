@@ -85,8 +85,14 @@ the existing ids for the links, and they show you which names are only variants.
   - `alts` = **the same movement on other equipment or a machine**: DB bench ↔ barbell bench ↔
     machine chest press, lying ↔ seated leg curl. It is the swap when a gym lacks the kit, not
     "another exercise that also trains the legs".
-  Link only to ids that exist (in the Spine or in this batch), link both ways (a progression's
-  entry lists this one as a regression), and leave a list empty rather than stretch it.
+  **Link by id when the exercise has an entry (in the Spine or in this batch); otherwise write its
+  plain name** (Amir, 2026-09-24: *"if we already have it, link it, if not, just put the name"*),
+  in Title Case as a coach would say it (`Nordic Hamstring Curl`, never `nordic-hamstring-curl`:
+  an id-shaped item must exist or the tool refuses it). Check the name is not an existing entry's
+  name or alias first. The athlete sees a name as a quiet pill with nothing to tap until an entry
+  with that name is approved, and then it links on its own. Link ids both ways (a progression's
+  entry lists this one as a regression); a name has no other side. Keep each list to about four,
+  closest steps first, and leave a list empty rather than stretch it.
 - **qualities:** the Quality Map (stage32). One to three of `strength · muscle · power · spring ·
   speed · brakes · rotation · engine · armour · movement`, **first = primary**: what the exercise is
   mostly FOR. A day card on Home counts working sets × (primary 1, secondary ½), so tag what it
@@ -181,10 +187,15 @@ no SFR. Answer them once and they stop mattering.
 - **Qualities:** tag what the exercise is mostly FOR, first = primary, stop at three. A new
   exercise without qualities makes its day card go blank (under 70% tagged shows nothing), so this
   is never optional.
-- **Links:** link only to ids that exist, by the strict meanings in the Run above. A new exercise
-  that is a progression of an existing one gets linked from both sides (`harder` on the old,
-  `easier` on the new); an alternative goes in `alts` on both. On an approved entry, adding a
-  missing link is filling a gap; changing or removing one is a proposal.
+- **Links:** an id when the entry exists, a plain name when it doesn't, by the strict meanings in
+  the Run above. A new exercise that is a progression of an existing one gets linked from both
+  sides (`harder` on the old, `easier` on the new); an alternative goes in `alts` on both. On an
+  approved entry, adding a missing link is filling a gap; changing or removing one is a proposal.
+- **A name that just got its own entry:** when you draft an exercise that other entries already
+  list by NAME, swap the name for the new id on each of them (same list, same place) and mirror
+  it. Find them with
+  `select id from public.exercises, unnest(easier || harder || alts) l where lower(l) = lower('<Name>');`.
+  The app would resolve the name anyway, but only an id gets the link on the other side.
 - **What this programme taught us counts as "can be updated":** a better general cue Amir wrote
   or approved while designing (design's `spine_cue:` lines), a new restriction flag the athlete's
   picture showed was missing, an SFR order Amir overruled at the checkpoint. On a draft, apply

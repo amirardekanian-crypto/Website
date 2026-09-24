@@ -671,7 +671,7 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 #### `exId` and the Spine (2026-09-24)
 
 The Spine is one record per exercise Amir programmes (`supabase/stage31_spine.sql`): purpose,
-pattern, the cues, its regressions/progressions/alternatives (`easier`/`harder`/`alts` as ids), what it loads, the video. A
+pattern, the cues, its regressions/progressions/alternatives (`easier`/`harder`/`alts`: an entry id, or the plain name of an exercise with no entry yet), what it loads, the video. A
 card resolves to its entry by **`exId` first, then its name** (the entry's `name` and `aliases`,
 through the same four matching tiers Personal Records uses). Names in stored programmes are
 **never rewritten**; `exId` is added beside the name by `/program-assemble` from 2026-09-24 on.
