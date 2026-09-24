@@ -393,6 +393,10 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
 - **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). coach.html → Exercises →
   *Quality check* flags every current programme whose headline is not in its week's top two.
 - `qualcache` (localStorage, no prefix) caches `get_qualities()` and never syncs.
+- **Library → Qualities is the fourth door** (Amir, 2026-09-24: *"this should exist in library with its
+  seperate card"*): the ten in fixed order, each on its own cycle picture (the family it names; Speed
+  and Rotation borrow day art), tagged *In your plan · N exercises* or *Not in this block*. Each opens
+  the same `openQualitySheet()` as a day-card chip (`renderQualityLibrary()`). No picture was generated.
 
 ### 🎯 Because — why THIS athlete has this exercise (2026-09-24)
 
