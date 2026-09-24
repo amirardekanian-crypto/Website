@@ -78,7 +78,7 @@ the existing ids for the links, and they show you which names are only variants.
 - **loads + impact = "Body parts involved"** (Amir, 2026-09-24, from the course app's
   «بخش‌هایی از بدن که درگیر است»; stage36). The athlete sees them in the About sheet: the regions as
   soft pills, the impact word in clay. **Every entry gets both, and `draft_sql.py` refuses one without.**
-  - `loads`: 1 to 4 of `ankle-foot · calf-achilles · knee · hip-groin · hamstring · low-back · trunk ·
+  - `loads`: 1 to 4 (more only when copying the course, whose Trap Bar Deadlift has five) of `ankle-foot · calf-achilles · knee · hip-groin · hamstring · low-back · trunk ·
     shoulder · elbow-forearm-wrist · neck` (the course's own ids plus `neck`; the database refuses
     anything else). Name what the exercise really loads, not every joint that moves. The calibration,
     from the course's own 114 tags: squat or lunge = `knee, hip-groin` (+ `low-back` with a bar on the
@@ -195,7 +195,7 @@ no SFR. Answer them once and they stop mattering.
 |---|---|---|
 | **No entry at all** | Draft it now with `draft_sql.py` (the whole Run above, for one or a few names) | — |
 | **Empty field** (video, alias, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
-| **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). An approved entry whose `impact` is null still carries the loose words renamed in stage36: check them against the calibration and fix them in the same pass |
+| **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). Since stage37 every entry has both, so a gap here is a new exercise or one somebody cleared |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
