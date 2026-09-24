@@ -246,3 +246,14 @@ Say so, and offer to stop at the names that are used now.
   em-dash) and only copies from a programme when the batch has none. One library video was plainly
   wrong (Half-Kneeling Cable Thoracic Rotation had Single-Leg Balance's link) and was left empty; 61
   entries still have no video. From here the Spine grows through **Upkeep**, not batches.
+- *(2026-09-24, links by name, stage34/35)* Three traps, all caught before they reached a phone:
+  1. **A name link must not resolve to its own entry.** The resolver drops the word "machine" and
+     ignores word order, so "Machine Dip" on Dip's Alternatives read as "Dip" and vanished. Check
+     every new name through the four tiers (the `pg_temp.vars()` query in stage34's session, or
+     `exNameVariants()` in program.html), not just an exact `lower(name)` match.
+  2. **Mirroring copies mistakes.** Before making id links two-sided, read the one-sided ones: four
+     were wrong (Hollow Hold <- Dead Bug and the like) and mirroring would have put each on a
+     second entry. Hold those back and propose them instead.
+  3. **Check a programme before removing an alias.** "Single-Leg Bound" on Lateral Bound looked like
+     a trap for a forward bound, but the one card using it was a lateral bound, so removing it would
+     have cut that card off its cues. `select … where lower(e->>'name') = '<alias>'` first.

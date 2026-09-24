@@ -378,8 +378,14 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   dashed pill with nothing to tap. The name resolves at READ time like a card does (`spineFor()`),
   so it becomes a real link on its own once an approved entry carries that name or alias. Only id
   links are mirrored both ways. The same day's link pass (stage34) took the Spine from 255
-  links to 387 (103 of them names) and from 40 entries with no link to 16 (warm-up drills and
-  stretches); each entry's links before it are in `exercise_coach.links_history`.
+  links to 387 (103 of them names); then stage35 (Amir: *"apply the fixes"*) corrected the
+  approved links that broke the strict meanings and **merged three duplicates into aliases**
+  (Cable Single-Leg Hip Extension → Cable Glute Kickback, Rotational Wall Slam → Medicine Ball
+  Rotational Throw, Thoracic Windmill → Open Book), leaving **209 entries, 365 links (104 names),
+  17 with no link** (warm-up drills and stretches). Every entry's links before each pass, and each
+  merged entry's whole row, are in `exercise_coach.links_history`. ⚠ **Two entries may never
+  share a name or alias**: the resolver wants ONE entry per tier, so a shared name resolves to
+  nothing and both cards lose their cues. A duplicate becomes an alias and its entry is deleted.
 - **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
   *"the aim is to use these cues for all the exercises that everyone has from now on … if there is
   a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline
