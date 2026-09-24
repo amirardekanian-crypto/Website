@@ -4258,8 +4258,12 @@ const SPINE_FLAGS = ['loaded-knee-flexion','axial-load','free-hinge','high-impac
 // The Quality Map (2026-09-24): the ten ids, and which cycle-picture family
 // word names each one. A cycle's headline quality is read from its `art` word.
 const QM_IDS = ['strength','muscle','power','spring','speed','brakes','rotation','engine','armour','movement'];
+// `bedrock`, `peak` and `reset` name a PHASE (foundation, sharpen, recover), not one quality,
+// so those blocks carry no headline and are never flagged. bedrock→movement was tried first
+// and flagged nearly every foundation block, which trains base strength first (2026-09-24).
 const QM_ART = { iron: 'strength', build: 'muscle', voltage: 'power', spring: 'spring', brakes: 'brakes',
-  engine: 'engine', armour: 'armour', bedrock: 'movement' };
+  engine: 'engine', armour: 'armour' };
+const QM_PHASE = { bedrock: 'a foundation block', peak: 'a peaking block', reset: 'a recovery block' };
 const QM_PREP = /warm|mobility|activation|cool|prime|prep/i;   // same test as program.html isPrepBlockTitle()
 let _spineOpen = null;      // id of the entry whose editor is open
 let _spineFilter = 'draft';
@@ -4418,12 +4422,23 @@ function qualityPanels(idx, byId) {
     .map(([aid, data]) => Object.assign({ aid }, qualityCheckC(data, idx, byId)))
     .sort((a, b) => (b.flag - a.flag) || a.coverage - b.coverage);
   const nFlag = rows.filter(r => r.flag).length;
-  h += `<section class="panel" style="margin-bottom:16px"><details${nFlag ? ' open' : ''}><summary class="arch-toggle">Quality check · ${nFlag} block${nFlag === 1 ? '' : 's'} not training their headline</summary>
-    <p class="psub" style="margin:10px 0">Working sets per week by quality, from each current programme. The headline is the cycle's picture word; a flag means it is not in the top two. Coverage is how much of the week is tagged. Below 70% the athlete's day card shows nothing.</p>` +
-    rows.map(r => `<div class="credrow"><span class="credname">${esc(nameOf(r.aid))} <span class="muted">· ${esc(r.cycle)}${r.art ? ' · ' + esc(r.art) : ''}</span></span>
-      <span class="muted">${r.ranked.slice(0, 4).map(q => `${esc(q)} ${Math.round(r.score[q] * 10) / 10}`).join(' · ') || 'nothing tagged'}${
-        r.flag ? ` · <b style="color:var(--clay)">headline ${esc(r.head)} is ${r.ranked.indexOf(r.head) < 0 ? 'missing' : '#' + (r.ranked.indexOf(r.head) + 1)}</b>` : ''}</span>
-      <span class="muted">${Math.round(r.coverage * 100)}% tagged</span></div>`).join('') + `</details></section>`;
+  const qn = id => (quals.find(q => q.id === id) || {}).name || (id ? id[0].toUpperCase() + id.slice(1) : '');
+  const sets = n => Math.round(n);
+  h += `<section class="panel" style="margin-bottom:16px"><details${nFlag ? ' open' : ''}><summary class="arch-toggle">Quality check · ${
+    nFlag ? `${nFlag} block${nFlag === 1 ? '' : 's'} to look at` : 'every block trains what it says'}</summary>
+    <p class="psub" style="margin:10px 0">For each athlete: what their current week trains most, in working sets a week (a quality an exercise trains second counts as half a set; warm-ups don't count). The block's picture word says what it is <i>meant</i> to build (iron = Strength, voltage = Power …). If that isn't in the top two, it's flagged. Foundation, peaking and recovery blocks train a mix on purpose, so they are never flagged.</p>` +
+    rows.map(r => {
+      const top = r.ranked.slice(0, 4).map(q => `${esc(qn(q))} ${sets(r.score[q])}`).join(' · ');
+      const aim = r.head ? `meant to build <b>${esc(qn(r.head))}</b>` : (QM_PHASE[String(r.art).toLowerCase()] || 'no picture word');
+      const verdict = !r.ranked.length ? 'Nothing tagged yet, so the day cards show nothing.'
+        : r.flag ? `<b style="color:var(--clay)">⚠ ${esc(qn(r.head))} is ${r.ranked.indexOf(r.head) < 0 ? 'not trained at all' : 'only #' + (r.ranked.indexOf(r.head) + 1)} this week.</b> Either the week or the picture word is off.`
+        : r.head ? `✓ ${esc(qn(r.head))} is in the top two.` : '✓ A mixed block, nothing to check.';
+      const cov = r.coverage >= 0.995 ? 'every exercise tagged' : `${Math.round(r.coverage * 100)}% tagged${r.coverage < 0.7 ? ', so the day cards show nothing yet' : ''}`;
+      return `<div class="credrow" style="display:block;padding:10px 0">
+        <div><b>${esc(nameOf(r.aid))}</b> <span class="muted">· ${r.cycle ? `cycle "${esc(r.cycle)}" · ` : ''}${aim}</span></div>
+        <div class="muted" style="margin-top:3px">Trains most: ${top || '—'} <span style="opacity:.8">(sets a week)</span></div>
+        <div style="margin-top:3px;font-size:14px">${verdict} <span class="muted">· ${cov}</span></div></div>`;
+    }).join('') + `</details></section>`;
   return h;
 }
 

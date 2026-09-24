@@ -413,9 +413,19 @@ Amir, 2026-09-24: *"when i write or update a program, and there are movements th
 or missing some info, or can be updated, it should be updated there at the end … so everytime i
 write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this
 athlete's programme: draft every exercise with no entry, fill every empty field (video, alias,
-equipment, loads, rungs, SFR, flags), apply design's `spine_cue:` lines to drafts and propose them
-for approved entries, and put the one-line **SPINE** report in the handoff brief. Never approve an
-entry, and never put anything about this athlete on one.
+equipment, loads, rungs, SFR, flags, **qualities**), stamp `exId` on every card that resolves,
+link a new exercise into its ladder from both sides, apply design's `spine_cue:` lines to drafts
+and propose them for approved entries, and put the one-line **SPINE** report in the handoff brief.
+Never approve an entry, and never put anything about this athlete on one.
+
+**Then the two checks that read the finished programme** (both 2026-09-24):
+- **Quality Map.** Per day, the top three qualities (working sets × primary 1 / secondary ½, prep
+  blocks skipped): that is what each day card on Home will say. And the cycle's headline (`art`
+  word) must be in the week's top two unless it is `bedrock`, `peak` or `reset`. Report both as one
+  **QUALITY** line: `Day 1 Strength · Brakes · Spring | Day 2 … | headline iron ✓`. A day under
+  70% tagged shows nothing on the phone, so it is a gap to fix in the upkeep above.
+- **Because.** The cycle carries 5–10 `why`s, each on an exercise that is in this programme, none
+  carried over from last cycle. `Chips.auditWhy()` / `auditWhyProgram()` clean (Step 3).
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.

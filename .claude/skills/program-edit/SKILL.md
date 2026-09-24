@@ -251,7 +251,15 @@ Report what changed, the updated set tally, and flag anything left for a future 
 **Then run `/spine` → Upkeep** on this athlete's programme (Amir, 2026-09-24: every programme
 write leaves the Spine more complete). An exercise the edit brought in that has no entry gets
 drafted; empty fields get filled; a better general cue that came up is applied to a draft or
-proposed for an approved entry. One-line **SPINE** report at the end.
+proposed for an approved entry; qualities tagged; `exId` stamped on the new card. One-line
+**SPINE** report at the end.
+
+**And keep the edit honest to the rest of the system** (2026-09-24):
+- **Because.** If the exercise you removed carried a `why`, the reason goes with it. If the swap
+  was made *for this athlete* (pain, equipment, a dislike), give the new exercise a `why`
+  (`src: body/you…`, one sentence, the /program-engage PART 3b rules) and run `Chips.auditWhy()`.
+- **Quality Map.** Re-read the day's top three after the edit. If the swap changed what the day
+  card says it builds (a power day now reading Armour first), say so in the Step 4 report.
 
 **Then log the change.** Append a dated in-cycle note under an `## In-cycle edits — Cycle N`
 heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split

@@ -132,7 +132,7 @@ with ex as (
   where p.athlete_id = '<id>' and not (e ? 'items' and i is null)),
 hit as (
   select ex.*, x.id, x.status, x.aliases, x.video, x.cues, x.purpose, x.tennis, x.equipment,
-         x.loads, x.easier, x.harder, x.alts, c.sfr, c.flags
+         x.loads, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities
   from ex left join public.exercises x
     on x.id = ex.exid or lower(x.name) = lower(ex.nm)
        or lower(ex.nm) = any(select lower(a) from unnest(x.aliases) a)
@@ -149,6 +149,8 @@ select nm, id, status,
     case when cardinality(equipment) = 0 then 'equipment' end,
     case when cardinality(loads) = 0 then 'loads' end,
     case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'rungs' end,
+    case when id is not null and cardinality(qualities) = 0 and cardinality(coalesce(suggested_qualities, '{}')) = 0 then 'qualities' end,
+    case when id is not null and exid is null then 'exId on the card' end,
     case when id is not null and sfr is null then 'sfr?' end], null) gaps
 from hit order by (id is null) desc, status, nm;
 ```
@@ -160,9 +162,15 @@ no SFR. Answer them once and they stop mattering.
 |---|---|---|
 | **No entry at all** | Draft it now with `draft_sql.py` (the whole Run above, for one or a few names) | — |
 | **Empty field** (video, alias, equipment, loads, a rung, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
+| **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
 - **Alias:** the programme's spelling goes on the entry (rule 4). Never rename the card.
+- **exId on the card:** a programme exercise that resolves to an entry but has no `exId` gets one
+  (on the programme row, beside the name; never rename). It is what makes the link survive a rename.
+- **Qualities:** tag what the exercise is mostly FOR, first = primary, stop at three. A new
+  exercise without qualities makes its day card go blank (under 70% tagged shows nothing), so this
+  is never optional.
 - **Rungs:** link only to ids that exist. A new exercise that is the next rung of an existing one
   gets linked from both sides (`harder` on the old, `easier` on the new).
 - **What this programme taught us counts as "can be updated":** a better general cue Amir wrote
@@ -174,7 +182,8 @@ no SFR. Answer them once and they stop mattering.
 - Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
-`SPINE — added 2 drafts (names) · filled 5 gaps (what) · 3 proposals for you (entry: old → new) ·
+`SPINE — added 2 drafts (names) · filled 5 gaps (what) · tagged qualities on 3 (2 as suggestions on
+approved entries) · linked 2 rungs · 3 proposals for you (entry: old → new) ·
 N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 
 ## Batch size and order

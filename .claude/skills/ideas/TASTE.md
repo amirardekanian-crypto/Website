@@ -5,6 +5,13 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · coach.html has to explain itself too.** Of the first Quality check row
+  (*"strength 29.5 · muscle 15.5 · … headline movement is #4"*): *"i have no idea what this means
+  in my coach.html"*. Coach screens get the same plain-words rule as athlete screens: a sentence
+  with a verdict (✓ / ⚠ and what to do), whole numbers with their unit, and no internal names
+  (`headline`, `art`). And he wants every new feature **wired into the pipeline**, not left to
+  memory: *"every time i update, write a new program … be done when the program is done"*.
+
 - **2026-09-24 · #2 The Quality Map.** *"it should be on the day cards, in their home. both for tennis
   players, and other clients. the rest can be where you recommend."* He moved it off the session
   screen onto the **Home day cards**: what a day builds belongs where the athlete picks the day,
