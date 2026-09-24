@@ -5,6 +5,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · #12 The Debrief, picked because a real athlete needed it.** *"it is actually a good
+  idea to do it now, because i want to give alireza a debrief of this cycle … tell me what you think
+  we should do as a coach and then produce a result, in farsi so i can check an actual outcome"*. He
+  judges an idea by its **output on a real athlete**, not by the pitch: a deep-dive for a picked idea
+  should end in a real result he can read (here, Alireza's actual Cycle 1 debrief, built only from his
+  logs), with the few things only Amir knows left as switches rather than guessed. The athlete-facing
+  text was **Farsi**, for WhatsApp, even though program.html is English.
+
 - **2026-09-24 · coach.html has to explain itself too.** Of the first Quality check row
   (*"strength 29.5 · muscle 15.5 · … headline movement is #4"*): *"i have no idea what this means
   in my coach.html"*. Coach screens get the same plain-words rule as athlete screens: a sentence

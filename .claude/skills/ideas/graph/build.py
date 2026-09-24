@@ -189,6 +189,16 @@ IDEAS = [
   coach="Your maintenance rule, checked every day from what was actually done, not from what was planned.",
   mvp="Days since the last logged working set per quality, from #5's history through the Spine tags. Flag past a threshold you set (e.g. 10 days).",
   adv="Part of Radar (#9). The threshold differs per quality: strength drains slower than power."),
+ dict(n=18, name="The Back-off Week Shows Itself", sub="The closing week draws itself: same weight, half the sets", layer="Grown along the way", grown="12",
+  stages=["Execution","Programming","Adaptation"], needs=[], cost="None. The week is worked out from the cycle's dates.",
+  chain=["Cycle start date","Week number","Closing week","Primary blocks","Set rows"],
+  what="The last week of every cycle draws itself as the back-off week: one line on the Home day card (<em>Back-off week: same weight, half the sets</em>) and the extra set rows on each Primary card greyed out as <em>not this week</em>.",
+  problem="Four loading weeks plus one back-off is the house rule, and the back-off lives only in a notes card. Alireza's Cycle 1 debrief found it: in week 5 he did every set, with his heaviest squat and RDL of the cycle.",
+  how="Nothing to set up. From the cycle's <code>startDate</code> the app knows it is the closing week; Home says so, and Primary cards show half their set rows, the rest greyed.",
+  athlete="The one easy week is actually easy, so the four hard ones land.",
+  coach="Your back-off rule, applied on every athlete's phone without a message from you.",
+  mvp="Primary blocks only, half the sets rounded up (4 becomes 2, 3 becomes 2). Weight and intent unchanged.",
+  adv="A per-cycle override for a cycle that ends on a test week or a tournament, and the Debrief (#12) reading whether the back-off happened."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
@@ -210,13 +220,14 @@ STATUS = {
  2: ("Built 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
  "5b": ("Built 24 Sep", None), 14: ("Removed 24 Sep", None), 15: ("Built 24 Sep", None),
  16: ("Parked 24 Sep", None),
+ 12: ("Picked 24 Sep", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
 }
 
 def chips(i):
     st = STATUS.get(i["n"])
     s = ""
     if st:
-        cls = "built" if st[0].startswith("Built") else "gone"
+        cls = "gone" if st[0].startswith(("Removed", "Parked")) else "built"
         s += (f'<a class="chip {cls}" href="{st[1]}">{E(st[0])} · the brief ›</a>' if st[1]
               else f'<span class="chip {cls}">{E(st[0])}</span>')
     if i.get("grown"):
