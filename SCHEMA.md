@@ -643,6 +643,30 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | `note` | the coach's note to this athlete | clay "Coach's Note" callout |
 | `cues` | technique — `good[]` / `bad[]`. **Optional since the Spine:** omit it and the card shows the exercise's approved Spine cues | the cues list |
 | `exId` | the exercise's id in the Spine (`public.exercises`), e.g. `"trap-bar-deadlift"` | nothing directly: it ties the card to its entry |
+| `why` | **Because:** why THIS athlete has this exercise — `{ "src", "part"?, "text" }` | a clay dot on the ⓘ; the reason opens the About sheet, and the cycle's Why page lists them all |
+
+#### `why` — Because (2026-09-24)
+
+```json
+"why": { "src": "body", "part": "knee", "text": "Stepping back is kinder to your knee than a forward lunge." }
+```
+
+- **`src`** is where the decision came from: `goal` (intake, roadmap) · `body` (injury history,
+  needs `part`: knee, back, shoulder…) · `test` (an assessment, a film, a Personal Record) ·
+  `cycle` (kept, harder or replaced, with what moved) · `you` (their own feedback: a dislike, the
+  gym's kit, a time limit) · `court` (their own game: a lefty, a serve-volleyer, padel at the net).
+  The tags read *Your goal · Your knee · Your test · Last cycle · You said · Your game*.
+- **`text`**: one sentence of up to 140 characters in Amir's voice. Name the body part, never the
+  diagnosis. Say what happens next, never the failure. It is **personal or absent**: a reason
+  that would be true for anyone is the Spine's `purpose`, not a `why`.
+- **5–10 per cycle**, written fresh each cycle by `/program-design` (`why_flag`) →
+  `/program-engage` (PART 3b) → `/program-assemble`. Never carried over from the last cycle.
+  `Chips.auditWhy()` / `auditWhyProgram()` in `assets/js/chips.js` check all of this.
+- Absent means no personal reason, and nothing shows. The ⓘ appears for a `why` even before
+  the exercise's Spine entry is approved. The **Why your plan looks like this** button under
+  the current cycle card appears when the programme has three or more.
+- The coach-only Exercise Ledger in `coaching_logs` stays coach-only; `why` is written fresh
+  for the athlete and is never a copy of a ledger row.
 
 #### `exId` and the Spine (2026-09-24)
 

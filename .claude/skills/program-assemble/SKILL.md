@@ -53,6 +53,10 @@ card follows the id even if the name is edited later. `sport.badge` ← design's
   design's `note_flag`), not from design directly. Copy verbatim, plain text — never wrap it
   in HTML (that's the cycle notes cards' convention, not this field's). Never move
   exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
+- **Place engage's Becauses** (PART 3b), matched by exercise name, as `"why": { "src", "part"?,
+  "text" }` on that exercise (standard or simple, never a circuit). Verbatim, and never invent one.
+  **Write `why` fresh every cycle: never carry a previous cycle's `why` over**, because a reason
+  from Cycle 1 is stale by Cycle 3. Then run the audit (Step 3) and fix everything it flags.
 
 **2b — Copy the dose into `rx`** (per SCHEMA → "`rx` — the prescription"). Design's dose
 fields map one-to-one; there is nothing to convert:
@@ -170,6 +174,17 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   bad) **or none, when its `exId` points at an approved Spine entry that has cues**; section titles use the standard names (Primary/Accessory/etc, never "Strength").
   **Reps are one number, never a range** (Amir, 2026-09-24). If the spec carries a range,
   stop and ask — do not pick an end yourself. `auditRx()` flags one as `rep-range`.
+- **Because audit** (`why`): fix every line it prints. It flags a bad `src`, a missing `part`,
+  text over 140 characters, coach-log words (a diagnosis, "stalled", "hated"), em-dashes or
+  semicolons, a reason the Coach's Note repeats, and more than 10 in the cycle.
+  ```
+  node -e "require('./assets/js/chips.js');const C=globalThis.Chips;
+  const d=JSON.parse(require('fs').readFileSync('data/<id>.json','utf8'));const out=[];
+  (d.workouts.days||[]).forEach(dy=>(dy.blocks||[]).forEach(b=>(b.exercises||[]).forEach(e=>
+    C.auditWhy(e).forEach(p=>out.push('Day '+dy.id+' '+e.name+': '+p.code+' '+p.label+' — '+p.msg)))));
+  C.auditWhyProgram(d).forEach(p=>out.push(p.code+': '+p.msg));
+  console.log(out.length?out.join('\n'):'ok — Because clean')"
+  ```
 - **⛔ No working circuit in a FIRST cycle — hard reject.** If `currentCycleIndex` is `0`,
   every `"circuit"` must sit in a prep block. A superset or complex in Primary/Accessory/Core
   on cycle 1 violates COACHING-PRINCIPLES.md → Session structure ("no supersets in an

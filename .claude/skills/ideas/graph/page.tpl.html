@@ -1,0 +1,198 @@
+<title>The Coaching Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --paper:#FAF7F2; --band:#F1ECE3; --card:#FFFFFF; --ink:#18231E; --muted:#5A6660; --line:#E2DACD;
+  --green:#0E4A36; --green-ink:#FFFFFF; --clay:#C7552F; --clay-soft:#F6E4DC; --node:#EEF3F0; --node-ink:#0E4A36;
+  --disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --paper:#0F1714; --band:#131D19; --card:#18241F; --ink:#ECE7DE; --muted:#9DA8A2; --line:#2A3832;
+  --green:#0E4A36; --clay:#E06B43; --clay-soft:#3A2219; --node:#1F332A; --node-ink:#CFE3D8;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --paper:#0F1714; --band:#131D19; --card:#18241F; --ink:#ECE7DE; --muted:#9DA8A2; --line:#2A3832;
+  --green:#0E4A36; --clay:#E06B43; --clay-soft:#3A2219; --node:#1F332A; --node-ink:#CFE3D8;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.55 var(--body);margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px}
+a{color:inherit}
+code{font:500 .86em ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--band);padding:.05em .35em;border-radius:4px}
+h1,h2,h3,h4{overflow-wrap:anywhere;font-family:var(--disp);text-transform:uppercase;letter-spacing:.02em;line-height:1.02;margin:0;text-wrap:balance}
+
+.hero{background:radial-gradient(120% 140% at 85% 0%,#1A6A4E 0%,#0E4A36 55%,#0A3627 100%);color:#fff}
+.hero .wrap{padding-block:48px 40px;display:grid;gap:18px}
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:#F2B49D}
+.hero h1{font-size:clamp(46px,9vw,92px)}
+.hero h1 em{font-style:normal;color:#F08A63}
+.lede{max-width:62ch;font-size:19px;color:#E4EEE9;margin:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));gap:12px;margin-top:10px}
+.fact{border-top:2px solid #F08A63;padding-top:10px;font-size:14.5px;color:#DCE8E2}
+.fact b{display:block;font:700 26px/1 var(--disp);color:#fff;margin-bottom:4px;letter-spacing:.01em}
+
+section.block{padding-block:44px}
+section.alt{background:var(--band)}
+.sh{display:grid;gap:6px;margin-bottom:22px}
+.sh h2{font-size:clamp(30px,5vw,44px)}
+.sh p{margin:0;color:var(--muted);max-width:64ch}
+
+/* build order */
+.rank{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px}
+.pick{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:8px;align-content:start}
+.pick.lead{background:var(--green);border-color:var(--green);color:#fff}
+.pick.lead .k,.pick.lead p{color:#DCE8E2}
+.pick .k{font:600 12px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--clay)}
+.pick.lead .k{color:#F2B49D}
+.pick h3{font-size:28px}
+.pick p{margin:0;font-size:15px;color:var(--muted)}
+.order{margin-top:18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--muted)}
+.order a{font:700 17px/1 var(--disp);text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 11px;color:var(--ink);font-variant-numeric:tabular-nums}
+.order a.hot{background:var(--clay);border-color:var(--clay);color:#fff}
+.order span.sep{opacity:.5}
+
+/* dependency map */
+.deps{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:14px;align-items:stretch}
+.col{border:1px dashed var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start}
+.col.core{border:2px solid var(--clay);background:var(--clay-soft)}
+.col h4{font-size:15px;letter-spacing:.08em;color:var(--muted)}
+.col.core h4{color:var(--clay)}
+.dn{display:flex;gap:10px;align-items:baseline;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-weight:600;font-size:15px}
+.dn b{font:700 18px/1 var(--disp);color:var(--clay);min-width:1.4em;font-variant-numeric:tabular-nums}
+.col .note{font-size:13.5px;color:var(--muted);margin:2px 0 0}
+.core .flow{text-align:center;font:700 20px/1 var(--disp);color:var(--clay)}
+
+/* stages */
+.stages{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stages li{background:var(--card);padding:12px;display:grid;gap:8px;align-content:start;counter-increment:st}
+.stages .st{font:600 12.5px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stages .st::before{content:counter(st,decimal-leading-zero) "  ";color:var(--clay)}
+.stages{counter-reset:st}
+.pins{display:flex;flex-wrap:wrap;gap:5px}
+.pins a{font:700 15px/1 var(--disp);text-decoration:none;background:var(--green);color:#fff;border-radius:6px;padding:5px 8px;font-variant-numeric:tabular-nums}
+
+/* ideas */
+.layer{padding-block:36px 8px;display:grid;gap:22px}
+.lh{display:grid;gap:4px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.lh h2{font-size:clamp(28px,4.4vw,38px)}
+.lh p{margin:0;color:var(--muted)}
+.idea{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:14px;scroll-margin-top:14px}
+.ih{display:flex;gap:16px;align-items:center}
+.num{font:700 56px/.8 var(--disp);color:var(--clay);font-variant-numeric:tabular-nums}
+.ih h3{font-size:clamp(28px,4vw,36px)}
+.sub{margin:3px 0 0;color:var(--muted);font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 12px/1 var(--body);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:6px 9px;color:var(--muted);text-decoration:none}
+.chip.need{border-color:var(--clay);color:var(--clay)}
+.chip.built{background:var(--clay);border-color:var(--clay);color:#fff}
+.chip.grown{border-style:dashed;border-color:var(--clay);color:var(--clay)}
+.chip.free{background:var(--node);border-color:transparent;color:var(--node-ink)}
+dl.f{margin:0;display:grid;gap:0}
+dl.f>div{display:grid;grid-template-columns:170px 1fr;gap:16px;padding-block:11px;border-top:1px solid var(--line)}
+dt{font:600 12px/1.5 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+dd{margin:0;max-width:68ch}
+.cost{margin:8px 0 0;font-size:14.5px;color:var(--muted)}
+.cost b{color:var(--ink)}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.node{background:var(--node);color:var(--node-ink);font-weight:600;font-size:14px;border-radius:8px;padding:5px 9px}
+.arr{color:var(--clay);font-weight:700}
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tier{border-radius:12px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.tier h4{font-size:17px;letter-spacing:.06em}
+.tier p{margin:0;font-size:15px}
+.tier.mvp{background:var(--clay-soft)}
+.tier.mvp h4{color:var(--clay)}
+.tier.adv{border:1px solid var(--line)}
+.tier.adv h4{color:var(--muted)}
+
+.foot{padding-block:40px 60px;color:var(--muted);font-size:14.5px}
+.foot p{max-width:66ch;margin:0 0 10px}
+a:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+
+@media (max-width:760px){
+  .deps{grid-template-columns:1fr}
+  dl.f>div{grid-template-columns:1fr;gap:4px}
+  .tiers{grid-template-columns:1fr}
+  .idea{padding:18px}
+  .num{font-size:44px}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">AA Performance · product strategy · 23 Sep 2026</span>
+    <h1>The Coaching <em>Graph</em></h1>
+    <p class="lede">Your apps already collect most of what a good coach knows about an athlete. The problem is that it's stored in separate places that don't connect. These 13 ideas connect them, so the app can show an athlete why each thing is in their plan, what it trains, and how it's working. Four more grew out of building them.</p>
+    <p class="lede" style="font-size:16px"><b>Built so far:</b> <a href="#idea-1">#1 The Spine</a> · <a href="#idea-4">#4 Because</a> · <a href="#idea-5">#5 The Card Remembers</a>, plus <a href="#idea-5b">the History Sheet</a>, <a href="#idea-14">Rungs</a> and <a href="#idea-15">Who Has This</a>. Next up: <a href="#idea-16">#16 Not Yet</a>.</p>
+    <div class="facts">
+      <div class="fact"><b>0 links</b>An exercise is only its name. Nothing can point at it, so nothing connects to it.</div>
+      <div class="fact"><b>Never read back</b>Every session is saved to <code style="background:#ffffff22;color:#fff">session_history</code>, and the athlete never sees it again.</div>
+      <div class="fact"><b>Promised, not built</b>Readiness is collected but never changes the session.</div>
+      <div class="fact"><b>Coach-only</b>The reason for each exercise is written down every cycle, in a log only you can read.</div>
+    </div>
+  </div>
+</header>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sh"><h2>Where to start</h2><p>Ranked by how strongly the athlete would think <em>this app understands my training</em>, weighed against how much it depends on other ideas.</p></div>
+    <div class="rank">
+      <div class="pick lead"><span class="k">Build first</span><h3>05 · The Card Remembers</h3><p>The biggest change an athlete will feel, and it needs no new data: the sessions are already saved. It also adds a reps box, which your own 1RM estimates are missing.</p></div>
+      <div class="pick"><span class="k">Start alongside it</span><h3>01 · The Spine</h3><p>The foundation. Six other ideas need it. It's mostly data work that Claude drafts and you approve, and it's the course app's exercise library done properly.</p></div>
+      <div class="pick"><span class="k">Strongest "it knows me"</span><h3>04 · Because · 12 · Debrief · 06 · Green Light</h3><p>All three turn work that already happens (your reasoning, your cycle review, your readiness rule) into something the athlete can see.</p></div>
+      <div class="pick"><span class="k">Park for now</span><h3>10 · Pinned · 13 · Patterns · 03 · Court Map</h3><p>Pinned only pays off once the Spine exists. Patterns needs months of data before it says anything honest. Court Map needs the Quality Map first.</p></div>
+    </div>
+    <div class="order"><span>Suggested order:</span>
+      <a class="hot" href="#idea-5">5</a><span class="sep">→</span><a class="hot" href="#idea-1">1</a><span class="sep">→</span><a href="#idea-4">4</a><span class="sep">→</span><a href="#idea-6">6</a><span class="sep">→</span><a href="#idea-12">12</a><span class="sep">→</span><a href="#idea-2">2</a><span class="sep">→</span><a href="#idea-7">7</a><span class="sep">→</span><a href="#idea-9">9</a><span class="sep">→</span><a href="#idea-8">8</a><span class="sep">→</span><a href="#idea-11">11</a><span class="sep">→</span><a href="#idea-3">3</a><span class="sep">→</span><a href="#idea-10">10</a><span class="sep">→</span><a href="#idea-13">13</a>
+    </div>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="wrap">
+    <div class="sh"><h2>How they connect</h2><p>These aren't 17 separate screens. Two data layers sit in the middle; some ideas can be built today, and others only work once those layers exist.</p></div>
+    <div class="deps">
+      <div class="col"><h4>Can be built today</h4>
+        <a class="dn" href="#idea-5"><b>5</b>The Card Remembers</a>
+        <a class="dn" href="#idea-6"><b>6</b>Green Light</a>
+        <a class="dn" href="#idea-4"><b>4</b>Because</a>
+        <a class="dn" href="#idea-12"><b>12</b>The Debrief</a>
+        <a class="dn" href="#idea-9"><b>9</b>Radar</a>
+        <a class="dn" href="#idea-13"><b>13</b>Patterns</a>
+        <p class="note">They use data you already collect. Each gets better once the Spine exists.</p>
+      </div>
+      <div class="col core"><h4>The foundation</h4>
+        <a class="dn" href="#idea-1"><b>1</b>The Spine: every exercise with an id and its links</a>
+        <div class="flow" aria-hidden="true">↓</div>
+        <a class="dn" href="#idea-2"><b>2</b>The Quality Map: what each exercise builds</a>
+        <p class="note">Data rather than screens. One source shared by program.html, coach.html, the course app and the pipeline.</p>
+      </div>
+      <div class="col"><h4>Unlocked by the foundation</h4>
+        <a class="dn" href="#idea-7"><b>7</b>The Ladder</a>
+        <a class="dn" href="#idea-8"><b>8</b>Body Check</a>
+        <a class="dn" href="#idea-11"><b>11</b>Right Read, Right Time</a>
+        <a class="dn" href="#idea-10"><b>10</b>Pinned</a>
+        <a class="dn" href="#idea-3"><b>3</b>Court Map</a>
+        <p class="note">Each one is a new way into the same exercise data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sh"><h2>Across the coaching process</h2><p>Your twelve stages, with the ideas that serve each one. Tap a number to jump to it.</p></div>
+    <ol class="stages">{{STAGES}}</ol>
+  </div>
+</section>
+
+<div class="wrap">{{SECTIONS}}</div>
+
+<footer class="wrap foot">
+  <p><b>What this is based on.</b> A read of program.html, coach.html, the course app, AA Proof, the programme pipeline skills and COACHING-PRINCIPLES.md on 23 Sep 2026. Every problem named above is something the code does or doesn't do today, not a guess.</p>
+  <p><b>What it doesn't change.</b> RPE, never load, still holds: nothing here prescribes a weight. The coaching log stays coach-only; #4 writes a separate line for the athlete. Nothing here diagnoses pain.</p>
+  <p>Pick the ones you want, and tell me why you like or reject each. That goes into the <code>/ideas</code> skill's taste file, so the next round fits better.</p>
+</footer>

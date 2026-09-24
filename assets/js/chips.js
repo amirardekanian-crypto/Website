@@ -637,9 +637,51 @@
     return problems;
   }
 
+
+  // ── Because (2026-09-24): ex.why = { src, part?, text } ────────────────────
+  // One sentence of WHY THIS ATHLETE has this exercise. auditWhy() checks one
+  // exercise; auditWhyProgram() adds the per-cycle cap. The words a coaching log
+  // may use but an athlete must never read are the first check (CLAUDE.md →
+  // Because: name the body part, never the diagnosis).
+  const WHY_SRCS = ['goal', 'body', 'test', 'cycle', 'you', 'court'];
+  const WHY_CLINICAL = /\b(tear|torn|rupture|bulge|bulging|herniat\w*|disc|subchondral|apophys\w*|retinacul\w*|tendinopath\w*|tendinosis|fracture|lesion|impingement|labral|labrum|meniscus|chondromalacia|spondylo\w*|stenosis|diagnos\w*|MRI|RPE drifted|stalled|you hated)\b/i;
+  const WHY_MAX = 140;
+  function auditWhy(ex, purpose) {
+    const problems = [];
+    const w = ex && ex.why;
+    if (w === undefined) return problems;
+    const push = (code, label, msg) => problems.push({ level: 'warn', code, label, msg });
+    if (!w || typeof w !== 'object') { push('why-shape', String(w), 'why must be { src, text }.'); return problems; }
+    if (WHY_SRCS.indexOf(w.src) < 0) push('why-src', String(w.src), 'src must be one of ' + WHY_SRCS.join(', ') + '.');
+    const text = cleanStr(w.text);
+    if (!text) { push('why-empty', '', 'A why with no text. Remove it instead.'); return problems; }
+    if (text.length > WHY_MAX) push('why-long', text.length + ' chars', 'Keep it to one short sentence (' + WHY_MAX + ' characters or less).');
+    const m = text.match(WHY_CLINICAL);
+    if (m) push('why-clinical', m[0], 'Coach-log wording. Name the body part and say what we do next, never the diagnosis or a failure.');
+    if (/[—;]/.test(text)) push('why-voice', text.match(/[—;]/)[0], 'Em-dash or semicolon: not how Amir writes.');
+    if (w.part && w.src !== 'body') push('why-part', String(w.part), 'part only goes with src "body".');
+    if (w.src === 'body' && !cleanStr(w.part)) push('why-part', '', 'src "body" needs a part (knee, back, shoulder…) so the tag reads "Your knee".');
+    const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    if (purpose && norm(purpose) && norm(text).indexOf(norm(purpose).slice(0, 40)) >= 0)
+      push('why-generic', '', 'This repeats the Spine purpose. A why is personal or it is left out.');
+    if (ex.note && norm(ex.note).indexOf(norm(text).slice(0, 40)) >= 0)
+      push('why-twice', '', 'The Coach\'s Note says the same thing. Keep the reason in why and the how-to in the note.');
+    return problems;
+  }
+  function auditWhyProgram(data) {
+    const out = [];
+    let n = 0;
+    ((data && data.workouts && data.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b =>
+      (b.exercises || []).forEach(ex => { if (ex && ex.why !== undefined) n++; })));
+    if (n > 10) out.push({ level: 'warn', code: 'why-too-many', label: String(n),
+      msg: n + ' reasons this cycle. Keep the 5-10 real personal decisions: a reason on everything reads as filler.' });
+    return out;
+  }
+
   global.Chips = {
     parseChips, parseDurationToSec, isPureDuration,
     slotOf, fmt, readStats, applyStats, audit,
-    rxOf, repCount, applyRx, toRx, circuitToRx, detailToRx, auditRx, tempoDisplay, DOSE_LABEL
+    rxOf, repCount, applyRx, toRx, circuitToRx, detailToRx, auditRx, tempoDisplay, DOSE_LABEL,
+    auditWhy, auditWhyProgram, WHY_SRCS
   };
 })(typeof window !== 'undefined' ? window : globalThis);
