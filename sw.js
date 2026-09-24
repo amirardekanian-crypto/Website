@@ -28,7 +28,10 @@
 // forms. An installed athlete on the pre-cached v9 shell keeps a renderer that IGNORES
 // `before`, so this bump is what gets the new shell onto phones. It is also why the sessions'
 // safety wording is only moved into `before` AFTER this version has been live for a while.
-const CACHE = 'aap-v13';
+// v14: program.html changed (The Card Remembers, 2026-09-24): sets log reps, every card shows
+// last time, and the History sheet reads get_my_history(). The session record now carries `log`,
+// so the sooner phones leave the v13 shell the sooner their sessions are saved as data.
+const CACHE = 'aap-v14';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

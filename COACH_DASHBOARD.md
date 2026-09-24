@@ -231,9 +231,14 @@ under its name. Anything they logged that you never prescribed appears at the bo
 The bar is `RPE_OVER` / `RPE_UNDER` in `coach.html`, both **1.5** — a set logged at 8 against a
 target of 7 is a good set and doesn't need a flag; a point and a half out does.
 
-**Reps are not compared, deliberately.** The athlete's app records weight, RPE and a tick per set —
-it never asks for reps. So the dashboard compares sets, load and RPE, and says nothing about reps
-rather than inventing a number you might train off.
+**Reps are compared from 2026-09-24 (The Card Remembers).** The set log gained a reps box that
+shows the prescribed number in grey and stays empty unless the athlete did something else, so a
+normal set costs no tap. The log line reads `Set 3: 80 ×4 @8 ✓`; `parseSetLine()` reads the `×`
+back, the row lists `reps: 5 · 5 · 4`, and a set under the prescription raises **"1 set under 5
+reps"**. Sessions saved before that date have no reps and are never given one — nothing here
+invents a number you might train off. ⚠️ `parseSetText()` in `program.html` reads the same grammar
+for the athlete's own history, so a change to the log line moves three places together
+(`buildSessionData()`, `parseSetLine()`, `parseSetText()`).
 
 Other things on this tab: the **day's session picker** when a day has been trained more than once
 (tap a date to compare against that run instead), the athlete's note with **Reply** / **Mark read**,

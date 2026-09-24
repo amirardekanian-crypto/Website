@@ -2298,6 +2298,124 @@
   .ex-set-row.done .ex-set-check::after { opacity: 1; transform: scale(1); }
   body[data-dark] .ex-set-check { border-color: #444; }
 
+  /* REPS column (2026-09-24, The Card Remembers). Only on exercises prescribed a
+     rep count. Amir prescribes ONE number, never a range, so the box shows that
+     number as its placeholder and stays EMPTY unless the athlete did something
+     else: an empty box means "as prescribed", which is zero taps on a normal set.
+     A typed number turns clay, so a short set is visible at a glance. Both grids
+     move to the same five-track template together (see the note above). */
+  .ex-set-log.has-reps .ex-set-header,
+  .ex-set-log.has-reps .ex-set-row {
+    grid-template-columns: 26px minmax(46px, 1fr) 30px minmax(0, 128px) 28px;
+    gap: 5px;
+  }
+  .ex-set-log.has-reps .ex-set-weight { padding: 7px 8px; }
+  .ex-set-reps {
+    width: 100%;
+    background: var(--grey-card);
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 7px 0;
+    font-size: 13px;
+    font-family: 'Barlow', sans-serif;
+    text-align: center;
+    color: var(--ice);
+    font-weight: 600;
+    outline: none;
+    box-sizing: border-box;
+    -moz-appearance: textfield;
+  }
+  .ex-set-reps::-webkit-outer-spin-button,
+  .ex-set-reps::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .ex-set-reps::placeholder { color: var(--grey-dark); opacity: 0.55; font-weight: 400; }
+  .ex-set-reps:focus { border-color: var(--yellow); }
+  body[data-dark] .ex-set-reps { background: #2a2a2a; }
+  body[data-dark] .ex-set-reps::placeholder { color: #ddd; }
+
+  /* ── The Card Remembers (2026-09-24) — see paintLastTime() ──
+     Direction B from the build brief: a clay-OUTLINED pill on the closed card
+     (outlined, not filled, so it never reads as the coach's note pill), one strip
+     above Log Sets, and a faint line under the one set that ran over target.
+     Clay marks only what ran over target — everything else stays quiet. */
+  .ex-summary-pill.lt-pill {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--ice);
+    color: var(--ice);
+  }
+  body[data-dark] .ex-summary-pill.lt-pill { background: transparent; color: #E06B43; box-shadow: inset 0 0 0 1.5px #E06B43; }
+  .lt-strip {
+    background: var(--white);
+    border: 1px solid var(--grey-card);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin: 14px 0 4px;
+    display: grid;
+    gap: 5px;
+  }
+  body[data-dark] .lt-strip { background: #1e1e1e; border-color: #2a2a2a; }
+  .lt-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .lt-when {
+    font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 1.3px;
+    text-transform: uppercase; color: var(--grey-text);
+  }
+  .lt-hist {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--ice); background: none; border: 0; padding: 4px 0 4px 8px;
+    cursor: pointer; white-space: nowrap;
+  }
+  .lt-big {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.1;
+    letter-spacing: 0.2px; color: var(--grey-dark); overflow-wrap: anywhere;
+  }
+  .lt-big b { font-weight: 700; }
+  body[data-dark] .lt-big { color: #eee; }
+  .lt-rpe { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey-dark); }
+  body[data-dark] .lt-rpe { color: #ccc; }
+  .lt-rpe b, .lt-ghost b { color: var(--ice); }
+  body[data-dark] .lt-rpe b, body[data-dark] .lt-ghost b { color: #E06B43; }
+  .lt-low { color: var(--grey-text); }
+  .lt-note { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 13px; color: var(--grey-text); white-space: pre-line; }
+  .lt-first { grid-template-columns: auto 1fr; align-items: baseline; gap: 10px; }
+  .lt-first-txt { font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--grey-dark); }
+  body[data-dark] .lt-first-txt { color: #ccc; }
+  .lt-ghost {
+    grid-column: 2 / -1;
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey-text);
+    margin-top: -3px;
+  }
+
+  /* The History sheet — the readiness sheet's own frame, above Guided Mode. */
+  .hist-overlay { z-index: 210; }
+  .hs-lbl {
+    font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 1.3px;
+    text-transform: uppercase; color: var(--grey-text); margin: 2px 0 4px;
+  }
+  .hs-chart { width: 100%; height: auto; display: block; margin-bottom: 8px; overflow: visible; }
+  .hs-base { stroke: var(--grey-mid); stroke-width: 1; }
+  .hs-area { fill: var(--ice); fill-opacity: 0.10; }
+  .hs-line { fill: none; stroke: var(--ice); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .hs-dot { fill: var(--ice); }
+  .hs-tick { font-family: 'Space Mono', monospace; font-size: 9px; fill: var(--grey-text); }
+  .hs-end { font-family: 'Space Mono', monospace; font-size: 10.5px; font-weight: 700; fill: var(--ice); }
+  body[data-dark] .hs-line { stroke: #E06B43; }
+  body[data-dark] .hs-area, body[data-dark] .hs-dot { fill: #E06B43; }
+  body[data-dark] .hs-end { fill: #E06B43; }
+  .hs-list { display: grid; }
+  .hs-row { display: grid; gap: 3px; padding: 10px 0; border-top: 1px solid var(--grey-card); }
+  body[data-dark] .hs-row { border-top-color: #2a2a2a; }
+  .hs-d { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--grey-text); }
+  .hs-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; color: var(--grey-dark); overflow-wrap: anywhere; }
+  body[data-dark] .hs-v { color: #eee; }
+  .hs-d b { color: var(--ice); }
+  body[data-dark] .hs-d b { color: #E06B43; }
+  .hs-n { font-family: 'Barlow', sans-serif; font-style: italic; font-size: 12.5px; color: var(--grey-text); white-space: pre-line; }
+  .hs-actions { display: grid; gap: 4px; margin-top: 12px; }
+  .hs-link {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--ice); background: none; border: 1.5px solid var(--ice);
+    border-radius: 10px; padding: 11px; cursor: pointer;
+  }
+
   /* ── THE CEILING — estimated 1RM, folded into the bottom of the set log ──
      One clay line while closed, a small panel when tapped. Everything here is
      DERIVED from the set log that is already on the card: no storage key, no
@@ -3967,6 +4085,12 @@
   </div>
 </div>
 
+<!-- The Card Remembers: the History sheet. Reuses the readiness sheet's look;
+     openHistorySheet() fills it. Sits above Guided Mode (z-index in CSS). -->
+<div class="readiness-overlay hist-overlay" id="hist-overlay" onclick="if(event.target===this)closeHistorySheet()">
+  <div class="readiness-modal" role="dialog" aria-modal="true" aria-label="Exercise history"></div>
+</div>
+
 <!-- Guided Mode — walks one exercise (and within it, one set) at a time, reusing the
      exact same set-log rows/listeners as the list view (see openStepMode in the script
      below): nothing here is a second copy of the logging or Ceiling logic. -->
@@ -4159,6 +4283,10 @@ function _snapshot() {
     // boot (the stored key is consulted before the JSON), and from then on every
     // RPC is rejected and the athlete silently stops syncing for good.
     if (k === prefix + 'drops' || k === prefix + 'skey') continue;
+    // The Card Remembers' offline copy of the athlete's session history. It is a
+    // CACHE of get_my_history(), which the server already holds; pushing it would
+    // put every past session into every progress save.
+    if (k === prefix + 'histcache') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -4373,12 +4501,12 @@ function staleCloudPlan(data, prefix) {
 }
 
 // Cloud copy of a per-set log for a session that is over: keep the weights, clear
-// the RPE and done-ticks. Mirrors what autoResetStaleDays() does locally.
+// the reps, RPE and done-ticks. Mirrors what autoResetStaleDays() does locally.
 function stripSetLogSession(val) {
   try {
     const a = JSON.parse(val);
     if (!Array.isArray(a)) return val;
-    return JSON.stringify(a.map(s => ({ w: (s && s.w) || '', r: '', d: false })));
+    return JSON.stringify(a.map(s => ({ w: (s && s.w) || '', n: '', r: '', d: false })));
   } catch (e) { return val; }
 }
 
@@ -4401,7 +4529,7 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
           : (a, b) => (b != null && b !== '') ? b : (a || '');   // real value wins; cloud breaks ties
         for (let i = 0; i < n; i++) {
           const a = L[i] || {}, b = C[i] || {};
-          out.push({ w: pick(a.w, b.w), r: pick(a.r, b.r), d: !!(a.d || b.d) });
+          out.push({ w: pick(a.w, b.w), n: pick(a.n, b.n), r: pick(a.r, b.r), d: !!(a.d || b.d) });
         }
         return JSON.stringify(out);
       }
@@ -4803,6 +4931,9 @@ function getVideoUrl(ex) {
   renderNotes();
 
   restoreState();
+  // The Card Remembers: paint last time from the phone's copy now, then refresh
+  // it from the server. Never blocks the first paint.
+  loadHistory();
   isLoading = false;
   markSuggestedDay();
   // restoreState() ran updateProgress() while isLoading was still true, which
@@ -6249,7 +6380,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // which is what stops the Ceiling offering an estimate it cannot honour.
   const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
 
-  return `<div class="checklist-item collapsed ${blockClass}${(rx.extras.length || rx.intent || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}">
+  return `<div class="checklist-item collapsed ${blockClass}${(rx.extras.length || rx.intent || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-target="${esc(rx.rpe || '')}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
@@ -6625,7 +6756,9 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
+    body: `<p>Tap an exercise to expand it. Add the weight you used, your RPE for the set, and any quick note (felt heavy, knee tight, etc.).</p><p><strong>Reps</strong> already show the number I prescribed, in grey. Leave it alone when you hit it. If you did fewer (or more), type what you actually did: it turns orange, and I see it.</p><p>Tap the circle to mark the set done. Everything saves automatically — if you close the app and come back, your inputs are still there.</p>` },
+  { icon: 'activity', title: 'Last time — your history on every exercise',
+    body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
@@ -8734,12 +8867,14 @@ function resetDay(day) {
     if (card.dataset.sets && !card.classList.contains('round-group')) {
       const name  = card.querySelector('.item-name').textContent.trim();
       const total = parseInt(card.dataset.sets, 10) || 1;
-      const log = loadSetLog(name, total).map(s => ({ w: s.w || '', r: '', d: false }));
+      const log = loadSetLog(name, total).map(s => ({ w: s.w || '', n: '', r: '', d: false }));
       saveSetLogValue(name, log);
       // Refresh the rendered set rows
       card.querySelectorAll('.ex-set-row').forEach((row, i) => {
         row.classList.remove('done');
         row.querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
+        const rp = row.querySelector('.ex-set-reps');
+        if (rp) rp.value = '';
       });
     }
   });
@@ -9000,12 +9135,12 @@ function autoResetStaleDays() {
           for (let round = 2; round <= rounds; round++) {
             localStorage.removeItem(circuitRpeKey(ex.name, round));
           }
-          // Per-set log: clear RPE + done, keep weights
+          // Per-set log: clear reps, RPE + done, keep weights
           const setKey = ATHLETE_ID + '_setlog_' + k;
           let log = [];
           try { log = JSON.parse(localStorage.getItem(setKey)) || []; } catch (e) {}
           if (log.length) {
-            log = log.map(s => ({ w: s.w || '', r: '', d: false }));
+            log = log.map(s => ({ w: s.w || '', n: '', r: '', d: false }));
             localStorage.setItem(setKey, JSON.stringify(log));
           }
         });
@@ -9197,6 +9332,12 @@ function buildSessionData(day) {
   summary += `\nExercise log:\n`;
 
   const missingByName = new Map(dayStatus.missing.map(m => [m.name, m]));
+  // The same sets as DATA, saved beside the text summary (session_history.log).
+  // It is what The Card Remembers reads back; the summary stays for the email
+  // and the coach dashboard. One entry per exercise:
+  //   { ex, block, reps (planned), sets: [{ w, n, r, d }], note }            standard
+  //   { ex, block, circuit: true, items: [{ name, w }], rounds: [{ round, r }], note }
+  const log = [];
   const collectFor = (ex, isCircuit) => {
     const name = ex.name;
     const k = name.replace(/\s+/g, '_');
@@ -9231,10 +9372,23 @@ function buildSessionData(day) {
       const m = missingByName.get(ex.name);
       const tag = m ? ` (${m.label})` : ' (✓)';
       summary += `• ${ex.name}${tag}\n`;
+      const planned = data.kind === 'sets' ? repCount(ex) : null;
+      if (data.kind === 'sets') {
+        log.push({ ex: ex.name, block: block.title || '', reps: planned,
+          sets: data.log.map(s => ({ w: s.w || '', n: setReps(s, planned), r: s.r || '', d: !!s.d })),
+          note: data.n || '' });
+      } else if (data.kind === 'circuit') {
+        log.push({ ex: ex.name, block: block.title || '', circuit: true,
+          items: data.itemNames.map((nm, ii) => ({ name: nm, w: data.weights[ii] || '' })),
+          rounds: data.rpeRounds, note: data.n || '' });
+      }
       if (data.kind === 'sets' && data.log.length) {
         data.log.forEach((s, i) => {
           const bits = [];
           if (s.w) bits.push(s.w);
+          // Reps as "×5", written only for a set that was actually logged. coach.html's
+          // parseSetLine() reads the × back out — change the two together.
+          if (planned && (s.w || s.r || s.d)) bits.push('×' + setReps(s, planned));
           if (s.r) bits.push('@' + s.r);
           const tail = s.d ? '✓' : (s.w || s.r ? '·' : 'skipped');
           summary += `    Set ${i+1}: ` + (bits.length ? bits.join(' ') + ' ' + tail : tail) + '\n';
@@ -9257,7 +9411,7 @@ function buildSessionData(day) {
     });
   });
 
-  return { dayStatus, dayData, dayNote, isPartial, statusLabel, sRpe, durMin, hasDur, auLoad, readiness, readinessField, summary };
+  return { dayStatus, dayData, dayNote, isPartial, statusLabel, sRpe, durMin, hasDur, auLoad, readiness, readinessField, summary, log };
 }
 
 // Saves a permanent session record to the cloud (coach dashboard). Called on
@@ -9284,7 +9438,8 @@ async function recordSessionToCloud(day) {
       readiness:    D.readiness || null,
       day_note:     D.dayNote || '',
       focus:        D.dayData.focusTag || '',
-      summary:      D.summary
+      summary:      D.summary,
+      log:          D.log
     }
   };
   const sb = _sb();
@@ -9433,7 +9588,10 @@ function logSlotFor(card) {
 
 // ── Per-set log helpers ─────────────────────────────────────────────
 // One JSON-stored array per exercise (replaces the old _wlog_ + _rpe_ keys).
-// Format: [{ w: '60', r: '7', d: true }, …] — one entry per set.
+// Format: [{ w: '60', n: '', r: '7', d: true }, …] — one entry per set.
+// `n` is the reps the athlete ACTUALLY did, and only when that differs from the
+// prescription: an empty `n` means "as prescribed" (Amir prescribes one number,
+// never a range, 2026-09-24). setReps() is the one place that resolves it.
 function setLogKey(exName) {
   return ATHLETE_ID + '_setlog_' + exName.replace(/\s+/g, '_');
 }
@@ -9450,9 +9608,20 @@ function loadSetLog(exName, totalSets) {
     if (oldW || oldR) log.push({ w: oldW, r: oldR, d: false });
   }
   // Pad up to totalSets and trim if shrunk.
-  while (log.length < totalSets) log.push({ w: '', r: '', d: false });
+  while (log.length < totalSets) log.push({ w: '', n: '', r: '', d: false });
   if (log.length > totalSets) log = log.slice(0, totalSets);
   return log;
+}
+// The prescribed rep count on a card, or null (holds, carries, intervals).
+function cardReps(card) {
+  const m = String((card && card.dataset.reps) || '').match(/\d+/);
+  const n = m ? parseInt(m[0], 10) : NaN;
+  return n > 0 ? n : null;
+}
+// Reps a set was actually done for: the athlete's own number, else the plan.
+function setReps(s, planned) {
+  const n = parseInt(s && s.n, 10);
+  return n > 0 ? n : (planned || null);
 }
 function saveSetLogValue(exName, log) {
   localStorage.setItem(setLogKey(exName), JSON.stringify(log));
@@ -9473,17 +9642,22 @@ function attachSetLog(card) {
 
   const slot = logSlotFor(card);
   const wrap = document.createElement('div');
-  wrap.className = 'ex-set-log';
+  const planned = cardReps(card);
+  wrap.className = 'ex-set-log' + (planned ? ' has-reps' : '');
   wrap.addEventListener('click', e => e.stopPropagation());
 
-  let html = `<div class="ex-set-header"><div>SET</div><div>WEIGHT</div><div>RPE</div><div></div></div>`;
+  let html = `<div class="ex-set-header"><div>SET</div><div>${planned ? 'KG' : 'WEIGHT'}</div>${planned ? '<div>REPS</div>' : ''}<div>RPE</div><div></div></div>`;
   log.forEach((s, i) => {
     const rpeBtns = [6,7,8,9,10].map(n =>
       `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button">${n}</button>`
     ).join('');
+    const repsBox = planned
+      ? `<input class="ex-set-reps" type="text" inputmode="numeric" maxlength="3" placeholder="${planned}" value="${esc(s.n || '')}" aria-label="Reps done on set ${i+1}, if not ${planned}">`
+      : '';
     html += `<div class="ex-set-row${s.d ? ' done' : ''}" data-set-idx="${i}">
       <div class="ex-set-num">${i+1}</div>
       <input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}">
+      ${repsBox}
       <div class="ex-set-rpe">${rpeBtns}</div>
       <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done"></button>
     </div>`;
@@ -9497,10 +9671,26 @@ function attachSetLog(card) {
     // Weight input — saves on every keystroke
     row.querySelector('.ex-set-weight').addEventListener('input', e => {
       const cur = loadSetLog(name, total);
-      cur[idx] = cur[idx] || { w: '', r: '', d: false };
+      cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
       cur[idx].w = e.target.value;
       saveSetLogValue(name, cur);
       if (card._ceilingRefresh) card._ceilingRefresh();
+    });
+    // Reps — only typed when the set was NOT the prescribed number. Typing the
+    // prescribed number itself stores nothing, so "as prescribed" stays one state.
+    const repsIn = row.querySelector('.ex-set-reps');
+    if (repsIn) repsIn.addEventListener('input', e => {
+      const digits = e.target.value.replace(/\D/g, '').slice(0, 3);
+      if (digits !== e.target.value) e.target.value = digits;
+      const cur = loadSetLog(name, total);
+      cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
+      cur[idx].n = (digits && parseInt(digits, 10) !== planned) ? digits : '';
+      saveSetLogValue(name, cur);
+      if (card._ceilingRefresh) card._ceilingRefresh();
+    });
+    // Typing the prescribed number back in means "as prescribed": show it that way.
+    if (repsIn) repsIn.addEventListener('blur', e => {
+      if (parseInt(e.target.value, 10) === planned) e.target.value = '';
     });
     // RPE buttons — toggle-select (tap selected = deselect)
     row.querySelectorAll('.ex-set-rpe .rpe-btn').forEach(b => {
@@ -9509,7 +9699,7 @@ function attachSetLog(card) {
         const wasSelected = b.classList.contains('selected');
         row.querySelectorAll('.rpe-btn').forEach(x => x.classList.remove('selected'));
         const cur = loadSetLog(name, total);
-        cur[idx] = cur[idx] || { w: '', r: '', d: false };
+        cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
         if (wasSelected) {
           cur[idx].r = '';
         } else {
@@ -9524,7 +9714,7 @@ function attachSetLog(card) {
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
       const cur = loadSetLog(name, total);
-      cur[idx] = cur[idx] || { w: '', r: '', d: false };
+      cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
       cur[idx].d = !cur[idx].d;
       saveSetLogValue(name, cur);
       row.classList.toggle('done', cur[idx].d);
@@ -9605,12 +9795,15 @@ function parseLoggedKg(v) {
 
 // The set that produces the HIGHEST estimate — the athlete's real best effort
 // of the day, not simply the last row they happened to fill in.
+// Each set is read at the reps it was actually done for (setReps), so a short
+// set logged as 4 of 5 estimates off 4, not the 5 that was planned.
 function bestCeilingSet(log, reps) {
   let best = null;
   (log || []).forEach((s, i) => {
-    const est = estimateOneRM(parseLoggedKg(s.w), reps, s.r);
+    const rp  = setReps(s, reps);
+    const est = estimateOneRM(parseLoggedKg(s.w), rp, s.r);
     if (est != null && (!best || est > best.est)) {
-      best = { est: est, kg: parseLoggedKg(s.w), rpe: Number(s.r), idx: i };
+      best = { est: est, kg: parseLoggedKg(s.w), rpe: Number(s.r), reps: rp, idx: i };
     }
   });
   return best;
@@ -10133,8 +10326,8 @@ function attachCeiling(card) {
       // their own numbers and what is wrong with them.
       const s = (log || []).find(x => parseLoggedKg(x.w) != null && Number(x.r) > 0);
       if (s && !touched) {
-        fKg.value = parseLoggedKg(s.w); fRp.value = reps; fRpe.value = Number(s.r);
-        paintFromFields(`From your set · ${parseLoggedKg(s.w)} kg × ${reps} @ RPE ${Number(s.r)}`);
+        fKg.value = parseLoggedKg(s.w); fRp.value = setReps(s, reps); fRpe.value = Number(s.r);
+        paintFromFields(`From your set · ${parseLoggedKg(s.w)} kg × ${setReps(s, reps)} @ RPE ${Number(s.r)}`);
         txt.textContent = 'Too many reps to work out a one-rep max';
       }
       return;
@@ -10142,9 +10335,9 @@ function attachCeiling(card) {
     box.classList.remove('is-empty');
     line.disabled = false;
     fKg.value  = best.kg;
-    fRp.value  = reps;
+    fRp.value  = best.reps;
     fRpe.value = best.rpe;
-    paintFromFields(`From set ${best.idx + 1} &middot; ${best.kg} kg &times; ${reps} @ RPE ${best.rpe}`);
+    paintFromFields(`From set ${best.idx + 1} &middot; ${best.kg} kg &times; ${best.reps} @ RPE ${best.rpe}`);
   }
 
   line.addEventListener('click', ev => {
@@ -10194,7 +10387,7 @@ function syncExerciseCheck(card, log) {
 function setAllSetsDone(card, done) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
-  const cur = loadSetLog(name, total).map(s => ({ w: s.w, r: s.r, d: !!done }));
+  const cur = loadSetLog(name, total).map(s => ({ w: s.w, n: s.n || '', r: s.r, d: !!done }));
   saveSetLogValue(name, cur);
   // Reflect on the rendered rows
   card.querySelectorAll('.ex-set-row').forEach((row, i) => {
@@ -10215,6 +10408,7 @@ function initSetOrRPE() {
       attachSetLog(card);
       attachCeiling(card);
     }
+    paintLastTime(card);
   });
 }
 
@@ -10612,6 +10806,379 @@ function showStepComplete() {
   document.getElementById('step-footer').innerHTML =
     `<button type="button" class="step-primary-btn step-primary-full" onclick="closeStepMode()">Exit Guided Mode</button>`;
 }
+
+// ── THE CARD REMEMBERS (2026-09-24) ──────────────────────────────────────
+// Idea #5 of "The Coaching Graph": every exercise card shows what the athlete did
+// the LAST time they did that exercise, on any day and across cycles.
+//
+//   · a clay-outlined "Last 80×5" pill on the closed card
+//   · a strip above Log Sets: when, weight × reps, RPE against today's target,
+//     the note they left, and whether it was a low-readiness day
+//   · a faint "last · 80 × 4 @ 9" line under the ONE set that ran over target
+//   · History › — every time they did it, with a trend (the History sheet)
+//
+// ⚠ HISTORY, NEVER A PRESCRIPTION. Amir's rule is RPE, never load: a weight is
+// only ever written in his Coach's Note. Nothing here suggests a number to lift.
+//
+// Source: get_my_history() (supabase/stage30_session_log.sql). New sessions carry
+// `log` (structured sets); older ones only a text summary, which parseSummaryLog()
+// reads — a port of parseSetLine()/parseSessionLog() in coach.html. ⚠ Two copies of
+// that grammar now: change the summary format in buildSessionData() and BOTH
+// parsers move with it. The phone keeps a copy (<id>_histcache, never synced) so
+// last time still shows offline.
+let HIST = null;          // [{ date, day, readiness, entries: [...] }], newest first; null = not loaded
+let HIST_ALIAS = {};      // old exercise name -> current name (a lift renamed between cycles)
+
+function histKey() { return ATHLETE_ID + '_histcache'; }
+function histNorm(n) { return String(n || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+
+// "Set 1: 80 ×5 @8 ✓" -> { w, n, r, d }. Older lines have no ×; n stays null.
+function parseSetText(t) {
+  t = String(t || '').trim();
+  const s = { w: '', n: null, r: '', d: false };
+  if (!t || /^skipped$/i.test(t)) return s;
+  if (t.indexOf('✓') >= 0) s.d = true;
+  t = t.replace(/[✓·]/g, ' ');
+  let m = t.match(/@\s*(\d+(?:\.\d+)?)/);
+  if (m) { s.r = m[1]; t = t.replace(m[0], ' '); }
+  m = t.match(/×\s*(\d+)/);
+  if (m) { s.n = parseInt(m[1], 10); t = t.replace(m[0], ' '); }
+  s.w = t.trim();
+  return s;
+}
+function parseSummaryLog(summary) {
+  const str = String(summary || '');
+  const i = str.indexOf('Exercise log:');
+  if (i < 0) return [];
+  const out = [];
+  let cur = null, inNote = false;
+  str.slice(i + 'Exercise log:'.length).split('\n').forEach(raw => {
+    const line = raw.trim();
+    if (!line || /^\[.*\]$/.test(line)) { if (line) { cur = null; inNote = false; } return; }
+    let m;
+    if ((m = line.match(/^•\s*(.+?)(?:\s*\(([^)]*)\))?\s*$/))) {
+      cur = { ex: m[1].trim(), sets: [], note: '', gear: '', rounds: '' };
+      out.push(cur); inNote = false; return;
+    }
+    if (!cur) return;
+    if ((m = line.match(/^Set\s+\d+:\s*(.*)$/i))) { inNote = false; cur.sets.push(parseSetText(m[1])); return; }
+    if ((m = line.match(/^Note:\s*(.*)$/i)))      { inNote = true; cur.note = m[1].trim(); return; }
+    if ((m = line.match(/^RPE:\s*(.*)$/i)))       { inNote = false; cur.rounds = m[1].trim(); return; }
+    if (/^·/.test(line)) { inNote = false; return; }
+    if (inNote) cur.note += '\n' + line; else cur.gear = line;
+  });
+  return out.map(e => e.sets.length
+    ? { ex: e.ex, reps: null, sets: e.sets, note: e.note }
+    : { ex: e.ex, circuit: true, gear: e.gear, items: [], note: e.note });
+}
+
+function histFromRows(rows) {
+  return (Array.isArray(rows) ? rows : []).map(r => ({
+    date: String(r.completed_on || ''),
+    day: r.day,
+    readiness: (typeof r.readiness === 'number') ? r.readiness : null,
+    entries: Array.isArray(r.log) ? r.log : parseSummaryLog(r.summary)
+  })).filter(s => s.date);
+}
+
+// A set counts as done work if anything was recorded on it.
+function histSetLogged(s) { return !!(s && (s.w || s.r || s.d)); }
+
+// Every past session of this exercise, newest first. Today's own session is left
+// out: it is the one being logged right now. `completed_on` is written as a UTC
+// date (recordSessionToCloud), so "today" is compared on the same basis.
+function historyFor(name) {
+  if (!HIST) return [];
+  const want = histNorm(name), todayUtc = new Date().toISOString().slice(0, 10);
+  const out = [];
+  HIST.forEach(s => {
+    if (s.date >= todayUtc) return;
+    (s.entries || []).forEach(e => {
+      const nm = HIST_ALIAS[e.ex] || e.ex;
+      if (histNorm(nm) !== want) return;
+      if (e.circuit ? !(e.items || []).some(it => it.w) && !e.gear
+                    : !(e.sets || []).some(histSetLogged)) return;
+      out.push({ date: s.date, readiness: s.readiness, entry: e });
+    });
+  });
+  return out;
+}
+
+// Rename matching, the same matcher Personal Records uses: a history name that is
+// no longer in the plan is joined to its one unambiguous current successor.
+function buildHistAlias() {
+  HIST_ALIAS = {};
+  if (!HIST) return;
+  const current = currentCycleNames();
+  if (!current.length) return;
+  const cur = {}; current.forEach(n => { cur[histNorm(n)] = 1; });
+  const orphans = {};
+  HIST.forEach(s => (s.entries || []).forEach(e => { if (!cur[histNorm(e.ex)]) orphans[e.ex] = 1; }));
+  const names = Object.keys(orphans);
+  if (names.length) HIST_ALIAS = matchRenamed(names, current) || {};
+}
+
+function histDateLabel(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  if (isNaN(d)) return iso;
+  const days = Math.round((new Date(new Date().toISOString().slice(0, 10) + 'T12:00:00') - d) / 86400000);
+  // "Tue 22 Sep" — built by hand: toLocaleDateString gives "Tue, 22 Sept" in en-GB.
+  const when = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + d.getDate() + ' '
+             + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  const ago = days <= 0 ? 'today' : days === 1 ? 'yesterday' : days < 60 ? days + ' days ago'
+            : Math.round(days / 30) + ' months ago';
+  return { when, ago };
+}
+function histKg(v) {
+  const k = parseLoggedKg(v);
+  return k == null ? null : String(Math.round(k * 100) / 100);
+}
+
+// "80 kg × 5 · 5 · 4", "80 · 82.5 · 85 kg", "× 12 · 12 · 10", or "3 sets".
+function histSetsText(sets, planned) {
+  const done = (sets || []).filter(histSetLogged);
+  if (!done.length) return '';
+  const ws = done.map(s => histKg(s.w));
+  const ns = done.map(s => (s.n != null && s.n !== '') ? Number(s.n) : (planned || null));
+  const anyN = ns.some(n => n), allW = ws.every(w => w != null), noW = ws.every(w => w == null);
+  const same = allW && ws.every(w => w === ws[0]);
+  if (same) return anyN ? `${ws[0]} kg × ${ns.map(n => n || '–').join(' · ')}` : `${ws[0]} kg · ${done.length} sets`;
+  if (noW)  return anyN ? `× ${ns.map(n => n || '–').join(' · ')}` : `${done.length} set${done.length === 1 ? '' : 's'}`;
+  if (anyN) return done.map((s, i) => `${ws[i] || 'BW'}×${ns[i] || '–'}`).join(' · ');
+  return ws.map(w => w || 'BW').join(' · ') + ' kg';
+}
+function histTopSet(sets, planned) {
+  let best = null;
+  (sets || []).filter(histSetLogged).forEach(s => {
+    const w = parseLoggedKg(s.w);
+    const n = (s.n != null && s.n !== '') ? Number(s.n) : planned;
+    if (!best || (w || 0) > (best.w || 0)) best = { w, n };
+  });
+  return best;
+}
+
+function paintLastTime(card) {
+  if (!card || !card.querySelector('.item-name')) return;
+  card.querySelectorAll('.lt-pill, .lt-strip, .lt-ghost').forEach(el => el.remove());
+  if (HIST == null) return;                       // not loaded yet — draw nothing rather than "first time"
+  const name = card.querySelector('.item-name').textContent.trim();
+  const isCircuit = card.classList.contains('round-group');
+  const hist = historyFor(name);
+  const detail = card.querySelector('.ex-detail');
+  const logLabel = detail && [...detail.querySelectorAll('.ex-section-label')].find(l => /log/i.test(l.textContent));
+  const anchor = logLabel || (detail && detail.querySelector('.ex-log, .ex-rest-bottom'));
+  if (!detail) return;
+
+  if (!hist.length) {
+    // First meeting with this lift. Only said on a standard (logged) exercise,
+    // and only once history has genuinely loaded (HIST != null above).
+    if (isCircuit || !card.querySelector('.ex-set-log')) return;
+    const first = document.createElement('div');
+    first.className = 'lt-strip lt-first';
+    first.innerHTML = `<span class="lt-when">First time</span><span class="lt-first-txt">Today sets your baseline.</span>`;
+    detail.insertBefore(first, anchor || null);
+    return;
+  }
+
+  const last = hist[0], e = last.entry, dl = histDateLabel(last.date);
+  const target = parseInt(card.dataset.target, 10) || null;
+  const planned = cardReps(card);
+  const strip = document.createElement('div');
+  strip.className = 'lt-strip';
+  strip.addEventListener('click', ev => ev.stopPropagation());
+
+  let big = '', rpeLine = '';
+  if (e.circuit) {
+    const parts = (e.items || []).filter(it => it.w).map(it => `${esc(it.name)} <b>${esc(histKg(it.w) || it.w)}</b>`);
+    big = parts.length ? parts.join(' · ') : esc(e.gear || '');
+  } else {
+    big = esc(histSetsText(e.sets, e.reps || null));
+    const rs = (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null);
+    if (rs.some(r => r)) {
+      rpeLine = 'RPE ' + rs.map(r => r ? (target && r > target ? `<b>${r}</b>` : String(r)) : '–').join(' · ')
+              + (target ? ` — target ${target}` : '');
+    }
+  }
+  const low = last.readiness != null && last.readiness <= 2.5;
+  strip.innerHTML = `
+    <div class="lt-top"><span class="lt-when">Last time · ${esc(dl.when)} · ${esc(dl.ago)}</span>
+      <button type="button" class="lt-hist">History ›</button></div>
+    <div class="lt-big">${big}</div>
+    ${rpeLine || low ? `<div class="lt-rpe">${rpeLine}${low ? `${rpeLine ? ' · ' : ''}<span class="lt-low">low-readiness day</span>` : ''}</div>` : ''}
+    ${e.note ? `<div class="lt-note">“${esc(e.note)}”</div>` : ''}`;
+  strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
+  detail.insertBefore(strip, anchor || null);
+
+  // The closed-card pill. Hidden once the card opens (the strip takes over).
+  const top = e.circuit ? null : histTopSet(e.sets, e.reps || null);
+  const pillTxt = top ? (top.w ? `Last ${histKg(top.w)}${top.n ? '×' + top.n : ' kg'}` : (top.n ? `Last ×${top.n}` : ''))
+                      : '';                      // circuits: the strip is enough, no pill
+  if (pillTxt) {
+    let sum = card.querySelector('.ex-summary');
+    if (!sum) {
+      sum = document.createElement('div');
+      sum.className = 'ex-summary';
+      card.querySelector('.item-body, .item-main').appendChild(sum);
+    }
+    const p = document.createElement('span');
+    p.className = 'ex-summary-pill stat lt-pill';
+    p.textContent = pillTxt;
+    sum.appendChild(p);
+  }
+
+  // The ghost line: only under the set(s) that ran OVER target last time.
+  if (!e.circuit && target) {
+    const lastSets = e.sets || [];
+    card.querySelectorAll('.ex-set-row').forEach(row => {
+      const i = parseInt(row.dataset.setIdx, 10);
+      const s = lastSets[i];
+      if (!histSetLogged(s) || !(Number(s.r) > target)) return;
+      const g = document.createElement('div');
+      g.className = 'lt-ghost';
+      const w = histKg(s.w), n = (s.n != null && s.n !== '') ? s.n : (e.reps || null);
+      g.innerHTML = `last · ${w ? esc(w) : 'BW'}${n ? ' × ' + esc(String(n)) : ''} @ <b>${esc(String(s.r))}</b>`;
+      row.appendChild(g);
+    });
+  }
+}
+function paintAllLastTime() {
+  document.querySelectorAll('.checklist-item').forEach(card => {
+    if (card.querySelector('.ex-set-log') || card.classList.contains('round-group')) paintLastTime(card);
+  });
+}
+
+// Made-up history for the public demo — it is how a visitor sees the feature.
+function demoHistory() {
+  const rows = [], day0 = new Date();
+  const hash = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach((d, di) => {
+    for (let k = 0; k < 4; k++) {
+      const dt = new Date(day0.getTime() - ((di + 2) + 7 * k) * 86400000);
+      const log = [];
+      (d.blocks || []).forEach(b => (b.exercises || []).forEach((ex, xi) => {
+        if (!ex || ex.type !== 'standard') return;
+        const planned = repCount(ex), r = rxOf(ex), tgt = parseInt(r.rpe, 10) || 7;
+        const sets = parseInt(r.sets, 10) || 3;
+        const base = planned ? 20 + (hash(ex.name) % 13) * 5 : 0;
+        const w = base ? String(base - 2.5 * k) : '';
+        log.push({ ex: ex.name, block: b.title || '', reps: planned, note: (k === 0 && xi === 0) ? 'Last set grip went, knee fine' : '',
+          sets: Array.from({ length: sets }, (_, i) => {
+            const lastSet = i === sets - 1 && k === 0;
+            return { w, n: planned ? planned - (lastSet ? 1 : 0) : null, r: String(Math.min(10, tgt + (lastSet ? 1 : (i === 0 ? -1 : 0)))), d: true };
+          }) });
+      }));
+      rows.push({ completed_on: dt.toISOString().slice(0, 10), day: d.id, readiness: k === 2 ? 2.5 : 4, log });
+    }
+  });
+  return rows.sort((a, b) => (a.completed_on < b.completed_on ? 1 : -1));
+}
+
+async function loadHistory() {
+  if (window.IS_DEMO) {
+    HIST = histFromRows(demoHistory()); buildHistAlias(); paintAllLastTime(); return;
+  }
+  try {
+    const cached = JSON.parse(localStorage.getItem(histKey()) || 'null');
+    if (Array.isArray(cached)) { HIST = histFromRows(cached); buildHistAlias(); paintAllLastTime(); }
+  } catch (e) { /* no copy yet */ }
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const res = await _withTimeout(sb.rpc('get_my_history', { p_athlete_id: ATHLETE_ID }), 8000);
+    if (!res || res.error || !Array.isArray(res.data)) return;
+    try { _lsRawSet(histKey(), JSON.stringify(res.data)); } catch (e) { /* storage full — still shown this visit */ }
+    HIST = histFromRows(res.data); buildHistAlias(); paintAllLastTime();
+  } catch (e) { /* offline — the cached copy above stays */ }
+}
+
+// ── The History sheet ── every time this exercise was done, newest first, with a
+// trend of the best set's estimated 1RM (the same maths as Personal Records, so
+// the two can never disagree) or, when no set can be estimated, the top weight.
+function openHistorySheet(card) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  const planned = cardReps(card);
+  const target = parseInt(card.dataset.target, 10) || null;
+  const hist = historyFor(name).slice(0, 12);
+  const ov = document.getElementById('hist-overlay');
+  if (!ov) return;
+
+  const pts = hist.slice().reverse().map(h => {
+    const e = h.entry;
+    if (e.circuit) return null;
+    let best = null, top = null;
+    (e.sets || []).filter(histSetLogged).forEach(s => {
+      const kg = parseLoggedKg(s.w);
+      const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps || null);
+      const est = (kg && n) ? estimateOneRM(kg, n, s.r) : null;
+      if (est != null && (best == null || est > best)) best = est;
+      if (kg != null && (top == null || kg > top)) top = kg;
+    });
+    return { date: h.date, est: best, top };
+  }).filter(Boolean);
+  const estPts = pts.filter(p => p.est != null);
+  const series = estPts.length >= 2 ? { label: 'Best set · estimated 1RM, kg', vals: estPts.map(p => p.est) }
+               : (pts.filter(p => p.top != null).length >= 2
+                 ? { label: 'Top weight, kg', vals: pts.filter(p => p.top != null).map(p => p.top) } : null);
+
+  let chart = '';
+  if (series) {
+    const v = series.vals, W = 300, H = 84, px = 10, py = 14;
+    const lo = Math.min(...v), hi = Math.max(...v), span = (hi - lo) || 1;
+    const x = i => px + (v.length === 1 ? 0 : i * (W - 2 * px) / (v.length - 1));
+    const y = val => H - py - ((val - lo) / span) * (H - 2 * py);
+    const line = v.map((val, i) => `${x(i).toFixed(1)},${y(val).toFixed(1)}`).join(' ');
+    const area = `M${x(0).toFixed(1)},${H - py} L` + v.map((val, i) => `${x(i).toFixed(1)},${y(val).toFixed(1)}`).join(' L')
+               + ` L${x(v.length - 1).toFixed(1)},${H - py} Z`;
+    const lastI = v.length - 1;
+    chart = `<div class="hs-lbl">${esc(series.label)}</div>
+      <svg class="hs-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(series.label)}: from ${v[0]} to ${v[lastI]}">
+        <line x1="0" y1="${H - py}" x2="${W}" y2="${H - py}" class="hs-base"/>
+        <path d="${area}" class="hs-area"/>
+        <polyline points="${line}" class="hs-line"/>
+        <circle cx="${x(lastI).toFixed(1)}" cy="${y(v[lastI]).toFixed(1)}" r="4.5" class="hs-dot"/>
+        <text x="${px}" y="${H - 2}" class="hs-tick">${esc(String(v[0]))}</text>
+        <text x="${W - px - 10}" y="${Math.max(11, y(v[lastI]) - 9).toFixed(1)}" text-anchor="end" class="hs-end">${esc(String(v[lastI]))}</text>
+      </svg>`;
+  }
+
+  const rows = hist.map(h => {
+    const e = h.entry, dl = histDateLabel(h.date);
+    const txt = e.circuit ? ((e.items || []).filter(it => it.w).map(it => `${it.name} ${histKg(it.w) || it.w}`).join(' · ') || e.gear || '')
+                          : histSetsText(e.sets, e.reps || null);
+    const rs = e.circuit ? '' : (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null).filter(Boolean)
+      .map(r => target && r > target ? `<b>${r}</b>` : String(r)).join(' ');
+    const low = h.readiness != null && h.readiness <= 2.5;
+    return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · RPE ' + rs : ''}${low ? ' · low day' : ''}</span>
+      <span class="hs-v">${esc(txt)}</span>
+      ${e.note ? `<span class="hs-n">“${esc(e.note)}”</span>` : ''}</div>`;
+  }).join('');
+
+  const hasRecord = typeof ceilingLifts === 'function' && ceilingLifts().some(l => l.lift === name);
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your history</div>
+    <h2 class="readiness-title">${esc(name)}</h2>
+    <p class="readiness-sub">${hist.length} time${hist.length === 1 ? '' : 's'} logged${target ? ` · today's target RPE ${target}` : ''}. What you did, never what to lift: your coach sets the load.</p>
+    ${chart}
+    <div class="hs-list">${rows}</div>
+    <div class="hs-actions">
+      ${hasRecord ? `<button type="button" class="hs-link" id="hs-rec">Open in Personal Records ›</button>` : ''}
+      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
+    </div>`;
+  const rec = document.getElementById('hs-rec');
+  if (rec) rec.addEventListener('click', () => {
+    closeHistorySheet();
+    if (typeof STEP !== 'undefined' && STEP) closeStepMode();
+    _ceilReturn = { dayId: card.dataset.day, exName: name };
+    renderCeilingLift(name);
+  });
+  ov.classList.add('visible');
+}
+function closeHistorySheet() {
+  const ov = document.getElementById('hist-overlay');
+  if (ov) ov.classList.remove('visible');
+}
+window.openHistorySheet = openHistorySheet;
+window.closeHistorySheet = closeHistorySheet;
 
 function esc(str) {
   if (!str) return '';
