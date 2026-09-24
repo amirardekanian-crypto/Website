@@ -31,7 +31,7 @@
 // v14: program.html changed (The Card Remembers, 2026-09-24): sets log reps, every card shows
 // last time, and the History sheet reads get_my_history(). The session record now carries `log`,
 // so the sooner phones leave the v13 shell the sooner their sessions are saved as data.
-const CACHE = 'aap-v15';
+const CACHE = 'aap-v16';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

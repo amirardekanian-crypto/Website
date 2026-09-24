@@ -197,6 +197,12 @@
     --ice-mid: rgba(199,85,47,0.22);
     --ice-glow: rgba(199,85,47,0.2);
 
+    /* RPE UNDER the prescribed target (2026-09-24, Amir). Over target is clay
+       (--ice); under is this muted steel blue: warm = harder, cool = easier, and
+       orange-vs-blue stays distinct for colour-blind athletes, which red-vs-green
+       would not. Used ONLY for an RPE against its target, nowhere else. */
+    --rpe-under: #3E6A92;
+
     --purple: #A8741C;
     --purple-dim: rgba(168,116,28,0.08);
     --purple-mid: rgba(168,116,28,0.22);
@@ -2378,6 +2384,15 @@
     text-transform: uppercase; color: var(--grey-text); white-space: nowrap; margin-right: 2px;
   }
   .ex-set-rpe .rpe-btn { flex: 1 1 0; max-width: none; height: 40px; font-size: 16px; border-radius: 8px; }
+  /* RPE against target (rpeVs): clay over, steel blue under, green on target. */
+  .ex-set-rpetag.over  { color: var(--ice); }
+  .ex-set-rpetag.under { color: var(--rpe-under); }
+  body[data-dark] .ex-set-rpetag.over { color: #E06B43; }
+  body[data-dark] .ex-set-rpetag.under { color: var(--rpe-under); }
+  .ex-set-rpe .rpe-btn.selected.over,  .tl-rpe-btn.selected.over  { background: var(--ice); border-color: var(--ice); color: #fff; }
+  .ex-set-rpe .rpe-btn.selected.under, .tl-rpe-btn.selected.under { background: #3E6A92; border-color: #3E6A92; color: #fff; }
+  b.rpe-under, .lt-rpe b.rpe-under, .lt-ghost b.rpe-under, .hs-d b.rpe-under,
+  body[data-dark] .lt-rpe b.rpe-under, body[data-dark] .hs-d b.rpe-under { color: var(--rpe-under); }
   body[data-dark] .ex-set-row.done .ex-set-num { color: #9fd3bd; }
   /* The narrowest phones (320px): every fixed track gives a little so a load like
      "102.5" still fits the weight box. */
@@ -3588,7 +3603,7 @@
   .dark-toggle { background: transparent; border: 1px solid #444; border-radius: 4px; padding: 5px 9px; cursor: pointer; font-size: 14px; margin-left: auto; line-height: 1; }
 
   /* ── Dark Mode ── */
-  body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #888; --white: #202020; --grey-dark: #e8e8e8; }
+  body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #888; --white: #202020; --grey-dark: #e8e8e8; --rpe-under: #8DB3D6; }
   body[data-dark] .checklist-item { border-color: #333; }
   body[data-dark] .item-name { color: #ddd; }
   body[data-dark] .section-title { color: #666; }
@@ -9712,6 +9727,23 @@ function loadSetLog(exName, totalSets) {
   return log;
 }
 // The prescribed rep count on a card, or null (holds, carries, intervals).
+// ── RPE against the prescribed target ── 'over' | 'under' | '' (on target, or
+// nothing to compare). The target may be a range ("7-8"): anything inside it is
+// on target. Every screen that marks an RPE goes through this, so a set can never
+// be "over" on the card and "on target" in History.
+function rpeVs(r, target) {
+  const m = String(target == null ? '' : target).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
+  const v = Number(r);
+  if (!m || !(v > 0)) return '';
+  const lo = Number(m[1]), hi = m[2] ? Number(m[2]) : lo;
+  return v > hi ? 'over' : v < lo ? 'under' : '';
+}
+// An RPE as text, wrapped in <b class="rpe-over|rpe-under"> when off target.
+function rpeMark(r, target) {
+  const k = rpeVs(r, target);
+  return k ? `<b class="rpe-${k}">${esc(String(r))}</b>` : esc(String(r));
+}
+
 // A leftover RANGE ("8-10") is not a prescribed number and returns null — see
 // repRangeText(). Amir prescribes one number, never a range (2026-09-24).
 function cardReps(card) {
@@ -9809,7 +9841,17 @@ function attachSetLog(card) {
       const tag = row.querySelector('.ex-set-rpetag');
       tag.textContent = (s.d && s.r) ? 'RPE ' + s.r : (s.d ? 'RPE' : '');
       tag.classList.toggle('empty', !s.r);
-      row.querySelectorAll('.rpe-btn').forEach(b => b.classList.toggle('selected', String(s.r) === b.dataset.rpe));
+      // Off target: clay when harder than prescribed, steel blue when easier.
+      const vs = s.r ? rpeVs(s.r, card.dataset.target) : '';
+      tag.classList.toggle('over', vs === 'over');
+      tag.classList.toggle('under', vs === 'under');
+      tag.setAttribute('aria-label', s.r ? `RPE ${s.r}${vs ? (vs === 'over' ? ', above' : ', below') + ' target' : ''}. Tap to change` : `Rate set ${i + 1}`);
+      row.querySelectorAll('.rpe-btn').forEach(b => {
+        const on = String(s.r) === b.dataset.rpe;
+        b.classList.toggle('selected', on);
+        b.classList.toggle('over', on && vs === 'over');
+        b.classList.toggle('under', on && vs === 'under');
+      });
     });
   }
   card._paintSets = (openIdx) => { if (openIdx != null) open.add(openIdx); paintSets(); };
@@ -10997,7 +11039,8 @@ function paintTimerLog(row, item) {
       </div>` : ''}
       <div class="tl-line tl-rpe">
         <span class="tl-lab">RPE</span>
-        ${[6,7,8,9,10].map(v => `<button type="button" class="tl-rpe-btn${selRpe() === String(v) ? ' selected' : ''}" data-rpe="${v}">${v}</button>`).join('')}
+        ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, item.card.dataset.target) : '';
+          return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
       </div>`;
     tl.querySelectorAll('.tl-step').forEach(b => b.addEventListener('click', () => {
       const base = repsNow() || (isRange ? parseInt(repsIn.getAttribute('placeholder'), 10) || 1 : 1);
@@ -11214,7 +11257,7 @@ function paintLastTime(card) {
   }
 
   const last = hist[0], e = last.entry, dl = histDateLabel(last.date);
-  const target = parseInt(card.dataset.target, 10) || null;
+  const target = card.dataset.target || null;
   const planned = cardReps(card);
   const strip = document.createElement('div');
   strip.className = 'lt-strip';
@@ -11228,7 +11271,7 @@ function paintLastTime(card) {
     big = esc(histSetsText(e.sets, e.reps || null));
     const rs = (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null);
     if (rs.some(r => r)) {
-      rpeLine = 'RPE ' + rs.map(r => r ? (target && r > target ? `<b>${r}</b>` : String(r)) : '–').join(' · ')
+      rpeLine = 'RPE ' + rs.map(r => r ? rpeMark(r, target) : '–').join(' · ')
               + (target ? ` — target ${target}` : '');
     }
   }
@@ -11265,7 +11308,7 @@ function paintLastTime(card) {
     card.querySelectorAll('.ex-set-row').forEach(row => {
       const i = parseInt(row.dataset.setIdx, 10);
       const s = lastSets[i];
-      if (!histSetLogged(s) || !(Number(s.r) > target)) return;
+      if (!histSetLogged(s) || rpeVs(s.r, target) !== 'over') return;
       const g = document.createElement('div');
       g.className = 'lt-ghost';
       const w = histKg(s.w), n = (s.n != null && s.n !== '') ? s.n : (e.reps || null);
@@ -11330,7 +11373,7 @@ async function loadHistory() {
 function openHistorySheet(card) {
   const name = card.querySelector('.item-name').textContent.trim();
   const planned = cardReps(card);
-  const target = parseInt(card.dataset.target, 10) || null;
+  const target = card.dataset.target || null;
   const hist = historyFor(name).slice(0, 12);
   const ov = document.getElementById('hist-overlay');
   if (!ov) return;
@@ -11379,7 +11422,7 @@ function openHistorySheet(card) {
     const txt = e.circuit ? ((e.items || []).filter(it => it.w).map(it => `${it.name} ${histKg(it.w) || it.w}`).join(' · ') || e.gear || '')
                           : histSetsText(e.sets, e.reps || null);
     const rs = e.circuit ? '' : (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null).filter(Boolean)
-      .map(r => target && r > target ? `<b>${r}</b>` : String(r)).join(' ');
+      .map(r => rpeMark(r, target)).join(' ');
     const low = h.readiness != null && h.readiness <= 2.5;
     return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · RPE ' + rs : ''}${low ? ' · low day' : ''}</span>
       <span class="hs-v">${esc(txt)}</span>
