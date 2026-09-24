@@ -5,6 +5,8 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · #1 The Spine and #14 Rungs.** *"I love your rung idea. I love the exercise database."* Two rules came with it, both now standing: **"I just dont want to make my exercise cards busier. Maybe add something clickable and then you can see more?"** (so a new feature adds at most one small control to a card and puts the rest behind a tap), and **"the cues should be there so we dont write the cues for each exercise everytime"** (write shared content once, on the entity, and let a programme override it).
+
 - **2026-09-24 · The History Sheet** (the extra idea added inside the #5 deep-dive: every time an exercise was done, with a trend). *"I liked how you add a new idea, the story sheet."* He values an unrequested idea that grows out of the picked one, **so a deep-dive should always look for one**. Decisions on #5: *"lets go with your suggestions"*, with one correction from his coaching: **"I dont prescribe rep ranges, i prescribe a number only"**, and the reps box exists **so athletes can record fewer reps when they can't hit the number**. Never design for rep ranges in his programmes.
 
 - **2026-09-24 · The artifact format itself.** *"I like that you created an artifact for this … for next times, produce the same answer."* Every `/ideas` result and every idea deep-dive is an **Artifact page**, not a chat answer: 8 fields per idea, build order, dependency map, stage strip. The chat reply is the ranking and the link.

@@ -31,7 +31,9 @@
 // v14: program.html changed (The Card Remembers, 2026-09-24): sets log reps, every card shows
 // last time, and the History sheet reads get_my_history(). The session record now carries `log`,
 // so the sooner phones leave the v13 shell the sooner their sessions are saved as data.
-const CACHE = 'aap-v16';
+// v17: program.html changed (The Spine, 2026-09-24): the ⓘ About sheet with Rungs, and cues filled
+// from the exercise's entry on cards that carry none of their own. (v16 was the RPE colours.)
+const CACHE = 'aap-v17';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

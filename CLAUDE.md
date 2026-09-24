@@ -323,6 +323,27 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30.
 
+### 🦴 The Spine — one record per exercise (2026-09-24)
+
+Idea #1 of `/ideas` round 1 (brief: claude.ai/artifact/WymDKxk58nkCy5eSgodSrU). Amir: *"I love
+the exercise database … I just dont want to make my exercise cards busier … the cues should be
+there so we dont write the cues for each exercise everytime."* Server: `supabase/stage31_spine.sql`.
+- **Two tables.** `exercises` (athlete-readable when approved: purpose, pattern, cues, the ladder
+  as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags). A separate
+  TABLE so no athlete query can ever touch the flags. `get_exercises()` serves **approved rows only**.
+- **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
+  (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;
+  their cues are Amir's own wording, copied from the most recent live programme using each one.
+- **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
+  else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame and
+  carries **Rungs** (the pattern's ladder, marked done / in your plan / next rung).
+- **Cues are written once, on the entry.** A card without its own `cues` shows the entry's
+  (`paintSpine()` fills `.ex-cues-slot`); a card with its own keeps them as an override.
+- **Names are never rewritten.** Card → entry resolves by `exId`, then name/aliases through
+  `exNameVariants()`. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
+  `spineForC()` (coach.html). Same rule: `exId` first, then the tightest tier with ONE entry.
+- `spinecache` (localStorage, no athlete prefix) is a cache of `get_exercises()` and never syncs.
+
 ### ✍️ The set log is COUNTERSIGNED, and the note belongs to ONE session (2026-09-24)
 
 Amir: *"do as you recommend"*, on top of The Card Remembers. Design and evidence in

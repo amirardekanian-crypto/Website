@@ -24,7 +24,10 @@ copies them, it does not render them. There is no chip formatting left to get wr
 **2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
 the spec. Each exercise → `type` + `rx` + `cues` {good:[ext,int], bad:[avoid]};
 circuits → `rounds` + `items[]`. Map cues: ext+int → `cues.good[]`, avoid →
-`cues.bad[]`. `sport.badge` ← design's `SPORT_BADGE` line. `completionTitle`/
+`cues.bad[]` — **except `cues: spine`, which means OMIT `cues` entirely**: the app fills the
+card from the exercise's approved Spine entry (SCHEMA "`exId` and the Spine"). **Stamp `exId`**
+on every exercise whose name resolves to a `public.exercises` entry (approved or draft), so the
+card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line. `completionTitle`/
 `completionMessage` per day from /program-engage PART 4; `cycles[currentCycleIndex].message`
 = PART 1 message + outcomes; next cycle's `teaser` = PART 2. Leave `videoUrl: null`
 (auto-resolved by name downstream).
@@ -164,7 +167,7 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
 - **Coaching lint** (still yours): every `standard` has sets·reps·tempo·RPE·rest unless the
   movement says otherwise; ballistic/carry correctly OMIT tempo and carry an `intent`;
   warm-up/prep carry NO `rpe`; every exercise has exactly 3 cues (ext+int in good, avoid in
-  bad); section titles use the standard names (Primary/Accessory/etc, never "Strength").
+  bad) **or none, when its `exId` points at an approved Spine entry that has cues**; section titles use the standard names (Primary/Accessory/etc, never "Strength").
   **Reps are one number, never a range** (Amir, 2026-09-24). If the spec carries a range,
   stop and ask — do not pick an end yourself. `auditRx()` flags one as `rep-range`.
 - **⛔ No working circuit in a FIRST cycle — hard reject.** If `currentCycleIndex` is `0`,
@@ -234,6 +237,11 @@ for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exer
 console.log('done');
 "
 ```
+
+**Then check the Spine.** Every name should resolve to an entry in `public.exercises`
+(`select id, name, aliases, status from public.exercises`). One that doesn't is a **new
+exercise**: list it for Amir as *"add to the Spine? (coach.html → Exercises)"* and draft the
+entry as `status 'draft'` if he says yes. Never approve an entry yourself.
 
 **Then act on the output:**
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;

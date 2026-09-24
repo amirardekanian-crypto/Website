@@ -641,7 +641,23 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | `setup` | equipment / position / conditions — `"neutral grip"`, `"45° bench"`, `"In 4 · out 8"` | quiet grey line under the name |
 | `intent` | **ONE** coaching intention — `"max intent"`, `"max speed"`, `"stick the landing"` | the green pill (the only pill) |
 | `note` | the coach's note to this athlete | clay "Coach's Note" callout |
-| `cues` | technique — `good[]` / `bad[]` | the cues list |
+| `cues` | technique — `good[]` / `bad[]`. **Optional since the Spine:** omit it and the card shows the exercise's approved Spine cues | the cues list |
+| `exId` | the exercise's id in the Spine (`public.exercises`), e.g. `"trap-bar-deadlift"` | nothing directly: it ties the card to its entry |
+
+#### `exId` and the Spine (2026-09-24)
+
+The Spine is one record per exercise Amir programmes (`supabase/stage31_spine.sql`): purpose,
+pattern, the cues, the ladder (`easier`/`harder`/`alts` as ids), what it loads, the video. A
+card resolves to its entry by **`exId` first, then its name** (the entry's `name` and `aliases`,
+through the same four matching tiers Personal Records uses). Names in stored programmes are
+**never rewritten**; `exId` is added beside the name by `/program-assemble` from 2026-09-24 on.
+
+- **Cues are written once, on the entry.** An exercise with no `cues` of its own shows the
+  entry's; an exercise that carries `cues` keeps them (a per-athlete override).
+- The card gains one small **ⓘ** after the name when the entry is **approved**. It opens the
+  About sheet: purpose, on court, the ladder (Rungs), where it sits in the programme, History.
+- Drafts are invisible to athletes: `get_exercises()` serves approved entries only, and never
+  the coach half (`exercise_coach`: SFR rank, restriction flags).
 
 #### The TEMPO cell, and the digit that carries the instruction
 

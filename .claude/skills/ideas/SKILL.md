@@ -109,7 +109,9 @@ Also an Artifact page. Reference: #5 The Card Remembers, https://claude.ai/artif
    connects** → **Developer hat** (numbered build steps with the files and functions, MVP vs next,
    docs in the same PR) → **Traps** → **Your call** (the decisions to make, the recommended pick
    highlighted, and "say *go with your picks*").
-4. Build nothing until he answers the decisions.
+4. **Always include one idea that grows out of the picked one** and label it so (Amir liked the
+   unrequested History Sheet in #5: *"I liked how you add a new idea"*). Add it to `BANK.md`.
+5. Build nothing until he answers the decisions.
 
 ## After Amir reacts
 
