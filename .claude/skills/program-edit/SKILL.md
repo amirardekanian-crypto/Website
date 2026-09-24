@@ -251,7 +251,7 @@ Report what changed, the updated set tally, and flag anything left for a future 
 **Then run `/spine` → Upkeep** on this athlete's programme (Amir, 2026-09-24: every programme
 write leaves the Spine more complete). An exercise the edit brought in that has no entry gets
 drafted; empty fields get filled; a better general cue that came up is applied to a draft or
-proposed for an approved entry; qualities tagged; `exId` stamped on the new card. One-line
+proposed for an approved entry; qualities and body parts (`loads` + `impact`) filled; `exId` stamped on the new card. One-line
 **SPINE** report at the end.
 
 **And keep the edit honest to the rest of the system** (2026-09-24):

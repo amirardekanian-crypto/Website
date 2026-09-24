@@ -4256,6 +4256,12 @@ const SPINE_PATTERNS = ['squat','hinge','single-leg','push-horizontal','push-ver
   'mobility','isolation','conditioning'];
 const SPINE_FLAGS = ['loaded-knee-flexion','axial-load','free-hinge','high-impact','overhead'];
 const SPINE_ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;   // the shape of an entry id (stage31 check)
+// Body parts involved (stage36): the course app's region and impact ids, the same lists
+// program.html's SPINE_REGION / SPINE_IMPACT draw and the database's check constraint allows.
+const SPINE_REGIONS = [['ankle-foot', 'Ankle & foot'], ['calf-achilles', 'Calf & Achilles'], ['knee', 'Knee'],
+  ['hip-groin', 'Hip & groin'], ['hamstring', 'Hamstring'], ['low-back', 'Low back'], ['trunk', 'Trunk'],
+  ['shoulder', 'Shoulder'], ['elbow-forearm-wrist', 'Elbow, forearm & wrist'], ['neck', 'Neck']];
+const SPINE_IMPACTS = [['none', 'No impact'], ['running', 'Running'], ['plyometric', 'Jumping'], ['landing', 'Landing']];
 // The Quality Map (2026-09-24): the ten ids, and which cycle-picture family
 // word names each one. A cycle's headline quality is read from its `art` word.
 const QM_IDS = ['strength','muscle','power','spring','speed','brakes','rotation','engine','armour','movement'];
@@ -4348,7 +4354,8 @@ async function spineSave(id, approve) {
     id, name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
     purpose: f('purpose').trim() || null, tennis: f('tennis').trim() || null,
     cues: (good.length || badCues.length) ? { good, bad: badCues } : null,
-    equipment: spineCsv(f('equipment')), loads: spineCsv(f('loads')),
+    equipment: spineCsv(f('equipment')), loads: [...c.querySelectorAll('[data-sload]:checked')].map(x => x.dataset.sload),
+    impact: f('impact') || null,
     easier: links.easier, harder: links.harder, alts: links.alts, video: f('video').trim() || null,
     // First = primary. Blank slots drop out; a repeat keeps its first position.
     qualities: [f('q1'), f('q2'), f('q3')].filter((x, i, a) => x && a.indexOf(x) === i),
@@ -4508,7 +4515,13 @@ function renderExercises() {
         <div>${lbl('Regressions: easier versions of the same movement (ids, or a name)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Progressions: harder versions of the same movement (ids, or a name)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Alternatives: same movement, other equipment or machine (ids, or a name)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
-        <div>${lbl('Equipment · loads (comma)')}<input data-sf="equipment" value="${esc((e.equipment || []).join(', '))}" style="${field};margin-bottom:6px"><input data-sf="loads" value="${esc((e.loads || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Equipment (comma)')}<input data-sf="equipment" value="${esc((e.equipment || []).join(', '))}" style="${field}"></div>
+      </div>
+      ${lbl('Body parts involved · the athlete sees these, with the impact pill after them')}
+      <div style="display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center">
+        ${SPINE_REGIONS.map(([id, nm]) => `<label style="font-size:14px"><input type="checkbox" data-sload="${id}"${(e.loads || []).includes(id) ? ' checked' : ''}> ${nm}</label>`).join('')}
+        <select data-sf="impact" style="${field.replace('width:100%;', '')};width:auto"><option value="">— impact —</option>${
+          SPINE_IMPACTS.map(([id, nm]) => `<option value="${id}"${e.impact === id ? ' selected' : ''}>${nm}</option>`).join('')}</select>
       </div>
       <div style="border-top:1px dashed var(--line);margin-top:14px;padding-top:4px">
         ${lbl('Coach only · never sent to a phone')}

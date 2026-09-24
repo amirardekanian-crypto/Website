@@ -67,7 +67,7 @@ the existing ids for the links, and they show you which names are only variants.
 
 **3. Write the batch** to `<scratchpad>/spine_batchN.json`, as a list of objects with these fields:
 `id` (kebab-case, the name slugged), `name` (as programmes spell it), `aliases`, `pattern`,
-`purpose`, `tennis`, `equipment`, `loads`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
+`purpose`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
 - **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
   sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
   wherever it fits, so Library → Exercises groups it with its family.
@@ -75,6 +75,23 @@ the existing ids for the links, and they show you which names are only variants.
   it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general. The
   *why for this athlete* belongs to the programme, not to the entry.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch.
+- **loads + impact = "Body parts involved"** (Amir, 2026-09-24, from the course app's
+  «بخش‌هایی از بدن که درگیر است»; stage36). The athlete sees them in the About sheet: the regions as
+  soft pills, the impact word in clay. **Every entry gets both, and `draft_sql.py` refuses one without.**
+  - `loads`: 1 to 4 of `ankle-foot · calf-achilles · knee · hip-groin · hamstring · low-back · trunk ·
+    shoulder · elbow-forearm-wrist · neck` (the course's own ids plus `neck`; the database refuses
+    anything else). Name what the exercise really loads, not every joint that moves. The calibration,
+    from the course's own 114 tags: squat or lunge = `knee, hip-groin` (+ `low-back` with a bar on the
+    back); hinge = `hamstring, hip-groin` (+ `low-back` when loaded); bridge or thrust = `hip-groin,
+    hamstring`; pull or press = `shoulder, elbow-forearm-wrist`; trunk work = `trunk` (+ `low-back`
+    when it rotates or lifts the back); calf work = `calf-achilles, ankle-foot`; running =
+    `ankle-foot, calf-achilles` (+ `hamstring` for sprints, + `knee, hip-groin` for change of direction).
+  - `impact`: one of `none · running · plyometric · landing` (the app says No impact, Running,
+    Jumping, Landing). Only jumps, hops and bounds are `plyometric`; drop-and-stick drills are
+    `landing`; anything run is `running`; walking, bikes and every lift are `none`.
+  - **If the course has the same exercise, copy its tags exactly** so the two apps agree:
+    `select v->'tags', v->>'impact' from public.tps_content c, jsonb_each(c.body->'exercises') e(k, v)
+    where c.key like 'exercises-%' and lower(v->>'nameEn') = lower('<Name>');`
 - **easier / harder / alts** are shown to athletes as **Regressions**, **Progressions** and
   **Alternatives** (Amir, 2026-09-24; the old Rungs ladder is gone for good: *"too much
   information, even im mixed up"*). Keep the three meanings strict:
@@ -148,7 +165,7 @@ with ex as (
   where p.athlete_id = '<id>' and not (e ? 'items' and i is null)),
 hit as (
   select ex.*, x.id, x.status, x.aliases, x.video, x.cues, x.purpose, x.tennis, x.equipment,
-         x.loads, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities
+         x.loads, x.impact, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities
   from ex left join public.exercises x
     on x.id = ex.exid or lower(x.name) = lower(ex.nm)
        or lower(ex.nm) = any(select lower(a) from unnest(x.aliases) a)
@@ -163,7 +180,7 @@ select nm, id, status,
     case when cues is null then 'cues' end,
     case when coalesce(tennis, '') = '' then 'tennis?' end,
     case when cardinality(equipment) = 0 then 'equipment' end,
-    case when cardinality(loads) = 0 then 'loads' end,
+    case when id is not null and (cardinality(loads) = 0 or impact is null) then 'body parts (loads + impact)' end,
     case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'links' end,
     case when id is not null and cardinality(qualities) = 0 and cardinality(coalesce(suggested_qualities, '{}')) = 0 then 'qualities' end,
     case when id is not null and exid is null then 'exId on the card' end,
@@ -177,7 +194,8 @@ no SFR. Answer them once and they stop mattering.
 | | A **draft** entry | An **approved** entry (athletes see it) |
 |---|---|---|
 | **No entry at all** | Draft it now with `draft_sql.py` (the whole Run above, for one or a few names) | — |
-| **Empty field** (video, alias, equipment, loads, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
+| **Empty field** (video, alias, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
+| **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). An approved entry whose `impact` is null still carries the loose words renamed in stage36: check them against the calibration and fix them in the same pass |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
@@ -205,7 +223,7 @@ no SFR. Answer them once and they stop mattering.
 - Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
-`SPINE — added 2 drafts (names) · filled 5 gaps (what) · tagged qualities on 3 (2 as suggestions on
+`SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · tagged qualities on 3 (2 as suggestions on
 approved entries) · linked 2 (regressions/progressions/alternatives) · 3 proposals for you (entry: old → new) ·
 N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 
