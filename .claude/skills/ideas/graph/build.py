@@ -207,7 +207,7 @@ STATUS = {
  1: ("Built 24 Sep", "https://claude.ai/artifact/WymDKxk58nkCy5eSgodSrU"),
  4: ("Built 24 Sep", "https://claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw"),
  5: ("Built 24 Sep", "https://claude.ai/artifact/NTtDNds5vcLoE6AfX21Zoj"),
- 2: ("Picked 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
+ 2: ("Built 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
  "5b": ("Built 24 Sep", None), 14: ("Built 24 Sep", None), 15: ("Built 24 Sep", None),
 }
 
