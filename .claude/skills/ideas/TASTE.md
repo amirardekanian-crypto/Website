@@ -5,6 +5,15 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · A debrief answers what the athlete SAID, not only what he logged.** Amir, reviewing
+  Alireza's debrief, added his phone call: *"he mentioned that his heart rate rises too much playing
+  tennis … after 30 minutes my left hand gets tired … in mid cycle he asked for more speed"*, each with
+  the answer he gave. So The Debrief carries a **"What you told me"** section (his words → what we do →
+  when), and the coach.html version needs a box for call notes. A promise made on a call can change
+  the locked roadmap (here, cardio base before cycle 4); the design step records it as a named change.
+  Also learned: switches on a published page don't reach Claude. **Ask for a coach's answers in chat**,
+  or give the page a saved state.
+
 - **2026-09-24 · #12 The Debrief, picked because a real athlete needed it.** *"it is actually a good
   idea to do it now, because i want to give alireza a debrief of this cycle … tell me what you think
   we should do as a coach and then produce a result, in farsi so i can check an actual outcome"*. He
