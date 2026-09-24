@@ -5,6 +5,15 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · The Debrief is a MESSAGE plus a LOG ENTRY, not a page.** *"i dont need a debrief
+  file like this, i just want the message which is like a cycle report … tell him what he did well,
+  what we are gonna do next, what we want more work from him, and celebrate his wins … then we want
+  to update the athlete record … save the debrief, only the parts that affects our coaching
+  decision, to his log."* And: *"i dont need a file, i liked the content."* So the athlete gets a
+  WhatsApp text in chat (wins, what you told me, next cycle, what I need from you, questions), and
+  the coach-only decisions go into `coaching_logs` as a `## Debrief — Cycle NN` section that
+  `/program-design` reads. Plan → prescribe → five weeks of training → learn from the logs.
+
 - **2026-09-24 · A debrief answers what the athlete SAID, not only what he logged.** Amir, reviewing
   Alireza's debrief, added his phone call: *"he mentioned that his heart rate rises too much playing
   tennis … after 30 minutes my left hand gets tired … in mid cycle he asked for more speed"*, each with
