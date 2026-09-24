@@ -110,11 +110,29 @@ Also an Artifact page. Reference: #5 The Card Remembers, https://claude.ai/artif
    docs in the same PR) → **Traps** → **Your call** (the decisions to make, the recommended pick
    highlighted, and "say *go with your picks*").
 4. **Always include one idea that grows out of the picked one** and label it so (Amir liked the
-   unrequested History Sheet in #5: *"I liked how you add a new idea"*). Add it to `BANK.md`.
+   unrequested History Sheet in #5: *"I liked how you add a new idea"*). Add it to `BANK.md`
+   **and to The Coaching Graph** (below).
 5. Build nothing until he answers the decisions.
+
+## The Coaching Graph stays the one map
+
+Amir, 2026-09-24: *"if you have came up with a new idea along the way, this should be added to the
+coaching graph."* The round-1 page (https://claude.ai/artifact/Bu746VeRc4uh2RVbF4F6Mv) is the one
+place he reads every idea, so **every new idea from a deep-dive or a build goes onto it, and every
+status change shows on it**, not only in `BANK.md`.
+- The source is `graph/build.py` (one `dict` per idea with all 8 fields; grown ideas carry
+  `layer="Grown along the way"` and `grown="<n>"`; `STATUS` holds *Built* and the brief's link) plus
+  `graph/page.tpl.html`. Build into the scratchpad, never into the repo:
+  `python3 .claude/skills/ideas/graph/build.py <scratchpad>`.
+- Republish to the same URL: `Artifact` read it first (the tool refuses a publish over a version
+  this session hasn't read), check nobody edited it, then publish `<scratchpad>/coaching-graph.html`
+  with `url`. Update the hero's *Built so far* line in the template when something ships.
+- Commit `build.py` and the template with the change, so the next session starts from the page as
+  it stands.
 
 ## After Amir reacts
 
 - Write his reaction into `TASTE.md` **in his words**, with the *why*. "Liked" alone teaches nothing.
-- Update the idea's status in `BANK.md`: `picked` · `built` (with the commit) · `parked` · `rejected`.
+- Update the idea's status in `BANK.md`: `picked` · `built` (with the commit) · `parked` · `rejected`,
+  and the same on The Coaching Graph (`STATUS` in `graph/build.py`, then republish).
 - If a reaction reveals a rule (e.g. "never show the athlete X"), add it to the rules above.
