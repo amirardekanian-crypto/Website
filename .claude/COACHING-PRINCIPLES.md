@@ -8,6 +8,10 @@ calls are NOT saved). Amir can open and edit this file anytime.
 
 Tracked in git (synced + versioned) but inside `.claude/`, so GitHub Pages does not
 publish it. No athlete health/chat detail goes here — principles only.
+⚠️ **The GitHub repo itself is PUBLIC, so never write an athlete's name or id in this file.**
+The worked examples say *Athlete A*, *Athlete B* … (coded 2026-09-24 in order of first
+appearance; the key is deliberately not kept anywhere). A new example takes the next
+free letter, or no label at all. The athlete's own record belongs in `public.coaching_logs`.
 
 > How to add: append a dated bullet under the right section. Keep each principle one or
 > two lines, general (applies across athletes), and actionable.
@@ -90,8 +94,8 @@ publish it. No athlete health/chat detail goes here — principles only.
   stated exception if used, never a silent default. Exception: an isolation slot with no genuine
   SFR-equivalent alternative in the library (e.g. Leg Extension for direct knee extension) can
   stay — say so, don't force a worse substitute just to rotate. *(2026-06-15, clarified 2026-07-13
-  — Pooya C3 shipped with ~half its accessories unrotated by oversight, not by stated exception;
-  same failure mode hit Mehrnaz C2 the same day, at an 83% overlap with Cycle 1, caught on review
+  — Athlete A C3 shipped with ~half its accessories unrotated by oversight, not by stated exception;
+  same failure mode hit Athlete B C2 the same day, at an 83% overlap with Cycle 1, caught on review
   not at design time — two independent hits in one day means this is a recurring gap, not a
   one-off)*
 - **Conditioning-circuit/finisher exercises rotate for real variety too — not just accessories.**
@@ -101,22 +105,22 @@ publish it. No athlete health/chat detail goes here — principles only.
   accessories: genuinely different equipment and movement patterns each time (loaded carries,
   battle ropes, rowing, sled work, renegade rows, overhead carries — not just a new rep scheme
   on the same three moves), picked for what the athlete's equipment/goals/injury history
-  actually support. *(2026-07-18, Amir: Pooya's and Pegah's circuits had converged on identical
+  actually support. *(2026-07-18, Amir: Athlete A's and Athlete C's circuits had converged on identical
   exercises)*
 - **Rehab/corrective:** keep the best-in-class pieces; rotate the rest for freshness.
-  (Coach may elect to rotate the whole block — done for Mehraneh C3.) *(2026-06-15)*
+  (Coach may elect to rotate the whole block — done for Athlete D C3.) *(2026-06-15)*
 - **The "keep best-in-class" exception above is for rehab/corrective work only.** Don't stretch
   it to general accessories just because their load is progressing well on paper — that kind of
   progress is invisible to the athlete; new movements are what read as forward motion, and she's
   paying monthly expecting to feel it. *(2026-07-13)*
 - **Anything genuinely kept must still show a visible dose progression — never re-ship an
   identical prescription cycle to cycle.** Rotation isn't the only lever: a kept exercise's sets,
-  rounds, load, or difficulty should move. Mehrnaz C2 initially re-shipped Medicine Ball
+  rounds, load, or difficulty should move. Athlete B C2 initially re-shipped Medicine Ball
   Rotational Slam and Assault Bike Intervals with the exact same numbers as Cycle 1 — caught on
   review, not by design. *(2026-07-13)*
 - **A fresh-exercise swap must fit the athlete's demonstrated capacity, not the most
   advanced-sounding progression.** Nordic Curl and Depth Jump to Box were both proposed as
-  Mehrnaz C2 swaps and both rejected as too advanced; Stability Ball Leg Curl and a lower-box
+  Athlete B C2 swaps and both rejected as too advanced; Stability Ball Leg Curl and a lower-box
   Single-Leg Box Jump were the right calibration. Same logic as "Trust the bar over the résumé"
   (Intake & assessment) — program for what's shown, not what sounds impressive. *(2026-07-13)*
 - **Knee-history clients:** reverse lunge over forward lunge; reintroduce plyometrics
@@ -130,7 +134,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   Back Squat; the squat re-enters the next cycle only after a fully pain-free one. Same logic
   as the hinge rule above — the pain-free cycle is the permission slip, and SFR means almost
   nothing is lost by waiting. Applies to the *fallbacks* too: don't let a fallback quietly
-  re-admit the free pattern the cycle deferred. *(2026-07-30, Amir, on Faraz C1: "leg press as
+  re-admit the free pattern the cycle deferred. *(2026-07-30, Amir, on Athlete E C1: "leg press as
   its safer a bit for his lower back, if he was pain free the whole cycle then we can progress
   to a back squat")*
 - **A RANGE OR HEIGHT RESTRICTION MUST BE AUDITED AGAINST EVERY EXERCISE IN THE CYCLE, INCLUDING
@@ -143,7 +147,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   never give opposite instructions for the same joint. Sweep the restriction across every
   movement, every cue and every prep item before the spec is final; if no exercise in a pattern
   can satisfy it, the PATTERN leaves the cycle rather than the rule bending. *(2026-08-17,
-  amir_teflisi C1 — the clinical audit lens caught four separate breaches of the cycle's own
+  Athlete F C1 — the clinical audit lens caught four separate breaches of the cycle's own
   shoulder rule plus a prep-circuit flexion leak on a chronic back)*
 - **The fallback rule above generalises: EVERY fallback is checked against EVERY deferral the
   cycle makes, not just the free hinge.** A fallback is written as an afterthought ("if the
@@ -152,7 +156,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   the leg-press fallback in a cycle that had removed axial loading entirely: shoulder pads are
   axial load, so a full gym sent a chronic-back athlete straight onto the thing the cycle
   existed to avoid. Read the fallback list last, against the contraindication list, every time.
-  *(2026-08-17, amir_teflisi C1)*
+  *(2026-08-17, Athlete F C1)*
 - **Posture / tennis clients:** horizontal-press volume deliberately low or omitted;
   bias posterior chain + scapular health. *(2026-06-15)*
 - **No corrective/postural drills without an indication.** Postural or scap-control
@@ -166,7 +170,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   movement for the second exposure. Repeating the exercise across days reads to the athlete as the
   program repeating itself, wastes a rotation slot, and hides the fact that the movement pool for
   that muscle has run out — which is information you need, not something to paper over.
-  *(2026-07-27, Amir — Elmira C2 shipped Cable Lateral Raise on both Day 1 and Day 4 to reach a
+  *(2026-07-27, Amir — Athlete G C2 shipped Cable Lateral Raise on both Day 1 and Day 4 to reach a
   side-delt target; the fix was 5 sets on one day plus a different raise on the other.)*
 - **One-exercise-once-per-cycle applies to WORKING exercises only** (Primary / Accessory / Core /
   conditioning). **Activation & Prep items may repeat across days** — a primer's job is to prime
@@ -194,7 +198,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   upright bike set high enough that the hips stay above the knees and the torso stays tall)
   instead. Same failure shape as the Cat-Cow precedent (2026-08-17), one scale up: the warm-up
   is where a cycle's own contraindication is most likely to be broken, because nobody re-reads
-  the prep block against it. *(2026-09-07, zahra_rasoulian C1 — the draft opened all three
+  the prep block against it. *(2026-09-07, Athlete H C1 — the draft opened all three
   sessions with it on a lumbar-disc athlete, having already dropped Cat-Cow for that very reason)*
 - **A loaded carry's PICK-UP is a free hinge — spec the pick-up, not just the carry.** Any cycle
   deferring the free loaded hinge must say where the weight is lifted from: a bench or a rack pin
@@ -204,7 +208,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   attached to it. The exercise's own cues describe the walk; nobody writes a cue for getting the
   thing off the floor. Extends "audit the restriction against every exercise, including warm-up
   and fallbacks" (2026-08-17) to the parts of an exercise nobody thinks to write down.
-  *(2026-09-07, zahra_rasoulian C1)*
+  *(2026-09-07, Athlete H C1)*
 
 ## Exercise naming
 *(This is the single source of truth for exercise names — `/program-design`,
@@ -228,7 +232,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
 - **An isometric hold on a dynamic library exercise KEEPS the canonical library name —
   the video stays; the chip + Coach's Note carry the hold.** Amir's ruling (2026-07-24,
-  Setareh C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
+  Athlete I C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
   it — the machine-setup video is still worth having, and the execution change is
   communicated by the duration chip (`×30s`), the **`Tempo Iso` chip** (see "Chips &
   modifiers" — Amir's rule), the `mid-range hold` modifier chip, and a Coach's Note
@@ -245,7 +249,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   (the app handles a missing video gracefully — no play button, nothing breaks). Follow the naming
   *convention* above regardless of whether the name is already catalogued. Compensate for the
   missing video with a clear setup note when the movement is new to the athlete. *(2026-07-27,
-  Amir, verbatim: "you can prescribe any movement that you like" — said after Elmira C2 avoided a
+  Amir, verbatim: "you can prescribe any movement that you like" — said after Athlete G C2 avoided a
   genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only
   library entries were available.)*
 - **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
@@ -260,23 +264,23 @@ publish it. No athlete health/chat detail goes here — principles only.
   low-readiness days, **never below 6**) + a minimum effective dose (first power move +
   first primary lift) + flexible session order. *(2026-06-15, floor added 2026-08-21)*
 - **Separate training fatigue from life load** in every review — a readiness dip from
-  poor sleep/stress is not the same as training fatigue (Mehraneh's end-cycle dip was
+  poor sleep/stress is not the same as training fatigue (Athlete D's end-cycle dip was
   life, not load). *(2026-06-15)*
 - **Never program past a fatigue wall** — build a deload/back-off after dense weeks
-  (Mehraneh ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)*
+  (Athlete D ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)*
 - **Concurrent athletes (heavy sport schedule alongside the gym) always get a double-day
   rule in autoregulation.** When most gym days will also be sport days, the program must say
   what to do on one: gym after the sport session, or at least 4–6 h apart; if the gap is
   impossible, run the minimum effective dose with the primary capped at RPE 6. Silence on
   double days is a design gap, not a detail — at 5–6 sport days/week they are the norm, not
-  the edge case. *(2026-08-02, Behnam C1 — caught by the dose/time audit)*
+  the edge case. *(2026-08-02, Athlete J C1 — caught by the dose/time audit)*
 
 ## Session structure & time
 - **`workouts.days[]` is authored in the best execution order.** The order days appear in
   the app IS the recommended weekly sequence (e.g. Lower → Upper → Walk-Run → Control →
   Recovery) — the athlete reads the week top-to-bottom, then the notes tell her she may
   shuffle around her schedule (within the stated invariants). Never list days in
-  design-convenience order and rely on a notes card to re-map them. *(2026-07-24, Setareh C1
+  design-convenience order and rely on a notes card to re-map them. *(2026-07-24, Athlete I C1
   — shipped with the run day after the control day; Amir had the order corrected to the
   ideal week and the days renumbered.)*
 - **An OPTIONAL day still sits in its correct place in the week — you mark it optional, you
@@ -285,13 +289,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   execution order — restoration/recovery days included, since *where they fall between loaded
   days* is the whole point of them — then write "optional" on the ones that are. A restoration
   day parked after the last lifting day reads as an afterthought and loses the spacing it was
-  designed to provide. *(2026-08-07, Amir, on Maryam C1)*
+  designed to provide. *(2026-08-07, Amir, on Athlete K C1)*
 - **A day trains what it says it trains — upper work on upper days, lower work on lower days.**
   Never sprinkle a muscle onto the wrong half of the split to top up its weekly total. The day's
   identity, its prep circuit and its fatigue profile are all built for one half of the body, so a
   stray delt raise on a glute day is warmed up by nothing and lengthens a session that was already
   dosed. If a muscle is under its target, add the volume on the days that actually train it.
-  *(2026-07-27, Amir — Elmira C2 put a rear-delt raise on the glute day and a lateral raise on the
+  *(2026-07-27, Amir — Athlete G C2 put a rear-delt raise on the glute day and a lateral raise on the
   single-leg day as "adherence insurance" for an athlete who reliably skips her back-half days.
   The legitimate fixes for that are **day ORDER** — put the priority day first, where attendance
   is highest — and the short-week/minimum-dose protocol. Not contaminating the split.)*
@@ -330,7 +334,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   scoped to the **Primary** block specifically — a unilateral **Accessory** exercise (e.g.
   Single-Arm Dumbbell Row, Single-Leg Glute Bridge) can still superset per the normal
   non-competing-pair rule above; accessories aren't progression-tracked with the same rigor
-  and the time-saving trade-off is the whole point there. *(2026-07-18, lem_cass1 C2 —
+  and the time-saving trade-off is the whole point there. *(2026-07-18, Athlete L C2 —
   Single-Leg Dumbbell Hip Thrust had been mistakenly tagged as a superset partner for
   Front-Foot-Elevated Split Squat, the only such instance across every multi-primary day in
   this athlete's entire file; tag removed.)*
@@ -344,7 +348,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   nothing to load from. It also hides an over-cap effort, because a shared round-RPE can't say
   which of the two lifts is the one running hot. **This applies to a mid-cycle restructure too,
   not just the original build** — merging two already-running straight-set exercises into a pair
-  destroys the resolution they were already giving you. *(2026-07-05, Bardia C1; again
+  destroys the resolution they were already giving you. *(2026-07-05, Athlete M C1; again
   amir_ardekani C1, caught 2026-09-15 on Amir's review — three supersets had been merged in
   mid-cycle, leaving 5 of 16 working exercises with no baseline going into "Forge — Earn the
   Load", while the Delt pair logged an identical `R1 9 · R2 9 · R3 9` against a prescribed RPE
@@ -358,7 +362,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   exercises are even paired. Name the circuit descriptively (`"Push-Pull Superset"`, `"Arm
   Superset"`), never a generic `"Superset A/B"` — the block's name is what communicates the
   pairing. See SCHEMA.md → `"circuit"` type ("Common mistake") and `/program-assemble`
-  SKILL.md → "Set type from the design category." *(2026-07-18, Pooya C3 — shipped across all
+  SKILL.md → "Set type from the design category." *(2026-07-18, Athlete A C3 — shipped across all
   4 days with every superset pair built this wrong way; caught only when Amir asked why the
   pairing wasn't labeled and why the first exercise still had its own rest. Root cause: the
   design SPEC template and this file's own "Chips & modifiers" section both listed `superset`
@@ -418,14 +422,14 @@ publish it. No athlete health/chat detail goes here — principles only.
   to the number on the card**. Triggers: a layoff or detraining, week-1 recalibration, a
   deload/back-off week, a movement new to the client, a staged return from injury, a period
   week. *(2026-08-21, Amir, verbatim: "Remember if some one has to start with lower rpe, you
-  mention that in notes." Ghazal C2 shipped RPE 8 primaries to an athlete 16 weeks detrained
+  mention that in notes." Athlete N C2 shipped RPE 8 primaries to an athlete 16 weeks detrained
   with only a load-finding card and no stated week-1 ceiling.)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
   When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
   number — by convention, the top of the intended range — and write that. This applies to
   every exercise on every day, including circuit items and unilateral (`Each Side`) reps.
-  *(2026-07-08, Niloufar C1 — caught 15 rep-range chips across the program and converted them.)*
+  *(2026-07-08, Athlete O C1 — caught 15 rep-range chips across the program and converted them.)*
   **Reconfirmed 2026-09-24** (Amir: *"I don't prescribe rep ranges"*), after a 2026-09-20 schema
   note had briefly said ranges ship as ranges. It matters more now: the set log pre-fills the
   prescribed number and a tick means "done as written", so the one number IS what gets recorded.
@@ -439,7 +443,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   facing text (cycle message, notes, completion messages) must never imply otherwise (e.g.
   "I'm setting your loads", "I calculate your weight next cycle"). Frame progression as the
   *program* changing — RPE targets, rep ranges, exercise selection — driven by what she logs,
-  never as "here's your number." *(2026-07-08, Niloufar C1 — caught two athlete-facing lines
+  never as "here's your number." *(2026-07-08, Athlete O C1 — caught two athlete-facing lines
   that implied weight assignment and reworded them.)*
 - **Progression/regression explainer note: mandatory for a NEW athlete, conditional after
   that.** Since the app never assigns weight (see above), a NEW athlete needs the mechanism
@@ -482,7 +486,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   cost-weighted load and spare time (see the bullet below), and prefer movements the athlete
   hasn't seen in the prior cycle so the added volume also reads as new. *(2026-07-27, Amir,
   verbatim: "specially for women every major muscle in lower body should get at least 10, this is
-  a hard rule, unless you have a very good reason not to" — Elmira C2 first shipped with quads at
+  a hard rule, unless you have a very good reason not to" — Athlete G C2 first shipped with quads at
   5.5 and hamstrings at 7.5 sets/wk, both wrongly justified as secondary-by-design.)*
 - **Check for unused session-time budget before calling a day "done."** Estimate the day's
   actual working time (sets × rest + set duration) against its time cap — if there's real
@@ -490,7 +494,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   reason to stop. Fill it with low-priority, low-CNS-cost work (arms, calves, a secondary
   muscle under its dose range) rather than leaving the session light. A session with room to
   spare and nothing added in it is an under-dosed session, even if every individual exercise
-  looks reasonable on its own. *(2026-07-08, Niloufar C1 — first draft left 20–25 min unused
+  looks reasonable on its own. *(2026-07-08, Athlete O C1 — first draft left 20–25 min unused
   on three lifting days; caught only because Amir compared it against her training age.)*
 - **The PATTERN is deferred; the EFFORT never is.** Any cycle that withholds a movement pattern
   (axial loading, the free hinge, cutting) must still carry a real strength benchmark the athlete
@@ -503,20 +507,20 @@ publish it. No athlete health/chat detail goes here — principles only.
   Y-T-W, face-pull-style retraction into the mid-back), so a posture cycle can push back volume up
   without inflating the shoulder number. *(2026-09-05, Amir, verbatim: "The whole shoulder total
   load should be 10 sets total. So if she is doing rear delt, it counts" and, when the rewrite
-  landed at exactly 10, "10 is not a cap, 10-20 is good." Elmira C3 first drafted at 26 shoulder
+  landed at exactly 10, "10 is not a cap, 10-20 is good." Athlete G C3 first drafted at 26 shoulder
   sets/week by scoring each head against its own 10-20 range.)*
 - **Never more than 4 working sets on one exercise for an intermediate athlete. If a muscle needs
   more volume, ADD AN EXERCISE.** *(2026-09-05, Amir, verbatim: "For an intermediate athele, never
   go for more than 4 sets in an exercise. Always add a new exercise. This is a rule.")* This is the
   hard-cap version of the 2026-07-27 movement-variety correction ("padding sets onto an existing
   movement instead of adding a new one is itself a corner-cut") — that one banned set-padding as a
-  way to reach a number, this one caps the set count outright. Elmira C3 had a leg curl at 6 sets to
+  way to reach a number, this one caps the set count outright. Athlete G C3 had a leg curl at 6 sets to
   clear the hamstring floor; the fix was 4 sets plus a second, genuinely distinct curl variation.
 - **Do not load horizontal pressing to hit a volume range on a rounded-shoulder / forward-head
   client.** The "every major muscle group clears its range" rule yields to the posture principle
   here: chest volume stays low or omitted, the volume goes into pulling and scapular work instead,
   and the exception is stated on the face of the design rather than silently resolved either way.
-  *(2026-09-05, Elmira C3 — chest held at 3 sets against a 10-20 range, deliberately.)*
+  *(2026-09-05, Athlete G C3 — chest held at 3 sets against a 10-20 range, deliberately.)*
 - **⚖️ COUNT EVERY EXERCISE THAT LOADS THE MUSCLE, NOT JUST THE ISOLATION WORK — and show the
   working in the coaching log.** *(2026-09-08, Amir, verbatim: "why are you calculating hamstring
   work just by isolated movements? she is getting them from rdls, hipthrusts and other stuff, all
@@ -540,7 +544,7 @@ publish it. No athlete health/chat detail goes here — principles only.
 
   **Why this is a rule and not a preference:** scored isolation-only, a muscle can read as
   under-dosed when the athlete is training it hard through compounds, and the programme then gets
-  contorted around a number that was never true. Elmira C3 read hamstrings 11 direct-only and a
+  contorted around a number that was never true. Athlete G C3 read hamstrings 11 direct-only and a
   seated leg curl looked load-bearing; counted properly it was 14.5, and the same pass revealed
   glutes at **22 — over the 10-20 ceiling** — which the old convention had scored 13. The error
   runs in both directions. **A missing machine is not a reason to contort the programme:** clear
@@ -553,7 +557,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   all-out set.** The set ends at the first rep that slows, shortens, or breaks position
   (~2 shy of grind), and if the cycle carries an RPE ceiling, the test is written as an
   explicit, stated exception to it — two lines of a program must never give opposite
-  instructions for the same set. *(2026-08-02, Behnam C1 — all three audit lenses
+  instructions for the same set. *(2026-08-02, Athlete J C1 — all three audit lenses
   independently caught the unstated contradiction)*
 
 ## Communication & in-app text
@@ -594,7 +598,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   Control day"; a notes card that references days by the coach's internal labels
   (Lower/Upper/Control) is unintelligible to her. Anchor every day reference to **Day N**,
   optionally + its visible focusTag, and describe it in plain words ("Day 4 — knee control &
-  trunk"). *(2026-07-24, Setareh C1 — Amir couldn't map "Control day" to anything in the app.)*
+  trunk"). *(2026-07-24, Athlete I C1 — Amir couldn't map "Control day" to anything in the app.)*
 - **Exercise-scoped guidance goes ON the exercise — the `note` field.** Anything about one
   specific exercise (an injury caveat like "start slower", a starting-weight suggestion from
   the athlete's past logs, how to load it) is authored as that exercise's `note`, which the
@@ -610,7 +614,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   Write 2–4 short paragraphs (one idea each), reach for a bullet list the instant content is
   enumerable (rules, steps, a keep/cut/skip breakdown), bold the one key phrase per paragraph.
   A note that opens as a dense wall of text is a bug, not a style choice — see SCHEMA.md →
-  "notes" and program-engage SKILL.md PART 3. *(2026-07-08, caught on Niloufar's "How To
+  "notes" and program-engage SKILL.md PART 3. *(2026-07-08, caught on Athlete O's "How To
   Progress & Regress" note.)*
 - **Notes card count is a byproduct, not a target — never pad.** Write every mandatory note
   that applies plus whatever else is genuinely load-bearing this cycle; a simple cycle with
@@ -641,7 +645,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   Two things the card must say: that nobody else sees it, and — for anyone previously told not
   to trust the scale — why the rolling average is a different instrument from the number under
   their feet. *(2026-09-05, Amir: "i have added weight logging in my habit tracker … if some
-  one like maryam need to monitor her weight, add a note in their app and point it to them so
+  one like Athlete K need to monitor her weight, add a note in their app and point it to them so
   they start using it")*
 
 ## Coaching cues
@@ -675,9 +679,9 @@ publish it. No athlete health/chat detail goes here — principles only.
   target muscle or exercise category — if it just re-labels what the exercise already trains,
   especially when that's already said in the internal cue right next to it, drop it; it's a
   label, not an instruction. Test before adding one: could the athlete act on this mid-set, or
-  would removing it lose nothing? *(2026-07-05, Bardia C1 — dropped "knee control," "adductor
+  would removing it lose nothing? *(2026-07-05, Athlete M C1 — dropped "knee control," "adductor
   focus," "anti-rotation," "no push-off," "dysplasia stability" as redundant with cues/
-  rationale already stated elsewhere on the card. 2026-07-18, Pooya C3 — this file itself was
+  rationale already stated elsewhere on the card. 2026-07-18, Athlete A C3 — this file itself was
   found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's
   chip tables and the design SPEC template; all three fixed the same day, see "Session
   structure & time.")*
@@ -688,13 +692,13 @@ publish it. No athlete health/chat detail goes here — principles only.
   continuous hold, not reps. The parser routes any `Tempo <text>` label to the TEMPO
   cell (`program.html` chip parsing), so this renders correctly today. Pairs with the
   canonical-name ruling in "Exercise naming" — name stays library-canonical, the Tempo
-  cell + note carry the execution. *(2026-07-24, Setareh C1 — applied to the leg-extension holds
+  cell + note carry the execution. *(2026-07-24, Athlete I C1 — applied to the leg-extension holds
   and Side Plank.)*
 - **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.** Any
   sub-6 intent (easy run, recovery walk, low-effort control drill) is authored as **RPE 6**
   (the scale's floor = easy/conversational), or the RPE chip is omitted entirely on a
   `simple` item that doesn't need grading. A prescribed RPE the athlete literally cannot
-  select in the logger is a mismatch, not a nuance. *(2026-07-24, Setareh C1 — shipped with
+  select in the logger is a mismatch, not a nuance. *(2026-07-24, Athlete I C1 — shipped with
   RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
   mismatch and all three were raised to 6.)*
 - **The 6 floor binds INSTRUCTIONS as well as chips — any note telling the athlete to take
@@ -704,7 +708,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   exercise authored at 6, and she cannot log it. Write it as *"take 1 off every RPE, but
   never go below 6 — anything already at 6 stays at 6."* Same for a period-week card, a
   deload note, a double-day rule, or a Coach's Note. Sweep every athlete-facing string for
-  sub-6 RPE, not just `chips[]`. *(2026-08-21, Amir, on Ghazal C2: "Again you prescribed rpe
+  sub-6 RPE, not just `chips[]`. *(2026-08-21, Amir, on Athlete N C2: "Again you prescribed rpe
   5 but my app minumum is 6. That is a hard rule." The chip lint was clean; the notes card
   was the leak.)*
 
@@ -731,7 +735,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   verification panel audits the draft in parallel — clinical/injury lens · house-rules
   compliance lint (against this file + the exercise library) · dose/time-budget audit —
   and every surviving must-fix/should-fix is applied before the spec is shown to Amir.
-  This caught real issues on its first run (Setareh C1: a deep-flexion warm-up leak on a
+  This caught real issues on its first run (Athlete I C1: a deep-flexion warm-up leak on a
   locking-history knee, a 60-min cap breach, an unwritten run ladder) — the panel is the
   quality gate, not ceremony. *(2026-07-24)*
 - **Every progression gate resolves to a MEASUREMENT, a FILM, or a THIRD PARTY — never the
@@ -744,7 +748,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   explicit notes card: which exercise, which weeks, where to send it, and the consequence if it
   stops. Precedent, verbatim: *"These lifts are new to you and I'm not standing next to you, so
   video is how I coach you… weight goes up on those three only after I've seen the film and
-  cleared it. If the videos stop coming, the weight stops moving."* (Behnam C1, `📹 Film your top
+  cleared it. If the videos stop coming, the weight stops moving."* (Athlete J C1, `📹 Film your top
   sets`.) A film-gated exercise with only a design-side `note_flag` and no matching notes card is
   a gate that exists in the coach's head and nowhere the athlete can actually read it — the
   exercise-level Coach's Note tells him what to do *on the lift*, this card is what tells him the
@@ -807,7 +811,7 @@ publish it. No athlete health/chat detail goes here — principles only.
   athlete, and say out loud that you are deviating. *(Written after a roadmap shipped as
   6 cycles of 4/5/5/4/6/5 because the multi-lens panel argued the arc from the science and
   nobody checked it against the house rule.)*
-  A second, independent hit the same day: on Alireza N.'s roadmap the head-coach judge issued
+  A second, independent hit the same day: on Athlete P's roadmap the head-coach judge issued
   *"do not add a fifth cycle"* as a binding directive, on the science. It is overruled — fit the
   arc to 5×5 and make the extra block do real work rather than padding it with a retest or a
   maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**, which is what
