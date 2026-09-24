@@ -199,5 +199,20 @@ console.log('7. day never trained');
   is(dayVerdict(groups), { total: 1, clean: 0, off: 0, missing: 1 }, 'counts as missing');
 }
 
+// ── 8. Reps (The Card Remembers, 2026-09-24): "Set 1: 80 ×4 @8 ✓"
+console.log('8. reps');
+{
+  const { parseSetLine } = sandbox;
+  is(parseSetLine('80 ×4 @8 ✓'), { w: '80', rpe: '8', done: true, skipped: false, reps: 4 }, 'weight, reps, rpe');
+  is(parseSetLine('×12 @7 ✓'), { w: '', rpe: '7', done: true, skipped: false, reps: 12 }, 'bodyweight reps');
+  is(parseSetLine('60 @7 ✓'), { w: '60', rpe: '7', done: true, skipped: false }, 'old line: no reps key');
+  const mk = reps => ({ name: 'X', label: '✓', done: true, items: [], note: '', rounds: '', gear: '',
+                        sets: reps.map(n => ({ w: '80', rpe: '8', done: true, skipped: false, reps: n })) });
+  const pex = { name: 'X', rx: { sets: 3, reps: 5, rpe: 8 } };
+  is(compareExercise(pex, mk([5, 5, 5])).flags.length, 0, 'all reps hit: no flag');
+  is(compareExercise(pex, mk([5, 5, 4])).flags.map(f => f.text), ['1 set under 5 reps'], 'one short set flagged');
+  is(compareExercise(pex, mk([5, 5, 4])).repsPer, '5 · 5 · 4', 'reps listed');
+}
+
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));
 process.exit(fail ? 1 : 0);

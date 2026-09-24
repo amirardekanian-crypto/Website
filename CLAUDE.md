@@ -306,6 +306,19 @@ dose fields; `/program-assemble` step 2b used to convert them into chips under a
 the top). That step is now a copy. **Rep ranges ship as ranges** — `rx` has a real range field, so
 `"reps": "8-10"` reaches the athlete as the zone Amir actually meant.
 
+### 🕘 The Card Remembers — last time on every exercise (2026-09-24)
+
+Idea #5 of `/ideas` round 1, built from the brief Amir approved ("go with your suggestions"). Every
+standard exercise card shows what the athlete did **the last time they did that exercise** (any
+day, across cycles via `matchRenamed()`), and **History ›** opens the History sheet. Four rules:
+- **History, never a prescription.** It never suggests a load — Amir's rule is RPE, never load.
+- **Reps are an override.** The reps box shows the prescribed number as a placeholder; `n` is
+  stored only when the athlete did something else. Amir prescribes **one number, never a range**.
+- **The log-line grammar exists three times** — `buildSessionData()` writes `Set 1: 80 ×5 @8 ✓`,
+  `parseSetLine()` (coach.html) and `parseSetText()` (program.html) read it. Change all three.
+- **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
+  `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30.
+
 ### 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
 
 Full account in `CODEBASE.md` → *The Ceiling*. The three duplications to keep in step:

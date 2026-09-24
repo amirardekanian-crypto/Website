@@ -2432,6 +2432,11 @@ function parseSetLine(rest) {
   t = t.replace(/[✓·]/g, ' ');
   const m = t.match(/@\s*([\d.]+)/);
   if (m) { s.rpe = m[1]; t = t.replace(m[0], ' '); }
+  // Reps, "×5" — logged from 2026-09-24 (The Card Remembers). Older lines have
+  // none, and get no `reps` key at all. ⚠ program.html's parseSetText() reads
+  // the same grammar for the athlete's history; change the two together.
+  const mr = t.match(/×\s*(\d+)/);
+  if (mr) { s.reps = parseInt(mr[1], 10); t = t.replace(mr[0], ' '); }
   s.w = t.trim();                       // free text: "24", "24kg", "red band"
   if (!s.done && !s.w && !s.rpe) s.skipped = true;
   return s;
@@ -2535,15 +2540,15 @@ function loadSummary(sets) {
   return (nums[0] <= nums[nums.length - 1]) ? `${lo} → ${hi}` : `${hi} → ${lo}`;
 }
 // One prescribed exercise against its log line. Returns only what is actually
-// known — reps are never logged per set (the athlete enters weight and RPE and
-// ticks the set off), so nothing here claims a rep count that was never recorded.
+// known. Reps are logged per set since 2026-09-24 ("×5"); older sessions have
+// none, and nothing here claims a rep count that was never recorded.
 function compareExercise(pex, logged) {
   const rx = legacyRx(pex);
   const want = rx.sets ? parseInt(rx.sets, 10) : null;
   const tgt = rpeTarget(rx.target);
   const c = {
     name: (pex && pex.name) || (logged && logged.name) || '', pex, rx, tgt, logged,
-    state: 'none', doneSets: 0, allSets: 0, load: '', rpeMean: null, rpePer: '',
+    state: 'none', doneSets: 0, allSets: 0, load: '', rpeMean: null, rpePer: '', repsPer: '',
     flags: [], extra: !pex, want,
   };
   if (!logged) return c;                // prescribed but nothing logged against it
@@ -2556,6 +2561,8 @@ function compareExercise(pex, logged) {
     c.rpeMean = Math.round((rpes.reduce((a, b) => a + b, 0) / rpes.length) * 10) / 10;
     c.rpePer = rpes.join(' · ');
   }
+  const reps = sets.filter(s => s.reps != null).map(s => s.reps);
+  if (reps.length) c.repsPer = reps.join(' · ');
   const touched = c.doneSets > 0 || rpes.length > 0 || sets.some(s => s.w) || logged.rounds || logged.gear;
   c.state = logged.done ? 'done' : (touched ? 'part' : 'skip');
   if (c.state === 'skip') c.flags.push({ tone: 'miss', text: 'not done' });
@@ -2566,6 +2573,12 @@ function compareExercise(pex, logged) {
   if (tgt && c.rpeMean != null && c.state !== 'skip') {
     if (c.rpeMean - tgt.hi >= RPE_OVER)       c.flags.push({ tone: 'warn', text: round1(c.rpeMean - tgt.hi) + ' over target RPE' });
     else if (tgt.lo - c.rpeMean >= RPE_UNDER) c.flags.push({ tone: 'note', text: round1(tgt.lo - c.rpeMean) + ' under target RPE' });
+  }
+  // Short sets: the athlete typed fewer reps than prescribed.
+  const plannedReps = parseInt(rx.reps, 10);
+  if (plannedReps > 0 && reps.length && c.state !== 'skip') {
+    const short = reps.filter(n => n < plannedReps).length;
+    if (short) c.flags.push({ tone: 'warn', text: short + ' set' + (short === 1 ? '' : 's') + ' under ' + plannedReps + ' reps' });
   }
   if (c.extra) c.flags.push({ tone: 'note', text: 'not in the plan' });
   return c;
@@ -2640,6 +2653,7 @@ function cmpCell(c) {
     bits.push(`<span class="did-rpe ${over ? 'warn' : under ? 'note' : 'ok'}">RPE ${esc(c.rpeMean)}</span>`);
   }
   const detail = [];
+  if (c.repsPer) detail.push('reps: ' + esc(c.repsPer));
   if (c.rpePer && c.allSets > 1) detail.push('per set: ' + esc(c.rpePer));
   if (c.logged.rounds) detail.push(esc(c.logged.rounds));
   if (c.logged.gear) detail.push(esc(c.logged.gear));
@@ -3071,7 +3085,7 @@ function liveSnapshotHtml(D) {
   const progRow = S.prog.find(r => r.athlete_id === athleteId) || null;
   const { days, ex } = progRow ? decode(athleteId, progRow.data) : { days: {}, ex: {} };
   const setStr = (e) => (e.sets || []).map(s => {
-    const bits = [s.w, s.r ? '@' + s.r : ''].filter(Boolean).join(' ');
+    const bits = [s.w, s.n ? '×' + s.n : '', s.r ? '@' + s.r : ''].filter(Boolean).join(' ');
     return (bits || '·') + (s.d ? ' ✓' : '');
   }).join(' · ');
   const hasData = (e) => e && ((e.sets && e.sets.some(s => s.w || s.r || s.d)) || e.note || e.rpe);
