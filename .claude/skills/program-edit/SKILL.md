@@ -235,6 +235,11 @@ Wait for Amir's go-ahead before touching the file.
 
 ## Step 3 — Apply edits
 
+**Cues are not edited on a card any more** (2026-09-24). Each exercise's cues are its Spine entry's
+and every athlete sees the same three. A cue change that would help anyone is an edit to the entry
+(coach.html → Exercises). A point about this athlete only is the exercise's `note` (Coach's Note),
+one sentence. Never add or change `cues` on a programme card.
+
 Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then either hand it to Amir to publish from coach.html, or apply it with an `update programs set data = ...` through the Supabase MCP.
 
 After editing, re-tally the set counts to confirm the numbers match what was agreed.

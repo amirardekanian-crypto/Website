@@ -15,9 +15,15 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
 2. **The coach-only half never enters this repo.** `sfr` and `flags` (restriction flags) live in
    `public.exercise_coach`. The repo is PUBLIC. Write the batch file in the **scratchpad**; only the
    SQL goes to the database.
-3. **Cues are Amir's words, not mine.** The generated SQL copies them from the most recent live
-   programme that uses the name. If no programme has cues for it, leave cues empty for him to
-   write in coach.html. Do not invent cues.
+3. **An entry's cues are THE cues, for every athlete** (Amir, 2026-09-24: *"the aim is to use these
+   cues for all the exercises that everyone has from now on"*). Programmes stop carrying cues, so
+   the entry is what every card shows. Exactly **2 good + 1 bad** (external, internal, avoid), and
+   written for ANYONE: no athlete, no side ("the right shoulder"), no home kit ("sofa", "worktop",
+   "table edge"), no tempo ("stick 2 sec", "the pause"), no dose ("stop 2 reps short"), no
+   em-dashes. The generated SQL copies Amir's wording from the most recent live programme; keep
+   his words and strip only what is about one person. What you strip belongs in THAT athlete's
+   Coach's Note (`note`), not lost: list it for Amir with the athlete id. If no programme has
+   cues for a name, write three general ones and say so, since the entry is where cues live now.
 4. **Names are never rewritten.** A variant spelling that is really the same exercise becomes an
    `alias` on the existing entry, not a new entry and not an edit to any programme.
 
@@ -118,8 +124,12 @@ Say so, and offer to stop at the names that are used now.
 - *(2026-09-24, batch 2)* Copying the most recent programme's cues brings that ATHLETE's words with
   it: "Letting the **right** shoulder roll forward", "shoulders on a **sofa** edge", "grip the
   **table** edge", a tempo ("stick 2 sec", "loads in the pause") or a dose ("stop 2 reps short").
-  After a run, grep the new cues for those and list them for Amir. Don't rewrite them: they are his
-  words, so he decides.
+  38 entries were rewritten for anyone the same day (Amir's call). After every run, check:
+  ```sql
+  select id, cues from public.exercises
+  where jsonb_array_length(cues->'good') <> 2 or jsonb_array_length(cues->'bad') <> 1
+     or cues::text ~* '—|right (shoulder|knee|hip|side|leg)|left (shoulder|knee|hip|side|leg)|sofa|chair|worktop|table edge|cushion|\d+ ?sec|\mpause\M|reps short';
+  ```
 - *(2026-09-24, batch 2)* Check what the cues say before calling a name an alias. `Single-Leg RDL
   (BW)` has cues that say "a dumbbell in each hand", so it is an alias of the dumbbell entry. `Cable
   Wood Chop` says "turn through the hips", so it is a standing chop and needs its own entry, not an

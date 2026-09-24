@@ -640,8 +640,8 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | `rx` | the numbers | the stats grid |
 | `setup` | equipment / position / conditions — `"neutral grip"`, `"45° bench"`, `"In 4 · out 8"` | quiet grey line under the name |
 | `intent` | **ONE** coaching intention — `"max intent"`, `"max speed"`, `"stick the landing"` | the green pill (the only pill) |
-| `note` | the coach's note to this athlete | clay "Coach's Note" callout |
-| `cues` | technique — `good[]` / `bad[]`. **Optional since the Spine:** omit it and the card shows the exercise's approved Spine cues | the cues list |
+| `note` | the coach's note to this athlete. **Anything about THIS athlete that used to be a custom cue goes here** (2026-09-24) | clay "Coach's Note" callout |
+| `cues` | **Do not write (2026-09-24).** Every card, circuit items included, shows its approved Spine entry's cues. Legacy cards still carry `cues`, which the app shows instead of the entry's until the next cycle drops them | the cues list |
 | `exId` | the exercise's id in the Spine (`public.exercises`), e.g. `"trap-bar-deadlift"` | nothing directly: it ties the card to its entry |
 | `why` | **Because:** why THIS athlete has this exercise — `{ "src", "part"?, "text" }` | a clay dot on the ⓘ; the reason opens the About sheet, and the cycle's Why page lists them all |
 
@@ -676,8 +676,11 @@ card resolves to its entry by **`exId` first, then its name** (the entry's `name
 through the same four matching tiers Personal Records uses). Names in stored programmes are
 **never rewritten**; `exId` is added beside the name by `/program-assemble` from 2026-09-24 on.
 
-- **Cues are written once, on the entry.** An exercise with no `cues` of its own shows the
-  entry's; an exercise that carries `cues` keeps them (a per-athlete override).
+- **Cues are written once, on the entry, for everyone** (Amir, 2026-09-24). A programme writes no
+  `cues`; each card and each circuit item shows its entry's. A card that still carries `cues`
+  (every programme written before that date) shows its own instead; they drop at the next cycle,
+  and anything in them that was about that athlete moves to the exercise's `note`. So the entry
+  must be **approved** before a programme that uses it goes live, or the card shows no cues.
 - The card gains one small **ⓘ** after the name when the entry is **approved**. It opens the
   About sheet: purpose, on court, the ladder (Rungs), where it sits in the programme, History.
 - Drafts are invisible to athletes: `get_exercises()` serves approved entries only, and never
@@ -785,6 +788,10 @@ and fails on any difference; it is in `.githooks/pre-commit`. `assets/js/chips.j
 owns the write side — `applyRx()`, `toRx()`, `auditRx()`.
 
 ### Coaching Cues
+
+> **Since 2026-09-24 a programme writes no cues.** They come from the exercise's Spine entry (see
+> "`exId` and the Spine"), and anything about one athlete goes in `note`. This section describes
+> the shape, which the Spine entry, library workouts and legacy cards all use.
 
 Every exercise (including circuit sub-items) can have optional cues:
 

@@ -341,8 +341,15 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
 - **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
   else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame and
   carries **Rungs** (the pattern's ladder, marked done / in your plan / next rung).
-- **Cues are written once, on the entry.** A card without its own `cues` shows the entry's
-  (`paintSpine()` fills `.ex-cues-slot`); a card with its own keeps them as an override.
+- **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
+  *"the aim is to use these cues for all the exercises that everyone has from now on … if there is
+  a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline
+  writes **no `cues`** on a programme card. Anything about one athlete is that exercise's `note`
+  (Coach's Note). `paintSpine()` fills `.ex-cues-slot` on a card and `.round-cues-slot` on a
+  circuit item. Legacy cards still carry their own `cues` and show those until their next cycle.
+  So **an entry must be approved before a programme using it goes live** (`/program-assemble`
+  checks), or the card shows no cues. Entry cues are 2 good + 1 bad, written for anyone: no side,
+  no home kit, no tempo, no dose.
 - **Names are never rewritten.** Card → entry resolves by `exId`, then name/aliases through
   `exNameVariants()`. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
   `spineForC()` (coach.html). Same rule: `exId` first, then the tightest tier with ONE entry.
