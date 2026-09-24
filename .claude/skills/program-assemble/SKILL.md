@@ -57,7 +57,7 @@ fields map one-to-one; there is nothing to convert:
 | design spec | `rx` |
 |---|---|
 | sets | `"sets": 4` |
-| reps (**a range stays a range** — `8-10`) | `"reps": 6` or `"reps": "8-10"` |
+| reps (**one number, never a range**) | `"reps": 6` |
 | duration | `"time": "30s"` |
 | distance | `"distance": "20m"` |
 | each side / each leg | `"side": true` — **its own field, never baked into the number** |
@@ -165,8 +165,8 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   movement says otherwise; ballistic/carry correctly OMIT tempo and carry an `intent`;
   warm-up/prep carry NO `rpe`; every exercise has exactly 3 cues (ext+int in good, avoid in
   bad); section titles use the standard names (Primary/Accessory/etc, never "Strength").
-  **Rep ranges are fine now** — `rx` has a real range field, so `"reps": "8-10"` ships as
-  written and no longer needs collapsing to the top of the range.
+  **Reps are one number, never a range** (Amir, 2026-09-24). If the spec carries a range,
+  stop and ask — do not pick an end yourself. `auditRx()` flags one as `rep-range`.
 - **⛔ No working circuit in a FIRST cycle — hard reject.** If `currentCycleIndex` is `0`,
   every `"circuit"` must sit in a prep block. A superset or complex in Primary/Accessory/Core
   on cycle 1 violates COACHING-PRINCIPLES.md → Session structure ("no supersets in an

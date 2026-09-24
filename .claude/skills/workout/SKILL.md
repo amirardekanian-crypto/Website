@@ -114,8 +114,8 @@ Best for: all strength exercises, single-exercise loaded rows, any set/rep work 
 ```
 
 `rx` keys for `standard`: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe`
-(6–10) · `tempo` (`"3-0-1-0"` or `"iso"`) · `rest` (seconds). Rep **ranges** are allowed:
-`"reps": "8-10"`.
+(6–10) · `tempo` (`"3-0-1-0"` or `"iso"`) · `rest` (seconds). Reps are **one number, never a
+range** (Amir, 2026-09-24).
 
 ⚠ **`rest` is not defaulted any more.** Omit it and the card shows no rest cell; the timer
 button is still there, labelled *Rest timer*. It used to fall back to 120s, which is how the

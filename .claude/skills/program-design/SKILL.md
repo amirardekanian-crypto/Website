@@ -282,10 +282,10 @@ move on — /program-assemble lint-checks names against the library.
 **PRESCRIPTION — emit the DOSE as plain fields.** These fields ARE the storage format now
 (`rx` — see SCHEMA.md): /program-assemble copies them across rather than rendering anything,
 so what you write is what ships. You just decide the numbers + the coaching intent:
-- **Reps: write it however you naturally think about it — a single number or a range** (e.g.
-  `8-10` for a hypertrophy zone). **A range ships as a range** — `rx` has a real range field
-  since 2026-09-20, so nothing collapses it to the top any more and the athlete sees the zone
-  you actually meant. Applies to every reps field: standard lifts, circuit items, unilateral
+- **Reps: ONE number, never a range** (Amir, 2026-09-24: *"I don't prescribe rep ranges"*).
+  When the intent is naturally a zone (hypertrophy 8–10), write the one number you mean. The
+  set log pre-fills it and a tick means "done as written", so a range leaves the app guessing
+  what was done. Applies to every reps field: standard lifts, circuit items, unilateral
   (each-side) counts.
 - **OMIT WHAT YOU DID NOT PRESCRIBE.** An absent field is not a gap for someone downstream to
   fill — it means "not prescribed", and the app draws no cell for it. This is why a warm-up

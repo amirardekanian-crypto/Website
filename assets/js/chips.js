@@ -306,7 +306,7 @@
      only rule is: WRITE WHAT YOU PRESCRIBED, OMIT WHAT YOU DID NOT.
 
        rx.sets      number                      omit for a single-effort/prep item
-       rx.reps      number | "8-10"          ─┐
+       rx.reps      number (NEVER a range)   ─┐
        rx.time      "30s" | "5 min"           ├─ exactly ONE of these three
        rx.distance  "20m" | "400m"           ─┘
        rx.side      true                        the dose is per side
@@ -618,6 +618,12 @@
     if (ex.type === 'standard' && doses[0] === 'reps' && !rx.sets)
       problems.push({ level: 'warn', code: 'reps-without-sets', label: String(rx.reps),
         msg: 'A rep count with no set count.' });
+
+    // One rep number, never a range (Amir, 2026-09-24). The set log pre-fills the
+    // prescribed number and a tick means "done as written", so a range cannot be ticked.
+    if (/\d\s*[-–]\s*\d/.test(String(rx.reps === undefined ? '' : rx.reps)))
+      problems.push({ level: 'warn', code: 'rep-range', label: String(rx.reps),
+        msg: 'A rep range. Reps are one number: write the one you mean.' });
 
     const rpeLow = parseFloat(String(rx.rpe === undefined ? '' : rx.rpe));
     if (!isNaN(rpeLow) && rpeLow < 6)

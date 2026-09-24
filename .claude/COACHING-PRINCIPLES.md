@@ -426,6 +426,9 @@ publish it. No athlete health/chat detail goes here — principles only.
   number — by convention, the top of the intended range — and write that. This applies to
   every exercise on every day, including circuit items and unilateral (`Each Side`) reps.
   *(2026-07-08, Niloufar C1 — caught 15 rep-range chips across the program and converted them.)*
+  **Reconfirmed 2026-09-24** (Amir: *"I don't prescribe rep ranges"*), after a 2026-09-20 schema
+  note had briefly said ranges ship as ranges. It matters more now: the set log pre-fills the
+  prescribed number and a tick means "done as written", so the one number IS what gets recorded.
 - **The program is written once per cycle and adjusted reactively, not on a fixed rewrite
   cadence.** Amir doesn't rebuild the program every week by default — he steps in on a real
   signal: a logged difficulty pattern (RPE consistently over/under the target) or a wellbeing/
