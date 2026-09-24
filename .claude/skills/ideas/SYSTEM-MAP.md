@@ -14,7 +14,8 @@ idea gets pitched for a feature that already shipped. Line numbers drift, so sea
   `workouts.days[]` → `blocks[]` (`title`, `rest`) → exercises (`rx`, `setup`, `intent`, `note`,
   `cues{good,bad}`, `test`, `videoUrl`, circuits with `items[]`), `programHistory[]`, `notes.cards[]`.
   **No week level:** the days repeat every week of a cycle.
-- **What the athlete logs:** per set weight + RPE + done (**no reps**); per-exercise note;
+- **What the athlete logs:** per set weight + reps (`n`, only when not the prescribed number; since
+  2026-09-24) + RPE + done; per-exercise note;
   readiness (sleep, energy, soreness, stress, overall → composite); session RPE + duration; a day
   note. **No structured pain field** (pain is free text). Goes to `session_history` via
   `save_session`, and `athlete_progress` via `save_progress`. The midnight reset wipes RPE and ticks.
@@ -29,7 +30,8 @@ video, cues, set log, rest timer, Guided mode, readiness modal, finish + complet
 Ceiling (e1RM per lift, retest window for `test` lifts, + Log a max) · Body weight · Coach tab (chat
 with Day N tags, notes cards, app guide) · Library (Train sessions, Read articles) · Archive.
 
-**Gaps found:** `session_history` is **never read back** in the athlete app (no "last time");
+**Built since the map:** #5 The Card Remembers (last time on every card, the History sheet,
+`get_my_history()`, `session_history.log`, reps logged). **Gaps still open:**
 readiness changes nothing (the autoregulation in PRODUCT.md is not built); cycle outcomes are never
 checked; the "why" of each exercise stays coach-side; Library and programme do not link each other.
 

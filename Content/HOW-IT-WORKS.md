@@ -116,7 +116,9 @@ get a **demo video**, the full prescription (sets, reps, target, tempo, rest), a
 guessing what an exercise is or how it should look.
 
 **As you go — you log your work.** Each set, you record the weight, your effort (RPE),
-and tick it off. A built-in session timer and rest timer keep you moving. When you
+and tick it off (and the reps, if you didn't hit the number). Every exercise also shows what you
+did the last time you did it, with your full history one tap away, so you always know where
+you're starting from. A built-in session timer and rest timer keep you moving. When you
 finish, you rate the session, leave a note if you want, and send it all to your coach.
 
 That log isn't busywork — it's the raw material your coach uses to make your next week
