@@ -344,6 +344,12 @@ costs more than one tap.
   box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
   for The Ceiling only.
 - Weight and reps inputs normalise Persian/Arabic digits (`normDigits()`); live logs held `۲۵`.
+- **An RPE off its target is coloured: clay OVER, steel blue `--rpe-under` UNDER, green on target**
+  (Amir, 2026-09-24). The one exception to "clay is the only accent", and only for an RPE against
+  its target: warm = harder, cool = easier, and orange-vs-blue survives colour blindness where
+  red-vs-green does not. Every screen goes through `rpeVs()`/`rpeMark()` (row tag, the strip, Guided
+  rest screen, Last time, History), which treats a target range like `7-8` as on target inside it —
+  the old `parseInt` read `7-8` as 7 and called an 8 "over".
 
 ### 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
 
