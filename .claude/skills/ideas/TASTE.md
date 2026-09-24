@@ -26,6 +26,14 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 - **2026-09-24 · #4 Because.** *"Go"*, on the recommended picks: dot on the ⓘ plus a Why page, 5–10
   per cycle, all six source tags, no backfill, #16 Not Yet next.
 
+- **2026-09-24 · The ⓘ stays short, and Library → Qualities REJECTED.** *"if its there in their
+  program, it shouldnt be showed there in 'i', it should only live in exercise sections of the
+  library … remove the qualities from library, bad decision … the exercise qualities shouldnt contain
+  what other exercises does it, unless its in exercise section, the explanation is enough."* So: a
+  sheet opened from the athlete's own programme explains, it does not browse. Lists of other
+  exercises (regressions, progressions, alternatives, "in your plan") belong in Library → Exercises
+  only. And a second library door for the same data was one door too many.
+
 - **2026-09-24 · Rungs REJECTED, after it shipped.** *"remove the rung, too much information, even im
   mixed up. doesnt help athlete … the easier and harder is regressions and progressions. i mean real
   regressions and progressions. and alternatives should be the ones with other machines or

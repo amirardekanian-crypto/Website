@@ -1035,20 +1035,6 @@
   /* The third door (2026-09-24): the exercise library, from the Spine. Ink, so it
      reads as its own world beside the green and the clay; picture reused, not new. */
   .lib-door.door-exercises { background: #141A17 url('assets/art/days/fullbody-v1.webp') center/cover no-repeat; background-image: linear-gradient(to top, rgba(20,26,23,0.9) 0%, rgba(20,26,23,0.35) 65%), url('assets/art/days/fullbody-v1.webp'); background-position: center, 70% center; }
-  /* The fourth door (2026-09-24): the Quality Map as a library. Deep green-ink,
-     picture reused from the cycle art (voltage), never generated. */
-  .lib-door.door-qualities { background: #10231B url('assets/art/cycles/voltage-v1.webp') center/cover no-repeat; background-image: linear-gradient(to top, rgba(12,34,26,0.92) 0%, rgba(12,34,26,0.35) 65%), url('assets/art/cycles/voltage-v1.webp'); background-position: center, 60% center; }
-  .w-head.w-head-q { background-color: #10231B; background-image: linear-gradient(to top, rgba(12,34,26,0.92) 0%, rgba(12,34,26,0.45) 100%), url('assets/art/cycles/voltage-v1.webp'); background-position: center, 60% center; }
-  .ql-list { padding: 14px 18px 110px; display: grid; gap: 12px; }
-  .ql-card { position: relative; overflow: hidden; border-radius: 18px; min-height: 124px; padding: 16px 16px 14px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; cursor: pointer; color: #fff; text-align: left; border: 0; font: inherit; background-color: #0E4A36; background-size: cover; background-position: center; }
-  .ql-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,24,18,0.9) 0%, rgba(10,24,18,0.25) 100%); }
-  .ql-card > * { position: relative; }
-  .ql-card:active { transform: scale(0.985); }
-  .ql-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; text-transform: uppercase; letter-spacing: 0.2px; }
-  .ql-line { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.35; color: rgba(255,255,255,0.88); max-width: 34ch; }
-  .ql-tag { align-self: flex-start; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 9.5px; letter-spacing: 0.7px; text-transform: uppercase; border-radius: 999px; padding: 5px 8px; background: #fff; color: #0E4A36; margin-bottom: 4px; }
-  .ql-tag.off { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.35); }
-  .ql-empty { font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--grey-text); padding: 28px 4px; text-align: center; }
   .w-head.w-head-ex { background-color: #141A17; background-image: linear-gradient(to top, rgba(20,26,23,0.92) 0%, rgba(20,26,23,0.45) 100%), url('assets/art/days/fullbody-v1.webp'); background-position: center, 72% center; }
   .xl-tools { padding: 16px 18px 6px; display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--grey-bg); }
   .xl-search { width: 100%; box-sizing: border-box; font: 15px 'Barlow', sans-serif; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); outline: none; }
@@ -4097,7 +4083,7 @@
   <div id="lib-doors" class="lib-pane">
     <div class="lib-head">
       <div class="lib-title">Library</div>
-      <div class="lib-sub">Train it, learn it, know it, build it.</div>
+      <div class="lib-sub">Train it, learn it, know it.</div>
     </div>
     <div class="lib-doors">
       <div class="lib-door door-sessions" role="button" tabindex="0" onclick="enterWorld('sessions')">
@@ -4119,12 +4105,6 @@
         <div class="lib-door-big">Exercises</div>
         <div class="lib-door-d">Every exercise: what it's for, how to do it, and its easier, harder and other-equipment versions.</div>
         <div class="lib-door-row"><span class="lib-door-ct" id="exercises-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
-      </div>
-      <div class="lib-door door-qualities" role="button" tabindex="0" onclick="enterWorld('qualities')">
-        <div class="lib-door-k">— Build</div>
-        <div class="lib-door-big">Qualities</div>
-        <div class="lib-door-d">What your training builds, and where each one shows up in your plan.</div>
-        <div class="lib-door-row"><span class="lib-door-ct" id="qualities-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
       </div>
     </div>
   </div>
@@ -4158,18 +4138,6 @@
       <div class="xl-chips" id="xl-chips"></div>
     </div>
     <div class="xl-list" id="xl-list"></div>
-  </div>
-
-  <!-- Qualities world (2026-09-24): the Quality Map as a library. Each card opens
-       the same quality page as a chip on a Home day card (renderQualityLibrary). -->
-  <div id="lib-qualities" class="lib-pane" hidden>
-    <div class="w-head w-head-q">
-      <button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
-      <div class="w-kick">— Build</div>
-      <div class="w-title">Qualities</div>
-      <div class="w-sub" id="ql-sub">What your training builds.</div>
-    </div>
-    <div class="ql-list" id="ql-list"></div>
   </div>
 </div>
 
@@ -5231,7 +5199,6 @@ function getVideoUrl(ex) {
   paintDayQualities();
   // Library door counts from the phone's copies, so they never wait on a manifest.
   paintExerciseCount();
-  paintQualityCount();
   refreshSpine();
   refreshQualities();
   isLoading = false;
@@ -7085,9 +7052,9 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: what it does, where it shows up on court, and three short lists. <strong>Regressions</strong> are easier versions of the same movement, <strong>Progressions</strong> are harder ones, and <strong>Alternatives</strong> are the same movement on other equipment or a machine.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Tap any name in those lists to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, the alternatives show what does the same job: message me and I'll swap it.</p>` },
+    body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, and where it shows up on court.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you'll also find its <strong>Regressions</strong> (easier versions), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
-    body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means, every exercise in your plan that trains it, and how we test it. The same words show on an exercise's <strong>i</strong> sheet, and all ten are in <strong>Library → Qualities</strong>.</p>` },
+    body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
@@ -8016,7 +7983,7 @@ window.renderCeiling = renderCeiling;
 
 function showLibPane(which) {
   _libPane = which;
-  ['doors', 'sessions', 'playbook', 'exercises', 'qualities'].forEach(p => {
+  ['doors', 'sessions', 'playbook', 'exercises'].forEach(p => {
     const el = document.getElementById('lib-' + p);
     if (el) el.hidden = (p !== which);
   });
@@ -8027,7 +7994,6 @@ async function enterWorld(which) {
   if (which === 'sessions') await renderSessionsWorld();
   if (which === 'playbook') await renderPlaybook();
   if (which === 'exercises') renderExerciseLibrary();
-  if (which === 'qualities') renderQualityLibrary();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 function exitWorld() { showLibPane('doors'); window.scrollTo({ top: 0, behavior: 'instant' }); }
@@ -8045,7 +8011,6 @@ async function loadLibCounts() {
   if (sEl) sEl.textContent = sCount + ' ' + (sCount === 1 ? 'Session' : 'Sessions');
   if (rEl) rEl.textContent = rCount + ' ' + (rCount === 1 ? 'Read' : 'Reads');
   paintExerciseCount();
-  paintQualityCount();
   _libCountsLoaded = true;
 }
 
@@ -11692,9 +11657,10 @@ window.closeHistorySheet = closeHistorySheet;
 //   · the card gains ONE thing: a small ⓘ after the name, only when the exercise
 //     has an APPROVED entry. It opens the About sheet.
 //   · cues come from the entry whenever the programme has none of its own.
-//   · the About sheet: why it's here, where it shows up on court (tennis and
-//     padel only), its regressions, progressions and alternatives, every day in
-//     the programme that uses it, and a door into the History sheet.
+//   · the About sheet: why it's here, what it does, its qualities, where it shows
+//     up on court (tennis and padel only) and a door into the History sheet.
+//     Opened from Library → Exercises it also carries the regressions,
+//     progressions, alternatives and every day in the programme that uses it.
 //
 // ⚠ NAMES ARE NEVER REWRITTEN. A card's name is resolved to an entry at READ time
 // (ex.exId first, then the entry's name and aliases through exNameVariants(), the
@@ -11740,7 +11706,6 @@ async function refreshSpine() {
     paintDayQualities();
     paintExerciseCount();
     if (_libPane === 'exercises') renderExerciseLibrary();
-    if (_libPane === 'qualities') renderQualityLibrary();
   } catch (e) { /* offline: the cached copy stays */ }
 }
 
@@ -11891,6 +11856,9 @@ function openExerciseSheet(id, card, fromLib) {
     return xs.length ? `<div class="sp-sec"><div class="sp-lbl">${label}</div><div class="sp-alts">${
       xs.map(a => `<button type="button" class="sp-alt" data-id="${esc(a.id)}">${esc(a.name)}</button>`).join('')}</div></div>` : '';
   };
+  // Amir, 2026-09-24: these lists and "In your programme" live ONLY in
+  // Library → Exercises. The ⓘ on a card stays short: what it does, why you,
+  // its qualities, on court, your history.
   const linksHtml = linkList('Regressions', e.easier) + linkList('Progressions', e.harder) + linkList('Alternatives', e.alts);
   const whereHtml = inProg.length ? `<div class="sp-sec"><div class="sp-lbl">In your programme</div>${
     inProg.map(w => `<div class="sp-where"><span>Day ${esc(String(w.day))}${w.focus ? ' · ' + esc(w.focus) : ''}</span><small>${esc(w.block)}</small></div>`).join('')}</div>` : '';
@@ -11910,14 +11878,13 @@ function openExerciseSheet(id, card, fromLib) {
     ${e.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
     ${full && e.video ? `<div class="sp-sec">${renderVideoBlock(e.video)}</div>` : ''}
     ${full && e.cues ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : ''}
-    ${linksHtml}
-    ${whereHtml}
+    ${fromLib ? linksHtml + whereHtml : ''}
     <div class="hs-actions">
       ${histBtn}
       <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
     </div>`;
   ov.querySelectorAll('.sp-q[data-q]').forEach(b => b.addEventListener('click', () => {
-    openQualitySheet(b.dataset.q);
+    openQualitySheet(b.dataset.q, fromLib);
     ov.querySelector('.readiness-modal').scrollTop = 0;
   }));
   ov.querySelectorAll('.sp-alt[data-id]').forEach(b => b.addEventListener('click', () => {
@@ -12009,8 +11976,6 @@ async function refreshQualities() {
     try { _lsRawSet('qualcache', JSON.stringify(res.data)); } catch (e) { /* storage full */ }
     setQualities(res.data);
     paintDayQualities();
-    paintQualityCount();
-    if (_libPane === 'qualities') renderQualityLibrary();
   } catch (e) { /* offline: the cached copy stays */ }
 }
 function isRacketSport() {
@@ -12082,11 +12047,14 @@ function qualityUses(qid) {
   }));
   return Object.values(out).sort((a, b) => (b.primary - a.primary) || (a.days[0] - b.days[0]));
 }
-function openQualitySheet(qid) {
+// The explanation is the page (Amir, 2026-09-24: "the explanation is enough").
+// The list of exercises that train it shows only when the page is reached from
+// Library → Exercises, never from a day card or a card's ⓘ.
+function openQualitySheet(qid, fromLib) {
   const q = QUALS_BY_ID[qid];
   const ov = document.getElementById('hist-overlay');
   if (!q || !ov) return;
-  const uses = qualityUses(qid);
+  const uses = fromLib ? qualityUses(qid) : [];
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">What you're building</div>
     <h2 class="readiness-title">${esc(q.name)}</h2>
@@ -12100,48 +12068,12 @@ function openQualitySheet(qid) {
       <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
     </div>`;
   ov.querySelectorAll('.qm-use').forEach(b => b.addEventListener('click', () => {
-    openExerciseSheet(b.dataset.id, xlCardFor(b.dataset.id));
+    openExerciseSheet(b.dataset.id, xlCardFor(b.dataset.id), true);
     ov.querySelector('.readiness-modal').scrollTop = 0;
   }));
   ov.classList.add('visible');
 }
 window.openQualitySheet = openQualitySheet;
-
-// ── Library → Qualities (2026-09-24) ────────────────────────────────────────
-// Amir: "this should exist in library with its seperate card". The ten, in their
-// fixed order, each on its own cycle picture (the family it names), with a tag
-// saying whether this athlete's current plan trains it. Tap → openQualitySheet().
-// Pictures are reused: a quality with no family borrows a day picture.
-const QL_ART = { speed: ART_DAYS + APP_ART.days.power + '.webp', rotation: ART_DAYS + APP_ART.days.core + '.webp' };
-function qualityArt(q) {
-  if (q.family && APP_ART.cycles[q.family]) return ART_CYCLES + APP_ART.cycles[q.family] + '.webp';
-  return QL_ART[q.id] || (ART_DAYS + APP_ART.days.default + '.webp');
-}
-function paintQualityCount() {
-  const el = document.getElementById('qualities-count');
-  if (!el) return;
-  const n = (QUALS || []).length;
-  el.textContent = n ? n + ' ' + (n === 1 ? 'Quality' : 'Qualities') : '\u00a0';
-}
-function renderQualityLibrary() {
-  const list = document.getElementById('ql-list');
-  if (!list) return;
-  const quals = QUALS || [];
-  if (!quals.length) {
-    list.innerHTML = '<div class="ql-empty">Your coach is still writing these. They\'ll show here soon.</div>';
-    return;
-  }
-  list.innerHTML = quals.map(q => {
-    const n = SPINE ? qualityUses(q.id).length : 0;
-    const tag = n ? `In your plan · ${n} exercise${n === 1 ? '' : 's'}` : 'Not in this block';
-    return `<button type="button" class="ql-card" data-q="${esc(q.id)}" style="background-image:url('${qualityArt(q)}')">
-      <span class="ql-tag${n ? '' : ' off'}">${esc(tag)}</span>
-      <span class="ql-name">${esc(q.name)}</span>
-      <span class="ql-line">${esc(q.line)}</span>
-    </button>`;
-  }).join('');
-  list.querySelectorAll('.ql-card').forEach(b => b.addEventListener('click', () => openQualitySheet(b.dataset.q)));
-}
 
 // ── The Exercises library (2026-09-24) ─────────────────────────────────────
 // The third door in Library (Amir: "something like the one i have in tps course").

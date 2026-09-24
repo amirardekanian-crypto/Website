@@ -36,7 +36,7 @@
 // v18: program.html changed (Library → Exercises, the third door, 2026-09-24).
 // v20: program.html changed (2026-09-24): exercises inside a circuit show their Spine entry's cues
 // when they carry none of their own, the same as a standalone card.
-const CACHE = 'aap-v23';
+const CACHE = 'aap-v24';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

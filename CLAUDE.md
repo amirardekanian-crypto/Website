@@ -359,8 +359,10 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   alias/new/skip sort, and `draft_sql.py`, which checks every link. The batch file with SFR and
   flags stays in the scratchpad, never in this public repo.
 - **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
-  else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame and
-  carries three plain lists: **Regressions** (`easier`: the same movement made easier),
+  else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame.
+  ⚠ **Opened from a CARD, the sheet is short** (Amir, 2026-09-24): Why you, what it does, pattern
+  and quality chips, On court, History. The three lists and *In your programme* show **only when it
+  is opened from Library → Exercises** (`fromLib`). The library sheet carries three plain lists: **Regressions** (`easier`: the same movement made easier),
   **Progressions** (`harder`: the same movement made harder) and **Alternatives** (`alts`: the
   same movement on other equipment or a machine). ⚠ **Rungs are GONE** (Amir, 2026-09-24:
   *"remove the rung, too much information, even im mixed up. doesnt help athlete"*): no ladder, no
@@ -411,8 +413,11 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
 - **The day card on Home shows up to three chips** (`paintDayQualities()` → `qualityMix(day)`):
   working sets × (primary 1, secondary ½), **prep blocks skipped** (`isPrepBlockTitle()`), and
   **nothing at all below 70% tagged coverage**, rather than a wrong mix. Tapping a chip opens the
-  quality page (`openQualitySheet()`: line, court line, *In your plan*, how we measure it); the About
-  sheet's quality chips open it too. **Words only: athletes never see set counts.**
+  quality page (`openQualitySheet()`: line, court line, how we measure it); the About
+  sheet's quality chips open it too. ⚠ **The explanation is the page** (Amir, 2026-09-24: *"the
+  explanation is enough"*): the list of exercises that train it (*In your plan*) shows only when the
+  page is reached from Library → Exercises (`openQualitySheet(q, fromLib)`), never from a day card or
+  a card's ⓘ. **Words only: athletes never see set counts.**
 - ⚠ **The mix rule exists three times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html)
   and the quality check in `/program-design`. Same weights, same prep test, or the coach's check and
   the athlete's card disagree.
@@ -421,10 +426,9 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   every foundation block, 2026-09-24). coach.html → Exercises →
   *Quality check* flags every current programme whose headline is not in its week's top two.
 - `qualcache` (localStorage, no prefix) caches `get_qualities()` and never syncs.
-- **Library → Qualities is the fourth door** (Amir, 2026-09-24: *"this should exist in library with its
-  seperate card"*): the ten in fixed order, each on its own cycle picture (the family it names; Speed
-  and Rotation borrow day art), tagged *In your plan · N exercises* or *Not in this block*. Each opens
-  the same `openQualitySheet()` as a day-card chip (`renderQualityLibrary()`). No picture was generated.
+- **There is NO Library → Qualities door.** It shipped and was removed the same day (Amir,
+  2026-09-24: *"remove the qualities from library, bad decision"*). Library has three doors:
+  Sessions, Playbook, Exercises. Do not bring a qualities door back.
 
 ### 🎯 Because — why THIS athlete has this exercise (2026-09-24)
 
