@@ -351,6 +351,24 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   (`renderExerciseLibrary()` → `openExerciseSheet(id, card, true)`); opened from the library, or with
   no card on screen, the sheet also carries the video and cues. One design, not two.
 
+### 🎯 Because — why THIS athlete has this exercise (2026-09-24)
+
+Idea #4 of `/ideas` round 1 (brief: claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw; Amir: *"go"*, on the
+recommended picks). `ex.why = { src, part?, text }`, spec in `SCHEMA.md` → *`why` — Because*.
+- **The card gains only a clay dot on the ⓘ** (`.ex-about.has-why`). The sentence opens the About
+  sheet under **Why you** (`whyBlock()`), and **Why your plan looks like this**, a button under the
+  current cycle card (three or more reasons), groups them by source (`openWhyPlan()`). A card with a
+  `why` gets the ⓘ even before its Spine entry is approved.
+- **Personal or nothing, 5–10 per cycle, written fresh each cycle**:
+  `why_flag` (/program-design) → PART 3b (/program-engage) → /program-assemble, audited by
+  `Chips.auditWhy()`/`auditWhyProgram()` (bad source, over 140 characters, diagnosis words, a
+  failure quoted back, em-dashes, repeating the Coach's Note, more than 10).
+- **The coaching log's Exercise Ledger stays coach-only.** `why` is rewritten for the athlete:
+  the body part, never the diagnosis, and what we do next, never the failure.
+- **No backfill** (Amir's pick): live programmes gain reasons with each athlete's next cycle.
+  coach.html's ✎ editor keeps `why` through a save (`toRx`/`applyRx` copy the whole exercise);
+  editing it there is the next step, not built yet.
+
 ### ✍️ The set log is COUNTERSIGNED, and the note belongs to ONE session (2026-09-24)
 
 Amir: *"do as you recommend"*, on top of The Card Remembers. Design and evidence in

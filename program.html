@@ -2573,6 +2573,56 @@
   .sp-where small { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--grey-text); }
   body[data-dark] .sp-where { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
 
+  /* ── Because (2026-09-24) — see whyOf() / whyBlock() / openWhyPlan() ──
+     The card gains nothing but a clay dot on the ⓘ; the reason itself lives in
+     the About sheet and on the cycle's Why page. */
+  .ex-about.has-why { position: relative; }
+  .ex-about.has-why::after {
+    content: ''; position: absolute; top: -3px; right: -3px; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--ice); border: 2px solid var(--white);
+  }
+  body[data-dark] .ex-about.has-why::after { background: #E06B43; border-color: #1e1e1e; }
+  .sp-why {
+    display: grid; gap: 7px; background: var(--grey-bg); border: 1px solid var(--grey-card);
+    border-left: 3px solid var(--ice); border-radius: 10px; padding: 11px 12px; margin-bottom: 4px;
+  }
+  .sp-why p { margin: 0; font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 15px; line-height: 1.4; color: var(--grey-dark); }
+  body[data-dark] .sp-why { background: #1a1a1a; border-color: #2a2a2a; border-left-color: #E06B43; }
+  body[data-dark] .sp-why p { color: #eee; }
+  .why-src {
+    justify-self: start; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 9.5px;
+    letter-spacing: 0.8px; text-transform: uppercase; border-radius: 999px; padding: 4px 8px;
+    background: var(--grey-card); color: var(--grey-dark);
+  }
+  .why-src.goal { background: var(--ice); color: #fff; }
+  .why-src.body { background: var(--yellow); color: var(--on-accent); }
+  .why-src.cycle { background: transparent; color: var(--ice); border: 1.5px solid var(--ice); }
+  body[data-dark] .why-src { background: #2a2a2a; color: #ddd; }
+  body[data-dark] .why-src.goal { background: #E06B43; color: #fff; }
+  body[data-dark] .why-src.body { background: #1F5A44; color: #fff; }
+  body[data-dark] .why-src.cycle { background: transparent; color: #E06B43; border-color: #E06B43; }
+  .why-plan-btn {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; width: calc(100% - 48px);
+    margin: -8px 24px 20px; padding: 13px 14px; cursor: pointer; text-align: left;
+    background: var(--white); border: 1.5px solid var(--ice); border-radius: 14px; color: var(--grey-dark);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.3px; text-transform: uppercase;
+  }
+  .why-plan-btn small { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.8px; color: var(--ice); white-space: nowrap; }
+  body[data-dark] .why-plan-btn { background: #1e1e1e; color: #eee; border-color: #E06B43; }
+  body[data-dark] .why-plan-btn small { color: #E06B43; }
+  .wp-grp { display: grid; gap: 6px; border-top: 1px solid var(--grey-card); padding-top: 11px; margin-top: 12px; }
+  body[data-dark] .wp-grp { border-top-color: #2a2a2a; }
+  .wp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .wp-head small { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey-text); }
+  .wp-row {
+    display: grid; gap: 3px; text-align: left; cursor: pointer; font: inherit;
+    background: var(--white); border: 1px solid var(--grey-card); border-radius: 10px; padding: 9px 11px; color: var(--grey-dark);
+  }
+  .wp-row b { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.2px; text-transform: uppercase; display: flex; justify-content: space-between; gap: 8px; }
+  .wp-row b small { font-family: 'Space Mono', monospace; font-weight: 400; font-size: 9.5px; letter-spacing: 0.6px; color: var(--grey-text); white-space: nowrap; }
+  .wp-row span { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.4; color: var(--grey-text); }
+  body[data-dark] .wp-row { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
+
   /* ── THE CEILING — estimated 1RM, folded into the bottom of the set log ──
      One clay line while closed, a small panel when tapped. Everything here is
      DERIVED from the set log that is already on the card: no storage key, no
@@ -5971,6 +6021,13 @@ function renderPlan() {
       outcomes: msg.outcomes
     });
   }
+  // Because: the cycle's reasons on one page — only when there are enough of
+  // them to read as a plan (three), never a thin page with one line on it.
+  const nWhy = whyList().length;
+  if (current && nWhy >= 3) {
+    document.getElementById('current-message-wrap').insertAdjacentHTML('beforeend',
+      `<button type="button" class="why-plan-btn" onclick="openWhyPlan()">Why your plan looks like this<small>${nWhy} reasons ›</small></button>`);
+  }
 
   // ── All future cycles — rendered through the SAME shared card builder as the
   // past and current cards, so every card on the home page matches.
@@ -6983,7 +7040,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: <strong>why it's in your plan</strong>, where it shows up on court, and <strong>its ladder</strong>, the easier and harder versions of the same movement.</p><p>On the ladder, a ✓ marks a rung you've already trained, and the dashed one is the next rung up. Tap any rung to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving up a rung is my call, made when I write your next cycle, so use it to see where you're heading, not to swap exercises mid-session.</p>` },
+    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: what it does, where it shows up on court, and <strong>its ladder</strong>, the easier and harder versions of the same movement.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>On the ladder, a ✓ marks a rung you've already trained, and the dashed one is the next rung up. Tap any rung to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving up a rung is my call, made when I write your next cycle, so use it to see where you're heading, not to swap exercises mid-session.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
@@ -11648,26 +11705,79 @@ function spineFor(name, exId) {
   return null;
 }
 
+// ── Because (2026-09-24) ────────────────────────────────────────────────
+// Idea #4: why THIS athlete has this exercise, written by the pipeline as
+// ex.why = { src, part?, text } on the 5–10 exercises per cycle that were decided
+// for them (SCHEMA.md → "why"). Absent means no personal reason, and nothing shows.
+// The card gains only a clay dot on the ⓘ; the sentence is in the About sheet and
+// on the cycle's Why page. The general "what it does" stays the Spine's purpose.
+const WHY_SRC = { goal: 'Your goal', body: 'Your body', test: 'Your test', cycle: 'Last cycle', you: 'You said', court: 'Your game' };
+const WHY_ORDER = ['goal', 'body', 'test', 'court', 'cycle', 'you'];
+function whyValid(w) { return !!(w && typeof w === 'object' && WHY_SRC[w.src] && typeof w.text === 'string' && w.text.trim()); }
+function whyLabel(w) {
+  if (w.src === 'body' && w.part) return 'Your ' + String(w.part).toLowerCase();
+  return WHY_SRC[w.src];
+}
+// The programme exercise behind a card, found by its day and name (the card
+// markup carries no JSON). The first match that has a reason wins.
+function whyOfCard(card) {
+  if (!card || !DATA || !DATA.workouts) return null;
+  const nameEl = card.querySelector('.item-name');
+  const name = nameEl && nameEl.textContent.trim();
+  const day = (DATA.workouts.days || []).find(d => String(d.id) === String(card.dataset.day));
+  if (!day || !name) return null;
+  for (const b of (day.blocks || [])) for (const ex of (b.exercises || []))
+    if (ex.type !== 'circuit' && ex.name === name && whyValid(ex.why)) return ex.why;
+  return null;
+}
+function whyBlock(w) {
+  if (!whyValid(w)) return '';
+  return `<div class="sp-sec"><div class="sp-lbl">Why you</div><div class="sp-why"><span class="why-src ${esc(w.src)}">${
+    esc(whyLabel(w))}</span><p>${esc(w.text.trim())}</p></div></div>`;
+}
+// Every reason in the current programme, in the order the athlete meets them.
+function whyList() {
+  const out = [], seen = {};
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b =>
+    (b.exercises || []).forEach(ex => {
+      if (ex.type === 'circuit' || !whyValid(ex.why)) return;
+      const k = ex.name + '|' + ex.why.text;
+      if (seen[k]) { seen[k].days.push(d.id); return; }
+      seen[k] = { name: ex.name, exId: ex.exId || '', why: ex.why, days: [d.id] };
+      out.push(seen[k]);
+    })));
+  return out;
+}
+
 // Cues into empty slots, and the ⓘ after the name. Safe to call again: it only
-// fills what is still empty and never adds a second button.
+// fills what is still empty and never adds a second button. A card with a reason
+// (ex.why) gets the ⓘ even before its Spine entry is approved, marked with a dot.
 function paintSpine() {
-  if (!SPINE) return;
   document.querySelectorAll('.checklist-item').forEach(card => {
     if (card.classList.contains('round-group')) return;
     const nameEl = card.querySelector('.item-name');
     if (!nameEl) return;
-    const entry = spineFor(nameEl.textContent.trim(), card.dataset.exid);
+    const entry = SPINE ? spineFor(nameEl.textContent.trim(), card.dataset.exid) : null;
+    const why = whyOfCard(card);
     const slot = card.querySelector('.ex-cues-slot');
     if (slot && !slot.childElementCount && entry && entry.cues) slot.innerHTML = renderInlineCues(entry.cues);
     const row = card.querySelector('.item-name-row');
     const btn = row && row.querySelector('.ex-about');
-    if (entry && row && !btn) {
+    if ((entry || why) && row && !btn) {
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'ex-about'; b.textContent = 'i';
-      b.setAttribute('aria-label', 'About ' + entry.name);
-      b.addEventListener('click', ev => { ev.stopPropagation(); openExerciseSheet(entry.id, card); });
+      b.type = 'button'; b.className = 'ex-about' + (why ? ' has-why' : ''); b.textContent = 'i';
+      b.setAttribute('aria-label', (why ? 'Why you have ' : 'About ') + nameEl.textContent.trim());
+      // Resolve at tap time: the Spine can arrive after the card was painted.
+      b.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const e = SPINE ? spineFor(nameEl.textContent.trim(), card.dataset.exid) : null;
+        openExerciseSheet(e ? e.id : null, card);
+      });
       row.appendChild(b);
-    } else if (!entry && btn) btn.remove();
+    } else if (btn) {
+      if (!entry && !why) btn.remove();
+      else btn.classList.toggle('has-why', !!why);
+    }
   });
 }
 
@@ -11717,10 +11827,31 @@ function spineLadder(id) {
 // not on the athlete's page) the sheet is the whole entry: it also carries the
 // video and the cues, because there is no card on screen showing them.
 function openExerciseSheet(id, card, fromLib) {
-  const e = SPINE_BY_ID[id];
+  const e = id ? SPINE_BY_ID[id] : null;
   const full = !!fromLib || !card;
   const ov = document.getElementById('hist-overlay');
-  if (!e || !ov) return;
+  if (!ov) return;
+  // Because: the reason for THIS athlete leads the sheet. Found on the card, or —
+  // opened from the library or the Why page — on any programme exercise that
+  // resolves to this entry.
+  let why = whyOfCard(card);
+  if (!why && e) {
+    const hit = whyList().find(w => { const x = spineFor(w.name, w.exId); return x && x.id === e.id; });
+    if (hit) why = hit.why;
+  }
+  if (!e) {
+    // A reason with no approved Spine entry yet: the sheet is just the reason.
+    if (!why || !card) return;
+    ov.querySelector('.readiness-modal').innerHTML = `
+      <div class="readiness-eyebrow">About this exercise</div>
+      <h2 class="readiness-title">${esc(card.querySelector('.item-name').textContent.trim())}</h2>
+      ${whyBlock(why)}
+      <div class="hs-actions">
+        <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
+      </div>`;
+    ov.classList.add('visible');
+    return;
+  }
   const done = spineDoneIds();
   const inProg = spineUsesInProgramme(id);
   const nowIds = {};
@@ -11752,6 +11883,8 @@ function openExerciseSheet(id, card, fromLib) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">About this exercise</div>
     <h2 class="readiness-title">${esc(e.name)}</h2>
+    ${whyBlock(why)}
+    ${why && e.purpose ? `<div class="sp-lbl" style="margin-top:14px">What it does</div>` : ''}
     ${e.purpose ? `<p class="sp-purpose">${esc(e.purpose)}</p>` : ''}
     <div class="sp-chips">${e.pattern ? `<span class="sp-chip">${esc(SPINE_PATTERN[e.pattern] || e.pattern)}</span>` : ''}${
       (e.qualities || []).map(q => `<span class="sp-chip">${esc(q)}</span>`).join('')}</div>
@@ -11780,6 +11913,52 @@ function openExerciseSheet(id, card, fromLib) {
   ov.classList.add('visible');
 }
 window.openExerciseSheet = openExerciseSheet;
+
+// The Why page: every reason in the current programme, grouped by where it came
+// from. Each row opens that exercise's sheet (with its card when it is on the
+// page, so History comes along). Same frame as the About and History sheets.
+function openWhyPlan() {
+  const ov = document.getElementById('hist-overlay');
+  const list = whyList();
+  if (!ov || !list.length) return;
+  const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
+  const cur = cycles[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
+  const title = cur && cur.num != null ? `Why Cycle ${cur.num} looks like this` : 'Why your plan looks like this';
+  const groups = {};
+  list.forEach((w, i) => {
+    const k = w.why.src === 'body' ? 'body:' + String(w.why.part || '').toLowerCase() : w.why.src;
+    (groups[k] = groups[k] || []).push(Object.assign({ i }, w));
+  });
+  const keys = Object.keys(groups).sort((a, b) =>
+    WHY_ORDER.indexOf(a.split(':')[0]) - WHY_ORDER.indexOf(b.split(':')[0]) || groups[b].length - groups[a].length);
+  const days = ds => 'Day ' + ds.join(' · ');
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your plan</div>
+    <h2 class="readiness-title">${esc(title)}</h2>
+    <p class="sp-purpose">Every exercise below is here because of something about you. Tap one to see more.</p>
+    ${keys.map(k => {
+      const g = groups[k], w0 = g[0].why;
+      return `<div class="wp-grp"><div class="wp-head"><span class="why-src ${esc(w0.src)}">${esc(whyLabel(w0))}</span><small>${
+        g.length} exercise${g.length === 1 ? '' : 's'}</small></div>${
+        g.map(r => `<button type="button" class="wp-row" data-i="${r.i}"><b>${esc(r.name)}<small>${esc(days(r.days))}</small></b><span>${esc(r.why.text.trim())}</span></button>`).join('')}</div>`;
+    }).join('')}
+    <div class="hs-actions">
+      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
+    </div>`;
+  ov.querySelectorAll('.wp-row').forEach(b => b.addEventListener('click', () => {
+    const w = list[+b.dataset.i];
+    const card = [...document.querySelectorAll('#screen-home .checklist-item')].find(c => {
+      const n = c.querySelector('.item-name');
+      return n && n.textContent.trim() === w.name && String(c.dataset.day) === String(w.days[0]);
+    }) || null;
+    const e = SPINE ? spineFor(w.name, w.exId) : null;
+    if (!e && !card) return;
+    openExerciseSheet(e ? e.id : null, card);
+    ov.querySelector('.readiness-modal').scrollTop = 0;
+  }));
+  ov.classList.add('visible');
+}
+window.openWhyPlan = openWhyPlan;
 
 // ── The Exercises library (2026-09-24) ─────────────────────────────────────
 // The third door in Library (Amir: "something like the one i have in tps course").

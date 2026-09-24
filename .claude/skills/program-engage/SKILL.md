@@ -163,6 +163,24 @@ specifics for that exercise (starting depth, load, cue) and does not re-explain 
 List these separately from the cycle notes cards — tag each with the exercise name so
 assemble can place it. Skip an exercise with no flag; don't invent notes design didn't ask for.
 
+**PART 3b — Because (from design's `why_flag`s, 2026-09-24).** For every exercise design
+flagged with a `why_flag`, write `{ src, part?, text }`: why THIS athlete has THIS exercise. It
+opens the About sheet under **Why you**, and the cycle's Why page groups them by `src`.
+- **One sentence, 140 characters at most, plain text**, in Amir's voice (short words, no
+  em-dashes or semicolons). *"Stepping back is kinder to your knee than a forward lunge."*
+- **Name the body part, never the diagnosis**, and say what we do next, never the failure. The
+  ledger's "torn lateral retinaculum" becomes `src: body, part: knee`. "RPE drifted to 9–10" or
+  "you stalled" becomes "we build from 15 kg". Build, don't scare: *"so your knee can take more
+  later"*, never *"to protect your damaged knee"*.
+- **Personal or nothing.** If the sentence would be true for anyone, drop the flag. That is the
+  Spine's purpose.
+- **Split it out of the Coach's Note.** When a `note_flag` and a `why_flag` sit on the same
+  exercise, the reason goes in `why` and the note keeps only the how-to. Never say it twice.
+- `part` only with `src: body` (knee, back, shoulder, hip, elbow, ankle, wrist, groin), so the
+  tag reads "Your knee". `cycle` names what moved when it did (*"your hip thrust went 60 to 75
+  kg, so it stays and gets heavier"*); the numbers come from the athlete's own logs.
+- List them with the exercise name, like the Coach's Notes. Amir reviews them with the rest.
+
 ## PART 4 — DAY COMPLETION MESSAGES
 For each training day in the program spec (Day 1…N), tied to that day's focus and how
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.

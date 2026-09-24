@@ -319,6 +319,15 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   loaded unilateral lift, never a jump, a carry, a warm-up or anything prescribed by time.
   The nudge earns its attention by being rare — an athlete asked to retest six things at the
   end of a block retests none of them. Assemble renders this as `"test": "5RM"`.
+- `why_flag` (optional, NOT athlete-facing wording — Because, 2026-09-24): on an exercise that
+  was chosen **for this athlete**, name the source and the reason in coach words, e.g.
+  `why_flag: body/knee — reverse lunge over forward, knee history` or
+  `why_flag: cycle — hip thrust kept, 60→75 kg last block` or `why_flag: you — replaces the back
+  extension he disliked`. Sources: `goal · body · test · cycle · you · court`. **5–10 per cycle,
+  no more**: the primaries whose choice came from the brief, every swap, every injury choice. An
+  exercise that would be in anyone's programme gets none; its general job is the Spine's
+  `purpose`. The ledger row you already write is where this comes from. /program-engage writes
+  the athlete's sentence from it; you don't.
 - `note_flag` (optional, NOT athlete-facing wording): when an exercise carries guidance that
   belongs on the card itself — an injury caveat, a starting point drawn from the athlete's
   logs, how to load it — flag it in one short coaching-domain line, e.g. `note_flag: staged

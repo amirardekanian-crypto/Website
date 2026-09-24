@@ -584,6 +584,9 @@ publish it. No athlete health/chat detail goes here — principles only.
     reads generated.
   - **Say the real reason in plain words.** "Your back has history, so we start with the leg
     press" beats "we are prioritising trunk-supported loading patterns."
+    Since 2026-09-24 that sentence has its own home on the exercise: **`why` (Because)**, 5–10 per
+    cycle, on the exercises chosen for THIS athlete. Body part, never the diagnosis. What we do
+    next, never the failure. See SCHEMA.md → *`why` — Because* and /program-engage PART 3b.
   - Read it back and ask: *would a busy coach type this on his phone?* If it reads like a
     brochure or a textbook, rewrite it.
 - **Notes speak in the athlete's app language — day numbers + on-screen names, never
