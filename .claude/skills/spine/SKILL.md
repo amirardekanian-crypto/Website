@@ -10,7 +10,8 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
 
 ## The four rules
 
-1. **Claude drafts, Amir approves.** Every row goes in as `status 'draft'`. Never set `approved`,
+1. **Claude drafts, Amir approves** (he can also tell Claude to approve, as he did on 2026-09-24:
+   *"approve all when youre done"*, 212 entries). Every row goes in as `status 'draft'`. Never set `approved`,
    and never write a flow that does. Nothing reaches a phone until he taps Approve.
 2. **The coach-only half never enters this repo.** `sfr` and `flags` (restriction flags) live in
    `public.exercise_coach`. The repo is PUBLIC. Write the batch file in the **scratchpad**; only the
@@ -206,3 +207,10 @@ Say so, and offer to stop at the names that are used now.
   (BW)` has cues that say "a dumbbell in each hand", so it is an alias of the dumbbell entry. `Cable
   Wood Chop` says "turn through the hips", so it is a standing chop and needs its own entry, not an
   alias of the half-kneeling one (where the hips stay still).
+- *(2026-09-24, batch 3)* The last 77 names (57 entries + 20 aliases) closed the list: every exercise
+  name in every live programme resolves, 212 entries, and Amir had them all approved the same day.
+  Copied cues were too dirty for this tail (heart rates, RPEs, "four full seconds", "on the mat"),
+  so the batch carried its own: `draft_sql.py` now takes a `cues` field (checked for 2 + 1 and no
+  em-dash) and only copies from a programme when the batch has none. One library video was plainly
+  wrong (Half-Kneeling Cable Thoracic Rotation had Single-Leg Balance's link) and was left empty; 61
+  entries still have no video. From here the Spine grows through **Upkeep**, not batches.

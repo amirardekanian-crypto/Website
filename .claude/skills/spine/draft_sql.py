@@ -6,7 +6,8 @@
 #   { "id": "goblet-squat", "name": "Goblet Squat", "aliases": [], "pattern": "squat",
 #     "purpose": "...", "tennis": "...", "equipment": [...], "loads": [...],
 #     "easier": [...ids], "harder": [...ids], "alts": [...ids],
-#     "sfr": 3, "flags": ["loaded-knee-flexion"] }
+#     "sfr": 3, "flags": ["loaded-knee-flexion"],
+#     "cues": {"good": [ext, int], "bad": [avoid]} }   (optional; written for anyone)
 # existing_ids.txt: one id per line, from `select id from public.exercises order by 1`.
 #
 # The batch file carries the coach-only half (sfr, flags), which is why it stays in the scratchpad
@@ -39,6 +40,9 @@ for e in batch:
     i = e['id']
     if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', i): problems.append(f'{i}: id is not a slug')
     if i in existing: problems.append(f'{i}: already in the Spine')
+    c = e.get('cues')
+    if c and (len(c.get('good', [])) != 2 or len(c.get('bad', [])) != 1): problems.append(f'{i}: cues must be 2 good + 1 bad')
+    if c and '—' in json.dumps(c, ensure_ascii=False): problems.append(f'{i}: em-dash in cues')
     if e.get('pattern') not in PATTERNS: problems.append(f'{i}: unknown pattern {e.get("pattern")!r}')
     for f in e.get('flags', []):
         if f not in FLAGS: problems.append(f'{i}: new flag {f!r} (add it to FLAGS here and to coach.html only if Amir agreed)')
@@ -64,10 +68,12 @@ for e in batch:
     nvid += vid is not None
     rows.append('(' + ','.join([q(e['id']), q(e['name']), arr(e.get('aliases')), q(e['pattern']),
         q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')),
-        arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid), "'draft'", "'claude-draft'"]) + ')')
+        arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
+        # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
+        (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null', "'draft'", "'claude-draft'"]) + ')')
     crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))})")
 
-print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,easier,harder,alts,qualities,video,status,updated_by) values')
+print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,easier,harder,alts,qualities,video,cues,status,updated_by) values')
 print(',\n'.join(rows) + '\non conflict (id) do nothing;')
 print('insert into public.exercise_coach (id,sfr,flags) values')
 print(',\n'.join(crow) + '\non conflict (id) do nothing;')
