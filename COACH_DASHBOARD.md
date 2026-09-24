@@ -57,6 +57,18 @@ and the flags `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`, 
 in a separate table no athlete query can read; `/program-design` filters on those flags.
 *Not in the Spine yet* lists the names still without an entry, most-used first.
 
+**The Quality Map (2026-09-24)** adds three things to this tab:
+- **The ten qualities.** The words each athlete's Home day cards use (Strength, Brakes …): one
+  line for everyone, a court line for tennis and padel players, and how each is measured.
+  Nothing shows on a phone until you approve a quality.
+- **Qualities on every entry.** Three selects, first = primary. Where Claude suggested tags for
+  an entry you had already approved, they arrive pre-filled and marked, and are saved only when
+  you save.
+- **Quality check.** Every current programme's working sets per quality per week, against its
+  cycle's picture word. A flag means the headline quality is not in the week's top two.
+  *% tagged* is how much of that week the athlete's day cards can read. Below 70% the card
+  shows nothing.
+
 ### Intake — where the apply form lands
 
 `form.html` and `form-fa.html` used to depend entirely on **Web3Forms**: the form

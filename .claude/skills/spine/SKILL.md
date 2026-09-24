@@ -66,7 +66,7 @@ the existing ids for the links, and they show you which names are only variants.
 
 **3. Write the batch** to `<scratchpad>/spine_batchN.json`, as a list of objects with these fields:
 `id` (kebab-case, the name slugged), `name` (as programmes spell it), `aliases`, `pattern`,
-`purpose`, `tennis`, `equipment`, `loads`, `easier`, `harder`, `alts` (ids), `sfr`, `flags`.
+`purpose`, `tennis`, `equipment`, `loads`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
 - **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
   sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
   wherever it fits, because Rungs are drawn per pattern.
@@ -76,6 +76,13 @@ the existing ids for the links, and they show you which names are only variants.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch.
 - **easier / harder / alts:** these draw the Rungs, so link only to ids that exist (in the Spine
   or in this batch). A rung you would like to have but nobody programmes can wait.
+- **qualities:** the Quality Map (stage32). One to three of `strength · muscle · power · spring ·
+  speed · brakes · rotation · engine · armour · movement`, **first = primary**: what the exercise is
+  mostly FOR. A day card on Home counts working sets × (primary 1, secondary ½), so tag what it
+  really trains and stop at three. A curl is `muscle`, not `muscle strength armour`. Warm-up drills
+  still get tagged (`movement`), because prep blocks are skipped when a day is counted.
+  For an entry Amir has already **approved**, never write `qualities` on it: put the suggestion in
+  `exercise_coach.suggested_qualities`, and coach.html pre-fills his editor with it.
 - **sfr:** 1 = best stimulus-to-fatigue in its pattern. Use `null` for prep, drills and plyos.
 - **flags:** only from `FLAGS` in the tool (`loaded-knee-flexion`, `axial-load`, `free-hinge`,
   `overhead`, `high-impact`). If you need a new one, that is Amir's decision. Ask him first.
@@ -87,8 +94,8 @@ Save the ids from `select id from public.exercises order by 1` to
 python3 .claude/skills/spine/draft_sql.py <scratchpad>/spine_batchN.json <scratchpad>/existing_ids.txt > <scratchpad>/spine_batchN.sql
 ```
 The tool refuses the batch (exit 1, one line per problem) if it finds any of these: an id that
-already exists, a link to an id that doesn't exist, an unknown pattern or flag, or a
-self-link. Fix the problems and run it again. It picks up the video from `exercise_library.json`
+already exists, a link to an id that doesn't exist, an unknown pattern, flag or quality, a
+self-link, or an entry with no qualities or more than three. Fix the problems and run it again. It picks up the video from `exercise_library.json`
 by exact name.
 
 **5. Run the SQL** with the Supabase MCP `execute_sql` (project `bvipfipbdcyqnbczjmaq`). It is

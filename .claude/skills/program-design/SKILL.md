@@ -353,6 +353,18 @@ Use it for the decisions this pass already makes: **SFR** order within a pattern
 along the ladder (`harder[0]` is the next rung, `alts` do the same job). Prefer an exercise that
 has an entry; a new one is fine, flag it as `new_exercise:` so it gets an entry.
 
+**THE QUALITY CHECK — before the spec goes to Amir (Quality Map, 2026-09-24).** Each Spine entry
+carries `qualities` (first = primary) from the ten: `strength · muscle · power · spring · speed ·
+brakes · rotation · engine · armour · movement`. The cycle's `art` word is its headline
+(`iron`→strength, `build`→muscle, `voltage`→power, `spring`, `brakes`, `engine`, `armour`,
+`bedrock`→movement; `peak` and `reset` are phases, no headline). Count the designed week's
+working sets per quality: primary 1, secondary ½, prep blocks skipped (the same rule as the
+athlete's day cards and coach.html → Exercises → *Quality check*). **The headline must be in the
+top two.** If it isn't, either the week is wrong or the `art` word is, so fix one and say which in
+the report. Report the per-day top three too: it is exactly what each day card on Home will say
+it builds, so a day card that reads "Movement · Armour" on a day you meant as the power day is a
+design bug.
+
 **CUES COME FROM THE SPINE, and only from the Spine (Amir, 2026-09-24: *"the aim is to use these
 cues for all the exercises that everyone has from now on … if there is a cue for someone specific,
 it should be in coach's notes. thats why its there"*).** The spec carries **no cues**. Each exercise
