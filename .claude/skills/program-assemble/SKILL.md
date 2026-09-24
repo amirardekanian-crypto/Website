@@ -241,7 +241,7 @@ console.log('done');
 **Then check the Spine.** Every name should resolve to an entry in `public.exercises`
 (`select id, name, aliases, status from public.exercises`). One that doesn't is a **new
 exercise**: list it for Amir as *"add to the Spine? (coach.html → Exercises)"* and draft the
-entry as `status 'draft'` if he says yes. Never approve an entry yourself.
+entry as `status 'draft'` if he says yes, the way `/spine` does it. Never approve an entry yourself.
 
 **Then act on the output:**
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
