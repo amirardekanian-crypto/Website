@@ -75,8 +75,12 @@ change before I build?"* before writing exercises.
    mid-design). If the pull fails (conflicts/WIP), say so and continue with a warning.
 1. Read **`.claude/COACHING-PRINCIPLES.md`** (apply throughout).
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
-3. **Detect mode:** `data/<id>.json` exists with prior `session_history` → **RETURNING**;
-   else → **NEW**.
+3. **Detect mode FROM THE SERVER** (`data/*.json` is deleted, so a file test calls everyone NEW):
+   `select jsonb_typeof(data->'workouts'->'days') = 'array' as has_workouts from programs where athlete_id = '<id>'`
+   plus `select count(*) from session_history where athlete_id = '<id>'`. A programme with
+   workouts and logged sessions → **RETURNING**; no row, or a row holding only intake's
+   `athlete`/`sport` → **NEW**. Workouts but **no** sessions → the athlete never trained the
+   last cycle (no login yet? check `athlete_identities`): stop and ask Amir before designing.
 4. **Get the brief:**
    - RETURNING → invoke the **`athlete-brief`** subagent (MODE=returning), passing any
      check-in chat Amir pasted. It returns the one-page brief (loads, RPE, readiness,
@@ -86,7 +90,7 @@ change before I build?"* before writing exercises.
      used when you set loads.
    - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
      /athlete-intake first.
-5. **RETURNING — read the prior rationale:** read `.claude/coaching-log/<id>.md` if it exists.
+5. **RETURNING — read the prior rationale:** `select body from coaching_logs where athlete_id = '<id>'`.
    This is the *why* behind the last cycle(s) — why each primary was chosen, what changed
    mid-cycle and why, the progression levers — and it is the thread you continue. The next
    cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
@@ -108,7 +112,7 @@ change before I build?"* before writing exercises.
    reconstruct exposure history by reading every prior cycle's prose. Cross-check it against
    the brief's exercise-specific signals (athlete-brief flags dislikes/pain tied to a named
    exercise, not just general injury) before finalizing REPLACE — see COACHING-PRINCIPLES.md
-   → "Exercise selection" and `.claude/coaching-log/README.md` → "Exercise Ledger".
+   → "Exercise selection" (the ledger's columns: Exercise · Status · Last cycle · Note).
 6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
    state the data point + reason.
@@ -463,8 +467,8 @@ SECTION: Core
 These reports are the durable record of WHY this cycle looks the way it does. Emit them as ONE
 self-contained **COACHING LOG ENTRY** block — this is both what you print for Amir AFTER the
 program and what /program-assemble appends verbatim to the coach-only, unpublished
-`.claude/coaching-log/<id>.md` (append-only; prior cycles are never touched). They go to chat +
-that log ONLY — never into the athlete app or `data/<id>.json`. (See `.claude/coaching-log/README.md`.)
+athlete's `public.coaching_logs` row (append-only; prior cycles are never touched). They go to chat +
+that log ONLY — never into the athlete app or the programme.
 
 ```
 ## Cycle <NN> — <Cycle Name> · <YYYY-MM-DD> · <NEW|RETURNING>
@@ -578,6 +582,6 @@ are fine for them.
   note, nothing more.
 - Don't save one-off athlete-specific calls as principles — only generalizable ones, with Amir's OK.
 - Don't put coach-facing reports or athlete health/chat detail into the athlete JSON or any
-  **published** path — the reports' only home is chat + the coach-only, unpublished
-  `.claude/coaching-log/<id>.md` (which assemble writes).
+  **published** path — the reports' only home is chat + the coach-only
+  `public.coaching_logs` row (which assemble writes).
 - Don't regenerate the roadmap.

@@ -839,6 +839,12 @@ Both arrays are optional. If omitted or empty, no cues section appears.
 
 Archives are read-only summaries. Add a new object for each completed program block.
 
+**Newest FIRST, and every entry has an `id`** (`"prog<N>"`, N = that cycle's number).
+The past card opens `programHistory[0].id` and `renderArchive()` finds the entry by `id`, so an
+entry added at the END opens the athlete's first cycle, and an entry without an `id` opens
+nothing. Both shipped: on 2026-09-24 five athletes' "Done" cards were wrong (three stored
+newest-last, two with no `id`) and were repaired in place.
+
 #### How `programHistory` powers the home "past program" card
 
 The home screen shows a tappable **past program card** for the cycle immediately
@@ -901,7 +907,7 @@ No HTML editing required.
 
 ### Advancing to the Next Cycle
 
-1. **Move the previous `workouts` content into `programHistory`** (in the simplified `{label, focus, exercises[{name, detail}]}` shape). This is what the new past program card opens — don't skip it, or the card won't appear.
+1. **Put the previous `workouts` content FIRST in `programHistory`, with an `id`** (`"prog<N>"`; the simplified `{id, label, subtitle, days:[{label, focus, exercises[{name, detail}]}]}` shape). This is what the new past program card opens — don't skip it, or the card won't appear. Newest first and an `id` on every entry: see *How `programHistory` powers the home "past program" card*.
 2. **Replace `workouts.days`** with the new cycle's training days.
 3. **Increment `currentCycleIndex` by 1.**
 4. (Optional) Update `workouts.label`.

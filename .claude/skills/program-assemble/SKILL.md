@@ -1,17 +1,27 @@
 ---
 name: program-assemble
-description: Mechanically assemble a designed program + engagement text + roadmap into a valid data/<id>.json, then validate it. Use after /program-design and /program-engage, or when Amir says "build the json", "assemble", "write her file", "ship it". Handles cycle advancement (archive prior cycle, bump currentCycleIndex) for returning athletes and fresh-file creation for new ones. This is the mechanical step — it keeps formatting/JSON work out of the design pass.
+description: Mechanically assemble a designed program + engagement text + roadmap into the athlete's programme in public.programs (the server is the only copy that counts), then validate it. Use after /program-design and /program-engage, or when Amir says "build the json", "assemble", "write her file", "ship it". Handles cycle advancement (archive prior cycle, bump currentCycleIndex) for returning athletes and fresh-file creation for new ones. This is the mechanical step — it keeps formatting/JSON work out of the design pass.
 ---
 
 # Assembler — write + validate (mechanical)
 
 Turn the **program spec** (/program-design) and the **engagement text** (/program-engage)
-into a valid `data/<id>.json` that matches `SCHEMA.md`. This stage is deterministic
-plumbing — it makes no coaching decisions. Read `SCHEMA.md` first if unsure of a field.
+into the athlete's programme in `public.programs`, matching `SCHEMA.md`. This stage is
+deterministic plumbing — it makes no coaching decisions. Read `SCHEMA.md` first if unsure of a
+field. A local `data/<id>.json` may be built as a scratch copy to lint and diff; it is never
+the source of truth and never committed.
 
-## Step 1 — Detect new vs returning
-- `data/<id>.json` exists with prior `workouts` → **RETURNING**.
-- No file → **NEW**.
+## Step 1 — Detect new vs returning — FROM THE SERVER
+`data/*.json` is deleted and gitignored, so a file test calls every athlete NEW in a cloud
+session. Ask the row:
+```sql
+select jsonb_typeof(data->'workouts'->'days') = 'array' as has_workouts,
+       coalesce((data->>'currentCycleIndex')::int, 0) as cci,
+       jsonb_array_length(coalesce(data->'programHistory', '[]')) as archived
+from public.programs where athlete_id = '<id>';
+```
+- `has_workouts` true → **RETURNING** (advance the cycle, Step 7.1).
+- No row, or a row holding only `athlete`/`sport` from intake → **NEW** (Step 7, *New athlete*).
 
 ## Step 2 — Build the JSON
 This stage owns ALL serialization the design spec deliberately left out — section
@@ -130,8 +140,13 @@ warm-up is noise; readiness check covers feel). With only a dose, the app drops 
 renders the item as a name and a number on one line, which is what a warm-up should look like. Per COACHING-PRINCIPLES "Session structure & time".
 
 **RETURNING — advance the cycle (per SCHEMA.md "Advancing to the Next Cycle"):**
-1. Move the OLD `workouts` into `programHistory` in the simplified
-   `{label, subtitle, days:[{label, focus, exercises:[{name, detail}]}]}` shape.
+1. Put the OLD `workouts` FIRST in `programHistory`, in the simplified
+   `{id, label, subtitle, days:[{label, focus, exercises:[{name, detail}]}]}` shape, with
+   `id: "prog<N>"` (N = the finished cycle's number). **Newest FIRST, and every entry has an `id`.**
+   The past card opens `programHistory[0].id` and `renderArchive()` finds the entry by `id`, so an
+   entry added at the END opens the athlete's first cycle, and an entry without an `id` opens
+   nothing. Both shipped: on 2026-09-24 five athletes' "Done" cards were wrong (three stored
+   newest-last, two with no `id`) and were repaired in place.
 2. Replace `workouts.days` with the new cycle.
 3. **Increment `currentCycleIndex` by 1.**
 4. Keep the whole `athlete` block unchanged — `id`, the names, `boardName` and `tier`
@@ -280,14 +295,14 @@ Persist the **COACHING LOG ENTRY** from /program-design — the coach-only recor
 cycle looks the way it does (the read, decisions, volume, progression levers, e1RM).
 ⚠️ **The record is the `public.coaching_logs` row, not a file.** Coach-only, read from
 coach.html → athlete → File; Step 7 (*The coaching log goes to the server too*) has the
-splice. `.claude/coaching-log/<id>.md` is a **gitignored local working copy** — build the
-entry there if it helps, then write it to the row. It used to be git-tracked in this PUBLIC
-repo, world-readable, which is exactly why it moved; never re-add it to git. The athlete app
-reads neither. See `.claude/coaching-log/README.md` for the convention + template.
-- **File missing (new athlete):** create it with the README's header
-  (`# Coaching Log — <First Last> (<id>)` + the coach-only note), an empty **Exercise Ledger**
-  table (header row only — see README "Exercise Ledger"), then the entry.
-- **File exists (returning):** **append** the new `## Cycle NN — …` section to the end.
+splice. Read it with `select body from coaching_logs where athlete_id = '<id>'`. The old
+`.claude/coaching-log/` folder (and the README it named) is gone: it was git-tracked in this
+PUBLIC repo, world-readable, which is exactly why the log moved; never re-create it in git.
+The athlete app never reads the log. The entry template is /program-design's COACHING LOG ENTRY.
+- **No row (new athlete):** insert one with the header (`# Coaching Log — <First Last> (<id>)`
+  + the coach-only note), an empty **Exercise Ledger** table (header row only:
+  `| Exercise | Status | Last cycle | Note |`), then the entry.
+- **Row exists (returning):** **append** the new `## Cycle NN — …` section to the end.
   **Never edit, reorder, or delete any existing cycle section** — this archive is append-only, so
   a cycle's original reasoning survives even after the program is later changed. (It grows in
   lockstep with `programHistory` / `currentCycleIndex`.)
@@ -308,8 +323,10 @@ reads neither. See `.claude/coaching-log/README.md` for the convention + templat
   the first time; update `Status`/`Last cycle`/`Note` for every exercise design flagged as
   changed. If the file predates the ledger (an athlete whose log started before this existed),
   backfill it from this cycle's exercise list only — don't reconstruct earlier cycles from
-  memory, just start the table clean from here. See `.claude/coaching-log/README.md` →
-  "Exercise Ledger" for the exact format and status values.
+  memory, just start the table clean from here. Format: `| Exercise | Status | Last cycle | Note |`;
+  Status in use across the live logs: Active · Available · Paused · Disliked · Pain-flagged ·
+  Banned · Retired-equipment · Retired-space (the README that used to
+  hold this was deleted with the old `.claude/coaching-log/` folder).
 
 ## Step 6 — COACH HANDOFF BRIEF (mandatory, never skip, never bury)
 **Amir's standing order (2026-08-08).** Before shipping, print a clearly-headed section in chat
@@ -356,12 +373,20 @@ localise a mistake. Publish in stages, one top-level key per statement, verifyin
    it. The live row still holds the OLD `workouts`, so build the history entry from it with
    `jsonb_agg` over `days → blocks → exercises` (`detail` = the dose read off `rx`, e.g.
    `4 × 6 · RPE 7` — or the old chip labels joined with ` · ` on a row not yet migrated,
-   or `rounds` for a circuit), append it to `programHistory`, and bump `currentCycleIndex`
-   in the same statement. This is strictly better than sending your local copy: the archive
+   or `rounds` for a circuit), give it `"id": "prog<N>"` (N = the finished cycle's number),
+   put it FIRST (`jsonb_build_array(entry) || coalesce(data->'programHistory', '[]')`, never
+   append), and bump `currentCycleIndex` in the same statement. This is strictly better than sending your local copy: the archive
    is then provably what the athlete actually had, not what your file says they had.
 2. **`jsonb_set(data,'{workouts}', $W$…$W$::jsonb)`** — the new cycle's days.
 3. **`jsonb_set(data,'{notes}', …)`**, plus `{cycles,N}` for the current cycle's
    `message`/`focuses` and `{cycles,N+1,teaser}`. These three fit comfortably in one call.
+
+**New athlete (no `workouts` on the row yet).** Skip 7.1: there is nothing to archive and the
+index stays 0. The row may hold only `athlete` and `sport` from intake, or not exist at all, and
+`jsonb_set(data, '{cycles,N}', …)` does NOTHING on a path that is not there. So write the
+missing keys by merging, not by path: `update programs set data = data || jsonb_build_object(
+'currentCycleIndex', 0, 'cycles', $C$…$C$::jsonb, 'workouts', $W$…$W$::jsonb, 'notes', $N$…$N$::jsonb)`
+(or `insert` the whole object when there is no row), then verify every key is present.
 
 **Dollar-quote everything** (`$W$ … $W$`) and check the payload does not contain your tag.
 Apostrophes are everywhere in athlete-facing copy and single-quoting will shred it.
