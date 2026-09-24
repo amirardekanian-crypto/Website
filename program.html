@@ -1032,6 +1032,30 @@
   .lib-door:active { transform: scale(0.985); }
   .lib-door.door-sessions { background: #0E4A36 url('court-sessions.jpg') center/cover no-repeat; background-image: linear-gradient(to top, rgba(14,74,54,0.82) 0%, rgba(14,74,54,0.28) 65%), url('court-sessions.jpg'); }
   .lib-door.door-playbook { background: #C7552F url('court-playbook.jpg') center/cover no-repeat; background-image: linear-gradient(to top, rgba(199,85,47,0.82) 0%, rgba(199,85,47,0.28) 65%), url('court-playbook.jpg'); }
+  /* The third door (2026-09-24): the exercise library, from the Spine. Ink, so it
+     reads as its own world beside the green and the clay; picture reused, not new. */
+  .lib-door.door-exercises { background: #141A17 url('assets/art/days/fullbody-v1.webp') center/cover no-repeat; background-image: linear-gradient(to top, rgba(20,26,23,0.9) 0%, rgba(20,26,23,0.35) 65%), url('assets/art/days/fullbody-v1.webp'); background-position: center, 70% center; }
+  .w-head.w-head-ex { background-color: #141A17; background-image: linear-gradient(to top, rgba(20,26,23,0.92) 0%, rgba(20,26,23,0.45) 100%), url('assets/art/days/fullbody-v1.webp'); background-position: center, 72% center; }
+  .xl-tools { padding: 16px 18px 6px; display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--grey-bg); }
+  .xl-search { width: 100%; box-sizing: border-box; font: 15px 'Barlow', sans-serif; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); outline: none; }
+  .xl-search:focus { border-color: var(--yellow); }
+  .xl-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .xl-chips::-webkit-scrollbar { display: none; }
+  .xl-chip { flex: none; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; white-space: nowrap; }
+  .xl-chip.on { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  .xl-list { padding: 8px 18px 110px; display: grid; gap: 8px; }
+  .xl-group { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--grey-text); margin: 10px 2px 0; }
+  .xl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; width: 100%; background: var(--white); border: 1px solid var(--grey-card); border-left: 3px solid var(--grey-mid); border-radius: 12px; padding: 12px 14px; cursor: pointer; font: inherit; color: var(--grey-dark); }
+  .xl-row.mine { border-left-color: var(--ice); }
+  .xl-row b { display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.2px; line-height: 1.1; }
+  .xl-row small { display: block; font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
+  .xl-row small em { font-style: normal; color: var(--ice); }
+  .xl-row .xl-arr { color: var(--grey-text); font-size: 18px; flex: none; }
+  .xl-empty { font-family: 'Barlow', sans-serif; font-size: 14.5px; line-height: 1.5; color: var(--grey-text); background: var(--white); border: 1px dashed var(--grey-mid); border-radius: 12px; padding: 16px; }
+  body[data-dark] .xl-tools { background: #121212; }
+  body[data-dark] .xl-search, body[data-dark] .xl-row, body[data-dark] .xl-empty { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
+  body[data-dark] .xl-row.mine { border-left-color: #E06B43; }
+  body[data-dark] .xl-row small em { color: #E06B43; }
   .lib-door-court { display: none; }
   .lib-door-court svg { width: 100%; height: 100%; display: block; }
   .lib-door > *:not(.lib-door-court) { position: relative; z-index: 2; }
@@ -4028,6 +4052,12 @@
         <div class="lib-door-d">Everything you need to know to play better tennis — in one place.</div>
         <div class="lib-door-row"><span class="lib-door-ct" id="playbook-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
       </div>
+      <div class="lib-door door-exercises" role="button" tabindex="0" onclick="enterWorld('exercises')">
+        <div class="lib-door-k">— Know</div>
+        <div class="lib-door-big">Exercises</div>
+        <div class="lib-door-d">Every exercise: what it's for, how to do it, and its ladder from easier to harder.</div>
+        <div class="lib-door-row"><span class="lib-door-ct" id="exercises-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
+      </div>
     </div>
   </div>
 
@@ -4045,6 +4075,22 @@
 
   <!-- Playbook world: broadcast feed — latest hero + list (filled by renderPlaybook) -->
   <div id="lib-playbook" class="lib-pane lib-pane-dark" hidden></div>
+
+  <!-- Exercises world (2026-09-24): the Spine as a library, like the course app's.
+       Every row opens the same About sheet as the ⓘ on a card (renderExerciseLibrary). -->
+  <div id="lib-exercises" class="lib-pane" hidden>
+    <div class="w-head w-head-ex">
+      <button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
+      <div class="w-kick">— Know</div>
+      <div class="w-title">Exercises</div>
+      <div class="w-sub" id="xl-sub">What it's for, how to do it, and its ladder.</div>
+    </div>
+    <div class="xl-tools">
+      <input id="xl-q" class="xl-search" type="search" placeholder="Search exercises" autocomplete="off" aria-label="Search exercises">
+      <div class="xl-chips" id="xl-chips"></div>
+    </div>
+    <div class="xl-list" id="xl-list"></div>
+  </div>
 </div>
 
 <!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
@@ -6937,7 +6983,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: <strong>why it's in your plan</strong>, where it shows up on court, and <strong>its ladder</strong>, the easier and harder versions of the same movement.</p><p>On the ladder, a ✓ marks a rung you've already trained, and the dashed one is the next rung up. Tap any rung to read about it. Moving up a rung is my call, made when I write your next cycle, so use it to see where you're heading, not to swap exercises mid-session.</p>` },
+    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: <strong>why it's in your plan</strong>, where it shows up on court, and <strong>its ladder</strong>, the easier and harder versions of the same movement.</p><p>On the ladder, a ✓ marks a rung you've already trained, and the dashed one is the next rung up. Tap any rung to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving up a rung is my call, made when I write your next cycle, so use it to see where you're heading, not to swap exercises mid-session.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
@@ -7866,7 +7912,7 @@ window.renderCeiling = renderCeiling;
 
 function showLibPane(which) {
   _libPane = which;
-  ['doors', 'sessions', 'playbook'].forEach(p => {
+  ['doors', 'sessions', 'playbook', 'exercises'].forEach(p => {
     const el = document.getElementById('lib-' + p);
     if (el) el.hidden = (p !== which);
   });
@@ -7876,6 +7922,7 @@ async function enterWorld(which) {
   showLibPane(which);
   if (which === 'sessions') await renderSessionsWorld();
   if (which === 'playbook') await renderPlaybook();
+  if (which === 'exercises') renderExerciseLibrary();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 function exitWorld() { showLibPane('doors'); window.scrollTo({ top: 0, behavior: 'instant' }); }
@@ -7892,6 +7939,7 @@ async function loadLibCounts() {
   const rEl = document.getElementById('playbook-count');
   if (sEl) sEl.textContent = sCount + ' ' + (sCount === 1 ? 'Session' : 'Sessions');
   if (rEl) rEl.textContent = rCount + ' ' + (rCount === 1 ? 'Read' : 'Reads');
+  paintExerciseCount();
   _libCountsLoaded = true;
 }
 
@@ -11582,6 +11630,8 @@ async function refreshSpine() {
     try { _lsRawSet('spinecache', JSON.stringify(res.data)); } catch (e) { /* storage full */ }
     setSpine(res.data);
     paintSpine();
+    paintExerciseCount();
+    if (_libPane === 'exercises') renderExerciseLibrary();
   } catch (e) { /* offline: the cached copy stays */ }
 }
 
@@ -11663,8 +11713,12 @@ function spineLadder(id) {
 
 // The About sheet. Uses the History sheet's own frame (#hist-overlay), so the
 // two never stack: History › from here swaps the content in place.
-function openExerciseSheet(id, card) {
+// Opened WITHOUT a card (from the Exercises library, or walking to a rung that is
+// not on the athlete's page) the sheet is the whole entry: it also carries the
+// video and the cues, because there is no card on screen showing them.
+function openExerciseSheet(id, card, fromLib) {
   const e = SPINE_BY_ID[id];
+  const full = !!fromLib || !card;
   const ov = document.getElementById('hist-overlay');
   if (!e || !ov) return;
   const done = spineDoneIds();
@@ -11702,6 +11756,8 @@ function openExerciseSheet(id, card) {
     <div class="sp-chips">${e.pattern ? `<span class="sp-chip">${esc(SPINE_PATTERN[e.pattern] || e.pattern)}</span>` : ''}${
       (e.qualities || []).map(q => `<span class="sp-chip">${esc(q)}</span>`).join('')}</div>
     ${e.tennis ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
+    ${full && e.video ? `<div class="sp-sec">${renderVideoBlock(e.video)}</div>` : ''}
+    ${full && e.cues ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : ''}
     ${rungs}
     ${altsHtml}
     ${whereHtml}
@@ -11716,7 +11772,7 @@ function openExerciseSheet(id, card) {
       const n = c.querySelector('.item-name'); const x = n && spineFor(n.textContent.trim(), c.dataset.exid);
       return x && x.id === other;
     }) || null;
-    openExerciseSheet(other, oc);
+    openExerciseSheet(other, oc, fromLib);
     ov.querySelector('.readiness-modal').scrollTop = 0;
   }));
   const hb = document.getElementById('sp-hist');
@@ -11724,6 +11780,66 @@ function openExerciseSheet(id, card) {
   ov.classList.add('visible');
 }
 window.openExerciseSheet = openExerciseSheet;
+
+// ── The Exercises library (2026-09-24) ─────────────────────────────────────
+// The third door in Library (Amir: "something like the one i have in tps course").
+// The same approved Spine entries the ⓘ reads, as a searchable list: this
+// athlete's own exercises first, then everything else, filterable by pattern.
+// Every row opens openExerciseSheet() — with the athlete's card when the exercise
+// is in their programme (so History comes along), without it otherwise (so the
+// sheet carries the video and cues itself). No new data, no second design.
+let _xlPattern = 'all';
+function paintExerciseCount() {
+  const el = document.getElementById('exercises-count');
+  if (!el) return;
+  const n = (SPINE || []).length;
+  el.textContent = n ? n + ' ' + (n === 1 ? 'Exercise' : 'Exercises') : '\u00a0';
+}
+function xlCardFor(id) {
+  return [...document.querySelectorAll('#screen-home .checklist-item')].find(c => {
+    if (c.classList.contains('round-group')) return false;
+    const n = c.querySelector('.item-name'); const x = n && spineFor(n.textContent.trim(), c.dataset.exid);
+    return x && x.id === id;
+  }) || null;
+}
+function renderExerciseLibrary() {
+  const list = document.getElementById('xl-list'), chips = document.getElementById('xl-chips');
+  const q = document.getElementById('xl-q');
+  if (!list || !chips || !q) return;
+  const all = (SPINE || []).slice();
+  paintExerciseCount();
+  if (!all.length) {
+    chips.innerHTML = '';
+    list.innerHTML = `<div class="xl-empty">Your coach is building this library. Each exercise appears here once it's ready: what it's for, how to do it, and its ladder from easier to harder.</div>`;
+    return;
+  }
+  const mine = {};
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b =>
+    (b.exercises || []).forEach(ex => { if (ex.type !== 'circuit') { const x = spineFor(ex.name, ex.exId); if (x) mine[x.id] = 1; } })));
+  const pats = Object.keys(SPINE_PATTERN).filter(p => all.some(e => e.pattern === p));
+  if (_xlPattern !== 'all' && _xlPattern !== 'mine' && pats.indexOf(_xlPattern) === -1) _xlPattern = 'all';
+  chips.innerHTML = [['all', 'All'], ['mine', 'In your plan']].concat(pats.map(p => [p, SPINE_PATTERN[p]]))
+    .map(([k, l]) => `<button type="button" class="xl-chip${_xlPattern === k ? ' on' : ''}" data-p="${esc(k)}">${esc(l)}</button>`).join('');
+  chips.querySelectorAll('.xl-chip').forEach(b => b.addEventListener('click', () => { _xlPattern = b.dataset.p; renderExerciseLibrary(); }));
+  if (!q._wired) { q._wired = true; q.addEventListener('input', () => renderExerciseLibrary()); }
+
+  const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
+  const hay = e => [e.name].concat(e.aliases || [], [SPINE_PATTERN[e.pattern] || '', e.purpose || '', e.tennis || '', (e.equipment || []).join(' ')]).join(' ').toLowerCase();
+  const shown = all.filter(e =>
+    (_xlPattern === 'all' || (_xlPattern === 'mine' ? mine[e.id] : e.pattern === _xlPattern)) &&
+    words.every(w => hay(e).indexOf(w) !== -1));
+  const row = e => `<button type="button" class="xl-row${mine[e.id] ? ' mine' : ''}" data-id="${esc(e.id)}"><span><b>${esc(e.name)}</b><small>${
+    esc(SPINE_PATTERN[e.pattern] || '')}${mine[e.id] ? ' · <em>In your plan</em>' : ''}</small></span><span class="xl-arr" aria-hidden="true">›</span></button>`;
+  const byName = (a, b) => a.name.localeCompare(b.name);
+  const own = shown.filter(e => mine[e.id]).sort(byName), rest = shown.filter(e => !mine[e.id]).sort(byName);
+  list.innerHTML = !shown.length
+    ? `<div class="xl-empty">Nothing matches${q.value ? ' “' + esc(q.value) + '”' : ''}. Try another word, or tap All.</div>`
+    : (own.length && rest.length && _xlPattern !== 'mine'
+        ? `<div class="xl-group">In your plan · ${own.length}</div>${own.map(row).join('')}<div class="xl-group">Everything else · ${rest.length}</div>${rest.map(row).join('')}`
+        : own.concat(rest).map(row).join(''));
+  list.querySelectorAll('.xl-row').forEach(b => b.addEventListener('click', () => openExerciseSheet(b.dataset.id, xlCardFor(b.dataset.id), true)));
+}
+window.renderExerciseLibrary = renderExerciseLibrary;
 
 function esc(str) {
   if (!str) return '';

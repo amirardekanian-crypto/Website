@@ -343,6 +343,10 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   `exNameVariants()`. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
   `spineForC()` (coach.html). Same rule: `exId` first, then the tightest tier with ONE entry.
 - `spinecache` (localStorage, no athlete prefix) is a cache of `get_exercises()` and never syncs.
+- **Library → Exercises is the third door** (Amir, 2026-09-24: *"something like the one i have in tps
+  course"*): search, pattern chips, *In your plan* first. Every row opens the same About sheet
+  (`renderExerciseLibrary()` → `openExerciseSheet(id, card, true)`); opened from the library, or with
+  no card on screen, the sheet also carries the video and cues. One design, not two.
 
 ### ✍️ The set log is COUNTERSIGNED, and the note belongs to ONE session (2026-09-24)
 

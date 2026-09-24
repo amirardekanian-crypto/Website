@@ -33,7 +33,8 @@
 // so the sooner phones leave the v13 shell the sooner their sessions are saved as data.
 // v17: program.html changed (The Spine, 2026-09-24): the ⓘ About sheet with Rungs, and cues filled
 // from the exercise's entry on cards that carry none of their own. (v16 was the RPE colours.)
-const CACHE = 'aap-v17';
+// v18: program.html changed (Library → Exercises, the third door, 2026-09-24).
+const CACHE = 'aap-v18';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
