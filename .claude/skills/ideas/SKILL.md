@@ -83,9 +83,33 @@ source and say what changes when it is moved into S&C for tennis/padel players.
    8. Advanced version
 5. **Rank them.** Top 3, the one you would build first and why, and the ones you would cut.
    Show which ideas depend on each other (a shared data layer is often the real first build).
-6. Long results go in an **Artifact page** (load `artifact-design` first) so Amir can read them on
-   his phone; the chat reply is the ranking and the link.
+6. **Every result is an Artifact page — always, not only for long ones** (Amir, 2026-09-24: *"I like
+   that you created an artifact for this … for next times, produce the same answer"*). Load
+   `artifact-design` first. Use the house look of round 1 (green radial hero with 3–4 fact tiles,
+   clay the only accent, Barlow Condensed + Barlow, paper/band sections, both themes). The chat
+   reply is the ranking and the link. Round 1 is the reference: https://claude.ai/artifact/Bu746VeRc4uh2RVbF4F6Mv
 7. Add every idea to `BANK.md` with status `pitched` and the date.
+
+## The deep-dive — when Amir picks an idea
+
+He asks for it as *"act as my app developer and coach and give me ideas of how we can add this"*.
+Also an Artifact page. Reference: #5 The Card Remembers, https://claude.ai/artifact/NTtDNds5vcLoE6AfX21Zoj
+
+1. **Read the real code first**: the functions the idea touches, the tables and their access rules
+   (`pg_policies`), and the live numbers (row counts, how much history exists). Put 3–4 of those
+   findings in the hero; they are what makes the brief trustworthy.
+2. **Render the real screen** before designing over it. Supabase and Google Fonts are blocked from
+   headless Chromium here, so write a throwaway `data/demo.json` (gitignored — `get_program` fails
+   and the app falls back to it), serve with `python3 -m http.server`, drive it with the global
+   Playwright (`PW=$(npm root -g)/playwright`, `executablePath` the chromium in `/opt/pw-browsers`),
+   seed localStorage with `addInitScript`, screenshot. **Delete `data/demo.json` afterwards.**
+3. Sections, in order: **Coach hat** (the rules the feature must obey, quoting
+   `COACHING-PRINCIPLES.md`) → **Design directions** (2–3 options drawn as HTML mockups in the app's
+   own card style, each with strong/weak, one marked Recommended, plus the advanced view) → **What
+   connects** → **Developer hat** (numbered build steps with the files and functions, MVP vs next,
+   docs in the same PR) → **Traps** → **Your call** (the decisions to make, the recommended pick
+   highlighted, and "say *go with your picks*").
+4. Build nothing until he answers the decisions.
 
 ## After Amir reacts
 

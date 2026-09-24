@@ -5,6 +5,9 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · The artifact format itself.** *"I like that you created an artifact for this … for next times, produce the same answer."* Every `/ideas` result and every idea deep-dive is an **Artifact page**, not a chat answer: 8 fields per idea, build order, dependency map, stage strip. The chat reply is the ranking and the link.
+- **2026-09-24 · Picked #5 The Card Remembers** as the first build (the one the round recommended). Next step he asked for: *"act as my app developer and coach and give me ideas of how we can add this. Design direction and …"*, i.e. a **deep-dive** on one picked idea: design directions to choose from, the coaching logic, the build plan.
+
 - **2026-09-23 · The TPS exercise library** (each exercise → its regressions, its progressions, every
   session that uses it). *"I really liked this idea."* What he named when asked for more: ideas
   where **information is connected rather than isolated**, e.g.
