@@ -179,6 +179,16 @@ IDEAS = [
   coach="Fewer <em>when can I…</em> messages, and filmed evidence arriving at the moment you need it.",
   mvp="A <code>gates</code> list on the programme (exercise id plus one sentence), written with the Becauses, drawn as a dashed rung.",
   adv="The unlock ties to a real result, a Personal Record or a test, and the rung turns solid the day it's met."),
+ dict(n=17, name="Still Warm", sub="Qualities the cycle means to keep, watched for going cold", layer="Grown along the way", grown="2",
+  stages=["Monitoring","Adaptation","Progression"], needs=[2, 5], cost="None. It reads what was logged against the qualities already tagged.",
+  chain=["Cycle: qualities to keep","Logged working sets","Days since last trained","Radar row"],
+  what="Once exercises carry qualities, the logged sessions show when each quality was last trained. Still Warm watches the ones a cycle is meant to <em>keep</em> and flags one that goes cold.",
+  problem="Your own focus lines say <em>one heavy exposure a week so the force base doesn't drain</em>. Nothing checks it: a missed day or a swapped session can quietly drop the one strength exposure for two weeks.",
+  how="A row in coach.html's Needs-you list: <em>Strength: no working set in 12 days (a power cycle, keeping strength)</em>. Only for qualities the cycle means to keep, never for ones it is resting on purpose.",
+  athlete="Nothing directly, and that's the point: the maintenance they never see is kept.",
+  coach="Your maintenance rule, checked every day from what was actually done, not from what was planned.",
+  mvp="Days since the last logged working set per quality, from #5's history through the Spine tags. Flag past a threshold you set (e.g. 10 days).",
+  adv="Part of Radar (#9). The threshold differs per quality: strength drains slower than power."),
 ]
 
 STAGES = ["Assessment","Decision making","Exercise selection","Programming","Execution","Feedback",
@@ -197,6 +207,7 @@ STATUS = {
  1: ("Built 24 Sep", "https://claude.ai/artifact/WymDKxk58nkCy5eSgodSrU"),
  4: ("Built 24 Sep", "https://claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw"),
  5: ("Built 24 Sep", "https://claude.ai/artifact/NTtDNds5vcLoE6AfX21Zoj"),
+ 2: ("Picked 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
  "5b": ("Built 24 Sep", None), 14: ("Built 24 Sep", None), 15: ("Built 24 Sep", None),
 }
 
