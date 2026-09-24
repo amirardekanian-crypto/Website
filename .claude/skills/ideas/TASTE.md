@@ -30,9 +30,10 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
   program, it shouldnt be showed there in 'i', it should only live in exercise sections of the
   library … remove the qualities from library, bad decision … the exercise qualities shouldnt contain
   what other exercises does it, unless its in exercise section, the explanation is enough."* So: a
-  sheet opened from the athlete's own programme explains, it does not browse. Lists of other
-  exercises (regressions, progressions, alternatives, "in your plan") belong in Library → Exercises
-  only. And a second library door for the same data was one door too many.
+  sheet opened from the athlete's own programme explains, it does not browse: "in your plan" lists
+  belong in Library → Exercises only. **Corrected the same day:** *"i liked how regression progresion
+  and alternatives lives in i"*, so those three lists stay in the card's ⓘ. Only the "where it is in
+  your plan" list moved. And a second library door for the same data was one door too many.
 
 - **2026-09-24 · Rungs REJECTED, after it shipped.** *"remove the rung, too much information, even im
   mixed up. doesnt help athlete … the easier and harder is regressions and progressions. i mean real

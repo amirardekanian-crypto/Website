@@ -360,9 +360,10 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   flags stays in the scratchpad, never in this public repo.
 - **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
   else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame.
-  ⚠ **Opened from a CARD, the sheet is short** (Amir, 2026-09-24): Why you, what it does, pattern
-  and quality chips, On court, History. The three lists and *In your programme* show **only when it
-  is opened from Library → Exercises** (`fromLib`). The library sheet carries three plain lists: **Regressions** (`easier`: the same movement made easier),
+  ⚠ **Opened from a CARD** (Amir, 2026-09-24): Why you, what it does, pattern and quality chips,
+  On court, the three lists, History. *In your programme* shows **only when it is opened from
+  Library → Exercises** (`fromLib`); the lists stay in both (Amir: *"i liked how regression
+  progresion and alternatives lives in i"*). The three plain lists: **Regressions** (`easier`: the same movement made easier),
   **Progressions** (`harder`: the same movement made harder) and **Alternatives** (`alts`: the
   same movement on other equipment or a machine). ⚠ **Rungs are GONE** (Amir, 2026-09-24:
   *"remove the rung, too much information, even im mixed up. doesnt help athlete"*): no ladder, no
