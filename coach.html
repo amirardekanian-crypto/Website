@@ -4497,9 +4497,9 @@ function renderExercises() {
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
         <div>${lbl('Cues · one per line')}<textarea data-sf="good" rows="3" style="${field}">${esc(((e.cues || {}).good || []).join('\n'))}</textarea></div>
         <div>${lbl('Don’t · one per line')}<textarea data-sf="bad" rows="3" style="${field}">${esc(((e.cues || {}).bad || []).join('\n'))}</textarea></div>
-        <div>${lbl('Easier (ids, first = main rung)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
-        <div>${lbl('Harder (ids, first = main rung)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
-        <div>${lbl('Same job (ids)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Regressions: easier versions of the same movement (ids)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Progressions: harder versions of the same movement (ids)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Alternatives: same movement, other equipment or machine (ids)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Equipment · loads (comma)')}<input data-sf="equipment" value="${esc((e.equipment || []).join(', '))}" style="${field};margin-bottom:6px"><input data-sf="loads" value="${esc((e.loads || []).join(', '))}" style="${field}"></div>
       </div>
       <div style="border-top:1px dashed var(--line);margin-top:14px;padding-top:4px">

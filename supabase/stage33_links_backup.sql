@@ -1,0 +1,35 @@
+-- stage33 — Regressions, Progressions, Alternatives (2026-09-24). APPLIED.
+--
+-- Amir: "remove the rung, too much information, even im mixed up. doesnt help
+-- athlete … the easier and harder is regressions and progressions. i mean real
+-- regressions and progressions. and alternatives should be the ones with other
+-- machines or equipment."
+--
+-- The About sheet stopped drawing a ladder (Rungs) and now shows three plain lists
+-- from the same three columns on public.exercises:
+--   easier  → Regressions   the SAME movement made easier
+--   harder  → Progressions  the SAME movement made harder
+--   alts    → Alternatives  the same movement on other equipment or a machine
+--
+-- The links on all 212 approved entries were rewritten to those meanings the same
+-- day (updated_by = 'claude-links-2026-09-24'), on Amir's instruction. Before the
+-- rewrite each entry's old links were copied here, so any one can be put back:
+--
+--   update public.exercises x
+--      set easier = array(select jsonb_array_elements_text(c.links_before->'easier')),
+--          harder = array(select jsonb_array_elements_text(c.links_before->'harder')),
+--          alts   = array(select jsonb_array_elements_text(c.links_before->'alts'))
+--     from public.exercise_coach c
+--    where c.id = x.id and x.id = '<exercise-id>';
+--
+-- exercise_coach is coach-only (RLS), so the backup never reaches a phone.
+
+alter table public.exercise_coach add column if not exists links_before jsonb;
+  -- { easier: [...], harder: [...], alts: [...], saved: timestamptz }
+
+-- The backup itself (run once, before the rewrite):
+-- insert into public.exercise_coach (id, links_before)
+-- select id, jsonb_build_object('easier', easier, 'harder', harder, 'alts', alts, 'saved', now())
+--   from public.exercises
+-- on conflict (id) do update set links_before = excluded.links_before
+--   where public.exercise_coach.links_before is null;

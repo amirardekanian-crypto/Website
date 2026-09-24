@@ -58,8 +58,8 @@ program, if an exercise comes up, add it, if it can be updated, or linked better
 done when the program is done"*). Whether it is `/program-assemble` (a new cycle), `/program-edit`
 (a change) or `/workout` (a library session), the run is not finished until:
 1. **Spine upkeep** (`/spine` → Upkeep): every exercise has an entry; empty fields filled; aliases
-   added for new spellings; `exId` stamped on every card; a new exercise linked into its ladder
-   from both sides; general cues from the design pass applied to drafts, proposed for approved.
+   added for new spellings; `exId` stamped on every card; a new exercise linked to its
+   regressions, progressions and alternatives from both sides; general cues from the design pass applied to drafts, proposed for approved.
 2. **Qualities**: every exercise tagged (drafts directly, approved entries as
    `suggested_qualities` for Amir to accept), so no day card goes blank.
 3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
@@ -346,8 +346,8 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
 Idea #1 of `/ideas` round 1 (brief: claude.ai/artifact/WymDKxk58nkCy5eSgodSrU). Amir: *"I love
 the exercise database … I just dont want to make my exercise cards busier … the cues should be
 there so we dont write the cues for each exercise everytime."* Server: `supabase/stage31_spine.sql`.
-- **Two tables.** `exercises` (athlete-readable when approved: purpose, pattern, cues, the ladder
-  as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags). A separate
+- **Two tables.** `exercises` (athlete-readable when approved: purpose, pattern, cues, regressions/
+  progressions/alternatives as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags). A separate
   TABLE so no athlete query can ever touch the flags. `get_exercises()` serves **approved rows only**.
 - **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
   (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;
@@ -360,7 +360,15 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   flags stays in the scratchpad, never in this public repo.
 - **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
   else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame and
-  carries **Rungs** (the pattern's ladder, marked done / in your plan / next rung).
+  carries three plain lists: **Regressions** (`easier`: the same movement made easier),
+  **Progressions** (`harder`: the same movement made harder) and **Alternatives** (`alts`: the
+  same movement on other equipment or a machine). ⚠ **Rungs are GONE** (Amir, 2026-09-24:
+  *"remove the rung, too much information, even im mixed up. doesnt help athlete"*): no ladder, no
+  "next rung", no "climbed" marks, and never bring one back. Use those three names everywhere, and
+  keep the definitions strict: a regression or progression is a REAL one of the same movement, an
+  alternative is the same movement on different kit. **On court** shows to tennis and padel
+  athletes only (`isRacketSport()`). All 212 entries' links were rewritten to this rule that day;
+  the old links are in `exercise_coach.links_before` (stage33).
 - **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
   *"the aim is to use these cues for all the exercises that everyone has from now on … if there is
   a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline

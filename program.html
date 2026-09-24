@@ -2555,24 +2555,6 @@
   }
   .sp-court { font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--grey-dark); margin: 0; }
   body[data-dark] .sp-court { color: #ddd; }
-  .sp-rungs { display: grid; gap: 5px; }
-  .sp-rung {
-    display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; text-align: left;
-    background: var(--white); border: 1px solid var(--grey-card); border-radius: 10px; padding: 9px 11px;
-    cursor: pointer; font: inherit; color: var(--grey-dark);
-  }
-  .sp-rung i { font-style: normal; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: var(--grey-text); text-align: center; }
-  .sp-rung b { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.2px; }
-  .sp-rung small { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--grey-text); }
-  .sp-rung.here { border: 2px solid var(--ice); cursor: default; }
-  .sp-rung.here i, .sp-rung.here small { color: var(--ice); }
-  .sp-rung.done i { color: var(--yellow); }
-  .sp-rung.now small { color: var(--yellow); }
-  .sp-rung.next { border-style: dashed; border-color: var(--grey-mid); }
-  body[data-dark] .sp-rung { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
-  body[data-dark] .sp-rung.here { border-color: #E06B43; }
-  body[data-dark] .sp-rung.here i, body[data-dark] .sp-rung.here small { color: #E06B43; }
-  body[data-dark] .sp-rung.done i, body[data-dark] .sp-rung.now small { color: #7FC3A6; }
   .sp-alts { display: flex; flex-wrap: wrap; gap: 6px; }
   .sp-alt {
     font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: var(--ice);
@@ -4135,7 +4117,7 @@
       <div class="lib-door door-exercises" role="button" tabindex="0" onclick="enterWorld('exercises')">
         <div class="lib-door-k">— Know</div>
         <div class="lib-door-big">Exercises</div>
-        <div class="lib-door-d">Every exercise: what it's for, how to do it, and its ladder from easier to harder.</div>
+        <div class="lib-door-d">Every exercise: what it's for, how to do it, and its easier, harder and other-equipment versions.</div>
         <div class="lib-door-row"><span class="lib-door-ct" id="exercises-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
       </div>
       <div class="lib-door door-qualities" role="button" tabindex="0" onclick="enterWorld('qualities')">
@@ -4169,7 +4151,7 @@
       <button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
       <div class="w-kick">— Know</div>
       <div class="w-title">Exercises</div>
-      <div class="w-sub" id="xl-sub">What it's for, how to do it, and its ladder.</div>
+      <div class="w-sub" id="xl-sub">What it's for, how to do it, and what to swap it for.</div>
     </div>
     <div class="xl-tools">
       <input id="xl-q" class="xl-search" type="search" placeholder="Search exercises" autocomplete="off" aria-label="Search exercises">
@@ -7103,7 +7085,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: what it does, where it shows up on court, and <strong>its ladder</strong>, the easier and harder versions of the same movement.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>On the ladder, a ✓ marks a rung you've already trained, and the dashed one is the next rung up. Tap any rung to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving up a rung is my call, made when I write your next cycle, so use it to see where you're heading, not to swap exercises mid-session.</p>` },
+    body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: what it does, where it shows up on court, and three short lists. <strong>Regressions</strong> are easier versions of the same movement, <strong>Progressions</strong> are harder ones, and <strong>Alternatives</strong> are the same movement on other equipment or a machine.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Tap any name in those lists to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, the alternatives show what does the same job: message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means, every exercise in your plan that trains it, and how we test it. The same words show on an exercise's <strong>i</strong> sheet, and all ten are in <strong>Library → Qualities</strong>.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
@@ -11710,9 +11692,9 @@ window.closeHistorySheet = closeHistorySheet;
 //   · the card gains ONE thing: a small ⓘ after the name, only when the exercise
 //     has an APPROVED entry. It opens the About sheet.
 //   · cues come from the entry whenever the programme has none of its own.
-//   · the About sheet: why it's here, where it shows up on court, the ladder
-//     (Rungs: every step of this pattern, marked with what the athlete has done),
-//     every day in the programme that uses it, and a door into the History sheet.
+//   · the About sheet: why it's here, where it shows up on court (tennis and
+//     padel only), its regressions, progressions and alternatives, every day in
+//     the programme that uses it, and a door into the History sheet.
 //
 // ⚠ NAMES ARE NEVER REWRITTEN. A card's name is resolved to an entry at READ time
 // (ex.exId first, then the entry's name and aliases through exNameVariants(), the
@@ -11869,38 +11851,10 @@ function spineUsesInProgramme(id) {
   return out;
 }
 
-// Every exercise id this athlete has done: logged sessions (#5's history), the
-// archived programmes, and today's programme. What Rungs marks as climbed.
-function spineDoneIds() {
-  const done = {};
-  (HIST || []).forEach(s => (s.entries || []).forEach(e => {
-    if (!(e.circuit ? (e.items || []).some(it => it.w) : (e.sets || []).some(histSetLogged))) return;
-    const x = spineFor(HIST_ALIAS[e.ex] || e.ex); if (x) done[x.id] = 1;
-  }));
-  ((DATA && DATA.programHistory) || []).forEach(p => (p.days || []).forEach(d =>
-    (d.exercises || []).forEach(ex => { const x = spineFor(ex.name); if (x) done[x.id] = 1; })));
-  return done;
-}
-
-// Rungs: the main line of this pattern, walking easier[0] down and harder[0] up.
-function spineLadder(id) {
-  const seen = {}; seen[id] = 1;
-  const down = [], up = [];
-  let cur = SPINE_BY_ID[id];
-  while (cur && cur.easier && cur.easier[0] && SPINE_BY_ID[cur.easier[0]] && !seen[cur.easier[0]] && down.length < 5) {
-    cur = SPINE_BY_ID[cur.easier[0]]; seen[cur.id] = 1; down.unshift(cur);
-  }
-  cur = SPINE_BY_ID[id];
-  while (cur && cur.harder && cur.harder[0] && SPINE_BY_ID[cur.harder[0]] && !seen[cur.harder[0]] && up.length < 5) {
-    cur = SPINE_BY_ID[cur.harder[0]]; seen[cur.id] = 1; up.push(cur);
-  }
-  return down.concat([SPINE_BY_ID[id]], up);
-}
-
 // The About sheet. Uses the History sheet's own frame (#hist-overlay), so the
 // two never stack: History › from here swaps the content in place.
-// Opened WITHOUT a card (from the Exercises library, or walking to a rung that is
-// not on the athlete's page) the sheet is the whole entry: it also carries the
+// Opened WITHOUT a card (from the Exercises library, or tapping a linked exercise
+// that is not on the athlete's page) the sheet is the whole entry: it also carries the
 // video and the cues, because there is no card on screen showing them.
 function openExerciseSheet(id, card, fromLib) {
   const e = id ? SPINE_BY_ID[id] : null;
@@ -11928,29 +11882,16 @@ function openExerciseSheet(id, card, fromLib) {
     ov.classList.add('visible');
     return;
   }
-  const done = spineDoneIds();
   const inProg = spineUsesInProgramme(id);
-  const nowIds = {};
-  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b =>
-    (b.exercises || []).forEach(ex => { const x = spineFor(ex.name, ex.exId); if (x) nowIds[x.id] = 1; })));
-
-  const ladder = spineLadder(id);
-  let rungs = '';
-  if (ladder.length > 1) {
-    const me = ladder.findIndex(r => r.id === id);
-    const climbed = ladder.filter(r => r.id !== id && done[r.id] && ladder.indexOf(r) < me).length;
-    rungs = `<div class="sp-sec"><div class="sp-lbl">The ${esc((SPINE_PATTERN[e.pattern] || 'movement').toLowerCase())} ladder${
-      climbed ? ` · ${climbed} rung${climbed === 1 ? '' : 's'} climbed` : ''}</div><div class="sp-rungs">` +
-      ladder.map((r, i) => {
-        const cls = r.id === id ? 'here' : (nowIds[r.id] ? 'now' : (done[r.id] ? 'done' : (i === me + 1 ? 'next' : '')));
-        const tag = r.id === id ? 'This one' : (nowIds[r.id] ? 'In your plan' : (done[r.id] ? 'Done' : (i === me + 1 ? 'Next rung' : (i < me ? 'Easier' : 'Harder'))));
-        const mark = cls === 'done' ? '✓' : (r.id === id ? '●' : '○');
-        return `<button type="button" class="sp-rung ${cls}" data-id="${esc(r.id)}"${r.id === id ? ' disabled' : ''}><i>${mark}</i><b>${esc(r.name)}</b><small>${tag}</small></button>`;
-      }).reverse().join('') + `</div></div>`;
-  }
-  const alts = (e.alts || []).map(a => SPINE_BY_ID[a]).filter(Boolean);
-  const altsHtml = alts.length ? `<div class="sp-sec"><div class="sp-lbl">Does the same job</div><div class="sp-alts">${
-    alts.map(a => `<button type="button" class="sp-alt" data-id="${esc(a.id)}">${esc(a.name)}</button>`).join('')}</div></div>` : '';
+  // Three plain lists (Amir, 2026-09-24: "remove the rung, too much information").
+  // Regressions and progressions are the SAME movement made easier or harder;
+  // alternatives are the same movement on other equipment or a machine.
+  const linkList = (label, ids) => {
+    const xs = (ids || []).map(a => SPINE_BY_ID[a]).filter(Boolean);
+    return xs.length ? `<div class="sp-sec"><div class="sp-lbl">${label}</div><div class="sp-alts">${
+      xs.map(a => `<button type="button" class="sp-alt" data-id="${esc(a.id)}">${esc(a.name)}</button>`).join('')}</div></div>` : '';
+  };
+  const linksHtml = linkList('Regressions', e.easier) + linkList('Progressions', e.harder) + linkList('Alternatives', e.alts);
   const whereHtml = inProg.length ? `<div class="sp-sec"><div class="sp-lbl">In your programme</div>${
     inProg.map(w => `<div class="sp-where"><span>Day ${esc(String(w.day))}${w.focus ? ' · ' + esc(w.focus) : ''}</span><small>${esc(w.block)}</small></div>`).join('')}</div>` : '';
   const hist = card ? historyFor(card.querySelector('.item-name').textContent.trim()) : historyFor(e.name);
@@ -11966,11 +11907,10 @@ function openExerciseSheet(id, card, fromLib) {
       // Qualities only once their text is approved; each opens its Quality Map page.
       (e.qualities || []).filter(q => QUALS_BY_ID[q]).map(q =>
         `<button type="button" class="sp-chip sp-q" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('')}</div>
-    ${e.tennis ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
+    ${e.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
     ${full && e.video ? `<div class="sp-sec">${renderVideoBlock(e.video)}</div>` : ''}
     ${full && e.cues ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : ''}
-    ${rungs}
-    ${altsHtml}
+    ${linksHtml}
     ${whereHtml}
     <div class="hs-actions">
       ${histBtn}
@@ -11980,9 +11920,9 @@ function openExerciseSheet(id, card, fromLib) {
     openQualitySheet(b.dataset.q);
     ov.querySelector('.readiness-modal').scrollTop = 0;
   }));
-  ov.querySelectorAll('.sp-rung[data-id], .sp-alt[data-id]').forEach(b => b.addEventListener('click', () => {
+  ov.querySelectorAll('.sp-alt[data-id]').forEach(b => b.addEventListener('click', () => {
     const other = b.dataset.id;
-    // Walking the ladder: the card only comes along if that rung is on today's page.
+    // The card only comes along if that exercise is on today's page.
     const oc = [...document.querySelectorAll('.checklist-item')].find(c => {
       const n = c.querySelector('.item-name'); const x = n && spineFor(n.textContent.trim(), c.dataset.exid);
       return x && x.id === other;
@@ -12232,7 +12172,7 @@ function renderExerciseLibrary() {
   paintExerciseCount();
   if (!all.length) {
     chips.innerHTML = '';
-    list.innerHTML = `<div class="xl-empty">Your coach is building this library. Each exercise appears here once it's ready: what it's for, how to do it, and its ladder from easier to harder.</div>`;
+    list.innerHTML = `<div class="xl-empty">Your coach is building this library. Each exercise appears here once it's ready: what it's for, how to do it, and its easier, harder and other-equipment versions.</div>`;
     return;
   }
   const mine = {};

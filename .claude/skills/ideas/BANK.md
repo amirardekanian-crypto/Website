@@ -35,7 +35,7 @@ real links to exercise ids is the course-app half of #1.
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 5+ | The History Sheet | Every past session of a lift with an e1RM trend (from the #5 deep-dive) | 5 | **built** with #5 |
-| 14 | Rungs | Each movement pattern as a staircase marked with the rungs this athlete has climbed (Spine links + programme archive + #5 history) | 1, 5 | **built** 2026-09-24 inside the About sheet ("I love your rung idea") |
+| 14 | Rungs | Each movement pattern as a staircase marked with the rungs this athlete has climbed | 1, 5 | **removed** 2026-09-24, the day it shipped: *"remove the rung, too much information, even im mixed up. doesnt help athlete."* Replaced by three plain lists: Regressions · Progressions · Alternatives |
 | 15 | Who has this exercise | coach.html: exercise → every athlete doing it now (before changing a cue or video) | 1 | **built** 2026-09-24 in the Exercises editor |
-| 16 | Not Yet | The ledgers' Paused exercises shown as dashed rungs with their unlock gate in plain words (never a Banned one) | 1, 4 | pitched (from the #4 deep-dive) |
+| 16 | Not Yet | The ledgers' Paused exercises with their unlock gate in plain words (never a Banned one) | 1, 4 | **parked** 2026-09-24: its home was Rungs, now removed. Ask Amir before reviving |
 | 17 | Still Warm | Qualities a cycle means to keep, flagged in coach.html when one goes cold (days since last logged working set) | 2, 5 | pitched (from the #2 deep-dive) |
