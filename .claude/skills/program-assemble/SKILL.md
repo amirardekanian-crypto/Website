@@ -320,6 +320,8 @@ COACH HANDOFF BRIEF". Cover, one line each, each with its reason:
 - **FILM** — every filmed set he must review, by when, and what is blocked until he clears it.
 - **DATES** — every date-stamped escalation: referrals, appointments, checkpoints, expiries.
 - **WATCH** — trigger conditions that fire a deload, a stop, or a referral.
+- **SPINE** — the Step 8 upkeep report: drafts added, gaps filled, proposals for him, and the
+  entries this programme uses that still need his approval.
 - **⚠️ MY CALLS** — every decision made on his behalf: anything that **overrides** something he
   said, **extends** it past what he actually approved, or **fills a gap** he never ruled on.
   State it plainly and offer to reverse it. This section is the whole point; put it last so it
@@ -405,6 +407,15 @@ are both plain text, so a straight `md5(body)` comparison IS valid — use it.
   as-is; translate them to Python before running. See also: no `gh`, so ship by local merge.
 - Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
   gitignored; there is normally nothing to commit at all.
+
+## Step 8 — Spine upkeep (every programme, the last thing you do)
+Amir, 2026-09-24: *"when i write or update a program, and there are movements that are not there,
+or missing some info, or can be updated, it should be updated there at the end … so everytime i
+write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this
+athlete's programme: draft every exercise with no entry, fill every empty field (video, alias,
+equipment, loads, rungs, SFR, flags), apply design's `spine_cue:` lines to drafts and propose them
+for approved entries, and put the one-line **SPINE** report in the handoff brief. Never approve an
+entry, and never put anything about this athlete on one.
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.

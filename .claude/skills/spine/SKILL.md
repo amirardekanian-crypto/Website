@@ -1,6 +1,6 @@
 ---
 name: spine
-description: Draft the next batch of exercises for The Spine (public.exercises), the one-record-per-exercise catalogue behind the ⓘ, the About sheet, Rungs and Library → Exercises. Use when Amir says "add the next 80 exercises", "draft more exercises", "fill the Spine", "add <exercise> to the Spine", or when /program-assemble finds a name the Spine does not have. Drafts only: Amir approves in coach.html → Exercises.
+description: Draft the next batch of exercises for The Spine (public.exercises), the one-record-per-exercise catalogue behind the ⓘ, the About sheet, Rungs and Library → Exercises. Use when Amir says "add the next 80 exercises", "draft more exercises", "fill the Spine", "add <exercise> to the Spine", or when /program-assemble finds a name the Spine does not have. Drafts only: Amir approves in coach.html → Exercises. Also the Upkeep pass that ends every /program-assemble, /program-edit and /workout run: draft missing exercises, fill empty fields, propose updates.
 ---
 
 # The Spine: drafting the next batch
@@ -110,6 +110,71 @@ select status, count(*), count(*) filter (where cues is null) no_cues,
 - how many have no cues (he writes those) and how many have no video;
 - that he approves them in **coach.html → Exercises → Drafts**, and that the list shows which
   athletes use each one.
+
+## Upkeep: the end of EVERY programme write (Amir, 2026-09-24)
+
+Amir: *"when i write or update a program, and there are movements that are not there, or missing
+some info, or can be updated, it should be updated there at the end … so everytime i write a
+program for an athlete, this gets more complete."* So the last step of `/program-assemble`,
+`/program-edit` and `/workout` is this pass, run on the exercises that programme just used.
+The Spine grows as a side effect of coaching, not in big batches.
+
+**1. List the gaps for this athlete's programme** (a standalone exercise or a circuit item alike):
+```sql
+with ex as (
+  select distinct coalesce(i->>'name', e->>'name') nm, coalesce(i->>'exId', e->>'exId') exid,
+         coalesce(i->>'videoUrl', e->>'videoUrl') vid
+  from public.programs p, jsonb_array_elements(p.data->'workouts'->'days') d,
+       jsonb_array_elements(d->'blocks') b, jsonb_array_elements(b->'exercises') e
+       left join lateral jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array'
+                 then e->'items' else '[]' end) i on true
+  where p.athlete_id = '<id>' and not (e ? 'items' and i is null)),
+hit as (
+  select ex.*, x.id, x.status, x.aliases, x.video, x.cues, x.purpose, x.tennis, x.equipment,
+         x.loads, x.easier, x.harder, x.alts, c.sfr, c.flags
+  from ex left join public.exercises x
+    on x.id = ex.exid or lower(x.name) = lower(ex.nm)
+       or lower(ex.nm) = any(select lower(a) from unnest(x.aliases) a)
+  left join public.exercise_coach c on c.id = x.id)
+select nm, id, status,
+  case when id is null then 'NO ENTRY' end missing,
+  array_remove(array[
+    case when id is not null and lower(nm) <> lower((select name from public.exercises where id = hit.id))
+          and not lower(nm) = any(select lower(a) from unnest(aliases) a) then 'alias' end,
+    case when video is null and vid is not null then 'video (card has one)' end,
+    case when video is null and vid is null then 'video' end,
+    case when cues is null then 'cues' end,
+    case when coalesce(tennis, '') = '' then 'tennis?' end,
+    case when cardinality(equipment) = 0 then 'equipment' end,
+    case when cardinality(loads) = 0 then 'loads' end,
+    case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'rungs' end,
+    case when id is not null and sfr is null then 'sfr?' end], null) gaps
+from hit order by (id is null) desc, status, nm;
+```
+`tennis?` and `sfr?` are questions, not errors: a warm-up drill honestly has no court moment and
+no SFR. Answer them once and they stop mattering.
+
+**2. Fix what you can, by what kind of entry it is:**
+| | A **draft** entry | An **approved** entry (athletes see it) |
+|---|---|---|
+| **No entry at all** | Draft it now with `draft_sql.py` (the whole Run above, for one or a few names) | — |
+| **Empty field** (video, alias, equipment, loads, a rung, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
+| **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
+- **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
+- **Alias:** the programme's spelling goes on the entry (rule 4). Never rename the card.
+- **Rungs:** link only to ids that exist. A new exercise that is the next rung of an existing one
+  gets linked from both sides (`harder` on the old, `easier` on the new).
+- **What this programme taught us counts as "can be updated":** a better general cue Amir wrote
+  or approved while designing (design's `spine_cue:` lines), a new restriction flag the athlete's
+  picture showed was missing, an SFR order Amir overruled at the checkpoint. On a draft, apply
+  it. On an approved entry, propose it.
+- **Never approve, never move anything athlete-specific onto an entry.** Athlete detail is the
+  Coach's Note.
+- Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
+
+**3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
+`SPINE — added 2 drafts (names) · filled 5 gaps (what) · 3 proposals for you (entry: old → new) ·
+N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 
 ## Batch size and order
 

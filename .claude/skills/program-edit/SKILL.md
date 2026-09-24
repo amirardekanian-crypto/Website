@@ -248,6 +248,11 @@ After editing, re-tally the set counts to confirm the numbers match what was agr
 
 Report what changed, the updated set tally, and flag anything left for a future session.
 
+**Then run `/spine` → Upkeep** on this athlete's programme (Amir, 2026-09-24: every programme
+write leaves the Spine more complete). An exercise the edit brought in that has no entry gets
+drafted; empty fields get filled; a better general cue that came up is applied to a draft or
+proposed for an approved entry. One-line **SPINE** report at the end.
+
 **Then log the change.** Append a dated in-cycle note under an `## In-cycle edits — Cycle N`
 heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split
 Squat — R-knee pain on BSS*). This keeps the coaching log the complete running record (design
