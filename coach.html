@@ -37,6 +37,10 @@
     --court: #0E4A36; --court-deep: #0B3B2B; --court-100: rgba(14,74,54,0.08);
     --clay: #C7552F; --clay-100: rgba(199,85,47,0.10);
     --ochre: #A8741C; --ochre-100: rgba(168,116,28,0.12);
+    /* RPE UNDER target (2026-09-24). Same steel blue as program.html's --rpe-under,
+       so a set reads the same colour on the athlete's phone and here: clay over,
+       blue under. Used only for an RPE against its target. */
+    --rpe-under: #3E6A92; --rpe-under-100: rgba(62,106,146,0.12);
     --line: #E4DCCC; --rule: rgba(26,26,26,0.08);
     --muted: rgba(26,26,26,0.56); --muted-soft: rgba(26,26,26,0.42);
     --track: rgba(26,26,26,0.10);
@@ -499,6 +503,9 @@
   .fl.warn { background: var(--clay-100); color: var(--clay); }
   .fl.miss { background: var(--clay); color: #fff; }
   .fl.note { background: var(--ochre-100); color: var(--ochre); }
+  .fl.under { background: var(--rpe-under-100); color: var(--rpe-under); }
+  .did-rpe.under { color: var(--rpe-under); font-weight: 700; }
+  .rpe-set.over { color: var(--clay); font-weight: 700; } .rpe-set.under { color: var(--rpe-under); font-weight: 700; }
   @media (max-width: 820px) {
     .cmp-head { display: none; }
     .cmp-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 0; }
@@ -2566,6 +2573,7 @@ function compareExercise(pex, logged) {
   if (rpes.length) {
     c.rpeMean = Math.round((rpes.reduce((a, b) => a + b, 0) / rpes.length) * 10) / 10;
     c.rpePer = rpes.join(' · ');
+    c.rpeList = rpes;
   }
   const reps = sets.filter(s => s.reps != null).map(s => s.reps);
   if (reps.length) c.repsPer = reps.join(' · ');
@@ -2578,7 +2586,7 @@ function compareExercise(pex, logged) {
     c.flags.push({ tone: 'note', text: (c.doneSets - want) + ' extra set' + (c.doneSets - want === 1 ? '' : 's') });
   if (tgt && c.rpeMean != null && c.state !== 'skip') {
     if (c.rpeMean - tgt.hi >= RPE_OVER)       c.flags.push({ tone: 'warn', text: round1(c.rpeMean - tgt.hi) + ' over target RPE' });
-    else if (tgt.lo - c.rpeMean >= RPE_UNDER) c.flags.push({ tone: 'note', text: round1(tgt.lo - c.rpeMean) + ' under target RPE' });
+    else if (tgt.lo - c.rpeMean >= RPE_UNDER) c.flags.push({ tone: 'under', text: round1(tgt.lo - c.rpeMean) + ' under target RPE' });
   }
   // Short sets: the athlete typed fewer reps than prescribed.
   const plannedReps = parseInt(rx.reps, 10);
@@ -2656,11 +2664,17 @@ function cmpCell(c) {
   if (c.rpeMean != null) {
     const over = c.tgt && c.rpeMean - c.tgt.hi >= RPE_OVER;
     const under = c.tgt && c.tgt.lo - c.rpeMean >= RPE_UNDER;
-    bits.push(`<span class="did-rpe ${over ? 'warn' : under ? 'note' : 'ok'}">RPE ${esc(c.rpeMean)}</span>`);
+    bits.push(`<span class="did-rpe ${over ? 'warn' : under ? 'under' : 'ok'}">RPE ${esc(c.rpeMean)}</span>`);
   }
   const detail = [];
   if (c.repsPer) detail.push('reps: ' + esc(c.repsPer));
-  if (c.rpePer && c.allSets > 1) detail.push('per set: ' + esc(c.rpePer));
+  // Each set coloured against the target exactly as the athlete's app shows it:
+  // clay above the target (range), steel blue below, plain inside it. The mean
+  // above keeps its RPE_OVER/UNDER threshold; a single set is shown as it was.
+  if (c.rpePer && c.allSets > 1) detail.push('per set: ' + (c.rpeList || []).map(r => {
+    const k = !c.tgt ? '' : r > c.tgt.hi ? 'over' : r < c.tgt.lo ? 'under' : '';
+    return k ? `<b class="rpe-set ${k}">${esc(r)}</b>` : esc(r);
+  }).join(' · '));
   if (c.logged.rounds) detail.push(esc(c.logged.rounds));
   if (c.logged.gear) detail.push(esc(c.logged.gear));
   return bits.join('') + (detail.length ? `<div class="did-detail">${detail.join(' · ')}</div>` : '');
