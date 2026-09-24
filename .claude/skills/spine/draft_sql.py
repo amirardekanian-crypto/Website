@@ -30,6 +30,8 @@ PATTERNS = {'squat', 'hinge', 'single-leg', 'isolation', 'pull-vertical', 'pull-
             'anti-lateral-flexion', 'carry', 'rotation', 'throw', 'jump-land', 'conditioning',
             'mobility', 'sprint-cod'}  # must match SPINE_PATTERNS in coach.html
 FLAGS = {'loaded-knee-flexion', 'axial-load', 'free-hinge', 'overhead', 'high-impact'}
+# The Quality Map (stage32): must match QM_IDS in coach.html and public.qualities.
+QUALITIES = ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotation', 'engine', 'armour', 'movement']
 
 ids = {e['id'] for e in batch}
 known = ids | existing
@@ -44,6 +46,12 @@ for e in batch:
     if e.get('pattern') not in PATTERNS: problems.append(f'{i}: unknown pattern {e.get("pattern")!r}')
     for f in e.get('flags', []):
         if f not in FLAGS: problems.append(f'{i}: new flag {f!r} (add it to FLAGS here and to coach.html only if Amir agreed)')
+    qs = e.get('qualities', [])
+    if not qs: problems.append(f'{i}: no qualities (first = primary, up to 3)')
+    if len(qs) > 3: problems.append(f'{i}: {len(qs)} qualities, keep it to 3 so a day does not build everything')
+    if len(set(qs)) != len(qs): problems.append(f'{i}: a quality is listed twice')
+    for x in qs:
+        if x not in QUALITIES: problems.append(f'{i}: unknown quality {x!r}')
     for k in ('easier', 'harder', 'alts'):
         for x in e.get(k, []):
             if x not in known: problems.append(f'{i}.{k} -> {x} (no such id)')
@@ -60,12 +68,12 @@ for e in batch:
     nvid += vid is not None
     rows.append('(' + ','.join([q(e['id']), q(e['name']), arr(e.get('aliases')), q(e['pattern']),
         q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')),
-        arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), q(vid),
+        arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
         # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
         (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null', "'draft'", "'claude-draft'"]) + ')')
     crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))})")
 
-print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,easier,harder,alts,video,cues,status,updated_by) values')
+print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,easier,harder,alts,qualities,video,cues,status,updated_by) values')
 print(',\n'.join(rows) + '\non conflict (id) do nothing;')
 print('insert into public.exercise_coach (id,sfr,flags) values')
 print(',\n'.join(crow) + '\non conflict (id) do nothing;')

@@ -369,6 +369,31 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   (`renderExerciseLibrary()` → `openExerciseSheet(id, card, true)`); opened from the library, or with
   no card on screen, the sheet also carries the video and cues. One design, not two.
 
+### 🗺️ The Quality Map — what each day builds (2026-09-24)
+
+Idea #2 of `/ideas` round 1 (brief: claude.ai/artifact/US2RW8TaHZbFk8voADq6fu). Amir: *"it should be
+on the day cards, in their home. both for tennis players, and other clients. the rest can be where
+you recommend."* Server: `supabase/stage32_qualities.sql`.
+- **Ten qualities** in `public.qualities`, plain word + the cycle-picture family it matches:
+  Strength (iron) · Muscle (build) · Power (voltage) · Spring · Speed · Brakes · Rotation · Engine ·
+  Armour · Movement (bedrock). Each has one line for everyone, a court line shown **only** when
+  `sport.badge` says tennis or padel (`isRacketSport()`), and its tests. `get_qualities()` serves
+  **approved rows only**; Amir approves them in coach.html → Exercises → *The ten qualities*.
+- **Tagged once, on the Spine entry** (`exercises.qualities`, first = primary, max three). Never on
+  a programme. Claude drafts tags on drafts only; for an entry Amir already approved the suggestion
+  sits in `exercise_coach.suggested_qualities` and pre-fills his editor.
+- **The day card on Home shows up to three chips** (`paintDayQualities()` → `qualityMix(day)`):
+  working sets × (primary 1, secondary ½), **prep blocks skipped** (`isPrepBlockTitle()`), and
+  **nothing at all below 70% tagged coverage**, rather than a wrong mix. Tapping a chip opens the
+  quality page (`openQualitySheet()`: line, court line, *In your plan*, how we measure it); the About
+  sheet's quality chips open it too. **Words only: athletes never see set counts.**
+- ⚠ **The mix rule exists three times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html)
+  and the quality check in `/program-design`. Same weights, same prep test, or the coach's check and
+  the athlete's card disagree.
+- **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). coach.html → Exercises →
+  *Quality check* flags every current programme whose headline is not in its week's top two.
+- `qualcache` (localStorage, no prefix) caches `get_qualities()` and never syncs.
+
 ### 🎯 Because — why THIS athlete has this exercise (2026-09-24)
 
 Idea #4 of `/ideas` round 1 (brief: claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw; Amir: *"go"*, on the

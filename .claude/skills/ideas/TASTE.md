@@ -5,6 +5,12 @@ Newest at the top. One entry per reaction; never rewrite an old one — add a ne
 
 ## Liked
 
+- **2026-09-24 · #2 The Quality Map.** *"it should be on the day cards, in their home. both for tennis
+  players, and other clients. the rest can be where you recommend."* He moved it off the session
+  screen onto the **Home day cards**: what a day builds belongs where the athlete picks the day,
+  not after they've started it. And **not tennis-only**: a feature built on tennis language must
+  still work for his fitness, physique and running clients (14 of 33).
+
 - **2026-09-24 · One map for every idea.** *"if you have came up with a new idea along the way, this
   should be added to the coaching graph."* He reads the ideas as one connected map, not as a trail
   of separate briefs. So grown ideas (History Sheet, Rungs, Who Has This, Not Yet) and build status

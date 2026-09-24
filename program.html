@@ -2573,6 +2573,22 @@
   .sp-where small { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--grey-text); }
   body[data-dark] .sp-where { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
 
+
+  /* ── The Quality Map (2026-09-24) — see qualityMix() / paintDayQualities() ──
+     What a day builds, on the day card itself (Amir: "it should be on the day
+     cards, in their home"). Words only, strongest first, the first one filled. */
+  .dq-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .dq-row:empty { display: none; }
+  .dq-chip {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.6px;
+    text-transform: uppercase; line-height: 1; padding: 6px 9px; border-radius: 999px; cursor: pointer;
+    color: #fff; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.35);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  }
+  .dq-chip.main { background: #fff; color: #0E4A36; border-color: #fff; }
+  .dq-chip:focus-visible { outline: 2px solid #E06B43; outline-offset: 2px; }
+  .sp-q { border: 0; cursor: pointer; font: inherit; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.3px; }
+
   /* ── Because (2026-09-24) — see whyOf() / whyBlock() / openWhyPlan() ──
      The card gains nothing but a clay dot on the ⓘ; the reason itself lives in
      the About sheet and on the cycle's Why page. */
@@ -4543,6 +4559,8 @@ function _snapshot() {
     if (k === prefix + 'histcache') continue;
     // The Spine's offline copy: a cache of get_exercises(), never progress.
     if (k === 'spinecache' || k === prefix + 'spinecache') continue;
+    // The Quality Map's offline copy of get_qualities(): a cache too.
+    if (k === 'qualcache' || k === prefix + 'qualcache') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -5184,6 +5202,7 @@ function getVideoUrl(ex) {
 
   // The Spine's offline copy has to be in memory BEFORE the cards are drawn.
   loadSpineCache();
+  loadQualCache();
 
   renderPlan();
   renderHome();
@@ -5195,7 +5214,9 @@ function getVideoUrl(ex) {
   loadHistory();
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
+  paintDayQualities();
   refreshSpine();
+  refreshQualities();
   isLoading = false;
   markSuggestedDay();
   // restoreState() ran updateProgress() while isLoading was still true, which
@@ -5828,6 +5849,9 @@ function dayCardHTML(day, dayNum, total, opts) {
   h += `<div class="cm-name day-card-num">Day ${dayNum}</div>`;
   h += `<div class="day-card-name">${esc(name)}</div>`;
   h += `<div class="cm-weeks">${esc(sub)}</div>`;
+  // The Quality Map: what this day builds. Filled by paintDayQualities() once the
+  // Spine and the approved qualities are in memory; empty (and invisible) until then.
+  h += `<div class="dq-row" data-dq="${idStr}"></div>`;
   h += `</div></div></div>`;
   return h;
 }
@@ -5853,6 +5877,7 @@ function openDayView(dayId) {
       `<button class="day-view-back" onclick="closeDayView()" aria-label="Back to overview">←</button>` +
       `<button class="day-view-dark" onclick="toggleDark(event)" aria-label="Toggle dark mode">${window.ICON('moon', 1.6)}</button>` +
       dayCardHTML(days[i], i + 1, days.length, { static: true });
+    paintDayQualities();
   }
 
   // switchDay() compares against the raw day ids (numbers in the JSON) with ===,
@@ -7044,6 +7069,8 @@ const APP_GUIDE = [
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>A small <strong>i</strong> after an exercise's name opens everything about it: what it does, where it shows up on court, and <strong>its ladder</strong>, the easier and harder versions of the same movement.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>On the ladder, a ✓ marks a rung you've already trained, and the dashed one is the next rung up. Tap any rung to read about it. Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and yours at the top. Moving up a rung is my call, made when I write your next cycle, so use it to see where you're heading, not to swap exercises mid-session.</p>` },
+  { icon: 'compass', title: 'What each day builds',
+    body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means, every exercise in your plan that trains it, and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'The Ceiling — the most you could lift once',
@@ -11691,6 +11718,7 @@ async function refreshSpine() {
     try { _lsRawSet('spinecache', JSON.stringify(res.data)); } catch (e) { /* storage full */ }
     setSpine(res.data);
     paintSpine();
+    paintDayQualities();
     paintExerciseCount();
     if (_libPane === 'exercises') renderExerciseLibrary();
   } catch (e) { /* offline: the cached copy stays */ }
@@ -11897,7 +11925,9 @@ function openExerciseSheet(id, card, fromLib) {
     ${why && e.purpose ? `<div class="sp-lbl" style="margin-top:14px">What it does</div>` : ''}
     ${e.purpose ? `<p class="sp-purpose">${esc(e.purpose)}</p>` : ''}
     <div class="sp-chips">${e.pattern ? `<span class="sp-chip">${esc(SPINE_PATTERN[e.pattern] || e.pattern)}</span>` : ''}${
-      (e.qualities || []).map(q => `<span class="sp-chip">${esc(q)}</span>`).join('')}</div>
+      // Qualities only once their text is approved; each opens its Quality Map page.
+      (e.qualities || []).filter(q => QUALS_BY_ID[q]).map(q =>
+        `<button type="button" class="sp-chip sp-q" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('')}</div>
     ${e.tennis ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
     ${full && e.video ? `<div class="sp-sec">${renderVideoBlock(e.video)}</div>` : ''}
     ${full && e.cues ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : ''}
@@ -11908,6 +11938,10 @@ function openExerciseSheet(id, card, fromLib) {
       ${histBtn}
       <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
     </div>`;
+  ov.querySelectorAll('.sp-q[data-q]').forEach(b => b.addEventListener('click', () => {
+    openQualitySheet(b.dataset.q);
+    ov.querySelector('.readiness-modal').scrollTop = 0;
+  }));
   ov.querySelectorAll('.sp-rung[data-id], .sp-alt[data-id]').forEach(b => b.addEventListener('click', () => {
     const other = b.dataset.id;
     // Walking the ladder: the card only comes along if that rung is on today's page.
@@ -11969,6 +12003,129 @@ function openWhyPlan() {
   ov.classList.add('visible');
 }
 window.openWhyPlan = openWhyPlan;
+
+// ── The Quality Map (2026-09-24) ────────────────────────────────────────────
+// Idea #2 of /ideas round 1 (brief: claude.ai/artifact/US2RW8TaHZbFk8voADq6fu).
+// Ten qualities (Strength, Brakes …) live in public.qualities and reach the phone
+// through get_qualities() — APPROVED ONLY. Each Spine entry carries up to three in
+// `qualities`, the first being its primary. A day's mix is worked out here from
+// the exercises in it; nothing is tagged on a programme. Amir's calls: shown on
+// the DAY CARDS on Home for every athlete; words only, never set counts.
+let QUALS = null, QUALS_BY_ID = {};
+function setQualities(list) {
+  QUALS = Array.isArray(list) ? list.slice().sort((a, b) => (a.sort || 0) - (b.sort || 0)) : null;
+  QUALS_BY_ID = {};
+  (QUALS || []).forEach(q => { QUALS_BY_ID[q.id] = q; });
+}
+function loadQualCache() {
+  try { const c = JSON.parse(localStorage.getItem('qualcache') || 'null'); if (Array.isArray(c)) setQualities(c); }
+  catch (e) { /* no copy yet */ }
+}
+async function refreshQualities() {
+  try {
+    const sb = await _sbReady();
+    if (!sb) return;
+    const res = await _withTimeout(sb.rpc('get_qualities'), 8000);
+    if (!res || res.error || !Array.isArray(res.data)) return;
+    // A cache, never synced (no athlete prefix, _lsRawSet so it stamps nothing).
+    try { _lsRawSet('qualcache', JSON.stringify(res.data)); } catch (e) { /* storage full */ }
+    setQualities(res.data);
+    paintDayQualities();
+  } catch (e) { /* offline: the cached copy stays */ }
+}
+function isRacketSport() {
+  return /tennis|padel/i.test(String((DATA && DATA.sport && DATA.sport.badge) || ''));
+}
+// What one day builds: working sets × (primary 1, secondary ½), prep blocks
+// skipped. Returns [] unless ~70% of the day's working sets resolve to a tagged,
+// approved entry: a half-tagged day would show a wrong mix, so it shows none.
+const QM_COVERAGE = 0.7;
+function qualityMix(day) {
+  if (!SPINE || !QUALS || !QUALS.length || !day) return [];
+  const score = {};
+  let total = 0, covered = 0;
+  const add = (name, exId, sets) => {
+    total += sets;
+    const e = spineFor(name, exId);
+    const qs = (e && e.qualities || []).filter(q => QUALS_BY_ID[q]);
+    if (!qs.length) return;
+    covered += sets;
+    qs.forEach((q, i) => { score[q] = (score[q] || 0) + sets * (i === 0 ? 1 : 0.5); });
+  };
+  (day.blocks || []).forEach(b => {
+    if (isPrepBlockTitle(b.title)) return;
+    (b.exercises || []).forEach(ex => {
+      if (ex.type === 'circuit') {
+        const rounds = parseInt(rxOf(ex).rounds || ex.rounds, 10) || 1;
+        (ex.items || []).forEach(it => add(it.name, it.exId, rounds));
+      } else {
+        add(ex.name, ex.exId, parseInt(rxOf(ex).sets, 10) || 1);
+      }
+    });
+  });
+  if (!total || covered / total < QM_COVERAGE) return [];
+  const sum = Object.values(score).reduce((a, b) => a + b, 0);
+  return Object.keys(score)
+    .filter(q => score[q] >= Math.max(1.5, sum * 0.12))
+    .sort((a, b) => score[b] - score[a] || (QUALS_BY_ID[a].sort - QUALS_BY_ID[b].sort))
+    .slice(0, 3);
+}
+function paintDayQualities() {
+  const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
+  document.querySelectorAll('.dq-row[data-dq]').forEach(row => {
+    const day = days.find(d => String(d.id) === row.dataset.dq);
+    const mix = qualityMix(day);
+    row.innerHTML = mix.map((q, i) =>
+      `<button type="button" class="dq-chip${i === 0 ? ' main' : ''}" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('');
+    row.querySelectorAll('.dq-chip').forEach(b => b.addEventListener('click', ev => {
+      ev.stopPropagation();   // the card itself opens the day
+      openQualitySheet(b.dataset.q);
+    }));
+  });
+}
+// Where a quality is trained in the athlete's current programme, primary first.
+function qualityUses(qid) {
+  const out = {};
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b => {
+    if (isPrepBlockTitle(b.title)) return;
+    (b.exercises || []).forEach(ex => {
+      const list = ex.type === 'circuit' ? (ex.items || []) : [ex];
+      list.forEach(it => {
+        const e = spineFor(it.name, it.exId);
+        const i = e ? (e.qualities || []).indexOf(qid) : -1;
+        if (i < 0) return;
+        const o = out[e.id] || (out[e.id] = { entry: e, days: [], primary: false });
+        if (out[e.id].days.indexOf(d.id) < 0) o.days.push(d.id);
+        if (i === 0) o.primary = true;
+      });
+    });
+  }));
+  return Object.values(out).sort((a, b) => (b.primary - a.primary) || (a.days[0] - b.days[0]));
+}
+function openQualitySheet(qid) {
+  const q = QUALS_BY_ID[qid];
+  const ov = document.getElementById('hist-overlay');
+  if (!q || !ov) return;
+  const uses = qualityUses(qid);
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">What you're building</div>
+    <h2 class="readiness-title">${esc(q.name)}</h2>
+    <p class="sp-purpose">${esc(q.line)}</p>
+    ${q.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(q.tennis)}</p></div>` : ''}
+    ${uses.length ? `<div class="sp-sec"><div class="sp-lbl">In your plan</div>${
+      uses.map(u => `<button type="button" class="wp-row qm-use" data-id="${esc(u.entry.id)}"><b>${esc(u.entry.name)}<small>Day ${
+        esc(u.days.join(' · '))}</small></b></button>`).join('')}</div>` : ''}
+    ${(q.tests || []).length ? `<div class="sp-sec"><div class="sp-lbl">How we measure it</div><p class="sp-court">${esc(q.tests.join(' · '))}</p></div>` : ''}
+    <div class="hs-actions">
+      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
+    </div>`;
+  ov.querySelectorAll('.qm-use').forEach(b => b.addEventListener('click', () => {
+    openExerciseSheet(b.dataset.id, xlCardFor(b.dataset.id));
+    ov.querySelector('.readiness-modal').scrollTop = 0;
+  }));
+  ov.classList.add('visible');
+}
+window.openQualitySheet = openQualitySheet;
 
 // ── The Exercises library (2026-09-24) ─────────────────────────────────────
 // The third door in Library (Amir: "something like the one i have in tps course").

@@ -4255,6 +4255,12 @@ const SPINE_PATTERNS = ['squat','hinge','single-leg','push-horizontal','push-ver
   'carry','anti-extension','anti-rotation','anti-lateral-flexion','rotation','jump-land','throw','sprint-cod',
   'mobility','isolation','conditioning'];
 const SPINE_FLAGS = ['loaded-knee-flexion','axial-load','free-hinge','high-impact','overhead'];
+// The Quality Map (2026-09-24): the ten ids, and which cycle-picture family
+// word names each one. A cycle's headline quality is read from its `art` word.
+const QM_IDS = ['strength','muscle','power','spring','speed','brakes','rotation','engine','armour','movement'];
+const QM_ART = { iron: 'strength', build: 'muscle', voltage: 'power', spring: 'spring', brakes: 'brakes',
+  engine: 'engine', armour: 'armour', bedrock: 'movement' };
+const QM_PREP = /warm|mobility|activation|cool|prime|prep/i;   // same test as program.html isPrepBlockTitle()
 let _spineOpen = null;      // id of the entry whose editor is open
 let _spineFilter = 'draft';
 
@@ -4266,17 +4272,19 @@ async function loadSpine() {
       mk('goblet-squat', 'Goblet Squat', 'squat', 'draft', { harder: ['machine-leg-press'] }),
       mk('machine-leg-press', 'Machine Leg Press', 'squat', 'approved', { easier: ['goblet-squat'] }),
       mk('dead-bug', 'Dead Bug', 'anti-extension', 'draft'),
-    ], coach: { 'machine-leg-press': { id: 'machine-leg-press', sfr: 1, flags: ['loaded-knee-flexion'] } } };
+    ], coach: { 'machine-leg-press': { id: 'machine-leg-press', sfr: 1, flags: ['loaded-knee-flexion'], suggested_qualities: ['strength', 'muscle'] } },
+      quals: QM_IDS.map((id, i) => ({ id, name: id[0].toUpperCase() + id.slice(1), family: null, line: 'Sample line.', tennis: '', tests: [], sort: i + 1, status: i < 3 ? 'approved' : 'draft' })) };
     return;
   }
-  const [a, b] = await Promise.all([
+  const [a, b, q] = await Promise.all([
     sb.from('exercises').select('*').order('name'),
     sb.from('exercise_coach').select('*'),
+    sb.from('qualities').select('*').order('sort'),
   ]);
   if (a.error) toast('Could not load exercises: ' + a.error.message);
   const coach = {};
   (b.data || []).forEach(r => { coach[r.id] = r; });
-  S.spine = { list: a.data || [], coach };
+  S.spine = { list: a.data || [], coach, quals: q.data || [] };
 }
 function spineIndexC(list) {
   const idx = [{}, {}, {}, {}];
@@ -4330,6 +4338,8 @@ async function spineSave(id, approve) {
     cues: (good.length || badCues.length) ? { good, bad: badCues } : null,
     equipment: spineCsv(f('equipment')), loads: spineCsv(f('loads')),
     easier: links.easier, harder: links.harder, alts: links.alts, video: f('video').trim() || null,
+    // First = primary. Blank slots drop out; a repeat keeps its first position.
+    qualities: [f('q1'), f('q2'), f('q3')].filter((x, i, a) => x && a.indexOf(x) === i),
     status: approve === true ? 'approved' : approve === false ? 'draft' : (cur.status || 'draft'),
     updated_at: new Date().toISOString(), updated_by: 'coach',
   };
@@ -4342,6 +4352,79 @@ async function spineSave(id, approve) {
   toast(row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : 'Saved as draft');
   if (approve === true) _spineOpen = null;
   await loadSpine(); renderExercises();
+}
+
+// ── The Quality Map (2026-09-24) — the ten texts, and the check across athletes ──
+async function qualSave(id, approve) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const c = $('content');
+  const f = n => ((c.querySelector(`[data-qf="${id}:${n}"]`) || {}).value || '').trim();
+  const cur = (S.spine.quals || []).find(q => q.id === id) || {};
+  const row = { id, name: f('name') || cur.name, line: f('line') || cur.line, tennis: f('tennis') || null,
+    tests: f('tests').split(',').map(x => x.trim()).filter(Boolean), family: cur.family || null, sort: cur.sort || 0,
+    status: approve === true ? 'approved' : approve === false ? 'draft' : (cur.status || 'draft'),
+    updated_at: new Date().toISOString(), updated_by: 'coach' };
+  const r = await sb.from('qualities').upsert(row, { onConflict: 'id' });
+  if (r.error) { alert('Could not save: ' + r.error.message); return; }
+  toast(row.status === 'approved' ? 'Approved — it shows on day cards once exercises carry it' : 'Saved as draft');
+  await loadSpine(); renderExercises();
+}
+// One programme's current week: working sets per quality (primary 1, secondary
+// half, prep blocks skipped — program.html's qualityMix() rule, drafts included
+// here because this is the coach's view), plus the cycle's headline from `art`.
+function qualityCheckC(data, idx, byId) {
+  const score = {}; let total = 0, covered = 0;
+  const add = (name, exId, sets) => {
+    total += sets;
+    const id = spineForC(idx, name, exId, byId);
+    const qs = id ? (byId[id].qualities || []) : [];
+    if (!qs.length) return;
+    covered += sets;
+    qs.forEach((q, i) => { score[q] = (score[q] || 0) + sets * (i === 0 ? 1 : 0.5); });
+  };
+  ((data.workouts && data.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b => {
+    if (QM_PREP.test(b.title || '')) return;
+    (b.exercises || []).forEach(ex => {
+      if (ex.type === 'circuit') {
+        const r = parseInt(Chips.rxOf(ex).rounds || ex.rounds, 10) || 1;
+        (ex.items || []).forEach(it => add(it.name, it.exId, r));
+      } else add(ex.name, ex.exId, parseInt(Chips.rxOf(ex).sets, 10) || 1);
+    });
+  }));
+  const cyc = (data.cycles || [])[Number.isInteger(data.currentCycleIndex) ? data.currentCycleIndex : 0] || {};
+  const head = QM_ART[String(cyc.art || '').toLowerCase()] || null;
+  const ranked = Object.keys(score).sort((a, b) => score[b] - score[a]);
+  return { score, ranked, head, art: cyc.art || '', cycle: cyc.name || '', coverage: total ? covered / total : 0,
+    flag: !!(head && ranked.length && ranked.slice(0, 2).indexOf(head) < 0) };
+}
+function qualityPanels(idx, byId) {
+  const quals = S.spine.quals || [];
+  const field = 'width:100%;font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;box-sizing:border-box';
+  const nAp = quals.filter(q => q.status === 'approved').length;
+  let h = `<section class="panel" style="margin-bottom:16px"><details${nAp < quals.length ? ' open' : ''}><summary class="arch-toggle">The ten qualities · ${nAp} of ${quals.length} approved</summary>
+    <p class="psub" style="margin:10px 0">What each day card on Home says it builds. A quality reaches a phone only when it is approved <b>and</b> the day's exercises carry it. Athletes see the words, never your numbers. The court line shows to tennis and padel players only.</p>` +
+    quals.map(q => `<div class="credrow" style="display:block;padding:10px 0">
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start">
+        <div><input data-qf="${q.id}:name" value="${esc(q.name)}" style="${field};font-weight:700"><div class="muted" style="font-size:12px;margin-top:4px">${esc(q.family || 'no picture')} · ${q.status === 'approved' ? '<b style="color:#1E7A55">approved</b>' : 'draft'}</div></div>
+        <div style="display:grid;gap:6px">
+          <input data-qf="${q.id}:line" value="${esc(q.line || '')}" placeholder="One line, for everyone" style="${field}">
+          <input data-qf="${q.id}:tennis" value="${esc(q.tennis || '')}" placeholder="On court (tennis and padel only)" style="${field}">
+          <input data-qf="${q.id}:tests" value="${esc((q.tests || []).join(', '))}" placeholder="How we measure it (comma)" style="${field}">
+          <div style="display:flex;gap:8px">${q.status === 'draft'
+            ? `<button class="btn primary sm qm-save" data-q="${q.id}" data-ap="1">Approve</button><button class="btn sm qm-save" data-q="${q.id}">Save draft</button>`
+            : `<button class="btn primary sm qm-save" data-q="${q.id}">Save</button><button class="btn sm qm-save" data-q="${q.id}" data-ap="0">Move back to draft</button>`}</div>
+        </div></div></div>`).join('') + `</details></section>`;
+  const rows = Object.entries(S.programs || {}).filter(([k, v]) => v && k !== 'demo' && v.workouts)
+    .map(([aid, data]) => Object.assign({ aid }, qualityCheckC(data, idx, byId)))
+    .sort((a, b) => (b.flag - a.flag) || a.coverage - b.coverage);
+  const nFlag = rows.filter(r => r.flag).length;
+  h += `<section class="panel" style="margin-bottom:16px"><details${nFlag ? ' open' : ''}><summary class="arch-toggle">Quality check · ${nFlag} block${nFlag === 1 ? '' : 's'} not training their headline</summary>
+    <p class="psub" style="margin:10px 0">Working sets per week by quality, from each current programme. The headline is the cycle's picture word; a flag means it is not in the top two. Coverage is how much of the week is tagged. Below 70% the athlete's day card shows nothing.</p>` +
+    rows.map(r => `<div class="credrow"><span class="credname">${esc(nameOf(r.aid))} <span class="muted">· ${esc(r.cycle)}${r.art ? ' · ' + esc(r.art) : ''}</span></span>
+      <span class="muted">${r.ranked.slice(0, 4).map(q => `${esc(q)} ${Math.round(r.score[q] * 10) / 10}`).join(' · ') || 'nothing tagged'}${
+        r.flag ? ` · <b style="color:var(--clay)">headline ${esc(r.head)} is ${r.ranked.indexOf(r.head) < 0 ? 'missing' : '#' + (r.ranked.indexOf(r.head) + 1)}</b>` : ''}</span>
+      <span class="muted">${Math.round(r.coverage * 100)}% tagged</span></div>`).join('') + `</details></section>`;
+  return h;
 }
 
 function renderExercises() {
@@ -4385,6 +4468,15 @@ function renderExercises() {
         <div>${lbl('Pattern')}<select data-sf="pattern" style="${field}"><option value=""></option>${SPINE_PATTERNS.map(p => `<option${p === e.pattern ? ' selected' : ''}>${p}</option>`).join('')}</select></div>
         <div>${lbl('Video')}<input data-sf="video" value="${esc(e.video || '')}" style="${field}"></div>
       </div>
+      ${(() => {
+        const sug = !(e.qualities || []).length && (k.suggested_qualities || []).length;
+        const cur = (e.qualities || []).length ? e.qualities : (k.suggested_qualities || []);
+        const qname = id => ((S.spine.quals || []).find(q => q.id === id) || {}).name || id;
+        const sel = (n, v) => `<select data-sf="q${n}" style="${field}"><option value="">${n === 1 ? '— primary —' : '—'}</option>${
+          QM_IDS.map(id => `<option value="${id}"${id === v ? ' selected' : ''}>${esc(qname(id))}</option>`).join('')}</select>`;
+        return lbl('Qualities · first is the primary' + (sug ? ' · <b style="color:var(--clay)">Claude’s suggestion, saved when you save</b>' : '')) +
+          `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${sel(1, cur[0])}${sel(2, cur[1])}${sel(3, cur[2])}</div>`;
+      })()}
       ${lbl('Why it’s here (the athlete reads this)')}<textarea data-sf="purpose" rows="2" style="${field}">${esc(e.purpose || '')}</textarea>
       ${lbl('On court')}<input data-sf="tennis" value="${esc(e.tennis || '')}" style="${field}">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
@@ -4413,7 +4505,7 @@ function renderExercises() {
   };
   const row = e => `<div class="credrow" style="cursor:pointer" data-open="${esc(e.id)}">
       <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}</span></span>
-      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}</span>
+      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay)">no qualities</b>'}</span>
       <span class="acts"><button class="btn sm" data-open="${esc(e.id)}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
     </div>` + (_spineOpen === e.id ? editor(e) : '');
 
@@ -4421,6 +4513,7 @@ function renderExercises() {
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} names · ${pct}% of exercise slots</span></div>
     <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--clay)"></div></div>
     <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} drafts waiting for you. Counted across ${Object.entries(S.programs || {}).filter(([k, v]) => v && k !== 'demo').length} live programmes.</p></section>`;
+  html += qualityPanels(idx, byId);
   html += `<section class="panel"><div class="phead"><span class="t hd">${_spineFilter === 'approved' ? 'Approved' : 'Waiting for you'}</span>
     <span class="r"><button class="btn sm sp-filter" data-f="draft"${_spineFilter === 'draft' ? ' disabled' : ''}>Drafts · ${drafts.length}</button> <button class="btn sm sp-filter" data-f="approved"${_spineFilter === 'approved' ? ' disabled' : ''}>Approved · ${approved.length}</button></span></div>` +
     (shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
@@ -4437,6 +4530,10 @@ function renderExercises() {
   }));
   c.querySelectorAll('.sp-filter').forEach(el => el.addEventListener('click', () => { _spineFilter = el.dataset.f; _spineOpen = null; renderExercises(); }));
   c.querySelectorAll('.sp-close').forEach(el => el.addEventListener('click', () => { _spineOpen = null; renderExercises(); }));
+  c.querySelectorAll('.qm-save').forEach(el => el.addEventListener('click', () => {
+    el.disabled = true;
+    qualSave(el.dataset.q, el.dataset.ap === '1' ? true : el.dataset.ap === '0' ? false : undefined).finally(() => { el.disabled = false; });
+  }));
   c.querySelectorAll('.sp-save').forEach(el => el.addEventListener('click', () => {
     el.disabled = true;
     spineSave(el.dataset.id, el.dataset.ap === '1' ? true : el.dataset.ap === '0' ? false : undefined).finally(() => { el.disabled = false; });
