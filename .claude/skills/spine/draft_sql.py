@@ -4,7 +4,7 @@
 #
 # batch.json: a list of objects, one per exercise:
 #   { "id": "goblet-squat", "name": "Goblet Squat", "aliases": [], "pattern": "squat",
-#     "purpose": "...", "tennis": "...", "equipment": [...], "loads": [...],
+#     "purpose": "...", "tennis": "...", "equipment": [...], "loads": [...regions], "impact": "none",
 #     "easier": [...ids or names], "harder": [...ids or names], "alts": [...ids or names],
 #     "sfr": 3, "flags": ["loaded-knee-flexion"],
 #     "cues": {"good": [ext, int], "bad": [avoid]} }   (optional; written for anyone)
@@ -32,6 +32,11 @@ PATTERNS = {'squat', 'hinge', 'single-leg', 'isolation', 'pull-vertical', 'pull-
 FLAGS = {'loaded-knee-flexion', 'axial-load', 'free-hinge', 'overhead', 'high-impact'}
 # The Quality Map (stage32): must match QM_IDS in coach.html and public.qualities.
 QUALITIES = ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotation', 'engine', 'armour', 'movement']
+# Body parts involved (stage36): the course app's region and impact ids. Must match SPINE_REGION /
+# SPINE_IMPACT in program.html, SPINE_REGIONS / SPINE_IMPACTS in coach.html and the stage36 checks.
+REGIONS = {'ankle-foot', 'calf-achilles', 'knee', 'hip-groin', 'hamstring', 'low-back', 'trunk',
+           'shoulder', 'elbow-forearm-wrist', 'neck'}
+IMPACTS = {'none', 'running', 'plyometric', 'landing'}
 
 ids = {e['id'] for e in batch}
 known = ids | existing
@@ -52,6 +57,10 @@ for e in batch:
     if len(set(qs)) != len(qs): problems.append(f'{i}: a quality is listed twice')
     for x in qs:
         if x not in QUALITIES: problems.append(f'{i}: unknown quality {x!r}')
+    if not e.get('loads'): problems.append(f'{i}: no loads (the body parts involved, 1 to 4 of REGIONS)')
+    for r in e.get('loads', []):
+        if r not in REGIONS: problems.append(f'{i}: unknown body part {r!r} (one of {sorted(REGIONS)})')
+    if e.get('impact') not in IMPACTS: problems.append(f'{i}: impact must be one of {sorted(IMPACTS)}')
     for k in ('easier', 'harder', 'alts'):
         for x in e.get(k, []):
             # An id must exist; anything not shaped like an id is a plain NAME for an
@@ -69,13 +78,13 @@ for e in batch:
     vid = next((libn[k] for k in (re.sub(r'\s+', ' ', x.lower()).strip() for x in [e['name']] + e.get('aliases', [])) if k in libn), None)
     nvid += vid is not None
     rows.append('(' + ','.join([q(e['id']), q(e['name']), arr(e.get('aliases')), q(e['pattern']),
-        q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')),
+        q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')), q(e.get('impact')),
         arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
         # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
         (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null', "'draft'", "'claude-draft'"]) + ')')
     crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))})")
 
-print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,easier,harder,alts,qualities,video,cues,status,updated_by) values')
+print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,impact,easier,harder,alts,qualities,video,cues,status,updated_by) values')
 print(',\n'.join(rows) + '\non conflict (id) do nothing;')
 print('insert into public.exercise_coach (id,sfr,flags) values')
 print(',\n'.join(crow) + '\non conflict (id) do nothing;')

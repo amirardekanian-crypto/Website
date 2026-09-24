@@ -415,7 +415,8 @@ Amir, 2026-09-24: *"when i write or update a program, and there are movements th
 or missing some info, or can be updated, it should be updated there at the end … so everytime i
 write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this
 athlete's programme: draft every exercise with no entry, fill every empty field (video, alias,
-equipment, loads, regressions/progressions/alternatives, SFR, flags, **qualities**), stamp `exId` on every card that resolves,
+equipment, regressions/progressions/alternatives, SFR, flags, **qualities**, **body parts**: `loads` +
+`impact`, which the athlete sees as *Body parts involved*), stamp `exId` on every card that resolves,
 link a new exercise to its regressions, progressions and alternatives from both sides, apply design's `spine_cue:` lines to drafts
 and propose them for approved entries, and put the one-line **SPINE** report in the handoff brief.
 Never approve an entry, and never put anything about this athlete on one.

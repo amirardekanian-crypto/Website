@@ -59,7 +59,8 @@ done when the program is done"*). Whether it is `/program-assemble` (a new cycle
 (a change) or `/workout` (a library session), the run is not finished until:
 1. **Spine upkeep** (`/spine` → Upkeep): every exercise has an entry; empty fields filled; aliases
    added for new spellings; `exId` stamped on every card; a new exercise linked to its
-   regressions, progressions and alternatives from both sides; general cues from the design pass applied to drafts, proposed for approved.
+   regressions, progressions and alternatives from both sides; **body parts** (`loads` + `impact`)
+   filled on any entry that lacks them; general cues from the design pass applied to drafts, proposed for approved.
 2. **Qualities**: every exercise tagged (drafts directly, approved entries as
    `suggested_qualities` for Amir to accept), so no day card goes blank.
 3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
@@ -386,6 +387,17 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   merged entry's whole row, are in `exercise_coach.links_history`. ⚠ **Two entries may never
   share a name or alias**: the resolver wants ONE entry per tier, so a shared name resolves to
   nothing and both cards lose their cues. A duplicate becomes an alias and its entry is deleted.
+- **Body parts involved** (Amir, 2026-09-24, from the course app's «بخش‌هایی از بدن که درگیر است»;
+  `supabase/stage36_body_parts.sql`). `loads` = the course's region ids (`ankle-foot · calf-achilles ·
+  knee · hip-groin · hamstring · low-back · trunk · shoulder · elbow-forearm-wrist`, plus `neck`),
+  `impact` = `none · running · plyometric · landing` (shown as No impact, Running, Jumping, Landing).
+  The About sheet draws them as *Body parts involved* (`bodyPartsHtml()`), regions as soft pills and
+  impact in clay; coach.html edits them as tick boxes and a menu; the database refuses any other
+  word. The 100 most-used entries were set by hand, 35 copied exactly from the course where it has
+  the same exercise. ⚠ **`impact` null means never checked**: the other 109 carry the old loose words
+  renamed, and **every programme write fills both** through `/spine` → Upkeep, which flags them.
+  The region and impact lists exist FOUR times (program.html `SPINE_REGION`/`SPINE_IMPACT`,
+  coach.html `SPINE_REGIONS`/`SPINE_IMPACTS`, `draft_sql.py`, the stage36 checks): change all four.
 - **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
   *"the aim is to use these cues for all the exercises that everyone has from now on … if there is
   a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline

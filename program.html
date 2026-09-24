@@ -2542,6 +2542,14 @@
   .sp-court { font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--grey-dark); margin: 0; }
   body[data-dark] .sp-court { color: #ddd; }
   .sp-alts { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* Body parts involved: the course app's regions as soft pills, its impact word in clay. */
+  .sp-parts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sp-part {
+    font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: var(--grey-dark);
+    background: var(--grey-card); border-radius: 999px; padding: 5px 11px;
+  }
+  .sp-part.impact { color: var(--ice); background: var(--ice-dim); }
+  body[data-dark] .sp-part.impact { color: #E06B43; }
   .sp-alt {
     font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: var(--ice);
     background: transparent; border: 1.5px solid var(--ice); border-radius: 999px; padding: 6px 11px; cursor: pointer;
@@ -7055,7 +7063,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, where it shows up on court, and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
+    body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
@@ -11681,6 +11689,23 @@ const SPINE_PATTERN = {
   'isolation': 'Isolation', 'conditioning': 'Conditioning'
 };
 
+// Body parts involved (Amir, 2026-09-24: "in farsi version of this in TPS app we have …").
+// The SAME ids as the course app (REGION_FA / IMPACT_FA in tennis/app/app.js), so both apps
+// name the body the same way; `neck` is the one region the course has no use for. `loads` holds
+// regions, `impact` one word; an id not in these lists is ignored rather than shown raw.
+const SPINE_REGION = { 'ankle-foot': 'Ankle & foot', 'calf-achilles': 'Calf & Achilles', knee: 'Knee',
+  'hip-groin': 'Hip & groin', hamstring: 'Hamstring', 'low-back': 'Low back', trunk: 'Trunk',
+  shoulder: 'Shoulder', 'elbow-forearm-wrist': 'Elbow, forearm & wrist', neck: 'Neck' };
+const SPINE_IMPACT = { plyometric: 'Jumping', landing: 'Landing', running: 'Running', none: 'No impact' };
+function bodyPartsHtml(e) {
+  const rs = (e.loads || []).filter(r => SPINE_REGION[r]);
+  const im = SPINE_IMPACT[e.impact];
+  if (!rs.length) return '';
+  return `<div class="sp-sec"><div class="sp-lbl">Body parts involved</div><div class="sp-parts">${
+    rs.map(r => `<span class="sp-part">${esc(SPINE_REGION[r])}</span>`).join('')}${
+    im ? `<span class="sp-part impact">${esc(im)}</span>` : ''}</div></div>`;
+}
+
 function setSpine(list) {
   SPINE = Array.isArray(list) ? list : [];
   SPINE_BY_ID = {}; SPINE_IDX = [{}, {}, {}, {}];
@@ -11886,6 +11911,7 @@ function openExerciseSheet(id, card, fromLib) {
       (e.qualities || []).filter(q => QUALS_BY_ID[q]).map(q =>
         `<button type="button" class="sp-chip sp-q" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('')}</div>
     ${e.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
+    ${bodyPartsHtml(e)}
     ${full && e.video ? `<div class="sp-sec">${renderVideoBlock(e.video)}</div>` : ''}
     ${full && e.cues ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : ''}
     ${linksHtml}
