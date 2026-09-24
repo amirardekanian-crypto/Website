@@ -426,7 +426,9 @@ per round, after BOTH exercises, not per exercise)
 SECTION: Core
 [Movement or circuit] | dose | note_flag: [optional]
 
-(cues: none in the spec. They come from each exercise's Spine entry.
+(cues: none in the spec. They come from each exercise's Spine entry. Anything you noticed about
+ an entry while designing, such as a missing rung, a wrong flag or a better general cue, goes in as
+ spine_cue: / new_exercise: lines. /program-assemble applies them in its Spine upkeep step.
  new_exercise: [name] | ext / int / avoid, written for anyone → drafted into the Spine
  spine_cue: [entry id] | [a general wording change for Amir to make on the entry])
 

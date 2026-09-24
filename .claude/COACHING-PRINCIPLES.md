@@ -659,6 +659,11 @@ publish it. No athlete health/chat detail goes here — principles only.
   *(Amir, 2026-09-24: "the aim is to use these cues for all the exercises that everyone has from
   now on … if there is a cue for someone specific, it should be in coach's notes. thats why its
   there")*
+- **Every programme write leaves the Spine more complete.** At the end of writing or editing a
+  programme (or a library workout), every exercise it used is checked against the Spine: a missing
+  one is drafted, empty fields are filled, and a better general cue is applied to a draft or
+  proposed for an approved entry (`/spine` → Upkeep). *(Amir, 2026-09-24: "so everytime i write a
+  program for an athlete, this gets more complete")*
 
 ## Chips & modifiers
 - **A modifier (`intent`) chip must be something the athlete actively does or holds in mind

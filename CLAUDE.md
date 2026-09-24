@@ -350,6 +350,14 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   So **an entry must be approved before a programme using it goes live** (`/program-assemble`
   checks), or the card shows no cues. Entry cues are 2 good + 1 bad, written for anyone: no side,
   no home kit, no tempo, no dose.
+- **Every programme write ends with Spine upkeep** (Amir, 2026-09-24: *"when i write or update a
+  program, and there are movements that are not there, or missing some info, or can be updated, it
+  should be updated there at the end … so everytime i write a program for an athlete, this gets more
+  complete"*). `/program-assemble` Step 8, `/program-edit` Step 4 and `/workout` all run `/spine` →
+  **Upkeep**: draft what's missing, fill empty fields on any entry, change the text of a draft freely
+  but only *propose* changes to an approved one, and report a one-line **SPINE** block in the
+  handoff. The same day, the athlete-specific cues on amir_teflisi's and lem_cass1's cards moved
+  into their Coach's Notes (previous versions in `program_versions`).
 - **Names are never rewritten.** Card → entry resolves by `exId`, then name/aliases through
   `exNameVariants()`. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
   `spineForC()` (coach.html). Same rule: `exId` first, then the tightest tier with ONE entry.
