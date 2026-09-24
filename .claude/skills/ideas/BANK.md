@@ -24,7 +24,7 @@ Brief: product strategy across assessment → … → adaptation; connected info
 | 9 | Radar | coach.html Needs-you fires on readiness drop, RPE creep, pain, missed sessions, retest due, handoff dates | — | pitched |
 | 10 | Pinned | Messages attached to an exercise/session/outcome and shown on it | 1 | pitched · suggested park |
 | 11 | Right Read, Right Time | Articles tagged to exercises/qualities/cycles/moments, offered in context | 1, 2 | pitched |
-| 12 | The Debrief | Cycle outcomes scored against measures + what changes next cycle and why | — | pitched |
+| 12 | The Debrief | Cycle outcomes scored against measures + what changes next cycle and why | — | **picked** 2026-09-24 for a real athlete (Alireza's Cycle 1) · deep-dive + his Farsi debrief: https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx |
 | 13 | Patterns | Proof habits × readiness × RPE × Personal Records findings, above a minimum amount of data | — | pitched · suggested park |
 
 Quick win noted in the same round: the TPS course app's `easier`/`harder` are free text; making them
@@ -39,3 +39,4 @@ real links to exercise ids is the course-app half of #1.
 | 15 | Who has this exercise | coach.html: exercise → every athlete doing it now (before changing a cue or video) | 1 | **built** 2026-09-24 in the Exercises editor |
 | 16 | Not Yet | The ledgers' Paused exercises with their unlock gate in plain words (never a Banned one) | 1, 4 | **parked** 2026-09-24: its home was Rungs, now removed. Ask Amir before reviving |
 | 17 | Still Warm | Qualities a cycle means to keep, flagged in coach.html when one goes cold (days since last logged working set) | 2, 5 | pitched (from the #2 deep-dive) |
+| 18 | The Back-off Week Shows Itself | The closing week draws itself: a line on the Home day card, half the Primary set rows greyed (from the #12 deep-dive: Alireza did every set in his back-off week) | — | pitched |
