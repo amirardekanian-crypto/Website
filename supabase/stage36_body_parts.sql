@@ -25,8 +25,8 @@
 --    agree; the rest follow the course's calibration: squat/lunge = knee + hip-groin (+ low-back with
 --    a bar on the back), hinge = hamstring + hip-groin (+ low-back when loaded), bridge/thrust =
 --    hip-groin + hamstring, pull/press = shoulder + elbow-forearm-wrist, trunk work = trunk (+ low-back
---    when it rotates or lifts the back), calf work = calf-achilles + ankle-foot. The other 109 keep
---    their renamed words and no impact until upkeep reaches them.
+--    when it rotates or lifts the back), calf work = calf-achilles + ankle-foot. The other 109 kept
+--    their renamed words and no impact; stage37 set them by hand the same day.
 -- 4. get_exercises() returns impact.
 --
 -- Undo one entry's loads:

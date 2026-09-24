@@ -393,9 +393,10 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   `impact` = `none · running · plyometric · landing` (shown as No impact, Running, Jumping, Landing).
   The About sheet draws them as *Body parts involved* (`bodyPartsHtml()`), regions as soft pills and
   impact in clay; coach.html edits them as tick boxes and a menu; the database refuses any other
-  word. The 100 most-used entries were set by hand, 35 copied exactly from the course where it has
-  the same exercise. ⚠ **`impact` null means never checked**: the other 109 carry the old loose words
-  renamed, and **every programme write fills both** through `/spine` → Upkeep, which flags them.
+  word. **All 209 entries were set by hand** (stage36 the 100 most-used, stage37 the other 109, on
+  Amir's *"do all 109 now"*), 56 of them copied exactly from the course where it has the same
+  exercise. ⚠ **`impact` null means never checked**, and **every programme write fills both** for a
+  new or touched exercise through `/spine` → Upkeep, which flags a missing one.
   The region and impact lists exist FOUR times (program.html `SPINE_REGION`/`SPINE_IMPACT`,
   coach.html `SPINE_REGIONS`/`SPINE_IMPACTS`, `draft_sql.py`, the stage36 checks): change all four.
 - **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
