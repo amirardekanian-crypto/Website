@@ -4255,6 +4255,7 @@ const SPINE_PATTERNS = ['squat','hinge','single-leg','push-horizontal','push-ver
   'carry','anti-extension','anti-rotation','anti-lateral-flexion','rotation','jump-land','throw','sprint-cod',
   'mobility','isolation','conditioning'];
 const SPINE_FLAGS = ['loaded-knee-flexion','axial-load','free-hinge','high-impact','overhead'];
+const SPINE_ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;   // the shape of an entry id (stage31 check)
 // The Quality Map (2026-09-24): the ten ids, and which cycle-picture family
 // word names each one. A cycle's headline quality is read from its `art` word.
 const QM_IDS = ['strength','muscle','power','spring','speed','brakes','rotation','engine','armour','movement'];
@@ -4332,9 +4333,16 @@ async function spineSave(id, approve) {
   const f = n => (c.querySelector(`[data-sf="${n}"]`) || {}).value || '';
   const cur = S.spine.list.find(e => e.id === id) || {};
   const ids = new Set(S.spine.list.map(e => e.id));
-  const links = { easier: spineCsv(f('easier')), harder: spineCsv(f('harder')), alts: spineCsv(f('alts')) };
-  const bad = [].concat(links.easier, links.harder, links.alts).filter(x => !ids.has(x));
-  if (bad.length) { alert('These links are not entries yet:\n\n' + bad.join('\n') + '\n\nPick ids from the list.'); return; }
+  // A link is an entry id, or the plain name of an exercise with no entry yet (Amir,
+  // 2026-09-24: "if we already have it, link it, if not, just put the name"). A name that
+  // matches an entry is stored as that entry's id; an id-shaped typo is refused.
+  const byId = {}; S.spine.list.forEach(e => { byId[e.id] = e; });
+  const idx = spineIndexC(S.spine.list);
+  const toLink = x => ids.has(x) ? x : SPINE_ID_RE.test(x) ? x : (spineForC(idx, x, null, byId) || x);
+  const links = {};
+  ['easier', 'harder', 'alts'].forEach(k => { links[k] = spineCsv(f(k)).map(toLink).filter((x, i, a) => x !== id && a.indexOf(x) === i); });
+  const bad = [].concat(links.easier, links.harder, links.alts).filter(x => SPINE_ID_RE.test(x) && !ids.has(x));
+  if (bad.length) { alert('These look like ids but are not entries:\n\n' + bad.join('\n') + '\n\nPick an id from the list, or type the exercise\'s name (e.g. Nordic Hamstring Curl).'); return; }
   const good = spineLines(f('good')), badCues = spineLines(f('bad'));
   const row = {
     id, name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
@@ -4497,9 +4505,9 @@ function renderExercises() {
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
         <div>${lbl('Cues · one per line')}<textarea data-sf="good" rows="3" style="${field}">${esc(((e.cues || {}).good || []).join('\n'))}</textarea></div>
         <div>${lbl('Don’t · one per line')}<textarea data-sf="bad" rows="3" style="${field}">${esc(((e.cues || {}).bad || []).join('\n'))}</textarea></div>
-        <div>${lbl('Regressions: easier versions of the same movement (ids)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
-        <div>${lbl('Progressions: harder versions of the same movement (ids)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
-        <div>${lbl('Alternatives: same movement, other equipment or machine (ids)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Regressions: easier versions of the same movement (ids, or a name)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Progressions: harder versions of the same movement (ids, or a name)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
+        <div>${lbl('Alternatives: same movement, other equipment or machine (ids, or a name)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Equipment · loads (comma)')}<input data-sf="equipment" value="${esc((e.equipment || []).join(', '))}" style="${field};margin-bottom:6px"><input data-sf="loads" value="${esc((e.loads || []).join(', '))}" style="${field}"></div>
       </div>
       <div style="border-top:1px dashed var(--line);margin-top:14px;padding-top:4px">

@@ -5,7 +5,7 @@
 # batch.json: a list of objects, one per exercise:
 #   { "id": "goblet-squat", "name": "Goblet Squat", "aliases": [], "pattern": "squat",
 #     "purpose": "...", "tennis": "...", "equipment": [...], "loads": [...],
-#     "easier": [...ids], "harder": [...ids], "alts": [...ids],
+#     "easier": [...ids or names], "harder": [...ids or names], "alts": [...ids or names],
 #     "sfr": 3, "flags": ["loaded-knee-flexion"],
 #     "cues": {"good": [ext, int], "bad": [avoid]} }   (optional; written for anyone)
 # existing_ids.txt: one id per line, from `select id from public.exercises order by 1`.
@@ -54,7 +54,9 @@ for e in batch:
         if x not in QUALITIES: problems.append(f'{i}: unknown quality {x!r}')
     for k in ('easier', 'harder', 'alts'):
         for x in e.get(k, []):
-            if x not in known: problems.append(f'{i}.{k} -> {x} (no such id)')
+            # An id must exist; anything not shaped like an id is a plain NAME for an
+            # exercise with no entry yet (2026-09-24), shown as a quiet pill until one exists.
+            if re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', x) and x not in known: problems.append(f'{i}.{k} -> {x} (no such id)')
             if x == i: problems.append(f'{i}.{k} points at itself')
 if problems:
     sys.exit('\n'.join(problems))

@@ -2547,6 +2547,9 @@
     background: transparent; border: 1.5px solid var(--ice); border-radius: 999px; padding: 6px 11px; cursor: pointer;
   }
   body[data-dark] .sp-alt { color: #E06B43; border-color: #E06B43; }
+  /* A plain name, no entry behind it yet: same pill, quiet, nothing to tap. */
+  .sp-alt-name { color: var(--grey-dark); font-weight: 500; border: 1.5px dashed var(--grey-text); cursor: default; }
+  body[data-dark] .sp-alt-name { color: #ccc; border-color: #444; }
   .sp-where {
     display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
     background: var(--white); border: 1px solid var(--grey-card); border-radius: 9px; padding: 8px 11px;
@@ -7052,7 +7055,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, where it shows up on court, and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap any name to read about it.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
+    body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, where it shows up on court, and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
@@ -11851,10 +11854,17 @@ function openExerciseSheet(id, card, fromLib) {
   // Three plain lists (Amir, 2026-09-24: "remove the rung, too much information").
   // Regressions and progressions are the SAME movement made easier or harder;
   // alternatives are the same movement on other equipment or a machine.
-  const linkList = (label, ids) => {
-    const xs = (ids || []).map(a => SPINE_BY_ID[a]).filter(Boolean);
+  // A link is an entry id, or (Amir, 2026-09-24: "if we already have it, link it, if not,
+  // just put the name") the plain name of an exercise with no entry yet. A name resolves at
+  // read time like a card does, so it turns into a tappable link on its own once an approved
+  // entry carries that name or alias. An id whose entry is still a draft shows nothing.
+  const linkList = (label, items) => {
+    const seen = {};
+    const xs = (items || []).map(a => SPINE_BY_ID[a] || (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(a) ? null : (spineFor(a) || { name: a })))
+      .filter(a => a && a.id !== e.id && !seen[a.id || a.name] && (seen[a.id || a.name] = 1));
     return xs.length ? `<div class="sp-sec"><div class="sp-lbl">${label}</div><div class="sp-alts">${
-      xs.map(a => `<button type="button" class="sp-alt" data-id="${esc(a.id)}">${esc(a.name)}</button>`).join('')}</div></div>` : '';
+      xs.map(a => a.id ? `<button type="button" class="sp-alt" data-id="${esc(a.id)}">${esc(a.name)}</button>`
+        : `<span class="sp-alt sp-alt-name">${esc(a.name)}</span>`).join('')}</div></div>` : '';
   };
   // Amir, 2026-09-24: the three lists show everywhere ("i liked how regression
   // progression and alternatives lives in i"). "In your programme" shows ONLY in
