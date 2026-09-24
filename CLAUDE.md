@@ -334,7 +334,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
 - **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
   (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;
   their cues are Amir's own wording, copied from the most recent live programme using each one. Batch 2 (80 more, the same day) took the exercises inside circuits, which
-  batch 1's query could not see.
+  batch 1's query could not see. Batch 3 (57 + aliases) closed the list the same day: **212 entries,
+  every exercise name in every live programme resolves, and all approved on Amir's word** (*"approve
+  all when youre done"*). 61 still have no video. New names come in through Upkeep, below.
   **The next batch is the `/spine` skill** (`.claude/skills/spine/`): the what's-missing query, the
   alias/new/skip sort, and `draft_sql.py`, which checks every link. The batch file with SFR and
   flags stays in the scratchpad, never in this public repo.
