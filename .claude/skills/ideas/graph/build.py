@@ -220,7 +220,7 @@ STATUS = {
  2: ("Built 24 Sep", "https://claude.ai/artifact/US2RW8TaHZbFk8voADq6fu"),
  "5b": ("Built 24 Sep", None), 14: ("Removed 24 Sep", None), 15: ("Built 24 Sep", None),
  16: ("Parked 24 Sep", None),
- 12: ("Picked 24 Sep", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
+ 12: ("Built 24 Sep as /cycle-report", "https://claude.ai/artifact/JY1eG1RNYHTLvYpFCwcHBx"),
 }
 
 def chips(i):

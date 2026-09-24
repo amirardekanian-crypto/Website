@@ -96,8 +96,8 @@ change before I build?"* before writing exercises.
    back-fill, no separate seeding step: just design from the info you have (brief, roadmap,
    current program), and the entry written for THIS cycle becomes the baseline the next cycle
    continues. The logic is captured the first time you design their next cycle.
-   **A `## Debrief — Cycle NN …` section after the last cycle is the end-of-cycle review** (added
-   2026-09-24, first for alireza_nikkhah): film verdicts, the athlete's own words from calls, data
+   **A `## Debrief — Cycle NN …` section after the last cycle is the end-of-cycle review**, written
+   by **`/cycle-report`** in the closing week (since 2026-09-24, first for alireza_nikkhah): film verdicts, the athlete's own words from calls, data
    problems in the log (units, warm-ups typed into working rows, missing RPE), decisions already
    promised to the athlete, and an **Open** list. Read it in full: it is STEP 1A's evidence and the
    "check-in chat" STEP 1A says never to ignore. Every **Open** item gets an answer at the STEP 1

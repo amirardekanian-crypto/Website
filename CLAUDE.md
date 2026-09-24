@@ -27,7 +27,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
-- `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
+- `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble → **`/cycle-report`** at the end of every cycle: the athlete's WhatsApp report plus a coach-only `## Debrief` section in their coaching log, which `/program-design` reads before the next cycle). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
   written from coach.html (it used to be `.claude/coaching-log/*.md`, in this public repo).
 
 ## ⚠️ THE BIG ONE: programmes live on the SERVER now, not in files (2026-09-07)

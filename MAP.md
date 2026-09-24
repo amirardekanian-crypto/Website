@@ -117,6 +117,7 @@ The brain behind every program. Read the principles before touching sets/reps.
 | 3 | [`program-design`](.claude/skills/program-design/SKILL.md) | Design one cycle (the core S&C pass) |
 | 4 | [`program-engage`](.claude/skills/program-engage/SKILL.md) | Write the in-app messages/notes |
 | 5 | [`program-assemble`](.claude/skills/program-assemble/SKILL.md) | Build & validate `data/<id>.json` |
+| 6 | [`cycle-report`](.claude/skills/cycle-report/SKILL.md) | End of a cycle: the athlete's WhatsApp cycle report (wins, what they told you, what's next, what you need from them, 3 questions) + a coach-only **Debrief** section in their coaching log, which step 3 reads next time. [Queries](.claude/skills/cycle-report/queries.sql) · [Shamsi dates](.claude/skills/cycle-report/shamsi.py) |
 | ✎ | [`program-edit`](.claude/skills/program-edit/SKILL.md) | Review / fix an existing program |
 | 🔬 | [`sc-research`](.claude/skills/sc-research/SKILL.md) | Find & translate the S&C evidence |
 | 🆓 | [`proof-signup`](.claude/skills/proof-signup/SKILL.md) | Turn a `proof.html` signup email into a live habit-tracker link (no programme) |
