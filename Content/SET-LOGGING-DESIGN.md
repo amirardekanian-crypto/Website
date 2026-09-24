@@ -1,7 +1,17 @@
 # Set logging: design analysis and recommendation
 
-*2026-09-24. Design analysis only. No code has been written for this. Scope: the `standard`
-exercise card in `program.html`, its Guided Mode, and what the coach reads in `coach.html`.*
+*2026-09-24. Scope: the `standard` exercise card in `program.html`, its Guided Mode, and what
+the coach reads in `coach.html`.*
+
+> **Status, later on 2026-09-24.** Amir answered the open decisions: **no rep ranges** (schema
+> updated) and **notes per session**, and said *"do as you recommend"*. While this analysis was being
+> written, another session shipped *The Card Remembers* (reps box, Last time strip, History sheet,
+> sessions stored as data in `session_history.log`). That covers "last time", history and the reps
+> field, so they were not rebuilt. What was built on top of it: the countersign row (RPE after the
+> tick, 40px targets, live row), reps + RPE on Guided Mode's rest screen, per-session notes,
+> honest handling of leftover ranges, and Persian digits. **Not built** from Phase 10: `setlast`
+> (superseded by `session_history.log`), same-slot keying of Last time (it matches by exercise
+> name, on any day), *+ Add a set*, the L/R split, and the Finish-screen "mark remaining sets done".
 
 Scores in this document are **design-analysis estimates**, not measurements. Everything
 labelled *live data* comes from read-only queries against `public.session_history`

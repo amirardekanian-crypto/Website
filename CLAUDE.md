@@ -302,9 +302,13 @@ never leave `chips` sitting beside an `rx`.
 
 **Writing a programme got shorter, which was the point.** `/program-design` already emitted plain
 dose fields; `/program-assemble` step 2b used to convert them into chips under a page of rules
-(`×`-prefix, style colours, chip order, "never put a dose in a modifier", collapse rep ranges to
-the top). That step is now a copy. **Rep ranges ship as ranges** — `rx` has a real range field, so
-`"reps": "8-10"` reaches the athlete as the zone Amir actually meant.
+(`×`-prefix, style colours, chip order, "never put a dose in a modifier"). That step is now a copy.
+**Reps are ONE number, never a range** (Amir, 2026-09-24: *"I don't prescribe rep ranges"* —
+this reverses a 2026-09-20 note that said ranges ship as ranges). The set log pre-fills the
+prescribed number and a tick means "done as written", so a range leaves the app guessing.
+`auditRx()` flags one as `rep-range`. Thirteen legacy `chips[]` ranges still sit in three live
+programmes (amirabbas_esh1, bardia_ahmadi, lem_cass1); the app shows them as a range and records
+reps only when the athlete types them, rather than inventing the low end.
 
 ### 🕘 The Card Remembers — last time on every exercise (2026-09-24)
 
@@ -318,6 +322,28 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
   `parseSetLine()` (coach.html) and `parseSetText()` (program.html) read it. Change all three.
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30.
+
+### ✍️ The set log is COUNTERSIGNED, and the note belongs to ONE session (2026-09-24)
+
+Amir: *"do as you recommend"*, on top of The Card Remembers. Design and evidence in
+`Content/SET-LOGGING-DESIGN.md`. **Written by the coach, countersigned by the athlete:** every
+set arrives pre-written, the tick means "done as written", and only a set that went differently
+costs more than one tap.
+- **The row is SET · KG · REPS · RPE tag · tick.** RPE is no longer five ~20px buttons on every
+  row before a rep is lifted: **How hard?** opens full width under a row the moment it is ticked,
+  then folds into an `RPE 8` tag that reopens it. `.live` tints the next set to do. All row state
+  is drawn by one painter, `card._paintSets()`; "tick all" and Reset call it too.
+- **Guided Mode asks on the REST screen** (`paintTimerLog()`): a reps − / + and the RPE strip for
+  the set just done. It holds no state — every tap goes through the row's own input and buttons.
+- **The note is per SESSION**: `<id>_snote_<Name>` = `{ d: local date, v }`, shown and sent only on
+  day `d`. The old `<id>_note_` was never cleared, so half the notes Amir received were re-runs
+  (522 sent, 259 distinct). A date stamp, not a clear, because the cloud merge prefers text over a
+  blank and would hand a cleared note back. Last session's note shows in the Last time strip.
+  coach.html reads `snote_` ahead of `note_`.
+- **Leftover rep ranges are never guessed.** `cardReps()`/`plannedReps()` return null for one, so the
+  box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
+  for The Ceiling only.
+- Weight and reps inputs normalise Persian/Arabic digits (`normDigits()`); live logs held `۲۵`.
 
 ### 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
 

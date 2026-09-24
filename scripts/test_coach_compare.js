@@ -212,6 +212,13 @@ console.log('8. reps');
   is(compareExercise(pex, mk([5, 5, 5])).flags.length, 0, 'all reps hit: no flag');
   is(compareExercise(pex, mk([5, 5, 4])).flags.map(f => f.text), ['1 set under 5 reps'], 'one short set flagged');
   is(compareExercise(pex, mk([5, 5, 4])).repsPer, '5 · 5 · 4', 'reps listed');
+  // 2026-09-24: a leftover range ("8-10") pre-fills nothing, so a bare tick writes
+  // no × at all — that must read as reps NOT recorded, never as short.
+  is(parseSetLine('✓'), { w: '', rpe: '', done: true, skipped: false }, 'bare tick: no reps key');
+  const rex = { name: 'X', rx: { sets: 2, reps: '8-10', rpe: 8 } };
+  const mk2 = { name: 'X', label: '✓', done: true, items: [], note: '', rounds: '', gear: '',
+                sets: [{ w: '', rpe: '', done: true, skipped: false, reps: 10 }, { w: '', rpe: '', done: true, skipped: false }] };
+  is(compareExercise(rex, mk2).flags.filter(f => /under/.test(f.text)).length, 0, 'range: typed 10 and a bare tick are not short');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));
