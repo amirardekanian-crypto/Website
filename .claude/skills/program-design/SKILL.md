@@ -332,7 +332,24 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 
-**CUES — exactly three:** ext (outside) · int (internal feel) · avoid (most common error).
+**THE SPINE — read it before choosing (2026-09-24).** Every exercise Amir programmes has (or
+will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`:
+```sql
+select e.id, e.name, e.status, e.pattern, e.easier, e.harder, e.alts, c.sfr, c.flags
+from public.exercises e left join public.exercise_coach c using (id) order by e.pattern, c.sfr;
+```
+Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
+**restrictions** (`flags`: `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`,
+`overhead` — check every flag against the athlete's injury picture), and **PROGRESS/REPLACE**
+along the ladder (`harder[0]` is the next rung, `alts` do the same job). Prefer an exercise that
+has an entry; a new one is fine, flag it as `new_exercise:` so it gets an entry.
+
+**CUES — exactly three, OR none.** When the exercise's Spine entry is **approved** and has cues,
+write `cues: spine` and nothing else: the app shows the entry's cues on every card that carries
+none of its own (Amir: *"the cues should be there so we dont write the cues for each exercise
+everytime"*). Write three custom cues only when THIS athlete needs different ones (training
+age, an injury, a fault you saw on video), and say why in one line. Custom cues: ext (outside) ·
+int (internal feel) · avoid (most common error).
 
 **Never spend a cue on the tempo.** The card already shows `rx.tempo` with the digits that
 matter picked out in clay. A cue reading "three seconds down, one second pause, drive up" is

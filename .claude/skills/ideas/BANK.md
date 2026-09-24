@@ -13,7 +13,7 @@ Brief: product strategy across assessment → … → adaptation; connected info
 
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
-| 1 | The Spine | Exercise catalogue with stable ids: purpose, pattern, qualities, easier/harder/alternative links, where used | — | **picked** 2026-09-24 · deep-dive https://claude.ai/artifact/WymDKxk58nkCy5eSgodSrU · waiting on 6 decisions |
+| 1 | The Spine | Exercise catalogue with stable ids: purpose, pattern, qualities, easier/harder/alternative links, where used | — | **built** 2026-09-24 (stage31; ⓘ + About sheet, cues from the entry, coach.html → Exercises, 75 drafts seeded) · deep-dive https://claude.ai/artifact/WymDKxk58nkCy5eSgodSrU |
 | 2 | The Quality Map | 10–12 tennis/padel physical qualities tagged on exercises → session and cycle quality mix | 1 | pitched |
 | 3 | Court Map | Court moments (split step, wide forehand, serve…) → qualities → your exercises, and back | 1, 2 | pitched · suggested park |
 | 4 | Because | One athlete-safe "why you have this" line per exercise, tagged with its source (goal/test/injury/sport/last cycle) | — | pitched |
@@ -35,5 +35,5 @@ real links to exercise ids is the course-app half of #1.
 | # | Name | What | Needs | Status |
 |---|---|---|---|---|
 | 5+ | The History Sheet | Every past session of a lift with an e1RM trend (from the #5 deep-dive) | 5 | **built** with #5 |
-| 14 | Rungs | Each movement pattern as a staircase marked with the rungs this athlete has climbed (Spine links + programme archive + #5 history) | 1, 5 | pitched 2026-09-24 in the #1 deep-dive |
-| 15 | Who has this exercise | coach.html: exercise → every athlete doing it now (before changing a cue or video) | 1 | pitched 2026-09-24, part of the Exercises tab |
+| 14 | Rungs | Each movement pattern as a staircase marked with the rungs this athlete has climbed (Spine links + programme archive + #5 history) | 1, 5 | **built** 2026-09-24 inside the About sheet ("I love your rung idea") |
+| 15 | Who has this exercise | coach.html: exercise → every athlete doing it now (before changing a cue or video) | 1 | **built** 2026-09-24 in the Exercises editor |

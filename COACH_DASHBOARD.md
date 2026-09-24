@@ -35,6 +35,7 @@ safe to open anywhere — handy for screenshots or design work.
 | **Today** | The day's play: who's on court, what's on the wall, who needs you, the quest lever |
 | **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done |
+| **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, and an editor (purpose, cues, the ladder, video, and the coach-only SFR rank and flags) showing who is doing each exercise now. **Approve** is what puts an entry on athletes' phones |
 | **Proof** | The board, the season, the signup funnel, titles minted |
 | **Links** | Copyable deep links to every published article and workout |
 | **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
@@ -43,6 +44,18 @@ The URL carries the view (`#today`, `#intake`, `#athletes`, `#proof`, `#links`, 
 `#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any screen can be bookmarked or
 reloaded in place.
 **↻ Refresh** re-pulls everything.
+
+### Exercises — the Spine
+
+Cues written here fill **every card that has no cues of its own**, so a cue is written once and
+not once per programme (every one of the 23 athletes with Lat Pulldown had their own wording).
+An approved entry also gives athletes a small **ⓘ** after the name, opening its purpose, where it
+shows up on court, and its ladder (**Rungs**). Drafts are invisible to athletes until you tap
+**Approve**; *Move back to draft* takes one off the phones again. Links (easier, harder, same job)
+must be ids from the list, so a ladder can never point at a typo. The coach-only half (SFR rank
+and the flags `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`, `overhead`) lives
+in a separate table no athlete query can read; `/program-design` filters on those flags.
+*Not in the Spine yet* lists the names still without an entry, most-used first.
 
 ### Intake — where the apply form lands
 
