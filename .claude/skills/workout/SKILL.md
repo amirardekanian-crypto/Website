@@ -196,7 +196,16 @@ Any exercise can have `"videoUrl": "https://..."` for a demo video. Set to `null
 ---
 
 ### Coaching cues
-Every exercise (and circuit sub-item) supports `cues.good[]` and `cues.bad[]`. Both are optional. Write them as short, specific, actionable coaching points — not generic advice.
+⚠️ **Since 2026-09-24 the cues come from the Spine** (Amir: *"the aim is to use these cues for
+all the exercises that everyone has from now on"*). A new library workout writes **no `cues`**:
+every card and circuit item shows its exercise's approved Spine entry (`public.exercises`). Before
+publishing, check every name resolves to an **approved** entry with cues; a name with no entry gets
+one drafted with `/spine`, and Amir approves it in coach.html → Exercises. When Amir pastes a
+workout with his own cues, compare them with the entry's: a better general cue is a change to the
+entry (tell him), a point about this one session goes in `note`. Workouts already in the library
+keep the cues they carry.
+
+The shape, for reference (it is what a Spine entry holds): `cues.good[]` and `cues.bad[]`.
 
 - `good` → what to do / what to feel (shown with ✅)
 - `bad` → what to avoid (shown with ❌)
@@ -238,7 +247,7 @@ much."*
 | **`before`** | What to stop for: who it is not for today, the red flags, spacing, the first-time dose | rows of `{label, text}`, **50–210 words** in all |
 | **`intro`** | Why this session exists, how it runs, kit and timing | **1–2 paragraphs, about 100–150 words** |
 | **`note`** | One thing about *this exercise* the cues cannot carry | **ONE SENTENCE** |
-| **`cues`** | How to do the rep | **EXACTLY 3** |
+| **`cues`** | How to do the rep. **Comes from the Spine now, not written here** | **EXACTLY 3**, on the entry |
 
 **Cues: exactly three. One external, one internal, one avoid.** External +
 internal go in `cues.good[]`, the avoid cue in `cues.bad[]` — so `good` has 2

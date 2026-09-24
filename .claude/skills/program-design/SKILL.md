@@ -353,12 +353,27 @@ Use it for the decisions this pass already makes: **SFR** order within a pattern
 along the ladder (`harder[0]` is the next rung, `alts` do the same job). Prefer an exercise that
 has an entry; a new one is fine, flag it as `new_exercise:` so it gets an entry.
 
-**CUES — exactly three, OR none.** When the exercise's Spine entry is **approved** and has cues,
-write `cues: spine` and nothing else: the app shows the entry's cues on every card that carries
-none of its own (Amir: *"the cues should be there so we dont write the cues for each exercise
-everytime"*). Write three custom cues only when THIS athlete needs different ones (training
-age, an injury, a fault you saw on video), and say why in one line. Custom cues: ext (outside) ·
-int (internal feel) · avoid (most common error).
+**CUES COME FROM THE SPINE, and only from the Spine (Amir, 2026-09-24: *"the aim is to use these
+cues for all the exercises that everyone has from now on … if there is a cue for someone specific,
+it should be in coach's notes. thats why its there"*).** The spec carries **no cues**. Each exercise
+has one set of three cues, on its Spine entry, and every athlete's card shows those.
+- **Something only THIS athlete needs** (an injury limit, a range to stop at, a side, a setup for
+  their home kit, a fault you saw on video) goes in that exercise's **`note:`**, the Coach's Note.
+  It is one sentence and is never written as a cue. Examples: *"Hands on a bench, not the floor:
+  your wrists take too much at your bodyweight."* or *"Stop at about 90 degrees of knee bend."*
+- **A general coaching point is not a note.** If it would help anyone doing the lift, it belongs on
+  the Spine entry. Say so in the spec (`spine_cue:` + the entry id + the wording) and Amir changes
+  the entry in coach.html → Exercises. Never put it on one card.
+- **RETURNING athlete whose last cycle's cards carry their own `cues`** (every programme before
+  2026-09-24 does): read each card's cues against its Spine entry's. Anything that is about THIS
+  athlete becomes a `note_flag` on the same exercise in the new cycle, so it is not lost when the
+  card stops carrying cues. The rest is dropped. As of 2026-09-24 that is: amir_teflisi (Scapular
+  Push-Up on a bench for the wrists, Quadruped Thoracic Rotation with the hand across the chest
+  for the shoulder, Assault Bike with the arms off the handles) and lem_cass1 (the right shoulder
+  on Dumbbell Bench Press and Farmer's Carry, stop any Standing DB Overhead Press set at a pinch).
+- **An exercise with no Spine entry** is `new_exercise:` with three cues written for ANYONE
+  (ext · int · avoid, no athlete, no home kit, no tempo, no dose). They go on the new draft entry
+  via `/spine`, not on the card.
 
 **Never spend a cue on the tempo.** The card already shows `rx.tempo` with the digits that
 matter picked out in clay. A cue reading "three seconds down, one second pause, drive up" is
@@ -389,29 +404,31 @@ PROGRAM: [number] | [N] days | [one-line focus]
 DAY [N] — [plain working title: what it trains] | load identity: [peak/moderate/low]
 
 SECTION: Activation & Prep   (logs nothing — no RPE)
-  • [Movement] | [reps or duration] | ext: "[cue]" | int: "[cue]" | avoid: "[cue]"
+  • [Movement] | [reps or duration] | note_flag: [only if this athlete needs one]
   • ...
 
 SECTION: Primary
 [Movement] | role: primary
 sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [e.g. 3s eccentric / none]
-ext: [cue]
-int: [cue]
-avoid: [cue]
+note_flag: [only if THIS athlete needs something the Spine cues can't say]
 
 SECTION: Accessory
 [Movement] | role: accessory
 sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [e.g. 3s eccentric / none]
-ext / int / avoid
+note_flag: [optional]
 
 SECTION: Accessory (superset pair — role: circuit, NOT two accessory entries)
 [Movement A] + [Movement B] | role: circuit (superset) | rounds: X | rest: Xs (shared — once
 per round, after BOTH exercises, not per exercise)
-  [Movement A] — reps: X | RPE: X | ext / int / avoid
-  [Movement B] — reps: X | RPE: X | ext / int / avoid
+  [Movement A] — reps: X | RPE: X | note_flag: [optional]
+  [Movement B] — reps: X | RPE: X | note_flag: [optional]
 
 SECTION: Core
-[Movement or circuit] | dose | ext / int / avoid
+[Movement or circuit] | dose | note_flag: [optional]
+
+(cues: none in the spec. They come from each exercise's Spine entry.
+ new_exercise: [name] | ext / int / avoid, written for anyone → drafted into the Spine
+ spine_cue: [entry id] | [a general wording change for Amir to make on the entry])
 
 (fallback per primary: one same-pattern swap if pain / station busy)
 ---

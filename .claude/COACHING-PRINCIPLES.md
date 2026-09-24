@@ -650,6 +650,15 @@ publish it. No athlete health/chat detail goes here — principles only.
   cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
   mistake that most risks injury). Calibrate the wording to training age. In the JSON the
   external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`. *(2026-06-17)*
+- **The cues live on the exercise, not the athlete.** Each exercise's three cues are written once,
+  on its Spine entry (`public.exercises`, edited in coach.html → Exercises), and every athlete's
+  card shows them. A programme carries **no cues**. Something only this athlete needs (an injury
+  limit, a range, a side, a home-kit setup, a fault seen on video) is the exercise's **Coach's
+  Note**, one sentence, never a cue. A point that would help anyone is a change to the Spine entry.
+  Spine cues are written for anyone: no athlete, no side, no home furniture, no tempo, no dose.
+  *(Amir, 2026-09-24: "the aim is to use these cues for all the exercises that everyone has from
+  now on … if there is a cue for someone specific, it should be in coach's notes. thats why its
+  there")*
 
 ## Chips & modifiers
 - **A modifier (`intent`) chip must be something the athlete actively does or holds in mind

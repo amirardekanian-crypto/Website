@@ -6722,7 +6722,10 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
 
   const roundsHtml = (ex.items || []).map((item, i) => {
     const letter = String.fromCharCode(65 + i); // 65 = 'A'
-    const itemCues = renderRoundCues(item.cues);
+    // THE SPINE: an item without its own cues gets a slot that paintSpine() fills
+    // from its entry, exactly like a standalone card's .ex-cues-slot.
+    const itemCues = renderRoundCues(item.cues)
+      || `<div class="round-cues-slot" data-name="${esc(item.name || '')}" data-exid="${esc(item.exId || '')}"></div>`;
     // Per-item play button — only renders if this sub-exercise has a video
     // (either an explicit videoUrl, or one resolved via the exercise library).
     const itemVid = getVideoUrl(item);
@@ -8554,6 +8557,7 @@ async function openWorkout(file) {
     });
   });
   body.innerHTML = html || `<div class="wl-empty">This workout has no exercises yet.</div>`;
+  paintSpine();   // a library exercise without its own cues shows its Spine entry's
 
   // Re-bind check-off to our local-only handler. The rendered cards carry the
   // training screen's inline onclick (onCheckBoxTap / onExerciseRowTap), which
@@ -11753,6 +11757,12 @@ function whyList() {
 // fills what is still empty and never adds a second button. A card with a reason
 // (ex.why) gets the ⓘ even before its Spine entry is approved, marked with a dot.
 function paintSpine() {
+  // Exercises inside a circuit: cues only (a circuit row has no ⓘ).
+  if (SPINE) document.querySelectorAll('.round-cues-slot').forEach(slot => {
+    if (slot.childElementCount) return;
+    const entry = spineFor(slot.dataset.name, slot.dataset.exid);
+    if (entry && entry.cues) slot.innerHTML = renderRoundCues(entry.cues);
+  });
   document.querySelectorAll('.checklist-item').forEach(card => {
     if (card.classList.contains('round-group')) return;
     const nameEl = card.querySelector('.item-name');

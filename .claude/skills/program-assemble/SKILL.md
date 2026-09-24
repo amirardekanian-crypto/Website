@@ -22,10 +22,12 @@ prescription as DATA (`rx`), and design's dose fields already ARE that data — 
 copies them, it does not render them. There is no chip formatting left to get wrong.
 
 **2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
-the spec. Each exercise → `type` + `rx` + `cues` {good:[ext,int], bad:[avoid]};
-circuits → `rounds` + `items[]`. Map cues: ext+int → `cues.good[]`, avoid →
-`cues.bad[]` — **except `cues: spine`, which means OMIT `cues` entirely**: the app fills the
-card from the exercise's approved Spine entry (SCHEMA "`exId` and the Spine"). **Stamp `exId`**
+the spec. Each exercise → `type` + `rx` (+ `setup`/`intent`/`note` where the spec has them);
+circuits → `rounds` + `items[]`. **Write NO `cues`, on any exercise or circuit item** (Amir,
+2026-09-24: *"the aim is to use these cues for all the exercises that everyone has from now on"*).
+The app draws every card's cues from its Spine entry, circuit items included (SCHEMA "`exId` and
+the Spine"). Something only this athlete needs arrives as engage's Coach's Note (`note`), never
+as a cue. **Stamp `exId`**
 on every exercise whose name resolves to a `public.exercises` entry (approved or draft), so the
 card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line. `completionTitle`/
 `completionMessage` per day from /program-engage PART 4; `cycles[currentCycleIndex].message`
@@ -170,8 +172,8 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   It also runs in `.githooks/pre-commit`.
 - **Coaching lint** (still yours): every `standard` has sets·reps·tempo·RPE·rest unless the
   movement says otherwise; ballistic/carry correctly OMIT tempo and carry an `intent`;
-  warm-up/prep carry NO `rpe`; every exercise has exactly 3 cues (ext+int in good, avoid in
-  bad) **or none, when its `exId` points at an approved Spine entry that has cues**; section titles use the standard names (Primary/Accessory/etc, never "Strength").
+  warm-up/prep carry NO `rpe`; **no exercise or circuit item carries `cues`** (each shows its
+  Spine entry's three); section titles use the standard names (Primary/Accessory/etc, never "Strength").
   **Reps are one number, never a range** (Amir, 2026-09-24). If the spec carries a range,
   stop and ask — do not pick an end yourself. `auditRx()` flags one as `rep-range`.
 - **Because audit** (`why`): fix every line it prints. It flags a bad `src`, a missing `part`,
@@ -253,10 +255,14 @@ console.log('done');
 "
 ```
 
-**Then check the Spine.** Every name should resolve to an entry in `public.exercises`
-(`select id, name, aliases, status from public.exercises`). One that doesn't is a **new
-exercise**: list it for Amir as *"add to the Spine? (coach.html → Exercises)"* and draft the
-entry as `status 'draft'` if he says yes, the way `/spine` does it. Never approve an entry yourself.
+**Then check the Spine. This is a publishing gate now**, because the cards carry no cues of their
+own. Every exercise AND every circuit item must resolve to an entry in `public.exercises`
+(`select id, name, aliases, status, cues is not null as has_cues from public.exercises`), and
+that entry must be **`approved` with cues**, or the athlete sees a card with no cues at all
+(`get_exercises()` serves approved entries only). Before publishing, list for Amir:
+- **Drafts it uses:** *"approve these N in coach.html → Exercises → Drafts before this goes live"*.
+- **Names with no entry:** draft them with `/spine` (three cues written for anyone), then the same.
+Never approve an entry yourself. If Amir says ship anyway, say which cards will show no cues.
 
 **Then act on the output:**
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
