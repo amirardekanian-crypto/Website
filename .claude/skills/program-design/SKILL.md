@@ -357,7 +357,7 @@ has an entry; a new one is fine, flag it as `new_exercise:` so it gets an entry.
 carries `qualities` (first = primary) from the ten: `strength · muscle · power · spring · speed ·
 brakes · rotation · engine · armour · movement`. The cycle's `art` word is its headline
 (`iron`→strength, `build`→muscle, `voltage`→power, `spring`, `brakes`, `engine`, `armour`,
-`bedrock`→movement; `peak` and `reset` are phases, no headline). Count the designed week's
+`bedrock`, `peak` and `reset` are phases, a foundation, sharpening or recovery block that trains a mix on purpose, so no headline). Count the designed week's
 working sets per quality: primary 1, secondary ½, prep blocks skipped (the same rule as the
 athlete's day cards and coach.html → Exercises → *Quality check*). **The headline must be in the
 top two.** If it isn't, either the week is wrong or the `art` word is, so fix one and say which in

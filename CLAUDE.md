@@ -53,6 +53,24 @@ coach.html → Athletes → **↑ Publish programme file**. Day-to-day changes (
 tempo, rest, the coach's note) are made in the dashboard's inline editor, which writes
 straight to `programs` and keeps the previous version in `program_versions`.
 
+**✅ Every programme write ends the same way** (Amir, 2026-09-24: *"every time i update, write a new
+program, if an exercise comes up, add it, if it can be updated, or linked better to anything, be
+done when the program is done"*). Whether it is `/program-assemble` (a new cycle), `/program-edit`
+(a change) or `/workout` (a library session), the run is not finished until:
+1. **Spine upkeep** (`/spine` → Upkeep): every exercise has an entry; empty fields filled; aliases
+   added for new spellings; `exId` stamped on every card; a new exercise linked into its ladder
+   from both sides; general cues from the design pass applied to drafts, proposed for approved.
+2. **Qualities**: every exercise tagged (drafts directly, approved entries as
+   `suggested_qualities` for Amir to accept), so no day card goes blank.
+3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
+   `art` headline in the week's top two unless it is bedrock/peak/reset.
+4. **Because**: 5–10 fresh `why`s on the exercises chosen for this athlete, audited; a removed
+   exercise takes its `why` with it.
+5. **One report block** in the handoff: `SPINE …` and `QUALITY …` lines, plus anything that
+   needs Amir (drafts to approve, proposals on approved entries).
+Never approve anything and never put athlete-specific detail on a Spine entry. Details live in
+`/spine` → Upkeep and `/program-assemble` Step 8.
+
 **Coaching logs are on the server too.** `.claude/coaching-log/*.md` were tracked in this
 PUBLIC repo — world-readable, despite each opening with "Never published". They now live
 in `public.coaching_logs`, coach-only, with no athlete arm at all.
@@ -390,7 +408,9 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
 - ⚠ **The mix rule exists three times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html)
   and the quality check in `/program-design`. Same weights, same prep test, or the coach's check and
   the athlete's card disagree.
-- **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). coach.html → Exercises →
+- **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). `bedrock`, `peak` and `reset` are
+  phases, not qualities: they have no headline and are never flagged (bedrock→movement flagged almost
+  every foundation block, 2026-09-24). coach.html → Exercises →
   *Quality check* flags every current programme whose headline is not in its week's top two.
 - `qualcache` (localStorage, no prefix) caches `get_qualities()` and never syncs.
 - **Library → Qualities is the fourth door** (Amir, 2026-09-24: *"this should exist in library with its

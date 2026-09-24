@@ -64,10 +64,12 @@ in a separate table no athlete query can read; `/program-design` filters on thos
 - **Qualities on every entry.** Three selects, first = primary. Where Claude suggested tags for
   an entry you had already approved, they arrive pre-filled and marked, and are saved only when
   you save.
-- **Quality check.** Every current programme's working sets per quality per week, against its
-  cycle's picture word. A flag means the headline quality is not in the week's top two.
-  *% tagged* is how much of that week the athlete's day cards can read. Below 70% the card
-  shows nothing.
+- **Quality check.** One row per athlete, in plain words: the cycle and what its picture word says
+  it is meant to build (iron = Strength, voltage = Power …), what the current week trains most in
+  working sets a week (an exercise's second quality counts half a set, warm-ups don't count), and a
+  verdict: ✓ in the top two, or ⚠ *only #4 this week*. Foundation (bedrock), peaking and recovery
+  blocks train a mix on purpose and are never flagged. *Every exercise tagged* / *N% tagged*
+  says how much of the week the athlete's day cards can read. Below 70% they show nothing.
 
 ### Intake — where the apply form lands
 

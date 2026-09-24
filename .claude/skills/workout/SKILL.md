@@ -208,7 +208,8 @@ keep the cues they carry.
 The shape, for reference (it is what a Spine entry holds): `cues.good[]` and `cues.bad[]`.
 
 **At the end, run `/spine` → Upkeep** on the workout's exercises, the same as after a programme:
-draft what is missing, fill empty fields, propose changes to approved entries.
+draft what is missing, fill empty fields (qualities included: Library → Qualities lists where
+each quality shows up), propose changes to approved entries.
 
 - `good` → what to do / what to feel (shown with ✅)
 - `bad` → what to avoid (shown with ❌)
