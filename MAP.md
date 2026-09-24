@@ -120,6 +120,7 @@ The brain behind every program. Read the principles before touching sets/reps.
 | ✎ | [`program-edit`](.claude/skills/program-edit/SKILL.md) | Review / fix an existing program |
 | 🔬 | [`sc-research`](.claude/skills/sc-research/SKILL.md) | Find & translate the S&C evidence |
 | 🆓 | [`proof-signup`](.claude/skills/proof-signup/SKILL.md) | Turn a `proof.html` signup email into a live habit-tracker link (no programme) |
+| 🦴 | [`spine`](.claude/skills/spine/SKILL.md) | Draft the next batch of exercises for the Spine (drafts only; Amir approves in coach.html → Exercises) |
 
 **Content skills:** [`article`](.claude/skills/article/SKILL.md) (publish a blog) ·
 [`workout`](.claude/skills/workout/SKILL.md) (publish a Train session) ·

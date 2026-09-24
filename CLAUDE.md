@@ -334,6 +334,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
 - **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
   (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;
   their cues are Amir's own wording, copied from the most recent live programme using each one.
+  **The next batch is the `/spine` skill** (`.claude/skills/spine/`): the what's-missing query, the
+  alias/new/skip sort, and `draft_sql.py`, which checks every link. The batch file with SFR and
+  flags stays in the scratchpad, never in this public repo.
 - **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
   else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame and
   carries **Rungs** (the pattern's ladder, marked done / in your plan / next rung).
