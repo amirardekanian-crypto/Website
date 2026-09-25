@@ -18,7 +18,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 |---|---|
 | **Anything design** — assets, format recipes, current rules, app look | [`Content/DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md) ← the designer's working file |
 | The look/brand rules (colours, fonts, marks, reels) | [`Content/DESIGN_SYSTEM.md`](Content/DESIGN_SYSTEM.md) · [colour tokens](assets/css/tokens.css) |
-| A specific image (logo, court photo, cutout, banner, headshot) | [Asset shelf](Content/DESIGN-ATLAS.md#asset-shelf--grab--go) in the atlas |
+| A specific image (logo, court photo, banner, headshot) | [Asset shelf](Content/DESIGN-ATLAS.md#asset-shelf--grab--go) in the atlas |
 | How to build a carousel / reel / result card | [Recipes](Content/DESIGN-ATLAS.md#recipe-carousel-ig-45-10801350) in the atlas |
 | What the business *is* (pricing, voice, backend) | [`Content/PRODUCT.md`](Content/PRODUCT.md) |
 | How the coaching process works (customer-facing) | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) |
@@ -239,8 +239,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   black-and-white gym photo, heavy italics, red/white strips) plus "The Padel Line". Print the file
   for the A3 PDF, open with `#story` or `#story2` for the 1080×1920 stories; exports in [`uts-padel/`](Content/uts-padel/).
   No QR on purpose: people book and pay at the club, the form is only for booked athletes.
-- **Image kits:** [`tennis-players/`](Content/tennis-players/) (transparent player cutouts) ·
-  [`recovery-run/`](Content/recovery-run/) (graded photo-story frames).
+- **Image kits:** [`recovery-run/`](Content/recovery-run/) (graded photo-story frames).
 
 ---
 
