@@ -124,6 +124,14 @@ def check_structure(data, args):
                 fail(f"{where}: a working circuit (superset) in a new athlete's first cycle: straight sets only")
             continue
         if not o.get('exId'): fail(f"{where}: no exId")
+        # A grip is a CHIP on Amir's cards, never free text (Amir, 2026-09-25: "grips should be a chip on
+        # the card not a free text"). The only chip an rx card draws is `intent`, in the same pill style
+        # his older cards use for "neutral grip", so the grip goes there. Anything else in `setup` is a
+        # grey line his own cards never had: he has not ruled on those, so it is a question for him.
+        if re.search(r'\bgrip|\bpalms?\b|pronat|supinat|\boverhand\b|\bunderhand\b', o.get('setup') or '', re.I):  # = GRIP_WORDS in chips.js
+            fail(f"{where}: a grip written as free text ('{o['setup']}'): make it the chip, the exercise's intent (e.g. \"neutral grip\")")
+        elif o.get('setup'):
+            warn(f"{where}: a grey free-text line on the card ('{o['setup']}'): Amir's cards never had one, ask him before shipping it")
         rx = o.get('rx') or {}
         doses = [k for k in ('reps', 'time', 'distance', 'work') if rx.get(k) not in (None, '')]
         if len(doses) > 1: fail(f"{where}: two doses ({' + '.join(doses)})")
@@ -413,10 +421,20 @@ def check_spine(data, args):
     ids = {(it or ex).get('exId') for d, b, ex, it in exercises(data)
            if not (not it and ex.get('type') == 'circuit') and (it or ex).get('exId')}
     drafts = sorted(i for i in ids if i in spine and spine[i]['status'] != 'approved')
+    # Any movement may be prescribed, but a new one goes INTO the library, in full, like the entries
+    # already there (Amir, 2026-09-25: "if there is any exercise that is outside of the exercise
+    # library, after its prescribed for any athlete, it should be added to our library, with all the
+    # cues and other details like the ones already there"). A card shows cues only from an APPROVED
+    # entry, so a draft is listed for Amir's yes before the login is made.
     for i in sorted(ids):
-        if i not in spine: fail(f"{i}: no Spine entry (draft it with /spine before this goes live)")
-        elif not spine[i]['cues']: fail(f"{i}: the Spine entry has no cues, so the card shows none")
-    if drafts: warn(f"{len(drafts)} Spine entries are drafts. Amir approves them before the login is made: {', '.join(drafts)}")
+        if i not in spine:
+            fail(f"{i}: not in the library yet. Add it with /spine (cues and every detail, linked like the others)")
+            continue
+        if not spine[i]['cues']: fail(f"{i}: the library entry has no cues, so the card shows none")
+        # Only Amir's ten quality pills (2026-09-25: "just use the 10 pills i have, this is a rule").
+        bad = [q for q in spine[i]['q'] if q not in QUALITIES]
+        if bad: fail(f"{i}: tagged {', '.join(bad)}, not one of the ten qualities ({', '.join(QUALITIES)})")
+    if drafts: warn(f"{len(drafts)} library entries are drafts, so their cards show no cues until Amir approves them. Ask him in the handoff: {', '.join(drafts)}")
     days = (data.get('workouts') or {}).get('days') or []
     now, later = [], []
     week = {}

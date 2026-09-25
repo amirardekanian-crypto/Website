@@ -48,7 +48,9 @@ for e in batch:
     c = e.get('cues')
     if c and (len(c.get('good', [])) != 2 or len(c.get('bad', [])) != 1): problems.append(f'{i}: cues must be 2 good + 1 bad')
     if c and '—' in json.dumps(c, ensure_ascii=False): problems.append(f'{i}: em-dash in cues')
-    if e.get('pattern') not in PATTERNS: problems.append(f'{i}: unknown pattern {e.get("pattern")!r}')
+    # A NEW entry carries no pattern (Amir, 2026-09-25): the ⓘ sheet draws the pattern as a pill beside
+    # the ten qualities, and he wants only his ten there ("just use the 10 pills i have, this is a rule").
+    if e.get('pattern') is not None: problems.append(f'{i}: pattern {e.get("pattern")!r} on a new entry: leave it out, the ⓘ would draw it as a pill beside the ten')
     for f in e.get('flags', []):
         if f not in FLAGS: problems.append(f'{i}: new flag {f!r} (add it to FLAGS here and to coach.html only if Amir agreed)')
     qs = e.get('qualities', [])
@@ -77,7 +79,7 @@ rows, crow, nvid = [], [], 0
 for e in batch:
     vid = next((libn[k] for k in (re.sub(r'\s+', ' ', x.lower()).strip() for x in [e['name']] + e.get('aliases', [])) if k in libn), None)
     nvid += vid is not None
-    rows.append('(' + ','.join([q(e['id']), q(e['name']), arr(e.get('aliases')), q(e['pattern']),
+    rows.append('(' + ','.join([q(e['id']), q(e['name']), arr(e.get('aliases')), q(e.get('pattern')),
         q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')), q(e.get('impact')),
         arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
         # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
