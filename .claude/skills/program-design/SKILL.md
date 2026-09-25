@@ -325,7 +325,7 @@ SCHEMA "Standard section names"; assemble assigns titles + icons.)
 single source of truth; don't restate or re-derive it here). In one line: `[modification]
 [equipment] [movement]`, bodyweight = bare name (no "Bodyweight" prefix), defining setups
 in the name, everything else (grip/intent/range/tempo/holds/digits/punctuation) → the dose
-fields, `intent` or `setup`,
+fields or `intent` (a grip is the pill: `intent: neutral grip`),
 and match the `exercise_library.json` spelling. If a name is rough mid-design, flag it and
 move on — /program-assemble lint-checks names against the library.
 
@@ -354,8 +354,11 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   `stick the landing`) — it ships as the exercise's `intent` field and draws the single green
   pill. Leave blank if none. **Never restate the tempo here**: `3s eccentric` beside a tempo of
   `3-1-1-0` is the same instruction twice, and the card already shows the tempo with its key
-  digits highlighted. Equipment or position (`neutral grip`, `45° bench`) is not an intent —
-  that goes to `setup`.
+  digits highlighted.
+  **A GRIP is written here too, as the pill** (`neutral grip`, `wide grip`; with an intention,
+  `neutral grip · max intent`). Amir, 2026-09-25: *"grips should be a chip on the card not a
+  free text"*. Anything else as a grey `setup` line is a question for Amir: his own cards never
+  had one.
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
   **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
@@ -400,8 +403,13 @@ it again exercise by exercise. Use it for the decisions this pass already makes:
 `overhead` — check every flag against the athlete's injury picture), and **PROGRESS/REPLACE**
 with the entry's links: `harder` = progressions (the same movement made harder), `easier` =
 regressions (the same movement made easier), `alts` = alternatives (the same movement on other
-equipment or a machine: the swap when a gym lacks the kit). Prefer an exercise that
-has an entry; a new one is fine, flag it as `new_exercise:` so it gets an entry.
+equipment or a machine: the swap when a gym lacks the kit).
+**Prescribe the movement that is right, in the library or not.** A movement with no entry is a
+`new_exercise:` line, and it goes INTO the library, in full, like the entries already there (Amir,
+2026-09-25: *"if there is any exercise that is outside of the exercise library, after its
+prescribed for any athlete, it should be added to our library, with all the cues and other details
+like the ones already there"*). A card shows cues only from an APPROVED entry, so the new entries
+are the one approval question in the handoff. Never swap a movement out because it has no entry.
 
 **THE QUALITY CHECK — before the spec goes to Amir (Quality Map, 2026-09-24).** Each Spine entry
 carries `qualities` (first = primary) from the ten: `strength · muscle · power · spring · speed ·
@@ -434,8 +442,8 @@ has one set of three cues, on its Spine entry, and every athlete's card shows th
   for the shoulder, Assault Bike with the arms off the handles) and lem_cass1 (the right shoulder
   on Dumbbell Bench Press and Farmer's Carry, stop any Standing DB Overhead Press set at a pinch).
 - **An exercise with no Spine entry** is `new_exercise:` with three cues written for ANYONE
-  (ext · int · avoid, no athlete, no home kit, no tempo, no dose). They go on the new draft entry
-  via `/spine`, not on the card.
+  (ext · int · avoid, no athlete, no home kit, no tempo, no dose). They go on the new entry via
+  `/spine`, with every other field the existing entries carry, never on the card.
 
 **Never spend a cue on the tempo.** The card already shows `rx.tempo` with the digits that
 matter picked out in clay. A cue reading "three seconds down, one second pause, drive up" is
@@ -471,12 +479,12 @@ SECTION: Activation & Prep   (logs nothing — no RPE)
 
 SECTION: Primary
 [Movement] | role: primary
-sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [e.g. 3s eccentric / none]
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [a grip (neutral grip) or one intention (max intent) / none]
 note_flag: [only if THIS athlete needs something the Spine cues can't say]
 
 SECTION: Accessory
 [Movement] | role: accessory
-sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [e.g. 3s eccentric / none]
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [a grip (neutral grip) or one intention (max intent) / none]
 note_flag: [optional]
 
 SECTION: Accessory (superset pair — role: circuit, NOT two accessory entries)

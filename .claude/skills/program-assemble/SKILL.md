@@ -83,7 +83,7 @@ fields map one-to-one; there is nothing to convert:
 | RPE | `"rpe": 7` |
 | tempo | `"tempo": "3-1-1-0"` |
 | rest | `"rest": 120` |
-| `intent` | `"intent": "max intent"` at exercise level — the one green pill |
+| `intent` | `"intent": "max intent"` or a grip, `"intent": "neutral grip"`, at exercise level — the one green pill |
 
 **Rest belongs to the BLOCK when a section shares one.** Write `"rest": 120` on the block and
 leave `rx.rest` off its exercises — the section header states it once and every timer in the
@@ -103,8 +103,14 @@ or carries, and no `rest` unless the spec named one** (the app stopped inventing
 **Never restate the tempo in `intent`.** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
 same instruction twice; the card already shows the tempo with its key digits highlighted.
 
-**Never write `chips[]`.** It is legacy-read-only. Equipment or position notes
-(`neutral grip`, `45° bench`) go in `"setup"`, not a chip and not the name.
+**Never write `chips[]`.** It is legacy-read-only.
+
+**A GRIP IS THE PILL, never free text** (Amir, 2026-09-25: *"grips should be a chip on the card not
+a free text … you changed how my file look like"*). `"intent": "neutral grip"` draws the same
+deep-green pill his older cards draw for a grip chip; a card that also has an intention joins them in
+the one pill (`"neutral grip · max intent"`). Anything else in `setup` draws a grey line his own
+cards never had, so ask him before shipping one. `check_program.py` fails a grip in `setup` and
+warns on any other.
 
 **Working (non-warm-up) circuits:** give each item its own `rx` from the spec's per-item reps
 (`{"rx":{"reps":12}}`), and put one overall circuit RPE on the circuit's own `rx.rpe`.
@@ -193,7 +199,8 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
   6 anywhere in the text, a note that lowers the RPE without naming the floor, a day over the
   time cap, chips or cues on a card, a missing `exId`, a Because over 140 characters or more
-  than 10 of them, a notes card that isn't HTML, an exercise with no Spine entry or no cues,
+  than 10 of them, a notes card that isn't HTML, a grip written in `setup` instead of the pill,
+  an exercise with no library entry or no cues, a quality outside the ten,
   and a headline quality outside the week's top two. It prints what the handoff needs: minutes
   per day, sets per muscle and the **QUALITY** line. The first programme it was run on (a new
   athlete's live Cycle 1) passes it with 0 FAIL; a copy with twelve faults planted in it fails on
@@ -306,15 +313,22 @@ console.log('done');
 own. Every exercise AND every circuit item must resolve to an entry in `public.exercises`, and
 that entry must be **`approved` with cues**, or the athlete sees a card with no cues at all
 (`get_exercises()` serves approved entries only). Step 3's `--spine` run already checked this
-with ONE query (`--spine-sql`): it FAILs an id with no entry or no cues and lists the drafts.
-Don't look entries up one by one. Before publishing, list for Amir:
-- **Drafts it uses:** *"approve these N in coach.html → Exercises → Drafts before this goes live"*.
-- **Names with no entry:** draft them with `/spine` (three cues written for anyone), then the same.
-Never approve an entry yourself. If Amir says ship anyway, say which cards will show no cues.
+with ONE query (`--spine-sql`): it FAILs an id with no entry, an entry with no cues, or a quality
+outside the ten, and lists the drafts. Don't look entries up one by one.
+**A new exercise goes INTO the library, in full, and stays in the programme** (Amir, 2026-09-25:
+*"if there is any exercise that is outside of the exercise library, after its prescribed for any
+athlete, it should be added to our library, with all the cues and other details like the ones
+already there"*). Never swap one out because it has no entry. Add it with `/spine`: three cues
+written for anyone, and every field the existing entries carry (purpose, on-court line, equipment,
+body parts, links both ways, SFR and flags), qualities from the ten only, and **no pattern**: the ⓘ
+draws the pattern as a pill beside the ten, and Amir wants only his ten there. Only an approved
+entry reaches the phone, so the new entries are one question in the handoff: *"approve these N so
+their cards show cues?"* Approve only on his word (he said *"Approve them"* for the first seven).
 
 **Then act on the output:**
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
-  remove `()` `:` `,` (if the qualifier carried meaning, move it to `setup`); snap spelling/
+  remove `()` `:` `,` (if the qualifier carried meaning: a grip goes to the pill, anything else
+  is a question for Amir); snap spelling/
   casing to the library's canonical key whenever `MISS -> canonical:` shows one. Edit the JSON,
   then **re-run until clean** (every line `OK`/`GAP`, no `[FIX]`, no fixable `MISS`).
 - **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` (new
@@ -497,6 +511,13 @@ Never approve an entry, and never put anything about this athlete on one.
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.
+- **Don't touch the app.** No edit to any `.html` page or `assets/js/*` while assembling, correcting
+  or delivering a programme; an idea or a bug seen on the way goes in the handoff for Amir to decide
+  (Amir, 2026-09-25: *"when you write a program and you deliver, dont touch the html file"*). The
+  library is the one thing outside the programme a run may change: a new exercise added in full.
+- **A correction changes only what Amir named.** Fixing grips does not rebuild a day, rename a
+  section or rewrite a note (2026-09-25: *"why did you changed her program and removed some of the
+  exercises?"*).
 - Don't add, reuse or regenerate an `athlete.key`, and don't hand out a `?client=&key=`
   link — that whole mechanism is retired and a key written today authorises nothing.
   Athletes sign in with a username and password Amir creates from coach.html.

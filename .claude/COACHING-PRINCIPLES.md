@@ -230,6 +230,10 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19)*
 - **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
   `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
+  **And never free text either:** on an `rx` card the chip is `intent` (`"intent": "neutral grip"`),
+  never the grey `setup` line. *(Amir, 2026-09-25, after a first cycle came back with its grips as
+  grey lines: "grips should be a chip on the card not a free text. you changed how my file look
+  like")*
 - **An isometric hold on a dynamic library exercise KEEPS the canonical library name —
   the video stays; the chip + Coach's Note carry the hold.** Amir's ruling (2026-07-24,
   Athlete I C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
@@ -252,6 +256,15 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   Amir, verbatim: "you can prescribe any movement that you like" — said after Athlete G C2 avoided a
   genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only
   library entries were available.)*
+  ⚠ **Since the Spine (2026-09-24) the card's cues come from the library**, so a newly prescribed
+  exercise is ADDED to the library in the same run, in full: its three cues and every detail the
+  existing entries carry (purpose, on-court line, body parts, qualities, links both ways). Never
+  swap the movement out because it has no entry. Only an approved entry reaches the phone, so the
+  new entries are the one approval question in the handoff. *(Amir, 2026-09-25: "if there is any
+  exercise that is outside of the exercise library, after its prescribed for any athlete, it should
+  be added to our library, with all the cues and other details like the ones already there". A
+  first cycle had shipped seven new outside-day drills as bare drafts, so every card was blank; the
+  "fix" then removed the drills, which was worse.)*
 - **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
   drift still finds the video and Notion renames don't break old programs — but
   word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
@@ -669,6 +682,13 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   *(Amir, 2026-09-24: "the aim is to use these cues for all the exercises that everyone has from
   now on … if there is a cue for someone specific, it should be in coach's notes. thats why its
   there")*
+- **Only the ten quality pills.** An exercise's qualities come from the ten (Strength, Muscle,
+  Power, Spring, Speed, Brakes, Rotation, Engine, Armour, Movement) and nothing else: together they
+  cover every physical quality. Never invent another label for one, on an entry or anywhere an
+  athlete reads it. *(Amir, 2026-09-25, on the ⓘ sheet: "you invented conditioning which is Engine,
+  you invented jump and land which is power and breaks, so if you are adding exercises to library,
+  just use the 10 pills i have, this is a rule")* Those two were movement-pattern pills the ⓘ draws
+  beside the ten; a new entry is added with no pattern, so its sheet shows only the ten.
 - **Every programme write leaves the Spine more complete.** At the end of writing or editing a
   programme (or a library workout), every exercise it used is checked against the Spine: a missing
   one is drafted, empty fields are filled, and a better general cue is applied to a draft or
@@ -728,6 +748,22 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
 
 ## Process
+- **Writing a programme never touches the app. Ideas go to Amir; they are not built.** No edit to
+  `program.html`, `coach.html`, `habits.html`, `assets/js/*` or any other page while a programme is
+  being written, corrected or delivered. A better way to prescribe something, a bug seen in passing,
+  a new idea: say it in the handoff and let him decide. The one change a programme run may make
+  outside the programme is the library: a newly prescribed exercise added to the Spine in full,
+  cues and all, linked like the others. *(Amir, 2026-09-25, verbatim: "this is a strict rule, you
+  cant do that, when you write a program and you deliver, dont touch the html file, if you see
+  anything or want to prescribe better in a way , or have a new idea, share it with me, dont change
+  everything. the only thing that you can change, is that , when you actually prescribe a new
+  movement or exercise, it should have cue, should be connected to our spine like other ones")*
+- **A correction changes exactly what Amir named, and nothing else.** Asked to fix one thing on a
+  delivered programme, fix that thing: no exercise removed or swapped, no section renamed, no note
+  or message rewritten on the side. Anything else that looks wrong is a question for him. *(Amir,
+  2026-09-25, after a request to turn grips into chips came back with a rebuilt Day 3, rewritten
+  notes and seven exercises gone: "why did you changed her program and removed some of the
+  exercises?")*
 - **Every design pass is checked, and reviewed where judgment is needed — Amir's standing
   order, not an option.** *(Amir, 2026-07-24, verbatim intent: "it should happen for every
   single program you want to write for me." Reshaped 2026-09-25, when a new athlete's first

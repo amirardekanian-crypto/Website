@@ -11,8 +11,13 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
 ## The four rules
 
 1. **Claude drafts, Amir approves** (he can also tell Claude to approve, as he did on 2026-09-24:
-   *"approve all when youre done"*, 212 entries). Every row goes in as `status 'draft'`. Never set `approved`,
-   and never write a flow that does. Nothing reaches a phone until he taps Approve.
+   *"approve all when youre done"*, 212 entries, and on 2026-09-25 for seven new outside-day drills:
+   *"Approve them"*). Every row goes in as `status 'draft'`. Never set `approved` without his word,
+   and never write a flow that does. Nothing reaches a phone until then, so a programme that uses a
+   new entry puts one question in the handoff: approve these N so their cards show cues?
+   **A newly prescribed exercise is added in full, never dropped from the programme** (Amir,
+   2026-09-25: *"it should be added to our library, with all the cues and other details like the
+   ones already there"*): every field below, links both ways, not a bare name with cues.
 2. **The coach-only half never enters this repo.** `sfr` and `flags` (restriction flags) live in
    `public.exercise_coach`. The repo is PUBLIC. Write the batch file in the **scratchpad**; only the
    SQL goes to the database.
@@ -68,9 +73,13 @@ the existing ids for the links, and they show you which names are only variants.
 **3. Write the batch** to `<scratchpad>/spine_batchN.json`, as a list of objects with these fields:
 `id` (kebab-case, the name slugged), `name` (as programmes spell it), `aliases`, `pattern`,
 `purpose`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
-- **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
-  sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
-  wherever it fits, so Library → Exercises groups it with its family.
+- **pattern: leave it out on a new entry** (Amir, 2026-09-25). The ⓘ sheet draws the pattern as a
+  pill beside the ten qualities, and he read "Conditioning" and "Jump & land" there as invented
+  qualities: *"you invented conditioning which is Engine, you invented jump and land which is power
+  and breaks, so if you are adding exercises to library, just use the 10 pills i have, this is a
+  rule"*. `draft_sql.py` refuses a pattern on a new entry. The cost: the entry is under *All* and
+  *In your plan* in Library → Exercises, not a pattern chip. Whether the ⓘ should draw patterns at
+  all is Amir's call (an app change, proposed to him, not made).
 - **purpose:** one sentence in Amir's voice (`COACHING-PRINCIPLES.md` → *Communication*). Say what
   it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general. The
   *why for this athlete* belongs to the programme, not to the entry.
@@ -111,7 +120,8 @@ the existing ids for the links, and they show you which names are only variants.
   entry lists this one as a regression); a name has no other side. Keep each list to about four,
   closest steps first, and leave a list empty rather than stretch it.
 - **qualities:** the Quality Map (stage32). One to three of `strength · muscle · power · spring ·
-  speed · brakes · rotation · engine · armour · movement`, **first = primary**: what the exercise is
+  speed · brakes · rotation · engine · armour · movement`, **and only those ten, ever**: they cover
+  every physical quality, and a new label is exactly what Amir ruled out. **First = primary**: what the exercise is
   mostly FOR. A day card on Home counts working sets × (primary 1, secondary ½), so tag what it
   really trains and stop at three. A curl is `muscle`, not `muscle strength armour`. Warm-up drills
   still get tagged (`movement`), because prep blocks are skipped when a day is counted.

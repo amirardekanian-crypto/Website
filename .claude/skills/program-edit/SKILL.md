@@ -235,6 +235,13 @@ Wait for Amir's go-ahead before touching the file.
 
 ## Step 3 — Apply edits
 
+**Change exactly what Amir named, and nothing else** (2026-09-25). Asked to turn grips into chips,
+a correction once also rebuilt a day, rewrote the notes and dropped seven exercises; Amir: *"why did
+you changed her program and removed some of the exercises?"* It was restored from
+`program_versions`. Anything else you would change is a question in Step 4, not an edit. And no app
+file is touched during an edit (*"dont touch the html file … share it with me"*): the one change
+outside the programme is adding a newly prescribed exercise to the library, in full.
+
 **Cues are not edited on a card any more** (2026-09-24). Each exercise's cues are its Spine entry's
 and every athlete sees the same three. A cue change that would help anyone is an edit to the entry
 (coach.html → Exercises). A point about this athlete only is the exercise's `note` (Coach's Note),

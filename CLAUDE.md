@@ -62,7 +62,7 @@ done when the program is done"*). Whether it is `/program-assemble` (a new cycle
    added for new spellings; `exId` stamped on every card; a new exercise linked to its
    regressions, progressions and alternatives from both sides; **body parts** (`loads` + `impact`)
    filled on any entry that lacks them; general cues from the design pass applied to drafts, proposed for approved.
-2. **Qualities**: every exercise tagged (drafts directly, approved entries as
+2. **Qualities**: every exercise tagged, **from the ten only** (drafts directly, approved entries as
    `suggested_qualities` for Amir to accept), so no day card goes blank.
 3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
    `art` headline in the week's top two unless it is bedrock/peak/reset.
@@ -70,8 +70,23 @@ done when the program is done"*). Whether it is `/program-assemble` (a new cycle
    exercise takes its `why` with it.
 5. **One report block** in the handoff: `SPINE …` and `QUALITY …` lines, plus anything that
    needs Amir (drafts to approve, proposals on approved entries).
-Never approve anything and never put athlete-specific detail on a Spine entry. Details live in
-`/spine` → Upkeep and `/program-assemble` Step 8.
+Never approve anything without Amir's word, and never put athlete-specific detail on a Spine entry.
+Details live in `/spine` → Upkeep and `/program-assemble` Step 8.
+
+**⛔ Three rules for every programme run** (Amir, 2026-09-25, after a correction went wrong):
+- **Never touch the app while writing, correcting or delivering a programme.** No edit to any
+  `.html` page or `assets/js/*`; an idea or a bug seen on the way goes in the handoff (*"this is a
+  strict rule … dont touch the html file, if you see anything or want to prescribe better in a way ,
+  or have a new idea, share it with me"*). The one change outside the programme is the library.
+- **A newly prescribed exercise goes INTO the library, in full, and stays in the programme** (*"it
+  should be added to our library, with all the cues and other details like the ones already
+  there"*): every field the other entries carry, links both ways, **qualities from his ten only**,
+  and **no pattern** (the ⓘ draws the pattern as a pill beside the ten, and *"just use the 10 pills
+  i have, this is a rule"*). Only an approved entry reaches a phone, so the new ones are one
+  approval question in the handoff.
+- **A correction changes only what Amir named.** A grip fix once came back with Day 3 rebuilt,
+  notes rewritten and seven exercises gone (*"why did you changed her program and removed some of
+  the exercises?"*); it was restored from `program_versions`.
 
 **Coaching logs are on the server too.** `.claude/coaching-log/*.md` were tracked in this
 PUBLIC repo — world-readable, despite each opening with "Never published". They now live
@@ -280,8 +295,16 @@ doing the same, and a duration filed under a cell labelled **REPS**.
 **Four fields beside it, four meanings, four looks** — this is the fix for "pills get mixed up",
 where one green pill stood for 121 different labels (a tempo said in words, equipment, an intent
 cue, and occasionally a real dose):
-`rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (ONE
-intention) · `note` → clay callout · `cues` → the cues list.
+`rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (a grip
+or ONE intention) · `note` → clay callout · `cues` → the cues list.
+⚠ **A GRIP IS THE PILL, never the grey line** (Amir, 2026-09-25: *"grips should be a chip on the card
+not a free text"*): `"intent": "neutral grip"`, the same pill his older cards draw for a grip chip.
+`scripts/check_program.py` fails a grip in `setup` and warns on any other grey line: his own cards
+never had one, and whether positions and kit should be chips too is open with him.
+⚠ **coach.html's ✎ editor does not follow this yet.** Saving an old card makes `toRx()` move its
+grip chip into Setup, and the editor's Setup box (empty for an old card) then drops it, so the
+grip is lost, and the editor has no box for the pill at all. Seen 2026-09-25 and proposed to Amir,
+not changed: app files are his call (*Every programme write* above).
 ⚠ **THE TEMPO IS ONE CELL, with the digit that carries the instruction in CLAY.**
 `TEMPO 3-1-1-0`, notation intact, and `tempoDisplay()` colours **the slowest phase when it is 2s
 or more, plus any non-zero pause** — so `3-0-1-0` colours the 3, `2-1-1-0` the 2 and the 1, and

@@ -163,7 +163,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 - `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
 - `message.outcomes[]` → 3–6 concrete, measurable expected outcomes.
 - `teaser` → hype section for the NEXT cycle only. Omit the whole `teaser` object if there is no next cycle planned.
-- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest`. **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `setup` (equipment/position), `intent` (one intention, the green pill), `note`, `cues`. Never write `chips[]`.
+- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest`. **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `intent` (the one green pill: a grip like `neutral grip`, or one intention), `setup` (a grey line, never a grip), `note`, `cues`. Never write `chips[]`.
 - `videoUrl` → full YouTube / Vimeo URL. Omit the field entirely if no video exists.
 - `notes` → optional. Remove the whole object if there are no coaching notes to add.
 
@@ -638,12 +638,20 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | Field | What it is | How it draws |
 |---|---|---|
 | `rx` | the numbers | the stats grid |
-| `setup` | equipment / position / conditions — `"neutral grip"`, `"45° bench"`, `"In 4 · out 8"` | quiet grey line under the name |
-| `intent` | **ONE** coaching intention — `"max intent"`, `"max speed"`, `"stick the landing"` | the green pill (the only pill) |
+| `setup` | equipment / position / conditions — `"45° bench"`, `"In 4 · out 8"`. **Never a grip.** Amir's own cards never had a grey line, so ask him before a programme ships one | quiet grey line under the name |
+| `intent` | **the ONE pill:** a **grip** (`"neutral grip"`, `"wide grip"`, `"neutral grip · straps"`) or ONE coaching intention (`"max intent"`, `"stick the landing"`). A card that needs both joins them in the one pill: `"neutral grip · max intent"` | the green pill (the only pill), the same pill Amir's older cards draw for a grip chip |
 | `note` | the coach's note to this athlete. **Anything about THIS athlete that used to be a custom cue goes here** (2026-09-24) | clay "Coach's Note" callout |
 | `cues` | **Do not write (2026-09-24).** Every card, circuit items included, shows its approved Spine entry's cues. Legacy cards still carry `cues`, which the app shows instead of the entry's until the next cycle drops them | the cues list |
 | `exId` | the exercise's id in the Spine (`public.exercises`), e.g. `"trap-bar-deadlift"` | nothing directly: it ties the card to its entry |
 | `why` | **Because:** why THIS athlete has this exercise — `{ "src", "part"?, "text" }` | a clay dot on the ⓘ; the reason opens the About sheet, and the cycle's Why page lists them all |
+
+**A grip is a chip, never free text** (Amir, 2026-09-25: *"grips should be a chip on the card not a
+free text"*). The rx redesign of 2026-09-20 had moved `neutral grip` into the grey `setup` line,
+against his 2026-06-15 rule that a grip is a chip; the first programme written that way came back
+with *"you changed how my file look like"*. `intent` draws the same deep-green pill his older cards
+draw for a grip chip, so the grip goes there. `scripts/check_program.py` fails a grip in `setup`
+and warns on any other `setup`. ⚠ `toRx()` (the coach editor's first save of an old card) still
+sends a grip chip to `setup`, and the editor then drops it; proposed to Amir, not changed.
 
 #### `why` — Because (2026-09-24)
 

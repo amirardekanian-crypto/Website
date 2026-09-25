@@ -132,8 +132,8 @@ junk drawer of 121 labels:**
 
 | Field | What it is | How it draws |
 |---|---|---|
-| `setup` | equipment / position — `"neutral grip"`, `"45° bench"`, `"In 4 · out 8"` | quiet grey line under the name |
-| `intent` | **ONE** intention — `"max intent"`, `"max speed"` | the green pill (the only pill) |
+| `setup` | equipment / position — `"45° bench"`, `"In 4 · out 8"`. **Never a grip** | quiet grey line under the name |
+| `intent` | a **grip** (`"neutral grip"`) or **ONE** intention (`"max intent"`, `"max speed"`); both join in the one pill: `"neutral grip · max intent"` | the green pill (the only pill) |
 | `cues` | technique, `good[]` / `bad[]` | the cues list |
 
 **Never restate the tempo in `intent` — or in a cue.** The card already shows `rx.tempo` with
@@ -387,7 +387,8 @@ Before committing:
 - `file` path in the manifest exactly matches the file you created
 - Every `standard` exercise has `rx.sets` and exactly one dose
   (`reps` / `time` / `distance` / `work`)
-- No dose hiding in `intent` or `setup` — `intent` is ONE intention, `setup` is kit/position
+- No dose hiding in `intent` or `setup` — `intent` is a grip or ONE intention, `setup` is kit/position,
+  and a grip is never in `setup` (Amir, 2026-09-25: a grip is a chip, never free text)
 - No `chips[]` anywhere, and no `chips` left beside an `rx`
 - Circuits use `rx.rounds` (a NUMBER) and `rx.rest`; items take their own `rx` when the dose is
   plain and keep free-text `detail` only when the wording says more than a number
