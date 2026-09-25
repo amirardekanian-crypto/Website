@@ -124,7 +124,7 @@
           "type": "standard",
           "name": "Cossack Squat",
           "videoUrl": null,
-          "note": "2s pause. Go only as deep as you can control and come up a little if the front of the hip pinches.",
+          "note": "Go only as deep as you can control and come up a little if the front of the hip pinches.",
           "cues": {
             "good": [
               "Sit deep into one hip with the other leg straight and its heel down",
@@ -139,7 +139,8 @@
             "reps": 8,
             "side": true,
             "rpe": 7,
-            "rest": 60
+            "rest": 60,
+            "tempo": "1-2-1-0"
           }
         },
         {

@@ -179,7 +179,7 @@
           "type": "standard",
           "name": "Single-Leg Calf Raise",
           "videoUrl": null,
-          "note": "3s eccentric. Once the bodyweight version feels easier than a 7, hold something heavy in the other hand and add weight before you add reps.",
+          "note": "Once the bodyweight version feels easier than a 7, hold something heavy in the other hand and add weight before you add reps.",
           "cues": {
             "good": [
               "Stand on flat floor with a fingertip on the wall, rise onto the ball of one foot, then take three seconds to lower",
@@ -194,7 +194,8 @@
             "reps": 12,
             "side": true,
             "rpe": 7,
-            "rest": 45
+            "rest": 45,
+            "tempo": "3-0-1-0"
           }
         },
         {
@@ -215,9 +216,9 @@
             "reps": 15,
             "side": true,
             "rpe": 7,
-            "rest": 30
-          },
-          "note": "2s top hold."
+            "rest": 30,
+            "tempo": "1-0-1-2"
+          }
         }
       ]
     }

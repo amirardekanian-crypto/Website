@@ -154,7 +154,7 @@
           "type": "standard",
           "name": "Modified Curl-Up",
           "videoUrl": null,
-          "note": "10 sec hold. Leave this one for an hour after you wake up, when the discs are most swollen.",
+          "note": "Leave this one for an hour after you wake up, when the discs are most swollen.",
           "cues": {
             "good": [
               "Hands under the small of your back, lift head and shoulders barely an inch",
@@ -167,14 +167,15 @@
           "rx": {
             "sets": 3,
             "reps": "6 / 4 / 2",
-            "rest": 30
+            "rest": 30,
+            "tempo": "1-0-1-10"
           }
         },
         {
           "type": "standard",
           "name": "Side Bridge",
           "videoUrl": null,
-          "note": "10 sec hold. Start on your knees and only move to the feet when the knee version is easy on both sides.",
+          "note": "Start on your knees and only move to the feet when the knee version is easy on both sides.",
           "cues": {
             "good": [
               "Elbow under the shoulder, lift the hips into a straight line",
@@ -188,14 +189,15 @@
             "sets": 3,
             "reps": "6 / 4 / 2",
             "side": true,
-            "rest": 30
+            "rest": 30,
+            "tempo": "1-0-1-10"
           }
         },
         {
           "type": "standard",
           "name": "Bird Dog",
           "videoUrl": null,
-          "note": "10 sec hold. Six reps, then four, then two, so it gets easier as you tire — never to failure.",
+          "note": "Six reps, then four, then two, so it gets easier as you tire — never to failure.",
           "cues": {
             "good": [
               "Reach the opposite arm and leg long, not high",
@@ -209,7 +211,8 @@
             "sets": 3,
             "reps": "6 / 4 / 2",
             "side": true,
-            "rest": 30
+            "rest": 30,
+            "tempo": "1-0-1-10"
           }
         }
       ]
