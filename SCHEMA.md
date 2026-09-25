@@ -163,7 +163,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 - `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
 - `message.outcomes[]` → 3–6 concrete, measurable expected outcomes.
 - `teaser` → hype section for the NEXT cycle only. Omit the whole `teaser` object if there is no next cycle planned.
-- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest`. **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `intent` (the one green pill: a grip like `neutral grip`, or one intention), `setup` (a grey line, never a grip), `note`, `cues`. Never write `chips[]`.
+- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest`. **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `intent` (the one green pill: a grip like `neutral grip`, or one intention), `note`, `cues`. No `setup` (no floating text). Never write `chips[]`.
 - `videoUrl` → full YouTube / Vimeo URL. Omit the field entirely if no video exists.
 - `notes` → optional. Remove the whole object if there are no coaching notes to add.
 
@@ -638,7 +638,7 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | Field | What it is | How it draws |
 |---|---|---|
 | `rx` | the numbers | the stats grid |
-| `setup` | equipment / position / conditions — `"45° bench"`, `"In 4 · out 8"`. **Never on an athlete's programme** (no floating text, Amir 2026-09-25: the detail goes in the `note`); some library sessions still carry one | quiet grey line under the name |
+| `setup` | equipment / position / conditions — `"45° bench"`, `"In 4 · out 8"`. **Not used any more** (no floating text, Amir 2026-09-25: the detail goes in the `note`). Programmes, the library files and the coach editor carry none; the app still draws one if an old file has it | quiet grey line under the name |
 | `intent` | **the ONE pill:** a **grip** (`"neutral grip"`, `"wide grip"`, `"neutral grip · straps"`) or ONE coaching intention (`"max intent"`, `"stick the landing"`). A card that needs both joins them in the one pill: `"neutral grip · max intent"` | the green pill (the only pill), the same pill Amir's older cards draw for a grip chip |
 | `note` | the coach's note to this athlete. **Anything about THIS athlete that used to be a custom cue goes here** (2026-09-24) | clay "Coach's Note" callout |
 | `cues` | **Do not write (2026-09-24).** Every card, circuit items included, shows its approved Spine entry's cues. Legacy cards still carry `cues`, which the app shows instead of the entry's until the next cycle drops them | the cues list |

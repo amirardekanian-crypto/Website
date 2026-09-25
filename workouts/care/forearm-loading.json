@@ -127,7 +127,7 @@
           "type": "standard",
           "name": "Wrist Extension",
           "videoUrl": null,
-          "note": "On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
+          "note": "Sore side. On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
           "cues": {
             "good": [
               "Rest your forearm on a bench palm down and hold a light weight with your wrist up",
@@ -143,8 +143,7 @@
             "rpe": 7,
             "tempo": "Iso",
             "rest": 30
-          },
-          "setup": "sore side"
+          }
         }
       ]
     },
@@ -156,7 +155,7 @@
           "type": "standard",
           "name": "Single-Arm Eccentric Wrist Extension",
           "videoUrl": null,
-          "note": "If your elbow feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
+          "note": "Sore side, 4s eccentric. If your elbow feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
           "cues": {
             "good": [
               "Lift the weight up with your free hand, then lower it over four seconds with the wrist you're training",
@@ -171,8 +170,7 @@
             "reps": 12,
             "rpe": 7,
             "rest": 40
-          },
-          "setup": "sore side · 4s eccentric"
+          }
         },
         {
           "type": "standard",
@@ -193,7 +191,7 @@
             "rpe": 7,
             "rest": 30
           },
-          "setup": "sore side · 3s eccentric"
+          "note": "Sore side, 3s eccentric."
         },
         {
           "type": "standard",
@@ -214,7 +212,7 @@
             "rpe": 7,
             "rest": 20
           },
-          "setup": "sore side"
+          "note": "Sore side."
         }
       ]
     }

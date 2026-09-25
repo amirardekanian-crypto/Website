@@ -178,7 +178,7 @@
           "type": "simple",
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
-          "note": "If you feel dizzy or tingly, go back to normal breathing.",
+          "note": "In 4, out 8. If you feel dizzy or tingly, go back to normal breathing.",
           "cues": {
             "good": [
               "Lie on your back with one hand on your belly and let each breath out slowly empty it",
@@ -190,8 +190,7 @@
           },
           "rx": {
             "time": "3 minutes"
-          },
-          "setup": "In 4 · out 8"
+          }
         }
       ]
     }

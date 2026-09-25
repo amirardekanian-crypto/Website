@@ -135,7 +135,7 @@
           "type": "standard",
           "name": "Build-Up Run",
           "videoUrl": null,
-          "note": "Run the last two as ten metres out, a turn at about three quarters speed and ten metres back.",
+          "note": "Easy to fast. Run the last two as ten metres out, a turn at about three quarters speed and ten metres back.",
           "cues": {
             "good": [
               "Each one a little faster than the last, and the final one at about nine tenths of top speed",
@@ -149,8 +149,7 @@
             "sets": 4,
             "distance": "20 m",
             "rest": 45
-          },
-          "setup": "easy to fast"
+          }
         }
       ]
     },

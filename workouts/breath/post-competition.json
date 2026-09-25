@@ -133,7 +133,7 @@
           "type": "simple",
           "name": "Box Breathing",
           "videoUrl": null,
-          "note": "The counting is the point: it gives a racing head something to hold on to.",
+          "note": "In 4, hold 4, out 4, hold 4. The counting is the point: it gives a racing head something to hold on to.",
           "cues": {
             "good": [
               "In for four, hold four, out for four, hold four",
@@ -145,14 +145,13 @@
           },
           "rx": {
             "time": "4 minutes"
-          },
-          "setup": "In 4 · hold 4 · out 4 · hold 4"
+          }
         },
         {
           "type": "simple",
           "name": "Extended Exhale Breathing",
           "videoUrl": null,
-          "note": "The long out-breath is the part that does the work.",
+          "note": "In 4, out 8. The long out-breath is the part that does the work.",
           "cues": {
             "good": [
               "In through the nose for four, out through the mouth for eight",
@@ -164,8 +163,7 @@
           },
           "rx": {
             "time": "4 minutes"
-          },
-          "setup": "In 4 · out 8"
+          }
         }
       ]
     }

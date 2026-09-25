@@ -194,7 +194,7 @@
             "rpe": 7,
             "rest": 45
           },
-          "setup": "2s top hold"
+          "note": "2s top hold."
         },
         {
           "type": "standard",

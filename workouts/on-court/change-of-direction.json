@@ -83,7 +83,7 @@
             "reps": 10,
             "side": true
           },
-          "setup": "Front-back, then side-side"
+          "note": "Front-back, then side-side."
         },
         {
           "type": "simple",

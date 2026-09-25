@@ -46,7 +46,7 @@
             "time": "60 sec",
             "side": true
           },
-          "setup": "Top and underside"
+          "note": "Top and underside."
         },
         {
           "type": "simple",

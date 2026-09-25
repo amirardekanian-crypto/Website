@@ -117,7 +117,7 @@
             "time": "30s",
             "rest": 30
           },
-          "setup": "resistance up each one"
+          "note": "Resistance up each one."
         }
       ]
     },

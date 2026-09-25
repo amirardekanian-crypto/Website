@@ -182,7 +182,7 @@
             "reps": "4 Throws",
             "rest": 60
           },
-          "setup": "change your distance each set"
+          "note": "Change your distance each set."
         },
         {
           "type": "standard",
@@ -202,7 +202,7 @@
             "reps": 1,
             "rest": 45
           },
-          "setup": "alternate sides"
+          "note": "Alternate sides."
         }
       ]
     },
@@ -214,7 +214,7 @@
           "type": "standard",
           "name": "Backpedal and Turn",
           "videoUrl": null,
-          "note": "Do the first two at half speed to get the feel, then build up.",
+          "note": "Alternate sides. Do the first two at half speed to get the feel, then build up.",
           "cues": {
             "good": [
               "Face the wall and throw the ball hard into it, backpedal away while you watch the rebound, then turn and chase it down",
@@ -228,8 +228,7 @@
             "sets": 4,
             "reps": 1,
             "rest": 75
-          },
-          "setup": "alternate sides"
+          }
         }
       ]
     }

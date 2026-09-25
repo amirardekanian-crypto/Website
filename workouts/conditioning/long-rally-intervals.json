@@ -259,7 +259,7 @@
           "rx": {
             "time": "2 minutes"
           },
-          "setup": "In 4 · out 8"
+          "note": "In 4, out 8."
         }
       ]
     }

@@ -305,7 +305,9 @@ The chip is the athlete's: never put a grip on a library entry. ⚠ **NO FLOATIN
 all; a detail for this athlete is the Coach's Note. `scripts/check_program.py` fails both.
 **The ✎ editor keeps old chips** (fixed 2026-09-25, on Amir's *"if its a bug, fix it"*): `toRx()` used
 to move an old card's leftover chips ("neutral grip") into Setup, and the editor's empty Setup box
-then deleted them on the first save. Now every leftover chip stays in the pill.
+then deleted them on the first save. Now every leftover chip stays in the pill. **The editor has no
+Setup box** (removed the same day, *"yes remove the setup box"*): an old grey line opens at the start
+of "Your note to them" and moves there on save. The library files' 54 grey lines became notes too.
 ⚠ **THE TEMPO IS ONE CELL, with the digit that carries the instruction in CLAY.**
 `TEMPO 3-1-1-0`, notation intact, and `tempoDisplay()` colours **the slowest phase when it is 2s
 or more, plus any non-zero pause** — so `3-0-1-0` colours the 3, `2-1-1-0` the 2 and the 1, and
