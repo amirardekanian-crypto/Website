@@ -15,14 +15,26 @@ never drift from the plan.
   returning athlete who somehow has no roadmap yet, the `athlete-brief` subagent can
   generate the brief first.
 - **PROGRAM_START_DATE** (`YYYY-MM-DD`). If unknown, ask once.
+- **The context pull** from /program-design STEP 0 (one database call). A new athlete reaches
+  the roadmap before design, so run it here, once; design reuses the same result rather than
+  asking again. The roadmap needs its `cycle_names_in_use`.
 
 ## Rules
-- **Multi-lens panel is MANDATORY (Amir's standing order, 2026-07-24).** Read
-  `.claude/COACHING-PRINCIPLES.md` → Process → "Every design pass runs a multi-lens
-  panel" and run that shape via the Workflow tool: 3+ independent specialist proposals
-  (lenses picked to fit the athlete) → a head-coach judge scoring against the brief +
-  principles → Claude synthesizes the final roadmap from the winner + best grafts.
-  Never skip it to save time; Amir asked for it on every program.
+- **Multi-lens panel is MANDATORY (Amir's standing order, 2026-07-24; reshaped 2026-09-25).**
+  Read `.claude/COACHING-PRINCIPLES.md` → Process → "Every design pass is checked" and run
+  that shape via the Workflow tool: **exactly three lens agents** in parallel, each writing
+  one independent proposal (lenses picked to fit the athlete, e.g. sport-transfer
+  periodization · durability/return-to-play · recovery-constrained pragmatist). **You are the
+  judge:** score the three against the brief + principles yourself and synthesize the final
+  roadmap from the winner + best grafts. There is no separate judge agent any more.
+  - **No literature search unless Amir asks for one.** The lenses work from the brief, the
+    principles and what they know; the 2026-09-24 panel ran 15 PubMed searches and took 44
+    minutes. Three lenses with no search should take about 20.
+  - **Files only.** Write the brief (and the context pull's `cycle_names_in_use`) into a
+    scratchpad file before launching, pass its real path, and tell each lens not to call the
+    database or any MCP tool (COACHING-PRINCIPLES.md → Process → "Background agents work from
+    files"). Never launch with placeholder arguments.
+  Never skip the panel to save time; Amir asked for it on every program.
 - **THE HOUSE SHAPE IS 5 CYCLES OF 5 WEEKS — 25 weeks.** *(Amir, 2026-08-17: "the rule is
   5 cycles of 5 weeks and you need to remember that.")* This is the default and you do not
   re-derive it from the goal each time. Cycle 1's length must match the first program

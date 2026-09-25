@@ -27,6 +27,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
+- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (COACHING-PRINCIPLES → Process).
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` — the coaching pipeline (intake → roadmap → design → engage → assemble → **`/cycle-report`** at the end of every cycle: the athlete's WhatsApp report plus a coach-only `## Debrief` section in their coaching log, which `/program-design` reads before the next cycle). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
   written from coach.html (it used to be `.claude/coaching-log/*.md`, in this public repo).
 
@@ -446,9 +447,10 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   explanation is enough"*): the list of exercises that train it (*In your plan*) shows only when the
   page is reached from Library → Exercises (`openQualitySheet(q, fromLib)`), never from a day card or
   a card's ⓘ. **Words only: athletes never see set counts.**
-- ⚠ **The mix rule exists three times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html)
-  and the quality check in `/program-design`. Same weights, same prep test, or the coach's check and
-  the athlete's card disagree.
+- ⚠ **The mix rule exists four times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html),
+  the quality check in `/program-design` and `mix()`/`top3()` in `scripts/check_program.py` (2026-09-25).
+  Same weights, same prep test, same 70% coverage and 12% cut, or the coach's check, the pipeline's
+  check and the athlete's card disagree.
 - **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). `bedrock`, `peak` and `reset` are
   phases, not qualities: they have no headline and are never flagged (bedrock→movement flagged almost
   every foundation block, 2026-09-24). coach.html → Exercises →

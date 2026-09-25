@@ -75,22 +75,57 @@ change before I build?"* before writing exercises.
    mid-design). If the pull fails (conflicts/WIP), say so and continue with a warning.
 1. Read **`.claude/COACHING-PRINCIPLES.md`** (apply throughout).
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
-3. **Detect mode FROM THE SERVER** (`data/*.json` is deleted, so a file test calls everyone NEW):
-   `select jsonb_typeof(data->'workouts'->'days') = 'array' as has_workouts from programs where athlete_id = '<id>'`
-   plus `select count(*) from session_history where athlete_id = '<id>'`. A programme with
-   workouts and logged sessions → **RETURNING**; no row, or a row holding only intake's
-   `athlete`/`sport` → **NEW**. Workouts but **no** sessions → the athlete never trained the
-   last cycle (no login yet? check `athlete_identities`): stop and ask Amir before designing.
+3. **ONE context pull: everything design reads from the server, in a single call.** Run it once
+   per athlete and keep the result for the whole pipeline (roadmap, design, assemble). Never look
+   these up again one at a time, and never discover the schema: the tables and columns are all
+   named here. *(2026-09-25: the last new-athlete run made 43 database calls, 36 of them lookups,
+   and every one was an approval prompt for Amir.)*
+   ```sql
+   select jsonb_build_object(
+     'row', (select jsonb_build_object(
+               'has_workouts', jsonb_typeof(data->'workouts'->'days') = 'array',
+               'cci', coalesce((data->>'currentCycleIndex')::int, 0),
+               'tier', data->'athlete'->>'tier', 'badge', data->'sport'->>'badge',
+               'cycles', (select jsonb_agg(jsonb_build_object('num', c->'num', 'name', c->'name', 'art', c->'art',
+                            'start', c->'startDate', 'end', c->'endDate'))
+                          from jsonb_array_elements(coalesce(data->'cycles', '[]'::jsonb)) c))
+             from public.programs where athlete_id = '<id>'),
+     'sessions', (select jsonb_build_object('n', count(*), 'last', max(completed_on))
+                  from public.session_history where athlete_id = '<id>'),
+     'log', (select body from public.coaching_logs where athlete_id = '<id>'),
+     'cycle_names_in_use', (select jsonb_agg(distinct c->>'name') from public.programs p,
+                            jsonb_array_elements(coalesce(p.data->'cycles', '[]'::jsonb)) c),
+     'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved')
+   ) as ctx,
+   (select string_agg(concat_ws('|', e.id, coalesce(e.pattern, ''), e.status, coalesce(c.sfr::text, '-'),
+             coalesce(array_to_string(c.flags, ','), ''), coalesce(array_to_string(e.qualities, ','), ''),
+             coalesce(array_to_string(e.loads, ','), ''), coalesce(e.impact, '-'),
+             coalesce(array_to_string(e.easier, ','), '') || '>' || coalesce(array_to_string(e.harder, ','), '') || '>' ||
+             coalesce(array_to_string(e.alts, ','), ''),
+             coalesce(array_to_string(e.aliases, ';'), '')), E'\n' order by e.pattern, c.sfr nulls last, e.id)
+    from public.exercises e left join public.exercise_coach c using (id)) as spine;
+   ```
+   - **Mode** from `ctx.row.has_workouts` and `ctx.sessions.n` (`data/*.json` is deleted, so a
+     file test calls everyone NEW). Workouts and logged sessions → **RETURNING**; no row, or a
+     row holding only intake's `athlete`/`sport` → **NEW**. Workouts but **no** sessions → the
+     athlete never trained the last cycle (no login yet? check `athlete_identities`): stop and
+     ask Amir before designing.
+   - `ctx.log` is the coaching log (step 5). `ctx.cycle_names_in_use` stops a roadmap reusing a
+     cycle name. `ctx.qualities` are the Quality Map words.
+   - `spine` is the whole exercise catalogue, one line per entry, pattern by pattern, best SFR
+     first: `id|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases`. It
+     replaces the catalogue query under THE SPINE below. Save it to the scratchpad to grep it.
 4. **Get the brief:**
-   - RETURNING → invoke the **`athlete-brief`** subagent (MODE=returning), passing any
-     check-in chat Amir pasted. It returns the one-page brief (loads, RPE, readiness,
+   - RETURNING → invoke the **`athlete-brief`** subagent (MODE=returning), **in the foreground**
+     (`run_in_background: false`: it is the one agent that reads the database, and a background
+     agent's approval prompts do not reach Amir), passing any check-in chat Amir pasted. It returns the one-page brief (loads, RPE, readiness,
      **e1RM from heaviest logged sets**, injuries) and imports any missing sessions. Use
      the brief — don't re-pull raw data. The athlete also has a dated estimated-1RM
      history of their own — see **The Ceiling** below for what it is and how it may be
      used when you set loads.
    - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
      /athlete-intake first.
-5. **RETURNING — read the prior rationale:** `select body from coaching_logs where athlete_id = '<id>'`.
+5. **RETURNING — read the prior rationale:** `ctx.log` from the context pull (step 3).
    This is the *why* behind the last cycle(s) — why each primary was chosen, what changed
    mid-cycle and why, the progression levers — and it is the thread you continue. The next
    cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
@@ -263,16 +298,21 @@ Day count + type of each day; one line of rationale per day citing Step 1.
 
 ## STEP 3 — FULL PROGRAM
 
-**ADVERSARIAL VERIFICATION PANEL — MANDATORY after drafting, before showing Amir
-(his standing order, 2026-07-24).** Draft the full spec, then run the panel via the
-Workflow tool per `.claude/COACHING-PRINCIPLES.md` → Process → "Every design pass runs
-a multi-lens panel": three parallel auditors — clinical/injury lens · house-rules
-compliance lint (against COACHING-PRINCIPLES + `exercise_library.json`) · dose/
-time-budget audit (real per-day minutes vs the cap, volume vs targets, week
-schedulability) — then apply every surviving must-fix/should-fix and present the
-corrected spec. On its first run this caught a deep-flexion warm-up leak on a
-knee-history athlete, a 60-min cap breach, and an unwritten run progression. Never
-skip it; never show Amir an unaudited spec.
+**CHECKS, THEN ONE REVIEW (Amir's standing order, reshaped 2026-09-25).** Every spec is
+still checked before Amir sees the finished programme, but the three-agent panel is gone
+(COACHING-PRINCIPLES.md → Process → "Every design pass is checked"). The review happens on
+the BUILT programme, so it runs in /program-assemble (Step 3 checks, Step 3b review), not here:
+1. **`scripts/check_program.py`** on the built file, with this spec's volume table (`--log`)
+   and the athlete's bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
+   covers what the old panel mostly found: the 10-set floors, the 4-set cap, the new-athlete
+   8-rep rule, a banned movement in any exercise or fallback, RPE floors in every note,
+   session length, back-to-back days, the Spine gate and the Quality Map.
+2. **NEW athlete: ONE reviewer** (one agent, files only) for what a script cannot judge:
+   injury logic, exercise choice, transfer, and whether the notes cover every exercise they
+   should. **RETURNING athlete: no reviewer** unless Amir asks for one.
+So write the spec for a script to read: every loaded exercise in the volume table, each
+banned movement named in one line (`bans: goblet, hanging, …`), every fallback on a line that
+starts `fallback:`.
 
 **CLASSIFICATION:** every exercise gets a role, and the role IS its section block:
 primary (stable, progress via load — use Step 1 selections) → **Primary** block ·
@@ -352,12 +392,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 
 **THE SPINE — read it before choosing (2026-09-24).** Every exercise Amir programmes has (or
-will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`:
-```sql
-select e.id, e.name, e.status, e.pattern, e.easier, e.harder, e.alts, c.sfr, c.flags
-from public.exercises e left join public.exercise_coach c using (id) order by e.pattern, c.sfr;
-```
-Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
+will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`.
+You already have all of it: the `spine` column of STEP 0's context pull, one line per entry
+(`id|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases`). Don't query
+it again exercise by exercise. Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
 **restrictions** (`flags`: `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`,
 `overhead` — check every flag against the athlete's injury picture), and **PROGRESS/REPLACE**
 with the entry's links: `harder` = progressions (the same movement made harder), `easier` =
@@ -495,6 +533,11 @@ never score isolation-only.
 
 1. **Per-exercise contribution** — day · exercise · sets · what it counts toward, with the
    fraction shown where it is not 1.0 (`Glutes 2 (×0.5)`). This is the working, and Amir reads it.
+   **A script reads it too** (`scripts/check_program.py --log`), so keep the shape exact: a
+   markdown table with the header `| Day | Exercise | Sets | Counts toward |`, the day as `D1`
+   (`D1 prep` for core counted in a warm-up), each exercise spelled exactly as on the programme,
+   cells like `Quads 4 · Glutes 2 (×0.5)`. A row the programme doesn't have, a set count that
+   differs, a loaded exercise left out, or `sets × weight` that doesn't add up is a FAIL.
 2. **Per-muscle total** — muscle → sets/week → goal range → verdict (developing / maintaining /
    under-dosed / over / by-design).
 

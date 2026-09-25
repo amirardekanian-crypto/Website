@@ -12,9 +12,29 @@ designs nothing.
 ## Step 1 — Pull what already exists
 - Establish the `athlete_id` (lowercase `firstname_lastname`). If Amir pasted athlete
   info, use it.
-- Invoke the **`athlete-brief`** subagent in MODE=`new` to pull the Web3Forms intake
-  submission from Gmail and list what's missing. (If there's no form, work from what
-  Amir pasted.)
+- **If Amir pasted the form, that IS the form.** Don't search Gmail for it and don't send
+  the subagent. Make the ONE lookup below (it checks for an intake row, a contact and a
+  programme row under this id in a single call) and go to Step 2.
+- **If he only gave a name**, make the same one lookup. A Farsi-form signup lands in
+  `public.hab_intake` with the whole form in `payload`. Only if it finds nothing, invoke the
+  **`athlete-brief`** subagent in MODE=`new` to pull the Web3Forms submission from Gmail, **in
+  the foreground** (`run_in_background: false`), so any approval prompt it raises reaches Amir.
+  ```sql
+  -- ONE call. <name> = a distinctive part of the name (Latin or Persian), <digits> = the
+  -- phone's last 8 digits. hab_intake columns: id, created_at, lang, name, email, contact,
+  -- programme, status, handled_at, payload (there is no athlete_id column).
+  select jsonb_build_object(
+    'intake', (select jsonb_agg(jsonb_build_object('id', id, 'at', created_at::date, 'lang', lang, 'name', name,
+                 'contact', contact, 'programme', programme, 'status', status, 'payload', payload) order by created_at desc)
+               from public.hab_intake where name ilike '%<name>%' or contact like '%<digits>%'),
+    'contact', (select jsonb_agg(jsonb_build_object('id', athlete_id, 'name', display_name, 'whatsapp', whatsapp,
+                 'source', source, 'tier', tier)) from public.hab_contacts
+                where athlete_id = '<id>' or whatsapp like '%<digits>%'),
+    'programme_row', (select data->'athlete' from public.programs where athlete_id = '<id>')
+  ) as found;
+  ```
+  No schema discovery: the tables and columns are named here and in Step 3. *(2026-09-25: the
+  first intake done this way spent 5 calls finding tables, columns and a form Amir had pasted.)*
 
 ## Step 2 — Fill the gaps (ask Amir; never invent)
 The **Web3Forms intake form already captures most of this** — age, sex, body weight,
@@ -39,7 +59,8 @@ Grouped into one round of questions, the genuine gaps to close:
 
 ## Step 3 — Emit the brief + register the athlete
 - Output the **ATHLETE BRIEF** (same structure the subagent uses).
-- **Register them: two server-side rows. No file, no key.**
+- **Register them: two server-side rows, written in ONE call** (both inserts in the same
+  `execute_sql`). **No file, no key.**
   ⚠️ The old `athlete_keys` + `?client=&key=` mechanism is **retired** (2026-09-07). The
   table is empty, the keyed RPCs fail closed, and a key written now is dead weight that
   makes the next reader think links still work. See `CLAUDE.md` → *THE BIG ONE*.
