@@ -1121,6 +1121,104 @@
   .pb-latest-go { font-size: 20px; color: rgba(255,255,255,0.85); }
   body[data-dark] .pb-disp:active { background: rgba(255,255,255,0.04); }
 
+  /* ════ COURSE — the Tennis Performance System lessons (in Playbook) and tests (the Tests
+     door), in English. Content comes from get_course(): coached athletes get all of it, the
+     public demo gets three lessons and one test, and every other item arrives as its card only.
+     The pictures are the course app's (assets/tps/), composed for a right-to-left app with the
+     subject on the LEFT, so they are MIRRORED here to keep titles clear on the left. ════ */
+  .lib-door.door-tests { background: #1B2A24; }
+  .lib-door-img { position: absolute; inset: 0; z-index: 0 !important; overflow: hidden; }
+  .lib-door-img img, .ar-art img, .tl-cover img { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+  .lib-door-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,30,24,0.9) 0%, rgba(10,30,24,0.3) 65%); }
+  .lib-door > .lib-door-img { position: absolute; }
+  .pb-dn.has-art { background-image: none; overflow: hidden; }
+  .pb-dn.has-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  .pb-dn.has-art::after { content: ''; position: absolute; inset: 0; background: rgba(14,74,54,0.35); }
+  .pb-dn.has-art b, .pb-dn.has-art i { z-index: 1; }
+  .pb-disp.is-locked .pb-dt { color: var(--grey-text); }
+  .pb-lock { margin-left: auto; flex-shrink: 0; font-size: 14px; opacity: 0.7; }
+  .pb-sub { font-family: 'Barlow', sans-serif; font-size: 12.5px; line-height: 1.35; color: var(--grey-text); margin-top: 3px; text-transform: none; }
+  .pb-course { margin: 26px 18px 0; padding-top: 18px; border-top: 2px solid var(--ink); }
+  .pb-course-k { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ice); }
+  .pb-course-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; text-transform: uppercase; color: var(--ink); margin-top: 5px; }
+  .pb-course-d { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.45; color: var(--grey-text); margin-top: 6px; }
+
+  /* Tests world */
+  .tl-head { position: relative; overflow: hidden; min-height: 230px; background: #1B2A24; padding: 54px 22px 26px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .tl-head > .lib-door-img { position: absolute; }
+  .tl-head > *:not(.lib-door-img):not(.nav-back) { position: relative; z-index: 2; }
+  .tl-body { padding: 18px 18px 110px; }
+  .tl-why { background: var(--white); border: 1px solid var(--grey-mid); border-radius: 16px; padding: 16px 16px 14px; font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.55; color: var(--ink); }
+  .tl-why b { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .tl-sec { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey-dark); margin: 24px 2px 10px; display: flex; align-items: center; gap: 10px; }
+  .tl-sec .pb-s { flex-shrink: 0; }
+  .tl-card { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 12px; cursor: pointer; background: #0E4A36; min-height: 132px; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; transition: transform .12s ease; }
+  .tl-card:active { transform: scale(0.985); }
+  .tl-cover { position: absolute; inset: 0; }
+  .tl-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,30,24,0.92) 0%, rgba(10,30,24,0.35) 70%); }
+  .tl-card > *:not(.tl-cover) { position: relative; z-index: 1; }
+  .tl-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 25px; line-height: 1; text-transform: uppercase; color: #fff; display: flex; align-items: center; gap: 8px; }
+  .tl-t .tl-lock { font-size: 15px; margin-left: auto; opacity: 0.85; }
+  .tl-d { font-family: 'Barlow', sans-serif; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.86); margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tl-badge { align-self: flex-start; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; background: rgba(199,85,47,0.9); border-radius: 999px; padding: 3px 8px; margin-bottom: 8px; }
+  .tl-card.is-locked .tl-cover img { filter: grayscale(0.6) brightness(0.8); }
+
+  /* The reader (#screen-article) reused for a lesson or a test */
+  #screen-article .ar-hero > .ar-art { position: absolute; inset: 0; z-index: 0; }
+  .ar-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,30,24,0.92) 0%, rgba(10,30,24,0.45) 100%); }
+  .ar-hero.has-art { background-image: none; }
+  #ar-body .ar-ol { padding-left: 22px; margin: 0 0 14px; }
+  #ar-body .ar-ol li { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.65; color: var(--ink); margin-bottom: 7px; padding-left: 4px; }
+  #ar-body .ar-ol li::marker { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; color: var(--ice); }
+  #ar-body .ar-warn { background: rgba(199,85,47,0.12); border: 1.5px solid var(--ice); border-radius: 12px; padding: 13px 15px; margin: 0 0 16px; font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  #ar-body .ar-warn b, #ar-body .ar-help b { display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; text-transform: uppercase; margin-bottom: 3px; }
+  #ar-body .ar-help { background: rgba(14,74,54,0.08); border-left: 3px solid #0E4A36; border-radius: 0 10px 10px 0; padding: 13px 15px; margin: 0 0 16px; font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  body[data-dark] #ar-body .ar-help { background: rgba(255,255,255,0.05); border-left-color: #5FA487; }
+  #ar-body .ar-label { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); margin: 20px 0 8px; }
+  #ar-body .ar-note { font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.55; color: var(--grey-text); margin: -4px 0 14px; }
+  #ar-body .ar-tablewrap { overflow-x: auto; margin: 0 0 14px; }
+  #ar-body table.ar-table { border-collapse: collapse; width: 100%; font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--ink); }
+  #ar-body .ar-table th { font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); text-align: left; padding: 7px 8px; border-bottom: 1.5px solid var(--ink); white-space: nowrap; }
+  #ar-body .ar-table td { padding: 8px; border-bottom: 1px solid var(--grey-mid); vertical-align: top; }
+  #ar-body .ar-table.sheet td { height: 30px; min-width: 56px; }
+  #ar-body .ar-btn { display: block; width: 100%; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 12px; padding: 13px; margin: 6px 0 14px; cursor: pointer; border: none; background: var(--ice); color: #fff; text-decoration: none; }
+  #ar-body .ar-btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--grey-mid); }
+  #ar-body .ar-locked { text-align: center; padding: 18px 6px 0; }
+  #ar-body .ar-locked .ar-lock-ic { font-size: 30px; }
+  #ar-body .ar-locked p { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.6; color: var(--ink); margin: 10px 0 16px; }
+
+  /* Yo-Yo IR1 beep player (ported from the course app, in English) */
+  .yoyo { position: fixed; inset: 0; z-index: 9000; background: #0E4A36; color: #fff; display: flex; flex-direction: column; overflow-y: auto; font-family: 'Barlow', sans-serif; }
+  .yoyo[hidden] { display: none; }
+  .yoyo[data-phase="rest"], .yoyo[data-phase="count"] { background: #2F6B57; }
+  .yoyo[data-phase="back"] { background: #0A3829; }
+  .yy-top { display: flex; justify-content: flex-end; padding: 12px 14px 0; }
+  .yy-x { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; cursor: pointer; }
+  .yy-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px 20px 32px; text-align: center; }
+  .yy-level { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+  .yy-speed { font-family: 'Space Mono', monospace; font-size: 12px; opacity: .8; text-transform: uppercase; }
+  .yy-left { font-family: 'Barlow Condensed', sans-serif; font-size: 110px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .yy-phase { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; text-transform: uppercase; }
+  .yy-dist-l { font-family: 'Space Mono', monospace; font-size: 11px; opacity: .75; margin-top: 12px; text-transform: uppercase; }
+  .yy-dist { font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 900; }
+  .yy-hint, .yy-note { font-size: 14px; line-height: 1.6; opacity: .88; max-width: 420px; margin: 0; }
+  .yy-adj { display: flex; align-items: center; gap: 14px; }
+  .yy-adj button { background: rgba(255,255,255,.16); color: #fff; border: 0; border-radius: 12px; padding: 12px 14px; font: inherit; font-weight: 800; cursor: pointer; }
+  .yy-big { font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 900; line-height: 1.05; }
+  .yy-big small { font-size: 20px; font-weight: 700; }
+  .yy-vo2 { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; color: #F4B89F; }
+  .yy-unit { font-size: 12px; opacity: .75; margin-top: -6px; }
+  .yy-btn { width: 100%; max-width: 360px; border: 0; border-radius: 12px; padding: 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; background: #fff; color: #0E4A36; }
+  .yy-btn.ghost { background: rgba(255,255,255,.16); color: #fff; }
+  .yy-btn.stop { background: #C7552F; color: #fff; margin-top: 18px; }
+  @media print {
+    body.printing-course .screen:not(#screen-article), body.printing-course nav, body.printing-course .nav-back, body.printing-course .demo-banner, body.printing-course .ar-btn { display: none !important; }
+    body.printing-course #screen-article { display: block !important; }
+    body.printing-course .ar-hero { background: none !important; padding: 0 0 10px; }
+    body.printing-course .ar-art { display: none; }
+    body.printing-course .ar-htitle, body.printing-course .ar-hmeta, body.printing-course .ar-kicker { color: #000 !important; }
+  }
+
   /* ════ ARTICLE READER — "Center Court" (broadcast scoreboard) ════ */
   #screen-article { background: var(--grey-bg); }
   /* Hero: deep-green band with court lines + grain; clay kicker, scoreboard meta */
@@ -4117,6 +4215,13 @@
         <div class="lib-door-d">Every exercise: what it's for, how to do it, and its easier, harder and other-equipment versions.</div>
         <div class="lib-door-row"><span class="lib-door-ct" id="exercises-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
       </div>
+      <div class="lib-door door-tests" role="button" tabindex="0" onclick="enterWorld('tests')">
+        <div class="lib-door-img" aria-hidden="true"><img src="assets/tps/test-day.webp" alt="" decoding="async" loading="lazy"></div>
+        <div class="lib-door-k">— Measure</div>
+        <div class="lib-door-big">Tests</div>
+        <div class="lib-door-d">Simple field tests. A tape, a stopwatch and a friend. See if the work is working.</div>
+        <div class="lib-door-row"><span class="lib-door-ct" id="tests-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
+      </div>
     </div>
   </div>
 
@@ -4150,6 +4255,9 @@
     </div>
     <div class="xl-list" id="xl-list"></div>
   </div>
+
+  <!-- Tests world: test-day rules + one card per test (filled by renderTestsWorld) -->
+  <div id="lib-tests" class="lib-pane" hidden></div>
 </div>
 
 <!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
@@ -7994,7 +8102,7 @@ window.renderCeiling = renderCeiling;
 
 function showLibPane(which) {
   _libPane = which;
-  ['doors', 'sessions', 'playbook', 'exercises'].forEach(p => {
+  ['doors', 'sessions', 'playbook', 'exercises', 'tests'].forEach(p => {
     const el = document.getElementById('lib-' + p);
     if (el) el.hidden = (p !== which);
   });
@@ -8005,6 +8113,7 @@ async function enterWorld(which) {
   if (which === 'sessions') await renderSessionsWorld();
   if (which === 'playbook') await renderPlaybook();
   if (which === 'exercises') renderExerciseLibrary();
+  if (which === 'tests') await renderTestsWorld();
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 function exitWorld() { showLibPane('doors'); window.scrollTo({ top: 0, behavior: 'instant' }); }
@@ -8020,8 +8129,13 @@ async function loadLibCounts() {
   const sEl = document.getElementById('sessions-count');
   const rEl = document.getElementById('playbook-count');
   if (sEl) sEl.textContent = sCount + ' ' + (sCount === 1 ? 'Session' : 'Sessions');
-  if (rEl) rEl.textContent = rCount + ' ' + (rCount === 1 ? 'Read' : 'Reads');
   paintExerciseCount();
+  const course = await ensureCourse();
+  const lCount = course ? course.lessons.length : 0, tCount = course ? course.tests.length : 0;
+  const all = rCount + lCount;
+  if (rEl) rEl.textContent = all + ' ' + (all === 1 ? 'Read' : 'Reads');
+  const tEl = document.getElementById('tests-count');
+  if (tEl) tEl.textContent = tCount ? tCount + ' ' + (tCount === 1 ? 'Test' : 'Tests') : '';
   _libCountsLoaded = true;
 }
 
@@ -8105,15 +8219,17 @@ async function renderPlaybook() {
   const host = document.getElementById('lib-playbook');
   if (!host) return;
   await ensureLibManifests();
+  const course = await ensureCourse();
   const backBtn = '<button class="nav-back" onclick="event.stopPropagation(); exitWorld()" aria-label="Back to Library">←</button>';
   if (!_readManifest) { host.innerHTML = backBtn + '<div class="pb-empty">Couldn\'t load the Playbook. Check your connection and try again.</div>'; return; }
   const all = [];
   (_readManifest.categories || []).forEach(c => (c.articles || []).forEach(a => all.push({ title: a.title, file: a.file, readMins: a.readMins, cat: c.title })));
-  if (!all.length) { host.innerHTML = backBtn + '<div class="pb-empty">Your coach is adding the Playbook — check back soon.</div>'; _playbookRendered = true; return; }
+  if (!all.length && !(course && course.lessons.length)) { host.innerHTML = backBtn + '<div class="pb-empty">Your coach is adding the Playbook — check back soon.</div>'; _playbookRendered = true; return; }
   const court = '<div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M90 100 L270 100 L340 220 L20 220 Z"/><line x1="56" y1="178" x2="304" y2="178"/><line x1="180" y1="100" x2="180" y2="220"/></g></svg></div>';
-  const heroHtml = `<div class="pb-hero">${backBtn}${court}<div class="pb-hk">— Learn</div><div class="pb-ht">Playbook</div><div class="pb-hm">${all.length} ${all.length === 1 ? 'article' : 'articles'} inside</div></div>`;
-  const latest = all[0];
-  const latestCard = `<div class="pb-latest" role="button" tabindex="0" data-file="${esc(latest.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-latest-label">— Latest · ${esc(latest.cat || '')}</div><div class="pb-latest-title">${esc(latest.title || '')}</div><div class="pb-latest-meta"><span>${latest.readMins ? esc(String(latest.readMins)) + ' min read' : ''}</span><span class="pb-latest-go">→</span></div></div>`;
+  const nReads = all.length + (course ? course.lessons.length : 0);
+  const heroHtml = `<div class="pb-hero">${backBtn}${court}<div class="pb-hk">— Learn</div><div class="pb-ht">Playbook</div><div class="pb-hm">${nReads} ${nReads === 1 ? 'read' : 'reads'} inside</div></div>`;
+  const latest = all[0] || {};
+  const latestCard = !all.length ? '' : `<div class="pb-latest" role="button" tabindex="0" data-file="${esc(latest.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-latest-label">— Latest · ${esc(latest.cat || '')}</div><div class="pb-latest-title">${esc(latest.title || '')}</div><div class="pb-latest-meta"><span>${latest.readMins ? esc(String(latest.readMins)) + ' min read' : ''}</span><span class="pb-latest-go">→</span></div></div>`;
   let catNum = 0;
   const catSections = (_readManifest.categories || []).map(c => {
     catNum++;
@@ -8123,7 +8239,7 @@ async function renderPlaybook() {
     const rows = (c.articles || []).map((a, i) => `<div class="pb-disp" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-dn"><b>${String(i + 1).padStart(2, '0')}</b><i></i></div><div class="pb-db"><div class="pb-dk">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}</div><div class="pb-dt">${esc(a.title || '')}</div></div><span class="pb-dgo" aria-hidden="true">›</span></div>`).join('');
     return header + rows;
   }).join('');
-  host.innerHTML = heroHtml + latestCard + catSections;
+  host.innerHTML = heroHtml + latestCard + catSections + courseLessonsHtml(course, catNum);
   _playbookRendered = true;
 }
 
@@ -8271,6 +8387,7 @@ async function openArticle(file) {
     return;
   }
 
+  setArHero(null);
   eyebrow.textContent = article.category || '';
   // Title with the last word wrapped in the clay highlight block (the scoreboard
   // "on-air" word). esc() each part so the title stays safe.
@@ -8289,6 +8406,472 @@ async function openArticle(file) {
   body.innerHTML = renderArticleBlocks(article.blocks || []);
 }
 window.openArticle = openArticle;
+
+// ═══════════════════════════════════════════════════════════════════════
+//  COURSE: the Tennis Performance System's lessons and tests, in English.
+//  Lessons sit in the Playbook (after the articles), tests behind the Tests door.
+//
+//  Everything comes from get_course() (supabase/course_en_01.sql). The lock is on
+//  the SERVER: a coached athlete or the coach gets every item whole. Anyone else,
+//  the public demo included, gets the demo picks (3 lessons, the broad jump and the
+//  test-day rules) and every other item as its card only, marked locked. Never
+//  "lock" something here alone: a locked item has nothing behind it to show.
+//
+//  The Farsi original lives in public.tps_content (the paid course app). This is a
+//  separate English copy in public.course_en, adapted for coached athletes. A change
+//  to one does NOT reach the other.
+// ═══════════════════════════════════════════════════════════════════════
+const COURSE_CACHE = 'aap_course_v1';
+const COURSE_ART_V = 2;   // follows ART_V in tennis/app/app.js: the files are the same
+const COURSE_ART = {
+  lesson: {
+    'growth': ['door-frame', '50% 55%'], 'agility-reaction': ['the-split-second', '50% 25%'],
+    'jumps-power': ['impact', '50% 50%'], 'speed-braking': ['braking-mark', '50% 45%'],
+    'strength': ['the-row', '50% 50%'], 'tennis-demands': ['rally-map', '50% 50%'],
+    'read-your-card': ['clock-and-chalk', '50% 50%'], 'recovery-adaptation': ['ice-and-clay', '50% 62%'],
+    'robustness': ['armour', '50% 50%'], 'rpe-weights': ['which-one', '50% 55%'],
+    'sleep-recovery': ['lights-out', '50% 55%'], 'tennis-fitness': ['tennis-fitness', '50% 18%'],
+    'missed-sessions': ['still-by-the-door', '50% 60%'], 'pain-red-flags': ['ice-and-tape', '50% 45%'],
+    'parents-guide': ['from-the-chair', '50% 50%'], 'ready-level-3': ['five-signs', '50% 55%'],
+    'tennis-tournaments': ['the-bag', '50% 45%'], 'warmup-ramp': ['first-turn', '50% 55%'],
+    'fuel-competition': ['match-day-box', '50% 60%'], 'fuel-training': ['before-and-after', '50% 45%'],
+    'hydration-heat': ['steam', '50% 60%'], 'why-strength': ['iron-pair', '50% 55%']
+  },
+  test: {
+    'broad-jump': ['the-coin', '50% 45%'], 'height': ['against-the-wall', '50% 50%'],
+    'jump-and-reach': ['chalk-bowl', '50% 55%'], 'spider-drill': ['five-points', '50% 50%'],
+    'sprint-20m': ['twenty-metres', '50% 55%'], 'strength-check': ['the-heavy-set', '50% 45%'],
+    'yo-yo-ir1': ['the-lane', '50% 45%']
+  },
+  testday: ['test-day', '50% 50%'],
+  locked: ['under-covers', '50% 55%']
+};
+function courseArt(kind, id) {
+  const a = kind === 'testday' || kind === 'locked' ? COURSE_ART[kind] : (COURSE_ART[kind] || {})[id];
+  return a || null;
+}
+// The course pictures face right-to-left, so they are mirrored (CSS) and the
+// horizontal focus is mirrored with them.
+function courseImg(a) {
+  if (!a) return '';
+  const pos = String(a[1] || '50% 50%').split(' ');
+  const x = 100 - parseFloat(pos[0] || 50);
+  return `<img src="assets/tps/${a[0]}.webp?v=${COURSE_ART_V}" alt="" decoding="async" loading="lazy" style="object-position:${x}% ${pos[1] || '50%'}" onerror="this.remove()">`;
+}
+
+let _course = null, _coursePromise = null;
+async function ensureCourse() {
+  if (_course) return _course;
+  if (_coursePromise) return _coursePromise;
+  _coursePromise = (async () => {
+    let data = null;
+    try {
+      const sb = await _sbReady();
+      if (sb) {
+        const res = await _withTimeout(sb.rpc('get_course'), 8000);
+        if (res && !res.error && res.data && Array.isArray(res.data.lessons)) data = res.data;
+      }
+    } catch (e) { /* offline: fall back to the copy below */ }
+    // Offline copy, for the athlete only. The demo never reads or writes it, so a
+    // full copy on a shared phone can't leak into the demo.
+    if (!window.IS_DEMO) {
+      if (data && data.full) { try { localStorage.setItem(COURSE_CACHE, JSON.stringify(data)); } catch (e) {} }
+      if (!data) { try { data = JSON.parse(localStorage.getItem(COURSE_CACHE) || 'null'); } catch (e) { data = null; } }
+    }
+    if (data) {
+      data.lessons = (data.lessons || []).slice().sort((a, b) => (+a.order || 999) - (+b.order || 999));
+      data.tests = (data.tests || []).slice().sort((a, b) => (+a.order || 999) - (+b.order || 999));
+      _course = data;
+    }
+    _coursePromise = null;
+    return _course;
+  })();
+  return _coursePromise;
+}
+
+function courseReadMins(l) {
+  let words = 0;
+  (l.sections || []).forEach(s => {
+    [s.h, s.callout, s.warn].concat(s.p || [], s.list || [], s.ol || []).forEach(t => { if (t) words += String(t).split(/\s+/).length; });
+  });
+  return words ? Math.max(1, Math.round(words / 200)) : 0;
+}
+
+// The lessons, as extra numbered sections at the foot of the Playbook.
+function courseLessonsHtml(course, startNum) {
+  if (!course || !course.lessons || !course.lessons.length) return '';
+  const L = course.lessons;
+  const open = L.filter(l => !l.locked).length;
+  const groups = [];
+  L.forEach(l => { const name = l.group || 'Lessons'; let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
+  const intro = open === L.length
+    ? 'The why behind your training. Short, plain lessons you can read in any order.'
+    : `${open} of ${L.length} lessons are open in the demo. Every coached athlete gets all of them.`;
+  let num = startNum || 0;
+  let html = `<div class="pb-course"><div class="pb-course-k">— The course</div><div class="pb-course-t">Tennis Performance System</div><div class="pb-course-d">${esc(intro)}</div></div>`;
+  groups.forEach(g => {
+    num++;
+    html += `<div class="pb-block"><span class="pb-s">${String(num).padStart(2, '0')}</span>${esc(g.name)}<span class="pb-ct">${g.items.length} ${g.items.length === 1 ? 'lesson' : 'lessons'}</span></div>`;
+    html += g.items.map((l, i) => {
+      const art = courseArt('lesson', l.id);
+      const mins = l.locked ? 0 : courseReadMins(l);
+      const kicker = l.locked ? 'Coached athletes' : (mins ? mins + ' min read' : 'Lesson');
+      return `<div class="pb-disp${l.locked ? ' is-locked' : ''}" role="button" tabindex="0" data-id="${esc(l.id)}" onclick="openLesson(this.dataset.id)">`
+        + `<div class="pb-dn${art ? ' has-art' : ''}">${courseImg(art)}<b>${String(i + 1).padStart(2, '0')}</b></div>`
+        + `<div class="pb-db"><div class="pb-dk">${esc(kicker)}</div><div class="pb-dt">${esc(l.title || '')}</div>${l.summary ? `<div class="pb-sub">${esc(l.summary)}</div>` : ''}</div>`
+        + (l.locked ? '<span class="pb-lock" aria-label="Locked">🔒</span>' : '<span class="pb-dgo" aria-hidden="true">›</span>')
+        + `</div>`;
+    }).join('');
+  });
+  return html;
+}
+
+// The reader (#screen-article) is shared by articles, lessons and tests. These set its hero.
+function setArHero(art) {
+  const hero = document.querySelector('#screen-article .ar-hero');
+  if (!hero) return;
+  const old = hero.querySelector('.ar-art');
+  if (old) old.remove();
+  hero.classList.toggle('has-art', !!art);
+  if (art) {
+    const d = document.createElement('div');
+    d.className = 'ar-art';
+    d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = courseImg(art);
+    hero.insertBefore(d, hero.firstChild);
+  }
+}
+function setArText(kicker, title, meta) {
+  document.getElementById('ar-eyebrow').textContent = kicker || '';
+  const words = String(title || '').trim().split(/\s+/);
+  const last = words.pop() || '';
+  document.getElementById('ar-title').innerHTML = (words.length ? esc(words.join(' ')) + ' ' : '') + '<span class="hl">' + esc(last) + '</span>';
+  document.getElementById('ar-meta').textContent = meta || '';
+}
+
+function courseLockedHtml(kind, item, list) {
+  const more = list.filter(x => x.locked).length - 1;
+  const what = kind === 'lesson' ? 'lesson' : 'test';
+  const line = more > 0
+    ? `This ${what} and ${more} more are in the full Library. Every coached athlete gets all of it in their app.`
+    : `This ${what} is in the full Library. Every coached athlete gets all of it in their app.`;
+  const lead = item.summary || item.why || '';
+  const cta = window.IS_DEMO
+    ? '<a class="ar-btn" href="/form.html">Apply for coaching</a>'
+    : `<button class="ar-btn" onclick="goTo('notes')">Ask your coach</button>`;
+  return `<div class="ar-locked"><div class="ar-lock-ic" aria-hidden="true">🔒</div>${lead ? `<p>${esc(lead)}</p>` : ''}<p>${esc(line)}</p>${cta}<button class="ar-btn ghost" onclick="goTo('workouts')">Back to the Library</button></div>`;
+}
+
+const courseUl = a => (a && a.length) ? `<ul class="ar-list">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : '';
+const courseOl = a => (a && a.length) ? `<ol class="ar-ol">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ol>` : '';
+const courseText = v => Array.isArray(v) ? courseUl(v) : (v ? `<p class="ar-p">${esc(v)}</p>` : '');
+
+async function openLesson(id) {
+  const body = document.getElementById('ar-body');
+  if (!body) return;
+  const course = await ensureCourse();
+  const l = course && course.lessons.find(x => x.id === id);
+  if (!l) return;
+  goTo('article');
+  window.scrollTo(0, 0);
+  if (l.locked) {
+    setArHero(courseArt('locked'));
+    setArText(l.group || 'Lesson', l.title, 'Coached athletes');
+    body.innerHTML = courseLockedHtml('lesson', l, course.lessons);
+    return;
+  }
+  setArHero(courseArt('lesson', l.id));
+  const mins = courseReadMins(l);
+  setArText(l.group || 'Lesson', l.title, ['Lesson', mins ? mins + ' min read' : '', l.audience ? 'For ' + String(l.audience).toLowerCase() : ''].filter(Boolean).join(' · '));
+  let lead = true;
+  body.innerHTML = (l.sections || []).map(s => {
+    let h = '';
+    if (s.h) h += `<h3 class="ar-h"><span class="ar-h-t">${esc(s.h)}</span></h3>`;
+    (s.p || []).forEach(p => { h += `<p class="ar-p${lead ? ' ar-lead' : ''}">${esc(p)}</p>`; lead = false; });
+    h += courseUl(s.list) + courseOl(s.ol);
+    if (s.callout) h += `<div class="ar-callout" data-label="Key point">${esc(s.callout)}</div>`;
+    if (s.warn) h += `<div class="ar-warn">${esc(s.warn)}</div>`;
+    return h;
+  }).join('');
+}
+window.openLesson = openLesson;
+
+// ── TESTS world ──
+let _testsRendered = false;
+async function renderTestsWorld() {
+  if (_testsRendered) return;
+  const host = document.getElementById('lib-tests');
+  if (!host) return;
+  const head = `<div class="tl-head"><button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>`
+    + `<div class="lib-door-img" aria-hidden="true">${courseImg(courseArt('testday'))}</div>`
+    + `<div class="w-kick">— Measure</div><div class="w-title">Tests</div><div class="w-sub">A tape, a stopwatch and a friend.</div></div>`;
+  host.innerHTML = head + '<div class="pb-empty">Loading…</div>';
+  const course = await ensureCourse();
+  if (!course || !course.tests.length) {
+    host.innerHTML = head + '<div class="pb-empty">Couldn\'t load the tests. Check your connection and try again.</div>';
+    return;
+  }
+  const card = (t, onclick) => {
+    const art = t._day ? courseArt('testday') : courseArt('test', t.id);
+    return `<div class="tl-card${t.locked ? ' is-locked' : ''}" role="button" tabindex="0" data-id="${esc(t.id || '')}" onclick="${onclick}">`
+      + `<div class="tl-cover" aria-hidden="true">${courseImg(art)}</div>`
+      + (t.badge ? `<span class="tl-badge">${esc(t.badge)}</span>` : '')
+      + `<div class="tl-t">${esc(t.title || '')}${t.locked ? '<span class="tl-lock" aria-label="Locked">🔒</span>' : ''}</div>`
+      + (t.why || t.intro ? `<div class="tl-d">${esc(t.why || t.intro)}</div>` : '')
+      + `</div>`;
+  };
+  const onDay = course.tests.filter(t => !t.optional), extra = course.tests.filter(t => t.optional);
+  let html = head + '<div class="tl-body">'
+    + `<div class="tl-why"><b>Why test?</b>Test before a new block and again in the lighter week at the end of it. Keep everything the same each time and you'll see if your body is really getting better. Testing is optional. Your programme works without it.</div>`;
+  if (course.day) html += `<div class="tl-sec"><span class="pb-s">00</span>Start here</div>` + card(Object.assign({ _day: true, badge: 'Read first' }, course.day), 'openTestDay()');
+  if (onDay.length) html += `<div class="tl-sec"><span class="pb-s">01</span>Test day, in this order</div>` + onDay.map(t => card(t, 'openCourseTest(this.dataset.id)')).join('');
+  if (extra.length) html += `<div class="tl-sec"><span class="pb-s">02</span>Outside test day</div>` + extra.map(t => card(t, 'openCourseTest(this.dataset.id)')).join('');
+  host.innerHTML = html + '</div>';
+  _testsRendered = true;
+}
+window.renderTestsWorld = renderTestsWorld;
+
+async function openTestDay() {
+  const body = document.getElementById('ar-body');
+  const course = await ensureCourse();
+  const D = course && course.day;
+  if (!body || !D) return;
+  goTo('article');
+  window.scrollTo(0, 0);
+  setArHero(courseArt('testday'));
+  setArText('Tests', D.title || 'Test day', 'Read this first');
+  let h = '';
+  if (D.intro) h += `<p class="ar-p ar-lead">${esc(D.intro)}</p>`;
+  if (D.ready) h += `<div class="ar-label">Only test today if all of these are true</div>${courseUl(D.ready)}`;
+  if (D.readyNote) h += `<p class="ar-note">${esc(D.readyNote)}</p>`;
+  if (D.order) h += `<div class="ar-label">Order and rest</div>${courseOl(D.order)}`;
+  if (D.orderNote) h += `<p class="ar-note">${esc(D.orderNote)}</p>`;
+  if (D.warmup) h += `<div class="ar-label">Test-day warm-up · the same every time, in this order</div>${courseUl(D.warmup)}`;
+  if (D.split) h += `<p class="ar-p">${esc(D.split)}</p>`;
+  body.innerHTML = h;
+}
+window.openTestDay = openTestDay;
+
+async function openCourseTest(id) {
+  const body = document.getElementById('ar-body');
+  const course = await ensureCourse();
+  const t = course && course.tests.find(x => x.id === id);
+  if (!body || !t) return;
+  goTo('article');
+  window.scrollTo(0, 0);
+  if (t.locked) {
+    setArHero(courseArt('locked'));
+    setArText(t.badge ? 'Test · ' + t.badge : 'Test', t.title, 'Coached athletes');
+    body.innerHTML = courseLockedHtml('test', t, course.tests);
+    return;
+  }
+  setArHero(courseArt('test', t.id));
+  setArText(t.badge ? 'Test · ' + t.badge : 'Test', t.title, t.optional ? 'Outside test day' : 'Test day');
+  const H = txt => `<h3 class="ar-h"><span class="ar-h-t">${esc(txt)}</span></h3>`;
+  let h = '';
+  if (t.why) h += H('Why this test?') + `<p class="ar-p ar-lead">${esc(t.why)}</p>`;
+  if (t.caution) h += `<div class="ar-warn"><b>${esc(t.cautionTitle || 'Careful')}</b>${esc(t.caution)}</div>`;
+  if (t.rmGuide && t.rmGuide.length) {
+    h += H(t.rmTitle || 'Which rep max?') + `<div class="ar-tablewrap"><table class="ar-table"><thead><tr><th>If you're</th><th>Test</th><th>Note</th></tr></thead><tbody>`
+      + t.rmGuide.map(r => `<tr><td>${esc(r.who || '')}</td><td><b>${esc(r.rm || '')}</b></td><td>${esc(r.note || '')}</td></tr>`).join('') + `</tbody></table></div>`;
+  }
+  if (t.rmWhy) h += t.rmWhy.map(x => `<p class="ar-p">${x.b ? `<b>${esc(x.b)}</b> ` : ''}${esc(x.t || '')}</p>`).join('');
+  if (t.equipment) h += H('What you need') + courseUl(t.equipment);
+  if (t.setup) h += H('Set-up') + courseOl(t.setup);
+  if (t.helper) h += `<div class="ar-help"><b>${esc(t.helperTitle || "Your helper's job")}</b>${esc(t.helper)}</div>`;
+  if (t.steps) h += H('How to do it') + courseOl(t.steps);
+  if (t.tries) h += H('How many tries?') + `<p class="ar-p">${esc(t.tries)}</p>`;
+  if (t.record) h += `<div class="ar-callout" data-label="Write down">${esc(t.record)}</div>`;
+  if (t.calc === 'one-rep-max') {
+    if (t.calcTitle) h += H(t.calcTitle);
+    h += courseText(t.calcIntro);
+    if (typeof openCeilingAdd === 'function' && !window.IS_DEMO) h += `<button class="ar-btn" onclick="openCeilingAdd()">Log it on The Ceiling</button>`;
+    if (t.calcHelp) h += `<div class="ar-help"><b>${esc(t.calcHelpTitle || 'How it works')}</b>${Array.isArray(t.calcHelp) ? courseUl(t.calcHelp) : esc(t.calcHelp)}</div>`;
+  }
+  if (t.player === 'yo-yo-ir1') {
+    h += `<div class="ar-help"><b>The test beeps</b>The beeps play on the published Yo-Yo IR1 timetable. Each shuttle is 2 x 20 m, then 10 seconds of recovery, and every level gets faster. At the end it shows your distance and an estimated VO2max. Nothing is saved.</div>`
+      + `<button class="ar-btn" onclick="yyOpen()">▶ Open the test screen</button>`;
+  }
+  if (t.mistakes) h += H('Mistakes that spoil the result') + courseUl(t.mistakes);
+  if (t.standard) h += H('The same every time') + courseUl(t.standard);
+  if (t.clearChange) h += H(t.clearTitle || 'How big is a real change?') + `<div class="ar-callout" data-label="Real change">${esc(t.clearChange)}</div>`;
+  if (t.when) h += H('When to test') + `<p class="ar-p">${esc(t.when)}</p>`;
+  const sh = t.sheet || {};
+  const cols = sh.cols || ['Try 1', 'Try 2', 'Try 3', 'Result'];
+  const rows = sh.rows || ['Baseline, day 1', 'Baseline, day 2', 'Retest 1', 'Retest 2', 'Retest 3', 'Retest 4'];
+  h += H('Results sheet') + `<p class="ar-note">Copy this onto paper or print it. Nothing is saved here. Send your numbers to your coach.</p>`
+    + `<div class="ar-tablewrap"><table class="ar-table sheet"><thead><tr><th>${esc(sh.first || 'Test')}</th>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>`
+    + `<tbody>${rows.map(r => `<tr><td>${esc(r)}</td>${cols.map(() => '<td></td>').join('')}</tr>`).join('')}</tbody></table></div>`
+    + `<button class="ar-btn ghost" onclick="printCourse()">Print this page</button>`;
+  body.innerHTML = h;
+}
+window.openCourseTest = openCourseTest;
+
+function printCourse() {
+  document.body.classList.add('printing-course');
+  const done = () => { document.body.classList.remove('printing-course'); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  window.print();
+  setTimeout(done, 1500);
+}
+window.printCourse = printCourse;
+
+/* ── Yo-Yo IR1 player: beeps on the published timetable (Bangsbo 2008). Nothing is saved.
+   Ported from tennis/app/app.js (Farsi). The timetable and the maths are the same. ── */
+// [level, km/h, runs]. One run = 2 × 20 m, then 10 s active recovery (2 × 5 m jog).
+const YOYO_LEVELS = [[5, 10, 1], [9, 12, 1], [11, 13, 2], [12, 13.5, 3], [13, 14, 4],
+  [14, 14.5, 8], [15, 15, 8], [16, 15.5, 8], [17, 16, 8], [18, 16.5, 8], [19, 17, 8],
+  [20, 17.5, 8], [21, 18, 8], [22, 18.5, 8], [23, 19, 8]];
+const YOYO_RECOVERY = 10, YOYO_COUNTDOWN = 5;
+const YY = { running: false, ctx: null, gain: null, t0: 0, runs: [], events: [], next: 0, tick: null, lock: null, result: 0, finished: false, armed: 0 };
+function yoyoPlan() {
+  const runs = []; let t = YOYO_COUNTDOWN, dist = 0;
+  YOYO_LEVELS.forEach(([lv, kmh, n]) => {
+    const leg = 72 / kmh;   // seconds per 20 m at this speed
+    for (let b = 1; b <= n; b++) {
+      dist += 40;
+      runs.push({ lv, b, n, kmh, go: t, turn: t + leg, home: t + 2 * leg, dist, newLevel: b === 1 });
+      t += 2 * leg + YOYO_RECOVERY;
+    }
+  });
+  return runs;
+}
+function yoyoEvents(runs) {
+  const ev = [];
+  runs.forEach(r => {
+    [3, 2, 1].forEach(k => ev.push({ t: r.go - k, f: 520, d: 0.08, v: 0.25 }));   // get ready
+    if (r.newLevel) { ev.push({ t: r.go, f: 1175, d: 0.16, v: 0.9 }); ev.push({ t: r.go + 0.2, f: 1175, d: 0.16, v: 0.9 }); }
+    else ev.push({ t: r.go, f: 880, d: 0.3, v: 0.9 });
+    ev.push({ t: r.turn, f: 880, d: 0.3, v: 0.9 });
+    ev.push({ t: r.home, f: 880, d: 0.3, v: 0.9 });
+  });
+  return ev.sort((a, b) => a.t - b.t);
+}
+function yyTone(at, freq, dur, vol) {
+  const o = YY.ctx.createOscillator(), g = YY.ctx.createGain();
+  o.frequency.value = freq; o.connect(g); g.connect(YY.gain);
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(vol, at + 0.015);
+  g.gain.setValueAtTime(vol, at + dur - 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  o.start(at); o.stop(at + dur + 0.02);
+}
+async function yyKeepAwake(on) {
+  try {
+    if (on && 'wakeLock' in navigator) YY.lock = await navigator.wakeLock.request('screen');
+    else if (!on && YY.lock) { await YY.lock.release(); YY.lock = null; }
+  } catch (e) { /* not supported: fine */ }
+}
+function yyAudio() {
+  try {
+    if (!YY.ctx) YY.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (YY.ctx.state === 'suspended') YY.ctx.resume();
+  } catch (e) { return false; }
+  YY.gain = YY.ctx.createGain(); YY.gain.gain.value = 1; YY.gain.connect(YY.ctx.destination);
+  return true;
+}
+function yyTestSound() {
+  if (!yyAudio()) return;
+  const now = YY.ctx.currentTime + 0.05;
+  [0, 0.45, 0.9].forEach(k => yyTone(now + k, 880, 0.3, 0.9));
+}
+function yyState(now) {
+  const R = YY.runs;
+  if (now < R[0].go) return { phase: 'count', left: R[0].go - now, r: R[0], done: 0 };
+  let i = 0; while (i + 1 < R.length && R[i + 1].go <= now) i++;
+  const r = R[i], done = now >= r.home ? i + 1 : i;
+  if (now < r.turn) return { phase: 'out', left: r.turn - now, r, done };
+  if (now < r.home) return { phase: 'back', left: r.home - now, r, done };
+  const nx = R[i + 1];
+  return { phase: 'rest', left: nx ? nx.go - now : 0, r: nx || r, next: !!nx, done };
+}
+function yyPaint(now) {
+  const el = document.getElementById('yoyo'); if (!el || !YY.running) return;
+  const st = yyState(now);
+  const label = { count: 'Ready, behind the start line', out: 'Run to the 20 m line', back: 'Back to the start line', rest: 'Recover: jog to the 5 m line and back' }[st.phase];
+  el.dataset.phase = st.phase;
+  el.querySelector('.yy-phase').textContent = label;
+  el.querySelector('.yy-left').textContent = Math.max(0, st.left).toFixed(1);
+  el.querySelector('.yy-level').textContent = `${st.phase === 'rest' && st.next ? 'Next: ' : ''}Level ${st.r.lv} · shuttle ${st.r.b} of ${st.r.n}`;
+  el.querySelector('.yy-speed').textContent = `${st.r.kmh} km/h`;
+  el.querySelector('.yy-dist').textContent = `${st.done * 40} m`;
+}
+function yyLoop() {
+  if (!YY.running) return;
+  const now = YY.ctx.currentTime - YY.t0;
+  while (YY.next < YY.events.length && YY.events[YY.next].t < now + 1.5) {
+    const e = YY.events[YY.next++];
+    if (e.t >= now - 0.05) yyTone(YY.t0 + e.t, e.f, e.d, e.v);
+  }
+  yyPaint(now);
+  if (now > YY.runs[YY.runs.length - 1].home + 1) yyStop(true);
+}
+function yyStart() {
+  if (!yyAudio()) return;
+  YY.runs = yoyoPlan(); YY.events = yoyoEvents(YY.runs); YY.next = 0;
+  YY.t0 = YY.ctx.currentTime + 0.3; YY.running = true; YY.finished = false; YY.armed = 0;
+  yyKeepAwake(true);
+  YY.tick = setInterval(yyLoop, 100); yyLoop();
+}
+// After the second miss, the last run whose end beep has passed was the missed one: count one less.
+function yyStop(finished) {
+  if (!YY.running) return;
+  const now = YY.ctx.currentTime - YY.t0;
+  YY.running = false; clearInterval(YY.tick); YY.tick = null;
+  try { YY.gain.gain.setValueAtTime(0, YY.ctx.currentTime); YY.gain.disconnect(); } catch (e) { /* already gone */ }
+  yyKeepAwake(false);
+  const done = now < YY.runs[0].go ? 0 : yyState(now).done;
+  YY.finished = !!finished;
+  YY.result = finished ? done : Math.max(0, done - 1);
+  yyRenderResult();
+}
+function yyShell(inner, closable) {
+  let el = document.getElementById('yoyo');
+  if (!el) { el = document.createElement('div'); el.id = 'yoyo'; el.className = 'yoyo'; document.body.appendChild(el); }
+  el.hidden = false; el.dataset.phase = ''; document.body.style.overflow = 'hidden';
+  el.innerHTML = (closable ? `<div class="yy-top"><button class="yy-x" data-yy="close" aria-label="Close">✕</button></div>` : '') + `<div class="yy-body">${inner}</div>`;
+}
+function yyOpen() {
+  yyShell(`<div class="yy-level">Yo-Yo IR1</div>
+    <div class="yy-phase">Stand behind the start line</div>
+    <p class="yy-hint">Turn your phone's volume all the way up and test the sound. The screen stays on until the test ends, so don't leave this page. Your helper counts the warnings, and after your second late arrival taps "End test" twice.</p>
+    <button class="yy-btn ghost" data-yy="testsound">🔊 Test the sound</button>
+    <button class="yy-btn" data-yy="start">▶ Start test</button>`, true);
+}
+window.yyOpen = yyOpen;
+function yyRenderRunning() {
+  yyShell(`<div class="yy-level"></div><div class="yy-speed"></div>
+    <div class="yy-left"></div><div class="yy-phase"></div>
+    <div class="yy-dist-l">Distance done</div><div class="yy-dist"></div>
+    <button class="yy-btn stop" data-yy="stop">⏹ End test</button>`, false);
+}
+function yyRenderResult() {
+  const R = YY.runs, n = YY.result, r = n > 0 ? R[n - 1] : null, dist = n * 40;
+  yyShell(`<div class="yy-phase">${YY.finished ? 'All levels done!' : 'Test over'}</div>
+    <p class="yy-hint">Set the distance to the last shuttle you finished on time.</p>
+    <div class="yy-adj"><button data-yy="minus" aria-label="40 m less">− 40</button><div class="yy-big">${dist}<small> m</small></div><button data-yy="plus" aria-label="40 m more">+ 40</button></div>
+    <div class="yy-level">${r ? `Last level: ${r.lv}.${r.b}` : 'No shuttle finished yet'}</div>
+    ${r ? `<div class="yy-vo2">Estimated VO2max ≈ ${(dist * 0.0084 + 36.4).toFixed(1)}</div><div class="yy-unit">ml of oxygen per kg per minute</div>` : ''}
+    <p class="yy-note">This estimate uses Bangsbo's formula and can be a few points off for one person. To compare with yourself, write down the distance. Nothing is saved here.</p>
+    <button class="yy-btn" data-yy="close">Close</button>`, true);
+}
+document.addEventListener('click', e => {
+  const b = e.target && e.target.closest && e.target.closest('[data-yy]'); if (!b) return;
+  const a = b.dataset.yy;
+  if (a === 'testsound') yyTestSound();
+  else if (a === 'start') { yyRenderRunning(); yyStart(); }
+  else if (a === 'stop') {
+    // Two taps, so a brush against the screen can't end a test.
+    if (YY.armed && Date.now() - YY.armed < 3000) { YY.armed = 0; yyStop(false); }
+    else { YY.armed = Date.now(); b.textContent = 'Tap again to end'; setTimeout(() => { if (YY.running && b.isConnected) b.textContent = '⏹ End test'; }, 3000); }
+  }
+  else if (a === 'minus' || a === 'plus') { YY.result = Math.min(YY.runs.length, Math.max(0, YY.result + (a === 'plus' ? 1 : -1))); yyRenderResult(); }
+  else if (a === 'close' && !YY.running) { const el = document.getElementById('yoyo'); if (el) { el.hidden = true; el.innerHTML = ''; } document.body.style.overflow = ''; }
+});
+document.addEventListener('visibilitychange', () => {
+  if (!YY.running || document.visibilityState !== 'visible') return;
+  yyKeepAwake(true); if (YY.ctx && YY.ctx.state === 'suspended') YY.ctx.resume();
+});
 
 // Renders an array of typed content blocks to HTML.
 // Block types: p · h · list · callout · img · workout
