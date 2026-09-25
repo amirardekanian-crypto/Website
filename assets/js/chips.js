@@ -318,8 +318,8 @@
        rx.label     "Hold"                      optional one-word dose-cell override
      and beside it, on the exercise itself — FOUR fields, four meanings, four
      looks, which is what stopped the pill row being a junk drawer of 121 labels:
-       ex.setup     "neutral grip"              equipment / position → quiet grey line
-       ex.intent    "max intent"                ONE coaching intention → the green pill
+       ex.setup     "45° bench"                 equipment / position → quiet grey line
+       ex.intent    "max intent" | "neutral grip"  the green pill: an intention or a grip
        ex.note      "start shallow…"            the coach's note   → clay callout
        ex.cues      {good:[…], bad:[…]}         technique         → the cues list
 
@@ -490,17 +490,14 @@
   // Convert one legacy exercise to rx. Used by scripts/migrate_rx.py's JS twin
   // and by the coach editor the first time it saves an unmigrated exercise.
   //
-  // The leftover green pills are triaged, not dumped: a pill that merely restates
-  // the tempo is DROPPED when a tempo cell already says it (153 cards were
-  // carrying that duplicate), and anything else becomes the `setup` line — which
-  // is where "neutral grip" and "45° bench" always belonged.
+  // The leftover green pills: a pill that merely restates the tempo is DROPPED
+  // when a tempo cell already says it (153 cards were carrying that duplicate),
+  // and every other one STAYS A PILL. Amir, 2026-09-25: "grips should be a chip on
+  // the card not a free text", and "i dont like floating text". This used to send
+  // anything that was not an intention ("neutral grip", "45° bench") to the grey
+  // setup line, and the coach editor then wrote its own Setup box (empty on an old
+  // card) over it, so the chip was lost on the first save.
   const TEMPO_WORDS = /(eccentric|squeeze|hold|pause|lower|slow|controlled|stretch|return|tempo)/i;
-
-  // What reads as an INTENTION rather than a condition. "max speed" on a sprint
-  // is the point of the exercise and has to stay loud; "neutral grip" is a
-  // condition and belongs in quiet text. Anything not matched here goes to setup,
-  // which is the safe direction to be wrong in.
-  const INTENT_WORDS = /^(max |fast |explosive|stick |stick$|drive |quiet |minimal ground|snap |punch |build |accelerat|attack)/i;
 
   function toRx(ex) {
     const r = rxOf(ex);
@@ -520,18 +517,17 @@
       .map(x => x.label)
       .filter(l => !(rx.tempo && TEMPO_WORDS.test(l)));
 
-    const intents = keep.filter(l => INTENT_WORDS.test(l));
-    const rest    = keep.filter(l => !INTENT_WORDS.test(l));
+    // The pill is the only chip an rx card draws, so the leftovers share it, in
+    // the card's own order: "max speed · neutral grip".
+    const pill = [ex.intent].concat(keep).filter((l, i, a) => l && a.indexOf(l) === i);
 
     // An exercise with no countable dose — "Start the Run", "Empty Bar Warm-Up
     // Sets" — gets NO rx at all rather than an empty one. Its instruction lives
-    // in setup/cues, and an empty object would only be a slot for a future bug.
+    // in its pill/cues, and an empty object would only be a slot for a future bug.
     const next = Object.assign({}, ex);
     if (Object.keys(rx).length) next.rx = rx; else delete next.rx;
-    const intent = ex.intent || intents[0] || '';
-    const setup = [ex.setup].concat(intents.slice(1), rest).filter(Boolean).join(' · ');
+    const intent = pill.join(' · ');
     if (intent) next.intent = intent; else delete next.intent;
-    if (setup)  next.setup  = setup;  else delete next.setup;
     delete next.chips;
     delete next.restSec;
     return next;

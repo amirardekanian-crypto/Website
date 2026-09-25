@@ -80,10 +80,11 @@ Details live in `/spine` → Upkeep and `/program-assemble` Step 8.
   or have a new idea, share it with me"*). The one change outside the programme is the library.
 - **A newly prescribed exercise goes INTO the library, in full, and stays in the programme** (*"it
   should be added to our library, with all the cues and other details like the ones already
-  there"*): every field the other entries carry, links both ways, **qualities from his ten only**,
-  and **no pattern** (the ⓘ draws the pattern as a pill beside the ten, and *"just use the 10 pills
-  i have, this is a rule"*). Only an approved entry reaches a phone, so the new ones are one
-  approval question in the handoff.
+  there"*): every field the other entries carry, links both ways, **qualities from his ten and a
+  pattern from his list, never a new pill of either kind** (*"remember to never create new pills"*).
+  A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise with its own
+  entry and cues. Only an approved entry reaches a phone, so the new ones are one approval question
+  in the handoff.
 - **A correction changes only what Amir named.** A grip fix once came back with Day 3 rebuilt,
   notes rewritten and seven exercises gone (*"why did you changed her program and removed some of
   the exercises?"*); it was restored from `program_versions`.
@@ -299,12 +300,12 @@ cue, and occasionally a real dose):
 or ONE intention) · `note` → clay callout · `cues` → the cues list.
 ⚠ **A GRIP IS THE PILL, never the grey line** (Amir, 2026-09-25: *"grips should be a chip on the card
 not a free text"*): `"intent": "neutral grip"`, the same pill his older cards draw for a grip chip.
-`scripts/check_program.py` fails a grip in `setup` and warns on any other grey line: his own cards
-never had one, and whether positions and kit should be chips too is open with him.
-⚠ **coach.html's ✎ editor does not follow this yet.** Saving an old card makes `toRx()` move its
-grip chip into Setup, and the editor's Setup box (empty for an old card) then drops it, so the
-grip is lost, and the editor has no box for the pill at all. Seen 2026-09-25 and proposed to Amir,
-not changed: app files are his call (*Every programme write* above).
+The chip is the athlete's: never put a grip on a library entry. ⚠ **NO FLOATING TEXT** (Amir,
+2026-09-25: *"i dont like floating text and remember this"*): no `setup` line on a programme card at
+all; a detail for this athlete is the Coach's Note. `scripts/check_program.py` fails both.
+**The ✎ editor keeps old chips** (fixed 2026-09-25, on Amir's *"if its a bug, fix it"*): `toRx()` used
+to move an old card's leftover chips ("neutral grip") into Setup, and the editor's empty Setup box
+then deleted them on the first save. Now every leftover chip stays in the pill.
 ⚠ **THE TEMPO IS ONE CELL, with the digit that carries the instruction in CLAY.**
 `TEMPO 3-1-1-0`, notation intact, and `tempoDisplay()` colours **the slowest phase when it is 2s
 or more, plus any non-zero pause** — so `3-0-1-0` colours the 3, `2-1-1-0` the 2 and the 1, and

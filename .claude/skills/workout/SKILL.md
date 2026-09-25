@@ -132,7 +132,7 @@ junk drawer of 121 labels:**
 
 | Field | What it is | How it draws |
 |---|---|---|
-| `setup` | equipment / position — `"45° bench"`, `"In 4 · out 8"`. **Never a grip** | quiet grey line under the name |
+| `setup` | equipment / position — `"45° bench"`, `"In 4 · out 8"`. **Never a grip.** Prefer the `note`: Amir doesn't like floating text (2026-09-25) | quiet grey line under the name |
 | `intent` | a **grip** (`"neutral grip"`) or **ONE** intention (`"max intent"`, `"max speed"`); both join in the one pill: `"neutral grip · max intent"` | the green pill (the only pill) |
 | `cues` | technique, `good[]` / `bad[]` | the cues list |
 

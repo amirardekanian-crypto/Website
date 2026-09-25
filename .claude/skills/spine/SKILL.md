@@ -73,13 +73,12 @@ the existing ids for the links, and they show you which names are only variants.
 **3. Write the batch** to `<scratchpad>/spine_batchN.json`, as a list of objects with these fields:
 `id` (kebab-case, the name slugged), `name` (as programmes spell it), `aliases`, `pattern`,
 `purpose`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
-- **pattern: leave it out on a new entry** (Amir, 2026-09-25). The ⓘ sheet draws the pattern as a
-  pill beside the ten qualities, and he read "Conditioning" and "Jump & land" there as invented
-  qualities: *"you invented conditioning which is Engine, you invented jump and land which is power
-  and breaks, so if you are adding exercises to library, just use the 10 pills i have, this is a
-  rule"*. `draft_sql.py` refuses a pattern on a new entry. The cost: the entry is under *All* and
-  *In your plan* in Library → Exercises, not a pattern chip. Whether the ⓘ should draw patterns at
-  all is Amir's call (an app change, proposed to him, not made).
+- **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
+  sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
+  wherever it fits, so Library → Exercises groups it with its family. **Never a new pattern**: the
+  ⓘ draws it as a pill, and Amir's rule is to never create a new pill (2026-09-25: *"pattern pills
+  are good, if its ones i created in my library, ofcourse use them"* and *"remember to never create
+  new pills"*).
 - **purpose:** one sentence in Amir's voice (`COACHING-PRINCIPLES.md` → *Communication*). Say what
   it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general. The
   *why for this athlete* belongs to the programme, not to the entry.

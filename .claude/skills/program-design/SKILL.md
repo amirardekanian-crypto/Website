@@ -357,8 +357,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   digits highlighted.
   **A GRIP is written here too, as the pill** (`neutral grip`, `wide grip`; with an intention,
   `neutral grip · max intent`). Amir, 2026-09-25: *"grips should be a chip on the card not a
-  free text"*. Anything else as a grey `setup` line is a question for Amir: his own cards never
-  had one.
+  free text"*. It is the athlete's chip, never the library entry's. **No floating text**: nothing
+  goes on a grey `setup` line (*"i dont like floating text"*); a detail for this athlete is the
+  `note:`. A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise,
+  a `new_exercise:` with its own cues, never the parent plus a note.
   It must be something the athlete actively does mid-set, never a restatement of the target
   muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
   **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
