@@ -146,9 +146,13 @@ eq(A.toRx({ type: 'simple', chips: [{ label: 'Zone 2' }] }).rx, undefined,
 const mixed = A.toRx({ type: 'standard', chips: [
   { label: 'max speed', style: 'dark' }, { label: 'neutral grip', style: 'dark' },
   { label: '3 Sets' }, { label: '×20 m' }] });
-eq(mixed.intent, 'max speed', 'an intention becomes the one green pill');
-eq(mixed.setup, 'neutral grip', 'a condition becomes the setup line');
+eq(mixed.intent, 'max speed · neutral grip', 'old chips stay chips: they share the one green pill, in card order');
+eq(mixed.setup, undefined, 'nothing becomes a grey setup line (Amir, 2026-09-25: no floating text)');
 eq(mixed.rx.distance, '20 m', 'and 20 m stays a distance');
+const bench = A.toRx({ type: 'standard', chips: [
+  { label: '3 Sets' }, { label: '×10' }, { label: '45° bench', style: 'dark' }] });
+eq(bench.intent, '45° bench', 'a position chip stays a chip too');
+eq(bench.setup, undefined, '…never floating text');
 
 // audit
 const two = { type: 'standard', rx: { reps: 8, time: '30s' } };

@@ -48,9 +48,8 @@ for e in batch:
     c = e.get('cues')
     if c and (len(c.get('good', [])) != 2 or len(c.get('bad', [])) != 1): problems.append(f'{i}: cues must be 2 good + 1 bad')
     if c and '—' in json.dumps(c, ensure_ascii=False): problems.append(f'{i}: em-dash in cues')
-    # A NEW entry carries no pattern (Amir, 2026-09-25): the ⓘ sheet draws the pattern as a pill beside
-    # the ten qualities, and he wants only his ten there ("just use the 10 pills i have, this is a rule").
-    if e.get('pattern') is not None: problems.append(f'{i}: pattern {e.get("pattern")!r} on a new entry: leave it out, the ⓘ would draw it as a pill beside the ten')
+    # Only the library's own patterns: never a new pill (Amir, 2026-09-25: "remember to never create new pills").
+    if e.get('pattern') not in PATTERNS: problems.append(f'{i}: unknown pattern {e.get("pattern")!r}: use one from the list, never a new one')
     for f in e.get('flags', []):
         if f not in FLAGS: problems.append(f'{i}: new flag {f!r} (add it to FLAGS here and to coach.html only if Amir agreed)')
     qs = e.get('qualities', [])

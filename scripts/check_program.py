@@ -124,14 +124,14 @@ def check_structure(data, args):
                 fail(f"{where}: a working circuit (superset) in a new athlete's first cycle: straight sets only")
             continue
         if not o.get('exId'): fail(f"{where}: no exId")
-        # A grip is a CHIP on Amir's cards, never free text (Amir, 2026-09-25: "grips should be a chip on
-        # the card not a free text"). The only chip an rx card draws is `intent`, in the same pill style
-        # his older cards use for "neutral grip", so the grip goes there. Anything else in `setup` is a
-        # grey line his own cards never had: he has not ruled on those, so it is a question for him.
-        if re.search(r'\bgrip|\bpalms?\b|pronat|supinat|\boverhand\b|\bunderhand\b', o.get('setup') or '', re.I):  # = GRIP_WORDS in chips.js
+        # No floating text on a card (Amir, 2026-09-25: "i dont like floating text and remember this").
+        # A grip is the athlete's CHIP ("grips should be a chip on the card not a free text"): the only
+        # chip an rx card draws is `intent`, the pill his older cards use for "neutral grip". Any other
+        # detail for this athlete (a hand position, a bench) is the Coach's Note.
+        if re.search(r'\bgrip|\bpalms?\b|pronat|supinat|\boverhand\b|\bunderhand\b', o.get('setup') or '', re.I):
             fail(f"{where}: a grip written as free text ('{o['setup']}'): make it the chip, the exercise's intent (e.g. \"neutral grip\")")
         elif o.get('setup'):
-            warn(f"{where}: a grey free-text line on the card ('{o['setup']}'): Amir's cards never had one, ask him before shipping it")
+            fail(f"{where}: floating text on the card ('{o['setup']}'): put it in the Coach's Note")
         rx = o.get('rx') or {}
         doses = [k for k in ('reps', 'time', 'distance', 'work') if rx.get(k) not in (None, '')]
         if len(doses) > 1: fail(f"{where}: two doses ({' + '.join(doses)})")

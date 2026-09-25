@@ -108,9 +108,10 @@ same instruction twice; the card already shows the tempo with its key digits hig
 **A GRIP IS THE PILL, never free text** (Amir, 2026-09-25: *"grips should be a chip on the card not
 a free text … you changed how my file look like"*). `"intent": "neutral grip"` draws the same
 deep-green pill his older cards draw for a grip chip; a card that also has an intention joins them in
-the one pill (`"neutral grip · max intent"`). Anything else in `setup` draws a grey line his own
-cards never had, so ask him before shipping one. `check_program.py` fails a grip in `setup` and
-warns on any other.
+the one pill (`"neutral grip · max intent"`). The grip is the athlete's: never on the library entry.
+**No `setup` on a programme card at all** (Amir, 2026-09-25: *"i dont like floating text"*): any other
+detail for this athlete is the Coach's Note (`note`; on a circuit item, the circuit's note).
+`check_program.py` fails any `setup`.
 
 **Working (non-warm-up) circuits:** give each item its own `rx` from the spec's per-item reps
 (`{"rx":{"reps":12}}`), and put one overall circuit RPE on the circuit's own `rx.rpe`.
@@ -199,7 +200,8 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
   6 anywhere in the text, a note that lowers the RPE without naming the floor, a day over the
   time cap, chips or cues on a card, a missing `exId`, a Because over 140 characters or more
-  than 10 of them, a notes card that isn't HTML, a grip written in `setup` instead of the pill,
+  than 10 of them, a notes card that isn't HTML, any `setup` (floating text: a grip is the pill,
+  anything else the Coach's Note),
   an exercise with no library entry or no cues, a quality outside the ten,
   and a headline quality outside the week's top two. It prints what the handoff needs: minutes
   per day, sets per muscle and the **QUALITY** line. The first programme it was run on (a new
@@ -320,15 +322,16 @@ outside the ten, and lists the drafts. Don't look entries up one by one.
 athlete, it should be added to our library, with all the cues and other details like the ones
 already there"*). Never swap one out because it has no entry. Add it with `/spine`: three cues
 written for anyone, and every field the existing entries carry (purpose, on-court line, equipment,
-body parts, links both ways, SFR and flags), qualities from the ten only, and **no pattern**: the ⓘ
-draws the pattern as a pill beside the ten, and Amir wants only his ten there. Only an approved
+body parts, links both ways, SFR and flags), qualities from the ten and a pattern from the library's
+list, never a new pill of either kind. Only an approved
 entry reaches the phone, so the new entries are one question in the handoff: *"approve these N so
 their cards show cues?"* Approve only on his word (he said *"Approve them"* for the first seven).
 
 **Then act on the output:**
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
-  remove `()` `:` `,` (if the qualifier carried meaning: a grip goes to the pill, anything else
-  is a question for Amir); snap spelling/
+  remove `()` `:` `,` (if the qualifier carried meaning: a grip goes to the pill; a variant that
+  changes the exercise, like "(short lever)", is its own exercise with its own entry; anything else
+  is the Coach's Note); snap spelling/
   casing to the library's canonical key whenever `MISS -> canonical:` shows one. Edit the JSON,
   then **re-run until clean** (every line `OK`/`GAP`, no `[FIX]`, no fixable `MISS`).
 - **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` (new

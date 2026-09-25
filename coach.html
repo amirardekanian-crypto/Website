@@ -30,7 +30,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Chip semantics, shared with program.html so the editor and the athlete app
      can never disagree about what a prescription says. See chips-selftest.html. -->
-<script src="/assets/js/chips.js?v=20260920c"></script>
+<script src="/assets/js/chips.js?v=20260925a"></script>
 <style>
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
@@ -2788,7 +2788,7 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
     <label class="exf exf-wide"><span>Your note to them</span>
       <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(found.ex.note || '')}</textarea>
     </label>
-    ${r.extras.length ? `<div class="exed-mods">Old technique chips — saving folds these into Setup:
+    ${r.extras.length ? `<div class="exed-mods">Old technique chips — saving keeps them as the pill:
       ${r.extras.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
     ${problems.length ? `<div class="exed-warn">${problems.map(p => '⚠ ' + esc(p.msg)).join('<br>')}</div>` : ''}
     <div class="exed-acts">
@@ -2821,8 +2821,9 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
   }
 
   // Saving an exercise that still carries chips[] also CONVERTS it: toRx() folds
-  // the old labels into rx and moves any leftover technique pill into `setup`, so
-  // an ordinary edit is the migration. From here the exercise has one source.
+  // the old labels into rx and keeps every leftover technique chip in the pill
+  // (`intent`), so an ordinary edit is the migration and no chip is lost. From
+  // here the exercise has one source.
   const kind = (val('exKind') || 'reps');
   const rxPatch = {
     sets:  (val('exSets')   || '').trim(),

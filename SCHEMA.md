@@ -638,7 +638,7 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 | Field | What it is | How it draws |
 |---|---|---|
 | `rx` | the numbers | the stats grid |
-| `setup` | equipment / position / conditions — `"45° bench"`, `"In 4 · out 8"`. **Never a grip.** Amir's own cards never had a grey line, so ask him before a programme ships one | quiet grey line under the name |
+| `setup` | equipment / position / conditions — `"45° bench"`, `"In 4 · out 8"`. **Never on an athlete's programme** (no floating text, Amir 2026-09-25: the detail goes in the `note`); some library sessions still carry one | quiet grey line under the name |
 | `intent` | **the ONE pill:** a **grip** (`"neutral grip"`, `"wide grip"`, `"neutral grip · straps"`) or ONE coaching intention (`"max intent"`, `"stick the landing"`). A card that needs both joins them in the one pill: `"neutral grip · max intent"` | the green pill (the only pill), the same pill Amir's older cards draw for a grip chip |
 | `note` | the coach's note to this athlete. **Anything about THIS athlete that used to be a custom cue goes here** (2026-09-24) | clay "Coach's Note" callout |
 | `cues` | **Do not write (2026-09-24).** Every card, circuit items included, shows its approved Spine entry's cues. Legacy cards still carry `cues`, which the app shows instead of the entry's until the next cycle drops them | the cues list |
@@ -649,9 +649,11 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 free text"*). The rx redesign of 2026-09-20 had moved `neutral grip` into the grey `setup` line,
 against his 2026-06-15 rule that a grip is a chip; the first programme written that way came back
 with *"you changed how my file look like"*. `intent` draws the same deep-green pill his older cards
-draw for a grip chip, so the grip goes there. `scripts/check_program.py` fails a grip in `setup`
-and warns on any other `setup`. ⚠ `toRx()` (the coach editor's first save of an old card) still
-sends a grip chip to `setup`, and the editor then drops it; proposed to Amir, not changed.
+draw for a grip chip, so the grip goes there. The chip is the athlete's: a grip never goes on a
+library entry. And there is **no floating text** on a programme card (*"i dont like floating text"*):
+anything else for this athlete goes in the `note`. `scripts/check_program.py` fails any `setup`.
+`toRx()` (the coach editor's first save of an old card) keeps every leftover chip in the pill; until
+2026-09-25 it moved them to `setup`, and the editor's empty Setup box then deleted them.
 
 #### `why` — Because (2026-09-24)
 
