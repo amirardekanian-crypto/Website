@@ -178,6 +178,26 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   than inventing a second identity for the same person.
 
 ## Step 3 — Validate (do not skip)
+- **`scripts/check_program.py` first: the house rules, as a script** (2026-09-25; plain Python,
+  so it runs on Amir's PC too). It reads the built file, the design's volume table and the spec:
+  ```
+  python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
+  # save the query's raw result as-is (the JSON the tool returns loads directly), then:
+  python3 scripts/check_program.py data/<id>.json --log <scratch>/log_entry.md --spec <scratch>/spec.md \
+      --spine <scratch>/spine_<id>.json [--female] [--new] [--cap 60] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
+  ```
+  `--new` for a new athlete's first cycle, `--female` for the women's lower-body floor; the bans
+  come from the spec's `bans:` line (or `--ban "goblet,hanging"`). **Fix every FAIL and re-run
+  until 0 FAIL; read every WARN.** It fails a muscle under its floor, a volume table that
+  disagrees with the programme, more than 4 sets, a weighted lift under 8 reps (new athlete), a
+  superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
+  6 anywhere in the text, a note that lowers the RPE without naming the floor, a day over the
+  time cap, chips or cues on a card, a missing `exId`, a Because over 140 characters or more
+  than 10 of them, a notes card that isn't HTML, an exercise with no Spine entry or no cues,
+  and a headline quality outside the week's top two. It prints what the handoff needs: minutes
+  per day, sets per muscle and the **QUALITY** line. The first programme it was run on (a new
+  athlete's live Cycle 1) passes it with 0 FAIL; a copy with twelve faults planted in it fails on
+  all twelve.
 - `node -e "JSON.parse(require('fs').readFileSync('data/<id>.json','utf8')); console.log('valid')"`
 - Confirm `athlete.id`, the `athlete` names, `currentCycleIndex`, day count, and
   exercise count print as expected.
@@ -243,6 +263,18 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
 - Report any structural violation and fix before finishing. (Exercise-name normalization is
   the next step — a required pass, not optional.)
 
+## Step 3b — ONE review, new athletes only (2026-09-25)
+Once the checks pass, a **NEW athlete's** programme gets ONE reviewer: one agent (the Agent
+tool), working from files only. Give it the paths to the brief, the spec, the built
+`data/<id>.json` and the check output, and say in so many words: *do not call the database or
+any MCP tool* (COACHING-PRINCIPLES.md → Process → "Background agents work from files"). Its job
+is only what a script cannot judge: the injury logic against the brief, exercise choice and
+transfer, whether each notes card covers every exercise it should (the period card, an arm or
+knee menu), whether a fallback is safe for THIS athlete, whether week 1 and the outside days
+are dosed sensibly. Apply every must-fix, re-run Step 3, then ship.
+**A RETURNING athlete gets no reviewer** unless Amir asks for one. The coaching log, the
+checks and his checkpoint already cover a cycle that continues a known logic.
+
 ## Step 4 — Normalize exercise names (required, blocking)
 Names from /program-design are rough by design — **this is the correction pass.** It enforces
 COACHING-PRINCIPLES "Exercise naming" + the `exercise_library.json` canonical spelling. Run
@@ -271,10 +303,11 @@ console.log('done');
 ```
 
 **Then check the Spine. This is a publishing gate now**, because the cards carry no cues of their
-own. Every exercise AND every circuit item must resolve to an entry in `public.exercises`
-(`select id, name, aliases, status, cues is not null as has_cues from public.exercises`), and
+own. Every exercise AND every circuit item must resolve to an entry in `public.exercises`, and
 that entry must be **`approved` with cues**, or the athlete sees a card with no cues at all
-(`get_exercises()` serves approved entries only). Before publishing, list for Amir:
+(`get_exercises()` serves approved entries only). Step 3's `--spine` run already checked this
+with ONE query (`--spine-sql`): it FAILs an id with no entry or no cues and lists the drafts.
+Don't look entries up one by one. Before publishing, list for Amir:
 - **Drafts it uses:** *"approve these N in coach.html → Exercises → Drafts before this goes live"*.
 - **Names with no entry:** draft them with `/spine` (three cues written for anyone), then the same.
 Never approve an entry yourself. If Amir says ship anyway, say which cards will show no cues.
@@ -410,6 +443,11 @@ cycle `focuses`/`paragraphs`/`outcomes`. `jsonb_array_elements(...) with ordinal
 preserves array order, so the SQL and the Python agree. Compare md5 AND length. Anything
 less than this is not verification — a `jsonb_set` that silently wrote a string where an
 object belonged still looks fine to a row-count check.
+**Don't hand-write it: `python3 scripts/check_program.py data/<id>.json --fingerprint`** prints
+the local fingerprint (md5, leaves, characters) AND the exact SQL that computes the server's the
+same way (every leaf with its path, sorted bytewise). Run that SQL once; the two lines must
+match. Proven 2026-09-25 on a live programme: the same md5, 509 leaves and 19,004 characters on
+both sides.
 
 **`get_program()` will fail for you with `invalid athlete key`. That is correct.** The RPC
 fails closed and the MCP connection is neither an athlete session nor a signed-in coach.
@@ -452,6 +490,8 @@ Never approve an entry, and never put anything about this athlete on one.
   word) must be in the week's top two unless it is `bedrock`, `peak` or `reset`. Report both as one
   **QUALITY** line: `Day 1 Strength · Brakes · Spring | Day 2 … | headline iron ✓`. A day under
   70% tagged shows nothing on the phone, so it is a gap to fix in the upkeep above.
+  Step 3's `check_program.py --spine` run already printed both, on phones now and once the
+  drafts are approved: copy its lines rather than counting by hand.
 - **Because.** The cycle carries 5–10 `why`s, each on an exercise that is in this programme, none
   carried over from last cycle. `Chips.auditWhy()` / `auditWhyProgram()` clean (Step 3).
 

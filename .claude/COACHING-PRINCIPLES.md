@@ -728,22 +728,43 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
 
 ## Process
-- **Every design pass runs a multi-lens panel — Amir's standing order, not an option.**
-  *(Amir, 2026-07-24, verbatim intent: "it should happen for every single program you want
-  to write for me.")* Two shapes, both via the Workflow tool:
-  **(1) Roadmaps** (/program-roadmap): 3+ independent specialist proposals from genuinely
-  different lenses (e.g. sport-transfer periodization · durability/return-to-play ·
-  recovery-constrained pragmatist — pick lenses that fit the athlete), then a head-coach
-  judge scores them against the brief + this file and issues synthesis directives; Claude
-  synthesizes the final roadmap from the winner + best grafts.
-  **(2) Cycle designs** (/program-design): Claude drafts the spec with full conversation
-  context (STEP 1 checkpoint with Amir still happens first), then an adversarial
-  verification panel audits the draft in parallel — clinical/injury lens · house-rules
-  compliance lint (against this file + the exercise library) · dose/time-budget audit —
-  and every surviving must-fix/should-fix is applied before the spec is shown to Amir.
-  This caught real issues on its first run (Athlete I C1: a deep-flexion warm-up leak on a
-  locking-history knee, a 60-min cap breach, an unwritten run ladder) — the panel is the
-  quality gate, not ceremony. *(2026-07-24)*
+- **Every design pass is checked, and reviewed where judgment is needed — Amir's standing
+  order, not an option.** *(Amir, 2026-07-24, verbatim intent: "it should happen for every
+  single program you want to write for me." Reshaped 2026-09-25, when a new athlete's first
+  programme took about 2 h 40 min of work, 70% of it two multi-agent panels, and about 50
+  approval prompts. Amir, on the five fixes: "yes, do all five".)* Two shapes:
+  **(1) Roadmaps** (/program-roadmap): exactly three lens agents in parallel via the Workflow
+  tool, each an independent proposal from a genuinely different lens (e.g. sport-transfer
+  periodization · durability/return-to-play · recovery-constrained pragmatist — pick lenses
+  that fit the athlete). Claude is the judge: scores them against the brief + this file and
+  synthesizes the roadmap from the winner + best grafts. No separate judge agent, and no
+  literature search unless Amir asks for one.
+  **(2) Cycle designs**: Claude drafts the spec with full context (the STEP 1 checkpoint with
+  Amir still comes first). The built programme then goes through `scripts/check_program.py`
+  and every FAIL is fixed: the 10-set floors, the 4-set cap, the new-athlete 8-rep rule, a
+  banned movement in any exercise or fallback, RPE floors in every note, session length,
+  back-to-back days, the Spine gate and the Quality Map. Then a **new athlete** gets ONE
+  reviewer, files only, for what a script cannot judge (injury logic, exercise choice,
+  transfer, whether the notes cover every exercise they should), and every surviving
+  must-fix/should-fix is applied. A **returning athlete** gets no reviewer unless Amir asks.
+  The original three-auditor panel caught real issues (Athlete I C1: a deep-flexion warm-up
+  leak on a locking-history knee, a 60-min cap breach, an unwritten run ladder). The script
+  now catches the mechanical half of that kind of miss, and the reviewer keeps the judgment
+  half. *(2026-07-24; reshaped 2026-09-25)*
+- **Background agents work from files, never the database.** Before launching a lens or a
+  reviewer, write everything it needs (brief, spec, Spine slice, built programme) into
+  scratchpad files, pass their real paths, and tell it in so many words not to call the
+  database or any MCP tool. A background agent's approval prompts do not reach Amir: on
+  2026-09-24 two reviewers sat 12 and 13 minutes on unanswered database prompts and the run had
+  to be killed. The one agent that must read the database, `athlete-brief`, runs in the
+  foreground. And never launch a Workflow with placeholder arguments (the first launch that
+  day went out with `"SEE_FILE"` and had to be stopped). *(2026-09-25)*
+- **Ask the database as few times as possible.** One lookup at intake, one context pull at the
+  start of design (athlete row, sessions, log, cycle names, the whole Spine), one Spine query
+  for the gate (`check_program.py --spine-sql`), the staged publish, one fingerprint, one log
+  write, then the upkeep. Never one query per exercise, and never schema discovery: the
+  skills name the tables and columns. *(2026-09-25: a new athlete's first programme made 43
+  database calls, 36 of them lookups, and each one stopped for Amir's approval.)*
 - **Every progression gate resolves to a MEASUREMENT, a FILM, or a THIRD PARTY — never the
   athlete's word.** That includes a gate written against "their log", because the log is them. For
   any athlete with a history of training through pain, a self-reported gate is not a gate. Ask in
