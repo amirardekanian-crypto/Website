@@ -2738,6 +2738,14 @@ function exAt(athleteId, dayId, blockIdx, exIdx) {
   return ex ? { prog, day, blk, ex } : null;
 }
 
+// "hands off the floor" -> "Hands off the floor." so an old grey line reads as a sentence in a note.
+function asSentence(t) {
+  t = String(t || '').trim();
+  if (!t) return '';
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  return /[.!?]$/.test(t) ? t : t + '.';
+}
+
 function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
   const box = document.getElementById('exed-' + eid);
   if (!box) return;
@@ -2754,7 +2762,9 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
     rpe:   r.rpe || '',
     tempo: r.tempo || '',
     restSec: r.rest || '',
-    setup: r.setup || ''
+    // NO SETUP BOX (Amir, 2026-09-25: "i dont like floating text", then "yes remove the setup box").
+    // An old grey line is shown at the start of the note instead, and moves there on save.
+    note:  [asSentence(r.setup), found.ex.note].filter(Boolean).join(' ')
   };
   const problems = Chips.audit(found.ex).concat(Chips.auditRx(found.ex));
   const f = (id, label, val, ph, w) =>
@@ -2783,11 +2793,10 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
       ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0 / iso', 108)}
       ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', 'blank = none', 92)}
     </div>
-    <label class="exf exf-wide"><span>Setup (grip, bench angle, kit)</span>
-      <input id="exSetup-${eid}" value="${esc(st.setup)}" placeholder="e.g. neutral grip" style="width:100%"></label>
     <label class="exf exf-wide"><span>Your note to them</span>
-      <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(found.ex.note || '')}</textarea>
+      <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(st.note)}</textarea>
     </label>
+    ${r.setup ? `<div class="exed-mods">Its old grey line is now the start of your note, and moves there when you save.</div>` : ''}
     ${r.extras.length ? `<div class="exed-mods">Old technique chips — saving keeps them as the pill:
       ${r.extras.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
     ${problems.length ? `<div class="exed-warn">${problems.map(p => '⚠ ' + esc(p.msg)).join('<br>')}</div>` : ''}
@@ -2835,8 +2844,7 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
   rxPatch[kind] = (val('exDose') || '').trim();   // clears the other three doses
 
   const updated = Chips.applyRx(Chips.toRx(found.ex), rxPatch);
-  const setup = (val('exSetup') || '').trim();
-  if (setup) updated.setup = setup; else delete updated.setup;
+  delete updated.setup;   // no floating text: openExEditor() put any old grey line in the note box
   const note = (val('exNote') || '').trim();
   if (note) updated.note = note; else delete updated.note;
 

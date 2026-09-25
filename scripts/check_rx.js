@@ -178,6 +178,9 @@ let checked = 0;
 files.forEach(file => {
   const j = JSON.parse(fs.readFileSync(file, 'utf8'));
   (j.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
+    // No floating text (Amir, 2026-09-25: "i dont like floating text"): a detail goes in the note.
+    [ex].concat(ex.items || []).forEach(o => say(!o.setup,
+      path.basename(file) + ' / ' + o.name + ': a grey setup line ("' + o.setup + '"): put it in the note'));
     if (!ex.rx) return;
     checked++;
     A.auditRx(ex).forEach(p =>

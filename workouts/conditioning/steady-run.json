@@ -163,7 +163,7 @@
           "type": "simple",
           "name": "Easy Run",
           "videoUrl": null,
-          "note": "If you don't run already, run two minutes and walk one the whole way instead.",
+          "note": "Full sentences. If you don't run already, run two minutes and walk one the whole way instead.",
           "cues": {
             "good": [
               "Pick a flat loop you can repeat and hold one pace the whole way",
@@ -176,8 +176,7 @@
           "rx": {
             "time": "28 minutes",
             "rpe": 6
-          },
-          "setup": "full sentences"
+          }
         }
       ]
     },

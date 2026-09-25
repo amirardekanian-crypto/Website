@@ -227,7 +227,7 @@
           "type": "standard",
           "name": "Lateral Run to Outside-Leg Stop",
           "videoUrl": null,
-          "note": "Do the first two at about three-quarter speed, then go flat out.",
+          "note": "Alternate sides. Do the first two at about three-quarter speed, then go flat out.",
           "cues": {
             "good": [
               "Run out about five metres to the side at full speed, then plant the foot on the side you're heading toward and stop",
@@ -242,8 +242,7 @@
             "reps": 1,
             "rest": 75
           },
-          "intent": "max speed",
-          "setup": "alternate sides"
+          "intent": "max speed"
         }
       ]
     },
@@ -270,7 +269,7 @@
             "rest": 75
           },
           "intent": "max speed",
-          "setup": "180° turn · alternate sides"
+          "note": "180° turn, alternate sides."
         },
         {
           "type": "standard",
@@ -291,7 +290,7 @@
             "rest": 60
           },
           "intent": "max speed",
-          "setup": "45° cut · alternate sides"
+          "note": "45° cut, alternate sides."
         }
       ]
     }

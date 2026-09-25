@@ -164,7 +164,7 @@
           "type": "standard",
           "name": "Calf Raise",
           "videoUrl": null,
-          "note": "Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",
+          "note": "3s lower. Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",
           "cues": {
             "good": [
               "Rise onto the balls of both feet from the edge of a step, holding a wall, then take three seconds to lower",
@@ -179,8 +179,7 @@
             "reps": 20,
             "rpe": 7,
             "rest": 45
-          },
-          "setup": "3s lower"
+          }
         },
         {
           "type": "standard",
@@ -201,7 +200,7 @@
             "rpe": 7,
             "rest": 45
           },
-          "setup": "2s lower"
+          "note": "2s lower."
         }
       ]
     }

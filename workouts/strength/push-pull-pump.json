@@ -110,7 +110,7 @@
           "rx": {
             "reps": "8 Reps / shape"
           },
-          "setup": "Bodyweight"
+          "note": "Bodyweight."
         },
         {
           "type": "simple",

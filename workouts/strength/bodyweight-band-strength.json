@@ -79,7 +79,7 @@
             "sets": 2,
             "reps": 15
           },
-          "setup": "Mini band above the knees"
+          "note": "Mini band above the knees."
         },
         {
           "type": "simple",
@@ -115,7 +115,7 @@
           "rx": {
             "reps": 10
           },
-          "setup": "3s down"
+          "note": "3s down."
         },
         {
           "type": "simple",
@@ -154,14 +154,13 @@
               "Leaning forward onto the front knee"
             ]
           },
-          "note": "Straight sets with full rest — finish one leg, rest, then do the other.",
+          "note": "3s down, RPE 7-8. Straight sets with full rest — finish one leg, rest, then do the other.",
           "rx": {
             "sets": 3,
             "reps": 8,
             "side": true,
             "rest": 90
-          },
-          "setup": "3s down · RPE 7-8"
+          }
         },
         {
           "type": "standard",
@@ -176,14 +175,13 @@
               "Twisting open at the hip"
             ]
           },
-          "note": "Fingertips on a wall if balance is the limiter rather than the hamstring.",
+          "note": "3s down, RPE 7. Fingertips on a wall if balance is the limiter rather than the hamstring.",
           "rx": {
             "sets": 3,
             "reps": 8,
             "side": true,
             "rest": 90
-          },
-          "setup": "3s down · RPE 7"
+          }
         }
       ]
     },
@@ -231,7 +229,7 @@
             "side": true,
             "rest": 60
           },
-          "setup": "Band above the knees"
+          "note": "Band above the knees."
         }
       ]
     },

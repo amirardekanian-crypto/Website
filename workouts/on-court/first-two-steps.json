@@ -196,7 +196,7 @@
             "rest": 75
           },
           "intent": "max speed",
-          "setup": "alternate sides"
+          "note": "Alternate sides."
         },
         {
           "type": "standard",
@@ -217,7 +217,7 @@
             "rest": 75
           },
           "intent": "max speed",
-          "setup": "alternate sides"
+          "note": "Alternate sides."
         }
       ]
     },
@@ -244,7 +244,7 @@
             "rest": 60
           },
           "intent": "max speed",
-          "setup": "alternate sides"
+          "note": "Alternate sides."
         }
       ]
     }

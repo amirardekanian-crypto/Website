@@ -88,7 +88,7 @@
           "type": "simple",
           "name": "Box Breathing",
           "videoUrl": null,
-          "note": "If your mind wanders, notice it and go back to the count — that is the exercise, not a failure at it.",
+          "note": "In 4, hold 4, out 4, hold 4. If your mind wanders, notice it and go back to the count — that is the exercise, not a failure at it.",
           "cues": {
             "good": [
               "Sit upright or lie down, in four, hold four, out four, hold four",
@@ -100,8 +100,7 @@
           },
           "rx": {
             "time": "5 minutes"
-          },
-          "setup": "In 4 · hold 4 · out 4 · hold 4"
+          }
         }
       ]
     },
@@ -113,7 +112,7 @@
           "type": "simple",
           "name": "Child's Pose with Extended Exhale",
           "videoUrl": null,
-          "note": "Box breathing steadies you; the long exhale is what drops you.",
+          "note": "In 4, out 8. Box breathing steadies you; the long exhale is what drops you.",
           "cues": {
             "good": [
               "Knees wide, forehead down, in for four and out for eight",
@@ -125,8 +124,7 @@
           },
           "rx": {
             "time": "2 minutes"
-          },
-          "setup": "In 4 · out 8"
+          }
         }
       ]
     }
