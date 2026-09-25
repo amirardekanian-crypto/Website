@@ -1,0 +1,16 @@
+{
+  "_about": "Config for .claude/skills/reel/tools/capture_app_screens.js: the real screens of the free course demo that reel-8 shows inside its phone. Run: node capture_app_screens.js Content/reel-8-course/tools/capture.config.json <temp-folder>, then python Content/reel-7-course/src/to_webp.py <temp-folder> Content/reel-8-course/assets/screens. Re-run it whenever the course app changes (it got cover pictures on 2026-09-20, after reel-7's screens were taken).",
+  "url": "https://www.amirardekani.com/tennis/app/?demo=1#/start",
+  "viewport": { "width": 390, "height": 770 },
+  "dpr": 2,
+  "locale": "fa-IR",
+  "mobile": true,
+  "localStorage": { "tps.prefs": "{\"age\":\"adult\"}" },
+  "settleMs": 2600,
+  "measure": [".demo-bar", ".tabs", ".cta-bar"],
+  "shots": [
+    { "name": "sessionA", "hash": "#/programme/week/1/A" },
+    { "name": "test", "hash": "#/tests/broad-jump" },
+    { "name": "lesson", "hash": "#/learn/tennis-demands" }
+  ]
+}

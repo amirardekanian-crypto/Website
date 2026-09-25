@@ -121,7 +121,13 @@ Never reuse anything in the right column, even though old files still contain it
 techniques, the three URL modes, known gotchas, the MP4 export pipeline) lives there now; this
 is just the quick-reference.
 
-- **Newest reel = [`reel-7-course.html`](reel-7-course.html)** (Farsi, 2026-09-20 — Amir's explicit choice,
+- **Newest reel = [`reel-8-course.html`](reel-8-course.html)** (Farsi, 2026-09-20, silent, 20 s, the same course on
+  **four generated video clips** that wipe in from the right with a clay line; a **rail of 16 week-dashes** at the top fills in
+  the hook and lights one block of four per cut; the real demo in a phone; the same free-week button). Two hooks in one file:
+  A «۱۶ هفته تا بدنِ تنیسی.» by default, B «تو زمین: سریع‌تر. قوی‌تر. انفجاری‌تر.» with `?hook=b`. The video plates are driven by
+  `window.__videoAt` so the MP4 renderer stays frame-accurate (see `.claude/skills/reel/tools/README.md`). Sources, clips and
+  rebuild steps in [`reel-8-course/`](reel-8-course/README.md). The footage is AI-generated: label the post if Instagram asks.
+- **Earlier ad reference = [`reel-7-course.html`](reel-7-course.html)** (Farsi, 2026-09-20 — Amir's explicit choice,
   because it sells the Farsi-only TPS course; silent, ~30 s, ends on «هفته‌ی ۱ رو رایگان امتحان کن» = the
   free demo). Techniques worth copying: **two full-bleed pictures of one court (dawn, night) crossfade
   under everything** while the four block pictures play as 16:9 windows; the white baseline was measured

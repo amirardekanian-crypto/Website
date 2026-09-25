@@ -216,7 +216,10 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   [`file-vs-coach`](Content/carousel-1-file-vs-coach.html) (stale chrome — see atlas) ·
   oldest: [`instagram-carousels.html`](Content/instagram-carousels.html).
 - **Reels** (1080×1920): build with the [`/reel` skill](.claude/skills/reel/SKILL.md) ·
-  **newest** = [`reel-7-course`](Content/reel-7-course.html) (**Farsi**, Amir's choice on 2026-09-20
+  **newest** = [`reel-8-course`](Content/reel-8-course.html) (**Farsi**, 2026-09-20 · silent, 20 s · four generated
+  video clips, a 16-week rail, the real demo in a phone · two hooks, `?hook=b` · sources, clips and the video-plate
+  protocol in [`reel-8-course/`](Content/reel-8-course/README.md)) · earlier ad reel =
+  [`reel-7-course`](Content/reel-7-course.html) (**Farsi**, Amir's choice on 2026-09-20
   because the course it sells is Farsi-only · silent, ~30 s · ends on the free demo · the ticks, ball
   and camera all sit on one court line · real demo screens in a phone · sources, both pictures and the
   rebuild steps in [`reel-7-course/`](Content/reel-7-course/README.md) · reel tools in

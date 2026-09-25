@@ -1,0 +1,1121 @@
+{
+ "videos": [
+  {
+   "id": "clay-burst",
+   "kind": "generated",
+   "date": "2026-09-20",
+   "title": "Clay burst",
+   "shows": "Low camera on a white shoe driving off red clay in slow motion. A burst of red dust explodes forward and up and drifts through warm light. Locked camera.",
+   "tags": [
+    "clay",
+    "dust",
+    "shoe",
+    "slow-motion",
+    "close-up",
+    "court",
+    "vertical"
+   ],
+   "used_in": [
+    "reel-8-course"
+   ],
+   "usable": "0-3.0 s (the foot leaves the frame at 3 s, then only drifting dust). Has a quiet audio track (sound was on).",
+   "credits": 10.5,
+   "notes": "5 s clip. Credits: 7.5 clip + 3 start picture (high/2k). Sound was on by mistake (the default): drop it with -an.",
+   "source": "Content/reel-8-course/ (masters/burst.mp4 is the trimmed part)",
+   "higgsfield": {
+    "job_id": "371bb4ef-83ec-4786-ba24-3687ce406b2e",
+    "model": "Cinema Studio v2",
+    "settings": "std, slowmo, sound on, 5 s, 9:16",
+    "prompt": "Slow motion. The player's white shoe drives off the red clay and a burst of red dust explodes forward and up, drifting through the warm light. Camera locked and low, no camera movement. Realistic, natural physics. The sound of a shoe pushing off clay and a soft dust burst.",
+    "start_image": {
+     "job_id": "6de014d5-3bff-4738-83e0-8da2d61c458f",
+     "file": "clips/2026-09-20_clay-burst_start.webp"
+    }
+   },
+   "file": "clips/2026-09-20_clay-burst.mp4",
+   "seconds": 5.04,
+   "width": 720,
+   "height": 1276,
+   "fps": 24.0,
+   "audio": true,
+   "mb": 5.4,
+   "poster": "posters/clay-burst.jpg"
+  },
+  {
+   "id": "floodlit-pivot",
+   "kind": "generated",
+   "date": "2026-09-20",
+   "title": "Floodlit pivot",
+   "shows": "A woman seen from behind on a clay court at night under floodlights: split-step, a turn, then a sprint away with clay dust bursting from each push-off. Locked camera.",
+   "tags": [
+    "clay",
+    "night",
+    "floodlights",
+    "sprint",
+    "pivot",
+    "woman",
+    "from-behind",
+    "vertical"
+   ],
+   "used_in": [
+    "reel-8-course"
+   ],
+   "usable": "0-1.75 s (she runs away and shrinks to a dot after that). Has an audio track (sound was on).",
+   "credits": 13,
+   "notes": "5 s clip. Credits: 10 clip + 3 start picture. Lesson: never prompt travel toward or away from a locked camera.",
+   "source": "Content/reel-8-course/ (masters/pivot.mp4 is the trimmed part)",
+   "higgsfield": {
+    "job_id": "b4e56996-df20-4ec1-bb28-5c10ff49203f",
+    "model": "Kling 3.0",
+    "settings": "std, sound on, 5 s, 9:16",
+    "prompt": "Static locked-off camera. The tennis player, seen from behind, lands from her split-step and explodes into a fast sprint toward the far baseline, arms driving, racket in her right hand. Red clay dust bursts from each push-off and hangs in the floodlight beams. Realistic athletic motion, no morphing, no extra limbs, face never visible. Sound: fast footsteps and scrapes on clay, breath, quiet night ambience.",
+    "start_image": {
+     "job_id": "6fdcfb40-7ea2-4989-b173-9f004988c2fb",
+     "file": "clips/2026-09-20_floodlit-pivot_start.webp"
+    }
+   },
+   "file": "clips/2026-09-20_floodlit-pivot.mp4",
+   "seconds": 5.04,
+   "width": 720,
+   "height": 1276,
+   "fps": 24.0,
+   "audio": true,
+   "mb": 2.9,
+   "poster": "posters/floodlit-pivot.jpg"
+  },
+  {
+   "id": "chalk-grip",
+   "kind": "generated",
+   "date": "2026-09-20",
+   "title": "Chalked grip",
+   "shows": "Chalked hands and forearms on the handles of a trap bar in a shaft of window light in a dark gym, chalk dust drifting, a clay-orange towel on the floor. Locked camera, slow motion.",
+   "tags": [
+    "gym",
+    "strength",
+    "chalk",
+    "trap-bar",
+    "hands",
+    "window-light",
+    "slow-motion",
+    "vertical"
+   ],
+   "used_in": [
+    "reel-8-course"
+   ],
+   "usable": "0-1.55 s ONLY. From 1.67 s a bearded man bends into the frame: his face and a printed shirt logo appear, which breaks the no-face, no-logo rule.",
+   "credits": 4,
+   "notes": "3 s silent clip. Credits: 3 clip + 1 start picture (medium/1k). The prompt said 'no face' and 'the bar stays on the floor'; the model completed the person anyway because the start picture showed only forearms.",
+   "source": "Content/reel-8-course/ (masters/gym.mp4 is the trimmed part)",
+   "higgsfield": {
+    "job_id": "804a5c00-f07c-422b-9c02-f66d2aa86d5c",
+    "model": "Cinema Studio v2",
+    "settings": "std, slowmo, sound off, 3 s, 9:16",
+    "prompt": "Static locked-off camera. The chalked hands squeeze the trap bar handles tighter, forearms tensing, and a small cloud of white chalk dust lifts off the knuckles and drifts through the shaft of window light. The bar stays on the floor. Slow motion. Realistic, natural physics, no morphing, no extra fingers, no face.",
+    "start_image": {
+     "job_id": "9c7eef38-a64e-47ae-8c17-daff50cb1746",
+     "file": "clips/2026-09-20_chalk-grip_start.webp"
+    }
+   },
+   "file": "clips/2026-09-20_chalk-grip.mp4",
+   "seconds": 3.04,
+   "width": 716,
+   "height": 1280,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 2.7,
+   "poster": "posters/chalk-grip.jpg"
+  },
+  {
+   "id": "night-court-plate",
+   "kind": "generated",
+   "date": "2026-09-20",
+   "title": "Night court plate",
+   "shows": "An empty red clay court at night under floodlights with a low haze drifting and dust in the light beams. Almost still: a calm plate to put text or a button over. Silent.",
+   "tags": [
+    "clay",
+    "night",
+    "floodlights",
+    "haze",
+    "empty-court",
+    "plate",
+    "calm",
+    "vertical"
+   ],
+   "used_in": [
+    "reel-8-course"
+   ],
+   "usable": "All 3.0 s. Only the haze moves, so on a phone it can read as almost still.",
+   "credits": 3,
+   "notes": "3 s silent clip made from the Reel 7 night picture (already vertical), so no new start picture was generated.",
+   "source": "Content/reel-8-course/ (masters/plate.mp4); start picture Content/reel-7-course/masters/week-sixteen.webp",
+   "higgsfield": {
+    "job_id": "0a334ef3-3184-45f6-9f98-97ae5ed59bb1",
+    "model": "Cinema Studio v2",
+    "settings": "std, linear, sound off, 3 s, 9:16",
+    "prompt": "Static locked-off camera. The empty red clay court at night under the floodlights. Fine red dust drifts slowly through the light beams and a thin low haze moves across the court. The floodlights glow steadily. Nothing else moves. Realistic, calm, no people.",
+    "start_image": {
+     "job_id": "6e9efc1d-3d5e-43e9-80e2-7c63d6ffe52a",
+     "note": "Content/reel-7-course/masters/week-sixteen.webp (uploaded as media 6e9efc1d)"
+    }
+   },
+   "file": "clips/2026-09-20_night-court-plate.mp4",
+   "seconds": 3.04,
+   "width": 716,
+   "height": 1280,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 2.0,
+   "poster": "posters/night-court-plate.jpg"
+  },
+  {
+   "id": "blue-court-sole-pushoff",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Blue court: sole push-off",
+   "shows": "Extreme close-up from behind of a shoe sole lifting off a dark blue hard court, weight rolling onto the toe, dust kicking up behind. Locked camera, slow motion. Has an audio track.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "dust",
+    "shoe-sole",
+    "close-up",
+    "slow-motion",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "35d62fd8-98f3-47ed-ac7e-299902af447a",
+    "model": "Kling 3.0",
+    "settings": "std, sound on, 5 s, 9:16",
+    "prompt": "The foot pushes off the ground, weight rolling forward onto the toe,\nmore dust kicking up and drifting behind, slow motion. Camera locked\noff, no movement.",
+    "start_image": {
+     "job_id": "ced4916e-dbac-47cb-8d45-ac5896aa6062",
+     "file": "clips/2026-09-02_start-blue-court-sole.webp"
+    }
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_blue-court-sole-pushoff.mp4",
+   "seconds": 5.04,
+   "width": 828,
+   "height": 1108,
+   "fps": 24.0,
+   "audio": true,
+   "mb": 5.4,
+   "poster": "posters/blue-court-sole-pushoff.jpg"
+  },
+  {
+   "id": "blue-court-calf-press",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Blue court: calf presses in",
+   "shows": "Low close-up of a calf and a dark shoe pressing into a blue hard court, a white court line running diagonally, dust drifting around the shoe. Locked camera.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "dust",
+    "calf",
+    "shoe",
+    "close-up",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "95267972-e02e-4709-9517-36ed0522da86",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 9:16",
+    "prompt": "The foot presses further into the ground under load, ankle and calf\ntensing, weight staying low and grounded. Dust drifts low across the\ncourt around the shoe. The foot does not lift or shift position.\nCamera locked off, no movement.",
+    "start_image": {
+     "job_id": "d60e0f04-f9e9-409b-aada-57a2da88097c",
+     "file": "clips/2026-09-02_start-blue-court-calf.webp"
+    }
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_blue-court-calf-press.mp4",
+   "seconds": 5.04,
+   "width": 828,
+   "height": 1108,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 4.2,
+   "poster": "posters/blue-court-calf-press.jpg"
+  },
+  {
+   "id": "blue-court-calf-skid",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Blue court: calf and skid",
+   "shows": "The same close-up of a calf and dark shoe on a blue hard court, but the shoe grips and skids on a hard stop and a burst of dust kicks out sideways. Locked camera.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "dust",
+    "calf",
+    "shoe",
+    "skid",
+    "close-up",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "ad3e5f0d-cf28-4be6-9f3b-cb48ffeb4aa4",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 9:16",
+    "prompt": "The shoe grips and skids slightly on the court as the leg absorbs a\nhard stop, ankle rolling and re-settling under the sudden load, a fresh\nburst of dust kicking out sideways from under the sole. Camera locked\noff, no movement.",
+    "start_image": {
+     "job_id": "d60e0f04-f9e9-409b-aada-57a2da88097c",
+     "file": "clips/2026-09-02_start-blue-court-calf.webp"
+    }
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_blue-court-calf-skid.mp4",
+   "seconds": 5.04,
+   "width": 828,
+   "height": 1108,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 5.0,
+   "poster": "posters/blue-court-calf-skid.jpg"
+  },
+  {
+   "id": "net-player-sprint",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Player at the net: lateral sprint",
+   "shows": "A curly-haired player in a maroon shirt, seen from behind at the net of a dusty tan court in warm low light, drives off his outside foot and accelerates sideways. Camera pans with him. Slow motion. (A person is on screen, from behind.)",
+   "tags": [
+    "net",
+    "lateral",
+    "sprint",
+    "acceleration",
+    "man",
+    "from-behind",
+    "warm-light",
+    "slow-motion",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "2c482ae1-a185-476c-8949-f68ebf15d75e",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 9:16",
+    "prompt": "The player drives explosively off his outside foot and accelerates\nsideways across the court, first two strides powerful and low.\nCamera pans with him. Slow motion.",
+    "start_image": {
+     "job_id": "e9ee238c-d1c9-4c4a-823e-e9a3bc99825e",
+     "file": "clips/2026-09-02_start-net-player.webp"
+    }
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_net-player-sprint.mp4",
+   "seconds": 5.04,
+   "width": 828,
+   "height": 1108,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 5.9,
+   "poster": "posters/net-player-sprint.jpg"
+  },
+  {
+   "id": "net-player-sprint-ball",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Player at the net: sprint to the ball",
+   "shows": "The same player and start picture as 'net-player-sprint', accelerating sideways toward an oncoming tennis ball, racket in hand. Camera pans with him. Slow motion.",
+   "tags": [
+    "net",
+    "lateral",
+    "sprint",
+    "ball",
+    "man",
+    "from-behind",
+    "warm-light",
+    "slow-motion",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "bf0c289f-15bb-449b-b4a3-21e174d6ec32",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 9:16",
+    "prompt": "The player drives explosively off his outside foot and accelerates\nsideways across the court toward an oncoming tennis ball, first two strides powerful and low.\nCamera pans with him. Slow motion.",
+    "start_image": {
+     "job_id": "e9ee238c-d1c9-4c4a-823e-e9a3bc99825e",
+     "file": "clips/2026-09-02_start-net-player.webp"
+    }
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_net-player-sprint-ball.mp4",
+   "seconds": 5.04,
+   "width": 828,
+   "height": 1108,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 5.8,
+   "poster": "posters/net-player-sprint-ball.jpg"
+  },
+  {
+   "id": "hardcourt-lunge-wide-a",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Hard court: sideways lunge (wide, from the net)",
+   "shows": "Wide locked shot from the net end of a sunlit blue hard court: a male player in white kit sprints sideways along the baseline and lunges to his right, off balance. He is small in a wide 16:9 frame.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "lunge",
+    "sprint",
+    "wide",
+    "man",
+    "16x9",
+    "sunlit"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded. Horizontal (16:9), so it needs cropping for a reel.",
+   "higgsfield": {
+    "job_id": "a0074244-1de9-4f33-a79d-a097505911fa",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 4 s, 16:9",
+    "prompt": "A male tennis player in white kit sprints sideways along the baseline of a sunlit blue hard court, moving left to right across the frame, parallel to the net. He stays behind the baseline the whole time and never moves forward toward the net. Three hard lateral strides, driving off the outside foot, then he lunges into a full stretch to his right with the racket extended, reaching toward the edge of the frame. He lands off balance, still short. Camera: positioned at the net end looking back at the baseline, locked off at hip height, wide enough to keep his whole body and the full width of the court in frame. The player crosses the frame horizontally. Warm amber late-afternoon sunlight, long shadows across the court. Cinematic, shallow depth of field, film grain, slow motion."
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_hardcourt-lunge-wide-a.mp4",
+   "seconds": 4.04,
+   "width": 1280,
+   "height": 720,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 3.8,
+   "poster": "posters/hardcourt-lunge-wide-a.jpg"
+  },
+  {
+   "id": "hardcourt-lunge-wide-b",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Hard court: sprint past a dropping ball (wide)",
+   "shows": "Wide side-on tracking shot on a sunlit blue hard court: a male player in white kit sprints toward the sideline and lunges for a ball that drops and bounces just past his racket. 16:9.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "lunge",
+    "sprint",
+    "ball",
+    "wide",
+    "man",
+    "16x9",
+    "sunlit"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded. Horizontal (16:9).",
+   "higgsfield": {
+    "job_id": "efb953fd-79cd-4e73-b8de-b05622126f0c",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 16:9",
+    "prompt": "A male tennis player in white kit sprints from behind the baseline\ntoward the sideline of a sunlit blue hard court. He starts low and\ndriving, taking three hard strides across the court, then lunges into a\nfull stretch with his racket extended out to the side. The tennis ball\ndrops and bounces past the tip of his racket, just out of reach. He\nlands off balance, momentum carrying him forward past the ball.\n\nCamera: side-on, hip height, tracking with him as he runs, staying wide\nenough to keep his whole body and the ball in frame.\n\nWarm amber late-afternoon sunlight from the left, long shadows across\nthe court. Cinematic, shallow depth of field, film grain, slow motion.\nVertical 9:16. No text, no logos, no crowd."
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_hardcourt-lunge-wide-b.mp4",
+   "seconds": 5.04,
+   "width": 1280,
+   "height": 720,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 5.0,
+   "poster": "posters/hardcourt-lunge-wide-b.jpg"
+  },
+  {
+   "id": "dusk-lateral-sprint",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Dusk court: lateral sprint (vertical)",
+   "shows": "Vertical evening shot of a blue court with floodlights glowing against a pale sky: a small player in white sprints sideways along the baseline and lunges.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "dusk",
+    "floodlights",
+    "lunge",
+    "sprint",
+    "man",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "19731a41-c95e-428d-81ba-8f3b57ade765",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 4 s, 9:16",
+    "prompt": "A male tennis player in white kit sprints sideways along his baseline on\na sunlit blue hard court, travelling left to right across the frame. He\nstays behind the baseline throughout and never moves toward the net.\nThree hard lateral strides driving off the outside foot, then he lunges\ninto a full stretch to his right with the racket extended, reaching\ntoward the edge of the frame. He lands off balance, still short.\n\nCamera: ground level, positioned inside the court about six metres in\nfront of the player, on the same side of the net as the player, looking\nstraight at him. No net between the camera and the player. The player\nfills most of the frame height and crosses horizontally.\n\nWarm amber late-afternoon sunlight, long shadows. Cinematic, film grain,\nslow motion. Vertical 9:16 portrait orientation, taller than it is wide.\nNo text, no logos, no crowd."
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_dusk-lateral-sprint.mp4",
+   "seconds": 4.04,
+   "width": 720,
+   "height": 1280,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 3.2,
+   "poster": "posters/dusk-lateral-sprint.jpg"
+  },
+  {
+   "id": "woman-forehand-reach",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Woman on a blue court: reaching for the ball",
+   "shows": "A woman in a blue dress with a racket on a blue hard court accelerates toward a tennis ball (upper right) that she cannot reach. Vertical. Her face is visible.",
+   "tags": [
+    "hard-court",
+    "blue-court",
+    "woman",
+    "forehand",
+    "ball",
+    "face-visible",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded. A face is visible.",
+   "higgsfield": {
+    "job_id": "427d6eb0-4d17-4c79-9d5c-605c0c2ac943",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 4 s, 9:16",
+    "prompt": "create a video of a tennis player on a tennis court. accelerating toward a tennis ball to hit a forehand but cant reach the ball"
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_woman-forehand-reach.mp4",
+   "seconds": 4.04,
+   "width": 720,
+   "height": 1280,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 3.9,
+   "poster": "posters/woman-forehand-reach.jpg"
+  },
+  {
+   "id": "through-the-net-forehand",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Through the net: reaching for the ball",
+   "shows": "Seen through the net mesh: a man in a light blue shirt accelerates sideways toward a ball he cannot reach. The camera is on the net. Vertical. His face is visible.",
+   "tags": [
+    "hard-court",
+    "net-mesh",
+    "man",
+    "forehand",
+    "ball",
+    "face-visible",
+    "vertical"
+   ],
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded. A face is visible.",
+   "higgsfield": {
+    "job_id": "b9f00890-3732-4cab-b636-4c099ca731d8",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 9:16",
+    "prompt": "create a video of a tennis player on a tennis court. accelerating in a lateral movement toward a tennis ball to hit a forehand but cant reach the ball\nthe camera is on the net"
+   },
+   "used_in": [],
+   "file": "clips/2026-09-02_through-the-net-forehand.mp4",
+   "seconds": 5.04,
+   "width": 720,
+   "height": 1280,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 3.8,
+   "poster": "posters/through-the-net-forehand.jpg"
+  },
+  {
+   "id": "photo-player-kling-a",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Photo player: lateral acceleration (Kling)",
+   "shows": "A young man in a dark teal shirt and white shorts on a blue and green hard court (a likeness taken from an uploaded photo): he drives off his outside foot and accelerates sideways toward an oncoming ball.",
+   "tags": [
+    "hard-court",
+    "man",
+    "face-visible",
+    "restricted"
+   ],
+   "private": true,
+   "restricted": "made from an uploaded photo of a real-looking player (his likeness). Do not use in an ad without that person's permission. Kept out of git.",
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "8435c650-bd52-4aaa-9c57-91c5fa492bbf",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s, 16:9 requested",
+    "prompt": "The player drives explosively off his outside foot and accelerates\nsideways across the court toward an oncoming tennis ball, first two strides powerful and low.\nCamera pans with him. Slow motion.",
+    "start_image": {
+     "job_id": "dbb06b25-55df-4f47-97fb-9e33067bb437",
+     "file": "private/2026-09-02_photo-player-reference.jpg"
+    }
+   },
+   "used_in": [],
+   "file": "private/2026-09-02_photo-player-kling-a.mp4",
+   "seconds": 5.04,
+   "width": 1176,
+   "height": 784,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 4.3,
+   "poster": "private/posters/photo-player-kling-a.jpg"
+  },
+  {
+   "id": "photo-player-kling-b",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Photo player: crossover steps (Kling)",
+   "shows": "A young man in a dark teal shirt and white shorts on a blue and green hard court (a likeness taken from an uploaded photo): three fast crossover steps toward the ball, racket drawing back for a forehand.",
+   "tags": [
+    "hard-court",
+    "man",
+    "face-visible",
+    "restricted"
+   ],
+   "private": true,
+   "restricted": "made from an uploaded photo of a real-looking player (his likeness). Do not use in an ad without that person's permission. Kept out of git.",
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "9b2d4143-95d3-4c9e-8387-0eb1252a6078",
+    "model": "Kling 3.0",
+    "settings": "std, sound off, 5 s",
+    "prompt": "The player pushes explosively off his left leg and accelerates diagonally forward and to his right, three fast crossover steps toward the ball, racket drawing back into forehand preparation. Camera tracks with him, holding chest height. Single continuous shot, no cut. 9:16",
+    "start_image": {
+     "job_id": "dbb06b25-55df-4f47-97fb-9e33067bb437",
+     "file": "private/2026-09-02_photo-player-reference.jpg"
+    }
+   },
+   "used_in": [],
+   "file": "private/2026-09-02_photo-player-kling-b.mp4",
+   "seconds": 5.04,
+   "width": 1176,
+   "height": 784,
+   "fps": 24.0,
+   "audio": false,
+   "mb": 4.0,
+   "poster": "private/posters/photo-player-kling-b.jpg"
+  },
+  {
+   "id": "photo-player-wan",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Photo player: sideways acceleration (Wan 2.5)",
+   "shows": "A young man in a dark teal shirt and white shorts on a blue and green hard court (a likeness taken from an uploaded photo): a slow-motion sideways acceleration toward an incoming ball, camera panning with him, net in the foreground. Has an audio track.",
+   "tags": [
+    "hard-court",
+    "man",
+    "face-visible",
+    "restricted"
+   ],
+   "private": true,
+   "restricted": "made from an uploaded photo of a real-looking player (his likeness). Do not use in an ad without that person's permission. Kept out of git.",
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "2f6574d1-f774-48e9-9911-e44a2ad01807",
+    "model": "Wan 2.5 (fast, 720p)",
+    "settings": "5 s, sound on",
+    "prompt": "A male tennis player wearing a fitted teal blue athletic shirt and white shorts stands centered on an outdoor hardcourt with a blue and green surface, holding a tennis racquet with both hands in a ready stance. He pushes off his outside foot with explosive power, then accelerates sideways with two strong, low strides toward an incoming tennis ball entering frame from the camera's right side at a slightly elevated height. The camera smoothly pans to follow the player's lateral motion... (full prompt shortened here; the rest asked for slow motion, soft daylight, enhanced footfall sounds and no text)",
+    "start_image": {
+     "job_id": "dbb06b25-55df-4f47-97fb-9e33067bb437",
+     "file": "private/2026-09-02_photo-player-reference.jpg"
+    }
+   },
+   "used_in": [],
+   "file": "private/2026-09-02_photo-player-wan.mp4",
+   "seconds": 5.04,
+   "width": 1184,
+   "height": 784,
+   "fps": 24.0,
+   "audio": true,
+   "mb": 8.5,
+   "poster": "private/posters/photo-player-wan.jpg"
+  },
+  {
+   "id": "photo-player-minimax",
+   "kind": "generated",
+   "date": "2026-09-02",
+   "title": "Photo player: split-step and sprint (MiniMax)",
+   "shows": "A young man in a dark teal shirt and white shorts on a blue and green hard court (a likeness taken from an uploaded photo): a split-step, then a full sprint toward a ball that drops in the far half, with a side-on tracking camera. Has an audio track.",
+   "tags": [
+    "hard-court",
+    "man",
+    "face-visible",
+    "restricted"
+   ],
+   "private": true,
+   "restricted": "made from an uploaded photo of a real-looking player (his likeness). Do not use in an ad without that person's permission. Kept out of git.",
+   "notes": "Amir's own test clip (2026-09-02). Described from the prompt and one frame: not checked frame by frame for faces, logos or morphing. Credits not recorded.",
+   "higgsfield": {
+    "job_id": "082f3714-db97-4d3e-82e9-358deae7a75c",
+    "model": "MiniMax H3",
+    "settings": "2K, 5 s, 9:16 requested, audio",
+    "prompt": "@Image1 is the reference photo of the tennis player: keep the player's identity and exact look... he does a split-step, then explodes into a full sprint toward the ball, visibly accelerating with every stride... side-on tracking shot, slow tracking camera, dust puffing off each step, sneaker squeaks and footfalls, no music. (full prompt shortened here)",
+    "start_image": {
+     "job_id": "dbb06b25-55df-4f47-97fb-9e33067bb437",
+     "file": "private/2026-09-02_photo-player-reference.jpg"
+    }
+   },
+   "used_in": [],
+   "file": "private/2026-09-02_photo-player-minimax.mp4",
+   "seconds": 5.17,
+   "width": 2176,
+   "height": 1440,
+   "fps": 24.0,
+   "audio": true,
+   "mb": 4.6,
+   "poster": "private/posters/photo-player-minimax.jpg"
+  },
+  {
+   "id": "app-clip-loop",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: the logging loop",
+   "shows": "The logging screen: four sets of a Barbell Back Squat are entered with weight and RPE and ticked off, with a caption «هر هفته چک‌این داریم» (we check in every week).",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-loop.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-loop.mp4",
+   "seconds": 6.77,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 1.1,
+   "poster": "posters/app-clip-loop.jpg"
+  },
+  {
+   "id": "app-clip-prescription",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: a prescription",
+   "shows": "A strength day card (Day 3, change of direction and rotational power) with the Barbell Romanian Deadlift row opening to its video slot: how a prescription looks in the app.",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-prescription.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-prescription.mp4",
+   "seconds": 7.57,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 2.1,
+   "poster": "posters/app-clip-prescription.jpg"
+  },
+  {
+   "id": "app-clip-map",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: the cycle map",
+   "shows": "«هر سیکل یه مأموریت» (each cycle is a mission): the cycles C1 to C5 with the Foundation Forge card (done) and Load and Build (active).",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-map.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-map.mp4",
+   "seconds": 6.77,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 1.3,
+   "poster": "posters/app-clip-map.jpg"
+  },
+  {
+   "id": "app-clip-delivery",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: delivery",
+   "shows": "A phone showing the short intake form: how the programme starts and reaches the athlete.",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-delivery.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-delivery.mp4",
+   "seconds": 6.77,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 2.0,
+   "poster": "posters/app-clip-delivery.jpg"
+  },
+  {
+   "id": "app-clip-watch",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: the coach watches",
+   "shows": "A phone with the Accelerations and Squat Strength session and its readiness check: the data the coach reads.",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-watch.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-watch.mp4",
+   "seconds": 8.27,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 2.5,
+   "poster": "posters/app-clip-watch.jpg"
+  },
+  {
+   "id": "app-clip-why",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: why this cycle",
+   "shows": "The cycle cards (Foundation Forge, Load and Build, Power Translation...) with one card opening to explain itself.",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-why.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-why.mp4",
+   "seconds": 7.27,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 4.3,
+   "poster": "posters/app-clip-why.jpg"
+  },
+  {
+   "id": "app-clip-human",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: written by a person",
+   "shows": "The coach's card next to the athlete's log with the words «من نوشتم» (I wrote it) against «خودکار» (automatic).",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-human.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-human.mp4",
+   "seconds": 6.97,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 1.2,
+   "poster": "posters/app-clip-human.jpg"
+  },
+  {
+   "id": "app-clip-needs",
+   "kind": "app-clip",
+   "date": "2026-09-06",
+   "title": "App clip: needs analysis",
+   "shows": "«تحلیل نیاز: زمین چی می‌خواد؟» (needs analysis: what does the court demand?) with sprint, change of direction and rotational power.",
+   "tags": [
+    "app",
+    "farsi",
+    "silent",
+    "cutaway",
+    "explainer",
+    "vertical"
+   ],
+   "source": "Content/clip-needs.html (spec in Content/APP-CLIPS.md)",
+   "used_in": [
+    "the Farsi system reel (reel-5/6-system)"
+   ],
+   "notes": "Silent looping cutaway exported from an HTML clip. Description written from one frame and the spec: check it against the spec before quoting it.",
+   "file": "app-clips/2026-09-06_app-clip-needs.mp4",
+   "seconds": 7.47,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 1.2,
+   "poster": "posters/app-clip-needs.jpg"
+  },
+  {
+   "id": "fast-feet-overlay-black",
+   "kind": "asset",
+   "date": "2026-09-03",
+   "title": "FAST FEET overlay (black, blend)",
+   "shows": "The words FAST FEET in bold white with a row of footprints, on black: for a Screen/Add blend over other footage in an editor. 4 s, 60 fps.",
+   "tags": [
+    "overlay",
+    "text",
+    "editing",
+    "vertical"
+   ],
+   "notes": "Not built in this repo: origin unknown (made outside these sessions).",
+   "used_in": [],
+   "file": "clips/2026-09-03_fast-feet-overlay-black.mp4",
+   "seconds": 4.0,
+   "width": 1080,
+   "height": 1920,
+   "fps": 60.0,
+   "audio": false,
+   "mb": 0.3,
+   "poster": "posters/fast-feet-overlay-black.jpg"
+  },
+  {
+   "id": "fast-feet-overlay-green",
+   "kind": "asset",
+   "date": "2026-09-03",
+   "title": "FAST FEET overlay (green screen)",
+   "shows": "The same FAST FEET title with footprints, on chroma green: key the green out in an editor. 4 s, 60 fps.",
+   "tags": [
+    "overlay",
+    "text",
+    "editing",
+    "vertical"
+   ],
+   "notes": "Not built in this repo: origin unknown.",
+   "used_in": [],
+   "file": "clips/2026-09-03_fast-feet-overlay-green.mp4",
+   "seconds": 4.0,
+   "width": 1080,
+   "height": 1920,
+   "fps": 60.0,
+   "audio": false,
+   "mb": 0.4,
+   "poster": "posters/fast-feet-overlay-green.jpg"
+  },
+  {
+   "id": "selfie-outdoor-2026-08-07",
+   "kind": "footage",
+   "date": "2026-08-07",
+   "title": "Selfie video outdoors",
+   "shows": "Amir in sunglasses and a backpack, filming himself outdoors on a sunny day. A real person's face: private.",
+   "tags": [
+    "footage",
+    "amir",
+    "selfie",
+    "face-visible"
+   ],
+   "private": true,
+   "notes": "Low resolution (464x848).",
+   "used_in": [],
+   "file": "private/2026-08-07_selfie-outdoor-2026-08-07.mov",
+   "seconds": 12.53,
+   "width": 464,
+   "height": 848,
+   "fps": 30.0,
+   "audio": true,
+   "mb": 2.7,
+   "poster": "private/posters/selfie-outdoor-2026-08-07.jpg"
+  },
+  {
+   "id": "court-indoor-player-from-behind",
+   "kind": "footage",
+   "date": "2026-08-30",
+   "title": "Indoor court: a player from behind",
+   "shows": "A woman in a blue top and dark shorts, seen from behind, on an indoor tennis court under a steel-arched roof. A real player.",
+   "tags": [
+    "footage",
+    "indoor-court",
+    "from-behind",
+    "woman"
+   ],
+   "file": "../../coach-site/media/court.mp4",
+   "usable": "All 10.8 s.",
+   "source": "Downloads/IMG_4203.MP4 is identical (same bytes)",
+   "notes": "Already public: it is served on the coach-site draft (coach-site/media/court.mp4, tracked in git). Not copied again.",
+   "used_in": [],
+   "seconds": 10.83,
+   "width": 464,
+   "height": 848,
+   "fps": 30.0,
+   "audio": true,
+   "mb": 2.3,
+   "poster": "posters/court-indoor-player-from-behind.jpg"
+  },
+  {
+   "id": "form-talk-raw",
+   "kind": "footage",
+   "date": "2026-09-06",
+   "title": "Talking to camera: the short form (raw, 4K)",
+   "shows": "Amir at a desk with a laptop, talking to camera, with a Farsi title «فرم کوتاه پر» (fill in the short form). 78.9 s, 4K vertical. A real person's face: private.",
+   "tags": [
+    "footage",
+    "amir",
+    "talking-head",
+    "face-visible",
+    "4k"
+   ],
+   "private": true,
+   "location": "Downloads folder: IMG_4315.MP4 (385 MB). NOT copied into the archive (too big): say the word and it will be.",
+   "notes": "Looks like the version with the on-screen title; the phone-mockup edit is form-talk-edit.",
+   "used_in": [],
+   "file": null,
+   "seconds": 78.87,
+   "width": 2160,
+   "height": 3840,
+   "fps": 30.0,
+   "audio": true,
+   "mb": 384.7,
+   "poster": "private/posters/form-talk-raw.jpg"
+  },
+  {
+   "id": "form-talk-edit",
+   "kind": "footage",
+   "date": "2026-09-07",
+   "title": "Talking to camera: the short form (edit with the form on screen)",
+   "shows": "The same 78.9 s recording of Amir at his desk, with a phone mock-up on screen showing the intake form. 4K vertical. A real person's face: private.",
+   "tags": [
+    "footage",
+    "amir",
+    "talking-head",
+    "face-visible",
+    "4k",
+    "edit"
+   ],
+   "private": true,
+   "location": "Downloads folder: 0807.mp4 (212 MB). NOT copied into the archive (too big): say the word and it will be.",
+   "notes": "Appears to be the finished edit of form-talk-raw.",
+   "used_in": [],
+   "file": null,
+   "seconds": 78.9,
+   "width": 2160,
+   "height": 3840,
+   "fps": 30.0,
+   "audio": true,
+   "mb": 211.6,
+   "poster": "private/posters/form-talk-edit.jpg"
+  },
+  {
+   "id": "reel-7-dawn-to-floodlights",
+   "kind": "reel",
+   "date": "2026-09-20",
+   "title": "Reel 7: Dawn to Floodlights",
+   "shows": "30 s silent Farsi ad for the tennis course (TPS). A clay ball hops along a court baseline through the 16 weeks and four blocks, the real demo in a phone, and it ends on the button «هفته‌ی ۱ رو رایگان امتحان کن». Made from stills, no video clips.",
+   "tags": [
+    "reel",
+    "farsi",
+    "course",
+    "tps",
+    "ad",
+    "silent",
+    "30s"
+   ],
+   "usable": "The whole file.",
+   "source": "Content/reel-7-course/ (rebuilds from src/; export with .claude/skills/reel/tools/render_mp4.js)",
+   "notes": "Approved by Amir ('incredible'). An identical copy sits on his Desktop as ZFe0Pmm5cZ9N5OHqb3geZg.mp4.",
+   "used_in": [],
+   "file": "reels/2026-09-20_reel-7-dawn-to-floodlights.mp4",
+   "seconds": 30.0,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 27.7,
+   "poster": "posters/reel-7-dawn-to-floodlights.jpg",
+   "poster_at": 3.0
+  },
+  {
+   "id": "reel-8-16-weeks-hook-a",
+   "kind": "reel",
+   "date": "2026-09-20",
+   "title": "Reel 8: 16 Weeks, hook A",
+   "shows": "20 s silent Farsi ad for the tennis course on four generated video clips (clay burst, chalked grip, floodlit pivot, night court), a rail of 16 weeks, the real demo in a phone, and the free-week button. Hook A: «۱۶ هفته تا بدنِ تنیسی.»",
+   "tags": [
+    "reel",
+    "farsi",
+    "course",
+    "tps",
+    "ad",
+    "silent",
+    "20s",
+    "generated-footage"
+   ],
+   "used_in": [],
+   "usable": "The whole file.",
+   "source": "Content/reel-8-course/ (README has the scene map; export with render_mp4.js, add --query hook=b for hook B)",
+   "notes": "Clips used: clay-burst, chalk-grip, floodlit-pivot, night-court-plate. Approved by Amir ('they are amazing', he prefers A). The footage is AI-generated: label the post if Instagram asks.",
+   "file": "reels/2026-09-20_reel-8-16-weeks-hook-a.mp4",
+   "seconds": 20.0,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 16.8,
+   "poster": "posters/reel-8-16-weeks-hook-a.jpg",
+   "poster_at": 2.6
+  },
+  {
+   "id": "reel-8-16-weeks-hook-b",
+   "kind": "reel",
+   "date": "2026-09-20",
+   "title": "Reel 8: 16 Weeks, hook B",
+   "shows": "20 s silent Farsi ad for the tennis course on four generated video clips (clay burst, chalked grip, floodlit pivot, night court), a rail of 16 weeks, the real demo in a phone, and the free-week button. Hook B: «تو زمین: سریع‌تر. قوی‌تر. انفجاری‌تر.»",
+   "tags": [
+    "reel",
+    "farsi",
+    "course",
+    "tps",
+    "ad",
+    "silent",
+    "20s",
+    "generated-footage"
+   ],
+   "used_in": [],
+   "usable": "The whole file.",
+   "source": "Content/reel-8-course/ (README has the scene map; export with render_mp4.js, add --query hook=b for hook B)",
+   "notes": "Clips used: clay-burst, chalk-grip, floodlit-pivot, night-court-plate. Amir's pick from six options; it replaced a first hook B that made no sense in Farsi. The footage is AI-generated: label the post if Instagram asks.",
+   "file": "reels/2026-09-20_reel-8-16-weeks-hook-b.mp4",
+   "seconds": 20.0,
+   "width": 1080,
+   "height": 1920,
+   "fps": 30.0,
+   "audio": false,
+   "mb": 16.8,
+   "poster": "posters/reel-8-16-weeks-hook-b.jpg",
+   "poster_at": 2.6
+  }
+ ]
+}

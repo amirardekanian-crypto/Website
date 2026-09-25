@@ -8,11 +8,17 @@
 //      seek every CSS transition, CSS animation and Web Animation to the same instant (document.getAnimations()),
 //      because those run on the browser's own timeline, which the fake clock does not control.
 //   3. One JPEG screenshot per frame, then ffmpeg (H.264, BT.709, yuv420p, faststart, no audio).
+//   4. VIDEO PLATES (reel-8): a <video> runs on the media pipeline, not on the fake clock, so the reel must not play
+//      it in this mode. The page checks window.__renderMode (set here before the page loads) and does not play its
+//      videos; after every frame step we call window.__videoAt(V), which seeks each video to the frame that belongs at
+//      V ms and resolves when the seeks have landed (a real-time timeout guards against a hang). A reel with no videos
+//      simply has no __videoAt and nothing changes. See Content/reel-8-course/src/reel8.template.html for the page side.
 //
 // usage:
 //   node render_mp4.js <reel.html> <out.mp4> [--fps 30] [--seconds 30] [--lead 150] [--crf 18]
 //        [--from 0] [--to N] [--every 1]      (--every 90 = a quick test: shoots one frame in 90, no video)
 //        [--frames <dir>] [--keep]            (default frames dir: <out>.frames, deleted after encoding unless --keep)
+//        [--query hook=b]                     (extra URL parameters after ?capture=1, e.g. reel-8's B hook)
 //
 // needs: `npm i playwright-core` somewhere on NODE_PATH, Microsoft Edge (or Chrome), and ffmpeg
 //        (PATH, $FFMPEG, or `python -m pip install --user imageio-ffmpeg`).
@@ -66,19 +72,27 @@ const SEEK = `(() => {
   const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
+  await page.addInitScript(() => { window.__renderMode = true; });   // tells a reel with <video> plates not to play them itself
   await page.clock.install({ time: 0 });
   await page.clock.pauseAt(1000);                      // frozen: nothing in the page moves until we say so
-  await page.goto(pathToFileURL(path.resolve(file)).href + '?capture=1', { waitUntil: 'load' });
+  await page.goto(pathToFileURL(path.resolve(file)).href + '?capture=1' + (opt('--query', '') ? '&' + opt('--query', '') : ''), { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(1500);                     // real time: fonts ready, play() has scheduled its timers
   await page.evaluate(SEEK);
   await page.evaluate(() => window.__seek(0));
-  let V = 0, shot = 0;
+  const hasVideo = await page.evaluate(() => typeof window.__videoAt === 'function');
+  let V = 0, shot = 0, seeks = 0, stalls = 0;
   for (let k = 0; k <= TO; k++) {
     const target = LEAD + Math.round(k * 1000 / FPS);  // ms since play(); scene 0 starts at LEAD
     if (target > V) await page.clock.runFor(target - V);
     V = target;
     await page.evaluate(v => window.__seek(v), V);
+    if (hasVideo) {
+      // put every <video> on the frame that belongs at V; a real timer stops a seek that never lands from hanging the run
+      const r = await Promise.race([page.evaluate(v => window.__videoAt(v), V), new Promise(res => setTimeout(() => res('stall'), 5000))]);
+      if (r === 'stall') { stalls++; console.log('WARNING: a video seek did not land at frame', k); }
+      else if (r) { seeks++; await page.waitForTimeout(45); }      // a frame changed: give the compositor a moment to paint it
+    }
     if (k >= FROM && (k - FROM) % EVERY === 0) {
       await page.screenshot({ path: path.join(framesDir, 'f_' + String(k).padStart(4, '0') + '.jpg'), type: 'jpeg', quality: 95 });
       shot++;
@@ -86,7 +100,8 @@ const SEEK = `(() => {
     if (k % 60 === 0) console.log('frame', k + '/' + TOTAL, ((Date.now() - t00) / 1000).toFixed(0) + 's');
   }
   await browser.close();
-  console.log('shot', shot, 'frames in', ((Date.now() - t00) / 1000).toFixed(0) + 's;', errs.length ? errs : 'no page errors');
+  console.log('shot', shot, 'frames in', ((Date.now() - t00) / 1000).toFixed(0) + 's;', errs.length ? errs : 'no page errors',
+    hasVideo ? '; video frames changed on ' + seeks + ' steps, ' + stalls + ' stalls' : '');
   if (EVERY !== 1 || FROM !== 0 || TO !== TOTAL - 1) { console.log('partial run: frames in', framesDir, '(no video)'); return; }
 
   const ff = findFfmpeg();

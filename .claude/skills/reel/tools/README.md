@@ -30,7 +30,15 @@ finds `playwright-core` through `NODE_PATH`. `render_mp4.js` finds ffmpeg on `PA
 - Scene timers made with `setTimeout` and animation done with CSS or the Web Animations API. `render_mp4.js`
   controls `setTimeout`, `requestAnimationFrame`, `performance.now` and `Date` through Playwright's fake clock, and
   seeks CSS transitions, CSS animations and `element.animate()` through `document.getAnimations()`. Anything driven
-  by something else (a `<video>`, a CSS `animation-timeline`, a WebGL clock) would not be frame-accurate.
+  by something else (a CSS `animation-timeline`, a WebGL clock) would not be frame-accurate.
+- **`<video>` plates** (reel-8) obey neither clock, so the reel and the renderer share a small protocol. The renderer sets
+  `window.__renderMode = true` before the page loads: the reel must then **not** play its videos. After every frame step the
+  renderer calls `window.__videoAt(V)` (V = ms since `play()`), which must seek each video to the frame that belongs at V and
+  return a Promise that resolves when the seeks have landed (truthy if a frame changed, so the renderer waits 45 ms for the
+  paint). No `__videoAt` means no videos and nothing changes. In real time the reel plays them itself. Seek to the MIDDLE of a
+  source frame, `(n + 0.5) / fps`, or float rounding shows the frame before. The reference is
+  `Content/reel-8-course/src/reel8.template.html` (search for `__videoAt`). Do not put a timer fallback in the seek under
+  `__renderMode`: the clock is frozen and it would never fire.
 
 ## Export recipe
 
@@ -40,5 +48,7 @@ node render_mp4.js Content/<reel>.html x.mp4 --every 90 --frames %TEMP%\t     (q
 ```
 
 `--seconds` is the sum of the scenes' `data-dur` (default 30) and `--lead` is the delay before scene 0 (default 150 ms,
-the reel-6/7 driver). Keep the frames folder OUT of the repo (OneDrive would sync 900 files). `crf 15` gave 26 MB for
-reel-7 (about 7 Mbps); `crf 18` gave 14 MB. The MP4 has no audio: Amir adds it in Instagram.
+the reel-6/7/8 driver). `--query hook=b` adds URL parameters after `?capture=1` (reel-8's second hook). Keep the frames
+folder OUT of the repo (OneDrive would sync 900 files). `crf 15` gave 26 MB for reel-7 (about 7 Mbps); `crf 18` gave 14 MB;
+reel-8 at `crf 16` gave 16 MB for 20 s, and 600 frames took 35 s (the clips add a seek and 45 ms on the 220 steps where a
+video frame changes). The MP4 has no audio: Amir adds it in Instagram.

@@ -216,6 +216,9 @@ sheet with Read** and check:
   is the *outer* bound: by eye the good part ended 0.5-1 s earlier both times (3.0 s against 3.5,
   1.75 s against 2.0).
 - **Faces**: visible at any moment? A head in profile at 0.5 s is small enough to pass; a face is not.
+- **A person who was not in the start picture.** When the start picture shows only body parts (hands, legs), the model can
+  complete the whole person mid-clip. The "grip" clip did: a bearded man bent into the frame from 1.67 s, with his face and
+  a printed shirt logo, although the prompt said "no face". Sweep the frames at 8 per second and cut before it happens.
 - **Morphing**: hands, racket, feet, a third leg. Logos or letters appearing on shoes and clothing.
 - **The last frame**: empty? Then the clip is too long.
 - **A quiet plate** (the night court) moves about 2 out of 255 per frame against 4-14 for an action
@@ -233,19 +236,26 @@ Writes a copy cut to that length, 0.25 s audio fade-out (when there is audio), H
 **original** too (it cost credits and a different cut may be wanted): `Content/<reel>/clips/`, tracked
 in git (2-5 MB each). Then add the ledger row below. Send Amir the trimmed clip with `SendUserFile`.
 
-## Step 8 — into a reel (PLAN: not built yet — rewrite this when the first reel needs it)
+## Step 8 — into a reel (BUILT: reel-8, `Content/reel-8-course/`)
 
-- A clip is a **plate**: a full-bleed `<video muted playsinline>` under the type, embedded as
-  base64 like every other asset (the reel stays self-contained). Embed a lean copy: 720p, no audio,
-  crf ~24 (a 2 s clip is roughly 0.5 MB, +33% as base64).
-- ⚠️ `render_mp4.js` steps a **fake clock**, so a `<video>` will not advance on its own. Per frame it
-  must set `video.currentTime = frameTime − sceneStart` and wait for `seeked` before the
-  screenshot. Build that in the first reel that uses a clip and test it on one clip first.
-- Clips are silent now, so there is nothing to mix. The two 5 s test clips still carry audio: drop it
-  (`-an`) unless he asks. If he ever wants clip sound, the renderer writes **no audio**: mix afterwards
-  with ffmpeg (`adelay` to each scene start, `amix` with `normalize=0`, mux with `-c:v copy -c:a aac`).
-- Cuts between a clip and a still plate (`bg-*.webp`) can jump in brightness: check the seam, and
-  put the same grain over both.
+The recipe is in `/reel` Step 2c, and the working example is `Content/reel-8-course/src/`. In short:
+
+- **Trim first, then embed.** `prep_clips.py` cuts each clip to the seconds that are used (a `masters/` copy at crf 14) and
+  makes a lean copy for the page (crf 24, `-an`, a light `unsharp`, a keyframe every 12 frames). Four clips, 9.3 s of
+  footage, 2.4 MB, and the whole reel 3.5 MB as base64.
+- A clip is a **plate**: a full-bleed `<video muted playsinline preload="auto">` under the type, in its own wrapper. It ends on its
+  last frame, so a scene that runs longer than the clip simply holds it.
+- ⚠️ **The MP4 renderer steps a fake clock, and a `<video>` does not obey it.** The page plays nothing when
+  `window.__renderMode` is set, and the renderer calls `window.__videoAt(V)` after every frame, which seeks each clip to the
+  frame that belongs there and resolves when it lands. It works: 600 frames in 35 s, 0 stalled seeks. Details in
+  `.claude/skills/reel/tools/README.md`.
+- Clips are silent, so nothing needs mixing. The two 5 s test clips carry audio; it was dropped (`-an`). If he ever wants
+  clip sound, the renderer writes **no audio**: mix afterwards with ffmpeg (`adelay` to each scene start, `amix` with
+  `normalize=0`, mux with `-c:v copy -c:a aac`).
+- 24 fps clips in a 30 fps MP4 show every fourth source frame twice. Not visible in practice.
+- Cuts between clips wipe in from the right with a clay line (the reading direction for Farsi), so a jump in brightness
+  between clips reads as a cut, not a glitch.
+- **After the export, sweep the footage for faces and logos** (a contact sheet every 0.3 s of each clip scene).
 
 ## Not tried yet (so do not claim it works)
 
@@ -289,7 +299,14 @@ Add a dated line whenever a round teaches something. This section is the reason 
 - **2026-09-20** — A vertical master we already had (the Reel 7 night court) went straight in as a
   start picture: no generation, and a calm haze-drift plate for 3 credits.
 - **2026-09-20** — The auto-mode check blocked one download (see Step 5). The clip was made and paid
-  for, but my frame-by-frame check of it is missing; Amir watched it through the Higgsfield viewer.
+  for, but my frame-by-frame check of it was missing; Amir watched it through the Higgsfield viewer. After
+  he said "go build reel 8" the same plain download went through, and the check found the problem below.
+- **2026-09-20** — **The "grip" clip broke two rules in its second half** (a face in profile and a printed shirt logo, from
+  1.67 s), so reel-8 uses only its first 1.55 s. The prompt already said "no face" and "the bar stays on the floor"; the model
+  completed the person anyway because the start picture showed only forearms. A prompt cannot forbid this reliably: keep the
+  action tiny, cut early, and sweep the frames. It also means a 3 s clip is not always 3 usable seconds.
+- **2026-09-20** — A video plate reel is cheap to build once the renderer protocol exists: four clips, 2.4 MB embedded, a 20 s
+  MP4 in 35 s. The cost was the 30.5 credits, and 7 of them (the lean run) delivered two of the four clips.
 
 ## Ledger — what already exists in the Higgsfield account
 
@@ -316,7 +333,7 @@ repo; the results are still on Higgsfield.
 | 2026-09-20 | Clip "floodlit pivot", 5 s | Kling 3.0 std, sound on | 10 | `b4e56996-df20-4ec1-bb28-5c10ff49203f` | use **0-1.75 s**; she runs away |
 | 2026-09-20 | Start picture "grip": chalked hands on a trap bar, window light, clay-orange towel, vertical | `first-light`, `gpt_image_2_5` medium/1k | 1 | `9c7eef38-a64e-47ae-8c17-daff50cb1746` | good, 752×1344 |
 | 2026-09-20 | Clip "night plate", 3 s, silent | Cinema Studio v2 std, `speedramp: "linear"`, from `week-sixteen` | 3 | `0a334ef3-3184-45f6-9f98-97ae5ed59bb1` | haze drifts, all else still; no audio track |
-| 2026-09-20 | Clip "grip", 3 s, silent | Cinema Studio v2 std, slowmo, from the "grip" picture | 3 | `804a5c00-f07c-422b-9c02-f66d2aa86d5c` | **not checked by me** (download blocked); Amir to judge |
+| 2026-09-20 | Clip "grip", 3 s, silent | Cinema Studio v2 std, slowmo, from the "grip" picture | 3 | `804a5c00-f07c-422b-9c02-f66d2aa86d5c` | checked: **first 1.55 s clean** (forearms, chalk); a man's face and shirt logo enter from 1.67 s, so only that part is used in reel-8 |
 
 Prompts as run for the last three: *grip picture:* "Recompose this photograph as a vertical 9:16 image.
 Same scene: a chalked pair of hands gripping the handles of a trap bar on a dark rubber gym floor, one

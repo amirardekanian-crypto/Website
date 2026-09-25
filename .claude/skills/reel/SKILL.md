@@ -1,6 +1,6 @@
 ---
 name: reel
-description: Build a ready-to-preview Instagram reel (1080×1920, animated HTML) from Amir's topic or script, including AD reels that sell a product (reel-7, the tennis course). Use whenever Amir asks for a reel, an Instagram ad, or a moving version of a carousel/story. Delivers an openable, self-playing HTML file. Exports a frame-accurate MP4 and saves the sources only when Amir asks.
+description: Build a ready-to-preview Instagram reel (1080×1920, animated HTML) from Amir's topic or script, including AD reels that sell a product (reel-7, the tennis course, on stills; reel-8, the same course on generated video clips). Use whenever Amir asks for a reel, an Instagram ad, or a moving version of a carousel/story. Delivers an openable, self-playing HTML file. Exports a frame-accurate MP4 and saves the sources only when Amir asks.
 ---
 
 # Instagram reel generator — AA Performance
@@ -113,6 +113,28 @@ directly and follow its `BEATS` array + `.phonewrap` structure; for the world la
 10. **Two safety rules.** Everything Amir needs to read sits between y ≈ 250 and y ≈ 1600 (Instagram
     covers the rest). The loop ends in a 0.3 s dip to black in the default view only, never in `?capture=1`.
 
+### Step 2c — Video plates: a reel on generated footage (reel-8)
+
+`Content/reel-8-course.html` (20 s, four Higgsfield clips, the real demo in a phone) is the reference; its README has the
+scene map and the rebuild steps. What it teaches:
+
+1. **Clips come from `/video`** (`.claude/skills/video/SKILL.md`: the spend protocol comes first, and Amir approves the plan).
+   Look at every clip before it goes in: reel-8's gym clip had a man's face and a printed shirt logo enter at 1.67 s, so
+   only its first 1.55 s is used. Trim each clip to the seconds that are used and let it **hold its last frame** after that.
+2. **Plates are `<video muted playsinline preload="auto">` in a `.world` layer**, one `.plate` wrapper each, embedded as base64
+   (`src/prep_clips.py` makes a lean copy: crf 24, a light unsharp, a keyframe every half second; 2.4 MB for 9 s of footage).
+   Each plate wipes in over the last with `clip-path: inset(0 0 0 100%)` → `inset(0)` on the **state rule** (right to left for
+   Farsi), and a clay line travels with the wipe. A plate keeps its final scale after its push-in, so the next wipe pops nothing.
+3. **Three ways to run a video**, all in one table in the page (`CLIPS`: element, scene, length, still frame):
+   real time (`setScene` seeks to 0 and plays), stills (`?beat=N` seeks to the hero frame), and the MP4 renderer, which
+   freezes the page clock, so the page slaves its videos to `window.__videoAt(V)` and plays nothing when `window.__renderMode`
+   is set. The protocol is in `tools/README.md`.
+4. **A progress rail beats a hero object when the footage is the hero.** Sixteen dashes at the top, filled by the count-up in the
+   hook, then one block of four lit white per cut. It is a number that drives things, and it costs almost nothing.
+5. **24 fps clips in a 30 fps MP4** show every fourth source frame twice. Nobody sees it; exporting at 24 would make the
+   interface motion coarse.
+6. **Keep the top ~40% of each clip calm** (the start picture was composed for it, per `/video` Step 2): all the type sits there.
+
 ## Step 3 — Write the copy
 
 English, sharp/uppercase Barlow Condensed per the EN site voice — not a translation of an old
@@ -211,6 +233,9 @@ folder is the model), and treat the built `Content/reel-<slug>.html` as output.
 | Everything plays backwards for a moment when the loop resets | A transition on the **base** rule reverses when the state class is removed | Transitions only on the state rules; the base rule declares none |
 | The overlay drifts from the photo it should sit on | Two layers with different transforms | One camera for both layers (Step 2b.4) |
 | Fine in stills, stuck in real time (or the second loop is broken) | Stills only show final states | The full check in Step 7 |
+| One element on screen is dim, blurred or missing, and it is not the one you styled | **A class name was reused for two families** (reel-8: video plates `.p1`-`.p3` and the phone's pills `.p1`-`.p3`), so the plate rules leaked onto the pills | Give each family its own prefix (`.pl0` plates, `.p1` pills); grep a new class name before you use it |
+| At a cut, the outgoing scene's text and phone vanish at once while only part of it fades | The children's visibility is tied to `.scene.on`, which is removed at the cut, so they snap hidden while the scene's own opacity is still fading | Keep `.on` while the scene fades out: add `.out` (opacity 0) to the leaving scene and remove both after the fade (`setScene` in reel-8) |
+| The MP4 shows the wrong or an old video frame | A `<video>` is not on the frozen page clock, or the seek landed on the frame boundary | The `__renderMode` / `__videoAt` protocol in `tools/README.md`; seek to the middle of the frame |
 
 ## Step 7 — Verify
 
@@ -255,7 +280,10 @@ depend on how fast the PC is.
 node .claude/skills/reel/tools/render_mp4.js Content/<reel>.html Content/<reel>/export/<reel>.mp4 --frames %TEMP%\<reel>-frames --crf 15
 ```
 
-- reel-7: 900 frames in about 35 s; `crf 15` = 26 MB (about 7 Mbps), `crf 18` = 14 MB.
+- reel-7: 900 frames in about 35 s; `crf 15` = 26 MB (about 7 Mbps), `crf 18` = 14 MB. reel-8 (video plates): 600 frames in 35 s,
+  `crf 16` = 16 MB. A reel with `<video>` plates needs the page side of the protocol in `tools/README.md`; `--query hook=b` exports a
+  variant. **After the export, scan the footage frame by frame for faces and logos** (a contact sheet every 0.3 s of each
+  clip scene): that is how the gym clip's problem was found, and a generator can add a person or a printed shirt without being asked.
 - `--seconds` is the sum of the scenes' `data-dur` (default 30); `--every 90` is a quick test (one frame in 90).
 - Needs `playwright-core` on `NODE_PATH`, Edge, and ffmpeg (`python -m pip install --user imageio-ffmpeg`).
 - Keep the frames folder **out of the repo** (OneDrive would sync 900 files). `export/` is git-ignored.
