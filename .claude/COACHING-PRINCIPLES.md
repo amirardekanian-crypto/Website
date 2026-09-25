@@ -549,6 +549,12 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   glutes at **22 — over the 10-20 ceiling** — which the old convention had scored 13. The error
   runs in both directions. **A missing machine is not a reason to contort the programme:** clear
   the 10-set floor with what the gym has and move on.
+- **A new athlete with no known lifts: no weighted exercise under 8 reps in the first cycle.**
+  Unweighted landing and jump drills (a snap down at 3 × 5, pogo contacts) and warm-up counts are
+  exempt. Heavier, lower-rep work waits until the first cycle's logs and films show what the
+  athlete can really do. *(2026-09-24, Amir, verbatim: "i dont want to start with anything less
+  that 8 reps in first cycle, because i dont know how good of athlete or how strong she really
+  is". Saved as a principle 2026-09-25.)*
 
 ## Testing
 - **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
