@@ -68,6 +68,8 @@ EXPANDED (tap the row)
 - **The key is the display name only**, not the day, the date or the session.
 - At the first boot after a finished day, `autoResetStaleDays()` clears `r` and `d` **and keeps
   `w`**, so last session's weight sits in the input as today's value.
+  *(Changed 2026-09-26, Fork 3B: the weight now moves to `lw` and shows as last time's hint under a
+  LAST caption; the box opens empty. See `PROGRAM-APP.md` → the set log.)*
 - A session's permanent record is `session_history.summary`, a **plain-text** block
   (`Set 1: 80 @8 ✓`). `coach.html`'s `parseSessionLog()` / `parseSetLine()` parse it back into
   numbers. The athlete app **never reads any history back**.

@@ -2445,6 +2445,35 @@
     .ex-set-rpe-q { display: none; }
   }
 
+  /* ── Last time's weight (Fork 3B, 2026-09-26) — see paintSets()/carrySet() ──
+     The number in an empty box is history, not something a tick records, so it
+     wears a LAST caption and sits smaller and paler than the prescribed reps beside
+     it. "Same as last" wears the clay outline of the Last pill: both are last time,
+     and neither is the coach. */
+  .ex-set-wbox { position: relative; min-width: 0; }
+  .ex-set-wlast {
+    display: none; position: absolute; left: 10px; top: 3px; pointer-events: none;
+    font-family: 'Space Mono', monospace; font-size: 8px; line-height: 1; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--grey-text);
+  }
+  .ex-set-wbox.show-last .ex-set-wlast { display: block; }
+  .ex-set-wbox.show-last .ex-set-weight::placeholder { font-size: 14px; color: var(--grey-text); opacity: 0.8; }
+  body[data-dark] .ex-set-wlast { color: #8a8a8a; }
+  body[data-dark] .ex-set-wbox.show-last .ex-set-weight::placeholder { color: #8a8a8a; opacity: 1; }
+  @media (max-width: 360px) { .ex-set-wlast { left: 6px; } }
+  .ex-same-last {
+    display: inline-flex; align-items: center; gap: 4px;
+    min-height: 34px; margin: 10px 10px 0; padding: 0 14px;
+    border: 0; border-radius: 99px; background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--ice); color: var(--ice);
+    font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13.5px;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .ex-same-last[hidden] { display: none; }
+  .ex-same-last b { font-weight: 700; }
+  .ex-same-last:active { background: var(--yellow-dim); }
+  body[data-dark] .ex-same-last { color: #E06B43; box-shadow: inset 0 0 0 1.5px #E06B43; }
+
   /* ── The Card Remembers (2026-09-24) — see paintLastTime() ──
      Direction B from the build brief: a clay-OUTLINED pill on the closed card
      (outlined, not filled, so it never reads as the coach's note pill), one strip
@@ -2722,6 +2751,15 @@
     text-transform: uppercase; color: var(--grey-text); line-height: 1.7;
   }
   body[data-dark] .ex-1rm-from { color: #888; }
+  /* In place of the Save button while the numbers come from the set log: the
+     finished session files them by itself (fillRecordsFrom, Fork 3B). */
+  .ex-1rm-auto {
+    margin-top: 12px; padding: 10px 12px; border-radius: 7px; text-align: center;
+    background: var(--yellow-dim); color: var(--grey-dark);
+    font-family: 'Barlow', sans-serif; font-size: 13px; line-height: 1.4;
+  }
+  .ex-1rm-auto[hidden] { display: none; }
+  body[data-dark] .ex-1rm-auto { background: rgba(14,74,54,0.28); color: #ddd; }
 
   .ex-1rm-save {
     display: block; width: 100%; margin-top: 12px; padding: 11px;
@@ -2732,6 +2770,9 @@
     transition: opacity 0.15s;
   }
   .ex-1rm-save:disabled { background: var(--yellow); cursor: default; }
+  /* `display: block` above outranks the browser's own [hidden] rule, so every
+     `save.hidden = true` in the app did nothing until this line (found 2026-09-26). */
+  .ex-1rm-save[hidden] { display: none; }
 
   /* Straight through to Personal Records from inside a set. The back chevron
      over there returns to this exact exercise — see _ceilReturn. */
@@ -4084,7 +4125,7 @@
   <div class="ceil-head">
     <button class="nav-back" onclick="ceilingBack()" aria-label="Back">←</button>
     <div class="ceil-kick">— Personal records</div>
-    <div class="ceil-title" id="ceil-title">The Ceiling</div>
+    <div class="ceil-title" id="ceil-title">Personal Records</div>
   </div>
   <div id="ceil-body" style="padding: 0 18px 110px;"></div>
 </div>
@@ -4785,13 +4826,28 @@ function staleCloudPlan(data, prefix) {
   return plan;
 }
 
-// Cloud copy of a per-set log for a session that is over: keep the weights, clear
-// the reps, RPE and done-ticks. Mirrors what autoResetStaleDays() does locally.
+// One set of a session that is over, as the next session starts it. The reps, RPE and
+// tick go; the weight survives as `lw`, LAST TIME'S weight, and `w` opens empty (Fork 3B,
+// Amir, 2026-09-26). It used to survive in `w`, so last week's load sat in today's box
+// looking typed and a bare tick logged it as today's. Now the box shows "last 80" as a
+// hint and records nothing until the athlete types a number or taps "Same as last".
+// `s.w || s.lw`: a session that skipped the weight keeps the last one ever typed.
+// ONE rule for the three places a session ends: autoResetStaleDays() on this phone,
+// stripSetLogSession() on the cloud's copy, and a rename carried by adoptRenamedExercises().
+function carrySet(s) {
+  const lw = (s && (s.w || s.lw)) || '';
+  const out = { w: '', n: '', r: '', d: false };
+  if (lw) out.lw = lw;
+  return out;
+}
+
+// Cloud copy of a per-set log for a session that is over. Mirrors what
+// autoResetStaleDays() does locally: carrySet() on every set.
 function stripSetLogSession(val) {
   try {
     const a = JSON.parse(val);
     if (!Array.isArray(a)) return val;
-    return JSON.stringify(a.map(s => ({ w: (s && s.w) || '', n: '', r: '', d: false })));
+    return JSON.stringify(a.map(carrySet));
   } catch (e) { return val; }
 }
 
@@ -4814,7 +4870,10 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
           : (a, b) => (b != null && b !== '') ? b : (a || '');   // real value wins; cloud breaks ties
         for (let i = 0; i < n; i++) {
           const a = L[i] || {}, b = C[i] || {};
-          out.push({ w: pick(a.w, b.w), n: pick(a.n, b.n), r: pick(a.r, b.r), d: !!(a.d || b.d) });
+          const o = { w: pick(a.w, b.w), n: pick(a.n, b.n), r: pick(a.r, b.r), d: !!(a.d || b.d) };
+          const lw = pick(a.lw, b.lw);                  // last time's weight (carrySet)
+          if (lw) o.lw = lw;
+          out.push(o);
         }
         return JSON.stringify(out);
       }
@@ -5187,9 +5246,10 @@ function getVideoUrl(ex) {
   adoptRenamedExercises();
 
   // Clear per-session data (checks, per-exercise RPE, day note, session RPE) for any day
-  // that was completed on a previous date. Weight inputs and per-exercise notes are PRESERVED
-  // because they're useful starting points (weights) or personal context (movement notes).
+  // that was completed on a previous date. Last time's weights are kept as the boxes'
+  // hint, and per-exercise notes are kept as personal context.
   autoResetStaleDays();
+  migrateCarriedWeights();
 
   // The Spine's offline copy has to be in memory BEFORE the cards are drawn.
   loadSpineCache();
@@ -7043,16 +7103,17 @@ function renderNotes() {
 // Guide screen (#screen-guide) was removed, so the content lives here directly.
 // Each entry renders as a collapsible note-style card. (`icon` is kept per card
 // so the rows can be given line-icon tiles later without re-deriving them.)
-// The Ceiling, explained for someone who has never heard of a one-rep max.
-// ONE copy, used in two places: the "Using the app" card in the Coach tab, and
-// the "How this works" panel on the Ceiling screen itself. Two copies of the
-// same prose would drift the first time either one is edited.
+// Personal Records (The Ceiling until 2026-09-26), explained for someone who has
+// never heard of a one-rep max. ONE copy, used in two places: the "Using the app"
+// card in the Coach tab, and the "How this works" panel on the records screen
+// itself. Two copies of the same prose would drift the first time either is edited.
 const CEILING_HELP = `
   <p><strong>What it is.</strong> Your one rep max is the heaviest you could lift one single time.
   It is the normal way to measure how strong you are.</p>
   <p><strong>You never have to test it.</strong> Testing a real one rep max takes a long warm-up,
   leaves you wrecked, and carries a risk. So the app works it out instead, from sets you already
-  do in your programme. Log the weight you used and your RPE, and the number appears.</p>
+  do in your programme. Log the weight you used and your RPE, and finish the session: every time
+  you beat your best, the new number appears by itself.</p>
   <p><strong>You can also put one in yourself.</strong> Tap <strong>Log a max</strong> on this
   screen, pick a lift from your programme, and enter what you lifted. Useful when you have just
   tested something, or trained somewhere the app was not open. You can date it to the day you
@@ -7090,14 +7151,14 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
-  { icon: 'activity', title: 'The Ceiling — the most you could lift once',
+  { icon: 'activity', title: 'Personal Records — the most you could lift once',
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
@@ -7399,7 +7460,7 @@ function ceilingCardHtml() {
   if (!lifts.length) {
     return head + `
       <button type="button" class="nc" onclick="goTo('ceiling')">
-        <div class="nc-k"><span>The Ceiling</span></div>
+        <div class="nc-k"><span>One-rep maxes</span></div>
         <div class="nc-big">No records yet</div>
         <div class="nc-f">Log a weight and your RPE on any lift<span class="nc-a">→</span></div>
       </button>`;
@@ -7420,7 +7481,7 @@ function ceilingCardHtml() {
 
   return head + `
     <button type="button" class="nc" onclick="goTo('ceiling')">
-      <div class="nc-k"><span>The Ceiling</span><span class="nc-r">${delta}</span></div>
+      <div class="nc-k"><span>Best lift</span><span class="nc-r">${delta}</span></div>
       <div class="nc-row">
         <div class="nc-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</div>
         <div class="nc-u">KG</div>
@@ -7588,12 +7649,28 @@ function returnFromCeiling() {
   });
 }
 
-// The Ceiling screen — retests first, then relative strength, then one row per
-// lift, with the way to add one by hand sitting above the list.
+// The head as the list and the two Log a max steps wear it: a plain kicker and no
+// New best art. renderCeilingLift() dresses it for the one lift that earned a band,
+// and without this the band stayed on the list after the back chevron.
+function ceilHeadPlain(kick) {
+  const head = document.querySelector('#screen-ceiling .ceil-head');
+  if (!head) return;
+  head.classList.remove('is-pr');
+  head.style.backgroundImage = '';
+  const gain = head.querySelector('.ceil-gain');
+  if (gain) gain.remove();
+  const k = head.querySelector('.ceil-kick');
+  if (k) k.textContent = kick;
+}
+
+// Personal Records (the screen was called The Ceiling until 2026-09-26) — retests
+// first, then relative strength, then one row per lift, with the way to add one by
+// hand sitting above the list.
 function renderCeiling() {
   _ceilLift = null;
   _ceilAdd = null;
-  document.getElementById('ceil-title').textContent = 'The Ceiling';
+  ceilHeadPlain('— One-rep maxes');
+  document.getElementById('ceil-title').textContent = 'Personal Records';
   const lifts = ceilingLifts();
   const body  = document.getElementById('ceil-body');
 
@@ -7618,7 +7695,7 @@ function renderCeiling() {
           <li>Open any exercise in today's session.</li>
           <li>Type in the weight you used.</li>
           <li>Tick the set, then tap your RPE for it, which is how hard it felt out of 10.</li>
-          <li>Tap <strong>Save to The Ceiling</strong>.</li>
+          <li>Finish the session. Your best set lands here by itself, and so does every new best after it.</li>
         </ol>
         ${canAdd ? `<p style="margin-top:14px">Or put one in from here — useful when you have
         just tested a lift, or lifted somewhere the app was not open.</p>`
@@ -7729,6 +7806,7 @@ function openCeilingAdd() {
   _ceilAdd = {};
   _ceilLift = null;
   goTo('ceiling', null, true);
+  ceilHeadPlain('— Personal records');
   document.getElementById('ceil-title').textContent = 'Log a max';
   const cands = ceilingCandidates();
   const known = {};
@@ -7770,6 +7848,7 @@ function openCeilingForm(i, asTest) {
   _ceilAdd = { lift: c.name, test: c.test, spec: spec };
   _ceilLift = null;
   goTo('ceiling', null, true);
+  ceilHeadPlain('— Log a max');
   document.getElementById('ceil-title').textContent = c.name;
 
   // Prefill the prescribed reps only when they could actually produce a number.
@@ -7798,7 +7877,7 @@ function openCeilingForm(i, asTest) {
         <label for="cf-day">When</label>
         <input id="cf-day" type="date" value="${ceilingToday()}" max="${ceilingToday()}">
       </div>
-      <button type="button" class="ex-1rm-save" id="cf-save" onclick="saveCeilingForm()">Save to The Ceiling</button>
+      <button type="button" class="ex-1rm-save" id="cf-save" onclick="saveCeilingForm()">Save to Personal Records</button>
     </div>
     <div class="ceil-note">A date in the past is fine — log the day you lifted it,<br>
       not the day you got round to typing it in.</div>`;
@@ -7848,7 +7927,7 @@ function paintCeilingForm() {
                          : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in you';
   save.hidden = false;
   save.disabled = false;
-  save.textContent = 'Save to The Ceiling';
+  save.textContent = 'Save to Personal Records';
   out.innerHTML = `<b>${est}</b><i>KG</i>`;
   grade.innerHTML = q.label + ' <em>&middot; how much to trust it</em>';
   grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
@@ -7949,7 +8028,7 @@ function renderCeilingLift(lift) {
   const rows = l.entries.slice().reverse().map((e, i) => `
     <div class="ceil-row">
       <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}${
-        e.test ? ' · tested' : ''}</span>
+        e.test ? ' · tested' : e.auto ? ' · from your sets' : ''}</span>
       <b>${e.kg} kg</b>
       <button type="button" class="wt-del" onclick="removeCeilingEntry(${i})"
         aria-label="Delete this entry">✕</button>
@@ -9183,11 +9262,12 @@ function resetDay(day) {
     card.classList.remove('checked');
     card.classList.add('collapsed');
     // Clear per-set done flags + RPE in storage AND in the rendered rows.
-    // Weights and the personal note are preserved (same policy as autoReset).
+    // Today's typed weights, last time's hint (`lw`) and the personal note stay:
+    // this starts the SAME session again, so the numbers typed for it are still its own.
     if (card.dataset.sets && !card.classList.contains('round-group')) {
       const name  = card.querySelector('.item-name').textContent.trim();
       const total = parseInt(card.dataset.sets, 10) || 1;
-      const log = loadSetLog(name, total).map(s => ({ w: s.w || '', n: '', r: '', d: false }));
+      const log = loadSetLog(name, total).map(s => Object.assign({}, s, { w: s.w || '', n: '', r: '', d: false }));
       saveSetLogValue(name, log);
       // Refresh the rendered set rows
       card.querySelectorAll('.ex-set-row').forEach((row, i) => {
@@ -9356,36 +9436,24 @@ function sessionStartedToday(dayId, today) {
   return false;
 }
 
-// Wipes per-session data for any day completed on a previous calendar date.
-// Preserves: weight log inputs, per-exercise notes (personal context).
-// Clears: exercise checks, per-exercise RPE, day note, session RPE, sent timestamp.
-function autoResetStaleDays() {
-  if (!DATA || !DATA.workouts) return;
-  const today = new Date().toDateString();
-  const days  = DATA.workouts.days || [];
-
-  // Pull the global checks state once so we can prune stale days from it
-  let checkState = {};
-  try { checkState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) {}
-  let checkStateChanged = false;
-
-  // Per-exercise keys are built from the NAME alone (setLogKey), and 21 of the 22
-  // live programmes reuse a name across days — "Stationary Bike" sits in all four
-  // of Pooya's. Clearing a finished day by name therefore reaches sideways into a
-  // day that is NOT over and blanks the RPE and done-ticks the athlete logged
-  // there today. Collect the names that still belong to a live day and leave
-  // those exercises alone.
-  //
-  // "Live" must mean finished TODAY or genuinely underway today — NOT merely
-  // "has no completed stamp". A day the athlete has never once finished has no
-  // stamp and never will, so treating that as live pinned its exercise names
-  // forever: Pooya's Day 4 was sent but never finished in-app, so Stationary
-  // Bike (all four of his days) was protected on every boot and its done-tick
-  // never cleared — he opened Day 1 with the bike already ticked, permanently.
-  // Three other athletes had a day stuck the same way. A day with no stamp is only
-  // protective while a session is actually running on it (timer or readiness
-  // stamped today), which is the same pair the abandoned-session sweep below
-  // already uses to decide a session was started.
+// Per-exercise keys are built from the NAME alone (setLogKey), and 21 of the 22
+// live programmes reuse a name across days: "Stationary Bike" sits in all four of
+// one athlete's. Clearing a finished day by name therefore reaches sideways into a
+// day that is NOT over and blanks the RPE and done-ticks the athlete logged there
+// today. These are the names that still belong to a live day; leave them alone.
+//
+// "Live" must mean finished TODAY or genuinely underway today — NOT merely
+// "has no completed stamp". A day the athlete has never once finished has no
+// stamp and never will, so treating that as live pinned its exercise names
+// forever: one athlete's Day 4 was sent but never finished in-app, so Stationary
+// Bike (all four of his days) was protected on every boot and its done-tick
+// never cleared — he opened Day 1 with the bike already ticked, permanently.
+// Three other athletes had a day stuck the same way. A day with no stamp is only
+// protective while a session is actually running on it (timer or readiness
+// stamped today), which is the same pair the abandoned-session sweep in
+// autoResetStaleDays() already uses to decide a session was started.
+// Shared by autoResetStaleDays() and migrateCarriedWeights().
+function liveExerciseKeys(days, today) {
   const liveNames = new Set();
   days.forEach(d => {
     const on = completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id));
@@ -9398,6 +9466,25 @@ function autoResetStaleDays() {
       liveNames.add(String(ex.name || '').replace(/\s+/g, '_'));
     }));
   });
+  return liveNames;
+}
+
+// Wipes per-session data for any day completed on a previous calendar date.
+// Preserves: last time's weights (as the hint, carrySet), per-exercise notes.
+// Clears: exercise checks, per-exercise RPE, day note, session RPE, sent timestamp,
+// and the weights themselves from today's boxes.
+function autoResetStaleDays() {
+  if (!DATA || !DATA.workouts) return;
+  const today = new Date().toDateString();
+  const days  = DATA.workouts.days || [];
+
+  // Pull the global checks state once so we can prune stale days from it
+  let checkState = {};
+  try { checkState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) {}
+  let checkStateChanged = false;
+
+  // Exercises a live day still holds are left alone (liveExerciseKeys, above).
+  const liveNames = liveExerciseKeys(days, today);
 
   days.forEach(day => {
     const completedKey = ATHLETE_ID + '_completed_d' + day.id;
@@ -9442,9 +9529,8 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_timer_'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_readiness_' + day.id);
-      // Per-exercise RPE + per-set RPE/done for this day's exercises.
-      // Weights and personal notes are kept on purpose — they're useful starting
-      // points / context for next session.
+      // Per-exercise RPE + per-set RPE/done for this day's exercises. The weights
+      // move out of the boxes into last time's hint (carrySet); personal notes stay.
       (day.blocks || []).forEach(block => {
         (block.exercises || []).forEach(ex => {
           const k = ex.name.replace(/\s+/g, '_');
@@ -9458,12 +9544,12 @@ function autoResetStaleDays() {
           for (let round = 2; round <= rounds; round++) {
             localStorage.removeItem(circuitRpeKey(ex.name, round));
           }
-          // Per-set log: clear reps, RPE + done, keep weights
+          // Per-set log: clear reps, RPE + done; the weight becomes last time's hint
           const setKey = ATHLETE_ID + '_setlog_' + k;
           let log = [];
           try { log = JSON.parse(localStorage.getItem(setKey)) || []; } catch (e) {}
           if (log.length) {
-            log = log.map(s => ({ w: s.w || '', n: '', r: '', d: false }));
+            log = log.map(carrySet);
             localStorage.setItem(setKey, JSON.stringify(log));
           }
         });
@@ -9477,6 +9563,39 @@ function autoResetStaleDays() {
   });
 
   if (checkStateChanged) localStorage.setItem(STORAGE_KEY, JSON.stringify(checkState));
+}
+
+// Once per phone (Fork 3B, 2026-09-26). Every sweep before carrySet() left last
+// session's weights in `w`, so they would still open as real numbers. A set that
+// holds ONLY a weight (no reps, no RPE, no tick, no `lw` yet) on an exercise no live
+// day holds is one of those carried weights: it becomes last time's hint. A live day
+// is left exactly as it is, so a session in progress keeps every number it has.
+// The marker sits outside the athlete's key prefix on purpose: it is a fact about
+// this phone, and syncing it would stop the athlete's other phone converting its own.
+function migrateCarriedWeights() {
+  if (!ATHLETE_ID || !DATA || !DATA.workouts) return;
+  const flag = 'aap_lw1_' + ATHLETE_ID;
+  try { if (localStorage.getItem(flag)) return; } catch (e) { return; }
+  const live = liveExerciseKeys(DATA.workouts.days || [], new Date().toDateString());
+  const prefix = ATHLETE_ID + '_setlog_';
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.indexOf(prefix) === 0 && !live.has(k.slice(prefix.length))) keys.push(k);
+  }
+  keys.forEach(k => {
+    let log;
+    try { log = JSON.parse(localStorage.getItem(k)); } catch (e) { return; }
+    if (!Array.isArray(log)) return;
+    let changed = false;
+    const out = log.map(s => {
+      if (!s || !s.w || s.n || s.r || s.d || s.lw) return s;
+      changed = true;
+      return carrySet(s);
+    });
+    if (changed) try { localStorage.setItem(k, JSON.stringify(out)); } catch (e) {}
+  });
+  try { localStorage.setItem(flag, '1'); } catch (e) {}
 }
 
 function saveState() {
@@ -9750,14 +9869,20 @@ async function recordSessionToCloud(day) {
   // Never in coach preview. Preview runs under Amir's own sign-in and save_session
   // accepts the coach, so Finish, an RPE tap or a note typed while looking around
   // wrote a real session_history row into this athlete's record.
-  if (window.IS_DEMO || window.IS_PREVIEW || day == null) return;
+  if (window.IS_PREVIEW || day == null) return;
   const D = buildSessionData(day);
   if (!D) return;
+  const completedOn = new Date().toISOString().slice(0, 10);
+  // Personal Records follow the session record, on every save of it (finish, a later
+  // RPE or note, send), under the date the server files it by. They stay on the
+  // phone, so the demo gets them too; nothing below this line runs in the demo.
+  fillRecordsFrom([{ date: completedOn, entries: D.log }], true);
+  if (window.IS_DEMO) return;
   const base = {
     p_athlete_id:   ATHLETE_ID,
     p_athlete_name: `${DATA.athlete.firstName} ${DATA.athlete.lastName}`,
     p_day:          Number(day),
-    p_completed_on: new Date().toISOString().slice(0, 10),
+    p_completed_on: completedOn,
     p_session: {
       status:       D.statusLabel,
       session_rpe:  String(D.sRpe || ''),
@@ -10017,7 +10142,9 @@ function attachSetLog(card) {
   wrap.className = 'ex-set-log' + (repsCol ? ' has-reps' : '');
   wrap.addEventListener('click', e => e.stopPropagation());
 
-  let html = `<div class="ex-set-header"><div>SET</div><div>${repsCol ? 'KG' : 'WEIGHT'}</div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
+  // "Same as last" sits above the table; paintSets() decides whether it shows.
+  let html = `<button type="button" class="ex-same-last" hidden></button>`
+    + `<div class="ex-set-header"><div>SET</div><div>${repsCol ? 'KG' : 'WEIGHT'}</div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
   log.forEach((s, i) => {
     const rpeBtns = [6,7,8,9,10].map(n =>
       `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="RPE ${n}">${n}</button>`
@@ -10027,7 +10154,7 @@ function attachSetLog(card) {
       : '';
     html += `<div class="ex-set-row${s.d ? ' done' : ''}" data-set-idx="${i}">
       <div class="ex-set-num">${i+1}</div>
-      <input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}" aria-label="Weight on set ${i+1}">
+      <div class="ex-set-wbox"><input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}" aria-label="Weight on set ${i+1}"><span class="ex-set-wlast" aria-hidden="true">last</span></div>
       ${repsBox}
       <button class="ex-set-rpetag" type="button" aria-label="Rate set ${i+1}"></button>
       <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done as written"></button>
@@ -10038,11 +10165,17 @@ function attachSetLog(card) {
   slot.appendChild(wrap);
 
   const rows = Array.from(wrap.querySelectorAll('.ex-set-row'));
+  const sameBtn = wrap.querySelector('.ex-same-last');
   // Which rows have their RPE strip open. Opened by a tick, closed by picking.
   const open = new Set();
+  // Which rows hold a weight carried down from a set above rather than typed there.
+  // Only these may be rewritten by the next number typed higher up. In memory only:
+  // after a reload every weight counts as the athlete's own.
+  const carried = new Set();
 
   // Repaint every row from storage — the single place row state is drawn, so the
   // list, Guided Mode, "tick all" and Reset can never leave two rows disagreeing.
+  // That includes the weight boxes: their value, and last time's hint.
   function paintSets() {
     const cur = loadSetLog(name, total);
     const liveIdx = cur.findIndex(s => !s.d);
@@ -10051,6 +10184,19 @@ function attachSetLog(card) {
       row.classList.toggle('done', !!s.d);
       row.classList.toggle('live', i === liveIdx);
       row.classList.toggle('rpe-open', !!s.d && open.has(i));
+      // Last time's weight (carrySet), shown in the empty box under a small LAST caption.
+      // The caption is the point: the reps box beside it shows a grey number too, the
+      // prescription, and a tick DOES record that one. A bare grey 80 next to a grey 5
+      // reads as two numbers a tick signs for, and this one is recorded only once it is
+      // typed or "Same as last" puts it in. ("last 80" as the placeholder itself was
+      // tried: at 375px the box holds about 38px of text, so "last 22.5" was cut off.)
+      // A ticked set shows no hint: its empty box is the receipt of a set with no weight.
+      const wIn = row.querySelector('.ex-set-weight');
+      if (wIn !== document.activeElement && wIn.value !== (s.w || '')) wIn.value = s.w || '';
+      const lastW = (!s.d && s.lw) ? s.lw : '';
+      if (wIn.placeholder !== (lastW || 'kg')) wIn.placeholder = lastW || 'kg';
+      wIn.setAttribute('aria-label', `Weight on set ${i + 1}${lastW ? ', last time ' + lastW : ''}`);
+      row.querySelector('.ex-set-wbox').classList.toggle('show-last', !!lastW && !s.w);
       const tag = row.querySelector('.ex-set-rpetag');
       tag.textContent = (s.d && s.r) ? 'RPE ' + s.r : (s.d ? 'RPE' : '');
       tag.classList.toggle('empty', !s.r);
@@ -10066,8 +10212,24 @@ function attachSetLog(card) {
         b.classList.toggle('under', on && vs === 'under');
       });
     });
+    const fills = sameAsLastFills(cur);
+    sameBtn.hidden = !fills.length;
+    if (fills.length) sameBtn.innerHTML = sameAsLastLabel(fills);
   }
   card._paintSets = (openIdx) => { if (openIdx != null) open.add(openIdx); paintSets(); };
+
+  // "Same as last": one tap puts last time's weights into every empty set not yet
+  // ticked. It is the athlete choosing to repeat last time, on purpose, and it never
+  // overwrites a number already in a box.
+  sameBtn.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const cur = loadSetLog(name, total);
+    sameAsLastFills(cur).forEach(f => { cur[f.i].w = f.v; carried.delete(f.i); });
+    saveSetLogValue(name, cur);
+    if (card._ceilingRefresh) card._ceilingRefresh();
+    paintSets();
+    if (navigator.vibrate) navigator.vibrate(8);
+  });
 
   rows.forEach(row => {
     const idx = parseInt(row.dataset.setIdx, 10);
@@ -10081,10 +10243,25 @@ function attachSetLog(card) {
     };
     // Weight — saves on every keystroke. Persian/Arabic digits and decimal marks are
     // normalised on the way in (live logs held "۲۵" and "٫20", which nothing can read).
+    // A number typed in a set also fills the empty sets below it (Fork 3B), and keeps
+    // them in step while it is typed, so "8" then "80" leaves 80, not 8. It stops at
+    // the first set holding a number the athlete put there, and skips ticked sets.
     row.querySelector('.ex-set-weight').addEventListener('input', e => {
       const v = normDigits(e.target.value);
       if (v !== e.target.value) e.target.value = v;
-      edit(s => { s.w = v; });
+      const cur = loadSetLog(name, total);
+      cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
+      cur[idx].w = v;
+      carried.delete(idx);
+      for (let j = idx + 1; j < cur.length; j++) {
+        if (cur[j].d) continue;
+        if (cur[j].w && !carried.has(j)) break;
+        cur[j].w = v;
+        if (v) carried.add(j); else carried.delete(j);
+      }
+      saveSetLogValue(name, cur);
+      if (card._ceilingRefresh) card._ceilingRefresh();
+      paintSets();
     });
     // Reps — only typed when the set was NOT the prescribed number. Typing the
     // prescribed number itself stores nothing, so "as prescribed" stays one state.
@@ -10120,6 +10297,7 @@ function attachSetLog(card) {
     // an RPE is already there; unticking closes it. Nothing is erased either way.
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
+      carried.delete(idx);                          // countersigned: its weight is the athlete's now
       const cur = edit(s => { s.d = !s.d; });
       if (cur[idx].d && !cur[idx].r) open.add(idx); else open.delete(idx);
       paintSets();
@@ -10138,6 +10316,33 @@ function normDigits(v) {
     .replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06F0))
     .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660))
     .replace(/[٫،]/g, '.');
+}
+
+// The sets "Same as last" would fill: every set not ticked and with an empty box,
+// each given its own last weight, or the nearest one above it when last time had
+// fewer sets. [{ i, v }]. Nothing to fill means the button stays hidden.
+function sameAsLastFills(log) {
+  const out = [];
+  let last = '';
+  (log || []).forEach((s, i) => {
+    if (s.lw) last = s.lw;
+    if (!s.d && !s.w && (s.lw || last)) out.push({ i: i, v: s.lw || last });
+  });
+  return out;
+}
+// "Same as last · 80 kg", or "· 80–90 kg" for a pyramid. A weight that is not a
+// plain number ("2x20", "BW+10") is named only when every set shares it; a number
+// pulled out of it could be the wrong one, so otherwise the button names none.
+function sameAsLastLabel(fills) {
+  const vs = fills.map(f => normDigits(f.v).replace(',', '.').trim());
+  let txt = '';
+  if (vs.every(v => /^\d+(?:\.\d+)?$/.test(v))) {
+    const ks = vs.map(Number), lo = Math.min.apply(null, ks), hi = Math.max.apply(null, ks);
+    txt = (lo === hi ? lo : lo + '–' + hi) + ' kg';
+  } else if (vs.every(v => v === vs[0])) {
+    txt = vs[0];
+  }
+  return 'Same as last' + (txt ? ' · <b>' + esc(String(txt)) + '</b>' : '');
 }
 
 // ── THE CEILING — estimated 1RM from a set the athlete just logged ─────
@@ -10278,6 +10483,119 @@ function deleteCeilingEntry(lift, day) {
   all.push({ lift: lift, d: day, del: true, t: Date.now() });
   writeCeiling(all);
 }
+
+// ── Personal Records that fill themselves (Fork 3B, Amir, 2026-09-26) ──────────
+// Until now a record existed only if the athlete tapped Save on the card, and 2 of
+// about 33 coached athletes ever had. Now a logged set puts one on by itself when it
+// beats every number before it: each session's best set per lift (histBestSet(), the
+// maths the History sheet's trend already uses), kept only if it is a new best.
+// Written into this same store, marked `auto`, so the Records screen and coach.html
+// show them with no Save button and no new code on the coach's side.
+//   · Only new bests, on purpose. Every screen leads with a lift's LATEST entry, so
+//     an entry for every session would put a deload week's lower number on top as
+//     "▼ 12.5 kg". History is where every session lives; this is the record.
+//   · Lifts: ceilingCandidates(), the current cycle's loaded, rep-counted movements
+//     (the list "+ Log a max" offers), narrowed by recordsItself() to the strength
+//     patterns. A lift renamed between cycles is joined through HIST_ALIAS.
+//   · Date: the session's completed_on, the date History shows it under, so the
+//     session just finished and the same session read back from the server land
+//     on ONE entry, never two.
+//   · The athlete's own entries lead. A max logged by hand or a test is always
+//     kept and raises the bar for every later day; a day they deleted (a
+//     tombstone) holds no record and sets no bar. ⚠ Automatic entries are written
+//     with t: 0, the oldest write there can be, so anything the athlete does to
+//     that day wins every merge, on either phone, whichever syncs first.
+//   · A stored automatic entry whose session has aged out of get_my_history()
+//     (the last 120 sessions) keeps its number and still counts.
+// `celebrate` is the session just finished: a new best marks the New best band
+// (noteNewBest). History read at boot never does, or the first open after this
+// shipped would celebrate a session from weeks ago.
+// The lifts a one-rep max means something for, which are the only ones the app files a
+// record for by itself: a loaded strength pattern in the Spine, with no impact. A jump, a
+// throw, a sprint, a carry or a trunk drill is left out even with a weight and an RPE
+// logged on it: a 6 kg med ball slammed five times at RPE 7 is not "a 7.5 kg max". An
+// exercise the Spine does not know yet is left out until its entry exists. The athlete can
+// still put any lift on by hand (+ Log a max, or Save on the card's own numbers).
+const RECORD_PATTERNS = { squat: 1, hinge: 1, 'single-leg': 1, 'push-horizontal': 1,
+  'push-vertical': 1, 'pull-horizontal': 1, 'pull-vertical': 1, isolation: 1 };
+function recordsItself(name, exId) {
+  const e = spineFor(name, exId);
+  return !!(e && RECORD_PATTERNS[e.pattern] && (e.impact || 'none') === 'none');
+}
+
+// ⚠ Every caller goes through this wrapper. recordSessionToCloud() fills the records
+// BEFORE it saves the session, and a slip in the records must never cost the athlete
+// the session itself.
+function fillRecordsFrom(sessions, celebrate) {
+  try { fillRecords(sessions, celebrate); } catch (e) { console.warn('[records] not filled:', e); }
+}
+function fillRecords(sessions, celebrate) {
+  if (!ATHLETE_ID || !DATA || window.IS_PREVIEW) return;
+  const want = {};
+  ceilingCandidates().forEach(c => { if (recordsItself(c.name, c.exId)) want[histNorm(c.name)] = c.name; });
+  const found = {};                                   // lift -> date -> best set
+  (sessions || []).forEach(s => (s.entries || []).forEach(e => {
+    const lift = s.date && want[histNorm(HIST_ALIAS[e.ex] || e.ex)];
+    const b = lift ? histBestSet(e) : null;
+    if (!b) return;
+    const f = (found[lift] = found[lift] || {});
+    if (!f[s.date] || b.est > f[s.date].est) f[s.date] = b;
+  }));
+  const lifts = Object.keys(found);
+  if (!lifts.length) return;
+
+  // What each stored row reads as, a renamed lift's old rows and tombstones included:
+  // a day deleted under the old name is still a deleted day.
+  let all = loadCeilingRaw();
+  const current = currentCycleNames();
+  const orphans = all.map(e => e.lift).filter((n, i, a) => a.indexOf(n) === i && current.indexOf(n) < 0);
+  const alias = orphans.length ? matchRenamed(orphans, current) : {};
+  const read = e => alias[e.lift] || e.lift;
+  const same = (a, b) => a.lift === b.lift && a.kg === b.kg && a.w === b.w && a.r === b.r && a.rpe === b.rpe;
+  let changed = false;
+
+  lifts.forEach(lift => {
+    // One entry speaks for each day: the newest write, as in ceilingLifts().
+    const top = {};
+    all.forEach(e => {
+      if (read(e) !== lift) return;
+      if (!top[e.d] || (e.t || 0) > (top[e.d].t || 0)) top[e.d] = e;
+    });
+    const days = Object.keys(Object.assign({}, top, found[lift])).sort();
+    let bar = -Infinity;
+    days.forEach(d => {
+      const eff = top[d], h = found[lift][d];
+      let next = null;                                // the automatic entry this day should hold
+      if (eff && eff.del) {
+        // Deleted: no record, no bar.
+      } else if (eff && !eff.auto) {
+        bar = Math.max(bar, eff.kg);                  // by hand or a test: always kept
+        return;
+      } else {
+        const v = h ? h.est : (eff ? eff.kg : null);
+        if (v == null || !(v > bar)) {
+          // Not a new best: no automatic entry here.
+        } else {
+          bar = v;
+          next = h ? { lift: lift, kg: h.est, w: h.kg, r: h.reps, rpe: h.rpe, d: d, t: 0, auto: true } : eff;
+        }
+      }
+      const autos = all.filter(e => e.auto && !e.del && e.d === d && read(e) === lift);
+      if (next && autos.length === 1 && (autos[0] === next || same(autos[0], next))) return;
+      if (!next && !autos.length) return;
+      if (celebrate && next && next !== eff && !(autos.length && autos[0].kg >= next.kg)) noteNewBest(lift, next.kg, d);
+      all = all.filter(e => autos.indexOf(e) < 0);
+      if (next) all.push(next);
+      changed = true;
+    });
+  });
+  if (!changed) return;
+  writeCeiling(all);
+  // The Home card is drawn at boot and on every visit to Home; history arrives after
+  // the first paint, so bring the card up to date now.
+  const hc = document.getElementById('home-ceiling-wrap');
+  if (hc && hc.innerHTML) { hc.innerHTML = ceilingCardHtml(); ceilingCountUp(hc); }
+}
 // ── Renames, and why this is an ALIAS rather than a rewrite ──────────────
 // Every entry is filed under the exercise's DISPLAY NAME, so the cycle that
 // renames "Barbell Back Squat" to "Back Squat" splits an athlete's squat line
@@ -10330,7 +10648,7 @@ function ceilingCandidates() {
       const r = rxOf(ex);
       if (repCount(ex) == null) return;              // holds, carries, intervals
       seen[name] = 1;
-      out.push({ name: name, reps: r.dose ? r.dose.value : '', test: exTestSpec(ex) });
+      out.push({ name: name, reps: r.dose ? r.dose.value : '', test: exTestSpec(ex), exId: ex.exId || '' });
     })));
   return out;
 }
@@ -10651,7 +10969,8 @@ function attachCeiling(card) {
       <div class="ex-1rm-out"></div>
       <div class="ex-1rm-grade"></div>
       <div class="ex-1rm-from"></div>
-      <button type="button" class="ex-1rm-save">Save to The Ceiling</button>
+      <div class="ex-1rm-auto">A new best goes on your Personal Records by itself when you finish the session.</div>
+      <button type="button" class="ex-1rm-save">Save to Personal Records</button>
       <button type="button" class="ex-1rm-go">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg>
         <span>Personal Records</span><span class="ex-1rm-go-a">→</span>
@@ -10665,6 +10984,7 @@ function attachCeiling(card) {
   const grade = box.querySelector('.ex-1rm-grade');
   const from  = box.querySelector('.ex-1rm-from');
   const save  = box.querySelector('.ex-1rm-save');
+  const autoNote = box.querySelector('.ex-1rm-auto');
   const fKg  = box.querySelector('.ex-1rm-kg');
   const fRp  = box.querySelector('.ex-1rm-rp');
   const fRpe = box.querySelector('.ex-1rm-rpe');
@@ -10683,6 +11003,7 @@ function attachCeiling(card) {
       grade.textContent = '';
       grade.className = 'ex-1rm-grade';
       save.hidden = true;
+      autoNote.hidden = true;
       // Two different failures, and telling them apart matters: saying "put in
       // a weight" to somebody who just put one in is how this read as broken.
       if (kgV > 0 && rpV > 0 && rpeV > 0) {
@@ -10697,9 +11018,15 @@ function attachCeiling(card) {
       }
       return;
     }
-    save.hidden = false;
+    // Numbers read off the set log need no Save: the finished session puts a new best
+    // on the record by itself (fillRecordsFrom). Only numbers the athlete typed into
+    // the panel, which no set holds, need the button, and so does a lift the app does
+    // not file by itself (recordsItself(): a jump, a throw, a carry...).
+    const auto = !touched && recordsItself(name, card.dataset.exid);
+    save.hidden = auto;
+    autoNote.hidden = !auto;
     save.disabled = false;
-    save.textContent = 'Save to The Ceiling';
+    save.textContent = 'Save to Personal Records';
     const rir  = Math.max(0, 10 - Number(fRpe.value));
     const eff  = Number(fRp.value) + rir;
     const q    = ceilingQuality(eff);
@@ -10803,7 +11130,7 @@ function syncExerciseCheck(card, log) {
 function setAllSetsDone(card, done) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
-  const cur = loadSetLog(name, total).map(s => ({ w: s.w, n: s.n || '', r: s.r, d: !!done }));
+  const cur = loadSetLog(name, total).map(s => Object.assign({}, s, { n: s.n || '', d: !!done }));
   saveSetLogValue(name, cur);
   // Reflect on the rendered rows
   // Reflect on the rendered rows — through the set log's own painter, so the live
@@ -11436,6 +11763,21 @@ function histSetsText(sets, planned) {
   if (anyN) return done.map((s, i) => `${ws[i] || 'BW'}×${ns[i] || '–'}`).join(' · ');
   return ws.map(w => w || 'BW').join(' · ') + ' kg';
 }
+// The set in one past session that gives the highest estimated max, at the reps it
+// was done for (its own `n`, else the plan's). { est, kg, reps, rpe } or null. ONE copy
+// of the maths, read by the History sheet's trend and by the records that fill
+// themselves (fillRecordsFrom), so the two can never show different numbers.
+function histBestSet(e) {
+  if (!e || e.circuit) return null;
+  let best = null;
+  (e.sets || []).filter(histSetLogged).forEach(s => {
+    const kg = parseLoggedKg(s.w);
+    const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps || null);
+    const est = (kg && n) ? estimateOneRM(kg, n, s.r) : null;
+    if (est != null && (!best || est > best.est)) best = { est: est, kg: kg, reps: n, rpe: Number(s.r) };
+  });
+  return best;
+}
 function histTopSet(sets, planned) {
   let best = null;
   (sets || []).filter(histSetLogged).forEach(s => {
@@ -11537,6 +11879,22 @@ function paintAllLastTime() {
 }
 
 // Made-up history for the public demo — it is how a visitor sees the feature.
+// Believable working loads for the demo's invented history. Personal Records fill
+// themselves from it (fillRecordsFrom), and a hash of the name alone once gave the
+// demo a 32.5 kg Romanian deadlift and a 77.5 kg one-arm landmine press. Jumps and
+// hops are bodyweight; dumbbells are per hand.
+function demoLoad(name, h) {
+  const n = String(name || '').toLowerCase(), j = (h % 3) * 2.5;
+  if (/jump|hop|bound|plank|dead bug|bird dog/.test(n)) return 0;
+  if (/medicine ball|med ball/.test(n)) return 6;
+  if (/landmine/.test(n)) return 20 + j;
+  if (/pallof/.test(n)) return 10;
+  if (/dumbbell|kettlebell/.test(n)) return (/row/.test(n) ? 24 : /split squat|step-up|lunge/.test(n) ? 14 : /external rotation/.test(n) ? 4 : 16) + j;
+  if (/barbell|trap bar/.test(n)) return (/hip thrust/.test(n) ? 90 : /squat/.test(n) ? 70 : /deadlift/.test(n) ? 80 : 55) + j;
+  if (/calf/.test(n)) return 50;
+  if (/machine|cable/.test(n)) return 35 + j;
+  return 20;
+}
 function demoHistory() {
   const rows = [], day0 = new Date();
   const hash = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
@@ -11548,8 +11906,9 @@ function demoHistory() {
         if (!ex || ex.type !== 'standard') return;
         const planned = repCount(ex), r = rxOf(ex), tgt = parseInt(r.rpe, 10) || 7;
         const sets = parseInt(r.sets, 10) || 3;
-        const base = planned ? 20 + (hash(ex.name) % 13) * 5 : 0;
-        const w = base ? String(base - 2.5 * k) : '';
+        const base = planned ? demoLoad(ex.name, hash(ex.name)) : 0;
+        const step = base >= 40 ? 2.5 : base >= 12 ? 1 : 0;
+        const w = base ? String(base - step * k) : '';
         log.push({ ex: ex.name, block: b.title || '', reps: planned, note: (k === 0 && xi === 0) ? 'Last set grip went, knee fine' : '',
           sets: Array.from({ length: sets }, (_, i) => {
             const lastSet = i === sets - 1 && k === 0;
@@ -11564,11 +11923,11 @@ function demoHistory() {
 
 async function loadHistory() {
   if (window.IS_DEMO) {
-    HIST = histFromRows(demoHistory()); buildHistAlias(); paintAllLastTime(); return;
+    HIST = histFromRows(demoHistory()); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); return;
   }
   try {
     const cached = JSON.parse(localStorage.getItem(histKey()) || 'null');
-    if (Array.isArray(cached)) { HIST = histFromRows(cached); buildHistAlias(); paintAllLastTime(); }
+    if (Array.isArray(cached)) { HIST = histFromRows(cached); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); }
   } catch (e) { /* no copy yet */ }
   try {
     const sb = await _sbReady();
@@ -11576,7 +11935,7 @@ async function loadHistory() {
     const res = await _withTimeout(sb.rpc('get_my_history', { p_athlete_id: ATHLETE_ID }), 8000);
     if (!res || res.error || !Array.isArray(res.data)) return;
     try { _lsRawSet(histKey(), JSON.stringify(res.data)); } catch (e) { /* storage full — still shown this visit */ }
-    HIST = histFromRows(res.data); buildHistAlias(); paintAllLastTime();
+    HIST = histFromRows(res.data); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST);
   } catch (e) { /* offline — the cached copy above stays */ }
 }
 
@@ -11594,15 +11953,13 @@ function openHistorySheet(card) {
   const pts = hist.slice().reverse().map(h => {
     const e = h.entry;
     if (e.circuit) return null;
-    let best = null, top = null;
+    const best = histBestSet(e);
+    let top = null;
     (e.sets || []).filter(histSetLogged).forEach(s => {
       const kg = parseLoggedKg(s.w);
-      const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps || null);
-      const est = (kg && n) ? estimateOneRM(kg, n, s.r) : null;
-      if (est != null && (best == null || est > best)) best = est;
       if (kg != null && (top == null || kg > top)) top = kg;
     });
-    return { date: h.date, est: best, top };
+    return { date: h.date, est: best ? best.est : null, top };
   }).filter(Boolean);
   const estPts = pts.filter(p => p.est != null);
   const series = estPts.length >= 2 ? { label: 'Best set · estimated 1RM, kg', vals: estPts.map(p => p.est) }
@@ -11742,6 +12099,9 @@ async function refreshSpine() {
     try { _lsRawSet('spinecache', JSON.stringify(res.data)); } catch (e) { /* storage full */ }
     setSpine(res.data);
     _spineFresh = true;
+    // Records file themselves only for lifts the Spine knows (recordsItself()); on a new
+    // phone history can arrive first, so run the fill again now the entries are here.
+    if (HIST) fillRecordsFrom(HIST);
     paintSpine();
     paintDayQualities();
     paintExerciseCount();

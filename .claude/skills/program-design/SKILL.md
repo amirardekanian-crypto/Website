@@ -712,8 +712,10 @@ entry together, and rebuild. Only then **/program-engage** (Prompt 2) writes the
 
 Athletes now carry an **estimated 1RM per lift**, built from the sets they already log.
 `program.html` derives it from any set that has both a weight and an RPE (reps in reserve
-= 10 − RPE, added back before the maths), and the history lives in **The Ceiling**, the
-strength section on Game Plan. Nobody has to test a true max for this to exist.
+= 10 − RPE, added back before the maths), and the history lives in **Personal Records**, reached
+from its card on Home (the screen was called The Ceiling until 2026-09-26). Since then a finished
+session's best set goes on by itself whenever it beats the lift's best (`auto`). Nobody has to
+test a true max for this to exist.
 
 **Read it before you set loads.** For a RETURNING athlete it arrives as the Debrief's **The
 Ceiling** line (the one e1RM this pass uses: estimate, grade, date), and it also

@@ -316,8 +316,33 @@ costs more than one tap.
   coach.html reads `snote_` ahead of `note_`.
 - **Leftover rep ranges are never guessed.** `cardReps()`/`plannedReps()` return null for one, so the
   box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
-  for The Ceiling only.
+  for Personal Records only.
 - Weight and reps inputs normalise Persian/Arabic digits (`normDigits()`); live logs held `۲۵`.
+- **Weight boxes open EMPTY, with last time's weight as a hint (Fork 3B, 2026-09-26).** Amir picked
+  *"Hint plus Same as last"*. They used to open holding last session's weights as real numbers, so a
+  bare tick logged last week's load as today's and every number built on the log (records included)
+  was quietly a repeat. Now:
+  - A set carries `lw`, **last time's weight**, and `w` is only ever today's. ONE function,
+    `carrySet()`, ends a session's set for all three places that do it: `autoResetStaleDays()` on the
+    phone, `stripSetLogSession()` on the cloud's copy, and a rename carried by
+    `adoptRenamedExercises()`. `mergeStoredValue()` merges `lw` like the other fields. A skipped
+    weight keeps the last one ever typed (`s.w || s.lw`).
+  - The empty box shows that number under a small **LAST** caption (`.ex-set-wlast`), smaller and
+    paler than the prescribed reps beside it, because a tick records the reps and not this. A bare
+    `last 80` placeholder was tried first: at 375px the box holds about 38px of text, so `last 22.5`
+    was cut off. A ticked set shows no hint.
+  - **Same as last** (`.ex-same-last`, clay outline like the *Last* pill) fills every empty, unticked
+    set with its own last weight, or the nearest one above when last time had fewer sets
+    (`sameAsLastFills()`); the label names the load or the range, `80–90 kg`, and no number at all
+    when a weight is not a plain number (`2x20`).
+  - **A number typed in a set fills the empty sets below it**, and keeps them in step while it is
+    typed (`8` then `80` leaves 80). It stops at the first set holding a number the athlete put there
+    and skips ticked sets. Which rows were filled this way is kept in memory only.
+  - **A tick on an empty box records no weight.** The summary grammar did not change, so History,
+    coach.html and the email read the log exactly as before.
+  - `migrateCarriedWeights()` converts, once per phone, the weights every sweep before this left in
+    `w` (a set holding only a weight, on an exercise no live day holds). Its marker `aap_lw1_<id>`
+    sits outside the athlete's key prefix so it never syncs.
 - **An RPE off its target is coloured: clay OVER, steel blue `--rpe-under` UNDER, green on target**
   (Amir, 2026-09-24). The one exception to "clay is the only accent", and only for an RPE against
   its target: warm = harder, cool = easier, and orange-vs-blue survives colour blindness where
@@ -364,14 +389,38 @@ athlete to WhatsApp from wherever the question comes up, with the context alread
 It sat above them from 2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit in a
 week while 16 trained. The training is why the app is opened, so it leads.
 
-## 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
+## 🏋️ Personal Records — three write doors, and three things written twice
 
-Full account in `CODEBASE.md` → *The Ceiling*. The three duplications to keep in step:
+One name on every screen since 2026-09-26 (it was also called **The Ceiling**; the code keeps
+`ceiling*` names and the `<id>_1rm` key). Full account in `CODEBASE.md` → *Personal Records*.
 
-- **Two ways in, one estimator.** *Save to The Ceiling* on an exercise card, and **+ Log a max**
-  on the Records screen (pick a lift from the current cycle, enter kg/reps/RPE, optionally
-  backdated). `paintCeilingForm()` mirrors `paintFromFields()` deliberately — a second copy of
-  the maths is how the two screens start disagreeing. Change one, change both.
+**Records fill themselves (Fork 3B, 2026-09-26).** Before, a record existed only if the athlete
+tapped Save, and 2 of about 33 coached athletes ever had one. `fillRecordsFrom()` now writes one
+when a session's best set (`histBestSet()`, the History sheet's own maths) **beats every earlier
+number for that lift**, marked `auto: true`:
+- **New bests only**, because every screen leads with a lift's latest entry: an entry for every
+  session would put a deload week's lower estimate on top as *▼ 12.5 kg*. History keeps every session.
+- Runs on every save of a finished session (`recordSessionToCloud()`, with the New best band) and
+  whenever history loads (without it, or the first open after this shipped would celebrate a
+  session from weeks ago). Only `ceilingCandidates()` lifts; renames join through `HIST_ALIAS`.
+- Filed under the session's `completed_on`, the date History shows, so the session just finished
+  and the same session read back from the server are one entry.
+- **The athlete's own entries lead.** A max by hand or a test is always kept and raises the bar for
+  later days; a deleted day (tombstone) holds no record and sets no bar. ⚠️ Automatic entries carry
+  `t: 0`, the oldest write there can be, so any write the athlete makes to that day wins every merge
+  on either phone. coach.html reads them unchanged (*from a set*).
+- The card's estimate panel no longer asks for Save on numbers read off the set log: it says a new
+  best goes on by itself. *Save to Personal Records* appears only once the athlete types their own
+  numbers into the panel. (`.ex-1rm-save[hidden]` was also fixed: `display: block` had been
+  overriding every `save.hidden = true`.)
+
+The three duplications to keep in step:
+
+- **One estimator for every door.** Automatic new bests, *Save to Personal Records* on an exercise
+  card, and **+ Log a max** on the Records screen (pick a lift from the current cycle, enter
+  kg/reps/RPE, optionally backdated). `paintCeilingForm()` mirrors `paintFromFields()`
+  deliberately — a second copy of the maths is how the two screens start disagreeing. Change one,
+  change both.
 - **The rename matcher is in `program.html` AND `coach.html`** (`matchRenamed()` /
   `ceilAliasMapC()`). It decides whether a lift renamed between cycles reads as one row or
   two; if the copies drift, the coach and the athlete are looking at different records for

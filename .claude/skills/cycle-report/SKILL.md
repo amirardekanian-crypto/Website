@@ -112,7 +112,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **Typos** | a jump ×10 (250 after 20) | Never quote it; note it for Amir |
 | **Back-off week** | the closing week's `n_sets` and `top` vs weeks 1–4, against the cycle's `weekNotes.last` (what it prescribed, since 2026-09-26) | Full sets and a new top = the back-off didn't happen |
 | **Weigh-ins** | Q4 `weigh_ins` | Body weight promised in a notes card and never logged |
-| **Personal Records** | Q4 `ceiling` | Empty after a whole cycle = no strength baseline |
+| **Personal Records** | Q4 `ceiling` | Empty after a whole cycle = no strength baseline. Since 2026-09-26 the app adds a new best by itself (`auto`), so entries are not evidence the athlete opened the screen; `test` still is |
 | **Promises and gates** | each note card and each `message.outcomes` line against the evidence | Done / partly / not yet, with its number |
 | **Baselines** | every number the cycle promised to change: is there a starting value? | No baseline = the promise can never be shown; add a test to the next cycle's week 1 |
 | **Sleep** | readiness `sleep`: avg, and poor nights by weekday | Call a pattern only at 3+ points; 2 is "watch" |
