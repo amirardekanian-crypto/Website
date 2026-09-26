@@ -6827,9 +6827,11 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
 
-  // How many rounds? Parse the leading number out of the rounds string
-  // (e.g. "×3 Rounds" → 3). Drives one RPE row per round below. Min 1.
-  const roundCount = _rxC.rounds ? (parseInt(_rxC.rounds, 10) || 1) : parseRoundCount(ex.rounds);
+  // How many rounds? The first number in rx.rounds or a legacy "×3 Rounds" string. Drives one RPE
+  // row per round below. Min 1. (2026-09-26: this read parseInt("×3 Rounds") = NaN → 1 for every
+  // legacy circuit, because rxOf passes the legacy string through; the same parse as the day reset
+  // and the Quality mix now.)
+  const roundCount = parseRoundCount(_rxC.rounds || ex.rounds);
 
   // Rest button at the bottom of the detail
   const restBottom = `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`;

@@ -330,6 +330,19 @@ expect('volume: a flat week warns', has(run(FLAT, ctx=CTX), 'WARN', '[VOL-2] a f
 FLAT['workouts']['days'][2]['blocks'][0]['exercises'][0]['rx']['sets'] = 2
 expect('volume: an undulating week does not', not has(run(FLAT, ctx=CTX), 'WARN', 'a flat week'))
 expect('volume: --log is retired, and says so', has(run(BASE, '--log', 'x.md', ctx=CTX), 'WARN', '--log is retired'))
+
+# ── 8. added 2026-09-26: legacy rounds in the session length, the fingerprint's number text ──
+def day2_minutes(circuit):
+    d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'].append({"title": "Conditioning", "exercises": [circuit]})
+    return next((l for l in run(d, ctx=CTX).splitlines() if 'Day 2 ≈' in l), '')
+legacy = day2_minutes({"type": "circuit", "name": "E", "rounds": "×3 Rounds", "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "rx": {"reps": 12}}]})
+modern = day2_minutes({"type": "circuit", "name": "E", "rx": {"rounds": 3}, "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "rx": {"reps": 12}}]})
+expect('session length: a legacy "×3 Rounds" circuit times like rx.rounds 3', legacy and legacy.split('min')[0] == modern.split('min')[0], legacy + ' | ' + modern)
+p = os.path.join(TMP, 'fp.json')
+open(p, 'w', encoding='utf-8').write('{"athlete": {"id": "t"}, "currentCycleIndex": 1, "cycles": [{"rpe": 7.0, "load": 7.50}]}')
+fp = subprocess.run([sys.executable, CHECK, p, '--fingerprint'], capture_output=True, text=True, encoding='utf-8', cwd=REPO).stdout
+# leaves: "t", "1", "7.50", "7.0" = 9 characters (printed as "7.5" and "7" it was 6, a false mismatch)
+expect('fingerprint keeps "7.0" and "7.50" as written, like the server', '4 leaves  9 chars' in fp, fp)
 expect('volume: no --spine, no count', has(run(BASE), 'WARN', 'the volume count'))
 
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────

@@ -58,7 +58,7 @@ bans, floor-except and --cap, so no run has to remember them. A flag typed here 
 
 Exit code 1 if anything FAILs. FAIL = a house rule is broken. WARN = look at it.
 """
-import argparse, hashlib, json, os, re, subprocess, sys
+import argparse, decimal, hashlib, json, os, re, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -496,7 +496,7 @@ def day_minutes(day):
         for ex in b.get('exercises') or []:
             rx = ex.get('rx') or {}
             if ex.get('type') == 'circuit':
-                rounds = int(num(rx.get('rounds') or ex.get('rounds') or 1) or 1)
+                rounds = round_count(ex)  # a legacy "×3 Rounds" is 3, not 1 (2026-09-26)
                 per = sum(work_secs(it.get('rx') or {}, simple=True) + 10 for it in ex.get('items') or [])
                 rest = secs(rx.get('rest')) or 30
                 total += rounds * per + (rounds - 1) * rest
@@ -998,8 +998,10 @@ def fingerprint(data, athlete_id):
         elif isinstance(v, list):
             for i, x in enumerate(v): walk(path + '/' + str(i), x)
         elif v is not None:
-            leaves.append((path, ('true' if v else 'false') if isinstance(v, bool) else
-                           (str(int(v)) if isinstance(v, float) and v.is_integer() else str(v))))
+            # Numbers keep the text they were written with ("7.0", "7.50"), exactly as the server's
+            # `#>> '{}'` does: main() re-reads the file with parse_float=Decimal for this. Printing
+            # 7.0 as "7" made a false mismatch on any x.0 literal (2026-09-26).
+            leaves.append((path, ('true' if v else 'false') if isinstance(v, bool) else str(v)))
     for k in KEYS:
         if k in data: walk(k, data[k])
     leaves.sort(key=lambda p: p[0].encode('utf-8'))
@@ -1025,7 +1027,8 @@ def main():
     data = json.load(open(args.program, encoding='utf-8'))
     athlete_id = (data.get('athlete') or {}).get('id', '<id>')
     if args.spine_sql: spine_sql(data); return 0
-    if args.fingerprint: fingerprint(data, athlete_id); return 0
+    if args.fingerprint:
+        fingerprint(json.load(open(args.program, encoding='utf-8'), parse_float=decimal.Decimal), athlete_id); return 0
     if args.female:
         warn('--female is retired and did nothing: pass --floor only when the aim is strength and muscle (any athlete, any sex)')
     if args.log:
