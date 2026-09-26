@@ -915,6 +915,11 @@ needed — the past card reuses the same fields every cycle card uses.
 
 ### `notes` — Coaching Notes
 
+Each card is `{ icon, title, body }`, plus an optional **`tags`** array (2026-09-26) that the app
+never shows: the obligation keys the card carries (`pain-ladder`, `film`, `weigh-in`,
+`low-readiness`, …), so `scripts/check_program.py` can confirm every note the spec's `obligations:`
+list requires is really there. coach.html doesn't edit notes cards, so the tags stay put.
+
 `card.body` renders as **HTML, not escaped plain text** — write it as 2–4 short `<p>`
 paragraphs, and use a `<ul><li>` list for anything enumerable (rules, steps, a keep/cut/skip
 breakdown). Use `<strong>` to bold the one phrase per paragraph that matters most; `<em>` for

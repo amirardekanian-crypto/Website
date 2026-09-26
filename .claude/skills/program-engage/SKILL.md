@@ -142,7 +142,12 @@ Rules: athlete-specific only — cite real numbers/situation; no padding, no gen
 advice that could fit anyone. **Never invent data** — if a domain has no intake data (e.g.
 diet), prescribe an elite baseline framed as setup to refine via check-ins, never fabricated
 macros/numbers.
-Per note: `ICON:` (emoji) · `TITLE:` (≤6 words) · `BODY:` (prescriptive; format per the HTML
+**Every item on design's `obligations:` list gets written, and TAGGED** (2026-09-26): the card that
+carries an obligation lists its key under `TAGS:` (`pain-ladder`, `film`, `weigh-in`,
+`low-readiness`, …; one card can carry two). `backoff` and `week1` are the week notes (PART 3c), not
+cards. The checker fails an obligation no card is tagged with, and the app never shows the tags.
+The mandatory notes described below are exactly those obligations, written well.
+Per note: `ICON:` (emoji) · `TITLE:` (≤6 words) · `TAGS:` (obligation keys, if any) · `BODY:` (prescriptive; format per the HTML
 rule below).
 
 **Format the body as real HTML, not one paragraph.** `card.body` renders as HTML in the app
@@ -219,7 +224,7 @@ and which day is non-negotiable · what they should have by the end · and a poi
 second message is coming and matters.
 
 **MESSAGE 2 — what to watch for.** The *actionable* half, mirroring the notes cards but as
-instructions: what to film and what it unlocks · any dated appointment or referral, with the
+instructions, one line for every obligation that asks the athlete to do something: what to film and what it unlocks · any dated appointment or referral, with the
 escalation triggers · the weekly measurements and why they're numbers not feelings · fuelling ·
 the rest-day / load rule · **the back-off week with its dates** (and week 1, if it differs) ·
 where to weigh in, when the cycle needs it (the programme app's Home → Body Weight, never AA

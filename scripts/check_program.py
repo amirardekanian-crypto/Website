@@ -45,6 +45,9 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   programming check, none of the text ones. final (default) = everything
   --fingerprint   print the content fingerprint and the SQL that computes the server's, then stop
 
+In the full run it also reads the spec's "obligations:" block (the notes this cycle must carry)
+and fails any key that no notes card's `tags` (or, for backoff/week1, the weekNotes) carries.
+
 The athlete profile (a ```profile block at the top of the spec, else the one stored at the top of
 the coaching log, which --spine-sql returns) sets --floor (aim: strength-muscle), --proven, the
 bans, floor-except and --cap, so no run has to remember them. A flag typed here overrides it.
@@ -323,6 +326,47 @@ def check_week_notes(data, args):
         fail(f"cycle {cyc.get('num')}: a new athlete's first cycle needs weekNotes.first (how week 1 finds their weights, with the number)")
     elif not isinstance(wn.get('first'), dict):
         info(f"cycle {cyc.get('num')}: no weekNotes.first (fine when nothing in week 1 is different)")
+
+# ── the notes obligations list (2026-09-26) ───────────────────────────────────
+# Rules that exist only as "engage should write a card about X" were missed: engage's own list
+# of required notes left out the back-off, "start lower with the number", the film gate and the
+# weigh-in. Now design names every required note in the spec's "obligations:" block, engage tags
+# the card that carries each one (notes.cards[].tags, which the app never shows), and this
+# checks that each is there. backoff and week1 are carried by the cycle's weekNotes.
+OBLIGATIONS = ('backoff', 'week1', 'explainer', 'pain-ladder', 'modification-menu', 'film', 'weigh-in',
+               'double-day', 'low-readiness', 'period', 'start-lower', 'close-loop', 'win')
+
+def spec_obligations(args):
+    if not args.spec: return []
+    text = open(args.spec, encoding='utf-8').read()
+    m = re.search(r'^\s*obligations\s*:[^\n]*\n((?:[ \t]*-[^\n]*\n?)+)', text, re.I | re.M)
+    keys = []
+    for line in (m.group(1).splitlines() if m else []):
+        k = re.match(r'\s*-\s*([a-z0-9-]+)', line.strip().lower())
+        if k: keys.append(k.group(1))
+    return keys
+
+def check_obligations(data, args):
+    keys = spec_obligations(args)
+    if not keys:
+        if args.spec: warn("no obligations: block in the spec, so the required notes were not checked")
+        return
+    cycles = data.get('cycles') or []
+    i = data.get('currentCycleIndex') or 0
+    wn = (cycles[i] if 0 <= i < len(cycles) else {}).get('weekNotes') or {}
+    tags = {str(t).lower() for c in (data.get('notes') or {}).get('cards') or [] for t in (c.get('tags') or [])}
+    for k in keys:
+        if k not in OBLIGATIONS:
+            warn(f"obligation '{k}' is not one of the known ones ({', '.join(OBLIGATIONS)})"); continue
+        if k in ('backoff', 'week1'):
+            n = wn.get('last' if k == 'backoff' else 'first')
+            ok = isinstance(n, dict) and str(n.get('text') or '').strip()
+            where = 'weekNotes.' + ('last' if k == 'backoff' else 'first')
+        else:
+            ok, where = k in tags, f"a notes card tagged '{k}'"
+        if not ok: fail(f"obligation '{k}' is not met: {where} must carry it")
+    extra = sorted(tags - set(keys))
+    if extra: info(f"cards tagged {', '.join(extra)} though the spec didn't list them (fine if they're real)")
 
 def ban_hit(word, s):
     return re.search(r'(?<![a-z])' + re.escape(word.lower()) + r'(e?s)?(?![a-z])', s.lower())
@@ -900,7 +944,7 @@ def main():
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
-        check_text(data); check_cards(data); check_whys(data)
+        check_text(data); check_cards(data); check_whys(data); check_obligations(data, args)
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
     check_week_notes(data, args)

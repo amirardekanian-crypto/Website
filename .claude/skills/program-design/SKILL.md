@@ -493,6 +493,24 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 
+**OBLIGATIONS (required output, 2026-09-26): name every note this cycle MUST carry.** Engage writes
+each one, tags the card that carries it, and the checker fails a missing one, so a rule that
+lives only as "engage should write a card about X" can no longer slip. List every key that applies:
+- `backoff` — every cycle (carried by `weekNotes.last`).
+- `week1` — a new athlete, a layoff, a return from injury, a cycle of new patterns (`weekNotes.first`).
+- `explainer` — a new athlete; a returning one only when the read flags RPE drift or confusion.
+- `pain-ladder: <body part>` — any active injury, rehab stage or managed history.
+- `modification-menu` — an athlete who hides pain (reporting buys a change, never a ban).
+- `film: <exercises, weeks>` — any gate that resolves to film.
+- `weigh-in` — a cycle that depends on body mass (Home → Body Weight, never Proof).
+- `double-day` — a concurrent athlete (sport and gym on the same days).
+- `low-readiness` — everyone (the one line); the full kit for high-stress and concurrent athletes.
+- `period` — only when Amir confirmed it at the checkpoint this cycle.
+- `start-lower: <what, the number>` — a start-lower longer than week 1 (a staged return).
+- `close-loop: <what resolved>` — a standing issue confirmed resolved.
+- `win: <what, with its number>` — a real win in the data (never manufactured).
+The same list drives WhatsApp message 2 and your handoff (MEASURE, GATE, FILM, DATES, WATCH).
+
 **THE SPINE — read it before choosing (2026-09-24).** Every exercise Amir programmes has (or
 will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`.
 You already have all of it: the `spine` column of STEP 0's context pull, one line per entry
@@ -579,6 +597,9 @@ week1: [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (or 
 lastweek: [setsDrop 1 · rpeCap 6, plus anything else that changes] (every cycle)
 bans: [one line, if any]
 floor-except: [muscle (reason), only when --floor applies and a muscle is excused]
+obligations:
+- backoff
+- [week1 · explainer · pain-ladder: knee · film: … · weigh-in · double-day · low-readiness · …, one per line]
 keep: [exercise (why it stays), … — returning athletes, anything carried over on purpose]
 reintroduce: [exercise (what earned it back), … — only for a Disliked / Pain-flagged / Banned ledger row]
 

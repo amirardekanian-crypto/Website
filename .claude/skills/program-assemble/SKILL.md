@@ -206,7 +206,9 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
 by `exId`, since Part A stamped one on every card).
 - `completionTitle` / `completionMessage` per day from engage PART 4;
   `cycles[currentCycleIndex].message` = PART 1 message + outcomes; next cycle's `teaser` = PART 2;
-  `notes.cards` from PART 3.
+  `notes.cards` from PART 3, each card's `TAGS:` as `"tags": ["film"]` (pipeline-only, the app
+  never shows it; SCHEMA → notes). The full check fails any obligation on the spec's list that
+  no card (or week note) carries.
 - **Coach's Notes** into that exercise's `note` field (any type) — the app renders it as the clay
   "Coach's Note" (per SCHEMA "Exercise coach's note"). The text comes from /program-engage (which
   wrote it from design's `note_flag`), not from design directly. Copy verbatim, plain text — never
@@ -303,7 +305,7 @@ any MCP tool* (COACHING-PRINCIPLES.md → Process → "Background agents work fr
 is only what a script cannot judge: the injury logic against the brief, exercise choice and
 transfer, whether a fallback is safe for THIS athlete, whether week 1, the back-off and the
 outside days are dosed sensibly, and what the notes must cover (the period card, an arm or knee
-menu), as a list engage then writes to. Apply every must-fix, re-run the build check, then hand
+menu), as keys added to the spec's `obligations:` list, which engage then writes to. Apply every must-fix, re-run the build check, then hand
 to engage.
 **A RETURNING athlete gets no reviewer** unless Amir asks for one. The coaching log, the
 checks and his checkpoint already cover a cycle that continues a known logic.
@@ -446,6 +448,9 @@ telling him everything the program now requires of *him*. This is a to-do list h
 a recap of the programming — he must never have to reverse-engineer his own responsibilities out
 of the design write-up. See COACHING-PRINCIPLES.md → Process → "EVERY program build ENDS with a
 COACH HANDOFF BRIEF". Cover, one line each, each with its reason:
+*Build these lines from the spec's `obligations:` list (2026-09-26): every film, weigh-in,
+pain-ladder, double-day and period obligation is a line below, so nothing the athlete was told to
+do is missing from what Amir is told to watch.*
 - **MEASURE** — every number he or the athlete must collect, how often, and what it feeds.
 - **GATE** — every progression gate, and *exactly* what clears it (never the athlete's word).
 - **FILM** — every filmed set he must review, by when, and what is blocked until he clears it.

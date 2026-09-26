@@ -712,6 +712,13 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   A note that opens as a dense wall of text is a bug, not a style choice — see SCHEMA.md →
   "notes" and program-engage SKILL.md PART 3. *(2026-07-08, caught on Athlete O's "How To
   Progress & Regress" note.)*
+- **Every required note is on the spec's obligations list, and the checker holds engage to it.**
+  *(2026-09-26, from the pipeline audit: engage's own list of required notes had left out the
+  back-off week, "start lower and say the number", the film gate and the weigh-in, so those rules
+  changed nothing.)* Design lists the keys that apply (`backoff`, `week1`, `explainer`,
+  `pain-ladder`, `modification-menu`, `film`, `weigh-in`, `double-day`, `low-readiness`, `period`,
+  `start-lower`, `close-loop`, `win`); engage writes each and tags its card; the same list drives
+  WhatsApp message 2 and Amir's handoff. A required note is written first, before the breadth.
 - **Notes card count is a byproduct, not a target — never pad.** Write every mandatory note
   that applies plus whatever else is genuinely load-bearing this cycle; a simple cycle with
   less to say gets fewer, sharper cards. Manufacturing a card to hit a number produces exactly
