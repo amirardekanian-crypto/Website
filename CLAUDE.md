@@ -110,8 +110,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   region and impact lists (four copies) · the muscle list of the Spine's volume credits (SIX copies since the
   muscle map: `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`, program.html `MAP_MUSCLE` and
   the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
-  `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its hand-entry
-  doors (`paintCeilingForm()` mirrors `paintFromFields()`) · how a session's set ends (`carrySet()`, called by
+  `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) · how a session's set ends (`carrySet()`, called by
   the midnight sweep, the cloud copy and a rename) · whether a session is over (`sessionIsStale()`, 6 h grace past
   midnight; DATA-02) and the date it is filed under (`sessionDateFor()`, the local day it was finished).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
@@ -126,6 +125,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   Playbook, Exercises) and **no Qualities door**.
 - **A delete is a tombstone** (Personal Records `{del: true}`, body weight `kg: null` with a fresh `t`), and every
   records write rebuilds from `loadCeilingRaw()`, or a device that missed the delete brings it back.
+- **No estimate on the working card** (Fresh Eyes, Amir 2026-09-26: "Off the card, keep in Records"): nothing on
+  the card suggests a weight mid-set. Records → "+ Log a max" (`paintCeilingForm()`) is the one hand-entry door.
 - **Personal Records fill themselves** (2026-09-26): a finished session's best set goes on when it beats every
   earlier number for the lift, marked `auto` and written with `t: 0` so anything the athlete does to that day wins.
   New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
@@ -224,7 +225,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v55` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v56` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

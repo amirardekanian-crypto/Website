@@ -654,13 +654,13 @@ number for that lift**, marked `auto: true`:
   numbers into the panel. (`.ex-1rm-save[hidden]` was also fixed: `display: block` had been
   overriding every `save.hidden = true`.)
 
-The three duplications to keep in step:
+What to keep in step:
 
-- **One estimator for every door.** Automatic new bests, *Save to Personal Records* on an exercise
-  card, and **+ Log a max** on the Records screen (pick a lift from the current cycle, enter
-  kg/reps/RPE, optionally backdated). `paintCeilingForm()` mirrors `paintFromFields()`
-  deliberately — a second copy of the maths is how the two screens start disagreeing. Change one,
-  change both.
+- **One estimator for every door.** Automatic new bests, and **+ Log a max** on the Records screen
+  (pick a lift from the current cycle, enter kg/reps/RPE, optionally backdated), both through
+  `estimateOneRM()`. The exercise card's own estimate and *Save to Personal Records* panel
+  (`attachCeiling()` / `paintFromFields()`) were removed on 2026-09-26 (REC-01, Amir: "Off the card,
+  keep in Records"): nothing on the working card suggests a weight mid-set.
 - **The rename matcher is in `program.html` AND `coach.html`** (`matchRenamed()` /
   `ceilAliasMapC()`). It decides whether a lift renamed between cycles reads as one row or
   two; if the copies drift, the coach and the athlete are looking at different records for

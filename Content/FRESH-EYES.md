@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**13 done · 11 partly done · 20 open**, of 44. Each was checked against the code on `main`.
+**14 done · 10 partly done · 20 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -58,9 +58,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#251](https://github.com/amirardekanian-crypto/Website/pull/251) | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
+| [#255](https://github.com/amirardekanian-crypto/Website/pull/255) | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -85,13 +86,38 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
-- **REC-01.** The estimated max still sits on the working card during the set.
-- **Home's Today block (HOME-02).** The next session (or "Rest day" with one suggestion) with Start or
-  Resume, then one-line rows for habits, records and weight, empty states a single quiet line. A visible
-  redesign of Home: build as described, or mockup first?
-- **The estimate on the working card (REC-01).** The estimated max still sits on the card mid-set. Take it off
-  the card (it stays in Records) or keep it?
 
+**Open.** P1: WK-02, CARD-01. P2: PROG-01,
+PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
+
+## Next, in order
+
+**REL-01 is done** (#237, 2026-09-26): both apps open with no signal from `plancache`; the full
+account is `PROGRAM-APP.md` → *No signal*.
+
+**PRIV-01 is done** (#238, 2026-09-26, Amir's call B): every line about the board reads `boardState()`
+(`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
+under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
+
+1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
+   HOME-03, WK-03's quick parts, A11Y-01 in the training app. So are NAV-01 (both apps), HOME-01, BW-01,
+   DATA-02's safe part, SHEET-01 and POL-01 (#239–#252, Amir: "keep going, only pause if you want me to choose").
+   **Amir answered four of the six calls** (2026-09-26, each his recommended option): the Today block →
+   a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
+   unfinished day → ask the athlete on their next open. Two remain: a rest day in Proof, following the
+   phone's dark setting.
+2. **Foundations:** HOME-02's Today block: a mockup page first, then build after his yes.
+3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
+   Confirm the card freeze with Amir first (below).
+4. **Home and progress:** PROG-01, and DATA-02's unfinished-day prompt ("You didn't finish Tuesday. Send it?", his answer).
+5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
+   PRF-03.
+6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
+
+## Open calls and things to watch (put these to Amir)
+
+- **Answered 2026-09-26:** Today block → mockup first · Game Plan → fold (#254) · estimate → off the card ·
+  unfinished day → ask the athlete. Still his: a rest day in Proof, following the phone's dark setting (below).
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
   rather than in that exercise's Coach's Note (PRG-2). The words were left as written when the demo
@@ -121,7 +147,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **An unfinished day (DATA-02).** Sets ticked on a day that was never finished carry into next week and never
   reach Amir. Options: record it automatically as a partial session on the day it was logged (Amir sees
   it in coach.html like a Finish Anyway), ask the athlete on their next open ("You didn't finish Tuesday:
-  send it?"), or leave it. Recording changes what the dashboard shows, so it is his call.
+  send it?"), or leave it. **Answered: ask the athlete** (2026-09-26).
 - **The readiness thresholds** (amber at 2.5 or 0.75 under the athlete's last-10 average, red at 2.0
   or any answer at 1, sore at 2) are judgement calls. Review them at the eight-cycle review.
 
@@ -187,7 +213,7 @@ The app cannot reach Supabase from here, so stub it and feed it a local programm
 ## Paste this to start the next chat
 
 > Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the "Watch and decide" panel on
-> the Fresh Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Put the six open calls to me
-> first, then build HOME-02's Today block the way I answer, using the same loop as before: restate the
+> the Fresh Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Show me the HOME-02 Today block
+> mockup first (I asked for one before it touches the app), then build it after my yes, using the same loop as before: restate the
 > problem, give two or three directions with trade-offs and your recommendation, name the architectural
 > consequences, and wait for my yes before building.

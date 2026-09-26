@@ -44,10 +44,10 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   the list: every exercise a collapsible card, sets logged by hand, Rest tapped when wanted. **Guided**
   (next to Start on the session timer) instead walks the day's "standard" exercises one set at a time,
   with rest auto-starting and auto-advancing between them (`openStepMode()`/`STEP` state, near the end
-  of the script). It relocates the REAL `.ex-detail` node — video, cues, the set-log table, Ceiling —
+  of the script). It relocates the REAL `.ex-detail` node — video, cues, the set-log table —
   out of the card and into the overlay while a step is showing (`renderStep()`), then puts it back on
   exit. **Nothing about logging, saving or estimating a set is reimplemented**: the weight input, RPE
-  buttons and check circle are the exact nodes `attachSetLog()`/`attachCeiling()` already wired up, so
+  buttons and check circle are the exact nodes `attachSetLog()` already wired up (the card estimate, `attachCeiling()`, went with REC-01), so
   Guided Mode can never disagree with the list view about what happened — the same trap this doc warns
   about for `coach.html`'s `parseSessionLog()`. Circuits and simple check-off exercises (warm-ups, and
   a few conditioning finishers with no per-set log) are **not** in the sequence yet — the athlete
