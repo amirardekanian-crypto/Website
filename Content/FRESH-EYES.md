@@ -59,7 +59,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
 | [#255](https://github.com/amirardekanian-crypto/Website/pull/255) | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
-| HOME-02 PR | Home led by the training: a small cycle line, done days as small rows, the in-progress card with Resume, habits / records / weight as one row each, quiet empty states, never a rest day (Amir's notes on the mockup) | HOME-02 |
+| [#258](https://github.com/amirardekanian-crypto/Website/pull/258) | Home led by the training: a small cycle line, done days as small rows, the in-progress card with Resume, habits / records / weight as one row each, quiet empty states, never a rest day (Amir's notes on the mockup) | HOME-02 |
 | [#256](https://github.com/amirardekanian-crypto/Website/pull/256) | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
@@ -104,7 +104,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
    unfinished day → ask the athlete on their next open. Two remain: a rest day in Proof, following the
    phone's dark setting.
-2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (HOME-02 PR): no separate Today card, no
+2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
    rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
@@ -115,7 +115,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 
 ## Open calls and things to watch (put these to Amir)
 
-- **Answered 2026-09-26:** Today block → mockup first, then built from his notes (HOME-02 PR) · Game Plan → fold (#254) ·
+- **Answered 2026-09-26:** Today block → mockup first, then built from his notes (#258) · Game Plan → fold (#254) ·
   estimate → off the card (#255) · unfinished day → ask the athlete (#256). Still his: a rest day in Proof, following the phone's dark setting (below).
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
