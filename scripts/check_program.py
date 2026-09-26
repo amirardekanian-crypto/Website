@@ -8,7 +8,7 @@ that took RPE below 6. The panel caught 14 must-fixes; about a third were mechan
 mechanical rules live here, the review keeps only the judgment, and a returning athlete's cycle
 needs no reviewer at all unless Amir asks.
 
-Plain Python 3, standard library only, because Node is not on Amir's PC. Nothing here touches
+Plain Python 3, standard library only, so it runs wherever the pipeline does. Nothing here touches
 the database: the one lookup it needs is printed by --spine-sql for you to run and save.
 
   python3 scripts/check_program.py data/<id>.json [options]

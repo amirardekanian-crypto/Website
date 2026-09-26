@@ -337,6 +337,11 @@ PWA, deliberately self-contained) and in `assets/js/chips.js` (which `coach.html
 means the coach's dashboard and the athlete's phone show different prescriptions for the same
 exercise and **nothing errors**. `scripts/check_rx.js` runs fixtures through both copies and is in
 `.githooks/pre-commit`. `chips.js` also owns the write side: `applyRx()`, `toRx()`, `auditRx()`.
+⚠ **`rxOf()` returns a normalised VIEW, not the `rx` object**: `sets`, `rpe`, `tempo`, `rest`,
+`rounds` as strings, and the dose as `dose: { kind, value, side, label }`. So `rxOf(ex).time` is
+always undefined; read a duration from `dose.value` when `dose.kind === 'time'`. The Quality Map
+minutes rule first shipped reading `.time`, passed a unit test fed raw `rx` objects, and was
+caught only in the real page (2026-09-26). Test app code against real `rxOf()` output.
 
 **Legacy `chips[]` is still READ, never written.** `rxOf()` parses it on the fly and recovers what
 each number really was, so **the ~34 live programmes were deliberately NOT bulk-migrated** — they

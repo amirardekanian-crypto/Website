@@ -73,6 +73,13 @@ change before I build?"* before writing exercises.
    designing against a stale working copy silently drops his newest rules (it happened:
    a cycle shipped with rep ranges + plain-text notes because the rules landed in git
    mid-design). If the pull fails (conflicts/WIP), say so and continue with a warning.
+   **When it fails, read the pipeline from `origin/main` instead**: `git fetch`, then
+   `MSYS_NO_PATHCONV=1 git show origin/main:<path>` (Git Bash otherwise rewrites
+   `origin/main:.claude/…` into a Windows path) for COACHING-PRINCIPLES, SCHEMA, the three
+   program skills and `scripts/check_program.py`. **That includes this file: the Skill tool loaded
+   it from the stale working tree.** On 2026-09-26 the checkout was 101 commits behind with other
+   sessions' edits in the way, and the skill as loaded still allowed rep ranges, cues in the spec
+   and the retired three-agent panel.
 1. Read **`.claude/COACHING-PRINCIPLES.md`** (apply throughout).
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
 3. **ONE context pull: everything design reads from the server, in a single call.** Run it once
@@ -85,24 +92,35 @@ change before I build?"* before writing exercises.
      'row', (select jsonb_build_object(
                'has_workouts', jsonb_typeof(data->'workouts'->'days') = 'array',
                'cci', coalesce((data->>'currentCycleIndex')::int, 0),
-               'tier', data->'athlete'->>'tier', 'badge', data->'sport'->>'badge',
-               'cycles', (select jsonb_agg(jsonb_build_object('num', c->'num', 'name', c->'name', 'art', c->'art',
-                            'start', c->'startDate', 'end', c->'endDate'))
-                          from jsonb_array_elements(coalesce(data->'cycles', '[]'::jsonb)) c))
+               'athlete', data->'athlete', 'sport', data->'sport', 'cycles', data->'cycles',
+               'notes', (select jsonb_agg(c->'title') from jsonb_array_elements(coalesce(data->'notes'->'cards', '[]'::jsonb)) c),
+               'programme', (select jsonb_agg(jsonb_build_object('day', d->'id', 'tag', d->'focusTag', 'blocks',
+                   (select jsonb_agg(jsonb_build_object('t', b->'title', 'x',
+                      (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', e->'name', 'rx', e->'rx', 'rounds', e->'rounds',
+                          'note', e->'note', 'test', e->'test',
+                          'chips', (select jsonb_agg(coalesce(ch->'label', ch)) from jsonb_array_elements(case when jsonb_typeof(e->'chips') = 'array' then e->'chips' else '[]'::jsonb end) ch),
+                          'items', (select jsonb_agg(i->'name') from jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array' then e->'items' else '[]'::jsonb end) i))))
+                       from jsonb_array_elements(b->'exercises') e)))
+                    from jsonb_array_elements(d->'blocks') b)))
+                 from jsonb_array_elements(case when jsonb_typeof(data->'workouts'->'days') = 'array' then data->'workouts'->'days' else '[]'::jsonb end) d))
              from public.programs where athlete_id = '<id>'),
-     'sessions', (select jsonb_build_object('n', count(*), 'last', max(completed_on))
+     'sessions', (select jsonb_build_object('n', count(*), 'last', max(completed_on),
+                    'minutes_by_day', (select jsonb_object_agg(dd, m) from (select day as dd, round(avg(duration_min)) as m
+                       from public.session_history where athlete_id = '<id>' and duration_min > 10
+                        and completed_on >= current_date - 42 group by day) x))
                   from public.session_history where athlete_id = '<id>'),
      'log', (select body from public.coaching_logs where athlete_id = '<id>'),
      'cycle_names_in_use', (select jsonb_agg(distinct c->>'name') from public.programs p,
                             jsonb_array_elements(coalesce(p.data->'cycles', '[]'::jsonb)) c),
      'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved')
    ) as ctx,
-   (select string_agg(concat_ws('|', e.id, coalesce(e.pattern, ''), e.status, coalesce(c.sfr::text, '-'),
+   (select string_agg(concat_ws('|', e.id, e.name, coalesce(e.pattern, ''), e.status, coalesce(c.sfr::text, '-'),
              coalesce(array_to_string(c.flags, ','), ''), coalesce(array_to_string(e.qualities, ','), ''),
              coalesce(array_to_string(e.loads, ','), ''), coalesce(e.impact, '-'),
              coalesce(array_to_string(e.easier, ','), '') || '>' || coalesce(array_to_string(e.harder, ','), '') || '>' ||
              coalesce(array_to_string(e.alts, ','), ''),
-             coalesce(array_to_string(e.aliases, ';'), '')), E'\n' order by e.pattern, c.sfr nulls last, e.id)
+             coalesce(array_to_string(e.aliases, ';'), ''), case when e.video is null then 'novideo' else 'video' end),
+             E'\n' order by e.pattern, c.sfr nulls last, e.id)
     from public.exercises e left join public.exercise_coach c using (id)) as spine;
    ```
    - **Mode** from `ctx.row.has_workouts` and `ctx.sessions.n` (`data/*.json` is deleted, so a
@@ -112,13 +130,29 @@ change before I build?"* before writing exercises.
      ask Amir before designing.
    - `ctx.log` is the coaching log (step 5). `ctx.cycle_names_in_use` stops a roadmap reusing a
      cycle name. `ctx.qualities` are the Quality Map words.
+   - `ctx.row.programme` is the cycle being reviewed as prescribed: every day, block and exercise
+     with its `rx` (or legacy `chips`), Coach's Note and test flag. STEP 1A needs no other read of
+     it. `ctx.row.cycles` is the whole roadmap and `ctx.row.athlete`/`sport` the identity block,
+     exactly what assemble's local copy and fingerprint need, so nothing is looked up twice.
+     `ctx.row.notes` lists last cycle's card titles. `ctx.sessions.minutes_by_day` is the real
+     average session length per day over the last six weeks (STEP 2's time check).
    - `spine` is the whole exercise catalogue, one line per entry, pattern by pattern, best SFR
-     first: `id|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases`. It
-     replaces the catalogue query under THE SPINE below. Save it to the scratchpad to grep it.
+     first: `id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video`.
+     It replaces the catalogue query under THE SPINE below. Save it to the scratchpad to grep it;
+     its first field is also `draft_sql.py`'s existing-ids list. The entry's `name` is not always
+     the card's (`Inverted Row (BW)`, whose card says Inverted Row: assemble copies the library's
+     video into `videoUrl`), and every `novideo` exercise you prescribe goes on the handoff's film list.
 4. **Get the brief:**
-   - RETURNING → invoke the **`athlete-brief`** subagent (MODE=returning), **in the foreground**
+   - RETURNING with a **`## Debrief`** in `ctx.log` dated on or after `ctx.sessions.last` → **the
+     Debrief IS the brief: don't launch `athlete-brief`.** /cycle-report already read every
+     session, the calls and the log's data problems, and `ctx.row.programme` holds the
+     prescription. On 2026-09-26 the agent spent 10 minutes and ~225k tokens re-deriving what that
+     Debrief already said.
+   - RETURNING without one, or with sessions logged after it → invoke the **`athlete-brief`**
+     subagent (MODE=returning), **in the foreground**
      (`run_in_background: false`: it is the one agent that reads the database, and a background
-     agent's approval prompts do not reach Amir), passing any check-in chat Amir pasted. It returns the one-page brief (loads, RPE, readiness,
+     agent's approval prompts do not reach Amir), passing any check-in chat Amir pasted, and the
+     Debrief's date if there is one, so it reads only the sessions after it. It returns the one-page brief (loads, RPE, readiness,
      **e1RM from heaviest logged sets**, injuries) and imports any missing sessions. Use
      the brief — don't re-pull raw data. The athlete also has a dated estimated-1RM
      history of their own — see **The Ceiling** below for what it is and how it may be
@@ -214,6 +248,11 @@ REPLACE:  [accessory to rotate → safe replacement + why]
 ADD:      [new element → why THIS cycle]
 ```
 **→ CHECKPOINT:** show this analysis + the lists and ask Amir for changes before building.
+Always add one fixed question: **the day the athlete starts this cycle** (default: their next
+usual training day, never the roadmap's nominal Monday). Assemble writes it as the cycle's
+`startDate`, the app's week counter and retest window read it, and the WhatsApp dates come from
+it. Asked late, it cost a republish and a rewritten WhatsApp (2026-09-26). If Amir answers only
+some questions, go with your stated recommendation on the rest and list each under MY CALLS.
 
 ---
 
@@ -238,7 +277,8 @@ Close with the **LOCKED LIST**:
 ```
 PRIMARY LIFT SELECTIONS: [muscle/pattern → exercise, SFR/transfer rationale]
 ```
-**→ CHECKPOINT:** show this analysis + selections and ask Amir for changes before building.
+**→ CHECKPOINT:** show this analysis + selections and ask Amir for changes before building, and
+ask the day the athlete starts (see STEP 1A's checkpoint).
 
 ---
 
@@ -272,6 +312,11 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   are already well-dosed. A session that fits comfortably under its cap with nothing added is a
   design miss, not a light day — light days should be a deliberate undulation choice (see
   PER-DAY LOAD DISTRIBUTION above), not leftover time.
+  **RETURNING athlete: calibrate against reality first.** Put the last cycle's days through the
+  script's own timing (`day_minutes()` in `scripts/check_program.py`) and compare them with
+  `ctx.sessions.minutes_by_day`. Alireza's Cycle 1 modelled ~48 min and ran 69 (×1.44), so a
+  55-minute design meant ~75 real. Tell Amir the expected real length at the checkpoint, not
+  only the model's number, and note the ratio in the log for the next cycle.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
   conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
 - **Superset** non-competing pairs to fit the time ceiling — **except** an athlete's first
@@ -312,7 +357,9 @@ the BUILT programme, so it runs in /program-assemble (Step 3 checks, Step 3b rev
    should. **RETURNING athlete: no reviewer** unless Amir asks for one.
 So write the spec for a script to read: every loaded exercise in the volume table, each
 banned movement named in one line (`bans: goblet, hanging, …`), every fallback on a line that
-starts `fallback:`.
+starts `fallback:`. A ban word is matched anywhere on a line holding `fallback`, `→`, `instead`
+or `swap`, so never reuse it in another sense there (`two sessions running` failed with
+`running` banned).
 
 **CLASSIFICATION:** every exercise gets a role, and the role IS its section block:
 primary (stable, progress via load — use Step 1 selections) → **Primary** block ·

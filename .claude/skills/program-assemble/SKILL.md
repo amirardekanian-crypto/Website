@@ -160,6 +160,12 @@ renders the item as a name and a number on one line, which is what a warm-up sho
    are identity, not programme. ⚠️ There is no `key` any more: if an old file still
    carries `athlete.key`, drop it. It authorises nothing (`athlete_keys` is empty and
    `get_program()` fails closed on that path).
+5. **Set the new cycle's `startDate` to the day the athlete really starts** (design asks it at
+   the checkpoint) and `endDate` to start + 34 days. The roadmap's dates are nominal Mondays, but
+   Home's *Week X of Y*, the days-left banner and the retest nudge (the last 7 days before
+   `endDate`) all read these two fields. A Saturday start left on a Monday date shows last week's
+   number on every weekend session and misses a Saturday test day, which cost a republish and a
+   rewritten WhatsApp on 2026-09-26.
 
 **Write the picture on every cycle AND every day — this is part of assembling, not an
 extra.** Both use the same field name, `art`, and both are listed in `SCHEMA.md`:
@@ -441,6 +447,11 @@ missing keys by merging, not by path: `update programs set data = data || jsonb_
 **Dollar-quote everything** (`$W$ … $W$`) and check the payload does not contain your tag.
 Apostrophes are everywhere in athlete-facing copy and single-quoting will shred it.
 
+**Generate each statement with a script written by the Write tool, then read it back and run
+it verbatim.** Never build SQL inside a Bash heredoc: Git Bash halves backslashes there, and a
+`regexp_replace(…, '×\1 Rounds')` arrived as a control character (caught before it ran,
+2026-09-26). Count control characters in the generated file before running it.
+
 **Never touch the `athlete` block.** Assert `athlete.id` and the names are unchanged after
 every statement — a `jsonb_set` on the wrong path rewrites identity silently. (An old file
 may still carry a dead `athlete.key`; it authorises nothing and can simply go.)
@@ -481,12 +492,11 @@ are both plain text, so a straight `md5(body)` comparison IS valid — use it.
 
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm both the programme row
   and the coaching-log row verified.
-- ⚠️ **Node is NOT on this machine** — corrected 2026-09-19, verified in both bash and
-  PowerShell (`node`, `npm` and `gh` are all "command not found"). This line previously
-  claimed "Node **is** on this machine (v24)", which was wrong. **Use Python** (3.14 is
-  installed) — it is what the rest of this skill uses for fingerprints anyway. The three
-  `node -e` snippets above (Steps 3 and 4) are still written in JavaScript and will fail
-  as-is; translate them to Python before running. See also: no `gh`, so ship by local merge.
+- **Node 24 and npm ARE on this machine** (`C:\Program Files\nodejs`, on the Bash PATH;
+  `node --version` gave v24.14.1 on 2026-09-26). They arrived around 2026-09-20 with the reel
+  tools, after a 2026-09-19 check had rightly found neither. So the `node -e` snippets above
+  (Steps 3 and 4) run as they are, and so does the pre-commit hook's `node scripts/check_rx.js`.
+  Python 3.14 is here too. `gh` is still NOT installed, so ship by local merge.
 - Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
   gitignored; there is normally nothing to commit at all.
 
