@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**11 done · 10 partly done · 23 open**, of 44. Each was checked against the code on `main`.
+**11 done · 11 partly done · 22 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -54,6 +54,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#246](https://github.com/amirardekanian-crypto/Website/pull/246) | The phone's Back closes the top layer in the training app (one guard entry, `topLayer()` reads the page) instead of leaving the app | NAV-01 |
 | [#248](https://github.com/amirardekanian-crypto/Website/pull/248) | This Week is built from the session history: Done pills that last the week, the right day suggested, "2 of 3 sessions done this week", updated without a reload | HOME-01 |
 | [#249](https://github.com/amirardekanian-crypto/Website/pull/249) | The weigh-in box sits under the headline number, above the chart and every reading; the trend lines read in dark mode | BW-01 |
+| DATA-02 PR | A session is filed under the local day it was finished, one date for every save of it; a session past midnight keeps its clock, check-in, note and rating for 6 hours | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01.
@@ -71,6 +72,8 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   (`user-scalable=no`, a card change); and following the phone's dark setting (*Open calls*).
 - **NAV-01.** Back closes the top layer in both apps. Still open: one close grammar for the buttons
   (← for screens, ✕ top-right for overlays, drag or tap outside for sheets).
+- **DATA-02.** Local dates and the midnight grace are done. Still open: an unfinished day (ticks, never
+  finished) is never recorded or cleaned up (*Open calls*), and the sweep runs at launch only.
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
   compact rows for habits, records and weight, and quiet empty states.
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
@@ -81,8 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   still sends a new athlete to the plan instead of Day 1.
 
 **Open.** P1: WK-02, CARD-01. P2: PROG-01,
-PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03,
-DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
 
 ## Next, in order
 
@@ -98,7 +100,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 2. **Foundations:** HOME-02's Today block (HOME-01, the week from history, is done).
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
-4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, DATA-02.
+4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, DATA-02 (the unfinished day, after his call).
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
 6. **System and polish:** DS-01, DS-03, CONS-01, SHEET-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
@@ -131,6 +133,10 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 - **Follow the phone's dark setting (A11Y-01).** Both apps start light and switch only on a tap. Following the
   phone by default means athletes whose phones go dark at night see the app dark without choosing it; the
   dark theme reads properly since A11Y-01. Amir's call: it changes how the app looks for many athletes.
+- **An unfinished day (DATA-02).** Sets ticked on a day that was never finished carry into next week and never
+  reach Amir. Options: record it automatically as a partial session on the day it was logged (Amir sees
+  it in coach.html like a Finish Anyway), ask the athlete on their next open ("You didn't finish Tuesday:
+  send it?"), or leave it. Recording changes what the dashboard shows, so it is his call.
 - **The readiness thresholds** (amber at 2.5 or 0.75 under the athlete's last-10 average, red at 2.0
   or any answer at 1, sore at 2) are judgement calls. Review them at the eight-cycle review.
 

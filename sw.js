@@ -98,7 +98,9 @@
 //      that last the week, the right day suggested, "2 of 3 sessions done this week").
 // v51: program.html changed (2026-09-26, BW-01): the weigh-in box sits under the headline number, above
 //      the chart and the list; the weight and Records trend lines read in dark mode.
-const CACHE = 'aap-v51';
+// v52: program.html changed (2026-09-26, DATA-02): a session is filed under the local day it was finished
+//      (one date for every save of it), and a session running past midnight keeps its clock and check-in.
+const CACHE = 'aap-v52';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
