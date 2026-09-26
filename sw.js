@@ -50,7 +50,10 @@
 // again. Since 2026-09-20 renderCircuit() read parseInt("×3 Rounds") as NaN and drew one round.
 // v30: program.html changed (2026-09-26): the in-app chat is gone (the Coach tab opens WhatsApp
 // instead), Home puts the training before the habits, and the last ochre and amber are clay/paper.
-const CACHE = 'aap-v30';
+// v31: program.html changed (2026-09-26): WhatsApp doors at the end of a session and in each
+// exercise's About sheet, pre-filled with the day or exercise; the session note stops inviting
+// swap requests (Amir answers only on WhatsApp).
+const CACHE = 'aap-v31';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

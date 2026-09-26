@@ -633,7 +633,7 @@
   .prog-cycle-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 17px; letter-spacing: .03em; }
   .prog-focus { margin: 6px 0 0 18px; font-size: 13px; color: var(--muted); line-height: 1.5; }
 
-  /* Session-note actions (Reply on WhatsApp · Mark read) */
+  /* Session-note actions (Mark read). Amir answers only on WhatsApp, 2026-09-26. */
   .note-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
   /* Import form (ported) */
@@ -1893,7 +1893,7 @@ window.postCoachLine = postCoachLine;
 window.clearCoachLine = clearCoachLine;
 window.toggleHide = toggleHide;
 
-// Who needs the coach, in one list: session notes waiting on a reply, coached
+// Who needs the coach, in one list: session notes not yet read, coached
 // athletes gone quiet, Proof athletes gone silent. (Unread chat messages left
 // with the in-app chat on 2026-09-26: athletes reach Amir on WhatsApp.)
 function needPanelHtml() {
@@ -1943,7 +1943,7 @@ async function clearNoteBacklog() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const cut = addDays(todayKey(), -NEEDS_WINDOW_DAYS);
   const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
-  if (!confirm(`Mark ${stale} note${stale === 1 ? '' : 's'} older than ${cut} as read?\n\nThey stay on each athlete's file and you can still reply to any of them — this only clears them out of "needs you".`)) return;
+  if (!confirm(`Mark ${stale} note${stale === 1 ? '' : 's'} older than ${cut} as read?\n\nThey stay on each athlete's file — this only clears them out of "needs you".`)) return;
   const { error } = await sb.from('session_history')
     .update({ coach_status: 'read' })
     .lt('completed_on', cut)
@@ -2234,7 +2234,7 @@ window.setRosterFilter = setRosterFilter;
 // looked exactly like a row that didn't.
 function rosterReasons(a) {
   const out = [];
-  if (a.needReplyRecent && a.needReplyRecent.length) out.push({ tone: 'warn', text: a.needReplyRecent.length + ' note' + (a.needReplyRecent.length === 1 ? '' : 's') + ' to reply' });
+  if (a.needReplyRecent && a.needReplyRecent.length) out.push({ tone: 'warn', text: a.needReplyRecent.length + ' note' + (a.needReplyRecent.length === 1 ? '' : 's') + ' to read' });
   if (a.tier === 'coached' && a.finished > 0) {
     const gap = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
     if (gap > QUIET_SESSION_DAYS) out.push({ tone: 'note', text: 'no session for ' + gap + ' days' });
@@ -2939,9 +2939,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const noteBox = (s && s.day_note) ? `<div class="daynote">
       <div class="dn-txt">“${esc(s.day_note)}”</div>
       ${sessionNeedsReply(s) ? `<div class="note-actions">
-        <button class="btn sm primary" onclick="replyOnWhatsApp('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}', this)">Reply on WhatsApp</button>
         <button class="btn sm" onclick="markNoteRead('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Mark read</button>
-      </div>` : '<div class="dn-read">answered</div>'}
+      </div>` : '<div class="dn-read">read</div>'}
     </div>` : '';
 
   // The column header belongs to the day, not to every block inside it —
@@ -2959,7 +2958,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     <button class="wday-top" onclick="toggleWorkDay(${dayNum})">
       <span class="wday-n">${esc(dayNum)}</span>
       <span class="wday-main">
-        <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${needsReply ? ' <span class="zpill reply">note to reply</span>' : ''}</span>
+        <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${needsReply ? ' <span class="zpill reply">note to read</span>' : ''}</span>
         <span class="wday-meta">${esc(meta.join(' · ')) || 'nothing logged against this day yet'}</span>
       </span>
       <span class="wday-right">${scoreline}<span class="tag ${statusTone === 'ok' ? 'done' : statusTone === 'warn' ? 'partial' : ''}">${esc(status)}</span></span>
@@ -3377,35 +3376,16 @@ function fileTabHtml(D) {
     </section>`;
 }
 
-// --- replying to a session note ---------------------------------------------
-// On WhatsApp, not in the app (Amir, 2026-09-26: "whatsapp first, remove in app
-// chat from app and coach.html"). The note is quoted so the athlete sees what the
-// reply answers. The athlete's number comes from their contact row when there is
-// one (on 2026-09-26 only 1 of 17 active coached athletes had one: their numbers
-// live in Amir's phone, not in hab_contacts). Without it WhatsApp opens with the
-// reply already typed and he picks their chat (wa.me/?text= is WhatsApp's own
-// "choose a chat" link). Either way the session is marked replied, the same flag
-// the old in-app reply set, so it leaves Waiting on you.
-async function replyOnWhatsApp(athleteId, day, completedOn, btn) {
-  const s = (_detailHistory || []).find(x => Number(x.day) === Number(day) && x.completed_on === completedOn);
-  const note = s ? sessionNoteText(s) : '';
-  const text = 'Re your Day ' + day + ' note (' + prettyDate(completedOn) + '): "' + note + '"\n\n';
-  const a = S.ath[athleteId];
-  const wa = a && a.contact && a.contact.whatsapp ? affWa(a.contact.whatsapp) : '';
-  window.open((wa || 'https://wa.me/') + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
-  if (!wa) toast('No number on file for them: pick their chat in WhatsApp, the reply is already typed');
-  if (DEMO) return;
-  const { error } = await sb.from('session_history').update({ coach_status: 'replied' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  if (error) { alert('Could not update: ' + error.message); return; }
-  refetch(['hist']);
-}
+// --- session notes -----------------------------------------------------------
+// Read, never answered here (Amir, 2026-09-26: "Im only gonna reply to them when they
+// send me a message on whatsapp"). The athlete app sends anything that needs an
+// answer to WhatsApp; a note is marked read once Amir has seen it.
 async function markNoteRead(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const { error } = await sb.from('session_history').update({ coach_status: 'read' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
   if (error) { alert('Could not update: ' + error.message); return; }
   refetch(['hist']);
 }
-window.replyOnWhatsApp = replyOnWhatsApp;
 window.markNoteRead = markNoteRead;
 
 // --- import a past session from a coach email (ported) ----------------------

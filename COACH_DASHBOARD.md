@@ -215,7 +215,7 @@ Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
 habits but have no program file) or **No file** — their level, an ACWR pill *only when it's amber
 or red*, their session count, their Proof week (`n/7`) and seven presence dots.
 
-**A flagged row says why, in words:** *1 note to reply* · *no session for 9
+**A flagged row says why, in words:** *1 note to read* · *no session for 9
 days* · *silent on Proof — 4 days* · *ready to upgrade?*. The reasons are the same triggers as the
 Needs-you list on Today; before, they were folded into one dot-separated line and a row that needed
 a reply looked like a row that didn't.
@@ -271,9 +271,8 @@ for the athlete's own history, so a change to the log line moves three places to
 (`buildSessionData()`, `parseSetLine()`, `parseSetText()`).
 
 Other things on this tab: the **day's session picker** when a day has been trained more than once
-(tap a date to compare against that run instead), the athlete's note with **Reply on WhatsApp** / **Mark read** (the reply opens their WhatsApp with
-the note quoted, or with no number on file opens WhatsApp with the reply typed so you pick their chat,
-and marks the note replied),
+(tap a date to compare against that run instead), the athlete's note with **Mark read** (a note is read here, never answered: you answer only on
+WhatsApp, 2026-09-26, and the athlete app sends anything that needs an answer there),
 the **raw log exactly as sent** behind a toggle on every day, **+ Add past session from email**, and
 a collapsed **live app snapshot** — what is on their phone right now, which is a different question
 from what they finished.
@@ -397,7 +396,7 @@ it in this file.
 
 | Source | Feeds |
 |---|---|
-| `session_history` | Sessions, ACWR, readiness, adherence, notes to reply |
+| `session_history` | Sessions, ACWR, readiness, adherence, notes to read |
 | `athlete_progress` | Last active, live snapshot, and the habit log behind every presence dot |
 | `programs` | **The roster** — every athlete, their name, tier and prescribed plan |
 | `athlete_identities` | Who has a username/password login, and the passwords still to send |
