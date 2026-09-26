@@ -77,8 +77,9 @@ chat; this block's session types + technique priorities; every autoregulation / 
 nutrition decision design made).
 
 **Count is a byproduct, not a target.** Write every mandatory note that applies (below) plus
-whatever else is genuinely load-bearing this cycle — commonly that lands around 5–9, but
-never pad to reach a number. A cycle with less to say gets fewer, sharper cards; manufacturing
+whatever else is genuinely load-bearing this cycle — commonly that lands around 5–8, but
+never pad to reach a number. **Soft cap: 8 cards** (COM-10): past that, merge or cut, or say in the
+handoff why this cycle needs more. A cycle with less to say gets fewer, sharper cards; manufacturing
 a card to hit a count is exactly the padding the rule below forbids.
 
 **Span the breadth.** These are everything the athlete must think about or address to get

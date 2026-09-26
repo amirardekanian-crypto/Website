@@ -278,6 +278,11 @@ expect('every flagged note placed: no warning', not has(run(d, spec=SPEC2), 'WAR
 expect('template placeholders are not flags', not has(run(BASE, spec="note_flag: [optional]\nnote_flag: -\n"), 'WARN', "Coach's Notes and the programme"))
 expect('a Because with no why_flag warns', has(run(with_why({"src": "goal", "text": "Your legs drive every serve."}), spec="bans: -\n"), 'WARN', 'flags 0 Becauses and the programme carries 1'))
 
+d = copy.deepcopy(BASE); d['notes'] = {"cards": [{"title": f"Card {i}", "body": "<p>One idea.</p>"} for i in range(9)]}
+expect('nine notes cards warn (soft cap 8)', has(run(d), 'WARN', 'over the soft cap of 8'))
+d['notes']['cards'] = d['notes']['cards'][:8]
+expect('eight notes cards pass', not has(run(d), 'WARN', 'soft cap'))
+
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))
 P = os.path.join(REPO, '.claude', 'COACHING-PRINCIPLES.md')

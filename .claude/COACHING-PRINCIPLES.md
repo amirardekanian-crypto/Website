@@ -168,7 +168,7 @@ places, and a stale copy reached athletes.)*
 | COM-7 | Coach-facing reports (the volume tables) go to chat and the coaching log, never the app. | assemble | |
 | COM-8 | Note bodies are real HTML: 2–4 short paragraphs, a list when the content is a list, one bold phrase per paragraph. | engage | ✓ |
 | COM-9 | Every required note is on the spec's `obligations:` list; engage writes those first and tags each card. | design · engage | ✓ |
-| COM-10 | Card count is a byproduct: write what is required and what carries weight, never pad. | engage | |
+| COM-10 | Card count is a byproduct: write what is required and what carries weight, never pad. Past 8 cards, say why. | engage | warn (over 8) |
 | COM-11 | Celebrate a genuine win each cycle on its own card; never invent one. | engage | oblig `win` |
 | COM-12 | A notes card and the matching Coach's Note never repeat: the card holds the protocol, the note the point-of-action detail. | engage | |
 | COM-13 | When a cycle turns on body mass, a card sends the athlete to Home → Body Weight in the programme app, never AA Proof. | engage | oblig `weigh-in` |
@@ -218,6 +218,7 @@ places, and a stale copy reached athletes.)*
 | PRC-22 | Athlete first: programming before names, chips and styling. Design flags a needed note (`note_flag`); engage writes it. | design | |
 | PRC-23 | Skills cite rule IDs and never restate a rule; a checker message names the rule it enforces. | every stage | |
 | PRC-24 | The cycle's `art` headline should be in the week's top two qualities; if not, tell Amir with a recommendation, never add volume for a label. | design · assemble | warn |
+| PRC-25 | Rule freeze from 2026-09-26 until eight cycles have run on this pipeline: a new rule only when something breaks, through the index. | every stage | |
 
 ---
 
@@ -943,7 +944,10 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
 - `COM-10` **Notes card count is a byproduct, not a target — never pad.** Write every mandatory note
   that applies plus whatever else is genuinely load-bearing this cycle; a simple cycle with
   less to say gets fewer, sharper cards. Manufacturing a card to hit a number produces exactly
-  the generic filler the "athlete-specific only" rule forbids. *(2026-07-12)*
+  the generic filler the "athlete-specific only" rule forbids. *(2026-07-12)* **Soft cap: 8 cards.**
+  A cycle that needs more says why in the handoff; the checker warns past 8. *(Amir, 2026-09-26,
+  yes to the audit's soft cap: nine live programmes carried 10 or more cards, and the required ones
+  were getting buried among them. The required cards come first either way, COM-9.)*
 - `COM-11` **Celebrate a genuine win every cycle, on its own card — never manufacture one.** A lift
   that moved, a habit that stuck, a hard week survived, an adherence streak: give it its own
   card, not a caveat buried inside a corrective note. Retention runs on the athlete feeling
@@ -1307,3 +1311,10 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   it or change the art word. **Never add volume only to satisfy the line.** `bedrock`, `peak` and
   `reset` are phases, not qualities, so they have no headline. *(Quality Map 2026-09-24; a WARN
   since 2026-09-26, Amir: "report it, but recommend what you think should happen")*
+- `PRC-25` **Rule freeze: no new rules until eight cycles have run on this pipeline.** *(Amir,
+  2026-09-26, yes to the audit's recommendation.)* The pipeline changed more than 60 times in six
+  weeks while only two live programmes were in the current format, so rules were being added
+  faster than any of them was tested. Until eight cycles have been written on this pipeline
+  (count the `Checks:` lines in the coaching logs), a new rule goes in only when something
+  actually broke: through the index, with its stage and, where possible, a check. At eight
+  cycles, read the `Checks:` lines and prune what never fired or never mattered.

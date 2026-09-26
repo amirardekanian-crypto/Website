@@ -68,7 +68,8 @@ change before I build?"* before writing exercises.
   *"Save this as a principle?"* On yes, add it the way the file's *How to add* says: one index
   line with the next free ID in its section (25 words or fewer, its stage, its check) and a dated
   story bullet tagged with the same ID; `scripts/check_rule_index.py` checks the pair. **One-off,
-  athlete-specific calls are NOT saved** — Amir curates what's learned.
+  athlete-specific calls are NOT saved** — Amir curates what's learned. **During the rule freeze
+  (PRC-25)** offer this only when his call fixes something that actually broke.
 
 ## STEP 0 — Setup
 0. **Sync first — `git pull --rebase` before reading anything.** COACHING-PRINCIPLES,

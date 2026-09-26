@@ -259,7 +259,10 @@ def check_text(data):
         if m: warn(f"{where}: a rep range in the text ({m.group(0)})", 'PRG-6')
 
 def check_cards(data):
-    for c in (data.get('notes') or {}).get('cards') or []:
+    cards = (data.get('notes') or {}).get('cards') or []
+    # Soft cap (Amir, 2026-09-26): past 8 the required cards get buried among the rest.
+    if len(cards) > 8: warn(f"{len(cards)} notes cards: over the soft cap of 8. Merge or cut, or say in the handoff why this cycle needs more", 'COM-10')
+    for c in cards:
         body, t = c.get('body', ''), c.get('title')
         if not re.search(r'<(p|ul)\b', body): fail(f"card '{t}': the body is not HTML (<p>, <ul><li>)", 'COM-8')
         stack = []
