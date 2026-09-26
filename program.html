@@ -12239,7 +12239,14 @@ let STEP = null;   // { day, seq, pos, homeCard, homeDetail } — null while clo
 // finished) has no modal to wait for, so the guided view opens immediately.
 function openGuided(day) {
   window._pendingGuidedDay = day;
-  toggleSessionTimer(day);
+  // ⚠️ Never PAUSE a running clock (WK-01, 2026-09-26). toggleSessionTimer() is the Start/Pause
+  // button, so calling it on a running session paused it, and the session's minutes (and the
+  // training load coach.html reads, session RPE × minutes) came out short. Only a session that
+  // has not started (it goes through the readiness check), a leftover from an earlier day (the
+  // toggle clears it), or a paused one (they are about to train, so it resumes) is toggled.
+  const t = loadTimer(day);
+  const stale = !!(t && t.sessionStart && new Date(t.sessionStart).toDateString() !== new Date().toDateString());
+  if (!t || stale || (!t.running && !t.finished)) toggleSessionTimer(day);
   const ro = document.getElementById('readiness-overlay');
   if (!ro || !ro.classList.contains('visible')) {
     window._pendingGuidedDay = null;
@@ -12264,7 +12271,12 @@ function buildStepSeq(day) {
 function openStepMode(day) {
   const seq = buildStepSeq(day);
   if (!seq.length) return;   // nothing loggable today (e.g. a circuit-only day)
-  STEP = { day, seq, pos: 0, homeCard: null, homeDetail: null };
+  // Reopened mid-session: start at the first set not yet ticked, not at set 1 (WK-01).
+  // All ticked → the last set, whose button is Finish Session.
+  const isDone = it => !!it.card.querySelector(`.ex-set-row[data-set-idx="${it.setI}"].done`);
+  let pos = seq.findIndex(it => !isDone(it));
+  if (pos < 0) pos = seq.length - 1;
+  STEP = { day, seq, pos, homeCard: null, homeDetail: null };
   document.getElementById('stepOverlay').classList.add('visible');
   document.body.style.overflow = 'hidden';
   renderStep();
@@ -12329,7 +12341,7 @@ function currentStepRow() {
 function renderStepFooter() {
   const isLast = STEP.pos === STEP.seq.length - 1;
   const done = currentStepRow().classList.contains('done');
-  const label = done ? (isLast ? 'Finish Workout ✓' : 'Next →') : 'Done — Start Rest ✓';
+  const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : 'Done — Start Rest ✓';
   document.getElementById('step-footer').innerHTML = `
     <button type="button" class="step-nav-btn" onclick="stepPrev()"${STEP.pos === 0 ? ' disabled' : ''}>‹ Prev</button>
     <button type="button" class="step-primary-btn" onclick="stepPrimary()">${esc(label)}</button>`;
@@ -12343,9 +12355,26 @@ function stepPrimary() {
   if (!row.classList.contains('done')) {
     row.querySelector('.ex-set-check').click();
     stepAfterDone();
+  } else if (STEP.pos === STEP.seq.length - 1) {
+    stepFinish();
   } else {
     stepAdvance();
   }
+}
+
+// The last button FINISHES (WK-01): it used to say "Finish Workout ✓" and only close Guided.
+// It goes through the list's own Finish card, the one path that locks the clock, records
+// the session and opens the rating. Guided skips circuits and warm-ups, so when anything
+// else in the day is unticked the athlete lands on "Wrap up early?" and decides there;
+// Guided never finishes a partial session for them.
+function stepFinish() {
+  if (!STEP) return;
+  const day = STEP.day;
+  closeStepMode();
+  const card = document.getElementById('confirm-' + day);
+  if (!card) return;
+  if (card.classList.contains('visible') && !card.classList.contains('partial')) { confirmSession(day); return; }
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function stepAfterDone() {
@@ -12421,10 +12450,11 @@ function showStepComplete() {
     <div class="step-complete">
       <div class="step-complete-check">✓</div>
       <div class="step-complete-title">Every set logged.</div>
-      <p class="step-complete-sub">Rate the session and send it to your coach from Finish Session, below.</p>
+      <p class="step-complete-sub">Finish the session to rate it and send it to your coach.</p>
     </div>`);
   document.getElementById('step-footer').innerHTML =
-    `<button type="button" class="step-primary-btn step-primary-full" onclick="closeStepMode()">Exit Guided Mode</button>`;
+    `<button type="button" class="step-nav-btn" onclick="closeStepMode()">Exit</button>
+     <button type="button" class="step-primary-btn" onclick="stepFinish()">Finish Session ✓</button>`;
 }
 
 // ── THE CARD REMEMBERS (2026-09-24) ──────────────────────────────────────
