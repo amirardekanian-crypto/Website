@@ -4222,7 +4222,7 @@
      opened only by the "Done" card on the My Plan screen. -->
 <div id="screen-archive" class="screen">
   <div class="archive-banner" id="archive-banner" data-watermark="">
-    <button class="archive-back" onclick="goTo('plan')" aria-label="Back to My Plan">←</button>
+    <button class="archive-back" onclick="goTo('plan')" aria-label="Back to Game Plan">←</button>
     <div class="archive-label">Completed</div>
     <div class="archive-title" id="archive-title"></div>
   </div>
@@ -4317,9 +4317,11 @@
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
     <span class="nav-label">Library</span>
   </button>
+  <!-- "Game Plan" since 2026-09-26 (Amir picked it from four names; it was "My Plan"
+       with a person icon). A route: the cycles from where they started to where they go. -->
   <button class="nav-item" data-tab="plan" onclick="goTo('plan')">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></span>
-    <span class="nav-label">My Plan</span>
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19h8a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7h8"/></svg></span>
+    <span class="nav-label">Game Plan</span>
   </button>
 </div>
 
@@ -5589,7 +5591,7 @@ function maybeWelcome() {
     '<div class="wel-sheet">' +
       '<p>' + plan + '</p>' +
       '<p class="sub">Any questions, message me on WhatsApp. The button is in the Coach tab.</p>' +
-      '<button type="button" class="wel-go">See my plan</button>' +
+      '<button type="button" class="wel-go">See my game plan</button>' +
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
   document.body.appendChild(el);
@@ -7080,7 +7082,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>My Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', title: 'RPE & Tempo',

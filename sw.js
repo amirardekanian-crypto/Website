@@ -53,7 +53,8 @@
 // v31: program.html changed (2026-09-26): WhatsApp doors at the end of a session and in each
 // exercise's About sheet, pre-filled with the day or exercise; the session note stops inviting
 // swap requests (Amir answers only on WhatsApp).
-const CACHE = 'aap-v31';
+// v32: program.html changed (2026-09-26): the "My Plan" tab is now "Game Plan", with a route icon.
+const CACHE = 'aap-v32';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

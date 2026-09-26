@@ -58,7 +58,7 @@ The two apps are **linked both ways**:
 
 | From | To | Where |
 |---|---|---|
-| `program.html` | Proof | **Daily Habits card** on Home *and* at the end of My Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow |
+| `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow |
 | Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
