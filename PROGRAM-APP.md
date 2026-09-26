@@ -521,6 +521,22 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## ↩️ Back closes the top layer (NAV-01, 2026-09-26)
+
+Screens, sheets and overlays are shown and hidden in place, so until now the phone's Back button (or an Android
+swipe) **left the app** from any of them. Now, while anything is open over Home's overview, there is exactly
+**one guard entry** in history (`history.pushState`, same URL, so `?workout=` and other deep links are
+untouched). Back pops it; `topLayer()` names what is visibly on top and it is closed; if something is still
+open the guard is re-armed. Top first: the video pop-up, the rest timer (in Guided this ends the rest, as Skip
+does), the readiness check (cancelled, nothing starts), the sheet (History, About, Why, Quality), Guided (the
+clock keeps running), then a non-Home screen, which presses **its own ←** (Records → the exercise it was opened
+from, a session → its Library pane → the doors, the archive → Game Plan) or goes Home for a tab, then the day
+view. When the last layer closes through its own button, `navSync()` takes the guard back off quietly, so Back
+on Home still leaves the app, with no dead press. Nothing is tracked in a parallel stack: the page is the state,
+so it cannot drift. `initBackNav()` watches the overlays' `visible` class, the day view's `hidden` and each
+`.screen`'s class; `shared.js`'s video pop-up calls `navSync()` itself. Not in the coach preview.
+**Still open:** AA Proof, and one close grammar for the buttons (←, ✕, Close).
+
 ## 🔍 Readable in both themes (A11Y-01, 2026-09-26)
 
 - **Text tokens.** `--green-ink` and `--clay-ink` carry every green or clay *text* colour (37 + 58 rules were

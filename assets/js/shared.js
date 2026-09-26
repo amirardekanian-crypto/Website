@@ -241,12 +241,14 @@
       frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="Exercise video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
       el.classList.add('is-open');
       document.body.style.overflow = 'hidden';
+      if (typeof window.navSync === 'function') window.navSync();   // program.html: Back closes it (NAV-01)
     }
     function close() {
       if (!root) return;
       root.classList.remove('is-open');
       root.querySelector('.video-modal-frame').innerHTML = '';
       document.body.style.overflow = '';
+      if (typeof window.navSync === 'function') window.navSync();
     }
     return { open, close };
   })();
