@@ -13,8 +13,11 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
 
   python3 scripts/check_program.py data/<id>.json [options]
 
-  --log FILE      the coaching-log entry with the per-exercise volume table (| Day | Exercise |
-                  Sets | Counts toward |). Needed for the floors and the back-to-back check.
+  --tables FILE   write the two volume tables and the per-day load (markdown) to FILE: they are the
+                  coaching log's Volume & Dose section, pasted as written. Counted from each
+                  exercise's Spine credits and cost (stage39), so it needs --spine. The volume
+                  checks themselves (floors, over 20, per-session, flat week, back-to-back) run
+                  whenever --spine is given. (--log, the hand-typed table this replaced, is retired.)
   --floor         the programme's aim is to get strong and build muscle (Amir, 2026-09-26:
                   "that rule is based on science of hypertrophy, for athletes, do what is best
                   for them"): every major muscle (quads, hamstrings, glutes, back, chest,
@@ -36,8 +39,8 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
   --spec FILE     the design spec: its fallback lines are scanned for banned words too
   --week DAYS     the example week, e.g. "Sat:1,Sun:2,Mon:3,Wed:4" (back-to-back check); without it,
                   the spec's "week: ..." line is used
-  --spine FILE    the saved result of --spine-sql: the Spine gate, the Quality Map, "weighted"
-                  for the 8-rep rule, and (from last cycle and the Exercise Ledger in the same
+  --spine FILE    the saved result of --spine-sql: the Spine gate, the volume count, the Quality
+                  Map, "weighted" for the 8-rep rule, and (from last cycle and the Exercise Ledger in the same
                   result) the continuity checks: kept accessories, a kept dose that didn't move,
                   a Disliked / Pain-flagged / Banned exercise back. The spec's "keep:" and
                   "reintroduce:" lines name the ones kept or brought back on purpose, with reasons
@@ -108,9 +111,6 @@ def secs(v):
 def metres(v):
     m = re.match(r'^\s*(\d+(?:\.\d+)?)\s*m\b', str(v or ''))
     return float(m.group(1)) if m else None
-
-def dose_of(rx):
-    return next((k for k in ('reps', 'time', 'distance', 'work') if rx.get(k) not in (None, '')), None)
 
 # ── walking the programme ──────────────────────────────────────────────────────
 def exercises(data):
@@ -526,79 +526,112 @@ def check_time(data, args):
         if mins > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)", 'SES-7')
         else: info(line)
 
-# ── volume, from the coaching log's per-exercise table ────────────────────────
-def parse_volume(path):
-    rows, cur, lines = [], None, open(path, encoding='utf-8').read().splitlines()
-    for line in lines:
-        if line.startswith('|') and re.search(r'counts toward', line, re.I):
-            cur = []; rows = cur  # keep only the LAST such table (the newest cycle)
-            continue
-        if cur is None: continue
-        if not line.startswith('|'):
-            if cur: cur = None
-            continue
-        cells = [c.strip() for c in line.strip().strip('|').split('|')]
-        if len(cells) < 4 or set(cells[0]) <= set('-: '): continue
-        sets = num(cells[2])
-        if sets is None: continue
-        parts = []
-        for p in re.split(r'[·;,]', cells[3]):
-            m = re.match(r'^\s*([A-Za-z][A-Za-z /-]*?)\s+(\d+(?:\.\d+)?)\s*(?:\(\s*[x×]\s*(\d+(?:\.\d+)?)\s*\))?', p)
-            if m: parts.append((m.group(1).strip(), float(m.group(2)), float(m.group(3) or 1)))
-        cur.append({'day': cells[0], 'name': re.sub(r'\s*\(.*?\)\s*$', '', cells[1]).strip(), 'sets': sets, 'parts': parts})
-    return rows
+# ── volume, counted from each exercise's Spine credits (2026-09-26) ───────────
+# VOL-10's count (1 prime mover, 0.5 synergist) and VOL-2's cost live ONCE, on the exercise's Spine
+# entry (exercise_coach.credits and .cost, stage39), and this script does the arithmetic. Until then
+# every cycle's two tables were typed by hand in the coaching log and only checked here, and the same
+# exercise was counted differently in different logs (an RDL's glutes at 1 in one, 0.5 in another).
+# The muscle list must match public.spine_credits_ok(), SPINE_MUSCLES in coach.html and MUSCLES in
+# .claude/skills/spine/draft_sql.py.
+MUSCLES = ('quads', 'hamstrings', 'glutes', 'adductors', 'calves', 'shins', 'peroneals', 'back', 'chest',
+           'shoulder', 'biceps', 'triceps', 'forearm', 'core', 'neck')
+COST = {'heavy': 1.5, 'moderate': 1.0, 'isolation': 0.5, 'none': 0.0}  # per working set (VOL-2)
 
 def norm_muscle(m):
     m = m.lower().strip()
     return MUSCLE_ALIAS.get(m, m)
 
-def check_volume(data, args):
-    rows = parse_volume(args.log)
-    if not rows:
-        fail(f"{args.log}: no per-exercise volume table (| Day | Exercise | Sets | Counts toward |)", 'VOL-10'); return {}
-    prog, loaded = {}, {}
+def compute_volume(data, spine):
+    """The per-exercise rows, the weekly total per muscle, each day's sets per muscle (and direct sets,
+    weight 1 only), each day's working sets and cost-weighted load, and the entries missing a count."""
+    v = {'rows': [], 'total': {}, 'day': {}, 'direct': {}, 'load': {}, 'sets': {}, 'nocredit': set(), 'nocost': set()}
     for d, b, ex, it in exercises(data):
-        o = it or ex
         if not it and ex.get('type') == 'circuit': continue
+        o, day = it or ex, str(d.get('id'))
+        e = spine.get(o.get('exId') or '')
+        if not e: continue  # no entry: the Spine gate already fails it (NAM-9)
+        prep = bool(PREP.search(b.get('title') or ''))
         rx = o.get('rx') or {}
+        v['load'].setdefault(day, 0.0); v['sets'].setdefault(day, 0.0)
         sets = round_count(ex) if it else (num(rx.get('sets')) or 1)
-        prog.setdefault(o.get('name', '').lower(), []).append((d.get('id'), sets, bool(PREP.search(b.get('title') or ''))))
-        if (not it and ex.get('type') == 'standard' and not PREP.search(b.get('title') or '')
-                and rx.get('tempo') and dose_of(rx) in ('reps', 'time')):
-            loaded[o.get('name', '').lower()] = (d.get('id'), o.get('name'))
-    total, per_day, listed = {}, {}, set()
-    for r in rows:
-        key = r['name'].lower(); listed.add(key)
-        if key not in prog:
-            fail(f"volume table lists '{r['name']}', which the programme does not have", 'VOL-10'); continue
-        if not any(abs(s - r['sets']) < 0.01 for _, s, _ in prog[key]):
-            fail(f"volume table: '{r['name']}' at {r['sets']:g} sets, the programme has {', '.join(f'{s:g}' for _, s, _ in prog[key])}", 'VOL-10')
-        dm = re.match(r'D(?:ay)?\s*(\d+)', r['day'], re.I)
-        if dm and all(str(day) != dm.group(1) for day, _, _ in prog[key]):
-            warn(f"volume table: '{r['name']}' filed under {r['day']}, the programme has it on Day {prog[key][0][0]}", 'VOL-10')
-        for m, n, w in r['parts']:
-            if abs(n - r['sets'] * w) > 0.01:
-                fail(f"volume table: '{r['name']}' {m} {n:g} should be {r['sets'] * w:g} ({r['sets']:g} sets x {w:g})", 'VOL-10')
-            mm = norm_muscle(m)
-            total[mm] = total.get(mm, 0) + n
-            if dm: per_day.setdefault(dm.group(1), {}).setdefault(mm, 0); per_day[dm.group(1)][mm] += n
-    for key, (day, name) in loaded.items():
-        if key not in listed: fail(f"Day {day} {name}: a loaded exercise missing from the volume table (count every exercise that loads a muscle)", 'VOL-10')
+        if e.get('credits') is None: v['nocredit'].add(o.get('exId'))
+        else:
+            # Warm-up and activation work counts toward nothing but core (VOL-10).
+            parts = {m: w for m, w in e['credits'].items() if m == 'core' or not prep}
+            if parts: v['rows'].append((day, prep, o.get('name'), sets, parts))
+            for m, w in parts.items():
+                v['total'][m] = v['total'].get(m, 0) + sets * w
+                dd = v['day'].setdefault(day, {}); dd[m] = dd.get(m, 0) + sets * w
+                if w == 1: dr = v['direct'].setdefault(day, {}); dr[m] = dr.get(m, 0) + sets
+        if prep: continue
+        c = COST.get(e.get('cost') or '')
+        if c is None: v['nocost'].add(o.get('exId')); continue
+        n = round_count(ex) if it else qm_sets(rx)  # a 30-min ride is 3 sets, as in the Quality Map
+        v['load'][day] += n * c; v['sets'][day] += n
+    return v
+
+def check_volume(data, args, spine):
+    v = compute_volume(data, spine)
+    if v['nocredit']:
+        fail(f"no muscle credits on the Spine entr{'y' if len(v['nocredit']) == 1 else 'ies'} {', '.join(sorted(v['nocredit']))}, "
+             "so the volume count leaves them out: add them with /spine (Upkeep). A --spine file saved before "
+             "2026-09-26 has no credits at all: run --spine-sql again", 'VOL-10')
+    if v['nocost']:
+        warn(f"no cost tier on {', '.join(sorted(v['nocost']))}, so the day's load leaves them out: add it with /spine", 'VOL-2')
     # The 10-set floor is hypertrophy science, so it binds a programme whose aim is strength and
     # muscle, man or woman; a sport-performance athlete gets what is best for them (Amir,
     # 2026-09-26). --floor switches it on; floor-except names a muscle excused for a stated reason.
-    excused = floor_excused(args)
+    total, excused = v['total'], floor_excused(args)
     for mm in sorted(total, key=lambda k: -total[k]):
-        v = total[mm]
-        if args.floor and mm in MAJOR and v < 10:
-            if mm in excused: info(f"{mm} {v:g} sets/week: under 10, excused (floor-except)")
-            else: fail(f"{mm} {v:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)", 'VOL-4')
-        elif v > 20: warn(f"{mm} {v:g} sets/week: over 20", 'VOL-3')
-        elif mm == 'shoulder' and v < 10: warn(f"shoulder {v:g} sets/week: under the usual 10-20", 'VOL-7')
-        else: info(f"{mm} {v:g} sets/week")
+        n = total[mm]
+        if args.floor and mm in MAJOR and n < 10:
+            if mm in excused: info(f"{mm} {n:g} sets/week: under 10, excused (floor-except)")
+            else: fail(f"{mm} {n:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)", 'VOL-4')
+        elif n > 20: warn(f"{mm} {n:g} sets/week: over 20", 'VOL-3')
+        elif mm == 'shoulder' and n < 10: warn(f"shoulder {n:g} sets/week: under the usual 10-20", 'VOL-7')
+        else: info(f"{mm} {n:g} sets/week")
     for mm in MAJOR:
-        if args.floor and mm not in total and mm not in excused: fail(f"{mm}: 0 sets/week (not in the volume table)", 'VOL-4')
-    return per_day
+        if args.floor and mm not in total and mm not in excused:
+            fail(f"{mm}: 0 sets/week (nothing on the programme counts toward it)", 'VOL-4')
+    # About 10 direct sets on one muscle in a session is the most that pays; spread the rest (VOL-3).
+    for day, dr in sorted(v['direct'].items(), key=lambda kv: day_order(kv[0])):
+        for m, n in sorted(dr.items()):
+            if n > 10: warn(f"Day {day}: {n:g} direct sets on {m} in one session, past about 10: spread them over the week", 'VOL-3')
+    # Undulate the week: one peak, one or two moderate, one low day, never flat (VOL-2).
+    loads = {d: x for d, x in v['load'].items() if x > 0}
+    if len(loads) >= 3 and max(loads.values()) < 1.2 * min(loads.values()):
+        warn(f"a flat week: every day's load is {min(loads.values()):g} to {max(loads.values()):g}. Give each day a load "
+             "identity (one peak, one or two moderate, one low)", 'VOL-2')
+    if v['load']:
+        info('day load (working sets x cost: heavy 1.5, moderate 1, isolation 0.5): ' + ' · '.join(
+            f"Day {d} {round(v['load'][d], 1):g} from {round(v['sets'][d], 1):g} sets" for d in sorted(v['load'], key=day_order)))
+    if args.tables:
+        open(args.tables, 'w', encoding='utf-8').write(volume_tables(v, excused))
+        info(f"volume tables written to {args.tables}: paste them into the log's Volume & Dose section as they are")
+    return v['day']
+
+def day_order(d): return (0, int(d)) if str(d).isdigit() else (1, str(d))
+
+def volume_tables(v, excused):
+    """VOL-10's two tables and VOL-2's day loads, as markdown for the coaching log."""
+    def cells(sets, parts):
+        return ' · '.join(f"{m.title()} {sets * w:g}" + ('' if w == 1 else f" (×{w:g})")
+                          for m, w in sorted(parts.items(), key=lambda kv: (-kv[1], MUSCLES.index(kv[0]) if kv[0] in MUSCLES else 99)))
+    L = ['| Day | Exercise | Sets | Counts toward |', '|---|---|---|---|']
+    for day, prep, name, sets, parts in v['rows']:
+        L.append(f"| D{day}{' prep' if prep else ''} | {name} | {sets:g} | {cells(sets, parts)} |")
+    L += ['', '| Muscle | Sets/week | Range | Verdict |', '|---|---|---|---|']
+    order = lambda k: (-v['total'].get(k, 0), MUSCLES.index(k) if k in MUSCLES else 99)
+    for m in sorted(set(v['total']) | set(MAJOR), key=order):
+        n = v['total'].get(m, 0)
+        if m in MAJOR:
+            verdict = 'over 20' if n > 20 else 'in range' if n >= 10 else 'under 10, excused (floor-except)' if m in excused else 'under 10'
+            L.append(f"| {m.title()} | {n:g} | 10–20 | {verdict} |")
+        else: L.append(f"| {m.title()} | {n:g} | | |")
+    L += ['', '| Day | Working sets | Load (sets × cost) |', '|---|---|---|']
+    for day in sorted(v['load'], key=day_order):
+        L.append(f"| D{day} | {round(v['sets'][day], 1):g} | {round(v['load'][day], 1):g} |")
+    return '\n'.join(L) + '\n'
 
 def floor_excused(args):
     """Major muscles excused from --floor: --floor-except plus every 'floor-except:' line."""
@@ -658,6 +691,13 @@ def load_context(path):
         if len(p) >= 9:
             e.update(pattern=p[4] or None, impact=p[5] or None, equipment=[x for x in p[6].split(';') if x],
                      name=p[7], aliases=[x for x in p[8].split(';') if x])
+        # Muscle credits and cost (stage39): '' = never set, 'none' = counts toward nothing.
+        e['credits'], e['cost'] = None, None
+        if len(p) >= 11:
+            if p[9] == 'none': e['credits'] = {}
+            elif p[9]:
+                e['credits'] = {norm_muscle(k): float(w) for k, w in (x.split(':') for x in p[9].split(',') if ':' in x)}
+            e['cost'] = p[10] or None
         spine[p[0]] = e
     return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile}
 
@@ -922,11 +962,15 @@ def spine_sql(data):
     print(f"""-- Run once, save the raw result to the scratchpad, pass it as --spine. Missing ids = no entry.
 -- It also returns the athlete's live programme BEFORE this build (prev: the cycle just trained),
 -- their Exercise Ledger and their stored athlete profile (2026-09-26). Read-only, one call.
+-- Each Spine line ends with the entry's muscle credits and cost, which the volume count reads.
 select
  (select string_agg(e.id || '|' || e.status || '|' || (e.cues is not null)::text || '|' || array_to_string(e.qualities, ',')
      || '|' || coalesce(e.pattern, '') || '|' || coalesce(e.impact, '') || '|' || array_to_string(e.equipment, ';')
-     || '|' || e.name || '|' || array_to_string(e.aliases, ';'), E'\\n' order by e.id)
-  from public.exercises e where e.id in ({idlist})) as spine,
+     || '|' || e.name || '|' || array_to_string(e.aliases, ';')
+     || '|' || coalesce(case when c.credits = '{{}}'::jsonb then 'none' else
+          (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end, '')
+     || '|' || coalesce(c.cost, ''), E'\\n' order by e.id)
+  from public.exercises e left join public.exercise_coach c using (id) where e.id in ({idlist})) as spine,
  (select jsonb_build_object('cci', coalesce((p.data->>'currentCycleIndex')::int, 0), 'days',
     (select jsonb_agg(jsonb_build_object('id', d->'id', 'blocks',
        (select jsonb_agg(jsonb_build_object('t', b->>'title', 'x',
@@ -968,7 +1012,8 @@ def fingerprint(data, athlete_id):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('program')
-    ap.add_argument('--log'); ap.add_argument('--new', action='store_true')
+    ap.add_argument('--tables'); ap.add_argument('--new', action='store_true')
+    ap.add_argument('--log', help=argparse.SUPPRESS)  # retired 2026-09-26: the tables are counted, not typed
     ap.add_argument('--floor', action='store_true'); ap.add_argument('--floor-except')
     ap.add_argument('--proven', action='store_true'); ap.add_argument('--no-backoff', action='store_true')
     ap.add_argument('--female', action='store_true', help=argparse.SUPPRESS)  # retired 2026-09-26
@@ -983,6 +1028,9 @@ def main():
     if args.fingerprint: fingerprint(data, athlete_id); return 0
     if args.female:
         warn('--female is retired and did nothing: pass --floor only when the aim is strength and muscle (any athlete, any sex)')
+    if args.log:
+        warn('--log is retired and was not read: the volume tables are counted from the Spine credits now '
+             '(pass --spine, and --tables FILE to get them for the log)')
     # A first cycle is a new athlete's, whatever the command line remembered (2026-09-26: a
     # forgotten flag used to skip the new-athlete rules without a word).
     if not args.new and (data.get('currentCycleIndex') or 0) == 0:
@@ -1004,12 +1052,12 @@ def main():
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
     check_week_notes(data, args)
     check_bans(data, args); check_time(data, args)
-    per_day = check_volume(data, args) if args.log else {}
-    if not args.log: warn('no --log: the volume floors and back-to-back days were not checked')
+    per_day = check_volume(data, args, ctx['spine']) if args.spine else {}
     check_week(data, args, per_day)
     if args.spine:
         check_spine(data, args, ctx['spine']); check_continuity(data, args, ctx)
-    else: warn('no --spine: the Spine gate, the Quality Map and the continuity checks were not run (run --spine-sql)')
+    else: warn('no --spine: the Spine gate, the volume count (floors, tables, day loads, back-to-back days), '
+               'the Quality Map and the continuity checks were not run (run --spine-sql)')
     for level in ('FAIL', 'WARN', 'INFO'):
         for m in out[level]: print(f"{level:4}  {m}")
     print(f"\n{athlete_id}: {len(out['FAIL'])} FAIL · {len(out['WARN'])} WARN")

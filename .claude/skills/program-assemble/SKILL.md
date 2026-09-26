@@ -226,15 +226,19 @@ count and what landed on the cards differ, which is how a dropped or invented on
 ## Step 3 — Check: `--stage build` in Part A, the full run in Part B (do not skip)
 - **`scripts/check_program.py`: the house rules, as a script** (2026-09-25; Python, plus node for
   the app's own rx and Because rules, so it runs on Amir's PC too). It reads the built file, the
-  design's volume table and the spec:
+  spec and the Spine file, whose lines carry each exercise's muscle credits and cost, so it
+  **counts the volume itself** (2026-09-26: the hand-typed table and `--log` are retired):
   ```
   python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
   # save the query's raw result as-is (the JSON the tool returns loads directly), then:
-  python3 scripts/check_program.py data/<id>.json --stage build --log <scratch>/log_entry.md --spec <scratch>/spec.md \
-      --spine <scratch>/spine_<id>.json
+  python3 scripts/check_program.py data/<id>.json --stage build --spec <scratch>/spec.md \
+      --spine <scratch>/spine_<id>.json --tables <scratch>/volume_<id>.md
   # Part B: the same command without --stage build (the default is the full run). Re-run
   # --spine-sql only if Part B added an exercise; the saved result is still good otherwise.
   ```
+  `--tables` writes the log's Volume & Dose tables (per exercise, per muscle, per-day load); Step 5
+  pastes the file from the LAST run. A count that looks wrong is its Spine entry's (fix it via /spine
+  Upkeep, a proposal on an approved entry), never a hand edit of the table.
   **The spec sets the flags**: its athlete profile turns on `--floor` (aim: strength-muscle),
   `--proven`, the bans, `floor-except` and the cap; its `week:` line turns on the back-to-back
   check; a first cycle switches the new-athlete rules on by itself. Type a flag only to override
@@ -364,12 +368,11 @@ The athlete app never reads the log. The entry template is /program-design's COA
 - Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
   A `## Debrief — Cycle NN …` section (the end-of-cycle review) may sit between two cycle sections:
   it is not a cycle section, never edit or move it, and append the new cycle after it.
-- **⚖️ The Volume & Dose section must carry BOTH set-count tables** — the per-exercise
-  contribution table (day · exercise · sets · what it counts toward, fractions shown) *and* the
-  per-muscle total against its goal range. Standing order from Amir (2026-09-08): *"whenever you
-  calculate the sets, add that table to the athlete coaching log so i can see."* If /program-design
-  handed over only the summary table, build the per-exercise one here rather than shipping without
-  it. Counting convention: VOL-10.
+- **⚖️ The Volume & Dose section carries BOTH set-count tables and the day loads** — standing
+  order from Amir (2026-09-08): *"whenever you calculate the sets, add that table to the athlete
+  coaching log so i can see."* They are the file Step 3's last run wrote with `--tables`: replace
+  the design's `<the checker's tables>` line with it, as written, above the design's framing lines.
+  Counting convention: VOL-10.
 - **⚖️ The athlete profile — write this cycle's, in place (2026-09-26).** The spec opens with
   the current ```` ```profile ```` block; it goes into the log as the `## Athlete profile` section,
   right after the header and before the Exercise Ledger, **replacing** the old one (like the

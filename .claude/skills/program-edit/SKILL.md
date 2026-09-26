@@ -164,30 +164,26 @@ Never collapse Primary + Accessory into one "Strength" block.
 
 ### Rule 4 — Set / muscle review AND per-day load before changing load
 
-Two tallies, both before touching any numbers and both shown to Amir for sign-off.
+Both before touching any numbers, and both shown to Amir for sign-off. **The checker counts them;
+never tally by hand** (2026-09-26): save the live row to `<scratch>/<id>.json`, run
+`python3 scripts/check_program.py <scratch>/<id>.json --spine-sql`, run the query it prints and save
+the result, then `python3 scripts/check_program.py <scratch>/<id>.json --stage build --spine <result>
+--tables <scratch>/volume_<id>.md`. The file is the audit's VOLUME section: the per-exercise table
+(each exercise counted from its Spine entry's credits, VOL-10), the weekly total per muscle against
+10–20, and each day's cost-weighted load (VOL-2). Run it again on the edited programme so Amir sees
+before and after.
 
-**4a. Weekly sets per muscle** — tally and present. Targets for a foundation/beginner cycle (adjust upward in later cycles):
-- Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
-- Small muscles (biceps, triceps): 6–12 sets/week. **Shoulder is ONE muscle group on the 10–20 range** (VOL-7)
-- Core: count every set regardless of where it sits — activation circuit rounds count as sets just like Primary/Accessory block sets
+**4a. Weekly sets per muscle.** Flag anything very low (chest at 3 sets) **or over the ceiling**
+(VOL-3); shoulder is one group (VOL-7). Small muscles (biceps, triceps): 6–12 sets/week in a
+foundation cycle, higher later. A missing machine is never a reason to bend the programme:
+clear the 10-set floor with what the gym has (VOL-4, when the aim is strength and muscle).
 
-**⚖️ COUNT EVERY EXERCISE THAT LOADS THE MUSCLE, NOT JUST THE ISOLATION WORK.** An RDL is
-hamstring volume; a row is back volume and half a set of biceps. Scoring isolation-only makes a
-well-trained muscle read under-dosed and then contorts the programme around a number that was
-never true. **1.0** prime mover · **0.5** significant synergist or prime mover in a shortened /
-partial range · **0** stabiliser. Warm-up and activation circuits don't count (except core).
-Full convention + the worked example: VOL-10 and its story.
-
-Flag anything very low (chest at 3 sets) **or over the ceiling** — the fractional count surfaces
-over-dosing that a direct-only count hides. A missing machine is never a reason to bend the
-programme: clear the 10-set floor with what the gym has.
-
-**4b. Per-day load distribution** — raw set count lies, so weight each working set by systemic cost (**heavy compound ×1.5, moderate compound ×1.0, isolation ×0.5**) and tally the cost-weighted load per day. Then check:
-- Does each day have a deliberate **load identity**, and does the week **undulate** (one peak / one–two moderate / one low day) — or is it four flat "RPE 6, everything matters" days?
+**4b. Per-day load distribution** (VOL-2). Read the day loads:
+- Does each day have a deliberate **load identity**, and does the week **undulate** (one peak / one–two moderate / one low day) — or is it four flat "RPE 6, everything matters" days? The checker warns on a flat week.
 - Do two high-load days for the **same pattern** sit back-to-back (e.g. heavy hinge on consecutive days)?
-- Is any day a **grind** (≫6 working exercises) — a long session spikes cortisol even at low RPE, which matters most for poor-recovery clients.
+- Is any day a **grind** (7 or more working exercises)? The checker warns on it.
 
-For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the cost-weighted table and a recommended undulation before proposing changes (VOL-2).
+For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the day loads and a recommended undulation before proposing changes.
 
 ## Step 2 — Present the audit
 
@@ -205,27 +201,8 @@ STRUCTURAL
 - Day 1 Movement Drills block: remove (forward skip, lateral step-touch — gym session)
 - Day 3 core exercises (dead bug, bird dog) in prep circuit: move to end
 
-VOLUME — per-exercise contribution (the working)
-| Day | Exercise            | Sets | Counts toward                    |
-|-----|---------------------|------|----------------------------------|
-| D2  | Barbell Hip Thrust  | 4    | Glutes 4, Hamstrings 2 (x0.5)    |
-| D3  | DB Romanian Deadlift| 4    | Hamstrings 4, Glutes 2 (x0.5)    |
-...
-
-VOLUME — per muscle / week
-| Muscle     | Sets | Goal  | Verdict |
-|------------|------|-------|---------|
-| Glutes     | 22   | 10-20 | OVER    |
-| Hamstrings | 14.5 | 10-20 | in range|
-| Chest      | 3    | 10-20 | under (deliberate — posture) |
-...
-
-PER-DAY LOAD (cost-weighted)
-| Day | Identity      | Sets | Weighted load | Peak RPE |
-|-----|---------------|------|---------------|----------|
-| 1   | Lower squat   | 15   | 16.5          | 6        |
-| 2   | Upper         | 21   | 16.5 (grind)  | 6        |
-| 4   | Glute (peak)  | 13   | 13.5          | 7        |
+VOLUME — the checker's --tables file, as written (per exercise, per muscle, per-day load)
+→ Glutes 22: over 20. Chest 3: under by design (posture, VOL-9)
 → Recommend: 4 = peak, 1 = mod-high, 2 = moderate (trim), 3 = low day
 
 PROPOSED CHANGES

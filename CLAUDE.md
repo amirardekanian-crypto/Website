@@ -35,7 +35,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   restating (PRC-23). `scripts/check_rule_index.py` (pre-commit) keeps the index, its stories, the
   checker and every cited ID in agreement. Design reads the whole file; engage and the reviewers read
   the index and their own sections.
-- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. Every FAIL and WARN it prints names its rule ID. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (PRC-4).
+- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: the volume count (both log tables and the day loads, counted from each exercise's Spine credits since 2026-09-26), floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. Every FAIL and WARN it prints names its rule ID. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (PRC-4).
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` (data prep only since 2026-09-26: the new athlete's intake form, and the Gmail session import /cycle-report runs first) — the coaching pipeline (intake → roadmap → design → assemble **Part A** (build + every programming check) → engage → assemble **Part B** (words, full check, publish) → **`/cycle-report`** at the end of every cycle: the athlete's WhatsApp report plus a coach-only `## Debrief` section in their coaching log, which `/program-design` reads before the next cycle). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
   written from coach.html (it used to be `.claude/coaching-log/*.md`, in this public repo).
 
@@ -72,7 +72,8 @@ done when the program is done"*). Whether it is `/program-assemble` (a new cycle
 1. **Spine upkeep** (`/spine` → Upkeep): every exercise has an entry; empty fields filled; aliases
    added for new spellings; `exId` stamped on every card; a new exercise linked to its
    regressions, progressions and alternatives from both sides; **body parts** (`loads` + `impact`)
-   filled on any entry that lacks them; general cues from the design pass applied to drafts, proposed for approved.
+   and the **count** (`credits` + `cost`, coach-only, stage39) filled on any entry that lacks them;
+   general cues from the design pass applied to drafts, proposed for approved.
 2. **Qualities**: every exercise tagged, **from the ten only** (drafts directly, approved entries as
    `suggested_qualities` for Amir to accept), so no day card goes blank.
 3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
@@ -122,7 +123,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   numbers and nothing errors.** `rxOf()`/`repCount()`/`tempoWords()` (program.html + `assets/js/chips.js`,
   guarded by `scripts/check_rx.js`) · the Quality mix and its minutes rule (`qualityMix()`, `qualityCheckC()`,
   `/program-design`, `check_program.py`) · the Spine resolver (`spineFor()` / `spineForC()`) · the body-part
-  region and impact lists (four copies) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
+  region and impact lists (four copies) · the muscle list of the Spine's volume credits (four copies:
+  `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
   `parseSetText()`) · the Ceiling rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its two write
   doors (`paintCeilingForm()` mirrors `paintFromFields()`).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:

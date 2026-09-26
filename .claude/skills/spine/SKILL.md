@@ -18,9 +18,9 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
    **A newly prescribed exercise is added in full, never dropped from the programme** (Amir,
    2026-09-25: *"it should be added to our library, with all the cues and other details like the
    ones already there"*): every field below, links both ways, not a bare name with cues.
-2. **The coach-only half never enters this repo.** `sfr` and `flags` (restriction flags) live in
-   `public.exercise_coach`. The repo is PUBLIC. Write the batch file in the **scratchpad**; only the
-   SQL goes to the database.
+2. **The coach-only half never enters this repo.** `sfr`, `flags` (restriction flags), `credits`
+   and `cost` live in `public.exercise_coach`. The repo is PUBLIC. Write the batch file in the
+   **scratchpad**; only the SQL goes to the database.
 3. **An entry's cues are THE cues, for every athlete** (Amir, 2026-09-24: *"the aim is to use these
    cues for all the exercises that everyone has from now on"*). Programmes stop carrying cues, so
    the entry is what every card shows. Exactly **2 good + 1 bad** (external, internal, avoid), and
@@ -72,7 +72,8 @@ the existing ids for the links, and they show you which names are only variants.
 
 **3. Write the batch** to `<scratchpad>/spine_batchN.json`, as a list of objects with these fields:
 `id` (kebab-case, the name slugged), `name` (as programmes spell it), `aliases`, `pattern`,
-`purpose`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`.
+`purpose`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`,
+`credits`, `cost`.
 - **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
   sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
   wherever it fits, so Library → Exercises groups it with its family. **Never a new pattern**: the
@@ -129,6 +130,23 @@ the existing ids for the links, and they show you which names are only variants.
 - **sfr:** 1 = best stimulus-to-fatigue in its pattern. Use `null` for prep, drills and plyos.
 - **flags:** only from `FLAGS` in the tool (`loaded-knee-flexion`, `axial-load`, `free-hinge`,
   `overhead`, `high-impact`). If you need a new one, that is Amir's decision. Ask him first.
+- **credits + cost = the count** (stage39, 2026-09-26). `scripts/check_program.py` counts every
+  programme's volume tables and day loads from them, so a new entry without them FAILs the check.
+  - `credits`: what ONE working set counts toward, VOL-10's convention: `1` prime mover, `0.5`
+    significant helper or shortened range, a muscle left out = 0. Muscles, and only these:
+    `quads · hamstrings · glutes · adductors · calves · shins · peroneals · back · chest · shoulder ·
+    biceps · triceps · forearm · core · neck`. `{}` for work that builds no muscle volume (a
+    stretch, a drill, a sprint, a jump, a ride). Calibrate on the family already in the Spine:
+    squat = `quads 1, glutes 0.5`; lunge and split squat = `quads 1, glutes 1`; RDL and back
+    extension = `hamstrings 1, glutes 1`; hip thrust and bridge = `glutes 1, hamstrings 0.5`; row and
+    pulldown = `back 1, biceps 0.5`; face pull and pull-apart = `back 1, shoulder 0.5` (VOL-7:
+    retraction is back); rear-delt fly and lateral raise = `shoulder 1`; press = `chest 1, shoulder
+    0.5, triceps 0.5`; overhead press = `shoulder 1, triceps 0.5`; half-kneeling single-arm = add
+    `core 0.5`; plank, Pallof, carry = `core 1`. The same movement on other kit gets the same count.
+  - `cost`: the systemic cost of one working set (VOL-2): `heavy` (×1.5: barbell squat, deadlift,
+    RDL, bench, leg press, hack squat), `moderate` (×1: dumbbell, cable and machine compounds, rows,
+    presses, carries, jumps, sprints, conditioning), `isolation` (×0.5: single-joint work, core,
+    bodyweight drills done as sets), `none` (×0: stretches, mobility, walking, technique drills).
 
 **4. Generate and check.**
 Save the ids from `select id from public.exercises order by 1` to
@@ -138,7 +156,8 @@ python3 .claude/skills/spine/draft_sql.py <scratchpad>/spine_batchN.json <scratc
 ```
 The tool refuses the batch (exit 1, one line per problem) if it finds any of these: an id that
 already exists, a link to an id that doesn't exist, an unknown pattern, flag or quality, a
-self-link, or an entry with no qualities or more than three. Fix the problems and run it again. A new
+self-link, an entry with no qualities or more than three, or no `credits`/`cost` (or a muscle not
+on the list, a credit other than 1 or 0.5). Fix the problems and run it again. A new
 draft whose name matches one in `legacy_videos.json` (the videos the retired Notion list held under names
 no entry carries) gets that video; every other video is added in coach.html → Exercises.
 
@@ -175,7 +194,8 @@ with ex as (
   where p.athlete_id = '<id>' and not (e ? 'items' and i is null)),
 hit as (
   select ex.*, x.id, x.status, x.aliases, x.video, x.cues, x.purpose, x.tennis, x.equipment,
-         x.loads, x.impact, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities
+         x.loads, x.impact, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities,
+         c.credits, c.cost
   from ex left join public.exercises x
     on x.id = ex.exid or lower(x.name) = lower(ex.nm)
        or lower(ex.nm) = any(select lower(a) from unnest(x.aliases) a)
@@ -193,6 +213,7 @@ select nm, id, status,
     case when id is not null and (cardinality(loads) = 0 or impact is null) then 'body parts (loads + impact)' end,
     case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'links' end,
     case when id is not null and cardinality(qualities) = 0 and cardinality(coalesce(suggested_qualities, '{}')) = 0 then 'qualities' end,
+    case when id is not null and (credits is null or cost is null) then 'count (credits + cost)' end,
     case when id is not null and exid is null then 'exId on the card' end,
     case when id is not null and sfr is null then 'sfr?' end], null) gaps
 from hit order by (id is null) desc, status, nm;
@@ -207,6 +228,7 @@ no SFR. Answer them once and they stop mattering.
 | **Empty field** (video, alias, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
 | **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). Since stage37 every entry has both, so a gap here is a new exercise or one somebody cleared |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
+| **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: no phone reads them, and without them the checker FAILs every programme that uses the entry. **Changing** a count already there is a proposal: it changes every athlete's volume tables |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
 - **Alias:** the programme's spelling goes on the entry (rule 4). Never rename the card.
@@ -233,7 +255,7 @@ no SFR. Answer them once and they stop mattering.
 - Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
-`SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · tagged qualities on 3 (2 as suggestions on
+`SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · counts on 2 · tagged qualities on 3 (2 as suggestions on
 approved entries) · linked 2 (regressions/progressions/alternatives) · 3 proposals for you (entry: old → new) ·
 N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 

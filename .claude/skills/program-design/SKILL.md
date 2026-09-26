@@ -50,7 +50,7 @@ You are a colleague, not an interrogator. **Ask Amir when, and only when:**
    a lift, sport-transfer vs SFR, two equally good/safe accessory swaps, 3 vs 4 days.
    Lay out the trade-off in one or two lines and ask his call.
 2. **A decision needs info the brief/roadmap/principles don't contain.** Ask — never invent.
-3. **The Volume & Dose Report flags an under-dose** that's a real choice (accept
+3. **The volume count flags an under-dose** that's a real choice (accept
    maintenance for time, or find the sets).
 
 **Do NOT ask** when a sensible default exists or a principle already settles it — decide,
@@ -139,7 +139,10 @@ change before I build?"* before writing exercises.
              coalesce(array_to_string(e.loads, ','), ''), coalesce(e.impact, '-'),
              coalesce(array_to_string(e.easier, ','), '') || '>' || coalesce(array_to_string(e.harder, ','), '') || '>' ||
              coalesce(array_to_string(e.alts, ','), ''),
-             coalesce(array_to_string(e.aliases, ';'), ''), case when e.video is null then 'novideo' else 'video' end),
+             coalesce(array_to_string(e.aliases, ';'), ''), case when e.video is null then 'novideo' else 'video' end,
+             case when c.credits is null then '-' when c.credits = '{}'::jsonb then 'none' else
+               (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end,
+             coalesce(c.cost, '-')),
              E'\n' order by e.pattern, c.sfr nulls last, e.id)
     from public.exercises e left join public.exercise_coach c using (id)) as spine;
    ```
@@ -164,7 +167,9 @@ change before I build?"* before writing exercises.
      `ctx.row.notes` lists last cycle's card titles. `ctx.sessions.minutes_by_day` is the real
      average session length per day over the last six weeks (STEP 2's time check).
    - `spine` is the whole exercise catalogue, one line per entry, pattern by pattern, best SFR
-     first: `id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video`.
+     first: `id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video|credits|cost`.
+     `credits` is what one working set counts toward (`glutes:0.5,quads:1`; `none` = nothing) and
+     `cost` its day-load tier: size the week's volume with them, since the checker counts from them.
      It replaces the catalogue query under THE SPINE below. Save it to the scratchpad to grep it;
      its first field is also `draft_sql.py`'s existing-ids list. The entry's `name` is not always
      the card's (`Inverted Row (BW)`, whose card says Inverted Row); the card follows its `exId`, so it
@@ -341,14 +346,13 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   3–6 reps, RPE 7–9, rest 2–4′ · Hypertrophy → 6–12, RPE 7–9, 1–2′ · Power → 1–5
   explosive, RPE 6–8, full rest · Endurance/conditioning → 15+ / time. Don't let a Power
   cycle get programmed like hypertrophy.
-- **PER-DAY LOAD DISTRIBUTION (required — not just weekly volume):** give each day a
-  deliberate **load identity** and **undulate the week**. Weight each working set by systemic
-  cost (heavy compound ×1.5, moderate compound ×1.0, isolation ×0.5) to read true per-day
-  load — raw set count lies. Aim for one peak / one–two moderate / one low day, not four flat
-  days. Verify: (1) cost-weighted load per day is intentional, (2) no two high-load days for
-  the same pattern land back-to-back, (3) no session is a grind (≫6 working exercises spikes
-  cortisol even at low RPE). For poor-recovery clients this distribution is the primary lever
-  (VOL-2).
+- **PER-DAY LOAD DISTRIBUTION (required — not just weekly volume, VOL-2):** give each day a
+  deliberate **load identity** and **undulate the week**: one peak / one–two moderate / one low
+  day, not four flat days. Raw set count lies, so read each day by cost (the spine lines' `cost`:
+  heavy ×1.5, moderate ×1, isolation ×0.5). The build check prints every day's load from the same
+  numbers and warns on a flat week. Also: no two high-load days for the same pattern back-to-back,
+  and no grind (7 or more working exercises). For poor-recovery clients this distribution is the
+  primary lever.
 - **Warm-up + prep** on every day: 10–15 minutes (SES-3), its contents by SES-4, and its shape
   by SES-6 (lifting days may repeat rounds; cardio and running days build through distinct
   movements in one pass). Sweep it against every restriction (SEL-11, SEL-18).
@@ -402,8 +406,9 @@ still checked before Amir sees the finished programme, but the three-agent panel
 (PRC-4). The review happens on
 the BUILT programme, in /program-assemble **Part A**, straight after this spec and BEFORE engage
 writes anything (so a fix never leaves notes describing the old programme):
-1. **`scripts/check_program.py`** on the built file, with this spec's volume table (`--log`)
-   and the athlete's bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
+1. **`scripts/check_program.py`** on the built file, with the Spine file (`--spine`: it counts the
+   volume from each exercise's credits and writes both tables with `--tables`) and the athlete's
+   bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
    covers what the old panel mostly found: the 10-set floor (only with `--floor`, when the
    programme's aim is strength and muscle; a sport-performance athlete gets what is best for
    them, Amir 2026-09-26), the 4-set cap (`--proven` once our own logs show the athlete handles
@@ -414,7 +419,7 @@ writes anything (so a fix never leaves notes describing the old programme):
 2. **NEW athlete: ONE reviewer** (one agent, files only) for what a script cannot judge:
    injury logic, exercise choice, transfer, and whether the notes cover every exercise they
    should. **RETURNING athlete: no reviewer** unless Amir asks for one.
-So write the spec for a script to read: every loaded exercise in the volume table, each
+So write the spec for a script to read: each
 banned movement named in one line (`bans: goblet, hanging, …`), every fallback on a line that
 starts `fallback:`, a muscle excused from the floor on `floor-except: chest (posture)`, and the
 two special weeks on `week1:` and `lastweek:` lines. A ban word is matched anywhere on a line holding `fallback`, `→`, `instead`
@@ -681,24 +686,16 @@ freshness, safe to reuse later) unless the brief/Amir flagged it as `Disliked`,
 exercise → `Active`. If nothing changed status this cycle beyond the normal rotate/keep,
 say so in one line rather than omitting the section.
 
-**Volume & Dose** — **TWO tables, both of them, every time.** The counting convention is VOL-10
-(its story has the 1 / 0.5 / 0 table); never score isolation-only.
-
-1. **Per-exercise contribution** — day · exercise · sets · what it counts toward, with the
-   fraction shown where it is not 1.0 (`Glutes 2 (×0.5)`). This is the working, and Amir reads it.
-   **A script reads it too** (`scripts/check_program.py --log`), so keep the shape exact: a
-   markdown table with the header `| Day | Exercise | Sets | Counts toward |`, the day as `D1`
-   (`D1 prep` for core counted in a warm-up), each exercise spelled exactly as on the programme,
-   cells like `Quads 4 · Glutes 2 (×0.5)`. A row the programme doesn't have, a set count that
-   differs, a loaded exercise left out, or `sets × weight` that doesn't add up is a FAIL.
-2. **Per-muscle total** — muscle → sets/week → goal range → verdict (developing / maintaining /
-   under-dosed / over / by-design).
-
-Count **1.0** prime mover · **0.5** significant synergist or shortened-range only · **0**
-stabiliser. Warm-up and activation circuits don't count, except core, which counts wherever it
-sits. Frame a time-limited under-dose as "maintenance," and say where to invest if time allows.
-Flag an **over** as loudly as an under — the fractional count surfaces over-dosing the direct-only
-count used to hide.
+**Volume & Dose** — **the checker writes the tables; nobody types them** (2026-09-26). Part A's
+build check (`check_program.py --tables`) counts every exercise from its Spine entry's credits
+(VOL-10: 1 prime mover, 0.5 helper; warm-ups count only core) and writes the per-exercise table,
+the per-muscle totals against 10–20 and each day's cost-weighted load. /program-assemble pastes
+that file here as written. Leave the line `<the checker's tables>` in your draft, and write only
+what the numbers can't say, in a few lines: a time-limited under-dose framed as maintenance and
+where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL-9, the spec's
+`floor-except:`), an over flagged as loudly as an under (VOL-3), and each day's load identity
+(peak, moderate, low: VOL-2). A count that looks wrong for one exercise is fixed on its Spine
+entry (a proposal to Amir, /spine), never by hand in the log.
 
 **Special weeks** — the week-1 and back-off doses as decided (one line each).
 ```

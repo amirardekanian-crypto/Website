@@ -152,7 +152,8 @@ Idea #1 of `/ideas` round 1 (brief: claude.ai/artifact/WymDKxk58nkCy5eSgodSrU). 
 the exercise database … I just dont want to make my exercise cards busier … the cues should be
 there so we dont write the cues for each exercise everytime."* Server: `supabase/stage31_spine.sql`.
 - **Two tables.** `exercises` (athlete-readable when approved: purpose, pattern, cues, regressions/
-  progressions/alternatives as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags). A separate
+  progressions/alternatives as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags, and since
+  stage39 the muscle `credits` and `cost` tier that `scripts/check_program.py` counts volume from). A separate
   TABLE so no athlete query can ever touch the flags. `get_exercises()` serves **approved rows only**.
 - **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
   (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;

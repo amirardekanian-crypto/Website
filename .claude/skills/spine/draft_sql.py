@@ -7,7 +7,11 @@
 #     "purpose": "...", "tennis": "...", "equipment": [...], "loads": [...regions], "impact": "none",
 #     "easier": [...ids or names], "harder": [...ids or names], "alts": [...ids or names],
 #     "sfr": 3, "flags": ["loaded-knee-flexion"],
+#     "credits": {"quads": 1, "glutes": 0.5}, "cost": "moderate",
 #     "cues": {"good": [ext, int], "bad": [avoid]} }   (optional; written for anyone)
+# credits: what one working set counts toward (VOL-10: 1 prime mover, 0.5 helper; {} = nothing, as
+# for a stretch or a sprint). cost: heavy | moderate | isolation | none (VOL-2). Both required: the
+# checker counts every programme's volume tables and day loads from them (stage39).
 # existing_ids.txt: one id per line, from `select id from public.exercises order by 1`.
 #
 # The batch file carries the coach-only half (sfr, flags), which is why it stays in the scratchpad
@@ -47,6 +51,11 @@ QUALITIES = ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotati
 REGIONS = {'ankle-foot', 'calf-achilles', 'knee', 'hip-groin', 'hamstring', 'low-back', 'trunk',
            'shoulder', 'elbow-forearm-wrist', 'neck'}
 IMPACTS = {'none', 'running', 'plyometric', 'landing'}
+# Muscle credits and cost (stage39). Must match public.spine_credits_ok(), SPINE_MUSCLES in
+# coach.html and MUSCLES in scripts/check_program.py.
+MUSCLES = {'quads', 'hamstrings', 'glutes', 'adductors', 'calves', 'shins', 'peroneals', 'back', 'chest',
+           'shoulder', 'biceps', 'triceps', 'forearm', 'core', 'neck'}
+COSTS = {'heavy', 'moderate', 'isolation', 'none'}
 
 ids = {e['id'] for e in batch}
 known = ids | existing
@@ -72,6 +81,13 @@ for e in batch:
     for r in e.get('loads', []):
         if r not in REGIONS: problems.append(f'{i}: unknown body part {r!r} (one of {sorted(REGIONS)})')
     if e.get('impact') not in IMPACTS: problems.append(f'{i}: impact must be one of {sorted(IMPACTS)}')
+    cr = e.get('credits')
+    if not isinstance(cr, dict): problems.append(f'{i}: no credits (what a working set counts toward, e.g. {{"quads": 1, "glutes": 0.5}}; {{}} for nothing)')
+    else:
+        for m, w in cr.items():
+            if m not in MUSCLES: problems.append(f'{i}: unknown muscle {m!r} in credits (one of {sorted(MUSCLES)})')
+            if w not in (0.5, 1): problems.append(f'{i}: credit {m} {w!r} must be 1 or 0.5')
+    if e.get('cost') not in COSTS: problems.append(f'{i}: cost must be one of {sorted(COSTS)}')
     for k in ('easier', 'harder', 'alts'):
         for x in e.get(k, []):
             # An id must exist; anything not shaped like an id is a plain NAME for an
@@ -93,11 +109,12 @@ for e in batch:
         arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
         # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
         (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null', "'draft'", "'claude-draft'"]) + ')')
-    crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))})")
+    crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))},"
+                f"{q(json.dumps(e['credits']))}::jsonb,{q(e['cost'])})")
 
 print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,impact,easier,harder,alts,qualities,video,cues,status,updated_by) values')
 print(',\n'.join(rows) + '\non conflict (id) do nothing;')
-print('insert into public.exercise_coach (id,sfr,flags) values')
+print('insert into public.exercise_coach (id,sfr,flags,credits,cost) values')
 print(',\n'.join(crow) + '\non conflict (id) do nothing;')
 print("""
 -- Cues: Amir's own wording, from the most recently updated programme that uses each name or alias.
